@@ -595,7 +595,7 @@
         
         
             <div class="itemName expandableItem">
-                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId9928"> 
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId10214"> 
                     
                 </input>
 
@@ -1216,7 +1216,7 @@
         </div>
 
         <div class="extrasDocstring">
-          <p class="class-signature"><code><span class="py-keyword">class</span> <span class="py-defname">MultipartStreamParser</span>(<a href="orionis.http.payload.contracts.stream_parser.IMultipartStreamParser.html" class="internal-link" title="orionis.http.payload.contracts.stream_parser.IMultipartStreamParser">IMultipartStreamParser</a>): <a href="https://github.com/orionis-framework/framework/tree/09b5c2507c66690532315c421f52ebb3edaf6f66/orionis/http/payload/stream_parser.py#L68" class="sourceLink">(source)</a></code></p><p>Constructor: <code><a href="#__init__" class="internal-link" title="orionis.http.payload.stream_parser.MultipartStreamParser.__init__">MultipartStreamParser(stream, boundary, max_files, max_fields, ...)</a></code></p><p><a href="classIndex.html#orionis.http.payload.stream_parser.MultipartStreamParser">View In Hierarchy</a></p>
+          <p class="class-signature"><code><span class="py-keyword">class</span> <span class="py-defname">MultipartStreamParser</span>(<a href="orionis.http.payload.contracts.stream_parser.IMultipartStreamParser.html" class="internal-link" title="orionis.http.payload.contracts.stream_parser.IMultipartStreamParser">IMultipartStreamParser</a>): <a href="https://github.com/orionis-framework/framework/tree/dbaa747abe61f50f5dea7d99d3850214a1e71285/orionis/http/payload/stream_parser.py#L68" class="sourceLink">(source)</a></code></p><p>Constructor: <code><a href="#__init__" class="internal-link" title="orionis.http.payload.stream_parser.MultipartStreamParser.__init__">MultipartStreamParser(stream, boundary, max_files, max_fields, ...)</a></code></p><p><a href="classIndex.html#orionis.http.payload.stream_parser.MultipartStreamParser">View In Hierarchy</a></p>
         </div>
 
         <div class="moduleDocstring">
@@ -1224,7 +1224,7 @@
         </div>
 
         <div id="split-tables">
-          <table class="children sortable" id="id1023">
+          <table class="children sortable" id="id1039">
   
   
   <tr class="method">
@@ -1448,7 +1448,7 @@
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">__init__</span><span class="function-signature long-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">stream: <code><a href="https://docs.python.org/3/library/collections.abc.html#collections.abc.AsyncIterable" class="intersphinx-link">AsyncIterable</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#bytes" class="intersphinx-link">bytes</a>]</code>, </span><span class="rst-sig-param">boundary: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#bytes" class="intersphinx-link">bytes</a></code>, </span><span class="rst-sig-symbol">*, </span><span class="rst-sig-param">max_files: <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code> = <a href="orionis.http.payload.stream_parser.html#_DEFAULT_LIMITS" class="internal-link" title="orionis.http.payload.stream_parser._DEFAULT_LIMITS">_DEFAULT_LIMITS</a>[<wbr></wbr><span class="rst-variable-quote">'</span><span class="rst-variable-string">max_files</span><span class="rst-variable-quote">'</span>], </span><span class="rst-sig-param">max_fields: <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code> = <a href="orionis.http.payload.stream_parser.html#_DEFAULT_LIMITS" class="internal-link" title="orionis.http.payload.stream_parser._DEFAULT_LIMITS">_DEFAULT_LIMITS</a>[<wbr></wbr><span class="rst-variable-quote">'</span><span class="rst-variable-string">max_fields</span><span class="rst-variable-quote">'</span>], </span><span class="rst-sig-param">max_part_size: <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code> = <a href="orionis.http.payload.stream_parser.html#_DEFAULT_LIMITS" class="internal-link" title="orionis.http.payload.stream_parser._DEFAULT_LIMITS">_DEFAULT_LIMITS</a>[<wbr></wbr><span class="rst-variable-quote">'</span><span class="rst-variable-string">max_part_size</span><span class="rst-variable-quote">'</span>], </span><span class="rst-sig-param">memory_threshold: <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code> = <a href="orionis.http.payload.stream_parser.html#_DEFAULT_LIMITS" class="internal-link" title="orionis.http.payload.stream_parser._DEFAULT_LIMITS">_DEFAULT_LIMITS</a>[<wbr></wbr><span class="rst-variable-quote">'</span><span class="rst-variable-string">memory_threshold</span><span class="rst-variable-quote">'</span>], </span><span class="rst-sig-param">max_header_size: <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code> = <a href="orionis.http.payload.stream_parser.html#_DEFAULT_LIMITS" class="internal-link" title="orionis.http.payload.stream_parser._DEFAULT_LIMITS">_DEFAULT_LIMITS</a>[<wbr></wbr><span class="rst-variable-quote">'</span><span class="rst-variable-string">max_header_size</span><span class="rst-variable-quote">'</span>], </span><span class="rst-sig-param">max_body_size: <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code> = <a href="orionis.http.payload.stream_parser.html#_DEFAULT_LIMITS" class="internal-link" title="orionis.http.payload.stream_parser._DEFAULT_LIMITS">_DEFAULT_LIMITS</a>[<wbr></wbr><span class="rst-variable-quote">'</span><span class="rst-variable-string">max_body_size</span><span class="rst-variable-quote">'</span>], </span><span class="rst-sig-param">max_field_size: <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code> = <a href="orionis.http.payload.stream_parser.html#_DEFAULT_LIMITS" class="internal-link" title="orionis.http.payload.stream_parser._DEFAULT_LIMITS">_DEFAULT_LIMITS</a>[<wbr></wbr><span class="rst-variable-quote">'</span><span class="rst-variable-string">max_field_size</span><span class="rst-variable-quote">'</span>], </span><span class="rst-sig-param">max_memory_size: <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code> = <a href="orionis.http.payload.stream_parser.html#_DEFAULT_LIMITS" class="internal-link" title="orionis.http.payload.stream_parser._DEFAULT_LIMITS">_DEFAULT_LIMITS</a>[<wbr></wbr><span class="rst-variable-quote">'</span><span class="rst-variable-string">max_memory_size</span><span class="rst-variable-quote">'</span>]</span>):</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/09b5c2507c66690532315c421f52ebb3edaf6f66/orionis/http/payload/stream_parser.py#L99">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/dbaa747abe61f50f5dea7d99d3850214a1e71285/orionis/http/payload/stream_parser.py#L99">
       
       (source)
     </a>
@@ -1476,7 +1476,7 @@ transport buffers, object metadata and temporary copies.</td></tr></table><table
     
     
     <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">_advanceState</span><span class="function-signature long-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">state: <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code>, </span><span class="rst-sig-param">current_part: <code><a href="orionis.http.payload.part.MultipartPart.html" class="internal-link" title="orionis.http.payload.part.MultipartPart">MultipartPart</a> | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code>, </span><span class="rst-sig-param">form_items: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#list" class="intersphinx-link">list</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" class="intersphinx-link">tuple</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <wbr></wbr><a href="https://docs.python.org/3/builtins/functions.html#object" class="intersphinx-link">object</a>]]</code>, </span><span class="rst-sig-param">body_marker: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#bytes" class="intersphinx-link">bytes</a></code>, </span><span class="rst-sig-param">tail_size: <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" class="intersphinx-link">tuple</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a>, <wbr></wbr><a href="orionis.http.payload.part.MultipartPart.html" class="internal-link" title="orionis.http.payload.part.MultipartPart">MultipartPart</a> | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a>, <wbr></wbr><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a>]</code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/09b5c2507c66690532315c421f52ebb3edaf6f66/orionis/http/payload/stream_parser.py#L541">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/dbaa747abe61f50f5dea7d99d3850214a1e71285/orionis/http/payload/stream_parser.py#L541">
       
       (source)
     </a>
@@ -1503,7 +1503,7 @@ transport buffers, object metadata and temporary copies.</td></tr></table><table
     
     
     <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">_consumeBody</span><span class="function-signature long-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">current_part: <code><a href="orionis.http.payload.part.MultipartPart.html" class="internal-link" title="orionis.http.payload.part.MultipartPart">MultipartPart</a></code>, </span><span class="rst-sig-param">form_items: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#list" class="intersphinx-link">list</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" class="intersphinx-link">tuple</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <wbr></wbr><a href="https://docs.python.org/3/builtins/functions.html#object" class="intersphinx-link">object</a>]]</code>, </span><span class="rst-sig-param">body_marker: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#bytes" class="intersphinx-link">bytes</a></code>, </span><span class="rst-sig-param">tail_size: <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" class="intersphinx-link">tuple</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a>, <wbr></wbr><a href="orionis.http.payload.part.MultipartPart.html" class="internal-link" title="orionis.http.payload.part.MultipartPart">MultipartPart</a> | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a>]</code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/09b5c2507c66690532315c421f52ebb3edaf6f66/orionis/http/payload/stream_parser.py#L499">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/dbaa747abe61f50f5dea7d99d3850214a1e71285/orionis/http/payload/stream_parser.py#L499">
       
       (source)
     </a>
@@ -1530,7 +1530,7 @@ transport buffers, object metadata and temporary copies.</td></tr></table><table
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">_delimiterEnd</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">start: <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/09b5c2507c66690532315c421f52ebb3edaf6f66/orionis/http/payload/stream_parser.py#L214">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/dbaa747abe61f50f5dea7d99d3850214a1e71285/orionis/http/payload/stream_parser.py#L214">
       
       (source)
     </a>
@@ -1558,7 +1558,7 @@ or <tt class="rst-docutils rst-literal"><span class="pre">-2</span></tt> for an 
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">_discardPrefix</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">length: <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code></span>):</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/09b5c2507c66690532315c421f52ebb3edaf6f66/orionis/http/payload/stream_parser.py#L190">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/dbaa747abe61f50f5dea7d99d3850214a1e71285/orionis/http/payload/stream_parser.py#L190">
       
       (source)
     </a>
@@ -1585,7 +1585,7 @@ or <tt class="rst-docutils rst-literal"><span class="pre">-2</span></tt> for an 
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">_findBoundary</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">marker: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#bytes" class="intersphinx-link">bytes</a></code></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" class="intersphinx-link">tuple</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a>, <wbr></wbr><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a>]</code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/09b5c2507c66690532315c421f52ebb3edaf6f66/orionis/http/payload/stream_parser.py#L254">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/dbaa747abe61f50f5dea7d99d3850214a1e71285/orionis/http/payload/stream_parser.py#L254">
       
       (source)
     </a>
@@ -1612,7 +1612,7 @@ or <tt class="rst-docutils rst-literal"><span class="pre">-2</span></tt> for an 
     
     
     <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">_finishPart</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">part: <code><a href="orionis.http.payload.part.MultipartPart.html" class="internal-link" title="orionis.http.payload.part.MultipartPart">MultipartPart</a></code></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/functions.html#object" class="intersphinx-link">object</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/09b5c2507c66690532315c421f52ebb3edaf6f66/orionis/http/payload/stream_parser.py#L425">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/dbaa747abe61f50f5dea7d99d3850214a1e71285/orionis/http/payload/stream_parser.py#L425">
       
       (source)
     </a>
@@ -1639,7 +1639,7 @@ or <tt class="rst-docutils rst-literal"><span class="pre">-2</span></tt> for an 
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">_newPart</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">header_end: <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code></span>) -&gt; <code><a href="orionis.http.payload.part.MultipartPart.html" class="internal-link" title="orionis.http.payload.part.MultipartPart">MultipartPart</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/09b5c2507c66690532315c421f52ebb3edaf6f66/orionis/http/payload/stream_parser.py#L319">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/dbaa747abe61f50f5dea7d99d3850214a1e71285/orionis/http/payload/stream_parser.py#L319">
       
       (source)
     </a>
@@ -1666,7 +1666,7 @@ or <tt class="rst-docutils rst-literal"><span class="pre">-2</span></tt> for an 
     
     
     <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">_parseParts</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">form_items: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#list" class="intersphinx-link">list</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" class="intersphinx-link">tuple</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <wbr></wbr><a href="https://docs.python.org/3/builtins/functions.html#object" class="intersphinx-link">object</a>]]</code></span>) -&gt; <code><a href="orionis.http.payload.form_data.FormData.html" class="internal-link" title="orionis.http.payload.form_data.FormData">FormData</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/09b5c2507c66690532315c421f52ebb3edaf6f66/orionis/http/payload/stream_parser.py#L591">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/dbaa747abe61f50f5dea7d99d3850214a1e71285/orionis/http/payload/stream_parser.py#L591">
       
       (source)
     </a>
@@ -1693,7 +1693,7 @@ or <tt class="rst-docutils rst-literal"><span class="pre">-2</span></tt> for an 
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">_readHeaders</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>) -&gt; <code><a href="orionis.http.payload.part.MultipartPart.html" class="internal-link" title="orionis.http.payload.part.MultipartPart">MultipartPart</a> | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/09b5c2507c66690532315c421f52ebb3edaf6f66/orionis/http/payload/stream_parser.py#L400">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/dbaa747abe61f50f5dea7d99d3850214a1e71285/orionis/http/payload/stream_parser.py#L400">
       
       (source)
     </a>
@@ -1720,7 +1720,7 @@ or <tt class="rst-docutils rst-literal"><span class="pre">-2</span></tt> for an 
     
     
     <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">_receiveChunk</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">stream: <code><a href="https://docs.python.org/3/library/collections.abc.html#collections.abc.AsyncIterator" class="intersphinx-link">AsyncIterator</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#bytes" class="intersphinx-link">bytes</a>]</code></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/09b5c2507c66690532315c421f52ebb3edaf6f66/orionis/http/payload/stream_parser.py#L464">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/dbaa747abe61f50f5dea7d99d3850214a1e71285/orionis/http/payload/stream_parser.py#L464">
       
       (source)
     </a>
@@ -1747,7 +1747,7 @@ or <tt class="rst-docutils rst-literal"><span class="pre">-2</span></tt> for an 
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">_searchBoundary</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">body_marker: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#bytes" class="intersphinx-link">bytes</a></code></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/09b5c2507c66690532315c421f52ebb3edaf6f66/orionis/http/payload/stream_parser.py#L361">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/dbaa747abe61f50f5dea7d99d3850214a1e71285/orionis/http/payload/stream_parser.py#L361">
       
       (source)
     </a>
@@ -1774,7 +1774,7 @@ or <tt class="rst-docutils rst-literal"><span class="pre">-2</span></tt> for an 
     
     
     <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">_writePart</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">part: <code><a href="orionis.http.payload.part.MultipartPart.html" class="internal-link" title="orionis.http.payload.part.MultipartPart">MultipartPart</a></code>, </span><span class="rst-sig-param">length: <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code></span>):</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/09b5c2507c66690532315c421f52ebb3edaf6f66/orionis/http/payload/stream_parser.py#L279">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/dbaa747abe61f50f5dea7d99d3850214a1e71285/orionis/http/payload/stream_parser.py#L279">
       
       (source)
     </a>
@@ -1801,7 +1801,7 @@ or <tt class="rst-docutils rst-literal"><span class="pre">-2</span></tt> for an 
     
     
     <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">parse</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>) -&gt; <code><a href="orionis.http.payload.form_data.FormData.html" class="internal-link" title="orionis.http.payload.form_data.FormData">FormData</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/09b5c2507c66690532315c421f52ebb3edaf6f66/orionis/http/payload/stream_parser.py#L631">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/dbaa747abe61f50f5dea7d99d3850214a1e71285/orionis/http/payload/stream_parser.py#L631">
       
       (source)
     </a>
@@ -1827,7 +1827,7 @@ or <tt class="rst-docutils rst-literal"><span class="pre">-2</span></tt> for an 
   <div class="functionHeader">
     
     <span class="py-defname">__slots__</span>: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" class="intersphinx-link">tuple</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <wbr></wbr><span class="rst-variable-ellipsis">...</span>]</code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/09b5c2507c66690532315c421f52ebb3edaf6f66/orionis/http/payload/stream_parser.py#L71">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/dbaa747abe61f50f5dea7d99d3850214a1e71285/orionis/http/payload/stream_parser.py#L71">
       
       (source)
     </a>
@@ -1854,7 +1854,7 @@ or <tt class="rst-docutils rst-literal"><span class="pre">-2</span></tt> for an 
   <div class="functionHeader">
     
     <span class="py-defname">_atStart</span>: <code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/09b5c2507c66690532315c421f52ebb3edaf6f66/orionis/http/payload/stream_parser.py#L183">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/dbaa747abe61f50f5dea7d99d3850214a1e71285/orionis/http/payload/stream_parser.py#L183">
       
       (source)
     </a>
@@ -1881,7 +1881,7 @@ or <tt class="rst-docutils rst-literal"><span class="pre">-2</span></tt> for an 
   <div class="functionHeader">
     
     <span class="py-defname">_currentPart</span>: <code><a href="orionis.http.payload.part.MultipartPart.html" class="internal-link" title="orionis.http.payload.part.MultipartPart">MultipartPart</a> | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/09b5c2507c66690532315c421f52ebb3edaf6f66/orionis/http/payload/stream_parser.py#L188">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/dbaa747abe61f50f5dea7d99d3850214a1e71285/orionis/http/payload/stream_parser.py#L188">
       
       (source)
     </a>
@@ -1908,7 +1908,7 @@ or <tt class="rst-docutils rst-literal"><span class="pre">-2</span></tt> for an 
   <div class="functionHeader">
     
     <span class="py-defname">_eof</span>: <code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/09b5c2507c66690532315c421f52ebb3edaf6f66/orionis/http/payload/stream_parser.py#L184">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/dbaa747abe61f50f5dea7d99d3850214a1e71285/orionis/http/payload/stream_parser.py#L184">
       
       (source)
     </a>
@@ -1935,7 +1935,7 @@ or <tt class="rst-docutils rst-literal"><span class="pre">-2</span></tt> for an 
   <div class="functionHeader">
     
     <span class="py-defname">_headerSearch</span> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/09b5c2507c66690532315c421f52ebb3edaf6f66/orionis/http/payload/stream_parser.py#L185">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/dbaa747abe61f50f5dea7d99d3850214a1e71285/orionis/http/payload/stream_parser.py#L185">
       
       (source)
     </a>
@@ -1962,7 +1962,7 @@ or <tt class="rst-docutils rst-literal"><span class="pre">-2</span></tt> for an 
   <div class="functionHeader">
     
     <span class="py-defname">_memorySize</span> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/09b5c2507c66690532315c421f52ebb3edaf6f66/orionis/http/payload/stream_parser.py#L179">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/dbaa747abe61f50f5dea7d99d3850214a1e71285/orionis/http/payload/stream_parser.py#L179">
       
       (source)
     </a>
@@ -1989,7 +1989,7 @@ or <tt class="rst-docutils rst-literal"><span class="pre">-2</span></tt> for an 
   <div class="functionHeader">
     
     <span class="py-defname">_paddingEnd</span> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/09b5c2507c66690532315c421f52ebb3edaf6f66/orionis/http/payload/stream_parser.py#L187">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/dbaa747abe61f50f5dea7d99d3850214a1e71285/orionis/http/payload/stream_parser.py#L187">
       
       (source)
     </a>
@@ -2016,7 +2016,7 @@ or <tt class="rst-docutils rst-literal"><span class="pre">-2</span></tt> for an 
   <div class="functionHeader">
     
     <span class="py-defname">_paddingStart</span> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/09b5c2507c66690532315c421f52ebb3edaf6f66/orionis/http/payload/stream_parser.py#L186">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/dbaa747abe61f50f5dea7d99d3850214a1e71285/orionis/http/payload/stream_parser.py#L186">
       
       (source)
     </a>
@@ -2043,7 +2043,7 @@ or <tt class="rst-docutils rst-literal"><span class="pre">-2</span></tt> for an 
   <div class="functionHeader">
     
     <span class="py-defname">_partMemorySize</span>: <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/09b5c2507c66690532315c421f52ebb3edaf6f66/orionis/http/payload/stream_parser.py#L180">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/dbaa747abe61f50f5dea7d99d3850214a1e71285/orionis/http/payload/stream_parser.py#L180">
       
       (source)
     </a>
@@ -2070,7 +2070,7 @@ or <tt class="rst-docutils rst-literal"><span class="pre">-2</span></tt> for an 
   <div class="functionHeader">
     
     <span class="py-defname">_pendingChunk</span> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/09b5c2507c66690532315c421f52ebb3edaf6f66/orionis/http/payload/stream_parser.py#L181">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/dbaa747abe61f50f5dea7d99d3850214a1e71285/orionis/http/payload/stream_parser.py#L181">
       
       (source)
     </a>
@@ -2097,7 +2097,7 @@ or <tt class="rst-docutils rst-literal"><span class="pre">-2</span></tt> for an 
   <div class="functionHeader">
     
     <span class="py-defname">_pendingOffset</span> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/09b5c2507c66690532315c421f52ebb3edaf6f66/orionis/http/payload/stream_parser.py#L182">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/dbaa747abe61f50f5dea7d99d3850214a1e71285/orionis/http/payload/stream_parser.py#L182">
       
       (source)
     </a>
@@ -2124,7 +2124,7 @@ or <tt class="rst-docutils rst-literal"><span class="pre">-2</span></tt> for an 
   <div class="functionHeader">
     
     <span class="py-defname">_totalSize</span>: <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/09b5c2507c66690532315c421f52ebb3edaf6f66/orionis/http/payload/stream_parser.py#L178">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/dbaa747abe61f50f5dea7d99d3850214a1e71285/orionis/http/payload/stream_parser.py#L178">
       
       (source)
     </a>
@@ -2151,7 +2151,7 @@ or <tt class="rst-docutils rst-literal"><span class="pre">-2</span></tt> for an 
   <div class="functionHeader">
     
     <span class="py-defname">boundary</span> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/09b5c2507c66690532315c421f52ebb3edaf6f66/orionis/http/payload/stream_parser.py#L162">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/dbaa747abe61f50f5dea7d99d3850214a1e71285/orionis/http/payload/stream_parser.py#L162">
       
       (source)
     </a>
@@ -2178,7 +2178,7 @@ or <tt class="rst-docutils rst-literal"><span class="pre">-2</span></tt> for an 
   <div class="functionHeader">
     
     <span class="py-defname">buffer</span> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/09b5c2507c66690532315c421f52ebb3edaf6f66/orionis/http/payload/stream_parser.py#L164">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/dbaa747abe61f50f5dea7d99d3850214a1e71285/orionis/http/payload/stream_parser.py#L164">
       
       (source)
     </a>
@@ -2205,7 +2205,7 @@ or <tt class="rst-docutils rst-literal"><span class="pre">-2</span></tt> for an 
   <div class="functionHeader">
     
     <span class="py-defname">current_part_size</span>: <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/09b5c2507c66690532315c421f52ebb3edaf6f66/orionis/http/payload/stream_parser.py#L177">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/dbaa747abe61f50f5dea7d99d3850214a1e71285/orionis/http/payload/stream_parser.py#L177">
       
       (source)
     </a>
@@ -2232,7 +2232,7 @@ or <tt class="rst-docutils rst-literal"><span class="pre">-2</span></tt> for an 
   <div class="functionHeader">
     
     <span class="py-defname">fields_count</span>: <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/09b5c2507c66690532315c421f52ebb3edaf6f66/orionis/http/payload/stream_parser.py#L176">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/dbaa747abe61f50f5dea7d99d3850214a1e71285/orionis/http/payload/stream_parser.py#L176">
       
       (source)
     </a>
@@ -2259,7 +2259,7 @@ or <tt class="rst-docutils rst-literal"><span class="pre">-2</span></tt> for an 
   <div class="functionHeader">
     
     <span class="py-defname">files_count</span>: <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/09b5c2507c66690532315c421f52ebb3edaf6f66/orionis/http/payload/stream_parser.py#L175">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/dbaa747abe61f50f5dea7d99d3850214a1e71285/orionis/http/payload/stream_parser.py#L175">
       
       (source)
     </a>
@@ -2286,7 +2286,7 @@ or <tt class="rst-docutils rst-literal"><span class="pre">-2</span></tt> for an 
   <div class="functionHeader">
     
     <span class="py-defname">max_body_size</span> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/09b5c2507c66690532315c421f52ebb3edaf6f66/orionis/http/payload/stream_parser.py#L171">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/dbaa747abe61f50f5dea7d99d3850214a1e71285/orionis/http/payload/stream_parser.py#L171">
       
       (source)
     </a>
@@ -2313,7 +2313,7 @@ or <tt class="rst-docutils rst-literal"><span class="pre">-2</span></tt> for an 
   <div class="functionHeader">
     
     <span class="py-defname">max_field_size</span> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/09b5c2507c66690532315c421f52ebb3edaf6f66/orionis/http/payload/stream_parser.py#L172">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/dbaa747abe61f50f5dea7d99d3850214a1e71285/orionis/http/payload/stream_parser.py#L172">
       
       (source)
     </a>
@@ -2340,7 +2340,7 @@ or <tt class="rst-docutils rst-literal"><span class="pre">-2</span></tt> for an 
   <div class="functionHeader">
     
     <span class="py-defname">max_fields</span> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/09b5c2507c66690532315c421f52ebb3edaf6f66/orionis/http/payload/stream_parser.py#L167">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/dbaa747abe61f50f5dea7d99d3850214a1e71285/orionis/http/payload/stream_parser.py#L167">
       
       (source)
     </a>
@@ -2367,7 +2367,7 @@ or <tt class="rst-docutils rst-literal"><span class="pre">-2</span></tt> for an 
   <div class="functionHeader">
     
     <span class="py-defname">max_files</span> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/09b5c2507c66690532315c421f52ebb3edaf6f66/orionis/http/payload/stream_parser.py#L166">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/dbaa747abe61f50f5dea7d99d3850214a1e71285/orionis/http/payload/stream_parser.py#L166">
       
       (source)
     </a>
@@ -2394,7 +2394,7 @@ or <tt class="rst-docutils rst-literal"><span class="pre">-2</span></tt> for an 
   <div class="functionHeader">
     
     <span class="py-defname">max_header_size</span> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/09b5c2507c66690532315c421f52ebb3edaf6f66/orionis/http/payload/stream_parser.py#L168">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/dbaa747abe61f50f5dea7d99d3850214a1e71285/orionis/http/payload/stream_parser.py#L168">
       
       (source)
     </a>
@@ -2421,7 +2421,7 @@ or <tt class="rst-docutils rst-literal"><span class="pre">-2</span></tt> for an 
   <div class="functionHeader">
     
     <span class="py-defname">max_memory_size</span> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/09b5c2507c66690532315c421f52ebb3edaf6f66/orionis/http/payload/stream_parser.py#L173">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/dbaa747abe61f50f5dea7d99d3850214a1e71285/orionis/http/payload/stream_parser.py#L173">
       
       (source)
     </a>
@@ -2448,7 +2448,7 @@ or <tt class="rst-docutils rst-literal"><span class="pre">-2</span></tt> for an 
   <div class="functionHeader">
     
     <span class="py-defname">max_part_size</span> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/09b5c2507c66690532315c421f52ebb3edaf6f66/orionis/http/payload/stream_parser.py#L169">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/dbaa747abe61f50f5dea7d99d3850214a1e71285/orionis/http/payload/stream_parser.py#L169">
       
       (source)
     </a>
@@ -2475,7 +2475,7 @@ or <tt class="rst-docutils rst-literal"><span class="pre">-2</span></tt> for an 
   <div class="functionHeader">
     
     <span class="py-defname">memory_threshold</span> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/09b5c2507c66690532315c421f52ebb3edaf6f66/orionis/http/payload/stream_parser.py#L170">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/dbaa747abe61f50f5dea7d99d3850214a1e71285/orionis/http/payload/stream_parser.py#L170">
       
       (source)
     </a>
@@ -2502,7 +2502,7 @@ or <tt class="rst-docutils rst-literal"><span class="pre">-2</span></tt> for an 
   <div class="functionHeader">
     
     <span class="py-defname">stream</span> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/09b5c2507c66690532315c421f52ebb3edaf6f66/orionis/http/payload/stream_parser.py#L160">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/dbaa747abe61f50f5dea7d99d3850214a1e71285/orionis/http/payload/stream_parser.py#L160">
       
       (source)
     </a>
@@ -2528,7 +2528,7 @@ or <tt class="rst-docutils rst-literal"><span class="pre">-2</span></tt> for an 
   <div class="orionis-footer-inner">
     <div class="orionis-footer-copy">
       <p>API documentation for <a href="https://orionis-framework.com/" class="projecthome">Orionis</a>.</p>
-      <p class="orionis-footer-meta">Generated with <a href="https://github.com/twisted/pydoctor/">Pydoctor</a> 25.10.1.<span class="orionis-footer-build"> Built 2026-10-06 15:40:45.</span></p>
+      <p class="orionis-footer-meta">Generated with <a href="https://github.com/twisted/pydoctor/">Pydoctor</a> 25.10.1.<span class="orionis-footer-build"> Built 2026-10-06 18:23:11.</span></p>
     </div>
     <nav class="orionis-footer-links" aria-label="Additional resources">
       <a href="https://docs.orionis-framework.com">Read the guide <span aria-hidden="true">↗</span></a>

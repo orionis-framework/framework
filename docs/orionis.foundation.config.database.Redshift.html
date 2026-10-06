@@ -1,0 +1,5443 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+          "DTD/xhtml1-strict.dtd">
+<html>
+  
+
+  <head>
+  
+  <title>API Reference | Orionis Framework</title>
+  <meta name="generator" content="pydoctor 25.10.1">
+    
+  </meta>
+  <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="color-scheme" content="dark light" />
+  <link rel="icon" type="image/svg+xml" href="orionis-icon.svg" />
+  <script src="orionis-theme.js" type="text/javascript"></script>
+  <link rel="stylesheet" type="text/css" href="apidocs.css" />
+  <link rel="stylesheet" type="text/css" href="extra.css" />
+  <script src="orionis-ui.js" type="text/javascript" defer="defer"></script>
+  
+</head>
+
+  <body>
+
+    <header class="orionis-header">
+  <div class="orionis-header-inner">
+    <a class="orionis-brand" href="index.html" aria-label="Orionis API reference home">
+      <img class="orionis-brand-icon" src="orionis-icon.svg" width="38" height="38" alt="" />
+      <span class="orionis-brand-copy">
+        <span class="orionis-wordmark">ORIONIS</span>
+        <span class="orionis-brand-caption">API REFERENCE</span>
+      </span>
+    </a>
+    <div class="orionis-header-actions">
+      <nav class="orionis-header-links" aria-label="Orionis resources">
+        <a href="https://docs.orionis-framework.com">Guide <span aria-hidden="true">↗</span></a>
+        <a href="https://github.com/orionis-framework/framework">GitHub <span aria-hidden="true">↗</span></a>
+      </nav>
+      <button class="orionis-icon-button" id="orionis-theme-toggle" type="button" aria-label="Toggle color theme" hidden="hidden">
+        <svg class="orionis-icon-sun" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="12" cy="12" r="4"></circle>
+          <path d="M12 2v2m0 16v2M2 12h2m16 0h2M4.93 4.93l1.42 1.42m11.3 11.3 1.42 1.42M4.93 19.07l1.42-1.42m11.3-11.3 1.42-1.42"></path>
+        </svg>
+        <svg class="orionis-icon-moon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg">
+          <path d="M20.5 13.1A8.7 8.7 0 0 1 10.9 3.5 8.7 8.7 0 1 0 20.5 13.1Z"></path>
+        </svg>
+      </button>
+      <button class="orionis-icon-button" id="orionis-menu-toggle" type="button" aria-label="Open API navigation" aria-expanded="false" hidden="hidden">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg">
+          <path d="M4 6h16M4 12h16M4 18h16"></path>
+        </svg>
+      </button>
+    </div>
+  </div>
+</header>
+
+    <nav class="navbar navbar-default mainnavbar">
+      
+  
+  <div class="container-fluid">
+
+
+    <div class="navbar-header">
+      
+      <div class="navlinks">
+        <span class="navbar-brand">
+          <a href="https://orionis-framework.com/" class="projecthome">Orionis</a> <a href="index.html">API Documentation</a>
+        </span>
+
+        <a href="moduleIndex.html">
+          Modules
+        </a>
+
+        <a href="classIndex.html">
+          Classes
+        </a>
+
+        <a href="nameIndex.html">
+          Names
+        </a>
+
+        <div id="search-box-container">
+          <div class="input-group">
+            <input id="search-box" type="search" name="search-query" placeholder="Search..." aria-label="Search" minlength="2" class="form-control" autocomplete="off" />
+            
+            <span class="input-group-btn">
+              <a style="display: none;" class="btn btn-default" id="search-clear-button" title="Clear" onclick="clearSearch()"><img src="fonts/x-circle.svg" alt="Clear" /></a>
+              <a class="btn btn-default" id="apidocs-help-button" title="Help" href="apidocs-help.html"><img src="fonts/info.svg" alt="Help" /></a>
+            </span>
+          </div>
+        </div>
+
+      </div>
+
+      <div id="search-results-container" style="display: none;">
+        
+        <div id="search-buttons">
+          <span class="label label-default" id="search-docstrings-button">
+          <label class="checkbox-inline">
+            <input type="checkbox" id="toggle-search-in-docstrings-checkbox" value="false" onclick="toggleSearchInDocstrings()">
+              search in docstrings
+            </input>
+          </label>
+          </span>
+          
+        </div>
+        
+        <noscript>
+            <h1>Cannot search: JavaScript is not supported/enabled in your browser.</h1>
+        </noscript>
+
+        <div id="search-status"> </div>
+
+        <div class="warning" id="search-warn-box" style="display: none;">
+          <p class="rst-last"><span id="search-warn"></span></p>
+        </div>
+
+        <table id="search-results">
+          <!-- Filled dynamically by JS -->
+        </table>
+        
+        <div style="margin-top: 10px;">
+          <p>For more information on the search, visit the <a href="apidocs-help.html#rst-search">help page</a>.</p>
+        </div>
+      </div>
+
+    </div>
+
+
+  </div>
+</nav>
+    
+    <div class="container-fluid">
+
+      <!-- Side navigation -->
+      <div class="sidebarcontainer" style="display: none;">
+        
+        <div class="sidebar"><nav class="sidebar">
+  
+
+  <div>
+
+      <div class="thingTitle">
+        <span>Class</span>
+        <code class="thisobject"><a href="orionis.foundation.config.database.Redshift.html" class="internal-link" title="This class"><wbr></wbr>Redshift</a></code> 
+      </div>
+      
+      <div>
+        
+
+        
+         
+
+        
+        
+
+        <div class="childrenKindTitle">Methods</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#__post_init__" class="internal-link" title="orionis.foundation.config.database.Redshift.__post_init__">__post<wbr></wbr>_init__</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        <div class="childrenKindTitle">Inherited Methods</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.support.entities.BaseEntity.html#_cachedFieldMetadata" class="internal-link" title="orionis.support.entities.BaseEntity._cachedFieldMetadata">_cached<wbr></wbr>Field<wbr></wbr>Metadata</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.support.entities.BaseEntity.html#getFields" class="internal-link" title="orionis.support.entities.BaseEntity.getFields">get<wbr></wbr>Fields</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.support.entities.BaseEntity.html#toDict" class="internal-link" title="orionis.support.entities.BaseEntity.toDict">to<wbr></wbr>Dict</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        <div class="childrenKindTitle">Attributes</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#cluster_identifier" class="internal-link" title="orionis.foundation.config.database.Redshift.cluster_identifier">cluster<wbr></wbr>_identifier</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#database" class="internal-link" title="orionis.foundation.config.database.Redshift.database">database</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#db_user" class="internal-link" title="orionis.foundation.config.database.Redshift.db_user">db<wbr></wbr>_user</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#driver" class="internal-link" title="orionis.foundation.config.database.Redshift.driver">driver</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#host" class="internal-link" title="orionis.foundation.config.database.Redshift.host">host</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#iam" class="internal-link" title="orionis.foundation.config.database.Redshift.iam">iam</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#is_serverless" class="internal-link" title="orionis.foundation.config.database.Redshift.is_serverless">is<wbr></wbr>_serverless</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#password" class="internal-link" title="orionis.foundation.config.database.Redshift.password">password</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#port" class="internal-link" title="orionis.foundation.config.database.Redshift.port">port</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#prefix" class="internal-link" title="orionis.foundation.config.database.Redshift.prefix">prefix</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#profile" class="internal-link" title="orionis.foundation.config.database.Redshift.profile">profile</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#region" class="internal-link" title="orionis.foundation.config.database.Redshift.region">region</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#serverless_acct_id" class="internal-link" title="orionis.foundation.config.database.Redshift.serverless_acct_id">serverless<wbr></wbr>_acct<wbr></wbr>_id</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#serverless_work_group" class="internal-link" title="orionis.foundation.config.database.Redshift.serverless_work_group">serverless<wbr></wbr>_work<wbr></wbr>_group</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#ssl" class="internal-link" title="orionis.foundation.config.database.Redshift.ssl">ssl</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#sslmode" class="internal-link" title="orionis.foundation.config.database.Redshift.sslmode">sslmode</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#timeout" class="internal-link" title="orionis.foundation.config.database.Redshift.timeout">timeout</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#username" class="internal-link" title="orionis.foundation.config.database.Redshift.username">username</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        <div class="childrenKindTitle">Inherited Attributes</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.support.entities.BaseEntity.html#__slots__" class="internal-link" title="orionis.support.entities.BaseEntity.__slots__">__slots__</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+        
+      </div>
+  </div><div>
+
+      <div class="thingTitle">
+        <span>Package</span>
+        <code><a href="orionis.foundation.config.database.html" class="internal-link" title="The parent of this class">database</a></code> 
+      </div>
+      
+      <div>
+        
+
+        <div class="childrenKindTitle">Modules</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+            <div class="itemName expandableItem">
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId7134"> 
+                    
+                </input>
+
+                <label class="lbl-toggle" for="expandableItemId7134">
+                    
+                    
+                </label>
+
+                <code><a href="orionis.foundation.config.database.entities.html" class="internal-link" title="orionis.foundation.config.database.entities">entities</a></code>
+
+                <div class="expandableContent">
+                    <div>
+        
+
+        <div class="childrenKindTitle">Modules</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.database.entities.connections.html" class="internal-link" title="orionis.foundation.config.database.entities.connections">connections</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.database.entities.database.html" class="internal-link" title="orionis.foundation.config.database.entities.database">database</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.database.entities.mysql.html" class="internal-link" title="orionis.foundation.config.database.entities.mysql">mysql</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.database.entities.oracle.html" class="internal-link" title="orionis.foundation.config.database.entities.oracle">oracle</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.database.entities.pgsql.html" class="internal-link" title="orionis.foundation.config.database.entities.pgsql">pgsql</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.database.entities.redshift.html" class="internal-link" title="orionis.foundation.config.database.entities.redshift">redshift</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.database.entities.sqlite.html" class="internal-link" title="orionis.foundation.config.database.entities.sqlite">sqlite</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.database.entities.sqlserver.html" class="internal-link" title="orionis.foundation.config.database.entities.sqlserver">sqlserver</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+        
+
+        
+         
+
+        
+         
+
+        
+         
+
+        
+         
+        
+      </div>
+                </div>
+            </div>
+            
+        
+
+        
+
+    </li><li class="">
+        
+        
+        
+            <div class="itemName expandableItem">
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId7135"> 
+                    
+                </input>
+
+                <label class="lbl-toggle" for="expandableItemId7135">
+                    
+                    
+                </label>
+
+                <code><a href="orionis.foundation.config.database.enums.html" class="internal-link" title="orionis.foundation.config.database.enums">enums</a></code>
+
+                <div class="expandableContent">
+                    <div>
+        
+
+        <div class="childrenKindTitle">Modules</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.database.enums.connection_name.html" class="internal-link" title="orionis.foundation.config.database.enums.connection_name">connection<wbr></wbr>_name</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.database.enums.mysql_charsets.html" class="internal-link" title="orionis.foundation.config.database.enums.mysql_charsets">mysql<wbr></wbr>_charsets</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.database.enums.mysql_collations.html" class="internal-link" title="orionis.foundation.config.database.enums.mysql_collations">mysql<wbr></wbr>_collations</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.database.enums.mysql_engine.html" class="internal-link" title="orionis.foundation.config.database.enums.mysql_engine">mysql<wbr></wbr>_engine</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.database.enums.oracle_encoding.html" class="internal-link" title="orionis.foundation.config.database.enums.oracle_encoding">oracle<wbr></wbr>_encoding</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.database.enums.oracle_nencoding.html" class="internal-link" title="orionis.foundation.config.database.enums.oracle_nencoding">oracle<wbr></wbr>_nencoding</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.database.enums.pgsql_charsets.html" class="internal-link" title="orionis.foundation.config.database.enums.pgsql_charsets">pgsql<wbr></wbr>_charsets</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.database.enums.pgsql_collations.html" class="internal-link" title="orionis.foundation.config.database.enums.pgsql_collations">pgsql<wbr></wbr>_collations</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.database.enums.pgsql_mode.html" class="internal-link" title="orionis.foundation.config.database.enums.pgsql_mode">pgsql<wbr></wbr>_mode</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.database.enums.redshift_mode.html" class="internal-link" title="orionis.foundation.config.database.enums.redshift_mode">redshift<wbr></wbr>_mode</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.database.enums.sqlite_foreign_key.html" class="internal-link" title="orionis.foundation.config.database.enums.sqlite_foreign_key">sqlite<wbr></wbr>_foreign<wbr></wbr>_key</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.database.enums.sqlite_journal.html" class="internal-link" title="orionis.foundation.config.database.enums.sqlite_journal">sqlite<wbr></wbr>_journal</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.database.enums.sqlite_synchronous.html" class="internal-link" title="orionis.foundation.config.database.enums.sqlite_synchronous">sqlite<wbr></wbr>_synchronous</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.database.enums.sqlserver_charset.html" class="internal-link" title="orionis.foundation.config.database.enums.sqlserver_charset">sqlserver<wbr></wbr>_charset</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+        
+
+        <div class="childrenKindTitle">Functions</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.database.enums.html#__dir__" class="internal-link" title="orionis.foundation.config.database.enums.__dir__">__dir__</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.database.enums.html#__getattr__" class="internal-link" title="orionis.foundation.config.database.enums.__getattr__">__getattr__</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+         
+
+        <div class="childrenKindTitle">Variables</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.database.enums.html#_EXPORTS" class="internal-link" title="orionis.foundation.config.database.enums._EXPORTS">_EXPORTS</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+         
+        
+      </div>
+                </div>
+            </div>
+            
+        
+
+        
+
+    </li>
+</ul> 
+
+        <div class="childrenKindTitle">Classes</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+            <div class="itemName expandableItem">
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId7136"> 
+                    
+                </input>
+
+                <label class="lbl-toggle" for="expandableItemId7136">
+                    
+                    
+                </label>
+
+                <code><a href="orionis.foundation.config.database.ConnectionName.html" class="internal-link" title="orionis.foundation.config.database.ConnectionName"><wbr></wbr>Connection<wbr></wbr>Name</a></code>
+
+                <div class="expandableContent">
+                    <div>
+        
+
+        
+         
+
+        
+        
+
+        
+         
+
+        
+         
+
+        <div class="childrenKindTitle">Attributes</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.database.ConnectionName.html#MYSQL" class="internal-link" title="orionis.foundation.config.database.ConnectionName.MYSQL">MYSQL</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.database.ConnectionName.html#ORACLE" class="internal-link" title="orionis.foundation.config.database.ConnectionName.ORACLE">ORACLE</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.database.ConnectionName.html#PGSQL" class="internal-link" title="orionis.foundation.config.database.ConnectionName.PGSQL">PGSQL</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.database.ConnectionName.html#REDSHIFT" class="internal-link" title="orionis.foundation.config.database.ConnectionName.REDSHIFT">REDSHIFT</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.database.ConnectionName.html#SQLITE" class="internal-link" title="orionis.foundation.config.database.ConnectionName.SQLITE">SQLITE</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.database.ConnectionName.html#SQLSERVER" class="internal-link" title="orionis.foundation.config.database.ConnectionName.SQLSERVER">SQLSERVER</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+         
+        
+      </div>
+                </div>
+            </div>
+            
+        
+
+        
+
+    </li><li class="">
+        
+        
+        
+            <div class="itemName expandableItem">
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId7137"> 
+                    
+                </input>
+
+                <label class="lbl-toggle" for="expandableItemId7137">
+                    
+                    
+                </label>
+
+                <code><a href="orionis.foundation.config.database.Connections.html" class="internal-link" title="orionis.foundation.config.database.Connections"><wbr></wbr>Connections</a></code>
+
+                <div class="expandableContent">
+                    <div>
+        
+
+        
+         
+
+        
+        
+
+        <div class="childrenKindTitle">Methods</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.database.Connections.html#__post_init__" class="internal-link" title="orionis.foundation.config.database.Connections.__post_init__">__post<wbr></wbr>_init__</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        <div class="childrenKindTitle">Inherited Methods</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.support.entities.BaseEntity.html#_cachedFieldMetadata" class="internal-link" title="orionis.support.entities.BaseEntity._cachedFieldMetadata">_cached<wbr></wbr>Field<wbr></wbr>Metadata</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.support.entities.BaseEntity.html#getFields" class="internal-link" title="orionis.support.entities.BaseEntity.getFields">get<wbr></wbr>Fields</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.support.entities.BaseEntity.html#toDict" class="internal-link" title="orionis.support.entities.BaseEntity.toDict">to<wbr></wbr>Dict</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        <div class="childrenKindTitle">Attributes</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.database.Connections.html#mysql" class="internal-link" title="orionis.foundation.config.database.Connections.mysql">mysql</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.database.Connections.html#oracle" class="internal-link" title="orionis.foundation.config.database.Connections.oracle">oracle</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.database.Connections.html#pgsql" class="internal-link" title="orionis.foundation.config.database.Connections.pgsql">pgsql</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.database.Connections.html#redshift" class="internal-link" title="orionis.foundation.config.database.Connections.redshift">redshift</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.database.Connections.html#sqlite" class="internal-link" title="orionis.foundation.config.database.Connections.sqlite">sqlite</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.database.Connections.html#sqlserver" class="internal-link" title="orionis.foundation.config.database.Connections.sqlserver">sqlserver</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        <div class="childrenKindTitle">Inherited Attributes</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.support.entities.BaseEntity.html#__slots__" class="internal-link" title="orionis.support.entities.BaseEntity.__slots__">__slots__</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+        
+      </div>
+                </div>
+            </div>
+            
+        
+
+        
+
+    </li><li class="">
+        
+        
+        
+            <div class="itemName expandableItem">
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId7138"> 
+                    
+                </input>
+
+                <label class="lbl-toggle" for="expandableItemId7138">
+                    
+                    
+                </label>
+
+                <code><a href="orionis.foundation.config.database.Database.html" class="internal-link" title="orionis.foundation.config.database.Database"><wbr></wbr>Database</a></code>
+
+                <div class="expandableContent">
+                    <div>
+        
+
+        
+         
+
+        
+        
+
+        <div class="childrenKindTitle">Methods</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.database.Database.html#__post_init__" class="internal-link" title="orionis.foundation.config.database.Database.__post_init__">__post<wbr></wbr>_init__</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        <div class="childrenKindTitle">Inherited Methods</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.support.entities.BaseEntity.html#_cachedFieldMetadata" class="internal-link" title="orionis.support.entities.BaseEntity._cachedFieldMetadata">_cached<wbr></wbr>Field<wbr></wbr>Metadata</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.support.entities.BaseEntity.html#getFields" class="internal-link" title="orionis.support.entities.BaseEntity.getFields">get<wbr></wbr>Fields</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.support.entities.BaseEntity.html#toDict" class="internal-link" title="orionis.support.entities.BaseEntity.toDict">to<wbr></wbr>Dict</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        <div class="childrenKindTitle">Attributes</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.database.Database.html#connections" class="internal-link" title="orionis.foundation.config.database.Database.connections">connections</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.database.Database.html#default" class="internal-link" title="orionis.foundation.config.database.Database.default">default</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        <div class="childrenKindTitle">Inherited Attributes</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.support.entities.BaseEntity.html#__slots__" class="internal-link" title="orionis.support.entities.BaseEntity.__slots__">__slots__</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+        
+      </div>
+                </div>
+            </div>
+            
+        
+
+        
+
+    </li><li class="">
+        
+        
+        
+            <div class="itemName expandableItem">
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId7139"> 
+                    
+                </input>
+
+                <label class="lbl-toggle" for="expandableItemId7139">
+                    
+                    
+                </label>
+
+                <code><a href="orionis.foundation.config.database.MySQL.html" class="internal-link" title="orionis.foundation.config.database.MySQL"><wbr></wbr>My<wbr></wbr>SQL</a></code>
+
+                <div class="expandableContent">
+                    <div>
+        
+
+        
+         
+
+        
+        
+
+        <div class="childrenKindTitle">Methods</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.database.MySQL.html#__post_init__" class="internal-link" title="orionis.foundation.config.database.MySQL.__post_init__">__post<wbr></wbr>_init__</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.database.MySQL.html#__validateCharset" class="internal-link" title="orionis.foundation.config.database.MySQL.__validateCharset">__validate<wbr></wbr>Charset</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.database.MySQL.html#__validateCollation" class="internal-link" title="orionis.foundation.config.database.MySQL.__validateCollation">__validate<wbr></wbr>Collation</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.database.MySQL.html#__validateEngine" class="internal-link" title="orionis.foundation.config.database.MySQL.__validateEngine">__validate<wbr></wbr>Engine</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        <div class="childrenKindTitle">Inherited Methods</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.support.entities.BaseEntity.html#_cachedFieldMetadata" class="internal-link" title="orionis.support.entities.BaseEntity._cachedFieldMetadata">_cached<wbr></wbr>Field<wbr></wbr>Metadata</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.support.entities.BaseEntity.html#getFields" class="internal-link" title="orionis.support.entities.BaseEntity.getFields">get<wbr></wbr>Fields</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.support.entities.BaseEntity.html#toDict" class="internal-link" title="orionis.support.entities.BaseEntity.toDict">to<wbr></wbr>Dict</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        <div class="childrenKindTitle">Attributes</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.database.MySQL.html#charset" class="internal-link" title="orionis.foundation.config.database.MySQL.charset">charset</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.database.MySQL.html#collation" class="internal-link" title="orionis.foundation.config.database.MySQL.collation">collation</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.database.MySQL.html#database" class="internal-link" title="orionis.foundation.config.database.MySQL.database">database</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.database.MySQL.html#driver" class="internal-link" title="orionis.foundation.config.database.MySQL.driver">driver</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.database.MySQL.html#engine" class="internal-link" title="orionis.foundation.config.database.MySQL.engine">engine</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.database.MySQL.html#host" class="internal-link" title="orionis.foundation.config.database.MySQL.host">host</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.database.MySQL.html#password" class="internal-link" title="orionis.foundation.config.database.MySQL.password">password</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.database.MySQL.html#port" class="internal-link" title="orionis.foundation.config.database.MySQL.port">port</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.database.MySQL.html#prefix" class="internal-link" title="orionis.foundation.config.database.MySQL.prefix">prefix</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.database.MySQL.html#prefix_indexes" class="internal-link" title="orionis.foundation.config.database.MySQL.prefix_indexes">prefix<wbr></wbr>_indexes</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.database.MySQL.html#strict" class="internal-link" title="orionis.foundation.config.database.MySQL.strict">strict</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.database.MySQL.html#unix_socket" class="internal-link" title="orionis.foundation.config.database.MySQL.unix_socket">unix<wbr></wbr>_socket</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.database.MySQL.html#username" class="internal-link" title="orionis.foundation.config.database.MySQL.username">username</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        <div class="childrenKindTitle">Inherited Attributes</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.support.entities.BaseEntity.html#__slots__" class="internal-link" title="orionis.support.entities.BaseEntity.__slots__">__slots__</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+        
+      </div>
+                </div>
+            </div>
+            
+        
+
+        
+
+    </li><li class="">
+        
+        
+        
+            <div class="itemName expandableItem">
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId7140"> 
+                    
+                </input>
+
+                <label class="lbl-toggle" for="expandableItemId7140">
+                    
+                    
+                </label>
+
+                <code><a href="orionis.foundation.config.database.MySQLCharset.html" class="internal-link" title="orionis.foundation.config.database.MySQLCharset"><wbr></wbr>My<wbr></wbr>SQLCharset</a></code>
+
+                <div class="expandableContent">
+                    <div>
+        
+
+        
+         
+
+        
+        
+
+        
+         
+
+        
+         
+
+        <div class="childrenKindTitle">Attributes</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.database.MySQLCharset.html#ASCII" class="internal-link" title="orionis.foundation.config.database.MySQLCharset.ASCII">ASCII</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.database.MySQLCharset.html#BIG5" class="internal-link" title="orionis.foundation.config.database.MySQLCharset.BIG5">BIG5</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.database.MySQLCharset.html#CP1250" class="internal-link" title="orionis.foundation.config.database.MySQLCharset.CP1250">CP1250</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.database.MySQLCharset.html#CP1251" class="internal-link" title="orionis.foundation.config.database.MySQLCharset.CP1251">CP1251</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.database.MySQLCharset.html#CP1256" class="internal-link" title="orionis.foundation.config.database.MySQLCharset.CP1256">CP1256</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.database.MySQLCharset.html#CP1257" class="internal-link" title="orionis.foundation.config.database.MySQLCharset.CP1257">CP1257</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.database.MySQLCharset.html#CP850" class="internal-link" title="orionis.foundation.config.database.MySQLCharset.CP850">CP850</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.database.MySQLCharset.html#CP852" class="internal-link" title="orionis.foundation.config.database.MySQLCharset.CP852">CP852</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.database.MySQLCharset.html#CP866" class="internal-link" title="orionis.foundation.config.database.MySQLCharset.CP866">CP866</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.database.MySQLCharset.html#CP932" class="internal-link" title="orionis.foundation.config.database.MySQLCharset.CP932">CP932</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.database.MySQLCharset.html#EUCKR" class="internal-link" title="orionis.foundation.config.database.MySQLCharset.EUCKR">EUCKR</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.database.MySQLCharset.html#GB18030" class="internal-link" title="orionis.foundation.config.database.MySQLCharset.GB18030">GB18030</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.database.MySQLCharset.html#GB2312" class="internal-link" title="orionis.foundation.config.database.MySQLCharset.GB2312">GB2312</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.database.MySQLCharset.html#GBK" class="internal-link" title="orionis.foundation.config.database.MySQLCharset.GBK">GBK</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.database.MySQLCharset.html#GREEK" class="internal-link" title="orionis.foundation.config.database.MySQLCharset.GREEK">GREEK</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.database.MySQLCharset.html#HEBREW" class="internal-link" title="orionis.foundation.config.database.MySQLCharset.HEBREW">HEBREW</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.database.MySQLCharset.html#KOI8R" class="internal-link" title="orionis.foundation.config.database.MySQLCharset.KOI8R">KOI8R</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.database.MySQLCharset.html#KOI8U" class="internal-link" title="orionis.foundation.config.database.MySQLCharset.KOI8U">KOI8U</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.database.MySQLCharset.html#LATIN1" class="internal-link" title="orionis.foundation.config.database.MySQLCharset.LATIN1">LATIN1</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.database.MySQLCharset.html#LATIN2" class="internal-link" title="orionis.foundation.config.database.MySQLCharset.LATIN2">LATIN2</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.database.MySQLCharset.html#LATIN5" class="internal-link" title="orionis.foundation.config.database.MySQLCharset.LATIN5">LATIN5</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.database.MySQLCharset.html#LATIN7" class="internal-link" title="orionis.foundation.config.database.MySQLCharset.LATIN7">LATIN7</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.database.MySQLCharset.html#MACROMAN" class="internal-link" title="orionis.foundation.config.database.MySQLCharset.MACROMAN">MACROMAN</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.database.MySQLCharset.html#SJIS" class="internal-link" title="orionis.foundation.config.database.MySQLCharset.SJIS">SJIS</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.database.MySQLCharset.html#TIS620" class="internal-link" title="orionis.foundation.config.database.MySQLCharset.TIS620">TIS620</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.database.MySQLCharset.html#UJIS" class="internal-link" title="orionis.foundation.config.database.MySQLCharset.UJIS">UJIS</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.database.MySQLCharset.html#UTF8" class="internal-link" title="orionis.foundation.config.database.MySQLCharset.UTF8">UTF8</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.database.MySQLCharset.html#UTF8MB3" class="internal-link" title="orionis.foundation.config.database.MySQLCharset.UTF8MB3">UTF8MB3</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.database.MySQLCharset.html#UTF8MB4" class="internal-link" title="orionis.foundation.config.database.MySQLCharset.UTF8MB4">UTF8MB4</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+         
+        
+      </div>
+                </div>
+            </div>
+            
+        
+
+        
+
+    </li><li class="">
+        
+        
+        
+            <div class="itemName expandableItem">
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId7141"> 
+                    
+                </input>
+
+                <label class="lbl-toggle" for="expandableItemId7141">
+                    
+                    
+                </label>
+
+                <code><a href="orionis.foundation.config.database.MySQLCollation.html" class="internal-link" title="orionis.foundation.config.database.MySQLCollation"><wbr></wbr>My<wbr></wbr>SQLCollation</a></code>
+
+                <div class="expandableContent">
+                    <div>
+        
+
+        
+         
+
+        
+        
+
+        
+         
+
+        
+         
+
+        <div class="childrenKindTitle">Attributes</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.database.MySQLCollation.html#ASCII_BIN" class="internal-link" title="orionis.foundation.config.database.MySQLCollation.ASCII_BIN">ASCII<wbr></wbr>_BIN</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.database.MySQLCollation.html#ASCII_GENERAL_CI" class="internal-link" title="orionis.foundation.config.database.MySQLCollation.ASCII_GENERAL_CI">ASCII<wbr></wbr>_GENERAL<wbr></wbr>_CI</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.database.MySQLCollation.html#GB18030_BIN" class="internal-link" title="orionis.foundation.config.database.MySQLCollation.GB18030_BIN">GB18030<wbr></wbr>_BIN</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.database.MySQLCollation.html#GB18030_CHINESE_CI" class="internal-link" title="orionis.foundation.config.database.MySQLCollation.GB18030_CHINESE_CI">GB18030<wbr></wbr>_CHINESE<wbr></wbr>_CI</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.database.MySQLCollation.html#GB18030_UNICODE_520_CI" class="internal-link" title="orionis.foundation.config.database.MySQLCollation.GB18030_UNICODE_520_CI">GB18030<wbr></wbr>_UNICODE<wbr></wbr>_520<wbr></wbr>_CI</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.database.MySQLCollation.html#LATIN1_BIN" class="internal-link" title="orionis.foundation.config.database.MySQLCollation.LATIN1_BIN">LATIN1<wbr></wbr>_BIN</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.database.MySQLCollation.html#LATIN1_GENERAL_CI" class="internal-link" title="orionis.foundation.config.database.MySQLCollation.LATIN1_GENERAL_CI">LATIN1<wbr></wbr>_GENERAL<wbr></wbr>_CI</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.database.MySQLCollation.html#LATIN1_SWEDISH_CI" class="internal-link" title="orionis.foundation.config.database.MySQLCollation.LATIN1_SWEDISH_CI">LATIN1<wbr></wbr>_SWEDISH<wbr></wbr>_CI</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.database.MySQLCollation.html#UTF8_BIN" class="internal-link" title="orionis.foundation.config.database.MySQLCollation.UTF8_BIN">UTF8<wbr></wbr>_BIN</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.database.MySQLCollation.html#UTF8_GENERAL_CI" class="internal-link" title="orionis.foundation.config.database.MySQLCollation.UTF8_GENERAL_CI">UTF8<wbr></wbr>_GENERAL<wbr></wbr>_CI</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.database.MySQLCollation.html#UTF8_UNICODE_CI" class="internal-link" title="orionis.foundation.config.database.MySQLCollation.UTF8_UNICODE_CI">UTF8<wbr></wbr>_UNICODE<wbr></wbr>_CI</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.database.MySQLCollation.html#UTF8MB4_BIN" class="internal-link" title="orionis.foundation.config.database.MySQLCollation.UTF8MB4_BIN">UTF8MB4<wbr></wbr>_BIN</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.database.MySQLCollation.html#UTF8MB4_GENERAL_CI" class="internal-link" title="orionis.foundation.config.database.MySQLCollation.UTF8MB4_GENERAL_CI">UTF8MB4<wbr></wbr>_GENERAL<wbr></wbr>_CI</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.database.MySQLCollation.html#UTF8MB4_UNICODE_CI" class="internal-link" title="orionis.foundation.config.database.MySQLCollation.UTF8MB4_UNICODE_CI">UTF8MB4<wbr></wbr>_UNICODE<wbr></wbr>_CI</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+         
+        
+      </div>
+                </div>
+            </div>
+            
+        
+
+        
+
+    </li><li class="">
+        
+        
+        
+            <div class="itemName expandableItem">
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId7142"> 
+                    
+                </input>
+
+                <label class="lbl-toggle" for="expandableItemId7142">
+                    
+                    
+                </label>
+
+                <code><a href="orionis.foundation.config.database.MySQLEngine.html" class="internal-link" title="orionis.foundation.config.database.MySQLEngine"><wbr></wbr>My<wbr></wbr>SQLEngine</a></code>
+
+                <div class="expandableContent">
+                    <div>
+        
+
+        
+         
+
+        
+        
+
+        
+         
+
+        
+         
+
+        <div class="childrenKindTitle">Attributes</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.database.MySQLEngine.html#INNODB" class="internal-link" title="orionis.foundation.config.database.MySQLEngine.INNODB">INNODB</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+         
+        
+      </div>
+                </div>
+            </div>
+            
+        
+
+        
+
+    </li><li class="">
+        
+        
+        
+            <div class="itemName expandableItem">
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId7143"> 
+                    
+                </input>
+
+                <label class="lbl-toggle" for="expandableItemId7143">
+                    
+                    
+                </label>
+
+                <code><a href="orionis.foundation.config.database.Oracle.html" class="internal-link" title="orionis.foundation.config.database.Oracle"><wbr></wbr>Oracle</a></code>
+
+                <div class="expandableContent">
+                    <div>
+        
+
+        
+         
+
+        
+        
+
+        <div class="childrenKindTitle">Methods</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.database.Oracle.html#__post_init__" class="internal-link" title="orionis.foundation.config.database.Oracle.__post_init__">__post<wbr></wbr>_init__</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.database.Oracle.html#__validateConnectionParameters" class="internal-link" title="orionis.foundation.config.database.Oracle.__validateConnectionParameters">__validate<wbr></wbr>Connection<wbr></wbr>Parameters</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.database.Oracle.html#__validateEncoding" class="internal-link" title="orionis.foundation.config.database.Oracle.__validateEncoding">__validate<wbr></wbr>Encoding</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.database.Oracle.html#__validateNencoding" class="internal-link" title="orionis.foundation.config.database.Oracle.__validateNencoding">__validate<wbr></wbr>Nencoding</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        <div class="childrenKindTitle">Inherited Methods</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.support.entities.BaseEntity.html#_cachedFieldMetadata" class="internal-link" title="orionis.support.entities.BaseEntity._cachedFieldMetadata">_cached<wbr></wbr>Field<wbr></wbr>Metadata</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.support.entities.BaseEntity.html#getFields" class="internal-link" title="orionis.support.entities.BaseEntity.getFields">get<wbr></wbr>Fields</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.support.entities.BaseEntity.html#toDict" class="internal-link" title="orionis.support.entities.BaseEntity.toDict">to<wbr></wbr>Dict</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        <div class="childrenKindTitle">Attributes</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.database.Oracle.html#driver" class="internal-link" title="orionis.foundation.config.database.Oracle.driver">driver</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.database.Oracle.html#dsn" class="internal-link" title="orionis.foundation.config.database.Oracle.dsn">dsn</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.database.Oracle.html#encoding" class="internal-link" title="orionis.foundation.config.database.Oracle.encoding">encoding</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.database.Oracle.html#host" class="internal-link" title="orionis.foundation.config.database.Oracle.host">host</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.database.Oracle.html#nencoding" class="internal-link" title="orionis.foundation.config.database.Oracle.nencoding">nencoding</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.database.Oracle.html#password" class="internal-link" title="orionis.foundation.config.database.Oracle.password">password</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.database.Oracle.html#port" class="internal-link" title="orionis.foundation.config.database.Oracle.port">port</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.database.Oracle.html#service_name" class="internal-link" title="orionis.foundation.config.database.Oracle.service_name">service<wbr></wbr>_name</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.database.Oracle.html#sid" class="internal-link" title="orionis.foundation.config.database.Oracle.sid">sid</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.database.Oracle.html#tns_name" class="internal-link" title="orionis.foundation.config.database.Oracle.tns_name">tns<wbr></wbr>_name</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.database.Oracle.html#username" class="internal-link" title="orionis.foundation.config.database.Oracle.username">username</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        <div class="childrenKindTitle">Inherited Attributes</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.support.entities.BaseEntity.html#__slots__" class="internal-link" title="orionis.support.entities.BaseEntity.__slots__">__slots__</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+        
+      </div>
+                </div>
+            </div>
+            
+        
+
+        
+
+    </li><li class="">
+        
+        
+        
+            <div class="itemName expandableItem">
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId7144"> 
+                    
+                </input>
+
+                <label class="lbl-toggle" for="expandableItemId7144">
+                    
+                    
+                </label>
+
+                <code><a href="orionis.foundation.config.database.OracleEncoding.html" class="internal-link" title="orionis.foundation.config.database.OracleEncoding"><wbr></wbr>Oracle<wbr></wbr>Encoding</a></code>
+
+                <div class="expandableContent">
+                    <div>
+        
+
+        
+         
+
+        
+        
+
+        
+         
+
+        
+         
+
+        <div class="childrenKindTitle">Attributes</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.database.OracleEncoding.html#AL32UTF8" class="internal-link" title="orionis.foundation.config.database.OracleEncoding.AL32UTF8">AL32UTF8</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+         
+        
+      </div>
+                </div>
+            </div>
+            
+        
+
+        
+
+    </li><li class="">
+        
+        
+        
+            <div class="itemName expandableItem">
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId7145"> 
+                    
+                </input>
+
+                <label class="lbl-toggle" for="expandableItemId7145">
+                    
+                    
+                </label>
+
+                <code><a href="orionis.foundation.config.database.OracleNencoding.html" class="internal-link" title="orionis.foundation.config.database.OracleNencoding"><wbr></wbr>Oracle<wbr></wbr>Nencoding</a></code>
+
+                <div class="expandableContent">
+                    <div>
+        
+
+        
+         
+
+        
+        
+
+        
+         
+
+        
+         
+
+        <div class="childrenKindTitle">Attributes</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.database.OracleNencoding.html#AL16UTF16" class="internal-link" title="orionis.foundation.config.database.OracleNencoding.AL16UTF16">AL16UTF16</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.database.OracleNencoding.html#UTF8" class="internal-link" title="orionis.foundation.config.database.OracleNencoding.UTF8">UTF8</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+         
+        
+      </div>
+                </div>
+            </div>
+            
+        
+
+        
+
+    </li><li class="">
+        
+        
+        
+            <div class="itemName expandableItem">
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId7146"> 
+                    
+                </input>
+
+                <label class="lbl-toggle" for="expandableItemId7146">
+                    
+                    
+                </label>
+
+                <code><a href="orionis.foundation.config.database.PGSQL.html" class="internal-link" title="orionis.foundation.config.database.PGSQL">PGSQL</a></code>
+
+                <div class="expandableContent">
+                    <div>
+        
+
+        
+         
+
+        
+        
+
+        <div class="childrenKindTitle">Methods</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.database.PGSQL.html#__post_init__" class="internal-link" title="orionis.foundation.config.database.PGSQL.__post_init__">__post<wbr></wbr>_init__</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.database.PGSQL.html#__validateCharset" class="internal-link" title="orionis.foundation.config.database.PGSQL.__validateCharset">__validate<wbr></wbr>Charset</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.database.PGSQL.html#__validateSSLMode" class="internal-link" title="orionis.foundation.config.database.PGSQL.__validateSSLMode">__validate<wbr></wbr>SSLMode</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        <div class="childrenKindTitle">Inherited Methods</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.support.entities.BaseEntity.html#_cachedFieldMetadata" class="internal-link" title="orionis.support.entities.BaseEntity._cachedFieldMetadata">_cached<wbr></wbr>Field<wbr></wbr>Metadata</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.support.entities.BaseEntity.html#getFields" class="internal-link" title="orionis.support.entities.BaseEntity.getFields">get<wbr></wbr>Fields</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.support.entities.BaseEntity.html#toDict" class="internal-link" title="orionis.support.entities.BaseEntity.toDict">to<wbr></wbr>Dict</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        <div class="childrenKindTitle">Attributes</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.database.PGSQL.html#charset" class="internal-link" title="orionis.foundation.config.database.PGSQL.charset">charset</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.database.PGSQL.html#database" class="internal-link" title="orionis.foundation.config.database.PGSQL.database">database</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.database.PGSQL.html#driver" class="internal-link" title="orionis.foundation.config.database.PGSQL.driver">driver</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.database.PGSQL.html#host" class="internal-link" title="orionis.foundation.config.database.PGSQL.host">host</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.database.PGSQL.html#password" class="internal-link" title="orionis.foundation.config.database.PGSQL.password">password</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.database.PGSQL.html#port" class="internal-link" title="orionis.foundation.config.database.PGSQL.port">port</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.database.PGSQL.html#prefix" class="internal-link" title="orionis.foundation.config.database.PGSQL.prefix">prefix</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.database.PGSQL.html#prefix_indexes" class="internal-link" title="orionis.foundation.config.database.PGSQL.prefix_indexes">prefix<wbr></wbr>_indexes</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.database.PGSQL.html#search_path" class="internal-link" title="orionis.foundation.config.database.PGSQL.search_path">search<wbr></wbr>_path</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.database.PGSQL.html#sslmode" class="internal-link" title="orionis.foundation.config.database.PGSQL.sslmode">sslmode</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.database.PGSQL.html#username" class="internal-link" title="orionis.foundation.config.database.PGSQL.username">username</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        <div class="childrenKindTitle">Inherited Attributes</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.support.entities.BaseEntity.html#__slots__" class="internal-link" title="orionis.support.entities.BaseEntity.__slots__">__slots__</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+        
+      </div>
+                </div>
+            </div>
+            
+        
+
+        
+
+    </li><li class="">
+        
+        
+        
+            <div class="itemName expandableItem">
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId7147"> 
+                    
+                </input>
+
+                <label class="lbl-toggle" for="expandableItemId7147">
+                    
+                    
+                </label>
+
+                <code><a href="orionis.foundation.config.database.PGSQLCharset.html" class="internal-link" title="orionis.foundation.config.database.PGSQLCharset"><wbr></wbr>PGSQLCharset</a></code>
+
+                <div class="expandableContent">
+                    <div>
+        
+
+        
+         
+
+        
+        
+
+        
+         
+
+        
+         
+
+        <div class="childrenKindTitle">Attributes</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.database.PGSQLCharset.html#EUC_CN" class="internal-link" title="orionis.foundation.config.database.PGSQLCharset.EUC_CN">EUC<wbr></wbr>_CN</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.database.PGSQLCharset.html#EUC_JIS_2004" class="internal-link" title="orionis.foundation.config.database.PGSQLCharset.EUC_JIS_2004">EUC<wbr></wbr>_JIS<wbr></wbr>_2004</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.database.PGSQLCharset.html#EUC_JP" class="internal-link" title="orionis.foundation.config.database.PGSQLCharset.EUC_JP">EUC<wbr></wbr>_JP</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.database.PGSQLCharset.html#EUC_KR" class="internal-link" title="orionis.foundation.config.database.PGSQLCharset.EUC_KR">EUC<wbr></wbr>_KR</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.database.PGSQLCharset.html#EUC_TW" class="internal-link" title="orionis.foundation.config.database.PGSQLCharset.EUC_TW">EUC<wbr></wbr>_TW</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.database.PGSQLCharset.html#ISO_8859_5" class="internal-link" title="orionis.foundation.config.database.PGSQLCharset.ISO_8859_5">ISO<wbr></wbr>_8859<wbr></wbr>_5</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.database.PGSQLCharset.html#ISO_8859_6" class="internal-link" title="orionis.foundation.config.database.PGSQLCharset.ISO_8859_6">ISO<wbr></wbr>_8859<wbr></wbr>_6</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.database.PGSQLCharset.html#ISO_8859_7" class="internal-link" title="orionis.foundation.config.database.PGSQLCharset.ISO_8859_7">ISO<wbr></wbr>_8859<wbr></wbr>_7</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.database.PGSQLCharset.html#ISO_8859_8" class="internal-link" title="orionis.foundation.config.database.PGSQLCharset.ISO_8859_8">ISO<wbr></wbr>_8859<wbr></wbr>_8</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.database.PGSQLCharset.html#KOI8R" class="internal-link" title="orionis.foundation.config.database.PGSQLCharset.KOI8R">KOI8R</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.database.PGSQLCharset.html#KOI8U" class="internal-link" title="orionis.foundation.config.database.PGSQLCharset.KOI8U">KOI8U</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.database.PGSQLCharset.html#LATIN1" class="internal-link" title="orionis.foundation.config.database.PGSQLCharset.LATIN1">LATIN1</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.database.PGSQLCharset.html#LATIN10" class="internal-link" title="orionis.foundation.config.database.PGSQLCharset.LATIN10">LATIN10</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.database.PGSQLCharset.html#LATIN2" class="internal-link" title="orionis.foundation.config.database.PGSQLCharset.LATIN2">LATIN2</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.database.PGSQLCharset.html#LATIN3" class="internal-link" title="orionis.foundation.config.database.PGSQLCharset.LATIN3">LATIN3</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.database.PGSQLCharset.html#LATIN4" class="internal-link" title="orionis.foundation.config.database.PGSQLCharset.LATIN4">LATIN4</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.database.PGSQLCharset.html#LATIN5" class="internal-link" title="orionis.foundation.config.database.PGSQLCharset.LATIN5">LATIN5</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.database.PGSQLCharset.html#LATIN6" class="internal-link" title="orionis.foundation.config.database.PGSQLCharset.LATIN6">LATIN6</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.database.PGSQLCharset.html#LATIN7" class="internal-link" title="orionis.foundation.config.database.PGSQLCharset.LATIN7">LATIN7</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.database.PGSQLCharset.html#LATIN8" class="internal-link" title="orionis.foundation.config.database.PGSQLCharset.LATIN8">LATIN8</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.database.PGSQLCharset.html#LATIN9" class="internal-link" title="orionis.foundation.config.database.PGSQLCharset.LATIN9">LATIN9</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.database.PGSQLCharset.html#UTF8" class="internal-link" title="orionis.foundation.config.database.PGSQLCharset.UTF8">UTF8</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.database.PGSQLCharset.html#WIN1250" class="internal-link" title="orionis.foundation.config.database.PGSQLCharset.WIN1250">WIN1250</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.database.PGSQLCharset.html#WIN1251" class="internal-link" title="orionis.foundation.config.database.PGSQLCharset.WIN1251">WIN1251</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.database.PGSQLCharset.html#WIN1252" class="internal-link" title="orionis.foundation.config.database.PGSQLCharset.WIN1252">WIN1252</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.database.PGSQLCharset.html#WIN1253" class="internal-link" title="orionis.foundation.config.database.PGSQLCharset.WIN1253">WIN1253</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.database.PGSQLCharset.html#WIN1254" class="internal-link" title="orionis.foundation.config.database.PGSQLCharset.WIN1254">WIN1254</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.database.PGSQLCharset.html#WIN1255" class="internal-link" title="orionis.foundation.config.database.PGSQLCharset.WIN1255">WIN1255</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.database.PGSQLCharset.html#WIN1256" class="internal-link" title="orionis.foundation.config.database.PGSQLCharset.WIN1256">WIN1256</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.database.PGSQLCharset.html#WIN1257" class="internal-link" title="orionis.foundation.config.database.PGSQLCharset.WIN1257">WIN1257</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.database.PGSQLCharset.html#WIN1258" class="internal-link" title="orionis.foundation.config.database.PGSQLCharset.WIN1258">WIN1258</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.database.PGSQLCharset.html#WIN866" class="internal-link" title="orionis.foundation.config.database.PGSQLCharset.WIN866">WIN866</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.database.PGSQLCharset.html#WIN874" class="internal-link" title="orionis.foundation.config.database.PGSQLCharset.WIN874">WIN874</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+         
+        
+      </div>
+                </div>
+            </div>
+            
+        
+
+        
+
+    </li><li class="">
+        
+        
+        
+            <div class="itemName expandableItem">
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId7148"> 
+                    
+                </input>
+
+                <label class="lbl-toggle" for="expandableItemId7148">
+                    
+                    
+                </label>
+
+                <code><a href="orionis.foundation.config.database.PGSQLCollation.html" class="internal-link" title="orionis.foundation.config.database.PGSQLCollation"><wbr></wbr>PGSQLCollation</a></code>
+
+                <div class="expandableContent">
+                    <div>
+        
+
+        
+         
+
+        
+        
+
+        
+         
+
+        
+         
+
+        <div class="childrenKindTitle">Attributes</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.database.PGSQLCollation.html#C" class="internal-link" title="orionis.foundation.config.database.PGSQLCollation.C">C</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.database.PGSQLCollation.html#POSIX" class="internal-link" title="orionis.foundation.config.database.PGSQLCollation.POSIX">POSIX</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+         
+        
+      </div>
+                </div>
+            </div>
+            
+        
+
+        
+
+    </li><li class="">
+        
+        
+        
+            <div class="itemName expandableItem">
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId7149"> 
+                    
+                </input>
+
+                <label class="lbl-toggle" for="expandableItemId7149">
+                    
+                    
+                </label>
+
+                <code><a href="orionis.foundation.config.database.PGSQLSSLMode.html" class="internal-link" title="orionis.foundation.config.database.PGSQLSSLMode"><wbr></wbr>PGSQLSSLMode</a></code>
+
+                <div class="expandableContent">
+                    <div>
+        
+
+        
+         
+
+        
+        
+
+        
+         
+
+        
+         
+
+        <div class="childrenKindTitle">Attributes</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.database.PGSQLSSLMode.html#ALLOW" class="internal-link" title="orionis.foundation.config.database.PGSQLSSLMode.ALLOW">ALLOW</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.database.PGSQLSSLMode.html#DISABLE" class="internal-link" title="orionis.foundation.config.database.PGSQLSSLMode.DISABLE">DISABLE</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.database.PGSQLSSLMode.html#PREFER" class="internal-link" title="orionis.foundation.config.database.PGSQLSSLMode.PREFER">PREFER</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.database.PGSQLSSLMode.html#REQUIRE" class="internal-link" title="orionis.foundation.config.database.PGSQLSSLMode.REQUIRE">REQUIRE</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.database.PGSQLSSLMode.html#VERIFY_CA" class="internal-link" title="orionis.foundation.config.database.PGSQLSSLMode.VERIFY_CA">VERIFY<wbr></wbr>_CA</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.database.PGSQLSSLMode.html#VERIFY_FULL" class="internal-link" title="orionis.foundation.config.database.PGSQLSSLMode.VERIFY_FULL">VERIFY<wbr></wbr>_FULL</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+         
+        
+      </div>
+                </div>
+            </div>
+            
+        
+
+        
+
+    </li><li class=" thisobject">
+        
+        
+        
+            <div class="itemName expandableItem">
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId7150"> 
+                    
+                </input>
+
+                <label class="lbl-toggle notExpandable" for="">
+                    
+                    
+                </label>
+
+                <code><a href="orionis.foundation.config.database.Redshift.html" class="internal-link" title="orionis.foundation.config.database.Redshift"><wbr></wbr>Redshift</a></code>
+
+                <div class="expandableContent">
+                    <div>
+        
+
+        
+         
+
+        
+        
+
+        <div class="childrenKindTitle">Methods</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#__post_init__" class="internal-link" title="orionis.foundation.config.database.Redshift.__post_init__">__post<wbr></wbr>_init__</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        <div class="childrenKindTitle">Inherited Methods</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.support.entities.BaseEntity.html#_cachedFieldMetadata" class="internal-link" title="orionis.support.entities.BaseEntity._cachedFieldMetadata">_cached<wbr></wbr>Field<wbr></wbr>Metadata</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.support.entities.BaseEntity.html#getFields" class="internal-link" title="orionis.support.entities.BaseEntity.getFields">get<wbr></wbr>Fields</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.support.entities.BaseEntity.html#toDict" class="internal-link" title="orionis.support.entities.BaseEntity.toDict">to<wbr></wbr>Dict</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        <div class="childrenKindTitle">Attributes</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#cluster_identifier" class="internal-link" title="orionis.foundation.config.database.Redshift.cluster_identifier">cluster<wbr></wbr>_identifier</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#database" class="internal-link" title="orionis.foundation.config.database.Redshift.database">database</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#db_user" class="internal-link" title="orionis.foundation.config.database.Redshift.db_user">db<wbr></wbr>_user</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#driver" class="internal-link" title="orionis.foundation.config.database.Redshift.driver">driver</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#host" class="internal-link" title="orionis.foundation.config.database.Redshift.host">host</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#iam" class="internal-link" title="orionis.foundation.config.database.Redshift.iam">iam</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#is_serverless" class="internal-link" title="orionis.foundation.config.database.Redshift.is_serverless">is<wbr></wbr>_serverless</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#password" class="internal-link" title="orionis.foundation.config.database.Redshift.password">password</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#port" class="internal-link" title="orionis.foundation.config.database.Redshift.port">port</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#prefix" class="internal-link" title="orionis.foundation.config.database.Redshift.prefix">prefix</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#profile" class="internal-link" title="orionis.foundation.config.database.Redshift.profile">profile</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#region" class="internal-link" title="orionis.foundation.config.database.Redshift.region">region</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#serverless_acct_id" class="internal-link" title="orionis.foundation.config.database.Redshift.serverless_acct_id">serverless<wbr></wbr>_acct<wbr></wbr>_id</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#serverless_work_group" class="internal-link" title="orionis.foundation.config.database.Redshift.serverless_work_group">serverless<wbr></wbr>_work<wbr></wbr>_group</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#ssl" class="internal-link" title="orionis.foundation.config.database.Redshift.ssl">ssl</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#sslmode" class="internal-link" title="orionis.foundation.config.database.Redshift.sslmode">sslmode</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#timeout" class="internal-link" title="orionis.foundation.config.database.Redshift.timeout">timeout</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#username" class="internal-link" title="orionis.foundation.config.database.Redshift.username">username</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        <div class="childrenKindTitle">Inherited Attributes</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.support.entities.BaseEntity.html#__slots__" class="internal-link" title="orionis.support.entities.BaseEntity.__slots__">__slots__</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+        
+      </div>
+                </div>
+            </div>
+            
+        
+
+        
+
+    </li><li class="">
+        
+        
+        
+            <div class="itemName expandableItem">
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId7151"> 
+                    
+                </input>
+
+                <label class="lbl-toggle" for="expandableItemId7151">
+                    
+                    
+                </label>
+
+                <code><a href="orionis.foundation.config.database.RedshiftSSLMode.html" class="internal-link" title="orionis.foundation.config.database.RedshiftSSLMode"><wbr></wbr>Redshift<wbr></wbr>SSLMode</a></code>
+
+                <div class="expandableContent">
+                    <div>
+        
+
+        
+         
+
+        
+        
+
+        
+         
+
+        
+         
+
+        <div class="childrenKindTitle">Attributes</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.database.RedshiftSSLMode.html#VERIFY_CA" class="internal-link" title="orionis.foundation.config.database.RedshiftSSLMode.VERIFY_CA">VERIFY<wbr></wbr>_CA</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.database.RedshiftSSLMode.html#VERIFY_FULL" class="internal-link" title="orionis.foundation.config.database.RedshiftSSLMode.VERIFY_FULL">VERIFY<wbr></wbr>_FULL</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+         
+        
+      </div>
+                </div>
+            </div>
+            
+        
+
+        
+
+    </li><li class="">
+        
+        
+        
+            <div class="itemName expandableItem">
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId7152"> 
+                    
+                </input>
+
+                <label class="lbl-toggle" for="expandableItemId7152">
+                    
+                    
+                </label>
+
+                <code><a href="orionis.foundation.config.database.SQLite.html" class="internal-link" title="orionis.foundation.config.database.SQLite"><wbr></wbr>SQLite</a></code>
+
+                <div class="expandableContent">
+                    <div>
+        
+
+        
+         
+
+        
+        
+
+        <div class="childrenKindTitle">Methods</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.database.SQLite.html#__normalizeForeignKeyConstraints" class="internal-link" title="orionis.foundation.config.database.SQLite.__normalizeForeignKeyConstraints">__normalize<wbr></wbr>Foreign<wbr></wbr>Key<wbr></wbr>Constraints</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.database.SQLite.html#__normalizeJournalMode" class="internal-link" title="orionis.foundation.config.database.SQLite.__normalizeJournalMode">__normalize<wbr></wbr>Journal<wbr></wbr>Mode</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.database.SQLite.html#__normalizeSynchronous" class="internal-link" title="orionis.foundation.config.database.SQLite.__normalizeSynchronous">__normalize<wbr></wbr>Synchronous</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.database.SQLite.html#__post_init__" class="internal-link" title="orionis.foundation.config.database.SQLite.__post_init__">__post<wbr></wbr>_init__</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        <div class="childrenKindTitle">Inherited Methods</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.support.entities.BaseEntity.html#_cachedFieldMetadata" class="internal-link" title="orionis.support.entities.BaseEntity._cachedFieldMetadata">_cached<wbr></wbr>Field<wbr></wbr>Metadata</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.support.entities.BaseEntity.html#getFields" class="internal-link" title="orionis.support.entities.BaseEntity.getFields">get<wbr></wbr>Fields</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.support.entities.BaseEntity.html#toDict" class="internal-link" title="orionis.support.entities.BaseEntity.toDict">to<wbr></wbr>Dict</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        <div class="childrenKindTitle">Attributes</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.database.SQLite.html#busy_timeout" class="internal-link" title="orionis.foundation.config.database.SQLite.busy_timeout">busy<wbr></wbr>_timeout</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.database.SQLite.html#database" class="internal-link" title="orionis.foundation.config.database.SQLite.database">database</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.database.SQLite.html#driver" class="internal-link" title="orionis.foundation.config.database.SQLite.driver">driver</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.database.SQLite.html#foreign_key_constraints" class="internal-link" title="orionis.foundation.config.database.SQLite.foreign_key_constraints">foreign<wbr></wbr>_key<wbr></wbr>_constraints</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.database.SQLite.html#journal_mode" class="internal-link" title="orionis.foundation.config.database.SQLite.journal_mode">journal<wbr></wbr>_mode</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.database.SQLite.html#prefix" class="internal-link" title="orionis.foundation.config.database.SQLite.prefix">prefix</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.database.SQLite.html#synchronous" class="internal-link" title="orionis.foundation.config.database.SQLite.synchronous">synchronous</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.database.SQLite.html#url" class="internal-link" title="orionis.foundation.config.database.SQLite.url">url</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        <div class="childrenKindTitle">Inherited Attributes</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.support.entities.BaseEntity.html#__slots__" class="internal-link" title="orionis.support.entities.BaseEntity.__slots__">__slots__</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+        
+      </div>
+                </div>
+            </div>
+            
+        
+
+        
+
+    </li><li class="">
+        
+        
+        
+            <div class="itemName expandableItem">
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId7153"> 
+                    
+                </input>
+
+                <label class="lbl-toggle" for="expandableItemId7153">
+                    
+                    
+                </label>
+
+                <code><a href="orionis.foundation.config.database.SQLiteForeignKey.html" class="internal-link" title="orionis.foundation.config.database.SQLiteForeignKey"><wbr></wbr>SQLite<wbr></wbr>Foreign<wbr></wbr>Key</a></code>
+
+                <div class="expandableContent">
+                    <div>
+        
+
+        
+         
+
+        
+        
+
+        
+         
+
+        
+         
+
+        <div class="childrenKindTitle">Attributes</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.database.SQLiteForeignKey.html#OFF" class="internal-link" title="orionis.foundation.config.database.SQLiteForeignKey.OFF">OFF</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.database.SQLiteForeignKey.html#ON" class="internal-link" title="orionis.foundation.config.database.SQLiteForeignKey.ON">ON</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+         
+        
+      </div>
+                </div>
+            </div>
+            
+        
+
+        
+
+    </li><li class="">
+        
+        
+        
+            <div class="itemName expandableItem">
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId7154"> 
+                    
+                </input>
+
+                <label class="lbl-toggle" for="expandableItemId7154">
+                    
+                    
+                </label>
+
+                <code><a href="orionis.foundation.config.database.SQLiteJournalMode.html" class="internal-link" title="orionis.foundation.config.database.SQLiteJournalMode"><wbr></wbr>SQLite<wbr></wbr>Journal<wbr></wbr>Mode</a></code>
+
+                <div class="expandableContent">
+                    <div>
+        
+
+        
+         
+
+        
+        
+
+        
+         
+
+        
+         
+
+        <div class="childrenKindTitle">Attributes</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.database.SQLiteJournalMode.html#DELETE" class="internal-link" title="orionis.foundation.config.database.SQLiteJournalMode.DELETE">DELETE</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.database.SQLiteJournalMode.html#MEMORY" class="internal-link" title="orionis.foundation.config.database.SQLiteJournalMode.MEMORY">MEMORY</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.database.SQLiteJournalMode.html#OFF" class="internal-link" title="orionis.foundation.config.database.SQLiteJournalMode.OFF">OFF</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.database.SQLiteJournalMode.html#PERSIST" class="internal-link" title="orionis.foundation.config.database.SQLiteJournalMode.PERSIST">PERSIST</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.database.SQLiteJournalMode.html#TRUNCATE" class="internal-link" title="orionis.foundation.config.database.SQLiteJournalMode.TRUNCATE">TRUNCATE</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.database.SQLiteJournalMode.html#WAL" class="internal-link" title="orionis.foundation.config.database.SQLiteJournalMode.WAL">WAL</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+         
+        
+      </div>
+                </div>
+            </div>
+            
+        
+
+        
+
+    </li><li class="">
+        
+        
+        
+            <div class="itemName expandableItem">
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId7155"> 
+                    
+                </input>
+
+                <label class="lbl-toggle" for="expandableItemId7155">
+                    
+                    
+                </label>
+
+                <code><a href="orionis.foundation.config.database.SQLiteSynchronous.html" class="internal-link" title="orionis.foundation.config.database.SQLiteSynchronous"><wbr></wbr>SQLite<wbr></wbr>Synchronous</a></code>
+
+                <div class="expandableContent">
+                    <div>
+        
+
+        
+         
+
+        
+        
+
+        
+         
+
+        
+         
+
+        <div class="childrenKindTitle">Attributes</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.database.SQLiteSynchronous.html#EXTRA" class="internal-link" title="orionis.foundation.config.database.SQLiteSynchronous.EXTRA">EXTRA</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.database.SQLiteSynchronous.html#FULL" class="internal-link" title="orionis.foundation.config.database.SQLiteSynchronous.FULL">FULL</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.database.SQLiteSynchronous.html#NORMAL" class="internal-link" title="orionis.foundation.config.database.SQLiteSynchronous.NORMAL">NORMAL</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.database.SQLiteSynchronous.html#OFF" class="internal-link" title="orionis.foundation.config.database.SQLiteSynchronous.OFF">OFF</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+         
+        
+      </div>
+                </div>
+            </div>
+            
+        
+
+        
+
+    </li><li class="">
+        
+        
+        
+            <div class="itemName expandableItem">
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId7156"> 
+                    
+                </input>
+
+                <label class="lbl-toggle" for="expandableItemId7156">
+                    
+                    
+                </label>
+
+                <code><a href="orionis.foundation.config.database.SQLServer.html" class="internal-link" title="orionis.foundation.config.database.SQLServer"><wbr></wbr>SQLServer</a></code>
+
+                <div class="expandableContent">
+                    <div>
+        
+
+        
+         
+
+        
+        
+
+        <div class="childrenKindTitle">Methods</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.database.SQLServer.html#__post_init__" class="internal-link" title="orionis.foundation.config.database.SQLServer.__post_init__">__post<wbr></wbr>_init__</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.database.SQLServer.html#__validateCredentials" class="internal-link" title="orionis.foundation.config.database.SQLServer.__validateCredentials">__validate<wbr></wbr>Credentials</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.database.SQLServer.html#__validateDriver" class="internal-link" title="orionis.foundation.config.database.SQLServer.__validateDriver">__validate<wbr></wbr>Driver</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.database.SQLServer.html#__validateEndpoint" class="internal-link" title="orionis.foundation.config.database.SQLServer.__validateEndpoint">__validate<wbr></wbr>Endpoint</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.database.SQLServer.html#__validateOptions" class="internal-link" title="orionis.foundation.config.database.SQLServer.__validateOptions">__validate<wbr></wbr>Options</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        <div class="childrenKindTitle">Inherited Methods</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.support.entities.BaseEntity.html#_cachedFieldMetadata" class="internal-link" title="orionis.support.entities.BaseEntity._cachedFieldMetadata">_cached<wbr></wbr>Field<wbr></wbr>Metadata</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.support.entities.BaseEntity.html#getFields" class="internal-link" title="orionis.support.entities.BaseEntity.getFields">get<wbr></wbr>Fields</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.support.entities.BaseEntity.html#toDict" class="internal-link" title="orionis.support.entities.BaseEntity.toDict">to<wbr></wbr>Dict</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        <div class="childrenKindTitle">Attributes</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.database.SQLServer.html#charset" class="internal-link" title="orionis.foundation.config.database.SQLServer.charset">charset</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.database.SQLServer.html#database" class="internal-link" title="orionis.foundation.config.database.SQLServer.database">database</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.database.SQLServer.html#driver" class="internal-link" title="orionis.foundation.config.database.SQLServer.driver">driver</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.database.SQLServer.html#encrypt" class="internal-link" title="orionis.foundation.config.database.SQLServer.encrypt">encrypt</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.database.SQLServer.html#host" class="internal-link" title="orionis.foundation.config.database.SQLServer.host">host</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.database.SQLServer.html#odbc_driver" class="internal-link" title="orionis.foundation.config.database.SQLServer.odbc_driver">odbc<wbr></wbr>_driver</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.database.SQLServer.html#password" class="internal-link" title="orionis.foundation.config.database.SQLServer.password">password</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.database.SQLServer.html#port" class="internal-link" title="orionis.foundation.config.database.SQLServer.port">port</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.database.SQLServer.html#prefix" class="internal-link" title="orionis.foundation.config.database.SQLServer.prefix">prefix</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.database.SQLServer.html#prefix_indexes" class="internal-link" title="orionis.foundation.config.database.SQLServer.prefix_indexes">prefix<wbr></wbr>_indexes</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.database.SQLServer.html#trust_server_certificate" class="internal-link" title="orionis.foundation.config.database.SQLServer.trust_server_certificate">trust<wbr></wbr>_server<wbr></wbr>_certificate</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.database.SQLServer.html#username" class="internal-link" title="orionis.foundation.config.database.SQLServer.username">username</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        <div class="childrenKindTitle">Inherited Attributes</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.support.entities.BaseEntity.html#__slots__" class="internal-link" title="orionis.support.entities.BaseEntity.__slots__">__slots__</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+        
+      </div>
+                </div>
+            </div>
+            
+        
+
+        
+
+    </li><li class="">
+        
+        
+        
+            <div class="itemName expandableItem">
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId7157"> 
+                    
+                </input>
+
+                <label class="lbl-toggle" for="expandableItemId7157">
+                    
+                    
+                </label>
+
+                <code><a href="orionis.foundation.config.database.SQLServerCharset.html" class="internal-link" title="orionis.foundation.config.database.SQLServerCharset"><wbr></wbr>SQLServer<wbr></wbr>Charset</a></code>
+
+                <div class="expandableContent">
+                    <div>
+        
+
+        
+         
+
+        
+        
+
+        
+         
+
+        
+         
+
+        <div class="childrenKindTitle">Attributes</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.database.SQLServerCharset.html#CP1250" class="internal-link" title="orionis.foundation.config.database.SQLServerCharset.CP1250">CP1250</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.database.SQLServerCharset.html#CP1251" class="internal-link" title="orionis.foundation.config.database.SQLServerCharset.CP1251">CP1251</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.database.SQLServerCharset.html#CP1252" class="internal-link" title="orionis.foundation.config.database.SQLServerCharset.CP1252">CP1252</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.database.SQLServerCharset.html#CP1253" class="internal-link" title="orionis.foundation.config.database.SQLServerCharset.CP1253">CP1253</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.database.SQLServerCharset.html#CP1254" class="internal-link" title="orionis.foundation.config.database.SQLServerCharset.CP1254">CP1254</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.database.SQLServerCharset.html#CP1255" class="internal-link" title="orionis.foundation.config.database.SQLServerCharset.CP1255">CP1255</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.database.SQLServerCharset.html#CP1256" class="internal-link" title="orionis.foundation.config.database.SQLServerCharset.CP1256">CP1256</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.database.SQLServerCharset.html#CP1257" class="internal-link" title="orionis.foundation.config.database.SQLServerCharset.CP1257">CP1257</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.database.SQLServerCharset.html#CP1258" class="internal-link" title="orionis.foundation.config.database.SQLServerCharset.CP1258">CP1258</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.database.SQLServerCharset.html#CP437" class="internal-link" title="orionis.foundation.config.database.SQLServerCharset.CP437">CP437</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.database.SQLServerCharset.html#CP850" class="internal-link" title="orionis.foundation.config.database.SQLServerCharset.CP850">CP850</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.database.SQLServerCharset.html#CP874" class="internal-link" title="orionis.foundation.config.database.SQLServerCharset.CP874">CP874</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.database.SQLServerCharset.html#CP932" class="internal-link" title="orionis.foundation.config.database.SQLServerCharset.CP932">CP932</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.database.SQLServerCharset.html#CP936" class="internal-link" title="orionis.foundation.config.database.SQLServerCharset.CP936">CP936</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.database.SQLServerCharset.html#CP949" class="internal-link" title="orionis.foundation.config.database.SQLServerCharset.CP949">CP949</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.database.SQLServerCharset.html#CP950" class="internal-link" title="orionis.foundation.config.database.SQLServerCharset.CP950">CP950</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.database.SQLServerCharset.html#ISO_8859_1" class="internal-link" title="orionis.foundation.config.database.SQLServerCharset.ISO_8859_1">ISO<wbr></wbr>_8859<wbr></wbr>_1</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.database.SQLServerCharset.html#ISO_8859_13" class="internal-link" title="orionis.foundation.config.database.SQLServerCharset.ISO_8859_13">ISO<wbr></wbr>_8859<wbr></wbr>_13</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.database.SQLServerCharset.html#ISO_8859_15" class="internal-link" title="orionis.foundation.config.database.SQLServerCharset.ISO_8859_15">ISO<wbr></wbr>_8859<wbr></wbr>_15</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.database.SQLServerCharset.html#ISO_8859_2" class="internal-link" title="orionis.foundation.config.database.SQLServerCharset.ISO_8859_2">ISO<wbr></wbr>_8859<wbr></wbr>_2</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.database.SQLServerCharset.html#ISO_8859_3" class="internal-link" title="orionis.foundation.config.database.SQLServerCharset.ISO_8859_3">ISO<wbr></wbr>_8859<wbr></wbr>_3</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.database.SQLServerCharset.html#ISO_8859_4" class="internal-link" title="orionis.foundation.config.database.SQLServerCharset.ISO_8859_4">ISO<wbr></wbr>_8859<wbr></wbr>_4</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.database.SQLServerCharset.html#ISO_8859_5" class="internal-link" title="orionis.foundation.config.database.SQLServerCharset.ISO_8859_5">ISO<wbr></wbr>_8859<wbr></wbr>_5</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.database.SQLServerCharset.html#ISO_8859_6" class="internal-link" title="orionis.foundation.config.database.SQLServerCharset.ISO_8859_6">ISO<wbr></wbr>_8859<wbr></wbr>_6</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.database.SQLServerCharset.html#ISO_8859_7" class="internal-link" title="orionis.foundation.config.database.SQLServerCharset.ISO_8859_7">ISO<wbr></wbr>_8859<wbr></wbr>_7</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.database.SQLServerCharset.html#ISO_8859_8" class="internal-link" title="orionis.foundation.config.database.SQLServerCharset.ISO_8859_8">ISO<wbr></wbr>_8859<wbr></wbr>_8</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.database.SQLServerCharset.html#ISO_8859_9" class="internal-link" title="orionis.foundation.config.database.SQLServerCharset.ISO_8859_9">ISO<wbr></wbr>_8859<wbr></wbr>_9</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.database.SQLServerCharset.html#UTF8" class="internal-link" title="orionis.foundation.config.database.SQLServerCharset.UTF8">UTF8</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+         
+        
+      </div>
+                </div>
+            </div>
+            
+        
+
+        
+
+    </li>
+</ul>
+
+        <div class="childrenKindTitle">Functions</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.database.html#__dir__" class="internal-link" title="orionis.foundation.config.database.__dir__">__dir__</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.database.html#__getattr__" class="internal-link" title="orionis.foundation.config.database.__getattr__">__getattr__</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+         
+
+        <div class="childrenKindTitle">Variables</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.database.html#_EXPORTS" class="internal-link" title="orionis.foundation.config.database._EXPORTS">_EXPORTS</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+         
+        
+      </div>
+  </div>
+
+</nav>
+        </div>
+        <div id="collapse-sidebar">
+          <a class="btn btn-link" onclick="toggleSideBarCollapse()" title="Toggle Sidebar Collapse">
+          </a>
+        </div> 
+        <script src="sidebartoggle.js" type="text/javascript"></script>
+       
+      </div>
+
+      <main class="">
+        
+
+        <div class="orionis-subheader">
+  <nav class="orionis-breadcrumb" aria-label="Documentation breadcrumb">
+    <a href="index.html">REFERENCE</a>
+    <span aria-hidden="true">/</span>
+    <span>ORIONIS FRAMEWORK</span>
+  </nav>
+  <section class="orionis-hero" aria-labelledby="orionis-hero-title">
+    <div class="orionis-hero-content">
+      <p class="orionis-eyebrow"><span class="orionis-status-dot" aria-hidden="true"></span> THE ORIONIS API</p>
+      <h2 id="orionis-hero-title">Build with <span class="orionis-accent">clarity.</span></h2>
+      <p class="orionis-hero-description">Explore the building blocks of an async-first Python framework. Every module, class, and method — connected, searchable, and ready to build with.</p>
+      <div class="orionis-hero-actions">
+        <a class="orionis-button" href="moduleIndex.html">Explore modules <span aria-hidden="true">→</span></a>
+        <a class="orionis-button orionis-button-secondary" href="classIndex.html">View classes</a>
+      </div>
+    </div>
+    <div class="orionis-hero-constellation" aria-hidden="true">
+      <span class="orionis-star orionis-star-one"></span>
+      <span class="orionis-star orionis-star-two"></span>
+      <span class="orionis-star orionis-star-three"></span>
+      <span class="orionis-star orionis-star-four"></span>
+    </div>
+  </section>
+</div>
+
+        <div class="page-header">
+          <h1 class="class"><code><code><a href="index.html" class="internal-link">orionis</a></code><wbr></wbr>.<code><a href="orionis.foundation.html" class="internal-link" title="orionis.foundation">foundation</a></code><wbr></wbr>.<code><a href="orionis.foundation.config.html" class="internal-link" title="orionis.foundation.config">config</a></code><wbr></wbr>.<code><a href="orionis.foundation.config.database.html" class="internal-link" title="orionis.foundation.config.database">database</a></code><wbr></wbr>.<code><a href="orionis.foundation.config.database.Redshift.html" class="internal-link" title="orionis.foundation.config.database.Redshift">Redshift</a></code></code></h1>
+          <div id="show-private">
+            <button class="btn btn-link" onclick="togglePrivate()">Toggle Private API</button>
+          </div>
+        </div>
+
+        <div class="categoryHeader">
+          class documentation
+        </div>
+
+        <div class="extrasDocstring">
+          <p class="class-signature"><code><span class="py-keyword">class</span> <span class="py-defname">Redshift</span>(<a href="orionis.support.entities.BaseEntity.html" class="internal-link" title="orionis.support.entities.BaseEntity">BaseEntity</a>): <a href="https://github.com/orionis-framework/framework/tree/dbaa747abe61f50f5dea7d99d3850214a1e71285/orionis/foundation/config/database/entities/redshift.py#L10" class="sourceLink">(source)</a></code></p><p><a href="classIndex.html#orionis.foundation.config.database.Redshift">View In Hierarchy</a></p>
+        </div>
+
+        <div class="moduleDocstring">
+          <div><p>Configure Amazon Redshift with the official AWS Python connector.</p></div>
+        </div>
+
+        <div id="split-tables">
+          <table class="children sortable" id="id659">
+  
+  
+  <tr class="method">
+    
+    <td>Method</td>
+    <td><code><a href="#__post_init__" class="internal-link" title="orionis.foundation.config.database.Redshift.__post_init__">__post<wbr></wbr>_init__</a></code></td>
+    <td>Validate connector settings without contacting AWS or opening a socket.</td>
+  </tr><tr class="instancevariable">
+    
+    <td>Instance Variable</td>
+    <td><code><a href="#cluster_identifier" class="internal-link" title="orionis.foundation.config.database.Redshift.cluster_identifier">cluster<wbr></wbr>_identifier</a></code></td>
+    <td>Provisioned cluster identifier for IAM authentication.</td>
+  </tr><tr class="instancevariable">
+    
+    <td>Instance Variable</td>
+    <td><code><a href="#database" class="internal-link" title="orionis.foundation.config.database.Redshift.database">database</a></code></td>
+    <td>Database name.</td>
+  </tr><tr class="instancevariable">
+    
+    <td>Instance Variable</td>
+    <td><code><a href="#db_user" class="internal-link" title="orionis.foundation.config.database.Redshift.db_user">db<wbr></wbr>_user</a></code></td>
+    <td>Database user requested through IAM.</td>
+  </tr><tr class="instancevariable">
+    
+    <td>Instance Variable</td>
+    <td><code><a href="#driver" class="internal-link" title="orionis.foundation.config.database.Redshift.driver">driver</a></code></td>
+    <td>Fixed Redshift driver identifier.</td>
+  </tr><tr class="instancevariable">
+    
+    <td>Instance Variable</td>
+    <td><code><a href="#host" class="internal-link" title="orionis.foundation.config.database.Redshift.host">host</a></code></td>
+    <td>Cluster endpoint, or None when IAM resolves the endpoint.</td>
+  </tr><tr class="instancevariable">
+    
+    <td>Instance Variable</td>
+    <td><code><a href="#iam" class="internal-link" title="orionis.foundation.config.database.Redshift.iam">iam</a></code></td>
+    <td>Enable the connector's IAM authentication.</td>
+  </tr><tr class="instancevariable">
+    
+    <td>Instance Variable</td>
+    <td><code><a href="#is_serverless" class="internal-link" title="orionis.foundation.config.database.Redshift.is_serverless">is<wbr></wbr>_serverless</a></code></td>
+    <td>Select Redshift Serverless instead of a provisioned cluster.</td>
+  </tr><tr class="instancevariable">
+    
+    <td>Instance Variable</td>
+    <td><code><a href="#password" class="internal-link" title="orionis.foundation.config.database.Redshift.password">password</a></code></td>
+    <td>Database authentication password, unused with IAM credentials.</td>
+  </tr><tr class="instancevariable">
+    
+    <td>Instance Variable</td>
+    <td><code><a href="#port" class="internal-link" title="orionis.foundation.config.database.Redshift.port">port</a></code></td>
+    <td>Database port, defaulting to 5439.</td>
+  </tr><tr class="instancevariable">
+    
+    <td>Instance Variable</td>
+    <td><code><a href="#prefix" class="internal-link" title="orionis.foundation.config.database.Redshift.prefix">prefix</a></code></td>
+    <td>Table name prefix.</td>
+  </tr><tr class="instancevariable">
+    
+    <td>Instance Variable</td>
+    <td><code><a href="#profile" class="internal-link" title="orionis.foundation.config.database.Redshift.profile">profile</a></code></td>
+    <td>AWS credentials profile; None uses the SDK credential chain.</td>
+  </tr><tr class="instancevariable">
+    
+    <td>Instance Variable</td>
+    <td><code><a href="#region" class="internal-link" title="orionis.foundation.config.database.Redshift.region">region</a></code></td>
+    <td>AWS region used for IAM endpoint and credential resolution.</td>
+  </tr><tr class="instancevariable">
+    
+    <td>Instance Variable</td>
+    <td><code><a href="#serverless_acct_id" class="internal-link" title="orionis.foundation.config.database.Redshift.serverless_acct_id">serverless<wbr></wbr>_acct<wbr></wbr>_id</a></code></td>
+    <td>AWS account owning the Serverless workgroup.</td>
+  </tr><tr class="instancevariable">
+    
+    <td>Instance Variable</td>
+    <td><code><a href="#serverless_work_group" class="internal-link" title="orionis.foundation.config.database.Redshift.serverless_work_group">serverless<wbr></wbr>_work<wbr></wbr>_group</a></code></td>
+    <td>Serverless workgroup used for endpoint resolution.</td>
+  </tr><tr class="instancevariable">
+    
+    <td>Instance Variable</td>
+    <td><code><a href="#ssl" class="internal-link" title="orionis.foundation.config.database.Redshift.ssl">ssl</a></code></td>
+    <td>Enable TLS for database connections.</td>
+  </tr><tr class="instancevariable">
+    
+    <td>Instance Variable</td>
+    <td><code><a href="#sslmode" class="internal-link" title="orionis.foundation.config.database.Redshift.sslmode">sslmode</a></code></td>
+    <td>Certificate verification policy, defaulting to verify-full.</td>
+  </tr><tr class="instancevariable">
+    
+    <td>Instance Variable</td>
+    <td><code><a href="#timeout" class="internal-link" title="orionis.foundation.config.database.Redshift.timeout">timeout</a></code></td>
+    <td>Connection socket timeout in seconds, or None for no timeout.</td>
+  </tr><tr class="instancevariable">
+    
+    <td>Instance Variable</td>
+    <td><code><a href="#username" class="internal-link" title="orionis.foundation.config.database.Redshift.username">username</a></code></td>
+    <td>Database authentication user.</td>
+  </tr>
+</table>
+          
+            <p class="inheritedFrom">
+              Inherited from <code><a href="orionis.support.entities.BaseEntity.html" class="internal-link" title="orionis.support.entities.BaseEntity">BaseEntity</a></code>:
+            </p>
+            <table class="children sortable" id="id660">
+  
+  
+  <tr class="baseclassmethod">
+    
+    <td>Class Method</td>
+    <td><code><a href="orionis.support.entities.BaseEntity.html#_cachedFieldMetadata" class="internal-link" title="orionis.support.entities.BaseEntity._cachedFieldMetadata">_cached<wbr></wbr>Field<wbr></wbr>Metadata</a></code></td>
+    <td>Retrieve field definitions and normalized types cached by class.</td>
+  </tr><tr class="basemethod">
+    
+    <td>Method</td>
+    <td><code><a href="orionis.support.entities.BaseEntity.html#getFields" class="internal-link" title="orionis.support.entities.BaseEntity.getFields">get<wbr></wbr>Fields</a></code></td>
+    <td>Describe field names, normalized types, defaults, and metadata.</td>
+  </tr><tr class="basemethod">
+    
+    <td>Method</td>
+    <td><code><a href="orionis.support.entities.BaseEntity.html#toDict" class="internal-link" title="orionis.support.entities.BaseEntity.toDict">to<wbr></wbr>Dict</a></code></td>
+    <td>Convert the dataclass instance to a recursively copied dictionary.</td>
+  </tr><tr class="baseclassvariable">
+    
+    <td>Class Variable</td>
+    <td><code><a href="orionis.support.entities.BaseEntity.html#__slots__" class="internal-link" title="orionis.support.entities.BaseEntity.__slots__">__slots__</a></code></td>
+    <td><span class="rst-undocumented">Undocumented</span></td>
+  </tr>
+</table>
+            
+
+            
+        </div>
+
+        <div id="child-list">
+          <div class="basemethod">
+  
+  
+  <a name="orionis.foundation.config.database.Redshift.__post_init__">
+    
+  </a>
+  <a name="__post_init__">
+    
+  </a>
+  <div class="functionHeader">
+    
+    
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">__post_init__</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>):</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/dbaa747abe61f50f5dea7d99d3850214a1e71285/orionis/foundation/config/database/entities/redshift.py#L150">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#__post_init__" title="orionis.foundation.config.database.Redshift.__post_init__">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    <div class="interfaceinfo">overrides <code><a href="orionis.support.entities.BaseEntity.html#__post_init__" class="internal-link">orionis.support.entities.BaseEntity.__post_init__</a></code></div>
+    <div><p>Validate connector settings without contacting AWS or opening a socket.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">Validate scalar fields and store the canonical SSL mode.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/exceptions.html#TypeError" class="intersphinx-link">TypeError</a></code></td><td>If a setting has an incompatible type.</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/exceptions.html#ValueError" class="intersphinx-link">ValueError</a></code></td><td>If the driver, port, timeout or SSL mode is invalid.</td></tr></table></div>
+  </div>
+</div><div class="baseinstancevariable">
+  
+  
+  <a name="orionis.foundation.config.database.Redshift.cluster_identifier">
+    
+  </a>
+  <a name="cluster_identifier">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <span class="py-defname">cluster_identifier</span>: <code>str | None</code> =
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/dbaa747abe61f50f5dea7d99d3850214a1e71285/orionis/foundation/config/database/entities/redshift.py#L120">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#cluster_identifier" title="orionis.foundation.config.database.Redshift.cluster_identifier">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="functionBody">
+    
+    <div><p>Provisioned cluster identifier for IAM authentication.</p></div>
+    
+  </div>
+</div><div class="baseinstancevariable">
+  
+  
+  <a name="orionis.foundation.config.database.Redshift.database">
+    
+  </a>
+  <a name="database">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <span class="py-defname">database</span>: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code> =
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/dbaa747abe61f50f5dea7d99d3850214a1e71285/orionis/foundation/config/database/entities/redshift.py#L70">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#database" title="orionis.foundation.config.database.Redshift.database">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="functionBody">
+    
+    <div><p>Database name.</p></div>
+    
+  </div>
+</div><div class="baseinstancevariable">
+  
+  
+  <a name="orionis.foundation.config.database.Redshift.db_user">
+    
+  </a>
+  <a name="db_user">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <span class="py-defname">db_user</span>: <code>str | None</code> =
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/dbaa747abe61f50f5dea7d99d3850214a1e71285/orionis/foundation/config/database/entities/redshift.py#L125">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#db_user" title="orionis.foundation.config.database.Redshift.db_user">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="functionBody">
+    
+    <div><p>Database user requested through IAM.</p></div>
+    
+  </div>
+</div><div class="baseinstancevariable">
+  
+  
+  <a name="orionis.foundation.config.database.Redshift.driver">
+    
+  </a>
+  <a name="driver">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <span class="py-defname">driver</span>: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code> =
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/dbaa747abe61f50f5dea7d99d3850214a1e71285/orionis/foundation/config/database/entities/redshift.py#L55">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#driver" title="orionis.foundation.config.database.Redshift.driver">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="functionBody">
+    
+    <div><p>Fixed Redshift driver identifier.</p></div>
+    
+  </div>
+</div><div class="baseinstancevariable">
+  
+  
+  <a name="orionis.foundation.config.database.Redshift.host">
+    
+  </a>
+  <a name="host">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <span class="py-defname">host</span>: <code>str | None</code> =
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/dbaa747abe61f50f5dea7d99d3850214a1e71285/orionis/foundation/config/database/entities/redshift.py#L60">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#host" title="orionis.foundation.config.database.Redshift.host">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="functionBody">
+    
+    <div><p>Cluster endpoint, or None when IAM resolves the endpoint.</p></div>
+    
+  </div>
+</div><div class="baseinstancevariable">
+  
+  
+  <a name="orionis.foundation.config.database.Redshift.iam">
+    
+  </a>
+  <a name="iam">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <span class="py-defname">iam</span>: <code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code> =
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/dbaa747abe61f50f5dea7d99d3850214a1e71285/orionis/foundation/config/database/entities/redshift.py#L110">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#iam" title="orionis.foundation.config.database.Redshift.iam">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="functionBody">
+    
+    <div><p>Enable the connector's IAM authentication.</p></div>
+    
+  </div>
+</div><div class="baseinstancevariable">
+  
+  
+  <a name="orionis.foundation.config.database.Redshift.is_serverless">
+    
+  </a>
+  <a name="is_serverless">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <span class="py-defname">is_serverless</span>: <code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code> =
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/dbaa747abe61f50f5dea7d99d3850214a1e71285/orionis/foundation/config/database/entities/redshift.py#L135">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#is_serverless" title="orionis.foundation.config.database.Redshift.is_serverless">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="functionBody">
+    
+    <div><p>Select Redshift Serverless instead of a provisioned cluster.</p></div>
+    
+  </div>
+</div><div class="baseinstancevariable">
+  
+  
+  <a name="orionis.foundation.config.database.Redshift.password">
+    
+  </a>
+  <a name="password">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <span class="py-defname">password</span>: <code>str | None</code> =
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/dbaa747abe61f50f5dea7d99d3850214a1e71285/orionis/foundation/config/database/entities/redshift.py#L80">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#password" title="orionis.foundation.config.database.Redshift.password">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="functionBody">
+    
+    <div><p>Database authentication password, unused with IAM credentials.</p></div>
+    
+  </div>
+</div><div class="baseinstancevariable">
+  
+  
+  <a name="orionis.foundation.config.database.Redshift.port">
+    
+  </a>
+  <a name="port">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <span class="py-defname">port</span>: <code>str | int</code> =
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/dbaa747abe61f50f5dea7d99d3850214a1e71285/orionis/foundation/config/database/entities/redshift.py#L65">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#port" title="orionis.foundation.config.database.Redshift.port">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="functionBody">
+    
+    <div><p>Database port, defaulting to 5439.</p></div>
+    
+  </div>
+</div><div class="baseinstancevariable">
+  
+  
+  <a name="orionis.foundation.config.database.Redshift.prefix">
+    
+  </a>
+  <a name="prefix">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <span class="py-defname">prefix</span>: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code> =
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/dbaa747abe61f50f5dea7d99d3850214a1e71285/orionis/foundation/config/database/entities/redshift.py#L85">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#prefix" title="orionis.foundation.config.database.Redshift.prefix">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="functionBody">
+    
+    <div><p>Table name prefix.</p></div>
+    
+  </div>
+</div><div class="baseinstancevariable">
+  
+  
+  <a name="orionis.foundation.config.database.Redshift.profile">
+    
+  </a>
+  <a name="profile">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <span class="py-defname">profile</span>: <code>str | None</code> =
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/dbaa747abe61f50f5dea7d99d3850214a1e71285/orionis/foundation/config/database/entities/redshift.py#L130">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#profile" title="orionis.foundation.config.database.Redshift.profile">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="functionBody">
+    
+    <div><p>AWS credentials profile; None uses the SDK credential chain.</p></div>
+    
+  </div>
+</div><div class="baseinstancevariable">
+  
+  
+  <a name="orionis.foundation.config.database.Redshift.region">
+    
+  </a>
+  <a name="region">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <span class="py-defname">region</span>: <code>str | None</code> =
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/dbaa747abe61f50f5dea7d99d3850214a1e71285/orionis/foundation/config/database/entities/redshift.py#L115">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#region" title="orionis.foundation.config.database.Redshift.region">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="functionBody">
+    
+    <div><p>AWS region used for IAM endpoint and credential resolution.</p></div>
+    
+  </div>
+</div><div class="baseinstancevariable">
+  
+  
+  <a name="orionis.foundation.config.database.Redshift.serverless_acct_id">
+    
+  </a>
+  <a name="serverless_acct_id">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <span class="py-defname">serverless_acct_id</span>: <code>str | None</code> =
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/dbaa747abe61f50f5dea7d99d3850214a1e71285/orionis/foundation/config/database/entities/redshift.py#L145">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#serverless_acct_id" title="orionis.foundation.config.database.Redshift.serverless_acct_id">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="functionBody">
+    
+    <div><p>AWS account owning the Serverless workgroup.</p></div>
+    
+  </div>
+</div><div class="baseinstancevariable">
+  
+  
+  <a name="orionis.foundation.config.database.Redshift.serverless_work_group">
+    
+  </a>
+  <a name="serverless_work_group">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <span class="py-defname">serverless_work_group</span>: <code>str | None</code> =
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/dbaa747abe61f50f5dea7d99d3850214a1e71285/orionis/foundation/config/database/entities/redshift.py#L140">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#serverless_work_group" title="orionis.foundation.config.database.Redshift.serverless_work_group">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="functionBody">
+    
+    <div><p>Serverless workgroup used for endpoint resolution.</p></div>
+    
+  </div>
+</div><div class="baseinstancevariable">
+  
+  
+  <a name="orionis.foundation.config.database.Redshift.ssl">
+    
+  </a>
+  <a name="ssl">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <span class="py-defname">ssl</span>: <code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code> =
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/dbaa747abe61f50f5dea7d99d3850214a1e71285/orionis/foundation/config/database/entities/redshift.py#L90">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#ssl" title="orionis.foundation.config.database.Redshift.ssl">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="functionBody">
+    
+    <div><p>Enable TLS for database connections.</p></div>
+    
+  </div>
+</div><div class="baseinstancevariable">
+  
+  
+  <a name="orionis.foundation.config.database.Redshift.sslmode">
+    
+  </a>
+  <a name="sslmode">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <span class="py-defname">sslmode</span>: <code>str | RedshiftSSLMode</code> =
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/dbaa747abe61f50f5dea7d99d3850214a1e71285/orionis/foundation/config/database/entities/redshift.py#L95">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#sslmode" title="orionis.foundation.config.database.Redshift.sslmode">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="functionBody">
+    
+    <div><p>Certificate verification policy, defaulting to verify-full.</p></div>
+    
+  </div>
+</div><div class="baseinstancevariable">
+  
+  
+  <a name="orionis.foundation.config.database.Redshift.timeout">
+    
+  </a>
+  <a name="timeout">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <span class="py-defname">timeout</span>: <code>int | None</code> =
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/dbaa747abe61f50f5dea7d99d3850214a1e71285/orionis/foundation/config/database/entities/redshift.py#L105">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#timeout" title="orionis.foundation.config.database.Redshift.timeout">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="functionBody">
+    
+    <div><p>Connection socket timeout in seconds, or None for no timeout.</p></div>
+    
+  </div>
+</div><div class="baseinstancevariable">
+  
+  
+  <a name="orionis.foundation.config.database.Redshift.username">
+    
+  </a>
+  <a name="username">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <span class="py-defname">username</span>: <code>str | None</code> =
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/dbaa747abe61f50f5dea7d99d3850214a1e71285/orionis/foundation/config/database/entities/redshift.py#L75">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#username" title="orionis.foundation.config.database.Redshift.username">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="functionBody">
+    
+    <div><p>Database authentication user.</p></div>
+    
+  </div>
+</div>
+        </div>
+      
+      </main>
+    </div>
+
+    <footer class="orionis-footer">
+  
+  <div class="orionis-footer-inner">
+    <div class="orionis-footer-copy">
+      <p>API documentation for <a href="https://orionis-framework.com/" class="projecthome">Orionis</a>.</p>
+      <p class="orionis-footer-meta">Generated with <a href="https://github.com/twisted/pydoctor/">Pydoctor</a> 25.10.1.<span class="orionis-footer-build"> Built 2026-10-06 18:23:11.</span></p>
+    </div>
+    <nav class="orionis-footer-links" aria-label="Additional resources">
+      <a href="https://docs.orionis-framework.com">Read the guide <span aria-hidden="true">↗</span></a>
+      <a href="https://github.com/orionis-framework/framework">Source on GitHub <span aria-hidden="true">↗</span></a>
+    </nav>
+  </div>
+  <!-- Keep Pydoctor's search engine and its required load order intact. -->
+  <script src="ajax.js" type="text/javascript"></script>
+  <script src="searchlib.js" type="text/javascript"></script>
+  <script src="search.js" type="text/javascript"></script>
+</footer>
+  
+    <script src="pydoctor.js" type="text/javascript"></script>
+
+  </body>
+</html>

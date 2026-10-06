@@ -1,3 +1,5 @@
+from dataclasses import fields
+from inspect import signature
 from typing import TYPE_CHECKING
 from orionis.foundation.config.http import HTTP, HTTPBodyLimits
 from orionis.http.enums.interfaces import Interface
@@ -87,6 +89,23 @@ class _RsgiBody:
 class TestBodyLimits(TestCase):
     """Exercise actual byte limits independently from declared Content-Length."""
 
+    def testPayloadConstructorDefaultsMatchStaticConfiguration(self) -> None:
+        """Keep public parser defaults aligned with finite configuration metadata.
+
+        Returns
+        -------
+        None
+            Default signatures remain stable without constructing configuration.
+        """
+        defaults = {
+            item.name: item.metadata["default"] for item in fields(HTTPBodyLimits)
+        }
+        for parser in (BodyStream, MultipartStreamParser):
+            for name, parameter in signature(parser).parameters.items():
+                if name in defaults:
+                    with self.subTest(parser=parser.__name__, field=name):
+                        self.assertEqual(parameter.default, defaults[name])
+
     def testRejectsUnsafeConfiguration(self) -> None:
         """Reject booleans, None, strings, negative values and zero budgets.
 
@@ -174,13 +193,16 @@ class TestBodyLimits(TestCase):
         None
             Confirm the default public constructor is hardened.
         """
+        defaults = {
+            item.name: item.metadata["default"] for item in fields(HTTPBodyLimits)
+        }
         stream = BodyStream(
-            Interface.ASGI, _BodyReceive([b"x" * (HTTPBodyLimits.max_body_size + 1)]),
+            Interface.ASGI, _BodyReceive([b"x" * (defaults["max_body_size"] + 1)]),
         )
         with self.assertRaises(PayloadTooLargeException):
             await anext(stream.stream())
         stream = BodyStream(
-            Interface.ASGI, _BodyReceive([b"x" * (HTTPBodyLimits.max_buffer_size + 1)]),
+            Interface.ASGI, _BodyReceive([b"x" * (defaults["max_buffer_size"] + 1)]),
         )
         with self.assertRaises(PayloadTooLargeException):
             await stream.read()

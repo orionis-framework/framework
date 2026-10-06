@@ -5,6 +5,7 @@ from orionis.foundation.config.view import View
 
 @dataclass(frozen=True, kw_only=True)
 class BootstrapView(View):
+
     # ----------------------------------------------------------------------------------
     # paths : list[str] | tuple[str, ...], optional
     # --- Directories searched for templates in priority order.

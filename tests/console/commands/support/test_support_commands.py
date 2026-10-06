@@ -445,7 +445,7 @@ class TestSupportCommands(TestCase):
             self.assertTrue(metadata.is_file())
 
     def testOptimizesFilesBelowTheApplicationRootOnly(self) -> None:
-        """Compile project sources while skipping virtualenv and build folders.
+        """Validate project sources while skipping virtualenv and build folders.
 
         Returns
         -------
@@ -466,15 +466,14 @@ class TestSupportCommands(TestCase):
             source.write_text("value = 1", encoding="utf-8")
             for filename in excluded_files:
                 filename.parent.mkdir(parents=True)
-                filename.write_text("value = 1", encoding="utf-8")
+                filename.write_text("value =\n", encoding="utf-8")
             console = Mock()
 
-            with patch(
-                "orionis.console.commands.support.optimize.compileall.compile_file",
-                return_value=True,
-            ) as compile_file:
-                result = OptimizeCommand().handle(_Application(root), console)
+            result = OptimizeCommand().handle(_Application(root), console)
 
             self.assertEqual(result, 0)
-            self.assertEqual(compile_file.call_count, 1)
-            self.assertEqual(Path(compile_file.call_args.args[0]), source)
+            console.error.assert_not_called()
+            console.success.assert_called_once_with(
+                "Validated 1 Python file(s) without writing bytecode.",
+                timestamp=False,
+            )

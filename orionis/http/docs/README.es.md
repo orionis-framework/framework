@@ -223,11 +223,16 @@ Validación: **Importación y sintaxis verificadas** en CPython 3.14.6; la ejecu
 | Cuerpo | `HTTP_MAX_BODY_SIZE`, `HTTP_MAX_BUFFER_SIZE`, `HTTP_MAX_CONCURRENT_REQUESTS` | Cuerpo de 16 MiB, búfer de 2 MiB y 128 solicitudes concurrentes por worker. |
 | Multipart | `HTTP_MAX_FILES`, `HTTP_MAX_FIELDS`, `HTTP_MAX_PART_SIZE`, `HTTP_MAX_FIELD_SIZE`, `HTTP_MAX_PART_HEADER_SIZE`, `HTTP_UPLOAD_MEMORY_THRESHOLD`, `HTTP_MAX_MULTIPART_MEMORY_SIZE` | Acota cantidades, tamaños, cabeceras, memoria y volcado a disco. |
 | Desconexiones | `HTTP_MONITOR_DISCONNECTS` | Desactivado; habilita cancelación de solicitudes al desconectar. |
-| WebSocket | `WEBSOCKET_MAX_CONNECTIONS`, `WEBSOCKET_MAX_MESSAGE_SIZE`, `WEBSOCKET_ALLOW_ORIGINS` | 128 conexiones, mensajes de 1 MiB y política same-origin salvo configuración. |
+| WebSocket | `WEBSOCKET_MAX_CONNECTIONS`, `WEBSOCKET_MAX_MESSAGE_SIZE`, `CORS_ALLOW_ORIGINS` | 128 conexiones, mensajes de 1 MiB y política same-origin salvo configuración. |
 | Proxies/hosts | `TRUSTED_PROXIES`, `ALLOWED_HOSTS` | Confía por defecto en el proxy local; la lista vacía permite todo host. |
-| Rate limit | `RATE_LIMIT_ENABLED`, `RATE_LIMIT_REQUESTS`, `RATE_LIMIT_WINDOW`, `RATE_LIMIT_STORE`, `RATE_LIMIT_MAX_KEYS`, `RATE_LIMIT_MAX_EVENTS`, `RATE_LIMIT_REDIS_URL`, `RATE_LIMIT_REDIS_PREFIX`, `RATE_LIMIT_REDIS_TIMEOUT` | Desactivado; 100 solicitudes por 60 segundos al habilitar; memoria o Redis. |
+| Rate limit | `RATE_LIMIT_ENABLED`, `RATE_LIMIT_REQUESTS`, `RATE_LIMIT_WINDOW`, `RATE_LIMIT_STORE`, `RATE_LIMIT_MAX_KEYS`, `RATE_LIMIT_MAX_EVENTS`, `RATE_LIMIT_REDIS_PREFIX`, `RATE_LIMIT_REDIS_TIMEOUT` | Desactivado; 100 solicitudes por 60 segundos al habilitar; memoria o Redis. |
+| Conexión Redis | `REDIS_HOST`, `REDIS_PORT`, `REDIS_DB`, `REDIS_PASSWORD` | `127.0.0.1`, puerto 6379, base 0, sin contraseña; valores de conexión compartidos. |
 | CORS | `CORS_ALLOW_ORIGINS`, `CORS_ALLOW_ORIGIN_REGEX`, `CORS_ALLOW_METHODS`, `CORS_ALLOW_HEADERS`, `CORS_EXPOSE_HEADERS`, `CORS_ALLOW_CREDENTIALS`, `CORS_MAX_AGE` | Política cross-origin explícita; credenciales desactivadas; preflight de 600 segundos. |
 | CSRF | `CSRF_ENABLED`, `CSRF_TOKEN_LENGTH`, `CSRF_SESSION_KEY`, `CSRF_XSRF_COOKIE`, `CSRF_COOKIE_NAME`, `CSRF_COOKIE_SECURE`, `CSRF_COOKIE_SAME_SITE`, `CSRF_COOKIE_PATH`, `CSRF_COOKIE_DOMAIN` | Activo en rutas web con estado; tokens de 32 bytes y cookie lax. |
+
+MCP y WebSocket leen directamente `CORS_ALLOW_ORIGINS` por defecto. Para usar listas diferentes, el desarrollador puede cambiar la variable de entorno en la configuración correspondiente o proporcionar orígenes explícitos. Los valores no se filtran automáticamente; MCP rechaza los comodines.
+
+`HTTPRateLimit.rate_limit_redis` acepta una entidad `Redis` o un diccionario con `endpoint`, `port`, `db` y `password`. Los campos se pasan directamente al cliente Redis diferido sin construir una URL. Las pruebas de integración con Redis real requieren `ORIONIS_HTTP_REDIS_HOST`; las variables opcionales `ORIONIS_HTTP_REDIS_PORT`, `ORIONIS_HTTP_REDIS_DB` y `ORIONIS_HTTP_REDIS_PASSWORD` seleccionan la conexión de prueba.
 
 ## Integración con Orionis
 

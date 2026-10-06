@@ -653,3 +653,39 @@ class TestDatabaseWiperDialects(TestCase):
         with self.assertRaisesRegex(RuntimeError, "outside the wipe scope"):
             await DatabaseWiper(inspector).wipe()
         inspector.connection.statement.assert_not_awaited()
+
+    async def testRedshiftWipeDropsObjectsInsideOneRootTransaction(self) -> None:
+        """Use supported Redshift DDL without attempting types, domains or savepoints.
+
+        Returns
+        -------
+        None
+            Qualified objects are quoted and materialized views are removed first.
+        """
+        inspector = self._inspector(
+            "redshift", tables=["analytics.events"], views=["analytics.active"],
+            materialized_views=["analytics.summary"],
+        )
+        result = await DatabaseWiper(inspector).wipe()
+        sql = [call.args[0] for call in inspector.connection.statement.await_args_list]
+        self.assertEqual((result.tables, result.views, result.types), (1, 2, 0))
+        self.assertEqual(sql, [
+            'DROP MATERIALIZED VIEW IF EXISTS "analytics"."summary" CASCADE',
+            'DROP VIEW IF EXISTS "analytics"."active" CASCADE',
+            'DROP TABLE IF EXISTS "analytics"."events" CASCADE',
+        ])
+        inspector.connection.transaction.assert_called_once()
+
+    async def testRedshiftWipeRejectsAmbiguousNamesBeforeDdl(self) -> None:
+        """Keep the qualified-name guard active for Redshift destructive DDL.
+
+        Returns
+        -------
+        None
+            Ambiguous names issue no statements and open no transaction.
+        """
+        inspector = self._inspector("redshift", tables=["analytics.odd.name"])
+        with self.assertRaisesRegex(ValueError, "contains a period"):
+            await DatabaseWiper(inspector).wipe()
+        inspector.connection.statement.assert_not_awaited()
+        inspector.connection.transaction.assert_not_called()

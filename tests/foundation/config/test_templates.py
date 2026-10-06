@@ -1,9 +1,11 @@
 import ast
 import logging
 import os
+import re
 import subprocess
 import sys
 from dataclasses import MISSING, fields, is_dataclass
+from io import StringIO
 from pathlib import Path
 from tempfile import TemporaryDirectory
 from dotenv.parser import parse_stream
@@ -18,18 +20,75 @@ from tests.foundation.config.test_environment import (
 )
 
 class TestConfigurationTemplates(ConfigurationTestCase):
+    def _exampleEnvironmentKeys(self) -> list[str]:
+        """Parse active declarations and optional commented overrides.
+
+        Returns
+        -------
+        list[str]
+            Environment names in declaration order, retaining duplicates.
+        """
+        example = Path(__file__).resolve().parents[3] / ".env.example"
+        content = re.sub(
+            r"(?m)^#[ \t]*(?=[A-Z][A-Z0-9_]*[ \t]*=)",
+            "",
+            example.read_text(encoding="utf-8"),
+        )
+        bindings = list(parse_stream(StringIO(content)))
+        for binding in bindings:
+            self.assertFalse(
+                binding.error,
+                f"Invalid dotenv syntax at line {binding.original.line}.",
+            )
+        return [binding.key for binding in bindings if binding.key]
+
     def testExampleEnvironmentDeclaresEachVariableOnce(self) -> None:
-        """Reject duplicated environment keys that silently replace earlier defaults.
+        """Reject duplicates across active and commented environment declarations.
 
         Returns
         -------
         None
             Every parsed example key has one unambiguous declaration.
         """
-        example = Path(__file__).resolve().parents[3] / ".env.example"
-        with example.open(encoding="utf-8") as stream:
-            keys = [binding.key for binding in parse_stream(stream) if binding.key]
+        keys = self._exampleEnvironmentKeys()
         self.assertEqual(len(keys), len(set(keys)))
+
+    def testExampleEnvironmentDocumentsEveryConfigurationVariable(self) -> None:
+        """Keep every consumed configuration variable visible in the example.
+
+        Returns
+        -------
+        None
+            Active or commented declarations cover both configuration layers.
+        """
+        documented = set(self._exampleEnvironmentKeys())
+        required: set[str] = set()
+        for module in self.modules:
+            tree = ast.parse(Path(module.__file__).read_text(encoding="utf-8"))
+            for node in ast.walk(tree):
+                if (
+                    not isinstance(node, ast.Call)
+                    or not isinstance(node.func, ast.Attribute)
+                    or not isinstance(node.func.value, ast.Name)
+                    or node.func.value.id != "Env"
+                    or node.func.attr != "get"
+                ):
+                    continue
+                key = node.args[0] if node.args else next(
+                    (item.value for item in node.keywords if item.arg == "key"),
+                    None,
+                )
+                with self.subTest(module=module.__name__, line=node.lineno):
+                    self.assertIsInstance(key, ast.Constant)
+                    if isinstance(key, ast.Constant):
+                        self.assertIsInstance(key.value, str)
+                        required.add(key.value)
+        self.assertTrue(required)
+        self.assertEqual(
+            required - documented,
+            set(),
+            "Document every Env.get key in .env.example, including optional keys.",
+        )
 
     def testExampleEnvironmentBuildsEveryApplicationConfiguration(self) -> None:
         """Construct real configuration defaults in an isolated child process.

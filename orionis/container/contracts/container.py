@@ -231,12 +231,12 @@ class IContainer(ABC):
         *args: tuple[Any, ...],
         **kwargs: dict[str, Any],
     ) -> Any:
-        """
+        r"""
         Build and return an instance of the specified type.
 
         Parameters
         ----------
-        type_ : Callable[..., Any]
+        type\_ : Callable[..., Any]
             The class to instantiate.
         *args : tuple[Any, ...]
             Positional arguments for the constructor.

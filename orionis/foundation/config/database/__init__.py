@@ -7,6 +7,7 @@ if _TYPE_CHECKING:
     from orionis.foundation.config.database.entities.mysql import MySQL
     from orionis.foundation.config.database.entities.oracle import Oracle
     from orionis.foundation.config.database.entities.pgsql import PGSQL
+    from orionis.foundation.config.database.entities.redshift import Redshift
     from orionis.foundation.config.database.entities.sqlite import SQLite
     from orionis.foundation.config.database.entities.sqlserver import SQLServer
     from orionis.foundation.config.database.enums.connection_name import ConnectionName
@@ -20,6 +21,7 @@ if _TYPE_CHECKING:
     from orionis.foundation.config.database.enums.pgsql_charsets import PGSQLCharset
     from orionis.foundation.config.database.enums.pgsql_collations import PGSQLCollation
     from orionis.foundation.config.database.enums.pgsql_mode import PGSQLSSLMode
+    from orionis.foundation.config.database.enums.redshift_mode import RedshiftSSLMode
     from orionis.foundation.config.database.enums.sqlite_foreign_key import (
         SQLiteForeignKey,
     )
@@ -48,6 +50,8 @@ __all__ = [
     "PGSQLCharset",
     "PGSQLCollation",
     "PGSQLSSLMode",
+    "Redshift",
+    "RedshiftSSLMode",
     "SQLServer",
     "SQLServerCharset",
     "SQLite",
@@ -90,6 +94,12 @@ _EXPORTS = {
     ),
     "PGSQLSSLMode": (
         "orionis.foundation.config.database.enums.pgsql_mode", "PGSQLSSLMode",
+    ),
+    "Redshift": (
+        "orionis.foundation.config.database.entities.redshift", "Redshift",
+    ),
+    "RedshiftSSLMode": (
+        "orionis.foundation.config.database.enums.redshift_mode", "RedshiftSSLMode",
     ),
     "SQLServer": (
         "orionis.foundation.config.database.entities.sqlserver", "SQLServer",

@@ -267,12 +267,14 @@ Validación: **Ejecutado correctamente** en CPython 3.14.6.
 | `MCP_MAX_SUBSCRIPTIONS` | 1024 | Presupuesto total de suscripciones. |
 | `MCP_MAX_RESOURCE_SUBSCRIPTIONS` | 64 | Suscripciones de recursos por contexto. |
 | `MCP_SUBSCRIPTION_KEEPALIVE` | 15.0 segundos | Intervalo de keepalive para streaming. |
-| `MCP_ALLOWED_ORIGINS` | vacío | Orígenes HTTP explícitos de navegador. |
+| `CORS_ALLOW_ORIGINS` | vacío | Orígenes HTTP de navegador compartidos con CORS y WebSocket. |
 | `MCP_TOOL_SEARCH_MAX_RESULTS` | 20 | Máximo de resultados de catálogo. |
 | `MCP_TOOL_SEARCH_MAX_CALLS` | 5 | Llamadas en una ejecución de catálogo. |
 | `MCP_TOOL_SEARCH_MAX_OUTPUT_BYTES` | 256 KiB | Máximo de salida de ejecución del catálogo. |
 | `MCP_MAX_RESPONSE_SIZE` | 4 MiB | Máximo de respuesta serializada. |
 | `MCP_MAX_METADATA_SIZE` | 64 KiB | Máximo de metadatos. |
+
+Tanto `McpConfig` como `config/mcp.py` leen directamente `CORS_ALLOW_ORIGINS`. El desarrollador puede elegir otra variable de entorno en la configuración de la aplicación o proporcionar `allowed_origins` explícitos. Ningún origen se elimina silenciosamente antes de validar.
 
 Todos los presupuestos numéricos deben ser positivos; la página predeterminada no puede superar el máximo. Un `Origin` HTTP ausente se admite, pero uno presente debe coincidir exactamente con la lista HTTP(S) validada: no hay comodín ni excepción implícita de mismo origen.
 

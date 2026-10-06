@@ -11,7 +11,9 @@ from orionis.foundation.config.database.entities.database import Database
 from orionis.test import TestCase
 
 # Every first-party connection declared by the configuration entities.
-_EXPECTED_CONNECTIONS = ("sqlite", "mysql", "pgsql", "oracle", "sqlserver")
+_EXPECTED_CONNECTIONS = (
+    "sqlite", "mysql", "pgsql", "oracle", "sqlserver", "redshift",
+)
 
 def template_config() -> dict:
     """Build the application database template with its documented defaults.

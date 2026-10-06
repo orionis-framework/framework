@@ -1,10 +1,11 @@
 from __future__ import annotations
 from dataclasses import dataclass, field
 from orionis.environment import Env
-from orionis.foundation.config.logging.channel_options import channel_option
 from orionis.foundation.config.logging.enums import Level
 from orionis.foundation.config.logging.validators import IsValidLevel, IsValidPath
 from orionis.support.entities.base import BaseEntity
+
+_DEFAULT_PATH: str = "storage/logs/stack.log"
 
 @dataclass(frozen=True, kw_only=True)
 class Stack(BaseEntity):
@@ -27,12 +28,14 @@ class Stack(BaseEntity):
     """
 
     path: str = field(
-        default_factory=lambda: channel_option(
-            "stack", "LOG_PATH", "storage/logs/stack.log",
+        default_factory=lambda: (
+            Env.get("LOG_PATH", _DEFAULT_PATH)
+            if Env.get("LOG_CHANNEL", "stack") == "stack"
+            else _DEFAULT_PATH
         ),
         metadata={
             "description": "The file path where the log is stored.",
-            "default": "storage/logs/stack.log",
+            "default": _DEFAULT_PATH,
         },
     )
 

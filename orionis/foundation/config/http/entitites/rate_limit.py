@@ -1,8 +1,7 @@
 from __future__ import annotations
 from dataclasses import dataclass, field
-from urllib.parse import urlsplit
 from orionis.environment import Env
-from orionis.foundation.config.environment import redis_url
+from orionis.foundation.config.http.entitites.redis import Redis
 from orionis.foundation.config.validation import validate_integer, validate_string
 from orionis.support.entities.base import BaseEntity
 
@@ -25,8 +24,8 @@ class HTTPRateLimit(BaseEntity):
         Maximum retained clients in the memory store.
     rate_limit_max_events : int
         Maximum retained accepted timestamps in the memory store.
-    rate_limit_redis_url : str
-        Redis connection URL, used only by the Redis store.
+    rate_limit_redis : Redis | dict
+        Redis connection settings, used only by the Redis store.
     rate_limit_redis_prefix : str
         Application namespace for Redis quota keys.
     rate_limit_redis_timeout_seconds : int
@@ -81,11 +80,11 @@ class HTTPRateLimit(BaseEntity):
         },
     )
 
-    rate_limit_redis_url: str = field(
-        default_factory=lambda: redis_url("RATE_LIMIT_REDIS_URL"),
+    rate_limit_redis: Redis | dict = field(
+        default_factory=Redis,
         metadata={
-            "description": "Redis connection URL.",
-            "default": "redis://127.0.0.1:6379/0",
+            "description": "Redis connection settings.",
+            "default": lambda: Redis().toDict(),
         },
     )
 
@@ -141,10 +140,13 @@ class HTTPRateLimit(BaseEntity):
             "rate_limit_redis_timeout_seconds",
         ):
             validate_integer(getattr(self, name), name, minimum=1)
-        validate_string(self.rate_limit_redis_url, "rate_limit_redis_url")
-        if urlsplit(self.rate_limit_redis_url).scheme not in {"redis", "rediss"}:
-            error_msg = "'rate_limit_redis_url' must use redis:// or rediss://."
-            raise ValueError(error_msg)
+        if isinstance(self.rate_limit_redis, dict):
+            object.__setattr__(
+                self, "rate_limit_redis", Redis(**self.rate_limit_redis),
+            )
+        elif not isinstance(self.rate_limit_redis, Redis):
+            error_msg = "'rate_limit_redis' must be a Redis instance or dict."
+            raise TypeError(error_msg)
         validate_string(self.rate_limit_redis_prefix, "rate_limit_redis_prefix")
 
     def __validateRateLimiting(self) -> None:

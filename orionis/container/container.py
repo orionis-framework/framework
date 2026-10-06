@@ -1155,12 +1155,12 @@ class Container(IContainer):
         *args: tuple[Any, ...],
         **kwargs: dict[str, Any],
     ) -> Any:
-        """
+        r"""
         Automatically instantiate a class with injected dependencies.
 
         Parameters
         ----------
-        type_ : Callable[..., Any]
+        type\_ : Callable[..., Any]
             The class to instantiate.
         *args : tuple[Any, ...]
             Positional arguments for the constructor.
@@ -1216,12 +1216,12 @@ class Container(IContainer):
         *args: tuple[Any, ...],
         **kwargs: dict[str, Any],
     ) -> Any:
-        """
+        r"""
         Build and return an instance of the specified type.
 
         Parameters
         ----------
-        type_ : Callable[..., Any]
+        type\_ : Callable[..., Any]
             The class to instantiate.
         *args : tuple[Any, ...]
             Positional arguments for the constructor.
@@ -1354,12 +1354,12 @@ class Container(IContainer):
         *args: object,
         **kwargs: object,
     ) -> type[Any]:
-        """
+        r"""
         Resolve and invoke a callable, injecting dependencies.
 
         Parameters
         ----------
-        type_ : Callable[..., Any]
+        type\_ : Callable[..., Any]
             The callable to invoke.
         *args : object
             Positional arguments for the callable.

@@ -3,8 +3,8 @@ from asyncio import current_task
 from contextvars import ContextVar
 from functools import lru_cache
 from typing import TYPE_CHECKING, Any
-from sqlalchemy import text
-from sqlalchemy.exc import SQLAlchemyError
+from sqlalchemy import create_engine, text
+from sqlalchemy.exc import NoSuchModuleError, SQLAlchemyError
 from sqlalchemy.ext.asyncio import AsyncEngine, create_async_engine
 from orionis.database.compiler import SQLCompiler
 from orionis.database.contracts.connection import IConnection
@@ -17,6 +17,8 @@ from orionis.database.dialect import (
 )
 from orionis.database.entities.result import InsertResult
 from orionis.database.exceptions import QueryException, TransactionException
+from orionis.database.threaded.connection import ThreadedConnection
+from orionis.database.threaded.engine import ThreadedEngine
 from orionis.database.transaction import Transaction
 
 if TYPE_CHECKING:
@@ -26,6 +28,8 @@ if TYPE_CHECKING:
     from sqlalchemy.ext.asyncio import AsyncConnection, AsyncTransaction
     from sqlalchemy.sql.elements import TextClause
     from orionis.database.contracts.transaction import ITransaction
+    from orionis.database.threaded.result import ThreadedResult
+    from orionis.database.threaded.transaction import ThreadedTransaction
     from orionis.orm.query.expressions import (
         DeletePlan,
         InsertPlan,
@@ -61,17 +65,17 @@ class _TransactionState:
 
     def __init__(
         self,
-        connection: AsyncConnection,
-        transaction: AsyncTransaction,
+        connection: AsyncConnection | ThreadedConnection,
+        transaction: AsyncTransaction | ThreadedTransaction,
     ) -> None:
         """
         Initialize the state with its root transaction.
 
         Parameters
         ----------
-        connection : AsyncConnection
+        connection : AsyncConnection | ThreadedConnection
             Raw connection owning the transaction stack.
-        transaction : AsyncTransaction
+        transaction : AsyncTransaction | ThreadedTransaction
             Root transaction opened on the connection.
 
         Returns
@@ -81,15 +85,15 @@ class _TransactionState:
         """
         self.connection = connection
         self.owner = current_task()
-        self.transactions: list[AsyncTransaction] = [transaction]
+        self.transactions: list[AsyncTransaction | ThreadedTransaction] = [transaction]
 
-    async def __aenter__(self) -> AsyncConnection:
+    async def __aenter__(self) -> AsyncConnection | ThreadedConnection:
         """
         Expose the wrapped connection without opening a new one.
 
         Returns
         -------
-        AsyncConnection
+        AsyncConnection | ThreadedConnection
             The wrapped, already-open connection.
         """
         return self.connection
@@ -118,7 +122,9 @@ class Connection(IConnection):
     configuration, compiles query plans through :class:`SQLCompiler`,
     and exposes only framework-owned types: dictionaries, integers,
     and result entities. Transactions are task-local and support
-    nesting through savepoints.
+    nesting through savepoints when supported. Redshift uses the official
+    blocking connector through a thread-backed Core engine; it does not
+    support savepoints or returning server-generated identity values.
     """
 
     # ruff: noqa: ANN401
@@ -151,12 +157,14 @@ class Connection(IConnection):
             If the configured driver has no registered dialect.
         """
         # Validate the driver eagerly so misconfiguration fails fast.
-        resolve_driver(config)
+        driver = resolve_driver(config)
 
         self._name = name
         self._config = dict(config)
-        self._engine: AsyncEngine | None = None
-        self._compiler = SQLCompiler(str(self._config.get("prefix", "") or ""))
+        self._engine: AsyncEngine | ThreadedEngine | None = None
+        self._compiler = SQLCompiler(
+            str(self._config.get("prefix", "") or ""), driver=driver,
+        )
         # Task-local transaction state keeps concurrent tasks isolated.
         self._tx_state: ContextVar[_TransactionState | None] = ContextVar(
             f"orionis_db_tx_{name}",
@@ -432,9 +440,12 @@ class Connection(IConnection):
         )
         async with self._acquire() as connection:
             try:
-                await connection.run_sync(
-                    statement.element.create, checkfirst=if_not_exists,
+                run_sync = (
+                    connection.runSync
+                    if isinstance(connection, ThreadedConnection)
+                    else connection.run_sync
                 )
+                await run_sync(statement.element.create, checkfirst=if_not_exists)
             except SQLAlchemyError as exc:
                 raise self._queryException(exc) from None
             return True
@@ -505,6 +516,9 @@ class Connection(IConnection):
                 self._tx_state.set(_TransactionState(raw, transaction))
             else:
                 # Nested calls open a savepoint on the same connection.
+                if isinstance(state.connection, ThreadedConnection):
+                    error_msg = "Amazon Redshift does not support nested transactions."
+                    raise TransactionException(error_msg)
                 savepoint = await state.connection.begin_nested()
                 state.transactions.append(savepoint)
         except SQLAlchemyError as exc:
@@ -610,26 +624,30 @@ class Connection(IConnection):
 
     # ── Internal plumbing ───────────────────────────────────────────────────
 
-    def _getEngine(self) -> AsyncEngine:
+    def _getEngine(self) -> AsyncEngine | ThreadedEngine:
         """
-        Build the async engine on first use and cache it.
+        Build the asynchronous engine or blocking-driver adapter on first use.
 
         Returns
         -------
-        AsyncEngine
+        AsyncEngine | ThreadedEngine
             Configured engine for this connection.
 
         Raises
         ------
         MissingDatabaseDependencyException
-            If the async driver package is not installed.
+            If the driver package or its SQLAlchemy dialect is not installed.
         """
         if self._engine is None:
             url = build_engine_url(self._config)
             options = engine_options(self._config)
             try:
-                engine = create_async_engine(url, **options)
-            except ModuleNotFoundError as exc:
+                engine = (
+                    ThreadedEngine(create_engine(url, **options), self._name)
+                    if resolve_driver(self._config) == "redshift"
+                    else create_async_engine(url, **options)
+                )
+            except (ImportError, NoSuchModuleError) as exc:
                 raise missing_dependency_error(
                     resolve_driver(self._config),
                     exc,
@@ -661,7 +679,10 @@ class Connection(IConnection):
 
     def _acquire(
         self,
-    ) -> AbstractAsyncContextManager[AsyncConnection] | _TransactionState:
+    ) -> (
+        AbstractAsyncContextManager[AsyncConnection | ThreadedConnection]
+        | _TransactionState
+    ):
         """
         Resolve the connection context to execute statements on.
 
@@ -683,16 +704,16 @@ class Connection(IConnection):
 
     async def _run(
         self,
-        connection: AsyncConnection,
+        connection: AsyncConnection | ThreadedConnection,
         statement: Any,
         parameters: Mapping[str, Any] | Sequence[Mapping[str, Any]] | None = None,
-    ) -> CursorResult[Any]:
+    ) -> CursorResult[Any] | ThreadedResult:
         """
         Execute a statement translating engine errors into Orionis errors.
 
         Parameters
         ----------
-        connection : AsyncConnection
+        connection : AsyncConnection | ThreadedConnection
             Raw connection to execute on.
         statement : Any
             Executable statement or textual clause.
@@ -701,7 +722,7 @@ class Connection(IConnection):
 
         Returns
         -------
-        CursorResult
+        CursorResult | ThreadedResult
             Raw execution result, consumed internally by callers.
 
         Raises

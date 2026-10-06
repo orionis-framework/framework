@@ -4,8 +4,8 @@ from orionis.environment import Env
 from orionis.foundation.config.database import (
     PGSQL, ConnectionName, Connections, Database, MySQL, MySQLCharset,
     MySQLCollation, MySQLEngine, Oracle, OracleEncoding, OracleNencoding,
-    PGSQLCharset, PGSQLSSLMode, SQLite, SQLiteForeignKey, SQLiteJournalMode,
-    SQLiteSynchronous, SQLServer, SQLServerCharset,
+    PGSQLCharset, PGSQLSSLMode, Redshift, RedshiftSSLMode, SQLite, SQLiteForeignKey,
+    SQLiteJournalMode, SQLiteSynchronous, SQLServer, SQLServerCharset,
 )
 
 @dataclass(frozen=True, kw_only=True)
@@ -126,6 +126,30 @@ class BootstrapDatabase(Database):
                 encrypt=Env.get("DB_ENCRYPT", "yes"),
                 trust_server_certificate=Env.get("DB_TRUST_SERVER_CERTIFICATE", True),
                 odbc_driver=Env.get("DB_ODBC_DRIVER", "ODBC Driver 18 for SQL Server"),
+            ),
+
+            # --------------------------------------------------------------------------
+            # redshift : Redshift, optional
+            # --- Amazon Redshift settings for the official AWS Python connector.
+            # --------------------------------------------------------------------------
+            redshift=Redshift(
+                host=Env.get("DB_HOST", "127.0.0.1"),
+                port=Env.get("DB_PORT", 5439),
+                database=Env.get("DB_DATABASE", "dev"),
+                username=Env.get("DB_USERNAME", "awsuser"),
+                password=Env.get("DB_PASSWORD", ""),
+                prefix=Env.get("DB_PREFIX", ""),
+                ssl=Env.get("DB_REDSHIFT_SSL", True),
+                sslmode=Env.get("DB_REDSHIFT_SSLMODE", RedshiftSSLMode.VERIFY_FULL),
+                timeout=Env.get("DB_REDSHIFT_TIMEOUT", 30),
+                iam=Env.get("DB_REDSHIFT_IAM", False),
+                region=Env.get("DB_REDSHIFT_REGION", None),
+                cluster_identifier=Env.get("DB_REDSHIFT_CLUSTER_IDENTIFIER", None),
+                db_user=Env.get("DB_REDSHIFT_DB_USER", None),
+                profile=Env.get("DB_REDSHIFT_PROFILE", None),
+                is_serverless=Env.get("DB_REDSHIFT_IS_SERVERLESS", False),
+                serverless_work_group=Env.get("DB_REDSHIFT_SERVERLESS_WORK_GROUP", None),
+                serverless_acct_id=Env.get("DB_REDSHIFT_SERVERLESS_ACCT_ID", None),
             ),
         ),
     )

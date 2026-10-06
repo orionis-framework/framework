@@ -1,4 +1,5 @@
 from __future__ import annotations
+from dataclasses import fields
 from typing import TYPE_CHECKING
 from orionis.foundation.config.http.entitites.body import HTTPBodyLimits
 from orionis.http.enums.interfaces import Interface
@@ -6,6 +7,10 @@ from orionis.http.payload.contracts.body_stream import IBodyStream
 
 if TYPE_CHECKING:
     from collections.abc import AsyncGenerator
+
+_DEFAULT_LIMITS = {
+    item.name: item.metadata["default"] for item in fields(HTTPBodyLimits)
+}
 
 class PayloadTooLargeException(ValueError):
     """Raise when the request body exceeds the configured size limit."""
@@ -41,9 +46,9 @@ class BodyStream(IBodyStream):
         self,
         interface: Interface,
         receive_or_protocol: object,
-        max_body_size: int | None = HTTPBodyLimits.max_body_size,
+        max_body_size: int | None = _DEFAULT_LIMITS["max_body_size"],
         *,
-        max_buffer_size: int | None = HTTPBodyLimits.max_buffer_size,
+        max_buffer_size: int | None = _DEFAULT_LIMITS["max_buffer_size"],
     ) -> None:
         """
         Initialize a BodyStream for the given transport interface.

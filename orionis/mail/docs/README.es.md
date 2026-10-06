@@ -1,823 +1,93 @@
-# Correo de Orionis
+# orionis.mail
 
-Los Mailables reutilizables y los envíos directos comparten un único flujo
-asíncrono de preparación y envío. Los únicos transportes de producción son
-**SMTP** y **file**.
+> Referencia de API derivada de la implementación actual.
 
-[Manual en inglés](README.md)
+## Tabla de contenido
 
-## Contenido
+- Requisitos
+- Resumen funcional
+- Estructura del módulo
+- Referencia de API
+- Ejemplos de uso
+- Características de diseño
+- Rendimiento y concurrencia
+- Notas de compatibilidad
+- Verificación y limitaciones
 
-- [Arquitectura](#arquitectura)
-- [Configuración](#configuración)
-- [API pública](#api-pública)
-- [Ejemplos](#ejemplos)
-- [Vistas y adjuntos](#vistas-y-adjuntos)
-- [MIME y privacidad](#mime-y-privacidad)
-- [Resultados y errores](#resultados-y-errores)
-- [Extender drivers](#extender-drivers)
-- [Arranque y scripts](#arranque-y-scripts)
-- [Concurrencia y límites](#concurrencia-y-límites)
-- [Verificación](#verificación)
+## Requisitos
 
-## Arquitectura
+Python 3.14 o superior, como declara pyproject.toml.
 
-```text
-Mail facade / IMailManager
-    -> independent PendingMail
-    -> Mailable instance OR class built by the application container OR direct Content
-    -> merged, validated Envelope
-    -> IViewEngine.render + IStorageManager.disk(...).file(...).open(...)
-    -> EmailMessage -> immutable PreparedMail (MIME bytes + transport envelope)
-    -> IMailTransport -> MailResult
-```
+## Resumen funcional
 
-| Componente | Responsabilidad |
+El inicializador de orionis.mail expone 9 símbolos públicos. Esta referencia usa __all__, las rutas de exportación y los archivos fuente actuales como evidencia.
+
+## Estructura del módulo
+
+| Ruta | Responsabilidad |
 | --- | --- |
-| [MailManager](../manager.py) / [IMailManager](../contracts/manager.py) | Leer configuración central y registrar/resolver factories. |
-| [PendingMail](../pending.py) | Crear cadenas independientes y construir Mailables por clase al ejecutar un terminal asíncrono. |
-| [Message](../message.py) | Modificar la configuración de un único callback de envío directo. |
-| [Mailable](../mailable.py) | Declarar sobre, contenido y adjuntos; su clase puede recibir dependencias del contenedor. |
-| [MailComposer](../composer.py) | Validar, renderizar vistas, cerrar streams y serializar MIME. |
-| [IMailTransport](../contracts/transport.py) | Consumir bytes preparados y el sobre de transporte separado. |
-| [MailProvider](../provider.py) | Registrar servicios compartidos y fijar la fachada durante el arranque. |
-
-`MailManager` reutiliza los terminales de `PendingMail`; `raw()` y `html()` no
-contienen rutas SMTP independientes. Las factories se ejecutan por envío y pueden
-obtener transportes compartidos sin estado de operación desde el contenedor.
-Ni el manager ni los transportes incorporados conservan destinatarios, cuerpos
-o adjuntos de una operación.
-
-No se necesitan dependencias adicionales. Se utilizan `email`, `smtplib`, `ssl`
-y filesystem de la biblioteca estándar, los workers de `Loop.execute()`, el motor
-de vistas configurado, storage y `DateTime.now()`.
-
-## Configuración
-
-Un **mailer** es el nombre de una configuración. Un **driver** es la
-implementación del transporte. Por ejemplo, el mailer `archive` puede utilizar
-el driver `file`.
-
-El bootstrap frozen existente sigue funcionando sin campos adicionales:
-
-```python
-from __future__ import annotations
-from dataclasses import dataclass, field
-from orionis.foundation.config.mail.entities.file import File
-from orionis.foundation.config.mail.entities.from_address import FromAddress
-from orionis.foundation.config.mail.entities.mail import Mail
-from orionis.foundation.config.mail.entities.mailers import Mailers
-from orionis.foundation.config.mail.entities.smtp import Smtp
-from orionis.environment import Env
-
-
-@dataclass(frozen=True, kw_only=True)
-class BootstrapMail(Mail):
-    default: str = field(
-        default_factory=lambda: Env.get("MAIL_MAILER", "smtp"),
-    )
-    from_address: FromAddress | dict = field(
-        default_factory=lambda: FromAddress(
-            address=Env.get("MAIL_FROM_ADDRESS", ""),
-            name=Env.get("MAIL_FROM_NAME", Env.get("APP_NAME", "Orionis")),
-        ),
-    )
-    mailers: Mailers | dict = field(
-        default_factory=lambda: Mailers(
-            smtp=Smtp(
-                url=Env.get("MAIL_URL", ""),
-                host=Env.get("MAIL_HOST", ""),
-                port=Env.get("MAIL_PORT", 587),
-                encryption=Env.get("MAIL_ENCRYPTION", "TLS"),
-                username=Env.get("MAIL_USERNAME", ""),
-                password=Env.get("MAIL_PASSWORD", ""),
-                timeout=None,
-            ),
-            file=File(path="storage/mail"),
-        ),
-    )
-```
-
-Se admiten diccionarios anidados equivalentes y mailers adicionales mediante
-entradas de diccionario. `Mailers(smtp=..., file=...)` no cambia:
-
-```python
-mail_configuration = {
-    "default": "archive",
-    "mailers": {
-        "archive": {"driver": "file", "path": "storage/mail/archive"},
-        "file": {"path": "storage/mail"},
-        "smtp": {
-            "host": "smtp.example.com",
-            "port": 587,
-            "encryption": "TLS",
-            "username": "",
-            "password": "",
-            "url": "",
-            "timeout": 30,
-        },
-    },
-}
-```
-
-Las entradas convencionales `smtp` y `file` pueden omitir `driver`; los demás
-nombres deben declararlo. Se respeta el campo `driver` de una entidad cuando
-existe. La entidad `Mail` conserva los nombres de los diccionarios durante
-`asdict()`/`toDict()`, sin convertirlos a los campos fijos de `Mailers`. `default`
-ya no está limitado a esos dos nombres. Un mailer o driver desconocido produce
-un error al enviar, nunca un fallback. Los providers pueden registrar drivers
-antes de su primer uso.
-
-Los servicios solo leen `app.config("mail")`: no releen variables de entorno ni
-importan el módulo de configuración de la aplicación. Copian los valores
-seleccionados en estructuras de solo lectura, sin modificar el original. Las
-entidades conservan la validación estructural de tipos; puertos, timeouts,
-cifrado y autenticación SMTP **efectivos** se validan al seleccionar el
-transporte, después de aplicar la URL. Una configuración SMTP no utilizada no
-impide enviar mediante file ni fijar la fachada.
-
-La sección `from_address` declara un remitente global, por lo que un mensaje solo
-necesita `fromAddress()` o `Envelope(from_address=...)` cuando quiere anularlo. El
-remitente explícito siempre gana; el global solo se lee si el sobre final no lleva
-ninguno. Un `address` vacío mantiene el remitente obligatorio en cada envío. Si el
-mensaje termina sin remitente, el envío falla antes del transporte; nunca se
-deduce del username SMTP.
-
-### Opciones SMTP y MAIL_URL
-
-| Opción | Significado |
-| --- | --- |
-| `host` | Host SMTP efectivo obligatorio. |
-| `port` | Entero efectivo entre 1 y 65535; se rechazan booleanos. |
-| `encryption` | Sin distinguir mayúsculas: `TLS` = STARTTLS obligatorio; `SSL` = TLS implícito; `""` o `none` = conexión sin cifrado solicitada explícitamente. Otros valores fallan. |
-| `username`, `password` | Ambos vacíos omiten autenticación. Solo uno informado es un error. |
-| `timeout` | Entero positivo de segundos o `None`. smtplib bloqueante no admite cero; tampoco se aceptan floats, booleanos ni negativos. |
-| `url` | Vacía utiliza los campos individuales; en otro caso se aplican las reglas siguientes. |
-
-`encryption` sigue siendo un string, no un campo nullable. TLS utiliza la tienda
-de confianza del sistema, verifica certificados y hostname, y exige TLS 1.2 como
-mínimo. Un STARTTLS ausente o fallido nunca deriva a texto plano.
-
-Para una `MAIL_URL` no vacía:
-
-1. Solo se admiten `smtp://` y `smtps://`, con host obligatorio.
-2. El host de la URL sustituye a `host`.
-3. `smtp://` utiliza su puerto explícito o el campo `port`, manteniendo el cifrado
-   configurado. No solicita texto plano implícitamente.
-4. `smtps://` fuerza TLS implícito y utiliza su puerto explícito o 465.
-5. Las credenciales de URL reemplazan username/password **como conjunto**, tras
-   decodificar escapes. Si no hay credenciales en la URL se usan ambos campos.
-6. `timeout` es independiente de la URL.
-7. Se rechazan paths (incluida una barra final), queries, fragmentos, esquemas
-   desconocidos, hosts mal formados y puertos inválidos, sin reinterpretarlos.
-
-`timeout=None` significa espera de socket ilimitada, no un default oculto. Utiliza
-un entero positivo cuando una espera indefinida no resulte adecuada. El timeout
-del socket no es un límite global de duración del envío.
-
-### Transporte file
-
-`File.path` es un directorio. Las rutas relativas parten de `app.basePath`, no
-del cwd del proceso ni del disco predeterminado de storage. Se respetan las rutas
-absolutas; se rechazan rutas de Windows relativas solo a una unidad o raíz por
-ser ambiguas.
-
-El worker crea el directorio, escribe un temporal privado de nombre único, hace
-flush y fsync, y publica un nombre `.eml` aleatorio mediante `os.link`. La
-publicación es atómica y exclusiva: una colisión nunca sobrescribe otro mensaje
-y un archivo final nunca expone contenido escrito a medias. En `finally` se
-intenta eliminar el temporal que pertenece a esa operación.
-
-Se requiere un filesystem con enlaces duros, como NTFS en Windows o filesystems
-locales POSIX habituales. Si no lo admite, se produce un error explícito; no hay
-fallback con sobrescritura insegura. Se usan permisos restrictivos cuando la
-plataforma los permite: 0600 para el temporal y 0700 para el nuevo directorio
-final. En Windows el acceso efectivo depende de las ACL heredadas. No se promete
-durabilidad de entradas de directorio ante cortes de energía ni protección ante
-cambios externos de permisos.
-
-No guardes mensajes en directorios públicos ni en control de versiones. Este
-repositorio ignora `storage/mail/`; excluye también tus rutas personalizadas.
-Almacenar un `.eml` no equivale a entregarlo a un buzón.
-
-## API pública
-
-```python
-from orionis.support.facades.mail import Mail
-from orionis.mail import (
-    Address, Attachment, Content, Envelope, MailResult, Mailable, Message,
-    PendingMail,
-)
-from orionis.mail.contracts.manager import IMailManager
-```
-
-Deliberadamente no se exporta otra fachada `Mail` desde `orionis.mail`.
-
-### Valores
-
-| Valor | Constructor o factory |
-| --- | --- |
-| `Address` | `Address(address: str, name: str | None = None)` |
-| `Envelope` | `Envelope(*, subject="", from_address=None, to=(), cc=(), bcc=(), reply_to=())` |
-| `Content` | `Content(*, view=None, html=None, text=None, text_view=None, data=None)` |
-| `Attachment` | `Attachment.fromStorage(path, *, disk=None, name=None, mime_type=None)` |
-
-Los valores son frozen y utilizan slots. Las colecciones de direcciones se
-convierten en tuplas. Los contenedores mapping/list/tuple/set del contexto se
-copian recursivamente a mappings de solo lectura, tuplas y frozensets; los ciclos
-de contenedores se rechazan. Los objetos arbitrarios, incluidos servicios,
-conservan su identidad: **no se hace deepcopy** y correo no los modifica.
-Los mapas de rechazo del resultado también se copian y protegen.
-
-`Content.view` identifica una vista HTML; `html` es HTML literal. Son excluyentes.
-Igualmente, `text_view` excluye al texto literal `text`. Hay que declarar al menos
-un cuerpo. `""` es un cuerpo intencional, no ausencia. Ambas vistas usan el mismo
-`data` explícito. Los literales nunca se interpretan como plantillas y no existe
-conversión automática de HTML a texto.
-
-### Composición síncrona
-
-`Mail`, `IMailManager` y `PendingMail` ofrecen `mailer(name)`,
-`fromAddress(address, name=None)`, `to(addresses, name=None)`, `cc(...)`, `bcc(...)`,
-`replyTo(...)`, `subject(value)` y `attach(attachment)`.
-
-Cada llamada devuelve inmediatamente un `PendingMail` independiente, sin
-renderizar, leer adjuntos ni resolver transportes. **No** utilices `await` en
-llamadas intermedias. `Message` ofrece los mismos mutadores del sobre salvo
-`mailer`, pero devuelve siempre el **mismo Message mutable**, exclusivo de una
-operación de callback.
-
-Los destinatarios aceptan un string, un `Address` o una lista/tupla de ellos.
-`name` solo puede acompañar a un único string, nunca a un `Address` o colección.
-Una cadena con varias direcciones separadas por comas se rechaza: utiliza una
-colección. `fromAddress()` admite un solo remitente y establece tanto `From` como
-el remitente de transporte, sin crear una cabecera `Sender` diferente.
-
-Llamadas repetidas a `subject()` y `fromAddress()` sustituyen el valor anterior.
-Destinatarios y adjuntos se agregan. La deduplicación conserva orden y mayúsculas
-de la parte local; los dominios se normalizan mediante IDNA y sin distinguir
-mayúsculas. Los conflictos entre destinatario visible y Bcc se rechazan.
-
-### Terminales asíncronos
-
-Todos devuelven `MailResult` y existen en manager, fachada y cadenas:
-
-| Operación | Interpretación |
-| --- | --- |
-| `await Mail.send(mailable)` | Envía una instancia ya construida; no admite `data` ni callback. |
-| `await Mail.send(MailableClass)` | Construye un Mailable nuevo con `app.build()` e inyecta sus dependencias; tampoco admite `data` ni callback. |
-| `await Mail.send(view, data=None, callback=None)` | Un string siempre identifica una vista HTML. |
-| `await Mail.send(content, *, callback=None)` | Content contiene sus datos; otro argumento data es inválido. |
-| `await Mail.raw(text, callback=None)` | Texto plano literal. |
-| `await Mail.html(html, callback=None)` | HTML literal. |
-
-Incluso pasar explícitamente `None` en un argumento prohibido es un error, no un
-valor ignorado. No existen aliases `from_`, `sender`, `setFrom`, `text`, `sendText`
-ni `sendHtml`.
-
-El callback recibe un `Message` exclusivo y se invoca exactamente una vez.
-Admite funciones, métodos y objetos callable. Debe devolver `None`, el Message
-recibido o un awaitable que resuelva a uno de esos valores. Se espera el awaitable
-antes de continuar. Cualquier otro resultado, incluidos `False` u otro Message,
-es un error. Una excepción impide el transporte. Mantén rápidos los callbacks
-síncronos; los mutadores no realizan E/S.
-
-En Mailables se obtiene primero la declaración: los escalares explícitos de la
-cadena prevalecen y sus destinatarios/adjuntos se agregan. En envíos directos el
-Message parte de la cadena: los escalares del callback prevalecen y sus
-destinatarios/adjuntos se agregan.
-
-## Ejemplos
-
-Los ejemplos se ejecutan después del arranque normal. Las fixtures de aceptación
-incluyen `emails.welcome`, `emails.invoice`, `emails/welcome.txt` y los archivos
-de storage `documents/guide.pdf` e `invoices/42.pdf`.
-
-### Mailable reutilizable
-
-```python
-from orionis.mail import Address, Attachment, Content, Envelope, MailResult, Mailable
-from orionis.support.facades.mail import Mail
-
-
-class WelcomeMail(Mailable):
-    __slots__ = ("name",)
-
-    def __init__(self, name: str) -> None:
-        self.name = name
-
-    def envelope(self) -> Envelope:
-        return Envelope(
-            from_address=Address("no-reply@example.com", "Example App"),
-            subject="Welcome",
-        )
-
-    def content(self) -> Content:
-        return Content(
-            view="emails.welcome",
-            data={"name": self.name},
-            text=f"Hello, {self.name}. Welcome to our application.",
-        )
-
-    def attachments(self) -> list[Attachment]:
-        return [Attachment.fromStorage(
-            "documents/guide.pdf", disk="local", name="guide.pdf",
-            mime_type="application/pdf",
-        )]
-
-
-async def send_welcome() -> MailResult:
-    return await (
-        Mail.mailer("file").to(Address("ana@example.com", "Ana"))
-        .send(WelcomeMail("Ana"))
-    )
-```
-
-Si `envelope()` ya declara destinatarios, basta `await Mail.send(mailable)`.
-`envelope()` y `content()` son declaraciones síncronas obligatorias;
-`attachments()` devuelve una secuencia vacía por defecto. Enviar no modifica
-el Mailable.
-
-### Mailable con dependencias en el constructor
-
-Pasa la **clase** a `send()` para que el contenedor de la aplicación construya el
-Mailable e inyecte sus dependencias. Registra los servicios de la aplicación en
-un provider; el constructor del Mailable debe declarar los tipos que necesita.
-Cada envío construye una instancia nueva. Si necesitas pasar valores concretos
-de una operación al constructor, constrúyelo antes con `await app.build(...)` y
-envía la instancia.
-
-```python
-from orionis.container.providers import ServiceProvider
-from orionis.mail import Content, Envelope, MailResult, Mailable
-from orionis.support.facades.mail import Mail
-
-
-class WelcomeText:
-    __slots__ = ()
-
-    def make(self) -> str:
-        return "Welcome to our application."
-
-
-class WelcomeMail(Mailable):
-    __slots__ = ("welcome_text",)
-
-    def __init__(self, welcome_text: WelcomeText) -> None:
-        self.welcome_text = welcome_text
-
-    def envelope(self) -> Envelope:
-        return Envelope(
-            from_address="no-reply@example.com",
-            subject="Welcome",
-            to="ana@example.com",
-        )
-
-    def content(self) -> Content:
-        return Content(text=self.welcome_text.make())
-
-
-class WelcomeTextProvider(ServiceProvider):
-    __slots__ = ()
-
-    def register(self) -> None:
-        self.app.singleton(WelcomeText, WelcomeText)
-
-
-async def send_welcome() -> MailResult:
-    return await Mail.send(WelcomeMail)
-```
-
-El envío mediante clase requiere el manager de correo de la aplicación para
-acceder al contenedor. Si el constructor pide un tipo que no puede resolverse,
-el envío falla antes de preparar o transportar el mensaje y conserva la causa
-de resolución en la excepción. Incluye `WelcomeTextProvider` en el arranque de
-la aplicación, por ejemplo con `app.withProviders(WelcomeTextProvider)` antes
-de llamar a `create()`.
-
-### Controlador sin Mailable
-
-```python
-from orionis.http import HttpResponse, response
-from orionis.http.base import BaseController
-from orionis.mail import Attachment, Message
-from orionis.support.facades.mail import Mail
-
-
-def configure_welcome(message: Message) -> None:
-    message.fromAddress("no-reply@example.com", "Example App")
-    message.to("ana@example.com", "Ana")
-    message.cc("operations@example.com")
-    message.bcc("audit@example.com")
-    message.replyTo("support@example.com")
-    message.subject("Welcome")
-    message.attach(Attachment.fromStorage(
-        "documents/guide.pdf", disk="local", name="guide.pdf",
-        mime_type="application/pdf",
-    ))
-
-
-class WelcomeController(BaseController):
-    __slots__ = ()
-
-    async def sendWelcome(self) -> HttpResponse:
-        result = await Mail.send(
-            "emails.welcome", {"name": "Ana"}, configure_welcome,
-        )
-        return response.json({
-            "message_id": result.message_id,
-            "status": result.status,
-        })
-```
-
-El controlador devuelve una respuesta HTTP real, no un MailResult ni una
-operación pendiente. `HttpResponse` es el alias de anotación del framework,
-no un tipo para utilizar con `isinstance()`.
-
-### Servicio fluido con adjunto
-
-```python
-from orionis.mail import Attachment, Content, MailResult
-from orionis.support.facades.mail import Mail
-
-
-class InvoiceDeliveryService:
-    __slots__ = ()
-
-    async def sendInvoice(
-        self, recipient: str, invoice_number: str, attachment_path: str,
-    ) -> MailResult:
-        return await (
-            Mail.mailer("file")
-            .fromAddress("billing@example.com", "Example Billing")
-            .to(recipient).subject(f"Invoice {invoice_number}")
-            .attach(Attachment.fromStorage(
-                attachment_path, disk="local", name=f"invoice-{invoice_number}.pdf",
-                mime_type="application/pdf",
-            ))
-            .send(Content(
-                view="emails.invoice", data={"invoice_number": invoice_number},
-                text=f"Your invoice {invoice_number} is attached.",
-            ))
-        )
-```
-
-### Texto y HTML literales
-
-```python
-from orionis.support.facades.mail import Mail
-
-
-async def send_notifications() -> None:
-    await (
-        Mail.fromAddress("notifications@example.com", "Example App")
-        .to("ana@example.com").subject("Report ready")
-        .raw("Your report is ready.")
-    )
-    await (
-        Mail.fromAddress("notifications@example.com", "Example App")
-        .to("ana@example.com").subject("Report ready")
-        .html("<h1>Your report is ready.</h1>")
-    )
-```
-
-`Mail.raw(text, callback)` y `Mail.html(html, callback)` también pueden iniciar
-una operación directamente, con adjuntos configurados por el callback.
-
-### Callback asíncrono
-
-```python
-from orionis.mail import MailResult, Message
-from orionis.support.facades.mail import Mail
-
-
-class NotificationService:
-    __slots__ = ()
-
-    async def configureMessage(self, message: Message) -> None:
-        message.fromAddress("notifications@example.com", "Example App")
-        message.to("ana@example.com")
-        message.subject("Notification")
-
-    async def sendNotification(self) -> MailResult:
-        return await Mail.mailer("file").raw(
-            "Your notification is ready.", self.configureMessage,
-        )
-```
-
-### Cadenas concurrentes independientes
-
-```python
-import asyncio
-from orionis.support.facades.mail import Mail
-
-
-async def send_independent_messages() -> None:
-    base = (
-        Mail.mailer("file")
-        .fromAddress("notifications@example.com", "Example App")
-        .subject("Notification")
-    )
-    first = base.to("ana@example.com")
-    second = base.to("luis@example.com")
-    await asyncio.gather(first.raw("Hello, Ana."), second.raw("Hello, Luis."))
-```
-
-`base` sigue sin destinatarios y `first` no comparte destinatarios con `second`.
-
-### Inyección de dependencias
-
-```python
-from orionis.mail import MailResult
-from orionis.mail.contracts.manager import IMailManager
-
-
-class AlertService:
-    __slots__ = ("__mail",)
-
-    def __init__(self, mail: IMailManager) -> None:
-        self.__mail = mail
-
-    async def sendAlert(self, recipient: str) -> MailResult:
-        return await (
-            self.__mail.fromAddress("alerts@example.com", "Example App")
-            .to(recipient).subject("Service alert")
-            .raw("A service alert requires your attention.")
-        )
-```
-
-Fachada e inyección resuelven el mismo singleton. Importa los contratos de los
-constructores en runtime y no uses anotaciones pospuestas como strings en
-servicios construidos mediante DI.
-
-## Vistas y adjuntos
-
-Las vistas se convierten en `str` mediante el contrato existente
-`IViewEngine.render(template, context)`, no mediante respuestas HTTP o
-PendingView. Se conservan loaders, caché, extensiones, filtros, escape y
-convenciones de nombres de Orionis. Las plantillas independientes funcionan sin
-una petición HTTP. El contexto es explícito por envío y no se instala en globals.
-
-```python
-from orionis.mail import Content, MailResult
-from orionis.support.facades.mail import Mail
-
-
-async def send_two_views() -> MailResult:
-    return await (
-        Mail.mailer("file").fromAddress("no-reply@example.com")
-        .to("ana@example.com")
-        .send(Content(
-            view="emails.welcome", text_view="emails/welcome.txt",
-            data={"name": "Ana"},
-        ))
-    )
-```
-
-Las vistas de texto conservan el escape configurado del motor. Para una extensión
-explícita distinta de HTML utiliza una ruta con barra, como `emails/welcome.txt`.
-Correo no crea un segundo entorno Jinja.
-
-`Attachment.fromStorage()` valida la declaración sin E/S. La preparación resuelve
-el disco explícito o predeterminado, obtiene el archivo mediante storage, abre
-su stream binario asíncrono, lee los bytes y lo cierra. No reconstruye rutas
-locales ni utiliza URLs públicas. Cero bytes es válido; archivos inexistentes,
-ilegibles o valores de fallo no binarios abortan todo el envío.
-
-Prevalece el MIME explícito, después metadatos MIME válidos de storage, luego
-inferencia por nombre y finalmente `application/octet-stream`. Prevalece el
-nombre explícito; si no existe, se muestra solo el basename lógico. Se rechazan
-controles, separadores de rutas y parámetros MIME inseguros. Los errores de
-lectura/apertura conservan la causa y un error al cerrar no oculta un error
-anterior de lectura. Cualquier fallo impide el transporte.
-
-## MIME y privacidad
-
-- `EmailMessage` construye texto, HTML, `multipart/alternative` y
-  `multipart/mixed`, con alternativas correctamente anidadas y adjuntos binarios.
-- Admite Unicode en asuntos, nombres, cuerpos y nombres de archivo. Cada
-  operación obtiene Date de `DateTime.now()` y genera un Message-ID, conservado
-  en el resultado.
-- Las cabeceras To/Cc están separadas de la unión de destinatarios del sobre.
-  Bcc participa en esa unión pero nunca se serializa como cabecera MIME o `.eml`.
-- Se admiten mensajes con solo Bcc. Una dirección no puede estar a la vez en
-  To/Cc y Bcc.
-- Las cabeceras rechazan CR/LF y otros controles. Las direcciones utilizan el
-  parser estándar de correo, no una regex improvisada. Se normaliza el dominio
-  y se conservan las mayúsculas de la parte local.
-- Las partes locales no ASCII, incluido Reply-To, requieren SMTPUTF8 y 8BITMIME.
-  Se negocian explícitamente o se falla, sin eliminar caracteres. Los nombres
-  visibles Unicode por sí solos no requieren SMTPUTF8.
-
-Todas las vistas y lecturas terminan antes de abrir SMTP o publicar un archivo.
-Message no expone un `EmailMessage` mutable para saltarse la validación.
-
-## Resultados y errores
-
-`MailResult` es frozen, utiliza slots y expone estos atributos:
-
-| Atributo | Tipo |
-| --- | --- |
-| `message_id` | `str` |
-| `mailer` | `str` |
-| `driver` | `str` |
-| `status` | `MailStatus` |
-| `recipients` | `tuple[str, ...]` |
-| `accepted_recipients` | `tuple[str, ...]` |
-| `rejected_recipients` | `Mapping[str, tuple[int, str]]` |
-| `file_path` | `Path | None` |
-
-`MailStatus`, de `orionis.mail.enums.status`, es un `StrEnum` con los miembros
-`ACCEPTED`, `PARTIAL` y `STORED`, por lo que `result.status == "stored"` sigue
-funcionando y el valor se serializa como texto plano.
-
-`accepted` significa que SMTP aceptó DATA para todos los destinatarios previstos.
-`partial` indica aceptación para algunos y rechazo para otros. Los rechazos
-conservan su código SMTP con mensajes acotados, sin controles y con credenciales
-ocultadas. Si falla DATA o se rechazan todos los destinatarios, se lanza una
-excepción, nunca un resultado de éxito falso.
-
-`stored` indica publicación completa en file. Sus colecciones de aceptación y
-rechazo están vacías; `recipients` conserva el sobre previsto y `file_path`
-referencia el archivo final. SMTP devuelve `file_path=None`. Ningún estado
-confirma entrega al buzón ni lectura.
-
-Las excepciones están en `orionis.mail.exceptions`:
-
-| Excepción | Significado |
-| --- | --- |
-| `MailException` | Base común de errores de correo. |
-| `MailConfigurationException` | Mailer, driver, factory u opciones seleccionadas inválidos o desconocidos. |
-| `MailCompositionException` | Combinaciones de API, resolución del Mailable, cabeceras, declaraciones, callbacks, vistas o MIME inválidos. |
-| `MailAttachmentException` | Subclase de composición para adjuntos inseguros o ilegibles. |
-| `MailTransportException` | Fallo de transacción SMTP o publicación de archivo. |
-
-Los fallos SMTP indican etapa, tipo de excepción y código cuando existe. Se
-suprimen las excepciones de protocolo originales en el traceback porque podrían
-contener credenciales o respuestas privadas. El módulo no registra sesiones
-SMTP, URLs con credenciales, contraseñas ni contenido MIME. Siempre se intenta
-cerrar la conexión sin ocultar el error principal.
-
-## Extender drivers
-
-`IMailManager.extend(driver, factory)` registra un nombre único y devuelve
-`None`. Reemplazar un driver incorporado o duplicado es un error explícito.
-Todas las factories tienen la misma firma tipada, exportada como
-`TransportFactory` desde `orionis.mail.types`:
-
-```python
-from collections.abc import Awaitable, Callable, Mapping
-from orionis.foundation.contracts.application import IApplication
-from orionis.mail.contracts.transport import IMailTransport
-
-type TransportFactory = Callable[
-    [IApplication, Mapping[str, object]],
-    IMailTransport | Awaitable[IMailTransport],
-]
-```
-
-Reciben el contenedor y una copia de solo lectura de la configuración seleccionada,
-incluido `driver`. Pueden esperar `app.make()`/`app.build()` para resolver
-dependencias. Las factories síncronas deben ser rápidas y no bloqueantes. El
-registro no construye transportes: se resuelven durante el terminal de envío,
-después de preparar correctamente el mensaje.
-
-Este ejemplo utilizable reutiliza file, sin añadir otro backend al framework:
-
-```python
-from collections.abc import Mapping
-from pathlib import Path
-from orionis.container.providers import ServiceProvider
-from orionis.foundation.contracts.application import IApplication
-from orionis.mail.contracts.manager import IMailManager
-from orionis.mail.contracts.transport import IMailTransport
-from orionis.mail.exceptions import MailConfigurationException
-from orionis.mail.transports.file import FileTransport
-
-
-async def archive_factory(
-    app: IApplication, config: Mapping[str, object],
-) -> IMailTransport:
-    output = config.get("path")
-    if not isinstance(output, str) or not output.strip():
-        error_msg = "An archive output path is required."
-        raise MailConfigurationException(error_msg)
-    path = Path(output)
-    if not path.is_absolute():
-        path = app.basePath / path
-    return await app.build(FileTransport, path=path)
-
-
-class ArchiveProvider(ServiceProvider):
-    __slots__ = ()
-
-    async def boot(self) -> None:
-        manager = await self.app.make(IMailManager)
-        manager.extend("custom_archive", archive_factory)
-```
-
-Registra el provider con `app.withProviders(...)` **antes** de `create()`. Declara
-`driver="custom_archive"` y un `path` en su mailer. Las pruebas también ejercitan
-un transporte de registro definido solo en tests, registrado mediante un provider
-real y la configuración central.
-
-Un nuevo transporte implementa el método asíncrono
-`send(message: PreparedMail, *, mailer: str, driver: str) -> MailResult`.
-`PreparedMail`, de `orionis.mail.entities.prepared`, contiene `message_id`, `sender`,
-`recipients`, `mime: bytes` y `smtp_utf8: bool`, sin vistas ni rutas lógicas de
-storage. Los transportes personalizados compartidos tampoco deben guardar estado
-mutable de operación y deben respetar resultados, privacidad y errores.
-
-## Arranque y scripts
-
-`MailProvider` es eager y forma parte de `CORE_PROVIDERS`. `register()` vincula
-compositor e `IMailManager`; `boot()` espera `Mail.pin()`. Los arranques normales
-HTTP ASGI/RSGI y CLI permiten utilizar la fachada fluida síncronamente desde la
-primera llamada. El arranque no abre ni valida operativamente transportes.
-Los constructores de arranque reciben contratos, no fachadas aún sin fijar.
-
-Un simple `from bootstrap.app import app` carga configuración y registros, pero
-**no** ejecuta los hooks normales del runtime. Para scripts que necesiten el
-arranque completo, vistas o providers personalizados, es preferible un comando
-de Orionis. Para un script externo de texto/HTML que solo necesite correo se
-admite el arranque explícito del componente:
-
-```python
-from bootstrap.app import app
-from orionis.aio import Loop
-from orionis.mail.provider import MailProvider
-from orionis.support.facades.mail import Mail
-
-
-async def main() -> None:
-    await MailProvider(app).boot()
-    await (
-        Mail.mailer("file").fromAddress("no-reply@example.com")
-        .to("ana@example.com").raw("Sent from an explicitly booted script.")
-    )
-
-
-if __name__ == "__main__":
-    Loop.run(main())
-```
-
-Este script mínimo no ejecuta el boot de otros providers. Para vistas, su provider
-también debe inicializar globals, filtros y extensiones; deben arrancarse además
-los hooks y drivers propios de la aplicación. Utiliza el arranque CLI normal
-cuando existan esas dependencias. Nunca trates `_FacadeDispatch` de una fachada
-sin fijar como si fuera un PendingMail.
-
-Después de incorporar este provider a un checkout compilado, invalida solo
-`storage/framework/bootstrap` o utiliza el mecanismo optimize-clear existente.
-La caché no vigila automáticamente los cambios del código del framework.
-
-## Concurrencia y límites
-
-- Cada entrada de fachada y derivación de cadena es independiente. Message es
-  mutable **por operación**; conservarlo no permite modificar un mensaje cuyo
-  snapshot ya se tomó. Los Mailables pueden reutilizarse sin mutaciones del módulo.
-- Cada envío SMTP utiliza su propia conexión. SMTP, TLS, serialización MIME y
-  publicación de archivos bloqueantes se ejecutan con `Loop.execute()`, fuera
-  del event loop.
-- MIME y adjuntos pueden materializarse completos en memoria: **no** hay
-  streaming de extremo a extremo. Considera tamaños concurrentes y copias de
-  codificación al dimensionar el proceso.
-- La cancelación en callback/render se propaga antes del transporte. La
-  preparación mantiene la propiedad de un stream en curso hasta completarlo y
-  cerrarlo, y después propaga cancelación; un backend bloqueado puede retrasar
-  esa limpieza.
-- Cancelar la espera de un worker SMTP/file no necesariamente detiene al worker.
-  SMTP podría haber aceptado el mensaje y el archivo todavía podría publicarse.
-  El worker conserva la responsabilidad de cerrar conexión y limpiar temporales.
-- Timeout, cancelación o desconexión no demuestran ausencia de entrega. No hay
-  reintentos automáticos. `timeout=None` puede bloquear indefinidamente al worker
-  y al cierre del proceso que espere su finalización.
-- Esta versión no incluye colas, programación, reintentos, failover, balanceo,
-  proveedores HTTP, tracking, webhooks, imágenes inline, Markdown de correo,
-  generadores ni una API pública de fakes. No hay métodos vacíos para esas funciones.
-
-## Verificación
-
-[Las pruebas](../../../tests/mail) utilizan el runner del framework y dobles
-explícitos de red, sin credenciales externas ni correos SMTP reales. Cubren el
-bootstrap original, diccionarios nombrados, ambos estilos de composición,
-DI/fachadas, Jinja real, storage local y sin rutas locales, MIME/privacidad,
-modos y fallos SMTP, publicación atómica, concurrencia y cancelación.
-
-[La fixture de aplicación aislada](../../../tests/mail/test_integration.py)
-ejecuta los ejemplos tras arranque HTTP lifespan y CLI normales, con una respuesta
-real de controlador y un transporte personalizado registrado por provider.
-Las únicas supresiones localizadas de tipos SMTP corresponden al timeout
-float-only del stub de typeshed; las pruebas
-confirman que Python 3.14 acepta `None` en los dos constructores SMTP reales sin
-abrir conexiones.
-
-```powershell
-$env:PYTHONIOENCODING = "utf-8"
-.\.venv\Scripts\python.exe reactor test --start-dir=tests/mail --verbosity=1
-.\.venv\Scripts\python.exe -m ruff check orionis/mail tests/mail
-uvx pyright --pythonpath .venv/Scripts/python.exe --pythonversion 3.14 orionis/mail orionis/support/facades/mail.pyi
-```
-
-La interoperabilidad con servidores SMTP reales y filesystems no locales debe
-verificarse en el despliegue; la suite no certifica proveedores externos.
+| ../__init__.py | Define las exportaciones del paquete. |
+| orionis.mail/ | Implementaciones y subpaquetes de esas exportaciones. |
+
+## Referencia de API
+
+| Símbolo | Importación verificada | Fuente | Declaración | Comportamiento observado |
+| --- | --- | --- | --- | --- |
+| Address | from orionis.mail import Address | [entities/address.py](../entities/address.py) | Address | Represent one mailbox with an optional Unicode display name. Parameters ---------- address : str Single addr-spec, never a comma-separated list or a display-name form. name : str / None Optional visible name. |
+| Address.asHeader | from orionis.mail import Address | [entities/address.py](../entities/address.py) | def asHeader(self) -> HeaderAddress | Build a standard immutable address header value. Returns ------- HeaderAddress The mailbox with its optional display name. |
+| Attachment | from orionis.mail import Attachment | [entities/attachment.py](../entities/attachment.py) | Attachment | Describe a storage attachment without opening it or resolving a disk. Parameters ---------- path : str Logical disk-relative path, normalized on declaration. disk : str / None Configured disk name, or None for the default disk. name : str / None Visible basename overriding the logical path's basename. mime_type : str / None Explicit MIME type overriding storage metadata and inference. |
+| Attachment.fromStorage | from orionis.mail import Attachment | [entities/attachment.py](../entities/attachment.py) | def fromStorage(cls, path: str, *, disk: str / None, name: str / None, mime_type: str / None) -> Self | Declare a file to resolve through Orionis storage when sending. Parameters ---------- path : str Logical disk-relative path. disk : str / None Configured disk name, or None for the default disk. name : str / None Visible basename overriding the logical path's basename. mime_type : str / None Explicit MIME type overriding storage metadata and inference. Returns ------- Self An immutable attachment declaration, with no I/O performed. Raises ------ MailAttachmentException If the declaration contains unsafe paths or metadata. |
+| Content | from orionis.mail import Content | [entities/content.py](../entities/content.py) | Content | Declare literal bodies or views with one explicit isolated context. Parameters ---------- view : str / None HTML template identifier, mutually exclusive with html. html : str / None Literal HTML, never interpreted as a template. text : str / None Literal plain text, mutually exclusive with text_view. text_view : str / None Plain-text template identifier. data : Mapping[str, object] / None Context shared by both views, with copied read-only containers. |
+| Envelope | from orionis.mail import Envelope | [entities/envelope.py](../entities/envelope.py) | Envelope | Store normalized immutable headers and intended recipients. Parameters ---------- subject : str Literal subject, including an intentionally empty subject. from_address : Address / None From header and transport sender. to : tuple[Address, ...] Primary visible recipients. cc : tuple[Address, ...] Additional visible recipients. bcc : tuple[Address, ...] Hidden transport recipients. reply_to : tuple[Address, ...] Reply destinations, which are never transport recipients. |
+| Envelope.recipients | from orionis.mail import Envelope | [entities/envelope.py](../entities/envelope.py) | def recipients(self) -> tuple[str, ...] | Return the stable deduplicated transport recipient union. Returns ------- tuple[str, ...] To, Cc, and Bcc addresses without Reply-To. |
+| MailResult | from orionis.mail import MailResult | [entities/result.py](../entities/result.py) | MailResult | Report SMTP acceptance or file storage, never final mailbox delivery. All recipient collections are copied. Rejection reasons are bounded, single-line text; transports must redact credentials before constructing the result. Stored messages have no SMTP acceptance or rejection entries. Parameters ---------- message_id : str Message-ID of the transmitted or stored message. mailer : str Selected configuration name. driver : str Registered transport implementation name. status : MailStatus Confirmed outcome of the operation. recipients : tuple[str, ...] Intended transport recipients. accepted_recipients : tuple[str, ...] Recipients confirmed by an SMTP transaction. rejected_recipients : Mapping[str, tuple[int, str]] Rejected recipients mapped to their SMTP code and sanitized reason. file_path : Path / None Published file for stored messages, or None for SMTP. |
+| MailStatus | from orionis.mail import MailStatus | [enums/status.py](../enums/status.py) | MailStatus | Enumerate the outcomes a transport can confirm for one operation. Members inherit from :class:`str`, so they compare equal to the plain status strings exposed in results and serialized payloads. No member confirms mailbox delivery or that a recipient read the message. Attributes ---------- ACCEPTED : str SMTP accepted the message for every intended recipient. PARTIAL : str SMTP accepted the message for some recipients and rejected others. STORED : str The file transport published the complete message on disk. |
+| Mailable | from orionis.mail import Mailable | [mailable.py](../mailable.py) | Mailable | Declare reusable mail without I/O or per-send mutation. Subclasses describe headers, bodies, and attachments synchronously. Pass an instance to ``Mail.send()`` when it is already constructed, or pass its class to let the application container inject constructor dependencies. Rendering, attachment reads, and transport happen afterwards, so the same instance can be sent concurrently without being modified. |
+| Mailable.envelope | from orionis.mail import Mailable | [mailable.py](../mailable.py) | def envelope(self) -> Envelope | Declare headers and recipients synchronously. Returns ------- Envelope Immutable envelope, augmented by explicit PendingMail data. |
+| Mailable.content | from orionis.mail import Mailable | [mailable.py](../mailable.py) | def content(self) -> Content | Declare literal bodies or views synchronously. Returns ------- Content Content whose rendering is deferred until sending. |
+| Mailable.attachments | from orionis.mail import Mailable | [mailable.py](../mailable.py) | def attachments(self) -> Sequence[Attachment] | Declare deferred storage attachments synchronously. Returns ------- Sequence[Attachment] Empty by default; subclasses may return their own declarations. |
+| Message | from orionis.mail import Message | [message.py](../message.py) | Message | Configure one direct send without exposing a mutable MIME message. The instance belongs to a single operation: a callback receives it once, and the options it holds are snapshotted before preparation starts. |
+| Message.fromAddress | from orionis.mail import Message | [message.py](../message.py) | def fromAddress(self, address: str / Address, name: str / None) -> Self | Replace the From header and the transport sender. Parameters ---------- address : str / Address Exactly one sender mailbox. name : str / None Display name for a string mailbox only. Returns ------- Self This configurator. |
+| Message.to | from orionis.mail import Message | [message.py](../message.py) | def to(self, addresses: Recipients, name: str / None) -> Self | Append primary visible recipients. Parameters ---------- addresses : Recipients One mailbox or a list/tuple of mailboxes. name : str / None Display name for one string mailbox only. Returns ------- Self This configurator. |
+| Message.cc | from orionis.mail import Message | [message.py](../message.py) | def cc(self, addresses: Recipients, name: str / None) -> Self | Append carbon-copy recipients. Parameters ---------- addresses : Recipients One mailbox or a list/tuple of mailboxes. name : str / None Display name for one string mailbox only. Returns ------- Self This configurator. |
+| Message.bcc | from orionis.mail import Message | [message.py](../message.py) | def bcc(self, addresses: Recipients, name: str / None) -> Self | Append hidden transport recipients. Parameters ---------- addresses : Recipients One mailbox or a list/tuple of mailboxes. name : str / None Display name for one string mailbox only. Returns ------- Self This configurator. |
+| Message.replyTo | from orionis.mail import Message | [message.py](../message.py) | def replyTo(self, addresses: Recipients, name: str / None) -> Self | Append Reply-To mailboxes without adding transport recipients. Parameters ---------- addresses : Recipients One mailbox or a list/tuple of mailboxes. name : str / None Display name for one string mailbox only. Returns ------- Self This configurator. |
+| Message.subject | from orionis.mail import Message | [message.py](../message.py) | def subject(self, value: str) -> Self | Replace the literal subject, including with an empty string. Parameters ---------- value : str Subject without control characters. Returns ------- Self This configurator. |
+| Message.attach | from orionis.mail import Message | [message.py](../message.py) | def attach(self, attachment: Attachment) -> Self | Append a deferred storage attachment. Parameters ---------- attachment : Attachment Safe immutable attachment declaration. Returns ------- Self This configurator. Raises ------ MailCompositionException If the supplied object is not an Attachment. |
+| PendingMail | from orionis.mail import PendingMail | [pending.py](../pending.py) | PendingMail | Build independent chains; every fluent call returns a new operation. A chain never builds a Mailable, renders, reads attachments, or resolves a transport: those steps belong to the asynchronous terminals. Deriving a chain copies its immutable options, so concurrent branches never share recipients. |
+| PendingMail.mailer | from orionis.mail import PendingMail | [pending.py](../pending.py) | def mailer(self, name: str) -> PendingMail | Select a mailer on an independent derived chain. Parameters ---------- name : str Central configuration name, not a driver name. Returns ------- PendingMail A new operation; resolution remains deferred until sending. Raises ------ MailConfigurationException If the name is not a non-empty string. |
+| PendingMail.fromAddress | from orionis.mail import PendingMail | [pending.py](../pending.py) | def fromAddress(self, address: str / Address, name: str / None) -> PendingMail | Replace the sender on a new independent chain. Parameters ---------- address : str / Address Exactly one sender mailbox. name : str / None Optional name for a string mailbox only. Returns ------- PendingMail Derived operation with an explicit From and transport sender. |
+| PendingMail.to | from orionis.mail import PendingMail | [pending.py](../pending.py) | def to(self, addresses: Recipients, name: str / None) -> PendingMail | Append visible recipients on an independent chain. Parameters ---------- addresses : Recipients One mailbox or a list/tuple of mailboxes. name : str / None Optional name for a single string mailbox only. Returns ------- PendingMail Derived operation retaining previous recipients. |
+| PendingMail.cc | from orionis.mail import PendingMail | [pending.py](../pending.py) | def cc(self, addresses: Recipients, name: str / None) -> PendingMail | Append carbon-copy recipients on an independent chain. Parameters ---------- addresses : Recipients One mailbox or a list/tuple of mailboxes. name : str / None Optional name for a single string mailbox only. Returns ------- PendingMail Derived operation retaining previous recipients. |
+| PendingMail.bcc | from orionis.mail import PendingMail | [pending.py](../pending.py) | def bcc(self, addresses: Recipients, name: str / None) -> PendingMail | Append hidden recipients on an independent chain. Parameters ---------- addresses : Recipients One mailbox or a list/tuple of mailboxes. name : str / None Optional name for a single string mailbox only. Returns ------- PendingMail Derived operation retaining previous recipients. |
+| PendingMail.replyTo | from orionis.mail import PendingMail | [pending.py](../pending.py) | def replyTo(self, addresses: Recipients, name: str / None) -> PendingMail | Append Reply-To mailboxes on an independent chain. Parameters ---------- addresses : Recipients One mailbox or a list/tuple of mailboxes. name : str / None Optional name for a single string mailbox only. Returns ------- PendingMail Derived operation retaining previous reply destinations. |
+| PendingMail.subject | from orionis.mail import PendingMail | [pending.py](../pending.py) | def subject(self, value: str) -> PendingMail | Replace the subject on an independent chain. Parameters ---------- value : str Literal subject, possibly empty. Returns ------- PendingMail Derived operation with an explicit subject. |
+| PendingMail.attach | from orionis.mail import PendingMail | [pending.py](../pending.py) | def attach(self, attachment: Attachment) -> PendingMail | Append a deferred storage attachment on an independent chain. Parameters ---------- attachment : Attachment Storage attachment declaration. Returns ------- PendingMail Derived operation retaining previous attachments. |
+| PendingMail.send | from orionis.mail import PendingMail | [pending.py](../pending.py) | async def send(self, mailable: Mailable / type[Mailable]) -> MailResult | Public method without a docstring. |
+| PendingMail.send | from orionis.mail import PendingMail | [pending.py](../pending.py) | async def send(self, view: str, data: Mapping[str, object] / None, callback: MessageCallback / None) -> MailResult | Public method without a docstring. |
+| PendingMail.send | from orionis.mail import PendingMail | [pending.py](../pending.py) | async def send(self, content: Content, *, callback: MessageCallback / None) -> MailResult | Public method without a docstring. |
+| PendingMail.send | from orionis.mail import PendingMail | [pending.py](../pending.py) | async def send(self, value: Mailable / type[Mailable] / str / Content, data: object, callback: object) -> MailResult | Send a reusable Mailable, an HTML view, or explicit Content. Parameters ---------- value : Mailable / type[Mailable] / str / Content Declaration, resolvable Mailable class, or HTML view identifier. data : Mapping[str, object] / None View context, accepted only when value is a string. callback : MessageCallback / None Operation-local configurator, not accepted for a Mailable. Returns ------- MailResult Confirmed SMTP acceptance or file publication result. Raises ------ MailCompositionException If arguments, container resolution, declarations, callbacks, or content are invalid. MailException If preparation or transport fails. |
+| PendingMail.raw | from orionis.mail import PendingMail | [pending.py](../pending.py) | async def raw(self, text: str, callback: MessageCallback / None) -> MailResult | Send literal plain text through the shared preparation pipeline. Parameters ---------- text : str Literal text, never rendered as a template. callback : MessageCallback / None Optional sync or async operation-local configurator. Returns ------- MailResult Transport outcome. Raises ------ MailCompositionException If the body, callback, or resulting envelope is invalid. MailException If preparation or transport fails. |
+| PendingMail.html | from orionis.mail import PendingMail | [pending.py](../pending.py) | async def html(self, html: str, callback: MessageCallback / None) -> MailResult | Send literal HTML through the shared preparation pipeline. Parameters ---------- html : str Literal HTML, never rendered as a template. callback : MessageCallback / None Optional sync or async operation-local configurator. Returns ------- MailResult Transport outcome. Raises ------ MailCompositionException If the body, callback, or resulting envelope is invalid. MailException If preparation or transport fails. |
+
+## Ejemplos de uso
+
+    from orionis.mail import Address
+
+La ruta de importación coincide con la tabla de API. Estado de importación: executed successfully under Python 3.14.3.
+
+## Características de diseño
+
+El paquete utiliza una superficie pública explícita. Los símbolos privados no se incluyen; las declaraciones se enlazan al propietario concreto.
+
+## Rendimiento y concurrencia
+
+No se declara una garantía uniforme en el nivel del paquete. Inspeccione cada archivo enlazado para E/S, corutinas, cachés, bloqueos y estado compartido.
+
+## Notas de compatibilidad
+
+Mínimo declarado: Python 3.14. La validación usó Python 3.14.3. Los límites de dependencias están en pyproject.toml.
+
+## Verificación y limitaciones
+
+Se analizaron los archivos Python y se verificaron las exportaciones. Las excepciones de dependencias, callbacks, E/S o configuración pueden propagarse y no se presentan como exhaustivas.

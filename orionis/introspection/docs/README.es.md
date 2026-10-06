@@ -1,794 +1,332 @@
 # orionis.introspection
 
-> Herramientas de reflexión con caché que clasifican los miembros de una clase y resuelven las dependencias de un callable para el contenedor de Orionis.
+> Referencia de API derivada de la implementación actual.
 
-## Tabla de contenidos
+## Tabla de contenido
 
-- [Descripción funcional](#descripción-funcional)
-  - [Dónde encaja en el framework](#dónde-encaja-en-el-framework)
-  - [Flujo de reflexión](#flujo-de-reflexión)
-  - [Mapa de archivos](#mapa-de-archivos)
-  - [Decisiones de diseño](#decisiones-de-diseño)
-- [Referencia de API](#referencia-de-api)
-  - [Reflection](#reflection)
-  - [ReflectionAbstract](#reflectionabstract)
-  - [ReflectionConcrete](#reflectionconcrete)
-  - [ReflectionInstance](#reflectioninstance)
-  - [ReflectionCallable](#reflectioncallable)
-  - [ReflectionModule](#reflectionmodule)
-  - [ReflectDependencies](#reflectdependencies)
-  - [Argument](#argument)
-  - [Signature](#signature)
-  - [ModuleInspector](#moduleinspector)
-  - [Contratos](#contratos)
-  - [API de clasificación de miembros](#api-de-clasificación-de-miembros)
-- [Ejemplos de uso](#ejemplos-de-uso)
-  - [Clasificar los miembros de una clase](#clasificar-los-miembros-de-una-clase)
-  - [Resolver las dependencias del constructor](#resolver-las-dependencias-del-constructor)
-  - [Reflejar una instancia](#reflejar-una-instancia)
-  - [Manejo de errores de reflexión](#manejo-de-errores-de-reflexión)
-  - [Descubrir módulos y dataclasses congeladas](#descubrir-módulos-y-dataclasses-congeladas)
-- [Consideraciones de rendimiento y concurrencia](#consideraciones-de-rendimiento-y-concurrencia)
-- [Notas de compatibilidad](#notas-de-compatibilidad)
+- Requisitos
+- Resumen funcional
+- Estructura del módulo
+- Referencia de API
+- Ejemplos de uso
+- Características de diseño
+- Rendimiento y concurrencia
+- Notas de compatibilidad
+- Verificación y limitaciones
 
----
+## Requisitos
 
-## Descripción funcional
+Python 3.14 o superior, como declara pyproject.toml.
 
-`orionis.introspection` envuelve los módulos estándar `inspect`, `typing`, `ast`
-e `importlib` detrás de clases especializadas que responden a las dos preguntas
-que el framework se hace constantemente:
+## Resumen funcional
 
-1. **¿Qué miembros expone esta clase, instancia o módulo?** — clasificados por
-   *visibilidad* (público / protegido / privado / dunder), *tipo* (método de
-   instancia, de clase, estático, atributo, propiedad) y *síncrono vs. asíncrono*.
-2. **¿Qué necesita este callable para construirse?** — cada parámetro se
-   convierte en un `Argument` y se reparte en cubetas de resueltos y no resueltos
-   que el contenedor IoC consume directamente.
+El inicializador de orionis.introspection expone 8 símbolos públicos. Esta referencia usa __all__, las rutas de exportación y los archivos fuente actuales como evidencia.
 
-### Dónde encaja en el framework
+## Estructura del módulo
 
-| Consumidor | Qué usa |
+| Ruta | Responsabilidad |
 | --- | --- |
-| `orionis/container/container.py` | `ReflectionCallable`, `ReflectionConcrete`, `Argument`, `Signature` para el autowiring de `make`, `build`, `invoke` y `call`. |
-| `orionis/console/core/loader.py` | `ModuleInspector`, `ReflectionModule` para descubrir comandos de consola. |
-| `orionis/database/migrations/migrator.py` | `ModuleInspector`, `ReflectionModule` para descubrir clases de migración. |
-| `orionis/foundation/application.py` | `ModuleInspector` para descubrir entidades de configuración en el arranque. |
-| `orionis/console/commands/schedule/work_command.py` | `ReflectionInstance`. |
-
-El paquete no tiene service provider ni facade: las clases se importan y se
-instancian directamente.
-
-### Flujo de reflexión
-
-```mermaid
-flowchart LR
-    A[Reflection facade] -->|instance| B[ReflectionInstance]
-    A -->|abstract| C[ReflectionAbstract]
-    A -->|concrete| D[ReflectionConcrete]
-    A -->|module| E[ReflectionModule]
-    A -->|callable| F[ReflectionCallable]
-    B --> G[ReflectDependencies]
-    C --> G
-    D --> G
-    F --> G
-    G --> H[Signature + Argument]
-```
-
-`ReflectionAbstract`, `ReflectionConcrete` y `ReflectionInstance` ejecutan un
-**barrido de una sola pasada** sobre el espacio de nombres de la clase la primera
-vez que se llama a cualquier accesor de clasificación, y a partir de ahí sirven
-todos los demás desde una caché interna. `ReflectDependencies` es una envoltura
-delgada con estado sobre dos funciones a nivel de módulo decoradas con
-`functools.lru_cache`, así que inspeccionar repetidamente el mismo objetivo no
-tiene coste.
-
-### Mapa de archivos
-
-| Ruta | Contenido |
-| --- | --- |
-| `reflection.py` | `Reflection` — facade estática: 5 métodos fábrica y 26 predicados. |
-| `abstract/reflection.py` | `ReflectionAbstract` para clases `abc`. |
-| `concretes/reflection.py` | `ReflectionConcrete` para clases ordinarias. |
-| `instances/reflection.py` | `ReflectionInstance` para instancias de objeto. |
-| `callables/reflection.py` | `ReflectionCallable` para funciones, métodos y lambdas. |
-| `modules/reflection.py` | `ReflectionModule` para módulos importados. |
-| `modules/inspector.py` | `ModuleInspector` — utilidades de descubrimiento por sistema de archivos y AST. |
-| `dependencies/reflection.py` | `ReflectDependencies` y las funciones de resolución cacheadas. |
-| `dependencies/entities/argument.py` | Dataclass congelada `Argument`. |
-| `dependencies/entities/signature.py` | Dataclass congelada `Signature`. |
-| `*/contracts/reflection.py` | Interfaces `abc.ABC` que implementa cada reflector. |
-
-### Decisiones de diseño
-
-- **Facade estática con imports perezosos** — `Reflection` solo contiene
-  `@staticmethod` e importa cada reflector concreto dentro del método fábrica,
-  así que importar `Reflection` no arrastra todo el paquete a memoria.
-- **Barrido único + caché de diccionario** — las cubetas visibilidad × tipo ×
-  síncrono/asíncrono se calculan una vez por instancia de reflector; después,
-  cada accesor `get*` es una búsqueda en un diccionario.
-- **Protocolo de caché tipo mapping** — `ReflectionAbstract`,
-  `ReflectionConcrete`, `ReflectionInstance`, `ReflectionCallable` y
-  `ReflectionModule` implementan `__getitem__`, `__setitem__`, `__contains__` y
-  `__delitem__` sobre esa misma caché, de modo que quien llama puede guardar sus
-  propios valores derivados junto a los internos.
-- **Entidades congeladas** — `Argument` es `@dataclass(slots=True, kw_only=True,
-  frozen=True)`; `Signature` es `@dataclass(frozen=True, kw_only=True)` y
-  extiende `orionis.support.entities.base.BaseEntity`.
-- **El name mangling queda oculto** — los miembros privados se devuelven sin el
-  prefijo `_NombreDeClase` (`__seal`, no `_Repository__seal`), y los accesores
-  que reciben un nombre de miembro vuelven a aplicar el mangling internamente.
-
----
+| ../__init__.py | Define las exportaciones del paquete. |
+| orionis.introspection/ | Implementaciones y subpaquetes de esas exportaciones. |
 
 ## Referencia de API
 
-### Reflection
-
-`orionis.introspection.reflection.Reflection` — facade estática, nunca se
-instancia.
-
-**Métodos fábrica**
-
-```python
-@staticmethod
-def instance(instance: Any) -> IReflectionInstance: ...
-
-@staticmethod
-def abstract(abstract: type) -> IReflectionAbstract: ...
-
-@staticmethod
-def concrete(concrete: type) -> IReflectionConcrete: ...
-
-@staticmethod
-def module(module: str) -> IReflectionModule: ...
-
-@staticmethod
-def callable(fn: Callable) -> IReflectionCallable: ...
-```
-
-Cada fábrica reenvía su argumento al constructor del reflector correspondiente y,
-por tanto, propaga las mismas excepciones (ver cada clase más abajo).
-
-**Predicados** — todos son `@staticmethod`, reciben un único `obj: Any` y
-devuelven `bool`.
-
-| Predicado | Delegado en |
-| --- | --- |
-| `isAbstract` | `inspect.isabstract` |
-| `isAsyncGen` | `inspect.isasyncgen` |
-| `isAsyncGenFunction` | `inspect.isasyncgenfunction` |
-| `isAwaitable` | `inspect.isawaitable` |
-| `isBuiltIn` | `inspect.isbuiltin` |
-| `isClass` | `inspect.isclass` |
-| `isCode` | `inspect.iscode` |
-| `isCoroutine` | `inspect.iscoroutine` |
-| `isCoroutineFunction` | `inspect.iscoroutinefunction` |
-| `isDataDescriptor` | `inspect.isdatadescriptor` |
-| `isFrame` | `inspect.isframe` |
-| `isFunction` | `inspect.isfunction` |
-| `isGenerator` | `inspect.isgenerator` |
-| `isGeneratorFunction` | `inspect.isgeneratorfunction` |
-| `isGetSetDescriptor` | `inspect.isgetsetdescriptor` |
-| `isMemberDescriptor` | `inspect.ismemberdescriptor` |
-| `isMethod` | `inspect.ismethod` |
-| `isMethodDescriptor` | `inspect.ismethoddescriptor` |
-| `isModule` | `inspect.ismodule` |
-| `isRoutine` | `inspect.isroutine` |
-| `isTraceback` | `inspect.istraceback` |
-
-Cinco predicados implementan reglas propias:
-
-- `isConcreteClass(obj)` — `True` cuando `obj` es un `type` que **no** es
-  built-in, abstracto, genérico, un `Protocol` ni una construcción de `typing`,
-  no lleva `abc.ABC` entre sus bases directas y tiene `__init__`. Comportamiento
-  verificado: `Reflection.isConcreteClass(int)` devuelve `True`, porque
-  `inspect.isbuiltin` es `False` para las clases.
-- `isGeneric(obj)` — `True` cuando `typing.get_origin(obj)` no es `None`, cuando
-  `obj` expone `__origin__` o cuando `obj` es un `typing.TypeVar`.
-- `isProtocol(obj)` — `True` cuando `obj` es una clase, subclase de
-  `typing.Protocol` y no es `Protocol` en sí.
-- `isInstance(obj)` — `True` cuando `obj` no es una clase y el módulo de su tipo
-  no es `builtins` ni `abc`.
-- `isTypingConstruct(obj)` — `True` cuando `type(obj).__name__` coincide con uno
-  de los 19 nombres fijos (`Any`, `Union`, `Optional`, `List`, `Dict`, `Set`,
-  `Tuple`, `Callable`, `TypeVar`, `Generic`, `Protocol`, `Literal`, `Final`,
-  `TypedDict`, `NewType`, `Deque`, `DefaultDict`, `Counter`, `ChainMap`).
-
-### ReflectionAbstract
-
-```python
-class ReflectionAbstract(IReflectionAbstract):
-    def __init__(self, abstract: type) -> None: ...
-```
-
-Lanza `TypeError` cuando `inspect.isabstract(abstract)` es `False`
-(`"The class 'Repository' is not an abstract base class."`).
-
-Además de la [API de clasificación de miembros](#api-de-clasificación-de-miembros)
-expone:
-
-| Método | Devuelve | Notas |
-| --- | --- | --- |
-| `getClass()` | `type` | La clase reflejada. |
-| `getClassName()` | `str` | |
-| `getModuleName()` | `str` | |
-| `getModuleWithClassName()` | `str` | `modulo.NombreDeClase`. |
-| `getDocstring()` | `str \| None` | |
-| `getBaseClasses()` | `list[type]` | Bases directas, como lista. |
-| `getSourceCode()` | `str` | Lanza `ValueError` si no se puede localizar el código fuente. |
-| `getFile()` | `str` | Lanza `ValueError` si la clase no tiene un archivo de módulo importable. |
-| `getAnnotations()` | `dict` | Anotaciones de clase sin el prefijo de mangling. |
-| `hasAttribute(attribute)` | `bool` | |
-| `getAttribute(attribute)` | `object \| None` | |
-| `setAttribute(name, value)` | `bool` | `ValueError` con identificadores/palabras reservadas inválidos, `TypeError` con callables. |
-| `removeAttribute(name)` | `bool` | `ValueError` si el atributo no existe. |
-| `hasMethod(name)` | `bool` | Acepta el nombre privado sin manglar. |
-| `removeMethod(name)` | `bool` | `ValueError` si el método no existe. |
-| `getMethodSignature(name)` | `inspect.Signature` | `ValueError` si no existe, `TypeError` si no es callable. |
-| `getPropertySignature(name)` | `inspect.Signature` | `ValueError` si no existe, `TypeError` si no es una propiedad. |
-| `getPropertyDocstring(name)` | `str \| None` | Mismas excepciones que el anterior. |
-| `constructorSignature()` | `Signature` | Delega en `ReflectDependencies`. |
-| `methodSignature(method_name)` | `Signature` | `AttributeError` si el método no existe. |
-| `clearCache()` | `None` | Vacía la caché interna. |
-
-### ReflectionConcrete
-
-```python
-class ReflectionConcrete(IReflectionConcrete):
-    def __init__(self, concrete: type) -> None: ...
-```
-
-Lanza `TypeError` cuando `Reflection.isConcreteClass(concrete)` es `False`
-(`"Argument 'concrete' must be a class type, got 'ABCMeta' instead."`).
-
-Ofrece la misma superficie que `ReflectionAbstract` más:
-
-| Método | Devuelve | Notas |
-| --- | --- | --- |
-| `getSourceCode(method=None)` | `str \| None` | La clase completa si `method` es `None`; devuelve `None` en lugar de lanzar cuando no se puede leer el código o el método no existe. |
-| `getFile()` | `str` | Lanza `ValueError` si la clase no tiene un archivo de módulo importable. |
-| `getAttribute(name, default=None)` | `Any` | Admite un valor por defecto. |
-| `setMethod(name, method)` | `bool` | `AttributeError` con nombres inválidos, `TypeError` con valores no callables. |
-| `getProperty(name)` | `Any` | Invoca el getter usando la clase como receptor. |
-| `getConstructorSignature()` | `inspect.Signature` | Firma cruda de `__init__`. |
-| `constructorSignature()` | `Signature` | Análisis de dependencias de `__init__`. |
-| `removeMethod(name)` | `bool` | |
-
-### ReflectionInstance
-
-```python
-class ReflectionInstance(IReflectionInstance):
-    def __init__(self, instance: Any) -> None: ...
-```
-
-Guardas del constructor, en orden:
-
-| Condición | Excepción |
-| --- | --- |
-| `instance` es una clase | `TypeError: The provided instance must be an object instance, not a class.` |
-| su tipo vive en `builtins` o `abc` | `TypeError: Cannot reflect on instances of built-in or abstract base classes.` |
-| su tipo vive en `__main__` | `ValueError: Cannot reflect on instances from '__main__'.` |
-
-Diferencias respecto a los reflectores de clase:
-
-| Método | Devuelve | Notas |
-| --- | --- | --- |
-| `getInstance()` | `Any` | El objeto envuelto. |
-| `getBaseClasses()` | `tuple[type, ...]` | Una **tupla**, no una lista. |
-| `getAttributes()` y sus variantes por visibilidad | `dict[str, Any]` | Leen las variables **de instancia** (`vars(instance)`), no los atributos de clase. |
-| `getAnnotations()` | `dict[str, type]` | Anotaciones de clase, sin manglar. |
-| `getAttributeDocstring(name)` | `str \| None` | `AttributeError` si el atributo no existe. |
-| `getMethodDocstring(name)` | `str \| None` | |
-| `getSourceCode(method=None)` | `str \| None` | Devuelve `None` ante un fallo. |
-| `getFile()` | `str \| None` | Devuelve `None` ante un fallo. |
-| `removeMethod(name)` | `None` | No devuelve nada, a diferencia de `ReflectionConcrete.removeMethod`. |
-| `getPropertyDocstring(name)` | `str` | `AttributeError` si la propiedad no existe. |
-| `setMethod(name, method)` | `bool` | Vincula el callable a la **instancia**, así que aparece en el barrido de variables de instancia, no en `getMethods()`. |
-
-### ReflectionCallable
-
-```python
-class ReflectionCallable(IReflectionCallable):
-    def __init__(self, fn: callable) -> None: ...
-```
-
-Acepta `types.FunctionType`, `types.MethodType` o cualquier callable que exponga
-`__code__`; cualquier otra cosa lanza
-`TypeError: Expected a function, method, or lambda, got builtin_function_or_method`.
-
-| Método | Devuelve | Notas |
-| --- | --- | --- |
-| `getCallable()` | `callable` | |
-| `getName()` | `str` | Precalculado en `__init__`. |
-| `getModuleName()` | `str` | Precalculado en `__init__`. |
-| `getModuleWithCallableName()` | `str` | `modulo.nombre`. |
-| `getDocstring()` | `str` | Cadena vacía si no hay docstring. |
-| `getSourceCode()` | `str` | `AttributeError` cuando el código fuente no está disponible. |
-| `getFile()` | `str` | Propaga el `TypeError` de `inspect.getfile`. |
-| `getSignature()` | `inspect.Signature` | Cacheado. |
-| `getDependencies()` | `Signature` | Análisis de dependencias cacheado. |
-| `clearCache()` | `None` | |
-
-### ReflectionModule
-
-```python
-class ReflectionModule(IReflectionModule):
-    def __init__(self, module: str) -> None: ...
-```
-
-Lanza `TypeError` si el argumento no es una cadena, si es una cadena vacía o en
-blanco (`"Module name must be a non-empty string, got ''"`) o si falla la
-importación (`"Failed to import module 'x': ..."`).
-
-| Método | Devuelve | Notas |
-| --- | --- | --- |
-| `getModule()` | `object` | El objeto módulo importado. |
-| `getClasses()` | `dict` | Todas las clases presentes en el espacio de nombres, incluidas las importadas. |
-| `getPublicClasses()` / `getProtectedClasses()` / `getPrivateClasses()` | `dict` | Filtradas por prefijo del nombre. |
-| `hasClass(class_name)` | `bool` | |
-| `getClass(class_name)` | `type \| None` | |
-| `setClass(class_name, cls)` | `bool` | `ValueError` con nombres inválidos o palabras reservadas, `TypeError` si `cls` no es una clase. |
-| `removeClass(class_name)` | `bool` | `ValueError` si no existe. |
-| `getConstants()` | `dict` | Atributos no callables cuyo nombre está en mayúsculas. |
-| `getPublicConstants()` / `getProtectedConstants()` / `getPrivateConstants()` | `dict` | |
-| `getConstant(constant_name)` | `object \| None` | |
-| `getFunctions()` | `dict` | Solo valores de tipo `types.FunctionType`. |
-| `getPublicFunctions()` / `getPublicSyncFunctions()` / `getPublicAsyncFunctions()` | `dict` | El mismo trío existe para `Protected` y `Private`. |
-| `getImports()` | `dict` | Atributos cuyo valor es un módulo. |
-| `getFile()` | `str` | Propaga el `TypeError` de `inspect.getfile` en módulos en memoria. |
-| `getSourceCode()` | `str` | Lanza `ValueError` cuando no se puede leer el archivo. |
-| `clearCache()` | `None` | |
-
-Todos los accesores anteriores memoizan su resultado; llamarlos dos veces
-devuelve exactamente el mismo objeto.
-
-### ReflectDependencies
-
-```python
-class ReflectDependencies(IReflectDependencies):
-    __slots__ = ("_target",)
-
-    def __init__(self, target: Any | None = None) -> None: ...
-    def constructorSignature(self) -> Signature: ...
-    def methodSignature(self, method_name: str) -> Signature: ...
-    def callableSignature(self) -> Signature: ...
-```
-
-- `constructorSignature()` inspecciona `target.__init__`.
-- `methodSignature(name)` inspecciona `getattr(target, name)`; un nombre
-  inexistente propaga `AttributeError`.
-- `callableSignature()` lanza
-  `TypeError: Target 42 is not callable and cannot have a signature.` cuando el
-  objetivo no es callable, y `ValueError: Unable to inspect signature of ...`
-  cuando `inspect.signature` falla (por ejemplo, con `min`).
-
-**Reglas de clasificación aplicadas a cada parámetro**
-
-| Situación | Cubeta | `type` / `class_name` |
-| --- | --- | --- |
-| Se llama `self`, `cls`, `args` o `kwargs`, o está declarado como `*args` / `**kwargs` | omitido | — |
-| Sin anotación y sin valor por defecto | `unresolved` | `type(typing.Any)` → `typing._AnyMeta` |
-| Tiene valor por defecto | `resolved` | `type(default)` — el valor por defecto prevalece sobre la anotación |
-| Anotado con un tipo de `builtins`, sin valor por defecto | `unresolved` | el tipo anotado |
-| Anotado con un tipo que no es de `builtins`, sin valor por defecto | `resolved` | el tipo anotado; `is_schema=True` si es subclase de `msgspec.Struct` |
-| Anotado con una cadena (referencia adelantada) | `resolved` | módulo `typing`, `class_name` es la cadena literal, `type` es `str` |
-
-### Argument
-
-```python
-@dataclass(slots=True, kw_only=True, frozen=True)
-class Argument:
-    name: str
-    resolved: bool
-    module_name: str
-    class_name: str
-    type: type[Any]
-    full_class_path: str
-    is_keyword_only: bool = False
-    is_schema: bool = False
-    default: Any | None = None
-```
-
-`__post_init__` lanza `TypeError` cuando `module_name`, `class_name` o
-`full_class_path` no son `str`, y `ValueError` cuando `type` es `None` y no se
-proporcionó ningún `default`.
-
-### Signature
-
-```python
-@dataclass(frozen=True, kw_only=True)
-class Signature(BaseEntity):
-    resolved: dict[str, Argument]
-    unresolved: dict[str, Argument]
-    ordered: dict[str, Argument]
-```
-
-`__post_init__` lanza `TypeError` si alguno de los tres campos no es un `dict`.
-
-| Método | Devuelve | Notas |
-| --- | --- | --- |
-| `hasParameters()` | `bool` | `True` cuando `ordered` no está vacío. |
-| `noArgumentsRequired()` | `bool` | Inverso de `hasParameters()`. |
-| `hasUnresolvedArguments()` | `bool` | |
-| `getResolved()` / `getUnresolved()` / `getAllOrdered()` | `dict[str, Argument]` | Devuelven los diccionarios **almacenados**. |
-| `resolvedToDict()` / `unresolvedToDict()` / `toDict()` | `dict[str, Argument]` | Devuelven **copias**. |
-| `getPositionalOnly()` / `getKeywordOnly()` | `dict[str, Argument]` | Diccionarios nuevos filtrados por `is_keyword_only`. |
-| `arguments()` | `dict_items[str, Argument]` | Vista iterable sobre `ordered`; es lo que consume el contenedor. |
-
-### ModuleInspector
-
-Utilidad de métodos estáticos y de clase con una caché de clases resueltas
-compartida por todo el proceso.
-
-```python
-@staticmethod
-def discoverModules(base_path: Path, target_path: Path) -> set[str]: ...
-
-@classmethod
-def loadClass(
-    cls: type,
-    module_path: str | None = None,
-    class_name: str | None = None,
-    *,
-    metadata: dict[str, str] | None = None,
-) -> type: ...
-
-@staticmethod
-def fileImportsAny(file_path: Path, target_modules: set[str]) -> bool: ...
-
-@staticmethod
-def discoverFrozenDataclasses(
-    modules: set[str],
-) -> set[tuple[str, str, str, type[Any]]]: ...
-```
-
-- `discoverModules` recorre `target_path` buscando archivos `*.py`, convierte el
-  directorio padre a notación con puntos relativa a `base_path`, elimina los
-  segmentos de `site-packages` y de entorno virtual, y descarta las entradas que
-  quedan vacías (archivos situados directamente en `base_path`).
-- `loadClass` acepta `module_path`/`class_name` explícitos o un `metadata` con
-  las claves `module` y `class` (`dict` o `MappingProxyType`). Lanza
-  `ImportError`, `AttributeError` o `TypeError` (el atributo no es una clase).
-  Las resoluciones correctas se cachean por `"modulo.Clase"`.
-- `fileImportsAny` analiza el archivo con `ast` y devuelve `False` si el archivo
-  no existe, tiene un error de sintaxis o no se puede decodificar como UTF-8.
-- `discoverFrozenDataclasses` devuelve tuplas
-  `(stem_del_archivo, ruta_del_modulo, nombre_de_clase, objeto_clase)` para las
-  dataclasses congeladas **definidas en** cada módulo, y envuelve cualquier fallo
-  de importación en `RuntimeError`.
-
-### Contratos
-
-Cada reflector implementa una interfaz `abc.ABC` ubicada en el paquete hermano
-`contracts`:
-
-| Contrato | Métodos abstractos | Declara `__slots__ = ()` |
-| --- | --- | --- |
-| `IReflectionAbstract` | 61 | no |
-| `IReflectionConcrete` | 64 | no |
-| `IReflectionInstance` | 65 | no |
-| `IReflectionModule` | 28 | no |
-| `IReflectionCallable` | 10 | sí |
-| `IReflectDependencies` | 3 | sí |
-
-Como cuatro de los seis contratos no declaran slots vacíos, solo las instancias
-de `ReflectionCallable` y `ReflectDependencies` carecen de `__dict__` por
-instancia; las de `ReflectionAbstract`, `ReflectionConcrete`,
-`ReflectionInstance` y `ReflectionModule` sí lo tienen.
-
-### API de clasificación de miembros
-
-`ReflectionAbstract`, `ReflectionConcrete` y `ReflectionInstance` comparten el
-mismo esquema de nombres para sus accesores:
-
-```
-get[Public|Protected|Private][Class|Static|""][Sync|Async|""]Methods() -> list[str]
-get[Public|Protected|Private]Attributes() -> dict
-get[Public|Protected|Private]Properties() -> list[str]
-getDunderMethods() / getMagicMethods() -> list[str]
-getDunderAttributes() / getMagicAttributes() -> dict
-```
-
-- **Visibilidad** — `Public` (sin guion bajo inicial), `Protected` (un solo guion
-  bajo inicial), `Private` (con name mangling, devuelto sin el prefijo
-  `_NombreDeClase`), más los accesores dunder independientes.
-- **Tipo** — métodos de instancia normales, métodos de clase (`Class`,
-  `@classmethod`) o métodos estáticos (`Static`, `@staticmethod`).
-- **Síncrono/asíncrono** — el infijo `Sync`/`Async` divide la lista según
-  `inspect.iscoroutinefunction`; omitirlo devuelve ambos.
-- `getMagicMethods()` y `getMagicAttributes()` son alias de las variantes
-  `Dunder`.
-- `getMethods()` agrega los métodos de instancia, de clase y estáticos de las
-  tres visibilidades.
-
----
+| Símbolo | Importación verificada | Fuente | Declaración | Comportamiento observado |
+| --- | --- | --- | --- | --- |
+| ModuleInspector | from orionis.introspection import ModuleInspector | [modules/inspector.py](../modules/inspector.py) | ModuleInspector | Exported public constant or alias. |
+| ModuleInspector.discoverModules | from orionis.introspection import ModuleInspector | [modules/inspector.py](../modules/inspector.py) | def discoverModules(base_path: Path, target_path: Path) -> set[str] | Discover Python modules in a directory tree. Traverse the target directory to find Python files and convert their paths to module notation. Exclude virtual environments and import caches. Collect each directory's modules with package initializers normalized to their package module names. Parameters ---------- base_path : Path Root directory of the application. target_path : Path Directory to search for Python modules. Returns ------- set of str Set of discovered module names in dot notation. Raises ------ ValueError If the target directory is outside the base directory. |
+| ModuleInspector.loadClass | from orionis.introspection import ModuleInspector | [modules/inspector.py](../modules/inspector.py) | def loadClass(cls: type, module_path: str / None, class_name: str / None, *, metadata: dict[str, str] / None) -> type | Load and return a class object from a specified module. Import the given module and retrieve the class by name, using internal caches for efficiency. If not provided directly, module and class names can be extracted from the metadata dictionary. Parameters ---------- cls : type Reference to the class for caching and method access. module_path : str or None Dotted path to the module (e.g., 'orionis.*.config.app.entities.app'). class_name : str or None Name of the class to retrieve from the module. metadata : dict[str, str] or None, optional Optional dictionary containing 'module' and 'class' keys. Returns ------- type The resolved class object. Raises ------ ImportError If the module cannot be imported. AttributeError If the class does not exist in the module. TypeError If the resolved attribute is not a class. |
+| ModuleInspector.fileImportsAny | from orionis.introspection import ModuleInspector | [modules/inspector.py](../modules/inspector.py) | def fileImportsAny(file_path: Path, target_modules: set[str], *, allow_empty: bool) -> bool | Determine if a file imports any target modules using AST analysis. Parameters ---------- file_path : Path Path to the file to analyze. target_modules : set[str] Set of module names to check for imports. allow_empty : bool, optional Whether an empty source is accepted without a required import. Returns ------- bool Whether the file imports a target or is explicitly allowed to be empty. |
+| ModuleInspector.discoverFrozenDataclasses | from orionis.introspection import ModuleInspector | [modules/inspector.py](../modules/inspector.py) | def discoverFrozenDataclasses(modules: set[str]) -> set[tuple[str, str, str, type[Any]]] | Discover frozen dataclasses in specified modules. Traverse the given set of module names, import each module, and inspect its attributes to find frozen dataclasses defined within the module. Parameters ---------- modules : set[str] Set of module names to inspect. Returns ------- set[tuple[str, str, str, type[Any]]] Set of tuples containing file name (without extension), module path, class name, and class type for each discovered frozen dataclass. Raises ------ RuntimeError If a module cannot be imported. |
+| ReflectDependencies | from orionis.introspection import ReflectDependencies | [dependencies/reflection.py](../dependencies/reflection.py) | ReflectDependencies | Reflect dependency metadata from callables, constructors, and methods. Wraps the module-level LRU-cached resolution functions behind a stateful, contract-bound interface, preserving zero overhead on repeated inspections of the same target. |
+| ReflectDependencies.constructorSignature | from orionis.introspection import ReflectDependencies | [dependencies/reflection.py](../dependencies/reflection.py) | def constructorSignature(self) -> Signature | Inspect the constructor (__init__) and categorize parameter dependencies. Returns ------- Signature Contains resolved and unresolved parameter dependencies. Raises ------ ValueError If the constructor signature cannot be inspected. |
+| ReflectDependencies.methodSignature | from orionis.introspection import ReflectDependencies | [dependencies/reflection.py](../dependencies/reflection.py) | def methodSignature(self, method_name: str) -> Signature | Inspect a named method and categorize its parameter dependencies. Parameters ---------- method_name : str Name of the method to inspect. Returns ------- Signature Categorized resolved and unresolved parameter dependencies. Raises ------ ValueError If the method does not exist or its signature cannot be inspected. |
+| ReflectDependencies.callableSignature | from orionis.introspection import ReflectDependencies | [dependencies/reflection.py](../dependencies/reflection.py) | def callableSignature(self) -> Signature | Inspect the callable target and categorize its parameter dependencies. Returns ------- Signature Contains resolved and unresolved parameter dependencies. Raises ------ TypeError If the target is not callable. ValueError If the target's signature cannot be inspected. |
+| Reflection | from orionis.introspection import Reflection | [reflection.py](../reflection.py) | Reflection | Exported public constant or alias. |
+| Reflection.instance | from orionis.introspection import Reflection | [reflection.py](../reflection.py) | def instance(instance: Any) -> IReflectionInstance | Create a ReflectionInstance for an object instance. Parameters ---------- instance : Any Object instance to reflect. Returns ------- ReflectionInstance Reflection object for the provided instance. |
+| Reflection.abstract | from orionis.introspection import Reflection | [reflection.py](../reflection.py) | def abstract(abstract: type) -> IReflectionAbstract | Create a ReflectionAbstract for an abstract class. Parameters ---------- abstract : type The abstract class to reflect. Returns ------- ReflectionAbstract Reflection object for the provided abstract class. |
+| Reflection.concrete | from orionis.introspection import Reflection | [reflection.py](../reflection.py) | def concrete(concrete: type) -> IReflectionConcrete | Create a ReflectionConcrete for a concrete class. Parameters ---------- concrete : type The concrete class to reflect. Returns ------- ReflectionConcrete Reflection object for the provided concrete class. |
+| Reflection.module | from orionis.introspection import Reflection | [reflection.py](../reflection.py) | def module(module: str) -> IReflectionModule | Create a reflection object for a module. Parameters ---------- module : str Name of the module to reflect. Returns ------- ReflectionModule Reflection object for the specified module. |
+| Reflection.callable | from orionis.introspection import Reflection | [reflection.py](../reflection.py) | def callable(fn: Callable) -> IReflectionCallable | Create a ReflectionCallable for a callable object. Parameters ---------- fn : Callable The function or method to wrap. Returns ------- ReflectionCallable Reflection object encapsulating the provided callable. |
+| Reflection.isAbstract | from orionis.introspection import Reflection | [reflection.py](../reflection.py) | def isAbstract(obj: Any) -> bool | Determine if the object is an abstract base class. Parameters ---------- obj : Any Object to check for abstractness. Returns ------- bool True if the object is an abstract base class, False otherwise. |
+| Reflection.isConcreteClass | from orionis.introspection import Reflection | [reflection.py](../reflection.py) | def isConcreteClass(obj: Any) -> bool | Determine if the object is a concrete user-defined class. Parameters ---------- obj : Any Object to check for concreteness. Returns ------- bool True if the object is a concrete class; False otherwise. |
+| Reflection.isAsyncGen | from orionis.introspection import Reflection | [reflection.py](../reflection.py) | def isAsyncGen(obj: Any) -> bool | Determine if the object is an asynchronous generator. Parameters ---------- obj : Any Object to check. Returns ------- bool True if the object is an asynchronous generator, False otherwise. |
+| Reflection.isAsyncGenFunction | from orionis.introspection import Reflection | [reflection.py](../reflection.py) | def isAsyncGenFunction(obj: Any) -> bool | Determine if the object is an asynchronous generator function. Parameters ---------- obj : Any Object to check. Returns ------- bool True if the object is an asynchronous generator function, False otherwise. |
+| Reflection.isAwaitable | from orionis.introspection import Reflection | [reflection.py](../reflection.py) | def isAwaitable(obj: Any) -> bool | Determine if the object can be awaited. Parameters ---------- obj : Any Object to check for awaitability. Returns ------- bool True if the object is awaitable, otherwise False. |
+| Reflection.isBuiltIn | from orionis.introspection import Reflection | [reflection.py](../reflection.py) | def isBuiltIn(obj: Any) -> bool | Determine if the object is a built-in function or method. Parameters ---------- obj : Any Object to check. Returns ------- bool True if the object is a built-in function or method, False otherwise. |
+| Reflection.isClass | from orionis.introspection import Reflection | [reflection.py](../reflection.py) | def isClass(obj: Any) -> bool | Determine if the object is a class. Parameters ---------- obj : Any Object to check. Returns ------- bool True if the object is a class, otherwise False. |
+| Reflection.isCode | from orionis.introspection import Reflection | [reflection.py](../reflection.py) | def isCode(obj: Any) -> bool | Determine if the object is a code object. Parameters ---------- obj : Any Object to check. Returns ------- bool True if the object is a code object, otherwise False. |
+| Reflection.isCoroutine | from orionis.introspection import Reflection | [reflection.py](../reflection.py) | def isCoroutine(obj: Any) -> bool | Determine if the object is a coroutine. Parameters ---------- obj : Any Object to check. Returns ------- bool True if the object is a coroutine, otherwise False. |
+| Reflection.isCoroutineFunction | from orionis.introspection import Reflection | [reflection.py](../reflection.py) | def isCoroutineFunction(obj: Any) -> bool | Determine if the object is a coroutine function. Parameters ---------- obj : Any Object to check. Returns ------- bool True if the object is a coroutine function, otherwise False. |
+| Reflection.isDataDescriptor | from orionis.introspection import Reflection | [reflection.py](../reflection.py) | def isDataDescriptor(obj: Any) -> bool | Determine if the object is a data descriptor. Parameters ---------- obj : Any Object to check. Returns ------- bool True if the object is a data descriptor, otherwise False. |
+| Reflection.isFrame | from orionis.introspection import Reflection | [reflection.py](../reflection.py) | def isFrame(obj: Any) -> bool | Determine if the object is a frame object. Parameters ---------- obj : Any Object to check. Returns ------- bool True if the object is a frame object, otherwise False. |
+| Reflection.isFunction | from orionis.introspection import Reflection | [reflection.py](../reflection.py) | def isFunction(obj: Any) -> bool | Determine if the object is a Python function. Parameters ---------- obj : Any Object to check. Returns ------- bool True if the object is a function, otherwise False. |
+| Reflection.isGenerator | from orionis.introspection import Reflection | [reflection.py](../reflection.py) | def isGenerator(obj: Any) -> bool | Determine if the object is a generator. Parameters ---------- obj : Any Object to check. Returns ------- bool True if the object is a generator, otherwise False. |
+| Reflection.isGeneratorFunction | from orionis.introspection import Reflection | [reflection.py](../reflection.py) | def isGeneratorFunction(obj: Any) -> bool | Determine if the object is a generator function. Parameters ---------- obj : Any Object to check. Returns ------- bool True if the object is a generator function, otherwise False. |
+| Reflection.isGetSetDescriptor | from orionis.introspection import Reflection | [reflection.py](../reflection.py) | def isGetSetDescriptor(obj: Any) -> bool | Determine if the object is a getset descriptor. Parameters ---------- obj : Any Object to check. Returns ------- bool True if the object is a getset descriptor, otherwise False. |
+| Reflection.isMemberDescriptor | from orionis.introspection import Reflection | [reflection.py](../reflection.py) | def isMemberDescriptor(obj: Any) -> bool | Determine if the object is a member descriptor. Parameters ---------- obj : Any Object to check. Returns ------- bool True if the object is a member descriptor, otherwise False. |
+| Reflection.isMethod | from orionis.introspection import Reflection | [reflection.py](../reflection.py) | def isMethod(obj: Any) -> bool | Determine if the object is a method. Parameters ---------- obj : Any Object to check. Returns ------- bool True if the object is a method, otherwise False. |
+| Reflection.isMethodDescriptor | from orionis.introspection import Reflection | [reflection.py](../reflection.py) | def isMethodDescriptor(obj: Any) -> bool | Determine if the object is a method descriptor. Parameters ---------- obj : Any Object to check. Returns ------- bool True if the object is a method descriptor, otherwise False. |
+| Reflection.isModule | from orionis.introspection import Reflection | [reflection.py](../reflection.py) | def isModule(obj: Any) -> bool | Determine if the object is a module. Parameters ---------- obj : Any Object to check. Returns ------- bool True if the object is a module, otherwise False. |
+| Reflection.isRoutine | from orionis.introspection import Reflection | [reflection.py](../reflection.py) | def isRoutine(obj: Any) -> bool | Determine if the object is a user-defined or built-in function or method. Parameters ---------- obj : Any Object to check. Returns ------- bool True if the object is a routine, otherwise False. |
+| Reflection.isTraceback | from orionis.introspection import Reflection | [reflection.py](../reflection.py) | def isTraceback(obj: Any) -> bool | Determine if the object is a traceback object. Parameters ---------- obj : Any Object to check. Returns ------- bool True if the object is a traceback object, otherwise False. |
+| Reflection.isGeneric | from orionis.introspection import Reflection | [reflection.py](../reflection.py) | def isGeneric(obj: Any) -> bool | Determine if the provided type is a generic type. Parameters ---------- obj : Any The type to check. Returns ------- bool True if the type is generic, otherwise False. |
+| Reflection.isProtocol | from orionis.introspection import Reflection | [reflection.py](../reflection.py) | def isProtocol(obj: Any) -> bool | Determine if the object is a subclass of `typing.Protocol`. Parameters ---------- obj : Any Object or type to evaluate. Returns ------- bool True if `obj` is a class that is a subclass of `typing.Protocol` (but not `Protocol` itself), otherwise False. |
+| Reflection.isInstance | from orionis.introspection import Reflection | [reflection.py](../reflection.py) | def isInstance(obj: Any) -> bool | Determine if the object is an instance of a user-defined class. Parameters ---------- obj : Any Object to evaluate. Returns ------- bool True if the object is an instance of a user-defined class, False otherwise. |
+| Reflection.isTypingConstruct | from orionis.introspection import Reflection | [reflection.py](../reflection.py) | def isTypingConstruct(obj: Any) -> bool | Determine if the object is a construct from the `typing` module. Parameters ---------- obj : Any Object to evaluate. Returns ------- bool True if the object is a recognized typing construct from the `typing` module, otherwise False. |
+| ReflectionAbstract | from orionis.introspection import ReflectionAbstract | [abstract/reflection.py](../abstract/reflection.py) | ReflectionAbstract | Exported public constant or alias. |
+| ReflectionAbstract.getClass | from orionis.introspection import ReflectionAbstract | [abstract/reflection.py](../abstract/reflection.py) | def getClass(self) -> type | Return the class type associated with this reflection instance. Returns ------- Type The abstract base class type provided during initialization. |
+| ReflectionAbstract.getClassName | from orionis.introspection import ReflectionAbstract | [abstract/reflection.py](../abstract/reflection.py) | def getClassName(self) -> str | Return the name of the reflected abstract class. Returns ------- str The name of the abstract class provided during initialization. |
+| ReflectionAbstract.getModuleName | from orionis.introspection import ReflectionAbstract | [abstract/reflection.py](../abstract/reflection.py) | def getModuleName(self) -> str | Return the module name of the reflected abstract class. Returns ------- str The fully qualified module name containing the abstract class. |
+| ReflectionAbstract.getModuleWithClassName | from orionis.introspection import ReflectionAbstract | [abstract/reflection.py](../abstract/reflection.py) | def getModuleWithClassName(self) -> str | Return the fully qualified name of the abstract class. Returns ------- str The module path and class name separated by a dot, such as 'module.submodule.ClassName'. |
+| ReflectionAbstract.getDocstring | from orionis.introspection import ReflectionAbstract | [abstract/reflection.py](../abstract/reflection.py) | def getDocstring(self) -> str / None | Retrieve the docstring for the reflected abstract class. Returns ------- str or None The docstring of the abstract class, or None if not available. |
+| ReflectionAbstract.getBaseClasses | from orionis.introspection import ReflectionAbstract | [abstract/reflection.py](../abstract/reflection.py) | def getBaseClasses(self) -> list[type] | Return the direct base classes of the reflected abstract class. Returns ------- list of type List of direct base classes for the abstract class. |
+| ReflectionAbstract.getSourceCode | from orionis.introspection import ReflectionAbstract | [abstract/reflection.py](../abstract/reflection.py) | def getSourceCode(self) -> str | Retrieve the source code of the reflected abstract class. Parameters ---------- None Returns ------- str The complete source code of the abstract class as a string. Raises ------ ValueError If the source code cannot be retrieved because the class has no reachable definition or no importable module file. |
+| ReflectionAbstract.getFile | from orionis.introspection import ReflectionAbstract | [abstract/reflection.py](../abstract/reflection.py) | def getFile(self) -> str | Retrieve the absolute file path of the reflected abstract class. Parameters ---------- None Returns ------- str The absolute file path containing the abstract class definition. Raises ------ ValueError If the file path cannot be retrieved because the class does not belong to an importable module file. |
+| ReflectionAbstract.getAnnotations | from orionis.introspection import ReflectionAbstract | [abstract/reflection.py](../abstract/reflection.py) | def getAnnotations(self) -> dict | Retrieve type annotations for class attributes. Returns ------- dict Dictionary mapping attribute names to their annotated types. Private attribute names are normalized by removing name mangling prefixes. |
+| ReflectionAbstract.hasAttribute | from orionis.introspection import ReflectionAbstract | [abstract/reflection.py](../abstract/reflection.py) | def hasAttribute(self, attribute: str) -> bool | Check if the class has a specific attribute. Parameters ---------- attribute : str The name of the attribute to check. Returns ------- bool True if the attribute exists, False otherwise. |
+| ReflectionAbstract.getAttribute | from orionis.introspection import ReflectionAbstract | [abstract/reflection.py](../abstract/reflection.py) | def getAttribute(self, attribute: str) -> object / None | Retrieve the value of a class attribute. Parameters ---------- attribute : str Name of the attribute to retrieve. Returns ------- object or None Value of the specified class attribute, or None if not found. Raises ------ ValueError If the attribute does not exist or is inaccessible. |
+| ReflectionAbstract.setAttribute | from orionis.introspection import ReflectionAbstract | [abstract/reflection.py](../abstract/reflection.py) | def setAttribute(self, name: str, value: object) -> bool | Set the value of a class attribute. Parameters ---------- name : str Name of the attribute to set. Must be a valid Python identifier and not a reserved keyword. value : object Value to assign to the attribute. Must not be callable. Returns ------- bool True if the attribute was successfully set. Raises ------ ValueError If the attribute name is invalid, is a Python keyword, or if the value is callable. |
+| ReflectionAbstract.removeAttribute | from orionis.introspection import ReflectionAbstract | [abstract/reflection.py](../abstract/reflection.py) | def removeAttribute(self, name: str) -> bool | Remove an attribute from the reflected abstract class. Parameters ---------- name : str Name of the attribute to remove. Returns ------- bool True if the attribute was successfully removed. Raises ------ ValueError If the attribute does not exist or cannot be removed. |
+| ReflectionAbstract.getAttributes | from orionis.introspection import ReflectionAbstract | [abstract/reflection.py](../abstract/reflection.py) | def getAttributes(self) -> dict | Aggregate all class-level attributes. Combines public, protected, private, and dunder attributes into a single dictionary. Excludes callable objects, static/class methods, and properties. Returns ------- dict Dictionary mapping attribute names to their values. |
+| ReflectionAbstract.getPublicAttributes | from orionis.introspection import ReflectionAbstract | [abstract/reflection.py](../abstract/reflection.py) | def getPublicAttributes(self) -> dict | Retrieve all public class-level attributes. Parameters ---------- None Returns ------- dict Dictionary mapping public attribute names to their values. Only includes attributes that do not start with underscores and are not callable, static methods, class methods, or properties. |
+| ReflectionAbstract.getProtectedAttributes | from orionis.introspection import ReflectionAbstract | [abstract/reflection.py](../abstract/reflection.py) | def getProtectedAttributes(self) -> dict | Retrieve all protected class-level attributes. Parameters ---------- None Returns ------- dict Dictionary mapping protected attribute names to their values. Only attributes that start with a single underscore, are not dunder, private, callable, static/class methods, or properties. |
+| ReflectionAbstract.getPrivateAttributes | from orionis.introspection import ReflectionAbstract | [abstract/reflection.py](../abstract/reflection.py) | def getPrivateAttributes(self) -> dict | Retrieve all private class-level attributes. Parameters ---------- None Returns ------- dict Dictionary mapping private attribute names (with name mangling removed) to their values. Only includes attributes starting with _ClassName that are not callable, static methods, class methods, or properties. |
+| ReflectionAbstract.getDunderAttributes | from orionis.introspection import ReflectionAbstract | [abstract/reflection.py](../abstract/reflection.py) | def getDunderAttributes(self) -> dict | Retrieve dunder (double underscore) class-level attributes. Returns ------- dict Dictionary mapping dunder attribute names to their values. Only includes attributes that start and end with double underscores, are not callable, static methods, class methods, or properties, and are not in the excluded built-in list. |
+| ReflectionAbstract.getMagicAttributes | from orionis.introspection import ReflectionAbstract | [abstract/reflection.py](../abstract/reflection.py) | def getMagicAttributes(self) -> dict | Return a dictionary of magic (dunder) class attributes. Returns ------- dict Dictionary mapping magic attribute names to their values. Only includes attributes that start with double underscores and are not callable, static methods, class methods, or properties. |
+| ReflectionAbstract.hasMethod | from orionis.introspection import ReflectionAbstract | [abstract/reflection.py](../abstract/reflection.py) | def hasMethod(self, name: str) -> bool | Determine if the abstract class contains a method with the given name. Parameters ---------- name : str The name of the method to check. Returns ------- bool True if the method exists in the class, otherwise False. |
+| ReflectionAbstract.removeMethod | from orionis.introspection import ReflectionAbstract | [abstract/reflection.py](../abstract/reflection.py) | def removeMethod(self, name: str) -> bool | Remove a method from the abstract class. Parameters ---------- name : str Name of the method to remove. Returns ------- bool True if the method was successfully removed. Raises ------ ValueError If the method does not exist or cannot be removed. |
+| ReflectionAbstract.getMethodSignature | from orionis.introspection import ReflectionAbstract | [abstract/reflection.py](../abstract/reflection.py) | def getMethodSignature(self, name: str) -> inspect.Signature | Retrieve the signature of a method in the abstract class. Parameters ---------- name : str Name of the method to retrieve the signature for. Returns ------- inspect.Signature Signature object of the specified method. Raises ------ ValueError If the method does not exist or is not callable. |
+| ReflectionAbstract.getMethods | from orionis.introspection import ReflectionAbstract | [abstract/reflection.py](../abstract/reflection.py) | def getMethods(self) -> list[str] | Return all method names defined in the abstract class. Returns ------- list of str List of all method names, including public, protected, private, static, and class methods. |
+| ReflectionAbstract.getPublicMethods | from orionis.introspection import ReflectionAbstract | [abstract/reflection.py](../abstract/reflection.py) | def getPublicMethods(self) -> list[str] | Return all public instance method names. Returns ------- list of str List of public instance method names. Excludes dunder, protected, private methods, static methods, class methods, and properties. |
+| ReflectionAbstract.getPublicSyncMethods | from orionis.introspection import ReflectionAbstract | [abstract/reflection.py](../abstract/reflection.py) | def getPublicSyncMethods(self) -> list[str] | Return all public synchronous method names from the abstract class. Returns ------- list of str List of public synchronous method names. Excludes asynchronous methods. |
+| ReflectionAbstract.getPublicAsyncMethods | from orionis.introspection import ReflectionAbstract | [abstract/reflection.py](../abstract/reflection.py) | def getPublicAsyncMethods(self) -> list[str] | Return all public asynchronous method names. Returns ------- list of str List of public asynchronous method names. Only coroutine functions are included. |
+| ReflectionAbstract.getProtectedMethods | from orionis.introspection import ReflectionAbstract | [abstract/reflection.py](../abstract/reflection.py) | def getProtectedMethods(self) -> list[str] | Return all protected instance method names. Parameters ---------- None Returns ------- list of str List of protected instance method names. Includes only methods that start with a single underscore, are not dunder, private, static, class methods, or properties. |
+| ReflectionAbstract.getProtectedSyncMethods | from orionis.introspection import ReflectionAbstract | [abstract/reflection.py](../abstract/reflection.py) | def getProtectedSyncMethods(self) -> list[str] | Return all protected synchronous method names. Returns ------- list of str List of protected synchronous method names. Only includes protected methods that are not coroutine functions. |
+| ReflectionAbstract.getProtectedAsyncMethods | from orionis.introspection import ReflectionAbstract | [abstract/reflection.py](../abstract/reflection.py) | def getProtectedAsyncMethods(self) -> list[str] | Return all protected asynchronous method names. Parameters ---------- None Returns ------- list of str List of protected asynchronous method names. Only includes protected methods that are coroutine functions. |
+| ReflectionAbstract.getPrivateMethods | from orionis.introspection import ReflectionAbstract | [abstract/reflection.py](../abstract/reflection.py) | def getPrivateMethods(self) -> list[str] | Return all private instance method names. Private methods are those with name-mangling (start with _ClassName). Excludes static methods, class methods, properties, and dunder methods. Returns ------- list of str List of private instance method names with class name prefixes removed. |
+| ReflectionAbstract.getPrivateSyncMethods | from orionis.introspection import ReflectionAbstract | [abstract/reflection.py](../abstract/reflection.py) | def getPrivateSyncMethods(self) -> list[str] | Return all private synchronous method names. Returns ------- list of str List of private synchronous method names. Only includes private methods that are not coroutine functions. |
+| ReflectionAbstract.getPrivateAsyncMethods | from orionis.introspection import ReflectionAbstract | [abstract/reflection.py](../abstract/reflection.py) | def getPrivateAsyncMethods(self) -> list[str] | Retrieve private asynchronous method names. Parameters ---------- self : ReflectionAbstract The reflection instance. Returns ------- list of str List of private asynchronous method names. Only includes private methods that are coroutine functions. |
+| ReflectionAbstract.getPublicClassMethods | from orionis.introspection import ReflectionAbstract | [abstract/reflection.py](../abstract/reflection.py) | def getPublicClassMethods(self) -> list[str] | Return all public class method names. Returns ------- list of str List of public class method names. Only includes methods decorated with @classmethod that do not start with underscores. |
+| ReflectionAbstract.getPublicClassSyncMethods | from orionis.introspection import ReflectionAbstract | [abstract/reflection.py](../abstract/reflection.py) | def getPublicClassSyncMethods(self) -> list[str] | Return all public synchronous class method names. Returns ------- list of str List of public synchronous class method names. Only includes methods that are not coroutine functions. |
+| ReflectionAbstract.getPublicClassAsyncMethods | from orionis.introspection import ReflectionAbstract | [abstract/reflection.py](../abstract/reflection.py) | def getPublicClassAsyncMethods(self) -> list[str] | Return all public asynchronous class method names. Returns ------- list of str List of public asynchronous class method names. Only includes methods decorated with @classmethod that are coroutine functions and do not start with underscores. |
+| ReflectionAbstract.getProtectedClassMethods | from orionis.introspection import ReflectionAbstract | [abstract/reflection.py](../abstract/reflection.py) | def getProtectedClassMethods(self) -> list[str] | Return a list of protected class methods. Parameters ---------- self : ReflectionAbstract The reflection instance. Returns ------- list of str Names of protected class methods (not instance methods). |
+| ReflectionAbstract.getProtectedClassSyncMethods | from orionis.introspection import ReflectionAbstract | [abstract/reflection.py](../abstract/reflection.py) | def getProtectedClassSyncMethods(self) -> list[str] | Return all protected synchronous class method names. Parameters ---------- self : ReflectionAbstract Returns ------- list of str List of protected synchronous class method names. Only includes protected class methods that are not coroutine functions. |
+| ReflectionAbstract.getProtectedClassAsyncMethods | from orionis.introspection import ReflectionAbstract | [abstract/reflection.py](../abstract/reflection.py) | def getProtectedClassAsyncMethods(self) -> list[str] | Return all protected asynchronous class method names. Parameters ---------- self : ReflectionAbstract Returns ------- list of str List of protected asynchronous class method names. Only includes protected class methods that are coroutine functions. |
+| ReflectionAbstract.getPrivateClassMethods | from orionis.introspection import ReflectionAbstract | [abstract/reflection.py](../abstract/reflection.py) | def getPrivateClassMethods(self) -> list[str] | Return a list of private class methods. Parameters ---------- self : ReflectionAbstract Returns ------- list of str List of private class method names with class name prefixes removed. |
+| ReflectionAbstract.getPrivateClassSyncMethods | from orionis.introspection import ReflectionAbstract | [abstract/reflection.py](../abstract/reflection.py) | def getPrivateClassSyncMethods(self) -> list[str] | Return all private synchronous class method names. Parameters ---------- self : ReflectionAbstract Returns ------- list of str List of private synchronous class method names. Only includes private class methods that are not coroutine functions. |
+| ReflectionAbstract.getPrivateClassAsyncMethods | from orionis.introspection import ReflectionAbstract | [abstract/reflection.py](../abstract/reflection.py) | def getPrivateClassAsyncMethods(self) -> list[str] | Return all private asynchronous class method names. Finds private class methods (name-mangled) that are coroutine functions. Returns ------- list of str List of private asynchronous class method names with class name prefixes removed. |
+| ReflectionAbstract.getPublicStaticMethods | from orionis.introspection import ReflectionAbstract | [abstract/reflection.py](../abstract/reflection.py) | def getPublicStaticMethods(self) -> list[str] | Return all public static method names. Returns ------- list of str List of public static method names. Only includes methods decorated with @staticmethod that do not start with underscores. |
+| ReflectionAbstract.getPublicStaticSyncMethods | from orionis.introspection import ReflectionAbstract | [abstract/reflection.py](../abstract/reflection.py) | def getPublicStaticSyncMethods(self) -> list[str] | Return all public synchronous static method names. Parameters ---------- self : ReflectionAbstract Returns ------- list of str List of public static method names that are synchronous (not coroutine functions). |
+| ReflectionAbstract.getPublicStaticAsyncMethods | from orionis.introspection import ReflectionAbstract | [abstract/reflection.py](../abstract/reflection.py) | def getPublicStaticAsyncMethods(self) -> list[str] | Return all public asynchronous static method names. Parameters ---------- self : ReflectionAbstract Returns ------- list of str List of public static method names that are coroutine functions. |
+| ReflectionAbstract.getProtectedStaticMethods | from orionis.introspection import ReflectionAbstract | [abstract/reflection.py](../abstract/reflection.py) | def getProtectedStaticMethods(self) -> list[str] | Return a list of protected static method names. Parameters ---------- self : ReflectionAbstract Returns ------- list of str List of protected static method names. Only includes methods decorated with @staticmethod that start with a single underscore, are not dunder, and are not name-mangled private methods. |
+| ReflectionAbstract.getProtectedStaticSyncMethods | from orionis.introspection import ReflectionAbstract | [abstract/reflection.py](../abstract/reflection.py) | def getProtectedStaticSyncMethods(self) -> list[str] | Return all protected synchronous static method names. Parameters ---------- self : ReflectionAbstract Returns ------- list of str List of protected static method names that are synchronous (not coroutine functions). |
+| ReflectionAbstract.getProtectedStaticAsyncMethods | from orionis.introspection import ReflectionAbstract | [abstract/reflection.py](../abstract/reflection.py) | def getProtectedStaticAsyncMethods(self) -> list[str] | Return all protected asynchronous static method names. Parameters ---------- self : ReflectionAbstract Returns ------- list of str List of protected static method names that are coroutine functions. |
+| ReflectionAbstract.getPrivateStaticMethods | from orionis.introspection import ReflectionAbstract | [abstract/reflection.py](../abstract/reflection.py) | def getPrivateStaticMethods(self) -> list[str] | Return a list of private static method names. Parameters ---------- self : ReflectionAbstract Returns ------- list of str List of private static method names with class name prefixes removed. |
+| ReflectionAbstract.getPrivateStaticSyncMethods | from orionis.introspection import ReflectionAbstract | [abstract/reflection.py](../abstract/reflection.py) | def getPrivateStaticSyncMethods(self) -> list[str] | Return all private synchronous static method names. Parameters ---------- self : ReflectionAbstract Returns ------- list of str List of private static method names that are synchronous (not coroutine functions). |
+| ReflectionAbstract.getPrivateStaticAsyncMethods | from orionis.introspection import ReflectionAbstract | [abstract/reflection.py](../abstract/reflection.py) | def getPrivateStaticAsyncMethods(self) -> list[str] | Return all private asynchronous static method names. Parameters ---------- self : ReflectionAbstract Returns ------- list of str List of private static method names that are coroutine functions. |
+| ReflectionAbstract.getDunderMethods | from orionis.introspection import ReflectionAbstract | [abstract/reflection.py](../abstract/reflection.py) | def getDunderMethods(self) -> list[str] | Return all dunder (double underscore) method names in the abstract class. Returns ------- list of str List of dunder method names. Only includes methods that start and end with double underscores, are callable, and are not static, class methods, or properties. |
+| ReflectionAbstract.getMagicMethods | from orionis.introspection import ReflectionAbstract | [abstract/reflection.py](../abstract/reflection.py) | def getMagicMethods(self) -> list[str] | Return all magic (dunder) methods from the abstract class. Returns ------- list of str List of magic method names. This is an alias for getDunderMethods(). |
+| ReflectionAbstract.getProperties | from orionis.introspection import ReflectionAbstract | [abstract/reflection.py](../abstract/reflection.py) | def getProperties(self) -> list[str] | Retrieve all property names from the abstract class. Returns ------- List[str] List of property names with name mangling prefixes removed for clarity. |
+| ReflectionAbstract.getPublicProperties | from orionis.introspection import ReflectionAbstract | [abstract/reflection.py](../abstract/reflection.py) | def getPublicProperties(self) -> list[str] | Return all public property names from the abstract class. Parameters ---------- self : ReflectionAbstract Returns ------- list of str List of public property names with name mangling prefixes removed. Only properties that do not start with underscores are included. |
+| ReflectionAbstract.getProtectedProperties | from orionis.introspection import ReflectionAbstract | [abstract/reflection.py](../abstract/reflection.py) | def getProtectedProperties(self) -> list[str] | Retrieve all protected properties from the abstract class. Parameters ---------- self : ReflectionAbstract Returns ------- list of str List of protected property names. Only includes properties that start with a single underscore, are not dunder, and are not name-mangled private properties. |
+| ReflectionAbstract.getPrivateProperties | from orionis.introspection import ReflectionAbstract | [abstract/reflection.py](../abstract/reflection.py) | def getPrivateProperties(self) -> list[str] | Retrieve all private properties from the abstract class. Parameters ---------- self : ReflectionAbstract Returns ------- list of str List of private property names with class name prefixes removed. Only includes name-mangled properties that start with _ClassName. |
+| ReflectionAbstract.getPropertySignature | from orionis.introspection import ReflectionAbstract | [abstract/reflection.py](../abstract/reflection.py) | def getPropertySignature(self, name: str) -> inspect.Signature | Retrieve the signature of a property's getter method. Parameters ---------- name : str Name of the property to inspect. Returns ------- inspect.Signature Signature object of the property's getter method. Raises ------ ValueError If the property does not exist or is not accessible. |
+| ReflectionAbstract.getPropertyDocstring | from orionis.introspection import ReflectionAbstract | [abstract/reflection.py](../abstract/reflection.py) | def getPropertyDocstring(self, name: str) -> str / None | Retrieve the docstring of a property's getter method. Parameters ---------- name : str The name of the property. Returns ------- str or None The docstring of the property's getter method, or None if unavailable. Raises ------ ValueError If the property does not exist or is not accessible. |
+| ReflectionAbstract.constructorSignature | from orionis.introspection import ReflectionAbstract | [abstract/reflection.py](../abstract/reflection.py) | def constructorSignature(self) -> Signature | Retrieve constructor dependencies for the reflected class. Returns ------- Signature Structured representation of constructor dependencies, including resolved (names and values) and unresolved (parameter names without default values or annotations). |
+| ReflectionAbstract.methodSignature | from orionis.introspection import ReflectionAbstract | [abstract/reflection.py](../abstract/reflection.py) | def methodSignature(self, method_name: str) -> Signature | Retrieve resolved and unresolved dependencies for a method. Parameters ---------- method_name : str Name of the method to inspect. Returns ------- Signature Structured representation of method dependencies, including resolved and unresolved dependencies. Raises ------ AttributeError If the method does not exist on the abstract class. |
+| ReflectionAbstract.clearCache | from orionis.introspection import ReflectionAbstract | [abstract/reflection.py](../abstract/reflection.py) | def clearCache(self) -> None | Clear all cached reflection data. Removes all cached entries stored in the reflection instance. Forces fresh computation on subsequent method calls. Returns ------- None This method does not return a value. |
+| ReflectionCallable | from orionis.introspection import ReflectionCallable | [callables/reflection.py](../callables/reflection.py) | ReflectionCallable | Exported public constant or alias. |
+| ReflectionCallable.getCallable | from orionis.introspection import ReflectionCallable | [callables/reflection.py](../callables/reflection.py) | def getCallable(self) -> callable | Return the callable function associated with this instance. Returns ------- callable The function object encapsulated by this instance. |
+| ReflectionCallable.getName | from orionis.introspection import ReflectionCallable | [callables/reflection.py](../callables/reflection.py) | def getName(self) -> str | Return the name of the callable. Returns ------- str Name of the function as defined in its declaration. |
+| ReflectionCallable.getModuleName | from orionis.introspection import ReflectionCallable | [callables/reflection.py](../callables/reflection.py) | def getModuleName(self) -> str | Return the module name where the callable is defined. Returns ------- str The name of the module in which the function was declared. |
+| ReflectionCallable.getModuleWithCallableName | from orionis.introspection import ReflectionCallable | [callables/reflection.py](../callables/reflection.py) | def getModuleWithCallableName(self) -> str | Return the fully qualified name of the callable. Combines the module name and callable name to create a complete identifier. Returns ------- str The module and callable name separated by a dot. |
+| ReflectionCallable.getDocstring | from orionis.introspection import ReflectionCallable | [callables/reflection.py](../callables/reflection.py) | def getDocstring(self) -> str | Return the docstring of the callable. Returns ------- str The docstring of the function, or an empty string if not present. |
+| ReflectionCallable.getSourceCode | from orionis.introspection import ReflectionCallable | [callables/reflection.py](../callables/reflection.py) | def getSourceCode(self) -> str | Retrieve the source code of the wrapped callable. Uses Python's inspect module to extract the complete source code of the callable function from its definition file. Returns ------- str The source code of the callable function as a string. Raises ------ AttributeError If the source code cannot be obtained due to an OSError or if the callable is built-in without accessible source. |
+| ReflectionCallable.getFile | from orionis.introspection import ReflectionCallable | [callables/reflection.py](../callables/reflection.py) | def getFile(self) -> str | Retrieve the absolute path to the source file of the callable. Returns ------- str Absolute path to the file containing the callable. Raises ------ TypeError If the callable is built-in or its file cannot be determined. |
+| ReflectionCallable.getSignature | from orionis.introspection import ReflectionCallable | [callables/reflection.py](../callables/reflection.py) | def getSignature(self) -> inspect.Signature | Return the signature of the callable. Returns ------- inspect.Signature The signature object representing the callable's parameters, default values, and type annotations. |
+| ReflectionCallable.getDependencies | from orionis.introspection import ReflectionCallable | [callables/reflection.py](../callables/reflection.py) | def getDependencies(self) -> Signature | Analyze and return the dependency signature of the wrapped callable. Delegates to ReflectDependencies to inspect each parameter and resolve its type annotation into a dependency descriptor. The result is stored in the shared cache so that repeated calls skip reanalysis. Returns ------- Signature A structure that holds the resolved and unresolved dependencies derived from the callable's parameter annotations. |
+| ReflectionCallable.clearCache | from orionis.introspection import ReflectionCallable | [callables/reflection.py](../callables/reflection.py) | def clearCache(self) -> None | Clear all cached reflection data. Removes all cached entries stored in the reflection instance. Forces fresh computation on subsequent method calls. Returns ------- None This method does not return a value. |
+| ReflectionConcrete | from orionis.introspection import ReflectionConcrete | [concretes/reflection.py](../concretes/reflection.py) | ReflectionConcrete | Exported public constant or alias. |
+| ReflectionConcrete.getClass | from orionis.introspection import ReflectionConcrete | [concretes/reflection.py](../concretes/reflection.py) | def getClass(self) -> type | Return the class type being reflected. Returns ------- Type The class type provided during initialization. |
+| ReflectionConcrete.getClassName | from orionis.introspection import ReflectionConcrete | [concretes/reflection.py](../concretes/reflection.py) | def getClassName(self) -> str | Return the name of the reflected class. Returns ------- str The simple name of the class without module qualification. |
+| ReflectionConcrete.getModuleName | from orionis.introspection import ReflectionConcrete | [concretes/reflection.py](../concretes/reflection.py) | def getModuleName(self) -> str | Return the module name where the reflected class is defined. Returns ------- str The fully qualified module name containing the class. |
+| ReflectionConcrete.getModuleWithClassName | from orionis.introspection import ReflectionConcrete | [concretes/reflection.py](../concretes/reflection.py) | def getModuleWithClassName(self) -> str | Return the fully qualified class name with module path. Returns ------- str The module name concatenated with the class name, separated by a dot. |
+| ReflectionConcrete.getDocstring | from orionis.introspection import ReflectionConcrete | [concretes/reflection.py](../concretes/reflection.py) | def getDocstring(self) -> str / None | Return the docstring of the reflected class. Returns ------- str or None The docstring of the class if defined, otherwise None. |
+| ReflectionConcrete.getBaseClasses | from orionis.introspection import ReflectionConcrete | [concretes/reflection.py](../concretes/reflection.py) | def getBaseClasses(self) -> list[type] | Return all base classes of the reflected class. Returns ------- list of type A list containing all base classes in the method resolution order. |
+| ReflectionConcrete.getSourceCode | from orionis.introspection import ReflectionConcrete | [concretes/reflection.py](../concretes/reflection.py) | def getSourceCode(self, method: str / None) -> str / None | Retrieve the source code for the class or a specific method. Parameters ---------- method : str or None, optional Name of the method to retrieve source code for. If None, returns the source code of the entire class. Returns ------- str or None Source code as a string if available, otherwise None. |
+| ReflectionConcrete.getFile | from orionis.introspection import ReflectionConcrete | [concretes/reflection.py](../concretes/reflection.py) | def getFile(self) -> str | Return the absolute file path of the reflected class. Returns ------- str The absolute file path containing the class definition. Raises ------ ValueError If the file path cannot be determined. |
+| ReflectionConcrete.getAnnotations | from orionis.introspection import ReflectionConcrete | [concretes/reflection.py](../concretes/reflection.py) | def getAnnotations(self) -> dict | Retrieve type annotations defined on the reflected class. Resolves name mangling for private attributes and returns a dictionary mapping attribute names to their type annotations. Returns ------- dict Dictionary of attribute names and their type annotations. |
+| ReflectionConcrete.hasAttribute | from orionis.introspection import ReflectionConcrete | [concretes/reflection.py](../concretes/reflection.py) | def hasAttribute(self, attribute: str) -> bool | Determine if the reflected class has a specific attribute. Parameters ---------- attribute : str Name of the attribute to check. Returns ------- bool True if the attribute exists in the class, otherwise False. |
+| ReflectionConcrete.getAttribute | from orionis.introspection import ReflectionConcrete | [concretes/reflection.py](../concretes/reflection.py) | def getAttribute(self, name: str, default: Any) -> Any | Retrieve the value of a class attribute. Parameters ---------- name : str Name of the attribute to retrieve. default : Any, optional Value to return if the attribute is not found. Defaults to None. Returns ------- Any Value of the attribute if found, otherwise the default value. |
+| ReflectionConcrete.setAttribute | from orionis.introspection import ReflectionConcrete | [concretes/reflection.py](../concretes/reflection.py) | def setAttribute(self, name: str, value: object) -> bool | Set a class attribute to the specified value. Parameters ---------- name : str Name of the attribute to set. value : object Value to assign to the attribute. Returns ------- bool True if the attribute was set successfully. Raises ------ ValueError If the attribute name is invalid or the value is callable. |
+| ReflectionConcrete.removeAttribute | from orionis.introspection import ReflectionConcrete | [concretes/reflection.py](../concretes/reflection.py) | def removeAttribute(self, name: str) -> bool | Remove an attribute from the reflected class. Parameters ---------- name : str Name of the attribute to remove. Returns ------- bool True if the attribute was successfully removed. Raises ------ ValueError If the attribute does not exist or cannot be removed. |
+| ReflectionConcrete.getAttributes | from orionis.introspection import ReflectionConcrete | [concretes/reflection.py](../concretes/reflection.py) | def getAttributes(self) -> dict | Aggregate all class attributes of all visibility levels. Returns ------- dict Dictionary mapping attribute names (str) to their values. Includes public, protected, private (with name mangling removed), and dunder attributes. Excludes methods and properties. The result is cached. |
+| ReflectionConcrete.getPublicAttributes | from orionis.introspection import ReflectionConcrete | [concretes/reflection.py](../concretes/reflection.py) | def getPublicAttributes(self) -> dict | Retrieve all public class attributes. Public attributes are those that do not start with an underscore and are not callables, static methods, class methods, or properties. Returns ------- dict Dictionary mapping public attribute names to their values. Excludes dunder, protected, and private attributes. |
+| ReflectionConcrete.getProtectedAttributes | from orionis.introspection import ReflectionConcrete | [concretes/reflection.py](../concretes/reflection.py) | def getProtectedAttributes(self) -> dict | Retrieve all protected class attributes. Protected attributes are those that start with a single underscore, excluding dunder, public, and private attributes. Returns ------- dict Dictionary mapping protected attribute names to their values. |
+| ReflectionConcrete.getPrivateAttributes | from orionis.introspection import ReflectionConcrete | [concretes/reflection.py](../concretes/reflection.py) | def getPrivateAttributes(self) -> dict | Retrieve all private class attributes. Private attributes use Python's name mangling convention (double underscore prefix). Excludes methods, static methods, class methods, and properties. Returns ------- dict Dictionary mapping private attribute names (with mangling removed) to their values. |
+| ReflectionConcrete.getDunderAttributes | from orionis.introspection import ReflectionConcrete | [concretes/reflection.py](../concretes/reflection.py) | def getDunderAttributes(self) -> dict | Retrieve all dunder (magic) class attributes. Dunder attributes are those with names that start and end with double underscores, excluding standard Python dunder attributes. Returns ------- dict Dictionary mapping dunder attribute names to their values, excluding standard Python dunder attributes. |
+| ReflectionConcrete.getMagicAttributes | from orionis.introspection import ReflectionConcrete | [concretes/reflection.py](../concretes/reflection.py) | def getMagicAttributes(self) -> dict | Return all magic (dunder) class attributes. This method is an alias for `getDunderAttributes()` and provides access to double underscore attributes. Returns ------- dict Dictionary mapping magic attribute names to their values. |
+| ReflectionConcrete.hasMethod | from orionis.introspection import ReflectionConcrete | [concretes/reflection.py](../concretes/reflection.py) | def hasMethod(self, name: str) -> bool | Determine if the class defines a method with the given name. Parameters ---------- name : str Name of the method to check. Returns ------- bool True if the method exists in the class, otherwise False. |
+| ReflectionConcrete.setMethod | from orionis.introspection import ReflectionConcrete | [concretes/reflection.py](../concretes/reflection.py) | def setMethod(self, name: str, method: Callable) -> bool | Add a method to the reflected class. Validates the method name and callable before adding it to the class. Handles private method name mangling automatically. Parameters ---------- name : str Name for the new method. method : Callable Callable object to set as a method. Returns ------- bool True if the method was successfully added. Raises ------ ValueError If the method name already exists, is invalid, or the object is not callable. |
+| ReflectionConcrete.removeMethod | from orionis.introspection import ReflectionConcrete | [concretes/reflection.py](../concretes/reflection.py) | def removeMethod(self, name: str) -> bool | Remove a method from the reflected class. Handles private method name mangling before removal. Parameters ---------- name : str Name of the method to remove. Returns ------- bool True if the method was successfully removed. Raises ------ ValueError If the method does not exist or cannot be removed. |
+| ReflectionConcrete.getMethodSignature | from orionis.introspection import ReflectionConcrete | [concretes/reflection.py](../concretes/reflection.py) | def getMethodSignature(self, name: str) -> inspect.Signature | Retrieve the signature of a specific method. Parameters ---------- name : str Name of the method to inspect. Returns ------- inspect.Signature Signature object containing parameter and return information. Raises ------ ValueError If the method does not exist or is not callable. |
+| ReflectionConcrete.getMethods | from orionis.introspection import ReflectionConcrete | [concretes/reflection.py](../concretes/reflection.py) | def getMethods(self) -> list[str] | Retrieve all method names defined in the reflected class. Aggregates method names from all visibility levels (public, protected, private) and method types (instance, class, static). The result is cached after the first call for efficiency. Returns ------- list of str List of all method names (instance, class, and static) defined in the class, including public, protected, and private methods. |
+| ReflectionConcrete.getPublicMethods | from orionis.introspection import ReflectionConcrete | [concretes/reflection.py](../concretes/reflection.py) | def getPublicMethods(self) -> list[str] | Return all public instance method names of the reflected class. Retrieves method names that are callable, not static or class methods, not properties, and do not start with underscores. Returns ------- list of str List of public instance method names. |
+| ReflectionConcrete.getPublicSyncMethods | from orionis.introspection import ReflectionConcrete | [concretes/reflection.py](../concretes/reflection.py) | def getPublicSyncMethods(self) -> list[str] | Return all public synchronous method names of the reflected class. Filters public methods to include only those that are not coroutine functions. Returns ------- list of str List of public synchronous method names. |
+| ReflectionConcrete.getPublicAsyncMethods | from orionis.introspection import ReflectionConcrete | [concretes/reflection.py](../concretes/reflection.py) | def getPublicAsyncMethods(self) -> list[str] | Return all public asynchronous method names of the reflected class. Filters public methods to include only coroutine functions. Returns ------- list of str List of public asynchronous method names. |
+| ReflectionConcrete.getProtectedMethods | from orionis.introspection import ReflectionConcrete | [concretes/reflection.py](../concretes/reflection.py) | def getProtectedMethods(self) -> list[str] | Return all protected instance method names. Protected methods start with a single underscore, are not dunder, and are not private (name-mangled). Excludes static, class methods, and properties. Returns ------- list of str List of protected instance method names. |
+| ReflectionConcrete.getProtectedSyncMethods | from orionis.introspection import ReflectionConcrete | [concretes/reflection.py](../concretes/reflection.py) | def getProtectedSyncMethods(self) -> list[str] | Return all protected synchronous method names. Filters protected methods to include only those that are not coroutine functions. Returns ------- list of str List of protected synchronous method names. |
+| ReflectionConcrete.getProtectedAsyncMethods | from orionis.introspection import ReflectionConcrete | [concretes/reflection.py](../concretes/reflection.py) | def getProtectedAsyncMethods(self) -> list[str] | Retrieve all protected asynchronous method names. Filters protected methods to include only those that are coroutine functions. Returns ------- list of str List of protected asynchronous method names. |
+| ReflectionConcrete.getPrivateMethods | from orionis.introspection import ReflectionConcrete | [concretes/reflection.py](../concretes/reflection.py) | def getPrivateMethods(self) -> list[str] | Retrieve all private instance method names. Private methods are those using Python's name mangling convention (class name prefix). Name mangling is resolved in the returned names. Returns ------- list of str List of private instance method names with mangling removed. |
+| ReflectionConcrete.getPrivateSyncMethods | from orionis.introspection import ReflectionConcrete | [concretes/reflection.py](../concretes/reflection.py) | def getPrivateSyncMethods(self) -> list[str] | Return all private synchronous method names of the class. Returns ------- list of str List of private synchronous method names. |
+| ReflectionConcrete.getPrivateAsyncMethods | from orionis.introspection import ReflectionConcrete | [concretes/reflection.py](../concretes/reflection.py) | def getPrivateAsyncMethods(self) -> list[str] | Return all private asynchronous method names of the class. Finds private methods (using name mangling) that are coroutine functions. Returns ------- list of str List of private asynchronous method names. |
+| ReflectionConcrete.getPublicClassMethods | from orionis.introspection import ReflectionConcrete | [concretes/reflection.py](../concretes/reflection.py) | def getPublicClassMethods(self) -> list[str] | Return a list of public class method names. Public class methods are those that do not start with an underscore, are not dunder, and are not private (name-mangled). Returns ------- list of str List of public class method names. |
+| ReflectionConcrete.getPublicClassSyncMethods | from orionis.introspection import ReflectionConcrete | [concretes/reflection.py](../concretes/reflection.py) | def getPublicClassSyncMethods(self) -> list[str] | Return all public synchronous class method names. Returns ------- list of str List of public synchronous class method names. |
+| ReflectionConcrete.getPublicClassAsyncMethods | from orionis.introspection import ReflectionConcrete | [concretes/reflection.py](../concretes/reflection.py) | def getPublicClassAsyncMethods(self) -> list[str] | Return all public asynchronous class method names. Returns ------- list of str List of public asynchronous class method names. |
+| ReflectionConcrete.getProtectedClassMethods | from orionis.introspection import ReflectionConcrete | [concretes/reflection.py](../concretes/reflection.py) | def getProtectedClassMethods(self) -> list[str] | Return a list of protected class method names. Protected class methods start with a single underscore, are not dunder, and are not private (name-mangled). Returns ------- list of str List of protected class method names. |
+| ReflectionConcrete.getProtectedClassSyncMethods | from orionis.introspection import ReflectionConcrete | [concretes/reflection.py](../concretes/reflection.py) | def getProtectedClassSyncMethods(self) -> list[str] | Return all protected synchronous class method names. Returns ------- list of str List of protected synchronous class method names. |
+| ReflectionConcrete.getProtectedClassAsyncMethods | from orionis.introspection import ReflectionConcrete | [concretes/reflection.py](../concretes/reflection.py) | def getProtectedClassAsyncMethods(self) -> list[str] | Return all protected asynchronous class method names. Returns ------- list of str List of protected asynchronous class method names. |
+| ReflectionConcrete.getPrivateClassMethods | from orionis.introspection import ReflectionConcrete | [concretes/reflection.py](../concretes/reflection.py) | def getPrivateClassMethods(self) -> list[str] | Return a list of private class method names. Private class methods use Python's name mangling convention and are defined with a double underscore prefix. Returns ------- list of str List of private class method names with name mangling removed. |
+| ReflectionConcrete.getPrivateClassSyncMethods | from orionis.introspection import ReflectionConcrete | [concretes/reflection.py](../concretes/reflection.py) | def getPrivateClassSyncMethods(self) -> list[str] | Return all private synchronous class method names. Returns ------- list of str List of private synchronous class method names. |
+| ReflectionConcrete.getPrivateClassAsyncMethods | from orionis.introspection import ReflectionConcrete | [concretes/reflection.py](../concretes/reflection.py) | def getPrivateClassAsyncMethods(self) -> list[str] | Return all private asynchronous class method names. Finds private class methods (using name mangling) that are coroutine functions. Returns ------- list of str List of private asynchronous class method names. |
+| ReflectionConcrete.getPublicStaticMethods | from orionis.introspection import ReflectionConcrete | [concretes/reflection.py](../concretes/reflection.py) | def getPublicStaticMethods(self) -> list[str] | Return a list of public static method names. Scans the class dictionary for static methods that are public, i.e., do not start with underscores or use name mangling. Returns ------- list of str List of public static method names. |
+| ReflectionConcrete.getPublicStaticSyncMethods | from orionis.introspection import ReflectionConcrete | [concretes/reflection.py](../concretes/reflection.py) | def getPublicStaticSyncMethods(self) -> list[str] | Return all public synchronous static method names of the class. Returns ------- list of str List of public synchronous static method names. |
+| ReflectionConcrete.getPublicStaticAsyncMethods | from orionis.introspection import ReflectionConcrete | [concretes/reflection.py](../concretes/reflection.py) | def getPublicStaticAsyncMethods(self) -> list[str] | Return all public asynchronous static method names of the class. Returns ------- list of str List of public asynchronous static method names. |
+| ReflectionConcrete.getProtectedStaticMethods | from orionis.introspection import ReflectionConcrete | [concretes/reflection.py](../concretes/reflection.py) | def getProtectedStaticMethods(self) -> list[str] | Return a list of protected static method names. Protected static methods start with a single underscore, are not dunder, and are not private (name-mangled). Returns ------- list of str List of protected static method names. |
+| ReflectionConcrete.getProtectedStaticSyncMethods | from orionis.introspection import ReflectionConcrete | [concretes/reflection.py](../concretes/reflection.py) | def getProtectedStaticSyncMethods(self) -> list[str] | Return all protected synchronous static method names of the class. Returns ------- list of str List of protected synchronous static method names. |
+| ReflectionConcrete.getProtectedStaticAsyncMethods | from orionis.introspection import ReflectionConcrete | [concretes/reflection.py](../concretes/reflection.py) | def getProtectedStaticAsyncMethods(self) -> list[str] | Retrieve all protected asynchronous static method names. Returns ------- list of str List of protected asynchronous static method names. |
+| ReflectionConcrete.getPrivateStaticMethods | from orionis.introspection import ReflectionConcrete | [concretes/reflection.py](../concretes/reflection.py) | def getPrivateStaticMethods(self) -> list[str] | Return the names of all private static methods of the class. Private static methods are those using Python's name mangling convention (class name prefix). Returns ------- list of str List of private static method names with name mangling removed. |
+| ReflectionConcrete.getPrivateStaticSyncMethods | from orionis.introspection import ReflectionConcrete | [concretes/reflection.py](../concretes/reflection.py) | def getPrivateStaticSyncMethods(self) -> list[str] | Return all private synchronous static method names of the class. Returns ------- list of str List of private synchronous static method names. |
+| ReflectionConcrete.getPrivateStaticAsyncMethods | from orionis.introspection import ReflectionConcrete | [concretes/reflection.py](../concretes/reflection.py) | def getPrivateStaticAsyncMethods(self) -> list[str] | Retrieve all private asynchronous static method names of the class. Returns ------- list of str List of private asynchronous static method names. |
+| ReflectionConcrete.getDunderMethods | from orionis.introspection import ReflectionConcrete | [concretes/reflection.py](../concretes/reflection.py) | def getDunderMethods(self) -> list[str] | Retrieve all dunder (magic) method names from the reflected class. Finds callable attributes that follow the double underscore naming convention, excluding static, class methods, and properties. Returns ------- list of str List of dunder method names available in the class. |
+| ReflectionConcrete.getMagicMethods | from orionis.introspection import ReflectionConcrete | [concretes/reflection.py](../concretes/reflection.py) | def getMagicMethods(self) -> list[str] | Return all magic (dunder) method names from the reflected class. This is an alias for ``getDunderMethods()``, providing alternative naming for accessing double underscore methods. Returns ------- list of str List of magic method names available in the class. |
+| ReflectionConcrete.getProperties | from orionis.introspection import ReflectionConcrete | [concretes/reflection.py](../concretes/reflection.py) | def getProperties(self) -> list[str] | Return all property names defined in the reflected class. Scans the class dictionary for property objects and returns their names with private attribute name mangling resolved. Returns ------- list of str List of all property names in the class, with name mangling removed. |
+| ReflectionConcrete.getPublicProperties | from orionis.introspection import ReflectionConcrete | [concretes/reflection.py](../concretes/reflection.py) | def getPublicProperties(self) -> list[str] | Return all public property names of the reflected class. Properties are considered public if their names do not start with underscores or the class name (for name-mangled attributes). Returns ------- list of str List of public property names with name mangling resolved. |
+| ReflectionConcrete.getProtectedProperties | from orionis.introspection import ReflectionConcrete | [concretes/reflection.py](../concretes/reflection.py) | def getProtectedProperties(self) -> list[str] | Retrieve all protected property names from the reflected class. Protected properties are those that start with a single underscore, are not private (name-mangled), and are not dunder attributes. Returns ------- list of str List of protected property names. |
+| ReflectionConcrete.getPrivateProperties | from orionis.introspection import ReflectionConcrete | [concretes/reflection.py](../concretes/reflection.py) | def getPrivateProperties(self) -> list[str] | Return all private property names of the reflected class. Private properties use Python's name mangling convention (class name prefix). The returned names have name mangling removed. Returns ------- list of str List of private property names with name mangling removed. |
+| ReflectionConcrete.getProperty | from orionis.introspection import ReflectionConcrete | [concretes/reflection.py](../concretes/reflection.py) | def getProperty(self, name: str) -> Any | Retrieve the value of a property from the reflected class. Handles private property name mangling and validates that the requested attribute is a property object. Parameters ---------- name : str Name of the property to retrieve. Returns ------- Any The current value of the property. Raises ------ ValueError If the property does not exist or is not accessible. |
+| ReflectionConcrete.getPropertySignature | from orionis.introspection import ReflectionConcrete | [concretes/reflection.py](../concretes/reflection.py) | def getPropertySignature(self, name: str) -> inspect.Signature | Return the signature of a property's getter method. Parameters ---------- name : str Name of the property to inspect. Returns ------- inspect.Signature The signature object of the property's getter function. Raises ------ ValueError If the property does not exist or is not accessible. |
+| ReflectionConcrete.getPropertyDocstring | from orionis.introspection import ReflectionConcrete | [concretes/reflection.py](../concretes/reflection.py) | def getPropertyDocstring(self, name: str) -> str / None | Retrieve the docstring of a property's getter method. Parameters ---------- name : str Name of the property to inspect. Returns ------- str or None The docstring of the property's getter function, or None if not defined. Raises ------ ValueError If the property does not exist or is not accessible. |
+| ReflectionConcrete.getConstructorSignature | from orionis.introspection import ReflectionConcrete | [concretes/reflection.py](../concretes/reflection.py) | def getConstructorSignature(self) -> inspect.Signature | Return the signature of the class constructor. Returns ------- inspect.Signature Signature object for the __init__ method, containing parameter information. |
+| ReflectionConcrete.constructorSignature | from orionis.introspection import ReflectionConcrete | [concretes/reflection.py](../concretes/reflection.py) | def constructorSignature(self) -> Signature | Analyze the constructor's dependencies. Analyzes the constructor parameters to identify resolved and unresolved dependencies using type annotations and default values. Returns ------- Signature Structured representation of resolved and unresolved dependencies. |
+| ReflectionConcrete.methodSignature | from orionis.introspection import ReflectionConcrete | [concretes/reflection.py](../concretes/reflection.py) | def methodSignature(self, method_name: str) -> Signature | Analyze the dependencies of a specific method. Parameters ---------- method_name : str Name of the method to analyze. Returns ------- Signature Structured representation of resolved and unresolved dependencies. Raises ------ AttributeError If the method does not exist in the class. |
+| ReflectionConcrete.clearCache | from orionis.introspection import ReflectionConcrete | [concretes/reflection.py](../concretes/reflection.py) | def clearCache(self) -> None | Clear the internal memory cache. Removes all cached entries stored in the reflection instance. Subsequent method calls will recompute and cache results. Returns ------- None This method does not return a value. |
+| ReflectionInstance | from orionis.introspection import ReflectionInstance | [instances/reflection.py](../instances/reflection.py) | ReflectionInstance | Exported public constant or alias. |
+| ReflectionInstance.getInstance | from orionis.introspection import ReflectionInstance | [instances/reflection.py](../instances/reflection.py) | def getInstance(self) -> Any | Return the reflected object instance. Returns ------- Any The object instance being reflected upon. |
+| ReflectionInstance.getClass | from orionis.introspection import ReflectionInstance | [instances/reflection.py](../instances/reflection.py) | def getClass(self) -> type | Return the class of the instance. Returns ------- type The class object of the instance. |
+| ReflectionInstance.getClassName | from orionis.introspection import ReflectionInstance | [instances/reflection.py](../instances/reflection.py) | def getClassName(self) -> str | Return the name of the instance's class. Returns ------- str The name of the class. |
+| ReflectionInstance.getModuleName | from orionis.introspection import ReflectionInstance | [instances/reflection.py](../instances/reflection.py) | def getModuleName(self) -> str | Return the name of the module where the class is defined. Returns ------- str The module name where the class is defined. |
+| ReflectionInstance.getModuleWithClassName | from orionis.introspection import ReflectionInstance | [instances/reflection.py](../instances/reflection.py) | def getModuleWithClassName(self) -> str | Return the module and class name as a single string. Returns ------- str The module name and class name in the format 'module.ClassName'. |
+| ReflectionInstance.getDocstring | from orionis.introspection import ReflectionInstance | [instances/reflection.py](../instances/reflection.py) | def getDocstring(self) -> str / None | Return the docstring of the instance's class. Returns ------- str or None The docstring of the class, or None if not available. |
+| ReflectionInstance.getBaseClasses | from orionis.introspection import ReflectionInstance | [instances/reflection.py](../instances/reflection.py) | def getBaseClasses(self) -> tuple[type, ...] | Return the base classes of the instance's class. Returns ------- tuple of type Tuple containing the base classes of the class. |
+| ReflectionInstance.getSourceCode | from orionis.introspection import ReflectionInstance | [instances/reflection.py](../instances/reflection.py) | def getSourceCode(self, method: str / None) -> str / None | Retrieve the source code for the class or a specific method. Parameters ---------- method : str or None, optional Name of the method to retrieve source code for. If None, retrieves the source code of the class. Returns ------- str or None The source code as a string if available, otherwise None. Notes ----- Handles name mangling for private methods. Returns None if the source code cannot be retrieved (e.g., for built-in or dynamically generated objects). |
+| ReflectionInstance.getFile | from orionis.introspection import ReflectionInstance | [instances/reflection.py](../instances/reflection.py) | def getFile(self) -> str / None | Return the file path where the class is defined. Returns ------- str or None The file path of the class definition, or None if unavailable. |
+| ReflectionInstance.getAnnotations | from orionis.introspection import ReflectionInstance | [instances/reflection.py](../instances/reflection.py) | def getAnnotations(self) -> dict[str, type] | Retrieve type annotations of the class. Returns ------- dict[str, type] Dictionary mapping attribute names to their type annotations. |
+| ReflectionInstance.hasAttribute | from orionis.introspection import ReflectionInstance | [instances/reflection.py](../instances/reflection.py) | def hasAttribute(self, name: str) -> bool | Check if the instance has a specific attribute. Parameters ---------- name : str Attribute name to check. Returns ------- bool True if the attribute exists, False otherwise. |
+| ReflectionInstance.getAttribute | from orionis.introspection import ReflectionInstance | [instances/reflection.py](../instances/reflection.py) | def getAttribute(self, name: str, default: Any) -> Any | Retrieve the value of an attribute by name from the instance. Parameters ---------- name : str Name of the attribute to retrieve. default : Any, optional Value to return if the attribute does not exist. Defaults to None. Returns ------- Any Value of the specified attribute if it exists, otherwise the provided `default` value. Raises ------ AttributeError If the attribute does not exist and no default value is provided. Notes ----- This method first checks the instance's attributes dictionary for the given name. If not found, it attempts to retrieve the attribute directly from the instance using `getattr`. If the attribute is still not found, the `default` value is returned. |
+| ReflectionInstance.setAttribute | from orionis.introspection import ReflectionInstance | [instances/reflection.py](../instances/reflection.py) | def setAttribute(self, name: str, value: Any) -> bool | Set the value of an attribute on the instance. Parameters ---------- name : str Name of the attribute to set. value : Any Value to assign to the attribute. Returns ------- bool True if the attribute was set successfully. Raises ------ AttributeError If the attribute name is invalid, is a keyword, or the value is callable. |
+| ReflectionInstance.removeAttribute | from orionis.introspection import ReflectionInstance | [instances/reflection.py](../instances/reflection.py) | def removeAttribute(self, name: str) -> bool | Remove an attribute from the instance. Parameters ---------- name : str Name of the attribute to remove. Returns ------- bool True if the attribute was removed successfully. Raises ------ AttributeError If the attribute does not exist or is read-only. Notes ----- Clears the memory cache after removal. |
+| ReflectionInstance.getAttributeDocstring | from orionis.introspection import ReflectionInstance | [instances/reflection.py](../instances/reflection.py) | def getAttributeDocstring(self, name: str) -> str / None | Retrieve the docstring of a specific attribute. Parameters ---------- name : str Name of the attribute. Returns ------- str or None The docstring of the attribute, or None if not available. Raises ------ AttributeError If the attribute does not exist on the instance. |
+| ReflectionInstance.getAttributes | from orionis.introspection import ReflectionInstance | [instances/reflection.py](../instances/reflection.py) | def getAttributes(self) -> dict[str, Any] | Aggregate all attributes of the instance. Combines public, protected, private, and dunder attributes into a single dictionary. Private attribute names are unmangled. The result is cached for performance. Returns ------- dict[str, Any] Dictionary mapping attribute names to their values for all visibility levels. |
+| ReflectionInstance.getPublicAttributes | from orionis.introspection import ReflectionInstance | [instances/reflection.py](../instances/reflection.py) | def getPublicAttributes(self) -> dict[str, Any] | Return all public attributes of the instance. Parameters ---------- self : ReflectionInstance Returns ------- dict[str, Any] Dictionary mapping public attribute names to their values. Excludes dunder, protected, and private attributes. |
+| ReflectionInstance.getProtectedAttributes | from orionis.introspection import ReflectionInstance | [instances/reflection.py](../instances/reflection.py) | def getProtectedAttributes(self) -> dict[str, Any] | Return all protected attributes of the instance. Parameters ---------- self : ReflectionInstance Returns ------- dict[str, Any] Dictionary containing protected attribute names and their values. Protected attributes start with a single underscore, are not dunder, and are not private (do not start with the class name). |
+| ReflectionInstance.getPrivateAttributes | from orionis.introspection import ReflectionInstance | [instances/reflection.py](../instances/reflection.py) | def getPrivateAttributes(self) -> dict[str, Any] | Retrieve all private attributes of the instance. Parameters ---------- self : ReflectionInstance Returns ------- dict[str, Any] Dictionary mapping unmangled private attribute names to their values. |
+| ReflectionInstance.getDunderAttributes | from orionis.introspection import ReflectionInstance | [instances/reflection.py](../instances/reflection.py) | def getDunderAttributes(self) -> dict[str, Any] | Retrieve all dunder (double underscore) attributes of the instance. Parameters ---------- self : ReflectionInstance Returns ------- dict[str, Any] Dictionary mapping dunder attribute names to their values. |
+| ReflectionInstance.getMagicAttributes | from orionis.introspection import ReflectionInstance | [instances/reflection.py](../instances/reflection.py) | def getMagicAttributes(self) -> dict[str, Any] | Return all magic attributes of the instance. Returns ------- dict[str, Any] Dictionary mapping magic attribute names to their values. |
+| ReflectionInstance.hasMethod | from orionis.introspection import ReflectionInstance | [instances/reflection.py](../instances/reflection.py) | def hasMethod(self, name: str) -> bool | Determine if the instance has a specific method. Parameters ---------- name : str Name of the method to check. Returns ------- bool True if the method exists, otherwise False. Notes ----- Checks the presence of the method in the aggregated method list. |
+| ReflectionInstance.setMethod | from orionis.introspection import ReflectionInstance | [instances/reflection.py](../instances/reflection.py) | def setMethod(self, name: str, method: Callable) -> bool | Set a callable attribute as a method. Parameters ---------- name : str Name of the method to set. method : Callable Callable object to assign as the method. Returns ------- bool True if the method was set successfully. Raises ------ AttributeError If the name is not a valid identifier, is a keyword, or the method is not callable. |
+| ReflectionInstance.removeMethod | from orionis.introspection import ReflectionInstance | [instances/reflection.py](../instances/reflection.py) | def removeMethod(self, name: str) -> None | Remove a method from the instance. Parameters ---------- name : str Name of the method to remove. Returns ------- None This method does not return a value. Raises ------ AttributeError If the method does not exist or is not callable. |
+| ReflectionInstance.getMethodSignature | from orionis.introspection import ReflectionInstance | [instances/reflection.py](../instances/reflection.py) | def getMethodSignature(self, name: str) -> inspect.Signature | Retrieve the signature of a method. Parameters ---------- name : str Name of the method. Returns ------- inspect.Signature Signature object representing the method's parameters and return type. Raises ------ AttributeError If the method does not exist or is not callable. |
+| ReflectionInstance.getMethodDocstring | from orionis.introspection import ReflectionInstance | [instances/reflection.py](../instances/reflection.py) | def getMethodDocstring(self, name: str) -> str / None | Retrieve the docstring of a method. Parameters ---------- name : str Name of the method. Returns ------- str / None The docstring of the method, or None if not available. Raises ------ AttributeError If the method does not exist on the class. |
+| ReflectionInstance.getMethods | from orionis.introspection import ReflectionInstance | [instances/reflection.py](../instances/reflection.py) | def getMethods(self) -> list[str] | Retrieve all method names associated with the instance. Aggregates method names from public, protected, private, class, and static categories by calling their respective getter methods. The result is cached for performance. Returns ------- list of str List of all method names (instance, class, static) defined on the instance's class, including public, protected, and private methods. |
+| ReflectionInstance.getPublicMethods | from orionis.introspection import ReflectionInstance | [instances/reflection.py](../instances/reflection.py) | def getPublicMethods(self) -> list[str] | Return all public method names of the instance. Parameters ---------- self : ReflectionInstance The ReflectionInstance object. Returns ------- list of str List of public method names. Public methods are not static, class, private, protected, or magic methods. |
+| ReflectionInstance.getPublicSyncMethods | from orionis.introspection import ReflectionInstance | [instances/reflection.py](../instances/reflection.py) | def getPublicSyncMethods(self) -> list[str] | Return all public synchronous method names of the instance. Returns ------- list of str List of public synchronous method names. |
+| ReflectionInstance.getPublicAsyncMethods | from orionis.introspection import ReflectionInstance | [instances/reflection.py](../instances/reflection.py) | def getPublicAsyncMethods(self) -> list[str] | Return all public asynchronous method names of the instance. Parameters ---------- self : ReflectionInstance The ReflectionInstance object. Returns ------- list of str List of public asynchronous method names. |
+| ReflectionInstance.getProtectedMethods | from orionis.introspection import ReflectionInstance | [instances/reflection.py](../instances/reflection.py) | def getProtectedMethods(self) -> list[str] | Return all protected method names of the instance. Parameters ---------- self : ReflectionInstance The ReflectionInstance object. Returns ------- list of str List of protected method names. Protected methods start with a single underscore, are not private (do not start with the class name), and are not dunder methods. |
+| ReflectionInstance.getProtectedSyncMethods | from orionis.introspection import ReflectionInstance | [instances/reflection.py](../instances/reflection.py) | def getProtectedSyncMethods(self) -> list[str] | Return all protected synchronous method names of the instance. Parameters ---------- self : ReflectionInstance The ReflectionInstance object. Returns ------- list of str List of protected synchronous method names. |
+| ReflectionInstance.getProtectedAsyncMethods | from orionis.introspection import ReflectionInstance | [instances/reflection.py](../instances/reflection.py) | def getProtectedAsyncMethods(self) -> list[str] | Retrieve all protected asynchronous method names of the instance. Parameters ---------- self : ReflectionInstance The ReflectionInstance object. Returns ------- list of str List of protected asynchronous method names. Notes ----- Protected asynchronous methods start with a single underscore, are not private, and are coroutine functions. |
+| ReflectionInstance.getPrivateMethods | from orionis.introspection import ReflectionInstance | [instances/reflection.py](../instances/reflection.py) | def getPrivateMethods(self) -> list[str] | Return all private method names of the instance. Private methods are those whose names start with the class name prefix (name-mangled), but do not start with double underscores. Returns ------- list of str List of private method names, unmangled (without class name prefix). |
+| ReflectionInstance.getPrivateSyncMethods | from orionis.introspection import ReflectionInstance | [instances/reflection.py](../instances/reflection.py) | def getPrivateSyncMethods(self) -> list[str] | Retrieve all private synchronous method names of the instance. Returns ------- list of str List of private synchronous method names (unmangled). |
+| ReflectionInstance.getPrivateAsyncMethods | from orionis.introspection import ReflectionInstance | [instances/reflection.py](../instances/reflection.py) | def getPrivateAsyncMethods(self) -> list[str] | Retrieve all private asynchronous method names of the instance. Returns ------- list of str List of private asynchronous method names (unmangled). |
+| ReflectionInstance.getPublicClassMethods | from orionis.introspection import ReflectionInstance | [instances/reflection.py](../instances/reflection.py) | def getPublicClassMethods(self) -> list[str] | Return all public class method names of the instance. Returns ------- list of str List of public class method names. |
+| ReflectionInstance.getPublicClassSyncMethods | from orionis.introspection import ReflectionInstance | [instances/reflection.py](../instances/reflection.py) | def getPublicClassSyncMethods(self) -> list[str] | Return all public synchronous class method names of the instance. Returns ------- list of str List of public synchronous class method names. |
+| ReflectionInstance.getPublicClassAsyncMethods | from orionis.introspection import ReflectionInstance | [instances/reflection.py](../instances/reflection.py) | def getPublicClassAsyncMethods(self) -> list[str] | Return all public asynchronous class method names of the instance. Returns ------- list of str List of public asynchronous class method names. |
+| ReflectionInstance.getProtectedClassMethods | from orionis.introspection import ReflectionInstance | [instances/reflection.py](../instances/reflection.py) | def getProtectedClassMethods(self) -> list[str] | Return all protected class method names of the instance. Returns ------- list of str List of protected class method names. |
+| ReflectionInstance.getProtectedClassSyncMethods | from orionis.introspection import ReflectionInstance | [instances/reflection.py](../instances/reflection.py) | def getProtectedClassSyncMethods(self) -> list[str] | Return all protected synchronous class method names of the instance. Parameters ---------- self : ReflectionInstance The ReflectionInstance object. Returns ------- list of str List of protected synchronous class method names. |
+| ReflectionInstance.getProtectedClassAsyncMethods | from orionis.introspection import ReflectionInstance | [instances/reflection.py](../instances/reflection.py) | def getProtectedClassAsyncMethods(self) -> list[str] | Retrieve all protected asynchronous class method names of the instance. Returns ------- list of str List of protected asynchronous class method names. |
+| ReflectionInstance.getPrivateClassMethods | from orionis.introspection import ReflectionInstance | [instances/reflection.py](../instances/reflection.py) | def getPrivateClassMethods(self) -> list[str] | Return all private class method names of the instance. Returns ------- list of str List of private class method names (unmangled). |
+| ReflectionInstance.getPrivateClassSyncMethods | from orionis.introspection import ReflectionInstance | [instances/reflection.py](../instances/reflection.py) | def getPrivateClassSyncMethods(self) -> list[str] | Retrieve all private synchronous class method names of the instance. Returns ------- list of str List of private synchronous class method names. |
+| ReflectionInstance.getPrivateClassAsyncMethods | from orionis.introspection import ReflectionInstance | [instances/reflection.py](../instances/reflection.py) | def getPrivateClassAsyncMethods(self) -> list[str] | Retrieve all private asynchronous class method names of the instance. Parameters ---------- self : ReflectionInstance The ReflectionInstance object. Returns ------- list of str List of private asynchronous class method names. |
+| ReflectionInstance.getPublicStaticMethods | from orionis.introspection import ReflectionInstance | [instances/reflection.py](../instances/reflection.py) | def getPublicStaticMethods(self) -> list[str] | Return the names of all public static methods of the instance's class. Returns ------- list of str List of public static method names defined on the class. |
+| ReflectionInstance.getPublicStaticSyncMethods | from orionis.introspection import ReflectionInstance | [instances/reflection.py](../instances/reflection.py) | def getPublicStaticSyncMethods(self) -> list[str] | Return all public synchronous static method names of the instance. Returns ------- list of str List of public synchronous static method names defined on the class. |
+| ReflectionInstance.getPublicStaticAsyncMethods | from orionis.introspection import ReflectionInstance | [instances/reflection.py](../instances/reflection.py) | def getPublicStaticAsyncMethods(self) -> list[str] | Retrieve all public asynchronous static method names of the instance. Returns ------- list of str List of public asynchronous static method names defined on the class. |
+| ReflectionInstance.getProtectedStaticMethods | from orionis.introspection import ReflectionInstance | [instances/reflection.py](../instances/reflection.py) | def getProtectedStaticMethods(self) -> list[str] | Return all protected static method names of the instance. Returns ------- list of str List of protected static method names defined on the class. |
+| ReflectionInstance.getProtectedStaticSyncMethods | from orionis.introspection import ReflectionInstance | [instances/reflection.py](../instances/reflection.py) | def getProtectedStaticSyncMethods(self) -> list[str] | Retrieve all protected synchronous static method names. Returns ------- list of str List of protected synchronous static method names defined on the class. |
+| ReflectionInstance.getProtectedStaticAsyncMethods | from orionis.introspection import ReflectionInstance | [instances/reflection.py](../instances/reflection.py) | def getProtectedStaticAsyncMethods(self) -> list[str] | Retrieve all protected asynchronous static method names. Parameters ---------- None Returns ------- list of str List of protected asynchronous static method names defined on the class. |
+| ReflectionInstance.getPrivateStaticMethods | from orionis.introspection import ReflectionInstance | [instances/reflection.py](../instances/reflection.py) | def getPrivateStaticMethods(self) -> list[str] | Return all private static method names of the instance. Returns ------- list of str List of private static method names defined on the class. |
+| ReflectionInstance.getPrivateStaticSyncMethods | from orionis.introspection import ReflectionInstance | [instances/reflection.py](../instances/reflection.py) | def getPrivateStaticSyncMethods(self) -> list[str] | Retrieve all private synchronous static method names of the instance. Returns ------- list of str List of private synchronous static method names defined on the class. |
+| ReflectionInstance.getPrivateStaticAsyncMethods | from orionis.introspection import ReflectionInstance | [instances/reflection.py](../instances/reflection.py) | def getPrivateStaticAsyncMethods(self) -> list[str] | Retrieve all private asynchronous static method names of the instance. Returns ------- list of str List of private asynchronous static method names defined on the class. |
+| ReflectionInstance.getDunderMethods | from orionis.introspection import ReflectionInstance | [instances/reflection.py](../instances/reflection.py) | def getDunderMethods(self) -> list[str] | Return all dunder (double underscore) method names of the instance. Returns ------- list of str List of dunder method names defined on the instance. |
+| ReflectionInstance.getMagicMethods | from orionis.introspection import ReflectionInstance | [instances/reflection.py](../instances/reflection.py) | def getMagicMethods(self) -> list[str] | Return all magic method names of the instance. Returns ------- list of str List of magic (dunder) method names defined on the instance. |
+| ReflectionInstance.getProperties | from orionis.introspection import ReflectionInstance | [instances/reflection.py](../instances/reflection.py) | def getProperties(self) -> list[str] | Return all property names of the instance. Returns ------- list of str List of property names defined as properties on the class. |
+| ReflectionInstance.getPublicProperties | from orionis.introspection import ReflectionInstance | [instances/reflection.py](../instances/reflection.py) | def getPublicProperties(self) -> list | Return all public properties of the instance. Returns ------- list List of public property names. |
+| ReflectionInstance.getProtectedProperties | from orionis.introspection import ReflectionInstance | [instances/reflection.py](../instances/reflection.py) | def getProtectedProperties(self) -> list | Retrieve all protected properties of the instance. Returns ------- list List of protected property names (unmangled). |
+| ReflectionInstance.getPrivateProperties | from orionis.introspection import ReflectionInstance | [instances/reflection.py](../instances/reflection.py) | def getPrivateProperties(self) -> list | Retrieve all private properties of the instance. Returns ------- list List of private property names (unmangled). |
+| ReflectionInstance.getProperty | from orionis.introspection import ReflectionInstance | [instances/reflection.py](../instances/reflection.py) | def getProperty(self, name: str) -> Any | Retrieve the value of a property from the instance. Parameters ---------- name : str Name of the property to retrieve. Returns ------- Any Value of the specified property. Raises ------ AttributeError If the property does not exist or is not accessible. |
+| ReflectionInstance.getPropertySignature | from orionis.introspection import ReflectionInstance | [instances/reflection.py](../instances/reflection.py) | def getPropertySignature(self, name: str) -> inspect.Signature | Return the signature of a property getter. Parameters ---------- name : str Name of the property. Returns ------- inspect.Signature Signature of the property's getter method. Raises ------ AttributeError If the property does not exist on the class. |
+| ReflectionInstance.getPropertyDocstring | from orionis.introspection import ReflectionInstance | [instances/reflection.py](../instances/reflection.py) | def getPropertyDocstring(self, name: str) -> str | Retrieve the docstring for a property. Parameters ---------- name : str Name of the property. Returns ------- str The docstring of the property, or an empty string if not present. Raises ------ AttributeError If the property does not exist on the class. |
+| ReflectionInstance.constructorSignature | from orionis.introspection import ReflectionInstance | [instances/reflection.py](../instances/reflection.py) | def constructorSignature(self) -> Signature | Analyze and return constructor dependencies of the instance's class. Returns ------- Signature Structured representation of the constructor dependencies. Contains: - ``resolved``: dictionary of resolved dependencies with names and values. - ``unresolved``: list of unresolved dependencies (parameter names without default values or annotations). |
+| ReflectionInstance.methodSignature | from orionis.introspection import ReflectionInstance | [instances/reflection.py](../instances/reflection.py) | def methodSignature(self, method_name: str) -> Signature | Analyze and return dependencies for a method of the instance's class. Parameters ---------- method_name : str Name of the method to inspect. Returns ------- Signature Structured representation of the method dependencies, including: - ``resolved``: dictionary of resolved dependencies with names and values. - ``unresolved``: list of unresolved dependencies (parameter names without default values or annotations). Raises ------ AttributeError If the method does not exist on the class. |
+| ReflectionInstance.clearCache | from orionis.introspection import ReflectionInstance | [instances/reflection.py](../instances/reflection.py) | def clearCache(self) -> None | Clear the internal memory cache. Removes all cached entries stored in the reflection instance. Subsequent method calls will recompute and cache results. Returns ------- None This method does not return a value. |
+| ReflectionModule | from orionis.introspection import ReflectionModule | [modules/reflection.py](../modules/reflection.py) | ReflectionModule | Exported public constant or alias. |
+| ReflectionModule.getModule | from orionis.introspection import ReflectionModule | [modules/reflection.py](../modules/reflection.py) | def getModule(self) -> object | Return the imported module object. Returns ------- object The imported module object. |
+| ReflectionModule.hasClass | from orionis.introspection import ReflectionModule | [modules/reflection.py](../modules/reflection.py) | def hasClass(self, class_name: str) -> bool | Check if a class with the specified name exists in the module. Parameters ---------- class_name : str Name of the class to check. Returns ------- bool True if the class exists in the module, otherwise False. |
+| ReflectionModule.getClass | from orionis.introspection import ReflectionModule | [modules/reflection.py](../modules/reflection.py) | def getClass(self, class_name: str) -> type / None | Retrieve a class object by its name from the module. Parameters ---------- class_name : str Name of the class to retrieve. Returns ------- type or None The class object if found, otherwise None. |
+| ReflectionModule.setClass | from orionis.introspection import ReflectionModule | [modules/reflection.py](../modules/reflection.py) | def setClass(self, class_name: str, cls: type) -> bool | Set a class in the module. Parameters ---------- class_name : str Name of the class to set. cls : type Class object to set. Raises ------ ValueError If `cls` is not a class type, if `class_name` is not a valid identifier, or if `class_name` is a reserved keyword. Returns ------- bool True if the class was set successfully. |
+| ReflectionModule.removeClass | from orionis.introspection import ReflectionModule | [modules/reflection.py](../modules/reflection.py) | def removeClass(self, class_name: str) -> bool | Remove a class from the module. Parameters ---------- class_name : str Name of the class to remove. Raises ------ ValueError If `class_name` is not a valid identifier or if the class does not exist. Returns ------- bool True if the class was removed successfully. |
+| ReflectionModule.getClasses | from orionis.introspection import ReflectionModule | [modules/reflection.py](../modules/reflection.py) | def getClasses(self) -> dict | Return a dictionary of classes defined in the module. Parameters ---------- None Returns ------- dict Dictionary with class names as keys and class objects as values. |
+| ReflectionModule.getPublicClasses | from orionis.introspection import ReflectionModule | [modules/reflection.py](../modules/reflection.py) | def getPublicClasses(self) -> dict | Return a dictionary of public classes defined in the module. Parameters ---------- None Returns ------- dict Dictionary with class names as keys and class objects as values. |
+| ReflectionModule.getProtectedClasses | from orionis.introspection import ReflectionModule | [modules/reflection.py](../modules/reflection.py) | def getProtectedClasses(self) -> dict | Return a dictionary of protected classes defined in the module. Parameters ---------- None Returns ------- dict Dictionary with class names as keys and class objects as values. |
+| ReflectionModule.getPrivateClasses | from orionis.introspection import ReflectionModule | [modules/reflection.py](../modules/reflection.py) | def getPrivateClasses(self) -> dict | Return a dictionary of private classes defined in the module. Parameters ---------- None Returns ------- dict Dictionary with class names as keys and class objects as values. |
+| ReflectionModule.getConstant | from orionis.introspection import ReflectionModule | [modules/reflection.py](../modules/reflection.py) | def getConstant(self, constant_name: str) -> object / None | Retrieve a constant value by name from the module. Parameters ---------- constant_name : str Name of the constant to retrieve. Returns ------- object or None Value of the constant if found, otherwise None. |
+| ReflectionModule.getConstants | from orionis.introspection import ReflectionModule | [modules/reflection.py](../modules/reflection.py) | def getConstants(self) -> dict | Retrieve constants defined in the module. Parameters ---------- None Returns ------- dict Dictionary with constant names as keys and their values as values. |
+| ReflectionModule.getPublicConstants | from orionis.introspection import ReflectionModule | [modules/reflection.py](../modules/reflection.py) | def getPublicConstants(self) -> dict | Retrieve public constants defined in the module. Parameters ---------- None Returns ------- dict Dictionary with constant names as keys and their values as values. |
+| ReflectionModule.getProtectedConstants | from orionis.introspection import ReflectionModule | [modules/reflection.py](../modules/reflection.py) | def getProtectedConstants(self) -> dict | Return protected constants defined in the module. Parameters ---------- None Returns ------- dict Dictionary with constant names as keys and their values as values. |
+| ReflectionModule.getPrivateConstants | from orionis.introspection import ReflectionModule | [modules/reflection.py](../modules/reflection.py) | def getPrivateConstants(self) -> dict | Retrieve private constants defined in the module. Parameters ---------- None Returns ------- dict Dictionary with constant names as keys and their values as values. |
+| ReflectionModule.getFunctions | from orionis.introspection import ReflectionModule | [modules/reflection.py](../modules/reflection.py) | def getFunctions(self) -> dict | Return a dictionary of functions defined in the module. Parameters ---------- None Returns ------- dict Dictionary with function names as keys and function objects as values. |
+| ReflectionModule.getPublicFunctions | from orionis.introspection import ReflectionModule | [modules/reflection.py](../modules/reflection.py) | def getPublicFunctions(self) -> dict | Return a dictionary of public functions defined in the module. Parameters ---------- None Returns ------- dict Dictionary mapping function names to function objects. |
+| ReflectionModule.getPublicSyncFunctions | from orionis.introspection import ReflectionModule | [modules/reflection.py](../modules/reflection.py) | def getPublicSyncFunctions(self) -> dict | Return a dictionary of public synchronous functions in the module. Parameters ---------- None Returns ------- dict Dictionary mapping function names to function objects. |
+| ReflectionModule.getPublicAsyncFunctions | from orionis.introspection import ReflectionModule | [modules/reflection.py](../modules/reflection.py) | def getPublicAsyncFunctions(self) -> dict | Return a dictionary of public asynchronous functions in the module. Parameters ---------- None Returns ------- dict Dictionary mapping function names to function objects. |
+| ReflectionModule.getProtectedFunctions | from orionis.introspection import ReflectionModule | [modules/reflection.py](../modules/reflection.py) | def getProtectedFunctions(self) -> dict | Return a dictionary of protected functions defined in the module. Parameters ---------- None Returns ------- dict Dictionary mapping protected function names to function objects. |
+| ReflectionModule.getProtectedSyncFunctions | from orionis.introspection import ReflectionModule | [modules/reflection.py](../modules/reflection.py) | def getProtectedSyncFunctions(self) -> dict | Return protected synchronous functions defined in the module. Parameters ---------- None Returns ------- dict Dictionary mapping function names to function objects. |
+| ReflectionModule.getProtectedAsyncFunctions | from orionis.introspection import ReflectionModule | [modules/reflection.py](../modules/reflection.py) | def getProtectedAsyncFunctions(self) -> dict | Return protected asynchronous functions defined in the module. Parameters ---------- None Returns ------- dict Dictionary mapping function names to function objects. |
+| ReflectionModule.getPrivateFunctions | from orionis.introspection import ReflectionModule | [modules/reflection.py](../modules/reflection.py) | def getPrivateFunctions(self) -> dict | Return private functions defined in the module. Parameters ---------- None Returns ------- dict Dictionary mapping function names to function objects. |
+| ReflectionModule.getPrivateSyncFunctions | from orionis.introspection import ReflectionModule | [modules/reflection.py](../modules/reflection.py) | def getPrivateSyncFunctions(self) -> dict | Return private synchronous functions defined in the module. Parameters ---------- None Returns ------- dict Dictionary with function names as keys and function objects as values. |
+| ReflectionModule.getPrivateAsyncFunctions | from orionis.introspection import ReflectionModule | [modules/reflection.py](../modules/reflection.py) | def getPrivateAsyncFunctions(self) -> dict | Return private asynchronous functions defined in the module. Returns ------- dict Dictionary with function names as keys and function objects as values. |
+| ReflectionModule.getImports | from orionis.introspection import ReflectionModule | [modules/reflection.py](../modules/reflection.py) | def getImports(self) -> dict | Retrieve imported modules from the module. Returns ------- dict Dictionary mapping import names to module objects. |
+| ReflectionModule.getFile | from orionis.introspection import ReflectionModule | [modules/reflection.py](../modules/reflection.py) | def getFile(self) -> str | Return the file path of the module. Returns ------- str The absolute file path of the module. |
+| ReflectionModule.getSourceCode | from orionis.introspection import ReflectionModule | [modules/reflection.py](../modules/reflection.py) | def getSourceCode(self) -> str | Retrieve the source code of the module. Returns ------- str The source code of the module as a string. Raises ------ ValueError If the source code cannot be read from the module file. |
+| ReflectionModule.clearCache | from orionis.introspection import ReflectionModule | [modules/reflection.py](../modules/reflection.py) | def clearCache(self) -> None | Clear all cached reflection data. Removes all cached entries stored in the reflection instance. Forces fresh computation on subsequent method calls. Parameters ---------- None Returns ------- None This method does not return a value. |
 
 ## Ejemplos de uso
 
-Todos los ejemplos asumen que este módulo existe como `app/services/catalog.py`:
+    from orionis.introspection import ModuleInspector
 
-```python
-from abc import ABC, abstractmethod
+La ruta de importación coincide con la tabla de API. Estado de importación: executed successfully under Python 3.14.3.
 
+## Características de diseño
 
-class CatalogContract(ABC):
-    """Contract for catalog services."""
+El paquete utiliza una superficie pública explícita. Los símbolos privados no se incluyen; las declaraciones se enlazan al propietario concreto.
 
-    @abstractmethod
-    def search(self, term: str) -> list[str]:
-        """Search the catalog."""
+## Rendimiento y concurrencia
 
-
-class Catalog:
-    """In-memory catalog service."""
-
-    limit: int = 25
-    _cursor: str = "0"
-    __token: str = "secret"
-
-    def __init__(self, dsn: str = "sqlite://") -> None:
-        self.dsn = dsn
-
-    def search(self, term: str) -> list[str]:
-        """Return the matching entries."""
-        return [term]
-
-    async def searchAsync(self, term: str) -> list[str]:
-        """Return the matching entries asynchronously."""
-        return [term]
-
-    def _reset(self) -> None:
-        """Reset the internal cursor."""
-
-    def __seal(self) -> None:
-        """Seal the catalog."""
-
-    @classmethod
-    def build(cls) -> "Catalog":
-        """Build a catalog with defaults."""
-        return cls()
-
-    @staticmethod
-    def ping() -> bool:
-        """Return True when the service is reachable."""
-        return True
-
-    @property
-    def cursor(self) -> str:
-        """Return the current cursor."""
-        return self._cursor
-```
-
-### Clasificar los miembros de una clase
-
-```python
-from app.services.catalog import Catalog
-from orionis.introspection import Reflection
-
-reflection = Reflection.concrete(Catalog)
-
-print(reflection.getPublicMethods())        # ['search', 'searchAsync']
-print(reflection.getPublicSyncMethods())    # ['search']
-print(reflection.getPublicAsyncMethods())   # ['searchAsync']
-print(reflection.getProtectedMethods())     # ['_reset']
-print(reflection.getPrivateMethods())       # ['__seal']
-print(reflection.getPublicClassMethods())   # ['build']
-print(reflection.getPublicStaticMethods())  # ['ping']
-print(reflection.getPublicProperties())     # ['cursor']
-print(reflection.getPublicAttributes())     # {'limit': 25}
-print(reflection.getPrivateAttributes())    # {'__token': 'secret'}
-print(reflection.getMethodSignature("__seal"))  # (self) -> None
-```
-
-### Resolver las dependencias del constructor
-
-```python
-import msgspec
-
-from orionis.introspection import ReflectDependencies
-
-
-class Payload(msgspec.Struct):
-    name: str
-
-
-class Repo:
-    pass
-
-
-class Service:
-    def __init__(self, repo: Repo, payload: Payload, retries: int, *, tag="x") -> None:
-        self.repo = repo
-        self.payload = payload
-        self.retries = retries
-        self.tag = tag
-
-
-signature = ReflectDependencies(Service).constructorSignature()
-
-print(signature.hasParameters())          # True
-print(list(signature.getResolved()))      # ['repo', 'payload', 'tag']
-print(list(signature.getUnresolved()))    # ['retries']
-print(list(signature.getKeywordOnly()))   # ['tag']
-
-for name, argument in signature.arguments():
-    print(name, argument.class_name, argument.resolved, argument.is_schema)
-# repo Repo True False
-# payload Payload True True
-# retries int False False
-# tag str True False
-```
-
-`retries: int` cae en `unresolved` porque una anotación de tipo builtin sin valor
-por defecto no aporta información que el contenedor pueda usar para construir un
-valor.
-
-### Reflejar una instancia
-
-```python
-from app.services.catalog import Catalog
-from orionis.introspection import ReflectionInstance
-
-reflection = ReflectionInstance(Catalog("postgres://"))
-
-print(reflection.getClassName())          # Catalog
-print(reflection.getAttributes())         # {'dsn': 'postgres://'}
-print(reflection.getAnnotations())        # {'limit': <class 'int'>, ...}
-print(reflection.getMethodDocstring("search"))
-print(reflection.getPropertyDocstring("cursor"))
-print(reflection.getProperty("cursor"))   # 0
-print(type(reflection.getBaseClasses()))  # <class 'tuple'>
-```
-
-`getAttributes()` lee variables de instancia, así que `limit`, `_cursor` y
-`__token` (atributos de clase) no aparecen; sí figuran en `getAnnotations()`.
-
-### Manejo de errores de reflexión
-
-```python
-from app.services.catalog import Catalog, CatalogContract
-from orionis.introspection import (
-    ReflectDependencies,
-    ReflectionAbstract,
-    ReflectionCallable,
-    ReflectionConcrete,
-    ReflectionInstance,
-    ReflectionModule,
-)
-
-try:
-    ReflectionAbstract(Catalog)
-except TypeError as exc:
-    print(exc)  # The class 'Catalog' is not an abstract base class.
-
-try:
-    ReflectionConcrete(CatalogContract)
-except TypeError as exc:
-    print(exc)  # Argument 'concrete' must be a class type, got 'ABCMeta' instead.
-
-try:
-    ReflectionInstance(Catalog)
-except TypeError as exc:
-    print(exc)  # The provided instance must be an object instance, not a class.
-
-try:
-    ReflectionInstance(42)
-except TypeError as exc:
-    print(exc)  # Cannot reflect on instances of built-in or abstract base classes.
-
-try:
-    ReflectionCallable(len)
-except TypeError as exc:
-    print(exc)  # Expected a function, method, or lambda, got builtin_function_or_method
-
-try:
-    ReflectionModule("")
-except TypeError as exc:
-    print(exc)  # Module name must be a non-empty string, got ''
-
-try:
-    ReflectDependencies(min).callableSignature()
-except ValueError as exc:
-    print(exc)  # Unable to inspect signature of <built-in function min>: ...
-```
-
-`ReflectionInstance` también rechaza con `ValueError` los objetos cuya clase está
-definida en `__main__`, así que ejecuta los fragmentos anteriores como módulo
-(`python -m ...`) o importa las clases desde un paquete.
-
-### Descubrir módulos y dataclasses congeladas
-
-```python
-from pathlib import Path
-
-from orionis.introspection import ModuleInspector, ReflectionModule
-
-base = Path.cwd()
-modules = ModuleInspector.discoverModules(base, base / "app")
-print(sorted(modules)[:3])
-
-Path_ = ModuleInspector.loadClass(metadata={"module": "pathlib", "class": "Path"})
-print(Path_.__name__)  # Path
-
-frozen = ModuleInspector.discoverFrozenDataclasses(
-    {"orionis.introspection.dependencies.entities.argument"},
-)
-print(sorted(entry[2] for entry in frozen))  # ['Argument']
-
-reflection = ReflectionModule("orionis.introspection.reflection")
-print(list(reflection.getPublicClasses()))   # ['Any', 'Reflection']
-print(list(reflection.getConstants()))       # ['TYPE_CHECKING']
-print(list(reflection.getImports()))         # ['abc', 'inspect', 'typing']
-```
-
-`getPublicClasses()` incluye `Any` porque `ReflectionModule` inspecciona todo lo
-que está vinculado en el espacio de nombres del módulo, incluidos los nombres
-importados.
-
----
-
-## Consideraciones de rendimiento y concurrencia
-
-- **Un barrido por instancia de reflector.** `ReflectionAbstract`,
-  `ReflectionConcrete` y `ReflectionInstance` recorren el espacio de nombres de
-  la clase una sola vez, en la primera llamada de clasificación, y después
-  responden desde un diccionario. Reutiliza el reflector en lugar de crear uno
-  nuevo por consulta.
-- **Cachés LRU de proceso.**
-  `orionis/introspection/dependencies/reflection.py` cachea `inspect.signature` y
-  el `Signature` resuelto por objetivo con `functools.lru_cache(maxsize=1024)`.
-  Las entradas se indexan por el propio objeto objetivo, así que este debe ser
-  hasheable; los fallos no se cachean y se vuelven a lanzar en cada llamada.
-- **Caché de clases de proceso.** `ModuleInspector.loadClass` guarda las clases
-  resueltas en un diccionario a nivel de clase indexado por `"modulo.Clase"`.
-  Nunca se invalida durante la vida del proceso.
-- **Las mutaciones invalidan la caché.** `setAttribute`, `removeAttribute`,
-  `setMethod` y `removeMethod` refrescan o limpian las cachés internas. Mutar la
-  clase reflejada directamente (con `setattr`/`delattr`) **no** lo hace, así que
-  el reflector puede seguir sirviendo listas de miembros obsoletas.
-- **`ReflectionModule` solo invalida la entrada `classes`.** `setClass` y
-  `removeClass` eliminan la clave de caché `"classes"`, pero las vistas derivadas
-  (`getPublicClasses`, `getProtectedClasses`, `getPrivateClasses`) conservan lo
-  que ya hubieran memoizado. Llama a `clearCache()` tras mutar un módulo si
-  necesitas refrescar esas vistas.
-- **No hay locks en ninguna parte.** Ninguna clase del paquete usa primitivas de
-  `threading` ni de `asyncio`. Varios lectores concurrentes sobre el mismo
-  reflector son seguros una vez completado el barrido; un primer uso concurrente
-  puede ejecutar el barrido más de una vez, lo cual es un desperdicio pero
-  produce el mismo resultado. Mutar un reflector desde varios hilos no está
-  sincronizado.
-- **`asyncio`.** Ningún método del paquete es una corrutina; la distinción
-  síncrono/asíncrono se refiere a los miembros *inspeccionados*, no a la API.
-- **E/S.** `getSourceCode`, `getFile`, `discoverModules`, `fileImportsAny` y
-  `discoverFrozenDataclasses` acceden al sistema de archivos, y `loadClass`,
-  `discoverFrozenDataclasses` y `ReflectionModule.__init__` pueden importar
-  módulos, ejecutando su código de nivel superior.
-
----
+No se declara una garantía uniforme en el nivel del paquete. Inspeccione cada archivo enlazado para E/S, corutinas, cachés, bloqueos y estado compartido.
 
 ## Notas de compatibilidad
 
-- **Python `>= 3.14`** (`requires-python` en `pyproject.toml`). El paquete se
-  apoya en la semántica de anotaciones de PEP 649: `getAnnotations()` lee
-  `__annotations__` directamente, de modo que una clase definida en un módulo con
-  `from __future__ import annotations` devuelve **cadenas**, mientras que una
-  clase definida sin ese import devuelve objetos de tipo reales.
-- **Dependencias.** Solo la biblioteca estándar (`abc`, `ast`, `dataclasses`,
-  `functools`, `importlib`, `inspect`, `keyword`, `pathlib`, `re`, `sys`,
-  `types`, `typing`) más `msgspec>=0.21.1`, que ya es dependencia base de Orionis
-  y se usa únicamente para marcar `is_schema` en `Argument`.
-- **Sin provider ni facade.** Importa las clases directamente; no hay nada que
-  registrar en el contenedor ni nada que `pin()`.
-- **Convención de nombres privados.** Todos los accesores intercambian el nombre
-  *sin manglar* (`__seal`). Pasar la forma manglada (`_Catalog__seal`) no está
-  soportado por `hasMethod`, `getMethodSignature`, `removeMethod` ni
-  `methodSignature`.
-- **Las asimetrías entre reflectores son intencionales y observables.**
-  `ReflectionInstance.getBaseClasses()` devuelve una `tuple` mientras que los
-  reflectores de clase devuelven una `list`;
-  `ReflectionInstance.removeMethod()` devuelve `None` mientras que
-  `ReflectionConcrete.removeMethod()` devuelve `bool`;
-  `ReflectionAbstract.getSourceCode()` lanza `ValueError` mientras que las
-  variantes de clase concreta e instancia devuelven `None`.
-- **Versión en inglés:** [README.md](README.md).
+Mínimo declarado: Python 3.14. La validación usó Python 3.14.3. Los límites de dependencias están en pyproject.toml.
+
+## Verificación y limitaciones
+
+Se analizaron los archivos Python y se verificaron las exportaciones. Las excepciones de dependencias, callbacks, E/S o configuración pueden propagarse y no se presentan como exhaustivas.

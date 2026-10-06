@@ -1,246 +1,163 @@
-# Orionis ORM
+# orionis.orm
 
-> Async-first Active Record models, query builders, relationships, and database schema definitions.
+> API reference derived from the current implementation.
 
 ## Table of contents
 
-- [Requirements](#requirements)
-- [Model factories](../factories/docs/README.md)
-- [Functional description](#functional-description)
-- [API reference](#api-reference)
-- [Usage examples](#usage-examples)
-- [Performance and concurrency considerations](#performance-and-concurrency-considerations)
-- [Compatibility notes](#compatibility-notes)
+- Requirements
+- Functional overview
+- Module structure
+- API reference
+- Usage examples
+- Design characteristics
+- Performance and concurrency
+- Compatibility notes
+- Verification and limitations
 
 ## Requirements
 
-There is no ORM-specific installation step beyond `uv add orionis`. The ORM uses the framework's database subsystem, including `aiosqlite>=0.22.1` for SQLite and `sqlalchemy[asyncio]>=2.0.54,<3.0`. Other database engines require the matching optional package extra and its driver dependencies: `orionis[mysql]` (`aiomysql>=0.3.2`, `pymysql>=1.2.3`), `orionis[pgsql]` (`asyncpg>=0.31.0`, `psycopg2-binary>=2.9.13`), `orionis[oracle]` (`oracledb>=26.0.0`), or `orionis[sqlserver]` (`aioodbc>=0.5.0`, `pyodbc>=5.3.0`). These requirements are declared in `pyproject.toml`.
+Python 3.14 or newer, as declared by pyproject.toml.
 
-Queries require the application database provider to install a connection manager in `ConnectionResolver`. In normal application use, framework boot performs this wiring.
+## Functional overview
 
-Optional [model factories](../factories/docs/README.md) generate test and seed
-data through these same models. Run `uv add 'orionis[factories]'` for Faker
-support; use `Factory[Model]`, synchronous `make()` and async `create()`, or generate an
-application factory with `reactor make:factory UserFactory --model=User`.
+The orionis.orm initializer exports 57 public symbols. This reference uses __all__, export routes, and current source files as evidence.
 
-## Functional description
+## Module structure
 
-`orionis.orm` provides declarative models whose column definitions are discovered by `ModelMeta`, then used for attribute casting, persistence, and query construction. `ModelQueryBuilder` and the raw `QueryBuilder` express asynchronous database operations through Orionis connections.
-
-The ORM also defines relationship builders, result collections and paginators, and engine-independent table and column descriptions consumed by the database compiler and migration subsystem. The public package surface is re-exported from `orionis.orm`; lower-level implementation modules include `orionis.orm.query`, `orionis.orm.relations`, and `orionis.orm.schema`.
+| Path | Responsibility |
+| --- | --- |
+| ../__init__.py | Defines package exports. |
+| orionis.orm/ | Implementations and subpackages for those exports. |
 
 ## API reference
 
-Unless shown otherwise, query and persistence operations that access the database are `async` and must be awaited. The signatures below follow declarations in the source; `...` in a type constructor row means that the row intentionally describes a family, not a callable signature.
-
-### `Model`
-
-`Model` is the base class for declarative Active Record models. Declare columns as class attributes using schema types, and configure class variables such as `table`, `connection`, `fillable`, `guarded`, `hidden`, `casts`, `timestamps`, `soft_deletes`, and `uuids` where needed. When `table` is `None`, the metaclass derives the table name; primary-key metadata comes from declared column flags unless overridden.
-
-| Signature | Behavior |
-|---|---|
-| `__init__(self, attributes: dict[str, Any] \| None = None) -> None` | Creates an unsaved model and mass-assigns provided attributes. Raises `MassAssignmentException` for unknown or non-fillable attributes. |
-| `query(cls) -> ModelQueryBuilder[Any]` | Starts a builder for the model. |
-| `getConnection(cls) -> IConnection` | Resolves the configured connection; raises `OrmConfigurationException` when the manager is not installed. |
-| `all(cls) -> Collection` | Async: returns all matching model instances. |
-| `find(cls, key: Any) -> Model \| None` | Async: looks up the primary key, returning `None` when absent. |
-| `findOrFail(cls, key: Any) -> Model` | Async: lookup that raises `ModelNotFoundException` when absent. |
-| `first(cls) -> Model \| None` / `firstOrFail(cls) -> Model` | Async: returns the first row, or raises `ModelNotFoundException` in the `OrFail` form when none exists. |
-| `create(cls, attributes: dict[str, Any]) -> Model` | Async: constructs, saves, and returns a model. Can raise `MassAssignmentException` or a database `QueryException`. |
-| `destroy(cls, *keys: Any) -> int` | Async: deletes rows with the given primary keys and returns the affected count. |
-| `save(self) -> bool` | Async: inserts a new model or writes its dirty attributes; dispatches lifecycle events and maintains enabled timestamps. A listener can veto a write, resulting in `False`. |
-| `update(self, attributes: dict[str, Any]) -> bool` | Async: mass-assigns and saves. Can raise `MassAssignmentException` or `QueryException`. |
-| `delete(self) -> bool` | Async: deletes an existing row, or stamps the configured delete column when soft deletes apply. |
-| `addGlobalScope(cls, name: str, scope: Callable[[ModelQueryBuilder[Any]], None]) -> type[Model]` | Registers a named constraint on model queries. |
-| `removeGlobalScope(cls, name: str) -> type[Model]` | Removes a named scope if present. |
-| `freshTimestamp(cls) -> datetime` | Produces current UTC time; returns naive UTC unless the selected timestamp column is declared as `TIMESTAMP`. |
-| `newUniqueId(cls) -> Any` | Produces a UUID by default for client-generated keys; models may override it. |
-
-Additional inherited public model methods include `fill`, `setAttribute`, `getAttribute`, `hasAccessor`, `toDict`, `serialize`, `toJson`, `only`, `exclude`, `getDirty`, `isDirty`, `isClean`, `wasChanged`, `getChanges`, `getOriginal`, and `syncOriginal`. Relationship methods are listed under [Relationships](#relationships). Attribute serialization omits `hidden` fields and can include declared `appends`; casts supported by the implementation are `int`, `float`, `bool`, `datetime`, `date`, `json`, and `uuid`. Unsupported cast names raise `OrmException`.
-
-### `ModelQueryBuilder`
-
-`ModelQueryBuilder` binds the shared query language to a model and returns hydrated models or `Collection` values. Its common signatures are:
-
-```python
-__init__(self, model: type[TModel]) -> None
-withRelations(self, *names: str) -> Self
-load(self, *names: str) -> Self
-withoutGlobalScope(self, name: str) -> Self
-withoutGlobalScopes(self, *names: str) -> Self
-scope(self, name: str, *args: Any, **kwargs: Any) -> Self
-get(self) -> Collection
-first(self) -> TModel | None
-firstOrFail(self) -> TModel
-find(self, key: Any) -> TModel | None
-findOrFail(self, key: Any) -> TModel
-value(self, column: str) -> Any
-pluck(self, column: str) -> Collection
-paginate(self, page: int = 1, per_page: int = _DEFAULT_PER_PAGE) -> Paginator
-restore(self) -> int
-forceDelete(self) -> int
-delete(self) -> int
-```
-
-The async methods above are awaited. `withTrashed`, `onlyTrashed`, and `withoutTrashed` control inclusion of soft-deleted rows. The builder also exposes the fluent query methods below.
-
-### Query builders and query language
-
-`QueryBuilder` is the model-less entry point used by the database facade; `table(self, name: str, *, alias: str | None = None, connection: str | None = None) -> IRawQueryBuilder` returns `RawQueryBuilder`. `RawQueryBuilder` reads table rows as dictionaries and supports `connection(self, name: str) -> Self`, `table(self, name: str, *, alias: str | None = None) -> Self`, and async `get(self) -> Collection`, `first(self) -> dict[str, Any] | None`, `value(self, column: str) -> Any`, `pluck(self, column: str) -> Collection`, and `paginate(self, page: int = 1, per_page: int = _DEFAULT_PER_PAGE) -> Paginator`.
-
-`QueryBuilder` exposes these signatures: `connection(self, name: str | None = None) -> Self`, `table(self, name: str, *, alias: str | None = None, connection: str | None = None) -> IRawQueryBuilder`, `select(self, sql: str, bindings: dict[str, object] | None = None, name: str | None = None) -> list[dict[str, object]]`, `execute(self, sql: str, bindings: dict[str, object] | None = None, name: str | None = None) -> int`, `statement(self, sql: str, bindings: dict[str, object] | None = None, name: str | None = None) -> bool`, `beginTransaction(self, name: str | None = None) -> None`, `commit(self, name: str | None = None) -> None`, `rollback(self, name: str | None = None) -> None`, and `transaction(self, name: str | None = None) -> ITransaction`. SQL execution and transaction methods are async; a table query is built by `table(...)`.
-
-### `ConnectionResolver`
-
-`ConnectionResolver` is the static bridge to the database connection manager. Its API is `setManager(cls, manager: IConnectionManager) -> None`, `manager(cls) -> IConnectionManager`, `connection(cls, name: str | None = None) -> IConnection`, and `clear(cls) -> None`. `manager()` and `connection()` raise `OrmConfigurationException` if a manager has not been installed. When `name` is `None`, `connection()` first checks for an active migration connection, then delegates to the manager.
-
-Both model and raw table builders use the shared fluent query API. Methods include:
-
-- Projection: `select(*columns)`, `addSelect(*columns)`, `selectRaw(sql, bindings=None, alias=None)`, `selectSub(query, alias)`, `distinct()`.
-- Predicates: `where(column, *args)`, `orWhere(column, *args)`, `whereIn`/`orWhereIn`, `whereNotIn`/`orWhereNotIn`, `whereNull`/`orWhereNull`, `whereNotNull`/`orWhereNotNull`, `whereBetween`, `whereNotBetween`, `whereLike`, `whereNotLike`, `whereILike`, `whereNotILike`, `whereStartsWith`, `whereEndsWith`, `whereContains`, `whereRegexpMatch`, `whereColumn`, `orWhereColumn`, `whereRaw`, `orWhereRaw`, `whereExists`, `orWhereExists`, `whereNotExists`, and `orWhereNotExists`.
-- Joins and grouping: `join`, `leftJoin`, `rightJoin`, `fullJoin`, `crossJoin`, `joinSub`, `leftJoinSub`, `rightJoinSub`, `groupBy`, `having`, `orHaving`, and `havingRaw`.
-- Ordering and paging: `orderBy(column, direction='asc')`, `latest(column=None)`, `oldest(column=None)`, `limit(value)`, `offset(value)`, `take(value)`, `skip(value)`, `forPage(page, per_page=15)`, `lockForUpdate()`, and `sharedLock()`.
-- Set operations and execution: `union(query)`, `unionAll(query)`, `count(column='*')`, `exists()`, `doesntExist()`, `max(column)`, `min(column)`, `avg(column)`, `sum(column)`, `insert(values)`, `update(values)`, and `delete()`.
-
-Builder calls are fluent and return the builder except execution methods, which are async and return the type described by their operation (`int`, `bool`, aggregate result, or `InsertResult`). Invalid builder arguments can raise `InvalidQueryException`; database failures can raise database exceptions. Exact parameter annotations are declared in `orionis.orm.contracts.base_builder.IQueryBuilderBase` and implemented by `orionis.orm.query.base_builder.QueryBuilderBase`.
-
-### Relationships
-
-Relationship methods are declared on model instances and return query-capable relation objects:
-
-```python
-hasOne(self, related: type[TRelated], foreign_key: str | None = None, local_key: str | None = None) -> HasOneRelation[TRelated]
-hasMany(self, related: type[TRelated], foreign_key: str | None = None, local_key: str | None = None) -> HasManyRelation[TRelated]
-belongsTo(self, related: type[TRelated], foreign_key: str | None = None, owner_key: str | None = None) -> BelongsToRelation[TRelated]
-belongsToMany(self, related: type[TRelated], table: str | None = None, foreign_pivot_key: str | None = None, related_pivot_key: str | None = None, parent_key: str | None = None, related_key: str | None = None) -> BelongsToManyRelation[TRelated]
-```
-
-`HasOneRelation` returns one model or `None`; `HasManyRelation` and `BelongsToManyRelation` return `Collection`; `BelongsToRelation` returns one model or `None`. `BelongsToManyRelation` additionally provides async `attach(ids, attributes=None) -> int`, `detach(ids=None) -> int`, `sync(ids: Iterable[Any]) -> dict[str, list[Any]]`, and `toggle(ids: Iterable[Any]) -> dict[str, list[Any]]`, plus `wherePivot(column, *args)`.
-
-`setRelation(name, value) -> Model`, `getRelation(name, default=None) -> Any`, and `relationLoaded(name) -> bool` manage a model's in-memory loaded relation values. `withRelations(*names)` requests eager loading; unresolved relation names raise `RelationNotFoundException` during relation resolution.
-
-### Collections and pagination
-
-`Collection` is the framework-wide collection type, re-exported as `ModelCollection`. Their implementations are the same class (`ModelCollection = Collection`); the collection operations are defined in `orionis.support.types.collection`.
-
-`Paginator` is constructed as `Paginator(items: Collection, total: int, page: int, per_page: int) -> None`. It exposes `items() -> Collection`, `total() -> int`, `page() -> int`, `perPage() -> int`, `lastPage() -> int`, `hasNext() -> bool`, `hasPrevious() -> bool`, `toDict() -> dict[str, Any]`, and `toJson(**kwargs: Any) -> str`; `len(paginator)` is the number of items in the page.
-
-### Schema definitions and column types
-
-`ColumnDefinition` is the shared mutable fluent definition. Its methods are `primary()`, `nullable()`, `default(value)`, `unique()`, `index()`, `foreign(reference)`, `autoIncrement()`, and `comment(text)`, each returning the same `ColumnDefinition`; `hasDefault() -> bool` reports whether a default was set. `foreign` parses a `"table.column"` reference and raises `ValueError` for an invalid reference.
-
-`TableDefinition` is a frozen, slotted dataclass with fields `name`, `columns`, `primary_key`, `schema`, `comment`, `composite_primary_key`, `unique_constraints`, `foreign_keys`, and `indexes`. It offers `columnNames() -> tuple[str, ...]` and `hasColumn(name: str) -> bool`. `ColumnOptions` is a dataclass of type-specific SQL type options. Constraint value objects exported by `orionis.orm.schema` are `CompositeForeignKey`, `ForeignReference`, `TableIndex`, and `UniqueConstraint`; `ForeignReference.parse(reference: str) -> ForeignReference` parses a qualified column reference and `qualified() -> str` formats it.
-
-The root package exports the following logical schema type constructors. Constructors below match their `__init__` declarations (the classes also inherit the column fluent methods):
-
-| Class | Constructor signature |
-|---|---|
-| `BigInteger`, `Date`, `Integer`, `MatchType`, `SmallInteger`, `StrictBigInt`, `StrictInt`, `StrictSmallInt`, `Time` | `__init__(self) -> None` |
-| `Boolean` | `__init__(self, *, create_constraint: bool = False, name: str \| None = None) -> None` |
-| `DateTime` | `__init__(self, *, timezone: bool = False) -> None` |
-| `Double`, `Float`, `StrictDoublePrecision`, `StrictReal` | `__init__(self, precision: int \| None = None, *, asdecimal: bool = False, decimal_return_scale: int \| None = None) -> None` |
-| `Enum` | `__init__(self, *enums: str, name: str \| None = None, create_constraint: bool = False, native_enum: bool = True, length: int \| None = None, validate_strings: bool = False) -> None` |
-| `Interval` | `__init__(self, *, native: bool = True, second_precision: int \| None = None, day_precision: int \| None = None) -> None` |
-| `LargeBinary` | `__init__(self, length: int \| None = None) -> None` |
-| `Numeric` | `__init__(self, precision: int \| None = None, scale: int \| None = None, decimal_return_scale: int \| None = None, *, asdecimal: bool = True) -> None` |
-| `NumericCommon` | `__init__(self) -> None` |
-| `PickleType` | `__init__(self, protocol: int = 5, pickler: object \| None = None, impl: object \| None = None) -> None` |
-| `SchemaType` | `__init__(self, name: str \| None = None) -> None` |
-| `StrictArray` | `__init__(self, item_type: ColumnDefinition, *, as_tuple: bool = False, dimensions: int \| None = None, zero_indexes: bool = False) -> None` |
-| `StrictBinary`, `StrictBlob` | `__init__(self, length: int \| None = None) -> None` |
-| `StrictChar`, `StrictNChar` | `__init__(self, length: int \| None = None, collation: str \| None = None) -> None` |
-| `StrictClob`, `StrictNVarChar` | `__init__(self, length: int \| None = None, collation: str \| None = None) -> None` |
-| `StrictVarChar`, `String` | `__init__(self, length: int \| None = DEFAULT_STRING_LENGTH, collation: str \| None = None) -> None` |
-| `Text`, `Unicode`, `UnicodeText` | `__init__(self, length: int \| None = None, collation: str \| None = None) -> None` |
-| `StrictDecimal` | `__init__(self, precision: int \| None = DEFAULT_DECIMAL_PRECISION, scale: int \| None = DEFAULT_DECIMAL_SCALE, decimal_return_scale: int \| None = None, *, asdecimal: bool = True) -> None` |
-| `StrictJson` | `__init__(self, *, none_as_null: bool = False) -> None` |
-| `StrictTimestamp` | `__init__(self, *, timezone: bool = False) -> None` |
-| `StrictVarBinary` | `__init__(self, length: int \| None = None) -> None` |
-| `Uuid` | `__init__(self, *, as_uuid: bool = True, native_uuid: bool = True) -> None` |
-
-`ColumnType` describes the logical column kinds consumed by the SQL compiler.
-
-### Exceptions
-
-All ORM exceptions derive from `OrmException`: `OrmConfigurationException` (manager wiring is missing), `ModelNotFoundException` (a required lookup found no record), `MassAssignmentException` (mass assignment violates rules), `InvalidQueryException` (invalid query-builder arguments), `RelationNotFoundException` (a model relation cannot be resolved), and `ScopeNotFoundException` (a requested local scope is undeclared). Database execution can also raise exception types from `orionis.database.exceptions`, including `QueryException`.
+| Symbol | Verified import | Source | Declaration | Observed behavior |
+| --- | --- | --- | --- | --- |
+| BelongsToManyRelation | from orionis.orm import BelongsToManyRelation | [relations/__init__.py](../relations/__init__.py) | exported constant or alias | Exported public constant or alias. |
+| BelongsToRelation | from orionis.orm import BelongsToRelation | [relations/__init__.py](../relations/__init__.py) | exported constant or alias | Exported public constant or alias. |
+| BigInteger | from orionis.orm import BigInteger | [schema/types/__init__.py](../schema/types/__init__.py) | exported constant or alias | Exported public constant or alias. |
+| Boolean | from orionis.orm import Boolean | [schema/types/__init__.py](../schema/types/__init__.py) | exported constant or alias | Exported public constant or alias. |
+| Collection | from orionis.orm import Collection | [collections/collection.py](../collections/collection.py) | exported constant or alias | Exported public constant or alias. |
+| ColumnType | from orionis.orm import ColumnType | [schema/types/__init__.py](../schema/types/__init__.py) | exported constant or alias | Exported public constant or alias. |
+| ConnectionResolver | from orionis.orm import ConnectionResolver | [resolver.py](../resolver.py) | ConnectionResolver | Static bridge between the ORM and the database connection manager. The database service provider installs the manager here during boot; models and query builders resolve their connections through this class without ever touching the container or the SQL engine. |
+| ConnectionResolver.setManager | from orionis.orm import ConnectionResolver | [resolver.py](../resolver.py) | def setManager(cls, manager: IConnectionManager) -> None | Install the connection manager used by every model. Parameters ---------- manager : IConnectionManager Manager resolving named database connections. Returns ------- None This method does not return a value. |
+| ConnectionResolver.manager | from orionis.orm import ConnectionResolver | [resolver.py](../resolver.py) | def manager(cls) -> IConnectionManager | Return the installed connection manager. Returns ------- IConnectionManager Manager resolving named database connections. Raises ------ OrmConfigurationException If no manager has been installed yet. |
+| ConnectionResolver.connection | from orionis.orm import ConnectionResolver | [resolver.py](../resolver.py) | def connection(cls, name: str / None) -> IConnection | Resolve a database connection by name. Parameters ---------- name : str or None, optional Connection name, or ``None`` for the default connection. Returns ------- IConnection Resolved connection. Raises ------ OrmConfigurationException If no manager has been installed yet. ConnectionNotFoundException If the connection is not declared in the configuration. |
+| ConnectionResolver.clear | from orionis.orm import ConnectionResolver | [resolver.py](../resolver.py) | def clear(cls) -> None | Remove the installed manager, mainly for test isolation. Returns ------- None This method does not return a value. |
+| Date | from orionis.orm import Date | [schema/types/__init__.py](../schema/types/__init__.py) | exported constant or alias | Exported public constant or alias. |
+| DateTime | from orionis.orm import DateTime | [schema/types/__init__.py](../schema/types/__init__.py) | exported constant or alias | Exported public constant or alias. |
+| Double | from orionis.orm import Double | [schema/types/__init__.py](../schema/types/__init__.py) | exported constant or alias | Exported public constant or alias. |
+| Enum | from orionis.orm import Enum | [schema/types/__init__.py](../schema/types/__init__.py) | exported constant or alias | Exported public constant or alias. |
+| Float | from orionis.orm import Float | [schema/types/__init__.py](../schema/types/__init__.py) | exported constant or alias | Exported public constant or alias. |
+| HasManyRelation | from orionis.orm import HasManyRelation | [relations/__init__.py](../relations/__init__.py) | exported constant or alias | Exported public constant or alias. |
+| HasOneRelation | from orionis.orm import HasOneRelation | [relations/__init__.py](../relations/__init__.py) | exported constant or alias | Exported public constant or alias. |
+| Integer | from orionis.orm import Integer | [schema/types/__init__.py](../schema/types/__init__.py) | exported constant or alias | Exported public constant or alias. |
+| Interval | from orionis.orm import Interval | [schema/types/__init__.py](../schema/types/__init__.py) | exported constant or alias | Exported public constant or alias. |
+| InvalidQueryException | from orionis.orm import InvalidQueryException | [exceptions/__init__.py](../exceptions/__init__.py) | InvalidQueryException | Raised when a query builder call receives invalid arguments. |
+| LargeBinary | from orionis.orm import LargeBinary | [schema/types/__init__.py](../schema/types/__init__.py) | exported constant or alias | Exported public constant or alias. |
+| MassAssignmentException | from orionis.orm import MassAssignmentException | [exceptions/__init__.py](../exceptions/__init__.py) | MassAssignmentException | Raised when a mass assignment violates the fillable/guarded rules. |
+| MatchType | from orionis.orm import MatchType | [schema/types/__init__.py](../schema/types/__init__.py) | exported constant or alias | Exported public constant or alias. |
+| Model | from orionis.orm import Model | [model.py](../model.py) | Model | Base class of the Orionis active-record models. Concrete models declare their columns with the fluent schema types and interact with the database exclusively through the Orionis query builder; the underlying SQL engine never surfaces. Class-level entry points such as ``where`` or ``orderBy`` start a builder implicitly. |
+| Model.query | from orionis.orm import Model | [model.py](../model.py) | def query(cls) -> ModelQueryBuilder[Any] | Start a new query builder bound to this model. Returns ------- ModelQueryBuilder Fresh builder targeting the model table. |
+| Model.getConnection | from orionis.orm import Model | [model.py](../model.py) | def getConnection(cls) -> IConnection | Resolve the connection configured for this model. Returns ------- IConnection Connection used for model queries and persistence. Raises ------ OrmConfigurationException If no connection manager has been installed. ConnectionNotFoundException If the configured connection is not declared. |
+| Model.addGlobalScope | from orionis.orm import Model | [model.py](../model.py) | def addGlobalScope(cls, name: str, scope: Callable[[ModelQueryBuilder[Any]], None]) -> type[Model] | Register a constraint applied to every query of this model. Parameters ---------- name : str Name the scope is registered under, used to disable it later with ``withoutGlobalScope``. scope : Callable Callable receiving the builder and constraining it in place. Returns ------- type The model class, enabling fluent chaining. |
+| Model.removeGlobalScope | from orionis.orm import Model | [model.py](../model.py) | def removeGlobalScope(cls, name: str) -> type[Model] | Unregister a previously added global scope. Parameters ---------- name : str Name the scope was registered under. Returns ------- type The model class, enabling fluent chaining. |
+| Model.all | from orionis.orm import Model | [model.py](../model.py) | async def all(cls) -> Collection | Retrieve every row of the model table. Returns ------- Collection Collection of hydrated model instances. |
+| Model.find | from orionis.orm import Model | [model.py](../model.py) | async def find(cls, key: Any) -> Model / None | Retrieve a model by its primary key. Parameters ---------- key : Any Primary key value to look up. Returns ------- Model or None Matching model, or ``None`` when absent. |
+| Model.findOrFail | from orionis.orm import Model | [model.py](../model.py) | async def findOrFail(cls, key: Any) -> Model | Retrieve a model by primary key or raise when absent. Parameters ---------- key : Any Primary key value to look up. Returns ------- Model Matching model. Raises ------ ModelNotFoundException If no record matches the key. |
+| Model.first | from orionis.orm import Model | [model.py](../model.py) | async def first(cls) -> Model / None | Retrieve the first row of the model table. Returns ------- Model or None First model, or ``None`` when the table is empty. |
+| Model.firstOrFail | from orionis.orm import Model | [model.py](../model.py) | async def firstOrFail(cls) -> Model | Retrieve the first row or raise when the table is empty. Returns ------- Model First model. Raises ------ ModelNotFoundException If the table has no rows. |
+| Model.create | from orionis.orm import Model | [model.py](../model.py) | async def create(cls, attributes: dict[str, Any]) -> Model | Create, persist, and return a new model. Parameters ---------- attributes : dict Attributes to mass assign honoring the fillable rules. Returns ------- Model Persisted model instance. Raises ------ MassAssignmentException If an attribute violates the mass assignment rules. QueryException If the insert statement fails. |
+| Model.destroy | from orionis.orm import Model | [model.py](../model.py) | async def destroy(cls, *keys) -> int | Delete the models matching the given primary keys. Parameters ---------- *keys : Any Primary key values to delete. Returns ------- int Number of deleted rows. |
+| Model.save | from orionis.orm import Model | [model.py](../model.py) | async def save(self) -> bool | Persist the model, inserting or updating as appropriate. New models are inserted, receiving their generated primary key; existing models write only their dirty attributes. Timestamps are maintained automatically when enabled, and the ``saving``, ``creating``/``updating``, ``created``/``updated`` and ``saved`` events are dispatched around the write. Returns ------- bool ``True`` when the operation succeeds or nothing changed, ``False`` when a listener vetoed the write. Raises ------ QueryException If the statement fails to execute. |
+| Model.update | from orionis.orm import Model | [model.py](../model.py) | async def update(self, attributes: dict[str, Any]) -> bool | Mass assign the given attributes and persist the model. Parameters ---------- attributes : dict Attributes to assign honoring the fillable rules. Returns ------- bool ``True`` when the operation succeeds or nothing changed. Raises ------ MassAssignmentException If an attribute violates the mass assignment rules. QueryException If the statement fails to execute. |
+| Model.delete | from orionis.orm import Model | [model.py](../model.py) | async def delete(self) -> bool | Delete the model row, honoring soft deletes when enabled. Models declaring ``soft_deletes`` stamp their delete column instead of removing the row; every other model is deleted permanently. Returns ------- bool ``True`` when a row was deleted or stamped, ``False`` for unsaved models or when a listener vetoed the operation. Raises ------ QueryException If the statement fails to execute. |
+| Model.freshTimestamp | from orionis.orm import Model | [model.py](../model.py) | def freshTimestamp(cls) -> datetime | Produce the current timestamp for persistence operations. Timezone-aware timestamps are produced when the update column is a timezone-aware type, naive UTC otherwise. Returns ------- datetime Current UTC timestamp. |
+| Model.newUniqueId | from orionis.orm import Model | [model.py](../model.py) | def newUniqueId(cls) -> Any | Produce a client-generated primary key value. Overridable by models needing a different identifier scheme, such as ULIDs or prefixed keys. Returns ------- Any Fresh unique identifier. |
+| ModelCollection | from orionis.orm import ModelCollection | [collections/collection.py](../collections/collection.py) | exported constant or alias | Exported public constant or alias. |
+| ModelNotFoundException | from orionis.orm import ModelNotFoundException | [exceptions/__init__.py](../exceptions/__init__.py) | ModelNotFoundException | Raised when a model lookup that must succeed finds no records. |
+| ModelQueryBuilder | from orionis.orm import ModelQueryBuilder | [query/builder.py](../query/builder.py) | ModelQueryBuilder | Fluent query builder bound to a model class. It adds model awareness on top of :class:`QueryBuilderBase`: rows are hydrated into model instances, written values go through the declared casts, timestamps are maintained, and relationships can be eager loaded. The query language itself is entirely inherited, so a model query and a ``DB.table(...)`` query compile identically. |
+| ModelQueryBuilder.withRelations | from orionis.orm import ModelQueryBuilder | [query/builder.py](../query/builder.py) | def withRelations(self, *names) -> Self | Eager load the given relationships alongside the query. Each relationship is loaded once in declaration order; :meth:`load` is an alias. Parameters ---------- *names : str Relationship method names declared on the model. Returns ------- ModelQueryBuilder The same builder, enabling fluent chaining. |
+| ModelQueryBuilder.load | from orionis.orm import ModelQueryBuilder | [query/builder.py](../query/builder.py) | def load(self, *names) -> Self | Eager load the given relationships; alias of :meth:`withRelations`. Parameters ---------- *names : str Relationship method names declared on the model. Returns ------- ModelQueryBuilder The same builder, enabling fluent chaining. |
+| ModelQueryBuilder.withoutGlobalScope | from orionis.orm import ModelQueryBuilder | [query/builder.py](../query/builder.py) | def withoutGlobalScope(self, name: str) -> Self | Disable one global scope for this query. Parameters ---------- name : str Name the global scope was registered under. Returns ------- ModelQueryBuilder The same builder, enabling fluent chaining. |
+| ModelQueryBuilder.withoutGlobalScopes | from orionis.orm import ModelQueryBuilder | [query/builder.py](../query/builder.py) | def withoutGlobalScopes(self, *names) -> Self | Disable several global scopes, or every one of them. Parameters ---------- *names : str Scope names to disable; empty disables all of them. Returns ------- ModelQueryBuilder The same builder, enabling fluent chaining. |
+| ModelQueryBuilder.scope | from orionis.orm import ModelQueryBuilder | [query/builder.py](../query/builder.py) | def scope(self, name: str, *args, **kwargs) -> Self | Apply a local scope by name. Useful when the scope name collides with a builder method; the attribute form (``query.active()``) is the common one. Parameters ---------- name : str Scope name, without the ``scope`` prefix. *args : Any Positional arguments forwarded to the scope. **kwargs : Any Keyword arguments forwarded to the scope. Returns ------- ModelQueryBuilder The same builder, enabling fluent chaining. Raises ------ ScopeNotFoundException If the model declares no such scope. |
+| ModelQueryBuilder.withTrashed | from orionis.orm import ModelQueryBuilder | [query/builder.py](../query/builder.py) | def withTrashed(self) -> Self | Include soft deleted rows in the query results. Returns ------- ModelQueryBuilder The same builder, enabling fluent chaining. |
+| ModelQueryBuilder.onlyTrashed | from orionis.orm import ModelQueryBuilder | [query/builder.py](../query/builder.py) | def onlyTrashed(self) -> Self | Restrict the query to soft deleted rows. Returns ------- ModelQueryBuilder The same builder, enabling fluent chaining. |
+| ModelQueryBuilder.withoutTrashed | from orionis.orm import ModelQueryBuilder | [query/builder.py](../query/builder.py) | def withoutTrashed(self) -> Self | Exclude soft deleted rows; the default behavior. Returns ------- ModelQueryBuilder The same builder, enabling fluent chaining. |
+| ModelQueryBuilder.restore | from orionis.orm import ModelQueryBuilder | [query/builder.py](../query/builder.py) | async def restore(self) -> int | Restore every soft deleted row matched by the query. Returns ------- int Number of restored rows. |
+| ModelQueryBuilder.forceDelete | from orionis.orm import ModelQueryBuilder | [query/builder.py](../query/builder.py) | async def forceDelete(self) -> int | Delete the matched rows permanently, ignoring soft deletes. Returns ------- int Number of affected rows. |
+| ModelQueryBuilder.delete | from orionis.orm import ModelQueryBuilder | [query/builder.py](../query/builder.py) | async def delete(self) -> int | Delete the matched rows, honoring soft deletes when enabled. Returns ------- int Number of affected rows. |
+| ModelQueryBuilder.get | from orionis.orm import ModelQueryBuilder | [query/builder.py](../query/builder.py) | async def get(self) -> Collection | Execute the query and hydrate every matching row. Returns ------- Collection Collection of hydrated model instances. Raises ------ QueryException If the statement fails to compile or execute. RelationNotFoundException If an eager-loaded relationship name does not resolve to one. |
+| ModelQueryBuilder.first | from orionis.orm import ModelQueryBuilder | [query/builder.py](../query/builder.py) | async def first(self) -> TModel / None | Execute the query and hydrate only the first matching row. Returns ------- Model or None First matching model, or ``None`` without matches. Raises ------ QueryException If the statement fails to compile or execute. RelationNotFoundException If an eager-loaded relationship name does not resolve to one. |
+| ModelQueryBuilder.firstOrFail | from orionis.orm import ModelQueryBuilder | [query/builder.py](../query/builder.py) | async def firstOrFail(self) -> TModel | Return the first matching row or raise when none exists. Returns ------- Model First matching model. Raises ------ ModelNotFoundException If the query yields no rows. |
+| ModelQueryBuilder.find | from orionis.orm import ModelQueryBuilder | [query/builder.py](../query/builder.py) | async def find(self, key: Any) -> TModel / None | Retrieve a model by its primary key. Parameters ---------- key : Any Primary key value to look up. Returns ------- Model or None Matching model, or ``None`` when absent. |
+| ModelQueryBuilder.findOrFail | from orionis.orm import ModelQueryBuilder | [query/builder.py](../query/builder.py) | async def findOrFail(self, key: Any) -> TModel | Retrieve a model by primary key or raise when absent. Parameters ---------- key : Any Primary key value to look up. Returns ------- Model Matching model. Raises ------ ModelNotFoundException If no record matches the key. |
+| ModelQueryBuilder.value | from orionis.orm import ModelQueryBuilder | [query/builder.py](../query/builder.py) | async def value(self, column: str) -> Any | Return a single column value of the first matching row. Parameters ---------- column : str Column whose value is returned. Returns ------- Any Column value, or ``None`` without matches. |
+| ModelQueryBuilder.pluck | from orionis.orm import ModelQueryBuilder | [query/builder.py](../query/builder.py) | async def pluck(self, column: str) -> Collection | Return one column of every matching row. Parameters ---------- column : str Column whose values are collected. Returns ------- Collection Collection of column values. |
+| ModelQueryBuilder.paginate | from orionis.orm import ModelQueryBuilder | [query/builder.py](../query/builder.py) | async def paginate(self, page: int, per_page: int) -> Paginator | Execute the query returning a length-aware page of results. Parameters ---------- page : int, optional Page number starting at 1. Defaults to the first page. per_page : int, optional Number of items per page. Defaults to 15. Returns ------- Paginator Page of hydrated models with pagination metadata. Raises ------ InvalidQueryException If the page or page size are not positive integers. |
+| ModelQueryBuilder.clone | from orionis.orm import ModelQueryBuilder | [query/builder.py](../query/builder.py) | def clone(self) -> Self | Return an independent copy of this builder. Returns ------- ModelQueryBuilder Detached copy carrying its own plan and eager-load list. |
+| Numeric | from orionis.orm import Numeric | [schema/types/__init__.py](../schema/types/__init__.py) | exported constant or alias | Exported public constant or alias. |
+| NumericCommon | from orionis.orm import NumericCommon | [schema/types/__init__.py](../schema/types/__init__.py) | exported constant or alias | Exported public constant or alias. |
+| OrmConfigurationException | from orionis.orm import OrmConfigurationException | [exceptions/__init__.py](../exceptions/__init__.py) | OrmConfigurationException | Raised when the ORM is used before its wiring is complete. |
+| OrmException | from orionis.orm import OrmException | [exceptions/__init__.py](../exceptions/__init__.py) | OrmException | Base exception for all ORM-related errors. |
+| Paginator | from orionis.orm import Paginator | [collections/paginator.py](../collections/paginator.py) | Paginator | Length-aware page of query results. Wraps a :class:`Collection` of items together with the pagination metadata required to render page controls: total row count, current page, page size, and derived navigation flags. |
+| Paginator.items | from orionis.orm import Paginator | [collections/paginator.py](../collections/paginator.py) | def items(self) -> Collection | Return the items for the current page. Returns ------- Collection Items of the current page. |
+| Paginator.total | from orionis.orm import Paginator | [collections/paginator.py](../collections/paginator.py) | def total(self) -> int | Return the total number of rows across all pages. Returns ------- int Total row count. |
+| Paginator.page | from orionis.orm import Paginator | [collections/paginator.py](../collections/paginator.py) | def page(self) -> int | Return the current page number. Returns ------- int Current page, starting at 1. |
+| Paginator.perPage | from orionis.orm import Paginator | [collections/paginator.py](../collections/paginator.py) | def perPage(self) -> int | Return the configured page size. Returns ------- int Number of items per page. |
+| Paginator.lastPage | from orionis.orm import Paginator | [collections/paginator.py](../collections/paginator.py) | def lastPage(self) -> int | Return the number of the last available page. Returns ------- int Last page number, never lower than 1. |
+| Paginator.hasNext | from orionis.orm import Paginator | [collections/paginator.py](../collections/paginator.py) | def hasNext(self) -> bool | Report whether a page exists after the current one. Returns ------- bool ``True`` when the current page is not the last. |
+| Paginator.hasPrevious | from orionis.orm import Paginator | [collections/paginator.py](../collections/paginator.py) | def hasPrevious(self) -> bool | Report whether a page exists before the current one. Returns ------- bool ``True`` when the current page is not the first. |
+| Paginator.toDict | from orionis.orm import Paginator | [collections/paginator.py](../collections/paginator.py) | def toDict(self) -> dict[str, Any] | Serialize the page and its metadata into a dictionary. Returns ------- dict Dictionary with items and pagination metadata. |
+| Paginator.toJson | from orionis.orm import Paginator | [collections/paginator.py](../collections/paginator.py) | def toJson(self, **kwargs) -> str | Serialize the page and its metadata into a JSON string. Parameters ---------- **kwargs : Any Additional keyword arguments forwarded to ``json.dumps``. Returns ------- str JSON representation of the page. |
+| PickleType | from orionis.orm import PickleType | [schema/types/__init__.py](../schema/types/__init__.py) | exported constant or alias | Exported public constant or alias. |
+| Relation | from orionis.orm import Relation | [relations/__init__.py](../relations/__init__.py) | exported constant or alias | Exported public constant or alias. |
+| RelationNotFoundException | from orionis.orm import RelationNotFoundException | [exceptions/__init__.py](../exceptions/__init__.py) | RelationNotFoundException | Raised when a relationship name cannot be resolved on a model. |
+| SchemaType | from orionis.orm import SchemaType | [schema/types/__init__.py](../schema/types/__init__.py) | exported constant or alias | Exported public constant or alias. |
+| SmallInteger | from orionis.orm import SmallInteger | [schema/types/__init__.py](../schema/types/__init__.py) | exported constant or alias | Exported public constant or alias. |
+| StrictArray | from orionis.orm import StrictArray | [schema/types/__init__.py](../schema/types/__init__.py) | exported constant or alias | Exported public constant or alias. |
+| StrictBigInt | from orionis.orm import StrictBigInt | [schema/types/__init__.py](../schema/types/__init__.py) | exported constant or alias | Exported public constant or alias. |
+| StrictBinary | from orionis.orm import StrictBinary | [schema/types/__init__.py](../schema/types/__init__.py) | exported constant or alias | Exported public constant or alias. |
+| StrictBlob | from orionis.orm import StrictBlob | [schema/types/__init__.py](../schema/types/__init__.py) | exported constant or alias | Exported public constant or alias. |
+| StrictChar | from orionis.orm import StrictChar | [schema/types/__init__.py](../schema/types/__init__.py) | exported constant or alias | Exported public constant or alias. |
+| StrictClob | from orionis.orm import StrictClob | [schema/types/__init__.py](../schema/types/__init__.py) | exported constant or alias | Exported public constant or alias. |
+| StrictDecimal | from orionis.orm import StrictDecimal | [schema/types/__init__.py](../schema/types/__init__.py) | exported constant or alias | Exported public constant or alias. |
+| StrictDoublePrecision | from orionis.orm import StrictDoublePrecision | [schema/types/__init__.py](../schema/types/__init__.py) | exported constant or alias | Exported public constant or alias. |
+| StrictInt | from orionis.orm import StrictInt | [schema/types/__init__.py](../schema/types/__init__.py) | exported constant or alias | Exported public constant or alias. |
+| StrictJson | from orionis.orm import StrictJson | [schema/types/__init__.py](../schema/types/__init__.py) | exported constant or alias | Exported public constant or alias. |
+| StrictNChar | from orionis.orm import StrictNChar | [schema/types/__init__.py](../schema/types/__init__.py) | exported constant or alias | Exported public constant or alias. |
+| StrictNVarChar | from orionis.orm import StrictNVarChar | [schema/types/__init__.py](../schema/types/__init__.py) | exported constant or alias | Exported public constant or alias. |
+| StrictReal | from orionis.orm import StrictReal | [schema/types/__init__.py](../schema/types/__init__.py) | exported constant or alias | Exported public constant or alias. |
+| StrictSmallInt | from orionis.orm import StrictSmallInt | [schema/types/__init__.py](../schema/types/__init__.py) | exported constant or alias | Exported public constant or alias. |
+| StrictTimestamp | from orionis.orm import StrictTimestamp | [schema/types/__init__.py](../schema/types/__init__.py) | exported constant or alias | Exported public constant or alias. |
+| StrictVarBinary | from orionis.orm import StrictVarBinary | [schema/types/__init__.py](../schema/types/__init__.py) | exported constant or alias | Exported public constant or alias. |
+| StrictVarChar | from orionis.orm import StrictVarChar | [schema/types/__init__.py](../schema/types/__init__.py) | exported constant or alias | Exported public constant or alias. |
+| String | from orionis.orm import String | [schema/types/__init__.py](../schema/types/__init__.py) | exported constant or alias | Exported public constant or alias. |
+| Text | from orionis.orm import Text | [schema/types/__init__.py](../schema/types/__init__.py) | exported constant or alias | Exported public constant or alias. |
+| Time | from orionis.orm import Time | [schema/types/__init__.py](../schema/types/__init__.py) | exported constant or alias | Exported public constant or alias. |
+| Unicode | from orionis.orm import Unicode | [schema/types/__init__.py](../schema/types/__init__.py) | exported constant or alias | Exported public constant or alias. |
+| UnicodeText | from orionis.orm import UnicodeText | [schema/types/__init__.py](../schema/types/__init__.py) | exported constant or alias | Exported public constant or alias. |
+| Uuid | from orionis.orm import Uuid | [schema/types/__init__.py](../schema/types/__init__.py) | exported constant or alias | Exported public constant or alias. |
 
 ## Usage examples
 
-These snippets use the public package imports. Run database operations after the Orionis application has booted and the corresponding tables have been created.
+    from orionis.orm import BelongsToManyRelation
 
-### Common model query
+The import path matches the API table. Import status: executed successfully under Python 3.14.3.
 
-```python
-from orionis.orm import Integer, Model, String
+## Design characteristics
 
+The package uses an explicit public surface. Private names are excluded; declarations link to their concrete owner.
 
-class User(Model):
-    id = Integer().primary().autoIncrement()
-    name = String()
-    timestamps = False
+## Performance and concurrency
 
-
-async def active_users():
-    return await User.query().where("name", "Ada").orderBy("name").get()
-```
-
-### Handle a missing row
-
-```python
-from orionis.orm import Integer, Model, String, ModelNotFoundException
-
-
-class User(Model):
-    id = Integer().primary().autoIncrement()
-    name = String()
-    timestamps = False
-
-
-async def load_user(user_id: int):
-    try:
-        return await User.findOrFail(user_id)
-    except ModelNotFoundException:
-        return None
-```
-
-### Integrate a relationship
-
-```python
-from orionis.orm import HasManyRelation, Integer, Model, String
-
-
-class Team(Model):
-    id = Integer().primary().autoIncrement()
-    name = String()
-    timestamps = False
-
-    def members(self) -> HasManyRelation["Member"]:
-        return self.hasMany(Member)
-
-
-class Member(Model):
-    id = Integer().primary().autoIncrement()
-    team_id = Integer()
-    name = String()
-    timestamps = False
-
-
-async def members_for(team_id: int):
-    team = await Team.findOrFail(team_id)
-    return await team.members().get()
-```
-
-## Performance and concurrency considerations
-
-- Model instances use `__slots__`; common model metadata is collected once by `ModelMeta` when each model class is created.
-- `TableDefinition` is a frozen, slotted dataclass; column definitions themselves are mutable fluent objects.
-- Database I/O is asynchronous through Orionis connection abstractions. The ORM code does not define its own thread-safety guarantee or lock around its shared connection resolver.
-- A model query returns all selected rows in a `Collection`; pagination limits the queried page and separately exposes the reported total.
-- Eager loading batches relation resolution across a list of models. No explicit ORM-level memory or CPU bound is specified in the source.
+No uniform guarantee is declared at package level. Inspect each linked file for I/O, coroutines, caches, locks, and shared state.
 
 ## Compatibility notes
 
-- The package declares `requires-python = ">=3.14"` in `pyproject.toml`. The source uses generic type parameter syntax such as `def hasMany[TRelated: "Model"](...)`; the supported minimum is set by package metadata.
-- SQL type wrappers and schema descriptions are translated by Orionis's database compiler; this module does not promise that every database engine supports every logical type or query operation.
-- Optional drivers are selected by the database engine: MySQL (`orionis[mysql]`), PostgreSQL (`orionis[pgsql]`), Oracle (`orionis[oracle]`), and SQL Server (`orionis[sqlserver]`). The source package metadata defines their dependency constraints.
-> ⚠️ Not specified in source code: engine-specific SQL support and concurrency guarantees beyond the asynchronous connection interfaces.
+Declared minimum: Python 3.14. Validation used Python 3.14.3. Dependency bounds are in pyproject.toml.
+
+## Verification and limitations
+
+Python files were analysed and exports verified. Failures from dependencies, callbacks, I/O, or configuration may propagate and are not presented as exhaustive.

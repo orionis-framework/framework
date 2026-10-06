@@ -1,396 +1,327 @@
-# `orionis.aio`
+# orionis.aio
 
-> Thread-safe, platform-aware `asyncio` event loop manager exposed through a single fully static class.
+> Select event loops, run native coroutines, offload callables, and schedule tasks.
 
-🇪🇸 Versión en español: [README.es.md](README.es.md)
+Spanish version: [README.es.md](README.es.md). Agent entry point:
+[SKILL.md](SKILL.md).
 
 ## Table of contents
 
-- [Functional description](#functional-description)
-  - [Where it fits in the framework](#where-it-fits-in-the-framework)
-  - [Module map](#module-map)
-  - [Loop factory resolution](#loop-factory-resolution)
-  - [Design decisions](#design-decisions)
+- [Functional overview](#functional-overview)
+- [Module structure](#module-structure)
 - [API reference](#api-reference)
-  - [`Loop`](#loop)
-  - [Class state](#class-state)
-  - [`Loop.getEventLoop()`](#loopgeteventloop)
-  - [`Loop.run()`](#looprun)
-  - [`Loop.runSync()`](#looprunsync)
-  - [`Loop.execute()`](#loopexecute)
-  - [`Loop.createTask()`](#loopcreatetask)
-  - [`Loop.eventLoopContext()`](#loopeventloopcontext)
-  - [`Loop.isLoopRunning()`](#loopislooprunning)
-  - [Internal helpers](#internal-helpers)
+- [Loop](#loop)
+- [Loop.getEventLoop()](#loopgeteventloop)
+- [Loop.run()](#looprun)
+- [Loop.runSync()](#looprunsync)
+- [Loop.execute()](#loopexecute)
+- [Loop.createTask()](#loopcreatetask)
+- [Loop.eventLoopContext()](#loopeventloopcontext)
+- [Loop.isLoopRunning()](#loopislooprunning)
 - [Usage examples](#usage-examples)
-  - [1. Application entry point](#1-application-entry-point)
-  - [2. Calling async code from synchronous code](#2-calling-async-code-from-synchronous-code)
-  - [3. Running a blocking function from a coroutine](#3-running-a-blocking-function-from-a-coroutine)
-  - [4. Scheduling a background task](#4-scheduling-a-background-task)
-  - [5. Managing a loop lifecycle with cleanup](#5-managing-a-loop-lifecycle-with-cleanup)
-  - [6. Rejected arguments](#6-rejected-arguments)
-- [Performance and concurrency considerations](#performance-and-concurrency-considerations)
+- [1. Run an entry-point coroutine](#1-run-an-entry-point-coroutine)
+- [2. Bridge from synchronous code](#2-bridge-from-synchronous-code)
+- [3. Execute both kinds of callable](#3-execute-both-kinds-of-callable)
+- [4. Schedule and join named tasks](#4-schedule-and-join-named-tasks)
+- [5. Clean up a stopped loop](#5-clean-up-a-stopped-loop)
+- [6. Handle rejected inputs and nested execution](#6-handle-rejected-inputs-and-nested-execution)
+- [7. Integrate with FreezeThaw](#7-integrate-with-freezethaw)
+- [8. Process temporary JSON files concurrently](#8-process-temporary-json-files-concurrently)
+- [Design characteristics](#design-characteristics)
+- [Performance and concurrency](#performance-and-concurrency)
 - [Compatibility notes](#compatibility-notes)
+- [Verification and limitations](#verification-and-limitations)
 
-## Functional description
+## Functional overview
 
-`orionis.aio` owns the event loop lifecycle for the framework: it picks the
-fastest loop implementation available on the current platform, caches one loop
-per thread, bridges synchronous and asynchronous code in both directions, and
-cancels pending tasks when a managed context exits. Everything is exposed
-through one class, `Loop`, whose members are all `@staticmethod` or
-`@classmethod`.
+`orionis.aio` exposes `Loop` to select or obtain an event loop, run a native
+coroutine synchronously, dispatch callables asynchronously, and create tasks.
+Its context manager conditionally cancels pending tasks on a stopped loop.
+The implementation uses the standard library and lazily detects `uvloop`;
+no additional setup beyond the framework installation is required.
 
-### Where it fits in the framework
+Verified direct consumers, not an exhaustive catalog:
 
-`orionis/aio/loop.py` imports only the standard library (`asyncio`,
-`concurrent.futures`, `functools`, `inspect`, `sys`, `threading`, `types`,
-`contextlib`, `typing`); it has **no dependency on any other Orionis module**,
-which makes it importable from anywhere without circular-import risk.
-
-Direct consumers inside the framework:
-
-| Consumer | Member used | Purpose |
-| --- | --- | --- |
-| `reactor` (CLI entry point at the repository root) | `Loop.run(...)` | Runs `app.handleCommand(sys.argv)` and feeds its result to `sys.exit`. |
-| `orionis/schemas/rules/unique.py` | `Loop.runSync(...)` | Bridges the synchronous validation-rule pipeline to the async ORM. |
-
-The module is **not** registered in the container and has **no facade and no
-service provider**: it is imported and used directly.
-
-### Module map
-
-| File | Contents |
+| Source and symbol | Relationship |
 | --- | --- |
-| `orionis/aio/__init__.py` | Re-exports `Loop`; `__all__ == ["Loop"]`. |
-| `orionis/aio/loop.py` | The `Loop` class: class-level state, four internal helpers and seven public members. |
+| [reactor](../../../reactor), `__main__` | Passes `app.handleCommand(sys.argv)` to `Loop.run()` and its result to `sys.exit()`. |
+| [orionis/schemas/rules/unique.py](../../schemas/rules/unique.py), `Unique.enforce()` | Uses `Loop.runSync()` for synchronous uniqueness validation; its asynchronous path awaits the current connection instead. |
+| [orionis/mail/composer.py](../../mail/composer.py), `MailComposer.prepare()` | Awaits `Loop.execute()` to compose MIME data with its synchronous `_compose()` helper. |
 
-### Loop factory resolution
+These callers import `Loop` directly. The assigned module contains no provider,
+facade, contract class, or configuration file. The integration example uses
+[orionis/support/structures/freezer.py](../../support/structures/freezer.py),
+`FreezeThaw.freeze()` and `FreezeThaw.thaw()`, without booting an application.
 
-`_getLoopFactory()` resolves the loop factory **once per process** and caches
-the result:
+## Module structure
 
-1. `uvloop.new_event_loop` — only when `_IS_WIN32` is `False` and `import
-   uvloop` succeeds.
-2. `asyncio.ProactorEventLoop` — only when `_IS_WIN32` is `True`; guarded by
-   `contextlib.suppress(AttributeError)` so a runtime that does not expose it
-   falls through.
-3. `None` — meaning "let asyncio decide"; callers then use
-   `asyncio.new_event_loop()`.
+Paths in link labels are relative to the repository root; link destinations
+are relative to this document.
 
-Observed on this repository's platform (`sys.platform == "win32"`,
-CPython 3.14):
+| Inspected file | Responsibility and public symbols |
+| --- | --- |
+| [orionis/aio/__init__.py](../__init__.py) | Re-exports the implementation's `Loop` by identity; `__all__ = ["Loop"]`. |
+| [orionis/aio/loop.py](../loop.py) | Defines `Loop`, its seven public methods, four private helpers, and class-level caches and locks. |
 
-```text
-Loop._IS_WIN32:      True
-Loop._detectUvloop(): None
-Loop._getLoopFactory(): <class 'asyncio.windows_events.ProactorEventLoop'>
-Loop.getEventLoop():  ProactorEventLoop instance
-```
-
-### Design decisions
-
-The following notes describe decisions already present in the code; they are
-informational, not recommendations.
-
-- **Class-as-namespace, no instances.** Every attribute is a `ClassVar` and
-  every member is a `@staticmethod`/`@classmethod`, so the class itself is the
-  shared manager. `Loop` declares no `__init__` and no `__slots__`, so
-  `Loop()` does succeed and produces an object with a `__dict__` — such an
-  instance simply adds nothing over the class.
-- **One loop per thread.** `_loop_local` is a `threading.local()`, so a loop
-  created in one thread is never handed to another.
-- **Double-checked locking twice.** `_detectUvloop()` (module import) and
-  `_getSyncExecutor()` (thread-pool creation) read a guard outside the lock and
-  re-read it inside, so the expensive operation runs at most once even when
-  several threads race on the first call.
-- **Single-worker bridging pool.** `runSync()` uses a
-  `ThreadPoolExecutor(max_workers=1, thread_name_prefix="orionis-sync")` to run
-  a coroutine on its own loop when the caller already sits inside one.
-- **Public API over private internals.** `_getRunningLoop()` wraps
-  `asyncio.get_running_loop()` in `try/except RuntimeError` instead of reading
-  CPython internals.
-- **Cleanup never raises.** `eventLoopContext()` gathers cancelled tasks with
-  `return_exceptions=True` inside `contextlib.suppress(RuntimeError,
-  asyncio.CancelledError)`, so the `finally` block cannot mask the exception
-  that left the `with` body.
+Both Python files were inspected in full. There are no Python subpackages or
+runtime resource files in this module. Its three documentation files are
+reference material, not runtime inputs.
 
 ## API reference
 
-### `Loop`
+The following declaration blocks are **literal reference fragments**, including
+decorators and source comments. They omit bodies and are not executable scripts.
+`cls` is supplied by the `@classmethod` descriptor, not by the caller. Exception
+lists distinguish explicit checks from propagated failures and are not exhaustive
+when a callable, task factory, event-loop factory, or executor is involved.
+
+### Loop
+
+Source: [orionis/aio/loop.py](../loop.py#L15), `Loop`. Package export:
+[orionis/aio/__init__.py](../__init__.py).
 
 ```python
 class Loop:
-    ...
 ```
 
-Import it from either the package or the implementation module:
+Use `from orionis.aio import Loop` or `from orionis.aio.loop import Loop`.
+The class has no base class, explicit constructor, properties, overloads, or
+custom special methods. All eleven declared methods are class or static methods;
+only the seven without an underscore are consumer API.
 
-```python
-from orionis.aio import Loop
-from orionis.aio.loop import Loop
-```
+`Loop()` uses the inherited `object` constructor and is permitted. An instance
+has a `__dict__` because no `__slots__` is declared, but construction does not
+create a loop or a pool and the methods keep using class-level state. Call the
+methods on `Loop`; there is no public cache reset, loop-close, or pool-shutdown
+method. Private helpers and imported standard-library names are not additional
+public APIs; their relevant mechanisms are covered under design and concurrency.
 
-All members are called on the class (`Loop.run(...)`). The class stores every
-piece of state at class level, so that state is shared by the whole process.
+### Loop.getEventLoop()
 
-### Class state
-
-Declared literally as:
-
-```python
-_IS_WIN32: ClassVar[bool] = sys.platform == "win32"
-_loop_local: ClassVar[threading.local] = threading.local()
-_uvloop_factory: ClassVar[Callable[[], asyncio.AbstractEventLoop] | None] = None
-_uvloop_checked: ClassVar[bool] = False
-_loop_lock: ClassVar[threading.Lock] = threading.Lock()
-_loop_factory_resolved: ClassVar[bool] = False
-_loop_factory_cached: ClassVar[
-    Callable[[], asyncio.AbstractEventLoop] | None
-] = None
-_sync_executor: ClassVar[concurrent.futures.ThreadPoolExecutor | None] = None
-_sync_executor_lock: ClassVar[threading.Lock] = threading.Lock()
-```
-
-| Attribute | Scope | Written by |
-| --- | --- | --- |
-| `_IS_WIN32` | Process | Evaluated once at class definition. |
-| `_loop_local` | Thread | `getEventLoop()` stores the created loop as `_loop_local.loop`. |
-| `_uvloop_factory`, `_uvloop_checked` | Process | `_detectUvloop()`. |
-| `_loop_factory_cached`, `_loop_factory_resolved` | Process | `_getLoopFactory()`. |
-| `_sync_executor` | Process | `_getSyncExecutor()`. |
-| `_loop_lock`, `_sync_executor_lock` | Process | Never reassigned; guard the two detection paths. |
-
-Neither the cached per-thread loops nor `_sync_executor` are ever closed or
-shut down by this module.
-
-### `Loop.getEventLoop()`
+Source: [orionis/aio/loop.py](../loop.py#L186), `Loop.getEventLoop`.
 
 ```python
 @classmethod
-def getEventLoop(cls) -> asyncio.AbstractEventLoop
+def getEventLoop(cls) -> asyncio.AbstractEventLoop:
 ```
 
-Returns the event loop for the calling thread, creating one when needed.
+**Parameters:** no caller-supplied parameters. **Result:** the running loop in
+the calling thread, otherwise an open loop retained in that thread's cache,
+otherwise a newly created `asyncio.AbstractEventLoop`.
 
-Resolution order:
+The creation branch selects the cached factory, falling back to
+`asyncio.new_event_loop()`, calls `asyncio.set_event_loop(loop)`, and stores
+`_loop_local.loop`. A closed cached loop is replaced. A running loop is returned
+without being written to this cache. An unrelated loop registered externally
+with `asyncio.set_event_loop()` is not consulted by the cache branch.
 
-1. The loop currently running in this thread, when there is one.
-2. `_loop_local.loop`, when it exists and `is_closed()` is `False`.
-3. A new loop built with the resolved factory, or with
-   `asyncio.new_event_loop()` when the factory is `None`.
+There is no explicit `raise` or broad exception translation: factory/import
+failures and asyncio registration errors can propagate. Merely obtaining the
+loop does not start or close it. The owner must arrange any required shutdown;
+example 5 closes the borrowed stopped loop explicitly.
 
-**Parameters:** none.
+### Loop.run()
 
-**Returns:** `asyncio.AbstractEventLoop`.
-
-**Raises:** nothing of its own.
-
-**Side effects:** on branch 3 it calls `asyncio.set_event_loop(loop)` and
-stores the loop in `_loop_local`. The loop is never closed by the module.
-
-### `Loop.run()`
+Source: [orionis/aio/loop.py](../loop.py#L213), `Loop.run`.
 
 ```python
 @staticmethod
-def run[T](coro: Coroutine[Any, Any, T]) -> T
+def run[T](coro: Coroutine[Any, Any, T]) -> T:
 ```
 
-Runs a coroutine as the application entry point, from a thread with **no**
-running loop. Uses `asyncio.Runner(loop_factory=...)` when a factory is
-resolved, otherwise `asyncio.run(coro)`.
-
-| Parameter | Type | Description |
+| Parameter | Declared annotation | Accepted value |
 | --- | --- | --- |
-| `coro` | `Coroutine[Any, Any, T]` | Coroutine object to execute. |
+| `coro` | `Coroutine[Any, Any, T]` | A native coroutine object, such as the result of calling an `async def`; no default. |
 
-**Returns:** the value produced by `coro`. If the coroutine raises
-`KeyboardInterrupt`, the exception is swallowed and the literal `0` (an `int`)
-is returned instead, regardless of `T`.
+**Result:** the coroutine's result. A `KeyboardInterrupt` caught during runner
+execution or teardown returns the literal integer `0`, even when `T` is not
+`int`. The return annotation therefore does not describe this exceptional result.
 
-**Raises:**
+**Explicit errors:** `TypeError("A coroutine object is required")` unless
+`isinstance(coro, types.CoroutineType)` is true. A function, `None`, task, future,
+or non-native awaitable fails this check. When a loop is already running in the
+calling thread, the method itself raises `RuntimeError` before opening a runner:
+`"Runner.run() cannot be called from a running event loop"` when a factory is
+selected, otherwise `"asyncio.run() cannot be called from a running event loop"`.
+That native coroutine remains unconsumed; close it or await it appropriately.
 
-- `TypeError("A coroutine object is required")` when
-  `isinstance(coro, types.CoroutineType)` is `False` — a coroutine *function*
-  is rejected too.
-- `RuntimeError` propagated from asyncio when a loop is already running in the
-  calling thread; `coro` is then left unconsumed. Use `Loop.runSync()` to
-  bridge into a running loop. The message belongs to the standard library and
-  differs between the `asyncio.Runner` and `asyncio.run` branches — observed on
-  CPython 3.14 / Windows: `Cannot run the event loop while another loop is
-  running`.
-- Any other exception raised inside the coroutine propagates unchanged.
+**Propagated errors:** coroutine failures other than the caught
+`KeyboardInterrupt`, factory failures, and runner failures are not generally
+translated. Reusing a consumed coroutine passed the native-type check but raised
+`RuntimeError("cannot reuse already awaited coroutine")` in the validated runtime.
 
-**Side effects:** creates and closes a loop dedicated to this call; it does not
-use nor populate the per-thread cache.
+With a factory, the method uses `with asyncio.Runner(loop_factory=factory)`;
+without one, it uses `asyncio.run(coro)`. The runner owns a new loop and its
+teardown. This does not consume or populate `Loop`'s thread-local loop cache.
+Factory resolution and the running-loop guard precede the `KeyboardInterrupt`
+handler. Use `run()` at an entry point without an active loop in that thread.
 
-### `Loop.runSync()`
+### Loop.runSync()
+
+Source: [orionis/aio/loop.py](../loop.py#L372), `Loop.runSync`;
+pool initialization is in `Loop._getSyncExecutor` in the same file.
 
 ```python
 @classmethod
-def runSync[T](cls, coro: Coroutine[Any, Any, T]) -> T
+def runSync[T](cls, coro: Coroutine[Any, Any, T]) -> T:
 ```
 
-Runs a coroutine to completion synchronously from any context.
-
-- No loop running in the calling thread → delegates to `Loop.run(coro)`.
-- A loop is running → submits `Loop.run` to the shared single-worker executor
-  and blocks on `.result()`, so the coroutine gets its own loop in another
-  thread instead of deadlocking the caller.
-
-| Parameter | Type | Description |
+| Parameter | Declared annotation | Accepted value |
 | --- | --- | --- |
-| `coro` | `Coroutine[Any, Any, T]` | Coroutine object to execute. |
+| `coro` | `Coroutine[Any, Any, T]` | A native coroutine object accepted by `run()`; no default. |
 
-**Returns:** the value produced by `coro` (or `0` when the coroutine raises
-`KeyboardInterrupt`, inherited from `Loop.run`).
+Without a running loop in the caller's thread, delegates to `cls.run(coro)`.
+Otherwise submits `cls.run` to the cached
+`ThreadPoolExecutor(max_workers=1, thread_name_prefix="orionis-sync")` and waits
+on `.result()` with **no timeout**. The coroutine then runs on a separate worker
+loop, while the caller's thread, including its event loop, remains blocked.
 
-**Raises:** whatever `coro` raises, re-raised in the calling thread by
-`concurrent.futures.Future.result()`; plus the same `TypeError` as
-`Loop.run()` for an invalid argument.
+**Result:** the result of `run()`, including integer `0` for a handled
+`KeyboardInterrupt`. **Errors:** `run()`'s validation and execution errors reach
+the caller directly or through the executor future; executor failures can also
+propagate. The running-loop branch may create the pool even for invalid input,
+because native-coroutine validation happens inside the submitted `run()`.
 
-**Side effects:** blocks the calling thread until the coroutine finishes and
-may create the process-wide bridging executor on first use.
+The worker and pool are shared on the class; arguments are not cloned. Do not
+pass work that depends on the blocked caller's progress or requires the same
+sole worker recursively. This bridge does not make loop-bound clients portable.
+See `Unique.enforce()` above for a real consumer that creates an isolated
+connection for the cross-loop branch.
 
-### `Loop.execute()`
+### Loop.execute()
+
+Source: [orionis/aio/loop.py](../loop.py#L266), `Loop.execute`.
 
 ```python
 @staticmethod
 async def execute(
-    func: Callable[..., Any],
-    /,
-    *args: Any,
-    **kwargs: Any,
-) -> Any
+        func: Callable[..., Any],
+        /,
+        *args: Any,  # noqa: ANN401
+        **kwargs: Any,  # noqa: ANN401
+) -> Any:  # noqa: ANN401
 ```
 
-Invokes a callable that may be synchronous or asynchronous, from inside a
-coroutine, without the caller having to branch on its nature.
-
-- `inspect.iscoroutinefunction(func)` → awaited directly on the running loop.
-- Otherwise → wrapped in `functools.partial(func, *args, **kwargs)` and sent to
-  the running loop's **default** executor via `loop.run_in_executor(None, ...)`.
-- If the synchronous call returns an object with `__await__`, that object is
-  awaited before returning.
-
-| Parameter | Type | Description |
+| Parameter | Declared annotation | Meaning |
 | --- | --- | --- |
-| `func` | `Callable[..., Any]` | Callable to invoke; positional-only. |
-| `*args` | `Any` | Positional arguments forwarded to `func`. |
-| `**kwargs` | `Any` | Keyword arguments forwarded to `func`. |
+| `func` | `Callable[..., Any]` | Callable to invoke; required and positional-only. |
+| `*args` | `Any` | Positional arguments forwarded unchanged; may be empty. |
+| `**kwargs` | `Any` | Keyword arguments forwarded unchanged; may be empty. |
 
-**Returns:** the result of `func`, or the result of awaiting it when it is
-awaitable.
+**Awaited result:** if `inspect.iscoroutinefunction(func)` is true, returns
+`await func(*args, **kwargs)` directly. Otherwise it submits a
+`functools.partial` to the current loop's **default executor**, waits for the
+result, then awaits it only if `hasattr(result, "__await__")` is true.
+An ordinary result, including `None`, is returned unchanged.
 
-**Raises:** `TypeError("The provided object is not callable")` when `func` is
-not callable; the errors raised by `func` propagate unchanged. It calls
-`asyncio.get_running_loop()` for the synchronous branch, so it must be awaited
-from a running loop.
+This last check is attribute-based, not `inspect.isawaitable()`. A
+generator-based awaitable without `__await__` was returned unchanged in the
+runtime probe. An object with an invalid `__await__` can instead fail when awaited.
+Callable instances not detected as coroutine functions take the executor path;
+a native coroutine they return is subsequently awaited on the caller's loop.
 
-### `Loop.createTask()`
+**Explicit error:** `TypeError("The provided object is not callable")` when
+`callable(func)` is false. **Propagated errors:** argument-binding failures,
+callable failures, await failures, cancellation, and executor failures. In the
+synchronous branch, `asyncio.get_running_loop()` also raises `RuntimeError`
+if the coroutine is driven without a running loop.
+
+Calling `execute()` alone just constructs its coroutine; invocation occurs when
+it is awaited. It does not copy arguments, close returned resources, shield work,
+or join a worker after cancellation. A worker already executing continued after
+its waiting task was cancelled in the isolated probe. See example 3 and the
+concurrency section.
+
+### Loop.createTask()
+
+Source: [orionis/aio/loop.py](../loop.py#L350), `Loop.createTask`.
 
 ```python
 @staticmethod
 async def createTask[T](
-    coro: Coroutine[Any, Any, T],
-    *,
-    name: str | None = None,
-) -> asyncio.Task[T]
+        coro: Coroutine[Any, Any, T],
+        *,
+        name: str | None = None,
+) -> asyncio.Task[T]:
 ```
 
-Schedules `coro` on the running loop through
-`asyncio.get_running_loop().create_task(coro, name=name)`.
-
-| Parameter | Type | Description |
+| Parameter | Declared annotation | Meaning |
 | --- | --- | --- |
-| `coro` | `Coroutine[Any, Any, T]` | Coroutine to schedule. |
+| `coro` | `Coroutine[Any, Any, T]` | Coroutine passed directly to the running loop's `create_task()`; required. |
 | `name` | `str \| None` | Optional task name; keyword-only, defaults to `None`. |
 
-**Returns:** `asyncio.Task[T]`.
+**Awaited result:** a scheduled `asyncio.Task[T]`, not the completed task's value.
+Use `task = await Loop.createTask(coro)` and then `result = await task`.
+The method itself has no suspension after calling `create_task()`, but calling it
+without awaiting it does not schedule `coro`.
 
-**Raises:** the `RuntimeError` raised by `asyncio.get_running_loop()` when no
-loop is running.
+There is no module-level validation: input validation and scheduling behavior
+belong to `asyncio.get_running_loop().create_task(coro, name=name)`, including any
+custom task factory. Missing running loop propagates `RuntimeError`; invalid
+coroutines can propagate `TypeError`. Task failures surface when the returned
+task is awaited, not as this helper's completed task result. No task registry,
+automatic joining, cancellation, or task-factory override is added.
 
-Note that the member is itself a coroutine function: the task is obtained with
-`task = await Loop.createTask(...)`, and awaited a second time to collect its
-result.
+### Loop.eventLoopContext()
 
-### `Loop.eventLoopContext()`
+Source: [orionis/aio/loop.py](../loop.py#L314), `Loop.eventLoopContext`.
 
 ```python
 @staticmethod
 @contextmanager
-def eventLoopContext() -> Generator[asyncio.AbstractEventLoop]
+def eventLoopContext() -> Generator[asyncio.AbstractEventLoop]:
 ```
 
-Context manager that yields `Loop.getEventLoop()` and performs cooperative
-cleanup on exit.
+**Parameters:** none. The `@contextmanager` decorator provides a **synchronous**
+context manager, used with `with`, not `async with`. Entering it obtains
+`Loop.getEventLoop()`; the generator yields that loop once. The declaration's
+generator annotation describes the decorated function's underlying generator,
+not the externally returned context-manager object's type.
 
-Cleanup runs only when, at exit time, the loop is **not** running *and*
-`asyncio.all_tasks(loop)` is non-empty. In that case every pending task is
-cancelled and then awaited with `asyncio.gather(*pending,
-return_exceptions=True)` through `loop.run_until_complete(...)`.
+On exit, if the loop is not running, the method snapshots `asyncio.all_tasks(loop)`.
+If this set is nonempty, it calls `cancel()` on every included task and drains
+them with `loop.run_until_complete(asyncio.gather(..., return_exceptions=True))`.
+This includes unrelated pending tasks on the borrowed loop, not just tasks
+created within the block. Completed tasks are absent from that set. There is
+no loop closure, async-generator shutdown, executor shutdown, or cleanup timeout.
 
-**Parameters:** none.
+When the loop is running at exit, **all cleanup is skipped**. With no pending
+tasks, no gather is run. The cleanup region suppresses only `RuntimeError` and
+`asyncio.CancelledError`; acquisition failures occur before that region. Ordinary
+task exceptions returned by `gather` are discarded. A body exception propagates
+when cleanup completes; do not infer universal exception suppression from the
+docstring. Repeated use on an open cached loop is possible, but a decorated
+context-manager instance is not a reusable lifecycle object.
 
-**Yields:** `asyncio.AbstractEventLoop`.
+### Loop.isLoopRunning()
 
-**Raises:** nothing — `RuntimeError` and `asyncio.CancelledError` raised while
-cleaning up are suppressed by design.
-
-**Side effects:** cancels the pending tasks of the yielded loop. The loop
-itself is **not** closed, so it stays cached for the thread.
-
-### `Loop.isLoopRunning()`
+Source: [orionis/aio/loop.py](../loop.py#L339), `Loop.isLoopRunning`;
+detection helper `Loop._getRunningLoop` starts in the same file at
+[the helper declaration](../loop.py#L70).
 
 ```python
 @staticmethod
-def isLoopRunning() -> bool
+def isLoopRunning() -> bool:
 ```
 
-Reports whether an event loop is running in the calling thread.
-
-**Parameters:** none.
-
-**Returns:** `bool` — `True` when `_getRunningLoop()` is not `None`.
-
-**Raises:** nothing.
-
-### Internal helpers
-
-Documented because they define the caching guarantees of the public members;
-they are not part of the supported surface.
-
-```python
-@staticmethod
-def _getRunningLoop() -> asyncio.AbstractEventLoop | None
-
-@classmethod
-def _detectUvloop(cls) -> Callable[[], asyncio.AbstractEventLoop] | None
-
-@classmethod
-def _getLoopFactory(cls) -> Callable[[], asyncio.AbstractEventLoop] | None
-
-@classmethod
-def _getSyncExecutor(cls) -> concurrent.futures.ThreadPoolExecutor
-```
-
-- `_getRunningLoop()` — `asyncio.get_running_loop()` wrapped in
-  `try/except RuntimeError`, returning `None` instead of raising.
-- `_detectUvloop()` — imports `uvloop` at most once per process, only outside
-  Windows; `ImportError` is swallowed and the result cached in
-  `_uvloop_factory`.
-- `_getLoopFactory()` — applies the resolution order described above and caches
-  the answer in `_loop_factory_cached`.
-- `_getSyncExecutor()` — creates the single-worker bridging pool on first use
-  and returns the same instance afterwards.
+**Parameters:** none. **Result:** whether `asyncio.get_running_loop()` succeeds
+in the calling thread. The helper translates its `RuntimeError` into `None`;
+this method returns whether the result is not `None`. It creates no loop and
+mutates no cache. A cached but stopped loop, or a loop running in another thread,
+does not make the result true. There is no explicit error raised by this method;
+unexpected errors other than the helper's caught `RuntimeError` are not translated.
 
 ## Usage examples
 
-Every snippet below is a complete script that can be executed as is with
-`python <file>.py`.
+Each block in this section is an independent script for Python 3.14+ with the
+framework installed, or the checkout root on `PYTHONPATH`. No application boot,
+credentials, or external services are needed. Assertions define the expected
+behavior; each script prints only `example-N: OK` after its assertions pass.
+Do not combine these scripts into a shared process when verifying class state.
 
-### 1. Application entry point
+### 1. Run an entry-point coroutine
+
+The native coroutine runs to completion and exposes its loop only while active.
 
 ```python
 import asyncio
@@ -398,216 +329,417 @@ from orionis.aio import Loop
 
 
 async def main() -> int:
-    print("Application started")
-    await asyncio.sleep(0.1)
-    return 0
+        assert Loop.isLoopRunning()
+        assert Loop.getEventLoop() is asyncio.get_running_loop()
+        await asyncio.sleep(0)
+        return sum((10, 20, 30))
 
 
-exit_code = Loop.run(main())
-print("exit code:", exit_code)
+assert not Loop.isLoopRunning()
+assert Loop.run(main()) == 60
+assert not Loop.isLoopRunning()
+print("example-1: OK")
 ```
 
-Output:
+### 2. Bridge from synchronous code
 
-```text
-Application started
-exit code: 0
-```
-
-This is the pattern used by the `reactor` CLI, which passes the returned value
-straight to `sys.exit(...)`.
-
-### 2. Calling async code from synchronous code
+Without an active loop the coroutine runs in the caller's thread. Inside one,
+`runSync()` blocks while the independent coroutine runs in the bridge worker.
 
 ```python
+import threading
 from orionis.aio import Loop
 
 
-async def fetch_greeting() -> str:
-    return "Hello from an async task"
+async def identify_thread() -> int:
+        return threading.get_ident()
 
 
-def sync_entrypoint() -> str:
-    # Same call works with or without a loop already running in this thread.
-    return Loop.runSync(fetch_greeting())
+async def inside_loop() -> int:
+        assert Loop.isLoopRunning()
+        return Loop.runSync(identify_thread())
 
 
-async def async_entrypoint() -> str:
-    return Loop.runSync(fetch_greeting())
-
-
-print("no loop running:", sync_entrypoint())
-print("loop running:", Loop.run(async_entrypoint()))
+caller_thread = threading.get_ident()
+assert Loop.runSync(identify_thread()) == caller_thread
+assert Loop.run(inside_loop()) != caller_thread
+print("example-2: OK")
 ```
 
-Output:
+### 3. Execute both kinds of callable
 
-```text
-no loop running: Hello from an async task
-loop running: Hello from an async task
-```
-
-### 3. Running a blocking function from a coroutine
+The synchronous invocation uses another thread; coroutine functions and native
+coroutines returned by synchronous factories are awaited on the caller's loop.
 
 ```python
-import time
+import asyncio
+import threading
 from orionis.aio import Loop
 
 
-def slow_blocking_call(seconds: float) -> str:
-    time.sleep(seconds)
-    return "blocking call finished"
+async def append_suffix(value: str, *, suffix: str) -> str:
+        await asyncio.sleep(0)
+        return value + suffix
 
 
-async def handler() -> None:
-    print(await Loop.execute(slow_blocking_call, 0.2))
-    print(await Loop.execute(slow_blocking_call, seconds=0.1))
+def coroutine_factory(value: str, *, suffix: str) -> object:
+        return append_suffix(value, suffix=suffix)
 
 
-Loop.run(handler())
+async def main() -> None:
+        caller_thread = threading.get_ident()
+        assert await Loop.execute(threading.get_ident) != caller_thread
+        assert await Loop.execute(append_suffix, "direct", suffix="!") == "direct!"
+        factory_result = await Loop.execute(
+                coroutine_factory, "factory", suffix="!",
+        )
+        assert factory_result == "factory!"
+
+
+Loop.run(main())
+print("example-3: OK")
 ```
 
-Output:
+### 4. Schedule and join named tasks
 
-```text
-blocking call finished
-blocking call finished
-```
-
-### 4. Scheduling a background task
+Creating a task and waiting for its value are separate operations. Cleanup joins
+every task retained by this example, including on an intermediate failure.
 
 ```python
 import asyncio
 from orionis.aio import Loop
 
 
-async def background_job() -> str:
-    await asyncio.sleep(0.05)
-    return "background job finished"
+async def square(value: int) -> int:
+        await asyncio.sleep(0)
+        return value * value
 
 
-async def controller() -> None:
-    print("loop running:", Loop.isLoopRunning())
-    task = await Loop.createTask(background_job(), name="warmup")
-    print("task name:", task.get_name())
-    print("task result:", await task)
+async def main() -> None:
+        tasks: list[asyncio.Task[int]] = []
+        try:
+                for value in range(4):
+                        task = await Loop.createTask(
+                                square(value), name=f"square-{value}",
+                        )
+                        tasks.append(task)
+                assert [task.get_name() for task in tasks] == [
+                        f"square-{value}" for value in range(4)
+                ]
+                assert await asyncio.gather(*tasks) == [0, 1, 4, 9]
+        finally:
+                for task in tasks:
+                        if not task.done():
+                                task.cancel()
+                await asyncio.gather(*tasks, return_exceptions=True)
 
 
-Loop.run(controller())
+Loop.run(main())
+print("example-4: OK")
 ```
 
-Output:
+### 5. Clean up a stopped loop
 
-```text
-loop running: True
-task name: warmup
-task result: background job finished
-```
-
-### 5. Managing a loop lifecycle with cleanup
+The context cancels a pending task, retains the open loop, and permits reuse.
+The script closes that loop itself and verifies replacement of the closed cache.
 
 ```python
 import asyncio
 from orionis.aio import Loop
 
 
-async def pending_forever() -> None:
-    await asyncio.sleep(3600)
+async def wait_forever() -> None:
+        await asyncio.Event().wait()
 
 
-def run_batch() -> None:
-    with Loop.eventLoopContext() as loop:
-        leftover = loop.create_task(pending_forever())
-        loop.run_until_complete(asyncio.sleep(0))
-    print("leftover cancelled:", leftover.cancelled())
-    print("loop closed:", loop.is_closed())
+loop = Loop.getEventLoop()
+try:
+    assert Loop.getEventLoop() is loop
+    with Loop.eventLoopContext() as borrowed:
+        assert borrowed is loop
+        leftover = borrowed.create_task(wait_forever())
+        borrowed.run_until_complete(asyncio.sleep(0))
+    assert leftover.cancelled()
+    assert not loop.is_closed()
+    assert not Loop.isLoopRunning()
+finally:
+    loop.close()
+    asyncio.set_event_loop(None)
 
-
-run_batch()
+replacement = Loop.getEventLoop()
+try:
+    assert replacement is not loop and not replacement.is_closed()
+finally:
+    replacement.close()
+    asyncio.set_event_loop(None)
+print("example-5: OK")
 ```
 
-Output:
+### 6. Handle rejected inputs and nested execution
 
-```text
-leftover cancelled: True
-loop closed: False
-```
-
-### 6. Rejected arguments
+These are actual module validation errors. The rejected native coroutine remains
+unstarted and is explicitly closed by its owner after the nested-run attempt.
 
 ```python
 from orionis.aio import Loop
 
 
 async def noop() -> None:
-    return None
+        return None
 
 
 try:
     Loop.run(noop)
 except TypeError as error:
-    print("run:", error)
+    assert str(error) == "A coroutine object is required"
+else:
+    raise AssertionError("A coroutine function was accepted")
 
 
-async def guard() -> None:
+async def check_errors() -> None:
     try:
         await Loop.execute(42)
     except TypeError as error:
-        print("execute:", error)
+        assert str(error) == "The provided object is not callable"
+    else:
+        raise AssertionError("A non-callable value was accepted")
+
+    coroutine = noop()
+    try:
+        try:
+            Loop.run(coroutine)
+        except RuntimeError:
+            pass
+        else:
+            raise AssertionError("A nested runner was accepted")
+    finally:
+        coroutine.close()
 
 
-Loop.run(guard())
+Loop.run(check_errors())
+print("example-6: OK")
 ```
 
-Output:
+### 7. Integrate with FreezeThaw
 
-```text
-run: A coroutine object is required
-execute: The provided object is not callable
+`Loop.execute()` returns the other Orionis component's actual result. This
+integration uses an acyclic local structure; it does not claim that this module
+provides freezing semantics or manages application configuration.
+
+```python
+from types import MappingProxyType
+from orionis.aio import Loop
+from orionis.support.structures.freezer import FreezeThaw
+
+
+async def main() -> None:
+        payload = {"names": ["Ada", "Linus"]}
+        frozen = await Loop.execute(FreezeThaw.freeze, payload)
+        assert isinstance(frozen, MappingProxyType)
+        assert frozen["names"] == ("Ada", "Linus")
+        editable = await Loop.execute(FreezeThaw.thaw, frozen)
+        assert isinstance(editable, dict)
+        editable["names"].append("Grace")
+        assert editable["names"] == ["Ada", "Linus", "Grace"]
+        assert payload["names"] == ["Ada", "Linus"]
+        assert frozen["names"] == ("Ada", "Linus")
+
+
+Loop.run(main())
+print("example-7: OK")
 ```
 
-## Performance and concurrency considerations
+### 8. Process temporary JSON files concurrently
 
-- **Platform detection happens once.** `_detectUvloop()` and
-  `_getLoopFactory()` cache their result in class attributes, so repeated calls
-  to `getEventLoop()`, `run()` or `runSync()` never repeat the import or the
-  platform check.
-- **Fast path when a loop is already running.** `getEventLoop()` and
-  `isLoopRunning()` resolve through a single `asyncio.get_running_loop()` call
-  inside `try/except`, which is the common case inside request handlers.
-- **Thread isolation.** The loop cache lives in a `threading.local()`, so two
-  threads calling `getEventLoop()` receive two different loops; no lock is
-  taken on that path.
-- **`runSync()` blocks and serialises.** It blocks the calling thread until the
-  coroutine finishes, and the bridging pool has exactly **one** worker, so
-  concurrent `runSync()` calls made from inside a running loop queue up behind
-  each other instead of running in parallel.
-- **`execute()` uses asyncio's default executor**, not the single-worker
-  bridging pool, so its parallelism is whatever the running loop's default
-  executor provides.
-- **Cleanup is conditional.** `eventLoopContext()` cancels tasks only when the
-  loop is idle at exit; when the loop is still running, the block exits without
-  touching any task.
-- **`run()` builds a fresh loop per call.** It never reuses the thread-local
-  loop, so it is meant for entry points and not for hot paths.
-- **Nothing is ever torn down.** Neither the per-thread loops nor the bridging
-  executor are closed by this module; they live until the process ends.
+Combine named tasks, synchronous file I/O dispatched with `execute()`, ordered
+results, task joining, and temporary-directory cleanup. This is not a benchmark
+or a claim that threads accelerate CPU-bound Python work.
+
+```python
+import asyncio
+import json
+from pathlib import Path
+from tempfile import TemporaryDirectory
+from orionis.aio import Loop
+
+
+def read_scores(path: Path) -> list[int]:
+    with path.open(encoding="utf-8") as stream:
+        return json.load(stream)["scores"]
+
+
+async def summarize(path: Path) -> int:
+        scores = await Loop.execute(read_scores, path)
+        return sum(scores)
+
+
+async def process(paths: tuple[Path, ...]) -> list[int]:
+    tasks: list[asyncio.Task[int]] = []
+    try:
+        for path in paths:
+            task = await Loop.createTask(summarize(path), name=path.stem)
+            tasks.append(task)
+        return list(await asyncio.gather(*tasks))
+    finally:
+        for task in tasks:
+            if not task.done():
+                task.cancel()
+        await asyncio.gather(*tasks, return_exceptions=True)
+
+
+with TemporaryDirectory(prefix="orionis-aio-") as directory:
+        paths: list[Path] = []
+        for index, scores in enumerate(((1, 2), (3, 4), (5, 6))):
+                path = Path(directory) / f"batch-{index}.json"
+                path.write_text(json.dumps({"scores": scores}), encoding="utf-8")
+                paths.append(path)
+        assert Loop.run(process(tuple(paths))) == [3, 7, 11]
+print("example-8: OK")
+```
+
+## Design characteristics
+
+All mechanisms below are located in
+[orionis/aio/loop.py](../loop.py), `Loop`, unless otherwise linked.
+
+| Observed mechanism | Consumer-visible consequence |
+| --- | --- |
+| `_getRunningLoop()` catches `RuntimeError` from `asyncio.get_running_loop()`. | Detection is local to the calling thread and does not create a loop. |
+| `_IS_WIN32` records `sys.platform == "win32"` at class definition. | Platform selection is not recalculated from environment variables on each call. |
+| `_detectUvloop()` uses `_uvloop_checked`, `_uvloop_factory`, and `_loop_lock`. | Outside Windows, imports `uvloop` lazily and caches success or `ImportError`; on Windows it skips that import. |
+| `_getLoopFactory()` uses `_loop_factory_resolved` and `_loop_factory_cached`. | Selects detected `uvloop.new_event_loop`, otherwise Windows `asyncio.ProactorEventLoop`, otherwise `None`. Missing Proactor attribute is tolerated; `None` delegates creation to asyncio. |
+| `_loop_local` is `threading.local()`. | Open loops created through `getEventLoop()` are retained separately per thread, without automatic shutdown on thread exit. |
+| `_getSyncExecutor()` uses `_sync_executor` and `_sync_executor_lock`. | Initializes one cached single-worker bridging pool with double-checked locking. |
+| `run()` and `eventLoopContext()` explicitly reference `Loop`; class methods use `cls`. | Subclassing is not a complete way to customize every operation's factory or state. |
+| `@contextmanager` wraps a generator; `createTask()` is itself asynchronous. | Use `with Loop.eventLoopContext()` and await task creation before awaiting its result. |
+
+Importing the two module files defines the class, creates its `threading.local`
+and two locks, and re-exports `Loop`; it does not create an event loop, pool, or
+perform application startup. The parent package's lazy export resolver is in
+[orionis/__init__.py](../../__init__.py) and
+[orionis/_exports.py](../../_exports.py). Verified imports in isolated processes
+resolved to this checkout, not a second framework installation.
+
+## Performance and concurrency
+
+Evidence: [orionis/aio/loop.py](../loop.py), particularly
+`Loop._detectUvloop`, `Loop._getLoopFactory`, `Loop._getSyncExecutor`,
+`Loop.runSync`, `Loop.execute`, and `Loop.eventLoopContext`.
+
+- Detection and pool creation are deferred until needed. Subsequent calls use
+    cached class state, including a failed `uvloop` import; there is no public
+    invalidation or capacity control for these fixed entries.
+- The running-loop path of `getEventLoop()` avoids the per-thread creation
+    branch. `run()` instead creates a runner-owned loop for each valid call.
+- `_loop_lock` protects `uvloop` detection and `_sync_executor_lock` protects
+    pool creation. `_getLoopFactory()`'s final cached-field writes have no separate
+    lock. A thread-local cache does not synchronize tasks, callbacks, or resources
+    that users explicitly share between threads.
+- Concurrent running-loop `runSync()` submissions share one worker and queue;
+    `.result()` blocks without a timeout. The coroutine must be able to finish
+    independently of the blocked caller and of recursive submissions to that
+    worker. Class/docstring phrases about avoiding deadlock do not establish a
+    universal deadlock-free contract.
+- `execute()` uses the active loop's default executor, not the bridging pool.
+    Parallelism and queueing depend on that executor. References captured by its
+    `functools.partial` remain live while queued or running; mutable arguments are
+    shared, not copied. There is no explicit per-submission context copy.
+- Cancelling an await on `execute()` is not a stop mechanism for a synchronous
+    callable already running in a thread. The module adds neither shielding nor
+    a resource-cleanup protocol. Async-branch cancellation follows the callback.
+- `eventLoopContext()` materializes the pending-task set and submits a gather.
+    It issues one cancel per included task; tasks must cooperate. There is no
+    timeout, and tasks created after the snapshot are not independently rescanned.
+- The module never shuts down its cached bridge pool or closes loops retained
+    by `getEventLoop()`. That statement does **not** apply to the dedicated loop
+    owned and closed by each `run()` invocation.
+
+> ⚠️ Not specified in the source code: module-wide safety under arbitrary
+> concurrent access from multiple threads or multiple event loops, fairness
+> between callers, and per-submission context-variable propagation.
+
+No benchmarks, throughput figures, constant-time guarantees, or claims about
+CPU-bound speedups were produced for this documentation task.
 
 ## Compatibility notes
 
-- **Python:** `>= 3.14`, as declared in `pyproject.toml`. The module relies on
-  PEP 695 generic syntax (`def run[T](...)`, `def createTask[T](...)`,
-  `def runSync[T](...)`), which is a syntax error on older interpreters.
-- **Dependencies:** standard library only. `uvloop>=0.22.1` is a base
-  dependency of the framework restricted to `sys_platform != 'win32'`, so
-  nothing extra needs to be installed; when it is importable it is picked up
-  automatically and, when it is not, `ImportError` is swallowed.
-- **Platform behaviour differs by design:** Windows resolves to
-  `asyncio.ProactorEventLoop`, other platforms to `uvloop` when available and
-  to the asyncio default otherwise.
-- **Type annotations:** the module uses `from __future__ import annotations`,
-  so its annotations are strings at runtime; the class is never built by the
-  dependency-injection container, which resolves constructor annotations
-  eagerly.
-- **Public surface:** `orionis/aio/__init__.py` exports exactly `Loop`
-  (`__all__ == ["Loop"]`).
+| Evidence | Verified distinction |
+| --- | --- |
+| [pyproject.toml](../../../pyproject.toml), `project.requires-python` | The declared framework minimum is `>=3.14`; the examples target Python 3.14+. |
+| [orionis/aio/loop.py](../loop.py), `run[T]`, `runSync[T]`, `createTask[T]` | PEP 695 function type-parameter syntax requires a parser supporting that syntax, introduced in Python 3.12. This does not declare framework support for 3.12 or 3.13. |
+| [pyproject.toml](../../../pyproject.toml), `project.dependencies` | `uvloop>=0.22.1 ; sys_platform != 'win32'` is a platform-conditional **base** dependency, not an Orionis extra. The source tolerates its `ImportError` and falls back to asyncio. |
+| [uv.lock](../../../uv.lock), package `uvloop` | The resolved version is `0.23.0`; this is not the supported minimum and was not installed or exercised on Windows during validation. |
+| Actual validation | CPython `3.14.6`, `sys.platform == "win32"`; the selected loop was `asyncio.windows_events.ProactorEventLoop`. |
+
+The module's other runtime imports are standard-library modules. `Callable`,
+`Coroutine`, and `Generator` are imported only under `TYPE_CHECKING`, and
+`from __future__ import annotations` retains string annotations. Consequently,
+runtime type-hint resolution is not automatically complete: unassisted
+`typing.get_type_hints(Loop.run)` raised `NameError` for `Coroutine` in the probe.
+Literal declarations above are copied from source, not evaluated signatures.
+
+> ⚠️ Not executed in this environment: a real `uvloop` backend, non-Windows
+> execution, other Python releases, and a free-threaded Python build.
+
+## Verification and limitations
+
+Public inventory coverage is complete: both Python files, the `Loop` class and
+re-export, and all seven public methods. The four private helpers and nine
+private class-state fields are explained only where they determine public
+behavior. Standard-library imports, names imported under `TYPE_CHECKING`, and
+the reachable `loop` submodule attribute are excluded as additional consumer
+symbols; they are not separately exported APIs. No public exceptions,
+constants, properties,
+protocols, enums, or overloads were found in the assigned module.
+
+| Script | Syntax | Imports | Execution status |
+| --- | --- | --- | --- |
+| 1. Entry point | Passed | Local checkout verified | Executed successfully |
+| 2. Synchronous bridge | Passed | Local checkout verified | Executed successfully |
+| 3. Callable dispatch | Passed | Local checkout verified | Executed successfully |
+| 4. Named tasks | Passed | Local checkout verified | Executed successfully |
+| 5. Stopped-loop context | Passed | Local checkout verified | Executed successfully |
+| 6. Real errors | Passed | Local checkout verified | Executed successfully |
+| 7. FreezeThaw integration | Passed | Local checkout verified | Executed successfully |
+| 8. Temporary JSON workflow | Passed | Local checkout verified | Executed successfully |
+
+Each script was extracted from this README, parsed and compiled, import-checked,
+and executed in a fresh process with a temporary working directory. The loaded
+Orionis module paths were checked against the local repository. Every script
+produced its expected success marker without stderr warnings.
+
+The standalone behavior probes already confirmed the native-coroutine guard,
+consumed-coroutine error, integer `0` on `KeyboardInterrupt`, cross-thread
+`runSync()`, the attribute-based awaitable check, worker continuation after
+cancelled waiting, context-body error propagation, conditional context cleanup,
+cached-loop replacement, and the runtime type-hint limitation.
+
+Existing tests were run through Orionis `TestingEngine` and `TestRunner` with
+an application rooted in a temporary directory. Unmodified copies of
+[tests/aio/test_loop.py](../../../tests/aio/test_loop.py) and
+[tests/aio/test_package.py](../../../tests/aio/test_package.py) had their hashes
+checked before execution. The result was **48 passed, 0 failed, 0 errored,
+0 skipped**. Compilation caching and test-result persistence were disabled;
+the local implementation was used. Test cases simulate optional-backend branches
+with doubles; this does not certify the actual `uvloop` backend.
+
+Neutral source/documentation distinctions:
+
+- `run()` declares `-> T`, but its caught-interruption path returns integer `0`.
+- The `run()` docstring associates the nested-loop error with standard-library
+    entry points; the implementation raises it explicitly before entering them.
+- `eventLoopContext()` says no exception escapes cleanup, but its suppression
+    is limited to `RuntimeError` and `asyncio.CancelledError`; acquisition and body
+    failures are not broadly caught, and cleanup may wait indefinitely.
+- Class and `runSync()` docstrings use broad thread-safety/deadlock language;
+    the executable mechanisms are the limited locks and blocking bridge described
+    above, not unrestricted concurrency guarantees.
+
+> ⚠️ Not executed in this environment: recursive `runSync()` submissions and
+> cancellation-resistant cleanup tasks were not run because they can wait
+> indefinitely and the module supplies no timeout.
+
+This verification does not include live database or mail-service integration,
+the entire framework test suite, or platform/version certification beyond the
+runtime identified above. No implementation failure was repaired or source,
+test, dependency, or configuration file changed as part of this task.

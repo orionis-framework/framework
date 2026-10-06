@@ -1,310 +1,90 @@
-# Hubs Realtime
+# orionis.realtime
 
-Orionis Realtime agrega RPC explícito, tipado y bidireccional sobre la
-[API WebSocket](../../http/docs/websockets.es.md). Los sockets raw siguen siendo
-independientes de Hub. La capa opcional reutiliza Application, routing,
-middleware, scopes y Container tanto con ASGI como con RSGI.
+> Referencia de API derivada de la implementación actual.
 
-La especificación completa del cliente es
-[Orionis Realtime Protocol v1](protocol-v1.md). No implementa SignalR y esta
-versión no incluye un SDK JavaScript público.
+## Tabla de contenido
 
-## Primer Hub
+- Requisitos
+- Resumen funcional
+- Estructura del módulo
+- Referencia de API
+- Ejemplos de uso
+- Características de diseño
+- Rendimiento y concurrencia
+- Notas de compatibilidad
+- Verificación y limitaciones
 
-```python
-from orionis.realtime import Hub, remote
-from orionis.support.facades import Route
+## Requisitos
 
-class CalculatorHub(Hub):
-    @remote
-    async def add(self, a: int, b: int) -> int:
-        return a + b
+Python 3.14 o superior, como declara pyproject.toml.
 
-Route.hub("/hubs/calculator", CalculatorHub)
-```
+## Resumen funcional
 
-Después de recibir `ready`, el cliente envía
-`{"type":"invoke","id":"1","target":"add","args":[2,3]}` y recibe
-`{"type":"completion","id":"1","result":5}`. `None` se serializa como
-`null`. Un error de argumentos o de ejecución completa esa invocación sin
-cerrar necesariamente la conexión.
+El inicializador de orionis.realtime expone 8 símbolos públicos. Esta referencia usa __all__, las rutas de exportación y los archivos fuente actuales como evidencia.
 
-Sólo se exponen métodos `@remote`. Los helpers públicos no se publican de forma
-automática. `@remote(name="sendMessage")` define un alias sin envolver el método.
-Nombres privados, alias duplicados, métodos estáticos/de clase, parámetros
-variádicos o exclusivamente posicionales y anotaciones no resolubles se rechazan
-al registrar el Hub. Todos los parámetros requieren anotaciones explícitas y
-sus tipos deben estar importados en runtime para poder inspeccionarse al arrancar.
+## Estructura del módulo
 
-Se admiten métodos async y métodos síncronos breves. Los métodos síncronos se
-ejecutan en el event loop, sin crear threads; el I/O debe usar servicios async.
-Los trabajos durables o extensos pertenecen a Queue.
+| Ruta | Responsabilidad |
+| --- | --- |
+| ../__init__.py | Define las exportaciones del paquete. |
+| orionis.realtime/ | Implementaciones y subpaquetes de esas exportaciones. |
 
-## DI y scopes por invocación
+## Referencia de API
 
-```python
-from app.services.orders import OrderService
+| Símbolo | Importación verificada | Fuente | Declaración | Comportamiento observado |
+| --- | --- | --- | --- | --- |
+| BroadcastResult | from orionis.realtime import BroadcastResult | [entities.py](../entities.py) | BroadcastResult | Count delivered and failed recipients without retaining connections. |
+| ConnectionManager | from orionis.realtime import ConnectionManager | [manager.py](../manager.py) | ConnectionManager | Own worker-local connections and isolate every group by Hub class. Registry mutations contain no await points and run on the application's event loop. Delivery snapshots identifiers before awaiting network I/O. Replacing IConnectionManager is the extension point for distributed delivery; the default registry never crosses process or worker boundaries. |
+| ConnectionManager.config | from orionis.realtime import ConnectionManager | [manager.py](../manager.py) | def config(self) -> RealtimeConfig | Return the immutable application limits used by Hub lifecycles. Returns ------- RealtimeConfig Application-wide invocation, group and broadcast limits. |
+| ConnectionManager.connectionCount | from orionis.realtime import ConnectionManager | [manager.py](../manager.py) | def connectionCount(self) -> int | Return the number of owned, including provisional, connections. Returns ------- int Number of registered connections regardless of readiness. |
+| ConnectionManager.groupCount | from orionis.realtime import ConnectionManager | [manager.py](../manager.py) | def groupCount(self) -> int | Return the number of nonempty Hub-local groups. Returns ------- int Number of groups with at least one registered member. |
+| ConnectionManager.register | from orionis.realtime import ConnectionManager | [manager.py](../manager.py) | def register(self, connection: RealtimeConnectionLike) -> None | Own one provisional connection before its onConnect hook. Parameters ---------- connection : RealtimeConnectionLike Connection with a cryptographically generated unique identifier. Returns ------- None Register the connection, its Hub namespace and empty memberships. Raises ------ ValueError If its identifier is invalid or already belongs to a connection. |
+| ConnectionManager.unregister | from orionis.realtime import ConnectionManager | [manager.py](../manager.py) | def unregister(self, connection: RealtimeConnectionLike) -> None | Release owned registry entries and every group reference. Parameters ---------- connection : RealtimeConnectionLike Exact connection instance to release; repeated release is harmless. Returns ------- None Remove ownership without touching an instance that reused an ID. |
+| ConnectionManager.get | from orionis.realtime import ConnectionManager | [manager.py](../manager.py) | def get(self, connection_id: str, hub: type[Hub] / None) -> RealtimeConnectionLike / None | Look up a ready recipient without crossing an optional Hub boundary. Parameters ---------- connection_id : str Identifier of the requested connection. hub : type[Hub] / None, optional Required owning Hub class, or None to omit namespace filtering. Returns ------- RealtimeConnectionLike / None Ready, nonclosing connection in the requested namespace, or None. |
+| ConnectionManager.snapshot | from orionis.realtime import ConnectionManager | [manager.py](../manager.py) | def snapshot(self) -> tuple[RealtimeConnectionLike, ...] | Snapshot all owned connections for bounded lifecycle shutdown. Returns ------- tuple[RealtimeConnectionLike, ...] Active and provisional connections owned at the time of the call. |
+| ConnectionManager.connectionIds | from orionis.realtime import ConnectionManager | [manager.py](../manager.py) | def connectionIds(self, hub: type[Hub]) -> tuple[str, ...] | Snapshot ready connection identifiers in one Hub namespace. Parameters ---------- hub : type[Hub] Owning Hub class. Returns ------- tuple[str, ...] Current ready recipients; no connection objects are retained. |
+| ConnectionManager.groupIds | from orionis.realtime import ConnectionManager | [manager.py](../manager.py) | def groupIds(self, hub: type[Hub], group: str) -> tuple[str, ...] | Snapshot ready group members without crossing Hub namespaces. Parameters ---------- hub : type[Hub] Owning Hub class. group : str Group name within that Hub. Returns ------- tuple[str, ...] Current ready recipients of the named group. Raises ------ ValueError If the group name is invalid. |
+| ConnectionManager.join | from orionis.realtime import ConnectionManager | [manager.py](../manager.py) | def join(self, connection_id: str, group: str) -> None | Join an active or provisional connection to a bounded group set. Parameters ---------- connection_id : str Owned connection, including one in its onConnect hook. group : str Hub-local group name, at most 256 characters. Returns ------- None Add membership without consuming another slot for repeated joins. Raises ------ ValueError If the group name is invalid. ConnectionError If this connection is absent or closing. RuntimeError If joining another group would exceed its configured limit. |
+| ConnectionManager.leave | from orionis.realtime import ConnectionManager | [manager.py](../manager.py) | def leave(self, connection_id: str, group: str) -> None | Remove membership idempotently and discard empty group entries. Parameters ---------- connection_id : str Connection whose membership is being released. group : str Hub-local group name. Returns ------- None Remove the membership if still owned. Raises ------ ValueError If the group name is invalid. |
+| ConnectionManager.hub | from orionis.realtime import ConnectionManager | [manager.py](../manager.py) | def hub(self, hub: type[Hub]) -> HubClients | Return application-service client targets for a Hub namespace. Parameters ---------- hub : type[Hub] Hub class whose clients should receive events or invocations. Returns ------- HubClients Client selectors without a connection-specific caller. Raises ------ TypeError If the supplied class is not a Hub subclass. |
+| ConnectionManager.broadcast | from orionis.realtime import ConnectionManager | [manager.py](../manager.py) | async def broadcast(self, hub: type[Hub], connection_ids: tuple[str, ...], envelope: object) -> BroadcastResult | Encode once per codec and deliver through bounded concurrent workers. Parameters ---------- hub : type[Hub] Hub namespace restricting every recipient. connection_ids : tuple[str, ...] Recipient identifiers selected by the application. envelope : object Typed or mapping envelope accepted by the selected Hub codecs. Returns ------- BroadcastResult Successful and failed recipient counts; cancellation propagates. Raises ------ TypeError, ValueError If the payload cannot be encoded before delivery begins. |
+| Hub | from orionis.realtime import Hub | [hub.py](../hub.py) | Hub | Define an invocation-scoped realtime endpoint with explicit remote methods. |
+| Hub.onConnect | from orionis.realtime import Hub | [hub.py](../hub.py) | async def onConnect(self) -> None | Run connection initialization before the ready envelope is sent. Returns ------- None A subclass may reject or initialize this connection. |
+| Hub.onDisconnect | from orionis.realtime import Hub | [hub.py](../hub.py) | async def onDisconnect(self, code: int, reason: str / None) -> None | Run after connection-owned calls and registrations are released. Parameters ---------- code : int Observed close code, or an abnormal closure when unavailable. reason : str / None, optional Available peer or local close reason. Returns ------- None A subclass may release application-owned connection resources. |
+| HubClients | from orionis.realtime import HubClients | [clients.py](../clients.py) | HubClients | Select ready clients within one Hub in the current worker. |
+| HubClients.all | from orionis.realtime import HubClients | [clients.py](../clients.py) | def all(self) -> ClientTarget | Return a target for every ready connection to this Hub. Returns ------- ClientTarget Target resolving ready Hub connections at delivery time. |
+| HubClients.caller | from orionis.realtime import HubClients | [clients.py](../clients.py) | def caller(self) -> ClientTarget | Return a target for the calling connection. Returns ------- ClientTarget Single-client target supporting event delivery and invocation. Raises ------ RuntimeError If this proxy was created outside a Hub connection. ValueError If the caller identifier is invalid. |
+| HubClients.others | from orionis.realtime import HubClients | [clients.py](../clients.py) | def others(self) -> ClientTarget | Return a target excluding the calling connection. Returns ------- ClientTarget Target resolving other ready Hub connections at delivery time. Raises ------ RuntimeError If this proxy was created outside a Hub connection. |
+| HubClients.client | from orionis.realtime import HubClients | [clients.py](../clients.py) | def client(self, connection_id: str) -> ClientTarget | Select one connection for event delivery or bidirectional invocation. Parameters ---------- connection_id : str Identifier belonging to a connection in this Hub. Returns ------- ClientTarget Single recipient target; unavailable recipients fail on delivery. Raises ------ ValueError If the identifier is empty, non-string or longer than 128 characters. |
+| HubClients.clients | from orionis.realtime import HubClients | [clients.py](../clients.py) | def clients(self, connection_ids: Iterable[str]) -> ClientTarget | Select explicit recipients, preserving order and removing duplicates. Parameters ---------- connection_ids : Iterable[str] Connection identifiers belonging to this Hub. Returns ------- ClientTarget Multi-recipient target supporting event delivery. Raises ------ TypeError If the input is a string, bytes or a noniterable value. ValueError If any identifier is invalid. |
+| HubClients.group | from orionis.realtime import HubClients | [clients.py](../clients.py) | def group(self, name: str) -> ClientTarget | Select a named group within this Hub namespace. Parameters ---------- name : str Nonempty group name, at most 256 characters. Returns ------- ClientTarget Target resolving current group membership at delivery time. Raises ------ ValueError If the name is empty, non-string or longer than 256 characters. |
+| HubContext | from orionis.realtime import HubContext | [hub.py](../hub.py) | HubContext | Expose connection identity without providing service location. |
+| HubGroups | from orionis.realtime import HubGroups | [groups.py](../groups.py) | HubGroups | Manage group membership owned by the current Hub connection. |
+| HubGroups.join | from orionis.realtime import HubGroups | [groups.py](../groups.py) | async def join(self, group: str) -> None | Join a group without consuming another slot for existing membership. Parameters ---------- group : str Hub-local group name, at most 256 characters. Returns ------- None Add the current connection, subject to its configured group limit. Raises ------ ValueError If the group name is invalid. ConnectionError If the connection is absent or closing. RuntimeError If another membership would exceed the configured group limit. |
+| HubGroups.leave | from orionis.realtime import HubGroups | [groups.py](../groups.py) | async def leave(self, group: str) -> None | Remove the current connection from one group idempotently. Parameters ---------- group : str Hub-local group name. Returns ------- None Remove membership and discard groups with no remaining members. Raises ------ ValueError If the group name is invalid. |
+| HubProtocol | from orionis.realtime import HubProtocol | [protocol.py](../protocol.py) | HubProtocol | Encode Orionis Realtime v1 using route-selected JSON or MessagePack. |
+| HubProtocol.decode | from orionis.realtime import HubProtocol | [protocol.py](../protocol.py) | def decode(self, message: WebSocketMessage) -> ClientMessage | Decode and validate one client envelope from a complete socket message. Parameters ---------- message : WebSocketMessage Text JSON or binary MessagePack message selected by the route. Returns ------- ClientMessage Strict typed request, completion, cancellation or ping/pong. Raises ------ ProtocolError If frame kind, size, fields or structural limits are invalid. |
+| HubProtocol.encode | from orionis.realtime import HubProtocol | [protocol.py](../protocol.py) | def encode(self, message: object) -> str / bytes | Encode an outgoing envelope once for direct send or broadcast reuse. Parameters ---------- message : object Framework-owned envelope containing a serializable result or event. Returns ------- str / bytes Text JSON or binary MessagePack payload. Raises ------ TypeError If an application result cannot be encoded. |
+| remote | from orionis.realtime import remote | [decorators.py](../decorators.py) | def remote(function: F, *, name: str / None) -> F | Mark a supplied instance method for remote dispatch. Parameters ---------- function : F Original instance-method function. name : str / None, optional Public alias, or None to use the Python method name. Returns ------- F Original function with validated remote metadata attached. Raises ------ TypeError If the supplied object is not a Python function. ValueError If the method name or alias is invalid, or metadata is already attached. |
 
-class OrdersHub(Hub):
-    def __init__(self, service: OrderService) -> None:
-        self.service = service
+## Ejemplos de uso
 
-    @remote
-    async def find(self, order_id: int, service: OrderService) -> object:
-        return await service.find(order_id)
-```
+    from orionis.realtime import BroadcastResult
 
-El cliente sólo suministra `order_id`. `service` siempre se resuelve mediante
-Container: un payload que intente reemplazarlo se rechaza. Las posiciones de
-`args` omiten los servicios inyectados. Las clases de servicio concretas,
-contratos, contexto del framework y dependencias opcionales permanecen bajo DI.
-Incluso `service: OrderService | None = None` resuelve el servicio; ese default
-no concede control al cliente.
+La ruta de importación coincide con la tabla de API. Estado de importación: executed successfully under Python 3.14.3.
 
-Tipos primitivos, colecciones tipadas compatibles, enums y `msgspec.Struct` se
-validan como datos. Las conversiones son estrictas y los schemas Orionis ejecutan
-sus reglas existentes. Los defaults y schemas convertidos se pasan explícitamente
-al método, sin reutilizar el body de una petición HTTP. Las uniones ambiguas entre
-datos y servicios se rechazan durante el arranque.
+## Características de diseño
 
-El kernel conserva un scope durante toda la conexión. Cada RPC admitida abre
-un scope independiente basado en `contextvars` y crea una instancia nueva de Hub.
-Dos invocaciones concurrentes tienen servicios `SCOPED` diferentes. Constructor
-y método dentro de la misma invocación comparten los servicios de ese scope.
-Socket, contexto y selectores de conexión se vuelven a registrar explícitamente.
+El paquete utiliza una superficie pública explícita. Los símbolos privados no se incluyen; las declaraciones se enlazan al propietario concreto.
 
-No guardes estado global o de conexión en una instancia de Hub. `HubContext` es
-inmutable y contiene `connection_id`, `socket` y `user`. Una conexión no equivale
-a un usuario ni a una sesión; un usuario puede mantener varias conexiones.
+## Rendimiento y concurrencia
 
-## Lifecycle, autenticación y autorización
+No se declara una garantía uniforme en el nivel del paquete. Inspeccione cada archivo enlazado para E/S, corutinas, cachés, bloqueos y estado compartido.
 
-```python
-class ChatHub(Hub):
-    async def onConnect(self) -> None:
-        if self.context.user is None:
-            await self.context.socket.reject(status_code=401)
-            return
-        await self.groups.join("authenticated")
+## Notas de compatibilidad
 
-    async def onDisconnect(self, code: int, reason: str | None = None) -> None:
-        pass
-```
+Mínimo declarado: Python 3.14. La validación usó Python 3.14.3. Los límites de dependencias están en pyproject.toml.
 
-La conexión está registrada provisionalmente durante `onConnect`, por lo que
-puede incorporarse a grupos, pero sólo puede recibir envíos mediante selectores
-después del mensaje `ready`. El runtime acepta el socket tras el hook si éste
-no lo aceptó antes. No envíes mensajes del protocolo ni invoques clientes desde
-`onConnect`: todavía no recibieron `ready`.
+## Verificación y limitaciones
 
-Toda salida cancela RPC activas, resuelve los futures pendientes con error,
-elimina grupos y la entrada del registro, y ejecuta `onDisconnect`. Sus errores
-no impiden liberar el socket. El hook de desconexión tiene un límite temporal;
-el shutdown existente del kernel cancela los owners de conexión. El código de
-aplicación debe cooperar con la cancelación.
-
-Usa `Route.hub(...).middleware(TuWebSocketMiddleware)` con el contrato
-`handle(socket: WebSocket, call_next: WebSocketNext) -> None`. No se admiten
-middlewares HTTP que requieren Request/Response. El socket expone headers,
-cookies, query, path, client/server y scheme del handshake.
-
-WebSocket no ejecuta automáticamente middleware de sesión HTTP ni restauración
-de identidad por sesión/token. El middleware de conexión debe validar sus
-credenciales mediante los servicios de identidad/guards apropiados y publicar
-el contexto Auth existente. Tras obtener `validated_user` e inyectar un
-`IPermissionRepository` llamado `permissions`, puede hacer:
-
-```python
-from orionis.auth.context.context import AuthenticationContext
-from orionis.auth.context.functions import bind_auth_context
-
-bind_auth_context(AuthenticationContext(
-    identity=validated_user,
-    guard="websocket",
-    repository=permissions,
-))
-```
-
-Los métodos remotos usan `await Auth.can(...)` o servicios de autorización
-inyectados. No existe otra ACL dentro de Realtime. Estar autenticado no autoriza
-todas las operaciones ni el acceso a cualquier grupo.
-
-Cada invocación copia la identidad y restricciones de credencial del contexto
-Auth integrado, con locks y snapshots de permisos independientes. Las
-implementaciones personalizadas de `IAuthenticationContext` deben adaptarse
-explícitamente al contexto integrado: esta versión no presupone un contrato de
-clonación personalizado. La conexión no revalida automáticamente su credencial
-original en cada llamada; la aplicación debe añadir las verificaciones de
-revocación que requiera a su autorización.
-
-## Grupos, broadcasts y selectores
-
-```python
-class ChatHub(Hub):
-    @remote
-    async def joinRoom(self, room: str) -> None:
-        # Autorizar el acceso antes de incorporar esta conexión.
-        await self.groups.join(room)
-
-    @remote
-    async def sendMessage(self, room: str, message: str) -> dict:
-        result = await self.clients.group(room).send(
-            "messageReceived", {"room": room, "message": message},
-        )
-        return {"sent": result.sent, "failed": result.failed}
-```
-
-`await self.groups.leave(name)` es idempotente. Repetir `join` no consume otro
-slot. La desconexión elimina membresías y grupos vacíos. Los grupos pertenecen
-al namespace del Hub: nombres iguales en Hubs diferentes no mezclan destinatarios.
-
-| Selector | Destinatarios |
-|---|---|
-| `self.clients.all` | Conexiones listas de este Hub. |
-| `self.clients.caller` | La conexión actual. |
-| `self.clients.others` | Las otras conexiones listas de este Hub. |
-| `self.clients.client(id)` | Una conexión explícita del mismo Hub. |
-| `self.clients.clients(ids)` | Varios identificadores, sin duplicados. |
-| `self.clients.group(name)` | Miembros listos del grupo de este Hub. |
-
-`await target.send(event, *args)` devuelve `BroadcastResult(sent, failed)`.
-`sent` cuenta envíos de transporte, no la ejecución del handler del cliente.
-Un fallo de destinatario no aborta los demás; un grupo vacío devuelve ceros.
-Los selectores caller/others requieren contexto de conexión.
-
-El broadcast serializa una vez por codec y utiliza como máximo
-`broadcast_concurrency` workers. Comparte strings/bytes inmutables, espera el
-backpressure del socket y no crea una task por cada destinatario de un broadcast
-grande ni una cola de salida ilimitada.
-
-## Invocación al cliente y emisión desde servicios
-
-```python
-state = await self.clients.client(connection_id).invoke(
-    "getState", {"section": "orders"}, timeout=5,
-)
-```
-
-`invoke` espera un completion correlacionado, mientras `send` sólo espera el
-envío. Invoke se permite únicamente para un cliente explícito o caller; un
-selector múltiple lanza `RuntimeError`. Cada conexión posee un mapa acotado de
-futures, con cleanup al completar, expirar, cancelar o desconectar. Los
-completions desconocidos/duplicados se ignoran.
-
-Timeout lanza `TimeoutError`; desconexión, `ConnectionError`; un error informado
-por el cliente produce `orionis.realtime.errors.ClientInvocationError` con
-mensaje sanitizado. La cancelación/timeout del servidor no envía automáticamente
-un `cancel` al cliente en v1; una respuesta tardía se ignora.
-
-El provider eager y facade siguen el patrón normal de Orionis:
-
-```python
-from orionis.support.facades import Realtime
-
-await Realtime.hub(ChatHub).group("general").send(
-    "messageReceived", {"message": "Mantenimiento próximo"},
-)
-
-state = await Realtime.hub(DeviceHub).client(connection_id).invoke(
-    "getState", timeout=5,
-)
-```
-
-También se puede inyectar `IConnectionManager`. Facade y Hub delegan al mismo
-owner, sin registros paralelos. Sustituir ese contrato es el punto de extensión
-para distribución futura; no se incluye ningún backplane Redis/Kafka/etc.
-
-**Límite multi-worker:** el registro y los broadcasts sólo abarcan el proceso o
-worker actual. No hay replay, cola offline ni persistencia de mensajes.
-WebSocket send/RPC = realtime no durable. Queue job = ejecución durable.
-
-## Streaming y cancelación
-
-```python
-from collections.abc import AsyncIterator
-from app.services.progress import ProgressService
-
-class ProgressHub(Hub):
-    @remote
-    async def watchProgress(
-        self, process_id: str, service: ProgressService,
-    ) -> AsyncIterator[int]:
-        async for value in service.watch(process_id):
-            yield value
-```
-
-Cada valor genera `stream_item` y el final produce `stream_complete`. El runtime
-espera el envío antes de solicitar el siguiente valor: no acumula el stream.
-Fallo del productor/serialización genera un error terminal controlado.
-`aclose()` se espera cuando el iterador lo ofrece, incluida la cancelación.
-La limpieza del productor y la liberación del scope de invocación terminan
-antes de enviar el envelope terminal de éxito o error.
-
-El cliente envía `{"type":"cancel","id":"su-invocation-id"}`. Sólo se
-cancela esa RPC, se ejecuta su `finally` y se cierra su scope. Un envío que ya
-estaba en curso puede terminar antes del error de cancelación; no se interrumpe
-la escritura compartida del socket. Desconectar cancela todo el trabajo de esa
-conexión. No captures `CancelledError` para ignorarlo.
-
-Una vez que ejecución y cleanup fijan el resultado, una cancelación que llegue
-durante su entrega final no puede reemplazarlo ni generar un segundo terminal.
-El cliente puede reutilizar el ID después de recibir el envelope terminal. El
-servidor conserva la propiedad de la tarea de entrega hasta que termina y la
-incluye en el cleanup de desconexión o shutdown.
-
-Async generators y métodos anotados `AsyncIterable`/`AsyncIterator` no tienen
-timeout de stream predeterminado. El cliente puede enviar `timeout` positivo,
-finito y no mayor que `invocation_timeout`. Las llamadas ordinarias sí usan ese
-timeout predeterminado. La duración de la conexión es independiente.
-
-El deadline de invocación abarca DI, binding, ejecución, entrega de elementos
-del stream y limpieza del productor. La entrega final de `completion` o
-`stream_complete` ocurre después de liberar el scope y fuera de ese deadline,
-respetando todavía el backpressure de red. Puede terminar después del tiempo
-configurado sin producir un segundo resultado de timeout. Tanto las invocaciones
-activas como las que terminan de entregar su terminal cuentan para
-`max_concurrent_invocations`; un cliente lento no acumula tareas de entrega sin
-límite. Si el cliente necesita un plazo para recibir el terminal, debe mantener
-también su propio temporizador local.
-
-## Configuración y arquitectura
-
-En `config/realtime.py` usa una entidad frozen siguiendo la convención actual:
-
-```python
-from dataclasses import dataclass
-from orionis.foundation.config.realtime import RealtimeConfig
-
-@dataclass(frozen=True, kw_only=True)
-class BootstrapAppRealtime(RealtimeConfig):
-    max_concurrent_invocations: int = 16
-    max_pending_client_invocations: int = 32
-    invocation_timeout: float = 30.0
-    client_result_timeout: float = 30.0
-    broadcast_concurrency: int = 32
-    max_groups_per_connection: int = 64
-    max_message_size: int = 1024 * 1024
-```
-
-Los límites raw `http.websocket` también se aplican. El codec se selecciona con
-`Route.hub(..., protocol="json" | "msgpack")`: JSON es el default y MessagePack
-usa msgspec sin instalar otra dependencia. No se negocia mediante subprotocol.
-
-Los códigos estables incluyen `method_not_found`, `invalid_arguments`,
-`validation_error`, `unauthorized`, `forbidden`, `busy`, `timeout`, `cancelled`
-e `internal_error`. Los mensajes no contienen tracebacks, rutas, SQL ni secretos.
-Los errores estructurales del protocolo y fallos fatales cierran la conexión.
-No se loguea cada mensaje ni sus payloads.
-
-`Hub`/`HubContext`/`remote` son la API de aplicación; `RemoteMethod` conserva el
-dispatch y binding; `HubProtocol` codifica/decodifica; `HubRuntime` gobierna
-scopes y lifecycle; `RealtimeConnection` posee tasks/futures; `ConnectionManager`
-posee conexiones y grupos; `HubClients`/`HubGroups` ofrecen selectores pequeños;
-`RealtimeProvider` y `Realtime` integran el Container y facade.
-
-El hot path usa msgspec, lookup del dispatch compilado, validación, DI y envío
-esperado. La caché acotada no retiene instancias de Hub. No hay reflection de
-clases por mensaje, imports controlados por la red, threads, heartbeat obligatorio,
-BackgroundTask ni buffers durables. Las diferencias ASGI/RSGI permanecen en sus
-adapters raw; RSGI no expone headers/subprotocol de aceptación ni detalles del
-close frame. No se afirman mejoras de benchmark sin medirlas.
+Se analizaron los archivos Python y se verificaron las exportaciones. Las excepciones de dependencias, callbacks, E/S o configuración pueden propagarse y no se presentan como exhaustivas.

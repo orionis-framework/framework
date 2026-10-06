@@ -1,844 +1,245 @@
-# Orionis Storage (`orionis.storage`)
+# orionis.storage
 
-> Async, driver-agnostic file storage: a single API for local disks, in-memory disks, Amazon S3, Azure Blob Storage, and Google Cloud Storage.
+> API reference derived from the current implementation.
 
 ## Table of contents
 
-- [Requirements](#requirements)
-- [Functional description](#functional-description)
-  - [Where it fits in the framework](#where-it-fits-in-the-framework)
-  - [Component pipeline](#component-pipeline)
-  - [File map](#file-map)
-  - [Design decisions](#design-decisions)
-- [API reference](#api-reference)
-  - [`StorageManager`](#storagemanager)
-  - [`Disk`](#disk)
-  - [`File`](#file)
-  - [`Directory`](#directory)
-  - [`UploadedFile`](#uploadedfile)
-  - [`AsyncStream`](#asyncstream)
-  - [`IStorageDriver`](#istoragedriver)
-  - [`LocalStorageDriver`](#localstoragedriver)
-  - [`MemoryStorageDriver`](#memorystoragedriver)
-  - [`S3StorageDriver`](#s3storagedriver)
-  - [`AzureStorageDriver`](#azurestoragedriver)
-  - [`GoogleStorageDriver`](#googlestoragedriver)
-  - [Driver helper functions](#driver-helper-functions)
-  - [`FileInfo`](#fileinfo)
-  - [`Visibility`](#visibility)
-  - [Path normalization](#path-normalization)
-  - [Exceptions](#exceptions)
-  - [`StorageProvider` and the `Storage` facade](#storageprovider-and-the-storage-facade)
-  - [Configuration keys](#configuration-keys)
-- [Usage examples](#usage-examples)
-  - [Resolving a disk through the facade](#resolving-a-disk-through-the-facade)
-  - [Handling errors](#handling-errors)
-  - [Streaming large files](#streaming-large-files)
-  - [Storing an HTTP upload](#storing-an-http-upload)
-  - [Running standalone with the memory driver](#running-standalone-with-the-memory-driver)
-  - [Registering a custom driver](#registering-a-custom-driver)
-- [Performance and concurrency considerations](#performance-and-concurrency-considerations)
-- [Compatibility notes](#compatibility-notes)
+- Requirements
+- Functional overview
+- Module structure
+- API reference
+- Usage examples
+- Design characteristics
+- Performance and concurrency
+- Compatibility notes
+- Verification and limitations
 
 ## Requirements
 
-The `local` and `memory` drivers require nothing beyond `uv add orionis`: they
-only use the standard library (`asyncio`, `hashlib`, `mimetypes`, `shutil`,
-`pathlib`, `secrets`, `io`, `urllib.parse`).
+Python 3.14 or newer, as declared by pyproject.toml.
 
-The cloud drivers rely on the official SDK of each platform, declared as **optional
-dependencies** in `pyproject.toml`:
+## Functional overview
 
-| Driver | PyPI package | Minimum version | Install |
-| --- | --- | --- | --- |
-| `S3StorageDriver` | `boto3` | `>=1.35` | `uv add 'orionis[s3]'` |
-| `AzureStorageDriver` | `azure-storage-blob` | `>=12.24` | `uv add 'orionis[azure]'` |
-| `GoogleStorageDriver` | `google-cloud-storage` | `>=2.18` | `uv add 'orionis[gcs]'` |
-| All three at once | — | — | `uv add 'orionis[storage]'` |
+The orionis.storage initializer exports 13 public symbols. This reference uses __all__, export routes, and current source files as evidence.
 
-The SDK is never imported at construction time: each driver bootstraps its client on
-the first operation through `import_driver_dependency()`, so a missing package raises
-`MissingStorageDependencyException` with the exact install command instead of an
-`ImportError` at startup.
+## Module structure
 
-## Functional description
-
-### Where it fits in the framework
-
-`orionis.storage` provides uniform, fully asynchronous access to file storage,
-independently of the physical medium behind it. Application code always talks to the
-same objects (`Disk`, `File`, `Directory`); swapping a local disk for an S3 bucket is
-a configuration change, not a code change.
-
-Direct relationships with other modules:
-
-- `orionis.foundation.config.filesystems` — supplies the `Filesystems` / `Disks`
-  configuration entities that `StorageManager` reads through `app.config("filesystems")`.
-- `orionis.foundation` (`core_providers.py`) — registers `StorageProvider`.
-- `orionis.container` — resolves `IStorageManager` and powers the `Storage` facade.
-- `orionis.http.payload` — produces the multipart payload that `UploadedFile` adapts.
-  The HTTP contract is imported only under `TYPE_CHECKING`, so the storage module never
-  depends on the HTTP layer at runtime.
-
-### Component pipeline
-
-```text
-Storage (facade)  ->  IStorageManager
-                        |
-                        |  disk(name) / default()          cached per name
-                        v
-                      Disk  ------------------------------ IStorageDriver
-                        |                                   (local | memory |
-                        |  file(path) / directory(path)      s3 | azure | gcs |
-                        v                                    custom via extend)
-              File            Directory
-                |                 |
-                |  open()         |  files() / directories()
-                v                 v
-           AsyncStream        list[File] / list[Directory]
-
-UploadedFile  ->  manager.disk(disk).file(target).writeStream(chunks)
-```
-
-Every operation on `Disk`, `File`, and `Directory` is delegated to the driver, and the
-driver only speaks in canonical root-relative paths produced by
-`normalize_path()` / `normalize_file_path()`.
-
-### File map
-
-| File | Content |
+| Path | Responsibility |
 | --- | --- |
-| `manager.py` | `StorageManager`: reads the configuration, builds and caches disks, registers custom drivers, adapts HTTP uploads. |
-| `disk.py` | `Disk`: factory of `File` / `Directory` objects plus shortcut methods that always delegate to them. |
-| `file.py` | `File`: every single-file operation (content, metadata, relocation, URLs). |
-| `directory.py` | `Directory`: creation, deletion, existence, and listings that return objects, never strings. |
-| `uploaded_file.py` | `UploadedFile`: adapts an HTTP multipart payload so it can be persisted onto any disk. |
-| `stream.py` | `AsyncStream`: async wrapper over a lazily opened binary handle. |
-| `paths.py` | `normalize_path()` / `normalize_file_path()`: canonical form and traversal protection. |
-| `exceptions.py` | Exception hierarchy rooted at `StorageException`. |
-| `provider.py` | `StorageProvider`: binds `IStorageManager` and pins the `Storage` facade. |
-| `contracts/` | ABCs: `IStorageManager`, `IDisk`, `IFile`, `IDirectory`, `IUploadedFile`, `IStorageStream`, `IStorageDriver`. |
-| `drivers/local.py` | `LocalStorageDriver` (filesystem, atomic writes, POSIX permissions). |
-| `drivers/memory.py` | `MemoryStorageDriver` (in-process dictionaries, for tests/ephemeral use). |
-| `drivers/s3.py` | `S3StorageDriver` (Amazon S3 and S3-compatible services). |
-| `drivers/azure.py` | `AzureStorageDriver` (Azure Blob Storage). |
-| `drivers/gcs.py` | `GoogleStorageDriver` (Google Cloud Storage). |
-| `drivers/functions.py` | Helpers shared by drivers: lazy import, mode validation, download target, key filtering. |
-| `entities/file_info.py` | `FileInfo`: immutable metadata snapshot. |
-| `enums/visibility.py` | `Visibility`: `PUBLIC` / `PRIVATE`. |
-
-### Design decisions
-
-- **Driver pattern** — `IStorageDriver` isolates the medium; `File` / `Directory` /
-  `Disk` never know which backend they run on, so the same code works on every disk.
-- **No duplicated logic** — `Disk.put/exists/delete/copy/move` delegate to `File`, and
-  `Directory.files()` builds `File` objects; there is a single implementation per behavior.
-- **`__slots__` on every concrete class** (`StorageManager`, `Disk`, `File`, `Directory`,
-  `UploadedFile`, `AsyncStream`, all drivers) **and `__slots__ = ()` on every contract** —
-  instances carry no attribute dictionary, which bounds per-object memory.
-- **Immutable metadata** — `FileInfo` is a `@dataclass(frozen=True, kw_only=True, slots=True)`,
-  so a snapshot can be passed around without risk of mutation.
-- **Lazy SDK import** — cloud driver constructors perform no I/O and no import, which makes
-  them constructible (and testable) without the SDK installed.
-- **Path normalization at the boundary** — `File` and `Directory` normalize in `__init__`,
-  so drivers can assume paths are already safe.
-- **Deferrable provider** — `StorageProvider` implements `DeferrableProvider`, so nothing
-  in the storage stack is built until `IStorageManager` is first resolved.
-
-### Import and construction policy
-
-`orionis.storage.__init__` and `orionis.storage.drivers.__init__` resolve their
-public exports on first access and cache each resolved class. Importing the
-package alone does not import driver implementations. Selecting the local driver
-does not import the cloud drivers. The small `contracts`, `entities`, and `enums`
-package initializers remain eager because they expose cohesive types with no
-optional backend dependencies.
-
-`StorageManager`, `Disk`, `File`, and `Directory` initialize their required
-state eagerly. `File` and `Directory` normalize paths when constructed so later
-operations use canonical paths. Cloud driver constructors keep SDK loading and
-client creation deferred until the first storage operation.
-
-The canonical module helper names use `snake_case`. Existing mixed-case names
-remain available as cached compatibility exports.
+| ../__init__.py | Defines package exports. |
+| orionis.storage/ | Implementations and subpackages for those exports. |
 
 ## API reference
 
-### `StorageManager`
-
-`orionis.storage.manager.StorageManager` — implements
-`orionis.storage.contracts.manager.IStorageManager`.
-
-`__slots__ = ("_app", "_base_path", "_config", "_custom", "_default", "_disks")`
-
-```python
-def __init__(self, app: IApplication) -> None
-```
-
-Reads `app.config("filesystems")` and, when it is a `dict`, converts it into the
-validated `Filesystems` entity. Stores `app.basePath` as the anchor for relative local
-roots, and the configured `default` disk name.
-
-| Method | Signature | Description |
-| --- | --- | --- |
-| `disk` | `disk(name: str \| None = None) -> IDisk` | Resolves the disk declared under `name` (or the default one). Built on first access and cached in `_disks`. Raises `DiskNotFoundException` when the disk is not declared, and `DriverNotSupportedException` when its `driver` has no implementation. |
-| `default` | `default() -> IDisk` | Shortcut for `disk()`. |
-| `extend` | `extend(driver: str, factory: Callable[[object], IStorageDriver]) -> None` | Registers a factory for a driver name. The factory receives the disk configuration entity and must return a ready driver. **Side effect:** clears the disk cache so subsequent resolutions pick the factory up. |
-| `uploaded` | `uploaded(source: IHttpUploadedFile) -> IUploadedFile` | Wraps an HTTP multipart payload in an `UploadedFile` bound to this manager. |
-
-Driver resolution order inside the private `__buildDriver()`:
-
-1. Factory registered with `extend()` for the disk's `driver` value (always wins).
-2. `"local"` → `LocalStorageDriver`, rooted at `config.path`; relative paths are
-   anchored to `app.basePath`, and `config.url` becomes the public base URL.
-3. `"memory"` → `MemoryStorageDriver(base_url=config.url)`.
-4. `"aws"` or `"s3"` → `S3StorageDriver(config)`.
-5. `"azure"` → `AzureStorageDriver(config)`.
-6. `"gcs"` or `"google"` → `GoogleStorageDriver(config)`.
-7. Anything else → `DriverNotSupportedException`.
-
-### `Disk`
-
-`orionis.storage.disk.Disk` — implements `orionis.storage.contracts.disk.IDisk`.
-
-`__slots__ = ("_driver", "_name")`
-
-```python
-def __init__(self, name: str, driver: IStorageDriver) -> None
-```
-
-| Method | Signature | Description |
-| --- | --- | --- |
-| `name` | `name() -> str` | Configuration name of the disk. |
-| `file` | `file(path: str) -> IFile` | Builds a `File` bound to this driver. Raises `StoragePathException` for an invalid path or one that resolves to the root. |
-| `directory` | `directory(path: str = "") -> IDirectory` | Builds a `Directory`; the empty string is the disk root. Raises `StoragePathException` on escape attempts. |
-| `put` | `async put(path: str, contents: bytes \| str, visibility: str \| None = None) -> IFile` | `self.file(path).write(contents, visibility)`. |
-| `exists` | `async exists(path: str) -> bool` | `self.file(path).exists()`. |
-| `delete` | `async delete(path: str) -> bool` | `self.file(path).delete()`. |
-| `copy` | `async copy(source: str, target: str) -> IFile` | `self.file(source).copyTo(target)`. |
-| `move` | `async move(source: str, target: str) -> IFile` | `self.file(source).moveTo(target)`. |
-
-### `File`
-
-`orionis.storage.file.File` — implements `orionis.storage.contracts.file.IFile`.
-
-`__slots__ = ("_driver", "_path")`
-
-```python
-def __init__(self, driver: IStorageDriver, path: str) -> None
-```
-
-The path is normalized with `normalize_file_path()` at construction time, so an invalid
-path fails immediately with `StoragePathException` and never reaches the driver.
-
-| Method | Signature | Notes |
-| --- | --- | --- |
-| `path` | `path() -> str` | Canonical root-relative path. |
-| `read` | `async read() -> bytes` | Raises `StorageFileNotFoundException`. |
-| `readStream` | `readStream(chunk_size: int = 65536) -> AsyncIterator[bytes]` | Not a coroutine: returns the driver's async iterator, consume it with `async for`. |
-| `write` | `async write(contents: bytes \| str, visibility: str \| None = None) -> IFile` | `str` is encoded as UTF-8. Returns `self` (fluent). |
-| `writeStream` | `async writeStream(stream: AsyncIterable[bytes], visibility: str \| None = None) -> IFile` | Returns `self`. |
-| `open` | `open(mode: str = "rb") -> IStorageStream` | Sync call returning a lazily opened stream. Accepted modes: `rb`, `wb`, `ab`, `rb+`, `wb+`, `ab+`; anything else raises `UnsupportedStorageOperationException`. |
-| `delete` | `async delete() -> bool` | `True` when the file existed. |
-| `exists` | `async exists() -> bool` | — |
-| `copyTo` | `async copyTo(target: str) -> IFile` | Returns a **new** `File` pointing at the copy. |
-| `moveTo` | `async moveTo(target: str) -> IFile` | Returns a new `File`; the current object keeps pointing at the old path. |
-| `rename` | `async rename(name: str) -> IFile` | Renames within the same directory. Raises `StoragePathException` if `name` is empty or contains `/` or `\`. |
-| `size` | `async size() -> int` | Bytes. |
-| `mimeType` | `async mimeType() -> str \| None` | — |
-| `lastModified` | `async lastModified() -> datetime` | Timezone-aware (UTC). |
-| `url` | `async url() -> str` | Raises `UnsupportedStorageOperationException` when the disk exposes no public URLs. |
-| `temporaryUrl` | `async temporaryUrl(expires_in: int = 3600) -> str` | Signed URL; unsupported by `local` and `memory`. |
-| `visibility` | `async visibility() -> str` | `'public'` or `'private'`. |
-| `setVisibility` | `async setVisibility(visibility: str) -> IFile` | Returns `self`. |
-| `download` | `async download(destination: str \| Path) -> Path` | Copies to the local filesystem; when `destination` is an existing directory the original name is kept. Returns the absolute path. |
-| `hash` | `async hash(algorithm: str = "sha256") -> str` | Any algorithm accepted by `hashlib.new`. |
-| `info` | `async info() -> FileInfo` | Metadata snapshot. |
-
-### `Directory`
-
-`orionis.storage.directory.Directory` — implements
-`orionis.storage.contracts.directory.IDirectory`.
-
-`__slots__ = ("_driver", "_path")`
-
-```python
-def __init__(self, driver: IStorageDriver, path: str = "") -> None
-```
-
-The path is normalized with `normalize_path()`; the empty string denotes the disk root.
-
-| Method | Signature | Notes |
-| --- | --- | --- |
-| `path` | `path() -> str` | Empty string means the disk root. |
-| `create` | `async create() -> IDirectory` | Creates missing parents. Returns `self`. |
-| `delete` | `async delete() -> bool` | Recursive. `True` when it existed. |
-| `exists` | `async exists() -> bool` | — |
-| `files` | `async files() -> list[IFile]` | Direct children only, sorted by path. |
-| `allFiles` | `async allFiles() -> list[IFile]` | Whole subtree. |
-| `directories` | `async directories() -> list[IDirectory]` | Direct children only. |
-| `allDirectories` | `async allDirectories() -> list[IDirectory]` | Whole subtree. |
-
-Listing methods return `File` / `Directory` objects, never strings: the driver returns
-paths and `Directory` wraps them.
-
-### `UploadedFile`
-
-`orionis.storage.uploaded_file.UploadedFile` — implements
-`orionis.storage.contracts.uploaded_file.IUploadedFile`.
-
-`__slots__ = ("_hash_name", "_manager", "_source")`
-
-```python
-def __init__(self, source: IHttpUploadedFile, manager: IStorageManager) -> None
-```
-
-| Method | Signature | Notes |
-| --- | --- | --- |
-| `originalName` | `originalName() -> str` | `source.filename` (already sanitized by the HTTP layer). |
-| `extension` | `extension() -> str` | Lowercase, dot included; empty string when there is none. |
-| `size` | `size() -> int` | Payload bytes. |
-| `mimeType` | `mimeType() -> str \| None` | MIME type declared by the client. |
-| `hashName` | `hashName() -> str` | `secrets.token_hex(20)` plus the original extension. Generated once and cached per instance. |
-| `read` | `async read() -> bytes` | Reads the whole payload on a worker thread. |
-| `store` | `async store(directory: str = "", disk: str \| None = None, visibility: str \| None = None) -> IFile` | Persists under the generated hash name. |
-| `storeAs` | `async storeAs(directory: str, name: str, disk: str \| None = None, visibility: str \| None = None) -> IFile` | Explicit name. Raises `StoragePathException` if `name` is empty or contains a separator. |
-| `move` | `async move(directory: str, name: str \| None = None, disk: str \| None = None) -> IFile` | Persists and then closes the upload buffer. |
-| `copy` | `async copy(directory: str, name: str \| None = None, disk: str \| None = None) -> IFile` | Persists and keeps the buffer usable. |
-
-Persistence always goes through `manager.disk(disk).file(target).writeStream(...)`, and
-the payload is streamed chunk by chunk (the blocking iterator is advanced with
-`asyncio.to_thread`), so an upload spooled to a temporary file is never fully loaded
-into memory.
-
-### `AsyncStream`
-
-`orionis.storage.stream.AsyncStream` — implements
-`orionis.storage.contracts.stream.IStorageStream`.
-
-`__slots__ = ("_handle", "_on_close", "_opener")`
-
-```python
-def __init__(
-    self,
-    opener: Callable[[], BinaryIO],
-    on_close: Callable[[BinaryIO], None] | None = None,
-) -> None
-```
-
-The handle is created by `opener` on first use (or on `__aenter__`) and every blocking
-operation runs on a worker thread.
-
-| Method | Signature | Notes |
-| --- | --- | --- |
-| `read` | `async read(size: int = -1) -> bytes` | `-1` reads to EOF. |
-| `write` | `async write(data: bytes) -> int` | Bytes written. |
-| `seek` | `async seek(offset: int, whence: int = 0) -> int` | New absolute position. |
-| `close` | `async close() -> None` | Invokes `on_close` with the open handle, then closes it. Detaches the handle first, so a double close is a no-op. |
-| `__aenter__` | `async __aenter__() -> IStorageStream` | Opens the handle and returns the stream. |
-| `__aexit__` | `async __aexit__(exc_type, exc, traceback) -> None` | Always closes. |
-
-The `on_close` callback is what lets the memory driver flush the buffer back into its
-store when a writable stream is closed.
-
-### `IStorageDriver`
-
-`orionis.storage.contracts.driver.IStorageDriver` — ABC with 24 abstract methods.
-Application code never touches a driver directly.
-
-| Group | Methods |
-| --- | --- |
-| Content | `read`, `readStream`, `write`, `writeStream`, `delete`, `exists`, `open` |
-| Relocation | `copy`, `move`, `download` |
-| Metadata | `size`, `mimeType`, `lastModified`, `visibility`, `setVisibility`, `hash`, `info` |
-| Directories | `createDirectory`, `deleteDirectory`, `directoryExists`, `files`, `directories` |
-| URLs | `url`, `temporaryUrl` |
-
-`readStream` and `open` are the only non-`async def` members: `readStream` is
-implemented as an async generator (call it and iterate with `async for`) and `open`
-returns the stream object synchronously.
-
-`files()` and `directories()` take `recursive` as a keyword-only argument
-(`files(path="", *, recursive=False)`).
-
-Capability matrix of the five built-in drivers:
-
-| Capability | `local` | `memory` | `s3` | `azure` | `gcs` |
-| --- | --- | --- | --- | --- | --- |
-| `url()` | Requires configured `url`, otherwise `UnsupportedStorageOperationException` | Same as local | Configured `url`, custom `endpoint`, or virtual-host address | Configured `url` or the Azure blob endpoint | Configured `url` or `storage.googleapis.com` |
-| `temporaryUrl()` | Always raises `UnsupportedStorageOperationException` | Always raises `UnsupportedStorageOperationException` | `generate_presigned_url` | SAS token; requires the account key | V4 signed URL; requires a signing key |
-| `visibility()` | Derived from permission bits (`st_mode & 0o044`) | Value stored with the entry | Object ACL grants for `AllUsers` | Container access policy | `allUsers` entry in the blob ACL |
-| `setVisibility()` | `chmod` `0o644` / `0o600` | Updates the stored value | `put_object_acl` | Always raises `UnsupportedStorageOperationException` | Predefined ACL |
-| Directories | Real filesystem directories | Explicit set plus prefixes implied by keys | Zero-byte `path/` markers plus implied prefixes | Same as S3 | Same as S3 |
-
-### `LocalStorageDriver`
-
-`orionis.storage.drivers.local.LocalStorageDriver`
-
-`__slots__ = ("_base_url", "_root")`
-
-```python
-def __init__(self, root: Path, base_url: str | None = None) -> None
-```
-
-- `root` is resolved with `Path.resolve()` and created with `mkdir(parents=True, exist_ok=True)`
-  in the constructor.
-- `base_url` has its trailing `/` stripped; when it is `None`, `url()` raises and
-  `FileInfo.url` is `None`.
-- **Atomic writes:** `write()` and `writeStream()` write to a sibling
-  `<name>.<random>.tmp` file and then `Path.replace()` it over the destination. The
-  random infix gives every call its own staging file, so writers racing on the same path
-  never mix payloads; a failed write removes only its own temporary file and leaves the
-  destination untouched.
-- Because of that, `files()` skips entries whose name ends in `.tmp`.
-- Visibility maps onto POSIX bits: files `0o644` (public) / `0o600` (private),
-  directories `0o755` / `0o700`. An unknown level raises `UnsupportedStorageOperationException`.
-- `info()` reads the file once and computes MD5 (`etag`) and SHA-256 (`checksum`) in the
-  same pass; `createdAt` uses `st_birthtime` when the platform provides it, otherwise `None`.
-- `mimeType()` is derived from the extension via `mimetypes.guess_type()` and performs no
-  disk access.
-- Every blocking call runs through `asyncio.to_thread`.
-
-### `MemoryStorageDriver`
-
-`orionis.storage.drivers.memory.MemoryStorageDriver`
-
-`__slots__ = ("_base_url", "_directories", "_files")`
-
-```python
-def __init__(self, base_url: str | None = None) -> None
-```
-
-Keeps every object in process memory: `_files` maps paths to `_MemoryEntry`
-(`content`, `visibility`, `created_at`, `modified_at`) and `_directories` holds the
-directories created explicitly. Designed for tests and ephemeral workloads.
-
-- A new entry defaults to `Visibility.PRIVATE` when `write()` receives `visibility=None`;
-  on an overwrite the previous visibility is preserved and `created_at` is kept.
-- `open()` works over `io.BytesIO`: read modes require an existing file, append modes
-  seek to the end, and every writable mode flushes back into the store on close.
-- `download()` does touch the filesystem — it writes the in-memory content to the local
-  destination.
-- Concurrency: the store is a plain dictionary mutated without locks. Every operation
-  completes without awaiting midway, so concurrent tasks on a single event loop never
-  observe a partial mutation; no guarantee is offered when the same path is mutated from
-  several threads at once, which streams opened with `open()` do because they flush their
-  buffer on a worker thread.
-
-### `S3StorageDriver`
-
-`orionis.storage.drivers.s3.S3StorageDriver`
-
-`__slots__ = ("_base_url", "_bucket", "_client", "_client_error", "_endpoint", "_key", "_region", "_secret", "_use_path_style")`
-
-```python
-def __init__(self, config: object) -> None
-```
-
-Reads `bucket`, `region`, `key`, `secret`, `url`, `endpoint`, and
-`use_path_style_endpoint` from the configuration entity. The constructor performs no
-import and no network call.
-
-- The `boto3` client is built on first use: explicit credentials win, and when they are
-  absent boto3 falls back to its own credential chain. `use_path_style_endpoint=True`
-  switches the addressing style to `path`.
-- Error codes `404`, `NoSuchKey`, and `NotFound` are translated into
-  `StorageFileNotFoundException`; any other SDK error propagates unchanged.
-- Visibility maps to canned ACLs `public-read` / `private`; `visibility()` inspects the
-  object grants looking for a read permission for the anonymous-users group.
-- `deleteDirectory()` batch-deletes in groups of up to 1000 keys.
-- Streams are buffered into a spooled temporary file that spills to disk beyond 8 MiB.
-
-### `AzureStorageDriver`
-
-`orionis.storage.drivers.azure.AzureStorageDriver`
-
-`__slots__ = ("_account_key", "_account_name", "_base_url", "_connection_string", "_container", "_container_name", "_http_error", "_not_found", "_sdk")`
-
-```python
-def __init__(self, config: object) -> None
-```
-
-Reads `connection_string`, `account_name`, `account_key`, `container`, and `url`. When a
-connection string is supplied, `AccountName` and `AccountKey` are parsed out of it so
-URLs and SAS tokens can be produced.
-
-- Azure has no per-blob visibility: `visibility()` reflects the container access policy
-  and `setVisibility()` **always** raises `UnsupportedStorageOperationException`.
-- `temporaryUrl()` produces a read-only SAS URL and requires the account key; without it,
-  the call raises `UnsupportedStorageOperationException`.
-- `info()` fills `checksum` from the `Content-MD5` stored by Azure (hex-encoded) when
-  available, and `etag` from the blob ETag with quotes stripped.
-- `directoryExists("")` returns `True` (the root always exists).
-
-### `GoogleStorageDriver`
-
-`orionis.storage.drivers.gcs.GoogleStorageDriver`
-
-`__slots__ = ("_base_url", "_bucket", "_bucket_name", "_cloud_error", "_key_file", "_not_found", "_project")`
-
-```python
-def __init__(self, config: object) -> None
-```
-
-Reads `project_id`, `key_file`, `bucket`, and `url`. Authentication uses the
-service-account key file when configured, otherwise Application Default Credentials.
-
-- `temporaryUrl()` builds a V4 signed URL; signing requires credentials with a private
-  key (a key file), which plain ADC does not provide.
-- `visibility()` returns `'private'` when ACLs cannot be inspected — for example under
-  uniform bucket-level access.
-- Visibility maps to GCS predefined ACLs; an unknown level raises
-  `UnsupportedStorageOperationException`.
-
-### Driver helper functions
-
-`orionis.storage.drivers.functions` — module-level helpers shared by the cloud drivers.
-
-| Function | Signature | Description |
-| --- | --- | --- |
-| `import_driver_dependency` | `import_driver_dependency(module: str, package: str, extra: str) -> ModuleType` | Imports an optional SDK module and converts `ImportError` into `MissingStorageDependencyException` carrying the install command. |
-| `assert_binary_mode` | `assert_binary_mode(mode: str) -> None` | Validates a stream mode against `rb`, `wb`, `ab`, `rb+`, `wb+`, `ab+`. |
-| `resolve_download_target` | `resolve_download_target(normalized: str, destination: str \| Path) -> Path` | Resolves the local target of a download, keeping the original name when the destination is an existing directory, and creating missing parents. |
-| `filter_files` | `filter_files(keys: Iterable[str], base: str, *, recursive: bool) -> list[str]` | Selects the keys that are files under `base`; keys ending in `/` are directory markers and are always excluded. Returns a sorted list. |
-| `derive_directories` | `derive_directories(keys: Iterable[str], base: str, *, recursive: bool) -> list[str]` | Infers directory paths from object keys (object stores have no physical directories). Returns a sorted list. |
-
-### `FileInfo`
-
-`orionis.storage.entities.file_info.FileInfo` —
-`@dataclass(frozen=True, kw_only=True, slots=True)`. Returned by `await file.info()`.
-
-| Field | Type | Default | Description |
-| --- | --- | --- | --- |
-| `path` | `str` | — | Canonical root-relative path. |
-| `size` | `int` | — | Size in bytes. |
-| `lastModified` | `datetime` | — | Timezone-aware modification timestamp. |
-| `visibility` | `str` | — | `'public'` or `'private'`. |
-| `mimeType` | `str \| None` | `None` | Guessed MIME type. |
-| `createdAt` | `datetime \| None` | `None` | Creation timestamp when the driver can supply it. |
-| `etag` | `str \| None` | `None` | Entity tag (MD5 hex digest in the built-in drivers). |
-| `checksum` | `str \| None` | `None` | SHA-256 hex digest when available. |
-| `url` | `str \| None` | `None` | Public URL when the disk exposes one. |
-
-Field names are camelCase on purpose, to match the public API naming of the framework.
-
-### `Visibility`
-
-`orionis.storage.enums.visibility.Visibility` — `StrEnum` with `PUBLIC = "public"` and
-`PRIVATE = "private"`. Since members inherit from `str`, they can be passed anywhere a
-plain visibility string is accepted.
-
-### Path normalization
-
-`orionis.storage.paths` — two module-level functions applied at every boundary.
-
-```python
-def normalize_path(path: str) -> str
-def normalize_file_path(path: str) -> str
-```
-
-`normalize_path()` converts `\` into `/`, drops empty and `.` segments, resolves `..`
-logically (without touching the filesystem), and returns a path with no leading or
-trailing slash. The empty string represents the disk root. It raises
-`StoragePathException` when the path contains a null byte, when a segment contains `:`
-(blocking drive letters and stream separators), or when a `..` escapes the root.
-
-`normalize_file_path()` applies the same rules and additionally rejects an empty result,
-because the disk root can never be treated as a file.
-
-### Exceptions
-
-`orionis.storage.exceptions` — all inherit from `StorageException`, which inherits from
-`Exception`.
-
-| Exception | Raised when |
-| --- | --- |
-| `StorageException` | Base class for the module. |
-| `DiskNotFoundException` | The disk is not declared in the `filesystems` configuration. |
-| `DriverNotSupportedException` | The disk references a driver with no implementation. |
-| `MissingStorageDependencyException` | A driver needs an optional package that is not installed. |
-| `StoragePathException` | The path is malformed or escapes the disk root. |
-| `StorageFileNotFoundException` | The file does not exist on the target disk. |
-| `UnsupportedStorageOperationException` | The driver cannot perform the requested operation (temporary URL, visibility, stream mode, hash algorithm). |
-
-### `StorageProvider` and the `Storage` facade
-
-`orionis.storage.provider.StorageProvider` extends `ServiceProvider` and
-`DeferrableProvider`, and is listed in `orionis/foundation/core_providers.py`.
-
-| Member | Behavior |
-| --- | --- |
-| `provides()` | `[IStorageManager]` |
-| `register()` | `self.app.singleton(IStorageManager, StorageManager)` |
-| `boot()` | `await Storage.pin()` (async) |
-
-`orionis.support.facades.storage.Storage` only overrides `getFacadeAccessor()`, which
-returns `IStorageManager`. The sibling `storage.pyi` file exists purely for editor
-autocompletion and is never executed.
-
-Because the provider is **deferrable**, register and boot only run the first time
-`IStorageManager` is resolved through the container. That has a concrete consequence for
-the facade:
-
-- Before that first resolution, `Storage.disk("public")` returns a deferred dispatcher
-  that must be awaited: `disk = await Storage.disk("public")`. That call resolves the
-  service, boots the provider, and pins the facade.
-- Once pinned, attribute access is a direct passthrough: `Storage.disk("public")` returns
-  the `Disk` synchronously, and awaiting it would fail because a `Disk` is not awaitable.
-
-Injecting `IStorageManager` (constructor or controller-method parameter) avoids that
-distinction altogether: the container resolves the deferred provider and hands over the
-real manager.
-
-### Configuration keys
-
-`StorageManager` reads `app.config("filesystems")`, backed by the entities in
-`orionis.foundation.config.filesystems` and, in the application, by `config/filesystems.py`.
-
-| Key | Type | Description |
-| --- | --- | --- |
-| `default` | `DiskName \| str` | Disk used by `Storage.default()` / `disk(None)`. Validated against `DiskName` (`local`, `public`, `s3`, `azure`, `gcs`). |
-| `disks.local` | `Local` | `driver` (default `"local"`), `path` (default `"storage/app/private"`). |
-| `disks.public` | `Public` | `driver` (default `"local"`), `path`, `url`. |
-| `disks.s3` | `S3` | `driver` (default `"aws"`), `key`, `secret`, `region`, `bucket`, `url`, `endpoint`, `use_path_style_endpoint`. |
-| `disks.azure` | `Azure` | `driver` (default `"azure"`), `connection_string`, `account_name`, `account_key`, `container`, `url`. |
-| `disks.gcs` | `GCS` | `driver` (default `"gcs"`), `project_id`, `key_file`, `bucket`, `url`. |
-
-`Disks` is a frozen dataclass with exactly those five fields, so disk **names** are fixed;
-what is configurable per disk is the `driver` it points at, which is also the key used by
-`StorageManager.extend()`.
+| Symbol | Verified import | Source | Declaration | Observed behavior |
+| --- | --- | --- | --- | --- |
+| AsyncStream | from orionis.storage import AsyncStream | [stream.py](../stream.py) | AsyncStream | Asynchronous wrapper around a lazily opened binary handle. The underlying handle is produced by *opener* on first use (or on ``__aenter__``) and every blocking operation is executed on a worker thread, keeping the event loop responsive. Drivers may provide an *on_close* callback to persist buffered data before the handle is released. |
+| AsyncStream.read | from orionis.storage import AsyncStream | [stream.py](../stream.py) | async def read(self, size: int) -> bytes | Read up to *size* bytes from the stream. Parameters ---------- size : int Maximum number of bytes to read. ``-1`` reads until EOF. Returns ------- bytes Bytes read from the current position; empty at EOF. |
+| AsyncStream.write | from orionis.storage import AsyncStream | [stream.py](../stream.py) | async def write(self, data: bytes) -> int | Write *data* to the stream at the current position. Parameters ---------- data : bytes Raw bytes to write. Returns ------- int Number of bytes written. |
+| AsyncStream.seek | from orionis.storage import AsyncStream | [stream.py](../stream.py) | async def seek(self, offset: int, whence: int) -> int | Move the stream position to *offset*. Parameters ---------- offset : int Target offset relative to *whence*. whence : int Anchor point: ``0`` start, ``1`` current, ``2`` end. Returns ------- int The new absolute position within the stream. |
+| AsyncStream.close | from orionis.storage import AsyncStream | [stream.py](../stream.py) | async def close(self) -> None | Flush pending data and release the underlying handle. Invokes the *on_close* callback (when provided) before closing the handle. Closing an unopened or already closed stream is a no-op. Returns ------- None |
+| AzureStorageDriver | from orionis.storage import AzureStorageDriver | [drivers/azure.py](../drivers/azure.py) | AzureStorageDriver | Storage driver backed by Azure Blob Storage. Uses the official Azure SDK for Python (``azure-storage-blob``), which is an **optional dependency**: it is not installed with the framework. Install it before using this driver:: uv add 'orionis[azure]' The SDK is imported lazily on first operation, and every blocking call runs on a worker thread via :func:`asyncio.to_thread`. Directories are virtual: prefixes are inferred from blob names and explicit directories are stored as zero-byte ``path/`` markers. Azure has no per-blob visibility: :meth:`visibility` reflects the container access level and :meth:`setVisibility` is unsupported. |
+| AzureStorageDriver.read | from orionis.storage import AzureStorageDriver | [drivers/azure.py](../drivers/azure.py) | async def read(self, path: str) -> bytes | Read the full contents of the blob at *path*. Parameters ---------- path : str Root-relative file path. Returns ------- bytes Complete blob contents. Raises ------ StorageFileNotFoundException If the blob does not exist. |
+| AzureStorageDriver.readStream | from orionis.storage import AzureStorageDriver | [drivers/azure.py](../drivers/azure.py) | async def readStream(self, path: str, chunk_size: int) -> AsyncIterator[bytes] | Stream the contents of the blob at *path* in chunks. Chunk sizing follows the SDK transfer configuration; the *chunk_size* parameter is advisory for this driver. Parameters ---------- path : str Root-relative file path. chunk_size : int Advisory chunk size in bytes. Yields ------ bytes Consecutive chunks of the blob contents. Raises ------ StorageFileNotFoundException If the blob does not exist. |
+| AzureStorageDriver.exists | from orionis.storage import AzureStorageDriver | [drivers/azure.py](../drivers/azure.py) | async def exists(self, path: str) -> bool | Check whether a blob exists at *path*. Parameters ---------- path : str Root-relative file path. Returns ------- bool ``True`` if a blob exists at the given name. |
+| AzureStorageDriver.write | from orionis.storage import AzureStorageDriver | [drivers/azure.py](../drivers/azure.py) | async def write(self, path: str, contents: bytes / str, visibility: str / None) -> None | Write *contents* to *path*, replacing any existing blob. Azure Blob Storage has no per-blob visibility; access is governed by the container access level, so *visibility* is accepted for interface compatibility but ignored. Parameters ---------- path : str Root-relative file path. contents : bytes / str Data to persist. Strings are encoded as UTF-8. visibility : str / None Ignored by this driver. Returns ------- None |
+| AzureStorageDriver.writeStream | from orionis.storage import AzureStorageDriver | [drivers/azure.py](../drivers/azure.py) | async def writeStream(self, path: str, stream: AsyncIterable[bytes], visibility: str / None) -> None | Write the chunks produced by *stream* to *path*. The payload is buffered into a spooled temporary file (spilling to disk past 8 MiB) and uploaded in blocks by the SDK. Parameters ---------- path : str Root-relative file path. stream : AsyncIterable[bytes] Asynchronous byte-chunk producer. visibility : str / None Ignored by this driver. Returns ------- None |
+| AzureStorageDriver.delete | from orionis.storage import AzureStorageDriver | [drivers/azure.py](../drivers/azure.py) | async def delete(self, path: str) -> bool | Delete the blob at *path*. Parameters ---------- path : str Root-relative file path. Returns ------- bool ``True`` if the blob existed and was removed. |
+| AzureStorageDriver.copy | from orionis.storage import AzureStorageDriver | [drivers/azure.py](../drivers/azure.py) | async def copy(self, source: str, target: str) -> None | Copy the blob at *source* to *target*. The content is streamed through a spooled local buffer, which works with any authentication mode and never loads large blobs fully into memory. Parameters ---------- source : str Root-relative path of the existing blob. target : str Root-relative destination path. Returns ------- None Raises ------ StorageFileNotFoundException If the source blob does not exist. |
+| AzureStorageDriver.move | from orionis.storage import AzureStorageDriver | [drivers/azure.py](../drivers/azure.py) | async def move(self, source: str, target: str) -> None | Move the blob at *source* to *target*. Implemented as a copy followed by a delete of the source blob. Parameters ---------- source : str Root-relative path of the existing blob. target : str Root-relative destination path. Returns ------- None Raises ------ StorageFileNotFoundException If the source blob does not exist. |
+| AzureStorageDriver.size | from orionis.storage import AzureStorageDriver | [drivers/azure.py](../drivers/azure.py) | async def size(self, path: str) -> int | Return the size in bytes of the blob at *path*. Parameters ---------- path : str Root-relative file path. Returns ------- int Blob size in bytes. Raises ------ StorageFileNotFoundException If the blob does not exist. |
+| AzureStorageDriver.mimeType | from orionis.storage import AzureStorageDriver | [drivers/azure.py](../drivers/azure.py) | async def mimeType(self, path: str) -> str / None | Return the MIME type of the blob at *path*. Prefers the content type stored in Azure and falls back to a guess based on the file extension. Parameters ---------- path : str Root-relative file path. Returns ------- str / None MIME type, or ``None`` when it cannot be determined. Raises ------ StorageFileNotFoundException If the blob does not exist. |
+| AzureStorageDriver.lastModified | from orionis.storage import AzureStorageDriver | [drivers/azure.py](../drivers/azure.py) | async def lastModified(self, path: str) -> datetime | Return the last-modification timestamp of the blob at *path*. Parameters ---------- path : str Root-relative file path. Returns ------- datetime Timezone-aware modification timestamp. Raises ------ StorageFileNotFoundException If the blob does not exist. |
+| AzureStorageDriver.visibility | from orionis.storage import AzureStorageDriver | [drivers/azure.py](../drivers/azure.py) | async def visibility(self, path: str) -> str | Return the effective visibility of the blob at *path*. Azure controls access at container level, so the result reflects the container access policy rather than a per-blob ACL. Parameters ---------- path : str Root-relative file path. Returns ------- str ``'public'`` when the container allows anonymous access, otherwise ``'private'``. Raises ------ StorageFileNotFoundException If the blob does not exist. |
+| AzureStorageDriver.setVisibility | from orionis.storage import AzureStorageDriver | [drivers/azure.py](../drivers/azure.py) | async def setVisibility(self, path: str, visibility: str) -> None | Change the visibility of the blob at *path*. Azure Blob Storage does not support per-blob visibility, so this operation always fails. Adjust the container access level from the Azure portal or management SDK instead. Parameters ---------- path : str Root-relative file path. visibility : str Requested visibility level. Returns ------- None Never returned by this driver. Raises ------ UnsupportedStorageOperationException Always, since Azure has no per-blob visibility. |
+| AzureStorageDriver.hash | from orionis.storage import AzureStorageDriver | [drivers/azure.py](../drivers/azure.py) | async def hash(self, path: str, algorithm: str) -> str | Compute the content hash of the blob at *path*. The blob is streamed in chunks, so large files never load fully into memory. Parameters ---------- path : str Root-relative file path. algorithm : str Any algorithm name accepted by :func:`hashlib.new`. Returns ------- str Hexadecimal digest of the blob contents. Raises ------ StorageFileNotFoundException If the blob does not exist. UnsupportedStorageOperationException If *algorithm* is not available. |
+| AzureStorageDriver.info | from orionis.storage import AzureStorageDriver | [drivers/azure.py](../drivers/azure.py) | async def info(self, path: str) -> FileInfo | Collect a metadata snapshot for the blob at *path*. The snapshot is built from blob properties only; ``checksum`` holds the Content-MD5 stored by Azure when available. Parameters ---------- path : str Root-relative file path. Returns ------- FileInfo Immutable entity with size, MIME type, timestamps, ETag, visibility, and URL. Raises ------ StorageFileNotFoundException If the blob does not exist. |
+| AzureStorageDriver.createDirectory | from orionis.storage import AzureStorageDriver | [drivers/azure.py](../drivers/azure.py) | async def createDirectory(self, path: str) -> None | Create a zero-byte directory marker at *path*. Parameters ---------- path : str Root-relative directory path. Returns ------- None |
+| AzureStorageDriver.deleteDirectory | from orionis.storage import AzureStorageDriver | [drivers/azure.py](../drivers/azure.py) | async def deleteDirectory(self, path: str) -> bool | Recursively delete every blob under *path*. Parameters ---------- path : str Root-relative directory path. The empty string clears the whole container prefix space. Returns ------- bool ``True`` if at least one blob was removed. |
+| AzureStorageDriver.directoryExists | from orionis.storage import AzureStorageDriver | [drivers/azure.py](../drivers/azure.py) | async def directoryExists(self, path: str) -> bool | Check whether any blob exists under *path*. Parameters ---------- path : str Root-relative directory path. The empty string denotes the disk root. Returns ------- bool ``True`` if the prefix contains at least one blob. |
+| AzureStorageDriver.files | from orionis.storage import AzureStorageDriver | [drivers/azure.py](../drivers/azure.py) | async def files(self, path: str, *, recursive: bool) -> list[str] | List the blob names that represent files under *path*. Parameters ---------- path : str Root-relative directory path. Empty string for the root. recursive : bool When ``True``, include files from all nested prefixes. Returns ------- list[str] Sorted root-relative file paths. |
+| AzureStorageDriver.directories | from orionis.storage import AzureStorageDriver | [drivers/azure.py](../drivers/azure.py) | async def directories(self, path: str, *, recursive: bool) -> list[str] | List the directory prefixes contained under *path*. Parameters ---------- path : str Root-relative directory path. Empty string for the root. recursive : bool When ``True``, include all nested prefixes. Returns ------- list[str] Sorted root-relative directory paths. |
+| AzureStorageDriver.url | from orionis.storage import AzureStorageDriver | [drivers/azure.py](../drivers/azure.py) | async def url(self, path: str) -> str | Build the public URL for the blob at *path*. Parameters ---------- path : str Root-relative file path. Returns ------- str URL derived from the configured base URL or the canonical Azure Blob endpoint. |
+| AzureStorageDriver.temporaryUrl | from orionis.storage import AzureStorageDriver | [drivers/azure.py](../drivers/azure.py) | async def temporaryUrl(self, path: str, expires_in: int) -> str | Build a SAS URL for the blob at *path*. Requires the storage account key, either configured explicitly or embedded in the connection string. Parameters ---------- path : str Root-relative file path. expires_in : int Lifetime of the URL in seconds. Returns ------- str Read-only SAS URL valid for *expires_in* seconds. Raises ------ UnsupportedStorageOperationException If no account key is available for signing. MissingStorageDependencyException If ``azure-storage-blob`` is not installed. |
+| AzureStorageDriver.download | from orionis.storage import AzureStorageDriver | [drivers/azure.py](../drivers/azure.py) | async def download(self, path: str, destination: str / Path) -> Path | Download the blob at *path* to the local filesystem. Parameters ---------- path : str Root-relative file path on the disk. destination : str / Path Local target. When it points to an existing directory the file keeps its original name inside that directory. Returns ------- Path Absolute local path of the downloaded file. Raises ------ StorageFileNotFoundException If the blob does not exist. |
+| AzureStorageDriver.open | from orionis.storage import AzureStorageDriver | [drivers/azure.py](../drivers/azure.py) | def open(self, path: str, mode: str) -> AsyncStream | Open an asynchronous binary stream for the blob at *path*. Read-oriented modes download the blob into a spooled temporary buffer; writable modes upload the buffered content back to Azure when the stream is closed. Parameters ---------- path : str Root-relative file path. mode : str Binary mode: ``'rb'``, ``'wb'``, ``'ab'``, ``'rb+'``, ``'wb+'``, or ``'ab+'``. Returns ------- AsyncStream Lazily opened stream; use it as an async context manager. Raises ------ UnsupportedStorageOperationException If *mode* is not a supported binary mode. |
+| Directory | from orionis.storage import Directory | [directory.py](../directory.py) | Directory | Represent a directory on a storage disk. The object encapsulates its canonical path and the driver of the disk it belongs to. Listing methods always return :class:`~orionis.storage.file.File` and :class:`Directory` objects — never plain strings. |
+| Directory.path | from orionis.storage import Directory | [directory.py](../directory.py) | def path(self) -> str | Return the canonical root-relative path of the directory. Returns ------- str Normalized path relative to the disk root. The empty string denotes the disk root itself. |
+| Directory.create | from orionis.storage import Directory | [directory.py](../directory.py) | async def create(self) -> IDirectory | Create the directory, including any missing parents. Returns ------- IDirectory The directory itself, enabling fluent chaining. |
+| Directory.delete | from orionis.storage import Directory | [directory.py](../directory.py) | async def delete(self) -> bool | Recursively delete the directory and its contents. Returns ------- bool ``True`` if the directory existed and was removed. |
+| Directory.exists | from orionis.storage import Directory | [directory.py](../directory.py) | async def exists(self) -> bool | Check whether the directory exists on its disk. Returns ------- bool ``True`` if the directory exists. |
+| Directory.files | from orionis.storage import Directory | [directory.py](../directory.py) | async def files(self) -> list[IFile] | List the files directly contained in the directory. Returns ------- list[IFile] File objects for every direct child file, sorted by path. |
+| Directory.allFiles | from orionis.storage import Directory | [directory.py](../directory.py) | async def allFiles(self) -> list[IFile] | List every file contained in the directory tree. Returns ------- list[IFile] File objects for all nested files, sorted by path. |
+| Directory.directories | from orionis.storage import Directory | [directory.py](../directory.py) | async def directories(self) -> list[IDirectory] | List the directories directly contained in the directory. Returns ------- list[IDirectory] Directory objects for every direct child directory, sorted by path. |
+| Directory.allDirectories | from orionis.storage import Directory | [directory.py](../directory.py) | async def allDirectories(self) -> list[IDirectory] | List every directory contained in the directory tree. Returns ------- list[IDirectory] Directory objects for all nested directories, sorted by path. |
+| Disk | from orionis.storage import Disk | [disk.py](../disk.py) | Disk | Represent a configured storage disk. The disk is the high-level entry point to a storage backend. It builds :class:`~orionis.storage.file.File` and :class:`~orionis.storage.directory.Directory` objects bound to its driver, and its convenience methods always delegate to those objects so no logic is ever duplicated. |
+| Disk.name | from orionis.storage import Disk | [disk.py](../disk.py) | def name(self) -> str | Return the configuration name of the disk. Returns ------- str Disk name as declared in the filesystems configuration. |
+| Disk.file | from orionis.storage import Disk | [disk.py](../disk.py) | def file(self, path: str) -> IFile | Build a file object for *path* on this disk. Parameters ---------- path : str Root-relative file path. Returns ------- IFile File object bound to this disk's driver. Raises ------ StoragePathException If *path* is invalid or resolves to the disk root. |
+| Disk.directory | from orionis.storage import Disk | [disk.py](../disk.py) | def directory(self, path: str) -> IDirectory | Build a directory object for *path* on this disk. Parameters ---------- path : str Root-relative directory path. The empty string denotes the disk root. Returns ------- IDirectory Directory object bound to this disk's driver. Raises ------ StoragePathException If *path* is invalid or escapes the disk root. |
+| Disk.put | from orionis.storage import Disk | [disk.py](../disk.py) | async def put(self, path: str, contents: bytes / str, visibility: str / None) -> IFile | Write *contents* to *path* on this disk. Parameters ---------- path : str Root-relative file path. contents : bytes / str Data to persist. Strings are encoded as UTF-8. visibility : str / None Visibility to apply, or ``None`` for the medium default. Returns ------- IFile File object pointing at the written file. |
+| Disk.exists | from orionis.storage import Disk | [disk.py](../disk.py) | async def exists(self, path: str) -> bool | Check whether a file exists at *path* on this disk. Parameters ---------- path : str Root-relative file path. Returns ------- bool ``True`` if a file exists at the given path. |
+| Disk.delete | from orionis.storage import Disk | [disk.py](../disk.py) | async def delete(self, path: str) -> bool | Delete the file at *path* from this disk. Parameters ---------- path : str Root-relative file path. Returns ------- bool ``True`` if the file existed and was removed. |
+| Disk.copy | from orionis.storage import Disk | [disk.py](../disk.py) | async def copy(self, source: str, target: str) -> IFile | Copy the file at *source* to *target* on this disk. Parameters ---------- source : str Root-relative path of the existing file. target : str Root-relative destination path. Returns ------- IFile File object pointing at the copy. Raises ------ StorageFileNotFoundException If the source file does not exist. |
+| Disk.move | from orionis.storage import Disk | [disk.py](../disk.py) | async def move(self, source: str, target: str) -> IFile | Move the file at *source* to *target* on this disk. Parameters ---------- source : str Root-relative path of the existing file. target : str Root-relative destination path. Returns ------- IFile File object pointing at the moved file. Raises ------ StorageFileNotFoundException If the source file does not exist. |
+| File | from orionis.storage import File | [file.py](../file.py) | File | Represent a single file on a storage disk. The object encapsulates its canonical path and the driver of the disk it belongs to. It never knows which physical medium backs it: every operation is delegated to the driver. |
+| File.path | from orionis.storage import File | [file.py](../file.py) | def path(self) -> str | Return the canonical root-relative path of the file. Returns ------- str Normalized path relative to the disk root. |
+| File.read | from orionis.storage import File | [file.py](../file.py) | async def read(self) -> bytes | Read the full contents of the file. Returns ------- bytes Complete file contents. Raises ------ StorageFileNotFoundException If the file does not exist. |
+| File.readStream | from orionis.storage import File | [file.py](../file.py) | def readStream(self, chunk_size: int) -> AsyncIterator[bytes] | Stream the contents of the file in chunks. Parameters ---------- chunk_size : int Maximum number of bytes per yielded chunk. Returns ------- AsyncIterator[bytes] Asynchronous iterator yielding consecutive chunks. Raises ------ StorageFileNotFoundException If the file does not exist. |
+| File.write | from orionis.storage import File | [file.py](../file.py) | async def write(self, contents: bytes / str, visibility: str / None) -> IFile | Write *contents* to the file, replacing existing data. Parameters ---------- contents : bytes / str Data to persist. Strings are encoded as UTF-8. visibility : str / None Visibility to apply, or ``None`` for the medium default. Returns ------- IFile The file itself, enabling fluent chaining. |
+| File.writeStream | from orionis.storage import File | [file.py](../file.py) | async def writeStream(self, stream: AsyncIterable[bytes], visibility: str / None) -> IFile | Write the chunks produced by *stream* to the file. Parameters ---------- stream : AsyncIterable[bytes] Asynchronous byte-chunk producer. visibility : str / None Visibility to apply, or ``None`` for the medium default. Returns ------- IFile The file itself, enabling fluent chaining. |
+| File.open | from orionis.storage import File | [file.py](../file.py) | def open(self, mode: str) -> IStorageStream | Open an asynchronous binary stream over the file. Parameters ---------- mode : str Binary mode: ``'rb'``, ``'wb'``, ``'ab'``, ``'rb+'``, ``'wb+'``, or ``'ab+'``. Returns ------- IStorageStream Lazily opened stream; use it as an async context manager. Raises ------ UnsupportedStorageOperationException If *mode* is not a supported binary mode. |
+| File.delete | from orionis.storage import File | [file.py](../file.py) | async def delete(self) -> bool | Delete the file from its disk. Returns ------- bool ``True`` if the file existed and was removed. |
+| File.exists | from orionis.storage import File | [file.py](../file.py) | async def exists(self) -> bool | Check whether the file exists on its disk. Returns ------- bool ``True`` if the file exists. |
+| File.copyTo | from orionis.storage import File | [file.py](../file.py) | async def copyTo(self, target: str) -> IFile | Copy the file to *target* on the same disk. Parameters ---------- target : str Root-relative destination path. Returns ------- IFile A new file object pointing at the copy. Raises ------ StorageFileNotFoundException If the source file does not exist. |
+| File.moveTo | from orionis.storage import File | [file.py](../file.py) | async def moveTo(self, target: str) -> IFile | Move the file to *target* on the same disk. The current object keeps pointing at the old path; use the returned object to keep working with the moved file. Parameters ---------- target : str Root-relative destination path. Returns ------- IFile A new file object pointing at the moved file. Raises ------ StorageFileNotFoundException If the source file does not exist. |
+| File.rename | from orionis.storage import File | [file.py](../file.py) | async def rename(self, name: str) -> IFile | Rename the file within its current directory. Parameters ---------- name : str New file name without any directory separator. Returns ------- IFile A new file object pointing at the renamed file. Raises ------ StoragePathException If *name* is empty or contains a directory separator. StorageFileNotFoundException If the source file does not exist. |
+| File.size | from orionis.storage import File | [file.py](../file.py) | async def size(self) -> int | Return the size of the file in bytes. Returns ------- int File size in bytes. Raises ------ StorageFileNotFoundException If the file does not exist. |
+| File.mimeType | from orionis.storage import File | [file.py](../file.py) | async def mimeType(self) -> str / None | Guess the MIME type of the file. Returns ------- str / None MIME type, or ``None`` when it cannot be determined. |
+| File.lastModified | from orionis.storage import File | [file.py](../file.py) | async def lastModified(self) -> datetime | Return the last-modification timestamp of the file. Returns ------- datetime Timezone-aware modification timestamp (UTC). Raises ------ StorageFileNotFoundException If the file does not exist. |
+| File.url | from orionis.storage import File | [file.py](../file.py) | async def url(self) -> str | Build the public URL of the file. Returns ------- str Publicly accessible URL. Raises ------ UnsupportedStorageOperationException If the disk does not expose public URLs. |
+| File.temporaryUrl | from orionis.storage import File | [file.py](../file.py) | async def temporaryUrl(self, expires_in: int) -> str | Build a signed, time-limited URL for the file. Parameters ---------- expires_in : int Lifetime of the URL in seconds. Returns ------- str Temporary URL valid for *expires_in* seconds. Raises ------ UnsupportedStorageOperationException If the driver does not support temporary URLs. |
+| File.visibility | from orionis.storage import File | [file.py](../file.py) | async def visibility(self) -> str | Return the visibility of the file. Returns ------- str ``'public'`` or ``'private'``. Raises ------ StorageFileNotFoundException If the file does not exist. |
+| File.setVisibility | from orionis.storage import File | [file.py](../file.py) | async def setVisibility(self, visibility: str) -> IFile | Change the visibility of the file. Parameters ---------- visibility : str Target visibility (``'public'`` or ``'private'``). Returns ------- IFile The file itself, enabling fluent chaining. Raises ------ StorageFileNotFoundException If the file does not exist. |
+| File.download | from orionis.storage import File | [file.py](../file.py) | async def download(self, destination: str / Path) -> Path | Copy the file to a location on the local filesystem. Parameters ---------- destination : str / Path Local target. When it points to an existing directory the file keeps its original name inside that directory. Returns ------- Path Absolute local path of the downloaded file. Raises ------ StorageFileNotFoundException If the file does not exist. |
+| File.hash | from orionis.storage import File | [file.py](../file.py) | async def hash(self, algorithm: str) -> str | Compute the content hash of the file. Parameters ---------- algorithm : str Any algorithm name accepted by :func:`hashlib.new`. Returns ------- str Hexadecimal digest of the file contents. Raises ------ StorageFileNotFoundException If the file does not exist. |
+| File.info | from orionis.storage import File | [file.py](../file.py) | async def info(self) -> FileInfo | Collect a metadata snapshot for the file. Returns ------- FileInfo Immutable entity with size, MIME type, timestamps, hashes, visibility, and URL when available. Raises ------ StorageFileNotFoundException If the file does not exist. |
+| FileInfo | from orionis.storage import FileInfo | [entities/file_info.py](../entities/file_info.py) | FileInfo | Immutable snapshot of a stored file's metadata. Instances are produced by storage drivers and returned by ``await file.info()``. All values reflect the state of the file at the moment the snapshot was taken. Attributes ---------- path : str Canonical root-relative path of the file on its disk. size : int File size in bytes. lastModified : datetime Timezone-aware timestamp of the last modification. visibility : str Visibility level of the file (``'public'`` or ``'private'``). mimeType : str / None Guessed MIME type, or ``None`` when it cannot be determined. createdAt : datetime / None Timezone-aware creation timestamp, or ``None`` when the driver cannot provide it. etag : str / None Entity tag of the content (MD5 hex digest for built-in drivers), or ``None`` when unavailable. checksum : str / None SHA-256 hex digest of the content, or ``None`` when unavailable. url : str / None Public URL of the file, or ``None`` when the disk does not expose URLs. |
+| GoogleStorageDriver | from orionis.storage import GoogleStorageDriver | [drivers/gcs.py](../drivers/gcs.py) | GoogleStorageDriver | Storage driver backed by Google Cloud Storage. Uses the official Google Cloud client library (``google-cloud-storage``), which is an **optional dependency**: it is not installed with the framework. Install it before using this driver:: uv add 'orionis[gcs]' The SDK is imported lazily on first operation, and every blocking call runs on a worker thread via :func:`asyncio.to_thread`. Directories are virtual: prefixes are inferred from object names and explicit directories are stored as zero-byte ``path/`` markers. Authentication uses the configured service-account key file or Application Default Credentials. |
+| GoogleStorageDriver.read | from orionis.storage import GoogleStorageDriver | [drivers/gcs.py](../drivers/gcs.py) | async def read(self, path: str) -> bytes | Read the full contents of the object at *path*. Parameters ---------- path : str Root-relative file path. Returns ------- bytes Complete object contents. Raises ------ StorageFileNotFoundException If the object does not exist. |
+| GoogleStorageDriver.readStream | from orionis.storage import GoogleStorageDriver | [drivers/gcs.py](../drivers/gcs.py) | async def readStream(self, path: str, chunk_size: int) -> AsyncIterator[bytes] | Stream the contents of the object at *path* in chunks. Parameters ---------- path : str Root-relative file path. chunk_size : int Maximum number of bytes per yielded chunk. Yields ------ bytes Consecutive chunks of the object contents. Raises ------ StorageFileNotFoundException If the object does not exist. |
+| GoogleStorageDriver.exists | from orionis.storage import GoogleStorageDriver | [drivers/gcs.py](../drivers/gcs.py) | async def exists(self, path: str) -> bool | Check whether an object exists at *path*. Parameters ---------- path : str Root-relative file path. Returns ------- bool ``True`` if an object exists at the given name. |
+| GoogleStorageDriver.write | from orionis.storage import GoogleStorageDriver | [drivers/gcs.py](../drivers/gcs.py) | async def write(self, path: str, contents: bytes / str, visibility: str / None) -> None | Write *contents* to *path*, replacing any existing object. Parameters ---------- path : str Root-relative file path. contents : bytes / str Data to persist. Strings are encoded as UTF-8. visibility : str / None Visibility applied through a predefined ACL, or ``None`` for the bucket default. Ignored by GCS when the bucket enforces uniform bucket-level access. Returns ------- None |
+| GoogleStorageDriver.writeStream | from orionis.storage import GoogleStorageDriver | [drivers/gcs.py](../drivers/gcs.py) | async def writeStream(self, path: str, stream: AsyncIterable[bytes], visibility: str / None) -> None | Write the chunks produced by *stream* to *path*. The payload is buffered into a spooled temporary file (spilling to disk past 8 MiB) and uploaded with the SDK's resumable transfer. Parameters ---------- path : str Root-relative file path. stream : AsyncIterable[bytes] Asynchronous byte-chunk producer. visibility : str / None Visibility applied through a predefined ACL, or ``None`` for the bucket default. Returns ------- None |
+| GoogleStorageDriver.delete | from orionis.storage import GoogleStorageDriver | [drivers/gcs.py](../drivers/gcs.py) | async def delete(self, path: str) -> bool | Delete the object at *path*. Parameters ---------- path : str Root-relative file path. Returns ------- bool ``True`` if the object existed and was removed. |
+| GoogleStorageDriver.copy | from orionis.storage import GoogleStorageDriver | [drivers/gcs.py](../drivers/gcs.py) | async def copy(self, source: str, target: str) -> None | Copy the object at *source* to *target* server-side. Parameters ---------- source : str Root-relative path of the existing object. target : str Root-relative destination path. Returns ------- None Raises ------ StorageFileNotFoundException If the source object does not exist. |
+| GoogleStorageDriver.move | from orionis.storage import GoogleStorageDriver | [drivers/gcs.py](../drivers/gcs.py) | async def move(self, source: str, target: str) -> None | Move the object at *source* to *target*. Implemented as a server-side copy followed by a delete of the source object. Parameters ---------- source : str Root-relative path of the existing object. target : str Root-relative destination path. Returns ------- None Raises ------ StorageFileNotFoundException If the source object does not exist. |
+| GoogleStorageDriver.size | from orionis.storage import GoogleStorageDriver | [drivers/gcs.py](../drivers/gcs.py) | async def size(self, path: str) -> int | Return the size in bytes of the object at *path*. Parameters ---------- path : str Root-relative file path. Returns ------- int Object size in bytes. Raises ------ StorageFileNotFoundException If the object does not exist. |
+| GoogleStorageDriver.mimeType | from orionis.storage import GoogleStorageDriver | [drivers/gcs.py](../drivers/gcs.py) | async def mimeType(self, path: str) -> str / None | Return the MIME type of the object at *path*. Prefers the content type stored in GCS and falls back to a guess based on the file extension. Parameters ---------- path : str Root-relative file path. Returns ------- str / None MIME type, or ``None`` when it cannot be determined. Raises ------ StorageFileNotFoundException If the object does not exist. |
+| GoogleStorageDriver.lastModified | from orionis.storage import GoogleStorageDriver | [drivers/gcs.py](../drivers/gcs.py) | async def lastModified(self, path: str) -> datetime | Return the last-modification timestamp of the object at *path*. Parameters ---------- path : str Root-relative file path. Returns ------- datetime Timezone-aware modification timestamp. Raises ------ StorageFileNotFoundException If the object does not exist. |
+| GoogleStorageDriver.visibility | from orionis.storage import GoogleStorageDriver | [drivers/gcs.py](../drivers/gcs.py) | async def visibility(self, path: str) -> str | Return the visibility of the object at *path*. Parameters ---------- path : str Root-relative file path. Returns ------- str ``'public'`` when anonymous users can read the object, otherwise ``'private'``. Raises ------ StorageFileNotFoundException If the object does not exist. |
+| GoogleStorageDriver.setVisibility | from orionis.storage import GoogleStorageDriver | [drivers/gcs.py](../drivers/gcs.py) | async def setVisibility(self, path: str, visibility: str) -> None | Change the visibility of the object at *path*. Not available on buckets with uniform bucket-level access, where the SDK raises the corresponding API error. Parameters ---------- path : str Root-relative file path. visibility : str Target visibility (``'public'`` or ``'private'``). Returns ------- None Raises ------ StorageFileNotFoundException If the object does not exist. UnsupportedStorageOperationException If *visibility* is not a supported level. |
+| GoogleStorageDriver.hash | from orionis.storage import GoogleStorageDriver | [drivers/gcs.py](../drivers/gcs.py) | async def hash(self, path: str, algorithm: str) -> str | Compute the content hash of the object at *path*. The object is streamed in chunks, so large files never load fully into memory. Parameters ---------- path : str Root-relative file path. algorithm : str Any algorithm name accepted by :func:`hashlib.new`. Returns ------- str Hexadecimal digest of the object contents. Raises ------ StorageFileNotFoundException If the object does not exist. UnsupportedStorageOperationException If *algorithm* is not available. |
+| GoogleStorageDriver.info | from orionis.storage import GoogleStorageDriver | [drivers/gcs.py](../drivers/gcs.py) | async def info(self, path: str) -> FileInfo | Collect a metadata snapshot for the object at *path*. The snapshot is built from object metadata only; ``checksum`` holds the MD5 hash stored by GCS when available. Parameters ---------- path : str Root-relative file path. Returns ------- FileInfo Immutable entity with size, MIME type, timestamps, ETag, visibility, and URL. Raises ------ StorageFileNotFoundException If the object does not exist. |
+| GoogleStorageDriver.createDirectory | from orionis.storage import GoogleStorageDriver | [drivers/gcs.py](../drivers/gcs.py) | async def createDirectory(self, path: str) -> None | Create a zero-byte directory marker at *path*. Parameters ---------- path : str Root-relative directory path. Returns ------- None |
+| GoogleStorageDriver.deleteDirectory | from orionis.storage import GoogleStorageDriver | [drivers/gcs.py](../drivers/gcs.py) | async def deleteDirectory(self, path: str) -> bool | Recursively delete every object under *path*. Parameters ---------- path : str Root-relative directory path. The empty string clears the whole bucket prefix space. Returns ------- bool ``True`` if at least one object was removed. |
+| GoogleStorageDriver.directoryExists | from orionis.storage import GoogleStorageDriver | [drivers/gcs.py](../drivers/gcs.py) | async def directoryExists(self, path: str) -> bool | Check whether any object exists under *path*. Parameters ---------- path : str Root-relative directory path. The empty string denotes the disk root. Returns ------- bool ``True`` if the prefix contains at least one object. |
+| GoogleStorageDriver.files | from orionis.storage import GoogleStorageDriver | [drivers/gcs.py](../drivers/gcs.py) | async def files(self, path: str, *, recursive: bool) -> list[str] | List the object names that represent files under *path*. Parameters ---------- path : str Root-relative directory path. Empty string for the root. recursive : bool When ``True``, include files from all nested prefixes. Returns ------- list[str] Sorted root-relative file paths. |
+| GoogleStorageDriver.directories | from orionis.storage import GoogleStorageDriver | [drivers/gcs.py](../drivers/gcs.py) | async def directories(self, path: str, *, recursive: bool) -> list[str] | List the directory prefixes contained under *path*. Parameters ---------- path : str Root-relative directory path. Empty string for the root. recursive : bool When ``True``, include all nested prefixes. Returns ------- list[str] Sorted root-relative directory paths. |
+| GoogleStorageDriver.url | from orionis.storage import GoogleStorageDriver | [drivers/gcs.py](../drivers/gcs.py) | async def url(self, path: str) -> str | Build the public URL for the object at *path*. Parameters ---------- path : str Root-relative file path. Returns ------- str URL derived from the configured base URL or the canonical ``storage.googleapis.com`` address. |
+| GoogleStorageDriver.temporaryUrl | from orionis.storage import GoogleStorageDriver | [drivers/gcs.py](../drivers/gcs.py) | async def temporaryUrl(self, path: str, expires_in: int) -> str | Build a V4 signed URL for the object at *path*. Requires credentials with a private key (a service-account key file); plain Application Default Credentials without a key cannot sign URLs. Parameters ---------- path : str Root-relative file path. expires_in : int Lifetime of the URL in seconds. Returns ------- str Signed GET URL valid for *expires_in* seconds. Raises ------ MissingStorageDependencyException If ``google-cloud-storage`` is not installed. |
+| GoogleStorageDriver.download | from orionis.storage import GoogleStorageDriver | [drivers/gcs.py](../drivers/gcs.py) | async def download(self, path: str, destination: str / Path) -> Path | Download the object at *path* to the local filesystem. Parameters ---------- path : str Root-relative file path on the disk. destination : str / Path Local target. When it points to an existing directory the file keeps its original name inside that directory. Returns ------- Path Absolute local path of the downloaded file. Raises ------ StorageFileNotFoundException If the object does not exist. |
+| GoogleStorageDriver.open | from orionis.storage import GoogleStorageDriver | [drivers/gcs.py](../drivers/gcs.py) | def open(self, path: str, mode: str) -> AsyncStream | Open an asynchronous binary stream for the object at *path*. Read-oriented modes download the object into a spooled temporary buffer; writable modes upload the buffered content back to GCS when the stream is closed. Parameters ---------- path : str Root-relative file path. mode : str Binary mode: ``'rb'``, ``'wb'``, ``'ab'``, ``'rb+'``, ``'wb+'``, or ``'ab+'``. Returns ------- AsyncStream Lazily opened stream; use it as an async context manager. Raises ------ UnsupportedStorageOperationException If *mode* is not a supported binary mode. |
+| LocalStorageDriver | from orionis.storage import LocalStorageDriver | [drivers/local.py](../drivers/local.py) | LocalStorageDriver | Storage driver backed by the local filesystem. Every path is resolved inside the configured *root* directory and all blocking I/O runs on worker threads via :func:`asyncio.to_thread`, keeping the event loop responsive. Visibility is mapped onto POSIX permission bits (``0o644``/``0o600`` for files), which degrades gracefully on platforms without a full POSIX mode implementation. |
+| LocalStorageDriver.read | from orionis.storage import LocalStorageDriver | [drivers/local.py](../drivers/local.py) | async def read(self, path: str) -> bytes | Read the full contents of the file at *path*. Parameters ---------- path : str Root-relative file path. Returns ------- bytes Complete file contents. Raises ------ StorageFileNotFoundException If the file does not exist. |
+| LocalStorageDriver.readStream | from orionis.storage import LocalStorageDriver | [drivers/local.py](../drivers/local.py) | async def readStream(self, path: str, chunk_size: int) -> AsyncIterator[bytes] | Stream the contents of the file at *path* in chunks. Parameters ---------- path : str Root-relative file path. chunk_size : int Maximum number of bytes per yielded chunk. Yields ------ bytes Consecutive chunks of the file contents. Raises ------ StorageFileNotFoundException If the file does not exist. |
+| LocalStorageDriver.exists | from orionis.storage import LocalStorageDriver | [drivers/local.py](../drivers/local.py) | async def exists(self, path: str) -> bool | Check whether a file exists at *path*. Parameters ---------- path : str Root-relative file path. Returns ------- bool ``True`` if a file exists at the given path. |
+| LocalStorageDriver.write | from orionis.storage import LocalStorageDriver | [drivers/local.py](../drivers/local.py) | async def write(self, path: str, contents: bytes / str, visibility: str / None) -> None | Write *contents* to *path*, replacing any existing file. The write is atomic: data lands in a sibling temporary file that is renamed over the destination once complete. Parameters ---------- path : str Root-relative file path. contents : bytes / str Data to persist. Strings are encoded as UTF-8. visibility : str / None Visibility to apply, or ``None`` to keep the OS default. Returns ------- None |
+| LocalStorageDriver.writeStream | from orionis.storage import LocalStorageDriver | [drivers/local.py](../drivers/local.py) | async def writeStream(self, path: str, stream: AsyncIterable[bytes], visibility: str / None) -> None | Write the chunks produced by *stream* to *path*. Chunks are appended to a temporary file that atomically replaces the destination once the stream is exhausted, so a failed transfer never leaves a partial file behind. Parameters ---------- path : str Root-relative file path. stream : AsyncIterable[bytes] Asynchronous byte-chunk producer. visibility : str / None Visibility to apply, or ``None`` to keep the OS default. Returns ------- None |
+| LocalStorageDriver.delete | from orionis.storage import LocalStorageDriver | [drivers/local.py](../drivers/local.py) | async def delete(self, path: str) -> bool | Delete the file at *path*. Parameters ---------- path : str Root-relative file path. Returns ------- bool ``True`` if the file existed and was removed. |
+| LocalStorageDriver.copy | from orionis.storage import LocalStorageDriver | [drivers/local.py](../drivers/local.py) | async def copy(self, source: str, target: str) -> None | Copy the file at *source* to *target*. Parameters ---------- source : str Root-relative path of the existing file. target : str Root-relative destination path. Returns ------- None Raises ------ StorageFileNotFoundException If the source file does not exist. |
+| LocalStorageDriver.move | from orionis.storage import LocalStorageDriver | [drivers/local.py](../drivers/local.py) | async def move(self, source: str, target: str) -> None | Move the file at *source* to *target*. Parameters ---------- source : str Root-relative path of the existing file. target : str Root-relative destination path. Returns ------- None Raises ------ StorageFileNotFoundException If the source file does not exist. |
+| LocalStorageDriver.size | from orionis.storage import LocalStorageDriver | [drivers/local.py](../drivers/local.py) | async def size(self, path: str) -> int | Return the size in bytes of the file at *path*. Parameters ---------- path : str Root-relative file path. Returns ------- int File size in bytes. Raises ------ StorageFileNotFoundException If the file does not exist. |
+| LocalStorageDriver.mimeType | from orionis.storage import LocalStorageDriver | [drivers/local.py](../drivers/local.py) | async def mimeType(self, path: str) -> str / None | Guess the MIME type of the file at *path*. The guess is derived from the file extension and requires no disk access. Parameters ---------- path : str Root-relative file path. Returns ------- str / None MIME type, or ``None`` when it cannot be determined. |
+| LocalStorageDriver.lastModified | from orionis.storage import LocalStorageDriver | [drivers/local.py](../drivers/local.py) | async def lastModified(self, path: str) -> datetime | Return the last-modification timestamp of the file at *path*. Parameters ---------- path : str Root-relative file path. Returns ------- datetime Timezone-aware modification timestamp (UTC). Raises ------ StorageFileNotFoundException If the file does not exist. |
+| LocalStorageDriver.visibility | from orionis.storage import LocalStorageDriver | [drivers/local.py](../drivers/local.py) | async def visibility(self, path: str) -> str | Return the visibility of the file at *path*. Parameters ---------- path : str Root-relative file path. Returns ------- str ``'public'`` or ``'private'``. Raises ------ StorageFileNotFoundException If the file does not exist. |
+| LocalStorageDriver.setVisibility | from orionis.storage import LocalStorageDriver | [drivers/local.py](../drivers/local.py) | async def setVisibility(self, path: str, visibility: str) -> None | Change the visibility of the file at *path*. Parameters ---------- path : str Root-relative file path. visibility : str Target visibility (``'public'`` or ``'private'``). Returns ------- None Raises ------ StorageFileNotFoundException If the file does not exist. UnsupportedStorageOperationException If *visibility* is not a supported level. |
+| LocalStorageDriver.hash | from orionis.storage import LocalStorageDriver | [drivers/local.py](../drivers/local.py) | async def hash(self, path: str, algorithm: str) -> str | Compute the content hash of the file at *path*. Parameters ---------- path : str Root-relative file path. algorithm : str Any algorithm name accepted by :func:`hashlib.new`. Returns ------- str Hexadecimal digest of the file contents. Raises ------ StorageFileNotFoundException If the file does not exist. UnsupportedStorageOperationException If *algorithm* is not available. |
+| LocalStorageDriver.info | from orionis.storage import LocalStorageDriver | [drivers/local.py](../drivers/local.py) | async def info(self, path: str) -> FileInfo | Collect a metadata snapshot for the file at *path*. Parameters ---------- path : str Root-relative file path. Returns ------- FileInfo Immutable entity with size, MIME type, timestamps, hashes, visibility, and URL when available. Raises ------ StorageFileNotFoundException If the file does not exist. |
+| LocalStorageDriver.createDirectory | from orionis.storage import LocalStorageDriver | [drivers/local.py](../drivers/local.py) | async def createDirectory(self, path: str) -> None | Create the directory at *path*, including missing parents. Parameters ---------- path : str Root-relative directory path. Returns ------- None |
+| LocalStorageDriver.deleteDirectory | from orionis.storage import LocalStorageDriver | [drivers/local.py](../drivers/local.py) | async def deleteDirectory(self, path: str) -> bool | Recursively delete the directory at *path*. Parameters ---------- path : str Root-relative directory path. Returns ------- bool ``True`` if the directory existed and was removed. |
+| LocalStorageDriver.directoryExists | from orionis.storage import LocalStorageDriver | [drivers/local.py](../drivers/local.py) | async def directoryExists(self, path: str) -> bool | Check whether a directory exists at *path*. Parameters ---------- path : str Root-relative directory path. The empty string denotes the disk root. Returns ------- bool ``True`` if a directory exists at the given path. |
+| LocalStorageDriver.files | from orionis.storage import LocalStorageDriver | [drivers/local.py](../drivers/local.py) | async def files(self, path: str, *, recursive: bool) -> list[str] | List the file paths contained in the directory at *path*. Parameters ---------- path : str Root-relative directory path. Empty string for the root. recursive : bool When ``True``, include files from all nested directories. Returns ------- list[str] Sorted root-relative file paths. |
+| LocalStorageDriver.directories | from orionis.storage import LocalStorageDriver | [drivers/local.py](../drivers/local.py) | async def directories(self, path: str, *, recursive: bool) -> list[str] | List the directory paths contained in the directory at *path*. Parameters ---------- path : str Root-relative directory path. Empty string for the root. recursive : bool When ``True``, include all nested directories. Returns ------- list[str] Sorted root-relative directory paths. |
+| LocalStorageDriver.url | from orionis.storage import LocalStorageDriver | [drivers/local.py](../drivers/local.py) | async def url(self, path: str) -> str | Build the public URL for the file at *path*. Parameters ---------- path : str Root-relative file path. Returns ------- str Publicly accessible URL for the file. Raises ------ UnsupportedStorageOperationException If the disk has no base URL configured. |
+| LocalStorageDriver.temporaryUrl | from orionis.storage import LocalStorageDriver | [drivers/local.py](../drivers/local.py) | async def temporaryUrl(self, path: str, expires_in: int) -> str | Build a signed, time-limited URL for the file at *path*. The local driver cannot sign URLs, so this operation always fails. Parameters ---------- path : str Root-relative file path. expires_in : int Lifetime of the URL in seconds. Returns ------- str Never returned by this driver. Raises ------ UnsupportedStorageOperationException Always, since local disks cannot sign URLs. |
+| LocalStorageDriver.download | from orionis.storage import LocalStorageDriver | [drivers/local.py](../drivers/local.py) | async def download(self, path: str, destination: str / Path) -> Path | Copy the file at *path* to a location on the local filesystem. Parameters ---------- path : str Root-relative file path on the disk. destination : str / Path Local target. When it points to an existing directory the file keeps its original name inside that directory. Returns ------- Path Absolute local path of the downloaded file. Raises ------ StorageFileNotFoundException If the file does not exist. |
+| LocalStorageDriver.open | from orionis.storage import LocalStorageDriver | [drivers/local.py](../drivers/local.py) | def open(self, path: str, mode: str) -> AsyncStream | Open an asynchronous binary stream for the file at *path*. Parameters ---------- path : str Root-relative file path. mode : str Binary mode: ``'rb'``, ``'wb'``, ``'ab'``, ``'rb+'``, ``'wb+'``, or ``'ab+'``. Returns ------- AsyncStream Lazily opened stream; use it as an async context manager. Raises ------ UnsupportedStorageOperationException If *mode* is not a supported binary mode. |
+| MemoryStorageDriver | from orionis.storage import MemoryStorageDriver | [drivers/memory.py](../drivers/memory.py) | MemoryStorageDriver | Storage driver keeping every object in process memory. Designed for testing and ephemeral workloads: it implements the full driver contract over plain dictionaries, enabling fakes such as a future ``Storage.fake()`` without touching the rest of the component. Directories exist implicitly through file prefixes and explicitly through :meth:`createDirectory`. Concurrency ----------- The store is a plain dictionary mutated without locks. Every operation completes without awaiting midway, so concurrent tasks on a single event loop never observe a partial mutation. No guarantee is offered when the same path is mutated from several threads at once, which streams opened with :meth:`open` do because they flush their buffer on a worker thread. |
+| MemoryStorageDriver.read | from orionis.storage import MemoryStorageDriver | [drivers/memory.py](../drivers/memory.py) | async def read(self, path: str) -> bytes | Read the full contents of the file at *path*. Parameters ---------- path : str Root-relative file path. Returns ------- bytes Complete file contents. Raises ------ StorageFileNotFoundException If the file does not exist. |
+| MemoryStorageDriver.readStream | from orionis.storage import MemoryStorageDriver | [drivers/memory.py](../drivers/memory.py) | async def readStream(self, path: str, chunk_size: int) -> AsyncIterator[bytes] | Stream the contents of the file at *path* in chunks. Parameters ---------- path : str Root-relative file path. chunk_size : int Maximum number of bytes per yielded chunk. Yields ------ bytes Consecutive chunks of the file contents. Raises ------ StorageFileNotFoundException If the file does not exist. |
+| MemoryStorageDriver.exists | from orionis.storage import MemoryStorageDriver | [drivers/memory.py](../drivers/memory.py) | async def exists(self, path: str) -> bool | Check whether a file exists at *path*. Parameters ---------- path : str Root-relative file path. Returns ------- bool ``True`` if a file exists at the given path. |
+| MemoryStorageDriver.write | from orionis.storage import MemoryStorageDriver | [drivers/memory.py](../drivers/memory.py) | async def write(self, path: str, contents: bytes / str, visibility: str / None) -> None | Write *contents* to *path*, replacing any existing file. Parameters ---------- path : str Root-relative file path. contents : bytes / str Data to persist. Strings are encoded as UTF-8. visibility : str / None Visibility to apply, or ``None`` to keep the current one. Returns ------- None |
+| MemoryStorageDriver.writeStream | from orionis.storage import MemoryStorageDriver | [drivers/memory.py](../drivers/memory.py) | async def writeStream(self, path: str, stream: AsyncIterable[bytes], visibility: str / None) -> None | Write the chunks produced by *stream* to *path*. Parameters ---------- path : str Root-relative file path. stream : AsyncIterable[bytes] Asynchronous byte-chunk producer. visibility : str / None Visibility to apply, or ``None`` to keep the current one. Returns ------- None |
+| MemoryStorageDriver.delete | from orionis.storage import MemoryStorageDriver | [drivers/memory.py](../drivers/memory.py) | async def delete(self, path: str) -> bool | Delete the file at *path*. Parameters ---------- path : str Root-relative file path. Returns ------- bool ``True`` if the file existed and was removed. |
+| MemoryStorageDriver.copy | from orionis.storage import MemoryStorageDriver | [drivers/memory.py](../drivers/memory.py) | async def copy(self, source: str, target: str) -> None | Copy the file at *source* to *target*. Parameters ---------- source : str Root-relative path of the existing file. target : str Root-relative destination path. Returns ------- None Raises ------ StorageFileNotFoundException If the source file does not exist. |
+| MemoryStorageDriver.move | from orionis.storage import MemoryStorageDriver | [drivers/memory.py](../drivers/memory.py) | async def move(self, source: str, target: str) -> None | Move the file at *source* to *target*. Parameters ---------- source : str Root-relative path of the existing file. target : str Root-relative destination path. Returns ------- None Raises ------ StorageFileNotFoundException If the source file does not exist. |
+| MemoryStorageDriver.size | from orionis.storage import MemoryStorageDriver | [drivers/memory.py](../drivers/memory.py) | async def size(self, path: str) -> int | Return the size in bytes of the file at *path*. Parameters ---------- path : str Root-relative file path. Returns ------- int File size in bytes. Raises ------ StorageFileNotFoundException If the file does not exist. |
+| MemoryStorageDriver.mimeType | from orionis.storage import MemoryStorageDriver | [drivers/memory.py](../drivers/memory.py) | async def mimeType(self, path: str) -> str / None | Guess the MIME type of the file at *path*. Parameters ---------- path : str Root-relative file path. Returns ------- str / None MIME type, or ``None`` when it cannot be determined. |
+| MemoryStorageDriver.lastModified | from orionis.storage import MemoryStorageDriver | [drivers/memory.py](../drivers/memory.py) | async def lastModified(self, path: str) -> datetime | Return the last-modification timestamp of the file at *path*. Parameters ---------- path : str Root-relative file path. Returns ------- datetime Timezone-aware modification timestamp (UTC). Raises ------ StorageFileNotFoundException If the file does not exist. |
+| MemoryStorageDriver.visibility | from orionis.storage import MemoryStorageDriver | [drivers/memory.py](../drivers/memory.py) | async def visibility(self, path: str) -> str | Return the visibility of the file at *path*. Parameters ---------- path : str Root-relative file path. Returns ------- str ``'public'`` or ``'private'``. Raises ------ StorageFileNotFoundException If the file does not exist. |
+| MemoryStorageDriver.setVisibility | from orionis.storage import MemoryStorageDriver | [drivers/memory.py](../drivers/memory.py) | async def setVisibility(self, path: str, visibility: str) -> None | Change the visibility of the file at *path*. Parameters ---------- path : str Root-relative file path. visibility : str Target visibility (``'public'`` or ``'private'``). Returns ------- None Raises ------ StorageFileNotFoundException If the file does not exist. UnsupportedStorageOperationException If *visibility* is not a supported level. |
+| MemoryStorageDriver.hash | from orionis.storage import MemoryStorageDriver | [drivers/memory.py](../drivers/memory.py) | async def hash(self, path: str, algorithm: str) -> str | Compute the content hash of the file at *path*. Parameters ---------- path : str Root-relative file path. algorithm : str Any algorithm name accepted by :func:`hashlib.new`. Returns ------- str Hexadecimal digest of the file contents. Raises ------ StorageFileNotFoundException If the file does not exist. UnsupportedStorageOperationException If *algorithm* is not available. |
+| MemoryStorageDriver.info | from orionis.storage import MemoryStorageDriver | [drivers/memory.py](../drivers/memory.py) | async def info(self, path: str) -> FileInfo | Collect a metadata snapshot for the file at *path*. Parameters ---------- path : str Root-relative file path. Returns ------- FileInfo Immutable entity with size, MIME type, timestamps, hashes, visibility, and URL when available. Raises ------ StorageFileNotFoundException If the file does not exist. |
+| MemoryStorageDriver.createDirectory | from orionis.storage import MemoryStorageDriver | [drivers/memory.py](../drivers/memory.py) | async def createDirectory(self, path: str) -> None | Create the directory at *path*, including missing parents. Parameters ---------- path : str Root-relative directory path. Returns ------- None |
+| MemoryStorageDriver.deleteDirectory | from orionis.storage import MemoryStorageDriver | [drivers/memory.py](../drivers/memory.py) | async def deleteDirectory(self, path: str) -> bool | Recursively delete the directory at *path*. Parameters ---------- path : str Root-relative directory path. Returns ------- bool ``True`` if the directory existed and was removed. |
+| MemoryStorageDriver.directoryExists | from orionis.storage import MemoryStorageDriver | [drivers/memory.py](../drivers/memory.py) | async def directoryExists(self, path: str) -> bool | Check whether a directory exists at *path*. Parameters ---------- path : str Root-relative directory path. The empty string denotes the disk root. Returns ------- bool ``True`` if a directory exists at the given path. |
+| MemoryStorageDriver.files | from orionis.storage import MemoryStorageDriver | [drivers/memory.py](../drivers/memory.py) | async def files(self, path: str, *, recursive: bool) -> list[str] | List the file paths contained in the directory at *path*. Parameters ---------- path : str Root-relative directory path. Empty string for the root. recursive : bool When ``True``, include files from all nested directories. Returns ------- list[str] Sorted root-relative file paths. |
+| MemoryStorageDriver.directories | from orionis.storage import MemoryStorageDriver | [drivers/memory.py](../drivers/memory.py) | async def directories(self, path: str, *, recursive: bool) -> list[str] | List the directory paths contained in the directory at *path*. Parameters ---------- path : str Root-relative directory path. Empty string for the root. recursive : bool When ``True``, include all nested directories. Returns ------- list[str] Sorted root-relative directory paths. |
+| MemoryStorageDriver.url | from orionis.storage import MemoryStorageDriver | [drivers/memory.py](../drivers/memory.py) | async def url(self, path: str) -> str | Build the public URL for the file at *path*. Parameters ---------- path : str Root-relative file path. Returns ------- str Publicly accessible URL for the file. Raises ------ UnsupportedStorageOperationException If the disk has no base URL configured. |
+| MemoryStorageDriver.temporaryUrl | from orionis.storage import MemoryStorageDriver | [drivers/memory.py](../drivers/memory.py) | async def temporaryUrl(self, path: str, expires_in: int) -> str | Build a signed, time-limited URL for the file at *path*. The memory driver cannot sign URLs, so this operation always fails. Parameters ---------- path : str Root-relative file path. expires_in : int Lifetime of the URL in seconds. Returns ------- str Never returned by this driver. Raises ------ UnsupportedStorageOperationException Always, since memory disks cannot sign URLs. |
+| MemoryStorageDriver.download | from orionis.storage import MemoryStorageDriver | [drivers/memory.py](../drivers/memory.py) | async def download(self, path: str, destination: str / Path) -> Path | Copy the file at *path* to a location on the local filesystem. Parameters ---------- path : str Root-relative file path on the disk. destination : str / Path Local target. When it points to an existing directory the file keeps its original name inside that directory. Returns ------- Path Absolute local path of the downloaded file. Raises ------ StorageFileNotFoundException If the file does not exist. |
+| MemoryStorageDriver.open | from orionis.storage import MemoryStorageDriver | [drivers/memory.py](../drivers/memory.py) | def open(self, path: str, mode: str) -> AsyncStream | Open an asynchronous binary stream for the file at *path*. Parameters ---------- path : str Root-relative file path. mode : str Binary mode: ``'rb'``, ``'wb'``, ``'ab'``, ``'rb+'``, ``'wb+'``, or ``'ab+'``. Returns ------- AsyncStream Lazily opened stream; use it as an async context manager. Raises ------ UnsupportedStorageOperationException If *mode* is not a supported binary mode. |
+| S3StorageDriver | from orionis.storage import S3StorageDriver | [drivers/s3.py](../drivers/s3.py) | S3StorageDriver | Storage driver backed by Amazon S3 (or S3-compatible services). Uses the official AWS SDK for Python (``boto3``), which is an **optional dependency**: it is not installed with the framework. Install it before using this driver:: uv add 'orionis[s3]' The SDK is imported lazily on first operation, and every blocking call runs on a worker thread via :func:`asyncio.to_thread` so the event loop stays responsive. Directories are virtual: prefixes are inferred from object keys, and explicit directories are stored as zero-byte ``path/`` marker objects. |
+| S3StorageDriver.read | from orionis.storage import S3StorageDriver | [drivers/s3.py](../drivers/s3.py) | async def read(self, path: str) -> bytes | Read the full contents of the object at *path*. Parameters ---------- path : str Root-relative file path. Returns ------- bytes Complete object contents. Raises ------ StorageFileNotFoundException If the object does not exist. |
+| S3StorageDriver.readStream | from orionis.storage import S3StorageDriver | [drivers/s3.py](../drivers/s3.py) | async def readStream(self, path: str, chunk_size: int) -> AsyncIterator[bytes] | Stream the contents of the object at *path* in chunks. Parameters ---------- path : str Root-relative file path. chunk_size : int Maximum number of bytes per yielded chunk. Yields ------ bytes Consecutive chunks of the object contents. Raises ------ StorageFileNotFoundException If the object does not exist. |
+| S3StorageDriver.exists | from orionis.storage import S3StorageDriver | [drivers/s3.py](../drivers/s3.py) | async def exists(self, path: str) -> bool | Check whether an object exists at *path*. Parameters ---------- path : str Root-relative file path. Returns ------- bool ``True`` if an object exists at the given key. |
+| S3StorageDriver.write | from orionis.storage import S3StorageDriver | [drivers/s3.py](../drivers/s3.py) | async def write(self, path: str, contents: bytes / str, visibility: str / None) -> None | Write *contents* to *path*, replacing any existing object. Parameters ---------- path : str Root-relative file path. contents : bytes / str Data to persist. Strings are encoded as UTF-8. visibility : str / None Visibility to apply, or ``None`` for the bucket default. Returns ------- None |
+| S3StorageDriver.writeStream | from orionis.storage import S3StorageDriver | [drivers/s3.py](../drivers/s3.py) | async def writeStream(self, path: str, stream: AsyncIterable[bytes], visibility: str / None) -> None | Write the chunks produced by *stream* to *path*. The payload is buffered into a spooled temporary file (spilling to disk past 8 MiB) and uploaded with the SDK's managed transfer, which switches to multipart uploads for large objects. Parameters ---------- path : str Root-relative file path. stream : AsyncIterable[bytes] Asynchronous byte-chunk producer. visibility : str / None Visibility to apply, or ``None`` for the bucket default. Returns ------- None |
+| S3StorageDriver.delete | from orionis.storage import S3StorageDriver | [drivers/s3.py](../drivers/s3.py) | async def delete(self, path: str) -> bool | Delete the object at *path*. Parameters ---------- path : str Root-relative file path. Returns ------- bool ``True`` if the object existed and was removed. |
+| S3StorageDriver.copy | from orionis.storage import S3StorageDriver | [drivers/s3.py](../drivers/s3.py) | async def copy(self, source: str, target: str) -> None | Copy the object at *source* to *target* server-side. Parameters ---------- source : str Root-relative path of the existing object. target : str Root-relative destination path. Returns ------- None Raises ------ StorageFileNotFoundException If the source object does not exist. |
+| S3StorageDriver.move | from orionis.storage import S3StorageDriver | [drivers/s3.py](../drivers/s3.py) | async def move(self, source: str, target: str) -> None | Move the object at *source* to *target*. Implemented as a server-side copy followed by a delete of the source object. Parameters ---------- source : str Root-relative path of the existing object. target : str Root-relative destination path. Returns ------- None Raises ------ StorageFileNotFoundException If the source object does not exist. |
+| S3StorageDriver.size | from orionis.storage import S3StorageDriver | [drivers/s3.py](../drivers/s3.py) | async def size(self, path: str) -> int | Return the size in bytes of the object at *path*. Parameters ---------- path : str Root-relative file path. Returns ------- int Object size in bytes. Raises ------ StorageFileNotFoundException If the object does not exist. |
+| S3StorageDriver.mimeType | from orionis.storage import S3StorageDriver | [drivers/s3.py](../drivers/s3.py) | async def mimeType(self, path: str) -> str / None | Return the MIME type of the object at *path*. Prefers the ``Content-Type`` stored in S3 and falls back to a guess based on the file extension. Parameters ---------- path : str Root-relative file path. Returns ------- str / None MIME type, or ``None`` when it cannot be determined. Raises ------ StorageFileNotFoundException If the object does not exist. |
+| S3StorageDriver.lastModified | from orionis.storage import S3StorageDriver | [drivers/s3.py](../drivers/s3.py) | async def lastModified(self, path: str) -> datetime | Return the last-modification timestamp of the object at *path*. Parameters ---------- path : str Root-relative file path. Returns ------- datetime Timezone-aware modification timestamp. Raises ------ StorageFileNotFoundException If the object does not exist. |
+| S3StorageDriver.visibility | from orionis.storage import S3StorageDriver | [drivers/s3.py](../drivers/s3.py) | async def visibility(self, path: str) -> str | Return the visibility of the object at *path*. Parameters ---------- path : str Root-relative file path. Returns ------- str ``'public'`` or ``'private'`` based on the object ACL. Raises ------ StorageFileNotFoundException If the object does not exist. |
+| S3StorageDriver.setVisibility | from orionis.storage import S3StorageDriver | [drivers/s3.py](../drivers/s3.py) | async def setVisibility(self, path: str, visibility: str) -> None | Change the visibility of the object at *path*. Parameters ---------- path : str Root-relative file path. visibility : str Target visibility (``'public'`` or ``'private'``). Returns ------- None Raises ------ StorageFileNotFoundException If the object does not exist. UnsupportedStorageOperationException If *visibility* is not a supported level. |
+| S3StorageDriver.hash | from orionis.storage import S3StorageDriver | [drivers/s3.py](../drivers/s3.py) | async def hash(self, path: str, algorithm: str) -> str | Compute the content hash of the object at *path*. The object is streamed in chunks, so large files never load fully into memory. Parameters ---------- path : str Root-relative file path. algorithm : str Any algorithm name accepted by :func:`hashlib.new`. Returns ------- str Hexadecimal digest of the object contents. Raises ------ StorageFileNotFoundException If the object does not exist. UnsupportedStorageOperationException If *algorithm* is not available. |
+| S3StorageDriver.info | from orionis.storage import S3StorageDriver | [drivers/s3.py](../drivers/s3.py) | async def info(self, path: str) -> FileInfo | Collect a metadata snapshot for the object at *path*. The snapshot is built from object metadata only; the ``checksum`` field is ``None`` because computing it would require a full download (use :meth:`hash` instead). Parameters ---------- path : str Root-relative file path. Returns ------- FileInfo Immutable entity with size, MIME type, timestamps, ETag, visibility, and URL. Raises ------ StorageFileNotFoundException If the object does not exist. |
+| S3StorageDriver.createDirectory | from orionis.storage import S3StorageDriver | [drivers/s3.py](../drivers/s3.py) | async def createDirectory(self, path: str) -> None | Create a zero-byte directory marker at *path*. Parameters ---------- path : str Root-relative directory path. Returns ------- None |
+| S3StorageDriver.deleteDirectory | from orionis.storage import S3StorageDriver | [drivers/s3.py](../drivers/s3.py) | async def deleteDirectory(self, path: str) -> bool | Recursively delete every object under *path*. Parameters ---------- path : str Root-relative directory path. The empty string clears the whole bucket prefix space. Returns ------- bool ``True`` if at least one object was removed. |
+| S3StorageDriver.directoryExists | from orionis.storage import S3StorageDriver | [drivers/s3.py](../drivers/s3.py) | async def directoryExists(self, path: str) -> bool | Check whether any object exists under *path*. Parameters ---------- path : str Root-relative directory path. The empty string denotes the disk root. Returns ------- bool ``True`` if the prefix contains at least one object. |
+| S3StorageDriver.files | from orionis.storage import S3StorageDriver | [drivers/s3.py](../drivers/s3.py) | async def files(self, path: str, *, recursive: bool) -> list[str] | List the object keys that represent files under *path*. Parameters ---------- path : str Root-relative directory path. Empty string for the root. recursive : bool When ``True``, include files from all nested prefixes. Returns ------- list[str] Sorted root-relative file paths. |
+| S3StorageDriver.directories | from orionis.storage import S3StorageDriver | [drivers/s3.py](../drivers/s3.py) | async def directories(self, path: str, *, recursive: bool) -> list[str] | List the directory prefixes contained under *path*. Parameters ---------- path : str Root-relative directory path. Empty string for the root. recursive : bool When ``True``, include all nested prefixes. Returns ------- list[str] Sorted root-relative directory paths. |
+| S3StorageDriver.url | from orionis.storage import S3StorageDriver | [drivers/s3.py](../drivers/s3.py) | async def url(self, path: str) -> str | Build the public URL for the object at *path*. Parameters ---------- path : str Root-relative file path. Returns ------- str URL derived from the configured base URL, custom endpoint, or the canonical virtual-host address. |
+| S3StorageDriver.temporaryUrl | from orionis.storage import S3StorageDriver | [drivers/s3.py](../drivers/s3.py) | async def temporaryUrl(self, path: str, expires_in: int) -> str | Build a presigned URL for the object at *path*. Parameters ---------- path : str Root-relative file path. expires_in : int Lifetime of the URL in seconds. Returns ------- str Presigned GET URL valid for *expires_in* seconds. Raises ------ MissingStorageDependencyException If ``boto3`` is not installed. |
+| S3StorageDriver.download | from orionis.storage import S3StorageDriver | [drivers/s3.py](../drivers/s3.py) | async def download(self, path: str, destination: str / Path) -> Path | Download the object at *path* to the local filesystem. Parameters ---------- path : str Root-relative file path on the disk. destination : str / Path Local target. When it points to an existing directory the file keeps its original name inside that directory. Returns ------- Path Absolute local path of the downloaded file. Raises ------ StorageFileNotFoundException If the object does not exist. |
+| S3StorageDriver.open | from orionis.storage import S3StorageDriver | [drivers/s3.py](../drivers/s3.py) | def open(self, path: str, mode: str) -> AsyncStream | Open an asynchronous binary stream for the object at *path*. Read-oriented modes download the object into a spooled temporary buffer; writable modes upload the buffered content back to S3 when the stream is closed. Parameters ---------- path : str Root-relative file path. mode : str Binary mode: ``'rb'``, ``'wb'``, ``'ab'``, ``'rb+'``, ``'wb+'``, or ``'ab+'``. Returns ------- AsyncStream Lazily opened stream; use it as an async context manager. Raises ------ UnsupportedStorageOperationException If *mode* is not a supported binary mode. |
+| StorageManager | from orionis.storage import StorageManager | [manager.py](../manager.py) | StorageManager | Coordinate disk resolution for the storage component. The manager reads the ``filesystems`` configuration, builds :class:`~orionis.storage.disk.Disk` objects bound to their drivers, and caches them per name. It knows nothing about files or directories: that behavior lives in the domain objects returned by each disk. |
+| StorageManager.disk | from orionis.storage import StorageManager | [manager.py](../manager.py) | def disk(self, name: str / None) -> IDisk | Resolve the disk registered under *name*. The disk is built on first access and cached for reuse. Parameters ---------- name : str / None Disk name as declared in the filesystems configuration, or ``None`` for the default disk. Returns ------- IDisk Disk bound to its configured driver. Raises ------ DiskNotFoundException If the disk is not declared in the configuration. DriverNotSupportedException If the disk references a driver with no implementation. |
+| StorageManager.default | from orionis.storage import StorageManager | [manager.py](../manager.py) | def default(self) -> IDisk | Resolve the default disk from the configuration. Returns ------- IDisk The disk configured as default. Raises ------ DiskNotFoundException If the default disk is not declared in the configuration. |
+| StorageManager.extend | from orionis.storage import StorageManager | [manager.py](../manager.py) | def extend(self, driver: str, factory: Callable[[object], IStorageDriver]) -> None | Register a custom driver factory under *driver*. The factory receives the disk configuration entity and must return a ready-to-use driver instance. Registering a factory clears the disk cache so new resolutions pick it up. Parameters ---------- driver : str Driver name as referenced by disk configurations. factory : Callable[[object], IStorageDriver] Callable building the driver from a disk configuration. Returns ------- None |
+| StorageManager.uploaded | from orionis.storage import StorageManager | [manager.py](../manager.py) | def uploaded(self, source: IHttpUploadedFile) -> IUploadedFile | Wrap an HTTP multipart payload as a storable uploaded file. Parameters ---------- source : IHttpUploadedFile Buffered multipart payload produced by the HTTP layer. Returns ------- IUploadedFile Uploaded file bound to this manager for disk resolution. |
+| UploadedFile | from orionis.storage import UploadedFile | [uploaded_file.py](../uploaded_file.py) | UploadedFile | Represent a file received through HTTP, ready to be stored. The object adapts the buffered multipart payload produced by the HTTP layer so it can be persisted onto any configured disk. It is fully decoupled from the request object and internally always delegates persistence to :class:`~orionis.storage.file.File` through the disk resolved by the manager. |
+| UploadedFile.originalName | from orionis.storage import UploadedFile | [uploaded_file.py](../uploaded_file.py) | def originalName(self) -> str | Return the sanitized client-supplied file name. Returns ------- str Original file name as reported by the client. |
+| UploadedFile.extension | from orionis.storage import UploadedFile | [uploaded_file.py](../uploaded_file.py) | def extension(self) -> str | Return the lowercase file extension including the dot. Returns ------- str Extension such as ``'.png'``, or an empty string when the original name has none. |
+| UploadedFile.size | from orionis.storage import UploadedFile | [uploaded_file.py](../uploaded_file.py) | def size(self) -> int | Return the size of the uploaded payload in bytes. Returns ------- int Payload size in bytes. |
+| UploadedFile.mimeType | from orionis.storage import UploadedFile | [uploaded_file.py](../uploaded_file.py) | def mimeType(self) -> str / None | Return the MIME type declared by the client. Returns ------- str / None Declared MIME type, or ``None`` when absent. |
+| UploadedFile.hashName | from orionis.storage import UploadedFile | [uploaded_file.py](../uploaded_file.py) | def hashName(self) -> str | Return a random, collision-safe name for the file. The name is generated once and cached, so repeated calls on the same instance always return the same value. Returns ------- str Random hexadecimal name with the original extension. |
+| UploadedFile.read | from orionis.storage import UploadedFile | [uploaded_file.py](../uploaded_file.py) | async def read(self) -> bytes | Read the full uploaded payload. Returns ------- bytes Complete payload contents. |
+| UploadedFile.store | from orionis.storage import UploadedFile | [uploaded_file.py](../uploaded_file.py) | async def store(self, directory: str, disk: str / None, visibility: str / None) -> IFile | Persist the payload under a generated hash name. Parameters ---------- directory : str Root-relative target directory on the disk. disk : str / None Disk name, or ``None`` for the default disk. visibility : str / None Visibility to apply, or ``None`` for the medium default. Returns ------- IFile File object pointing at the stored file. |
+| UploadedFile.storeAs | from orionis.storage import UploadedFile | [uploaded_file.py](../uploaded_file.py) | async def storeAs(self, directory: str, name: str, disk: str / None, visibility: str / None) -> IFile | Persist the payload under an explicit file name. Parameters ---------- directory : str Root-relative target directory on the disk. name : str Target file name without directory separators. disk : str / None Disk name, or ``None`` for the default disk. visibility : str / None Visibility to apply, or ``None`` for the medium default. Returns ------- IFile File object pointing at the stored file. Raises ------ StoragePathException If *name* is empty or contains a directory separator. |
+| UploadedFile.move | from orionis.storage import UploadedFile | [uploaded_file.py](../uploaded_file.py) | async def move(self, directory: str, name: str / None, disk: str / None) -> IFile | Persist the payload and release the upload buffer. Parameters ---------- directory : str Root-relative target directory on the disk. name : str / None Target file name, or ``None`` to use a generated hash name. disk : str / None Disk name, or ``None`` for the default disk. Returns ------- IFile File object pointing at the stored file. |
+| UploadedFile.copy | from orionis.storage import UploadedFile | [uploaded_file.py](../uploaded_file.py) | async def copy(self, directory: str, name: str / None, disk: str / None) -> IFile | Persist the payload while keeping the upload buffer usable. Parameters ---------- directory : str Root-relative target directory on the disk. name : str / None Target file name, or ``None`` to use a generated hash name. disk : str / None Disk name, or ``None`` for the default disk. Returns ------- IFile File object pointing at the stored file. |
+| Visibility | from orionis.storage import Visibility | [enums/visibility.py](../enums/visibility.py) | Visibility | Enumerate the visibility levels supported by storage drivers. Members inherit from :class:`str`, so they can be passed anywhere a plain visibility string is accepted. Attributes ---------- PUBLIC : str The object is readable by anyone (e.g. world-readable file or publicly accessible cloud object). PRIVATE : str The object is only readable by the owning application. |
 
 ## Usage examples
 
-### Resolving a disk through the facade
+    from orionis.storage import AsyncStream
 
-```python
-from orionis.storage.contracts.file import IFile
-from orionis.support.facades.storage import Storage
+The import path matches the API table. Import status: executed successfully under Python 3.14.3.
 
+## Design characteristics
 
-async def store_report(payload: bytes) -> IFile:
-    """Persist a report on the public disk and return the stored file."""
-    # First facade access: awaiting it boots the deferred provider and pins
-    # the facade, so later accesses can be used directly.
-    disk = await Storage.disk("public")
+The package uses an explicit public surface. Private names are excluded; declarations link to their concrete owner.
 
-    report = await disk.put("reports/2026-q1.pdf", payload, "public")
-    print(report.path(), await report.size(), await report.url())
+## Performance and concurrency
 
-    for entry in await disk.directory("reports").files():
-        print(entry.path())
-
-    return report
-```
-
-### Handling errors
-
-```python
-import asyncio
-
-from orionis.storage.disk import Disk
-from orionis.storage.drivers.memory import MemoryStorageDriver
-from orionis.storage.exceptions import (
-    StorageFileNotFoundException,
-    StoragePathException,
-    UnsupportedStorageOperationException,
-)
-
-
-async def main() -> None:
-    disk = Disk(name="memory", driver=MemoryStorageDriver())
-
-    try:
-        await disk.file("missing.txt").read()
-    except StorageFileNotFoundException as exc:
-        print("not found:", exc)
-
-    try:
-        disk.file("../../etc/passwd")
-    except StoragePathException as exc:
-        print("rejected path:", exc)
-
-    await disk.put("notes.txt", "hello")
-    try:
-        await disk.file("notes.txt").temporaryUrl(60)
-    except UnsupportedStorageOperationException as exc:
-        print("unsupported:", exc)
-
-
-asyncio.run(main())
-```
-
-### Streaming large files
-
-```python
-import asyncio
-from collections.abc import AsyncIterator
-from pathlib import Path
-
-from orionis.storage.disk import Disk
-from orionis.storage.drivers.local import LocalStorageDriver
-
-
-async def rows() -> AsyncIterator[bytes]:
-    """Produce the export contents chunk by chunk."""
-    for index in range(3):
-        yield f"row-{index}\n".encode()
-
-
-async def main() -> None:
-    driver = LocalStorageDriver(root=Path("storage/app/private"))
-    disk = Disk(name="local", driver=driver)
-
-    # Nothing is fully materialized in memory, neither on write nor on read.
-    export = await disk.file("exports/report.csv").writeStream(rows())
-
-    async for chunk in export.readStream(chunk_size=8):
-        print(chunk)
-
-    async with export.open("rb") as stream:
-        print(await stream.read(5))
-
-    await export.delete()
-
-
-asyncio.run(main())
-```
-
-### Storing an HTTP upload
-
-```python
-from orionis.http import HttpResponse, response
-from orionis.http.base import BaseController
-from orionis.http.request import Request
-from orionis.storage.contracts.manager import IStorageManager
-
-
-class AvatarController(BaseController):
-
-    async def store(
-        self,
-        request: Request,
-        storage: IStorageManager,
-    ) -> HttpResponse:
-        """
-        Persist the uploaded avatar on the public disk.
-
-        Parameters
-        ----------
-        request : Request
-            Incoming HTTP request carrying the multipart form.
-        storage : IStorageManager
-            Storage manager injected by the container.
-
-        Returns
-        -------
-        HttpResponse
-            JSON payload with the stored path and its public URL.
-        """
-        form = await request.form()
-        upload = storage.uploaded(form.files["avatar"][0])
-
-        # store() uses a random hash name; storeAs() takes an explicit one.
-        stored = await upload.store("avatars", disk="public", visibility="public")
-
-        return response.json({
-            "path": stored.path(),
-            "url": await stored.url(),
-        })
-```
-
-### Running standalone with the memory driver
-
-```python
-import asyncio
-
-from orionis.storage.disk import Disk
-from orionis.storage.drivers.memory import MemoryStorageDriver
-
-
-async def main() -> None:
-    disk = Disk(name="fake", driver=MemoryStorageDriver(base_url="https://cdn.test"))
-
-    await disk.put("invoices/2026/001.txt", "total: 120", "public")
-    await disk.put("invoices/2026/002.txt", "total: 340")
-
-    invoices = disk.directory("invoices")
-    print([entry.path() for entry in await invoices.allFiles()])
-    print([entry.path() for entry in await invoices.directories()])
-
-    first = disk.file("invoices/2026/001.txt")
-    print(await first.visibility())
-    print(await first.url())
-    print(await first.hash("md5"))
-    print(await first.info())
-
-
-asyncio.run(main())
-```
-
-### Registering a custom driver
-
-```python
-from orionis.storage.contracts.driver import IStorageDriver
-from orionis.storage.contracts.manager import IStorageManager
-from orionis.storage.drivers.memory import MemoryStorageDriver
-
-
-def register_fake_driver(manager: IStorageManager) -> None:
-    """Bind the driver name 'fake' to an in-memory implementation."""
-
-    def factory(config: object) -> IStorageDriver:
-        # config is the disk configuration entity declared in config/filesystems.py.
-        return MemoryStorageDriver(base_url=getattr(config, "url", None))
-
-    # Any disk whose `driver` field is "fake" now resolves to this factory,
-    # which also takes precedence over the built-in drivers.
-    manager.extend("fake", factory)
-```
-
-## Performance and concurrency considerations
-
-- **Non-blocking I/O:** every blocking operation (filesystem access, SDK calls, spooled
-  upload buffers) runs through `asyncio.to_thread`, so the event loop stays responsive.
-  There is no truly asynchronous native client involved; the model is "worker threads
-  behind an async API".
-- **Bounded memory:** `readStream`, `writeStream`, `hash`, and `info` process 64 KiB
-  chunks; cloud drivers spool incoming streams into a temporary file that spills to disk
-  beyond 8 MiB. `read()` is the only operation that materializes the whole file.
-- **Disk cache:** `StorageManager` builds each `Disk` once and caches it in `_disks`;
-  `extend()` clears the cache. Cloud clients are also built once per driver instance and
-  reused.
-- **Atomic local writes:** the temporary-file plus `Path.replace()` sequence means a
-  reader never observes a half-written file, and a failed transfer leaves no partial
-  destination behind. Each call stages into its own randomly named temporary file, so
-  concurrent writers on the same path publish one complete payload or nothing.
-- **`__slots__` everywhere** in concrete classes and empty `__slots__` in the contracts,
-  which removes the attribute dictionary from the many short-lived `File` / `Directory`
-  instances a listing creates.
-- **Cheap objects:** `Disk.file()`, `Disk.directory()`, and `File.open()` perform no I/O;
-  they only build objects. Cost is incurred when awaiting or entering them.
-- **Independent state:** `File` and `Directory` hold only a driver reference and a string,
-  so they can be created and used freely from multiple tasks. `AsyncStream`, on the other
-  hand, wraps a single handle with a mutable position, so a stream should be used by one
-  task at a time.
+No uniform guarantee is declared at package level. Inspect each linked file for I/O, coroutines, caches, locks, and shared state.
 
 ## Compatibility notes
 
-- **Python `>= 3.14`** (`requires-python` in `pyproject.toml`). The module uses
-  `Path.walk()` (3.12+), `datetime.UTC` (3.11+), `StrEnum` (3.11+),
-  `hashlib.new(..., usedforsecurity=False)` (3.9+), and `X | Y` type syntax.
-- **Windows:** visibility relies on POSIX permission bits. Windows does not implement the
-  full POSIX model, so `chmod` degrades gracefully and `visibility()` can report `'public'`
-  for files created with the default mode.
-- **`createdAt`** depends on `st_birthtime`, which not every platform/filesystem exposes;
-  it is `None` when unavailable.
-- **`Path.replace()`** cannot cross devices; the local driver falls back to `shutil.move()`
-  for cross-device moves. On Windows it can also raise `PermissionError` when another
-  writer is replacing the same destination at that very instant, an operating system
-  restriction that POSIX does not have.
-- **Optional SDKs:** cloud drivers can be instantiated without their SDK installed; the
-  failure surfaces on the first operation as `MissingStorageDependencyException`.
-- **The `storage` module never imports the HTTP layer at runtime**: the multipart payload
-  contract is imported only under `TYPE_CHECKING` and consumed duck-typed
-  (`filename`, `extension`, `size`, `content_type`, `read()`, `chunks()`, `close()`).
+Declared minimum: Python 3.14. Validation used Python 3.14.3. Dependency bounds are in pyproject.toml.
+
+## Verification and limitations
+
+Python files were analysed and exports verified. Failures from dependencies, callbacks, I/O, or configuration may propagate and are not presented as exhaustive.

@@ -6,7 +6,7 @@
 
   <head>
   
-  <title>orionis.queues.manager.QueueManager</title>
+  <title>API Reference | Orionis Framework</title>
   <meta name="generator" content="pydoctor 25.10.1">
     
   </meta>
@@ -703,7 +703,7 @@
         </div>
 
         <div class="extrasDocstring">
-          <p class="class-signature"><code><span class="py-keyword">class</span> <span class="py-defname">QueueManager</span>(<a href="orionis.queues.contracts.manager.IQueueManager.html" class="internal-link" title="orionis.queues.contracts.manager.IQueueManager">IQueueManager</a>): <a href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/queues/manager.py#L72" class="sourceLink">(source)</a></code></p><p>Constructor: <code><a href="#__init__" class="internal-link" title="orionis.queues.manager.QueueManager.__init__">QueueManager(app, serializer)</a></code></p><p><a href="classIndex.html#orionis.queues.manager.QueueManager">View In Hierarchy</a></p>
+          <p class="class-signature"><code><span class="py-keyword">class</span> <span class="py-defname">QueueManager</span>(<a href="orionis.queues.contracts.manager.IQueueManager.html" class="internal-link" title="orionis.queues.contracts.manager.IQueueManager">IQueueManager</a>): <a href="https://github.com/orionis-framework/framework/tree/371af361a2bb77f17f065a9209a585b9b7a2bed8/orionis/queues/manager.py#L72" class="sourceLink">(source)</a></code></p><p>Constructor: <code><a href="#__init__" class="internal-link" title="orionis.queues.manager.QueueManager.__init__">QueueManager(app, serializer)</a></code></p><p><a href="classIndex.html#orionis.queues.manager.QueueManager">View In Hierarchy</a></p>
         </div>
 
         <div class="moduleDocstring">
@@ -830,7 +830,7 @@
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">__init__</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">app: <code>IApplication</code>, </span><span class="rst-sig-param">serializer: <code><a href="orionis.queues.contracts.serializer.IJobSerializer.html" class="internal-link" title="orionis.queues.contracts.serializer.IJobSerializer">IJobSerializer</a></code></span>):</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/queues/manager.py#L85">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/371af361a2bb77f17f065a9209a585b9b7a2bed8/orionis/queues/manager.py#L85">
       
       (source)
     </a>
@@ -857,7 +857,7 @@
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">_connectionName</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">name: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a> | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/queues/manager.py#L158">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/371af361a2bb77f17f065a9209a585b9b7a2bed8/orionis/queues/manager.py#L158">
       
       (source)
     </a>
@@ -884,7 +884,7 @@
     
     
     <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">_createDriver</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">name: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></span>) -&gt; <code><a href="orionis.queues.contracts.driver.IQueueDriver.html" class="internal-link" title="orionis.queues.contracts.driver.IQueueDriver">IQueueDriver</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/queues/manager.py#L253">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/371af361a2bb77f17f065a9209a585b9b7a2bed8/orionis/queues/manager.py#L253">
       
       (source)
     </a>
@@ -911,7 +911,7 @@
     
     
     <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">_submit</span><span class="function-signature long-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">job: <code>BaseJob</code>, </span><span class="rst-sig-param">connection: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a> | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code>, </span><span class="rst-sig-param">queue: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a> | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code>, </span><span class="rst-sig-param">delay: <code><a href="https://docs.python.org/3/builtins/functions.html#float" class="intersphinx-link">float</a></code></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/queues/manager.py#L179">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/371af361a2bb77f17f065a9209a585b9b7a2bed8/orionis/queues/manager.py#L179">
       
       (source)
     </a>
@@ -938,7 +938,7 @@
     
     
     <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">boot</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>):</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/queues/manager.py#L117">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/371af361a2bb77f17f065a9209a585b9b7a2bed8/orionis/queues/manager.py#L117">
       
       (source)
     </a>
@@ -965,7 +965,7 @@
     
     
     <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">close</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>):</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/queues/manager.py#L370">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/371af361a2bb77f17f065a9209a585b9b7a2bed8/orionis/queues/manager.py#L370">
       
       (source)
     </a>
@@ -993,7 +993,7 @@ then clear their cached references.</td></tr></table></div>
     
     
     <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">connection</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">name: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a> | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code> = <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></span>) -&gt; <code><a href="orionis.queues.contracts.driver.IQueueDriver.html" class="internal-link" title="orionis.queues.contracts.driver.IQueueDriver">IQueueDriver</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/queues/manager.py#L228">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/371af361a2bb77f17f065a9209a585b9b7a2bed8/orionis/queues/manager.py#L228">
       
       (source)
     </a>
@@ -1020,7 +1020,7 @@ then clear their cached references.</td></tr></table></div>
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">dispatch</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">job: <code>BaseJob</code></span>) -&gt; <code>PendingDispatch</code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/queues/manager.py#L139">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/371af361a2bb77f17f065a9209a585b9b7a2bed8/orionis/queues/manager.py#L139">
       
       (source)
     </a>
@@ -1047,7 +1047,7 @@ then clear their cached references.</td></tr></table></div>
     
     
     <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">failed</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>) -&gt; <code><a href="orionis.queues.contracts.failed_repository.IFailedJobRepository.html" class="internal-link" title="orionis.queues.contracts.failed_repository.IFailedJobRepository">IFailedJobRepository</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/queues/manager.py#L321">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/371af361a2bb77f17f065a9209a585b9b7a2bed8/orionis/queues/manager.py#L321">
       
       (source)
     </a>
@@ -1074,7 +1074,7 @@ then clear their cached references.</td></tr></table></div>
     
     
     <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">retryFailed</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">failed_id: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/queues/manager.py#L341">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/371af361a2bb77f17f065a9209a585b9b7a2bed8/orionis/queues/manager.py#L341">
       
       (source)
     </a>
@@ -1101,7 +1101,7 @@ then clear their cached references.</td></tr></table></div>
     
     
     <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">worker</span><span class="function-signature long-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">connection: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a> | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code> = <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a>, </span><span class="rst-sig-param">queues: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" class="intersphinx-link">tuple</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <wbr></wbr><span class="rst-variable-ellipsis">...</span>] | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code> = <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a>, </span><span class="rst-sig-param">concurrency: <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a> | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code> = <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></span>) -&gt; <code><a href="orionis.queues.worker.Worker.html" class="internal-link" title="orionis.queues.worker.Worker">Worker</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/queues/manager.py#L277">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/371af361a2bb77f17f065a9209a585b9b7a2bed8/orionis/queues/manager.py#L277">
       
       (source)
     </a>
@@ -1127,7 +1127,7 @@ then clear their cached references.</td></tr></table></div>
   <div class="functionHeader">
     
     <span class="py-defname">__slots__</span>: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" class="intersphinx-link">tuple</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <wbr></wbr><span class="rst-variable-ellipsis">...</span>]</code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/queues/manager.py#L75">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/371af361a2bb77f17f065a9209a585b9b7a2bed8/orionis/queues/manager.py#L75">
       
       (source)
     </a>
@@ -1154,7 +1154,7 @@ then clear their cached references.</td></tr></table></div>
   <div class="functionHeader">
     
     <span class="py-defname">_app</span> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/queues/manager.py#L108">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/371af361a2bb77f17f065a9209a585b9b7a2bed8/orionis/queues/manager.py#L108">
       
       (source)
     </a>
@@ -1181,7 +1181,7 @@ then clear their cached references.</td></tr></table></div>
   <div class="functionHeader">
     
     <span class="py-defname">_config</span> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/queues/manager.py#L111">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/371af361a2bb77f17f065a9209a585b9b7a2bed8/orionis/queues/manager.py#L111">
       
       (source)
     </a>
@@ -1208,7 +1208,7 @@ then clear their cached references.</td></tr></table></div>
   <div class="functionHeader">
     
     <span class="py-defname">_driver_lock</span> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/queues/manager.py#L113">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/371af361a2bb77f17f065a9209a585b9b7a2bed8/orionis/queues/manager.py#L113">
       
       (source)
     </a>
@@ -1235,7 +1235,7 @@ then clear their cached references.</td></tr></table></div>
   <div class="functionHeader">
     
     <span class="py-defname">_drivers</span>: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#dict" class="intersphinx-link">dict</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <wbr></wbr><a href="orionis.queues.contracts.driver.IQueueDriver.html" class="internal-link" title="orionis.queues.contracts.driver.IQueueDriver">IQueueDriver</a>]</code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/queues/manager.py#L112">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/371af361a2bb77f17f065a9209a585b9b7a2bed8/orionis/queues/manager.py#L112">
       
       (source)
     </a>
@@ -1262,7 +1262,7 @@ then clear their cached references.</td></tr></table></div>
   <div class="functionHeader">
     
     <span class="py-defname">_failed</span>: <code><a href="orionis.queues.contracts.failed_repository.IFailedJobRepository.html" class="internal-link" title="orionis.queues.contracts.failed_repository.IFailedJobRepository">IFailedJobRepository</a> | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/queues/manager.py#L114">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/371af361a2bb77f17f065a9209a585b9b7a2bed8/orionis/queues/manager.py#L114">
       
       (source)
     </a>
@@ -1289,7 +1289,7 @@ then clear their cached references.</td></tr></table></div>
   <div class="functionHeader">
     
     <span class="py-defname">_failed_lock</span> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/queues/manager.py#L115">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/371af361a2bb77f17f065a9209a585b9b7a2bed8/orionis/queues/manager.py#L115">
       
       (source)
     </a>
@@ -1316,7 +1316,7 @@ then clear their cached references.</td></tr></table></div>
   <div class="functionHeader">
     
     <span class="py-defname">_serializer</span> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/43ee748e029540403b75bb09579f7615bff074b3/orionis/queues/manager.py#L109">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/371af361a2bb77f17f065a9209a585b9b7a2bed8/orionis/queues/manager.py#L109">
       
       (source)
     </a>
@@ -1342,7 +1342,7 @@ then clear their cached references.</td></tr></table></div>
   <div class="orionis-footer-inner">
     <div class="orionis-footer-copy">
       <p>API documentation for <a href="https://orionis-framework.com/" class="projecthome">Orionis</a>.</p>
-      <p class="orionis-footer-meta">Generated with <a href="https://github.com/twisted/pydoctor/">Pydoctor</a> 25.10.1.<span class="orionis-footer-build"> Built 2026-10-05 09:23:38.</span></p>
+      <p class="orionis-footer-meta">Generated with <a href="https://github.com/twisted/pydoctor/">Pydoctor</a> 25.10.1.<span class="orionis-footer-build"> Built 2026-10-05 21:59:59.</span></p>
     </div>
     <nav class="orionis-footer-links" aria-label="Additional resources">
       <a href="https://docs.orionis-framework.com">Read the guide <span aria-hidden="true">↗</span></a>

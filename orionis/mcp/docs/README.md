@@ -1,71 +1,93 @@
-# Orionis MCP
+# orionis.mcp
 
-MCP shares Orionis' container, HTTP responses, streaming cleanup and authentication
-context. `McpProvider` binds `IMcpManager`, validated `McpConfig` and a bounded
-`IMcpEventBus`; boot pins the facades and loads the application's `ai` route files.
+> API reference derived from the current implementation.
 
-## Registration
+## Table of contents
 
-Declare `Server` subclasses with explicit tools, resources and prompts, then use
-the `Mcp` facade's `web(path, server)` or `local(name, server)` registration in
-`routes/ai.py`. HTTP registrations create native POST routes with the API profile.
-Local registrations resolve configured handles; they do not import client-supplied
-module names. The manager compiles each server once and never caches a request's
-identity or handler instance.
+- Requirements
+- Functional overview
+- Module structure
+- API reference
+- Usage examples
+- Design characteristics
+- Performance and concurrency
+- Compatibility notes
+- Verification and limitations
 
-`Tool[InputType, OutputType]` also supports explicit `input` and `output` attributes.
-`McpInvoker` compiles trusted dependency sources before accepting requests. Payload
-keys never become arbitrary constructor or handler keyword arguments. Primitive
-instances are built through the application container for availability,
-authorization and execution.
+## Requirements
 
-## Runtime And Limits
+Python 3.14 or newer, as declared by pyproject.toml.
 
-HTTP uses native `Response` and `EventStreamResponse`. STDIO uses bounded independent
-request tasks and serialized output; shutdown joins owned cleanup. `OwnedStream`
-implements the awaited `AsyncClosable` contract, including close-before-first-read.
-The process-local event bus coalesces duplicate changes and has finite listener
-and buffer capacities. It is not a distributed cross-worker broker.
+## Functional overview
 
-All configuration fields in `config/mcp.py` read environment factories. Request
-bytes and concurrency can share HTTP defaults; origins can share explicit CORS
-entries, never CORS wildcards. Protocol-specific environment values take precedence.
+The orionis.mcp initializer exports 19 public symbols. This reference uses __all__, export routes, and current source files as evidence.
 
-Dispatcher list sources, server identity and result-type tables are prepared once.
-Tool input validation owns the mutable copy of a request snapshot. Removing a
-second copy matters for nested mappings; list-shaped payloads only avoid the extra
-root dictionary. The synchronous payload/output helpers still run synchronous
-custom schema rules: do not attach blocking I/O rules there. HTTP controller schema
-injection uses the separate asynchronous validator.
+## Module structure
 
-## URI Matching
+| Path | Responsibility |
+| --- | --- |
+| ../__init__.py | Defines package exports. |
+| orionis.mcp/ | Implementations and subpackages for those exports. |
 
-Expansion uses the existing RFC 6570 library. Automatic inverses require simple
-variables separated by characters excluded from captures (`/`, `?`, `#`, `&`, `;`).
-Adjacent captures and ambiguous textual separators require an explicit static or
-class `Resource.match(uri)` hook. Every result must expand back to the requested URI;
-extra undeclared variables and inconsistent repeated values are rejected.
+## API reference
 
-This rejects previously accepted ambiguous templates during compilation. Supply
-an explicit inverse to retain them. Custom inverse complexity remains application
-code's responsibility. Regex variable-name checks use ASCII and possessive groups.
+| Symbol | Verified import | Source | Declaration | Observed behavior |
+| --- | --- | --- | --- | --- |
+| MCP_PROTOCOL_VERSION | from orionis.mcp import MCP_PROTOCOL_VERSION | [protocol/constants.py](../protocol/constants.py) | exported constant or alias | Exported public constant or alias. |
+| CacheHint | from orionis.mcp import CacheHint | [protocol/metadata.py](../protocol/metadata.py) | CacheHint | Describe client cache freshness without caching server-side results. |
+| Completion | from orionis.mcp import Completion | [protocol/results.py](../protocol/results.py) | Completion | At most one hundred completion values. |
+| ContentAnnotations | from orionis.mcp import ContentAnnotations | [protocol/metadata.py](../protocol/metadata.py) | ContentAnnotations | Resource/content audience, relevance, and modification hints. |
+| Icon | from orionis.mcp import Icon | [protocol/metadata.py](../protocol/metadata.py) | Icon | An icon reference; the server never fetches its source. |
+| InputRequiredResult | from orionis.mcp import InputRequiredResult | [protocol/results.py](../protocol/results.py) | InputRequiredResult | An MRTR interim result, never a pushed JSON-RPC request. |
+| McpConfig | from orionis.mcp import McpConfig | [config.py](../config.py) | exported constant or alias | Exported public constant or alias. |
+| McpContext | from orionis.mcp import McpContext | [context.py](../context.py) | exported constant or alias | Exported public constant or alias. |
+| McpExtension | from orionis.mcp import McpExtension | [server/extension.py](../server/extension.py) | McpExtension | Declare negotiated capabilities and extension-owned method/schema hooks. |
+| McpRequest | from orionis.mcp import McpRequest | [context.py](../context.py) | McpRequest | Hold only explicit input and native context for one independent call. |
+| McpRequest.identity | from orionis.mcp import McpRequest | [context.py](../context.py) | def identity(self) -> IAuthenticatable / None | Read identity through Orionis' scoped authentication lifecycle. Returns ------- IAuthenticatable / None Result of the operation described above. |
+| McpRequest.client_capabilities | from orionis.mcp import McpRequest | [context.py](../context.py) | def client_capabilities(self) -> Mapping[str, object] | Read capabilities declared on this request, never a previous call. Returns ------- Mapping[str, object] Result of the operation described above. |
+| McpResponse | from orionis.mcp import McpResponse | [responses.py](../responses.py) | McpResponse | Compose protocol content without knowing the transport or DI container. |
+| McpResponse.text | from orionis.mcp import McpResponse | [responses.py](../responses.py) | def text(cls, value: str) -> Self | Return text content. Parameters ---------- value : str Value to inspect, transform or validate. Returns ------- Self Text content. |
+| McpResponse.image | from orionis.mcp import McpResponse | [responses.py](../responses.py) | def image(cls, value: bytes, mime_type: str) -> Self | Encode raw image bytes once. Parameters ---------- value : bytes Value to inspect, transform or validate. mime_type : str Value supplied for ``mime_type``. Returns ------- Self Result of the operation described above. |
+| McpResponse.audio | from orionis.mcp import McpResponse | [responses.py](../responses.py) | def audio(cls, value: bytes, mime_type: str) -> Self | Encode raw audio bytes once. Parameters ---------- value : bytes Value to inspect, transform or validate. mime_type : str Value supplied for ``mime_type``. Returns ------- Self Result of the operation described above. |
+| McpResponse.resource | from orionis.mcp import McpResponse | [responses.py](../responses.py) | def resource(cls, uri: str, value: str / bytes, mime_type: str / None) -> Self | Embed text or binary resource content at an explicit URI. Parameters ---------- uri : str Value supplied for ``uri``. value : str / bytes Value to inspect, transform or validate. mime_type : str / None Value supplied for ``mime_type``. Returns ------- Self Result of the operation described above. |
+| McpResponse.resourceLink | from orionis.mcp import McpResponse | [responses.py](../responses.py) | def resourceLink(cls, uri: str, name: str, *, title: str / None, description: str / None, mime_type: str / None) -> Self | Link to a resource without loading it. Parameters ---------- uri : str Value supplied for ``uri``. name : str Value supplied for ``name``. title : str / None Value supplied for ``title``. description : str / None Value supplied for ``description``. mime_type : str / None Value supplied for ``mime_type``. Returns ------- Self Result of the operation described above. |
+| McpResponse.structured | from orionis.mcp import McpResponse | [responses.py](../responses.py) | def structured(cls, value: object) -> Self | Return any JSON value and the recommended serialized text content. Parameters ---------- value : object Value to inspect, transform or validate. Returns ------- Self Any JSON value and the recommended serialized text content. |
+| McpResponse.error | from orionis.mcp import McpResponse | [responses.py](../responses.py) | def error(cls, message: str) -> Self | Return an application-visible tool error, with an explicit safe message. Parameters ---------- message : str Value supplied for ``message``. Returns ------- Self An application-visible tool error, with an explicit safe message. |
+| McpResponse.progress | from orionis.mcp import McpResponse | [responses.py](../responses.py) | def progress(cls, current: float, total: float / None, message: str / None) -> Self | Yield progress; the dispatcher suppresses it without client opt-in. Parameters ---------- current : float Value supplied for ``current``. total : float / None Value supplied for ``total``. message : str / None Value supplied for ``message``. Returns ------- Self Result of the operation described above. |
+| McpResponse.asAssistant | from orionis.mcp import McpResponse | [responses.py](../responses.py) | def asAssistant(self) -> Self | Assign the assistant role for a prompt response. Returns ------- Self Result of the operation described above. |
+| McpResponse.asUser | from orionis.mcp import McpResponse | [responses.py](../responses.py) | def asUser(self) -> Self | Assign the user role for a prompt response. Returns ------- Self Result of the operation described above. |
+| McpResponse.withMeta | from orionis.mcp import McpResponse | [responses.py](../responses.py) | def withMeta(self, metadata: dict[str, object]) -> Self | Attach result metadata without allowing reserved protocol keys. Parameters ---------- metadata : dict[str, object] Metadata associated with the current operation. Returns ------- Self Result of the operation described above. |
+| McpResponse.withContentMeta | from orionis.mcp import McpResponse | [responses.py](../responses.py) | def withContentMeta(self, metadata: dict[str, object]) -> Self | Attach application metadata to each content block. Parameters ---------- metadata : dict[str, object] Metadata associated with the current operation. Returns ------- Self Result of the operation described above. |
+| McpResponse.withAnnotations | from orionis.mcp import McpResponse | [responses.py](../responses.py) | def withAnnotations(self, annotations: ContentAnnotations) -> Self | Set audience, priority and modification hints on content blocks. Parameters ---------- annotations : ContentAnnotations Value supplied for ``annotations``. Returns ------- Self Result of the operation described above. |
+| McpState | from orionis.mcp import McpState | [state.py](../state.py) | McpState | Seal state across workers sharing an application key and GCM cipher. |
+| McpState.seal | from orionis.mcp import McpState | [state.py](../state.py) | def seal(self, request: McpRequest, value: object, *, ttl: int) -> str | Encrypt data bound to its principal, arguments, method and expiry. Parameters ---------- request : McpRequest Current request and its trusted execution context. value : object Value to inspect, transform or validate. ttl : int Value supplied for ``ttl``. Returns ------- str Result of the operation described above. |
+| McpState.open | from orionis.mcp import McpState | [state.py](../state.py) | def open(self, request: McpRequest) -> object | Authenticate and validate client-carried state before using its data. Parameters ---------- request : McpRequest Current request and its trusted execution context. Returns ------- object Result of the operation described above. |
+| Prompt | from orionis.mcp import Prompt | [server/primitives.py](../server/primitives.py) | Prompt | Declare string arguments and return user/assistant prompt messages. |
+| PromptArgument | from orionis.mcp import PromptArgument | [protocol/metadata.py](../protocol/metadata.py) | PromptArgument | Declare one string-valued prompt argument. |
+| Resource | from orionis.mcp import Resource | [server/primitives.py](../server/primitives.py) | Resource | Read a declared URI or RFC 6570 template without implicit file access. |
+| Server | from orionis.mcp import Server | [server/primitives.py](../server/primitives.py) | Server | Define a server independently of any connection or transport. |
+| Tool | from orionis.mcp import Tool | [server/primitives.py](../server/primitives.py) | Tool | Declare a typed input, optional typed output, and an injectable handle method. |
+| ToolAnnotations | from orionis.mcp import ToolAnnotations | [protocol/metadata.py](../protocol/metadata.py) | ToolAnnotations | Describe tool behavior as hints, never as authorization rules. |
+| ToolCatalog | from orionis.mcp import ToolCatalog | [server/catalog.py](../server/catalog.py) | ToolCatalog | Hide catalog tools behind bounded search_tools and execute_tools tools. |
 
-## Initialization Policy
+## Usage examples
 
-Constructors capture configuration, immutable metadata and empty bounded state.
-They must not open STDIO, start request tasks or advance streaming producers.
-Schema/handler plans and dispatch tables are eager at server compilation. Resource
-instances, authentication context, input payloads and stream cleanup remain local
-to their invocation. See the [framework audit](../../docs/performance-audit.es.md)
-for executed checks, measurements and verification limits.
+    from orionis.mcp import MCP_PROTOCOL_VERSION
 
-## Testing
+The import path matches the API table. Import status: failed: missing uri_template.
 
-Use `TestCase` from `orionis.test` and create a client with
-`client = await self.mcp(ServerType)` inside an async test or `asyncSetUp`.
-The helper reuses the runner's booted application; `app=` selects an isolated
-container and `config=` overrides client limits. Requests and streams still use
-the native codecs, dispatcher and request scopes.
+## Design characteristics
 
-Run these tests with `reactor test`. The client, response assertions and API
-reference belong to the [testing package](../../test/docs/README.md#mcp-clients).
+The package uses an explicit public surface. Private names are excluded; declarations link to their concrete owner.
+
+## Performance and concurrency
+
+No uniform guarantee is declared at package level. Inspect each linked file for I/O, coroutines, caches, locks, and shared state.
+
+## Compatibility notes
+
+Declared minimum: Python 3.14. Validation used Python 3.14.3. Dependency bounds are in pyproject.toml.
+
+## Verification and limitations
+
+Python files were analysed and exports verified. Failures from dependencies, callbacks, I/O, or configuration may propagate and are not presented as exhaustive.

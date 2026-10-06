@@ -19,7 +19,7 @@ class TestDialect(TestCase):
     def testResolveDriverAcceptsSupportedDrivers(self) -> None:
         """Resolve every supported driver name.
 
-        Validates the normalization and acceptance of the five
+        Validates the normalization and acceptance of the six
         first-party drivers.
 
         Returns
@@ -27,7 +27,9 @@ class TestDialect(TestCase):
         None
             Assertions verify the behavior described above.
         """
-        for driver in ("sqlite", "mysql", "pgsql", "oracle", "sqlserver"):
+        for driver in (
+            "sqlite", "mysql", "pgsql", "oracle", "sqlserver", "redshift",
+        ):
             self.assertEqual(resolve_driver({"driver": driver}), driver)
 
     def testResolveDriverRejectsUnknownDriver(self) -> None:
@@ -457,6 +459,7 @@ class TestDialect(TestCase):
             ("pgsql", "asyncpg"),
             ("oracle", "oracledb"),
             ("sqlserver", "aioodbc"),
+            ("redshift", "redshift_connector"),
         ):
             error = missing_dependency_error(driver, cause)
             requirement = "orionis" if driver == "sqlite" else f"orionis[{driver}]"
@@ -479,6 +482,7 @@ class TestDialect(TestCase):
             ("pgsql", "psycopg2"),
             ("oracle", "oracledb"),
             ("sqlserver", "pyodbc"),
+            ("redshift", "redshift_connector"),
         ):
             error = missing_dependency_error(driver, cause, sync=True)
             self.assertIn(package, str(error))
@@ -503,6 +507,7 @@ class TestDialect(TestCase):
             "pgsql": "postgresql+psycopg2",
             "oracle": "oracle+oracledb",
             "sqlserver": "mssql+pyodbc",
+            "redshift": "redshift+redshift_connector",
         }
         for driver, drivername in expectations.items():
             config = {
@@ -531,3 +536,48 @@ class TestDialect(TestCase):
             sync=True,
         )
         self.assertNotIn("connect_args", options)
+
+    def testRedshiftUrlUsesTheOfficialDriverAndPreservesCredentials(self) -> None:
+        """Build both Redshift modes with the AWS connector without rewriting secrets.
+
+        Returns
+        -------
+        None
+            Endpoint fields and significant credential characters survive intact.
+        """
+        credential = " leading @:/?#% trailing "
+        config = {
+            "driver": "redshift", "host": "warehouse.example.com", "port": 5439,
+            "database": "analytics", "username": "analyst", "password": credential,
+        }
+        for sync in (False, True):
+            url = build_engine_url(config, sync=sync)
+            self.assertEqual(url.drivername, "redshift+redshift_connector")
+            self.assertEqual(url.host, "warehouse.example.com")
+            self.assertEqual(url.port, 5439)
+            self.assertEqual(url.database, "analytics")
+            self.assertEqual(url.username, "analyst")
+            self.assertEqual(url.password, credential)
+
+    def testRedshiftOptionsForwardNativeAuthenticationAndTlsFields(self) -> None:
+        """Pass connector options identically in blocking and asynchronous modes.
+
+        Returns
+        -------
+        None
+            Falsy switches and nullable timeouts retain their explicit values.
+        """
+        settings = {
+            "ssl": False, "sslmode": "verify-ca", "timeout": None,
+            "iam": True, "region": "us-east-1", "cluster_identifier": "warehouse",
+            "db_user": "analyst", "profile": "development", "is_serverless": True,
+            "serverless_work_group": "analytics", "serverless_acct_id": "123456789012",
+        }
+        for sync in (False, True):
+            options = engine_options({"driver": "redshift", **settings}, sync=sync)
+            self.assertEqual(options["connect_args"], settings)
+            self.assertTrue(options["hide_parameters"])
+        self.assertEqual(
+            engine_options({"driver": "redshift"})["connect_args"],
+            {"ssl": True, "sslmode": "verify-full", "timeout": 30},
+        )

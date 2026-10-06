@@ -16,6 +16,8 @@ class ConnectionName(StrEnum):
         Represents the Oracle database connection.
     SQLSERVER : str
         Represents the Microsoft SQL Server database connection.
+    REDSHIFT : str
+        Represents the Amazon Redshift database connection.
 
     Returns
     -------
@@ -28,3 +30,4 @@ class ConnectionName(StrEnum):
     PGSQL = "pgsql"            # PostgreSQL database connection
     ORACLE = "oracle"          # Oracle database connection
     SQLSERVER = "sqlserver"    # Microsoft SQL Server database connection
+    REDSHIFT = "redshift"

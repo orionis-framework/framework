@@ -4,6 +4,7 @@ from orionis.foundation.config.realtime import RealtimeConfig
 
 @dataclass(frozen=True, slots=True, kw_only=True)
 class BootstrapRealtime(RealtimeConfig):
+
     # ----------------------------------------------------------------------------------
     # max_message_size : int, optional
     # --- Maximum incoming message size in bytes. Defaults to the value of the

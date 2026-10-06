@@ -235,7 +235,7 @@
         
         
             <div class="itemName expandableItem">
-                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId3336"> 
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId3362"> 
                     
                 </input>
 
@@ -423,22 +423,22 @@
         </div>
 
         <div class="extrasDocstring">
-          <p class="class-signature"><code><span class="py-keyword">class</span> <span class="py-defname">OptimizeCommand</span>(BaseCommand): <a href="https://github.com/orionis-framework/framework/tree/4061ec5f7bb089a83865a33de14f5d0ddad22305/orionis/console/commands/support/optimize.py#L29" class="sourceLink">(source)</a></code></p><p><a href="classIndex.html#orionis.console.commands.support.optimize.OptimizeCommand">View In Hierarchy</a></p>
+          <p class="class-signature"><code><span class="py-keyword">class</span> <span class="py-defname">OptimizeCommand</span>(BaseCommand): <a href="https://github.com/orionis-framework/framework/tree/baa8efd19f4de548a718b4c28e48ca2d3639a125/orionis/console/commands/support/optimize.py#L28" class="sourceLink">(source)</a></code></p><p><a href="classIndex.html#orionis.console.commands.support.optimize.OptimizeCommand">View In Hierarchy</a></p>
         </div>
 
         <div class="moduleDocstring">
-          <div><p>Compile application Python source files into optimized bytecode.</p></div>
+          <div><p>Validate application Python sources without writing bytecode.</p></div>
         </div>
 
         <div id="split-tables">
-          <table class="children sortable" id="id316">
+          <table class="children sortable" id="id317">
   
   
   <tr class="method">
     
     <td>Method</td>
     <td><code><a href="#handle" class="internal-link" title="orionis.console.commands.support.optimize.OptimizeCommand.handle">handle</a></code></td>
-    <td>Compile Python modules below the application root.</td>
+    <td>Validate Python modules below the application root in memory.</td>
   </tr><tr class="classvariable">
     
     <td>Class Variable</td>
@@ -475,7 +475,7 @@
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">handle</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">app: <code>IApplication</code>, </span><span class="rst-sig-param">console: <code>Console</code></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/4061ec5f7bb089a83865a33de14f5d0ddad22305/orionis/console/commands/support/optimize.py#L38">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/baa8efd19f4de548a718b4c28e48ca2d3639a125/orionis/console/commands/support/optimize.py#L37">
       
       (source)
     </a>
@@ -487,7 +487,7 @@
   </div>
   <div class="docstring functionBody">
     
-    <div><p>Compile Python modules below the application root.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">app:</span><code><a href="orionis.IApplication.html" class="internal-link" title="orionis.IApplication">IApplication</a></code></td><td class="fieldArgDesc">Application providing the project root.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">console:</span><code><a href="orionis.console.Console.html" class="internal-link" title="orionis.console.Console">Console</a></code></td><td class="fieldArgDesc">Console used to report compilation results.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code></td><td class="fieldArgDesc">Zero when every source compiles; one when compilation or traversal fails.</td></tr></table></div>
+    <div><p>Validate Python modules below the application root in memory.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">app:</span><code><a href="orionis.IApplication.html" class="internal-link" title="orionis.IApplication">IApplication</a></code></td><td class="fieldArgDesc">Application providing the project root.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">console:</span><code><a href="orionis.console.Console.html" class="internal-link" title="orionis.console.Console">Console</a></code></td><td class="fieldArgDesc">Console used to report validation results.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code></td><td class="fieldArgDesc">Zero when every source validates; one when validation or traversal fails.</td></tr></table></div>
   </div>
 </div><div class="baseclassvariable">
   
@@ -501,7 +501,7 @@
   <div class="functionHeader">
     
     <span class="py-defname">description</span>: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/4061ec5f7bb089a83865a33de14f5d0ddad22305/orionis/console/commands/support/optimize.py#L36">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/baa8efd19f4de548a718b4c28e48ca2d3639a125/orionis/console/commands/support/optimize.py#L35">
       
       (source)
     </a>
@@ -528,7 +528,7 @@
   <div class="functionHeader">
     
     <span class="py-defname">signature</span>: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/4061ec5f7bb089a83865a33de14f5d0ddad22305/orionis/console/commands/support/optimize.py#L35">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/baa8efd19f4de548a718b4c28e48ca2d3639a125/orionis/console/commands/support/optimize.py#L34">
       
       (source)
     </a>
@@ -555,7 +555,7 @@
   <div class="functionHeader">
     
     <span class="py-defname">timestamps</span>: <code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/4061ec5f7bb089a83865a33de14f5d0ddad22305/orionis/console/commands/support/optimize.py#L34">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/baa8efd19f4de548a718b4c28e48ca2d3639a125/orionis/console/commands/support/optimize.py#L33">
       
       (source)
     </a>
@@ -581,7 +581,7 @@
   <div class="orionis-footer-inner">
     <div class="orionis-footer-copy">
       <p>API documentation for <a href="https://orionis-framework.com/" class="projecthome">Orionis</a>.</p>
-      <p class="orionis-footer-meta">Generated with <a href="https://github.com/twisted/pydoctor/">Pydoctor</a> 25.10.1.<span class="orionis-footer-build"> Built 2026-10-06 07:11:41.</span></p>
+      <p class="orionis-footer-meta">Generated with <a href="https://github.com/twisted/pydoctor/">Pydoctor</a> 25.10.1.<span class="orionis-footer-build"> Built 2026-10-06 09:50:45.</span></p>
     </div>
     <nav class="orionis-footer-links" aria-label="Additional resources">
       <a href="https://docs.orionis-framework.com">Read the guide <span aria-hidden="true">↗</span></a>

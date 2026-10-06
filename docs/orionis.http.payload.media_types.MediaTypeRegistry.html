@@ -255,7 +255,7 @@
         
         
             <div class="itemName expandableItem">
-                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId9879"> 
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId9923"> 
                     
                 </input>
 
@@ -453,7 +453,7 @@
         </div>
 
         <div class="extrasDocstring">
-          <p class="class-signature"><code><span class="py-keyword">class</span> <span class="py-defname">MediaTypeRegistry</span>(<a href="orionis.http.payload.contracts.media_types.IMediaTypeRegistry.html" class="internal-link" title="orionis.http.payload.contracts.media_types.IMediaTypeRegistry">IMediaTypeRegistry</a>): <a href="https://github.com/orionis-framework/framework/tree/4061ec5f7bb089a83865a33de14f5d0ddad22305/orionis/http/payload/media_types.py#L17" class="sourceLink">(source)</a></code></p><p>Constructor: <code><a href="#__init__" class="internal-link" title="orionis.http.payload.media_types.MediaTypeRegistry.__init__">MediaTypeRegistry(parsers)</a></code></p><p><a href="classIndex.html#orionis.http.payload.media_types.MediaTypeRegistry">View In Hierarchy</a></p>
+          <p class="class-signature"><code><span class="py-keyword">class</span> <span class="py-defname">MediaTypeRegistry</span>(<a href="orionis.http.payload.contracts.media_types.IMediaTypeRegistry.html" class="internal-link" title="orionis.http.payload.contracts.media_types.IMediaTypeRegistry">IMediaTypeRegistry</a>): <a href="https://github.com/orionis-framework/framework/tree/baa8efd19f4de548a718b4c28e48ca2d3639a125/orionis/http/payload/media_types.py#L17" class="sourceLink">(source)</a></code></p><p>Constructor: <code><a href="#__init__" class="internal-link" title="orionis.http.payload.media_types.MediaTypeRegistry.__init__">MediaTypeRegistry(parsers)</a></code></p><p><a href="classIndex.html#orionis.http.payload.media_types.MediaTypeRegistry">View In Hierarchy</a></p>
         </div>
 
         <div class="moduleDocstring">
@@ -467,7 +467,7 @@ automatically.  Defaults to an empty mapping.</td></tr></table></div>
         </div>
 
         <div id="split-tables">
-          <table class="children sortable" id="id1011">
+          <table class="children sortable" id="id1012">
   
   
   <tr class="method">
@@ -521,7 +521,7 @@ automatically.  Defaults to an empty mapping.</td></tr></table></div>
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">__init__</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">parsers: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#dict" class="intersphinx-link">dict</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <wbr></wbr><a href="orionis.http.payload.media_types.html#BodyParser" class="internal-link" title="orionis.http.payload.media_types.BodyParser">BodyParser</a>] | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code> = <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></span>):</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/4061ec5f7bb089a83865a33de14f5d0ddad22305/orionis/http/payload/media_types.py#L36">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/baa8efd19f4de548a718b4c28e48ca2d3639a125/orionis/http/payload/media_types.py#L36">
       
       (source)
     </a>
@@ -549,7 +549,7 @@ on ingestion.  Pass <tt class="rst-docutils rst-literal">None</tt> to start with
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">extend</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">parsers: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#dict" class="intersphinx-link">dict</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <wbr></wbr><a href="orionis.http.payload.media_types.html#BodyParser" class="internal-link" title="orionis.http.payload.media_types.BodyParser">BodyParser</a>]</code></span>) -&gt; <code><a href="orionis.http.payload.media_types.MediaTypeRegistry.html" class="internal-link" title="orionis.http.payload.media_types.MediaTypeRegistry">MediaTypeRegistry</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/4061ec5f7bb089a83865a33de14f5d0ddad22305/orionis/http/payload/media_types.py#L95">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/baa8efd19f4de548a718b4c28e48ca2d3639a125/orionis/http/payload/media_types.py#L95">
       
       (source)
     </a>
@@ -579,7 +579,7 @@ middleware or provider-level overrides.</p>
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">get</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">media_type: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></span>) -&gt; <code><a href="orionis.http.payload.media_types.html#BodyParser" class="internal-link" title="orionis.http.payload.media_types.BodyParser">BodyParser</a> | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/4061ec5f7bb089a83865a33de14f5d0ddad22305/orionis/http/payload/media_types.py#L76">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/baa8efd19f4de548a718b4c28e48ca2d3639a125/orionis/http/payload/media_types.py#L76">
       
       (source)
     </a>
@@ -607,7 +607,7 @@ when <em>media_type</em> has no registered parser.</td></tr></table></div>
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">register</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">media_type: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code>, </span><span class="rst-sig-param">parser: <code><a href="orionis.http.payload.media_types.html#BodyParser" class="internal-link" title="orionis.http.payload.media_types.BodyParser">BodyParser</a></code></span>):</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/4061ec5f7bb089a83865a33de14f5d0ddad22305/orionis/http/payload/media_types.py#L56">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/baa8efd19f4de548a718b4c28e48ca2d3639a125/orionis/http/payload/media_types.py#L56">
       
       (source)
     </a>
@@ -634,7 +634,7 @@ e.g. <tt class="rst-docutils rst-literal">"application/json"</tt>.</td></tr><tr>
   <div class="functionHeader">
     
     <span class="py-defname">__slots__</span>: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" class="intersphinx-link">tuple</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <wbr></wbr><span class="rst-variable-ellipsis">...</span>]</code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/4061ec5f7bb089a83865a33de14f5d0ddad22305/orionis/http/payload/media_types.py#L33">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/baa8efd19f4de548a718b4c28e48ca2d3639a125/orionis/http/payload/media_types.py#L33">
       
       (source)
     </a>
@@ -661,7 +661,7 @@ e.g. <tt class="rst-docutils rst-literal">"application/json"</tt>.</td></tr><tr>
   <div class="functionHeader">
     
     <span class="py-defname">_parsers</span>: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#dict" class="intersphinx-link">dict</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <wbr></wbr><a href="orionis.http.payload.media_types.html#BodyParser" class="internal-link" title="orionis.http.payload.media_types.BodyParser">BodyParser</a>]</code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/4061ec5f7bb089a83865a33de14f5d0ddad22305/orionis/http/payload/media_types.py#L51">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/baa8efd19f4de548a718b4c28e48ca2d3639a125/orionis/http/payload/media_types.py#L51">
       
       (source)
     </a>
@@ -687,7 +687,7 @@ e.g. <tt class="rst-docutils rst-literal">"application/json"</tt>.</td></tr><tr>
   <div class="orionis-footer-inner">
     <div class="orionis-footer-copy">
       <p>API documentation for <a href="https://orionis-framework.com/" class="projecthome">Orionis</a>.</p>
-      <p class="orionis-footer-meta">Generated with <a href="https://github.com/twisted/pydoctor/">Pydoctor</a> 25.10.1.<span class="orionis-footer-build"> Built 2026-10-06 07:11:41.</span></p>
+      <p class="orionis-footer-meta">Generated with <a href="https://github.com/twisted/pydoctor/">Pydoctor</a> 25.10.1.<span class="orionis-footer-build"> Built 2026-10-06 09:50:45.</span></p>
     </div>
     <nav class="orionis-footer-links" aria-label="Additional resources">
       <a href="https://docs.orionis-framework.com">Read the guide <span aria-hidden="true">↗</span></a>

@@ -7,6 +7,7 @@ from orionis.foundation.config.hashing import (
 
 @dataclass(frozen=True, kw_only=True)
 class BootstrapHashing(Hashing):
+
     # ----------------------------------------------------------------------------------
     # driver : Drivers | str, optional
     # --- The default password hashing driver.

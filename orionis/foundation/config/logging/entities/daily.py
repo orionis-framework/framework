@@ -2,10 +2,11 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 from datetime import time
 from orionis.environment import Env
-from orionis.foundation.config.logging.channel_options import channel_option
 from orionis.foundation.config.logging.enums import Level
 from orionis.foundation.config.logging.validators import IsValidLevel, IsValidPath
 from orionis.support.entities.base import BaseEntity
+
+_DEFAULT_PATH: str = "storage/logs/daily_{suffix}.log"
 
 @dataclass(frozen=True, kw_only=True)
 class Daily(BaseEntity):
@@ -25,12 +26,14 @@ class Daily(BaseEntity):
     """
 
     path: str = field(
-        default_factory=lambda: channel_option(
-            "daily", "LOG_PATH", "storage/logs/daily_{suffix}.log",
+        default_factory=lambda: (
+            Env.get("LOG_PATH", _DEFAULT_PATH)
+            if Env.get("LOG_CHANNEL", "stack") == "daily"
+            else _DEFAULT_PATH
         ),
         metadata={
             "description": "The file path where the log is stored.",
-            "default": "storage/logs/daily_{suffix}.log",
+            "default": _DEFAULT_PATH,
         },
     )
 
@@ -45,7 +48,10 @@ class Daily(BaseEntity):
     )
 
     retention_days: int = field(
-        default_factory=lambda: channel_option("daily", "LOG_RETENTION", 7),
+        default_factory=lambda: (
+            Env.get("LOG_RETENTION", 7)
+            if Env.get("LOG_CHANNEL", "stack") == "daily" else 7
+        ),
         metadata={
             "description": ("The number of days to retain log files before deletion."),
             "default": 7,

@@ -3,6 +3,7 @@ from dataclasses import dataclass, field
 from orionis.foundation.config.database.entities.mysql import MySQL
 from orionis.foundation.config.database.entities.oracle import Oracle
 from orionis.foundation.config.database.entities.pgsql import PGSQL
+from orionis.foundation.config.database.entities.redshift import Redshift
 from orionis.foundation.config.database.entities.sqlite import SQLite
 from orionis.foundation.config.database.entities.sqlserver import SQLServer
 from orionis.support.entities.base import BaseEntity
@@ -14,6 +15,7 @@ _CONNECTION_ENTITIES: tuple[tuple[str, type], ...] = (
     ("pgsql", PGSQL),
     ("oracle", Oracle),
     ("sqlserver", SQLServer),
+    ("redshift", Redshift),
 )
 
 @dataclass(frozen=True, kw_only=True)
@@ -33,6 +35,8 @@ class Connections(BaseEntity):
         Configuration for the Oracle database connection.
     sqlserver : SQLServer | dict
         Configuration for the Microsoft SQL Server database connection.
+    redshift : Redshift | dict
+        Configuration for the Amazon Redshift database connection.
     """
 
     sqlite: SQLite | dict = field(
@@ -72,6 +76,14 @@ class Connections(BaseEntity):
         metadata={
             "description": "SQL Server database connection configuration",
             "default": lambda: SQLServer().toDict(),
+        },
+    )
+
+    redshift: Redshift | dict = field(
+        default_factory=Redshift,
+        metadata={
+            "description": "Amazon Redshift database connection configuration",
+            "default": lambda: Redshift().toDict(),
         },
     )
 

@@ -389,7 +389,7 @@ class TestDbShowTableCommands(TestCase):
         None
             Verify ambiguous qualified names fail before additional queries.
         """
-        for driver in ("pgsql", "sqlserver"):
+        for driver in ("pgsql", "redshift", "sqlserver"):
             with self.subTest(driver=driver):
                 inspector = DatabaseInspector(self.manager, "reports")
                 catalog = _CatalogConnection("dbo.odd.name")
@@ -643,3 +643,134 @@ class TestDbShowTableCommands(TestCase):
         with patch.object(missing, "error") as error:
             self.assertEqual(await missing.handle(self.manager), 1)
         self.assertIn("does not exist", error.call_args.args[0])
+
+    async def testRedshiftCatalogSeparatesNativeObjectsAndBatchesCounts(self) -> None:
+        """Use AWS catalogs without partition columns or Oracle metadata fallback.
+
+        Returns
+        -------
+        None
+            Tables, ordinary views and materialized views stay separate.
+        """
+        inspector = DatabaseInspector(self.manager, "reports")
+        inspector.driver = "redshift"
+        catalog = Mock()
+        catalog.select = AsyncMock(side_effect=[
+            [{"name": "analytics.events"}], [{"name": "analytics.active"}],
+            [{"name": "analytics.summary"}],
+            [{"object_count": 1}], [{"object_count": 2}], [{"count": 3}],
+        ])
+        inspector.connection = catalog
+        self.assertEqual(await inspector.listTables(), ["analytics.events"])
+        self.assertEqual(await inspector.listViews(), ["analytics.active"])
+        self.assertEqual(
+            await inspector.listMaterializedViews(), ["analytics.summary"],
+        )
+        self.assertEqual(await inspector.listTypes(), [])
+        self.assertEqual(await inspector.listDomains(), [])
+        self.assertEqual(await inspector.viewCounts(), (1, 2))
+        self.assertEqual(await inspector.connectionCount(), 3)
+        self.assertEqual(
+            inspector.quoteIdentifier("analytics.events"), '"analytics"."events"',
+        )
+        self.assertEqual(
+            inspector._resolveTableName("events", ["analytics.events"]),
+            "analytics.events",
+        )
+        queries = [call.args[0] for call in catalog.select.await_args_list]
+        self.assertIn("svv_redshift_tables", queries[0])
+        self.assertIn("NOT EXISTS", queries[0])
+        self.assertIn("svv_mv_info", queries[0])
+        self.assertIn("svv_mv_info", queries[2])
+        self.assertIn("COUNT(*)", queries[3])
+        self.assertIn("stv_sessions", queries[5])
+        self.assertFalse(any("relispartition" in query for query in queries))
+        self.assertFalse(any("user_tables" in query for query in queries))
+
+    async def testRedshiftSizeQueriesPreserveQualifiedBindings(self) -> None:
+        """Read native sizes without PostgreSQL relation functions.
+
+        Returns
+        -------
+        None
+            Metric queries retain schema bindings and batch all table sizes.
+        """
+        inspector = DatabaseInspector(self.manager, "reports")
+        inspector.driver = "redshift"
+        catalog = Mock()
+        catalog.select = AsyncMock(side_effect=[
+            [{"bytes": 2097152}], [{"name": "analytics.events", "bytes": 1048576}],
+            [{"name": "analytics.events", "bytes": 1048576}],
+            [{"name": "analytics.events"}],
+        ])
+        inspector.connection = catalog
+        self.assertEqual(await inspector.databaseSize(), 2097152)
+        self.assertEqual(await inspector.tableSize("analytics.events"), 1048576)
+        self.assertEqual(await inspector.tableSizes(["analytics.events"]), {
+            "analytics.events": 1048576,
+        })
+        self.assertEqual(
+            await inspector._findTableName("analytics.events"), "analytics.events",
+        )
+        calls = catalog.select.await_args_list
+        self.assertIn("size * 1048576", calls[1].args[0])
+        self.assertEqual(calls[1].args[1], {"schema": "analytics", "table": "events"})
+        self.assertEqual(calls[3].args[1], {
+            "kind": "TABLE", "schema": "analytics", "table": "events",
+        })
+
+    async def testRedshiftOptionalMetricsHandlePermissionErrors(self) -> None:
+        """Keep inspection usable when optional activity and size views are restricted.
+
+        Returns
+        -------
+        None
+            Missing privileges report unknown metrics without hiding coding errors.
+        """
+        inspector = DatabaseInspector(self.manager, "reports")
+        inspector.driver = "redshift"
+        inspector.connection = _FailingMetadataConnection(
+            QueryException("restricted"),
+        )
+        self.assertIsNone(await inspector.databaseSize())
+        self.assertIsNone(await inspector.tableSize("analytics.events"))
+        self.assertEqual(await inspector.tableSizes(["analytics.events"]), {})
+        self.assertIsNone(await inspector.connectionCount())
+        inspector.connection = _FailingMetadataConnection(
+            TypeError("invalid metadata"),
+        )
+        with self.assertRaises(TypeError):
+            await inspector.databaseSize()
+
+    async def testRedshiftDetailsReportInformationalKeysWithoutIndexes(self) -> None:
+        """Read Redshift columns and declared keys without unsupported pg_index queries.
+
+        Returns
+        -------
+        None
+            Column and key output uses the common inspector result shape.
+        """
+        inspector = DatabaseInspector(self.manager, "reports")
+        inspector.driver = "redshift"
+        catalog = Mock()
+        catalog.select = AsyncMock(side_effect=[
+            [{
+                "name": "parent_id", "type": "bigint", "nullable": "NO",
+                "default_value": None, "primary_key": 1,
+            }],
+            [{
+                "name": "events_parent_fkey", "column_name": "parent_id",
+                "ref_table": "analytics.parent", "ref_column": "id",
+                "on_delete": "NO ACTION",
+            }],
+        ])
+        inspector.connection = catalog
+        columns, indexes, keys = await inspector._serverDetails("analytics.events")
+        self.assertTrue(columns[0]["primary"])
+        self.assertFalse(columns[0]["nullable"])
+        self.assertEqual(indexes, [])
+        self.assertEqual(keys[0]["references"], "analytics.parent.id")
+        self.assertEqual(catalog.select.await_count, 2)
+        for call in catalog.select.await_args_list:
+            self.assertEqual(call.args[1], {"schema": "analytics", "table": "events"})
+            self.assertNotIn("pg_index", call.args[0])

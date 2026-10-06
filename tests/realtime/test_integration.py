@@ -11,6 +11,7 @@ import sys
 import tempfile
 from pathlib import Path
 import msgspec
+import psutil
 from orionis.foundation.application import Application
 from orionis.http import WebSocket  # noqa: TC001
 from orionis.realtime import Hub, remote
@@ -190,22 +191,28 @@ def _stop_server(process: subprocess.Popen) -> None:
     Returns
     -------
     None
-        Stop the owned server and await its exit.
+        Stop the owned server and await all owned Windows processes.
 
     Raises
     ------
     RuntimeError
         If taskkill is unavailable on Windows.
     subprocess.TimeoutExpired
-        If process termination exceeds its five-second deadline.
+        If any owned process exceeds its five-second exit deadline.
     """
     if process.poll() is not None:
         return
+    descendants: list[psutil.Process] = []
     if sys.platform == "win32":
         executable = shutil.which("taskkill")
         if executable is None:
             error_msg = "Windows taskkill is required to release the test server tree"
             raise RuntimeError(error_msg)
+        try:
+            descendants = psutil.Process(process.pid).children(recursive=True)
+        except psutil.NoSuchProcess:
+            process.wait(timeout=5)
+            return
         subprocess.run(  # noqa: S603
             [executable, "/PID", str(process.pid), "/T", "/F"],
             check=False, capture_output=True, timeout=5,
@@ -213,6 +220,9 @@ def _stop_server(process: subprocess.Popen) -> None:
     else:
         process.terminate()
     process.wait(timeout=5)
+    _, alive = psutil.wait_procs(descendants, timeout=5)
+    if alive:
+        raise subprocess.TimeoutExpired(process.args, 5)
 
 class _Peer:
     """Exchange small RFC6455 frames without creating a public client library."""

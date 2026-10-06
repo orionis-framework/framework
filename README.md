@@ -37,6 +37,22 @@ Visit the [official documentation](https://docs.orionis-framework.com/) for
 guides and reference material. You can also explore the [project website](https://orionis-framework.com/)
 or find the package on [PyPI](https://pypi.org/project/orionis/).
 
+## Application CLI
+
+From the application root, run commands through the installed `orionis` entry
+point:
+
+```shell
+uv sync
+uv run orionis serve
+```
+
+With the project's virtual environment activated, run `orionis serve` directly.
+The entry point loads the project's `bootstrap.app` and runs commands in the
+same process with bytecode writes disabled; it does not require a `reactor`
+script. Command arguments and exit codes are preserved. The legacy command
+`python -B reactor serve` remains available.
+
 ## Native MCP servers
 
 Expose application services through MCP **2026-07-28** using the existing Orionis

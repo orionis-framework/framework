@@ -54,7 +54,7 @@ class DatabaseWiper:
         domains = await inspector.listDomains()
         driver = inspector.driver
         connection = inspector.connection
-        if driver in {"pgsql", "sqlserver"}:
+        if driver in {"pgsql", "redshift", "sqlserver"}:
             # The shared inspector reports schema and object as one string.
             # More than one separator is ambiguous and could target another
             # database on SQL Server. Refuse before the first DDL statement.
@@ -75,7 +75,7 @@ class DatabaseWiper:
                 await self._dropTables(tables)
         elif driver == "mysql":
             await self._wipeMysql(views, tables)
-        elif driver == "pgsql":
+        elif driver in {"pgsql", "redshift"}:
             async with connection.transaction():
                 await self._dropMaterializedViews(materialized_views)
                 await self._dropViews(views, cascade=True)

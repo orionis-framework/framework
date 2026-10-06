@@ -40,7 +40,7 @@ class RedisRateLimitStore:
         Parameters
         ----------
         config : HTTPRateLimit
-            Validated connection URL, namespace and operation timeout.
+            Validated connection fields, namespace and operation timeout.
         client : Redis | None, optional
             Externally owned transport. The caller remains responsible for it.
 
@@ -52,8 +52,12 @@ class RedisRateLimitStore:
         self.__prefix = config.rate_limit_redis_prefix
         self.__timeout = config.rate_limit_redis_timeout_seconds
         self.__owns_client = client is None
-        self.__client = client if client is not None else Redis.from_url(
-            config.rate_limit_redis_url,
+        connection = config.toDict()["rate_limit_redis"]
+        self.__client = client if client is not None else Redis(
+            host=connection["endpoint"],
+            port=connection["port"],
+            db=connection["db"],
+            password=connection["password"],
             socket_connect_timeout=config.rate_limit_redis_timeout_seconds,
             socket_timeout=config.rate_limit_redis_timeout_seconds,
             retry_on_timeout=False,

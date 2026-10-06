@@ -10,6 +10,7 @@ from orionis.foundation.config.database import (
 
 @dataclass(frozen=True, kw_only=True)
 class BootstrapDatabase(Database):
+
     # ----------------------------------------------------------------------------------
     # default : ConnectionName | str, optional
     # --- The default database connection name. Uses the 'DB_CONNECTION' environment
@@ -26,6 +27,7 @@ class BootstrapDatabase(Database):
     # ----------------------------------------------------------------------------------
     connections: Connections | dict = field(
         default_factory=lambda: Connections(
+
             # --------------------------------------------------------------------------
             # sqlite : SQLite, optional
             # --- SQLite connection settings. A missing URL is derived from the database
@@ -40,6 +42,7 @@ class BootstrapDatabase(Database):
                 journal_mode=Env.get("DB_JOURNAL_MODE", SQLiteJournalMode.DELETE),
                 synchronous=Env.get("DB_SYNCHRONOUS", SQLiteSynchronous.NORMAL),
             ),
+
             # --------------------------------------------------------------------------
             # mysql : MySQL, optional
             # --- MySQL connection settings, including socket, charset, and storage
@@ -63,6 +66,7 @@ class BootstrapDatabase(Database):
                 strict=Env.get("DB_STRICT", True),
                 engine=Env.get("DB_ENGINE", MySQLEngine.INNODB),
             ),
+
             # --------------------------------------------------------------------------
             # pgsql : PGSQL, optional
             # --- PostgreSQL connection settings, including search path and SSL mode.
@@ -83,6 +87,7 @@ class BootstrapDatabase(Database):
                 search_path=Env.get("DB_SEARCH_PATH", "public"),
                 sslmode=Env.get("DB_SSLMODE", PGSQLSSLMode.PREFER),
             ),
+
             # --------------------------------------------------------------------------
             # oracle : Oracle, optional
             # --- Oracle connection settings with service name, SID, DSN, or TNS
@@ -100,6 +105,7 @@ class BootstrapDatabase(Database):
                 encoding=Env.get("DB_ENCODING", OracleEncoding.AL32UTF8),
                 nencoding=Env.get("DB_NENCODING", OracleNencoding.AL16UTF16),
             ),
+
             # --------------------------------------------------------------------------
             # sqlserver : SQLServer, optional
             # --- SQL Server connection settings, including ODBC and TLS options.

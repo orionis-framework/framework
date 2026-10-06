@@ -116,7 +116,7 @@ class IApplication(IContainer, ABC):
 
         Returns
         -------
-        Path
+        pathlib.Path
             The base directory path of the application.
         """
 
@@ -141,7 +141,7 @@ class IApplication(IContainer, ABC):
 
         Returns
         -------
-        Path or None
+        pathlib.Path or None
             The directory path for compiled cache storage, or None if not
             configured.
         """
@@ -154,7 +154,7 @@ class IApplication(IContainer, ABC):
 
         Returns
         -------
-        list of Path
+        list of pathlib.Path
             List of directory paths monitored for cache invalidation.
         """
 
@@ -166,7 +166,7 @@ class IApplication(IContainer, ABC):
 
         Returns
         -------
-        list of Path
+        list of pathlib.Path
             List of file paths monitored for cache invalidation.
         """
 

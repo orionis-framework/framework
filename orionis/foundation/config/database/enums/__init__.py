@@ -11,6 +11,7 @@ if _TYPE_CHECKING:
     from .pgsql_charsets import PGSQLCharset
     from .pgsql_collations import PGSQLCollation
     from .pgsql_mode import PGSQLSSLMode
+    from .redshift_mode import RedshiftSSLMode
     from .sqlite_foreign_key import SQLiteForeignKey
     from .sqlite_journal import SQLiteJournalMode
     from .sqlite_synchronous import SQLiteSynchronous
@@ -26,6 +27,7 @@ __all__ = [
     "PGSQLCharset",
     "PGSQLCollation",
     "PGSQLSSLMode",
+    "RedshiftSSLMode",
     "SQLServerCharset",
     "SQLiteForeignKey",
     "SQLiteJournalMode",
@@ -59,6 +61,9 @@ _EXPORTS = {
     ),
     "PGSQLSSLMode": (
         "orionis.foundation.config.database.enums.pgsql_mode", "PGSQLSSLMode",
+    ),
+    "RedshiftSSLMode": (
+        "orionis.foundation.config.database.enums.redshift_mode", "RedshiftSSLMode",
     ),
     "SQLServerCharset": (
         "orionis.foundation.config.database.enums.sqlserver_charset",

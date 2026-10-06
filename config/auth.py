@@ -7,6 +7,7 @@ from orionis.foundation.config.auth import (
 
 @dataclass(frozen=True, kw_only=True)
 class BootstrapAppAuth(Auth):
+
     # ----------------------------------------------------------------------------------
     # default : Guards | str, optional
     # --- Guard applied when a middleware or a facade call does not name one.

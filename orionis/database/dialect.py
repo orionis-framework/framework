@@ -2,6 +2,7 @@ from __future__ import annotations
 import re
 from typing import TYPE_CHECKING, Any
 from sqlalchemy import URL, event
+from sqlalchemy.dialects import registry
 from sqlalchemy.pool import AsyncAdaptedQueuePool, QueuePool
 from orionis.database.exceptions import (
     MissingDatabaseDependencyException,
@@ -11,7 +12,9 @@ from orionis.database.exceptions import (
 if TYPE_CHECKING:
     from collections.abc import Callable
     from sqlalchemy.engine import Connection as SqlConnection
+    from sqlalchemy.exc import NoSuchModuleError
     from sqlalchemy.ext.asyncio import AsyncEngine
+    from orionis.database.threaded.engine import ThreadedEngine
 
 # Map of Orionis driver names to SQLAlchemy async dialect names.
 _ASYNC_DIALECTS: dict[str, str] = {
@@ -20,6 +23,7 @@ _ASYNC_DIALECTS: dict[str, str] = {
     "pgsql": "postgresql+asyncpg",
     "oracle": "oracle+oracledb_async",
     "sqlserver": "mssql+aioodbc",
+    "redshift": "redshift+redshift_connector",
 }
 
 # Map of Orionis driver names to (driver package, install extra) hints.
@@ -29,6 +33,7 @@ _ASYNC_DRIVER_PACKAGES: dict[str, tuple[str, str]] = {
     "pgsql": ("asyncpg", "orionis[pgsql]"),
     "oracle": ("oracledb", "orionis[oracle]"),
     "sqlserver": ("aioodbc", "orionis[sqlserver]"),
+    "redshift": ("redshift_connector", "orionis[redshift]"),
 }
 
 # Map of Orionis driver names to SQLAlchemy dialects backed by a blocking
@@ -40,6 +45,7 @@ _SYNC_DIALECTS: dict[str, str] = {
     "pgsql": "postgresql+psycopg2",
     "oracle": "oracle+oracledb",
     "sqlserver": "mssql+pyodbc",
+    "redshift": "redshift+redshift_connector",
 }
 
 # Map of Orionis driver names to (driver package, install extra) hints for the
@@ -52,6 +58,7 @@ _SYNC_DRIVER_PACKAGES: dict[str, tuple[str, str]] = {
     "pgsql": ("psycopg2", "orionis[pgsql]"),
     "oracle": ("oracledb", "orionis[oracle]"),
     "sqlserver": ("pyodbc", "orionis[sqlserver]"),
+    "redshift": ("redshift_connector", "orionis[redshift]"),
 }
 
 # Default ODBC driver used for SQL Server connections.
@@ -71,6 +78,12 @@ _MYSQL_RELAXED_MODE: str = "NO_ENGINE_SUBSTITUTION"
 
 # SQLite database markers that identify an in-memory database.
 _SQLITE_MEMORY_MARKERS: frozenset[str] = frozenset({":memory:", ""})
+
+_REDSHIFT_CONNECT_OPTIONS: tuple[str, ...] = (
+    "ssl", "sslmode", "timeout", "iam", "region", "cluster_identifier",
+    "db_user", "profile", "is_serverless", "serverless_work_group",
+    "serverless_acct_id",
+)
 
 class _MySQLParameterEscaper:
     """Escape binary parameters independently of aiomysql's removed converter."""
@@ -168,7 +181,7 @@ def resolve_driver(config: dict[str, Any]) -> str:
 
 def missing_dependency_error(
     driver: str,
-    cause: ModuleNotFoundError,
+    cause: ImportError | NoSuchModuleError,
     *,
     sync: bool = False,
 ) -> MissingDatabaseDependencyException:
@@ -179,8 +192,8 @@ def missing_dependency_error(
     ----------
     driver : str
         Orionis driver name whose package is missing.
-    cause : ModuleNotFoundError
-        Original import error raised by the engine.
+    cause : ImportError | NoSuchModuleError
+        Original missing driver or dialect error raised by the engine.
     sync : bool, optional
         Whether the missing package is the blocking (synchronous) driver
         instead of the default async one.
@@ -227,6 +240,11 @@ def build_engine_url(
         If the driver has no registered dialect.
     """
     driver = resolve_driver(config)
+    if driver == "redshift":
+        registry.register(
+            "redshift.redshift_connector", "orionis.database.redshift",
+            "RedshiftDialect",
+        )
     dialects = _SYNC_DIALECTS if sync else _ASYNC_DIALECTS
     dialect = dialects[driver]
     if driver == "sqlite":
@@ -268,6 +286,15 @@ def engine_options(
             options["pool_size"] = 1
             options["max_overflow"] = 0
             options["connect_args"] = {"check_same_thread": False}
+        return options
+
+    if driver == "redshift":
+        connect_args = {"ssl": True, "sslmode": "verify-full", "timeout": 30}
+        connect_args.update({
+            name: config[name] for name in _REDSHIFT_CONNECT_OPTIONS if name in config
+        })
+        connect_args["sslmode"] = _enum_value(connect_args["sslmode"])
+        options["connect_args"] = connect_args
         return options
 
     if not sync and driver == "pgsql":
@@ -321,7 +348,9 @@ def _pgsql_connect_args(config: dict[str, Any]) -> dict[str, Any]:
 
     return connect_args
 
-def configure_engine(engine: AsyncEngine, config: dict[str, Any]) -> None:
+def configure_engine(
+    engine: AsyncEngine | ThreadedEngine, config: dict[str, Any],
+) -> None:
     """
     Apply driver-specific session settings to a freshly built engine.
 
@@ -331,7 +360,7 @@ def configure_engine(engine: AsyncEngine, config: dict[str, Any]) -> None:
 
     Parameters
     ----------
-    engine : AsyncEngine
+    engine : AsyncEngine | ThreadedEngine
         Engine to configure.
     config : dict
         Connection configuration.
@@ -526,7 +555,11 @@ def _server_url(driver: str, config: dict[str, Any], dialect: str) -> URL:
     return URL.create(
         dialect,
         username=_config_text(config, "username"),
-        password=_config_text(config, "password"),
+        password=(
+            config.get("password")
+            if driver == "redshift"
+            else _config_text(config, "password")
+        ),
         host=_config_text(config, "host"),
         port=int(config["port"]) if config.get("port") else None,
         database=_config_text(config, "database"),

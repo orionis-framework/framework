@@ -11,6 +11,7 @@ from config.database import BootstrapDatabase
 from config.http import BootstrapHTTP
 from config.logging import BootstrapLogging
 from config.session import BootstrapSession
+from orionis.foundation.config.logging import Logging
 from tests.foundation.config.test_environment import (
     ConfigurationTestCase,
     configuration_classes,
@@ -227,23 +228,50 @@ raise SystemExit(bool(errors) or count == 0)
                 LOG_MB_SIZE=20,
                 LOG_FILES=3,
             )
-            with self.subTest(channel=name):
-                config = BootstrapLogging()
-                channel = getattr(config.channels, name)
-                self.assertEqual(channel.path, path)
-                if name in retentions:
-                    self.assertEqual(getattr(channel, retentions[name]), 2)
-                for other in fields(config.channels):
-                    self.assertEqual(
-                        getattr(config.channels, other.name).level,
-                        logging.DEBUG,
-                    )
-                    if other.name != name:
-                        self.assertNotEqual(
-                            getattr(config.channels, other.name).path,
-                            path,
+            for config_type in (Logging, BootstrapLogging):
+                with self.subTest(channel=name, entity=config_type.__name__):
+                    config = config_type()
+                    channel = getattr(config.channels, name)
+                    self.assertEqual(channel.path, path)
+                    if name in retentions:
+                        self.assertEqual(getattr(channel, retentions[name]), 2)
+                    for other in fields(config.channels):
+                        self.assertEqual(
+                            getattr(config.channels, other.name).level,
+                            logging.DEBUG,
                         )
-                self.assertEqual(config.channels.daily.at.hour, 3)
-                self.assertEqual(config.channels.daily.at.minute, 30)
-                self.assertEqual(config.channels.chunked.mb_size, 20)
-                self.assertEqual(config.channels.chunked.files, 3)
+                        if other.name != name:
+                            self.assertNotEqual(
+                                getattr(config.channels, other.name).path,
+                                path,
+                            )
+                    self.assertEqual(config.channels.daily.at.hour, 3)
+                    self.assertEqual(config.channels.daily.at.minute, 30)
+                    self.assertEqual(config.channels.chunked.mb_size, 20)
+                    self.assertEqual(config.channels.chunked.files, 3)
+
+    def testLoggingFactoriesReadCurrentEnvironmentForEachInstance(self) -> None:
+        """Read the active channel options lazily without mutating prior instances.
+
+        Returns
+        -------
+        None
+            Verify both configuration layers retain independent environment snapshots.
+        """
+        self.environment.values.update(
+            LOG_CHANNEL="stack", LOG_PATH="storage/first.log", LOG_RETENTION=168,
+        )
+        first = (Logging(), BootstrapLogging())
+        self.environment.values.update(
+            LOG_CHANNEL="hourly", LOG_PATH="storage/hourly_{suffix}.log",
+        )
+        second = (Logging(), BootstrapLogging())
+        for before, after in zip(first, second, strict=True):
+            self.assertEqual(before.default, "stack")
+            self.assertEqual(before.channels.stack.path, "storage/first.log")
+            self.assertEqual(before.channels.hourly.retention_hours, 24)
+            self.assertEqual(after.default, "hourly")
+            self.assertEqual(after.channels.stack.path, "storage/logs/stack.log")
+            self.assertEqual(after.channels.hourly.path, "storage/hourly_{suffix}.log")
+            self.assertEqual(after.channels.hourly.retention_hours, 168)
+            self.assertEqual(after.channels.monthly.retention_months, 4)

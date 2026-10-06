@@ -267,12 +267,14 @@ Validation: **Executed successfully** on CPython 3.14.6.
 | `MCP_MAX_SUBSCRIPTIONS` | 1024 | Total event-bus subscription budget. |
 | `MCP_MAX_RESOURCE_SUBSCRIPTIONS` | 64 | Resource subscriptions per request/client context. |
 | `MCP_SUBSCRIPTION_KEEPALIVE` | 15.0 seconds | Streaming keepalive interval. |
-| `MCP_ALLOWED_ORIGINS` | empty | Explicit browser HTTP origins. |
+| `CORS_ALLOW_ORIGINS` | empty | Browser HTTP origins shared with CORS and WebSocket. |
 | `MCP_TOOL_SEARCH_MAX_RESULTS` | 20 | Catalog search result cap. |
 | `MCP_TOOL_SEARCH_MAX_CALLS` | 5 | Calls in one catalog execution. |
 | `MCP_TOOL_SEARCH_MAX_OUTPUT_BYTES` | 256 KiB | Catalog execution output cap. |
 | `MCP_MAX_RESPONSE_SIZE` | 4 MiB | Serialized response cap. |
 | `MCP_MAX_METADATA_SIZE` | 64 KiB | Metadata cap. |
+
+Both `McpConfig` and `config/mcp.py` read `CORS_ALLOW_ORIGINS` directly. The developer may choose another environment key in the application configuration or supply explicit `allowed_origins`. No origins are silently removed before validation.
 
 All numeric budgets must be positive; the default page size cannot exceed the maximum. An absent HTTP `Origin` is allowed, while a present origin must exactly match the validated HTTP(S) allowlist—there is no wildcard or implicit same-origin exception.
 

@@ -4,7 +4,7 @@
 
 ## Overview
 
-This module is Orionis's database runtime beneath the query builder and ORM. `ConnectionManager` turns validated application configuration into reusable named `Connection` objects. A connection lazily creates a SQLAlchemy async engine, compiles Orionis query plans, executes raw parameterized SQL, exposes schema helpers, and owns nested transactions.
+This module is Orionis's database runtime beneath the query builder and ORM. `ConnectionManager` turns validated application configuration into reusable named `Connection` objects. A connection lazily creates a SQLAlchemy async engine, or a thread-backed Core engine for Redshift, compiles Orionis query plans, executes raw parameterized SQL, exposes schema helpers, and owns transactions.
 
 `Migrator` discovers versioned migration classes and records batches; `SeederRunner` discovers seeders and can claim once-only execution. `Schema` converts fluent blueprints or ORM table definitions into physical tables. Applications normally obtain connections through `ConnectionResolver`/query builders or use the database and schema facades, while extension and tooling code may use these classes directly.
 
@@ -12,7 +12,7 @@ This module is Orionis's database runtime beneath the query builder and ORM. `Co
 
 - Python 3.14 or newer.
 - `sqlalchemy[asyncio]>=2.0.54,<3.0` and `aiosqlite>=0.22.1`, installed by Orionis.
-- Driver extras for other databases: `orionis[mysql]`, `orionis[pgsql]`, `orionis[oracle]`, or `orionis[sqlserver]`.
+- Driver extras for other databases: `orionis[mysql]`, `orionis[pgsql]`, `orionis[oracle]`, `orionis[sqlserver]`, or `orionis[redshift]`.
 - A reachable server and credentials for server databases; SQLite can use a file or `:memory:`.
 - Migration and seeder directories are resolved relative to the application base path.
 
@@ -63,7 +63,7 @@ The ORM/query builder sends immutable select/insert/update/delete plans to `Conn
 
 ### Transaction ownership
 
-Transaction state is held in a `ContextVar` and tagged with the current asyncio task. The first `begin` opens a dedicated connection and root transaction; nested `begin` creates a savepoint. `transaction()` commits the innermost level on success and rolls it back when an exception escapes.
+Transaction state is held in a `ContextVar` and tagged with the current asyncio task. The first `begin` opens a dedicated connection and root transaction; nested `begin` creates a savepoint on supported backends. Redshift rejects nesting with `TransactionException`. `transaction()` commits the current level on success and rolls it back when an exception escapes.
 
 ### Schema, migrations, and seeders
 
@@ -75,6 +75,7 @@ Transaction state is held in a `ContextVar` and tagged with the current asyncio 
 |---|---|
 | `connection.py`, `connection_manager.py` | Engine lifecycle, execution, transactions, named connection reuse. |
 | `compiler.py`, `dialect.py` | Query-plan compilation, URLs/options, session setup, driver validation. |
+| `redshift.py`, `threaded/` | AWS connector dialect capabilities and thread-backed Core execution. |
 | `schema/`, `schema_provider.py` | Blueprint constraints and physical table operations. |
 | `migrations/` | Discovery, batch tracking, migrate/rollback/reset/refresh/fresh/status. |
 | `seeders/` | Seeder contract, discovery, events, concurrency-safe run tracking. |
@@ -144,7 +145,7 @@ Obtain a connection, pass user data through a bindings mapping, consume the retu
 
 ### Run an atomic unit of work
 
-Use `async with connection.transaction():`. Nested contexts use savepoints. Keep all transactional queries in the task that opened the transaction; child tasks are explicitly rejected.
+Use `async with connection.transaction():`. Nested contexts use savepoints except on Redshift, which supports root transactions only. Keep all transactional queries in the task that opened the transaction; child tasks are explicitly rejected.
 
 ### Apply migrations
 
@@ -278,8 +279,71 @@ Validation: **Import-only** on CPython 3.14.6; execution requires a booted appli
 | PostgreSQL | `DB_SEARCH_PATH`, `DB_SSLMODE`, `DB_PREFIX_INDEXES` | `5432` |
 | Oracle | `DB_SERVICE_NAME`, `DB_SID`, `DB_DSN`, `DB_TNS`, encodings | `1521` |
 | SQL Server | `DB_ENCRYPT`, `DB_TRUST_SERVER_CERTIFICATE`, `DB_ODBC_DRIVER` | `1433` |
+| Amazon Redshift | `DB_REDSHIFT_SSL`, `DB_REDSHIFT_SSLMODE`, `DB_REDSHIFT_TIMEOUT`, IAM/Serverless options | `5439` |
 
 Migration/seeder table names and paths are supplied by their application configuration/commands. URLs, when present, take precedence over decomposed connection fields in dialect URL construction.
+
+### Amazon Redshift
+
+Install the optional extra in an application:
+
+```sh
+uv add 'orionis[redshift]'
+```
+
+For a framework checkout, use `uv sync --extra redshift`. The extra declares `redshift-connector>=2.1.17,<3.0`, the official AWS Python driver, and `sqlalchemy-redshift>=1.0.0,<2.0`. PostgreSQL's `asyncpg` or `psycopg2` drivers are not used for Redshift.
+
+The editable application template exposes `Redshift` in `BootstrapDatabase.connections`; both it and `ConnectionName.REDSHIFT` are public exports from `orionis.foundation.config.database`.
+
+```dotenv
+DB_CONNECTION="redshift"
+DB_HOST="your-cluster.endpoint.amazonaws.com"
+DB_PORT=5439
+DB_DATABASE="dev"
+DB_USERNAME="awsuser"
+DB_PASSWORD="replace-with-database-credential"
+DB_REDSHIFT_SSL=True
+DB_REDSHIFT_SSLMODE="verify-full"
+DB_REDSHIFT_TIMEOUT=30
+```
+
+`verify-full` is the default TLS policy; `verify-ca` is also supported. `DB_REDSHIFT_TIMEOUT=null` selects no socket timeout. PostgreSQL's `DB_SSLMODE` is independent of `DB_REDSHIFT_SSLMODE`, so configuring one backend does not invalidate the other.
+
+IAM uses `DB_REDSHIFT_IAM=True`, `DB_REDSHIFT_REGION`, `DB_REDSHIFT_CLUSTER_IDENTIFIER`, and `DB_REDSHIFT_DB_USER`. `DB_REDSHIFT_PROFILE` selects an AWS profile; when omitted, the official connector uses the SDK credential chain. Serverless additionally exposes `DB_REDSHIFT_IS_SERVERLESS`, `DB_REDSHIFT_SERVERLESS_WORK_GROUP`, and `DB_REDSHIFT_SERVERLESS_ACCT_ID`. Credentials and endpoint resolution remain the responsibility of the official connector.
+
+The existing asynchronous query API remains unchanged:
+
+```python
+import asyncio
+
+from orionis.database import Connection
+from orionis.foundation.config.database import Redshift
+
+
+async def main() -> None:
+    connection = Connection("warehouse", Redshift().toDict())
+    try:
+        rows = await connection.select("SELECT :value AS value", {"value": 1})
+        print(rows)
+    finally:
+        await connection.disconnect()
+
+
+if __name__ == "__main__":
+    asyncio.run(main())
+```
+
+This example requires a reachable Redshift endpoint; it was not run against AWS. Local validation uses the actual AWS DBAPI/dialect for construction and SQL compilation, and an isolated blocking SQLite Core engine for adapter execution and cancellation.
+
+The connector is synchronous. Blocking connection/query/result/transaction work runs on one reserved worker per checked-out Core connection. Independent queries may use separate workers; one transaction keeps its own worker. Cancellation waits for an in-flight operation to finish before cleanup, so it does not guarantee that server-side work is aborted. The same official connector also serves synchronous scheduler engines.
+
+Redshift-specific limitations:
+
+- No savepoints or nested transactions.
+- No DML `RETURNING` or PostgreSQL sequences. `autoIncrement()` emits native `IDENTITY(1,1)`, but an omitted server-generated key is not returned in `InsertResult.last_insert_id`. Provide a client-generated primary key when an ORM model must know its key immediately.
+- No traditional indexes. Avoid index declarations in Redshift schemas.
+- Primary, unique and foreign keys are informational only. Redshift is not a suitable backend for framework cache locks, once-only seeder claims, or other workflows requiring enforced uniqueness.
+- `db:show`, `db:table` and `db:wipe` use Redshift catalogs and qualified names. Sizes use allocated 1-MB blocks; restricted or missing size metrics are unknown, and empty tables may have no size entry. Reported constraints are declarations, not enforcement guarantees.
 
 ## Integration with Orionis
 
@@ -307,7 +371,7 @@ Migrator and seeder tracking uses database transactions/conditional claims rathe
 
 ## Compatibility
 
-Orionis declares Python 3.14+, SQLAlchemy 2.0.54+, and aiosqlite 0.22.1+; validation used CPython 3.14.6 on Windows. Supported drivers are SQLite, MySQL, PostgreSQL, Oracle, and SQL Server. The lockfile's resolved versions are not minimum support claims; use the project extras for declared driver minimums.
+Orionis declares Python 3.14+, SQLAlchemy 2.0.54+, and aiosqlite 0.22.1+; validation used CPython 3.14.6 on Windows. Supported drivers are SQLite, MySQL, PostgreSQL, Oracle, SQL Server, and Amazon Redshift. The lockfile's resolved versions are not minimum support claims; use the project extras for declared driver minimums.
 
 ## Verification notes
 

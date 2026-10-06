@@ -4,17 +4,17 @@ import os
 from hashlib import sha256
 from uuid import uuid4
 from redis.exceptions import ResponseError
-from orionis.foundation.config.http import HTTPRateLimit
+from orionis.foundation.config.http import HTTPRateLimit, Redis
 from orionis.http.layer.store.redis_rate_limit import RedisRateLimitStore
 from orionis.test import TestCase
 
-def _process_hits(url: str, prefix: str, output: object) -> None:
+def _process_hits(connection: Redis, prefix: str, output: object) -> None:
     """Count accepted requests from an independent process.
 
     Parameters
     ----------
-    url : str
-        Redis connection URL.
+    connection : Redis
+        Redis connection fields.
     prefix : str
         Isolated key namespace for the integration run.
     output : object
@@ -34,7 +34,7 @@ def _process_hits(url: str, prefix: str, output: object) -> None:
             Number of requests accepted by this worker.
         """
         store = RedisRateLimitStore(HTTPRateLimit(
-            rate_limit_redis_url=url, rate_limit_redis_prefix=prefix,
+            rate_limit_redis=connection, rate_limit_redis_prefix=prefix,
         ))
         try:
             return sum([await store.hit("process-client", 17, 60)
@@ -44,13 +44,13 @@ def _process_hits(url: str, prefix: str, output: object) -> None:
 
     output.put(asyncio.run(run()))
 
-def _run_processes(url: str, prefix: str) -> list[int]:
+def _run_processes(connection: Redis, prefix: str) -> list[int]:
     """Spawn isolated workers and collect their accepted-request counts.
 
     Parameters
     ----------
-    url : str
-        Redis connection URL shared by the workers.
+    connection : Redis
+        Redis connection fields shared by the workers.
     prefix : str
         Isolated key namespace for the integration run.
 
@@ -61,7 +61,9 @@ def _run_processes(url: str, prefix: str) -> list[int]:
     """
     context = multiprocessing.get_context("spawn")
     output = context.Queue()
-    processes = [context.Process(target=_process_hits, args=(url, prefix, output))
+    processes = [context.Process(
+        target=_process_hits, args=(connection, prefix, output),
+    )
                  for _ in range(3)]
     try:
         for process in processes:
@@ -86,7 +88,7 @@ class TestRedisRateLimitIntegration(TestCase):
     """Opt in to real Lua, expiration and independent-process quota checks."""
 
     async def asyncSetUp(self) -> None:
-        """Require a Redis URL and create an isolated namespace.
+        """Require Redis connection fields and create an isolated namespace.
 
         Returns
         -------
@@ -96,13 +98,18 @@ class TestRedisRateLimitIntegration(TestCase):
         Raises
         ------
         SkipTest
-            If the Redis integration URL is not configured.
+            If the Redis integration host is not configured.
         """
-        url = os.environ.get("ORIONIS_HTTP_REDIS_URL")
-        if not url:
-            self.skipTest("Set ORIONIS_HTTP_REDIS_URL to run Redis integration tests.")
+        endpoint = os.environ.get("ORIONIS_HTTP_REDIS_HOST")
+        if not endpoint:
+            self.skipTest("Set ORIONIS_HTTP_REDIS_HOST to run Redis integration tests.")
         self.settings = HTTPRateLimit(
-            rate_limit_redis_url=url,
+            rate_limit_redis=Redis(
+                endpoint=endpoint,
+                port=int(os.environ.get("ORIONIS_HTTP_REDIS_PORT", "6379")),
+                db=int(os.environ.get("ORIONIS_HTTP_REDIS_DB", "0")),
+                password=os.environ.get("ORIONIS_HTTP_REDIS_PASSWORD"),
+            ),
             rate_limit_redis_prefix=f"orionis:test:http-rate:{uuid4().hex}",
             rate_limit_redis_timeout_seconds=10,
         )
@@ -156,7 +163,7 @@ class TestRedisRateLimitIntegration(TestCase):
         """
         results = await asyncio.to_thread(
             _run_processes,
-            self.settings.rate_limit_redis_url,
+            self.settings.rate_limit_redis,
             self.settings.rate_limit_redis_prefix,
         )
         self.assertEqual(sum(results), 17)

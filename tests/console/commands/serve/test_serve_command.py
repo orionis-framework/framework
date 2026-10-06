@@ -1,3 +1,5 @@
+import os
+import sys
 from pathlib import Path
 from tempfile import TemporaryDirectory
 from unittest.mock import AsyncMock, Mock, patch
@@ -13,21 +15,25 @@ class _Application:
         "compiled",
         "compiledInvalidationPathsDirs",
         "entryPoint",
+        "production",
         "startAt",
     )
 
-    def __init__(self, base_path: Path) -> None:
+    def __init__(self, base_path: Path, *, production: bool = False) -> None:
         """Store paths and metadata used to build the server command.
 
         Parameters
         ----------
         base_path : Path
             Existing project directory.
+        production : bool, optional
+            Whether the server runs in production mode.
         """
         self.basePath = base_path
         self.compiled = False
         self.compiledInvalidationPathsDirs: list[Path] = []
         self.entryPoint = "bootstrap.app:app"
+        self.production = production
         self.startAt = 123
 
     def config(self, key: str) -> object:
@@ -49,17 +55,51 @@ class _Application:
         }.get(key)
 
     def isProduction(self) -> bool:
-        """Report a development environment for command construction.
+        """Report the selected environment for command construction.
 
         Returns
         -------
         bool
-            Always false for this test application.
+            Whether the test application is in production mode.
         """
-        return False
+        return self.production
 
 class TestServerCommand(TestCase):
     """Verify server launch state and interface lifecycle behavior."""
+
+    async def testAlwaysDisablesBytecodeInEveryEnvironment(self) -> None:
+        """Disable bytecode in the parent and server for every environment.
+
+        Returns
+        -------
+        None
+            Assertions verify that inherited settings cannot enable pyc writes.
+        """
+        for production in (False, True):
+            with (
+                self.subTest(production=production),
+                TemporaryDirectory() as temporary,
+                patch.object(sys, "dont_write_bytecode", False),
+                patch.dict(os.environ, {"PYTHONDONTWRITEBYTECODE": "0"}),
+            ):
+                app = _Application(Path(temporary), production=production)
+                command = ServerCommand()
+
+                with (
+                    patch.object(command, "_ServerCommand__unixServe"),
+                    patch.object(command, "_ServerCommand__windowsServe"),
+                    patch.object(
+                        command, "_ServerCommand__isDebugMode", return_value=False,
+                    ),
+                ):
+                    await command.handle(app)
+
+                self.assertTrue(sys.dont_write_bytecode)
+                self.assertEqual(os.environ["PYTHONDONTWRITEBYTECODE"], "1")
+                self.assertEqual(
+                    command._ServerCommand__env["PYTHONDONTWRITEBYTECODE"], "1",
+                )
+                self.assertEqual(command._ServerCommand__cmd[1], "-B")
 
     def testInstancesHaveIndependentArgumentState(self) -> None:
         """Keep arguments private to each server command instance.

@@ -1,7 +1,7 @@
 import asyncio
 from redis.exceptions import ConnectionError as RedisConnectionError
 from redis.exceptions import TimeoutError as RedisTimeoutError
-from orionis.foundation.config.http import HTTPRateLimit
+from orionis.foundation.config.http import HTTPRateLimit, Redis
 from orionis.http.layer.store.redis_rate_limit import RedisRateLimitStore
 from orionis.test import TestCase
 
@@ -61,6 +61,37 @@ class _RedisTransport:
 
 class TestRedisRateLimitStore(TestCase):
     """Verify command boundaries and resource ownership using explicit doubles."""
+
+    async def testBuildsLazyClientFromConnectionFields(self) -> None:
+        """Pass IPv6 and literal credentials directly to the real Redis client.
+
+        Returns
+        -------
+        None
+            Verify connection arguments and that construction opens no sockets.
+        """
+        credential = "test@credential:/?#%"
+        config = HTTPRateLimit(
+            rate_limit_redis=Redis(
+                endpoint="::1", port=6381, db=4, password=credential,
+            ),
+            rate_limit_redis_timeout_seconds=2,
+        )
+        store = RedisRateLimitStore(config)
+        try:
+            pool = store._RedisRateLimitStore__client.connection_pool
+            options = pool.connection_kwargs
+            self.assertEqual(options["host"], "::1")
+            self.assertEqual(options["port"], 6381)
+            self.assertEqual(options["db"], 4)
+            self.assertEqual(options["password"], credential)
+            self.assertEqual(options["socket_connect_timeout"], 2)
+            self.assertEqual(options["socket_timeout"], 2)
+            self.assertEqual(pool.max_connections, 100)
+            self.assertFalse(pool._available_connections)
+            self.assertFalse(pool._in_use_connections)
+        finally:
+            await store.close()
 
     async def testUsesOneAtomicScriptWithUniqueMembersAndHashedIdentity(self) -> None:
         """Send distinct attempt IDs without exposing client IP addresses.

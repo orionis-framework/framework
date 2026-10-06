@@ -4,7 +4,7 @@
 
 ## Descripción general
 
-Este módulo es el runtime bajo query builder y ORM. `ConnectionManager` convierte configuración validada en conexiones reutilizables. Una `Connection` crea diferidamente un motor SQLAlchemy async, compila planes, ejecuta SQL parametrizado, ofrece helpers de esquema y posee transacciones anidadas.
+Este módulo es el runtime bajo query builder y ORM. `ConnectionManager` convierte configuración validada en conexiones reutilizables. Una `Connection` crea diferidamente un motor SQLAlchemy async, o un motor Core ejecutado en hilos para Redshift, compila planes, ejecuta SQL parametrizado, ofrece helpers de esquema y posee transacciones.
 
 `Migrator` descubre migraciones versionadas y registra lotes; `SeederRunner` descubre seeders y puede reclamar ejecuciones únicas. `Schema` convierte blueprints o definiciones ORM en tablas. Aplicaciones suelen obtener conexiones mediante resolver/builders o fachadas; tooling puede usar clases directamente.
 
@@ -12,7 +12,7 @@ Este módulo es el runtime bajo query builder y ORM. `ConnectionManager` convier
 
 - Python 3.14 o posterior.
 - `sqlalchemy[asyncio]>=2.0.54,<3.0` y `aiosqlite>=0.22.1`.
-- Extras `orionis[mysql]`, `[pgsql]`, `[oracle]` o `[sqlserver]` para otros drivers.
+- Extras `orionis[mysql]`, `[pgsql]`, `[oracle]`, `[sqlserver]` o `[redshift]` para otros drivers.
 - Servidor/credenciales para bases remotas; SQLite admite archivo o `:memory:`.
 - Directorios de migraciones/seeders relativos a base path.
 
@@ -63,7 +63,7 @@ ORM/query builder envía planes inmutables a `Connection`; `SQLCompiler` crea st
 
 ### Propiedad de transacción
 
-Estado vive en `ContextVar` etiquetado con tarea. Primer `begin` abre conexión/transacción raíz; anidado crea savepoint. `transaction()` confirma nivel interno en éxito y revierte al escapar excepción.
+Estado vive en `ContextVar` etiquetado con tarea. Primer `begin` abre conexión/transacción raíz; anidado crea savepoint en los motores compatibles. Redshift rechaza la anidación con `TransactionException`. `transaction()` confirma el nivel actual en éxito y revierte al escapar excepción.
 
 ### Esquema, migraciones y seeders
 
@@ -75,6 +75,7 @@ Estado vive en `ContextVar` etiquetado con tarea. Primer `begin` abre conexión/
 |---|---|
 | `connection.py`, `connection_manager.py` | Motores, ejecución, transacciones y conexiones nombradas. |
 | `compiler.py`, `dialect.py` | Compilación, URLs/opciones, sesiones y drivers. |
+| `redshift.py`, `threaded/` | Capacidades del dialecto AWS y ejecución Core en hilos. |
 | `schema/`, `schema_provider.py` | Constraints blueprint y tablas. |
 | `migrations/` | Descubrimiento y flujos de migración. |
 | `seeders/` | Contrato, descubrimiento, eventos y tracking. |
@@ -144,7 +145,7 @@ Obtén conexión, pasa datos por bindings, consume diccionarios y desconecta sol
 
 ### Unidad atómica
 
-Usa `async with connection.transaction():`. Anidación usa savepoints. Mantén queries en tarea propietaria.
+Usa `async with connection.transaction():`. Anidación usa savepoints excepto en Redshift, que admite solo transacciones raíz. Mantén queries en tarea propietaria.
 
 ### Aplicar migraciones
 
@@ -278,8 +279,71 @@ Validación: **Import-only** en CPython 3.14.6; ejecutarlo requiere contenedor i
 | PostgreSQL | `DB_SEARCH_PATH`, `DB_SSLMODE`, `DB_PREFIX_INDEXES` | `5432` |
 | Oracle | service/SID/DSN/TNS/encodings | `1521` |
 | SQL Server | encrypt/trust/ODBC | `1433` |
+| Amazon Redshift | `DB_REDSHIFT_SSL`, `DB_REDSHIFT_SSLMODE`, `DB_REDSHIFT_TIMEOUT`, opciones IAM/Serverless | `5439` |
 
 URLs tienen precedencia sobre campos descompuestos al construir dialecto.
+
+### Amazon Redshift
+
+Instala el extra opcional en una aplicación:
+
+```sh
+uv add 'orionis[redshift]'
+```
+
+Para un checkout del framework usa `uv sync --extra redshift`. El extra declara `redshift-connector>=2.1.17,<3.0`, el driver Python oficial de AWS, y `sqlalchemy-redshift>=1.0.0,<2.0`. Redshift no utiliza los drivers PostgreSQL `asyncpg` o `psycopg2`.
+
+La plantilla editable expone `Redshift` en `BootstrapDatabase.connections`; tanto la entidad como `ConnectionName.REDSHIFT` se exportan públicamente desde `orionis.foundation.config.database`.
+
+```dotenv
+DB_CONNECTION="redshift"
+DB_HOST="your-cluster.endpoint.amazonaws.com"
+DB_PORT=5439
+DB_DATABASE="dev"
+DB_USERNAME="awsuser"
+DB_PASSWORD="replace-with-database-credential"
+DB_REDSHIFT_SSL=True
+DB_REDSHIFT_SSLMODE="verify-full"
+DB_REDSHIFT_TIMEOUT=30
+```
+
+`verify-full` es la política TLS predeterminada; también se admite `verify-ca`. `DB_REDSHIFT_TIMEOUT=null` elimina el timeout del socket. La variable PostgreSQL `DB_SSLMODE` es independiente de `DB_REDSHIFT_SSLMODE`, por lo que configurar un motor no invalida el otro.
+
+IAM utiliza `DB_REDSHIFT_IAM=True`, `DB_REDSHIFT_REGION`, `DB_REDSHIFT_CLUSTER_IDENTIFIER` y `DB_REDSHIFT_DB_USER`. `DB_REDSHIFT_PROFILE` selecciona un perfil AWS; si se omite, el conector oficial utiliza la cadena de credenciales del SDK. Serverless expone además `DB_REDSHIFT_IS_SERVERLESS`, `DB_REDSHIFT_SERVERLESS_WORK_GROUP` y `DB_REDSHIFT_SERVERLESS_ACCT_ID`. Las credenciales y la resolución de endpoints siguen siendo responsabilidad del conector oficial.
+
+La API asíncrona de consultas existente no cambia:
+
+```python
+import asyncio
+
+from orionis.database import Connection
+from orionis.foundation.config.database import Redshift
+
+
+async def main() -> None:
+    connection = Connection("warehouse", Redshift().toDict())
+    try:
+        rows = await connection.select("SELECT :value AS value", {"value": 1})
+        print(rows)
+    finally:
+        await connection.disconnect()
+
+
+if __name__ == "__main__":
+    asyncio.run(main())
+```
+
+El ejemplo requiere un endpoint Redshift accesible; no se ejecutó contra AWS. La validación local utiliza el DBAPI y dialecto AWS reales para construir motores y compilar SQL, y un motor SQLite Core bloqueante aislado para probar ejecución y cancelación del adaptador.
+
+El conector es síncrono. Conexión, consultas, resultados y transacciones bloqueantes se ejecutan en un hilo reservado por cada conexión Core tomada del pool. Las consultas independientes pueden usar hilos distintos; una transacción conserva su hilo. Cancelar espera a que termine la operación en curso antes de limpiar, por lo que no garantiza abortar el trabajo del servidor. El mismo conector oficial sirve también a los motores síncronos del scheduler.
+
+Limitaciones específicas de Redshift:
+
+- No admite savepoints ni transacciones anidadas.
+- No admite DML `RETURNING` ni secuencias PostgreSQL. `autoIncrement()` emite `IDENTITY(1,1)` nativo, pero una clave generada por el servidor y omitida en el insert no retorna en `InsertResult.last_insert_id`. Proporciona una clave primaria generada por el cliente cuando un modelo ORM deba conocer su clave inmediatamente.
+- No admite índices tradicionales. Evita declarar índices en esquemas Redshift.
+- Las claves primarias, únicas y foráneas son solo informativas. Redshift no es un backend adecuado para bloqueos de caché del framework, claims de seeders únicos ni otros flujos que requieran unicidad impuesta por el servidor.
+- `db:show`, `db:table` y `db:wipe` utilizan catálogos Redshift y nombres calificados. Los tamaños usan bloques asignados de 1 MB; las métricas restringidas o ausentes son desconocidas y las tablas vacías pueden no tener tamaño disponible. Los constraints mostrados son declaraciones, no garantías de cumplimiento.
 
 ## Integración con Orionis
 
@@ -307,7 +371,7 @@ Tracking de migrator/seeder usa transacciones/claims DB, no locks de proceso.
 
 ## Compatibilidad
 
-Orionis declara Python 3.14+, SQLAlchemy 2.0.54+ y aiosqlite 0.22.1+; validado en CPython 3.14.6 Windows. Drivers: SQLite, MySQL, PostgreSQL, Oracle, SQL Server. Usa extras declarados para mínimos de drivers.
+Orionis declara Python 3.14+, SQLAlchemy 2.0.54+ y aiosqlite 0.22.1+; validado en CPython 3.14.6 Windows. Drivers: SQLite, MySQL, PostgreSQL, Oracle, SQL Server y Amazon Redshift. Usa extras declarados para mínimos de drivers.
 
 ## Notas de verificación
 

@@ -62,7 +62,7 @@ class DatabaseInspector:
         driver = self.driver
         parts = (
             name.split(".")
-            if qualified and driver in {"pgsql", "sqlserver"}
+            if qualified and driver in {"pgsql", "redshift", "sqlserver"}
             else (name,)
         )
         if "" in parts:
@@ -92,6 +92,8 @@ class DatabaseInspector:
                 ORDER BY name
                 """,
             )
+        elif self.driver == "redshift":
+            rows = await self._redshiftObjects("TABLE")
         elif self.driver == "pgsql":
             rows = await self.connection.select(
                 """
@@ -164,6 +166,8 @@ class DatabaseInspector:
                 ORDER BY name
                 """,
             )
+        elif self.driver == "redshift":
+            rows = await self._redshiftObjects("VIEW")
         elif self.driver == "pgsql":
             rows = await self.connection.select(
                 """
@@ -220,7 +224,18 @@ class DatabaseInspector:
         list[str]
             Materialized view names in catalog order.
         """
-        if self.driver == "pgsql":
+        if self.driver == "redshift":
+            rows = await self.connection.select(
+                """
+                SELECT TRIM(schema_name) || '.' || TRIM(name) AS name
+                FROM svv_mv_info
+                WHERE database_name = current_database()
+                  AND LEFT(schema_name, 3) <> 'pg_'
+                  AND schema_name <> 'information_schema'
+                ORDER BY name
+                """,
+            )
+        elif self.driver == "pgsql":
             rows = await self.connection.select(
                 """
                 SELECT n.nspname || '.' || c.relname AS name
@@ -261,6 +276,20 @@ class DatabaseInspector:
             Ordinary view count followed by materialized view count.
         """
         driver = self.driver
+        if driver == "redshift":
+            ordinary = await self._redshiftObjects("VIEW", count=True)
+            materialized = await self.connection.select(
+                """
+                SELECT COUNT(*) AS object_count
+                FROM svv_mv_info
+                WHERE database_name = current_database()
+                  AND LEFT(schema_name, 3) <> 'pg_'
+                  AND schema_name <> 'information_schema'
+                """,
+            )
+            return (
+                int(ordinary[0]["object_count"]), int(materialized[0]["object_count"]),
+            )
         if driver == "sqlite":
             rows = await self.connection.select(
                 """
@@ -413,7 +442,9 @@ class DatabaseInspector:
             pages = await self.connection.select("PRAGMA page_count")
             page_size = await self.connection.select("PRAGMA page_size")
             return int(pages[0]["page_count"]) * int(page_size[0]["page_size"])
-        if self.driver == "pgsql":
+        if self.driver == "redshift":
+            rows = await self._redshiftSizeRows(aggregate=True)
+        elif self.driver == "pgsql":
             rows = await self.connection.select(
                 "SELECT pg_database_size(current_database()) AS bytes",
             )
@@ -453,7 +484,15 @@ class DatabaseInspector:
         if self.driver == "sqlite":
             return None
         try:
-            if self.driver == "pgsql":
+            if self.driver == "redshift":
+                rows = await self.connection.select(
+                    """
+                    SELECT COUNT(*) AS count
+                    FROM stv_sessions
+                    WHERE db_name = current_database()
+                    """,
+                )
+            elif self.driver == "pgsql":
                 rows = await self.connection.select(
                     """
                     SELECT COUNT(*) AS count
@@ -525,7 +564,9 @@ class DatabaseInspector:
         int | None
             Physical size, or ``None`` when unavailable.
         """
-        if self.driver == "sqlite":
+        if self.driver == "redshift":
+            rows = await self._redshiftSizeRows(name)
+        elif self.driver == "sqlite":
             try:
                 rows = await self.connection.select(
                     """
@@ -595,6 +636,14 @@ class DatabaseInspector:
         if not tables:
             return {}
         driver = self.driver
+        if driver == "redshift":
+            rows = await self._redshiftSizeRows()
+            selected = set(tables)
+            return {
+                name: int(row["bytes"])
+                for row in rows or ()
+                if (name := str(row["name"])) in selected and row["bytes"] is not None
+            }
         if driver == "sqlite":
             query = """
                 SELECT name, SUM(pgsize) AS bytes
@@ -677,7 +726,7 @@ class DatabaseInspector:
             msg = f"Table '{name}' does not exist on connection '{self.name}'."
             raise ValueError(msg)
         name = resolved
-        if self.driver in {"pgsql", "sqlserver"} and name.count(".") != 1:
+        if self.driver in {"pgsql", "redshift", "sqlserver"} and name.count(".") != 1:
             msg = (
                 "Cannot inspect a schema-qualified object whose name "
                 "contains a period."
@@ -711,6 +760,9 @@ class DatabaseInspector:
             Unambiguous catalog table name, if one exists.
         """
         driver = self.driver
+        if driver == "redshift":
+            rows = await self._redshiftObjects("TABLE", name=name)
+            return self._resolveTableName(name, [str(row["name"]) for row in rows])
         if driver == "sqlite":
             query = """
                 SELECT name
@@ -811,7 +863,7 @@ class DatabaseInspector:
             ]
             if len(matches) == 1:
                 return matches[0]
-        if self.driver == "pgsql" and "." not in name:
+        if self.driver in {"pgsql", "redshift"} and "." not in name:
             matches = [table for table in tables if table.endswith(f".{name}")]
             if len(matches) == 1:
                 return matches[0]
@@ -908,7 +960,9 @@ class DatabaseInspector:
             Columns, indexes and foreign keys.
         """
         schema, _, table = name.rpartition(".")
-        if self.driver == "pgsql":
+        if self.driver == "redshift":
+            raw_columns, raw_indexes, raw_fks = await self._redshiftDetails(name)
+        elif self.driver == "pgsql":
             schema = schema or "public"
             raw_columns = await self.connection.select(
                 """
@@ -1188,3 +1242,150 @@ class DatabaseInspector:
             for row in raw_fks
         ]
         return columns, indexes, foreign_keys
+
+    async def _redshiftObjects(
+        self, kind: str, *, name: str | None = None, count: bool = False,
+    ) -> list[dict[str, Any]]:
+        """
+        Read visible local objects without treating materialized views as tables.
+
+        Parameters
+        ----------
+        kind : str
+            Native TABLE or VIEW catalog category.
+        name : str | None, optional
+            Optional qualified or unqualified object name used for a filtered lookup.
+        count : bool, optional
+            Return an aggregate rather than loading object names.
+
+        Returns
+        -------
+        list[dict[str, Any]]
+            Visible object names or one aggregate count.
+        """
+        projection = (
+            "SELECT COUNT(*) AS object_count"
+            if count else "SELECT t.schema_name || '.' || t.table_name AS name"
+        )
+        clauses = [projection, """
+            FROM svv_redshift_tables t
+            WHERE t.database_name = current_database()
+              AND t.table_type = :kind
+              AND LEFT(t.schema_name, 3) <> 'pg_'
+              AND t.schema_name <> 'information_schema'
+              AND NOT EXISTS (
+                  SELECT 1 FROM svv_mv_info m
+                  WHERE m.database_name = t.database_name
+                    AND m.schema_name = t.schema_name AND m.name = t.table_name
+              )
+            """]
+        bindings = {"kind": kind}
+        if name is not None:
+            schema, separator, table = name.rpartition(".")
+            clauses.append(" AND t.table_name = :table")
+            bindings["table"] = table
+            if separator:
+                clauses.append(" AND t.schema_name = :schema")
+                bindings["schema"] = schema
+        if not count:
+            clauses.append(" ORDER BY name")
+        return await self.connection.select("".join(clauses), bindings)
+
+    async def _redshiftSizeRows(
+        self, name: str | None = None, *, aggregate: bool = False,
+    ) -> list[dict[str, Any]] | None:
+        """
+        Read native block sizes when the caller can access SVV_TABLE_INFO.
+
+        Parameters
+        ----------
+        name : str | None, optional
+            Qualified table name, or None for all visible local tables.
+        aggregate : bool, optional
+            Sum allocated bytes instead of returning individual table sizes.
+
+        Returns
+        -------
+        list[dict[str, Any]] | None
+            Sizes in bytes, or None when optional metadata access is unavailable.
+        """
+        projection = (
+            "SELECT COALESCE(SUM(size), 0) * 1048576 AS bytes"
+            if aggregate else
+            'SELECT "schema" || \'.\' || "table" AS name, size * 1048576 AS bytes'
+        )
+        query = projection + """
+            FROM svv_table_info
+            WHERE "database" = current_database()
+            """
+        bindings = {}
+        if name is not None:
+            schema, _, table = name.rpartition(".")
+            query += ' AND "schema" = :schema AND "table" = :table'
+            bindings = {"schema": schema or "public", "table": table}
+        try:
+            return await self.connection.select(query, bindings)
+        except (QueryException, SQLAlchemyError):
+            return None
+
+    async def _redshiftDetails(
+        self, name: str,
+    ) -> tuple[list[dict[str, Any]], list[dict[str, Any]], list[dict[str, Any]]]:
+        """
+        Read Redshift columns and informational keys without querying indexes.
+
+        Parameters
+        ----------
+        name : str
+            Qualified catalog table name.
+
+        Returns
+        -------
+        tuple[list[dict[str, Any]], list[dict[str, Any]], list[dict[str, Any]]]
+            Raw columns, an empty index list and declared foreign-key metadata.
+        """
+        schema, _, table = name.rpartition(".")
+        bindings = {"schema": schema or "public", "table": table}
+        columns = await self.connection.select(
+            """
+            SELECT c.column_name AS name, c.data_type AS type,
+                   c.is_nullable AS nullable, c.column_default AS default_value,
+                   CASE WHEN EXISTS (
+                       SELECT 1
+                       FROM information_schema.key_column_usage k
+                       JOIN information_schema.table_constraints tc
+                         ON tc.constraint_catalog = k.constraint_catalog
+                        AND tc.constraint_schema = k.constraint_schema
+                        AND tc.constraint_name = k.constraint_name
+                       WHERE tc.constraint_type = 'PRIMARY KEY'
+                         AND k.table_schema = c.table_schema
+                         AND k.table_name = c.table_name
+                         AND k.column_name = c.column_name
+                   ) THEN 1 ELSE 0 END AS primary_key
+            FROM information_schema.columns c
+            WHERE c.table_schema = :schema AND c.table_name = :table
+            ORDER BY c.ordinal_position
+            """,
+            bindings,
+        )
+        foreign_keys = await self.connection.select(
+            """
+            SELECT k.constraint_name AS name, k.column_name AS column_name,
+                   ref.table_schema || '.' || ref.table_name AS ref_table,
+                   ref.column_name AS ref_column, r.delete_rule AS on_delete
+            FROM information_schema.referential_constraints r
+            JOIN information_schema.key_column_usage k
+              ON k.constraint_catalog = r.constraint_catalog
+             AND k.constraint_schema = r.constraint_schema
+             AND k.constraint_name = r.constraint_name
+            JOIN information_schema.key_column_usage ref
+              ON ref.constraint_catalog = r.unique_constraint_catalog
+             AND ref.constraint_schema = r.unique_constraint_schema
+             AND ref.constraint_name = r.unique_constraint_name
+             AND ref.ordinal_position = k.position_in_unique_constraint
+            WHERE k.table_schema = :schema AND k.table_name = :table
+            ORDER BY k.constraint_name, k.ordinal_position
+            """,
+            bindings,
+        )
+        return columns, [], foreign_keys

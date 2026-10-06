@@ -5,6 +5,7 @@ from orionis.foundation.config.app import App, Cipher, Environments
 
 @dataclass(frozen=True, kw_only=True)
 class BootstrapApp(App):
+
     # ----------------------------------------------------------------------------------
     # name : str, optional
     # --- The name of the application. Defaults to the value of the 'APP_NAME'

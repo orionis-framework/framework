@@ -7,6 +7,7 @@ from orionis.foundation.config.mail import (
 
 @dataclass(frozen=True, kw_only=True)
 class BootstrapMail(Mail):
+
     # ----------------------------------------------------------------------------------
     # default : str | MailDriver, optional
     # --- The default mailer transport to use.
@@ -35,6 +36,7 @@ class BootstrapMail(Mail):
     # ----------------------------------------------------------------------------------
     mailers: Mailers | dict = field(
         default_factory=lambda: Mailers(
+
             # --------------------------------------------------------------------------
             # smtp : Smtp, optional
             # --- SMTP mail transport configuration.
@@ -49,6 +51,7 @@ class BootstrapMail(Mail):
                 password=Env.get("MAIL_PASSWORD", ""),
                 timeout=Env.get("MAIL_TIMEOUT", None),
             ),
+
             # --------------------------------------------------------------------------
             # file : File, optional
             # --- File mail transport configuration.

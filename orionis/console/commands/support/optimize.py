@@ -1,4 +1,3 @@
-import compileall
 import sys
 from pathlib import Path
 from orionis.console.base.command import BaseCommand
@@ -27,29 +26,29 @@ if _ACTIVE_VENV_BASENAME:
     _SKIP_DIRS |= frozenset({_ACTIVE_VENV_BASENAME})
 
 class OptimizeCommand(BaseCommand):
-    """Compile application Python source files into optimized bytecode."""
+    """Validate application Python sources without writing bytecode."""
 
     # ruff: noqa: TC001
 
     timestamps: bool = True
     signature: str = "optimize"
-    description: str = "Compile application Python files to optimized bytecode."
+    description: str = "Validate application Python files without writing bytecode."
 
     def handle(self, app: IApplication, console: Console) -> int: # NOSONAR
         """
-        Compile Python modules below the application root.
+        Validate Python modules below the application root in memory.
 
         Parameters
         ----------
         app : IApplication
             Application providing the project root.
         console : Console
-            Console used to report compilation results.
+            Console used to report validation results.
 
         Returns
         -------
         int
-            Zero when every source compiles; one when compilation or traversal fails.
+            Zero when every source validates; one when validation or traversal fails.
         """
         source_count = 0
         errors: list[str] = []
@@ -68,21 +67,18 @@ class OptimizeCommand(BaseCommand):
                 source_count += 1
                 source_file = root / filename
                 try:
-                    compiled = compileall.compile_file(
+                    compile(
+                        source_file.read_bytes(),
                         str(source_file),
-                        force=True,
+                        "exec",
                         optimize=2,
-                        quiet=1,
                     )
-                except (OSError, RuntimeError, ValueError) as error:
+                except (OSError, RuntimeError, SyntaxError, ValueError) as error:
                     errors.append(f"{source_file}: {error}")
-                else:
-                    if not compiled:
-                        errors.append(f"Could not compile {source_file}.")
 
         if errors:
             console.error(
-                f"Application optimization failed for {len(errors)} item(s).",
+                f"Application source validation failed for {len(errors)} item(s).",
                 timestamp=False,
             )
             for error in errors:
@@ -90,7 +86,7 @@ class OptimizeCommand(BaseCommand):
             return 1
 
         console.success(
-            f"Optimized {source_count} Python file(s).",
+            f"Validated {source_count} Python file(s) without writing bytecode.",
             timestamp=False,
         )
         return 0

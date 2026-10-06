@@ -4,9 +4,11 @@ from typing import TYPE_CHECKING, Any, ClassVar
 import sqlalchemy
 from sqlalchemy import Column as SqlColumn
 from sqlalchemy import ForeignKey, MetaData, Table, and_, func, or_
+from sqlalchemy.exc import NoSuchModuleError
 from sqlalchemy.schema import CreateTable, DropTable
 from sqlalchemy.sql import CompoundSelect
 from sqlalchemy.sql.elements import ClauseElement
+from orionis.database.dialect import missing_dependency_error
 from orionis.database.exceptions import QueryException
 from orionis.orm.query.expressions import (
     COLUMNLESS_WHERE_TYPES,
@@ -100,7 +102,7 @@ class SQLCompiler:
     per compiler) and query plans into executable statements.
     """
 
-    __slots__ = ("_definitions", "_metadata", "_prefix", "_tables")
+    __slots__ = ("_definitions", "_driver", "_metadata", "_prefix", "_tables")
 
     # Builders translating logical column types into engine types.
     _TYPE_BUILDERS: ClassVar[
@@ -180,7 +182,7 @@ class SQLCompiler:
         ColumnType.JSON: lambda c: sqlalchemy.JSON(none_as_null=c.none_as_null),
     }
 
-    def __init__(self, prefix: str = "") -> None:
+    def __init__(self, prefix: str = "", *, driver: str | None = None) -> None:
         """
         Initialize the compiler with an optional table name prefix.
 
@@ -188,6 +190,8 @@ class SQLCompiler:
         ----------
         prefix : str, optional
             Prefix prepended to every physical table name.
+        driver : str | None, optional
+            Backend identifier for native column options such as Redshift IDENTITY.
 
         Returns
         -------
@@ -195,6 +199,7 @@ class SQLCompiler:
             This method does not return a value.
         """
         self._prefix = prefix or ""
+        self._driver = driver
         self._metadata = MetaData()
         self._tables: dict[str, Table] = {}
         self._definitions: dict[str, TableDefinition] = {}
@@ -1244,6 +1249,8 @@ class SQLCompiler:
         ------
         QueryException
             If the logical column type has no registered builder.
+        MissingDatabaseDependencyException
+            If Redshift native column options require an unavailable dialect package.
         """
         args: list[Any] = [
             definition.name if name is None else name,
@@ -1263,6 +1270,8 @@ class SQLCompiler:
             "autoincrement": True if definition.is_auto_increment else "auto",
             "comment": definition.comment_text,
         }
+        if self._driver == "redshift" and definition.is_auto_increment:
+            options["redshift_identity"] = (1, 1)
         if definition.hasDefault():
             value = definition.default_value
             options["default"] = value
@@ -1271,7 +1280,12 @@ class SQLCompiler:
             if value is not None and not callable(value):
                 options["server_default"] = sqlalchemy.literal(value, args[1])
 
-        return SqlColumn(*args, **options)
+        try:
+            return SqlColumn(*args, **options)
+        except (ImportError, NoSuchModuleError) as error:
+            if self._driver == "redshift":
+                raise missing_dependency_error(self._driver, error) from error
+            raise
 
     def _sqlType(self, definition: ColumnDefinition) -> TypeEngine[Any]:
         """

@@ -7,6 +7,7 @@ from orionis.foundation.config.testing import (
 
 @dataclass(frozen=True, kw_only=True)
 class BootstrapTesting(Testing):
+
     # ----------------------------------------------------------------------------------
     # verbosity : int | VerbosityMode, optional
     # --- Level of detail in test output. 0: silent, 1: standard, 2: detailed.

@@ -709,7 +709,7 @@
         </div>
 
         <div class="extrasDocstring">
-          <p class="class-signature"><code><span class="py-keyword">class</span> <span class="py-defname">SmtpTransport</span>(IMailTransport): <a href="https://github.com/orionis-framework/framework/tree/448bb10d8211ab0a1a02edddc5df3b0874b50fbd/orionis/mail/transports/smtp.py#L21" class="sourceLink">(source)</a></code></p><p>Constructor: <code><a href="#__init__" class="internal-link" title="orionis.mail.transports.SmtpTransport.__init__">SmtpTransport(settings)</a></code></p><p><a href="classIndex.html#orionis.mail.transports.SmtpTransport">View In Hierarchy</a></p>
+          <p class="class-signature"><code><span class="py-keyword">class</span> <span class="py-defname">SmtpTransport</span>(IMailTransport): <a href="https://github.com/orionis-framework/framework/tree/09b5c2507c66690532315c421f52ebb3edaf6f66/orionis/mail/transports/smtp.py#L21" class="sourceLink">(source)</a></code></p><p>Constructor: <code><a href="#__init__" class="internal-link" title="orionis.mail.transports.SmtpTransport.__init__">SmtpTransport(settings)</a></code></p><p><a href="classIndex.html#orionis.mail.transports.SmtpTransport">View In Hierarchy</a></p>
         </div>
 
         <div class="moduleDocstring">
@@ -774,7 +774,7 @@ that the server refused the message. There are no automatic retries.</p>
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">__init__</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">settings: <code>SmtpSettings</code></span>):</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/448bb10d8211ab0a1a02edddc5df3b0874b50fbd/orionis/mail/transports/smtp.py#L31">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/09b5c2507c66690532315c421f52ebb3edaf6f66/orionis/mail/transports/smtp.py#L31">
       
       (source)
     </a>
@@ -801,7 +801,7 @@ that the server refused the message. There are no automatic retries.</p>
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">_result</span><span class="function-signature long-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">message: <code>PreparedMail</code>, </span><span class="rst-sig-param">mailer: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code>, </span><span class="rst-sig-param">driver: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code>, </span><span class="rst-sig-param">refused: <code>Mapping[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" class="intersphinx-link">tuple</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a>, <wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#bytes" class="intersphinx-link">bytes</a> | <a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>]]</code></span>) -&gt; <code>MailResult</code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/448bb10d8211ab0a1a02edddc5df3b0874b50fbd/orionis/mail/transports/smtp.py#L165">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/09b5c2507c66690532315c421f52ebb3edaf6f66/orionis/mail/transports/smtp.py#L165">
       
       (source)
     </a>
@@ -828,7 +828,7 @@ that the server refused the message. There are no automatic retries.</p>
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">_sendSync</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">message: <code>PreparedMail</code>, </span><span class="rst-sig-param">mailer: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code>, </span><span class="rst-sig-param">driver: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></span>) -&gt; <code>MailResult</code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/448bb10d8211ab0a1a02edddc5df3b0874b50fbd/orionis/mail/transports/smtp.py#L78">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/09b5c2507c66690532315c421f52ebb3edaf6f66/orionis/mail/transports/smtp.py#L78">
       
       (source)
     </a>
@@ -855,7 +855,7 @@ that the server refused the message. There are no automatic retries.</p>
     
     
     <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">send</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">message: <code>PreparedMail</code>, </span><span class="rst-sig-symbol">*, </span><span class="rst-sig-param">mailer: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code>, </span><span class="rst-sig-param">driver: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></span>) -&gt; <code>MailResult</code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/448bb10d8211ab0a1a02edddc5df3b0874b50fbd/orionis/mail/transports/smtp.py#L47">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/09b5c2507c66690532315c421f52ebb3edaf6f66/orionis/mail/transports/smtp.py#L47">
       
       (source)
     </a>
@@ -881,7 +881,7 @@ that the server refused the message. There are no automatic retries.</p>
   <div class="functionHeader">
     
     <span class="py-defname">__slots__</span>: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" class="intersphinx-link">tuple</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <wbr></wbr><span class="rst-variable-ellipsis">...</span>]</code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/448bb10d8211ab0a1a02edddc5df3b0874b50fbd/orionis/mail/transports/smtp.py#L29">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/09b5c2507c66690532315c421f52ebb3edaf6f66/orionis/mail/transports/smtp.py#L29">
       
       (source)
     </a>
@@ -908,7 +908,7 @@ that the server refused the message. There are no automatic retries.</p>
   <div class="functionHeader">
     
     <span class="py-defname">_settings</span> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/448bb10d8211ab0a1a02edddc5df3b0874b50fbd/orionis/mail/transports/smtp.py#L45">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/09b5c2507c66690532315c421f52ebb3edaf6f66/orionis/mail/transports/smtp.py#L45">
       
       (source)
     </a>
@@ -934,7 +934,7 @@ that the server refused the message. There are no automatic retries.</p>
   <div class="orionis-footer-inner">
     <div class="orionis-footer-copy">
       <p>API documentation for <a href="https://orionis-framework.com/" class="projecthome">Orionis</a>.</p>
-      <p class="orionis-footer-meta">Generated with <a href="https://github.com/twisted/pydoctor/">Pydoctor</a> 25.10.1.<span class="orionis-footer-build"> Built 2026-10-06 14:50:05.</span></p>
+      <p class="orionis-footer-meta">Generated with <a href="https://github.com/twisted/pydoctor/">Pydoctor</a> 25.10.1.<span class="orionis-footer-build"> Built 2026-10-06 15:40:45.</span></p>
     </div>
     <nav class="orionis-footer-links" aria-label="Additional resources">
       <a href="https://docs.orionis-framework.com">Read the guide <span aria-hidden="true">↗</span></a>

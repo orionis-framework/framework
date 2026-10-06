@@ -275,7 +275,7 @@
         
         
             <div class="itemName expandableItem">
-                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId9686"> 
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId9660"> 
                     
                 </input>
 
@@ -483,7 +483,7 @@
         </div>
 
         <div class="extrasDocstring">
-          <p class="class-signature"><code><span class="py-keyword">class</span> <span class="py-defname">RedisRateLimitStore</span>: <a href="https://github.com/orionis-framework/framework/tree/baa8efd19f4de548a718b4c28e48ca2d3639a125/orionis/http/layer/store/redis_rate_limit.py#L26" class="sourceLink">(source)</a></code></p><p>Constructor: <code><a href="#__init__" class="internal-link" title="orionis.http.layer.store.redis_rate_limit.RedisRateLimitStore.__init__">RedisRateLimitStore(config, client)</a></code></p><p><a href="classIndex.html#orionis.http.layer.store.redis_rate_limit.RedisRateLimitStore">View In Hierarchy</a></p>
+          <p class="class-signature"><code><span class="py-keyword">class</span> <span class="py-defname">RedisRateLimitStore</span>: <a href="https://github.com/orionis-framework/framework/tree/448bb10d8211ab0a1a02edddc5df3b0874b50fbd/orionis/http/layer/store/redis_rate_limit.py#L26" class="sourceLink">(source)</a></code></p><p>Constructor: <code><a href="#__init__" class="internal-link" title="orionis.http.layer.store.redis_rate_limit.RedisRateLimitStore.__init__">RedisRateLimitStore(config, client)</a></code></p><p><a href="classIndex.html#orionis.http.layer.store.redis_rate_limit.RedisRateLimitStore">View In Hierarchy</a></p>
         </div>
 
         <div class="moduleDocstring">
@@ -491,7 +491,7 @@
         </div>
 
         <div id="split-tables">
-          <table class="children sortable" id="id979">
+          <table class="children sortable" id="id985">
   
   
   <tr class="method">
@@ -555,7 +555,7 @@
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">__init__</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">config: <code>HTTPRateLimit</code>, </span><span class="rst-sig-symbol">*, </span><span class="rst-sig-param">client: <code>Redis | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code> = <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></span>):</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/baa8efd19f4de548a718b4c28e48ca2d3639a125/orionis/http/layer/store/redis_rate_limit.py#L31">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/448bb10d8211ab0a1a02edddc5df3b0874b50fbd/orionis/http/layer/store/redis_rate_limit.py#L31">
       
       (source)
     </a>
@@ -567,7 +567,7 @@
   </div>
   <div class="docstring functionBody">
     
-    <div><p>Build a lazy Redis connection, optionally using an external client.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">config:</span><code><a href="orionis.foundation.config.http.HTTPRateLimit.html" class="internal-link" title="orionis.foundation.config.http.HTTPRateLimit">HTTPRateLimit</a></code></td><td class="fieldArgDesc">Validated connection URL, namespace and operation timeout.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">client:</span><code>Redis | None, <em>optional</em></code></td><td class="fieldArgDesc">Externally owned transport. The caller remains responsible for it.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">Prepare the backend without opening a network connection.</td></tr></table></div>
+    <div><p>Build a lazy Redis connection, optionally using an external client.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">config:</span><code><a href="orionis.foundation.config.http.HTTPRateLimit.html" class="internal-link" title="orionis.foundation.config.http.HTTPRateLimit">HTTPRateLimit</a></code></td><td class="fieldArgDesc">Validated connection fields, namespace and operation timeout.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">client:</span><code>Redis | None, <em>optional</em></code></td><td class="fieldArgDesc">Externally owned transport. The caller remains responsible for it.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">Prepare the backend without opening a network connection.</td></tr></table></div>
   </div>
 </div><div class="basemethod">
   
@@ -582,7 +582,7 @@
     
     
     <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">close</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>):</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/baa8efd19f4de548a718b4c28e48ca2d3639a125/orionis/http/layer/store/redis_rate_limit.py#L102">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/448bb10d8211ab0a1a02edddc5df3b0874b50fbd/orionis/http/layer/store/redis_rate_limit.py#L106">
       
       (source)
     </a>
@@ -609,7 +609,7 @@
     
     
     <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">hit</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">key: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code>, </span><span class="rst-sig-param">limit: <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code>, </span><span class="rst-sig-param">window: <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/baa8efd19f4de548a718b4c28e48ca2d3639a125/orionis/http/layer/store/redis_rate_limit.py#L65">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/448bb10d8211ab0a1a02edddc5df3b0874b50fbd/orionis/http/layer/store/redis_rate_limit.py#L69">
       
       (source)
     </a>
@@ -635,7 +635,7 @@
   <div class="functionHeader">
     
     <span class="py-defname">__slots__</span>: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" class="intersphinx-link">tuple</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <wbr></wbr><span class="rst-variable-ellipsis">...</span>]</code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/baa8efd19f4de548a718b4c28e48ca2d3639a125/orionis/http/layer/store/redis_rate_limit.py#L29">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/448bb10d8211ab0a1a02edddc5df3b0874b50fbd/orionis/http/layer/store/redis_rate_limit.py#L29">
       
       (source)
     </a>
@@ -662,7 +662,7 @@
   <div class="functionHeader">
     
     <span class="py-defname">__client</span> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/baa8efd19f4de548a718b4c28e48ca2d3639a125/orionis/http/layer/store/redis_rate_limit.py#L55">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/448bb10d8211ab0a1a02edddc5df3b0874b50fbd/orionis/http/layer/store/redis_rate_limit.py#L56">
       
       (source)
     </a>
@@ -689,7 +689,7 @@
   <div class="functionHeader">
     
     <span class="py-defname">__owns_client</span> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/baa8efd19f4de548a718b4c28e48ca2d3639a125/orionis/http/layer/store/redis_rate_limit.py#L54">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/448bb10d8211ab0a1a02edddc5df3b0874b50fbd/orionis/http/layer/store/redis_rate_limit.py#L54">
       
       (source)
     </a>
@@ -716,7 +716,7 @@
   <div class="functionHeader">
     
     <span class="py-defname">__prefix</span> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/baa8efd19f4de548a718b4c28e48ca2d3639a125/orionis/http/layer/store/redis_rate_limit.py#L52">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/448bb10d8211ab0a1a02edddc5df3b0874b50fbd/orionis/http/layer/store/redis_rate_limit.py#L52">
       
       (source)
     </a>
@@ -743,7 +743,7 @@
   <div class="functionHeader">
     
     <span class="py-defname">__timeout</span> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/baa8efd19f4de548a718b4c28e48ca2d3639a125/orionis/http/layer/store/redis_rate_limit.py#L53">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/448bb10d8211ab0a1a02edddc5df3b0874b50fbd/orionis/http/layer/store/redis_rate_limit.py#L53">
       
       (source)
     </a>
@@ -769,7 +769,7 @@
   <div class="orionis-footer-inner">
     <div class="orionis-footer-copy">
       <p>API documentation for <a href="https://orionis-framework.com/" class="projecthome">Orionis</a>.</p>
-      <p class="orionis-footer-meta">Generated with <a href="https://github.com/twisted/pydoctor/">Pydoctor</a> 25.10.1.<span class="orionis-footer-build"> Built 2026-10-06 09:50:45.</span></p>
+      <p class="orionis-footer-meta">Generated with <a href="https://github.com/twisted/pydoctor/">Pydoctor</a> 25.10.1.<span class="orionis-footer-build"> Built 2026-10-06 14:50:05.</span></p>
     </div>
     <nav class="orionis-footer-links" aria-label="Additional resources">
       <a href="https://docs.orionis-framework.com">Read the guide <span aria-hidden="true">↗</span></a>

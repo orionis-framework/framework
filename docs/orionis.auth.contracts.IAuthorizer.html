@@ -2283,7 +2283,7 @@
         </div>
 
         <div class="extrasDocstring">
-          <p class="class-signature"><code><span class="py-keyword">class</span> <span class="py-defname">IAuthorizer</span>(ABC): <a href="https://github.com/orionis-framework/framework/tree/baa8efd19f4de548a718b4c28e48ca2d3639a125/orionis/auth/contracts/authorizer.py#L9" class="sourceLink">(source)</a></code></p><p>Known subclasses: <code><a href="orionis.auth.authorization.authorizer.Authorizer.html" class="internal-link">orionis.auth.authorization.authorizer.Authorizer</a></code></p><p><a href="classIndex.html#orionis.auth.contracts.IAuthorizer">View In Hierarchy</a></p>
+          <p class="class-signature"><code><span class="py-keyword">class</span> <span class="py-defname">IAuthorizer</span>(ABC): <a href="https://github.com/orionis-framework/framework/tree/448bb10d8211ab0a1a02edddc5df3b0874b50fbd/orionis/auth/contracts/authorizer.py#L9" class="sourceLink">(source)</a></code></p><p>Known subclasses: <code><a href="orionis.auth.authorization.authorizer.Authorizer.html" class="internal-link">orionis.auth.authorization.authorizer.Authorizer</a></code></p><p><a href="classIndex.html#orionis.auth.contracts.IAuthorizer">View In Hierarchy</a></p>
         </div>
 
         <div class="moduleDocstring">
@@ -2354,7 +2354,7 @@ singleton.</p>
     
     <div><span class="decorator">@abstractmethod<br /></span></div>
     <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">allows</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">context: <code><a href="orionis.auth.contracts.IAuthenticationContext.html" class="internal-link" title="orionis.auth.contracts.IAuthenticationContext">IAuthenticationContext</a></code>, </span><span class="rst-sig-param">ability: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code>, </span><span class="rst-sig-param">resource: <code><a href="https://docs.python.org/3/builtins/functions.html#object" class="intersphinx-link">object</a></code></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/baa8efd19f4de548a718b4c28e48ca2d3639a125/orionis/auth/contracts/authorizer.py#L108">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/448bb10d8211ab0a1a02edddc5df3b0874b50fbd/orionis/auth/contracts/authorizer.py#L108">
       
       (source)
     </a>
@@ -2382,7 +2382,7 @@ not need an instance.</td></tr></table><table class="fieldTable"><tr class="fiel
     
     <div><span class="decorator">@abstractmethod<br /></span></div>
     <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">can</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">context: <code><a href="orionis.auth.contracts.IAuthenticationContext.html" class="internal-link" title="orionis.auth.contracts.IAuthenticationContext">IAuthenticationContext</a></code>, </span><span class="rst-sig-param">permission: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/baa8efd19f4de548a718b4c28e48ca2d3639a125/orionis/auth/contracts/authorizer.py#L20">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/448bb10d8211ab0a1a02edddc5df3b0874b50fbd/orionis/auth/contracts/authorizer.py#L20">
       
       (source)
     </a>
@@ -2409,7 +2409,7 @@ not need an instance.</td></tr></table><table class="fieldTable"><tr class="fiel
     
     <div><span class="decorator">@abstractmethod<br /></span></div>
     <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">canAll</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">context: <code><a href="orionis.auth.contracts.IAuthenticationContext.html" class="internal-link" title="orionis.auth.contracts.IAuthenticationContext">IAuthenticationContext</a></code>, </span><span class="rst-sig-param">permissions: <code>Iterable[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>]</code></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/baa8efd19f4de548a718b4c28e48ca2d3639a125/orionis/auth/contracts/authorizer.py#L64">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/448bb10d8211ab0a1a02edddc5df3b0874b50fbd/orionis/auth/contracts/authorizer.py#L64">
       
       (source)
     </a>
@@ -2436,7 +2436,7 @@ not need an instance.</td></tr></table><table class="fieldTable"><tr class="fiel
     
     <div><span class="decorator">@abstractmethod<br /></span></div>
     <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">canAny</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">context: <code><a href="orionis.auth.contracts.IAuthenticationContext.html" class="internal-link" title="orionis.auth.contracts.IAuthenticationContext">IAuthenticationContext</a></code>, </span><span class="rst-sig-param">permissions: <code>Iterable[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>]</code></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/baa8efd19f4de548a718b4c28e48ca2d3639a125/orionis/auth/contracts/authorizer.py#L42">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/448bb10d8211ab0a1a02edddc5df3b0874b50fbd/orionis/auth/contracts/authorizer.py#L42">
       
       (source)
     </a>
@@ -2463,7 +2463,7 @@ not need an instance.</td></tr></table><table class="fieldTable"><tr class="fiel
     
     <div><span class="decorator">@abstractmethod<br /></span></div>
     <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">hasRole</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">context: <code><a href="orionis.auth.contracts.IAuthenticationContext.html" class="internal-link" title="orionis.auth.contracts.IAuthenticationContext">IAuthenticationContext</a></code>, </span><span class="rst-sig-param">role: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/baa8efd19f4de548a718b4c28e48ca2d3639a125/orionis/auth/contracts/authorizer.py#L86">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/448bb10d8211ab0a1a02edddc5df3b0874b50fbd/orionis/auth/contracts/authorizer.py#L86">
       
       (source)
     </a>
@@ -2490,7 +2490,7 @@ not need an instance.</td></tr></table><table class="fieldTable"><tr class="fiel
     
     <div><span class="decorator">@abstractmethod<br /></span></div>
     <span class="py-keyword">def</span>&#160;<span class="py-defname">registerPolicy</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">resource: <code><a href="https://docs.python.org/3/builtins/functions.html#type" class="intersphinx-link">type</a></code>, </span><span class="rst-sig-param">policy: <code><a href="https://docs.python.org/3/builtins/functions.html#type" class="intersphinx-link">type</a>[<wbr></wbr><a href="orionis.auth.contracts.IPolicy.html" class="internal-link" title="orionis.auth.contracts.IPolicy">IPolicy</a>]</code></span>):</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/baa8efd19f4de548a718b4c28e48ca2d3639a125/orionis/auth/contracts/authorizer.py#L139">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/448bb10d8211ab0a1a02edddc5df3b0874b50fbd/orionis/auth/contracts/authorizer.py#L139">
       
       (source)
     </a>
@@ -2516,7 +2516,7 @@ not need an instance.</td></tr></table><table class="fieldTable"><tr class="fiel
   <div class="functionHeader">
     
     <span class="py-defname">__slots__</span>: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" class="intersphinx-link">tuple</a></code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/baa8efd19f4de548a718b4c28e48ca2d3639a125/orionis/auth/contracts/authorizer.py#L18">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/448bb10d8211ab0a1a02edddc5df3b0874b50fbd/orionis/auth/contracts/authorizer.py#L18">
       
       (source)
     </a>
@@ -2542,7 +2542,7 @@ not need an instance.</td></tr></table><table class="fieldTable"><tr class="fiel
   <div class="orionis-footer-inner">
     <div class="orionis-footer-copy">
       <p>API documentation for <a href="https://orionis-framework.com/" class="projecthome">Orionis</a>.</p>
-      <p class="orionis-footer-meta">Generated with <a href="https://github.com/twisted/pydoctor/">Pydoctor</a> 25.10.1.<span class="orionis-footer-build"> Built 2026-10-06 09:50:45.</span></p>
+      <p class="orionis-footer-meta">Generated with <a href="https://github.com/twisted/pydoctor/">Pydoctor</a> 25.10.1.<span class="orionis-footer-build"> Built 2026-10-06 14:50:05.</span></p>
     </div>
     <nav class="orionis-footer-links" aria-label="Additional resources">
       <a href="https://docs.orionis-framework.com">Read the guide <span aria-hidden="true">↗</span></a>

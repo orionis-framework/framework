@@ -391,7 +391,7 @@
         
         
             <div class="itemName expandableItem">
-                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId13138"> 
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId13112"> 
                     
                 </input>
 
@@ -702,19 +702,22 @@
         </div>
 
         <div class="extrasDocstring">
-          <p class="class-signature"><code><span class="py-keyword">class</span> <span class="py-defname">McpConfig</span>(<a href="orionis.support.entities.BaseEntity.html" class="internal-link" title="orionis.support.entities.BaseEntity">BaseEntity</a>): <a href="https://github.com/orionis-framework/framework/tree/baa8efd19f4de548a718b4c28e48ca2d3639a125/orionis/foundation/config/mcp/entities/mcp.py#L10" class="sourceLink">(source)</a></code></p><p><a href="classIndex.html#orionis.mcp.config.McpConfig">View In Hierarchy</a></p>
+          <p class="class-signature"><code><span class="py-keyword">class</span> <span class="py-defname">McpConfig</span>(<a href="orionis.support.entities.BaseEntity.html" class="internal-link" title="orionis.support.entities.BaseEntity">BaseEntity</a>): <a href="https://github.com/orionis-framework/framework/tree/448bb10d8211ab0a1a02edddc5df3b0874b50fbd/orionis/foundation/config/mcp/entities/mcp.py#L10" class="sourceLink">(source)</a></code></p><p><a href="classIndex.html#orionis.mcp.config.McpConfig">View In Hierarchy</a></p>
         </div>
 
         <div class="moduleDocstring">
           <div><p>Bound MCP work and explicitly allow trusted HTTP browser origins.</p>
+<p>Read environment defaults when each instance is created. Explicit constructor
+values take precedence and supplied origin lists are copied to immutable tuples.</p>
 <p>An absent Origin is accepted by the transport. An empty <tt class="rst-docutils rst-literal">allowed_origins</tt>
 rejects every present Origin; there is no wildcard or implicit same-origin
-exception. Each allowed entry is a serialized HTTP(S) origin.</p>
+exception. Each allowed entry is a serialized HTTP(S) origin. Defaults come
+directly from the shared <tt class="rst-docutils rst-literal">CORS_ALLOW_ORIGINS</tt> environment variable.</p>
 </div>
         </div>
 
         <div id="split-tables">
-          <table class="children sortable" id="id1240">
+          <table class="children sortable" id="id1246">
   
   
   <tr class="method">
@@ -722,83 +725,83 @@ exception. Each allowed entry is a serialized HTTP(S) origin.</p>
     <td>Method</td>
     <td><code><a href="#__post_init__" class="internal-link" title="orionis.mcp.config.McpConfig.__post_init__">__post<wbr></wbr>_init__</a></code></td>
     <td>Reject coercion, unbounded budgets, and ambiguous origin allowlists.</td>
-  </tr><tr class="classvariable">
+  </tr><tr class="instancevariable">
     
-    <td>Class Variable</td>
+    <td>Instance Variable</td>
     <td><code><a href="#allowed_origins" class="internal-link" title="orionis.mcp.config.McpConfig.allowed_origins">allowed<wbr></wbr>_origins</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
-  </tr><tr class="classvariable">
+    <td>Explicit trusted HTTP(S) browser origins without wildcards. Read <tt class="rst-docutils rst-literal">CORS_ALLOW_ORIGINS</tt> with a default of an empty tuple.</td>
+  </tr><tr class="instancevariable">
     
-    <td>Class Variable</td>
+    <td>Instance Variable</td>
     <td><code><a href="#default_page_size" class="internal-link" title="orionis.mcp.config.McpConfig.default_page_size">default<wbr></wbr>_page<wbr></wbr>_size</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
-  </tr><tr class="classvariable">
+    <td>Default number of entries returned by paginated list operations. Read <tt class="rst-docutils rst-literal">MCP_DEFAULT_PAGE_SIZE</tt> with a default of 50.</td>
+  </tr><tr class="instancevariable">
     
-    <td>Class Variable</td>
+    <td>Instance Variable</td>
     <td><code><a href="#max_concurrent_requests" class="internal-link" title="orionis.mcp.config.McpConfig.max_concurrent_requests">max<wbr></wbr>_concurrent<wbr></wbr>_requests</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
-  </tr><tr class="classvariable">
+    <td>Maximum concurrent MCP requests. Read <tt class="rst-docutils rst-literal">MCP_MAX_CONCURRENT_REQUESTS</tt>, then <tt class="rst-docutils rst-literal">HTTP_MAX_CONCURRENT_REQUESTS</tt>, with a final default of 32.</td>
+  </tr><tr class="instancevariable">
     
-    <td>Class Variable</td>
+    <td>Instance Variable</td>
     <td><code><a href="#max_metadata_size" class="internal-link" title="orionis.mcp.config.McpConfig.max_metadata_size">max<wbr></wbr>_metadata<wbr></wbr>_size</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
-  </tr><tr class="classvariable">
+    <td>Maximum serialized request or response metadata size in bytes. Read <tt class="rst-docutils rst-literal">MCP_MAX_METADATA_SIZE</tt> with a default of 64 KiB.</td>
+  </tr><tr class="instancevariable">
     
-    <td>Class Variable</td>
+    <td>Instance Variable</td>
     <td><code><a href="#max_page_size" class="internal-link" title="orionis.mcp.config.McpConfig.max_page_size">max<wbr></wbr>_page<wbr></wbr>_size</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
-  </tr><tr class="classvariable">
+    <td>Maximum entries per page; must be at least <tt class="rst-docutils rst-literal">default_page_size</tt>. Read <tt class="rst-docutils rst-literal">MCP_MAX_PAGE_SIZE</tt> with a default of 100.</td>
+  </tr><tr class="instancevariable">
     
-    <td>Class Variable</td>
+    <td>Instance Variable</td>
     <td><code><a href="#max_request_size" class="internal-link" title="orionis.mcp.config.McpConfig.max_request_size">max<wbr></wbr>_request<wbr></wbr>_size</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
-  </tr><tr class="classvariable">
+    <td>Maximum serialized request size in bytes. Read <tt class="rst-docutils rst-literal">MCP_MAX_REQUEST_SIZE</tt>, then <tt class="rst-docutils rst-literal">HTTP_MAX_BODY_SIZE</tt>, with a final default of 1 MiB.</td>
+  </tr><tr class="instancevariable">
     
-    <td>Class Variable</td>
+    <td>Instance Variable</td>
     <td><code><a href="#max_resource_subscriptions" class="internal-link" title="orionis.mcp.config.McpConfig.max_resource_subscriptions">max<wbr></wbr>_resource<wbr></wbr>_subscriptions</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
-  </tr><tr class="classvariable">
+    <td>Maximum resource subscriptions per request or client context. Read <tt class="rst-docutils rst-literal">MCP_MAX_RESOURCE_SUBSCRIPTIONS</tt> with a default of 64.</td>
+  </tr><tr class="instancevariable">
     
-    <td>Class Variable</td>
+    <td>Instance Variable</td>
     <td><code><a href="#max_response_size" class="internal-link" title="orionis.mcp.config.McpConfig.max_response_size">max<wbr></wbr>_response<wbr></wbr>_size</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
-  </tr><tr class="classvariable">
+    <td>Maximum serialized response size in bytes. Read <tt class="rst-docutils rst-literal">MCP_MAX_RESPONSE_SIZE</tt> with a default of 4 MiB.</td>
+  </tr><tr class="instancevariable">
     
-    <td>Class Variable</td>
+    <td>Instance Variable</td>
     <td><code><a href="#max_subscriptions" class="internal-link" title="orionis.mcp.config.McpConfig.max_subscriptions">max<wbr></wbr>_subscriptions</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
-  </tr><tr class="classvariable">
+    <td>Maximum total event-bus subscriptions. Read <tt class="rst-docutils rst-literal">MCP_MAX_SUBSCRIPTIONS</tt> with a default of 1024.</td>
+  </tr><tr class="instancevariable">
     
-    <td>Class Variable</td>
+    <td>Instance Variable</td>
     <td><code><a href="#subscription_buffer_size" class="internal-link" title="orionis.mcp.config.McpConfig.subscription_buffer_size">subscription<wbr></wbr>_buffer<wbr></wbr>_size</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
-  </tr><tr class="classvariable">
+    <td>Maximum buffered events per subscription. Read <tt class="rst-docutils rst-literal">MCP_SUBSCRIPTION_BUFFER_SIZE</tt> with a default of 64.</td>
+  </tr><tr class="instancevariable">
     
-    <td>Class Variable</td>
+    <td>Instance Variable</td>
     <td><code><a href="#subscription_keepalive" class="internal-link" title="orionis.mcp.config.McpConfig.subscription_keepalive">subscription<wbr></wbr>_keepalive</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
-  </tr><tr class="classvariable">
+    <td>Finite positive interval in seconds between subscription keepalive messages. Read <tt class="rst-docutils rst-literal">MCP_SUBSCRIPTION_KEEPALIVE</tt> with a default of 15.0.</td>
+  </tr><tr class="instancevariable">
     
-    <td>Class Variable</td>
+    <td>Instance Variable</td>
     <td><code><a href="#tool_search_max_calls" class="internal-link" title="orionis.mcp.config.McpConfig.tool_search_max_calls">tool<wbr></wbr>_search<wbr></wbr>_max<wbr></wbr>_calls</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
-  </tr><tr class="classvariable">
+    <td>Maximum tool calls allowed in one catalog execution. Read <tt class="rst-docutils rst-literal">MCP_TOOL_SEARCH_MAX_CALLS</tt> with a default of 5.</td>
+  </tr><tr class="instancevariable">
     
-    <td>Class Variable</td>
+    <td>Instance Variable</td>
     <td><code><a href="#tool_search_max_output_bytes" class="internal-link" title="orionis.mcp.config.McpConfig.tool_search_max_output_bytes">tool<wbr></wbr>_search<wbr></wbr>_max<wbr></wbr>_output<wbr></wbr>_bytes</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
-  </tr><tr class="classvariable">
+    <td>Maximum serialized tool catalog output size in bytes. Read <tt class="rst-docutils rst-literal">MCP_TOOL_SEARCH_MAX_OUTPUT_BYTES</tt> with a default of 256 KiB.</td>
+  </tr><tr class="instancevariable">
     
-    <td>Class Variable</td>
+    <td>Instance Variable</td>
     <td><code><a href="#tool_search_max_results" class="internal-link" title="orionis.mcp.config.McpConfig.tool_search_max_results">tool<wbr></wbr>_search<wbr></wbr>_max<wbr></wbr>_results</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
+    <td>Maximum results returned by a tool catalog search. Read <tt class="rst-docutils rst-literal">MCP_TOOL_SEARCH_MAX_RESULTS</tt> with a default of 20.</td>
   </tr>
 </table>
           
             <p class="inheritedFrom">
               Inherited from <code><a href="orionis.support.entities.BaseEntity.html" class="internal-link" title="orionis.support.entities.BaseEntity">BaseEntity</a></code>:
             </p>
-            <table class="children sortable" id="id1241">
+            <table class="children sortable" id="id1247">
   
   
   <tr class="baseclassmethod">
@@ -842,7 +845,7 @@ exception. Each allowed entry is a serialized HTTP(S) origin.</p>
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">__post_init__</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>):</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/baa8efd19f4de548a718b4c28e48ca2d3639a125/orionis/foundation/config/mcp/entities/mcp.py#L62">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/448bb10d8211ab0a1a02edddc5df3b0874b50fbd/orionis/foundation/config/mcp/entities/mcp.py#L190">
       
       (source)
     </a>
@@ -856,7 +859,7 @@ exception. Each allowed entry is a serialized HTTP(S) origin.</p>
     <div class="interfaceinfo">overrides <code><a href="orionis.support.entities.BaseEntity.html#__post_init__" class="internal-link">orionis.support.entities.BaseEntity.__post_init__</a></code></div>
     <div><p>Reject coercion, unbounded budgets, and ambiguous origin allowlists.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">Retain validated immutable configuration.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/exceptions.html#TypeError" class="intersphinx-link">TypeError</a></code></td><td>If a budget, duration, or origin has an incompatible type.</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/exceptions.html#ValueError" class="intersphinx-link">ValueError</a></code></td><td>If a budget or duration is invalid, or an origin is malformed.</td></tr></table></div>
   </div>
-</div><div class="baseclassvariable">
+</div><div class="baseinstancevariable">
   
   
   <a name="orionis.mcp.config.McpConfig.allowed_origins">
@@ -867,8 +870,8 @@ exception. Each allowed entry is a serialized HTTP(S) origin.</p>
   </a>
   <div class="functionHeader">
     
-    <span class="py-defname">allowed_origins</span>: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" class="intersphinx-link">tuple</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <wbr></wbr><span class="rst-variable-ellipsis">...</span>]</code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/baa8efd19f4de548a718b4c28e48ca2d3639a125/orionis/foundation/config/mcp/entities/mcp.py#L43">
+    <span class="py-defname">allowed_origins</span>: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" class="intersphinx-link">tuple</a>[<a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, ...]</code> =
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/448bb10d8211ab0a1a02edddc5df3b0874b50fbd/orionis/foundation/config/mcp/entities/mcp.py#L139">
       
       (source)
     </a>
@@ -880,10 +883,11 @@ exception. Each allowed entry is a serialized HTTP(S) origin.</p>
   </div>
   <div class="functionBody">
     
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p>Explicit trusted HTTP(S) browser origins without wildcards.
+Read <tt class="rst-docutils rst-literal">CORS_ALLOW_ORIGINS</tt> with a default of an empty tuple.</p></div>
     
   </div>
-</div><div class="baseclassvariable">
+</div><div class="baseinstancevariable">
   
   
   <a name="orionis.mcp.config.McpConfig.default_page_size">
@@ -895,7 +899,7 @@ exception. Each allowed entry is a serialized HTTP(S) origin.</p>
   <div class="functionHeader">
     
     <span class="py-defname">default_page_size</span>: <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/baa8efd19f4de548a718b4c28e48ca2d3639a125/orionis/foundation/config/mcp/entities/mcp.py#L22">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/448bb10d8211ab0a1a02edddc5df3b0874b50fbd/orionis/foundation/config/mcp/entities/mcp.py#L79">
       
       (source)
     </a>
@@ -907,10 +911,11 @@ exception. Each allowed entry is a serialized HTTP(S) origin.</p>
   </div>
   <div class="functionBody">
     
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p>Default number of entries returned by paginated list operations.
+Read <tt class="rst-docutils rst-literal">MCP_DEFAULT_PAGE_SIZE</tt> with a default of 50.</p></div>
     
   </div>
-</div><div class="baseclassvariable">
+</div><div class="baseinstancevariable">
   
   
   <a name="orionis.mcp.config.McpConfig.max_concurrent_requests">
@@ -922,7 +927,7 @@ exception. Each allowed entry is a serialized HTTP(S) origin.</p>
   <div class="functionHeader">
     
     <span class="py-defname">max_concurrent_requests</span>: <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/baa8efd19f4de548a718b4c28e48ca2d3639a125/orionis/foundation/config/mcp/entities/mcp.py#L28">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/448bb10d8211ab0a1a02edddc5df3b0874b50fbd/orionis/foundation/config/mcp/entities/mcp.py#L95">
       
       (source)
     </a>
@@ -934,10 +939,11 @@ exception. Each allowed entry is a serialized HTTP(S) origin.</p>
   </div>
   <div class="functionBody">
     
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p>Maximum concurrent MCP requests. Read <tt class="rst-docutils rst-literal">MCP_MAX_CONCURRENT_REQUESTS</tt>,
+then <tt class="rst-docutils rst-literal">HTTP_MAX_CONCURRENT_REQUESTS</tt>, with a final default of 32.</p></div>
     
   </div>
-</div><div class="baseclassvariable">
+</div><div class="baseinstancevariable">
   
   
   <a name="orionis.mcp.config.McpConfig.max_metadata_size">
@@ -949,7 +955,7 @@ exception. Each allowed entry is a serialized HTTP(S) origin.</p>
   <div class="functionHeader">
     
     <span class="py-defname">max_metadata_size</span>: <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/baa8efd19f4de548a718b4c28e48ca2d3639a125/orionis/foundation/config/mcp/entities/mcp.py#L58">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/448bb10d8211ab0a1a02edddc5df3b0874b50fbd/orionis/foundation/config/mcp/entities/mcp.py#L182">
       
       (source)
     </a>
@@ -961,10 +967,11 @@ exception. Each allowed entry is a serialized HTTP(S) origin.</p>
   </div>
   <div class="functionBody">
     
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p>Maximum serialized request or response metadata size in bytes.
+Read <tt class="rst-docutils rst-literal">MCP_MAX_METADATA_SIZE</tt> with a default of 64 KiB.</p></div>
     
   </div>
-</div><div class="baseclassvariable">
+</div><div class="baseinstancevariable">
   
   
   <a name="orionis.mcp.config.McpConfig.max_page_size">
@@ -976,7 +983,7 @@ exception. Each allowed entry is a serialized HTTP(S) origin.</p>
   <div class="functionHeader">
     
     <span class="py-defname">max_page_size</span>: <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/baa8efd19f4de548a718b4c28e48ca2d3639a125/orionis/foundation/config/mcp/entities/mcp.py#L25">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/448bb10d8211ab0a1a02edddc5df3b0874b50fbd/orionis/foundation/config/mcp/entities/mcp.py#L87">
       
       (source)
     </a>
@@ -988,10 +995,11 @@ exception. Each allowed entry is a serialized HTTP(S) origin.</p>
   </div>
   <div class="functionBody">
     
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p>Maximum entries per page; must be at least <tt class="rst-docutils rst-literal">default_page_size</tt>.
+Read <tt class="rst-docutils rst-literal">MCP_MAX_PAGE_SIZE</tt> with a default of 100.</p></div>
     
   </div>
-</div><div class="baseclassvariable">
+</div><div class="baseinstancevariable">
   
   
   <a name="orionis.mcp.config.McpConfig.max_request_size">
@@ -1003,7 +1011,7 @@ exception. Each allowed entry is a serialized HTTP(S) origin.</p>
   <div class="functionHeader">
     
     <span class="py-defname">max_request_size</span>: <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/baa8efd19f4de548a718b4c28e48ca2d3639a125/orionis/foundation/config/mcp/entities/mcp.py#L19">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/448bb10d8211ab0a1a02edddc5df3b0874b50fbd/orionis/foundation/config/mcp/entities/mcp.py#L69">
       
       (source)
     </a>
@@ -1015,10 +1023,11 @@ exception. Each allowed entry is a serialized HTTP(S) origin.</p>
   </div>
   <div class="functionBody">
     
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p>Maximum serialized request size in bytes. Read <tt class="rst-docutils rst-literal">MCP_MAX_REQUEST_SIZE</tt>,
+then <tt class="rst-docutils rst-literal">HTTP_MAX_BODY_SIZE</tt>, with a final default of 1 MiB.</p></div>
     
   </div>
-</div><div class="baseclassvariable">
+</div><div class="baseinstancevariable">
   
   
   <a name="orionis.mcp.config.McpConfig.max_resource_subscriptions">
@@ -1030,7 +1039,7 @@ exception. Each allowed entry is a serialized HTTP(S) origin.</p>
   <div class="functionHeader">
     
     <span class="py-defname">max_resource_subscriptions</span>: <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/baa8efd19f4de548a718b4c28e48ca2d3639a125/orionis/foundation/config/mcp/entities/mcp.py#L37">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/448bb10d8211ab0a1a02edddc5df3b0874b50fbd/orionis/foundation/config/mcp/entities/mcp.py#L121">
       
       (source)
     </a>
@@ -1042,10 +1051,11 @@ exception. Each allowed entry is a serialized HTTP(S) origin.</p>
   </div>
   <div class="functionBody">
     
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p>Maximum resource subscriptions per request or client context.
+Read <tt class="rst-docutils rst-literal">MCP_MAX_RESOURCE_SUBSCRIPTIONS</tt> with a default of 64.</p></div>
     
   </div>
-</div><div class="baseclassvariable">
+</div><div class="baseinstancevariable">
   
   
   <a name="orionis.mcp.config.McpConfig.max_response_size">
@@ -1057,7 +1067,7 @@ exception. Each allowed entry is a serialized HTTP(S) origin.</p>
   <div class="functionHeader">
     
     <span class="py-defname">max_response_size</span>: <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/baa8efd19f4de548a718b4c28e48ca2d3639a125/orionis/foundation/config/mcp/entities/mcp.py#L55">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/448bb10d8211ab0a1a02edddc5df3b0874b50fbd/orionis/foundation/config/mcp/entities/mcp.py#L174">
       
       (source)
     </a>
@@ -1069,10 +1079,11 @@ exception. Each allowed entry is a serialized HTTP(S) origin.</p>
   </div>
   <div class="functionBody">
     
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p>Maximum serialized response size in bytes.
+Read <tt class="rst-docutils rst-literal">MCP_MAX_RESPONSE_SIZE</tt> with a default of 4 MiB.</p></div>
     
   </div>
-</div><div class="baseclassvariable">
+</div><div class="baseinstancevariable">
   
   
   <a name="orionis.mcp.config.McpConfig.max_subscriptions">
@@ -1084,7 +1095,7 @@ exception. Each allowed entry is a serialized HTTP(S) origin.</p>
   <div class="functionHeader">
     
     <span class="py-defname">max_subscriptions</span>: <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/baa8efd19f4de548a718b4c28e48ca2d3639a125/orionis/foundation/config/mcp/entities/mcp.py#L34">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/448bb10d8211ab0a1a02edddc5df3b0874b50fbd/orionis/foundation/config/mcp/entities/mcp.py#L113">
       
       (source)
     </a>
@@ -1096,10 +1107,11 @@ exception. Each allowed entry is a serialized HTTP(S) origin.</p>
   </div>
   <div class="functionBody">
     
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p>Maximum total event-bus subscriptions.
+Read <tt class="rst-docutils rst-literal">MCP_MAX_SUBSCRIPTIONS</tt> with a default of 1024.</p></div>
     
   </div>
-</div><div class="baseclassvariable">
+</div><div class="baseinstancevariable">
   
   
   <a name="orionis.mcp.config.McpConfig.subscription_buffer_size">
@@ -1111,7 +1123,7 @@ exception. Each allowed entry is a serialized HTTP(S) origin.</p>
   <div class="functionHeader">
     
     <span class="py-defname">subscription_buffer_size</span>: <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/baa8efd19f4de548a718b4c28e48ca2d3639a125/orionis/foundation/config/mcp/entities/mcp.py#L31">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/448bb10d8211ab0a1a02edddc5df3b0874b50fbd/orionis/foundation/config/mcp/entities/mcp.py#L105">
       
       (source)
     </a>
@@ -1123,10 +1135,11 @@ exception. Each allowed entry is a serialized HTTP(S) origin.</p>
   </div>
   <div class="functionBody">
     
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p>Maximum buffered events per subscription.
+Read <tt class="rst-docutils rst-literal">MCP_SUBSCRIPTION_BUFFER_SIZE</tt> with a default of 64.</p></div>
     
   </div>
-</div><div class="baseclassvariable">
+</div><div class="baseinstancevariable">
   
   
   <a name="orionis.mcp.config.McpConfig.subscription_keepalive">
@@ -1138,7 +1151,7 @@ exception. Each allowed entry is a serialized HTTP(S) origin.</p>
   <div class="functionHeader">
     
     <span class="py-defname">subscription_keepalive</span>: <code><a href="https://docs.python.org/3/builtins/functions.html#float" class="intersphinx-link">float</a></code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/baa8efd19f4de548a718b4c28e48ca2d3639a125/orionis/foundation/config/mcp/entities/mcp.py#L40">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/448bb10d8211ab0a1a02edddc5df3b0874b50fbd/orionis/foundation/config/mcp/entities/mcp.py#L131">
       
       (source)
     </a>
@@ -1150,10 +1163,11 @@ exception. Each allowed entry is a serialized HTTP(S) origin.</p>
   </div>
   <div class="functionBody">
     
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p>Finite positive interval in seconds between subscription keepalive messages.
+Read <tt class="rst-docutils rst-literal">MCP_SUBSCRIPTION_KEEPALIVE</tt> with a default of 15.0.</p></div>
     
   </div>
-</div><div class="baseclassvariable">
+</div><div class="baseinstancevariable">
   
   
   <a name="orionis.mcp.config.McpConfig.tool_search_max_calls">
@@ -1165,7 +1179,7 @@ exception. Each allowed entry is a serialized HTTP(S) origin.</p>
   <div class="functionHeader">
     
     <span class="py-defname">tool_search_max_calls</span>: <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/baa8efd19f4de548a718b4c28e48ca2d3639a125/orionis/foundation/config/mcp/entities/mcp.py#L49">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/448bb10d8211ab0a1a02edddc5df3b0874b50fbd/orionis/foundation/config/mcp/entities/mcp.py#L158">
       
       (source)
     </a>
@@ -1177,10 +1191,11 @@ exception. Each allowed entry is a serialized HTTP(S) origin.</p>
   </div>
   <div class="functionBody">
     
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p>Maximum tool calls allowed in one catalog execution.
+Read <tt class="rst-docutils rst-literal">MCP_TOOL_SEARCH_MAX_CALLS</tt> with a default of 5.</p></div>
     
   </div>
-</div><div class="baseclassvariable">
+</div><div class="baseinstancevariable">
   
   
   <a name="orionis.mcp.config.McpConfig.tool_search_max_output_bytes">
@@ -1192,7 +1207,7 @@ exception. Each allowed entry is a serialized HTTP(S) origin.</p>
   <div class="functionHeader">
     
     <span class="py-defname">tool_search_max_output_bytes</span>: <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/baa8efd19f4de548a718b4c28e48ca2d3639a125/orionis/foundation/config/mcp/entities/mcp.py#L52">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/448bb10d8211ab0a1a02edddc5df3b0874b50fbd/orionis/foundation/config/mcp/entities/mcp.py#L166">
       
       (source)
     </a>
@@ -1204,10 +1219,11 @@ exception. Each allowed entry is a serialized HTTP(S) origin.</p>
   </div>
   <div class="functionBody">
     
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p>Maximum serialized tool catalog output size in bytes.
+Read <tt class="rst-docutils rst-literal">MCP_TOOL_SEARCH_MAX_OUTPUT_BYTES</tt> with a default of 256 KiB.</p></div>
     
   </div>
-</div><div class="baseclassvariable">
+</div><div class="baseinstancevariable">
   
   
   <a name="orionis.mcp.config.McpConfig.tool_search_max_results">
@@ -1219,7 +1235,7 @@ exception. Each allowed entry is a serialized HTTP(S) origin.</p>
   <div class="functionHeader">
     
     <span class="py-defname">tool_search_max_results</span>: <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/baa8efd19f4de548a718b4c28e48ca2d3639a125/orionis/foundation/config/mcp/entities/mcp.py#L46">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/448bb10d8211ab0a1a02edddc5df3b0874b50fbd/orionis/foundation/config/mcp/entities/mcp.py#L150">
       
       (source)
     </a>
@@ -1231,7 +1247,8 @@ exception. Each allowed entry is a serialized HTTP(S) origin.</p>
   </div>
   <div class="functionBody">
     
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p>Maximum results returned by a tool catalog search.
+Read <tt class="rst-docutils rst-literal">MCP_TOOL_SEARCH_MAX_RESULTS</tt> with a default of 20.</p></div>
     
   </div>
 </div>
@@ -1245,7 +1262,7 @@ exception. Each allowed entry is a serialized HTTP(S) origin.</p>
   <div class="orionis-footer-inner">
     <div class="orionis-footer-copy">
       <p>API documentation for <a href="https://orionis-framework.com/" class="projecthome">Orionis</a>.</p>
-      <p class="orionis-footer-meta">Generated with <a href="https://github.com/twisted/pydoctor/">Pydoctor</a> 25.10.1.<span class="orionis-footer-build"> Built 2026-10-06 09:50:45.</span></p>
+      <p class="orionis-footer-meta">Generated with <a href="https://github.com/twisted/pydoctor/">Pydoctor</a> 25.10.1.<span class="orionis-footer-build"> Built 2026-10-06 14:50:05.</span></p>
     </div>
     <nav class="orionis-footer-links" aria-label="Additional resources">
       <a href="https://docs.orionis-framework.com">Read the guide <span aria-hidden="true">↗</span></a>

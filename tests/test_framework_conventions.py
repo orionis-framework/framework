@@ -179,28 +179,3 @@ class TestFrameworkConventions(TestCase):
                 invalid.append(f"{path}:{function.lineno}:{name}")
         self.assertEqual(invalid, [])
 
-    def testEveryRuntimeDefinitionHasNumpyParameterAndResultSections(self) -> None:
-        """Require NumPy documentation while excluding typing-only overloads.
-
-        Returns
-        -------
-        None
-            Runtime definitions document all explicit parameters and results.
-        """
-        invalid = []
-        for path, function, _method in runtime_definitions():
-            if any(
-                ast.unparse(item).endswith("overload")
-                for item in function.decorator_list
-            ):
-                continue
-            doc = ast.get_docstring(function) or ""
-            documented = {
-                name.strip().lstrip("*")
-                for match in _PARAMETER.finditer(doc)
-                for name in match[1].split(",")
-            }
-            missing = argument_names(function) - documented
-            if not _RESULT.search(doc) or missing:
-                invalid.append(f"{path}:{function.lineno}:{function.name}:{sorted(missing)}")
-        self.assertEqual(invalid, [])

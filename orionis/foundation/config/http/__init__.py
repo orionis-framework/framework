@@ -4,6 +4,7 @@ from orionis.foundation.config.http.entitites.csrf import HTTPCsrf
 from orionis.foundation.config.http.entitites.http import HTTP
 from orionis.foundation.config.http.entitites.proxies import HTTPProxies
 from orionis.foundation.config.http.entitites.rate_limit import HTTPRateLimit
+from orionis.foundation.config.http.entitites.redis import Redis
 from orionis.foundation.config.http.entitites.security import HTTPSecurity
 from orionis.foundation.config.http.entitites.websocket import HTTPWebSocket
 
@@ -16,4 +17,5 @@ __all__ = [
     "HTTPRateLimit",
     "HTTPSecurity",
     "HTTPWebSocket",
+    "Redis",
 ]

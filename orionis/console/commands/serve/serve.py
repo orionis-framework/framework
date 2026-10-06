@@ -111,25 +111,19 @@ class ServerCommand(BaseCommand):
     # Command builder
     # -------------------------------------------------------------------------
 
-    def __configureBytecodeWriting(self, app: IApplication) -> None:
+    def __configureBytecodeWriting(self) -> None:
         """
-        Configure bytecode-writing flags based on the current environment.
-
-        Parameters
-        ----------
-        app : IApplication
-            The running application instance.
+        Disable bytecode writes in this interpreter and all server processes.
 
         Returns
         -------
         None
             This method does not return a value.
         """
-        is_production: bool = app.isProduction()
-        # Disable bytecode in development; allow it in production.
-        self.__env["PYTHONDONTWRITEBYTECODE"] = "0" if is_production else "1"
-        if not is_production:
-            self.__cmd.append("-B")
+        sys.dont_write_bytecode = True
+        os.environ["PYTHONDONTWRITEBYTECODE"] = "1"
+        self.__env["PYTHONDONTWRITEBYTECODE"] = "1"
+        self.__cmd.append("-B")
 
     def __appendHostAndPortToCommand(self, app: IApplication) -> None:
         """
@@ -539,8 +533,9 @@ class ServerCommand(BaseCommand):
 
         Notes
         -----
-        Passes the copied environment to the subprocess without changing
-        environment variables in the parent process.
+        Passes the copied environment to the subprocess. Server-specific
+        settings remain isolated; bytecode protection is also enforced in
+        the parent process.
 
         Uses ``asyncio.create_subprocess_exec`` so that ``await proc.wait()``
         is directly cancellable by the event loop.  On ``CancelledError``
@@ -623,7 +618,7 @@ class ServerCommand(BaseCommand):
             self.__cmd = [sys.executable.replace("\\", "/")]
             self.__call_in_shutdown = None
 
-            self.__configureBytecodeWriting(app)
+            self.__configureBytecodeWriting()
             self.__appendHostAndPortToCommand(app)
             self.__appendInterfaceToCommand()
             self.__appendWorkersToCommand()

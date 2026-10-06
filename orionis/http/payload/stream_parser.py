@@ -1,6 +1,7 @@
 from __future__ import annotations
 from asyncio import CancelledError, create_task, shield, to_thread
 from contextlib import suppress
+from dataclasses import fields
 from sys import getsizeof
 from typing import TYPE_CHECKING
 from orionis.foundation.config.http.entitites.body import HTTPBodyLimits
@@ -11,6 +12,10 @@ from orionis.http.payload.part import MultipartPart
 
 if TYPE_CHECKING:
     from collections.abc import AsyncIterable, AsyncIterator, Callable
+
+_DEFAULT_LIMITS = {
+    item.name: item.metadata["default"] for item in fields(HTTPBodyLimits)
+}
 
 # Integer constants for the parser state machine.
 _STATE_SEARCH_BOUNDARY: int = 0
@@ -96,14 +101,14 @@ class MultipartStreamParser(IMultipartStreamParser):
         stream: AsyncIterable[bytes],
         boundary: bytes,
         *,
-        max_files: int = HTTPBodyLimits.max_files,
-        max_fields: int = HTTPBodyLimits.max_fields,
-        max_part_size: int = HTTPBodyLimits.max_part_size,
-        memory_threshold: int = HTTPBodyLimits.memory_threshold,
-        max_header_size: int = HTTPBodyLimits.max_header_size,
-        max_body_size: int = HTTPBodyLimits.max_body_size,
-        max_field_size: int = HTTPBodyLimits.max_field_size,
-        max_memory_size: int = HTTPBodyLimits.max_memory_size,
+        max_files: int = _DEFAULT_LIMITS["max_files"],
+        max_fields: int = _DEFAULT_LIMITS["max_fields"],
+        max_part_size: int = _DEFAULT_LIMITS["max_part_size"],
+        memory_threshold: int = _DEFAULT_LIMITS["memory_threshold"],
+        max_header_size: int = _DEFAULT_LIMITS["max_header_size"],
+        max_body_size: int = _DEFAULT_LIMITS["max_body_size"],
+        max_field_size: int = _DEFAULT_LIMITS["max_field_size"],
+        max_memory_size: int = _DEFAULT_LIMITS["max_memory_size"],
     ) -> None:
         """
         Initialize a new ``MultipartStreamParser`` instance.
@@ -148,6 +153,8 @@ class MultipartStreamParser(IMultipartStreamParser):
             max_part_size=max_part_size, memory_threshold=memory_threshold,
             max_header_size=max_header_size, max_field_size=max_field_size,
             max_memory_size=max_memory_size,
+            max_buffer_size=_DEFAULT_LIMITS["max_buffer_size"],
+            max_concurrent_requests=_DEFAULT_LIMITS["max_concurrent_requests"],
         )
         # Store the async stream for deferred consumption.
         self.stream = stream

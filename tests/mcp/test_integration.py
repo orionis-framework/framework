@@ -207,7 +207,7 @@ class TestMcpIntegration(TestCase):
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)
             (root / "ai.py").write_text(
-                "from orionis.support.facades.mcp import Mcp\n"
+                "from orionis.support.facades import Mcp\n"
                 "from tests.mcp.test_integration import ExampleServer\n"
                 "Mcp.web('/mcp/ai', ExampleServer)\n"
                 "Mcp.local('ai', ExampleServer)\n",

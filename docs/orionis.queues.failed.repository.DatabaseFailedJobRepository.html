@@ -315,7 +315,7 @@
         
         
             <div class="itemName expandableItem">
-                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId24258"> 
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId24280"> 
                     
                 </input>
 
@@ -550,7 +550,7 @@
         </div>
 
         <div class="extrasDocstring">
-          <p class="class-signature"><code><span class="py-keyword">class</span> <span class="py-defname">DatabaseFailedJobRepository</span>(<a href="orionis.queues.contracts.failed_repository.IFailedJobRepository.html" class="internal-link" title="orionis.queues.contracts.failed_repository.IFailedJobRepository">IFailedJobRepository</a>): <a href="https://github.com/orionis-framework/framework/tree/c39ce1829b17817223a69d6adb68013c8e39e43c/orionis/queues/failed/repository.py#L22" class="sourceLink">(source)</a></code></p><p>Constructor: <code><a href="#__init__" class="internal-link" title="orionis.queues.failed.repository.DatabaseFailedJobRepository.__init__">DatabaseFailedJobRepository(connection, table)</a></code></p><p><a href="classIndex.html#orionis.queues.failed.repository.DatabaseFailedJobRepository">View In Hierarchy</a></p>
+          <p class="class-signature"><code><span class="py-keyword">class</span> <span class="py-defname">DatabaseFailedJobRepository</span>(<a href="orionis.queues.contracts.failed_repository.IFailedJobRepository.html" class="internal-link" title="orionis.queues.contracts.failed_repository.IFailedJobRepository">IFailedJobRepository</a>): <a href="https://github.com/orionis-framework/framework/tree/907defd08409198612ca5d10e6618332a9fec08a/orionis/queues/failed/repository.py#L22" class="sourceLink">(source)</a></code></p><p>Constructor: <code><a href="#__init__" class="internal-link" title="orionis.queues.failed.repository.DatabaseFailedJobRepository.__init__">DatabaseFailedJobRepository(connection, table)</a></code></p><p><a href="classIndex.html#orionis.queues.failed.repository.DatabaseFailedJobRepository">View In Hierarchy</a></p>
         </div>
 
         <div class="moduleDocstring">
@@ -558,7 +558,7 @@
         </div>
 
         <div id="split-tables">
-          <table class="children sortable" id="id1673">
+          <table class="children sortable" id="id1678">
   
   
   <tr class="method">
@@ -642,7 +642,7 @@
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">__init__</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">connection: <code>IConnection</code>, </span><span class="rst-sig-param">table: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code> = <span class="rst-variable-quote">'</span><span class="rst-variable-string">failed_jobs</span><span class="rst-variable-quote">'</span></span>):</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/c39ce1829b17817223a69d6adb68013c8e39e43c/orionis/queues/failed/repository.py#L27">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/907defd08409198612ca5d10e6618332a9fec08a/orionis/queues/failed/repository.py#L27">
       
       (source)
     </a>
@@ -669,7 +669,7 @@
     
     
     <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">_ensureSchema</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>):</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/c39ce1829b17817223a69d6adb68013c8e39e43c/orionis/queues/failed/repository.py#L48">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/907defd08409198612ca5d10e6618332a9fec08a/orionis/queues/failed/repository.py#L48">
       
       (source)
     </a>
@@ -696,7 +696,7 @@
     
     
     <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">all</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" class="intersphinx-link">tuple</a>[<wbr></wbr><a href="orionis.queues.entities.failed_job.FailedJob.html" class="internal-link" title="orionis.queues.entities.failed_job.FailedJob">FailedJob</a>, <wbr></wbr><span class="rst-variable-ellipsis">...</span>]</code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/c39ce1829b17817223a69d6adb68013c8e39e43c/orionis/queues/failed/repository.py#L125">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/907defd08409198612ca5d10e6618332a9fec08a/orionis/queues/failed/repository.py#L125">
       
       (source)
     </a>
@@ -723,7 +723,7 @@
     
     
     <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">close</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>):</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/c39ce1829b17817223a69d6adb68013c8e39e43c/orionis/queues/failed/repository.py#L183">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/907defd08409198612ca5d10e6618332a9fec08a/orionis/queues/failed/repository.py#L183">
       
       (source)
     </a>
@@ -750,7 +750,7 @@
     
     
     <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">find</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">failure_id: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></span>) -&gt; <code><a href="orionis.queues.entities.failed_job.FailedJob.html" class="internal-link" title="orionis.queues.entities.failed_job.FailedJob">FailedJob</a> | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/c39ce1829b17817223a69d6adb68013c8e39e43c/orionis/queues/failed/repository.py#L141">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/907defd08409198612ca5d10e6618332a9fec08a/orionis/queues/failed/repository.py#L141">
       
       (source)
     </a>
@@ -777,7 +777,7 @@
     
     
     <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">forget</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">failure_id: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/c39ce1829b17817223a69d6adb68013c8e39e43c/orionis/queues/failed/repository.py#L163">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/907defd08409198612ca5d10e6618332a9fec08a/orionis/queues/failed/repository.py#L163">
       
       (source)
     </a>
@@ -804,7 +804,7 @@
     
     
     <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">record</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">reserved: <code><a href="orionis.queues.entities.reserved_job.ReservedJob.html" class="internal-link" title="orionis.queues.entities.reserved_job.ReservedJob">ReservedJob</a></code>, </span><span class="rst-sig-param">connection: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code>, </span><span class="rst-sig-param">exception: <code><a href="https://docs.python.org/3/builtins/exceptions.html#Exception" class="intersphinx-link">Exception</a></code></span>) -&gt; <code><a href="orionis.queues.entities.failed_job.FailedJob.html" class="internal-link" title="orionis.queues.entities.failed_job.FailedJob">FailedJob</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/c39ce1829b17817223a69d6adb68013c8e39e43c/orionis/queues/failed/repository.py#L74">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/907defd08409198612ca5d10e6618332a9fec08a/orionis/queues/failed/repository.py#L74">
       
       (source)
     </a>
@@ -830,7 +830,7 @@
   <div class="functionHeader">
     
     <span class="py-defname">__slots__</span>: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" class="intersphinx-link">tuple</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <wbr></wbr><span class="rst-variable-ellipsis">...</span>]</code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/c39ce1829b17817223a69d6adb68013c8e39e43c/orionis/queues/failed/repository.py#L25">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/907defd08409198612ca5d10e6618332a9fec08a/orionis/queues/failed/repository.py#L25">
       
       (source)
     </a>
@@ -857,7 +857,7 @@
   <div class="functionHeader">
     
     <span class="py-defname">_connection</span> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/c39ce1829b17817223a69d6adb68013c8e39e43c/orionis/queues/failed/repository.py#L43">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/907defd08409198612ca5d10e6618332a9fec08a/orionis/queues/failed/repository.py#L43">
       
       (source)
     </a>
@@ -884,7 +884,7 @@
   <div class="functionHeader">
     
     <span class="py-defname">_definition</span> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/c39ce1829b17817223a69d6adb68013c8e39e43c/orionis/queues/failed/repository.py#L44">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/907defd08409198612ca5d10e6618332a9fec08a/orionis/queues/failed/repository.py#L44">
       
       (source)
     </a>
@@ -911,7 +911,7 @@
   <div class="functionHeader">
     
     <span class="py-defname">_ready</span>: <code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/c39ce1829b17817223a69d6adb68013c8e39e43c/orionis/queues/failed/repository.py#L45">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/907defd08409198612ca5d10e6618332a9fec08a/orionis/queues/failed/repository.py#L45">
       
       (source)
     </a>
@@ -938,7 +938,7 @@
   <div class="functionHeader">
     
     <span class="py-defname">_ready_lock</span> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/c39ce1829b17817223a69d6adb68013c8e39e43c/orionis/queues/failed/repository.py#L46">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/907defd08409198612ca5d10e6618332a9fec08a/orionis/queues/failed/repository.py#L46">
       
       (source)
     </a>
@@ -964,7 +964,7 @@
   <div class="orionis-footer-inner">
     <div class="orionis-footer-copy">
       <p>API documentation for <a href="https://orionis-framework.com/" class="projecthome">Orionis</a>.</p>
-      <p class="orionis-footer-meta">Generated with <a href="https://github.com/twisted/pydoctor/">Pydoctor</a> 25.10.1.<span class="orionis-footer-build"> Built 2026-10-06 21:05:02.</span></p>
+      <p class="orionis-footer-meta">Generated with <a href="https://github.com/twisted/pydoctor/">Pydoctor</a> 25.10.1.<span class="orionis-footer-build"> Built 2026-10-07 12:34:04.</span></p>
     </div>
     <nav class="orionis-footer-links" aria-label="Additional resources">
       <a href="https://docs.orionis-framework.com">Read the guide <span aria-hidden="true">↗</span></a>

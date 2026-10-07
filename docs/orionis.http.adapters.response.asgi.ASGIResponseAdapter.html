@@ -490,7 +490,7 @@
         </div>
 
         <div class="extrasDocstring">
-          <p class="class-signature"><code><span class="py-keyword">class</span> <span class="py-defname">ASGIResponseAdapter</span>(<a href="orionis.http.adapters.response.contracts.response.ResponseAdapter.html" class="internal-link" title="orionis.http.adapters.response.contracts.response.ResponseAdapter">ResponseAdapter</a>): <a href="https://github.com/orionis-framework/framework/tree/c39ce1829b17817223a69d6adb68013c8e39e43c/orionis/http/adapters/response/asgi.py#L15" class="sourceLink">(source)</a></code></p><p><a href="classIndex.html#orionis.http.adapters.response.asgi.ASGIResponseAdapter">View In Hierarchy</a></p>
+          <p class="class-signature"><code><span class="py-keyword">class</span> <span class="py-defname">ASGIResponseAdapter</span>(<a href="orionis.http.adapters.response.contracts.response.ResponseAdapter.html" class="internal-link" title="orionis.http.adapters.response.contracts.response.ResponseAdapter">ResponseAdapter</a>): <a href="https://github.com/orionis-framework/framework/tree/907defd08409198612ca5d10e6618332a9fec08a/orionis/http/adapters/response/asgi.py#L15" class="sourceLink">(source)</a></code></p><p><a href="classIndex.html#orionis.http.adapters.response.asgi.ASGIResponseAdapter">View In Hierarchy</a></p>
         </div>
 
         <div class="moduleDocstring">
@@ -567,7 +567,7 @@
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">__ensureContentLength</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">headers: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#list" class="intersphinx-link">list</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" class="intersphinx-link">tuple</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#bytes" class="intersphinx-link">bytes</a>, <wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#bytes" class="intersphinx-link">bytes</a>]]</code>, </span><span class="rst-sig-param">response: <code>Response</code></span>):</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/c39ce1829b17817223a69d6adb68013c8e39e43c/orionis/http/adapters/response/asgi.py#L253">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/907defd08409198612ca5d10e6618332a9fec08a/orionis/http/adapters/response/asgi.py#L253">
       
       (source)
     </a>
@@ -594,7 +594,7 @@
     
     
     <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">__fileRangeIterator</span><span class="function-signature long-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">path: <code><a href="https://docs.python.org/3/library/pathlib.html#pathlib.Path" class="intersphinx-link">Path</a></code>, </span><span class="rst-sig-param">start: <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code>, </span><span class="rst-sig-param">end: <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code>, </span><span class="rst-sig-param">chunk_size: <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code> = 64 * 1024</span>) -&gt; <code><a href="https://docs.python.org/3/library/collections.abc.html#collections.abc.AsyncGenerator" class="intersphinx-link">AsyncGenerator</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#bytes" class="intersphinx-link">bytes</a>]</code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/c39ce1829b17817223a69d6adb68013c8e39e43c/orionis/http/adapters/response/asgi.py#L282">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/907defd08409198612ca5d10e6618332a9fec08a/orionis/http/adapters/response/asgi.py#L282">
       
       (source)
     </a>
@@ -621,7 +621,7 @@
     
     
     <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">__sendHead</span><span class="function-signature long-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">response: <code>Response</code>, </span><span class="rst-sig-param">status: <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code>, </span><span class="rst-sig-param">headers: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#list" class="intersphinx-link">list</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" class="intersphinx-link">tuple</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#bytes" class="intersphinx-link">bytes</a>, <wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#bytes" class="intersphinx-link">bytes</a>]]</code>, </span><span class="rst-sig-param">send: <code><a href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Callable" class="intersphinx-link">Callable</a>[<wbr></wbr><span class="rst-variable-ellipsis">...</span>, <wbr></wbr><a href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Awaitable" class="intersphinx-link">Awaitable</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a>]]</code></span>):</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/c39ce1829b17817223a69d6adb68013c8e39e43c/orionis/http/adapters/response/asgi.py#L133">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/907defd08409198612ca5d10e6618332a9fec08a/orionis/http/adapters/response/asgi.py#L133">
       
       (source)
     </a>
@@ -648,7 +648,7 @@
     
     
     <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">__sendStream</span><span class="function-signature long-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">iterator: <code><a href="https://docs.python.org/3/library/collections.abc.html#collections.abc.AsyncIterator" class="intersphinx-link">AsyncIterator</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#bytes" class="intersphinx-link">bytes</a>]</code>, </span><span class="rst-sig-param">status: <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code>, </span><span class="rst-sig-param">headers: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#list" class="intersphinx-link">list</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" class="intersphinx-link">tuple</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#bytes" class="intersphinx-link">bytes</a>, <wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#bytes" class="intersphinx-link">bytes</a>]]</code>, </span><span class="rst-sig-param">send: <code><a href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Callable" class="intersphinx-link">Callable</a>[<wbr></wbr><span class="rst-variable-ellipsis">...</span>, <wbr></wbr><a href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Awaitable" class="intersphinx-link">Awaitable</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a>]]</code></span>):</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/c39ce1829b17817223a69d6adb68013c8e39e43c/orionis/http/adapters/response/asgi.py#L209">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/907defd08409198612ca5d10e6618332a9fec08a/orionis/http/adapters/response/asgi.py#L209">
       
       (source)
     </a>
@@ -675,7 +675,7 @@
     
     
     <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">__waitDisconnect</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">receive: <code><a href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Callable" class="intersphinx-link">Callable</a>[<wbr></wbr><span class="rst-variable-ellipsis">...</span>, <wbr></wbr><a href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Awaitable" class="intersphinx-link">Awaitable</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#dict" class="intersphinx-link">dict</a>]]</code></span>):</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/c39ce1829b17817223a69d6adb68013c8e39e43c/orionis/http/adapters/response/asgi.py#L180">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/907defd08409198612ca5d10e6618332a9fec08a/orionis/http/adapters/response/asgi.py#L180">
       
       (source)
     </a>
@@ -702,7 +702,7 @@
     
     
     <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">send</span><span class="function-signature long-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">adapter: <code><a href="orionis.http.adapters.request.contracts.transport.TransportAdapter.html" class="internal-link" title="orionis.http.adapters.request.contracts.transport.TransportAdapter">TransportAdapter</a></code>, </span><span class="rst-sig-param">response: <code>Response</code>, </span><span class="rst-sig-param">_receive: <code><a href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Callable" class="intersphinx-link">Callable</a>[<wbr></wbr><span class="rst-variable-ellipsis">...</span>, <wbr></wbr><a href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Awaitable" class="intersphinx-link">Awaitable</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#dict" class="intersphinx-link">dict</a>]]</code>, </span><span class="rst-sig-param">send: <code><a href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Callable" class="intersphinx-link">Callable</a>[<wbr></wbr><span class="rst-variable-ellipsis">...</span>, <wbr></wbr><a href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Awaitable" class="intersphinx-link">Awaitable</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a>]]</code></span>):</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/c39ce1829b17817223a69d6adb68013c8e39e43c/orionis/http/adapters/response/asgi.py#L22">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/907defd08409198612ca5d10e6618332a9fec08a/orionis/http/adapters/response/asgi.py#L22">
       
       (source)
     </a>
@@ -730,7 +730,7 @@ an event stream, which owns receive during response delivery.</td></tr><tr><td c
   <div class="functionHeader">
     
     <span class="py-defname">RESPONSE_BODY</span>: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/c39ce1829b17817223a69d6adb68013c8e39e43c/orionis/http/adapters/response/asgi.py#L18">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/907defd08409198612ca5d10e6618332a9fec08a/orionis/http/adapters/response/asgi.py#L18">
       
       (source)
     </a>
@@ -757,7 +757,7 @@ an event stream, which owns receive during response delivery.</td></tr><tr><td c
   <div class="functionHeader">
     
     <span class="py-defname">RESPONSE_START</span>: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/c39ce1829b17817223a69d6adb68013c8e39e43c/orionis/http/adapters/response/asgi.py#L17">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/907defd08409198612ca5d10e6618332a9fec08a/orionis/http/adapters/response/asgi.py#L17">
       
       (source)
     </a>
@@ -784,7 +784,7 @@ an event stream, which owns receive during response delivery.</td></tr><tr><td c
   <div class="functionHeader">
     
     <span class="py-defname">__slots__</span>: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" class="intersphinx-link">tuple</a></code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/c39ce1829b17817223a69d6adb68013c8e39e43c/orionis/http/adapters/response/asgi.py#L20">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/907defd08409198612ca5d10e6618332a9fec08a/orionis/http/adapters/response/asgi.py#L20">
       
       (source)
     </a>
@@ -810,7 +810,7 @@ an event stream, which owns receive during response delivery.</td></tr><tr><td c
   <div class="orionis-footer-inner">
     <div class="orionis-footer-copy">
       <p>API documentation for <a href="https://orionis-framework.com/" class="projecthome">Orionis</a>.</p>
-      <p class="orionis-footer-meta">Generated with <a href="https://github.com/twisted/pydoctor/">Pydoctor</a> 25.10.1.<span class="orionis-footer-build"> Built 2026-10-06 21:05:02.</span></p>
+      <p class="orionis-footer-meta">Generated with <a href="https://github.com/twisted/pydoctor/">Pydoctor</a> 25.10.1.<span class="orionis-footer-build"> Built 2026-10-07 12:34:04.</span></p>
     </div>
     <nav class="orionis-footer-links" aria-label="Additional resources">
       <a href="https://docs.orionis-framework.com">Read the guide <span aria-hidden="true">↗</span></a>

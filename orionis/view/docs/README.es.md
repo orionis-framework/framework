@@ -216,7 +216,9 @@ Las rutas y el directorio de caché pueden ser absolutos; los valores relativos 
 
 ## Integración con Orionis
 
-El proveedor registra estos globals: `app`, `asset`, `secure_asset`, `cache`, `collect`, `config`, `csrf_field`, `csrf_token`, `dump`, `encrypt`, `decrypt`, `errors`, `flash`, `framework_version`, `python_version`, `now`, `today`, `old`, `request`, `route`, `session`, `stringable`, `url`, `secure_url`, `trans`/`__`, `choice`, `locale` y `locales`.
+El proveedor registra estos globals: `app`, `asset`, `secure_asset`, `auth`, `cache`, `collect`, `config`, `csrf_field`, `csrf_token`, `dump`, `encrypt`, `decrypt`, `errors`, `flash`, `framework_version`, `python_version`, `now`, `today`, `old`, `request`, `route`, `session`, `stringable`, `url`, `secure_url`, `trans`/`__`, `choice`, `locale` y `locales`.
+
+`auth()` devuelve la fachada pública `Auth` de `orionis.support.facades`. Consulta la identidad de la petición actual con `auth().user()`, o comprueba `auth().check()` y `auth().guest()`. Los invitados no tienen usuario, por lo que debes proteger el acceso a sus atributos con `{% if auth().check() %}`. En layouts autenticados, `{% set user = auth().user() %}` evita pasar un usuario desde cada controlador. El global no almacena una identidad en caché.
 
 Muchos globals son asíncronos porque resuelven estado del framework vinculado al ámbito. El renderer asíncrono de Jinja espera sus valores; las llamadas explícitas en plantillas pueden usar `await` como en el inicio rápido. Los filtros `json` y `markdown` y la extensión `{% csrf %}` se instalan automáticamente.
 

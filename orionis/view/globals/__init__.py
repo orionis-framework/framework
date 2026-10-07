@@ -1,5 +1,6 @@
 from orionis.view.globals.app import _global_app
 from orionis.view.globals.asset import _global_asset, _global_secure_asset
+from orionis.view.globals.auth import _global_auth
 from orionis.view.globals.bcrypt import _global_decrypt, _global_encrypt
 from orionis.view.globals.cache import _global_cache
 from orionis.view.globals.collection import _global_collect
@@ -29,6 +30,7 @@ from orionis.view.globals.version import (
 __all__ = [
     "_global_app",
     "_global_asset",
+    "_global_auth",
     "_global_cache",
     "_global_choice",
     "_global_collect",

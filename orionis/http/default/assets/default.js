@@ -51,6 +51,9 @@
             }
             if (selectFrame(this.getAttribute('data-frame-target'))) {
                 event.preventDefault();
+                var selected = document.getElementById(this.getAttribute('data-frame-target'));
+                selected.focus({preventScroll: true});
+                selected.scrollIntoView({block: 'nearest'});
             }
         }
         function selectLocationFrame() {
@@ -64,6 +67,44 @@
         }
         selectLocationFrame();
         window.addEventListener('hashchange', selectLocationFrame);
+    }
+
+    function enableCopyReport() {
+        var button = document.getElementById('copy-exception');
+        var status = document.getElementById('copy-status');
+        if (!button || !status || !navigator.clipboard || !navigator.clipboard.writeText) {
+            return;
+        }
+        button.removeAttribute('hidden');
+        button.addEventListener('click', function () {
+            var report = [
+                document.getElementById('main-error').textContent,
+                document.getElementById('main-description').textContent,
+                document.getElementById('request-method').textContent + ' ' +
+                    document.getElementById('request-path').textContent
+            ];
+            var frames = document.querySelectorAll('[data-trace-frame]');
+            for (var index = 0; index < frames.length; index += 1) {
+                var values = frames[index].querySelectorAll('.file-info-value');
+                report.push('\n' + values[0].textContent.trim() + ':' + values[1].textContent.trim());
+                var rows = frames[index].querySelectorAll('.source-row');
+                for (var row = 0; row < rows.length; row += 1) {
+                    report.push(rows[row].querySelector('.source-number').textContent + ' ' +
+                        rows[row].querySelector('.source-code').textContent);
+                }
+            }
+            button.disabled = true;
+            status.textContent = '';
+            navigator.clipboard.writeText(report.join('\n')).then(function () {
+                button.disabled = false;
+                button.title = 'Report copied';
+                status.textContent = 'Exception report copied.';
+            }, function () {
+                button.disabled = false;
+                button.title = 'Copy exception report';
+                status.textContent = 'The exception report could not be copied.';
+            });
+        });
     }
 
     function highlightSource() {
@@ -104,6 +145,7 @@
         startClock();
         enableTraceNavigation();
         highlightSource();
+        enableCopyReport();
     }
     if (document.readyState === 'loading') {
         document.addEventListener('DOMContentLoaded', initialize);

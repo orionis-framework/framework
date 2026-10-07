@@ -89,7 +89,7 @@ def create_application() -> Application:
     routes = Path.cwd() / "routes"
     routes.mkdir(exist_ok=True)
     (routes / "realtime.py").write_text(
-        "from orionis.support.facades.router import Route\n"
+        "from orionis.support.facades import Route\n"
         "from tests.realtime.test_integration import SmokeHub, echo\n"
         'Route.websocket("/echo", echo)\n'
         'Route.hub("/json", SmokeHub)\n'

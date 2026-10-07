@@ -413,7 +413,10 @@ class TestDefaultTemplates(TestCase):
         self.assertIn(payload, text)
         self.assertEqual(response.getStatusCode(), 500)
         self.assertNotIn(b"<script>probe()", response.getBody())
-        self.assertNotIn("img", [tag for tag, _ in page.elements])
+        self.assertEqual(
+            [attrs.get("src") for tag, attrs in page.elements if tag == "img"],
+            [f"{DefaultResponses.ASSET_PREFIX}orionis-mark.png"],
+        )
         self._assertLocalResources(page)
 
     async def testConcurrentErrorRendersKeepDescriptionsAndHeadersSeparate(
@@ -580,6 +583,13 @@ class TestDefaultTemplates(TestCase):
             ("fonts/orbitron.ttf", "font/ttf"),
             ("fonts/share-tech-mono.ttf", "font/ttf"),
             ("fonts/fira-code.ttf", "font/ttf"),
+            ("fonts/titillium-web-400-latin.woff2", "font/woff2"),
+            ("fonts/titillium-web-400-latin-ext.woff2", "font/woff2"),
+            ("fonts/titillium-web-600-latin.woff2", "font/woff2"),
+            ("fonts/titillium-web-600-latin-ext.woff2", "font/woff2"),
+            ("fonts/titillium-web-700-latin.woff2", "font/woff2"),
+            ("fonts/titillium-web-700-latin-ext.woff2", "font/woff2"),
+            ("orionis-mark.png", "image/png"),
             ("favicon.ico", "image/x-icon"),
         ):
             with self.subTest(asset=name):

@@ -470,7 +470,7 @@
         </div>
 
         <div class="extrasDocstring">
-          <p class="class-signature"><code><span class="py-keyword">class</span> <span class="py-defname">IWebSocketTransport</span>(<a href="https://docs.python.org/3/library/abc.html#abc.ABC" class="intersphinx-link">ABC</a>): <a href="https://github.com/orionis-framework/framework/tree/dbaa747abe61f50f5dea7d99d3850214a1e71285/orionis/http/adapters/websocket/contracts/transport.py#L8" class="sourceLink">(source)</a></code></p><p>Known subclasses: <code><a href="orionis.http.adapters.websocket.asgi.ASGIWebSocketTransport.html" class="internal-link">orionis.http.adapters.websocket.asgi.ASGIWebSocketTransport</a></code>, <code><a href="orionis.http.adapters.websocket.rsgi.RSGIWebSocketTransport.html" class="internal-link">orionis.http.adapters.websocket.rsgi.RSGIWebSocketTransport</a></code></p><p><a href="classIndex.html#orionis.http.adapters.websocket.contracts.transport.IWebSocketTransport">View In Hierarchy</a></p>
+          <p class="class-signature"><code><span class="py-keyword">class</span> <span class="py-defname">IWebSocketTransport</span>(<a href="https://docs.python.org/3/library/abc.html#abc.ABC" class="intersphinx-link">ABC</a>): <a href="https://github.com/orionis-framework/framework/tree/c39ce1829b17817223a69d6adb68013c8e39e43c/orionis/http/adapters/websocket/contracts/transport.py#L8" class="sourceLink">(source)</a></code></p><p>Known subclasses: <code><a href="orionis.http.adapters.websocket.asgi.ASGIWebSocketTransport.html" class="internal-link">orionis.http.adapters.websocket.asgi.ASGIWebSocketTransport</a></code>, <code><a href="orionis.http.adapters.websocket.rsgi.RSGIWebSocketTransport.html" class="internal-link">orionis.http.adapters.websocket.rsgi.RSGIWebSocketTransport</a></code></p><p><a href="classIndex.html#orionis.http.adapters.websocket.contracts.transport.IWebSocketTransport">View In Hierarchy</a></p>
         </div>
 
         <div class="moduleDocstring">
@@ -542,7 +542,7 @@
     
     <div><span class="decorator">@<a href="https://docs.python.org/3/library/abc.html#abc.abstractmethod" class="intersphinx-link">abstractmethod</a><br /></span></div>
     <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">accept</span><span class="function-signature long-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-symbol">*, </span><span class="rst-sig-param">subprotocol: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a> | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code> = <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a>, </span><span class="rst-sig-param">headers: <code><a href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Mapping" class="intersphinx-link">Mapping</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>] | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code> = <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></span>):</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/dbaa747abe61f50f5dea7d99d3850214a1e71285/orionis/http/adapters/websocket/contracts/transport.py#L25">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/c39ce1829b17817223a69d6adb68013c8e39e43c/orionis/http/adapters/websocket/contracts/transport.py#L25">
       
       (source)
     </a>
@@ -569,7 +569,7 @@
     
     <div><span class="decorator">@<a href="https://docs.python.org/3/library/abc.html#abc.abstractmethod" class="intersphinx-link">abstractmethod</a><br /></span></div>
     <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">close</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">code: <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code> = 1000, </span><span class="rst-sig-param">reason: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code> = <span class="rst-variable-quote">'</span><span class="rst-variable-string"></span><span class="rst-variable-quote">'</span></span>):</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/dbaa747abe61f50f5dea7d99d3850214a1e71285/orionis/http/adapters/websocket/contracts/transport.py#L89">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/c39ce1829b17817223a69d6adb68013c8e39e43c/orionis/http/adapters/websocket/contracts/transport.py#L89">
       
       (source)
     </a>
@@ -596,7 +596,7 @@
     
     <div><span class="decorator">@<a href="https://docs.python.org/3/library/abc.html#abc.abstractmethod" class="intersphinx-link">abstractmethod</a><br /></span></div>
     <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">receive</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>) -&gt; <code>WebSocketMessage</code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/dbaa747abe61f50f5dea7d99d3850214a1e71285/orionis/http/adapters/websocket/contracts/transport.py#L46">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/c39ce1829b17817223a69d6adb68013c8e39e43c/orionis/http/adapters/websocket/contracts/transport.py#L46">
       
       (source)
     </a>
@@ -623,7 +623,7 @@
     
     <div><span class="decorator">@<a href="https://docs.python.org/3/library/abc.html#abc.abstractmethod" class="intersphinx-link">abstractmethod</a><br /></span></div>
     <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">reject</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">status_code: <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code> = 403</span>):</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/dbaa747abe61f50f5dea7d99d3850214a1e71285/orionis/http/adapters/websocket/contracts/transport.py#L107">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/c39ce1829b17817223a69d6adb68013c8e39e43c/orionis/http/adapters/websocket/contracts/transport.py#L107">
       
       (source)
     </a>
@@ -650,7 +650,7 @@
     
     <div><span class="decorator">@<a href="https://docs.python.org/3/library/abc.html#abc.abstractmethod" class="intersphinx-link">abstractmethod</a><br /></span></div>
     <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">sendBytes</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">data: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#bytes" class="intersphinx-link">bytes</a></code></span>):</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/dbaa747abe61f50f5dea7d99d3850214a1e71285/orionis/http/adapters/websocket/contracts/transport.py#L73">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/c39ce1829b17817223a69d6adb68013c8e39e43c/orionis/http/adapters/websocket/contracts/transport.py#L73">
       
       (source)
     </a>
@@ -677,7 +677,7 @@
     
     <div><span class="decorator">@<a href="https://docs.python.org/3/library/abc.html#abc.abstractmethod" class="intersphinx-link">abstractmethod</a><br /></span></div>
     <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">sendText</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">data: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></span>):</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/dbaa747abe61f50f5dea7d99d3850214a1e71285/orionis/http/adapters/websocket/contracts/transport.py#L57">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/c39ce1829b17817223a69d6adb68013c8e39e43c/orionis/http/adapters/websocket/contracts/transport.py#L57">
       
       (source)
     </a>
@@ -703,7 +703,7 @@
   <div class="functionHeader">
     
     <span class="py-defname">__slots__</span>: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" class="intersphinx-link">tuple</a></code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/dbaa747abe61f50f5dea7d99d3850214a1e71285/orionis/http/adapters/websocket/contracts/transport.py#L11">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/c39ce1829b17817223a69d6adb68013c8e39e43c/orionis/http/adapters/websocket/contracts/transport.py#L11">
       
       (source)
     </a>
@@ -730,7 +730,7 @@
   <div class="functionHeader">
     <div><span class="decorator">@<a href="https://docs.python.org/3/builtins/functions.html#property" class="intersphinx-link">property</a><br /></span></div>
     <span class="py-defname">supportsCloseDetails</span>: <code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/dbaa747abe61f50f5dea7d99d3850214a1e71285/orionis/http/adapters/websocket/contracts/transport.py#L13">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/c39ce1829b17817223a69d6adb68013c8e39e43c/orionis/http/adapters/websocket/contracts/transport.py#L13">
       
       (source)
     </a>
@@ -756,7 +756,7 @@
   <div class="orionis-footer-inner">
     <div class="orionis-footer-copy">
       <p>API documentation for <a href="https://orionis-framework.com/" class="projecthome">Orionis</a>.</p>
-      <p class="orionis-footer-meta">Generated with <a href="https://github.com/twisted/pydoctor/">Pydoctor</a> 25.10.1.<span class="orionis-footer-build"> Built 2026-10-06 18:23:11.</span></p>
+      <p class="orionis-footer-meta">Generated with <a href="https://github.com/twisted/pydoctor/">Pydoctor</a> 25.10.1.<span class="orionis-footer-build"> Built 2026-10-06 21:05:02.</span></p>
     </div>
     <nav class="orionis-footer-links" aria-label="Additional resources">
       <a href="https://docs.orionis-framework.com">Read the guide <span aria-hidden="true">↗</span></a>

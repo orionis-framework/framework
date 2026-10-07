@@ -1856,7 +1856,7 @@
         </div>
 
         <div class="extrasDocstring">
-          <p class="class-signature"><code><span class="py-keyword">class</span> <span class="py-defname">IRawQueryBuilder</span>(<a href="orionis.orm.contracts.base_builder.IQueryBuilderBase.html" class="internal-link" title="orionis.orm.contracts.base_builder.IQueryBuilderBase">IQueryBuilderBase</a>): <a href="https://github.com/orionis-framework/framework/tree/dbaa747abe61f50f5dea7d99d3850214a1e71285/orionis/orm/contracts/raw_builder.py#L10" class="sourceLink">(source)</a></code></p><p>Known subclasses: <code><a href="orionis.orm.query.raw_builder.RawQueryBuilder.html" class="internal-link">orionis.orm.query.raw_builder.RawQueryBuilder</a></code></p><p><a href="classIndex.html#orionis.orm.contracts.raw_builder.IRawQueryBuilder">View In Hierarchy</a></p>
+          <p class="class-signature"><code><span class="py-keyword">class</span> <span class="py-defname">IRawQueryBuilder</span>(<a href="orionis.orm.contracts.base_builder.IQueryBuilderBase.html" class="internal-link" title="orionis.orm.contracts.base_builder.IQueryBuilderBase">IQueryBuilderBase</a>): <a href="https://github.com/orionis-framework/framework/tree/c39ce1829b17817223a69d6adb68013c8e39e43c/orionis/orm/contracts/raw_builder.py#L10" class="sourceLink">(source)</a></code></p><p>Known subclasses: <code><a href="orionis.orm.query.raw_builder.RawQueryBuilder.html" class="internal-link">orionis.orm.query.raw_builder.RawQueryBuilder</a></code></p><p><a href="classIndex.html#orionis.orm.contracts.raw_builder.IRawQueryBuilder">View In Hierarchy</a></p>
         </div>
 
         <div class="moduleDocstring">
@@ -2287,7 +2287,7 @@ instead of hydrated instances.</p>
     
     <div><span class="decorator">@<a href="https://docs.python.org/3/library/abc.html#abc.abstractmethod" class="intersphinx-link">abstractmethod</a><br /></span></div>
     <span class="py-keyword">def</span>&#160;<span class="py-defname">connection</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">name: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></span>) -&gt; <code><a href="https://docs.python.org/3/library/typing.html#typing.Self" class="intersphinx-link">Self</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/dbaa747abe61f50f5dea7d99d3850214a1e71285/orionis/orm/contracts/raw_builder.py#L24">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/c39ce1829b17817223a69d6adb68013c8e39e43c/orionis/orm/contracts/raw_builder.py#L24">
       
       (source)
     </a>
@@ -2314,7 +2314,7 @@ instead of hydrated instances.</p>
     
     <div><span class="decorator">@<a href="https://docs.python.org/3/library/abc.html#abc.abstractmethod" class="intersphinx-link">abstractmethod</a><br /></span></div>
     <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">first</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/stdtypes.html#dict" class="intersphinx-link">dict</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <wbr></wbr><a href="https://docs.python.org/3/library/typing.html#typing.Any" class="intersphinx-link">Any</a>] | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/dbaa747abe61f50f5dea7d99d3850214a1e71285/orionis/orm/contracts/raw_builder.py#L69">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/c39ce1829b17817223a69d6adb68013c8e39e43c/orionis/orm/contracts/raw_builder.py#L69">
       
       (source)
     </a>
@@ -2341,7 +2341,7 @@ instead of hydrated instances.</p>
     
     <div><span class="decorator">@<a href="https://docs.python.org/3/library/abc.html#abc.abstractmethod" class="intersphinx-link">abstractmethod</a><br /></span></div>
     <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">get</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>) -&gt; <code>Collection</code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/dbaa747abe61f50f5dea7d99d3850214a1e71285/orionis/orm/contracts/raw_builder.py#L58">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/c39ce1829b17817223a69d6adb68013c8e39e43c/orionis/orm/contracts/raw_builder.py#L58">
       
       (source)
     </a>
@@ -2368,7 +2368,7 @@ instead of hydrated instances.</p>
     
     <div><span class="decorator">@<a href="https://docs.python.org/3/library/abc.html#abc.abstractmethod" class="intersphinx-link">abstractmethod</a><br /></span></div>
     <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">paginate</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">page: <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code> = 1, </span><span class="rst-sig-param">per_page: <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code> = 15</span>) -&gt; <code>Paginator</code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/dbaa747abe61f50f5dea7d99d3850214a1e71285/orionis/orm/contracts/raw_builder.py#L112">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/c39ce1829b17817223a69d6adb68013c8e39e43c/orionis/orm/contracts/raw_builder.py#L112">
       
       (source)
     </a>
@@ -2395,7 +2395,7 @@ instead of hydrated instances.</p>
     
     <div><span class="decorator">@<a href="https://docs.python.org/3/library/abc.html#abc.abstractmethod" class="intersphinx-link">abstractmethod</a><br /></span></div>
     <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">pluck</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">column: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></span>) -&gt; <code>Collection</code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/dbaa747abe61f50f5dea7d99d3850214a1e71285/orionis/orm/contracts/raw_builder.py#L96">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/c39ce1829b17817223a69d6adb68013c8e39e43c/orionis/orm/contracts/raw_builder.py#L96">
       
       (source)
     </a>
@@ -2422,7 +2422,7 @@ instead of hydrated instances.</p>
     
     <div><span class="decorator">@<a href="https://docs.python.org/3/library/abc.html#abc.abstractmethod" class="intersphinx-link">abstractmethod</a><br /></span></div>
     <span class="py-keyword">def</span>&#160;<span class="py-defname">table</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">name: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code>, </span><span class="rst-sig-symbol">*, </span><span class="rst-sig-param">alias: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a> | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code> = <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></span>) -&gt; <code><a href="https://docs.python.org/3/library/typing.html#typing.Self" class="intersphinx-link">Self</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/dbaa747abe61f50f5dea7d99d3850214a1e71285/orionis/orm/contracts/raw_builder.py#L40">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/c39ce1829b17817223a69d6adb68013c8e39e43c/orionis/orm/contracts/raw_builder.py#L40">
       
       (source)
     </a>
@@ -2449,7 +2449,7 @@ instead of hydrated instances.</p>
     
     <div><span class="decorator">@<a href="https://docs.python.org/3/library/abc.html#abc.abstractmethod" class="intersphinx-link">abstractmethod</a><br /></span></div>
     <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">value</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">column: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></span>) -&gt; <code><a href="https://docs.python.org/3/library/typing.html#typing.Any" class="intersphinx-link">Any</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/dbaa747abe61f50f5dea7d99d3850214a1e71285/orionis/orm/contracts/raw_builder.py#L80">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/c39ce1829b17817223a69d6adb68013c8e39e43c/orionis/orm/contracts/raw_builder.py#L80">
       
       (source)
     </a>
@@ -2475,7 +2475,7 @@ instead of hydrated instances.</p>
   <div class="functionHeader">
     
     <span class="py-defname">__slots__</span>: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" class="intersphinx-link">tuple</a></code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/dbaa747abe61f50f5dea7d99d3850214a1e71285/orionis/orm/contracts/raw_builder.py#L22">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/c39ce1829b17817223a69d6adb68013c8e39e43c/orionis/orm/contracts/raw_builder.py#L22">
       
       (source)
     </a>
@@ -2501,7 +2501,7 @@ instead of hydrated instances.</p>
   <div class="orionis-footer-inner">
     <div class="orionis-footer-copy">
       <p>API documentation for <a href="https://orionis-framework.com/" class="projecthome">Orionis</a>.</p>
-      <p class="orionis-footer-meta">Generated with <a href="https://github.com/twisted/pydoctor/">Pydoctor</a> 25.10.1.<span class="orionis-footer-build"> Built 2026-10-06 18:23:11.</span></p>
+      <p class="orionis-footer-meta">Generated with <a href="https://github.com/twisted/pydoctor/">Pydoctor</a> 25.10.1.<span class="orionis-footer-build"> Built 2026-10-06 21:05:02.</span></p>
     </div>
     <nav class="orionis-footer-links" aria-label="Additional resources">
       <a href="https://docs.orionis-framework.com">Read the guide <span aria-hidden="true">↗</span></a>

@@ -385,8 +385,21 @@
         
          
 
+        <div class="childrenKindTitle">Variables</div>
+        <ul>
+    
+    <li class="">
         
-         
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.database.redshift.html#RedshiftConnectorDialect" class="internal-link" title="orionis.database.redshift.RedshiftConnectorDialect"><wbr></wbr>Redshift<wbr></wbr>Connector<wbr></wbr>Dialect</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
 
         
          
@@ -444,15 +457,16 @@
         </div>
 
         <div class="extrasDocstring">
-          <p class="class-signature"><code><span class="py-keyword">class</span> <span class="py-defname">RedshiftDialect</span>(RedshiftConnectorDialect): <a href="https://github.com/orionis-framework/framework/tree/dbaa747abe61f50f5dea7d99d3850214a1e71285/orionis/database/redshift.py#L5" class="sourceLink">(source)</a></code></p><p><a href="classIndex.html#orionis.database.redshift.RedshiftDialect">View In Hierarchy</a></p>
+          <p class="class-signature"><code><span class="py-keyword">class</span> <span class="py-defname">RedshiftDialect</span>(<a href="orionis.database.redshift.html#RedshiftConnectorDialect" class="internal-link" title="orionis.database.redshift.RedshiftConnectorDialect">RedshiftConnectorDialect</a>): <a href="https://github.com/orionis-framework/framework/tree/c39ce1829b17817223a69d6adb68013c8e39e43c/orionis/database/redshift.py#L9" class="sourceLink">(source)</a></code></p><p><a href="classIndex.html#orionis.database.redshift.RedshiftDialect">View In Hierarchy</a></p>
         </div>
 
         <div class="moduleDocstring">
-          <div><p>Retain the official connector dialect without PostgreSQL-only capabilities.</p>
+          <div><p>Retain the connector dialect without PostgreSQL-only capabilities.</p>
 <p>Amazon Redshift does not implement DML RETURNING or PostgreSQL sequences.
-Server-generated IDENTITY values are not returned by the connector; callers
-needing a model key immediately must provide a client-generated primary key.
-This module is imported only when a Redshift engine is first constructed.</p>
+Server-generated IDENTITY values are not returned by the connector;
+callers needing a model key immediately must provide a client-generated
+primary key. This module is imported only when a Redshift engine is first
+constructed.</p>
 </div>
         </div>
 
@@ -515,7 +529,7 @@ This module is imported only when a Redshift engine is first constructed.</p>
   <div class="functionHeader">
     
     <span class="py-defname">__slots__</span>: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" class="intersphinx-link">tuple</a></code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/dbaa747abe61f50f5dea7d99d3850214a1e71285/orionis/database/redshift.py#L15">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/c39ce1829b17817223a69d6adb68013c8e39e43c/orionis/database/redshift.py#L20">
       
       (source)
     </a>
@@ -542,7 +556,7 @@ This module is imported only when a Redshift engine is first constructed.</p>
   <div class="functionHeader">
     
     <span class="py-defname">delete_returning</span>: <code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/dbaa747abe61f50f5dea7d99d3850214a1e71285/orionis/database/redshift.py#L19">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/c39ce1829b17817223a69d6adb68013c8e39e43c/orionis/database/redshift.py#L24">
       
       (source)
     </a>
@@ -569,7 +583,7 @@ This module is imported only when a Redshift engine is first constructed.</p>
   <div class="functionHeader">
     
     <span class="py-defname">insert_returning</span>: <code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/dbaa747abe61f50f5dea7d99d3850214a1e71285/orionis/database/redshift.py#L17">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/c39ce1829b17817223a69d6adb68013c8e39e43c/orionis/database/redshift.py#L22">
       
       (source)
     </a>
@@ -596,7 +610,7 @@ This module is imported only when a Redshift engine is first constructed.</p>
   <div class="functionHeader">
     
     <span class="py-defname">postfetch_lastrowid</span>: <code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/dbaa747abe61f50f5dea7d99d3850214a1e71285/orionis/database/redshift.py#L21">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/c39ce1829b17817223a69d6adb68013c8e39e43c/orionis/database/redshift.py#L26">
       
       (source)
     </a>
@@ -623,7 +637,7 @@ This module is imported only when a Redshift engine is first constructed.</p>
   <div class="functionHeader">
     
     <span class="py-defname">preexecute_autoincrement_sequences</span>: <code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/dbaa747abe61f50f5dea7d99d3850214a1e71285/orionis/database/redshift.py#L20">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/c39ce1829b17817223a69d6adb68013c8e39e43c/orionis/database/redshift.py#L25">
       
       (source)
     </a>
@@ -650,7 +664,7 @@ This module is imported only when a Redshift engine is first constructed.</p>
   <div class="functionHeader">
     
     <span class="py-defname">supports_statement_cache</span>: <code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/dbaa747abe61f50f5dea7d99d3850214a1e71285/orionis/database/redshift.py#L22">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/c39ce1829b17817223a69d6adb68013c8e39e43c/orionis/database/redshift.py#L27">
       
       (source)
     </a>
@@ -677,7 +691,7 @@ This module is imported only when a Redshift engine is first constructed.</p>
   <div class="functionHeader">
     
     <span class="py-defname">update_returning</span>: <code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/dbaa747abe61f50f5dea7d99d3850214a1e71285/orionis/database/redshift.py#L18">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/c39ce1829b17817223a69d6adb68013c8e39e43c/orionis/database/redshift.py#L23">
       
       (source)
     </a>
@@ -703,7 +717,7 @@ This module is imported only when a Redshift engine is first constructed.</p>
   <div class="orionis-footer-inner">
     <div class="orionis-footer-copy">
       <p>API documentation for <a href="https://orionis-framework.com/" class="projecthome">Orionis</a>.</p>
-      <p class="orionis-footer-meta">Generated with <a href="https://github.com/twisted/pydoctor/">Pydoctor</a> 25.10.1.<span class="orionis-footer-build"> Built 2026-10-06 18:23:11.</span></p>
+      <p class="orionis-footer-meta">Generated with <a href="https://github.com/twisted/pydoctor/">Pydoctor</a> 25.10.1.<span class="orionis-footer-build"> Built 2026-10-06 21:05:02.</span></p>
     </div>
     <nav class="orionis-footer-links" aria-label="Additional resources">
       <a href="https://docs.orionis-framework.com">Read the guide <span aria-hidden="true">↗</span></a>

@@ -609,7 +609,7 @@
         </div>
 
         <div class="extrasDocstring">
-          <p class="class-signature"><code><span class="py-keyword">class</span> <span class="py-defname">BodyStream</span>(<a href="orionis.http.payload.contracts.body_stream.IBodyStream.html" class="internal-link" title="orionis.http.payload.contracts.body_stream.IBodyStream">IBodyStream</a>): <a href="https://github.com/orionis-framework/framework/tree/dbaa747abe61f50f5dea7d99d3850214a1e71285/orionis/http/payload/body.py#L18" class="sourceLink">(source)</a></code></p><p>Constructor: <code><a href="#__init__" class="internal-link" title="orionis.http.payload.body.BodyStream.__init__">BodyStream(interface, receive_or_protocol, max_body_size, max_buffer_size)</a></code></p><p><a href="classIndex.html#orionis.http.payload.body.BodyStream">View In Hierarchy</a></p>
+          <p class="class-signature"><code><span class="py-keyword">class</span> <span class="py-defname">BodyStream</span>(<a href="orionis.http.payload.contracts.body_stream.IBodyStream.html" class="internal-link" title="orionis.http.payload.contracts.body_stream.IBodyStream">IBodyStream</a>): <a href="https://github.com/orionis-framework/framework/tree/c39ce1829b17817223a69d6adb68013c8e39e43c/orionis/http/payload/body.py#L18" class="sourceLink">(source)</a></code></p><p>Constructor: <code><a href="#__init__" class="internal-link" title="orionis.http.payload.body.BodyStream.__init__">BodyStream(interface, receive_or_protocol, max_body_size, max_buffer_size)</a></code></p><p><a href="classIndex.html#orionis.http.payload.body.BodyStream">View In Hierarchy</a></p>
         </div>
 
         <div class="moduleDocstring">
@@ -714,7 +714,7 @@ Raw bytes are gone after streaming multipart.</p>
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">__init__</span><span class="function-signature long-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">interface: <code>Interface</code>, </span><span class="rst-sig-param">receive_or_protocol: <code><a href="https://docs.python.org/3/builtins/functions.html#object" class="intersphinx-link">object</a></code>, </span><span class="rst-sig-param">max_body_size: <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a> | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code> = <a href="orionis.http.payload.body.html#_DEFAULT_LIMITS" class="internal-link" title="orionis.http.payload.body._DEFAULT_LIMITS">_DEFAULT_LIMITS</a>[<wbr></wbr><span class="rst-variable-quote">'</span><span class="rst-variable-string">max_body_size</span><span class="rst-variable-quote">'</span>], </span><span class="rst-sig-symbol">*, </span><span class="rst-sig-param">max_buffer_size: <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a> | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code> = <a href="orionis.http.payload.body.html#_DEFAULT_LIMITS" class="internal-link" title="orionis.http.payload.body._DEFAULT_LIMITS">_DEFAULT_LIMITS</a>[<wbr></wbr><span class="rst-variable-quote">'</span><span class="rst-variable-string">max_buffer_size</span><span class="rst-variable-quote">'</span>]</span>):</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/dbaa747abe61f50f5dea7d99d3850214a1e71285/orionis/http/payload/body.py#L45">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/c39ce1829b17817223a69d6adb68013c8e39e43c/orionis/http/payload/body.py#L45">
       
       (source)
     </a>
@@ -743,7 +743,7 @@ Raw bytes are gone after streaming multipart.</p>
     
     
     <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">read</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/stdtypes.html#bytes" class="intersphinx-link">bytes</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/dbaa747abe61f50f5dea7d99d3850214a1e71285/orionis/http/payload/body.py#L181">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/c39ce1829b17817223a69d6adb68013c8e39e43c/orionis/http/payload/body.py#L181">
       
       (source)
     </a>
@@ -774,7 +774,7 @@ without having been buffered first.</td></tr><tr><td class="fieldArgContainer"><
     
     
     <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">stream</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>) -&gt; <code><a href="https://docs.python.org/3/library/collections.abc.html#collections.abc.AsyncGenerator" class="intersphinx-link">AsyncGenerator</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#bytes" class="intersphinx-link">bytes</a>]</code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/dbaa747abe61f50f5dea7d99d3850214a1e71285/orionis/http/payload/body.py#L120">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/c39ce1829b17817223a69d6adb68013c8e39e43c/orionis/http/payload/body.py#L120">
       
       (source)
     </a>
@@ -804,7 +804,7 @@ was called first, making this method safe to call multiple times.</p>
   <div class="functionHeader">
     
     <span class="py-defname">__slots__</span>: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" class="intersphinx-link">tuple</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <wbr></wbr><span class="rst-variable-ellipsis">...</span>]</code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/dbaa747abe61f50f5dea7d99d3850214a1e71285/orionis/http/payload/body.py#L36">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/c39ce1829b17817223a69d6adb68013c8e39e43c/orionis/http/payload/body.py#L36">
       
       (source)
     </a>
@@ -831,7 +831,7 @@ was called first, making this method safe to call multiple times.</p>
   <div class="functionHeader">
     
     <span class="py-defname">__body</span>: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#bytes" class="intersphinx-link">bytes</a> | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/dbaa747abe61f50f5dea7d99d3850214a1e71285/orionis/http/payload/body.py#L74">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/c39ce1829b17817223a69d6adb68013c8e39e43c/orionis/http/payload/body.py#L74">
       
       (source)
     </a>
@@ -858,7 +858,7 @@ was called first, making this method safe to call multiple times.</p>
   <div class="functionHeader">
     
     <span class="py-defname">__consumed</span>: <code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/dbaa747abe61f50f5dea7d99d3850214a1e71285/orionis/http/payload/body.py#L76">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/c39ce1829b17817223a69d6adb68013c8e39e43c/orionis/http/payload/body.py#L76">
       
       (source)
     </a>
@@ -885,7 +885,7 @@ was called first, making this method safe to call multiple times.</p>
   <div class="functionHeader">
     
     <span class="py-defname">__is_rsgi</span>: <code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/dbaa747abe61f50f5dea7d99d3850214a1e71285/orionis/http/payload/body.py#L78">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/c39ce1829b17817223a69d6adb68013c8e39e43c/orionis/http/payload/body.py#L78">
       
       (source)
     </a>
@@ -912,7 +912,7 @@ was called first, making this method safe to call multiple times.</p>
   <div class="functionHeader">
     
     <span class="py-defname">__max_buffer_size</span> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/dbaa747abe61f50f5dea7d99d3850214a1e71285/orionis/http/payload/body.py#L90">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/c39ce1829b17817223a69d6adb68013c8e39e43c/orionis/http/payload/body.py#L90">
       
       (source)
     </a>
@@ -939,7 +939,7 @@ was called first, making this method safe to call multiple times.</p>
   <div class="functionHeader">
     
     <span class="py-defname">__max_size</span> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/dbaa747abe61f50f5dea7d99d3850214a1e71285/orionis/http/payload/body.py#L89">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/c39ce1829b17817223a69d6adb68013c8e39e43c/orionis/http/payload/body.py#L89">
       
       (source)
     </a>
@@ -966,7 +966,7 @@ was called first, making this method safe to call multiple times.</p>
   <div class="functionHeader">
     
     <span class="py-defname">__receive</span> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/dbaa747abe61f50f5dea7d99d3850214a1e71285/orionis/http/payload/body.py#L92">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/c39ce1829b17817223a69d6adb68013c8e39e43c/orionis/http/payload/body.py#L92">
       
       (source)
     </a>
@@ -993,7 +993,7 @@ was called first, making this method safe to call multiple times.</p>
   <div class="functionHeader">
     <div><span class="decorator">@<a href="https://docs.python.org/3/builtins/functions.html#property" class="intersphinx-link">property</a><br /></span></div>
     <span class="py-defname">isBuffered</span>: <code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/dbaa747abe61f50f5dea7d99d3850214a1e71285/orionis/http/payload/body.py#L94">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/c39ce1829b17817223a69d6adb68013c8e39e43c/orionis/http/payload/body.py#L94">
       
       (source)
     </a>
@@ -1021,7 +1021,7 @@ was called first, making this method safe to call multiple times.</p>
   <div class="functionHeader">
     <div><span class="decorator">@<a href="https://docs.python.org/3/builtins/functions.html#property" class="intersphinx-link">property</a><br /></span></div>
     <span class="py-defname">isConsumed</span>: <code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/dbaa747abe61f50f5dea7d99d3850214a1e71285/orionis/http/payload/body.py#L107">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/c39ce1829b17817223a69d6adb68013c8e39e43c/orionis/http/payload/body.py#L107">
       
       (source)
     </a>
@@ -1048,7 +1048,7 @@ was called first, making this method safe to call multiple times.</p>
   <div class="orionis-footer-inner">
     <div class="orionis-footer-copy">
       <p>API documentation for <a href="https://orionis-framework.com/" class="projecthome">Orionis</a>.</p>
-      <p class="orionis-footer-meta">Generated with <a href="https://github.com/twisted/pydoctor/">Pydoctor</a> 25.10.1.<span class="orionis-footer-build"> Built 2026-10-06 18:23:11.</span></p>
+      <p class="orionis-footer-meta">Generated with <a href="https://github.com/twisted/pydoctor/">Pydoctor</a> 25.10.1.<span class="orionis-footer-build"> Built 2026-10-06 21:05:02.</span></p>
     </div>
     <nav class="orionis-footer-links" aria-label="Additional resources">
       <a href="https://docs.orionis-framework.com">Read the guide <span aria-hidden="true">↗</span></a>

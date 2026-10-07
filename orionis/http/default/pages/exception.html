@@ -6,10 +6,11 @@
 {% block title %}{% autoescape true %}{{ exception }} | {{ app_name }}{% endautoescape %}{% endblock %}
 
 {% block content %}{% autoescape true %}
-<main class="main-container">
+<main id="main-content" class="main-container" tabindex="-1" aria-labelledby="main-error">
     <div class="content-wrapper">
         <div class="header-bar">
             <div class="error-summary">
+                <p class="page-eyebrow">Exception report</p>
                 <h1 class="error-badge">
                     <span class="error-badge-dot" aria-hidden="true"></span>
                     <span id="main-error" class="error-badge-text">{{ traceback.error_type }}</span>
@@ -17,7 +18,11 @@
                 <p id="main-description" class="error-message">{{ traceback.error_message }}</p>
             </div>
             <fieldset class="exception-actions">
-                <legend class="exception-help-label">Get help with this exception</legend>
+                <legend class="exception-help-label">Resources</legend>
+                <button class="btn" id="copy-exception" type="button" aria-label="Copy exception report" title="Copy exception report" hidden>
+                    {{ icon('copy') }}
+                </button>
+                <span id="copy-status" class="visually-hidden" role="status"></span>
                 <a class="help-link" href="https://www.google.com/search?q={{ ('Python ' ~ traceback.error_type ~ ' Exception')|urlencode }}&amp;hl={{ locale|urlencode }}" target="_blank" rel="noopener noreferrer" aria-label="Search Google for this exception" title="Search Google for this exception">
                     <svg class="help-icon" viewBox="0 0 24 24" width="16" height="16" aria-hidden="true" focusable="false">
                         <path fill="#4285f4" d="M22.56 12.25c0-.73-.06-1.42-.19-2.09H12v3.96h5.92c-.26 1.28-1.04 2.36-2.21 3.08v2.56h3.57c2.08-1.92 3.28-4.74 3.28-7.51Z" />
@@ -37,8 +42,7 @@
         </div>
         <div class="grid-layout">
             <div class="main-col">
-                <section class="hud-card red-corners" aria-labelledby="exception-details-title">
-                    <div class="hud-card-bottom">
+                <section class="diagnostic-section" aria-labelledby="exception-details-title">
                         <div class="card-header">
                             <h2 id="exception-details-title" class="card-header-title">Exception Details</h2>
                         </div>
@@ -48,18 +52,16 @@
                                 <span id="request-path" class="request-path">{{ request_path }}</span>
                             </div>
                             {% for frame in frames %}
-                            <div id="trace-frame-{{ loop.index }}" class="trace-frame" data-trace-frame>
+                            <div id="trace-frame-{{ loop.index }}" class="trace-frame" data-trace-frame tabindex="-1">
                                 <div class="code-container">
                                     <div class="code-header">
-                                        <div class="code-header-dots" aria-hidden="true">
-                                            <span class="dot-red"></span><span class="dot-yellow"></span><span class="dot-green"></span>
-                                        </div>
                                         <div class="code-header-info">
                                             <span class="code-lang-badge">Python</span>
                                             <span class="code-filename">{{ frame.filename.replace('\\', '/').rsplit('/', 1)[-1] }}</span>
                                         </div>
+                                        <span class="file-info-label">Line {{ frame.lineno }}</span>
                                     </div>
-                                    <div class="source-scroll" aria-label="Python source code">
+                                    <div class="source-scroll" role="region" tabindex="0" aria-label="Python source code for frame {{ loop.index }}">
                                         {% for source in frame.code %}
                                         <div class="source-row{% if frame.lines[loop.index0] == frame.lineno %} source-row-error{% endif %}"><span class="source-number" aria-label="Line {{ frame.lines[loop.index0] }}">{{ frame.lines[loop.index0] }}</span><pre><code class="source-code">{{ source }}</code></pre></div>
                                         {% else %}
@@ -82,12 +84,13 @@
                             <p class="empty-state">No stack trace is available for this exception.</p>
                             {% endfor %}
                         </div>
-                    </div>
                 </section>
-                <section class="hud-card" aria-labelledby="stack-trace-title">
-                    <div class="hud-card-bottom">
+            </div>
+            <aside class="side-col" aria-label="Exception context">
+                <section class="diagnostic-section" aria-labelledby="stack-trace-title">
                         <div class="card-header">
                             <h2 id="stack-trace-title" class="card-header-title">Stack Trace</h2>
+                            <span class="section-count">{{ frames|length }}</span>
                         </div>
                         <div class="card-body">
                             <div class="stack-trace-list" id="stack-trace">
@@ -95,7 +98,6 @@
                                 <a href="#trace-frame-{{ loop.index }}" class="stack-trace-item" data-frame-target="trace-frame-{{ loop.index }}" aria-controls="trace-frame-{{ loop.index }}">
                                     <div class="stack-trace-item-header">
                                         <div class="stack-trace-meta">
-                                            <span class="stack-trace-dot" aria-hidden="true"></span>
                                             <span class="stack-trace-file" title="{{ frame.filename }}">{{ frame.filename }}:{{ frame.lineno }}</span>
                                             <span class="stack-trace-fn">{{ frame.name }}</span>
                                         </div>
@@ -107,17 +109,10 @@
                                 {% endfor %}
                             </div>
                         </div>
-                    </div>
                 </section>
-            </div>
-            <aside class="side-col">
-                <section class="hud-card" aria-labelledby="system-info-title">
-                    <div class="hud-card-bottom">
+                <section class="diagnostic-section" aria-labelledby="system-info-title">
                         <div class="card-header">
                             <h2 id="system-info-title" class="card-header-title">System Info</h2>
-                        </div>
-                        <div class="documentation-action">
-                            <a href="https://docs.orionis-framework.com/" target="_blank" rel="noopener noreferrer" class="btn-search">Open Documentation</a>
                         </div>
                         <dl class="sys-info-list">
                             {% for label, value in [('Orionis Framework', framework_version), ('Python', python_version), ('Environment', environment), ('Debug Mode', debug_mode), ('Timezone', timezone), ('Interface', interface)] %}
@@ -127,7 +122,9 @@
                             </div>
                             {% endfor %}
                         </dl>
-                    </div>
+                        <div class="documentation-action">
+                            <a href="https://docs.orionis-framework.com/" target="_blank" rel="noopener noreferrer" class="btn-search">{{ icon('book-open') }}<span>Documentation</span></a>
+                        </div>
                 </section>
             </aside>
         </div>

@@ -91,6 +91,7 @@ class DefaultResponses(IDefaultResponses):
     _FAVICON_CACHE_CONTROL_AGE: str = "public, max-age=31536000, immutable"
     _FAVICON_NAME: str = "favicon.ico"
     _FONT_CONTENT_TYPE: str = "font/ttf"
+    _WEB_FONT_CONTENT_TYPE: str = "font/woff2"
     _GENERAL_CACHE_CONTROL: str = "no-cache, no-store, must-revalidate"
     _NO_CACHE_HEADERS: ClassVar[dict[str, str]] = {
         "cache-control": _GENERAL_CACHE_CONTROL,
@@ -113,6 +114,13 @@ class DefaultResponses(IDefaultResponses):
             ("fonts/orbitron.ttf", _FONT_CONTENT_TYPE),
             ("fonts/share-tech-mono.ttf", _FONT_CONTENT_TYPE),
             ("fonts/fira-code.ttf", _FONT_CONTENT_TYPE),
+            ("fonts/titillium-web-400-latin.woff2", _WEB_FONT_CONTENT_TYPE),
+            ("fonts/titillium-web-400-latin-ext.woff2", _WEB_FONT_CONTENT_TYPE),
+            ("fonts/titillium-web-600-latin.woff2", _WEB_FONT_CONTENT_TYPE),
+            ("fonts/titillium-web-600-latin-ext.woff2", _WEB_FONT_CONTENT_TYPE),
+            ("fonts/titillium-web-700-latin.woff2", _WEB_FONT_CONTENT_TYPE),
+            ("fonts/titillium-web-700-latin-ext.woff2", _WEB_FONT_CONTENT_TYPE),
+            ("orionis-mark.png", "image/png"),
         )
     }
 

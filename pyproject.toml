@@ -166,6 +166,21 @@ docs = [
     "pydoctor>=25.10.1",
 ]
 
+[tool.orionis.packages]
+"extra:s3" = "Amazon S3 file storage."
+"extra:azure" = "Azure Blob file storage."
+"extra:gcs" = "Google Cloud file storage."
+"extra:storage" = "All cloud storage backends."
+"extra:mysql" = "MySQL and MariaDB connections."
+"extra:pgsql" = "PostgreSQL connections."
+"extra:oracle" = "Oracle Database connections."
+"extra:sqlserver" = "Microsoft SQL Server connections."
+"extra:redshift" = "Amazon Redshift connections."
+"extra:database" = "All optional database drivers."
+"extra:factories" = "Test data and model factories."
+"group:dev" = "Development and quality checks."
+"group:docs" = "API reference generation."
+
 # Reusable API documentation settings; DOCS.ps1 supplies the current version and Git revision.
 [tool.pydoctor]
 project-name = "Orionis"

@@ -5,6 +5,7 @@ import sys
 import threading
 from contextvars import ContextVar
 from dataclasses import FrozenInstanceError
+from importlib import import_module
 from importlib.util import find_spec
 from pathlib import Path
 from tempfile import TemporaryDirectory
@@ -184,6 +185,7 @@ class TestRedshiftDialect(TestCase):
             for package in ("redshift_connector", "sqlalchemy_redshift")
         ):
             self.skipTest("Install orionis[redshift] to inspect the official driver.")
+        self._redshift_connector = import_module("redshift_connector")
 
     def testSyncEngineUsesTheOfficialConnectorWithoutOpeningSockets(self) -> None:
         """Build the actual dialect with no implicit network or PostgreSQL fallback.
@@ -193,14 +195,13 @@ class TestRedshiftDialect(TestCase):
         None
             The registered DBAPI is the AWS connector and RETURNING is disabled.
         """
-        import redshift_connector
         settings = {"driver": "redshift", "host": "warehouse.example.com"}
         engine = create_engine(
             build_engine_url(settings, sync=True),
             **engine_options(settings, sync=True),
         )
         try:
-            self.assertIs(engine.dialect.dbapi, redshift_connector)
+            self.assertIs(engine.dialect.dbapi, self._redshift_connector)
             self.assertEqual(engine.dialect.name, "redshift")
             self.assertFalse(engine.dialect.is_async)
             self.assertFalse(engine.dialect.insert_returning)
@@ -218,7 +219,6 @@ class TestRedshiftDialect(TestCase):
         None
             First engine construction neither opens sockets nor checks out handles.
         """
-        import redshift_connector
         connection = Connection(
             "warehouse", {"driver": "redshift", "host": "warehouse.example.com"},
         )
@@ -226,7 +226,7 @@ class TestRedshiftDialect(TestCase):
         try:
             engine = connection._getEngine()
             self.assertIsInstance(engine, ThreadedEngine)
-            self.assertIs(engine.sync_engine.dialect.dbapi, redshift_connector)
+            self.assertIs(engine.sync_engine.dialect.dbapi, self._redshift_connector)
             self.assertEqual(engine.sync_engine.pool.checkedout(), 0)
         finally:
             await connection.disconnect()

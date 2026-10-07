@@ -14,6 +14,7 @@ from orionis.view.filters import (
 from orionis.view.globals import (
     _global_app,
     _global_asset,
+    _global_auth,
     _global_cache,
     _global_choice,
     _global_collect,
@@ -92,6 +93,7 @@ class ViewServiceProvider(ServiceProvider):
         _globals: dict[str, Any] = {
             "app": _global_app(self.app),
             "asset": _global_asset(self.app),
+            "auth": _global_auth(),
             "cache": _global_cache(self.app),
             "choice": _global_choice(),
             "collect": _global_collect(),

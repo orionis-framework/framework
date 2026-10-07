@@ -136,6 +136,28 @@ Call `Reactor.command("signature", [Handler, "method"])`, then configure descrip
 
 Use `await Reactor.call("signature", ["--flag", "value"])`. Each call gets its own container scope marked with `KernelContext.CONSOLE`. Failures are logged, sent to the failure catcher, and return `1`.
 
+### Install optional framework features
+
+`orionis packages` lists optional features and development tools by purpose, then accepts names or catalog numbers. `--list` only displays the catalog; `--yes` confirms the selected installation without prompting. The public command name is `packages`, not `install`.
+
+```shell
+orionis packages --list
+orionis packages s3 redshift --yes
+orionis packages group:dev --yes
+```
+
+The command first reads the framework manifest bundled at `orionis/pyproject.toml`. Source and editable installations use the framework's root manifest when no bundled copy exists. Only when neither framework manifest is available does it fall back to the application's root manifest. Builds include the canonical manifest automatically; no second source copy needs maintaining.
+
+Option purposes come from `[tool.orionis.packages]` in the selected manifest, using namespaced keys:
+
+```toml
+[tool.orionis.packages]
+"extra:s3" = "Amazon S3 file storage."
+"group:dev" = "Development and quality checks."
+```
+
+Installation uses `uv` with the interpreter running Orionis. It does not rewrite the application manifest or lockfile. Extras, environment markers, group includes and dependency deduplication remain intact.
+
 ### Schedule an existing command
 
 During scheduler configuration, call `Schedule.command(...)` and finish the fluent trigger. Run `python reactor schedule:work`; the scheduler loads commands, adds the configured store, registers jobs/listeners, handles signals, and waits until shutdown.

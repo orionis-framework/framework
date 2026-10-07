@@ -3,8 +3,9 @@ import tomllib
 from asyncio import CancelledError, create_subprocess_exec, to_thread
 from asyncio.subprocess import DEVNULL, PIPE, STDOUT
 from contextlib import suppress
+from pathlib import Path
 from shutil import which
-from typing import TYPE_CHECKING, ClassVar
+from typing import ClassVar
 from rich import box
 from rich.console import Console as RichConsole
 from rich.panel import Panel
@@ -16,23 +17,23 @@ from orionis.console.base.command import BaseCommand
 from orionis.console.enums.actions import ArgumentAction
 from orionis.foundation.contracts.application import IApplication
 
-if TYPE_CHECKING:
-    from pathlib import Path
-
 _ACCENT_STYLE = "bold cyan"
 _ERROR_STYLE = "bold red"
 _WARNING_STYLE = "yellow"
+_MANIFEST_NAME = "pyproject.toml"
+_PACKAGE_MANIFEST = Path(__file__).resolve().parents[3] / _MANIFEST_NAME
+_SOURCE_MANIFEST = Path(__file__).resolve().parents[4] / _MANIFEST_NAME
 
 class InstallCommand(BaseCommand):
-    """Install dependencies declared by the application's project manifest."""
+    """Install optional features declared by the resolved project manifest."""
 
     # ruff: noqa: TC001
 
-    __slots__ = ("_console",)
+    __slots__ = ("_console", "_purposes")
 
     timestamps: bool = False
-    signature: str = "install"
-    description: str = "Install optional dependencies and dependency groups."
+    signature: str = "packages"
+    description: str = "Install optional Orionis features and development tools."
     arguments: ClassVar[list[Argument]] = [
         Argument(
             name_or_flags="options",
@@ -66,10 +67,11 @@ class InstallCommand(BaseCommand):
         """
         super().__init__()
         self._console = RichConsole()
+        self._purposes: dict[str, str] = {}
 
     async def handle(self, app: IApplication) -> int:
         """
-        List and install dependencies in the interpreter running Reactor.
+        List and install optional features in the interpreter running Reactor.
 
         Parameters
         ----------
@@ -82,8 +84,8 @@ class InstallCommand(BaseCommand):
             Zero on success or a declined selection, 130 on interruption,
             or a nonzero status when validation or installation fails.
         """
-        project_path = app.basePath / "pyproject.toml"
         try:
+            project_path = await to_thread(self.__projectPath, app.basePath)
             options = await to_thread(self.__loadOptions, project_path)
             self.__renderOptions(project_path, options)
             if self.getArgument("list", default=False) or not options:
@@ -99,6 +101,26 @@ class InstallCommand(BaseCommand):
         except (OSError, TypeError, ValueError) as error:
             self._console.print(Text(str(error), style=_ERROR_STYLE))
             return 1
+
+    @staticmethod
+    def __projectPath(application_root: Path) -> Path:
+        """
+        Prefer the framework manifest over the application's fallback manifest.
+
+        Parameters
+        ----------
+        application_root : Path
+            Application directory used when no framework manifest is available.
+
+        Returns
+        -------
+        Path
+            Bundled framework manifest, source manifest or application fallback.
+        """
+        for project_path in (_PACKAGE_MANIFEST, _SOURCE_MANIFEST):
+            if project_path.is_file():
+                return project_path
+        return application_root / _MANIFEST_NAME
 
     def __loadOptions(self, project_path: Path) -> dict[str, tuple[str, ...]]:
         """
@@ -140,7 +162,42 @@ class InstallCommand(BaseCommand):
             f"group:{name}": self.__resolveGroup(name, groups, ())
             for name in groups
         })
+        self._purposes = self.__loadPurposes(manifest)
         return options
+
+    def __loadPurposes(self, manifest: dict[str, object]) -> dict[str, str]:
+        """
+        Read human-readable purposes for the installation options.
+
+        Parameters
+        ----------
+        manifest : dict[str, object]
+            Parsed project manifest containing optional catalog descriptions.
+
+        Returns
+        -------
+        dict[str, str]
+            Descriptions keyed by the extra or dependency-group namespace.
+
+        Raises
+        ------
+        TypeError
+            If the catalog configuration is not a TOML table.
+        ValueError
+            If a purpose is not a nonempty string.
+        """
+        tool = self.__dependencyTable(manifest.get("tool", {}), "tool")
+        settings = self.__dependencyTable(tool.get("orionis", {}), "tool.orionis")
+        descriptions = self.__dependencyTable(
+            settings.get("packages", {}), "tool.orionis.packages",
+        )
+        purposes: dict[str, str] = {}
+        for key, purpose in descriptions.items():
+            if not isinstance(purpose, str) or not purpose.strip():
+                error_msg = f"The purpose of '{key}' must be a nonempty string."
+                raise ValueError(error_msg)
+            purposes[key] = purpose.strip()
+        return purposes
 
     @staticmethod
     def __dependencyTable(value: object, origin: str) -> dict[str, object]:
@@ -272,11 +329,11 @@ class InstallCommand(BaseCommand):
         Returns
         -------
         None
-            Print project metadata and a compact Rich dependency table.
+            Print project metadata and a compact Rich feature catalog.
         """
         header = Text.assemble(
             ("ORIONIS", "bold white"),
-            ("  Dependency installer", _ACCENT_STYLE),
+            ("  Optional features", _ACCENT_STYLE),
         )
         self._console.print(header)
         self._console.print(
@@ -303,21 +360,40 @@ class InstallCommand(BaseCommand):
         )
         table.add_column("Option", no_wrap=True)
         table.add_column(
-            "Packages", style="dim", no_wrap=True, overflow="ellipsis",
+            "Purpose", style="dim", no_wrap=True, overflow="ellipsis",
             max_width=self._console.width // 2,
         )
-        for index, (key, requirements) in enumerate(options.items(), start=1):
+        for index, key in enumerate(options, start=1):
             kind, _, name = key.partition(":")
             option = Text(
                 key if kind == "group" else name,
                 style=_ACCENT_STYLE if kind == "group" else "bold green",
             )
-            if len(requirements) > 1:
-                option.append(f" ({len(requirements)})", style="dim")
             table.add_row(
-                str(index), option, Text(", ".join(requirements) or "No packages"),
+                str(index), option, Text(self.__optionPurpose(key)),
             )
         self._console.print(table)
+
+    def __optionPurpose(self, key: str) -> str:
+        """
+        Describe an option without exposing its package requirements.
+
+        Parameters
+        ----------
+        key : str
+            Namespaced extra or dependency-group key.
+
+        Returns
+        -------
+        str
+            Configured purpose or a generic description for an unknown option.
+        """
+        if key in self._purposes:
+            return self._purposes[key]
+        kind, _, name = key.partition(":")
+        if kind == "group":
+            return f"Tools for the {name} workflow."
+        return f"Optional {name} support."
 
     def __selectOptions(self, options: dict[str, tuple[str, ...]]) -> list[str]:
         """
@@ -447,9 +523,10 @@ class InstallCommand(BaseCommand):
 
         summary = Text.assemble(
             ("Options   ", _ACCENT_STYLE), ", ".join(selected),
-            ("\nPackages  ", _ACCENT_STYLE), str(len(requirements)),
             ("\nTarget    ", _ACCENT_STYLE), sys.executable,
         )
+        for key in selected:
+            summary.append("\n" + self.__optionPurpose(key), style="dim")
         self._console.print(Panel(
             summary, title="Installation", border_style="green", padding=(1, 2),
         ))

@@ -24,7 +24,7 @@ exclude = [
 
 [project]
 name = "orionis"
-version = "0.802.0"
+version = "0.803.0"
 description = "Orionis Framework — Async-first full-stack framework for modern Python applications."
 readme = { file = "README.md", content-type = "text/markdown" }
 requires-python = ">=3.14"
@@ -161,6 +161,7 @@ dev = [
     "coverage>=7.16.1",
     "faker>=40.40.0,<41.0",
     "ruff>=0.16.8",
+    "setuptools>=84.0.0",
 ]
 docs = [
     "pydoctor>=25.10.1",

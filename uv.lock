@@ -1302,7 +1302,7 @@ wheels = [
 
 [[package]]
 name = "orionis"
-version = "0.802.0"
+version = "0.803.0"
 source = { editable = "." }
 dependencies = [
     { name = "aiocache", extra = ["memcached", "redis"] },
@@ -1384,6 +1384,7 @@ dev = [
     { name = "coverage" },
     { name = "faker" },
     { name = "ruff" },
+    { name = "setuptools" },
 ]
 docs = [
     { name = "pydoctor" },
@@ -1447,6 +1448,7 @@ dev = [
     { name = "coverage", specifier = ">=7.16.1" },
     { name = "faker", specifier = ">=40.40.0,<41.0" },
     { name = "ruff", specifier = ">=0.16.8" },
+    { name = "setuptools", specifier = ">=84.0.0" },
 ]
 docs = [{ name = "pydoctor", specifier = ">=25.10.1" }]
 

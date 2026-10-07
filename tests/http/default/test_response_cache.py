@@ -169,8 +169,10 @@ class _ErrorPage(HTMLParser):
         super().__init__(convert_charrefs=True)
         self.tags: list[str] = []
         self.description: list[str] = []
+        self.heading: list[str] = []
         self.scripts: list[str] = []
         self._in_description = False
+        self._in_heading = False
         self._in_script = False
         self.feed(content.decode("utf-8"))
         self.close()
@@ -193,8 +195,11 @@ class _ErrorPage(HTMLParser):
             Completes the operation described above.
         """
         self.tags.append(tag)
-        if ("class", "error-description") in attrs:
+        classes = (dict(attrs).get("class") or "").split()
+        if "status-description" in classes:
             self._in_description = True
+        if tag == "h1":
+            self._in_heading = True
         if tag == "script":
             self._in_script = True
 
@@ -211,8 +216,10 @@ class _ErrorPage(HTMLParser):
         None
             Completes the operation described above.
         """
-        if tag == "div":
+        if tag in {"div", "p"}:
             self._in_description = False
+        if tag == "h1":
+            self._in_heading = False
         if tag == "script":
             self._in_script = False
 
@@ -231,6 +238,8 @@ class _ErrorPage(HTMLParser):
         """
         if self._in_description:
             self.description.append(data)
+        if self._in_heading:
+            self.heading.append(data)
         if self._in_script:
             self.scripts.append(data)
 
@@ -394,8 +403,8 @@ class TestDefaultResponseCache(TestCase):
                         )
                         self.assertEqual(result.getStatusCode(), status)
                         if not expects_json:
-                            title = f'<h1 class="error-title">{label}</h1>'
-                            self.assertIn(title.encode(), result.getBody())
+                            parsed = _ErrorPage(result.getBody())
+                            self.assertEqual("".join(parsed.heading), label)
 
     async def testErrorRejectsInvalidStatusesBeforeRendering(self) -> None:
         """Validate type and range before reading templates or converting content.

@@ -2,6 +2,7 @@ from __future__ import annotations
 from asyncio import current_task
 from contextvars import ContextVar
 from functools import lru_cache
+from importlib import import_module
 from typing import TYPE_CHECKING, Any
 from sqlalchemy import create_engine, text
 from sqlalchemy.exc import NoSuchModuleError, SQLAlchemyError
@@ -642,6 +643,8 @@ class Connection(IConnection):
             url = build_engine_url(self._config)
             options = engine_options(self._config)
             try:
+                if resolve_driver(self._config) == "redshift":
+                    import_module("sqlalchemy_redshift.dialect")
                 engine = (
                     ThreadedEngine(create_engine(url, **options), self._name)
                     if resolve_driver(self._config) == "redshift"

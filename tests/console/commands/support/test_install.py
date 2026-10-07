@@ -1,6 +1,7 @@
 import argparse
 import re
 import sys
+import tomllib
 import venv
 from asyncio import CancelledError, create_subprocess_exec, to_thread
 from asyncio.subprocess import DEVNULL, PIPE, STDOUT
@@ -34,6 +35,12 @@ mysql = ["aiomysql>=0.3", "pymysql>=1"]
 [dependency-groups]
 lint = ["ruff>=0.16"]
 dev = [{include-group = "lint"}, "pytest>=8", "ruff>=0.16"]
+
+[tool.orionis.packages]
+"extra:s3" = "Amazon S3 file storage."
+"extra:mysql" = "MySQL and MariaDB connections."
+"group:lint" = "Static code checks."
+"group:dev" = "Development and quality checks."
 """
 
 class _StubApp:
@@ -263,6 +270,10 @@ class TestInstallCommand(TestCase):
         self.addCleanup(temporary.cleanup)
         self.root = Path(temporary.name)
         self.app = _StubApp(self.root)
+        self.package_manifest = (
+            self.root / "site-packages" / "orionis" / "pyproject.toml"
+        )
+        self.source_manifest = self.root / "framework" / "pyproject.toml"
         self.output = StringIO()
         self.command = InstallCommand()
         self.command._console = RichConsole(file=self.output, width=120)
@@ -272,13 +283,18 @@ class TestInstallCommand(TestCase):
         self.confirm = _RecordingConfirm()
         self.original_bindings = {
             name: getattr(install_module, name)
-            for name in ("which", "create_subprocess_exec", "Prompt", "Confirm")
+            for name in (
+                "which", "create_subprocess_exec", "Prompt", "Confirm",
+                "_PACKAGE_MANIFEST", "_SOURCE_MANIFEST",
+            )
         }
         install_module.__dict__.update(
             which=self.installer.which,
             create_subprocess_exec=self.installer.createProcess,
             Prompt=self.prompt,
             Confirm=self.confirm,
+            _PACKAGE_MANIFEST=self.package_manifest,
+            _SOURCE_MANIFEST=self.source_manifest,
         )
 
     def tearDown(self) -> None:
@@ -333,27 +349,111 @@ class TestInstallCommand(TestCase):
         })
         self.command._console.is_interactive = interactive
 
-    async def testListsExtrasAndGroupsFromTheApplicationRoot(self) -> None:
+    async def testFallsBackToTheApplicationManifest(self) -> None:
         """List declared options without exposing base dependencies as extras.
 
         Returns
         -------
         None
-            Assertions verify the options, requirements and manifest path.
+            Assertions verify the purposes and manifest path without requirements.
         """
         self._writeManifest()
 
         self.assertEqual(await self.command.handle(self.app), 0)
         rendered = self.output.getvalue()
         for expected in (
-            "s3", "mysql", "dev", "lint", "boto3>=1", "pymysql>=1", "pytest>=8",
+            "s3", "mysql", "dev", "lint", "Amazon S3 file storage",
+            "MySQL and MariaDB connections", "Development and quality checks",
             str(self.root / "pyproject.toml"),
         ):
             self.assertIn(expected, rendered)
-        self.assertNotIn("rich>=15", rendered)
+        for requirement in ("rich>=15", "boto3>=1", "pymysql>=1", "pytest>=8"):
+            self.assertNotIn(requirement, rendered)
         self.assertEqual(self.installer.calls, [])
         self.assertEqual(self.prompt.calls, [])
         self.assertEqual(self.confirm.calls, [])
+
+    async def testPrefersTheBundledFrameworkManifest(self) -> None:
+        """Ignore application extras when the installed framework has its manifest.
+
+        Returns
+        -------
+        None
+            The catalog and installer use only the package-owned declarations.
+        """
+        self._writeManifest('[project.optional-dependencies]\napplication = ["demo"]\n')
+        self.package_manifest.parent.mkdir(parents=True)
+        self.package_manifest.write_text(_MANIFEST, encoding="utf-8")
+        self.source_manifest.parent.mkdir(parents=True)
+        self.source_manifest.write_text(
+            '[project.optional-dependencies]\nsource = ["another-demo"]\n',
+            encoding="utf-8",
+        )
+        self._setSelection("s3")
+
+        self.assertEqual(await self.command.handle(self.app), 0)
+        self.assertEqual(self.installer.calls[0][0][6:], ("boto3>=1",))
+        self.assertEqual(
+            self.installer.calls[0][1]["cwd"], self.package_manifest.parent,
+        )
+        rendered = self.output.getvalue()
+        self.assertIn("Amazon S3 file storage", rendered)
+        self.assertNotIn("application", rendered)
+        self.assertNotIn("another-demo", rendered)
+
+    async def testUsesTheFrameworkSourceManifestBeforeTheApplication(self) -> None:
+        """Use the canonical checkout manifest during editable development.
+
+        Returns
+        -------
+        None
+            The source manifest remains preferred without a bundled package copy.
+        """
+        self._writeManifest('[project.optional-dependencies]\napplication = ["demo"]\n')
+        self.source_manifest.parent.mkdir(parents=True)
+        self.source_manifest.write_text(_MANIFEST, encoding="utf-8")
+        self._setSelection("mysql")
+
+        self.assertEqual(await self.command.handle(self.app), 0)
+        self.assertEqual(
+            self.installer.calls[0][0][6:], ("aiomysql>=0.3", "pymysql>=1"),
+        )
+        self.assertEqual(self.installer.calls[0][1]["cwd"], self.source_manifest.parent)
+
+    async def testReportsInvalidFrameworkTomlWithoutFallingBack(self) -> None:
+        """Keep a broken package manifest visible instead of reading application extras.
+
+        Returns
+        -------
+        None
+            Invalid bundled TOML fails before any installer is invoked.
+        """
+        self._writeManifest()
+        self.package_manifest.parent.mkdir(parents=True)
+        self.package_manifest.write_text("[project\n", encoding="utf-8")
+
+        self.assertEqual(await self.command.handle(self.app), 1)
+        self.assertEqual(self.installer.calls, [])
+        self.assertNotIn("ORIONIS", self.output.getvalue())
+
+    def testEveryFrameworkOptionHasAPurpose(self) -> None:
+        """Keep human-readable purposes aligned with all framework extras and groups.
+
+        Returns
+        -------
+        None
+            Every declared installation option has nonempty purpose metadata.
+        """
+        project_path = Path(__file__).resolve().parents[4] / "pyproject.toml"
+        manifest = tomllib.loads(project_path.read_text(encoding="utf-8"))
+        expected = {
+            f"extra:{name}" for name in manifest["project"]["optional-dependencies"]
+        } | {f"group:{name}" for name in manifest["dependency-groups"]}
+        purposes = manifest["tool"]["orionis"]["packages"]
+        self.assertEqual(set(purposes), expected)
+        for purpose in purposes.values():
+            self.assertIsInstance(purpose, str)
+            self.assertTrue(purpose.strip())
 
     def testCatalogKeepsOneRowPerOptionAcrossTerminalWidths(self) -> None:
         """Keep bundles compact and numbered without exceeding terminal width.
@@ -361,7 +461,7 @@ class TestInstallCommand(TestCase):
         Returns
         -------
         None
-            Assertions verify row counts, package counts and width constraints.
+            Assertions verify purposes, row counts and width constraints.
         """
         options = {
             "extra:storage": tuple(
@@ -369,6 +469,11 @@ class TestInstallCommand(TestCase):
             ),
             "group:dev": ("ruff>=0.16", "pytest>=8"),
             "extra:empty": (),
+        }
+        self.command._purposes = {
+            "extra:storage": "Cloud file storage.",
+            "group:dev": "Development tools.",
+            "extra:empty": "Unused feature.",
         }
         for width in (40, 80, 120):
             self.output.seek(0)
@@ -382,9 +487,11 @@ class TestInstallCommand(TestCase):
             lines = self.output.getvalue().splitlines()
             rows = [line for line in lines if re.match(r"^\s*\d+\s+", line)]
             self.assertEqual([int(row.split()[0]) for row in rows], [1, 2, 3])
-            self.assertIn("storage (7)", rows[0])
-            self.assertIn("group:dev (2)", rows[1])
-            self.assertIn("No packages", rows[2])
+            self.assertIn("storage", rows[0])
+            self.assertIn("group:dev", rows[1])
+            self.assertIn("Unused feature.", rows[2])
+            self.assertNotIn("cloud-driver", self.output.getvalue())
+            self.assertNotIn("pytest", self.output.getvalue())
             self.assertLessEqual(len(lines), len(options) + 7)
             for line in lines:
                 self.assertLessEqual(len(line), width)
@@ -517,7 +624,7 @@ class TestInstallCommand(TestCase):
         self.assertIn("No optional dependencies", self.output.getvalue())
 
     def testRegistersTheCommandInTheCoreCatalog(self) -> None:
-        """Expose install to the same loader used by Reactor.
+        """Expose packages to the same loader used by Reactor.
 
         Returns
         -------
@@ -525,6 +632,7 @@ class TestInstallCommand(TestCase):
             Assertions verify the command is registered exactly once.
         """
         self.assertEqual(CORE_COMMANDS.count(InstallCommand), 1)
+        self.assertEqual(InstallCommand.signature, "packages")
 
     def testParsesNamesAndAutomationFlags(self) -> None:
         """Parse multiple option names and the confirmation flag with argparse.
@@ -676,7 +784,7 @@ class TestInstallCommand(TestCase):
 
         self.assertEqual(await self.command.handle(self.app), 0)
         self.assertEqual(self.installer.calls[0][0][6:], (requirement,))
-        self.assertIn("demo[cloud]", self.output.getvalue())
+        self.assertNotIn("demo[cloud]", self.output.getvalue())
 
     async def testKeepsManifestValuesOutsideInstallerFlags(self) -> None:
         """Separate untrusted dependency values from uv's command options.
@@ -870,6 +978,19 @@ class TestInstallCommand(TestCase):
         self.assertTrue(self.installer.process.terminated)
         self.assertTrue(self.installer.process.waited)
 
+    async def testRejectsInvalidOptionPurposes(self) -> None:
+        """Reject malformed purpose metadata instead of printing package names.
+
+        Returns
+        -------
+        None
+            Invalid tables and descriptions fail without invoking the installer.
+        """
+        for value in ('"invalid"', '{"extra:s3" = 42}', '{"extra:s3" = "   "}'):
+            self._writeManifest(f"[tool.orionis]\npackages = {value}\n")
+            self.assertEqual(await self.command.handle(self.app), 1)
+        self.assertEqual(self.installer.calls, [])
+
 class TestInstallIntegration(TestCase):
     """Exercise real uv installation without network access or project mutation."""
 
@@ -904,8 +1025,16 @@ class TestInstallIntegration(TestCase):
         self.command._console = RichConsole(file=self.output, width=120)
         self.command.setArguments({"options": ["probe"], "yes": True})
         self.original_sys = install_module.sys
+        self.original_manifests = {
+            name: getattr(install_module, name)
+            for name in ("_PACKAGE_MANIFEST", "_SOURCE_MANIFEST")
+        }
         install_module.__dict__["sys"] = SimpleNamespace(
             executable=str(self.python_path),
+        )
+        install_module.__dict__.update(
+            _PACKAGE_MANIFEST=self.root / "missing-package" / "pyproject.toml",
+            _SOURCE_MANIFEST=self.root / "missing-source" / "pyproject.toml",
         )
 
     def tearDown(self) -> None:
@@ -917,6 +1046,7 @@ class TestInstallIntegration(TestCase):
             Restore production interpreter selection before project cleanup.
         """
         install_module.__dict__["sys"] = self.original_sys
+        install_module.__dict__.update(self.original_manifests)
 
     def _createWheel(self) -> Path:
         """Build a valid dependency-free wheel using standard library writers.

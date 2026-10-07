@@ -3,41 +3,19 @@
 {% block title %}{% autoescape true %}Maintenance | {{ app_name }}{% endautoescape %}{% endblock %}
 
 {% block content %}{% autoescape true %}
-<main class="main-container">
-    <div class="hud-card">
-        <div class="hud-card-inner">
-            <div class="card-header-label">
-                <span class="system-label">SYS.MAINTENANCE &mdash; {{ app_name }}</span>
-                <div class="status-badge">
-                    <div class="status-badge-dot" aria-hidden="true"></div>
-                    <span>MAINTENANCE</span>
-                </div>
-            </div>
-            <div class="uptime-ring-container">
-                <div class="uptime-ring">
-                    <svg viewBox="0 0 120 120" aria-hidden="true">
-                        <circle class="uptime-ring-bg" cx="60" cy="60" r="54"/>
-                        <circle class="uptime-ring-fill" cx="60" cy="60" r="54"/>
-                    </svg>
-                    <div class="uptime-ring-label">
-                        <span class="uptime-ring-value">0%</span>
-                        <span class="uptime-ring-unit">UPTIME</span>
-                    </div>
-                </div>
-            </div>
-            <div class="status-code-container">
-                <div class="status-code">
-                    <span class="digit">5</span><span class="digit">0</span><span class="digit">3</span>
-                </div>
-            </div>
-            <h1 class="status-title">SYSTEMS OFFLINE</h1>
-            <div class="glow-line"></div>
-            <div class="status-description">
-                Application is currently undergoing scheduled maintenance. All services are temporarily unavailable.
-            </div>
-            <div class="heartbeat-bar">
-                <div class="heartbeat-bar-fill"></div>
-            </div>
+<main id="main-content" class="main-container status-page" tabindex="-1" aria-labelledby="status-title">
+    <div class="status-content">
+        <p class="page-eyebrow">Maintenance</p>
+        <div class="status-code">503</div>
+        <div class="status-rule" aria-hidden="true"></div>
+        <h1 id="status-title" class="status-title">Temporarily unavailable</h1>
+        <p class="status-description">The application is in maintenance mode. Please try again later.</p>
+        <div class="status-actions">
+            <a class="btn btn-primary" href="">{{ icon('refresh-cw') }}<span>Try again</span></a>
+        </div>
+        <div class="status-detail">
+            <span class="topbar-dot" aria-hidden="true"></span>
+            <span>HTTP 503 &middot; Maintenance mode</span>
         </div>
     </div>
 </main>

@@ -56,7 +56,7 @@ _ASGI_BODY_QUEUE_SIZE = 8
 _CWD = Path.cwd()
 _CONFIG_KEY_CACHE_SIZE = 256
 _MAINTENANCE_REFRESH_NS = 100_000_000
-_ROUTER_FACADE_MODULE = "orionis.support.facades.router"
+_ROUTER_FACADE_MODULE = "orionis.support.facades"
 _ERR_NOT_CONFIGURED: str = (
     "Application configuration is not initialized. Please call create() first."
 )
@@ -1937,11 +1937,11 @@ class Application(Container, IApplication):
         # Resolve and validate console routing files
         console_routers = self.__resolveAndValidateRoutingFiles(
             console,
-            {"orionis.support.facades.reactor"},
+            {_ROUTER_FACADE_MODULE},
         )
         ai_routers = self.__resolveAndValidateRoutingFiles(
             ai,
-            {"orionis.support.facades.mcp"},
+            {_ROUTER_FACADE_MODULE},
         )
         websocket_routers = self.__resolveAndValidateRoutingFiles(
             websocket,

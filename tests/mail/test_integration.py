@@ -652,7 +652,7 @@ async def main(runtime: str) -> None:
     routes.mkdir()
     (routes / "__init__.py").write_text("", encoding="utf-8")
     (routes / "console.py").write_text(
-        "from orionis.support.facades.reactor import Reactor\n",
+        "from orionis.support.facades import Reactor\n",
         encoding="utf-8",
     )
     app = Application(base_path=Path.cwd())

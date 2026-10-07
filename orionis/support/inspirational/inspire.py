@@ -1,9 +1,12 @@
 import secrets
 from typing import ClassVar
+from orionis.console.output.console import Console
 from orionis.support.inspirational.contracts.inspire import IInspire
 from orionis.support.inspirational.quotes import INSPIRATIONAL_QUOTES
 
 class Inspire(IInspire):
+
+    # ruff: noqa: TC001
 
     __slots__ = ("_count", "_quotes")
 
@@ -17,18 +20,18 @@ class Inspire(IInspire):
 
     def __init__(self, quotes: list[dict] | None = None) -> None:
         """
-        Initialize the Inspire service with a list of inspirational quotes.
+        Initialize the service with inspirational quotes.
 
         Parameters
         ----------
         quotes : list[dict] | None, optional
-            List of dictionaries, each containing 'quote' (str) and 'author' (str).
-            If None or empty, defaults to INSPIRATIONAL_QUOTES.
+            Quote dictionaries with ``quote`` and ``author`` keys. If omitted or
+            empty, use ``INSPIRATIONAL_QUOTES``.
 
         Returns
         -------
         None
-            This method initializes the internal state of the Inspire service.
+            Store the quotes and their count.
 
         Raises
         ------
@@ -54,18 +57,31 @@ class Inspire(IInspire):
 
     def random(self) -> dict:
         """
-        Return a random inspirational quote from the available list.
-
-        Select a random quote from the internal list of inspirational quotes.
-        If the list is empty, return a fallback quote to ensure a valid response.
+        Select a random quote or the fallback quote.
 
         Returns
         -------
         dict
-            Dictionary with 'quote' (str) and 'author' (str) keys. If no quotes
-            are available, returns the fallback quote.
+            Quote dictionary containing ``quote`` and ``author`` keys.
         """
         if self._count == 0:
             return self._FALLBACK
         return secrets.choice(self._quotes)
+
+    def printQuote(self, console: Console) -> None:
+        """
+        Print a random quote to the console.
+
+        Parameters
+        ----------
+        console : Console
+            Console used to write the formatted quote.
+
+        Returns
+        -------
+        None
+            Write the quote and its author.
+        """
+        quote = self.random()
+        console.writeLine(f'"{quote["quote"]}" - {quote["author"]}') # ruff: noqa: T201
 

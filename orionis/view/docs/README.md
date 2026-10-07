@@ -216,7 +216,9 @@ Paths and the cache directory may be absolute; relative values resolve against t
 
 ## Integration with Orionis
 
-The provider registers these template globals: `app`, `asset`, `secure_asset`, `cache`, `collect`, `config`, `csrf_field`, `csrf_token`, `dump`, `encrypt`, `decrypt`, `errors`, `flash`, `framework_version`, `python_version`, `now`, `today`, `old`, `request`, `route`, `session`, `stringable`, `url`, `secure_url`, `trans`/`__`, `choice`, `locale`, and `locales`.
+The provider registers these template globals: `app`, `asset`, `secure_asset`, `auth`, `cache`, `collect`, `config`, `csrf_field`, `csrf_token`, `dump`, `encrypt`, `decrypt`, `errors`, `flash`, `framework_version`, `python_version`, `now`, `today`, `old`, `request`, `route`, `session`, `stringable`, `url`, `secure_url`, `trans`/`__`, `choice`, `locale`, and `locales`.
+
+`auth()` returns the public `Auth` facade from `orionis.support.facades`. Read the current request's identity with `auth().user()`, or check `auth().check()` and `auth().guest()`. Guests have no user, so guard attribute access with `{% if auth().check() %}`. In authenticated layouts, `{% set user = auth().user() %}` removes the need to pass a user from each controller. The global does not cache an identity.
 
 Many globals are asynchronous because they resolve scoped framework state. Jinja's async renderer awaits their values; explicit calls in templates may use `await` as shown in the quick start. The `json` and `markdown` filters and the `{% csrf %}` extension are installed automatically.
 

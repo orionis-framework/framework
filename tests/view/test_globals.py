@@ -1,9 +1,20 @@
+import asyncio
+from pathlib import Path
+from typing import TYPE_CHECKING, cast
 from unittest.mock import AsyncMock, MagicMock
+from jinja2 import Environment, FileSystemLoader, StrictUndefined
 from markupsafe import Markup, escape
+from orionis.auth import Authenticatable
+from orionis.auth.context.context import AuthenticationContext
+from orionis.auth.context.functions import bind_auth_context
+from orionis.container.context.manager import ScopeManager
+from orionis.support.facades import Auth
 from orionis.test import TestCase
 from orionis.view import globals as view_globals
+from orionis.view.extensions import CsrfExtension
 from orionis.view.globals import (
     _global_app,
+    _global_auth,
     _global_config,
     _global_csrf_field,
     _global_framework_version,
@@ -15,6 +26,10 @@ from orionis.view.globals import (
     _global_session,
     _global_today,
 )
+
+if TYPE_CHECKING:
+    from jinja2 import Template
+    from orionis.auth.contracts.authenticatable import IAuthenticatable
 
 class TestGlobalConfig(TestCase):
 
@@ -418,6 +433,190 @@ class TestGlobalCsrfField(TestCase):
             f'<input type="hidden" name="_csrf" value="{escape(token)}">',
         )
         self.assertNotIn("<script>", str(field))
+
+class _AuthIdentity(Authenticatable):
+
+    __slots__ = ("email", "name")
+
+    def __init__(self, name: str, email: str) -> None:
+        """
+        Initialize an authenticatable identity for template rendering.
+
+        Parameters
+        ----------
+        name : str
+            Display name exposed to the template.
+        email : str
+            Email address exposed to the template.
+
+        Returns
+        -------
+        None
+            Store the identity's display attributes.
+        """
+        self.name = name
+        self.email = email
+
+class TestGlobalAuth(TestCase):
+
+    def setUp(self) -> None:
+        """
+        Register the authentication global before entering a request scope.
+
+        Returns
+        -------
+        None
+            Configure an asynchronous, autoescaping Jinja environment.
+        """
+        self._environment = Environment(enable_async=True, autoescape=True)
+        self._environment.globals["auth"] = _global_auth()
+        self._template_path = (
+            Path(__file__).resolve().parents[2] / "resources" / "views"
+        )
+
+    @staticmethod
+    async def _renderForIdentity(
+        template: Template,
+        identity: _AuthIdentity | None,
+    ) -> str:
+        """
+        Render a template inside an independent authentication scope.
+
+        Parameters
+        ----------
+        template : Template
+            Shared template rendered without controller-supplied context.
+        identity : _AuthIdentity | None
+            User bound to the scope, or ``None`` for a guest.
+
+        Returns
+        -------
+        str
+            Rendered template using only the current scope's identity.
+        """
+        async with ScopeManager():
+            bind_auth_context(AuthenticationContext(
+                identity=cast("IAuthenticatable | None", identity),
+                guard="session",
+            ))
+            await asyncio.sleep(0)
+            return await template.render_async()
+
+    def testReturnsAuthenticationFacade(self) -> None:
+        """
+        Expose the public authentication facade from the template global.
+
+        Returns
+        -------
+        None
+            Assert that repeated calls return the same facade class.
+        """
+        auth = _global_auth()
+        self.assertIs(auth(), Auth)
+        self.assertIs(auth(), Auth)
+
+    async def testRendersUserWithoutControllerContext(self) -> None:
+        """
+        Render authenticated user attributes through the facade global.
+
+        Returns
+        -------
+        None
+            Verify user access, authentication checks and HTML escaping.
+        """
+        template = self._environment.from_string(
+            "{{ auth().user().name }}|{{ auth().user().email }}|"
+            "{{ auth().check() }}|{{ auth().guest() }}",
+        )
+        identity = _AuthIdentity("Alice <Admin>", "alice@example.test")
+        rendered = await self._renderForIdentity(template, identity)
+        self.assertEqual(
+            rendered,
+            "Alice &lt;Admin&gt;|alice@example.test|True|False",
+        )
+
+    async def testRendersGuestWithoutAUser(self) -> None:
+        """
+        Render guest state without requiring an authenticated identity.
+
+        Returns
+        -------
+        None
+            Verify that guests expose no user and fail authentication checks.
+        """
+        template = self._environment.from_string(
+            "{{ auth().user() is none }}|{{ auth().check() }}|"
+            "{{ auth().guest() }}",
+        )
+        rendered = await self._renderForIdentity(template, None)
+        self.assertEqual(rendered, "True|False|True")
+
+    async def testRendersIsolatedUsersAcrossScopes(self) -> None:
+        """
+        Keep concurrent template renders isolated by authentication scope.
+
+        Returns
+        -------
+        None
+            Verify that a shared global never caches another scope's user.
+        """
+        template = self._environment.from_string(
+            "{{ auth().user().name }}|{{ auth().user().email }}",
+        )
+        identities = [
+            _AuthIdentity(f"User {index}", f"user{index}@example.test")
+            for index in range(8)
+        ]
+        rendered = await asyncio.gather(*(
+            self._renderForIdentity(template, identity)
+            for identity in identities
+        ))
+        self.assertEqual(
+            rendered,
+            [f"{identity.name}|{identity.email}" for identity in identities],
+        )
+
+    async def testRendersAuthenticatedLayoutsWithoutControllerContext(self) -> None:
+        """
+        Render the application pages using authentication from their layout.
+
+        Returns
+        -------
+        None
+            Verify the shared header and home greeting without a user context.
+        """
+        environment = Environment(
+            loader=FileSystemLoader(str(self._template_path)),
+            extensions=[CsrfExtension],
+            enable_async=True,
+            autoescape=True,
+            undefined=StrictUndefined,
+        )
+        environment.globals.update({
+            "auth": _global_auth(),
+            "__": str,
+            "config": {"app.locale": "en", "app.name": "Orionis"}.get,
+            "framework_version": _global_framework_version(),
+            "asset": lambda path: f"/assets/{path}",
+            "route": lambda name: f"/{name}",
+            "csrf_token": lambda: "test-csrf-value",
+            "csrf_field": Markup,
+        })
+        identity = _AuthIdentity("Template User", "template@example.test")
+        pages = [
+            await self._renderForIdentity(environment.get_template(path), identity)
+            for path in (
+                "home/index.html",
+                "admin/roles/index.html",
+                "admin/users/index.html",
+            )
+        ]
+        for page in pages:
+            self.assertIn(
+                "<strong>Template User</strong><span>template@example.test</span>",
+                page,
+            )
+        self.assertIn("Welcome back, Template User.", pages[0])
 
 class TestHelpersPackage(TestCase):
 

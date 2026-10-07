@@ -16,6 +16,7 @@ _EXPECTED_GLOBALS: frozenset[str] = frozenset({
     "__",
     "app",
     "asset",
+    "auth",
     "cache",
     "choice",
     "collect",

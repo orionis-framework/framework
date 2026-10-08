@@ -9,12 +9,18 @@ from importlib import import_module
 from importlib.util import find_spec
 from pathlib import Path
 from tempfile import TemporaryDirectory
+from unittest.mock import MagicMock, patch
 from sqlalchemy import create_engine, event, text
+from sqlalchemy.engine import Connection as SqlConnection
+from sqlalchemy.exc import SQLAlchemyError
 from config.database import BootstrapDatabase
+from orionis.cache.stores.database import DatabaseCacheBackend
+from orionis.console.tasks.store import ScheduleStore
 from orionis.database.compiler import SQLCompiler
 from orionis.database.connection import Connection
 from orionis.database.dialect import build_engine_url, engine_options
 from orionis.database.exceptions import QueryException, TransactionException
+from orionis.database.seeders.runner import SeederRunner
 from orionis.database.threaded.engine import ThreadedEngine
 from orionis.foundation.config.database import (
     ConnectionName,
@@ -23,9 +29,15 @@ from orionis.foundation.config.database import (
     Redshift,
     RedshiftSSLMode,
 )
-from orionis.orm.query.expressions import DeletePlan, InsertPlan, SelectPlan, UpdatePlan
+from orionis.orm.query.expressions import (
+    AggregateClause, AggregateFunction, DeletePlan, InsertPlan, LockMode,
+    SelectPlan, SubQueryColumn, UpdatePlan,
+)
 from orionis.orm.schema.table import TableDefinition
 from orionis.orm.schema.types import BigInteger, Integer, String
+from orionis.queues.drivers.database import DatabaseQueueDriver
+from orionis.queues.exceptions import QueueStorageError
+from orionis.session.stores.database import DatabaseSessionStore
 from orionis.test import TestCase
 from tests.foundation.config.test_environment import ConfigurationTestCase
 
@@ -262,6 +274,111 @@ class TestRedshiftDialect(TestCase):
             self.assertNotIn("id", insert.params)
         finally:
             engine.dispose()
+
+    def testCheckfirstUsesBindingsForQuotedAndMaliciousIdentifiers(self) -> None:
+        """Keep catalog lookups separate from identifier values.
+
+        Returns
+        -------
+        None
+            Schema and table names never become SQL fragments.
+        """
+        dialect = import_module("orionis.database.redshift").RedshiftDialect()
+        connection = MagicMock(spec=SqlConnection)
+        connection.execute.return_value.scalar.return_value = True
+        schema = "owned' OR 1=1 --"
+        table = "items'; DROP TABLE existing_data; --"
+        self.assertTrue(dialect.has_table(connection, table, schema=schema))
+        statement, bindings = connection.execute.call_args.args
+        sql = str(statement)
+        self.assertEqual(bindings, {"schema": schema, "table_name": table})
+        self.assertNotIn(schema, sql)
+        self.assertNotIn(table, sql)
+        self.assertIn("current_database()", sql)
+        self.assertIn("COALESCE(:schema, current_schema())", sql)
+
+class TestRedshiftConsumerCapabilities(TestCase):
+    """Reject consumers whose correctness requires enforced unique keys."""
+
+    async def testCacheAndSeederClaimsRejectBeforeAnyDatabaseAccess(self) -> None:
+        """Keep unsafe atomic claims from creating tables or running seeders.
+
+        Returns
+        -------
+        None
+            The asynchronous warehouse connection remains lazy and reusable.
+        """
+        connection = Connection("warehouse", {"driver": "redshift"})
+        self.assertFalse(connection.supportsUniqueConstraints())
+        with self.assertRaisesRegex(QueryException, "enforced unique constraints"):
+            DatabaseCacheBackend(connection, "cache")
+        with self.assertRaisesRegex(QueryException, "one row per session"):
+            DatabaseSessionStore(connection, "sessions")
+        with self.assertRaisesRegex(QueueStorageError, "exclusive reservations"):
+            DatabaseQueueDriver(connection, "jobs")
+        application = MagicMock()
+        manager = MagicMock()
+        manager.connection.return_value = connection
+        runner = SeederRunner(application, manager)
+        with self.assertRaisesRegex(QueryException, "exclusive seeder claims"):
+            await runner.seed(connection="warehouse")
+        application.build.assert_not_called()
+        application.path.assert_not_called()
+        self.assertIsNone(connection._engine)
+        self.assertTrue(Connection(
+            "sqlite", {"driver": "sqlite", "database": ":memory:"},
+        ).supportsUniqueConstraints())
+
+    def testSchedulerRejectsTheWarehouseBeforeConstructingASyncEngine(self) -> None:
+        """Keep unsupported job-store uniqueness and indexes from reaching Redshift.
+
+        Returns
+        -------
+        None
+            The scheduler raises a configuration error before creating an engine.
+        """
+        application = MagicMock()
+        application.config.return_value = {
+            "store": "database",
+            "stores": {"database": {"connection": "warehouse", "table": "jobs"}},
+        }
+        manager = MagicMock()
+        manager.configFor.return_value = {"driver": "redshift"}
+        store = ScheduleStore(application, manager)
+        with (
+            patch("orionis.console.tasks.store.SQLAlchemyJobStore") as factory,
+            self.assertRaisesRegex(RuntimeError, "unique constraints and indexes"),
+        ):
+            store.database()
+        factory.assert_not_called()
+
+    async def testUnsupportedRowLocksRejectAllPlanFormsBeforeCheckout(self) -> None:
+        """Prevent warehouse SELECT plans from silently discarding requested locks.
+
+        Returns
+        -------
+        None
+            Unsupported locks reject before a worker or network connection starts.
+        """
+        connection = Connection("warehouse", {"driver": "redshift"})
+        table = TableDefinition(name="items", columns={"id": Integer().primary()})
+        for mode in (LockMode.UPDATE, LockMode.SHARE):
+            plans = (
+                SelectPlan(table=table, lock=mode),
+                SelectPlan(
+                    table=table, lock=mode, distinct=True,
+                    aggregate=AggregateClause(AggregateFunction.COUNT),
+                ),
+                SelectPlan(table=table, columns=(SubQueryColumn(
+                    SelectPlan(table=table, columns=("id",), lock=mode), "value",
+                ),)),
+            )
+            for plan in plans:
+                with self.subTest(mode=mode, plan=plan), self.assertRaisesRegex(
+                    QueryException, "row-level SELECT locks",
+                ):
+                    await connection.select(plan)
+        self.assertIsNone(connection._engine)
 
 class _BlockingQuery:
     """Pause real DBAPI work until the asynchronous test releases it."""
@@ -579,6 +696,203 @@ class TestThreadedRedshiftConnection(TestCase):
             await self._connection.select("SELECT * FROM items")
         await self._connection.disconnect()
         await self._connection.disconnect()
+
+    async def testCancelledBeginRollsBackLateTransactionAndClosesWorker(self) -> None:
+        """Drain BEGIN and discard its late result before releasing the checkout.
+
+        Returns
+        -------
+        None
+            Cancellation never leaves a live connection or worker behind.
+        """
+        gate = _BlockingQuery()
+        threads_before = {thread.ident for thread in threading.enumerate()}
+        event.listen(self._engine.sync_engine, "begin", lambda _raw: gate.wait())
+        task = asyncio.create_task(self._connection.begin())
+        try:
+            self.assertTrue(await asyncio.to_thread(gate.entered.wait, 2))
+            task.cancel()
+            await asyncio.sleep(0)
+            task.cancel()
+            self.assertFalse(task.done())
+        finally:
+            gate.release.set()
+        with self.assertRaises(asyncio.CancelledError):
+            await task
+        self.assertEqual(self._engine.sync_engine.pool.checkedout(), 0)
+        self.assertFalse(self._connection.inTransaction())
+        self.assertEqual([
+            thread for thread in threading.enumerate()
+            if thread.name.startswith("orionis-redshift")
+            and thread.ident not in threads_before
+        ], [])
+
+    async def testCancelledCommitAndRollbackDrainBeforeConnectionRelease(self) -> None:
+        """Keep transaction control outside the loop and drain repeated cancellation.
+
+        Returns
+        -------
+        None
+            Completed commits persist, rollbacks discard, and every checkout closes.
+        """
+        dialect = self._engine.sync_engine.dialect
+        for control, persisted in (("commit", True), ("rollback", False)):
+            with self.subTest(control=control):
+                gate = _BlockingQuery()
+                reached_control = asyncio.Event()
+                operation = getattr(dialect, "do_" + control)
+
+                def blocked(raw, callback=operation, blocker=gate):
+                    blocker.wait()
+                    return callback(raw)
+
+                async def transaction(operation=control, ready=reached_control):
+                    await self._connection.begin()
+                    try:
+                        await self._connection.execute(
+                            "INSERT INTO items (name) VALUES (:name)",
+                            {"name": operation},
+                        )
+                        ready.set()
+                        await asyncio.Event().wait()
+                    except asyncio.CancelledError:
+                        await getattr(self._connection, operation)()
+
+                task = asyncio.create_task(transaction())
+                try:
+                    await asyncio.wait_for(reached_control.wait(), 2)
+                    with patch.object(dialect, "do_" + control, blocked):
+                        task.cancel()
+                        self.assertTrue(await asyncio.to_thread(gate.entered.wait, 2))
+                        task.cancel()
+                        await asyncio.sleep(0)
+                        task.cancel()
+                        self.assertFalse(task.done())
+                        gate.release.set()
+                        with self.assertRaises(asyncio.CancelledError):
+                            await task
+                finally:
+                    gate.release.set()
+                    if not task.done():
+                        task.cancel()
+                        await asyncio.gather(task, return_exceptions=True)
+                self.assertEqual(self._engine.sync_engine.pool.checkedout(), 0)
+                rows = await self._connection.select(
+                    "SELECT name FROM items WHERE name = :name", {"name": control},
+                )
+                self.assertEqual(rows, [{"name": control}] if persisted else [])
+
+    async def testCancelledCloseDrainsPoolReleaseAndJoinsTheWorker(self) -> None:
+        """Wait for the blocking rollback of CLOSE before releasing its worker.
+
+        Returns
+        -------
+        None
+            A cancelled close still returns the connection to the pool.
+        """
+        raw = await self._engine.connect()
+        await raw.execute(text("SELECT 1"))
+        gate = _BlockingQuery()
+        dialect = self._engine.sync_engine.dialect
+        rollback = dialect.do_rollback
+
+        def blocked(connection):
+            gate.wait()
+            return rollback(connection)
+
+        with patch.object(dialect, "do_rollback", blocked):
+            task = asyncio.create_task(raw.close())
+            try:
+                self.assertTrue(await asyncio.to_thread(gate.entered.wait, 2))
+                task.cancel()
+                await asyncio.sleep(0)
+                task.cancel()
+                self.assertFalse(task.done())
+            finally:
+                gate.release.set()
+            with self.assertRaises(asyncio.CancelledError):
+                await task
+        self.assertEqual(self._engine.sync_engine.pool.checkedout(), 0)
+
+    async def testImplicitTransactionControlErrorsAreSanitizedAndRecover(self) -> None:
+        """Hide blocking-driver payloads from BEGIN, COMMIT and ROLLBACK errors.
+
+        Returns
+        -------
+        None
+            Failed terminals close their checkout and subsequent queries still run.
+        """
+        driver_payload = "private-credential-and-statement-payload"
+        dialect = self._engine.sync_engine.dialect
+        for control in ("begin", "commit", "rollback"):
+            with self.subTest(control=control):
+                if control == "begin":
+                    def fail_begin(_raw):
+                        raise SQLAlchemyError(driver_payload)
+
+                    event.listen(self._engine.sync_engine, "begin", fail_begin)
+                    try:
+                        with self.assertRaises(QueryException) as caught:
+                            await self._connection.select("SELECT 1 AS value")
+                    finally:
+                        event.remove(self._engine.sync_engine, "begin", fail_begin)
+                else:
+                    original = getattr(dialect, "do_" + control)
+
+                    def fail_control(raw, callback=original):
+                        callback(raw)
+                        raise SQLAlchemyError(driver_payload)
+
+                    with (
+                        patch.object(dialect, "do_" + control, fail_control),
+                        self.assertRaises(QueryException) as caught,
+                    ):
+                        if control == "commit":
+                            await self._connection.select("SELECT 1 AS value")
+                        else:
+                            await self._connection.select("SELECT * FROM missing")
+                self.assertNotIn(driver_payload, str(caught.exception))
+                self.assertTrue(caught.exception.__suppress_context__)
+                self.assertEqual(self._engine.sync_engine.pool.checkedout(), 0)
+                self.assertEqual(await self._connection.select("SELECT 1 AS value"), [
+                    {"value": 1},
+                ])
+
+    async def testFailedManualControlInvalidatesWithoutDriverLogs(self) -> None:
+        """Discard unsettled blocking transactions before pool reset can log errors.
+
+        Returns
+        -------
+        None
+            Public control errors are sanitized and the next checkout succeeds.
+        """
+        dialect = self._engine.sync_engine.dialect
+        for control in ("commit", "rollback"):
+            with self.subTest(control=control):
+                await self._connection.begin()
+                await self._connection.execute(
+                    "INSERT INTO items (name) VALUES (:name)", {"name": control},
+                )
+                original = getattr(dialect, "do_" + control)
+
+                def fail_control(raw, callback=original):
+                    callback(raw)
+                    message = "private-driver-payload"
+                    raise SQLAlchemyError(message)
+
+                with (
+                    patch.object(dialect, "do_" + control, fail_control),
+                    self.assertNoLogs("sqlalchemy.pool", level="ERROR"),
+                    self.assertRaises(TransactionException) as caught,
+                ):
+                    await getattr(self._connection, control)()
+                self.assertNotIn("private-driver-payload", str(caught.exception))
+                self.assertTrue(caught.exception.__suppress_context__)
+                self.assertFalse(self._connection.inTransaction())
+                self.assertEqual(self._engine.sync_engine.pool.checkedout(), 0)
+                self.assertEqual(await self._connection.select("SELECT 1 AS value"), [
+                    {"value": 1},
+                ])
 
 class TestRedshiftOptionalDependencies(TestCase):
     """Keep ordinary framework imports independent of the optional AWS packages."""

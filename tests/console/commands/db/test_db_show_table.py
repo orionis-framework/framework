@@ -147,6 +147,8 @@ class _CatalogConnection:
             One table name row.
         """
         self.queries.append(query)
+        if "FROM svv_mv_info" in query:
+            return []
         return self.rows
 
 class _FailingMetadataConnection:
@@ -397,7 +399,7 @@ class TestDbShowTableCommands(TestCase):
                 inspector.connection = catalog
                 with self.assertRaisesRegex(ValueError, "contains a period"):
                     await inspector.tableDetails("dbo.odd.name")
-                self.assertEqual(len(catalog.queries), 1)
+                self.assertEqual(len(catalog.queries), 2 if driver == "redshift" else 1)
 
     async def testQuotedAndReservedLikeSQLiteNames(self) -> None:
         """Keep literal dots and exclude only the reserved sqlite_ prefix.
@@ -656,9 +658,12 @@ class TestDbShowTableCommands(TestCase):
         inspector.driver = "redshift"
         catalog = Mock()
         catalog.select = AsyncMock(side_effect=[
-            [{"name": "analytics.events"}], [{"name": "analytics.active"}],
+            [{"name": "analytics.events"}, {"name": "analytics.summary"}],
             [{"name": "analytics.summary"}],
-            [{"object_count": 1}], [{"object_count": 2}], [{"count": 3}],
+            [{"name": "analytics.active"}], [{"name": "analytics.summary"}],
+            [{"name": "analytics.summary"}],
+            [{"name": "analytics.active"}], [{"name": "analytics.summary"}],
+            [{"object_count": 2}], [{"count": 3}],
         ])
         inspector.connection = catalog
         self.assertEqual(await inspector.listTables(), ["analytics.events"])
@@ -679,11 +684,12 @@ class TestDbShowTableCommands(TestCase):
         )
         queries = [call.args[0] for call in catalog.select.await_args_list]
         self.assertIn("svv_redshift_tables", queries[0])
-        self.assertIn("NOT EXISTS", queries[0])
-        self.assertIn("svv_mv_info", queries[0])
-        self.assertIn("svv_mv_info", queries[2])
-        self.assertIn("COUNT(*)", queries[3])
-        self.assertIn("stv_sessions", queries[5])
+        self.assertNotIn("JOIN svv_mv_info", queries[0])
+        self.assertNotIn("NOT EXISTS", queries[0])
+        self.assertIn("svv_mv_info", queries[1])
+        self.assertIn("svv_mv_info", queries[4])
+        self.assertIn("COUNT(*)", queries[7])
+        self.assertIn("stv_sessions", queries[8])
         self.assertFalse(any("relispartition" in query for query in queries))
         self.assertFalse(any("user_tables" in query for query in queries))
 
@@ -702,6 +708,7 @@ class TestDbShowTableCommands(TestCase):
             [{"bytes": 2097152}], [{"name": "analytics.events", "bytes": 1048576}],
             [{"name": "analytics.events", "bytes": 1048576}],
             [{"name": "analytics.events"}],
+            [],
         ])
         inspector.connection = catalog
         self.assertEqual(await inspector.databaseSize(), 2097152)
@@ -717,6 +724,9 @@ class TestDbShowTableCommands(TestCase):
         self.assertEqual(calls[1].args[1], {"schema": "analytics", "table": "events"})
         self.assertEqual(calls[3].args[1], {
             "kind": "TABLE", "schema": "analytics", "table": "events",
+        })
+        self.assertEqual(calls[4].args[1], {
+            "schema": "analytics", "table": "events",
         })
 
     async def testRedshiftOptionalMetricsHandlePermissionErrors(self) -> None:

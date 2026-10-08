@@ -21,7 +21,7 @@ class HomeController(BaseController):
         Returns
         -------
         JSONResponse
-            A JSON response indicating the API is working.
+            A JSON response containing the queried data from the "vigia.rates" table.
         """
         return response.json({
             "message": "Orionis API is working",

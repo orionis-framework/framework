@@ -519,6 +519,15 @@ class TestDatabaseNamingConventions(TestCase):
                         name = member.name
                         if name.startswith("__") and name.endswith("__"):
                             continue
+                        if (
+                            path.relative_to(_ROOT).as_posix()
+                            == "orionis/database/redshift.py"
+                            and isinstance(node, ast.ClassDef)
+                            and node.name == "RedshiftDialect"
+                            and name == "has_table"
+                        ):
+                            # SQLAlchemy dispatch requires its external API name.
+                            continue
                         if pattern.fullmatch(name) is None:
                             failures.append(
                                 f"{path.relative_to(_ROOT)}:{member.lineno} {name}",

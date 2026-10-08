@@ -1,5 +1,6 @@
 from __future__ import annotations
-from asyncio import current_task
+from asyncio import CancelledError, create_task, current_task, ensure_future
+from contextlib import asynccontextmanager
 from contextvars import ContextVar
 from functools import lru_cache
 from importlib import import_module
@@ -20,10 +21,11 @@ from orionis.database.entities.result import InsertResult
 from orionis.database.exceptions import QueryException, TransactionException
 from orionis.database.threaded.connection import ThreadedConnection
 from orionis.database.threaded.engine import ThreadedEngine
+from orionis.database.threaded.worker import _wait_for_completion
 from orionis.database.transaction import Transaction
 
 if TYPE_CHECKING:
-    from collections.abc import Mapping, Sequence
+    from collections.abc import AsyncGenerator, Mapping, Sequence
     from contextlib import AbstractAsyncContextManager
     from sqlalchemy.engine import CursorResult
     from sqlalchemy.ext.asyncio import AsyncConnection, AsyncTransaction
@@ -45,17 +47,17 @@ _NO_ACTIVE_TRANSACTION: str = "No active transaction on this connection."
 @lru_cache(maxsize=256)
 def _text_statement(sql: str) -> TextClause:
     """
-    Parse a SQL string into a reusable parameterized statement.
+    Parse and cache a SQL string as a reusable textual statement.
 
     Parameters
     ----------
     sql : str
-        Value supplied for ``sql``.
+        SQL text with optional named ``:param`` placeholders.
 
     Returns
     -------
     TextClause
-        Result of the operation described above.
+        SQLAlchemy textual statement with parsed bind parameters.
     """
     return text(sql)
 
@@ -70,19 +72,19 @@ class _TransactionState:
         transaction: AsyncTransaction | ThreadedTransaction,
     ) -> None:
         """
-        Initialize the state with its root transaction.
+        Bind a raw connection and root transaction to the current task.
 
         Parameters
         ----------
         connection : AsyncConnection | ThreadedConnection
-            Raw connection owning the transaction stack.
+            Open connection shared by all transaction levels.
         transaction : AsyncTransaction | ThreadedTransaction
-            Root transaction opened on the connection.
+            Root transaction used to initialize the stack.
 
         Returns
         -------
         None
-            This method does not return a value.
+            Store the connection, owning task, and transaction stack.
         """
         self.connection = connection
         self.owner = current_task()
@@ -90,29 +92,28 @@ class _TransactionState:
 
     async def __aenter__(self) -> AsyncConnection | ThreadedConnection:
         """
-        Expose the wrapped connection without opening a new one.
+        Return the existing raw connection without acquiring another one.
 
         Returns
         -------
         AsyncConnection | ThreadedConnection
-            The wrapped, already-open connection.
+            Open connection retained by the transaction owner.
         """
         return self.connection
 
     async def __aexit__(self, *exc_info: object) -> None:
         """
-        Leave the wrapped connection open for the enclosing transaction.
+        Leave transaction control and cleanup to the owning task.
 
         Parameters
         ----------
         *exc_info : object
-            Exception information from the ``with`` block; unused since
-            the transaction lifecycle is controlled by its owner.
+            Exception details supplied by the context manager; unused.
 
         Returns
         -------
         None
-            This method does not return a value.
+            Leave the connection and transaction stack unchanged.
         """
 
 class Connection(IConnection):
@@ -138,24 +139,26 @@ class Connection(IConnection):
         config: dict[str, Any],
     ) -> None:
         """
-        Initialize the connection with its configuration.
+        Validate the driver and initialize a lazy named connection.
+
+        No engine or database connection is created until first use.
 
         Parameters
         ----------
         name : str
-            Connection name as registered in the manager.
-        config : dict
-            Driver configuration for the connection.
+            Name identifying this connection in the manager.
+        config : dict of str to Any
+            Driver, connection settings, and optional table prefix.
 
         Returns
         -------
         None
-            This method does not return a value.
+            Copy the settings and initialize the compiler and task-local state.
 
         Raises
         ------
         UnsupportedDriverException
-            If the configured driver has no registered dialect.
+            If the driver is missing or unsupported.
         """
         # Validate the driver eagerly so misconfiguration fails fast.
         driver = resolve_driver(config)
@@ -174,14 +177,25 @@ class Connection(IConnection):
 
     def getName(self) -> str:
         """
-        Return the configured name of this connection.
+        Return this connection's registered name.
 
         Returns
         -------
         str
-            Connection name as registered in the manager.
+            Name assigned at construction.
         """
         return self._name
+
+    def supportsUniqueConstraints(self) -> bool:
+        """
+        Report whether the configured backend enforces key uniqueness.
+
+        Returns
+        -------
+        bool
+            ``False`` for Redshift; ``True`` for all other registered drivers.
+        """
+        return resolve_driver(self._config) != "redshift"
 
     # ── Query execution ─────────────────────────────────────────────────────
 
@@ -191,25 +205,25 @@ class Connection(IConnection):
         bindings: Mapping[str, Any] | None = None,
     ) -> list[dict[str, Any]]:
         """
-        Run a SELECT query and return its rows as dictionaries.
+        Execute a SELECT plan or raw SQL and materialize its rows.
 
         Parameters
         ----------
         query : SelectPlan or str
-            Compiled query plan, or a raw SQL string using named
-            ``:param`` placeholders.
+            Query plan to compile, or SQL using named ``:param`` placeholders.
         bindings : Mapping of str to Any, optional
-            Bound parameters for raw SQL strings.
+            Parameters for raw SQL only; ignored when ``query`` is a plan.
 
         Returns
         -------
         list of dict
-            One dictionary per row keyed by column name.
+            Rows keyed by column name, materialized before connection release.
+            Return an empty list when no rows match.
 
         Raises
         ------
         QueryException
-            If the statement fails to compile or execute.
+            If compilation, execution, or connection cleanup fails.
         """
         if isinstance(query, str):
             statement: Any = _text_statement(query)
@@ -228,22 +242,23 @@ class Connection(IConnection):
         plan: InsertPlan,
     ) -> InsertResult:
         """
-        Run an INSERT statement described by the given plan.
+        Execute an INSERT plan and report its key and row count.
 
         Parameters
         ----------
         plan : InsertPlan
-            Insert plan with the target table and row values.
+            Target table and one or more rows to insert.
 
         Returns
         -------
         InsertResult
-            Result carrying the generated key and affected row count.
+            Affected row count and optional first primary-key value. Keys are
+            reported only for single-row inserts when the driver provides one.
 
         Raises
         ------
         QueryException
-            If the statement fails to compile or execute.
+            If compilation, execution, or connection cleanup fails.
         """
         parameters = (
             plan.values if self._compiler.supportsBatchInsert(plan) else None
@@ -251,6 +266,10 @@ class Connection(IConnection):
         statement = self._compiler.compileInsert(
             plan, parameterized=parameters is not None,
         )
+        if resolve_driver(self._config) in {"oracle", "sqlserver", "redshift"}:
+            # Oracle closes executemany cursors before lazy rowcount access;
+            # Paged insertmanyvalues needs aggregated actual row counts.
+            statement = statement.execution_options(preserve_rowcount=True)
 
         async with self._acquire() as connection:
             result = await self._run(connection, statement, parameters)
@@ -265,6 +284,14 @@ class Connection(IConnection):
                 if parameters is not None and resolve_driver(self._config) == "pgsql"
                 else int(result.rowcount or 0)
             )
+            if (
+                resolve_driver(self._config) == "sqlserver"
+                and row_count < 0
+                and result.returned_defaults_rows is not None
+            ):
+                # pyodbc reports -1 for INSERT ... OUTPUT. Core has already
+                # buffered those actual server rows to extract generated keys.
+                row_count = len(result.returned_defaults_rows)
             return InsertResult(
                 last_insert_id=last_id,
                 row_count=row_count,
@@ -275,22 +302,22 @@ class Connection(IConnection):
         plan: UpdatePlan,
     ) -> int:
         """
-        Run an UPDATE statement described by the given plan.
+        Execute an UPDATE plan and return the driver's affected row count.
 
         Parameters
         ----------
         plan : UpdatePlan
-            Update plan with values and filtering conditions.
+            Target table, replacement values, and filtering conditions.
 
         Returns
         -------
         int
-            Number of affected rows.
+            Backend row count, which may count matched rather than changed rows.
 
         Raises
         ------
         QueryException
-            If the statement fails to compile or execute.
+            If compilation, execution, or connection cleanup fails.
         """
         statement = self._compiler.compileUpdate(plan)
         async with self._acquire() as connection:
@@ -302,22 +329,22 @@ class Connection(IConnection):
         plan: DeletePlan,
     ) -> int:
         """
-        Run a DELETE statement described by the given plan.
+        Execute a DELETE plan and return the driver's affected row count.
 
         Parameters
         ----------
         plan : DeletePlan
-            Delete plan with filtering conditions.
+            Target table and conditions selecting the rows to delete.
 
         Returns
         -------
         int
-            Number of affected rows.
+            Driver-reported number of deleted rows.
 
         Raises
         ------
         QueryException
-            If the statement fails to compile or execute.
+            If compilation, execution, or connection cleanup fails.
         """
         statement = self._compiler.compileDelete(plan)
         async with self._acquire() as connection:
@@ -329,22 +356,22 @@ class Connection(IConnection):
         plan: SelectPlan,
     ) -> Any:
         """
-        Run a SELECT plan and return the first column of the first row.
+        Execute a SELECT plan and return its first scalar value.
 
         Parameters
         ----------
         plan : SelectPlan
-            Query plan, typically carrying an aggregate projection.
+            Query plan whose first row and column provide the result.
 
         Returns
         -------
         Any
-            Scalar value, or ``None`` when the query yields no rows.
+            First column of the first row, or ``None`` when no rows are returned.
 
         Raises
         ------
         QueryException
-            If the statement fails to compile or execute.
+            If compilation, execution, or connection cleanup fails.
         """
         statement = self._compiler.compileSelect(plan)
         async with self._acquire() as connection:
@@ -357,25 +384,24 @@ class Connection(IConnection):
         bindings: Mapping[str, Any] | None = None,
     ) -> int:
         """
-        Run a raw data-modifying SQL statement.
+        Execute raw SQL and return the driver's affected row count.
 
         Parameters
         ----------
         sql : str
-            Raw SQL using named ``:param`` placeholders.
+            Data-modifying SQL with optional named ``:param`` placeholders.
         bindings : Mapping of str to Any, optional
-            Bound parameters for the statement.
+            Values bound to the statement's named parameters.
 
         Returns
         -------
         int
-            Number of affected rows.
+            Row count supplied by the driver, or ``0`` when it supplies none.
 
         Raises
         ------
         QueryException
-            If the statement fails to execute. Driver messages and bound
-            values are excluded because they may contain credentials.
+            If execution or cleanup fails; SQL and bound values are omitted.
         """
         async with self._acquire() as connection:
             result = await self._run(connection, _text_statement(sql), bindings)
@@ -387,26 +413,26 @@ class Connection(IConnection):
         bindings: Mapping[str, Any] | None = None,
     ) -> bool:
         """
-        Run a raw SQL statement without inspecting its result.
+        Execute raw SQL and discard its result.
 
-        Intended for DDL and maintenance commands.
+        Use this for DDL or maintenance commands with no result to consume.
 
         Parameters
         ----------
         sql : str
-            Raw SQL statement.
+            SQL statement with optional named ``:param`` placeholders.
         bindings : Mapping of str to Any, optional
-            Bound parameters for the statement.
+            Values bound to the statement's named parameters.
 
         Returns
         -------
         bool
-            ``True`` when the statement executes without errors.
+            ``True`` after the statement and connection cleanup succeed.
 
         Raises
         ------
         QueryException
-            If the statement fails to execute.
+            If execution or connection cleanup fails.
         """
         async with self._acquire() as connection:
             await self._run(connection, _text_statement(sql), bindings)
@@ -421,25 +447,24 @@ class Connection(IConnection):
         if_not_exists: bool = True,
     ) -> bool:
         """
-        Create the physical table described by the given definition.
+        Create a table from its schema definition.
 
         Parameters
         ----------
         table : TableDefinition
-            Table definition to materialize.
+            Logical table definition; the connection prefix is applied.
         if_not_exists : bool, optional
-            Whether to guard the statement with ``IF NOT EXISTS`` so that
-            an already existing table is silently kept.
+            Skip creation when the table already exists. Defaults to ``True``.
 
         Returns
         -------
         bool
-            ``True`` when the statement executes without errors.
+            ``True`` after creating the table or keeping an existing one.
 
         Raises
         ------
         QueryException
-            If the DDL statement fails to execute.
+            If schema compilation, creation, or connection cleanup fails.
         """
         statement = self._compiler.compileCreateTable(
             table, if_not_exists=if_not_exists,
@@ -464,27 +489,27 @@ class Connection(IConnection):
         if_exists: bool = True,
     ) -> bool:
         """
-        Drop the physical table with the given logical name.
+        Drop a table using its logical name and optional schema.
 
         Parameters
         ----------
         name : str
-            Logical table name; the connection prefix is applied.
+            Logical name to drop after applying the connection prefix.
         schema : str or None, optional
-            Database schema owning the table, or ``None`` for the default.
+            Schema owning the table, or ``None`` for the default schema.
         if_exists : bool, optional
-            Whether to guard the statement with ``IF EXISTS`` so that a
-            missing table does not raise an error.
+            Request ``IF EXISTS`` protection for a missing table. Defaults to
+            ``True``.
 
         Returns
         -------
         bool
-            ``True`` when the statement executes without errors.
+            ``True`` when the DROP statement completes without errors.
 
         Raises
         ------
         QueryException
-            If the DDL statement fails to execute.
+            If schema compilation, execution, or connection cleanup fails.
         """
         statement = self._compiler.compileDropTable(
             name, schema, if_exists=if_exists,
@@ -497,17 +522,18 @@ class Connection(IConnection):
 
     async def begin(self) -> None:
         """
-        Begin a transaction, or a savepoint when one is already active.
+        Begin a task-local transaction or create a nested savepoint.
 
         Returns
         -------
         None
-            This method does not return a value.
+            Push the new transaction level onto the current task's stack.
 
         Raises
         ------
         TransactionException
-            If the transaction cannot be started.
+            If acquisition or transaction control fails, nesting is unsupported,
+            or an active transaction belongs to another task.
         """
         state = self._transactionState()
         try:
@@ -515,9 +541,16 @@ class Connection(IConnection):
                 # Open a dedicated raw connection with a root transaction.
                 raw = await self._getEngine().connect()
                 try:
-                    transaction = await raw.begin()
-                except BaseException:
-                    await raw.close()
+                    transaction = (
+                        await raw.begin() if isinstance(raw, ThreadedConnection)
+                        else await _wait_for_completion(ensure_future(raw.begin()))
+                    )
+                except BaseException as exc:
+                    try:
+                        if isinstance(exc, CancelledError):
+                            await _wait_for_completion(create_task(raw.invalidate()))
+                    finally:
+                        await _wait_for_completion(create_task(raw.close()))
                     raise
                 self._tx_state.set(_TransactionState(raw, transaction))
             else:
@@ -525,25 +558,35 @@ class Connection(IConnection):
                 if isinstance(state.connection, ThreadedConnection):
                     error_msg = "Amazon Redshift does not support nested transactions."
                     raise TransactionException(error_msg)
-                savepoint = await state.connection.begin_nested()
+                savepoint = await _wait_for_completion(
+                    ensure_future(state.connection.begin_nested()),
+                    on_cancel=lambda late: _wait_for_completion(
+                        create_task(late.rollback()),
+                    ),
+                )
                 state.transactions.append(savepoint)
         except SQLAlchemyError as exc:
-            error_msg = f"Unable to begin transaction: {exc}"
-            raise TransactionException(error_msg) from exc
+            error_msg = (
+                f"Unable to begin transaction on connection '{self._name}' "
+                f"({type(exc).__name__})."
+            )
+            raise TransactionException(error_msg) from None
 
     async def commit(self) -> None:
         """
-        Commit the innermost active transaction or savepoint.
+        Commit the current task's innermost transaction or savepoint.
 
         Returns
         -------
         None
-            This method does not return a value.
+            Close the connection when no transaction levels remain.
 
         Raises
         ------
         TransactionException
-            If no transaction is active or the commit fails.
+            If no level is active, it belongs to another task, or commit fails.
+        QueryException
+            If releasing the settled connection fails.
         """
         state = self._transactionState()
         if state is None or not state.transactions:
@@ -551,26 +594,39 @@ class Connection(IConnection):
 
         transaction = state.transactions.pop()
         try:
-            await transaction.commit()
+            if isinstance(state.connection, ThreadedConnection):
+                await transaction.commit()
+            else:
+                await _wait_for_completion(create_task(transaction.commit()))
+        except CancelledError:
+            await _wait_for_completion(create_task(state.connection.invalidate()))
+            raise
         except SQLAlchemyError as exc:
-            error_msg = f"Unable to commit transaction: {exc}"
-            raise TransactionException(error_msg) from exc
+            if isinstance(state.connection, ThreadedConnection):
+                await state.connection.invalidate()
+            error_msg = (
+                f"Unable to commit transaction on connection '{self._name}' "
+                f"({type(exc).__name__})."
+            )
+            raise TransactionException(error_msg) from None
         finally:
             await self._releaseIfSettled(state)
 
     async def rollback(self) -> None:
         """
-        Roll back the innermost active transaction or savepoint.
+        Roll back the current task's innermost transaction or savepoint.
 
         Returns
         -------
         None
-            This method does not return a value.
+            Close the connection when no transaction levels remain.
 
         Raises
         ------
         TransactionException
-            If no transaction is active or the rollback fails.
+            If no level is active, it belongs to another task, or rollback fails.
+        QueryException
+            If releasing the settled connection fails.
         """
         state = self._transactionState()
         if state is None or not state.transactions:
@@ -578,32 +634,44 @@ class Connection(IConnection):
 
         transaction = state.transactions.pop()
         try:
-            await transaction.rollback()
+            if isinstance(state.connection, ThreadedConnection):
+                await transaction.rollback()
+            else:
+                await _wait_for_completion(create_task(transaction.rollback()))
+        except CancelledError:
+            await _wait_for_completion(create_task(state.connection.invalidate()))
+            raise
         except SQLAlchemyError as exc:
-            error_msg = f"Unable to roll back transaction: {exc}"
-            raise TransactionException(error_msg) from exc
+            if isinstance(state.connection, ThreadedConnection):
+                await state.connection.invalidate()
+            error_msg = (
+                f"Unable to roll back transaction on connection '{self._name}' "
+                f"({type(exc).__name__})."
+            )
+            raise TransactionException(error_msg) from None
         finally:
             await self._releaseIfSettled(state)
 
     def transaction(self) -> ITransaction:
         """
-        Return a transaction usable as an async context manager.
+        Return a context manager for a task-local transaction.
 
         Returns
         -------
         ITransaction
-            Context manager committing on success and rolling back on error.
+            Unentered context manager that commits on success or rolls back
+            when its block raises an exception.
         """
         return Transaction(self)
 
     def inTransaction(self) -> bool:
         """
-        Report whether a transaction is active in the current task.
+        Report whether the current task owns an active transaction.
 
         Returns
         -------
         bool
-            ``True`` when at least one transaction level is open.
+            ``True`` when this task owns a nonempty transaction stack.
         """
         state = self._tx_state.get()
         return (
@@ -616,33 +684,41 @@ class Connection(IConnection):
 
     async def disconnect(self) -> None:
         """
-        Dispose the underlying engine and release its pooled resources.
+        Dispose the cached engine and release its idle pooled connections.
 
         Returns
         -------
         None
-            This method does not return a value.
+            Clear the cached engine reference; skip disposal if no engine exists.
+
+        Raises
+        ------
+        QueryException
+            If engine disposal fails.
         """
         if self._engine is not None:
             engine = self._engine
             self._engine = None
-            await engine.dispose()
+            try:
+                await _wait_for_completion(create_task(engine.dispose()))
+            except SQLAlchemyError as exc:
+                raise self._queryException(exc) from None
 
     # ── Internal plumbing ───────────────────────────────────────────────────
 
     def _getEngine(self) -> AsyncEngine | ThreadedEngine:
         """
-        Build the asynchronous engine or blocking-driver adapter on first use.
+        Return the cached engine, creating and configuring it on first use.
 
         Returns
         -------
         AsyncEngine | ThreadedEngine
-            Configured engine for this connection.
+            Native async engine or Redshift's thread-backed engine adapter.
 
         Raises
         ------
         MissingDatabaseDependencyException
-            If the driver package or its SQLAlchemy dialect is not installed.
+            If a required DBAPI package or registered dialect is unavailable.
         """
         if self._engine is None:
             url = build_engine_url(self._config)
@@ -666,12 +742,17 @@ class Connection(IConnection):
 
     def _transactionState(self) -> _TransactionState | None:
         """
-        Resolve the transaction owned by the current asyncio task.
+        Return transaction state owned by the current task.
 
         Returns
         -------
         _TransactionState | None
-            Result of the operation described above.
+            State for this task, or ``None`` if no usable state exists.
+
+        Raises
+        ------
+        TransactionException
+            If another task owns an inherited state with active transaction levels.
         """
         state = self._tx_state.get()
         if state is None or state.owner is current_task():
@@ -692,23 +773,77 @@ class Connection(IConnection):
         | _TransactionState
     ):
         """
-        Resolve the connection context to execute statements on.
+        Return a context manager for reusing or acquiring a connection.
 
-        Inside a transaction the transactional connection is reused;
-        otherwise an ephemeral autocommit connection is opened. The
-        context manager is returned directly to the caller.
+        Reuse an owned transaction without committing it; otherwise open a
+        temporary transaction and close its connection on exit.
 
         Returns
         -------
-        AbstractAsyncContextManager
-            Context manager yielding the connection to execute on.
+        AbstractAsyncContextManager or _TransactionState
+            Context yielding the raw connection used for statement execution.
+
+        Raises
+        ------
+        TransactionException
+            If an active transaction is inherited from another task.
+        MissingDatabaseDependencyException
+            If engine creation requires an unavailable driver or dialect.
         """
         state = self._transactionState()
         if state is not None:
             # Reuse the transactional connection without committing.
             return state
 
-        return self._getEngine().begin()
+        engine = self._getEngine()
+        if resolve_driver(self._config) == "redshift":
+            return engine.begin()
+
+        @asynccontextmanager
+        async def protected() -> AsyncGenerator[AsyncConnection | ThreadedConnection]:
+            """
+            Yield a temporary connection and drain transaction control on exit.
+
+            Keep pool acquisition cancellable; finish transaction control and
+            connection cleanup before propagating cancellation.
+
+            Yields
+            ------
+            AsyncConnection | ThreadedConnection
+                Raw connection with an active temporary transaction.
+
+            Raises
+            ------
+            QueryException
+                If a SQLAlchemy error occurs during connection use or cleanup.
+            CancelledError
+                If cancelled while acquiring or using the temporary connection.
+            """
+            try:
+                raw = await engine.connect()
+                try:
+                    transaction = raw.begin()
+                    await _wait_for_completion(create_task(transaction.__aenter__()))
+                    try:
+                        yield raw
+                    except BaseException as exc:
+                        await _wait_for_completion(create_task(
+                            transaction.__aexit__(type(exc), exc, exc.__traceback__),
+                        ))
+                        raise
+                    else:
+                        await _wait_for_completion(create_task(
+                            transaction.__aexit__(None, None, None),
+                        ))
+                except CancelledError:
+                    await _wait_for_completion(create_task(raw.invalidate()))
+                    raise
+                finally:
+                    await _wait_for_completion(create_task(raw.close()))
+            except SQLAlchemyError as exc:
+                raise self._queryException(exc) from None
+
+        return protected()
 
     async def _run(
         self,
@@ -717,28 +852,37 @@ class Connection(IConnection):
         parameters: Mapping[str, Any] | Sequence[Mapping[str, Any]] | None = None,
     ) -> CursorResult[Any] | ThreadedResult:
         """
-        Execute a statement translating engine errors into Orionis errors.
+        Execute a SQLAlchemy statement and sanitize database errors.
 
         Parameters
         ----------
         connection : AsyncConnection | ThreadedConnection
-            Raw connection to execute on.
+            Open raw connection used for execution.
         statement : Any
-            Executable statement or textual clause.
-        parameters : Mapping, Sequence of Mapping or None, optional
-            Bound parameters for a statement or a batch of row mappings.
+            SQLAlchemy executable, including textual statements.
+        parameters : Mapping or Sequence of Mapping or None, optional
+            Named bind parameters or per-row parameter mappings for a batch.
 
         Returns
         -------
         CursorResult | ThreadedResult
-            Raw execution result, consumed internally by callers.
+            Raw driver result to be consumed by the calling connection method.
 
         Raises
         ------
         QueryException
-            If the statement fails to execute.
+            If execution raises a SQLAlchemy error; driver details are omitted.
         """
         try:
+            if resolve_driver(self._config) == "oracle":
+                # Drain the native thin-driver operation before rollback or pool
+                # release. Cancelling its protocol await can leave a late DML
+                # response racing with the next transaction-control message.
+                operation = create_task(
+                    connection.execute(statement, parameters)
+                    if parameters else connection.execute(statement),
+                )
+                return await _wait_for_completion(operation)
             if parameters:
                 return await connection.execute(statement, parameters)
             return await connection.execute(statement)
@@ -747,17 +891,17 @@ class Connection(IConnection):
 
     def _queryException(self, error: SQLAlchemyError) -> QueryException:
         """
-        Create a query exception without exposing SQL or bound values.
+        Build a query error containing only the connection name and error type.
 
         Parameters
         ----------
         error : SQLAlchemyError
-            Database error whose type identifies the failure.
+            Original SQLAlchemy error; only its class name is retained.
 
         Returns
         -------
         QueryException
-            Sanitized exception identifying the connection and error type.
+            Framework exception without SQL, parameters, or the driver message.
         """
         return QueryException(
             f"Query failed on connection '{self._name}' "
@@ -769,18 +913,26 @@ class Connection(IConnection):
         state: _TransactionState,
     ) -> None:
         """
-        Close the raw connection once every transaction level is settled.
+        Release the raw connection when its transaction stack becomes empty.
 
         Parameters
         ----------
         state : _TransactionState
-            Transaction state to inspect and release.
+            State whose remaining transaction levels determine whether to close.
 
         Returns
         -------
         None
-            This method does not return a value.
+            Clear task-local state and close only a fully settled connection.
+
+        Raises
+        ------
+        QueryException
+            If closing the settled connection fails.
         """
         if not state.transactions:
             self._tx_state.set(None)
-            await state.connection.close()
+            try:
+                await _wait_for_completion(create_task(state.connection.close()))
+            except SQLAlchemyError as exc:
+                raise self._queryException(exc) from None

@@ -521,6 +521,7 @@ class TestTransactionStartFailures(TestCase):
         """
         raw = MagicMock()
         raw.begin = AsyncMock(side_effect=asyncio.CancelledError)
+        raw.invalidate = AsyncMock()
         raw.close = AsyncMock()
         connection = Connection("cancelled", {"driver": "sqlite"})
         engine = MagicMock()
@@ -528,5 +529,6 @@ class TestTransactionStartFailures(TestCase):
         connection._engine = engine
         with self.assertRaises(asyncio.CancelledError):
             await connection.begin()
+        raw.invalidate.assert_awaited_once()
         raw.close.assert_awaited_once()
         self.assertFalse(connection.inTransaction())

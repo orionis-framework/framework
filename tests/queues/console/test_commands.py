@@ -5,7 +5,6 @@ import sys
 from pathlib import Path
 from tempfile import TemporaryDirectory
 from typing import TYPE_CHECKING
-
 from orionis.console.commands.make.job import MakeJob
 from orionis.console.commands.queue.clear import QueueClearCommand
 from orionis.console.commands.queue.failed import QueueFailedCommand
@@ -17,6 +16,8 @@ from orionis.console.core.loader import Loader
 from orionis.queues.entities.failed_job import FailedJob
 from orionis.queues.exceptions import QueueConfigurationError
 from orionis.test import TestCase
+
+_REPOSITORY_ROOT = Path(__file__).resolve().parents[3]
 
 if TYPE_CHECKING:
     from orionis.console.base.command import BaseCommand
@@ -502,6 +503,7 @@ asyncio.run(probe())
 '''
         process = await asyncio.create_subprocess_exec(
             sys.executable, "-X", "utf8", "-c", script,
+            cwd=_REPOSITORY_ROOT,
             stdout=asyncio.subprocess.PIPE, stderr=asyncio.subprocess.PIPE,
         )
         try:

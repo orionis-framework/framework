@@ -137,6 +137,12 @@ class DatabaseCacheBackend:
         None
             Complete the documented operation without returning a value.
         """
+        if not connection.supportsUniqueConstraints():
+            message = (
+                "Database cache requires enforced unique constraints; "
+                "Amazon Redshift cannot guarantee cache keys or atomic locks."
+            )
+            raise QueryException(message)
         self._connection = connection
         self._table = table
         self._lock_table = lock_table or _DEFAULT_LOCK_TABLE

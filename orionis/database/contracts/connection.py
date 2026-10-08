@@ -39,6 +39,21 @@ class IConnection(ABC):
             Connection name as registered in the manager.
         """
 
+    def supportsUniqueConstraints(self) -> bool:
+        """
+        Report whether primary and unique keys reject duplicate values.
+
+        Custom connections retain the relational default. Backends whose keys
+        are only informational must override this capability so consumers can
+        reject operations that require a database-enforced unique claim.
+
+        Returns
+        -------
+        bool
+            Whether uniqueness is enforced by the database.
+        """
+        return True
+
     # ── Query execution ─────────────────────────────────────────────────────
 
     @abstractmethod

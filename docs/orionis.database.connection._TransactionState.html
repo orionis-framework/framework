@@ -476,7 +476,7 @@
         </div>
 
         <div class="extrasDocstring">
-          <p class="class-signature"><code><span class="py-keyword">class</span> <span class="py-defname">_TransactionState</span>: <a href="https://github.com/orionis-framework/framework/tree/907defd08409198612ca5d10e6618332a9fec08a/orionis/database/connection.py#L62" class="sourceLink">(source)</a></code></p><p>Constructor: <code><a href="#__init__" class="internal-link" title="orionis.database.connection._TransactionState.__init__">_TransactionState(connection, transaction)</a></code></p><p><a href="classIndex.html#orionis.database.connection._TransactionState">View In Hierarchy</a></p>
+          <p class="class-signature"><code><span class="py-keyword">class</span> <span class="py-defname">_TransactionState</span>: <a href="https://github.com/orionis-framework/framework/tree/ee2023955df56107e76691f6efe34837a7c24529/orionis/database/connection.py#L64" class="sourceLink">(source)</a></code></p><p>Constructor: <code><a href="#__init__" class="internal-link" title="orionis.database.connection._TransactionState.__init__">_TransactionState(connection, transaction)</a></code></p><p><a href="classIndex.html#orionis.database.connection._TransactionState">View In Hierarchy</a></p>
         </div>
 
         <div class="moduleDocstring">
@@ -491,17 +491,17 @@
     
     <td>Async Method</td>
     <td><code><a href="#__aenter__" class="internal-link" title="orionis.database.connection._TransactionState.__aenter__">__aenter__</a></code></td>
-    <td>Expose the wrapped connection without opening a new one.</td>
+    <td>Return the existing raw connection without acquiring another one.</td>
   </tr><tr class="method">
     
     <td>Async Method</td>
     <td><code><a href="#__aexit__" class="internal-link" title="orionis.database.connection._TransactionState.__aexit__">__aexit__</a></code></td>
-    <td>Leave the wrapped connection open for the enclosing transaction.</td>
+    <td>Leave transaction control and cleanup to the owning task.</td>
   </tr><tr class="method">
     
     <td>Method</td>
     <td><code><a href="#__init__" class="internal-link" title="orionis.database.connection._TransactionState.__init__">__init__</a></code></td>
-    <td>Initialize the state with its root transaction.</td>
+    <td>Bind a raw connection and root transaction to the current task.</td>
   </tr><tr class="classvariable">
     
     <td>Class Variable</td>
@@ -543,7 +543,7 @@
     
     
     <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">__aenter__</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>) -&gt; <code>AsyncConnection | <a href="orionis.database.threaded.connection.ThreadedConnection.html" class="internal-link" title="orionis.database.threaded.connection.ThreadedConnection">ThreadedConnection</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/907defd08409198612ca5d10e6618332a9fec08a/orionis/database/connection.py#L91">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/ee2023955df56107e76691f6efe34837a7c24529/orionis/database/connection.py#L93">
       
       (source)
     </a>
@@ -555,7 +555,7 @@
   </div>
   <div class="docstring functionBody">
     
-    <div><p>Expose the wrapped connection without opening a new one.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code>AsyncConnection | ThreadedConnection</code></td><td class="fieldArgDesc">The wrapped, already-open connection.</td></tr></table></div>
+    <div><p>Return the existing raw connection without acquiring another one.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code>AsyncConnection | ThreadedConnection</code></td><td class="fieldArgDesc">Open connection retained by the transaction owner.</td></tr></table></div>
   </div>
 </div><div class="basemethod">
   
@@ -570,7 +570,7 @@
     
     
     <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">__aexit__</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">*exc_info: <code><a href="https://docs.python.org/3/builtins/functions.html#object" class="intersphinx-link">object</a></code></span>):</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/907defd08409198612ca5d10e6618332a9fec08a/orionis/database/connection.py#L102">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/ee2023955df56107e76691f6efe34837a7c24529/orionis/database/connection.py#L104">
       
       (source)
     </a>
@@ -582,8 +582,7 @@
   </div>
   <div class="docstring functionBody">
     
-    <div><p>Leave the wrapped connection open for the enclosing transaction.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">*exc<wbr></wbr>_info:</span><code><a href="https://docs.python.org/3/builtins/functions.html#object" class="intersphinx-link">object</a></code></td><td class="fieldArgDesc">Exception information from the <tt class="rst-docutils rst-literal">with</tt> block; unused since
-the transaction lifecycle is controlled by its owner.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">This method does not return a value.</td></tr></table></div>
+    <div><p>Leave transaction control and cleanup to the owning task.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">*exc<wbr></wbr>_info:</span><code><a href="https://docs.python.org/3/builtins/functions.html#object" class="intersphinx-link">object</a></code></td><td class="fieldArgDesc">Exception details supplied by the context manager; unused.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">Leave the connection and transaction stack unchanged.</td></tr></table></div>
   </div>
 </div><div class="basemethod">
   
@@ -598,7 +597,7 @@ the transaction lifecycle is controlled by its owner.</td></tr></table><table cl
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">__init__</span><span class="function-signature long-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">connection: <code>AsyncConnection | <a href="orionis.database.threaded.connection.ThreadedConnection.html" class="internal-link" title="orionis.database.threaded.connection.ThreadedConnection">ThreadedConnection</a></code>, </span><span class="rst-sig-param">transaction: <code>AsyncTransaction | <a href="orionis.database.threaded.transaction.ThreadedTransaction.html" class="internal-link" title="orionis.database.threaded.transaction.ThreadedTransaction">ThreadedTransaction</a></code></span>):</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/907defd08409198612ca5d10e6618332a9fec08a/orionis/database/connection.py#L67">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/ee2023955df56107e76691f6efe34837a7c24529/orionis/database/connection.py#L69">
       
       (source)
     </a>
@@ -610,7 +609,7 @@ the transaction lifecycle is controlled by its owner.</td></tr></table><table cl
   </div>
   <div class="docstring functionBody">
     
-    <div><p>Initialize the state with its root transaction.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">connection:</span><code>AsyncConnection | ThreadedConnection</code></td><td class="fieldArgDesc">Raw connection owning the transaction stack.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">transaction:</span><code>AsyncTransaction | ThreadedTransaction</code></td><td class="fieldArgDesc">Root transaction opened on the connection.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">This method does not return a value.</td></tr></table></div>
+    <div><p>Bind a raw connection and root transaction to the current task.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">connection:</span><code>AsyncConnection | ThreadedConnection</code></td><td class="fieldArgDesc">Open connection shared by all transaction levels.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">transaction:</span><code>AsyncTransaction | ThreadedTransaction</code></td><td class="fieldArgDesc">Root transaction used to initialize the stack.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">Store the connection, owning task, and transaction stack.</td></tr></table></div>
   </div>
 </div><div class="baseclassvariable">
   
@@ -624,7 +623,7 @@ the transaction lifecycle is controlled by its owner.</td></tr></table><table cl
   <div class="functionHeader">
     
     <span class="py-defname">__slots__</span>: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" class="intersphinx-link">tuple</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <wbr></wbr><span class="rst-variable-ellipsis">...</span>]</code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/907defd08409198612ca5d10e6618332a9fec08a/orionis/database/connection.py#L65">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/ee2023955df56107e76691f6efe34837a7c24529/orionis/database/connection.py#L67">
       
       (source)
     </a>
@@ -651,7 +650,7 @@ the transaction lifecycle is controlled by its owner.</td></tr></table><table cl
   <div class="functionHeader">
     
     <span class="py-defname">connection</span> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/907defd08409198612ca5d10e6618332a9fec08a/orionis/database/connection.py#L87">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/ee2023955df56107e76691f6efe34837a7c24529/orionis/database/connection.py#L89">
       
       (source)
     </a>
@@ -678,7 +677,7 @@ the transaction lifecycle is controlled by its owner.</td></tr></table><table cl
   <div class="functionHeader">
     
     <span class="py-defname">owner</span> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/907defd08409198612ca5d10e6618332a9fec08a/orionis/database/connection.py#L88">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/ee2023955df56107e76691f6efe34837a7c24529/orionis/database/connection.py#L90">
       
       (source)
     </a>
@@ -705,7 +704,7 @@ the transaction lifecycle is controlled by its owner.</td></tr></table><table cl
   <div class="functionHeader">
     
     <span class="py-defname">transactions</span>: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#list" class="intersphinx-link">list</a>[<wbr></wbr>AsyncTransaction | <a href="orionis.database.threaded.transaction.ThreadedTransaction.html" class="internal-link" title="orionis.database.threaded.transaction.ThreadedTransaction">ThreadedTransaction</a>]</code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/907defd08409198612ca5d10e6618332a9fec08a/orionis/database/connection.py#L89">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/ee2023955df56107e76691f6efe34837a7c24529/orionis/database/connection.py#L91">
       
       (source)
     </a>
@@ -731,7 +730,7 @@ the transaction lifecycle is controlled by its owner.</td></tr></table><table cl
   <div class="orionis-footer-inner">
     <div class="orionis-footer-copy">
       <p>API documentation for <a href="https://orionis-framework.com/" class="projecthome">Orionis</a>.</p>
-      <p class="orionis-footer-meta">Generated with <a href="https://github.com/twisted/pydoctor/">Pydoctor</a> 25.10.1.<span class="orionis-footer-build"> Built 2026-10-07 12:34:04.</span></p>
+      <p class="orionis-footer-meta">Generated with <a href="https://github.com/twisted/pydoctor/">Pydoctor</a> 25.10.1.<span class="orionis-footer-build"> Built 2026-10-08 10:16:09.</span></p>
     </div>
     <nav class="orionis-footer-links" aria-label="Additional resources">
       <a href="https://docs.orionis-framework.com">Read the guide <span aria-hidden="true">↗</span></a>

@@ -373,6 +373,26 @@
         
 
         
+            <div class="itemName"><code><a href="#_entry_definition" class="internal-link" title="orionis.cache.stores.database.DatabaseCacheBackend._entry_definition">_entry<wbr></wbr>_definition</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#_lock_definition" class="internal-link" title="orionis.cache.stores.database.DatabaseCacheBackend._lock_definition">_lock<wbr></wbr>_definition</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
             <div class="itemName"><code><a href="#_lock_table" class="internal-link" title="orionis.cache.stores.database.DatabaseCacheBackend._lock_table">_lock<wbr></wbr>_table</a></code>
             </div>
         
@@ -674,6 +694,26 @@
         
 
         
+            <div class="itemName"><code><a href="#_entry_definition" class="internal-link" title="orionis.cache.stores.database.DatabaseCacheBackend._entry_definition">_entry<wbr></wbr>_definition</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#_lock_definition" class="internal-link" title="orionis.cache.stores.database.DatabaseCacheBackend._lock_definition">_lock<wbr></wbr>_definition</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
             <div class="itemName"><code><a href="#_lock_table" class="internal-link" title="orionis.cache.stores.database.DatabaseCacheBackend._lock_table">_lock<wbr></wbr>_table</a></code>
             </div>
         
@@ -856,7 +896,7 @@
         </div>
 
         <div class="extrasDocstring">
-          <p class="class-signature"><code><span class="py-keyword">class</span> <span class="py-defname">DatabaseCacheBackend</span>: <a href="https://github.com/orionis-framework/framework/tree/907defd08409198612ca5d10e6618332a9fec08a/orionis/cache/stores/database.py#L94" class="sourceLink">(source)</a></code></p><p>Constructor: <code><a href="#__init__" class="internal-link" title="orionis.cache.stores.database.DatabaseCacheBackend.__init__">DatabaseCacheBackend(connection, table, lock_table)</a></code></p><p><a href="classIndex.html#orionis.cache.stores.database.DatabaseCacheBackend">View In Hierarchy</a></p>
+          <p class="class-signature"><code><span class="py-keyword">class</span> <span class="py-defname">DatabaseCacheBackend</span>: <a href="https://github.com/orionis-framework/framework/tree/ee2023955df56107e76691f6efe34837a7c24529/orionis/cache/stores/database.py#L97" class="sourceLink">(source)</a></code></p><p>Constructor: <code><a href="#__init__" class="internal-link" title="orionis.cache.stores.database.DatabaseCacheBackend.__init__">DatabaseCacheBackend(connection, table, lock_table)</a></code></p><p><a href="classIndex.html#orionis.cache.stores.database.DatabaseCacheBackend">View In Hierarchy</a></p>
         </div>
 
         <div class="moduleDocstring">
@@ -977,6 +1017,16 @@ require Redis or Memcached to support locking.</p>
   </tr><tr class="instancevariable">
     
     <td>Instance Variable</td>
+    <td><code><a href="#_entry_definition" class="internal-link" title="orionis.cache.stores.database.DatabaseCacheBackend._entry_definition">_entry<wbr></wbr>_definition</a></code></td>
+    <td><span class="rst-undocumented">Undocumented</span></td>
+  </tr><tr class="instancevariable">
+    
+    <td>Instance Variable</td>
+    <td><code><a href="#_lock_definition" class="internal-link" title="orionis.cache.stores.database.DatabaseCacheBackend._lock_definition">_lock<wbr></wbr>_definition</a></code></td>
+    <td><span class="rst-undocumented">Undocumented</span></td>
+  </tr><tr class="instancevariable">
+    
+    <td>Instance Variable</td>
     <td><code><a href="#_lock_table" class="internal-link" title="orionis.cache.stores.database.DatabaseCacheBackend._lock_table">_lock<wbr></wbr>_table</a></code></td>
     <td><span class="rst-undocumented">Undocumented</span></td>
   </tr><tr class="instancevariable">
@@ -1015,7 +1065,7 @@ require Redis or Memcached to support locking.</p>
     
     
     <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">__currentCounter</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">key: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" class="intersphinx-link">tuple</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <wbr></wbr><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a>] | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/907defd08409198612ca5d10e6618332a9fec08a/orionis/cache/stores/database.py#L542">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/ee2023955df56107e76691f6efe34837a7c24529/orionis/cache/stores/database.py#L590">
       
       (source)
     </a>
@@ -1044,7 +1094,7 @@ compare-and-swap witness, together with its integer value.
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">__decode</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">raw: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a> | <a href="https://docs.python.org/3/builtins/stdtypes.html#bytes" class="intersphinx-link">bytes</a> | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></span>) -&gt; <code><a href="https://docs.python.org/3/library/typing.html#typing.Any" class="intersphinx-link">Any</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/907defd08409198612ca5d10e6618332a9fec08a/orionis/cache/stores/database.py#L178">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/ee2023955df56107e76691f6efe34837a7c24529/orionis/cache/stores/database.py#L192">
       
       (source)
     </a>
@@ -1071,7 +1121,7 @@ compare-and-swap witness, together with its integer value.
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">__encode</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">value: <code><a href="https://docs.python.org/3/library/typing.html#typing.Any" class="intersphinx-link">Any</a></code></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/907defd08409198612ca5d10e6618332a9fec08a/orionis/cache/stores/database.py#L162">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/ee2023955df56107e76691f6efe34837a7c24529/orionis/cache/stores/database.py#L176">
       
       (source)
     </a>
@@ -1098,7 +1148,7 @@ compare-and-swap witness, together with its integer value.
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">__init__</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">connection: <code>IConnection</code>, </span><span class="rst-sig-param">table: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code>, </span><span class="rst-sig-param">lock_table: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a> | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code> = <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></span>):</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/907defd08409198612ca5d10e6618332a9fec08a/orionis/cache/stores/database.py#L110">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/ee2023955df56107e76691f6efe34837a7c24529/orionis/cache/stores/database.py#L116">
       
       (source)
     </a>
@@ -1126,7 +1176,7 @@ compare-and-swap witness, together with its integer value.
     
     
     <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">__insertOrRetryUpdate</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">key: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code>, </span><span class="rst-sig-param">encoded: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code>, </span><span class="rst-sig-param">expiration: <code><a href="https://docs.python.org/3/builtins/functions.html#float" class="intersphinx-link">float</a> | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></span>):</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/907defd08409198612ca5d10e6618332a9fec08a/orionis/cache/stores/database.py#L273">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/ee2023955df56107e76691f6efe34837a7c24529/orionis/cache/stores/database.py#L291">
       
       (source)
     </a>
@@ -1153,7 +1203,7 @@ compare-and-swap witness, together with its integer value.
     
     
     <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">_ensureSchema</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>):</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/907defd08409198612ca5d10e6618332a9fec08a/orionis/cache/stores/database.py#L142">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/ee2023955df56107e76691f6efe34837a7c24529/orionis/cache/stores/database.py#L156">
       
       (source)
     </a>
@@ -1180,7 +1230,7 @@ compare-and-swap witness, together with its integer value.
     
     
     <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">acquireLock</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">key: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code>, </span><span class="rst-sig-param">owner: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code>, </span><span class="rst-sig-param">lease: <code><a href="https://docs.python.org/3/builtins/functions.html#float" class="intersphinx-link">float</a></code></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/907defd08409198612ca5d10e6618332a9fec08a/orionis/cache/stores/database.py#L576">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/ee2023955df56107e76691f6efe34837a7c24529/orionis/cache/stores/database.py#L626">
       
       (source)
     </a>
@@ -1211,7 +1261,7 @@ self-owned row when the insert conflicts, mirroring
     
     
     <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">add</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">key: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code>, </span><span class="rst-sig-param">value: <code><a href="https://docs.python.org/3/library/typing.html#typing.Any" class="intersphinx-link">Any</a></code>, </span><span class="rst-sig-param">ttl: <code><a href="https://docs.python.org/3/builtins/functions.html#float" class="intersphinx-link">float</a> | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code> = <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/907defd08409198612ca5d10e6618332a9fec08a/orionis/cache/stores/database.py#L434">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/ee2023955df56107e76691f6efe34837a7c24529/orionis/cache/stores/database.py#L468">
       
       (source)
     </a>
@@ -1243,7 +1293,7 @@ already taken.</td></tr></table></div>
     
     
     <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">clear</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/907defd08409198612ca5d10e6618332a9fec08a/orionis/cache/stores/database.py#L376">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/ee2023955df56107e76691f6efe34837a7c24529/orionis/cache/stores/database.py#L410">
       
       (source)
     </a>
@@ -1270,7 +1320,7 @@ already taken.</td></tr></table></div>
     
     
     <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">delete</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">key: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/907defd08409198612ca5d10e6618332a9fec08a/orionis/cache/stores/database.py#L356">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/ee2023955df56107e76691f6efe34837a7c24529/orionis/cache/stores/database.py#L388">
       
       (source)
     </a>
@@ -1297,7 +1347,7 @@ already taken.</td></tr></table></div>
     
     
     <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">exists</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">key: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/907defd08409198612ca5d10e6618332a9fec08a/orionis/cache/stores/database.py#L341">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/ee2023955df56107e76691f6efe34837a7c24529/orionis/cache/stores/database.py#L373">
       
       (source)
     </a>
@@ -1324,7 +1374,7 @@ already taken.</td></tr></table></div>
     
     
     <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">get</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">key: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code>, </span><span class="rst-sig-param">default: <code><a href="https://docs.python.org/3/library/typing.html#typing.Any" class="intersphinx-link">Any</a></code> = <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></span>) -&gt; <code><a href="https://docs.python.org/3/library/typing.html#typing.Any" class="intersphinx-link">Any</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/907defd08409198612ca5d10e6618332a9fec08a/orionis/cache/stores/database.py#L202">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/ee2023955df56107e76691f6efe34837a7c24529/orionis/cache/stores/database.py#L216">
       
       (source)
     </a>
@@ -1354,7 +1404,7 @@ mirroring <tt class="rst-docutils rst-literal"><span class="pre">DatabaseStore::
     
     
     <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">increment</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">key: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code>, </span><span class="rst-sig-param">delta: <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code> = 1</span>) -&gt; <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/907defd08409198612ca5d10e6618332a9fec08a/orionis/cache/stores/database.py#L487">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/ee2023955df56107e76691f6efe34837a7c24529/orionis/cache/stores/database.py#L530">
       
       (source)
     </a>
@@ -1387,7 +1437,7 @@ that not every dialect supports.</p>
     
     
     <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">multiGet</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">keys: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#list" class="intersphinx-link">list</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>]</code>, </span><span class="rst-sig-param">default: <code><a href="https://docs.python.org/3/library/typing.html#typing.Any" class="intersphinx-link">Any</a></code> = <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/stdtypes.html#list" class="intersphinx-link">list</a>[<wbr></wbr><a href="https://docs.python.org/3/library/typing.html#typing.Any" class="intersphinx-link">Any</a>]</code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/907defd08409198612ca5d10e6618332a9fec08a/orionis/cache/stores/database.py#L389">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/ee2023955df56107e76691f6efe34837a7c24529/orionis/cache/stores/database.py#L423">
       
       (source)
     </a>
@@ -1414,7 +1464,7 @@ that not every dialect supports.</p>
     
     
     <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">multiSet</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">pairs: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#list" class="intersphinx-link">list</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" class="intersphinx-link">tuple</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <wbr></wbr><a href="https://docs.python.org/3/library/typing.html#typing.Any" class="intersphinx-link">Any</a>]]</code>, </span><span class="rst-sig-param">ttl: <code><a href="https://docs.python.org/3/builtins/functions.html#float" class="intersphinx-link">float</a> | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code> = <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/907defd08409198612ca5d10e6618332a9fec08a/orionis/cache/stores/database.py#L406">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/ee2023955df56107e76691f6efe34837a7c24529/orionis/cache/stores/database.py#L440">
       
       (source)
     </a>
@@ -1441,7 +1491,7 @@ that not every dialect supports.</p>
     
     
     <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">releaseLock</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">key: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code>, </span><span class="rst-sig-param">owner: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></span>):</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/907defd08409198612ca5d10e6618332a9fec08a/orionis/cache/stores/database.py#L617">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/ee2023955df56107e76691f6efe34837a7c24529/orionis/cache/stores/database.py#L679">
       
       (source)
     </a>
@@ -1468,7 +1518,7 @@ that not every dialect supports.</p>
     
     
     <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">replace</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">key: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code>, </span><span class="rst-sig-param">value: <code><a href="https://docs.python.org/3/library/typing.html#typing.Any" class="intersphinx-link">Any</a></code>, </span><span class="rst-sig-param">ttl: <code><a href="https://docs.python.org/3/builtins/functions.html#float" class="intersphinx-link">float</a> | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code> = <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/907defd08409198612ca5d10e6618332a9fec08a/orionis/cache/stores/database.py#L310">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/ee2023955df56107e76691f6efe34837a7c24529/orionis/cache/stores/database.py#L334">
       
       (source)
     </a>
@@ -1495,7 +1545,7 @@ that not every dialect supports.</p>
     
     
     <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">set</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">key: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code>, </span><span class="rst-sig-param">value: <code><a href="https://docs.python.org/3/library/typing.html#typing.Any" class="intersphinx-link">Any</a></code>, </span><span class="rst-sig-param">ttl: <code><a href="https://docs.python.org/3/builtins/functions.html#float" class="intersphinx-link">float</a> | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code> = <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/907defd08409198612ca5d10e6618332a9fec08a/orionis/cache/stores/database.py#L238">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/ee2023955df56107e76691f6efe34837a7c24529/orionis/cache/stores/database.py#L254">
       
       (source)
     </a>
@@ -1525,7 +1575,7 @@ without relying on driver-specific <tt class="rst-docutils rst-literal">ON CONFL
   <div class="functionHeader">
     
     <span class="py-defname">__slots__</span>: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" class="intersphinx-link">tuple</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <wbr></wbr><span class="rst-variable-ellipsis">...</span>]</code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/907defd08409198612ca5d10e6618332a9fec08a/orionis/cache/stores/database.py#L108">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/ee2023955df56107e76691f6efe34837a7c24529/orionis/cache/stores/database.py#L111">
       
       (source)
     </a>
@@ -1552,11 +1602,65 @@ without relying on driver-specific <tt class="rst-docutils rst-literal">ON CONFL
   <div class="functionHeader">
     
     <span class="py-defname">_connection</span> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/907defd08409198612ca5d10e6618332a9fec08a/orionis/cache/stores/database.py#L134">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/ee2023955df56107e76691f6efe34837a7c24529/orionis/cache/stores/database.py#L146">
       
       (source)
     </a>
     <a class="headerLink" href="#_connection" title="orionis.cache.stores.database.DatabaseCacheBackend._connection">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="functionBody">
+    
+    <div><p class="undocumented">Undocumented</p></div>
+    
+  </div>
+</div><div class="baseinstancevariable">
+  
+  
+  <a name="orionis.cache.stores.database.DatabaseCacheBackend._entry_definition">
+    
+  </a>
+  <a name="_entry_definition">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <span class="py-defname">_entry_definition</span> =
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/ee2023955df56107e76691f6efe34837a7c24529/orionis/cache/stores/database.py#L149">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#_entry_definition" title="orionis.cache.stores.database.DatabaseCacheBackend._entry_definition">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="functionBody">
+    
+    <div><p class="undocumented">Undocumented</p></div>
+    
+  </div>
+</div><div class="baseinstancevariable">
+  
+  
+  <a name="orionis.cache.stores.database.DatabaseCacheBackend._lock_definition">
+    
+  </a>
+  <a name="_lock_definition">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <span class="py-defname">_lock_definition</span> =
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/ee2023955df56107e76691f6efe34837a7c24529/orionis/cache/stores/database.py#L150">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#_lock_definition" title="orionis.cache.stores.database.DatabaseCacheBackend._lock_definition">
       
       
       ¶
@@ -1579,7 +1683,7 @@ without relying on driver-specific <tt class="rst-docutils rst-literal">ON CONFL
   <div class="functionHeader">
     
     <span class="py-defname">_lock_table</span> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/907defd08409198612ca5d10e6618332a9fec08a/orionis/cache/stores/database.py#L136">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/ee2023955df56107e76691f6efe34837a7c24529/orionis/cache/stores/database.py#L148">
       
       (source)
     </a>
@@ -1606,7 +1710,7 @@ without relying on driver-specific <tt class="rst-docutils rst-literal">ON CONFL
   <div class="functionHeader">
     
     <span class="py-defname">_ready</span>: <code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/907defd08409198612ca5d10e6618332a9fec08a/orionis/cache/stores/database.py#L137">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/ee2023955df56107e76691f6efe34837a7c24529/orionis/cache/stores/database.py#L151">
       
       (source)
     </a>
@@ -1633,7 +1737,7 @@ without relying on driver-specific <tt class="rst-docutils rst-literal">ON CONFL
   <div class="functionHeader">
     
     <span class="py-defname">_ready_lock</span> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/907defd08409198612ca5d10e6618332a9fec08a/orionis/cache/stores/database.py#L138">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/ee2023955df56107e76691f6efe34837a7c24529/orionis/cache/stores/database.py#L152">
       
       (source)
     </a>
@@ -1660,7 +1764,7 @@ without relying on driver-specific <tt class="rst-docutils rst-literal">ON CONFL
   <div class="functionHeader">
     
     <span class="py-defname">_table</span> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/907defd08409198612ca5d10e6618332a9fec08a/orionis/cache/stores/database.py#L135">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/ee2023955df56107e76691f6efe34837a7c24529/orionis/cache/stores/database.py#L147">
       
       (source)
     </a>
@@ -1686,7 +1790,7 @@ without relying on driver-specific <tt class="rst-docutils rst-literal">ON CONFL
   <div class="orionis-footer-inner">
     <div class="orionis-footer-copy">
       <p>API documentation for <a href="https://orionis-framework.com/" class="projecthome">Orionis</a>.</p>
-      <p class="orionis-footer-meta">Generated with <a href="https://github.com/twisted/pydoctor/">Pydoctor</a> 25.10.1.<span class="orionis-footer-build"> Built 2026-10-07 12:34:04.</span></p>
+      <p class="orionis-footer-meta">Generated with <a href="https://github.com/twisted/pydoctor/">Pydoctor</a> 25.10.1.<span class="orionis-footer-build"> Built 2026-10-08 10:16:09.</span></p>
     </div>
     <nav class="orionis-footer-links" aria-label="Additional resources">
       <a href="https://docs.orionis-framework.com">Read the guide <span aria-hidden="true">↗</span></a>

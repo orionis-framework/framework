@@ -155,8 +155,21 @@
         
         
 
+        <div class="childrenKindTitle">Methods</div>
+        <ul>
+    
+    <li class="">
         
-         
+        
+        
+
+        
+            <div class="itemName"><code><a href="#has_table" class="internal-link" title="orionis.database.redshift.RedshiftDialect.has_table">has<wbr></wbr>_table</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
 
         
          
@@ -231,6 +244,16 @@
 
         
             <div class="itemName"><code><a href="#update_returning" class="internal-link" title="orionis.database.redshift.RedshiftDialect.update_returning">update<wbr></wbr>_returning</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#use_insertmanyvalues_wo_returning" class="internal-link" title="orionis.database.redshift.RedshiftDialect.use_insertmanyvalues_wo_returning">use<wbr></wbr>_insertmanyvalues<wbr></wbr>_wo<wbr></wbr>_returning</a></code>
             </div>
         
 
@@ -262,7 +285,7 @@
         
         
             <div class="itemName expandableItem">
-                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId4876"> 
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId4886"> 
                     
                 </input>
 
@@ -283,8 +306,21 @@
         
         
 
+        <div class="childrenKindTitle">Methods</div>
+        <ul>
+    
+    <li class="">
         
-         
+        
+        
+
+        
+            <div class="itemName"><code><a href="#has_table" class="internal-link" title="orionis.database.redshift.RedshiftDialect.has_table">has<wbr></wbr>_table</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
 
         
          
@@ -359,6 +395,16 @@
 
         
             <div class="itemName"><code><a href="#update_returning" class="internal-link" title="orionis.database.redshift.RedshiftDialect.update_returning">update<wbr></wbr>_returning</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#use_insertmanyvalues_wo_returning" class="internal-link" title="orionis.database.redshift.RedshiftDialect.use_insertmanyvalues_wo_returning">use<wbr></wbr>_insertmanyvalues<wbr></wbr>_wo<wbr></wbr>_returning</a></code>
             </div>
         
 
@@ -457,7 +503,7 @@
         </div>
 
         <div class="extrasDocstring">
-          <p class="class-signature"><code><span class="py-keyword">class</span> <span class="py-defname">RedshiftDialect</span>(<a href="orionis.database.redshift.html#RedshiftConnectorDialect" class="internal-link" title="orionis.database.redshift.RedshiftConnectorDialect">RedshiftConnectorDialect</a>): <a href="https://github.com/orionis-framework/framework/tree/907defd08409198612ca5d10e6618332a9fec08a/orionis/database/redshift.py#L9" class="sourceLink">(source)</a></code></p><p><a href="classIndex.html#orionis.database.redshift.RedshiftDialect">View In Hierarchy</a></p>
+          <p class="class-signature"><code><span class="py-keyword">class</span> <span class="py-defname">RedshiftDialect</span>(<a href="orionis.database.redshift.html#RedshiftConnectorDialect" class="internal-link" title="orionis.database.redshift.RedshiftConnectorDialect">RedshiftConnectorDialect</a>): <a href="https://github.com/orionis-framework/framework/tree/ee2023955df56107e76691f6efe34837a7c24529/orionis/database/redshift.py#L16" class="sourceLink">(source)</a></code></p><p><a href="classIndex.html#orionis.database.redshift.RedshiftDialect">View In Hierarchy</a></p>
         </div>
 
         <div class="moduleDocstring">
@@ -471,10 +517,15 @@ constructed.</p>
         </div>
 
         <div id="split-tables">
-          <table class="children sortable" id="id489">
+          <table class="children sortable" id="id491">
   
   
-  <tr class="classvariable">
+  <tr class="method">
+    
+    <td>Method</td>
+    <td><code><a href="#has_table" class="internal-link" title="orionis.database.redshift.RedshiftDialect.has_table">has<wbr></wbr>_table</a></code></td>
+    <td>Check catalog membership with bound schema and table names.</td>
+  </tr><tr class="classvariable">
     
     <td>Class Variable</td>
     <td><code><a href="#__slots__" class="internal-link" title="orionis.database.redshift.RedshiftDialect.__slots__">__slots__</a></code></td>
@@ -509,6 +560,11 @@ constructed.</p>
     <td>Class Variable</td>
     <td><code><a href="#update_returning" class="internal-link" title="orionis.database.redshift.RedshiftDialect.update_returning">update<wbr></wbr>_returning</a></code></td>
     <td><span class="rst-undocumented">Undocumented</span></td>
+  </tr><tr class="classvariable">
+    
+    <td>Class Variable</td>
+    <td><code><a href="#use_insertmanyvalues_wo_returning" class="internal-link" title="orionis.database.redshift.RedshiftDialect.use_insertmanyvalues_wo_returning">use<wbr></wbr>_insertmanyvalues<wbr></wbr>_wo<wbr></wbr>_returning</a></code></td>
+    <td><span class="rst-undocumented">Undocumented</span></td>
   </tr>
 </table>
           
@@ -517,7 +573,38 @@ constructed.</p>
         </div>
 
         <div id="child-list">
-          <div class="baseclassvariable">
+          <div class="basemethod">
+  
+  
+  <a name="orionis.database.redshift.RedshiftDialect.has_table">
+    
+  </a>
+  <a name="has_table">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <div><span class="decorator">@reflection.cache<br /></span></div>
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">has_table</span><span class="function-signature long-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">connection: <code>Connection</code>, </span><span class="rst-sig-param">table_name: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code>, </span><span class="rst-sig-param">schema: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a> | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code> = <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a>, </span><span class="rst-sig-param">**_kw: <code><a href="https://docs.python.org/3/builtins/functions.html#object" class="intersphinx-link">object</a></code></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code>:</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/ee2023955df56107e76691f6efe34837a7c24529/orionis/database/redshift.py#L39">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#has_table" title="orionis.database.redshift.RedshiftDialect.has_table">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    
+    <div><p>Check catalog membership with bound schema and table names.</p>
+<p>The upstream reflection helper interpolates these identifiers into
+SQL string literals. CREATE TABLE's checkfirst path must keep them
+as values even when quoted identifiers contain apostrophes.</p>
+<table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">connection:</span><code><a href="orionis.database.Connection.html" class="internal-link" title="orionis.database.Connection">Connection</a></code></td><td class="fieldArgDesc">Core connection used by SQLAlchemy's reflection dispatch.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">table<wbr></wbr>_name:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Exact table identifier to find.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">schema:</span><code>str | None, <em>optional</em></code></td><td class="fieldArgDesc">Explicit namespace, or the current schema when omitted.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">**_kw:</span><code><a href="https://docs.python.org/3/builtins/functions.html#object" class="intersphinx-link">object</a></code></td><td class="fieldArgDesc">Reflection options accepted by the SQLAlchemy interface.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code></td><td class="fieldArgDesc">Whether the visible catalog contains this exact table.</td></tr></table></div>
+  </div>
+</div><div class="baseclassvariable">
   
   
   <a name="orionis.database.redshift.RedshiftDialect.__slots__">
@@ -529,7 +616,7 @@ constructed.</p>
   <div class="functionHeader">
     
     <span class="py-defname">__slots__</span>: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" class="intersphinx-link">tuple</a></code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/907defd08409198612ca5d10e6618332a9fec08a/orionis/database/redshift.py#L20">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/ee2023955df56107e76691f6efe34837a7c24529/orionis/database/redshift.py#L27">
       
       (source)
     </a>
@@ -556,7 +643,7 @@ constructed.</p>
   <div class="functionHeader">
     
     <span class="py-defname">delete_returning</span>: <code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/907defd08409198612ca5d10e6618332a9fec08a/orionis/database/redshift.py#L24">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/ee2023955df56107e76691f6efe34837a7c24529/orionis/database/redshift.py#L31">
       
       (source)
     </a>
@@ -583,7 +670,7 @@ constructed.</p>
   <div class="functionHeader">
     
     <span class="py-defname">insert_returning</span>: <code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/907defd08409198612ca5d10e6618332a9fec08a/orionis/database/redshift.py#L22">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/ee2023955df56107e76691f6efe34837a7c24529/orionis/database/redshift.py#L29">
       
       (source)
     </a>
@@ -610,7 +697,7 @@ constructed.</p>
   <div class="functionHeader">
     
     <span class="py-defname">postfetch_lastrowid</span>: <code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/907defd08409198612ca5d10e6618332a9fec08a/orionis/database/redshift.py#L26">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/ee2023955df56107e76691f6efe34837a7c24529/orionis/database/redshift.py#L33">
       
       (source)
     </a>
@@ -637,7 +724,7 @@ constructed.</p>
   <div class="functionHeader">
     
     <span class="py-defname">preexecute_autoincrement_sequences</span>: <code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/907defd08409198612ca5d10e6618332a9fec08a/orionis/database/redshift.py#L25">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/ee2023955df56107e76691f6efe34837a7c24529/orionis/database/redshift.py#L32">
       
       (source)
     </a>
@@ -664,7 +751,7 @@ constructed.</p>
   <div class="functionHeader">
     
     <span class="py-defname">supports_statement_cache</span>: <code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/907defd08409198612ca5d10e6618332a9fec08a/orionis/database/redshift.py#L27">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/ee2023955df56107e76691f6efe34837a7c24529/orionis/database/redshift.py#L34">
       
       (source)
     </a>
@@ -691,11 +778,38 @@ constructed.</p>
   <div class="functionHeader">
     
     <span class="py-defname">update_returning</span>: <code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/907defd08409198612ca5d10e6618332a9fec08a/orionis/database/redshift.py#L23">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/ee2023955df56107e76691f6efe34837a7c24529/orionis/database/redshift.py#L30">
       
       (source)
     </a>
     <a class="headerLink" href="#update_returning" title="orionis.database.redshift.RedshiftDialect.update_returning">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="functionBody">
+    
+    <div><p class="undocumented">Undocumented</p></div>
+    
+  </div>
+</div><div class="baseclassvariable">
+  
+  
+  <a name="orionis.database.redshift.RedshiftDialect.use_insertmanyvalues_wo_returning">
+    
+  </a>
+  <a name="use_insertmanyvalues_wo_returning">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <span class="py-defname">use_insertmanyvalues_wo_returning</span>: <code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code> =
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/ee2023955df56107e76691f6efe34837a7c24529/orionis/database/redshift.py#L37">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#use_insertmanyvalues_wo_returning" title="orionis.database.redshift.RedshiftDialect.use_insertmanyvalues_wo_returning">
       
       
       ¶
@@ -717,7 +831,7 @@ constructed.</p>
   <div class="orionis-footer-inner">
     <div class="orionis-footer-copy">
       <p>API documentation for <a href="https://orionis-framework.com/" class="projecthome">Orionis</a>.</p>
-      <p class="orionis-footer-meta">Generated with <a href="https://github.com/twisted/pydoctor/">Pydoctor</a> 25.10.1.<span class="orionis-footer-build"> Built 2026-10-07 12:34:04.</span></p>
+      <p class="orionis-footer-meta">Generated with <a href="https://github.com/twisted/pydoctor/">Pydoctor</a> 25.10.1.<span class="orionis-footer-build"> Built 2026-10-08 10:16:09.</span></p>
     </div>
     <nav class="orionis-footer-links" aria-label="Additional resources">
       <a href="https://docs.orionis-framework.com">Read the guide <span aria-hidden="true">↗</span></a>

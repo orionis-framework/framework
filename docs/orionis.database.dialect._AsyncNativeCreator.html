@@ -1,0 +1,1034 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+          "DTD/xhtml1-strict.dtd">
+<html>
+  
+
+  <head>
+  
+  <title>API Reference | Orionis Framework</title>
+  <meta name="generator" content="pydoctor 25.10.1">
+    
+  </meta>
+  <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="color-scheme" content="dark light" />
+  <link rel="icon" type="image/svg+xml" href="orionis-icon.svg" />
+  <script src="orionis-theme.js" type="text/javascript"></script>
+  <link rel="stylesheet" type="text/css" href="apidocs.css" />
+  <link rel="stylesheet" type="text/css" href="extra.css" />
+  <script src="orionis-ui.js" type="text/javascript" defer="defer"></script>
+  
+</head>
+
+  <body>
+
+    <header class="orionis-header">
+  <div class="orionis-header-inner">
+    <a class="orionis-brand" href="index.html" aria-label="Orionis API reference home">
+      <img class="orionis-brand-icon" src="orionis-icon.svg" width="38" height="38" alt="" />
+      <span class="orionis-brand-copy">
+        <span class="orionis-wordmark">ORIONIS</span>
+        <span class="orionis-brand-caption">API REFERENCE</span>
+      </span>
+    </a>
+    <div class="orionis-header-actions">
+      <nav class="orionis-header-links" aria-label="Orionis resources">
+        <a href="https://docs.orionis-framework.com">Guide <span aria-hidden="true">↗</span></a>
+        <a href="https://github.com/orionis-framework/framework">GitHub <span aria-hidden="true">↗</span></a>
+      </nav>
+      <button class="orionis-icon-button" id="orionis-theme-toggle" type="button" aria-label="Toggle color theme" hidden="hidden">
+        <svg class="orionis-icon-sun" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="12" cy="12" r="4"></circle>
+          <path d="M12 2v2m0 16v2M2 12h2m16 0h2M4.93 4.93l1.42 1.42m11.3 11.3 1.42 1.42M4.93 19.07l1.42-1.42m11.3-11.3 1.42-1.42"></path>
+        </svg>
+        <svg class="orionis-icon-moon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg">
+          <path d="M20.5 13.1A8.7 8.7 0 0 1 10.9 3.5 8.7 8.7 0 1 0 20.5 13.1Z"></path>
+        </svg>
+      </button>
+      <button class="orionis-icon-button" id="orionis-menu-toggle" type="button" aria-label="Open API navigation" aria-expanded="false" hidden="hidden">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg">
+          <path d="M4 6h16M4 12h16M4 18h16"></path>
+        </svg>
+      </button>
+    </div>
+  </div>
+</header>
+
+    <nav class="navbar navbar-default mainnavbar">
+      
+  
+  <div class="container-fluid">
+
+
+    <div class="navbar-header">
+      
+      <div class="navlinks">
+        <span class="navbar-brand">
+          <a href="https://orionis-framework.com/" class="projecthome">Orionis</a> <a href="index.html">API Documentation</a>
+        </span>
+
+        <a href="moduleIndex.html">
+          Modules
+        </a>
+
+        <a href="classIndex.html">
+          Classes
+        </a>
+
+        <a href="nameIndex.html">
+          Names
+        </a>
+
+        <div id="search-box-container">
+          <div class="input-group">
+            <input id="search-box" type="search" name="search-query" placeholder="Search..." aria-label="Search" minlength="2" class="form-control" autocomplete="off" />
+            
+            <span class="input-group-btn">
+              <a style="display: none;" class="btn btn-default" id="search-clear-button" title="Clear" onclick="clearSearch()"><img src="fonts/x-circle.svg" alt="Clear" /></a>
+              <a class="btn btn-default" id="apidocs-help-button" title="Help" href="apidocs-help.html"><img src="fonts/info.svg" alt="Help" /></a>
+            </span>
+          </div>
+        </div>
+
+      </div>
+
+      <div id="search-results-container" style="display: none;">
+        
+        <div id="search-buttons">
+          <span class="label label-default" id="search-docstrings-button">
+          <label class="checkbox-inline">
+            <input type="checkbox" id="toggle-search-in-docstrings-checkbox" value="false" onclick="toggleSearchInDocstrings()">
+              search in docstrings
+            </input>
+          </label>
+          </span>
+          
+        </div>
+        
+        <noscript>
+            <h1>Cannot search: JavaScript is not supported/enabled in your browser.</h1>
+        </noscript>
+
+        <div id="search-status"> </div>
+
+        <div class="warning" id="search-warn-box" style="display: none;">
+          <p class="rst-last"><span id="search-warn"></span></p>
+        </div>
+
+        <table id="search-results">
+          <!-- Filled dynamically by JS -->
+        </table>
+        
+        <div style="margin-top: 10px;">
+          <p>For more information on the search, visit the <a href="apidocs-help.html#rst-search">help page</a>.</p>
+        </div>
+      </div>
+
+    </div>
+
+
+  </div>
+</nav>
+    
+    <div class="container-fluid">
+
+      <!-- Side navigation -->
+      <div class="sidebarcontainer" style="display: none;">
+        
+        <div class="sidebar"><nav class="sidebar">
+  
+
+  <div>
+
+      <div class="thingTitle">
+        <span>Class</span>
+        <code class="thisobject"><a href="orionis.database.dialect._AsyncNativeCreator.html" class="internal-link" title="This class">_<wbr></wbr>Async<wbr></wbr>Native<wbr></wbr>Creator</a></code> 
+      </div>
+      
+      <div>
+        
+
+        
+         
+
+        
+        
+
+        <div class="childrenKindTitle">Methods</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#__call__" class="internal-link" title="orionis.database.dialect._AsyncNativeCreator.__call__">__call__</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#__init__" class="internal-link" title="orionis.database.dialect._AsyncNativeCreator.__init__">__init__</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+         
+
+        <div class="childrenKindTitle">Attributes</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#__slots__" class="internal-link" title="orionis.database.dialect._AsyncNativeCreator.__slots__">__slots__</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#_creator" class="internal-link" title="orionis.database.dialect._AsyncNativeCreator._creator">_creator</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+         
+        
+      </div>
+  </div><div>
+
+      <div class="thingTitle">
+        <span>Module</span>
+        <code><a href="orionis.database.dialect.html" class="internal-link" title="The parent of this class">dialect</a></code> 
+      </div>
+      
+      <div>
+        
+
+        
+         
+
+        <div class="childrenKindTitle">Classes</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+            <div class="itemName expandableItem">
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId4719"> 
+                    
+                </input>
+
+                <label class="lbl-toggle" for="expandableItemId4719">
+                    
+                    
+                </label>
+
+                <code><a href="orionis.database.dialect._AsyncDBAPIClient.html" class="internal-link" title="orionis.database.dialect._AsyncDBAPIClient">_<wbr></wbr>Async<wbr></wbr>DBAPIClient</a></code>
+
+                <div class="expandableContent">
+                    <div>
+        
+
+        
+         
+
+        
+        
+
+        <div class="childrenKindTitle">Methods</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.database.dialect._AsyncDBAPIClient.html#close" class="internal-link" title="orionis.database.dialect._AsyncDBAPIClient.close">close</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+         
+
+        
+         
+
+        
+         
+        
+      </div>
+                </div>
+            </div>
+            
+        
+
+        
+
+    </li><li class=" thisobject">
+        
+        
+        
+            <div class="itemName expandableItem">
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId4720"> 
+                    
+                </input>
+
+                <label class="lbl-toggle notExpandable" for="">
+                    
+                    
+                </label>
+
+                <code><a href="orionis.database.dialect._AsyncNativeCreator.html" class="internal-link" title="orionis.database.dialect._AsyncNativeCreator">_<wbr></wbr>Async<wbr></wbr>Native<wbr></wbr>Creator</a></code>
+
+                <div class="expandableContent">
+                    <div>
+        
+
+        
+         
+
+        
+        
+
+        <div class="childrenKindTitle">Methods</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#__call__" class="internal-link" title="orionis.database.dialect._AsyncNativeCreator.__call__">__call__</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#__init__" class="internal-link" title="orionis.database.dialect._AsyncNativeCreator.__init__">__init__</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+         
+
+        <div class="childrenKindTitle">Attributes</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#__slots__" class="internal-link" title="orionis.database.dialect._AsyncNativeCreator.__slots__">__slots__</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#_creator" class="internal-link" title="orionis.database.dialect._AsyncNativeCreator._creator">_creator</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+         
+        
+      </div>
+                </div>
+            </div>
+            
+        
+
+        
+
+    </li><li class="">
+        
+        
+        
+            <div class="itemName expandableItem">
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId4721"> 
+                    
+                </input>
+
+                <label class="lbl-toggle" for="expandableItemId4721">
+                    
+                    
+                </label>
+
+                <code><a href="orionis.database.dialect._MySQLParameterEscaper.html" class="internal-link" title="orionis.database.dialect._MySQLParameterEscaper">_<wbr></wbr>My<wbr></wbr>SQLParameter<wbr></wbr>Escaper</a></code>
+
+                <div class="expandableContent">
+                    <div>
+        
+
+        
+         
+
+        
+        
+
+        <div class="childrenKindTitle">Methods</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.database.dialect._MySQLParameterEscaper.html#__call__" class="internal-link" title="orionis.database.dialect._MySQLParameterEscaper.__call__">__call__</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.database.dialect._MySQLParameterEscaper.html#__init__" class="internal-link" title="orionis.database.dialect._MySQLParameterEscaper.__init__">__init__</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+         
+
+        <div class="childrenKindTitle">Attributes</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.database.dialect._MySQLParameterEscaper.html#__slots__" class="internal-link" title="orionis.database.dialect._MySQLParameterEscaper.__slots__">__slots__</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.database.dialect._MySQLParameterEscaper.html#_original" class="internal-link" title="orionis.database.dialect._MySQLParameterEscaper._original">_original</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+         
+        
+      </div>
+                </div>
+            </div>
+            
+        
+
+        
+
+    </li>
+</ul>
+
+        <div class="childrenKindTitle">Functions</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.database.dialect.html#_config_text" class="internal-link" title="orionis.database.dialect._config_text">_config<wbr></wbr>_text</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.database.dialect.html#_configure_async_native_creation" class="internal-link" title="orionis.database.dialect._configure_async_native_creation">_configure<wbr></wbr>_async<wbr></wbr>_native<wbr></wbr>_creation</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.database.dialect.html#_configure_mysql_binary_parameters" class="internal-link" title="orionis.database.dialect._configure_mysql_binary_parameters">_configure<wbr></wbr>_mysql<wbr></wbr>_binary<wbr></wbr>_parameters</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.database.dialect.html#_enum_value" class="internal-link" title="orionis.database.dialect._enum_value">_enum<wbr></wbr>_value</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.database.dialect.html#_is_sqlite_memory" class="internal-link" title="orionis.database.dialect._is_sqlite_memory">_is<wbr></wbr>_sqlite<wbr></wbr>_memory</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.database.dialect.html#_mysql_session_commands" class="internal-link" title="orionis.database.dialect._mysql_session_commands">_mysql<wbr></wbr>_session<wbr></wbr>_commands</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.database.dialect.html#_normalize_switch" class="internal-link" title="orionis.database.dialect._normalize_switch">_normalize<wbr></wbr>_switch</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.database.dialect.html#_oracle_query" class="internal-link" title="orionis.database.dialect._oracle_query">_oracle<wbr></wbr>_query</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.database.dialect.html#_oracle_url" class="internal-link" title="orionis.database.dialect._oracle_url">_oracle<wbr></wbr>_url</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.database.dialect.html#_pgsql_connect_args" class="internal-link" title="orionis.database.dialect._pgsql_connect_args">_pgsql<wbr></wbr>_connect<wbr></wbr>_args</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.database.dialect.html#_server_query" class="internal-link" title="orionis.database.dialect._server_query">_server<wbr></wbr>_query</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.database.dialect.html#_server_url" class="internal-link" title="orionis.database.dialect._server_url">_server<wbr></wbr>_url</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.database.dialect.html#_session_statements" class="internal-link" title="orionis.database.dialect._session_statements">_session<wbr></wbr>_statements</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.database.dialect.html#_sqlite_pragmas" class="internal-link" title="orionis.database.dialect._sqlite_pragmas">_sqlite<wbr></wbr>_pragmas</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.database.dialect.html#_sqlite_url" class="internal-link" title="orionis.database.dialect._sqlite_url">_sqlite<wbr></wbr>_url</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.database.dialect.html#_yes_no" class="internal-link" title="orionis.database.dialect._yes_no">_yes<wbr></wbr>_no</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.database.dialect.html#build_engine_url" class="internal-link" title="orionis.database.dialect.build_engine_url">build<wbr></wbr>_engine<wbr></wbr>_url</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.database.dialect.html#configure_engine" class="internal-link" title="orionis.database.dialect.configure_engine">configure<wbr></wbr>_engine</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.database.dialect.html#engine_options" class="internal-link" title="orionis.database.dialect.engine_options">engine<wbr></wbr>_options</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.database.dialect.html#missing_dependency_error" class="internal-link" title="orionis.database.dialect.missing_dependency_error">missing<wbr></wbr>_dependency<wbr></wbr>_error</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.database.dialect.html#resolve_driver" class="internal-link" title="orionis.database.dialect.resolve_driver">resolve<wbr></wbr>_driver</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+         
+
+        <div class="childrenKindTitle">Variables</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.database.dialect.html#_ASYNC_DIALECTS" class="internal-link" title="orionis.database.dialect._ASYNC_DIALECTS">_ASYNC<wbr></wbr>_DIALECTS</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.database.dialect.html#_ASYNC_DRIVER_PACKAGES" class="internal-link" title="orionis.database.dialect._ASYNC_DRIVER_PACKAGES">_ASYNC<wbr></wbr>_DRIVER<wbr></wbr>_PACKAGES</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.database.dialect.html#_DEFAULT_ODBC_DRIVER" class="internal-link" title="orionis.database.dialect._DEFAULT_ODBC_DRIVER">_DEFAULT<wbr></wbr>_ODBC<wbr></wbr>_DRIVER</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.database.dialect.html#_IDENTIFIER_PATTERN" class="internal-link" title="orionis.database.dialect._IDENTIFIER_PATTERN">_IDENTIFIER<wbr></wbr>_PATTERN</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.database.dialect.html#_MYSQL_RELAXED_MODE" class="internal-link" title="orionis.database.dialect._MYSQL_RELAXED_MODE">_MYSQL<wbr></wbr>_RELAXED<wbr></wbr>_MODE</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.database.dialect.html#_MYSQL_STRICT_MODE" class="internal-link" title="orionis.database.dialect._MYSQL_STRICT_MODE">_MYSQL<wbr></wbr>_STRICT<wbr></wbr>_MODE</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.database.dialect.html#_REDSHIFT_CONNECT_OPTIONS" class="internal-link" title="orionis.database.dialect._REDSHIFT_CONNECT_OPTIONS">_REDSHIFT<wbr></wbr>_CONNECT<wbr></wbr>_OPTIONS</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.database.dialect.html#_SQLITE_MEMORY_MARKERS" class="internal-link" title="orionis.database.dialect._SQLITE_MEMORY_MARKERS">_SQLITE<wbr></wbr>_MEMORY<wbr></wbr>_MARKERS</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.database.dialect.html#_SYNC_DIALECTS" class="internal-link" title="orionis.database.dialect._SYNC_DIALECTS">_SYNC<wbr></wbr>_DIALECTS</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.database.dialect.html#_SYNC_DRIVER_PACKAGES" class="internal-link" title="orionis.database.dialect._SYNC_DRIVER_PACKAGES">_SYNC<wbr></wbr>_DRIVER<wbr></wbr>_PACKAGES</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+         
+        
+      </div>
+  </div>
+
+</nav>
+        </div>
+        <div id="collapse-sidebar">
+          <a class="btn btn-link" onclick="toggleSideBarCollapse()" title="Toggle Sidebar Collapse">
+          </a>
+        </div> 
+        <script src="sidebartoggle.js" type="text/javascript"></script>
+       
+      </div>
+
+      <main class="">
+        
+
+        <div class="orionis-subheader">
+  <nav class="orionis-breadcrumb" aria-label="Documentation breadcrumb">
+    <a href="index.html">REFERENCE</a>
+    <span aria-hidden="true">/</span>
+    <span>ORIONIS FRAMEWORK</span>
+  </nav>
+  <section class="orionis-hero" aria-labelledby="orionis-hero-title">
+    <div class="orionis-hero-content">
+      <p class="orionis-eyebrow"><span class="orionis-status-dot" aria-hidden="true"></span> THE ORIONIS API</p>
+      <h2 id="orionis-hero-title">Build with <span class="orionis-accent">clarity.</span></h2>
+      <p class="orionis-hero-description">Explore the building blocks of an async-first Python framework. Every module, class, and method — connected, searchable, and ready to build with.</p>
+      <div class="orionis-hero-actions">
+        <a class="orionis-button" href="moduleIndex.html">Explore modules <span aria-hidden="true">→</span></a>
+        <a class="orionis-button orionis-button-secondary" href="classIndex.html">View classes</a>
+      </div>
+    </div>
+    <div class="orionis-hero-constellation" aria-hidden="true">
+      <span class="orionis-star orionis-star-one"></span>
+      <span class="orionis-star orionis-star-two"></span>
+      <span class="orionis-star orionis-star-three"></span>
+      <span class="orionis-star orionis-star-four"></span>
+    </div>
+  </section>
+</div>
+
+        <div class="page-header">
+          <h1 class="class"><code><code><a href="index.html" class="internal-link">orionis</a></code><wbr></wbr>.<code><a href="orionis.database.html" class="internal-link" title="orionis.database">database</a></code><wbr></wbr>.<code><a href="orionis.database.dialect.html" class="internal-link" title="orionis.database.dialect">dialect</a></code><wbr></wbr>.<code><a href="orionis.database.dialect._AsyncNativeCreator.html" class="internal-link" title="orionis.database.dialect._AsyncNativeCreator">_AsyncNativeCreator</a></code></code></h1>
+          <div id="show-private">
+            <button class="btn btn-link" onclick="togglePrivate()">Toggle Private API</button>
+          </div>
+        </div>
+
+        <div class="categoryHeader">
+          class documentation
+        </div>
+
+        <div class="extrasDocstring">
+          <p class="class-signature"><code><span class="py-keyword">class</span> <span class="py-defname">_AsyncNativeCreator</span>: <a href="https://github.com/orionis-framework/framework/tree/ee2023955df56107e76691f6efe34837a7c24529/orionis/database/dialect.py#L473" class="sourceLink">(source)</a></code></p><p>Constructor: <code><a href="#__init__" class="internal-link" title="orionis.database.dialect._AsyncNativeCreator.__init__">_AsyncNativeCreator(creator)</a></code></p><p><a href="classIndex.html#orionis.database.dialect._AsyncNativeCreator">View In Hierarchy</a></p>
+        </div>
+
+        <div class="moduleDocstring">
+          <div><p>Collect a late native client before propagating caller cancellation.</p></div>
+        </div>
+
+        <div id="split-tables">
+          <table class="children sortable" id="id479">
+  
+  
+  <tr class="method">
+    
+    <td>Async Method</td>
+    <td><code><a href="#__call__" class="internal-link" title="orionis.database.dialect._AsyncNativeCreator.__call__">__call__</a></code></td>
+    <td>Create a native client and collect it if cancellation arrives late.</td>
+  </tr><tr class="method">
+    
+    <td>Method</td>
+    <td><code><a href="#__init__" class="internal-link" title="orionis.database.dialect._AsyncNativeCreator.__init__">__init__</a></code></td>
+    <td>Store the native database client factory.</td>
+  </tr><tr class="classvariable">
+    
+    <td>Class Variable</td>
+    <td><code><a href="#__slots__" class="internal-link" title="orionis.database.dialect._AsyncNativeCreator.__slots__">__slots__</a></code></td>
+    <td><span class="rst-undocumented">Undocumented</span></td>
+  </tr><tr class="instancevariable">
+    
+    <td>Instance Variable</td>
+    <td><code><a href="#_creator" class="internal-link" title="orionis.database.dialect._AsyncNativeCreator._creator">_creator</a></code></td>
+    <td><span class="rst-undocumented">Undocumented</span></td>
+  </tr>
+</table>
+          
+
+            
+        </div>
+
+        <div id="child-list">
+          <div class="basemethod">
+  
+  
+  <a name="orionis.database.dialect._AsyncNativeCreator.__call__">
+    
+  </a>
+  <a name="__call__">
+    
+  </a>
+  <div class="functionHeader">
+    
+    
+    <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">__call__</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">*args: <code><a href="https://docs.python.org/3/builtins/functions.html#object" class="intersphinx-link">object</a></code>, </span><span class="rst-sig-param">**kwargs: <code><a href="https://docs.python.org/3/builtins/functions.html#object" class="intersphinx-link">object</a></code></span>) -&gt; <code><a href="orionis.database.dialect._AsyncDBAPIClient.html" class="internal-link" title="orionis.database.dialect._AsyncDBAPIClient">_AsyncDBAPIClient</a></code>:</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/ee2023955df56107e76691f6efe34837a7c24529/orionis/database/dialect.py#L496">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#__call__" title="orionis.database.dialect._AsyncNativeCreator.__call__">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    
+    <div><p>Create a native client and collect it if cancellation arrives late.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">*args:</span><code><a href="https://docs.python.org/3/builtins/functions.html#object" class="intersphinx-link">object</a></code></td><td class="fieldArgDesc">Positional arguments passed to the native creator.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">**kwargs:</span><code><a href="https://docs.python.org/3/builtins/functions.html#object" class="intersphinx-link">object</a></code></td><td class="fieldArgDesc">Keyword arguments passed to the native creator.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.database.dialect._AsyncDBAPIClient.html" class="internal-link" title="orionis.database.dialect._AsyncDBAPIClient">_AsyncDBAPIClient</a></code></td><td class="fieldArgDesc">Created native database client.</td></tr></table></div>
+  </div>
+</div><div class="basemethod">
+  
+  
+  <a name="orionis.database.dialect._AsyncNativeCreator.__init__">
+    
+  </a>
+  <a name="__init__">
+    
+  </a>
+  <div class="functionHeader">
+    
+    
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">__init__</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">creator: <code><a href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Callable" class="intersphinx-link">Callable</a>[<wbr></wbr><span class="rst-variable-ellipsis">...</span>, <wbr></wbr><a href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Awaitable" class="intersphinx-link">Awaitable</a>[<wbr></wbr><a href="orionis.database.dialect._AsyncDBAPIClient.html" class="internal-link" title="orionis.database.dialect._AsyncDBAPIClient">_AsyncDBAPIClient</a>]]</code></span>):</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/ee2023955df56107e76691f6efe34837a7c24529/orionis/database/dialect.py#L478">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#__init__" title="orionis.database.dialect._AsyncNativeCreator.__init__">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    
+    <div><p>Store the native database client factory.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">creator:</span><code><a href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Callable" class="intersphinx-link">Callable</a></code></td><td class="fieldArgDesc">Factory that asynchronously creates a native database client.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">Retain the factory for later connection attempts.</td></tr></table></div>
+  </div>
+</div><div class="baseclassvariable">
+  
+  
+  <a name="orionis.database.dialect._AsyncNativeCreator.__slots__">
+    
+  </a>
+  <a name="__slots__">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <span class="py-defname">__slots__</span>: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" class="intersphinx-link">tuple</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <wbr></wbr><span class="rst-variable-ellipsis">...</span>]</code> =
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/ee2023955df56107e76691f6efe34837a7c24529/orionis/database/dialect.py#L476">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#__slots__" title="orionis.database.dialect._AsyncNativeCreator.__slots__">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="functionBody">
+    
+    <div><p class="undocumented">Undocumented</p></div>
+    
+  </div>
+</div><div class="baseinstancevariable">
+  
+  
+  <a name="orionis.database.dialect._AsyncNativeCreator._creator">
+    
+  </a>
+  <a name="_creator">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <span class="py-defname">_creator</span> =
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/ee2023955df56107e76691f6efe34837a7c24529/orionis/database/dialect.py#L494">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#_creator" title="orionis.database.dialect._AsyncNativeCreator._creator">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="functionBody">
+    
+    <div><p class="undocumented">Undocumented</p></div>
+    
+  </div>
+</div>
+        </div>
+      
+      </main>
+    </div>
+
+    <footer class="orionis-footer">
+  
+  <div class="orionis-footer-inner">
+    <div class="orionis-footer-copy">
+      <p>API documentation for <a href="https://orionis-framework.com/" class="projecthome">Orionis</a>.</p>
+      <p class="orionis-footer-meta">Generated with <a href="https://github.com/twisted/pydoctor/">Pydoctor</a> 25.10.1.<span class="orionis-footer-build"> Built 2026-10-08 10:16:09.</span></p>
+    </div>
+    <nav class="orionis-footer-links" aria-label="Additional resources">
+      <a href="https://docs.orionis-framework.com">Read the guide <span aria-hidden="true">↗</span></a>
+      <a href="https://github.com/orionis-framework/framework">Source on GitHub <span aria-hidden="true">↗</span></a>
+    </nav>
+  </div>
+  <!-- Keep Pydoctor's search engine and its required load order intact. -->
+  <script src="ajax.js" type="text/javascript"></script>
+  <script src="searchlib.js" type="text/javascript"></script>
+  <script src="search.js" type="text/javascript"></script>
+</footer>
+  
+    <script src="pydoctor.js" type="text/javascript"></script>
+
+  </body>
+</html>

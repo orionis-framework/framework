@@ -78,6 +78,12 @@ class DatabaseQueueDriver(IQueueDriver):
         None
             Complete the documented operation without returning a value.
         """
+        if not connection.supportsUniqueConstraints():
+            message = (
+                "Database queues require enforced unique constraints "
+                "to guarantee one row per job and exclusive reservations."
+            )
+            raise QueueStorageError(message)
         self._connection = connection
         self._definition = build_jobs_table(table)
         self._ready = False

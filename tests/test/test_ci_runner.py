@@ -158,6 +158,32 @@ class TestSharedCiRunner(TestCase):
         """Return an empty inventory when no matching test files exist."""
         self.assertEqual(self.runner.discover_suites(self.repo), [])
 
+    def testDiscoveryExcludesOnlyTheLocalRealDatabaseDirectory(self) -> None:
+        """Exclude local tests while preserving similarly named public paths."""
+        for path in (
+            "tests/real_database/test_local.py",
+            "tests/real_database/pgsql/nested/test_connection.py",
+            "tests/database/real_database/test_public.py",
+            "tests/real_database_unit/test_public.py",
+            "tests/test_real_database.py",
+        ):
+            self._createFile(path)
+        suites = self.runner.discover_suites(self.repo)
+        self.assertEqual(
+            [(suite.directory, suite.pattern) for suite in suites],
+            [
+                ("tests/database", "test_*.py"),
+                ("tests/real_database_unit", "test_*.py"),
+                ("tests", "test_real_database.py"),
+            ],
+        )
+
+    def testDiscoveryReturnsNoSuitesForOnlyLocalRealDatabaseTests(self) -> None:
+        """Keep an exclusively local test tree out of automatic execution."""
+        self._createFile("tests/real_database/test_local.py")
+        self._createFile("tests/real_database/mysql/test_connection.py")
+        self.assertEqual(self.runner.discover_suites(self.repo), [])
+
     def testFailureStopsBeforeStartingTheNextSuite(self) -> None:
         """Preserve the failing exit code and stop subsequent processes."""
         self.processes.statuses = [7, 0, 0]
@@ -195,6 +221,7 @@ class TestSharedCiRunner(TestCase):
         self.assertIn("tests/queues", output)
         self.assertIn("tests/realtime", output)
         self.assertIn("Root [tests/test_example.py]", output)
+        self.assertNotIn("tests/real_database", output)
         self.assertEqual(self.processes.calls, [])
 
     def testCliUsesDetailedOutputByDefault(self) -> None:
@@ -203,6 +230,7 @@ class TestSharedCiRunner(TestCase):
         self.assertTrue(self.processes.calls)
         for command, _, _, _ in self.processes.calls:
             self.assertIn("--verbosity=2", command)
+            self.assertNotIn("--start-dir=tests/real_database", command)
 
     def testCliAppliesContinueAndVerbosityToAllDiscoveredSuites(self) -> None:
         """Forward CLI settings while returning an earlier module failure."""
@@ -216,6 +244,7 @@ class TestSharedCiRunner(TestCase):
         )
         for command, cwd, _, _ in self.processes.calls:
             self.assertIn("--verbosity=0", command)
+            self.assertNotIn("--start-dir=tests/real_database", command)
             self.assertEqual(cwd, repo)
         root_commands = [
             command for command, _, _, _ in self.processes.calls

@@ -4,6 +4,7 @@ from typing import TYPE_CHECKING, Any, ClassVar
 import sqlalchemy
 from sqlalchemy import Column as SqlColumn
 from sqlalchemy import ForeignKey, MetaData, Table, and_, func, or_
+from sqlalchemy.dialects.oracle import FLOAT
 from sqlalchemy.exc import NoSuchModuleError
 from sqlalchemy.schema import CreateTable, DropTable
 from sqlalchemy.sql import CompoundSelect
@@ -189,19 +190,19 @@ class SQLCompiler:
 
     def __init__(self, prefix: str = "", *, driver: str | None = None) -> None:
         """
-        Initialize the compiler with an optional table name prefix.
+        Initialize backend settings and compiler-owned table metadata.
 
         Parameters
         ----------
         prefix : str, optional
-            Prefix prepended to every physical table name.
-        driver : str | None, optional
-            Backend identifier for native column options such as Redshift IDENTITY.
+            Text prepended to logical table names; empty by default.
+        driver : str or None, optional
+            Orionis backend name for native type, identity, and locking options.
 
         Returns
         -------
         None
-            This method does not return a value.
+            Store the settings and create empty metadata and table caches.
         """
         self._prefix = prefix or ""
         self._driver = driver
@@ -213,24 +214,28 @@ class SQLCompiler:
 
     def compileSelect(self, plan: SelectPlan) -> Select[Any] | CompoundSelect:
         """
-        Compile a select plan into an executable SELECT statement.
+        Compile a SELECT plan, including aggregates and union branches.
+
+        Use a derived query for ``COUNT(*)`` over distinct, grouped, or unioned
+        results.
 
         Parameters
         ----------
         plan : SelectPlan
-            Engine-agnostic select description.
+            Projection, sources, conditions, grouping, unions, paging, and locks.
 
         Returns
         -------
         Select or CompoundSelect
-            Executable SELECT statement; a compound statement when the
-            plan carries unions.
+            Executable SELECT; union branches are wrapped in a derived table.
 
         Raises
         ------
         QueryException
-            If the plan references unknown columns or invalid clauses.
+            If sources or columns are unknown, clauses are invalid, or a Redshift
+            row lock is requested.
         """
+        self._validateSelectLock(plan)
         if (
             plan.aggregate is not None
             and plan.aggregate.function is AggregateFunction.COUNT
@@ -264,23 +269,22 @@ class SQLCompiler:
         plan: SelectPlan,
     ) -> Select[Any]:
         """
-        Combine a compiled statement with the plan union branches.
+        Combine union branches and apply global ordering and pagination.
 
-        Consecutive branches of the same kind form one flat compound.
-        Mixed operators retain left-to-right semantics through derived
-        tables, which also keeps the SQL valid on SQLite.
+        Flatten consecutive operators of the same kind; preserve left-to-right
+        grouping when switching between ``UNION`` and ``UNION ALL``.
 
         Parameters
         ----------
         statement : Select
-            Statement compiled from the owning plan.
+            Base SELECT without the owning plan's unions, ordering, or paging.
         plan : SelectPlan
-            Engine-agnostic select description carrying the unions.
+            SELECT plan containing at least one union branch.
 
         Returns
         -------
         Select
-            Combined rows with ordering and bounds applied to the whole union.
+            SELECT over combined rows with the owning plan's order and bounds.
         """
         branches: list[Any] = [statement]
         all_rows = plan.unions[0].all_rows
@@ -306,26 +310,26 @@ class SQLCompiler:
         outer_sources: SourceMap,
     ) -> Select[Any]:
         """
-        Compile a select plan, correlating it with an enclosing query.
+        Build a SELECT and resolve references to enclosing query sources.
 
         Parameters
         ----------
         plan : SelectPlan
-            Engine-agnostic select description.
+            SELECT description whose sources and clauses are compiled.
         outer_sources : SourceMap
-            Table sources of the enclosing query, so a subquery can
-            reference outer columns and be correlated by the engine.
+            Source lookup from the enclosing query, or an empty mapping.
 
         Returns
         -------
         Select
-            Executable SELECT statement.
+            SELECT with projection, filters, grouping, paging, and requested locks.
 
         Raises
         ------
         QueryException
-            If the plan references unknown columns or invalid clauses.
+            If references or clauses are invalid, or a Redshift lock is requested.
         """
+        self._validateSelectLock(plan)
         self._ensureSelectRawColumns(plan)
         default, own_sources, from_clause = self._resolveSources(plan)
         sources: SourceMap = (
@@ -360,30 +364,61 @@ class SQLCompiler:
             )
 
         if plan.lock is not None:
-            statement = statement.with_for_update(
-                read=plan.lock is LockMode.SHARE,
-            )
+            if self._driver == "sqlserver":
+                # SQL Server ignores Core's FOR UPDATE clause. Retain physical
+                # row locks until transaction end with native table hints.
+                hints = (
+                    "WITH (HOLDLOCK, ROWLOCK)" if plan.lock is LockMode.SHARE
+                    else "WITH (UPDLOCK, ROWLOCK)"
+                )
+                statement = statement.with_hint(default, hints, dialect_name="mssql")
+            else:
+                statement = statement.with_for_update(
+                    read=plan.lock is LockMode.SHARE,
+                )
 
         return statement
+
+    def _validateSelectLock(self, plan: SelectPlan) -> None:
+        """
+        Reject a SELECT row lock when the backend is Redshift.
+
+        Parameters
+        ----------
+        plan : SelectPlan
+            Current SELECT plan whose lock setting is checked.
+
+        Returns
+        -------
+        None
+            Continue compilation without modifying the plan.
+
+        Raises
+        ------
+        QueryException
+            If ``plan.lock`` is set for the Redshift backend.
+        """
+        if self._driver == "redshift" and plan.lock is not None:
+            message = "Amazon Redshift does not support row-level SELECT locks."
+            raise QueryException(message)
 
     # ── Schemaless (raw) table support ──────────────────────────────────────
 
     def _bareNameForIdentifier(self, name: str, identifier: str) -> str | None:
         """
-        Return the bare column name when a reference targets an identifier.
+        Extract a bare column name for a matching source identifier.
 
         Parameters
         ----------
         name : str
-            Column reference, optionally qualified as ``"table.column"``.
+            Unqualified or dot-qualified column reference.
         identifier : str
-            Alias or logical table name being checked against.
+            Alias or logical table name accepted as the qualifier.
 
         Returns
         -------
         str or None
-            The bare column name when unqualified or matching
-            ``identifier``, otherwise ``None``.
+            Bare name for unqualified or matching references; otherwise ``None``.
         """
         qualifier, column = self._splitQualifiedColumn(name)
         if qualifier is None or qualifier == identifier:
@@ -396,19 +431,19 @@ class SQLCompiler:
         names: set[str],
     ) -> None:
         """
-        Collect the column references of a clause list, recursing groups.
+        Collect explicit column references from conditions and nested groups.
 
         Parameters
         ----------
         clauses : Sequence of WhereClause
-            Conditions to inspect.
+            WHERE or HAVING conditions to inspect recursively.
         names : set of str
-            Accumulator receiving every referenced column name.
+            Mutable accumulator for left-hand and column-comparison references.
 
         Returns
         -------
         None
-            This method does not return a value.
+            Update ``names`` in place; skip raw SQL and EXISTS subqueries.
         """
         for clause in clauses:
             if clause.where_type is WhereType.NESTED:
@@ -422,17 +457,20 @@ class SQLCompiler:
 
     def _collectPlanColumnNames(self, plan: SelectPlan) -> set[str]:
         """
-        Collect every column reference touched anywhere in a select plan.
+        Collect explicit column references from the current SELECT plan.
+
+        Inspect projection names, conditions, ordering, grouping, aggregates,
+        and joins without parsing raw SQL or traversing subquery plans.
 
         Parameters
         ----------
         plan : SelectPlan
-            Engine-agnostic select description.
+            SELECT plan whose direct references will be collected.
 
         Returns
         -------
         set of str
-            Every column name referenced by the plan, qualified or not.
+            Qualified and unqualified names used by the current plan's clauses.
         """
         names: set[str] = {
             column for column in plan.columns if isinstance(column, str)
@@ -456,29 +494,24 @@ class SQLCompiler:
         names: set[str],
     ) -> None:
         """
-        Lazily declare columns a plan references against a raw table.
+        Declare missing referenced columns on a schemaless table.
 
-        A schemaless :class:`TableDefinition` (no declared columns, used
-        by model-less builders such as ``DB.table("users")``) has no
-        upfront column list for the compiler to validate against. Every
-        name the plan actually references for it is appended to its
-        engine table here, before any alias gets created, since
-        ``Table.alias().c`` memoizes on first access and would silently
-        miss columns appended afterwards.
+        Declare columns before creating aliases, whose column collections are
+        cached.
 
         Parameters
         ----------
         table : TableDefinition
-            Table to inspect; a no-op unless it declares no columns.
+            Table definition; declared schemas are left unchanged.
         alias : str or None
-            Alias this table is referred to by inside the query.
+            Query alias used to match qualified references, or ``None``.
         names : set of str
-            Every column reference collected from the owning plan.
+            Collected qualified or unqualified references from the owning plan.
 
         Returns
         -------
         None
-            This method does not return a value.
+            Append matching names to cached table metadata without assigning types.
         """
         if table.columns:
             return
@@ -499,17 +532,17 @@ class SQLCompiler:
 
     def _ensureSelectRawColumns(self, plan: SelectPlan) -> None:
         """
-        Lazily declare raw columns referenced by a select plan's sources.
+        Declare referenced columns for schemaless SELECT and JOIN sources.
 
         Parameters
         ----------
         plan : SelectPlan
-            Engine-agnostic select description.
+            SELECT plan supplying source definitions and column references.
 
         Returns
         -------
         None
-            This method does not return a value.
+            Update raw table metadata before alias creation; skip subquery joins.
         """
         # Collect references only when a source has no declared columns.
         if plan.table.columns and all(
@@ -528,25 +561,25 @@ class SQLCompiler:
         plan: SelectPlan,
     ) -> tuple[SqlSource, SourceMap, SqlSource]:
         """
-        Build the main source, the resolvable source map, and the FROM.
+        Build SELECT sources and assemble the FROM clause.
 
-        The main table and every joined table are registered under the
-        identifier queries use to qualify their columns: the alias when
-        present, otherwise the logical table name. This is what lets
-        ``_resolveColumn`` find ``"users.id"`` or ``"posts.title"``
-        regardless of how many tables participate in the query.
+        Index each source by its alias, or by its logical table name when no
+        alias is supplied.
 
         Parameters
         ----------
         plan : SelectPlan
-            Engine-agnostic select description.
+            Main table, optional alias, and ordered join descriptions.
 
         Returns
         -------
         tuple of (SqlSource, SourceMap, SqlSource)
-            The main source (for unqualified projections), the source
-            map keyed by alias or table name, and the compiled FROM
-            clause (the main source joined with every configured join).
+            Main source, source lookup map, and complete FROM/JOIN expression.
+
+        Raises
+        ------
+        QueryException
+            If a joined source or its ON conditions cannot be compiled.
         """
         table = self._sqlTable(plan.table)
         default = table.alias(plan.alias) if plan.alias else table
@@ -563,23 +596,22 @@ class SQLCompiler:
 
     def _joinSource(self, join: JoinExpression) -> tuple[str, SqlSource]:
         """
-        Build the FROM source contributed by a single join expression.
+        Build a joined table or an aliased subquery source.
 
         Parameters
         ----------
         join : JoinExpression
-            Join description to materialize.
+            Table or SELECT plan to join, with an optional source alias.
 
         Returns
         -------
         tuple of (str, SqlSource)
-            The identifier the joined source is reachable by, and the
-            source itself.
+            Source identifier and table, table alias, or compiled derived query.
 
         Raises
         ------
         QueryException
-            If a subquery join declares no alias to be referenced by.
+            If a subquery has no alias or its SELECT plan cannot be compiled.
         """
         if isinstance(join.table, SelectPlan):
             if not join.alias:
@@ -598,28 +630,28 @@ class SQLCompiler:
         join: JoinExpression,
     ) -> tuple[SqlSource, str, SqlSource]:
         """
-        Extend a FROM clause with a single joined table.
+        Extend a FROM clause with the requested join type.
+
+        Emulate RIGHT JOIN by swapping sources in a LEFT JOIN.
 
         Parameters
         ----------
         from_clause : SqlSource
-            FROM clause assembled so far.
+            FROM/JOIN expression built before this join.
         sources : SourceMap
-            Table sources already reachable by qualified references.
+            Existing sources used to resolve ON-clause column references.
         join : JoinExpression
-            Join description to compile.
+            Joined source, join type, and optional ON conditions.
 
         Returns
         -------
         tuple of (SqlSource, str, SqlSource)
-            The extended FROM clause, the identifier the joined table is
-            reachable by, and the joined source itself.
+            Extended FROM clause, joined identifier, and joined source.
 
         Raises
         ------
         QueryException
-            If the join type is not supported, or its ON conditions
-            cannot be resolved.
+            If a subquery alias is missing or ON conditions are absent or invalid.
         """
         joined_name, joined_source = self._joinSource(join)
 
@@ -648,28 +680,29 @@ class SQLCompiler:
         join: JoinExpression,
     ) -> ColumnElement[bool]:
         """
-        Fold a join's ON conditions into a single boolean expression.
+        Combine a join's ON conditions into one boolean expression.
 
         Parameters
         ----------
         sources : SourceMap
-            Table sources reachable before this join is applied.
+            Sources available before adding the joined source.
         joined_name : str
-            Identifier the joined table is reachable by.
+            Identifier used to qualify columns from the new source.
         joined_source : SqlSource
-            The joined table source itself.
+            Table or derived query introduced by this join.
         join : JoinExpression
-            Join description whose conditions are compiled.
+            Join description containing one or more ON conditions.
 
         Returns
         -------
         ColumnElement
-            Combined boolean expression for the ON clause.
+            ON expression, using the joined source for unqualified column names.
 
         Raises
         ------
         QueryException
-            If the join declares no ON conditions.
+            If ON conditions are absent, references are unknown, or operators are
+            unsupported.
         """
         if not join.conditions:
             error_msg = (
@@ -692,26 +725,26 @@ class SQLCompiler:
         condition: JoinCondition,
     ) -> ColumnElement[bool]:
         """
-        Compile a single ON condition into a column-to-column comparison.
+        Compile an ON condition as a comparison between two columns.
 
         Parameters
         ----------
         sources : SourceMap
-            Table sources reachable while resolving this condition.
+            Sources indexed by alias or logical table name.
         default : SqlSource
-            Source an unqualified column reference resolves against.
+            Source used to resolve unqualified column names.
         condition : JoinCondition
-            ON condition to compile.
+            Left reference, comparison operator, and right reference.
 
         Returns
         -------
         ColumnElement
-            Boolean expression comparing both column references.
+            Boolean comparison between the resolved column expressions.
 
         Raises
         ------
         QueryException
-            If the operator is not supported.
+            If either reference is unknown or the comparison operator is unsupported.
         """
         left = self._resolveColumn(sources, default, condition.first)
         right = self._resolveColumn(sources, default, condition.second)
@@ -728,22 +761,21 @@ class SQLCompiler:
         plan: SelectPlan,
     ) -> Select[Any]:
         """
-        Build the base SELECT statement with its projection.
+        Build a SELECT projection from an aggregate or projected entries.
 
         Parameters
         ----------
         default : SqlSource
-            Source an unqualified column reference resolves against.
+            Main query source and fallback for unqualified references.
         sources : SourceMap
-            Table sources reachable by qualified column references.
+            Sources indexed by alias or logical table name.
         plan : SelectPlan
-            Engine-agnostic select description.
+            Aggregate, explicit projections, or default table selection.
 
         Returns
         -------
         Select
-            Statement projecting the aggregate, explicit columns, or
-            every column of the main table.
+            SELECT of the requested projection; use literal ``*`` for raw tables.
         """
         # An explicit FROM is only added when the plan has no joins: with
         # joins the caller sets the composed FROM clause instead, and
@@ -771,22 +803,21 @@ class SQLCompiler:
     @staticmethod
     def _rawElement(raw: RawExpression) -> ColumnElement[Any]:
         """
-        Turn a raw SQL fragment into a bound engine element.
+        Compile trusted SQL text with named bindings and an optional alias.
 
-        Every value travels as a bound parameter, so the driver escapes
-        it and the fragment cannot be used to smuggle literals. A raw
-        fragment carrying an alias is compiled as a labeled column so it
-        stays addressable when the query is used as a derived table.
+        Treat SQL text as trusted input; only values in ``bindings`` are
+        parameterized. Aliased expressions remain addressable in derived queries.
 
         Parameters
         ----------
         raw : RawExpression
-            Fragment, its named bindings, and its optional alias.
+            SQL fragment, named parameter values, and optional projection alias.
 
         Returns
         -------
-        ColumnElement
-            Textual element ready to be embedded in a statement.
+        ColumnElement or TextClause
+            Text clause or labeled expression; supplied bindings use unique
+            parameters.
         """
         if raw.alias and not raw.bindings:
             return sqlalchemy.literal_column(raw.sql).label(raw.alias)
@@ -812,21 +843,21 @@ class SQLCompiler:
         entry: str | SubQueryColumn | RawExpression,
     ) -> ColumnElement[Any]:
         """
-        Compile a single entry of a select projection.
+        Compile one projection entry into a SQL expression.
 
         Parameters
         ----------
         sources : SourceMap
-            Table sources reachable by qualified column references.
+            Sources indexed by alias or logical table name.
         default : SqlSource
-            Source an unqualified column reference resolves against.
+            Fallback source for unqualified column names.
         entry : str or SubQueryColumn or RawExpression
-            Projected column name, scalar subquery, or raw fragment.
+            Column reference, correlated scalar subquery, or trusted SQL fragment.
 
         Returns
         -------
-        ColumnElement
-            Engine element for the projection entry.
+        ColumnElement or TextClause
+            Resolved column, labeled scalar subquery, or compiled raw expression.
         """
         if isinstance(entry, SubQueryColumn):
             subquery = self._buildSelect(entry.plan, sources)
@@ -843,23 +874,28 @@ class SQLCompiler:
         plan: SelectPlan,
     ) -> Select[Any]:
         """
-        Apply ordering, limit, and offset clauses to a statement.
+        Apply a plan's ordering, limit, and offset to a SELECT.
 
         Parameters
         ----------
         sources : SourceMap
-            Table sources reachable by qualified column references.
+            Sources indexed by alias or logical table name.
         default : SqlSource
-            Source an unqualified column reference resolves against.
+            Fallback source for unqualified ordering columns.
         statement : Select
-            Statement being assembled.
+            SELECT statement to extend without mutating it.
         plan : SelectPlan
-            Engine-agnostic select description.
+            Ordering clauses and optional limit and offset values.
 
         Returns
         -------
         Select
-            Statement with ordering and pagination applied.
+            SELECT with all requested sorting and pagination clauses applied.
+
+        Raises
+        ------
+        QueryException
+            If an ordering column or its source cannot be resolved.
         """
         if len(plan.orders) == 1:
             order = plan.orders[0]
@@ -887,17 +923,20 @@ class SQLCompiler:
     @staticmethod
     def supportsBatchInsert(plan: InsertPlan) -> bool:
         """
-        Report whether an insert plan supports batch execution.
+        Check whether multiple rows share a parameter-only batch shape.
+
+        Check row shapes and values without compiling the INSERT statement.
 
         Parameters
         ----------
         plan : InsertPlan
-            Insert plan whose rows are checked for a shared parameter shape.
+            Insert plan with row mappings and optional declared table columns.
 
         Returns
         -------
         bool
-            Whether the rows can be sent as one batch without SQL expressions.
+            ``True`` when the batch precheck accepts multiple rows with matching
+            keys and no SQLAlchemy expressions; ``False`` otherwise.
         """
         rows = plan.values
         if len(rows) <= 1:
@@ -919,24 +958,25 @@ class SQLCompiler:
         parameterized: bool = False,
     ) -> Insert:
         """
-        Compile an insert plan into an executable INSERT statement.
+        Compile row mappings into an executable INSERT statement.
 
         Parameters
         ----------
         plan : InsertPlan
-            Engine-agnostic insert description.
+            Target table and one or more row mappings.
         parameterized : bool, optional
-            Leave row values for executemany parameters supplied at execution.
+            Leave values to execution-time bindings. Defaults to ``False``.
 
         Returns
         -------
         Insert
-            Executable INSERT statement.
+            INSERT with attached row values, or a parameterized template.
+            Parameterized PostgreSQL statements include ``RETURNING 1``.
 
         Raises
         ------
         QueryException
-            If the plan carries no rows to insert.
+            If the plan has no rows or a column type has no SQL type builder.
         """
         if not plan.values:
             error_msg = "Cannot compile an INSERT statement without values."
@@ -963,22 +1003,22 @@ class SQLCompiler:
 
     def compileUpdate(self, plan: UpdatePlan) -> Update:
         """
-        Compile an update plan into an executable UPDATE statement.
+        Compile replacement values and filters into an UPDATE statement.
 
         Parameters
         ----------
         plan : UpdatePlan
-            Engine-agnostic update description.
+            Target table, nonempty assignment mapping, and WHERE conditions.
 
         Returns
         -------
         Update
-            Executable UPDATE statement.
+            UPDATE filtered by the plan's conditions, or unrestricted without them.
 
         Raises
         ------
         QueryException
-            If the plan carries no values to assign.
+            If assignments are empty or columns, types, or conditions are invalid.
         """
         if not plan.values:
             error_msg = "Cannot compile an UPDATE statement without values."
@@ -999,17 +1039,22 @@ class SQLCompiler:
 
     def compileDelete(self, plan: DeletePlan) -> Delete:
         """
-        Compile a delete plan into an executable DELETE statement.
+        Compile filtering conditions into a DELETE statement.
 
         Parameters
         ----------
         plan : DeletePlan
-            Engine-agnostic delete description.
+            Target table and WHERE conditions selecting rows to delete.
 
         Returns
         -------
         Delete
-            Executable DELETE statement.
+            DELETE filtered by the plan's conditions, or unrestricted without them.
+
+        Raises
+        ------
+        QueryException
+            If column references, types, or filtering conditions cannot be compiled.
         """
         if not plan.table.columns:
             names: set[str] = set()
@@ -1031,20 +1076,24 @@ class SQLCompiler:
         if_not_exists: bool = True,
     ) -> Executable:
         """
-        Compile a table definition into a CREATE TABLE statement.
+        Compile table metadata into a CREATE TABLE DDL object.
 
         Parameters
         ----------
         definition : TableDefinition
-            Table definition to materialize.
+            Logical table name, columns, constraints, schema, and comment.
         if_not_exists : bool, optional
-            Whether to guard the statement with ``IF NOT EXISTS`` so that
-            an already existing table is silently kept.
+            Request ``IF NOT EXISTS`` in the generated DDL. Defaults to ``True``.
 
         Returns
         -------
         Executable
-            DDL statement creating the table.
+            CREATE TABLE object using the compiler's prefix and cached metadata.
+
+        Raises
+        ------
+        QueryException
+            If a declared column type has no SQL type builder.
         """
         table = self._sqlTable(definition)
         return CreateTable(table, if_not_exists=if_not_exists)
@@ -1057,22 +1106,21 @@ class SQLCompiler:
         if_exists: bool = True,
     ) -> Executable:
         """
-        Compile a DROP TABLE statement for the given logical name.
+        Compile a DROP TABLE DDL object for a logical table name.
 
         Parameters
         ----------
         name : str
-            Logical table name; the compiler prefix is applied.
+            Logical name to prefix before resolving table metadata.
         schema : str or None, optional
-            Database schema owning the table, or ``None`` for the default.
+            Owning schema, or ``None`` to use the default schema.
         if_exists : bool, optional
-            Whether to guard the statement with ``IF EXISTS`` so that a
-            missing table does not raise an error.
+            Request ``IF EXISTS`` in the generated DDL. Defaults to ``True``.
 
         Returns
         -------
         Executable
-            DDL statement dropping the table.
+            DROP TABLE object using cached metadata or a lightweight table stub.
         """
         physical = self._physicalName(name)
         table = self._tables.get(self._cacheKey(physical, schema))
@@ -1085,51 +1133,59 @@ class SQLCompiler:
 
     def _physicalName(self, name: str) -> str:
         """
-        Prepend the connection prefix to a logical table name.
+        Build a physical table name by prepending the configured prefix.
 
         Parameters
         ----------
         name : str
-            Logical table name.
+            Logical table name, without the connection prefix.
 
         Returns
         -------
         str
-            Physical table name including the configured prefix.
+            Configured prefix concatenated with ``name`` without normalization.
         """
         return f"{self._prefix}{name}"
 
     def _cacheKey(self, physical: str, schema: str | None) -> str:
         """
-        Build the internal table cache key, disambiguating by schema.
+        Build a table cache key from its physical name and optional schema.
 
         Parameters
         ----------
         physical : str
-            Physical table name including the connection prefix.
+            Table name including the configured prefix.
         schema : str or None
-            Database schema owning the table, or ``None`` for the default.
+            Schema qualifier, or ``None`` for an unqualified cache key.
 
         Returns
         -------
         str
-            Cache key unique per physical name and schema.
+            Schema-qualified physical name, or the physical name without a schema.
         """
         return f"{schema}.{physical}" if schema else physical
 
     def _sqlTable(self, definition: TableDefinition) -> Table:
         """
-        Resolve and cache the engine table for a table definition.
+        Resolve cached table metadata or rebuild it for a new definition.
+
+        Reuse metadata for raw definitions or the same declared definition
+        instance; rebuild it for a different definition with declared columns.
 
         Parameters
         ----------
         definition : TableDefinition
-            Orionis table definition.
+            Logical table description, including columns, constraints, and schema.
 
         Returns
         -------
         Table
-            Engine table metadata.
+            Prefixed table registered in this compiler's metadata and table cache.
+
+        Raises
+        ------
+        QueryException
+            If a column type has no registered SQL type builder.
         """
         physical = self._physicalName(definition.name)
         cache_key = self._cacheKey(physical, definition.schema)
@@ -1173,17 +1229,18 @@ class SQLCompiler:
 
     def _tableConstraints(self, definition: TableDefinition) -> list[Any]:
         """
-        Build the composite, table-level constraints for a definition.
+        Build table-level keys, foreign keys, and indexes.
 
         Parameters
         ----------
         definition : TableDefinition
-            Orionis table definition.
+            Composite primary key, unique constraints, foreign keys, and indexes.
 
         Returns
         -------
         list of Any
-            SQLAlchemy schema items to attach alongside the columns.
+            SQLAlchemy schema items with prefixed foreign-key targets and generated
+            names for unnamed indexes.
         """
         constraints: list[Any] = []
         if definition.composite_primary_key:
@@ -1195,7 +1252,10 @@ class SQLCompiler:
             for unique in definition.unique_constraints
         )
         for foreign_key in definition.foreign_keys:
-            ref_table = self._physicalName(foreign_key.ref_table)
+            schema, separator, table_name = foreign_key.ref_table.rpartition(".")
+            if not separator:
+                table_name = foreign_key.ref_table
+            ref_table = self._cacheKey(self._physicalName(table_name), schema or None)
             ref_columns = [
                 f"{ref_table}.{column}"
                 for column in foreign_key.ref_columns
@@ -1214,21 +1274,18 @@ class SQLCompiler:
 
     def _ensureReferencedTable(self, reference: ForeignReference) -> None:
         """
-        Register a stub for a referenced table when it is unknown.
-
-        The stub only carries the referenced column so foreign key DDL
-        can resolve its target; compiling the real model later replaces
-        the stub through ``extend_existing``.
+        Register missing metadata for a single-column foreign-key target.
 
         Parameters
         ----------
         reference : ForeignReference
-            Foreign reference to resolve.
+            Logical target table, optional schema qualifier, and referenced column.
 
         Returns
         -------
         None
-            This method does not return a value.
+            Create an integer primary-key placeholder only when target metadata
+            is absent.
         """
         self._ensureReferencedColumns(reference.table, (reference.column,))
 
@@ -1238,22 +1295,26 @@ class SQLCompiler:
         columns: Sequence[str],
     ) -> None:
         """
-        Register a stub table exposing the given referenced columns.
+        Register missing table metadata for foreign-key target columns.
 
         Parameters
         ----------
         table_name : str
-            Logical name of the referenced table.
+            Logical table name, optionally qualified as ``schema.table``.
         columns : Sequence of str
-            Referenced column names, each stubbed as an integer key.
+            Target columns to declare as integer primary-key placeholders.
 
         Returns
         -------
         None
-            This method does not return a value.
+            Add a prefixed metadata table if absent; leave existing metadata
+            unchanged.
         """
-        physical = self._physicalName(table_name)
-        if physical in self._metadata.tables:
+        schema, separator, logical = table_name.rpartition(".")
+        if not separator:
+            logical = table_name
+        physical = self._physicalName(logical)
+        if self._cacheKey(physical, schema or None) in self._metadata.tables:
             return
         Table(
             physical,
@@ -1262,43 +1323,53 @@ class SQLCompiler:
                 SqlColumn(column, sqlalchemy.Integer(), primary_key=True)
                 for column in columns
             ),
+            schema=schema or None,
         )
 
-    def _sqlColumn(
+    def _sqlColumn( # NOSONAR
         self,
         definition: ColumnDefinition,
         name: str | None = None,
     ) -> SqlColumn[Any]:
         """
-        Translate a column definition into an engine column.
+        Translate a column definition into SQLAlchemy column metadata.
+
+        Apply backend identity options and emit non-null static defaults both as
+        client defaults and SQL server defaults.
 
         Parameters
         ----------
         definition : ColumnDefinition
-            Orionis column definition.
+            Type options, constraints, foreign key, defaults, and identity settings.
         name : str or None, optional
-            Authoritative column name from the table definition mapping.
+            Override the definition's name; use ``definition.name`` when ``None``.
 
         Returns
         -------
         Column
-            Engine column with type and constraints applied.
+            Column with resolved type, constraints, defaults, and backend options.
 
         Raises
         ------
         QueryException
-            If the logical column type has no registered builder.
+            If the logical column type has no registered SQL type builder.
         MissingDatabaseDependencyException
-            If Redshift native column options require an unavailable dialect package.
+            If Redshift column options require a missing dialect package.
         """
         args: list[Any] = [
             definition.name if name is None else name,
             self._sqlType(definition),
         ]
+        if self._driver == "oracle" and definition.is_auto_increment:
+            args.append(sqlalchemy.Identity())
         if definition.foreign_ref is not None:
             reference = definition.foreign_ref
+            schema, separator, table_name = reference.table.rpartition(".")
+            if not separator:
+                table_name = reference.table
+            target = self._cacheKey(self._physicalName(table_name), schema or None)
             args.append(
-                ForeignKey(f"{self._prefix}{reference.table}.{reference.column}"),
+                ForeignKey(f"{target}.{reference.column}"),
             )
 
         options: dict[str, Any] = {
@@ -1309,6 +1380,10 @@ class SQLCompiler:
             "autoincrement": True if definition.is_auto_increment else "auto",
             "comment": definition.comment_text,
         }
+        if self._driver == "sqlserver" and not definition.is_auto_increment:
+            # mssql's implicit "auto" turns an ordinary integer primary key
+            # into IDENTITY, preventing updates of client-managed keys.
+            options["autoincrement"] = False
         if self._driver == "redshift" and definition.is_auto_increment:
             options["redshift_identity"] = (1, 1)
         if definition.hasDefault():
@@ -1328,23 +1403,23 @@ class SQLCompiler:
 
     def _sqlType(self, definition: ColumnDefinition) -> TypeEngine[Any]:
         """
-        Resolve the engine type backing a column definition.
+        Build a SQLAlchemy type with any required backend variants.
 
         Parameters
         ----------
         definition : ColumnDefinition
-            Orionis column definition.
+            Logical column type and its conversion or precision options.
 
         Returns
         -------
         TypeEngine
-            Engine type, carrying a dialect variant when the declared
-            type cannot auto-increment on every backend.
+            Configured type, with Oracle FLOAT precision or SQLite auto-increment
+            variants when applicable.
 
         Raises
         ------
         QueryException
-            If the logical column type has no registered builder.
+            If no builder is registered for the declared column type.
         """
         builder = self._TYPE_BUILDERS.get(definition.column_type)
         if builder is None:
@@ -1355,6 +1430,22 @@ class SQLCompiler:
             raise QueryException(error_msg)
 
         column_type = builder(definition)
+
+        if (
+            self._driver == "oracle"
+            and definition.column_type is ColumnType.FLOAT
+            and definition.precision is not None
+        ):
+            # Follow SQLAlchemy's decimal-to-binary precision estimate for
+            # Oracle FLOAT, retaining the result conversion options.
+            return column_type.with_variant(
+                FLOAT(
+                    binary_precision=int(definition.precision / 0.30103),
+                    asdecimal=definition.as_decimal,
+                    decimal_return_scale=definition.decimal_return_scale,
+                ),
+                "oracle",
+            )
 
         # SQLite only treats a single-column primary key as an alias of
         # ROWID when its declared type is literally INTEGER, so a BIGINT
@@ -1371,18 +1462,17 @@ class SQLCompiler:
 
     def _splitQualifiedColumn(self, name: str) -> tuple[str | None, str]:
         """
-        Split a column reference into its table qualifier and column name.
+        Split a column reference at its last qualifier separator.
 
         Parameters
         ----------
         name : str
-            Column reference, optionally qualified as ``"table.column"``.
+            Bare column name or dot-qualified source and column reference.
 
         Returns
         -------
         tuple of (str or None, str)
-            The qualifier (``None`` when unqualified) and the bare
-            column name.
+            Qualifier and final column segment, with ``None`` for a bare name.
         """
         if "." in name:
             qualifier, _, column = name.rpartition(".")
@@ -1396,34 +1486,29 @@ class SQLCompiler:
         name: str,
     ) -> ColumnElement[Any]:
         """
-        Resolve a column reference against the tables reachable in a plan.
+        Resolve a column by source qualifier or default table.
 
-        A qualified reference such as ``"posts.title"`` is looked up in
-        ``sources`` by its table alias or name; an unqualified reference
-        resolves against ``default`` (the plan's main table). This is the
-        single place that understands multiple table origins, so joins,
-        aliases, and future table expressions never need bespoke column
-        lookup logic elsewhere in the compiler.
+        Look up qualified references in ``sources`` and unqualified names in
+        ``default``.
 
         Parameters
         ----------
         sources : SourceMap
-            Table sources reachable by alias or logical table name.
+            Available tables or derived sources indexed by query identifier.
         default : SqlSource
-            Source an unqualified column reference resolves against.
+            Source used for unqualified column names.
         name : str
-            Column reference, optionally qualified as ``"table.column"``.
+            Bare column name or dot-qualified source reference.
 
         Returns
         -------
         ColumnElement
-            Engine column element.
+            Column exposed by the selected source's column collection.
 
         Raises
         ------
         QueryException
-            If the qualifier is unknown, or the column is not declared
-            on the resolved table.
+            If the source identifier or column name is unknown.
         """
         qualifier, column = self._splitQualifiedColumn(name)
         if qualifier is None:
@@ -1449,24 +1534,28 @@ class SQLCompiler:
         clauses: Sequence[WhereClause],
     ) -> ColumnElement[bool] | None:
         """
-        Fold a sequence of where clauses into a boolean expression.
+        Compile ordered WHERE or HAVING clauses into one predicate.
 
-        Clauses are combined left to right honoring each clause boolean
-        connector, mirroring the semantics of fluent query builders.
+        Use each clause after the first to select its ``AND`` or ``OR`` connector.
 
         Parameters
         ----------
         sources : SourceMap
-            Table sources reachable by qualified column references.
+            Sources indexed by alias or logical table name.
         default : SqlSource
-            Source an unqualified column reference resolves against.
+            Fallback source for unqualified column names.
         clauses : Sequence of WhereClause
-            Conditions to combine.
+            Ordered conditions and their boolean connectors.
 
         Returns
         -------
-        ColumnElement or None
-            Combined boolean expression, or ``None`` without clauses.
+        ColumnElement or TextClause or None
+            Compiled predicate, or ``None`` when no clauses are supplied.
+
+        Raises
+        ------
+        QueryException
+            If a condition has unknown references or unsupported clause semantics.
         """
         if not clauses:
             return None
@@ -1484,23 +1573,26 @@ class SQLCompiler:
         clauses: Sequence[WhereClause] | Sequence[JoinCondition],
     ) -> ColumnElement[bool] | None:
         """
-        Combine clauses using left-to-right boolean grouping.
+        Combine compiled clauses while preserving left-to-right grouping.
+
+        Ignore the first clause's connector; later connectors join successive
+        clauses.
 
         Parameters
         ----------
         compile_clause : Callable
-            Function that translates one clause into a boolean expression.
+            Callable receiving ``sources``, ``default``, and one condition.
         sources : SourceMap
-            Sources available while resolving clause references.
+            Source lookup supplied unchanged to each clause compiler.
         default : SqlSource
-            Source used for unqualified column references.
-        clauses : Sequence of WhereClause or JoinCondition
-            Clauses to combine in their declared order.
+            Fallback source supplied to the clause compiler.
+        clauses : Sequence of WhereClause or Sequence of JoinCondition
+            Conditions to compile and combine in their declared order.
 
         Returns
         -------
-        ColumnElement or None
-            Combined boolean expression, or ``None`` for an empty sequence.
+        ColumnElement or TextClause or None
+            Combined predicate, or ``None`` for an empty sequence.
         """
         iterator = iter(clauses)
         first = next(iterator, None)
@@ -1529,25 +1621,23 @@ class SQLCompiler:
         clause: WhereClause,
     ) -> ColumnElement[bool] | None:
         """
-        Compile the clause kinds that carry no column reference.
+        Compile nested groups, raw predicates, and EXISTS subqueries.
 
-        Covers nested groups, raw fragments, and correlated ``EXISTS``
-        subqueries; every other kind is left to the caller.
+        Represent an empty nested group as a true predicate.
 
         Parameters
         ----------
         sources : SourceMap
-            Table sources reachable by qualified column references.
+            Sources available for column resolution and subquery correlation.
         default : SqlSource
-            Source an unqualified column reference resolves against.
+            Fallback source for unqualified names inside nested conditions.
         clause : WhereClause
-            Condition to compile.
+            Condition whose type determines whether this helper can handle it.
 
         Returns
         -------
-        ColumnElement or None
-            Boolean expression, or ``None`` when the clause kind is
-            column-based and must be handled by the caller.
+        ColumnElement or TextClause or None
+            Predicate for a supported kind, or ``None`` for a column-based kind.
         """
         kind = clause.where_type
         if kind is WhereType.NESTED:
@@ -1568,26 +1658,27 @@ class SQLCompiler:
         clause: WhereClause,
     ) -> ColumnElement[bool]:
         """
-        Compile a single where clause into a boolean expression.
+        Dispatch a WHERE condition to its matching SQL predicate builder.
 
         Parameters
         ----------
         sources : SourceMap
-            Table sources reachable by qualified column references.
+            Sources indexed by alias or logical table name.
         default : SqlSource
-            Source an unqualified column reference resolves against.
+            Fallback source for unqualified column names.
         clause : WhereClause
-            Condition to compile.
+            Condition type, column reference, operator, and comparison value.
 
         Returns
         -------
-        ColumnElement
-            Boolean expression for the clause.
+        ColumnElement or TextClause
+            Compiled condition, including nested, raw, and subquery predicates.
 
         Raises
         ------
         QueryException
-            If the clause uses an unsupported operator or shape.
+            If the clause type, references, comparison operator, or range shape
+            is invalid.
         """
         kind = clause.where_type
         if kind in COLUMNLESS_WHERE_TYPES:
@@ -1610,20 +1701,24 @@ class SQLCompiler:
 
     def _clauseValue(self, sources: SourceMap, value: Any) -> Any:  # noqa: ANN401
         """
-        Resolve the bound value of a clause, compiling nested subqueries.
+        Compile a SELECT value or return a non-query value unchanged.
 
         Parameters
         ----------
         sources : SourceMap
-            Table sources of the enclosing query, used to correlate a
-            subquery with the columns it references from outside.
+            Enclosing query sources available for subquery correlation.
         value : Any
-            Raw clause value taken from the plan.
+            Condition value, which may itself be a SELECT plan.
 
         Returns
         -------
         Any
-            The value untouched, or the compiled subquery statement.
+            Compiled SELECT for a plan value; the original object otherwise.
+
+        Raises
+        ------
+        QueryException
+            If a nested SELECT contains invalid clauses or unresolved references.
         """
         if isinstance(value, SelectPlan):
             return self._buildSelect(value, sources)
@@ -1635,24 +1730,24 @@ class SQLCompiler:
         clause: WhereClause,
     ) -> ColumnElement[bool]:
         """
-        Compile an inclusive range condition into a boolean expression.
+        Compile BETWEEN or NOT BETWEEN with exactly two bounds.
 
         Parameters
         ----------
         column : ColumnElement
-            Column the range applies to.
+            Left-hand column expression tested against the range.
         clause : WhereClause
-            Range condition carrying exactly two boundary values.
+            Range condition with lower and upper boundary values.
 
         Returns
         -------
         ColumnElement
-            Boolean expression for the range.
+            Inclusive range predicate, negated for ``NOT BETWEEN``.
 
         Raises
         ------
         QueryException
-            If the clause does not carry exactly two boundaries.
+            If the supplied value does not contain exactly two boundaries.
         """
         bounds = tuple(clause.value or ())
         if len(bounds) != _BETWEEN_BOUNDS:
@@ -1671,28 +1766,29 @@ class SQLCompiler:
         clause: WhereClause,
     ) -> ColumnElement[bool]:
         """
-        Compile a comparison between two columns of the same query.
+        Compare two resolved columns using the clause's operator.
 
         Parameters
         ----------
         sources : SourceMap
-            Table sources reachable by qualified column references.
+            Sources indexed by alias or logical table name.
         default : SqlSource
-            Source an unqualified column reference resolves against.
+            Fallback source for the right-hand column reference.
         column : ColumnElement
-            Left-hand column of the comparison.
+            Already-resolved left-hand column expression.
         clause : WhereClause
-            Condition carrying the right-hand column reference.
+            Comparison operator and right-hand column reference.
 
         Returns
         -------
         ColumnElement
-            Boolean expression comparing both columns.
+            Boolean comparison between the two column expressions.
 
         Raises
         ------
         QueryException
-            If the operator is not supported.
+            If the right-hand column cannot be resolved or the operator is
+            unsupported.
         """
         other = self._resolveColumn(sources, default, str(clause.value))
         comparator = _COMPARATORS.get(clause.operator.strip().lower())
@@ -1707,27 +1803,27 @@ class SQLCompiler:
         clause: WhereClause,
     ) -> ColumnElement[bool]:
         """
-        Compile a basic comparison clause into a boolean expression.
+        Compile a column-to-value comparison with backend-specific handling.
 
-        ``NULL`` comparisons with equality operators are transparently
-        promoted to ``IS NULL`` / ``IS NOT NULL``.
+        Translate ``None`` equality into ``IS NULL`` or ``IS NOT NULL``.
+        Use ``DBMS_LOB.COMPARE`` for Oracle text equality.
 
         Parameters
         ----------
         column : ColumnElement
-            Column the comparison applies to.
+            Column expression, including its SQL type for backend handling.
         clause : WhereClause
-            Basic condition to compile.
+            Comparison operator and bound value, including ``None``.
 
         Returns
         -------
         ColumnElement
-            Boolean expression for the comparison.
+            NULL check, text comparison, pattern predicate, or ordinary comparison.
 
         Raises
         ------
         QueryException
-            If the operator is not supported.
+            If the comparison operator has no supported handler.
         """
         op = clause.operator.strip().lower()
 
@@ -1736,6 +1832,18 @@ class SQLCompiler:
             return column.is_(None)
         if clause.value is None and op in _INEQUALITY_OPERATORS:
             return column.is_not(None)
+
+        if (
+            self._driver == "oracle"
+            and isinstance(column.type, sqlalchemy.Text)
+            and op in _EQUALITY_OPERATORS | _INEQUALITY_OPERATORS
+        ):
+            # Oracle CLOB values cannot use ordinary SQL equality. Typed text
+            # predicates also back the cache store's compare-and-swap update.
+            comparison = func.dbms_lob.compare(
+                column, sqlalchemy.literal(clause.value, type_=column.type),
+            )
+            return comparison == 0 if op in _EQUALITY_OPERATORS else comparison != 0
 
         pattern_handler = _PATTERN_OPERATORS.get(op)
         if pattern_handler is not None:
@@ -1754,26 +1862,26 @@ class SQLCompiler:
         aggregate: AggregateClause,
     ) -> ColumnElement[Any]:
         """
-        Compile an aggregate clause into a projection expression.
+        Compile an aggregate function over a column or all rows.
 
         Parameters
         ----------
         sources : SourceMap
-            Table sources reachable by qualified column references.
+            Sources indexed by alias or logical table name.
         default : SqlSource
-            Source an unqualified column reference resolves against.
+            Fallback source for an unqualified aggregate column.
         aggregate : AggregateClause
-            Aggregate projection description.
+            Aggregate function and column reference, or ``*`` for COUNT.
 
         Returns
         -------
         ColumnElement
-            Aggregate expression such as ``COUNT(*)`` or ``MAX(col)``.
+            COUNT expression or the requested function applied to a resolved column.
 
         Raises
         ------
         QueryException
-            If a non-count aggregate targets ``"*"``.
+            If a non-COUNT aggregate targets ``*`` or a column cannot be resolved.
         """
         if aggregate.function is AggregateFunction.COUNT:
             if aggregate.column == "*":

@@ -108,6 +108,12 @@ class DatabaseSessionStore(ISessionStore):
         -------
         None
         """
+        if not connection.supportsUniqueConstraints():
+            message = (
+                "Database sessions require enforced unique constraints "
+                "to guarantee one row per session."
+            )
+            raise QueryException(message)
         self._connection = connection
         self._table = table
         self._ready = False

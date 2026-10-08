@@ -142,6 +142,12 @@ class SeederRunner:
             Seeder names completed by this call, in execution order.
         """
         target = self.__conn_manager.connection(connection)
+        if not target.supportsUniqueConstraints():
+            message = (
+                "Once-only seeders require enforced unique constraints; "
+                "Amazon Redshift cannot guarantee exclusive seeder claims."
+            )
+            raise QueryException(message)
         await self.__ensureTrackingTable(target)
 
         ran = await self.__getRan(target)

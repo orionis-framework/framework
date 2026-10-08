@@ -35,7 +35,7 @@ class TestSuite:
 
 def discover_suites(repo_root: Path) -> list[TestSuite]:
     """
-    Discover module suites and individual root test files.
+    Discover public suites, excluding local real-database tests.
 
     Parameters
     ----------
@@ -54,6 +54,8 @@ def discover_suites(repo_root: Path) -> list[TestSuite]:
         if not path.is_file():
             continue
         relative = path.relative_to(test_root)
+        if relative.parts[0] == "real_database":
+            continue
         if len(relative.parts) == 1:
             root_files.append(relative.name)
         else:

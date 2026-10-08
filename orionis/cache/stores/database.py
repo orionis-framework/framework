@@ -5,6 +5,9 @@ from typing import TYPE_CHECKING, Any
 import msgspec
 import msgspec.json as _msgjson
 from orionis.database.exceptions import QueryException
+from orionis.orm.query.expressions import (
+    DeletePlan, InsertPlan, SelectPlan, UpdatePlan, WhereClause, WhereType,
+)
 from orionis.orm.schema.table import TableDefinition
 from orionis.orm.schema.types import Double, String, Text
 
@@ -105,7 +108,10 @@ class DatabaseCacheBackend:
 
     # ruff: noqa: ANN401
 
-    __slots__ = ("_connection", "_lock_table", "_ready", "_ready_lock", "_table")
+    __slots__ = (
+        "_connection", "_entry_definition", "_lock_definition", "_lock_table",
+        "_ready", "_ready_lock", "_table",
+    )
 
     def __init__(
         self,
@@ -134,6 +140,8 @@ class DatabaseCacheBackend:
         self._connection = connection
         self._table = table
         self._lock_table = lock_table or _DEFAULT_LOCK_TABLE
+        self._entry_definition = _build_entries_table(self._table)
+        self._lock_definition = _build_locks_table(self._lock_table)
         self._ready = False
         self._ready_lock = asyncio.Lock()
 
@@ -153,8 +161,8 @@ class DatabaseCacheBackend:
         async with self._ready_lock:
             if self._ready:
                 return
-            await self._connection.createTable(_build_entries_table(self._table))
-            await self._connection.createTable(_build_locks_table(self._lock_table))
+            await self._connection.createTable(self._entry_definition)
+            await self._connection.createTable(self._lock_definition)
             self._ready = True
 
     # ── Serialization helpers ────────────────────────────────────────────────
@@ -220,9 +228,11 @@ class DatabaseCacheBackend:
         """
         await self._ensureSchema()
         rows = await self._connection.select(
-            f"SELECT cache_value, expiration FROM {self._table} "  # noqa: S608
-            "WHERE cache_key = :k",
-            {"k": key},
+            SelectPlan(
+                table=self._entry_definition,
+                columns=("cache_value", "expiration"),
+                wheres=[WhereClause("cache_key", value=key)],
+            ),
         )
         if not rows:
             return default
@@ -261,10 +271,12 @@ class DatabaseCacheBackend:
         encoded = self.__encode(value)
         expiration = time.time() + ttl if ttl is not None else None
 
-        updated = await self._connection.execute(
-            f"UPDATE {self._table} SET cache_value = :v, expiration = :e "  # noqa: S608
-            "WHERE cache_key = :k",
-            {"v": encoded, "e": expiration, "k": key},
+        updated = await self._connection.update(
+            UpdatePlan(
+                table=self._entry_definition,
+                values={"cache_value": encoded, "expiration": expiration},
+                wheres=[WhereClause("cache_key", value=key)],
+            ),
         )
         if not updated:
             await self.__insertOrRetryUpdate(key, encoded, expiration)
@@ -294,17 +306,23 @@ class DatabaseCacheBackend:
             This method does not return a value.
         """
         try:
-            await self._connection.execute(
-                f"INSERT INTO {self._table} "  # noqa: S608
-                "(cache_key, cache_value, expiration) VALUES (:k, :v, :e)",
-                {"k": key, "v": encoded, "e": expiration},
+            await self._connection.insert(
+                InsertPlan(
+                    table=self._entry_definition,
+                    values=[{
+                        "cache_key": key, "cache_value": encoded,
+                        "expiration": expiration,
+                    }],
+                ),
             )
         except QueryException:
             # Another writer inserted the row first; retry as an update.
-            await self._connection.execute(
-                f"UPDATE {self._table} SET cache_value = :v, "  # noqa: S608
-                "expiration = :e WHERE cache_key = :k",
-                {"v": encoded, "e": expiration, "k": key},
+            await self._connection.update(
+                UpdatePlan(
+                    table=self._entry_definition,
+                    values={"cache_value": encoded, "expiration": expiration},
+                    wheres=[WhereClause("cache_key", value=key)],
+                ),
             )
 
     async def replace(self, key: str, value: Any, ttl: float | None = None) -> bool:
@@ -326,15 +344,23 @@ class DatabaseCacheBackend:
         """
         await self._ensureSchema()
         now = time.time()
-        affected = await self._connection.execute(
-            f"UPDATE {self._table} SET cache_value = :v, expiration = :e "  # noqa: S608
-            "WHERE cache_key = :k AND (expiration IS NULL OR expiration > :now)",
-            {
-                "k": key,
-                "v": self.__encode(value),
-                "e": now + ttl if ttl is not None else None,
-                "now": now,
-            },
+        affected = await self._connection.update(
+            UpdatePlan(
+                table=self._entry_definition,
+                values={
+                    "cache_value": self.__encode(value),
+                    "expiration": now + ttl if ttl is not None else None,
+                },
+                wheres=[
+                    WhereClause("cache_key", value=key),
+                    WhereClause("", where_type=WhereType.NESTED, value=[
+                        WhereClause("expiration", where_type=WhereType.NULL),
+                        WhereClause(
+                            "expiration", operator=">", value=now, boolean="or",
+                        ),
+                    ]),
+                ],
+            ),
         )
         return affected > 0
 
@@ -368,9 +394,11 @@ class DatabaseCacheBackend:
             1 if the key existed, 0 otherwise.
         """
         await self._ensureSchema()
-        return await self._connection.execute(
-            f"DELETE FROM {self._table} WHERE cache_key = :k",  # noqa: S608
-            {"k": key},
+        return await self._connection.delete(
+            DeletePlan(
+                table=self._entry_definition,
+                wheres=[WhereClause("cache_key", value=key)],
+            ),
         )
 
     async def clear(self) -> bool:
@@ -383,7 +411,7 @@ class DatabaseCacheBackend:
             Always True.
         """
         await self._ensureSchema()
-        await self._connection.execute(f"DELETE FROM {self._table}")  # noqa: S608
+        await self._connection.delete(DeletePlan(table=self._entry_definition))
         return True
 
     async def multiGet(self, keys: list[str], default: Any = None) -> list[Any]:
@@ -464,18 +492,27 @@ class DatabaseCacheBackend:
         await self._ensureSchema()
 
         # Release the slot when the previous entry is merely lingering.
-        await self._connection.execute(
-            f"DELETE FROM {self._table} WHERE cache_key = :k "  # noqa: S608
-            "AND expiration IS NOT NULL AND expiration <= :now",
-            {"k": key, "now": time.time()},
+        await self._connection.delete(
+            DeletePlan(
+                table=self._entry_definition,
+                wheres=[
+                    WhereClause("cache_key", value=key),
+                    WhereClause("expiration", where_type=WhereType.NOT_NULL),
+                    WhereClause("expiration", operator="<=", value=time.time()),
+                ],
+            ),
         )
 
         expiration = time.time() + ttl if ttl is not None else None
         try:
-            await self._connection.execute(
-                f"INSERT INTO {self._table} "  # noqa: S608
-                "(cache_key, cache_value, expiration) VALUES (:k, :v, :e)",
-                {"k": key, "v": self.__encode(value), "e": expiration},
+            await self._connection.insert(
+                InsertPlan(
+                    table=self._entry_definition,
+                    values=[{
+                        "cache_key": key, "cache_value": self.__encode(value),
+                        "expiration": expiration,
+                    }],
+                ),
             )
         except QueryException as exc:
             if not await self.exists(key):
@@ -525,10 +562,15 @@ class DatabaseCacheBackend:
 
             raw, current = counter
             new_value = current + delta
-            updated = await self._connection.execute(
-                f"UPDATE {self._table} SET cache_value = :v "  # noqa: S608
-                "WHERE cache_key = :k AND cache_value = :old",
-                {"v": self.__encode(new_value), "k": key, "old": raw},
+            updated = await self._connection.update(
+                UpdatePlan(
+                    table=self._entry_definition,
+                    values={"cache_value": self.__encode(new_value)},
+                    wheres=[
+                        WhereClause("cache_key", value=key),
+                        WhereClause("cache_value", value=raw),
+                    ],
+                ),
             )
             if updated:
                 return new_value
@@ -556,9 +598,11 @@ class DatabaseCacheBackend:
             ``None`` when the row is missing or already expired.
         """
         rows = await self._connection.select(
-            f"SELECT cache_value, expiration FROM {self._table} "  # noqa: S608
-            "WHERE cache_key = :k",
-            {"k": key},
+            SelectPlan(
+                table=self._entry_definition,
+                columns=("cache_value", "expiration"),
+                wheres=[WhereClause("cache_key", value=key)],
+            ),
         )
         if not rows:
             return None
@@ -599,17 +643,29 @@ class DatabaseCacheBackend:
         now = time.time()
         expiration = now + lease
         try:
-            await self._connection.execute(
-                f"INSERT INTO {self._lock_table} "  # noqa: S608
-                "(cache_key, owner, expiration) VALUES (:k, :o, :e)",
-                {"k": key, "o": owner, "e": expiration},
+            await self._connection.insert(
+                InsertPlan(
+                    table=self._lock_definition,
+                    values=[{
+                        "cache_key": key, "owner": owner, "expiration": expiration,
+                    }],
+                ),
             )
         except QueryException:
-            updated = await self._connection.execute(
-                f"UPDATE {self._lock_table} SET owner = :o, "  # noqa: S608
-                "expiration = :e WHERE cache_key = :k "
-                "AND (owner = :o OR expiration <= :now)",
-                {"k": key, "o": owner, "e": expiration, "now": now},
+            updated = await self._connection.update(
+                UpdatePlan(
+                    table=self._lock_definition,
+                    values={"owner": owner, "expiration": expiration},
+                    wheres=[
+                        WhereClause("cache_key", value=key),
+                        WhereClause("", where_type=WhereType.NESTED, value=[
+                            WhereClause("owner", value=owner),
+                            WhereClause(
+                                "expiration", operator="<=", value=now, boolean="or",
+                            ),
+                        ]),
+                    ],
+                ),
             )
             return updated > 0
         return True
@@ -630,10 +686,14 @@ class DatabaseCacheBackend:
         None
             This method does not return a value.
         """
-        await self._connection.execute(
-            f"DELETE FROM {self._lock_table} "  # noqa: S608
-            "WHERE cache_key = :k AND owner = :o",
-            {"k": key, "o": owner},
+        await self._connection.delete(
+            DeletePlan(
+                table=self._lock_definition,
+                wheres=[
+                    WhereClause("cache_key", value=key),
+                    WhereClause("owner", value=owner),
+                ],
+            ),
         )
 
 

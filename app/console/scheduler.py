@@ -2,7 +2,6 @@ from orionis.console.base import BaseScheduler
 from orionis.console.contracts import ISchedule
 from orionis.console.entities import SchedulerEvent
 
-
 class Scheduler(BaseScheduler):
 
     def tasks(

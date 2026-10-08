@@ -1,5 +1,6 @@
 from __future__ import annotations
 import uuid
+from copy import deepcopy
 from datetime import UTC, datetime
 from typing import TYPE_CHECKING, Any, ClassVar
 from orionis.orm.attributes import AttributesMixin, serialize_for_storage
@@ -14,7 +15,6 @@ from orionis.orm.query.expressions import (
 )
 from orionis.orm.relations.mixin import RelationsMixin
 from orionis.orm.resolver import ConnectionResolver
-from orionis.orm.schema.types import ColumnType
 from orionis.orm.soft_deletes import SoftDeletesMixin
 from orionis.orm.state import StateMixin
 
@@ -240,7 +240,7 @@ class Model(
         instance = cls.__new__(cls)
         attributes = cls.__meta__.applyCasts(row)
         object.__setattr__(instance, "_attributes", attributes)
-        object.__setattr__(instance, "_original", dict(attributes))
+        object.__setattr__(instance, "_original", deepcopy(attributes))
         object.__setattr__(instance, "_changes", {})
         object.__setattr__(instance, "_exists", True)
         object.__setattr__(instance, "_relations", {})
@@ -576,8 +576,8 @@ class Model(
         """
         Produce the current timestamp for persistence operations.
 
-        Timezone-aware timestamps are produced when the update column
-        is a timezone-aware type, naive UTC otherwise.
+        Timezone-aware timestamps follow the selected update, creation,
+        or soft-delete column's timezone option, naive UTC otherwise.
 
         Returns
         -------
@@ -586,12 +586,10 @@ class Model(
         """
         now = datetime.now(UTC)
         meta = cls.__meta__
-        target = meta.updated_column or meta.created_column
+        target = meta.updated_column or meta.created_column or meta.deleted_column
         if target is not None:
             column = meta.columns.get(target)
-            aware = column is not None and (
-                column.column_type is ColumnType.TIMESTAMP
-            )
+            aware = column is not None and column.timezone
             if not aware:
                 return now.replace(tzinfo=None)
         return now
@@ -669,7 +667,7 @@ class Model(
             self._attributes[meta.primary_key] = generated
 
         self._exists = True
-        self._changes = dict(self._attributes)
+        self._changes = deepcopy(self._attributes)
         self.syncOriginal()
         return True
 
@@ -713,6 +711,7 @@ class Model(
         )
         affected = await self.getConnection().update(plan)
 
-        self._changes = dirty
-        self.syncOriginal()
+        if affected > 0:
+            self._changes = deepcopy(dirty)
+            self.syncOriginal()
         return affected > 0

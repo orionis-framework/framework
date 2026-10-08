@@ -11,6 +11,9 @@ from orionis.database.migrations.events import NO_EVENTS, MigrationEvents
 from orionis.foundation.contracts.application import IApplication
 from orionis.introspection.modules.inspector import ModuleInspector
 from orionis.introspection.modules.reflection import ReflectionModule
+from orionis.orm.query.expressions import (
+    DeletePlan, InsertPlan, OrderClause, SelectPlan, WhereClause,
+)
 from orionis.orm.schema.column.definition import ColumnDefinition
 from orionis.orm.schema.table import TableDefinition
 from orionis.orm.schema.types import BigInteger, Integer, String
@@ -607,13 +610,11 @@ class Migrator(IMigrator):
             Rows with ``id``, ``migration``, and ``batch`` keys.
         """
         return await connection.select(
-            f"""
-            SELECT
-                id,
-                migration,
-                batch FROM {_MIGRATIONS_TABLE}
-            ORDER BY id ASC
-            """,
+            SelectPlan(
+                table=_MIGRATIONS_TABLE_DEFINITION,
+                columns=("id", "migration", "batch"),
+                orders=[OrderClause(column="id")],
+            ),
         )
 
     @staticmethod
@@ -659,23 +660,15 @@ class Migrator(IMigrator):
         None
             This method does not return a value.
         """
-        await connection.execute(
-            f"""
-            INSERT INTO {_MIGRATIONS_TABLE} (
-                migration,
-                batch,
-                migrated_at
-            ) VALUES (
-                :migration,
-                :batch,
-                :migrated_at
-            )
-            """,
-            {
-                "migration": name,
-                "batch": batch,
-                "migrated_at": int(time.time()),
-            },
+        await connection.insert(
+            InsertPlan(
+                table=_MIGRATIONS_TABLE_DEFINITION,
+                values=[{
+                    "migration": name,
+                    "batch": batch,
+                    "migrated_at": int(time.time()),
+                }],
+            ),
         )
 
     async def __deleteRecord(self, connection: IConnection, name: str) -> None:
@@ -694,7 +687,9 @@ class Migrator(IMigrator):
         None
             This method does not return a value.
         """
-        await connection.execute(
-            f"DELETE FROM {_MIGRATIONS_TABLE} WHERE migration = :migration",
-            {"migration": name},
+        await connection.delete(
+            DeletePlan(
+                table=_MIGRATIONS_TABLE_DEFINITION,
+                wheres=[WhereClause(column="migration", value=name)],
+            ),
         )

@@ -715,11 +715,11 @@ class TestSQLCompiler(TestCase):
         with self.assertRaises(QueryException):
             SQLCompiler().compileCreateTable(table)
 
-    def testDistinctIsIgnoredWhenAggregateIsSet(self) -> None:
-        """Skip DISTINCT when the plan also carries an aggregate.
+    def testDistinctCountPreservesProjectedRows(self) -> None:
+        """Count the rows of the distinct projection.
 
-        Validates that aggregate projections never combine with a
-        dangling DISTINCT flag.
+        Validates that COUNT wraps the distinct query rather than discarding
+        its projection and counting duplicate input rows.
 
         Returns
         -------
@@ -732,7 +732,8 @@ class TestSQLCompiler(TestCase):
             aggregate=AggregateClause(function=AggregateFunction.COUNT),
         )
         sql = self._sql(self._compiler.compileSelect(plan))
-        self.assertNotIn("distinct", sql)
+        self.assertIn("select count(*)", sql)
+        self.assertIn("select distinct users.id", sql)
 
     def testCompositePrimaryKeyRendersInDdl(self) -> None:
         """Render a multi-column primary key constraint.

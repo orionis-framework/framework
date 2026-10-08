@@ -525,7 +525,7 @@ class Collection(ICollection):
         """
         try:
             return self[key]
-        except IndexError:
+        except (IndexError, KeyError):
             pass
         return self.__value(default)
 
@@ -953,7 +953,20 @@ class Collection(ICollection):
             # Prefer serialize method, then to_dict, else return as is
             serializer = getattr(item, "serialize", _MISSING)
             if serializer is not _MISSING:
-                return serializer()
+                data = serializer()
+                getter = getattr(item, "getAttribute", None)
+                if self.__appends__ and isinstance(data, dict) and callable(getter):
+                    metadata = getattr(type(item), "__meta__", None)
+                    hidden = getattr(metadata, "hidden", ())
+                    data = {
+                        **data,
+                        **{
+                            key: getter(key)
+                            for key in self.__appends__
+                            if key not in hidden
+                        },
+                    }
+                return data
             serializer = getattr(item, "to_dict", _MISSING)
             if serializer is not _MISSING:
                 return serializer()

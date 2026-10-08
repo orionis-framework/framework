@@ -152,9 +152,9 @@ def serialize_for_storage(
     """
     Convert attribute values into driver-friendly storage values.
 
-    JSON-cast structures stored in non-JSON columns are serialized to
-    strings, and UUID objects targeting non-UUID columns are stringified;
-    every other value passes through unchanged.
+    Structures stored outside JSON or PickleType columns are serialized to
+    strings, and UUID objects targeting neither UUID nor PickleType columns
+    are stringified; every other value passes through unchanged.
 
     Parameters
     ----------
@@ -176,12 +176,16 @@ def serialize_for_storage(
         # JSON structures need explicit encoding outside JSON columns.
         if isinstance(value, (dict, list)):
             column = columns.get(key)
-            if column is not None and column.column_type is not ColumnType.JSON:
+            if column is not None and column.column_type not in {
+                ColumnType.JSON, ColumnType.PICKLE_TYPE,
+            }:
                 serialized[key] = json.dumps(value)
         # UUID objects need their string form outside UUID columns.
         elif isinstance(value, uuid.UUID):
             column = columns.get(key)
-            if column is not None and column.column_type is not ColumnType.UUID:
+            if column is not None and column.column_type not in {
+                ColumnType.UUID, ColumnType.PICKLE_TYPE,
+            }:
                 serialized[key] = str(value)
     return serialized
 

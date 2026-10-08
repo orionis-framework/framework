@@ -151,8 +151,13 @@ class SQLCompiler:
         ColumnType.ENUM: lambda c: sqlalchemy.Enum(
             *c.enum_values,
             name=c.enum_name,
-            native_enum=False,
-            create_constraint=False,
+            native_enum=c.native_enum,
+            create_constraint=c.create_constraint,
+            length=(
+                c.length if c.length is not None
+                else max(len(value) for value in c.enum_values)
+            ),
+            validate_strings=c.validate_strings,
         ),
 
         # SQL standard and multiple vendor "UPPERCASE" types.
@@ -226,16 +231,38 @@ class SQLCompiler:
         QueryException
             If the plan references unknown columns or invalid clauses.
         """
-        statement = self._buildSelect(plan, {})
+        if (
+            plan.aggregate is not None
+            and plan.aggregate.function is AggregateFunction.COUNT
+            and plan.aggregate.column == "*"
+            and (plan.distinct or plan.groups or plan.havings or plan.unions)
+        ):
+            probe = plan.clone()
+            probe.aggregate = None
+            probe.orders = []
+            probe.limit_value = None
+            probe.offset_value = None
+            probe.lock = None
+            if probe.groups and not probe.columns:
+                probe.columns = tuple(probe.groups)
+            return sqlalchemy.select(func.count()).select_from(
+                self.compileSelect(probe).subquery(),
+            )
         if not plan.unions:
-            return statement
+            return self._buildSelect(plan, {})
+        base = plan.clone()
+        base.unions = []
+        base.orders = []
+        base.limit_value = None
+        base.offset_value = None
+        statement = self._buildSelect(base, {})
         return self._applyUnions(statement, plan)
 
     def _applyUnions(
         self,
         statement: Select[Any],
         plan: SelectPlan,
-    ) -> CompoundSelect:
+    ) -> Select[Any]:
         """
         Combine a compiled statement with the plan union branches.
 
@@ -252,8 +279,8 @@ class SQLCompiler:
 
         Returns
         -------
-        CompoundSelect
-            Compound statement combining every branch.
+        Select
+            Combined rows with ordering and bounds applied to the whole union.
         """
         branches: list[Any] = [statement]
         all_rows = plan.unions[0].all_rows
@@ -267,7 +294,11 @@ class SQLCompiler:
                 branch = sqlalchemy.select(branch.subquery())
             branches.append(branch)
         combine = sqlalchemy.union_all if all_rows else sqlalchemy.union
-        return combine(*branches)
+        derived = combine(*branches).subquery()
+        sources = {plan.alias or plan.table.name: derived}
+        return self._applyOrderingAndPaging(
+            sources, derived, sqlalchemy.select(derived), plan,
+        )
 
     def _buildSelect(
         self,
@@ -761,7 +792,10 @@ class SQLCompiler:
             return sqlalchemy.literal_column(raw.sql).label(raw.alias)
         element = sqlalchemy.text(raw.sql)
         if raw.bindings:
-            element = element.bindparams(**raw.bindings)
+            element = element.bindparams(*(
+                sqlalchemy.bindparam(name, value, unique=True)
+                for name, value in raw.bindings.items()
+            ))
         if raw.alias:
             # Group the bound fragment and expose its projection name.
             return (
@@ -918,7 +952,12 @@ class SQLCompiler:
 
         table = self._sqlTable(plan.table)
         if parameterized:
-            return sqlalchemy.insert(table)
+            statement = sqlalchemy.insert(table)
+            if self._driver == "pgsql":
+                statement = statement.returning(
+                    sqlalchemy.literal_column("1"),
+                )
+            return statement
         rows = plan.values if len(plan.values) > 1 else plan.values[0]
         return sqlalchemy.insert(table).values(rows)
 

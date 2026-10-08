@@ -132,7 +132,8 @@ class RawQueryBuilder(QueryBuilderBase, IRawQueryBuilder):
             Column value, or ``None`` without matches.
         """
         row = await self.clone().select(column).first()
-        return row.get(column) if row else None
+        key = column.rsplit(".", 1)[-1]
+        return row.get(key) if row else None
 
     async def pluck(self, column: str) -> Collection:
         """
@@ -149,7 +150,8 @@ class RawQueryBuilder(QueryBuilderBase, IRawQueryBuilder):
             Collection of column values.
         """
         rows = await self.clone().select(column).get()
-        return Collection([row[column] for row in rows])
+        key = column.rsplit(".", 1)[-1]
+        return Collection([row[key] for row in rows])
 
     async def paginate(
         self,

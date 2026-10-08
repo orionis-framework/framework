@@ -250,11 +250,18 @@ class TestQueryBuilder(TestCase):
         """
         scoped = self.gateway.connection("reporting")
         self.assertIsNot(scoped, self.gateway)
-        self.assertIsNone(self.gateway.table("users")._connection_name)
+        self.assertIsNone(self.gateway._connection_name)
+        self.assertEqual(
+            self.gateway.table("users")._connection_name,
+            self.gateway.getDefaultName(),
+        )
         self.assertEqual(scoped.table("users")._connection_name, "reporting")
         explicit = scoped.table("users", connection="sqlite")
         self.assertEqual(explicit._connection_name, "sqlite")
-        self.assertIsNone(scoped.connection().table("users")._connection_name)
+        self.assertEqual(
+            scoped.connection().table("users")._connection_name,
+            self.gateway.getDefaultName(),
+        )
 
     def testDefaultConnectionChangesAreDelegated(self) -> None:
         """Read and update the default connection through the manager.

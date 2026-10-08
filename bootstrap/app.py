@@ -2,6 +2,7 @@ from pathlib import Path
 from orionis import Application
 from app.console.scheduler import Scheduler
 from app.exceptions.handler import ExceptionHandler
+from app.http.middleware.global_middleware import GlobalMiddleware
 from app.providers.app_service_provider import AppServiceProvider
 from bootstrap.lifespan import register_lifespan_callbacks
 
@@ -51,6 +52,7 @@ app.withProviders(
 
 # Register global middleware for HTTP request processing.
 app.withMiddleware(
+    GlobalMiddleware,
     # ...
 )
 

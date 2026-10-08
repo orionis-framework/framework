@@ -1405,10 +1405,10 @@ class QueryBuilderBase:
         Raises
         ------
         InvalidQueryException
-            If the value is negative.
+            If the value is not a nonnegative integer, excluding booleans.
         """
-        if value < 0:
-            error_msg = "Limit must not be negative."
+        if not isinstance(value, int) or isinstance(value, bool) or value < 0:
+            error_msg = "Limit must be a nonnegative integer."
             raise InvalidQueryException(error_msg)
         self._plan.limit_value = value
         return self
@@ -1430,10 +1430,10 @@ class QueryBuilderBase:
         Raises
         ------
         InvalidQueryException
-            If the value is negative.
+            If the value is not a nonnegative integer, excluding booleans.
         """
-        if value < 0:
-            error_msg = "Offset must not be negative."
+        if not isinstance(value, int) or isinstance(value, bool) or value < 0:
+            error_msg = "Offset must be a nonnegative integer."
             raise InvalidQueryException(error_msg)
         self._plan.offset_value = value
         return self
@@ -1867,7 +1867,8 @@ class QueryBuilderBase:
             A schemaless definition for a bare name, or ``table`` as is.
         """
         if isinstance(table, str):
-            return TableDefinition(name=table)
+            schema, separator, name = table.rpartition(".")
+            return TableDefinition(name=name, schema=schema if separator else None)
         return table
 
     def _addJoin(

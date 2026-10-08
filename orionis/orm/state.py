@@ -1,4 +1,5 @@
 from __future__ import annotations
+from copy import deepcopy
 from typing import Any
 
 # Distinguish an absent original attribute from stored values, including None.
@@ -101,7 +102,7 @@ class StateMixin:
         dict
             Attribute values written by the last save.
         """
-        return dict(self._changes)
+        return deepcopy(self._changes)
 
     def getOriginal(
         self,
@@ -125,8 +126,8 @@ class StateMixin:
             the requested key.
         """
         if key is None:
-            return dict(self._original)
-        return self._original.get(key, default)
+            return deepcopy(self._original)
+        return deepcopy(self._original[key]) if key in self._original else default
 
     def syncOriginal(self) -> Any:  # noqa: ANN401
         """
@@ -140,5 +141,5 @@ class StateMixin:
         # Mutate the snapshot in place: the mixin declares no slots,
         # so rebinding the attribute is left to the owning model.
         self._original.clear()
-        self._original.update(self._attributes)
+        self._original.update(deepcopy(self._attributes))
         return self

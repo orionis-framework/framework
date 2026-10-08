@@ -14,15 +14,16 @@ class HomeController(BaseController):
         """
         return await response.view("home.index")
 
-    async def api(self) -> JSONResponse:
+    async def health(self) -> JSONResponse:
         """
-        Return a JSON response for testing purposes.
+        Return the health status of the API.
 
         Returns
         -------
         JSONResponse
-            A JSON response containing a test message.
+            A JSON response indicating the API is working.
         """
         return response.json({
             "message": "Orionis API is working",
+            "status": "healthy",
         })

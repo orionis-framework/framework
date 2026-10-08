@@ -373,6 +373,14 @@ Tracking de migrator/seeder usa transacciones/claims DB, no locks de proceso.
 
 Orionis declara Python 3.14+, SQLAlchemy 2.0.54+ y aiosqlite 0.22.1+; validado en CPython 3.14.6 Windows. Drivers: SQLite, MySQL, PostgreSQL, Oracle, SQL Server y Amazon Redshift. Usa extras declarados para mínimos de drivers.
 
+## Pruebas locales con bases de datos reales
+
+Las pruebas que necesitan conexiones o credenciales de bases de datos reales pertenecen exclusivamente a `tests/real_database/`, una carpeta local ignorada por Git. Su configuración se mantiene en `tests/real_database/config.py`, sin reutilizar el `.env` de la aplicación.
+
+El [plan completo de pruebas](README.testing.es.md) inventaría la API, la integración con SQLAlchemy y los escenarios para SQLite, MySQL, PostgreSQL, Oracle, SQL Server y Redshift. Las suites reales anteriores se han retirado; las nuevas se implementarán por motor después de completar las credenciales y autorizar la ejecución. Cambiar `DB_CONNECTION` no convierte las pruebas existentes de SQLite en pruebas de otro motor.
+
+Los lotes PostgreSQL cuentan las filas devueltas por `RETURNING`, incluso cuando un trigger rechaza una entrada. Los enums respetan `native_enum`, `create_constraint`, `length` y `validate_strings`. Los timestamps automáticos del modelo respetan la opción `timezone` de la columna, incluyendo `deleted_at` cuando no hay timestamps de creación o actualización.
+
 ## Notas de verificación
 
 La validación usó CPython 3.14.6. Se inspeccionaron exports, conexión/manager, compiler/dialectos, transacciones, schema, migrations, seeders, providers, config, integración ORM y `tests/database`. Las 243 pruebas pasaron. Cuatro programas de conexión se ejecutaron; las definiciones de migración/seeder se importaron sin ejecutar operaciones ligadas a la aplicación.

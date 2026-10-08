@@ -260,9 +260,14 @@ class Connection(IConnection):
                 generated = result.inserted_primary_key
                 if generated is not None and len(generated) > 0:
                     last_id = generated[0]
+            row_count = (
+                sum(1 for _row in result.mappings())
+                if parameters is not None and resolve_driver(self._config) == "pgsql"
+                else int(result.rowcount or 0)
+            )
             return InsertResult(
                 last_insert_id=last_id,
-                row_count=int(result.rowcount or 0),
+                row_count=row_count,
             )
 
     async def update(

@@ -102,8 +102,13 @@ class QueryBuilder(IQueryBuilder):
         """
         builder = RawQueryBuilder()
         target = connection or self._connection_name
-        if target is not None:
-            builder.connection(target)
+        if target is None:
+            migration = current_migration_connection()
+            target = (
+                migration.getName() if migration is not None
+                else self._db_manager.getDefaultName()
+            )
+        builder.connection(target)
         return builder.table(name, alias=alias)
 
     def getDefaultName(self) -> str:

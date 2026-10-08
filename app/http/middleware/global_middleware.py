@@ -1,6 +1,6 @@
 from orionis.http import BaseMiddleware, NextCallable, Request, Response
 
-class CustomMiddleware(BaseMiddleware):
+class GlobalMiddleware(BaseMiddleware):
 
     __slots__ = ()
 

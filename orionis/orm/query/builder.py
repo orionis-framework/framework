@@ -451,7 +451,8 @@ class ModelQueryBuilder[TModel: "Model"](QueryBuilderBase, IModelQueryBuilder):
             Column value, or ``None`` without matches.
         """
         instance = await self.clone().select(column).first()
-        return getattr(instance, column) if instance is not None else None
+        key = column.rsplit(".", 1)[-1]
+        return getattr(instance, key) if instance is not None else None
 
     async def pluck(self, column: str) -> Collection:
         """
@@ -468,7 +469,8 @@ class ModelQueryBuilder[TModel: "Model"](QueryBuilderBase, IModelQueryBuilder):
             Collection of column values.
         """
         models = await self.clone().select(column).get()
-        return Collection([getattr(model, column) for model in models])
+        key = column.rsplit(".", 1)[-1]
+        return Collection([getattr(model, key) for model in models])
 
     async def paginate(
         self,

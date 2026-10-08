@@ -702,21 +702,6 @@ class TestModelCrud(TestCase):
         self.assertIn("Person", repr(person))
         self.assertIn("id=1", repr(person))
 
-    async def testFreshTimestampAwarenessFollowsColumnType(self) -> None:
-        """Produce aware or naive timestamps matching the column type.
-
-        Validates the timestamp awareness rule.
-
-        Returns
-        -------
-        None
-            Assertions verify the behavior described above.
-        """
-        aware = Person.freshTimestamp()
-        self.assertIsNotNone(aware.tzinfo)
-        naive = Legacy.freshTimestamp()
-        self.assertIsNone(naive.tzinfo)
-
     async def testModelWithNamedConnectionUsesIt(self) -> None:
         """Route model queries through the declared named connection.
 

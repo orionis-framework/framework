@@ -22,6 +22,7 @@ if TYPE_CHECKING:
     from orionis.queues.job import BaseJob
 
 _JOB_PACKAGE = "queue_probe_jobs"
+_REPOSITORY_ROOT = Path(__file__).resolve().parents[2]
 
 class TransactionRollback(RuntimeError):
     """Trigger rollback of an application-owned test transaction."""
@@ -353,6 +354,7 @@ class TestQueueApplicationIntegration(TestCase):
         process = await asyncio.create_subprocess_exec(
             sys.executable, "-B", "-X", "utf8", "-m",
             "tests.queues.test_integration",
+            cwd=_REPOSITORY_ROOT,
             stdout=asyncio.subprocess.PIPE, stderr=asyncio.subprocess.PIPE,
         )
         try:

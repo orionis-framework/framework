@@ -1,6 +1,7 @@
 from typing import Any
 from apscheduler.jobstores.redis import RedisJobStore
 from apscheduler.jobstores.sqlalchemy import SQLAlchemyJobStore
+from sqlalchemy.dialects.oracle import FLOAT
 from sqlalchemy.engine.url import URL
 from orionis.console.contracts.store import IScheduleStore
 from orionis.database.contracts.connection_manager import IConnectionManager
@@ -118,7 +119,7 @@ class ScheduleStore(IScheduleStore):
         Raises
         ------
         RuntimeError
-            If the database store configuration is not set.
+            If the database store is absent or its backend lacks required capabilities.
         MissingDatabaseDependencyException
             If the resolved driver package is not installed.
         """
@@ -133,15 +134,29 @@ class ScheduleStore(IScheduleStore):
 
         # Resolve the connection config and derive the sync engine URL.
         config: dict[str, Any] = self._db_manager.configFor(database_store.connection)
+        if resolve_driver(config) == "redshift":
+            message = (
+                "Amazon Redshift cannot back APScheduler's database store; "
+                "enforced unique constraints and indexes are required."
+            )
+            raise RuntimeError(message)
         url: URL = build_engine_url(config, sync=True)
         options: dict[str, Any] = engine_options(config, sync=True)
         try:
             # Build the job store; the sync driver may be missing.
-            return SQLAlchemyJobStore(
+            store = SQLAlchemyJobStore(
                 url=url,
                 tablename=database_store.table,
                 engine_options=options,
             )
+            if resolve_driver(config) == "oracle":
+                # APScheduler declares Float(25), whereas Oracle requires an
+                # explicit binary precision for this DDL column.
+                column = store.jobs_t.c.next_run_time
+                column.type = column.type.with_variant(
+                    FLOAT(binary_precision=83), "oracle",
+                )
+            return store
         except ModuleNotFoundError as exc:
             # Map the missing package to an actionable framework error.
             raise missing_dependency_error(

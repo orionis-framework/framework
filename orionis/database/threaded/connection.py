@@ -151,3 +151,14 @@ class ThreadedConnection:
             await self._worker.run(self._connection.close)
         finally:
             await self._worker.close()
+
+    async def invalidate(self) -> None:
+        """
+        Discard a connection whose transaction could not be settled.
+
+        Returns
+        -------
+        None
+            Close the DBAPI handle on its worker instead of returning it for reuse.
+        """
+        await self._worker.run(self._connection.invalidate)

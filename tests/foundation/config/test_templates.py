@@ -20,20 +20,31 @@ from tests.foundation.config.test_environment import (
 )
 
 class TestConfigurationTemplates(ConfigurationTestCase):
-    def _exampleEnvironmentKeys(self) -> list[str]:
+    def _environmentKeys(
+        self, filename: str, *, include_commented: bool = True,
+    ) -> list[str]:
         """Parse active declarations and optional commented overrides.
+
+        Parameters
+        ----------
+        filename : str
+            Environment template filename relative to the repository root.
+        include_commented : bool, optional
+            Include optional commented declarations, by default True.
 
         Returns
         -------
         list[str]
             Environment names in declaration order, retaining duplicates.
         """
-        example = Path(__file__).resolve().parents[3] / ".env.example"
-        content = re.sub(
-            r"(?m)^#[ \t]*(?=[A-Z][A-Z0-9_]*[ \t]*=)",
-            "",
-            example.read_text(encoding="utf-8"),
-        )
+        template = Path(__file__).resolve().parents[3] / filename
+        content = template.read_text(encoding="utf-8")
+        if include_commented:
+            content = re.sub(
+                r"(?m)^#[ \t]*(?=[A-Z][A-Z0-9_]*[ \t]*=)",
+                "",
+                content,
+            )
         bindings = list(parse_stream(StringIO(content)))
         for binding in bindings:
             self.assertFalse(
@@ -42,26 +53,28 @@ class TestConfigurationTemplates(ConfigurationTestCase):
             )
         return [binding.key for binding in bindings if binding.key]
 
-    def testExampleEnvironmentDeclaresEachVariableOnce(self) -> None:
+    def testEnvironmentTemplatesDeclareEachVariableOnce(self) -> None:
         """Reject duplicates across active and commented environment declarations.
 
         Returns
         -------
         None
-            Every parsed example key has one unambiguous declaration.
+            Each template declares every parsed key at most once.
         """
-        keys = self._exampleEnvironmentKeys()
-        self.assertEqual(len(keys), len(set(keys)))
+        for filename in (".env.example", ".env.reference"):
+            with self.subTest(template=filename):
+                keys = self._environmentKeys(filename)
+                self.assertEqual(len(keys), len(set(keys)))
 
-    def testExampleEnvironmentDocumentsEveryConfigurationVariable(self) -> None:
-        """Keep every consumed configuration variable visible in the example.
+    def testReferenceEnvironmentDocumentsEveryConfigurationVariable(self) -> None:
+        """Keep every consumed configuration variable visible in the reference.
 
         Returns
         -------
         None
             Active or commented declarations cover both configuration layers.
         """
-        documented = set(self._exampleEnvironmentKeys())
+        documented = set(self._environmentKeys(".env.reference"))
         required: set[str] = set()
         for module in self.modules:
             tree = ast.parse(Path(module.__file__).read_text(encoding="utf-8"))
@@ -87,7 +100,25 @@ class TestConfigurationTemplates(ConfigurationTestCase):
         self.assertEqual(
             required - documented,
             set(),
-            "Document every Env.get key in .env.example, including optional keys.",
+            "Document every Env.get key in .env.reference, including optional keys.",
+        )
+
+    def testExampleEnvironmentContainsOnlyActiveReferenceVariables(self) -> None:
+        """Keep the starter example smaller than the complete reference.
+
+        Returns
+        -------
+        None
+            The example contains documented active settings, not optional overrides.
+        """
+        example = self._environmentKeys(".env.example")
+        reference = self._environmentKeys(".env.reference")
+        self.assertTrue(example)
+        self.assertLess(len(example), len(reference))
+        self.assertLessEqual(set(example), set(reference))
+        self.assertEqual(
+            example,
+            self._environmentKeys(".env.example", include_commented=False),
         )
 
     def testExampleEnvironmentBuildsEveryApplicationConfiguration(self) -> None:
@@ -99,6 +130,12 @@ class TestConfigurationTemplates(ConfigurationTestCase):
             The shipped example can initialize every editable configuration module.
         """
         root = Path(__file__).resolve().parents[3]
+        environment_keys = set(self._environmentKeys(".env.reference"))
+        environment = {
+            key: value
+            for key, value in os.environ.items()
+            if key not in environment_keys
+        }
         script = """
 import importlib
 import json
@@ -131,7 +168,7 @@ raise SystemExit(bool(errors) or count == 0)
                 [sys.executable, "-B", "-c", script],
                 cwd=directory,
                 env={
-                    **os.environ, "PYTHONPATH": str(root),
+                    **environment, "PYTHONPATH": str(root),
                     "ORIONIS_AUDIT_ROOT": str(root),
                 },
                 capture_output=True, text=True, encoding="utf-8",

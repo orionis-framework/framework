@@ -268,7 +268,7 @@ class DatabaseInspector:
 
     async def viewCounts(self) -> tuple[int, int]:
         """
-        Count ordinary and materialized views without loading their names.
+        Count ordinary and materialized views from native catalogs.
 
         Returns
         -------
@@ -301,7 +301,7 @@ class DatabaseInspector:
         elif driver == "pgsql":
             rows = await self.connection.select(
                 """
-                SELECT c.relkind AS kind, COUNT(*) AS object_count
+                SELECT CAST(c.relkind AS text) AS kind, COUNT(*) AS object_count
                 FROM pg_class c
                 JOIN pg_namespace n ON n.oid = c.relnamespace
                 WHERE c.relkind IN ('v', 'm')
@@ -1263,21 +1263,15 @@ class DatabaseInspector:
         list[dict[str, Any]]
             Visible object names or one aggregate count.
         """
-        projection = (
-            "SELECT COUNT(*) AS object_count"
-            if count else "SELECT t.schema_name || '.' || t.table_name AS name"
-        )
-        clauses = [projection, """
+        # These system views cannot be joined on Redshift compute nodes.
+        # Read each independently instead of using an unsupported correlated
+        # subquery, including when the caller requests an object count.
+        clauses = ["SELECT t.schema_name || '.' || t.table_name AS name", """
             FROM svv_redshift_tables t
             WHERE t.database_name = current_database()
               AND t.table_type = :kind
               AND LEFT(t.schema_name, 3) <> 'pg_'
               AND t.schema_name <> 'information_schema'
-              AND NOT EXISTS (
-                  SELECT 1 FROM svv_mv_info m
-                  WHERE m.database_name = t.database_name
-                    AND m.schema_name = t.schema_name AND m.name = t.table_name
-              )
             """]
         bindings = {"kind": kind}
         if name is not None:
@@ -1287,9 +1281,26 @@ class DatabaseInspector:
             if separator:
                 clauses.append(" AND t.schema_name = :schema")
                 bindings["schema"] = schema
-        if not count:
-            clauses.append(" ORDER BY name")
-        return await self.connection.select("".join(clauses), bindings)
+        clauses.append(" ORDER BY name")
+        rows = await self.connection.select("".join(clauses), bindings)
+        if rows:
+            materialized_query = """
+                SELECT TRIM(schema_name) || '.' || TRIM(name) AS name
+                FROM svv_mv_info WHERE database_name = current_database()
+                """
+            materialized_bindings = {}
+            if name is not None:
+                materialized_query += " AND name = :table"
+                materialized_bindings["table"] = table
+                if separator:
+                    materialized_query += " AND schema_name = :schema"
+                    materialized_bindings["schema"] = schema
+            materialized = await self.connection.select(
+                materialized_query, materialized_bindings,
+            )
+            excluded = {str(row["name"]).strip() for row in materialized}
+            rows = [row for row in rows if str(row["name"]).strip() not in excluded]
+        return [{"object_count": len(rows)}] if count else rows
 
     async def _redshiftSizeRows(
         self, name: str | None = None, *, aggregate: bool = False,
@@ -1370,21 +1381,26 @@ class DatabaseInspector:
         )
         foreign_keys = await self.connection.select(
             """
-            SELECT k.constraint_name AS name, k.column_name AS column_name,
-                   ref.table_schema || '.' || ref.table_name AS ref_table,
-                   ref.column_name AS ref_column, r.delete_rule AS on_delete
-            FROM information_schema.referential_constraints r
+            SELECT c.conname AS name, k.column_name AS column_name,
+                   rn.nspname || '.' || rt.relname AS ref_table,
+                   ra.attname AS ref_column,
+                   CASE c.confdeltype
+                       WHEN 'a' THEN 'NO ACTION' WHEN 'r' THEN 'RESTRICT'
+                       WHEN 'c' THEN 'CASCADE' WHEN 'n' THEN 'SET NULL'
+                       WHEN 'd' THEN 'SET DEFAULT'
+                   END AS on_delete
+            FROM pg_constraint c
+            JOIN pg_class t ON t.oid = c.conrelid
+            JOIN pg_namespace n ON n.oid = t.relnamespace
+            JOIN pg_class rt ON rt.oid = c.confrelid
+            JOIN pg_namespace rn ON rn.oid = rt.relnamespace
             JOIN information_schema.key_column_usage k
-              ON k.constraint_catalog = r.constraint_catalog
-             AND k.constraint_schema = r.constraint_schema
-             AND k.constraint_name = r.constraint_name
-            JOIN information_schema.key_column_usage ref
-              ON ref.constraint_catalog = r.unique_constraint_catalog
-             AND ref.constraint_schema = r.unique_constraint_schema
-             AND ref.constraint_name = r.unique_constraint_name
-             AND ref.ordinal_position = k.position_in_unique_constraint
-            WHERE k.table_schema = :schema AND k.table_name = :table
-            ORDER BY k.constraint_name, k.ordinal_position
+              ON k.table_schema = n.nspname AND k.table_name = t.relname
+             AND k.constraint_name = c.conname
+            JOIN pg_attribute ra
+              ON ra.attrelid = rt.oid AND ra.attnum = c.confkey[k.ordinal_position]
+            WHERE n.nspname = :schema AND t.relname = :table AND c.contype = 'f'
+            ORDER BY c.conname, k.ordinal_position
             """,
             bindings,
         )

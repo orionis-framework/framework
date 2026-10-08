@@ -181,6 +181,8 @@ asyncio.run(main())
 
 Validación: **Executed successfully** en CPython 3.14.6.
 
+Los controles transaccionales terminan la operación en curso del driver antes de propagar la cancelación, tanto en drivers async nativos como en el puente de workers de Redshift. Un `COMMIT` solicitado puede persistir cambios aunque su llamador reciba `CancelledError`; cancelar esa llamada no garantiza rollback. Cancelar el cuerpo de una transacción o execute antes de solicitar commit revierte el trabajo propio. La limpieza drena e invalida las conexiones interrumpidas cuando corresponde, incluso ante cancelaciones repetidas. La espera por una conexión del pool permanece cancelable.
+
 ### Revertir al escapar excepción
 
 ```python
@@ -283,6 +285,13 @@ Validación: **Import-only** en CPython 3.14.6; ejecutarlo requiere contenedor i
 
 URLs tienen precedencia sobre campos descompuestos al construir dialecto.
 
+PostgreSQL aplica `charset`, `search_path` y `sslmode` a ambas rutas. El cliente
+async `asyncpg` usa `server_settings` y `ssl`; el cliente sync `psycopg2` usa
+`client_encoding`, `options` escapado y `sslmode` de libpq. El engine sync del
+scheduler conserva el schema configurado sin fallback a `public`. Los errores
+de control transaccional exponen conexion y tipo de error, no SQL, valores de
+parametros ni una excepcion del driver encadenada.
+
 ### Amazon Redshift
 
 Instala el extra opcional en una aplicación:
@@ -333,16 +342,18 @@ if __name__ == "__main__":
     asyncio.run(main())
 ```
 
-El ejemplo requiere un endpoint Redshift accesible; no se ejecutó contra AWS. La validación local utiliza el DBAPI y dialecto AWS reales para construir motores y compilar SQL, y un motor SQLite Core bloqueante aislado para probar ejecución y cancelación del adaptador.
+El ejemplo requiere un endpoint Redshift accesible. La campaña privada en `tests/real_database` ejecuta además consultas, ORM, tipos, migraciones, cancelación y lotes de 40000 filas contra Amazon Redshift QA real, con TLS verify-full y esquemas nuevos registrados por caso. Los informes distinguen esta evidencia de la simulación local y de las variantes pendientes.
 
-El conector es síncrono. Conexión, consultas, resultados y transacciones bloqueantes se ejecutan en un hilo reservado por cada conexión Core tomada del pool. Las consultas independientes pueden usar hilos distintos; una transacción conserva su hilo. Cancelar espera a que termine la operación en curso antes de limpiar, por lo que no garantiza abortar el trabajo del servidor. El mismo conector oficial sirve también a los motores síncronos del scheduler.
+El conector es síncrono. Conexión, consultas, resultados y transacciones bloqueantes se ejecutan en un hilo reservado por cada conexión Core tomada del pool. Las consultas independientes pueden usar hilos distintos; una transacción conserva su hilo. Cancelar espera a que termine la operación en curso antes de limpiar, por lo que no garantiza abortar el trabajo del servidor. Un COMMIT solicitado puede quedar confirmado aunque la tarea reciba CancelledError; las pruebas reales registran ese resultado y verifican el cierre de recursos.
 
 Limitaciones específicas de Redshift:
+
+- `lockForUpdate()` y `sharedLock()` lanzan `QueryException` al ejecutarse; Redshift no admite bloqueos de filas desde SELECT. La validación también cubre planes agregados y anidados.
 
 - No admite savepoints ni transacciones anidadas.
 - No admite DML `RETURNING` ni secuencias PostgreSQL. `autoIncrement()` emite `IDENTITY(1,1)` nativo, pero una clave generada por el servidor y omitida en el insert no retorna en `InsertResult.last_insert_id`. Proporciona una clave primaria generada por el cliente cuando un modelo ORM deba conocer su clave inmediatamente.
 - No admite índices tradicionales. Evita declarar índices en esquemas Redshift.
-- Las claves primarias, únicas y foráneas son solo informativas. Redshift no es un backend adecuado para bloqueos de caché del framework, claims de seeders únicos ni otros flujos que requieran unicidad impuesta por el servidor.
+- Las claves primarias, únicas y foráneas son solo informativas. `connection.supportsUniqueConstraints()` devuelve `False`. La construcción de caché, sesiones y colas de base de datos, `SeederRunner.seed()` y el almacén de tareas de APScheduler rechazan Redshift antes de acceder al servidor porque las claves de caché, los bloqueos atómicos, la identidad de sesiones/tareas y los claims de seeders únicos requieren unicidad impuesta. APScheduler también necesita índices que Redshift no ofrece.
 - `db:show`, `db:table` y `db:wipe` utilizan catálogos Redshift y nombres calificados. Los tamaños usan bloques asignados de 1 MB; las métricas restringidas o ausentes son desconocidas y las tablas vacías pueden no tener tamaño disponible. Los constraints mostrados son declaraciones, no garantías de cumplimiento.
 
 ## Integración con Orionis
@@ -377,10 +388,10 @@ Orionis declara Python 3.14+, SQLAlchemy 2.0.54+ y aiosqlite 0.22.1+; validado e
 
 Las pruebas que necesitan conexiones o credenciales de bases de datos reales pertenecen exclusivamente a `tests/real_database/`, una carpeta local ignorada por Git. Su configuración se mantiene en `tests/real_database/config.py`, sin reutilizar el `.env` de la aplicación.
 
-El [plan completo de pruebas](README.testing.es.md) inventaría la API, la integración con SQLAlchemy y los escenarios para SQLite, MySQL, PostgreSQL, Oracle, SQL Server y Redshift. Las suites reales anteriores se han retirado; las nuevas se implementarán por motor después de completar las credenciales y autorizar la ejecución. Cambiar `DB_CONNECTION` no convierte las pruebas existentes de SQLite en pruebas de otro motor.
+El [plan completo de pruebas](README.testing.es.md) inventaría la API, la integración con SQLAlchemy y los escenarios para SQLite, MySQL, PostgreSQL, Oracle, SQL Server y Redshift. Las suites privadas de `tests/real_database` tienen preflight, referencias independientes, ownership y launcher aislado para los seis motores. Su informe VERIFICACION.md y sus artefactos registran discovery, resultados, hashes de fuentes, integridad, cleanup y gates pendientes. Cambiar `DB_CONNECTION` no convierte las pruebas existentes de SQLite en pruebas de otro motor.
 
 Los lotes PostgreSQL cuentan las filas devueltas por `RETURNING`, incluso cuando un trigger rechaza una entrada. Los enums respetan `native_enum`, `create_constraint`, `length` y `validate_strings`. Los timestamps automáticos del modelo respetan la opción `timezone` de la columna, incluyendo `deleted_at` cuando no hay timestamps de creación o actualización.
 
 ## Notas de verificación
 
-La validación usó CPython 3.14.6. Se inspeccionaron exports, conexión/manager, compiler/dialectos, transacciones, schema, migrations, seeders, providers, config, integración ORM y `tests/database`. Las 243 pruebas pasaron. Cuatro programas de conexión se ejecutaron; las definiciones de migración/seeder se importaron sin ejecutar operaciones ligadas a la aplicación.
+La validación usó CPython 3.14.6. Se inspeccionaron exports, conexión/manager, compiler/dialectos, transacciones, schema, migrations, seeders, providers, config, integración ORM y `tests/database`. La evidencia histórica de 243 pruebas precede a la campaña actual; consultar los resultados vigentes de `tests/real_database/artifacts/VERIFICACION.md`. Cuatro programas de conexión se ejecutaron; las definiciones de migración/seeder se importaron sin ejecutar operaciones ligadas a la aplicación.

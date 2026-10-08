@@ -12,8 +12,8 @@ from orionis.database.exceptions import (
 )
 from orionis.test import TestCase
 
-class TestDialect(TestCase):
 
+class TestDialect(TestCase):
     # ── Driver resolution ─────────────────────────────────────────────────────
 
     def testResolveDriverAcceptsSupportedDrivers(self) -> None:
@@ -28,7 +28,12 @@ class TestDialect(TestCase):
             Assertions verify the behavior described above.
         """
         for driver in (
-            "sqlite", "mysql", "pgsql", "oracle", "sqlserver", "redshift",
+            "sqlite",
+            "mysql",
+            "pgsql",
+            "oracle",
+            "sqlserver",
+            "redshift",
         ):
             self.assertEqual(resolve_driver({"driver": driver}), driver)
 
@@ -97,15 +102,17 @@ class TestDialect(TestCase):
         None
             Assertions verify the behavior described above.
         """
-        url = build_engine_url({
-            "driver": "mysql",
-            "host": "127.0.0.1",
-            "port": 3306,
-            "database": "orionis",
-            "username": "root",
-            "password": "secret",
-            "charset": "utf8mb4",
-        })
+        url = build_engine_url(
+            {
+                "driver": "mysql",
+                "host": "127.0.0.1",
+                "port": 3306,
+                "database": "orionis",
+                "username": "root",
+                "password": "secret",
+                "charset": "utf8mb4",
+            },
+        )
         self.assertEqual(url.drivername, "mysql+aiomysql")
         self.assertEqual(url.host, "127.0.0.1")
         self.assertEqual(url.port, 3306)
@@ -123,12 +130,14 @@ class TestDialect(TestCase):
         None
             Assertions verify the behavior described above.
         """
-        url = build_engine_url({
-            "driver": "mysql",
-            "host": "localhost",
-            "database": "orionis",
-            "unix_socket": "/var/run/mysqld/mysqld.sock",
-        })
+        url = build_engine_url(
+            {
+                "driver": "mysql",
+                "host": "localhost",
+                "database": "orionis",
+                "unix_socket": "/var/run/mysqld/mysqld.sock",
+            },
+        )
         self.assertEqual(
             url.query.get("unix_socket"),
             "/var/run/mysqld/mysqld.sock",
@@ -144,14 +153,16 @@ class TestDialect(TestCase):
         None
             Assertions verify the behavior described above.
         """
-        url = build_engine_url({
-            "driver": "pgsql",
-            "host": "localhost",
-            "port": 5432,
-            "database": "orionis",
-            "username": "postgres",
-            "password": "",
-        })
+        url = build_engine_url(
+            {
+                "driver": "pgsql",
+                "host": "localhost",
+                "port": 5432,
+                "database": "orionis",
+                "username": "postgres",
+                "password": "",
+            },
+        )
         self.assertEqual(url.drivername, "postgresql+asyncpg")
         self.assertEqual(url.port, 5432)
 
@@ -165,14 +176,16 @@ class TestDialect(TestCase):
         None
             Assertions verify the behavior described above.
         """
-        url = build_engine_url({
-            "driver": "oracle",
-            "host": "localhost",
-            "port": 1521,
-            "username": "sys",
-            "password": "",
-            "service_name": "ORCL",
-        })
+        url = build_engine_url(
+            {
+                "driver": "oracle",
+                "host": "localhost",
+                "port": 1521,
+                "username": "sys",
+                "password": "",
+                "service_name": "ORCL",
+            },
+        )
         self.assertEqual(url.drivername, "oracle+oracledb_async")
         self.assertEqual(url.query.get("service_name"), "ORCL")
 
@@ -186,15 +199,17 @@ class TestDialect(TestCase):
         None
             Assertions verify the behavior described above.
         """
-        url = build_engine_url({
-            "driver": "oracle",
-            "host": "localhost",
-            "port": 1521,
-            "username": "sys",
-            "password": "",
-            "service_name": "ORCL",
-            "sid": "XE",
-        })
+        url = build_engine_url(
+            {
+                "driver": "oracle",
+                "host": "localhost",
+                "port": 1521,
+                "username": "sys",
+                "password": "",
+                "service_name": "ORCL",
+                "sid": "XE",
+            },
+        )
         self.assertEqual(url.database, "XE")
         self.assertNotIn("service_name", url.query)
 
@@ -246,10 +261,12 @@ class TestDialect(TestCase):
         None
             Assertions verify the behavior described above.
         """
-        options = engine_options({
-            "driver": "pgsql",
-            "sslmode": "require",
-        })
+        options = engine_options(
+            {
+                "driver": "pgsql",
+                "sslmode": "require",
+            },
+        )
         self.assertEqual(options["connect_args"]["ssl"], "require")
 
     def testPgsqlCharsetAndSearchPathTravelAsServerSettings(self) -> None:
@@ -262,11 +279,13 @@ class TestDialect(TestCase):
         None
             Assertions verify the behavior described above.
         """
-        options = engine_options({
-            "driver": "pgsql",
-            "charset": "UTF8",
-            "search_path": "public",
-        })
+        options = engine_options(
+            {
+                "driver": "pgsql",
+                "charset": "UTF8",
+                "search_path": "public",
+            },
+        )
         settings = options["connect_args"]["server_settings"]
         self.assertEqual(settings["client_encoding"], "UTF8")
         self.assertEqual(settings["search_path"], "public")
@@ -296,12 +315,14 @@ class TestDialect(TestCase):
         None
             Assertions verify the behavior described above.
         """
-        commands = _mysql_session_commands({
-            "driver": "mysql",
-            "charset": "utf8mb4",
-            "collation": "utf8mb4_unicode_ci",
-            "strict": True,
-        })
+        commands = _mysql_session_commands(
+            {
+                "driver": "mysql",
+                "charset": "utf8mb4",
+                "collation": "utf8mb4_unicode_ci",
+                "strict": True,
+            },
+        )
         self.assertIn("SET NAMES utf8mb4 COLLATE utf8mb4_unicode_ci", commands)
         self.assertTrue(
             any("STRICT_TRANS_TABLES" in command for command in commands),
@@ -317,10 +338,12 @@ class TestDialect(TestCase):
         None
             Assertions verify the behavior described above.
         """
-        commands = _mysql_session_commands({
-            "driver": "mysql",
-            "strict": False,
-        })
+        commands = _mysql_session_commands(
+            {
+                "driver": "mysql",
+                "strict": False,
+            },
+        )
         self.assertIn("SET SESSION sql_mode='NO_ENGINE_SUBSTITUTION'", commands)
 
     def testMysqlSessionRejectsMalformedIdentifiers(self) -> None:
@@ -333,10 +356,12 @@ class TestDialect(TestCase):
         None
             Assertions verify the behavior described above.
         """
-        commands = _mysql_session_commands({
-            "driver": "mysql",
-            "charset": "utf8; DROP TABLE users",
-        })
+        commands = _mysql_session_commands(
+            {
+                "driver": "mysql",
+                "charset": "utf8; DROP TABLE users",
+            },
+        )
         self.assertFalse(any("SET NAMES" in command for command in commands))
 
     # ── SQL Server ─────────────────────────────────────────────────────────────────
@@ -351,14 +376,16 @@ class TestDialect(TestCase):
         None
             Assertions verify the behavior described above.
         """
-        url = build_engine_url({
-            "driver": "sqlserver",
-            "host": "127.0.0.1",
-            "port": 1433,
-            "database": "orionis",
-            "username": "sa",
-            "password": "secret",
-        })
+        url = build_engine_url(
+            {
+                "driver": "sqlserver",
+                "host": "127.0.0.1",
+                "port": 1433,
+                "database": "orionis",
+                "username": "sa",
+                "password": "secret",
+            },
+        )
         self.assertEqual(url.drivername, "mssql+aioodbc")
         self.assertEqual(url.port, 1433)
         self.assertEqual(url.database, "orionis")
@@ -373,22 +400,26 @@ class TestDialect(TestCase):
         None
             Assertions verify the behavior described above.
         """
-        default_url = build_engine_url({
-            "driver": "sqlserver",
-            "host": "h",
-            "database": "d",
-        })
+        default_url = build_engine_url(
+            {
+                "driver": "sqlserver",
+                "host": "h",
+                "database": "d",
+            },
+        )
         self.assertEqual(
             default_url.query.get("driver"),
             "ODBC Driver 18 for SQL Server",
         )
 
-        explicit_url = build_engine_url({
-            "driver": "sqlserver",
-            "host": "h",
-            "database": "d",
-            "odbc_driver": "ODBC Driver 17 for SQL Server",
-        })
+        explicit_url = build_engine_url(
+            {
+                "driver": "sqlserver",
+                "host": "h",
+                "database": "d",
+                "odbc_driver": "ODBC Driver 17 for SQL Server",
+            },
+        )
         self.assertEqual(
             explicit_url.query.get("driver"),
             "ODBC Driver 17 for SQL Server",
@@ -404,23 +435,27 @@ class TestDialect(TestCase):
         None
             Assertions verify the behavior described above.
         """
-        url = build_engine_url({
-            "driver": "sqlserver",
-            "host": "h",
-            "database": "d",
-            "encrypt": True,
-            "trust_server_certificate": False,
-        })
+        url = build_engine_url(
+            {
+                "driver": "sqlserver",
+                "host": "h",
+                "database": "d",
+                "encrypt": True,
+                "trust_server_certificate": False,
+            },
+        )
         self.assertEqual(url.query.get("Encrypt"), "yes")
         self.assertEqual(url.query.get("TrustServerCertificate"), "no")
 
-        textual = build_engine_url({
-            "driver": "sqlserver",
-            "host": "h",
-            "database": "d",
-            "encrypt": "no",
-            "trust_server_certificate": "YES",
-        })
+        textual = build_engine_url(
+            {
+                "driver": "sqlserver",
+                "host": "h",
+                "database": "d",
+                "encrypt": "no",
+                "trust_server_certificate": "YES",
+            },
+        )
         self.assertEqual(textual.query.get("Encrypt"), "no")
         self.assertEqual(textual.query.get("TrustServerCertificate"), "yes")
 
@@ -520,11 +555,11 @@ class TestDialect(TestCase):
             url = build_engine_url(config, sync=True)
             self.assertEqual(url.drivername, drivername)
 
-    def testPgsqlSyncOmitsAsyncConnectArgs(self) -> None:
-        """Skip the asyncpg-only connect args when building a sync engine.
+    def testPgsqlSyncUsesLibpqOptionsAndOmitsAsyncOnlyArgs(self) -> None:
+        """Apply PostgreSQL session options in the blocking libpq dialect.
 
-        Validates the documented limitation: sslmode, search_path, and
-        charset only translate for the async PostgreSQL driver.
+        Validates TLS, encoding and escaped search_path without forwarding
+        the asyncpg-only ssl and server_settings keywords.
 
         Returns
         -------
@@ -532,10 +567,24 @@ class TestDialect(TestCase):
             Assertions verify the behavior described above.
         """
         options = engine_options(
-            {"driver": "pgsql", "sslmode": "require", "charset": "UTF8"},
+            {
+                "driver": "pgsql",
+                "sslmode": "require",
+                "charset": "UTF8",
+                "search_path": "orionis_it_suite, pg_catalog",
+            },
             sync=True,
         )
-        self.assertNotIn("connect_args", options)
+        self.assertEqual(
+            options["connect_args"],
+            {
+                "sslmode": "require",
+                "client_encoding": "UTF8",
+                "options": "-csearch_path=orionis_it_suite,\\ pg_catalog",
+            },
+        )
+        self.assertNotIn("ssl", options["connect_args"])
+        self.assertNotIn("server_settings", options["connect_args"])
 
     def testRedshiftUrlUsesTheOfficialDriverAndPreservesCredentials(self) -> None:
         """Build both Redshift modes with the AWS connector without rewriting secrets.
@@ -547,8 +596,12 @@ class TestDialect(TestCase):
         """
         credential = " leading @:/?#% trailing "
         config = {
-            "driver": "redshift", "host": "warehouse.example.com", "port": 5439,
-            "database": "analytics", "username": "analyst", "password": credential,
+            "driver": "redshift",
+            "host": "warehouse.example.com",
+            "port": 5439,
+            "database": "analytics",
+            "username": "analyst",
+            "password": credential,
         }
         for sync in (False, True):
             url = build_engine_url(config, sync=sync)
@@ -568,10 +621,17 @@ class TestDialect(TestCase):
             Falsy switches and nullable timeouts retain their explicit values.
         """
         settings = {
-            "ssl": False, "sslmode": "verify-ca", "timeout": None,
-            "iam": True, "region": "us-east-1", "cluster_identifier": "warehouse",
-            "db_user": "analyst", "profile": "development", "is_serverless": True,
-            "serverless_work_group": "analytics", "serverless_acct_id": "123456789012",
+            "ssl": False,
+            "sslmode": "verify-ca",
+            "timeout": None,
+            "iam": True,
+            "region": "us-east-1",
+            "cluster_identifier": "warehouse",
+            "db_user": "analyst",
+            "profile": "development",
+            "is_serverless": True,
+            "serverless_work_group": "analytics",
+            "serverless_acct_id": "123456789012",
         }
         for sync in (False, True):
             options = engine_options({"driver": "redshift", **settings}, sync=sync)

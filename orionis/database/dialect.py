@@ -1,6 +1,7 @@
 from __future__ import annotations
+from asyncio import create_task, ensure_future
 import re
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING, Any, Protocol
 from sqlalchemy import URL, event
 from sqlalchemy.dialects import registry
 from sqlalchemy.pool import AsyncAdaptedQueuePool, QueuePool
@@ -8,10 +9,12 @@ from orionis.database.exceptions import (
     MissingDatabaseDependencyException,
     UnsupportedDriverException,
 )
+from orionis.database.threaded.worker import _wait_for_completion
 
 if TYPE_CHECKING:
-    from collections.abc import Callable
+    from collections.abc import Awaitable, Callable
     from sqlalchemy.engine import Connection as SqlConnection
+    from sqlalchemy.engine.interfaces import Dialect
     from sqlalchemy.exc import NoSuchModuleError
     from sqlalchemy.ext.asyncio import AsyncEngine
     from orionis.database.threaded.engine import ThreadedEngine
@@ -297,8 +300,8 @@ def engine_options(
         options["connect_args"] = connect_args
         return options
 
-    if not sync and driver == "pgsql":
-        connect_args = _pgsql_connect_args(config)
+    if driver == "pgsql":
+        connect_args = _pgsql_connect_args(config, sync=sync)
         if connect_args:
             options["connect_args"] = connect_args
         return options
@@ -312,9 +315,11 @@ def engine_options(
 
     return options
 
-def _pgsql_connect_args(config: dict[str, Any]) -> dict[str, Any]:
+def _pgsql_connect_args( # NOSONAR
+    config: dict[str, Any], *, sync: bool = False,
+) -> dict[str, Any]:
     """
-    Build the asyncpg connect arguments for a PostgreSQL connection.
+    Build asyncpg or libpq connect arguments for PostgreSQL.
 
     Maps ``sslmode`` to the driver ``ssl`` argument and forwards the
     configured ``search_path`` and ``charset`` as server settings.
@@ -323,6 +328,8 @@ def _pgsql_connect_args(config: dict[str, Any]) -> dict[str, Any]:
     ----------
     config : dict
         PostgreSQL connection configuration.
+    sync : bool, optional
+        Whether to build the blocking libpq options instead of asyncpg settings.
 
     Returns
     -------
@@ -330,6 +337,19 @@ def _pgsql_connect_args(config: dict[str, Any]) -> dict[str, Any]:
         Driver connect arguments; empty when nothing is configured.
     """
     connect_args: dict[str, Any] = {}
+    if sync:
+        for key, source in (("sslmode", "sslmode"), ("client_encoding", "charset")):
+            value = _config_text(config, source)
+            if value:
+                connect_args[key] = value
+        search_path = _config_text(config, "search_path")
+        if search_path:
+            escaped = "".join(
+                "\\" + character if character == "\\" or character.isspace()
+                else character for character in search_path
+            )
+            connect_args["options"] = "-csearch_path=" + escaped
+        return connect_args
 
     # asyncpg accepts libpq-style ssl mode strings directly.
     sslmode = _config_text(config, "sslmode")
@@ -372,6 +392,10 @@ def configure_engine(
     """
     statements = _session_statements(config)
     driver = resolve_driver(config)
+    if (driver, engine.sync_engine.dialect.driver) in {
+        ("sqlserver", "aioodbc"), ("oracle", "oracledb"),
+    }:
+        _configure_async_native_creation(engine, driver)
     sqlite = driver == "sqlite"
     mysql_async = driver == "mysql" and engine.sync_engine.dialect.driver == "aiomysql"
     if not statements and not sqlite and not mysql_async:
@@ -429,6 +453,137 @@ def configure_engine(
                 cursor.execute(statement)
         finally:
             cursor.close()
+
+
+class _AsyncDBAPIClient(Protocol):
+    """Native async client whose close operation must settle after cancellation."""
+
+    async def close(self) -> None:
+        """
+        Release the underlying native database handle.
+
+        Returns
+        -------
+        None
+            Close the client and release its database resources.
+        """
+        ...
+
+
+class _AsyncNativeCreator:
+    """Collect a late native client before propagating caller cancellation."""
+
+    __slots__ = ("_creator",)
+
+    def __init__(
+        self, creator: Callable[..., Awaitable[_AsyncDBAPIClient]],
+    ) -> None:
+        """
+        Store the native database client factory.
+
+        Parameters
+        ----------
+        creator : Callable
+            Factory that asynchronously creates a native database client.
+
+        Returns
+        -------
+        None
+            Retain the factory for later connection attempts.
+        """
+        self._creator = creator
+
+    async def __call__(
+        self, *args: object, **kwargs: object,
+    ) -> _AsyncDBAPIClient:
+        """
+        Create a native client and collect it if cancellation arrives late.
+
+        Parameters
+        ----------
+        *args : object
+            Positional arguments passed to the native creator.
+        **kwargs : object
+            Keyword arguments passed to the native creator.
+
+        Returns
+        -------
+        _AsyncDBAPIClient
+            Created native database client.
+        """
+        async def close_late(client: _AsyncDBAPIClient) -> None:
+            """
+            Close a client created after its caller was cancelled.
+
+            Parameters
+            ----------
+            client : _AsyncDBAPIClient
+                Late result from the native creator.
+
+            Returns
+            -------
+            None
+                Release the late client's database handle.
+            """
+            await _wait_for_completion(create_task(client.close()))
+
+        return await _wait_for_completion(
+            ensure_future(self._creator(*args, **kwargs)),
+            on_cancel=close_late,
+        )
+
+
+def _configure_async_native_creation(engine: AsyncEngine, driver: str) -> None:
+    """
+    Protect native client creation while keeping pool waiters cancellable.
+
+    Parameters
+    ----------
+    engine : AsyncEngine
+        Engine whose native creator will be wrapped.
+    driver : str
+        Orionis driver name used to select the native creator.
+
+    Returns
+    -------
+    None
+        Register the native connection creation event listener.
+    """
+    @event.listens_for(engine.sync_engine, "do_connect")
+    def protect_native_creator(
+        dialect: Dialect,
+        _record: object,
+        _args: list[Any],
+        parameters: dict[str, Any],
+    ) -> None:
+        """
+        Wrap the dialect's native creator for cancellation-safe cleanup.
+
+        Parameters
+        ----------
+        dialect : Dialect
+            SQLAlchemy dialect creating the native connection.
+        _record : object
+            Pool record supplied by SQLAlchemy; unused.
+        _args : list of Any
+            Positional arguments supplied by the dialect; unused.
+        parameters : dict of str to Any
+            Connection parameters containing the native creator.
+
+        Returns
+        -------
+        None
+            Replace the creator with its cancellation-safe wrapper.
+        """
+        creator = parameters.get("async_creator_fn")
+        if not isinstance(creator, _AsyncNativeCreator):
+            if creator is None:
+                creator = (
+                    dialect.loaded_dbapi.aioodbc.connect
+                    if driver == "sqlserver"
+                    else dialect.loaded_dbapi.oracledb.connect_async
+                )
+            parameters["async_creator_fn"] = _AsyncNativeCreator(creator)
 
 def _session_statements(config: dict[str, Any]) -> tuple[str, ...]:
     """

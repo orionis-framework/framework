@@ -101,6 +101,20 @@ The package root exports `MCP_PROTOCOL_VERSION`, `McpConfig`, `McpRequest`, `Mcp
 
 `McpResponse.text()`, `image()`, `audio()`, `resource()`, `resourceLink()`, `structured()`, `error()`, and `progress()` create immutable values. `asAssistant()` and `asUser()` set prompt roles; `withMeta()`, `withContentMeta()`, and `withAnnotations()` return modified copies after validation.
 
+`McpResponse.resource(uri, value, mime_type=None)` accepts application data directly. Serialization belongs to the framework and uses `msgspec`; handlers do not need to call `json.dumps()` or encode MessagePack themselves. The same embedded resource can be returned from tools, resources, and prompts.
+
+| Content MIME type | MCP representation |
+|---|---|
+| `application/json` or `application/*+json` | UTF-8 JSON text in `TextResourceContents.text`. |
+| `application/msgpack`, `application/x-msgpack`, `application/vnd.msgpack`, or `application/*+msgpack` | MessagePack in `BlobResourceContents.blob`, encoded as Base64. |
+| Other MIME types | Only previously encoded text or bytes; structured data is rejected. |
+
+Without an explicit MIME type, structured data is serialized as `application/json`. Previously encoded JSON strings and binary buffers are preserved without double encoding; a string with a MessagePack MIME type is serialized as MessagePack data. Codec selection ignores case and parameters while preserving the declared response MIME type. `structured()` shares the JSON encoder and keeps its JSON `structuredContent` contract. Nonfinite numbers, non-string JSON keys, and other non-JSON values are rejected.
+
+When reading a `Resource`, its `mime_type` applies to responses from `structured()` and `text()`: a MessagePack resource converts the original structured value into a binary blob, not a string containing JSON. The handler can return `McpResponse.structured(data)` without repeating the MIME type or implementing the codec. Explicit embedded resources preserve their content and MIME type.
+
+The MIME type describes content, not transport: HTTP and STDIO JSON-RPC envelopes remain JSON even when they contain MessagePack data.
+
 ### Manager and facade
 
 `McpManager` provides `web`, `local`, `getWebServer`, `getLocalServer`, `servers`, `dispatchHttp`, `startLocal`, change notifications, and `shutdown`. Application code normally reaches the same singleton through `orionis.support.facades.Mcp`.
@@ -140,6 +154,11 @@ class UserResource(Resource):
         return McpResponse.structured({"id": user_id})
 
 
+class PackedUserResource(UserResource):
+    uri_template = "demo://packed-users/{user_id}"
+    mime_type = "application/msgpack"
+
+
 class ExplainPrompt(Prompt):
     arguments = (PromptArgument(name="topic", required=True),)
 
@@ -149,12 +168,12 @@ class ExplainPrompt(Prompt):
 
 class ContentServer(Server):
     name = "Content"
-    resources = (UserResource,)
+    resources = (UserResource, PackedUserResource)
     prompts = (ExplainPrompt,)
 
 
 compiled = compile_server(ContentServer)
-assert len(compiled.templates) == 1
+assert len(compiled.templates) == 2
 assert "explain" in compiled.prompts
 ```
 
@@ -163,6 +182,8 @@ Validation: **Executed successfully** on CPython 3.14.6.
 ### Compose protocol content
 
 ```python
+import base64
+import msgspec
 from orionis.mcp import ContentAnnotations, McpResponse
 
 response = (
@@ -175,6 +196,14 @@ response = (
 assert response.structured_content == {"status": "ok", "count": 2}
 assert response.meta["trace"] == "example"
 assert response.content[0].meta["source"] == "docs"
+
+data = {"status": "ok", "count": 2}
+json_resource = McpResponse.resource("demo://status", data, "application/json")
+packed_resource = McpResponse.resource("demo://status", data, "application/msgpack")
+
+assert msgspec.json.decode(json_resource.content[0].resource.text) == data
+packed = base64.b64decode(packed_resource.content[0].resource.blob, validate=True)
+assert msgspec.msgpack.decode(packed) == data
 ```
 
 Validation: **Executed successfully** on CPython 3.14.6.
@@ -309,7 +338,7 @@ Concurrency, request bytes, response bytes, metadata bytes, pagination, catalog 
 
 ## Verification notes
 
-- `tests/mcp`: **140 test methods passed** with the Orionis runner on CPython 3.14.6.
+- `tests/mcp`: **150 test methods passed** with the Orionis runner on CPython 3.14.6, including JSON/MessagePack serialization and tool, resource, and prompt dispatch.
 - Seven documentation programs were compiled; six standalone programs were executed successfully.
 - The facade registration program was import/syntax validated because it requires a booted application.
 - Documentation was checked against the public exports, compiler, dispatcher, transports, manager, configuration entity, metadata validators, console commands, and MCP testing client.

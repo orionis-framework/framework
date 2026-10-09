@@ -5,14 +5,13 @@ from orionis.mcp.protocol.content import (
     EmbeddedResource,
     PromptMessage,
     TextContent,
-    TextResourceContents,
 )
 from orionis.mcp.protocol.results import (
     CallToolResult,
     GetPromptResult,
     ReadResourceResult,
 )
-from orionis.mcp.responses import McpResponse, Progress
+from orionis.mcp.responses import McpResponse, Progress, mime_format
 from orionis.mcp.server.compiler import validate_output
 
 if TYPE_CHECKING:
@@ -150,12 +149,17 @@ def resource_result(
             if isinstance(part, EmbeddedResource):
                 contents.append(part.resource)
             elif isinstance(part, TextContent):
+                value = (
+                    item.structured_content
+                    if mime_format(primitive.mime_type) == "msgpack"
+                    and item.structured_content is not msgspec.UNSET
+                    else part.text
+                )
+                response = McpResponse.resource(
+                    cast("str", request.uri), value, primitive.mime_type,
+                )
                 contents.append(
-                    TextResourceContents(
-                        uri=cast("str", request.uri),
-                        text=part.text,
-                        mimeType=primitive.mime_type or msgspec.UNSET,
-                    ),
+                    cast("EmbeddedResource", response.content[0]).resource,
                 )
             else:
                 message = "resources/read requires text or blob contents"

@@ -20,6 +20,69 @@ from orionis.mcp.protocol.validation import validate_json
 if TYPE_CHECKING:
     from orionis.mcp.protocol.metadata import ContentAnnotations
 
+_JSON_MIME_TYPE = "application/json"
+_MSGPACK_MIME_TYPES = frozenset({
+    "application/msgpack", "application/x-msgpack", "application/vnd.msgpack",
+})
+
+def mime_format(mime_type: str | None) -> Literal["json", "msgpack"] | None:
+    """
+    Select a structured content codec without changing the declared MIME type.
+
+    Parameters
+    ----------
+    mime_type : str | None
+        Media type, optionally containing parameters or a structured suffix.
+
+    Returns
+    -------
+    Literal["json", "msgpack"] | None
+        Supported codec, JSON by default, or None for another media type.
+    """
+    if mime_type is None:
+        return "json"
+    media_type = mime_type.partition(";")[0].strip().lower()
+    if media_type == _JSON_MIME_TYPE or (
+        media_type.startswith("application/") and media_type.endswith("+json")
+    ):
+        return "json"
+    if media_type in _MSGPACK_MIME_TYPES or (
+        media_type.startswith("application/") and media_type.endswith("+msgpack")
+    ):
+        return "msgpack"
+    return None
+
+def _encode_payload(
+    value: object, payload_format: Literal["json", "msgpack"] | None,
+) -> bytes:
+    """
+    Serialize application data with the selected native msgspec codec.
+
+    Parameters
+    ----------
+    value : object
+        Application data to serialize without modifying the original value.
+    payload_format : Literal["json", "msgpack"] | None
+        Codec selected from the response MIME type.
+
+    Returns
+    -------
+    bytes
+        Encoded JSON or MessagePack content.
+
+    Raises
+    ------
+    ValueError
+        If JSON data is invalid or the MIME type has no structured codec.
+    """
+    if payload_format == "json":
+        validate_json(value)
+        return msgspec.json.encode(value)
+    if payload_format == "msgpack":
+        return msgspec.msgpack.encode(value)
+    message = "Structured MCP data requires a JSON or MessagePack MIME type"
+    raise ValueError(message)
+
 @dataclass(frozen=True, slots=True)
 class Progress:
     """A request-scoped progress update awaiting a client-provided token."""
@@ -113,33 +176,45 @@ class McpResponse:
     def resource(
         cls,
         uri: str,
-        value: str | bytes,
+        value: object,
         mime_type: str | None = None,
     ) -> Self:
         """
-        Embed text or binary resource content at an explicit URI.
+        Serialize and embed resource content according to its MIME type.
 
         Parameters
         ----------
         uri : str
             Value supplied for ``uri``.
-        value : str | bytes
-            Value to inspect, transform or validate.
+        value : object
+            Structured JSON or MessagePack data, or already encoded content.
+            JSON strings and binary buffers are retained without re-encoding.
         mime_type : str | None
-            Value supplied for ``mime_type``.
+            Declared media type. Structured data defaults to application/json;
+            MessagePack is emitted as Base64 binary resource content.
 
         Returns
         -------
         Self
-            Result of the operation described above.
+            Embedded content usable by tools, resources and prompts.
         """
+        payload_format = mime_format(mime_type)
         mime = mime_type if mime_type is not None else msgspec.UNSET
+        if isinstance(value, (bytes, bytearray, memoryview)):
+            data = bytes(value)
+        elif isinstance(value, str) and payload_format != "msgpack":
+            data = value
+        else:
+            encoded = _encode_payload(value, payload_format)
+            data = encoded.decode("utf-8") if payload_format == "json" else encoded
+            if mime_type is None:
+                mime = _JSON_MIME_TYPE
         contents = (
-            TextResourceContents(uri=uri, text=value, mimeType=mime)
-            if isinstance(value, str)
+            TextResourceContents(uri=uri, text=data, mimeType=mime)
+            if isinstance(data, str)
             else BlobResourceContents(
                 uri=uri,
-                blob=base64.b64encode(value).decode("ascii"),
+                blob=base64.b64encode(data).decode("ascii"),
                 mimeType=mime,
             )
         )
@@ -205,8 +280,7 @@ class McpResponse:
         Self
             Any JSON value and the recommended serialized text content.
         """
-        validate_json(value)
-        encoded = msgspec.json.encode(value)
+        encoded = _encode_payload(value, "json")
         return cls(
             content=(TextContent(text=encoded.decode("utf-8")),),
             structured_content=msgspec.json.decode(encoded),

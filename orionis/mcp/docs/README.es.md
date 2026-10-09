@@ -101,6 +101,20 @@ La raíz del paquete exporta `MCP_PROTOCOL_VERSION`, `McpConfig`, `McpRequest`, 
 
 `McpResponse.text()`, `image()`, `audio()`, `resource()`, `resourceLink()`, `structured()`, `error()` y `progress()` crean valores inmutables. `asAssistant()` y `asUser()` fijan roles; `withMeta()`, `withContentMeta()` y `withAnnotations()` devuelven copias modificadas tras validar.
 
+`McpResponse.resource(uri, value, mime_type=None)` acepta los datos de la aplicación directamente. La serialización pertenece al framework y usa `msgspec`; no es necesario llamar a `json.dumps()` ni codificar MessagePack en el manejador. El mismo recurso embebido puede devolverse desde herramientas, recursos y prompts.
+
+| MIME del contenido | Representación MCP |
+|---|---|
+| `application/json` o `application/*+json` | Texto JSON UTF-8 en `TextResourceContents.text`. |
+| `application/msgpack`, `application/x-msgpack`, `application/vnd.msgpack` o `application/*+msgpack` | MessagePack en `BlobResourceContents.blob`, codificado en Base64. |
+| Otros tipos MIME | Solo contenido previamente codificado como texto o bytes; los datos estructurados se rechazan. |
+
+Sin MIME explícito, los datos estructurados se serializan como `application/json`. Los strings JSON ya codificados y los buffers binarios se conservan sin doble codificación; un string con MIME MessagePack se serializa como dato MessagePack. La selección del códec ignora mayúsculas y parámetros, pero conserva el MIME declarado en la respuesta. `structured()` comparte el codificador JSON y mantiene su contrato de `structuredContent` JSON. Se rechazan números no finitos, claves JSON que no sean strings y otros valores no JSON.
+
+Al leer un `Resource`, su `mime_type` se aplica a las respuestas de `structured()` y `text()`: un recurso MessagePack convierte el valor estructurado original en un blob binario, no en un string que contenga JSON. El manejador puede devolver `McpResponse.structured(data)` sin repetir el MIME ni implementar el códec. Los recursos embebidos explícitos conservan su contenido y MIME.
+
+El MIME describe el contenido, no el transporte: los sobres JSON-RPC de HTTP y STDIO siguen siendo JSON incluso cuando contienen datos MessagePack.
+
 ### Manager y fachada
 
 `McpManager` ofrece `web`, `local`, `getWebServer`, `getLocalServer`, `servers`, `dispatchHttp`, `startLocal`, notificaciones de cambio y `shutdown`. El código de aplicación normalmente accede al mismo singleton mediante `orionis.support.facades.Mcp`.
@@ -140,6 +154,11 @@ class UserResource(Resource):
         return McpResponse.structured({"id": user_id})
 
 
+class PackedUserResource(UserResource):
+    uri_template = "demo://packed-users/{user_id}"
+    mime_type = "application/msgpack"
+
+
 class ExplainPrompt(Prompt):
     arguments = (PromptArgument(name="topic", required=True),)
 
@@ -149,12 +168,12 @@ class ExplainPrompt(Prompt):
 
 class ContentServer(Server):
     name = "Content"
-    resources = (UserResource,)
+    resources = (UserResource, PackedUserResource)
     prompts = (ExplainPrompt,)
 
 
 compiled = compile_server(ContentServer)
-assert len(compiled.templates) == 1
+assert len(compiled.templates) == 2
 assert "explain" in compiled.prompts
 ```
 
@@ -163,6 +182,8 @@ Validación: **Ejecutado correctamente** en CPython 3.14.6.
 ### Componer contenido de protocolo
 
 ```python
+import base64
+import msgspec
 from orionis.mcp import ContentAnnotations, McpResponse
 
 response = (
@@ -175,6 +196,14 @@ response = (
 assert response.structured_content == {"status": "ok", "count": 2}
 assert response.meta["trace"] == "example"
 assert response.content[0].meta["source"] == "docs"
+
+data = {"status": "ok", "count": 2}
+json_resource = McpResponse.resource("demo://status", data, "application/json")
+packed_resource = McpResponse.resource("demo://status", data, "application/msgpack")
+
+assert msgspec.json.decode(json_resource.content[0].resource.text) == data
+packed = base64.b64decode(packed_resource.content[0].resource.blob, validate=True)
+assert msgspec.msgpack.decode(packed) == data
 ```
 
 Validación: **Ejecutado correctamente** en CPython 3.14.6.
@@ -309,7 +338,7 @@ Concurrencia, bytes de solicitud/respuesta/metadatos, paginación, llamadas de c
 
 ## Notas de verificación
 
-- `tests/mcp`: **140 métodos de prueba aprobados** con el runner de Orionis en CPython 3.14.6.
+- `tests/mcp`: **150 métodos de prueba aprobados** con el runner de Orionis en CPython 3.14.6; incluye serialización JSON/MessagePack y despacho de herramientas, recursos y prompts.
 - Se compilaron siete programas de documentación; seis programas autónomos se ejecutaron correctamente.
 - El programa de registro por fachada se validó por importación/sintaxis porque requiere una aplicación iniciada.
 - La documentación se contrastó con exports públicos, compilador, dispatcher, transportes, manager, configuración, validadores de metadatos, comandos de consola y cliente de pruebas MCP.

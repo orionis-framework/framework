@@ -8,7 +8,7 @@ class FactoryDefinitionException(FactoryException):
     """Report an absent definition or invalid generated attributes."""
 
 class FactoryDependencyException(FactoryException):
-    """Report an unavailable optional data provider."""
+    """Retain the legacy dependency exception for public API compatibility."""
 
 class FactoryPersistenceException(FactoryException):
     """Report a model event vetoing persistence."""

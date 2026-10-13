@@ -13,7 +13,7 @@ Model persistence and query terminals are asynchronous. Definition, attribute ma
 - Python 3.14 or newer.
 - A configured and booted `orionis.database` connection manager before executing queries.
 - Database tables matching the model definitions, normally managed by migrations.
-- `faker` support included by Orionis when using model factories.
+- `faker` is installed with Orionis; model factories require no extra.
 
 ## Quick start
 

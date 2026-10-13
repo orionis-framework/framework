@@ -2,7 +2,7 @@ import os
 import sys
 from importlib import import_module
 from pathlib import Path
-from orionis.aio import Loop
+from orionis.console.startup import startup_feedback
 from orionis.console.stdio import protocol_stdio
 
 def main() -> int:
@@ -29,6 +29,8 @@ def main() -> int:
     sys.path.insert(0, str(Path.cwd()))
     arguments = ["reactor", *sys.argv[1:]]
 
-    with protocol_stdio(arguments):
+    with startup_feedback(arguments), protocol_stdio(arguments):
+        from orionis.aio import Loop  # noqa: PLC0415
+
         application = import_module("bootstrap.app").app
         return Loop.run(application.handleCommand(arguments))

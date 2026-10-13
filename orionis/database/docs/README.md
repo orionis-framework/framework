@@ -13,6 +13,7 @@ This module is Orionis's database runtime beneath the query builder and ORM. `Co
 - Python 3.14 or newer.
 - `sqlalchemy[asyncio]>=2.0.54,<3.0` and `aiosqlite>=0.22.1`, installed by Orionis.
 - Driver extras for other databases: `orionis[mysql]`, `orionis[pgsql]`, `orionis[oracle]`, `orionis[sqlserver]`, or `orionis[redshift]`.
+- PostgreSQL drivers (`asyncpg` and `psycopg2-binary`) are optional: install `orionis[pgsql]`, or `orionis[database]` for all database drivers. The base installation works with SQLite; a missing driver is reported when its backend is first used.
 - A reachable server and credentials for server databases; SQLite can use a file or `:memory:`.
 - Migration and seeder directories are resolved relative to the application base path.
 

@@ -1,4 +1,4 @@
-from uri_template import URITemplate
+from uritemplate import URITemplate
 from orionis.mcp.server.primitives import Resource
 from orionis.mcp.server.templates import UriMatcher
 from orionis.test import TestCase
@@ -42,6 +42,96 @@ def _inverse(variables: dict[str, object]) -> staticmethod:
 
 class TestTemplates(TestCase):
     """Use automatic matching only where inverse semantics are unambiguous."""
+
+    def testRfcExpansionHasIndependentExpectedUris(self) -> None:
+        """Check encoding, operators and absent values against fixed URI fixtures.
+
+        Returns
+        -------
+        None
+            Expansion and inverse verification preserve the declared URI contract.
+        """
+        cases = (
+            ("{name}", {"name": "café /?#+%"},
+             "caf%C3%A9%20%2F%3F%23%2B%25"),
+            ("{+path}", {"path": "a/b?x=1#part"}, "a/b?x=1#part"),
+            ("{#name}", {"name": "a b"}, "#a%20b"),
+            ("{name:2}", {"name": "é猫tail"}, "%C3%A9%E7%8C%AB"),
+            ("{name:9999}", {"name": "value"}, "value"),
+            ("{/items*}", {"items": ["a/b", "c d"]}, "/a%2Fb/c%20d"),
+            ("{?keys*}", {"keys": {"a&b": "x=y", "empty": ""}},
+             "?a%26b=x%3Dy&empty="),
+            ("{;name,empty,missing}", {"name": "a/b", "empty": ""},
+             ";name=a%2Fb;empty"),
+            ("{?missing,empty,nil,items}{&flag}",
+             {"empty": "", "nil": None, "items": [], "flag": True},
+             "?empty=&flag=true"),
+            ("{?missing}", {}, ""),
+            ("{?flag,zero}", {"flag": False, "zero": 0}, "?flag=false&zero=0"),
+            ("{var_dict}", {"var_dict": "value"}, "value"),
+            ("{?keys*}", {"keys": {"z": "last", "a": "first"}},
+             "?z=last&a=first"),
+            ("{?items*}", {"items": (True, False, 0)},
+             "?items=true&items=false&items=0"),
+            ("café/{name}", {"name": "é"}, "caf%C3%A9/%C3%A9"),
+            ("{x.y}/{percent%20name}",
+             {"x.y": "a", "percent%20name": "b"}, "a/b"),
+        )
+        for expression, values, expected in cases:
+            with self.subTest(expression=expression):
+                definition = type("Fixture", (Resource,), {
+                    "uri_template": "demo://root/" + expression,
+                    "match": _inverse(values),
+                })
+                matcher = UriMatcher.compile(definition)
+                uri = "demo://root/" + expected
+                self.assertEqual(matcher.match(uri), values)
+
+    def testSimpleCapturesPreserveUtf8AndLiteralPercentSigns(self) -> None:
+        """Decode exactly once and accept either hexadecimal escape case.
+
+        Returns
+        -------
+        None
+            Encoded separators stay inside the variable and UTF-8 remains strict.
+        """
+        definition = type("Encoded", (Resource,), {
+            "uri_template": "demo://root/{name}",
+        })
+        matcher = UriMatcher.compile(definition)
+        self.assertEqual(matcher.match("demo://root/caf%c3%a9%2f%252F"), {
+            "name": "café/%2F",
+        })
+        self.assertEqual(matcher.match("demo://root/"), {"name": ""})
+        unicode_literal = type("UnicodeLiteral", (Resource,), {
+            "uri_template": "demo://café/{name}",
+        })
+        self.assertEqual(
+            UriMatcher.compile(unicode_literal).match("demo://caf%C3%A9/%E7%8C%AB"),
+            {"name": "猫"},
+        )
+        for uri in ("demo://root/%", "demo://root/%GG", "demo://root/%FF"):
+            with self.subTest(uri=uri), self.assertRaises(ValueError):
+                matcher.match(uri)
+
+    def testPrefixRejectsCompositeValues(self) -> None:
+        """Reject prefix modifiers applied to a list instead of a string.
+
+        Returns
+        -------
+        None
+            Invalid inverse values cannot pass URI verification silently.
+        """
+        for value in (["first", "second"], {"first": "second"}):
+            definition = type("CompositePrefix", (Resource,), {
+                "uri_template": "demo://root/{items:2}",
+                "match": _inverse({"items": value}),
+            })
+            with (
+                self.subTest(value=value),
+                self.assertRaisesRegex(ValueError, "prefix"),
+            ):
+                UriMatcher.compile(definition).match("demo://root/fi")
 
     def testSimpleStringMatchingAndRepeatedNames(self) -> None:
         """Decode percent escapes while preserving repeated-variable identity.
@@ -124,7 +214,7 @@ class TestTemplates(TestCase):
                 UriMatcher.compile(definition)
 
     def testRejectNonRfcExtensions(self) -> None:
-        """Reject the expansion dependency's draft extensions.
+        """Reject malformed syntax and nonstandard URI template extensions.
 
         Returns
         -------
@@ -136,6 +226,12 @@ class TestTemplates(TestCase):
             "{?name/key}",
             "{value:0000}",
             "{,value}",
+            "{value[]}",
+            "{value:10000}",
+            "{value:2*}",
+            "{value",
+            "value}",
+            "{}",
         ):
             definition = type(
                 "Invalid",

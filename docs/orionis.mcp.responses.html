@@ -237,14 +237,60 @@
     </li>
 </ul>
 
+        <div class="childrenKindTitle">Functions</div>
+        <ul>
+    
+    <li class="">
         
-         
+        
+        
+
+        
+            <div class="itemName"><code><a href="#_encode_payload" class="internal-link" title="orionis.mcp.responses._encode_payload">_encode<wbr></wbr>_payload</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#mime_format" class="internal-link" title="orionis.mcp.responses.mime_format">mime<wbr></wbr>_format</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
 
         
          
 
+        <div class="childrenKindTitle">Variables</div>
+        <ul>
+    
+    <li class="">
         
-         
+        
+        
+
+        
+            <div class="itemName"><code><a href="#_JSON_MIME_TYPE" class="internal-link" title="orionis.mcp.responses._JSON_MIME_TYPE">_JSON<wbr></wbr>_MIME<wbr></wbr>_TYPE</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#_MSGPACK_MIME_TYPES" class="internal-link" title="orionis.mcp.responses._MSGPACK_MIME_TYPES">_MSGPACK<wbr></wbr>_MIME<wbr></wbr>_TYPES</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
 
         
          
@@ -1217,14 +1263,60 @@
     </li>
 </ul>
 
+        <div class="childrenKindTitle">Functions</div>
+        <ul>
+    
+    <li class="">
         
-         
+        
+        
+
+        
+            <div class="itemName"><code><a href="#_encode_payload" class="internal-link" title="orionis.mcp.responses._encode_payload">_encode<wbr></wbr>_payload</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#mime_format" class="internal-link" title="orionis.mcp.responses.mime_format">mime<wbr></wbr>_format</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
 
         
          
 
+        <div class="childrenKindTitle">Variables</div>
+        <ul>
+    
+    <li class="">
         
-         
+        
+        
+
+        
+            <div class="itemName"><code><a href="#_JSON_MIME_TYPE" class="internal-link" title="orionis.mcp.responses._JSON_MIME_TYPE">_JSON<wbr></wbr>_MIME<wbr></wbr>_TYPE</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#_MSGPACK_MIME_TYPES" class="internal-link" title="orionis.mcp.responses._MSGPACK_MIME_TYPES">_MSGPACK<wbr></wbr>_MIME<wbr></wbr>_TYPES</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
 
         
          
@@ -3741,7 +3833,7 @@
         </div>
 
         <div class="extrasDocstring">
-          <a href="https://github.com/orionis-framework/framework/tree/ee2023955df56107e76691f6efe34837a7c24529/orionis/mcp/responses.py" class="sourceLink">(source)</a>
+          <a href="https://github.com/orionis-framework/framework/tree/f01609be6102dd80f8020830e6bea8c2a1f36a46/orionis/mcp/responses.py" class="sourceLink">(source)</a>
         </div>
 
         <div class="moduleDocstring">
@@ -3757,6 +3849,26 @@
     <td>Class</td>
     <td><code><a href="orionis.mcp.responses.Progress.html" class="internal-link" title="orionis.mcp.responses.Progress"><wbr></wbr>Progress</a></code></td>
     <td>A request-scoped progress update awaiting a client-provided token.</td>
+  </tr><tr class="function">
+    
+    <td>Function</td>
+    <td><code><a href="#_encode_payload" class="internal-link" title="orionis.mcp.responses._encode_payload">_encode<wbr></wbr>_payload</a></code></td>
+    <td>Serialize application data with the selected native msgspec codec.</td>
+  </tr><tr class="function">
+    
+    <td>Function</td>
+    <td><code><a href="#mime_format" class="internal-link" title="orionis.mcp.responses.mime_format">mime<wbr></wbr>_format</a></code></td>
+    <td>Select a structured content codec without changing the declared MIME type.</td>
+  </tr><tr class="constant">
+    
+    <td>Constant</td>
+    <td><code><a href="#_JSON_MIME_TYPE" class="internal-link" title="orionis.mcp.responses._JSON_MIME_TYPE">_JSON<wbr></wbr>_MIME<wbr></wbr>_TYPE</a></code></td>
+    <td><span class="rst-undocumented">Undocumented</span></td>
+  </tr><tr class="constant">
+    
+    <td>Constant</td>
+    <td><code><a href="#_MSGPACK_MIME_TYPES" class="internal-link" title="orionis.mcp.responses._MSGPACK_MIME_TYPES">_MSGPACK<wbr></wbr>_MIME<wbr></wbr>_TYPES</a></code></td>
+    <td><span class="rst-undocumented">Undocumented</span></td>
   </tr>
 </table>
           
@@ -3765,7 +3877,117 @@
         </div>
 
         <div id="child-list">
-          
+          <div class="basefunction">
+  
+  
+  <a name="orionis.mcp.responses._encode_payload">
+    
+  </a>
+  <a name="_encode_payload">
+    
+  </a>
+  <div class="functionHeader">
+    
+    
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">_encode_payload</span><span class="function-signature long-signature">(<span class="rst-sig-param">value: <code><a href="https://docs.python.org/3/builtins/functions.html#object" class="intersphinx-link">object</a></code>, </span><span class="rst-sig-param">payload_format: <code><a href="https://docs.python.org/3/library/typing.html#typing.Literal" class="intersphinx-link">Literal</a>[<wbr></wbr><span class="rst-variable-quote">'</span><span class="rst-variable-string">json</span><span class="rst-variable-quote">'</span>, <wbr></wbr><span class="rst-variable-quote">'</span><span class="rst-variable-string">msgpack</span><span class="rst-variable-quote">'</span>] | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/stdtypes.html#bytes" class="intersphinx-link">bytes</a></code>:</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f01609be6102dd80f8020830e6bea8c2a1f36a46/orionis/mcp/responses.py#L55">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#_encode_payload" title="orionis.mcp.responses._encode_payload">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    
+    <div><p>Serialize application data with the selected native msgspec codec.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">value:</span><code><a href="https://docs.python.org/3/builtins/functions.html#object" class="intersphinx-link">object</a></code></td><td class="fieldArgDesc">Application data to serialize without modifying the original value.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">payload<wbr></wbr>_format:</span><code><a href="https://docs.python.org/3/library/typing.html#typing.Literal" class="intersphinx-link">Literal</a>[<span class="rst-variable-string">"json"</span>, <span class="rst-variable-string">"msgpack"</span>] | None</code></td><td class="fieldArgDesc">Codec selected from the response MIME type.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/stdtypes.html#bytes" class="intersphinx-link">bytes</a></code></td><td class="fieldArgDesc">Encoded JSON or MessagePack content.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/exceptions.html#ValueError" class="intersphinx-link">ValueError</a></code></td><td>If JSON data is invalid or the MIME type has no structured codec.</td></tr></table></div>
+  </div>
+</div><div class="basefunction">
+  
+  
+  <a name="orionis.mcp.responses.mime_format">
+    
+  </a>
+  <a name="mime_format">
+    
+  </a>
+  <div class="functionHeader">
+    
+    
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">mime_format</span><span class="function-signature">(<span class="rst-sig-param">mime_type: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a> | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></span>) -&gt; <code><a href="https://docs.python.org/3/library/typing.html#typing.Literal" class="intersphinx-link">Literal</a>[<wbr></wbr><span class="rst-variable-quote">'</span><span class="rst-variable-string">json</span><span class="rst-variable-quote">'</span>, <wbr></wbr><span class="rst-variable-quote">'</span><span class="rst-variable-string">msgpack</span><span class="rst-variable-quote">'</span>] | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code>:</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f01609be6102dd80f8020830e6bea8c2a1f36a46/orionis/mcp/responses.py#L28">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#mime_format" title="orionis.mcp.responses.mime_format">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    
+    <div><p>Select a structured content codec without changing the declared MIME type.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">mime<wbr></wbr>_type:</span><code>str | None</code></td><td class="fieldArgDesc">Media type, optionally containing parameters or a structured suffix.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/library/typing.html#typing.Literal" class="intersphinx-link">Literal</a>[<span class="rst-variable-string">"json"</span>, <span class="rst-variable-string">"msgpack"</span>] | None</code></td><td class="fieldArgDesc">Supported codec, JSON by default, or None for another media type.</td></tr></table></div>
+  </div>
+</div><div class="baseconstant">
+  
+  
+  <a name="orionis.mcp.responses._JSON_MIME_TYPE">
+    
+  </a>
+  <a name="_JSON_MIME_TYPE">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <span class="py-defname">_JSON_MIME_TYPE</span>: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code> =
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f01609be6102dd80f8020830e6bea8c2a1f36a46/orionis/mcp/responses.py#L23">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#_JSON_MIME_TYPE" title="orionis.mcp.responses._JSON_MIME_TYPE">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="functionBody">
+    
+    <div><p class="undocumented">Undocumented</p></div>
+    <table class="valueTable"><tr class="fieldStart"><td class="fieldName">Value</td></tr><tr><td><pre class="constant-value"><code><span class="rst-variable-quote">'</span><span class="rst-variable-string">application/json</span><span class="rst-variable-quote">'</span></code></pre></td></tr></table>
+  </div>
+</div><div class="baseconstant">
+  
+  
+  <a name="orionis.mcp.responses._MSGPACK_MIME_TYPES">
+    
+  </a>
+  <a name="_MSGPACK_MIME_TYPES">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <span class="py-defname">_MSGPACK_MIME_TYPES</span> =
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f01609be6102dd80f8020830e6bea8c2a1f36a46/orionis/mcp/responses.py#L24">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#_MSGPACK_MIME_TYPES" title="orionis.mcp.responses._MSGPACK_MIME_TYPES">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="functionBody">
+    
+    <div><p class="undocumented">Undocumented</p></div>
+    <table class="valueTable"><tr class="fieldStart"><td class="fieldName">Value</td></tr><tr><td><pre class="constant-value"><code><a href="https://docs.python.org/3/builtins/stdtypes.html#frozenset" class="intersphinx-link">frozenset</a>(<wbr></wbr>set([<wbr></wbr><span class="rst-variable-quote">'</span><span class="rst-variable-string">application/msgpack</span><span class="rst-variable-quote">'</span>,
+               <wbr></wbr><span class="rst-variable-quote">'</span><span class="rst-variable-string">application/x-msgpack</span><span class="rst-variable-quote">'</span>,
+               <wbr></wbr><span class="rst-variable-quote">'</span><span class="rst-variable-string">application/vnd.msgpack</span><span class="rst-variable-quote">'</span>]))</code></pre></td></tr></table>
+  </div>
+</div>
         </div>
       
       </main>
@@ -3776,7 +3998,7 @@
   <div class="orionis-footer-inner">
     <div class="orionis-footer-copy">
       <p>API documentation for <a href="https://orionis-framework.com/" class="projecthome">Orionis</a>.</p>
-      <p class="orionis-footer-meta">Generated with <a href="https://github.com/twisted/pydoctor/">Pydoctor</a> 25.10.1.<span class="orionis-footer-build"> Built 2026-10-08 10:16:09.</span></p>
+      <p class="orionis-footer-meta">Generated with <a href="https://github.com/twisted/pydoctor/">Pydoctor</a> 25.10.1.<span class="orionis-footer-build"> Built 2026-10-13 10:10:54.</span></p>
     </div>
     <nav class="orionis-footer-links" aria-label="Additional resources">
       <a href="https://docs.orionis-framework.com">Read the guide <span aria-hidden="true">↗</span></a>

@@ -6083,7 +6083,7 @@
             <div class="type">Module</div>
             <div class="kind">Module</div>
             <div class="privacy">PUBLIC</div>
-            <div class="summary"><span class="rst-undocumented">No module docstring; 1/1 class documented</span></div>
+            <div class="summary"><span class="rst-undocumented">No module docstring; 0/2 constant, 2/2 functions, 1/1 class documented</span></div>
           </li><li id="orionis.mcp.routing">
             
             <div class="fullName">orionis<wbr></wbr>.mcp<wbr></wbr>.routing</div>
@@ -6147,7 +6147,7 @@
             <div class="type">Module</div>
             <div class="kind">Module</div>
             <div class="privacy">PUBLIC</div>
-            <div class="summary"><span class="rst-undocumented">No module docstring; 0/8 constant, 5/5 functions, 1/1 class documented</span></div>
+            <div class="summary"><span class="rst-undocumented">No module docstring; 0/8 constant, 6/6 functions, 1/1 class documented</span></div>
           </li><li id="orionis.mcp.state">
             
             <div class="fullName">orionis<wbr></wbr>.mcp<wbr></wbr>.state</div>
@@ -38307,7 +38307,7 @@
             <div class="type">Function</div>
             <div class="kind">Function</div>
             <div class="privacy">PUBLIC</div>
-            <div class="summary">Accept RFC 6570 syntax while excluding the dependency's draft extensions.</div>
+            <div class="summary">Require RFC 6570 syntax before compiling a resource template.</div>
           </li><li id="orionis.mcp.server.templates._simple_pattern">
             
             <div class="fullName">orionis<wbr></wbr>.mcp<wbr></wbr>.server<wbr></wbr>.templates<wbr></wbr>._simple<wbr></wbr>_pattern</div>
@@ -38316,6 +38316,14 @@
             <div class="kind">Function</div>
             <div class="privacy">PUBLIC</div>
             <div class="summary">Compile safe simple-string inverses; other expressions need a match hook.</div>
+          </li><li id="orionis.mcp.server.templates._expansion_value">
+            
+            <div class="fullName">orionis<wbr></wbr>.mcp<wbr></wbr>.server<wbr></wbr>.templates<wbr></wbr>._expansion<wbr></wbr>_value</div>
+            <div class="url">orionis.mcp.server.templates.html#_expansion_value</div>
+            <div class="type">Function</div>
+            <div class="kind">Function</div>
+            <div class="privacy">PUBLIC</div>
+            <div class="summary">Preserve Orionis scalar formatting and mapping order during RFC expansion.</div>
           </li><li id="orionis.mcp.server.templates.UriMatcher">
             
             <div class="fullName">orionis<wbr></wbr>.mcp<wbr></wbr>.server<wbr></wbr>.templates<wbr></wbr>.<wbr></wbr>Uri<wbr></wbr>Matcher</div>
@@ -76468,6 +76476,38 @@
             <div class="kind">Function</div>
             <div class="privacy">PUBLIC</div>
             <div class="summary">Validate a prompt role and its single content block.</div>
+          </li><li id="orionis.mcp.responses._JSON_MIME_TYPE">
+            
+            <div class="fullName">orionis<wbr></wbr>.mcp<wbr></wbr>.responses<wbr></wbr>._JSON<wbr></wbr>_MIME<wbr></wbr>_TYPE</div>
+            <div class="url">orionis.mcp.responses.html#_JSON_MIME_TYPE</div>
+            <div class="type">Attribute</div>
+            <div class="kind">Constant</div>
+            <div class="privacy">PUBLIC</div>
+            <div class="summary"><span class="rst-undocumented">Undocumented</span></div>
+          </li><li id="orionis.mcp.responses._MSGPACK_MIME_TYPES">
+            
+            <div class="fullName">orionis<wbr></wbr>.mcp<wbr></wbr>.responses<wbr></wbr>._MSGPACK<wbr></wbr>_MIME<wbr></wbr>_TYPES</div>
+            <div class="url">orionis.mcp.responses.html#_MSGPACK_MIME_TYPES</div>
+            <div class="type">Attribute</div>
+            <div class="kind">Constant</div>
+            <div class="privacy">PUBLIC</div>
+            <div class="summary"><span class="rst-undocumented">Undocumented</span></div>
+          </li><li id="orionis.mcp.responses.mime_format">
+            
+            <div class="fullName">orionis<wbr></wbr>.mcp<wbr></wbr>.responses<wbr></wbr>.mime<wbr></wbr>_format</div>
+            <div class="url">orionis.mcp.responses.html#mime_format</div>
+            <div class="type">Function</div>
+            <div class="kind">Function</div>
+            <div class="privacy">PUBLIC</div>
+            <div class="summary">Select a structured content codec without changing the declared MIME type.</div>
+          </li><li id="orionis.mcp.responses._encode_payload">
+            
+            <div class="fullName">orionis<wbr></wbr>.mcp<wbr></wbr>.responses<wbr></wbr>._encode<wbr></wbr>_payload</div>
+            <div class="url">orionis.mcp.responses.html#_encode_payload</div>
+            <div class="type">Function</div>
+            <div class="kind">Function</div>
+            <div class="privacy">PUBLIC</div>
+            <div class="summary">Serialize application data with the selected native msgspec codec.</div>
           </li><li id="orionis.mcp.responses.Progress">
             
             <div class="fullName">orionis<wbr></wbr>.mcp<wbr></wbr>.responses<wbr></wbr>.<wbr></wbr>Progress</div>
@@ -76579,7 +76619,7 @@
             <div class="type">Function</div>
             <div class="kind">Class Method</div>
             <div class="privacy">PUBLIC</div>
-            <div class="summary">Embed text or binary resource content at an explicit URI.</div>
+            <div class="summary">Serialize and embed resource content according to its MIME type.</div>
           </li><li id="orionis.mcp.McpResponse.resourceLink">
             
             <div class="fullName">orionis<wbr></wbr>.mcp<wbr></wbr>.<wbr></wbr>Mcp<wbr></wbr>Response<wbr></wbr>.resource<wbr></wbr>Link</div>
@@ -81075,7 +81115,7 @@
             <div class="type">Class</div>
             <div class="kind">Exception</div>
             <div class="privacy">PUBLIC</div>
-            <div class="summary">Report an unavailable optional data provider.</div>
+            <div class="summary">Retain the legacy dependency exception for public API compatibility.</div>
           </li><li id="orionis.orm.factories.FactoryException">
             
             <div class="fullName">orionis<wbr></wbr>.orm<wbr></wbr>.factories<wbr></wbr>.<wbr></wbr>Factory<wbr></wbr>Exception</div>
@@ -81267,7 +81307,7 @@
             <div class="type">Function</div>
             <div class="kind">Function</div>
             <div class="privacy">PUBLIC</div>
-            <div class="summary">Create the optional provider with an independent random generator.</div>
+            <div class="summary">Create the data provider with an independent random generator.</div>
           </li><li id="orionis.orm.factories.Factory">
             
             <div class="fullName">orionis<wbr></wbr>.orm<wbr></wbr>.factories<wbr></wbr>.<wbr></wbr>Factory</div>

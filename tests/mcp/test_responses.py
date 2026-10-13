@@ -1,4 +1,9 @@
 import base64
+from dataclasses import dataclass
+from datetime import datetime
+from decimal import Decimal
+from enum import Enum
+from uuid import UUID
 import msgspec
 from orionis.container.container import Container
 from orionis.mcp.protocol.metadata import ContentAnnotations
@@ -10,6 +15,33 @@ from orionis.schemas import Schema
 from orionis.test import TestCase
 
 _SERIALIZED_DATA = {"name": "Caf\u00e9", "values": [1, None, False]}
+
+class _Status(Enum):
+    READY = "ready"
+
+class _NativePayload(Schema, omit_defaults=True):
+    display_name: str = msgspec.field(name="name")
+    created_at: datetime
+    amount: Decimal
+    identifier: UUID
+    status: _Status = _Status.READY
+
+@dataclass
+class _NativeEnvelope:
+    payload: _NativePayload
+
+_NATIVE_DATA = _NativePayload(
+    display_name="demo",
+    created_at=datetime(2026, 10, 13, 16, 21),
+    amount=Decimal("12.50"),
+    identifier=UUID("12345678-1234-5678-1234-567812345678"),
+)
+_NATIVE_JSON = {
+    "name": "demo",
+    "created_at": "2026-10-13T16:21:00",
+    "amount": "12.50",
+    "identifier": "12345678-1234-5678-1234-567812345678",
+}
 
 class _SerializationInput(Schema):
     mime_type: str
@@ -113,6 +145,34 @@ class _SerializationServer(Server):
     )
     prompts = (_SerializationPrompt,)
 
+class _NativeTool(Tool[_SerializationInput, _NativePayload]):
+    name = "native-data"
+
+    def handle(self) -> McpResponse:
+        """Return a native Schema without application-side conversion."""
+        return McpResponse.structured(_NATIVE_DATA)
+
+class _NativeResource(Resource):
+    uri = "demo://native"
+    mime_type = "application/json"
+
+    def handle(self) -> McpResponse:
+        """Return a native Schema using the resource MIME type."""
+        return McpResponse.structured(_NATIVE_DATA)
+
+class _NativePrompt(Prompt):
+    name = "native-data"
+
+    def handle(self) -> McpResponse:
+        """Embed native Schema data in a prompt."""
+        return McpResponse.resource("demo://native", _NATIVE_DATA).asAssistant()
+
+class _NativeServer(Server):
+    name = "Native serialization"
+    tools = (_NativeTool,)
+    resources = (_NativeResource,)
+    prompts = (_NativePrompt,)
+
 class TestResponses(TestCase):
     """Preserve JSON scalar/null values and base64 binary contents."""
 
@@ -137,6 +197,89 @@ class TestResponses(TestCase):
             self.assertEqual(wire["structuredContent"], value)
             self.assertEqual(msgspec.json.decode(wire["content"][0]["text"]), value)
             self.assertEqual(wire["resultType"], "complete")
+
+    def testNativeJsonValuesAreNormalized(self) -> None:
+        """Normalize native types recursively while honoring Struct settings."""
+        class _TaggedPayload(msgspec.Struct, tag=True):
+            payload: _NativePayload
+            optional: str | msgspec.UnsetType = msgspec.UNSET
+
+        for payload, expected in (
+            (_NATIVE_DATA, _NATIVE_JSON),
+            ({"items": [_NativeEnvelope(_NATIVE_DATA)]},
+             {"items": [{"payload": _NATIVE_JSON}]}),
+            (_TaggedPayload(_NATIVE_DATA),
+             {"type": "_TaggedPayload", "payload": _NATIVE_JSON}),
+            (_Status.READY, "ready"),
+        ):
+            with self.subTest(payload=payload):
+                response = McpResponse.structured(payload)
+                self.assertEqual(response.structured_content, expected)
+                self.assertEqual(
+                    msgspec.json.decode(response.content[0].text), expected,
+                )
+                for mime_type in (None, "application/json", "application/example+json"):
+                    resource = McpResponse.resource(
+                        "docs://native", payload, mime_type,
+                    ).content[0].resource
+                    self.assertEqual(msgspec.json.decode(resource.text), expected)
+        self.assertEqual(_NATIVE_DATA.display_name, "demo")
+        self.assertIsInstance(_NATIVE_DATA.created_at, datetime)
+        self.assertIsInstance(_NATIVE_DATA.amount, Decimal)
+
+    def testNativeJsonResponsesCaptureIndependentSnapshots(self) -> None:
+        """Keep normalized response content independent of native mutations."""
+        payload = msgspec.structs.replace(_NATIVE_DATA)
+        response = McpResponse.structured(payload)
+        resource = McpResponse.resource("docs://native", payload)
+        payload.display_name = "changed"
+        self.assertEqual(response.structured_content, _NATIVE_JSON)
+        self.assertEqual(
+            msgspec.json.decode(response.content[0].text), _NATIVE_JSON,
+        )
+        self.assertEqual(
+            msgspec.json.decode(resource.content[0].resource.text), _NATIVE_JSON,
+        )
+
+    def testNativeJsonValuesStillRejectInvalidData(self) -> None:
+        """Normalization must not hide invalid nested JSON values."""
+        class _InvalidPayload(Schema):
+            value: object
+
+        for value in (
+            float("nan"), float("inf"), float("-inf"), {1: "key"},
+            b"data", bytearray(b"data"), memoryview(b"data"), object(),
+        ):
+            payload = {"nested": [_InvalidPayload(value)]}
+            with self.subTest(value=value):
+                with self.assertRaises(ValueError):
+                    McpResponse.structured(payload)
+                with self.assertRaises(ValueError):
+                    McpResponse.resource("docs://native", payload)
+
+    async def testNativeSerializationWorksAcrossPrimitives(self) -> None:
+        """Dispatch normalized Schema output through the real MCP wire path."""
+        class _NativeContainer(Container):
+            pass
+
+        client = await self.mcp(_NativeServer, app=_NativeContainer())
+        tool = await client.tool("native-data", {"mime_type": "application/json"})
+        resource = await client.request("resources/read", {"uri": "demo://native"})
+        prompt = await client.request("prompts/get", {"name": "native-data"})
+        for response in (tool, resource, prompt):
+            response.assertOk()
+        result = tool.message["result"]
+        self.assertFalse(result["isError"])
+        self.assertEqual(result["structuredContent"], _NATIVE_JSON)
+        self.assertEqual(
+            msgspec.json.decode(result["content"][0]["text"]), _NATIVE_JSON,
+        )
+        self.assertEqual(
+            msgspec.json.decode(resource.message["result"]["contents"][0]["text"]),
+            _NATIVE_JSON,
+        )
+        content = prompt.message["result"]["messages"][0]["content"]["resource"]
+        self.assertEqual(msgspec.json.decode(content["text"]), _NATIVE_JSON)
 
     def test_content_factories(self):
         """Images, audio and blobs use protocol-defined shapes.

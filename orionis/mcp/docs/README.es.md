@@ -110,7 +110,9 @@ La raíz del paquete exporta `MCP_PROTOCOL_VERSION`, `McpConfig`, `McpRequest`, 
 | `application/msgpack`, `application/x-msgpack`, `application/vnd.msgpack` o `application/*+msgpack` | MessagePack en `BlobResourceContents.blob`, codificado en Base64. |
 | Otros tipos MIME | Solo contenido previamente codificado como texto o bytes; los datos estructurados se rechazan. |
 
-Sin MIME explícito, los datos estructurados se serializan como `application/json`. Los strings JSON ya codificados y los buffers binarios se conservan sin doble codificación; un string con MIME MessagePack se serializa como dato MessagePack. La selección del códec ignora mayúsculas y parámetros, pero conserva el MIME declarado en la respuesta. `structured()` comparte el codificador JSON y mantiene su contrato de `structuredContent` JSON. Se rechazan números no finitos, claves JSON que no sean strings y otros valores no JSON.
+Sin MIME explícito, los datos estructurados se serializan como `application/json`. Los strings JSON ya codificados y los buffers binarios se conservan sin doble codificación; un string con MIME MessagePack se serializa como dato MessagePack. La selección del códec ignora mayúsculas y parámetros, pero conserva el MIME declarado en la respuesta. `structured()` comparte el codificador JSON y mantiene su contrato de `structuredContent` JSON.
+
+Los constructores de respuestas JSON normalizan los valores nativos de la aplicación con `msgspec.to_builtins()` antes de validarlos. Admiten recursivamente `Schema` de Orionis, `msgspec.Struct`, dataclasses, enums, fechas, UUIDs y decimales, respetando alias de campos, tags y valores predeterminados omitidos. Los manejadores pueden devolver `McpResponse.structured(schema_instance)` o `McpResponse.resource(uri, schema_instance)` sin conversión manual. El texto serializado y `structuredContent` usan la misma instantánea JSON normalizada; no se modifica el dato original. Los números no finitos, las claves JSON que no sean strings, los objetos no compatibles y los buffers binarios anidados siguen siendo inválidos como datos de respuestas JSON. Para contenido binario, use un recurso binario explícito o un MIME MessagePack.
 
 Al leer un `Resource`, su `mime_type` se aplica a las respuestas de `structured()` y `text()`: un recurso MessagePack convierte el valor estructurado original en un blob binario, no en un string que contenga JSON. El manejador puede devolver `McpResponse.structured(data)` sin repetir el MIME ni implementar el códec. Los recursos embebidos explícitos conservan su contenido y MIME.
 
@@ -349,4 +351,3 @@ Concurrencia, bytes de solicitud/respuesta/metadatos, paginación, llamadas de c
 - Se compilaron siete programas de documentación; seis programas autónomos se ejecutaron correctamente.
 - El programa de registro por fachada se validó por importación/sintaxis porque requiere una aplicación iniciada.
 - La documentación se contrastó con exports públicos, compilador, dispatcher, transportes, manager, configuración, validadores de metadatos, comandos de consola y cliente de pruebas MCP.
-

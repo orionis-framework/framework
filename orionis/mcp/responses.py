@@ -73,9 +73,16 @@ def _encode_payload(
     Raises
     ------
     ValueError
-        If JSON data is invalid or the MIME type has no structured codec.
+        If JSON data is unsupported or invalid, or the MIME type has no
+        structured codec.
     """
     if payload_format == "json":
+        try:
+            value = msgspec.to_builtins(
+                value, builtin_types=(bytes, bytearray, memoryview),
+            )
+        except TypeError as exc:
+            raise ValueError(str(exc)) from exc
         validate_json(value)
         return msgspec.json.encode(value)
     if payload_format == "msgpack":
@@ -187,7 +194,8 @@ class McpResponse:
         uri : str
             Value supplied for ``uri``.
         value : object
-            Structured JSON or MessagePack data, or already encoded content.
+            Native msgspec-compatible data, or already encoded content.
+            JSON data is normalized to builtins before strict validation.
             JSON strings and binary buffers are retained without re-encoding.
         mime_type : str | None
             Declared media type. Structured data defaults to application/json;
@@ -273,7 +281,7 @@ class McpResponse:
         Parameters
         ----------
         value : object
-            Value to inspect, transform or validate.
+            Native msgspec-compatible data normalized to a finite JSON value.
 
         Returns
         -------

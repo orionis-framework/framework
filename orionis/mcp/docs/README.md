@@ -110,7 +110,9 @@ The package root exports `MCP_PROTOCOL_VERSION`, `McpConfig`, `McpRequest`, `Mcp
 | `application/msgpack`, `application/x-msgpack`, `application/vnd.msgpack`, or `application/*+msgpack` | MessagePack in `BlobResourceContents.blob`, encoded as Base64. |
 | Other MIME types | Only previously encoded text or bytes; structured data is rejected. |
 
-Without an explicit MIME type, structured data is serialized as `application/json`. Previously encoded JSON strings and binary buffers are preserved without double encoding; a string with a MessagePack MIME type is serialized as MessagePack data. Codec selection ignores case and parameters while preserving the declared response MIME type. `structured()` shares the JSON encoder and keeps its JSON `structuredContent` contract. Nonfinite numbers, non-string JSON keys, and other non-JSON values are rejected.
+Without an explicit MIME type, structured data is serialized as `application/json`. Previously encoded JSON strings and binary buffers are preserved without double encoding; a string with a MessagePack MIME type is serialized as MessagePack data. Codec selection ignores case and parameters while preserving the declared response MIME type. `structured()` shares the JSON encoder and keeps its JSON `structuredContent` contract.
+
+JSON response builders normalize native application values with `msgspec.to_builtins()` before validation. Orionis `Schema`, `msgspec.Struct`, dataclasses, enums, dates, UUIDs, and decimals are supported recursively, honoring field aliases, tags, and omitted defaults. Handlers can return `McpResponse.structured(schema_instance)` or `McpResponse.resource(uri, schema_instance)` without manual conversion. Both serialized text and `structuredContent` use the normalized JSON snapshot; the original data is not mutated. Nonfinite numbers, non-string JSON keys, unsupported objects, and nested binary buffers remain invalid JSON response data. Use an explicit binary resource or MessagePack MIME type for binary content.
 
 When reading a `Resource`, its `mime_type` applies to responses from `structured()` and `text()`: a MessagePack resource converts the original structured value into a binary blob, not a string containing JSON. The handler can return `McpResponse.structured(data)` without repeating the MIME type or implementing the codec. Explicit embedded resources preserve their content and MIME type.
 
@@ -349,4 +351,3 @@ Concurrency, request bytes, response bytes, metadata bytes, pagination, catalog 
 - Seven documentation programs were compiled; six standalone programs were executed successfully.
 - The facade registration program was import/syntax validated because it requires a booted application.
 - Documentation was checked against the public exports, compiler, dispatcher, transports, manager, configuration entity, metadata validators, console commands, and MCP testing client.
-

@@ -241,7 +241,7 @@ class Reactor(IReactor):
         self.__cache_info = sorted(commands_info, key=operator.itemgetter("signature"))
         return self.__cache_info
 
-    async def call( # NOSONAR
+    async def call( # NOSONAR  # noqa: PLR0912, PLR0915
         self,
         signature: str,
         args: list[str] | None = None,
@@ -306,6 +306,14 @@ class Reactor(IReactor):
                     error_msg: str = f"Command '{signature}' not found."
                     raise ValueError(error_msg)
 
+                # Retire launcher feedback before command code can write through
+                # native file descriptors, child processes, or interactive tools.
+                # Only launchers load feedback; programmatic dispatch does not
+                # introduce its imports into HTTP or scheduler runtimes.
+                feedback = sys.modules.get("orionis.console.startup")
+                if feedback is not None:
+                    feedback.stop_startup_feedback()
+
                 # Determine if timestamps should be logged based
                 # on command settings and help flags
                 # Use an empty argument sequence when none was provided.
@@ -367,6 +375,12 @@ class Reactor(IReactor):
                 return 0
 
             except Exception as e:
+
+                # Custom loggers and exception handlers may use native writers.
+                # Retire feedback before reporting discovery or signature errors.
+                feedback = sys.modules.get("orionis.console.startup")
+                if feedback is not None:
+                    feedback.stop_startup_feedback()
 
                 # Log the error in the logger service
                 error_msg = f"Command '{signature}' execution failed: {e}"

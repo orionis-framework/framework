@@ -11,6 +11,7 @@ El runtime aísla el contexto de cada solicitud, valida entradas JSON-RPC y esqu
 ## Requisitos
 
 - Python 3.14 o posterior.
+- La expansión RFC 6570 utiliza `uritemplate`, instalado por Orionis. El matching conserva validación estricta, codificación UTF-8, formato de escalares y orden de los mappings.
 - Una aplicación Orionis iniciada para registro de transportes, inyección, autenticación y la fachada `Mcp`.
 - Tipos de entrada/salida compatibles con los esquemas de Orionis y `msgspec` al usar herramientas tipadas.
 - Orígenes confiables explícitos cuando clientes de navegador envían el encabezado HTTP `Origin`.
@@ -120,6 +121,12 @@ El MIME describe el contenido, no el transporte: los sobres JSON-RPC de HTTP y S
 `McpManager` ofrece `web`, `local`, `getWebServer`, `getLocalServer`, `servers`, `dispatchHttp`, `startLocal`, notificaciones de cambio y `shutdown`. El código de aplicación normalmente accede al mismo singleton mediante `orionis.support.facades.Mcp`.
 
 ## Flujos de trabajo comunes
+
+### Dependencia de plantillas URI
+
+Orionis utiliza [uritemplate 4.2+](https://pypi.org/project/uritemplate/) para expansión RFC 6570 de nivel cuatro. Admite Python 3.9+ y no tiene dependencias de ejecución. La migración corrige claves asociativas sin codificar en consultas con explode y prefijos de cuatro cifras detectados en `uri-template` 1.3. Orionis conserva validación estricta, codificación UTF-8 de literales, booleanos en minúsculas, orden de inserción de mappings y rechazo de prefijos sobre valores compuestos. Las plantillas complejas siguen requiriendo un inverso explícito `Resource.match(uri)`, cuyo resultado debe expandirse a la URI solicitada.
+
+La comparación utilizó el [corpus de pruebas URI Templates](https://github.com/uri-templates/uritemplate-test) y regresiones con resultados fijos. `std-uritemplate` también superó el corpus positivo, pero acepta prefijos sobre listas y carece de la API de plantillas compiladas y nombres de variables utilizada aquí. La biblioteca estándar ofrece parsing y quoting de URI, pero no expansión RFC 6570. La API consolidada de `uritemplate` permite mantener una integración pequeña y corregir los defectos observados.
 
 ### Registrar endpoints web y locales
 

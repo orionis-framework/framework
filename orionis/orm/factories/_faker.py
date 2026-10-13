@@ -1,7 +1,7 @@
-from importlib import import_module
 from locale import normalize
+from faker import Faker
+from faker.config import AVAILABLE_LOCALES
 from orionis.foundation.application import Application
-from orionis.orm.factories.exceptions import FactoryDependencyException
 from orionis.orm.factories.fake import Fake
 
 def _application_locale() -> str:
@@ -25,7 +25,7 @@ def _application_locale() -> str:
 
 def create_faker(locale: str | None, seed: int | None) -> Fake:
     """
-    Create the optional provider with an independent random generator.
+    Create the data provider with an independent random generator.
 
     Parameters
     ----------
@@ -40,23 +40,11 @@ def create_faker(locale: str | None, seed: int | None) -> Fake:
     Fake
         Typed Orionis facade over the instance-local data provider.
 
-    Raises
-    ------
-    FactoryDependencyException
-        If the optional factories extra is not installed.
     """
-    try:
-        provider = import_module("faker")
-    except ModuleNotFoundError as exc:
-        if exc.name != "faker":
-            raise
-        error_msg = "Install factory support with: uv add 'orionis[factories]'"
-        raise FactoryDependencyException(error_msg) from exc
     requested = _application_locale() if locale is None else locale
     normalized = normalize(requested.replace("-", "_")).split(".")[0]
-    available = import_module("faker.config").AVAILABLE_LOCALES
-    selected = normalized if normalized in available else "en_US"
-    fake = provider.Faker(locale=selected)
+    selected = normalized if normalized in AVAILABLE_LOCALES else "en_US"
+    fake = Faker(locale=selected)
     # Calling this even for None detaches Faker's shared random generator.
     fake.seed_instance(seed)
     return Fake(fake)

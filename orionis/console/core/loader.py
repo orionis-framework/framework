@@ -8,7 +8,6 @@ from orionis.cache.file_based_cache import FileBasedCache
 from orionis.console.args.argument import Argument
 from orionis.console.base.command import BaseCommand
 from orionis.console.base.contracts.command import IBaseCommand
-from orionis.console.core.commands import CORE_COMMANDS
 from orionis.console.core.contracts.loader import ILoader
 from orionis.console.entities.command import Command
 from orionis.console.enums.actions import ArgumentAction as _ArgumentAction
@@ -205,6 +204,9 @@ class Loader(ILoader):
         None
             Registers core commands internally for later lookup and execution.
         """
+        # Import implementations only when cached command metadata is unavailable.
+        from orionis.console.core.commands import CORE_COMMANDS  # noqa: PLC0415
+
         # Iterate and register each core command
         for obj in CORE_COMMANDS:
             sign = self.__getSignature(obj)

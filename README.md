@@ -37,6 +37,13 @@ Visit the [official documentation](https://docs.orionis-framework.com/) for
 guides and reference material. You can also explore the [project website](https://orionis-framework.com/)
 or find the package on [PyPI](https://pypi.org/project/orionis/).
 
+## Installation
+
+Install the framework with `uv add orionis`. Faker and SQLite support are included.
+Use `uv add 'orionis[pgsql]'` for PostgreSQL (async and synchronous drivers), or
+`uv add 'orionis[database]'` for all optional database drivers. Cloud storage
+SDKs and other database backends remain optional; see `pyproject.toml` for extras.
+
 ## Application CLI
 
 From the application root, run commands through the installed `orionis` entry
@@ -97,6 +104,12 @@ verification commands.
 - [Inertia Adapter](https://github.com/orionis-framework/inertia-orionis) — Orionis integration for Inertia.js.
 
 ## Contributing
+
+API documentation uses `[tool.pydoctor]`. Pydoctor reads that table, not PEP 621
+metadata, so the display name and link URLs must remain explicit. `DOCS.ps1`
+already reads the version from `[project]` and supplies the Git revision through
+supported CLI options; no metadata synchronization layer is needed. See the
+[official configuration reference](https://pydoctor.readthedocs.io/en/latest/help.html).
 
 Contributions and feedback are welcome. Report bugs or request features in
 [GitHub Issues](https://github.com/orionis-framework/framework/issues), or join

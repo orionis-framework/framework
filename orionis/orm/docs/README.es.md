@@ -13,7 +13,7 @@ La persistencia y terminales de consulta son asíncronos. Definición, atributos
 - Python 3.14 o posterior.
 - Un manager de conexiones `orionis.database` configurado e iniciado antes de ejecutar consultas.
 - Tablas compatibles con los modelos, normalmente gestionadas por migraciones.
-- El soporte Faker incluido por Orionis al usar factories.
+- `faker` se instala con Orionis; las factorías no requieren extras.
 
 ## Inicio rápido
 

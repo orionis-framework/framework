@@ -1,6 +1,5 @@
 import sys
-from orionis.aio import Loop
-from orionis.console.stdio import protocol_stdio
+from orionis.console.startup import startup_feedback
 
 if __name__ == "__main__":
     """
@@ -16,11 +15,15 @@ if __name__ == "__main__":
     int
         The exit code returned by the reactor loop.
     """
-    with protocol_stdio(sys.argv):
-        from bootstrap.app import app
+    with startup_feedback(sys.argv):
+        from orionis.console.stdio import protocol_stdio
 
-        sys.exit(
-            Loop.run(
-                app.handleCommand(sys.argv),
-            ),
-        )
+        with protocol_stdio(sys.argv):
+            from orionis.aio import Loop
+            from bootstrap.app import app
+
+            sys.exit(
+                Loop.run(
+                    app.handleCommand(sys.argv),
+                ),
+            )

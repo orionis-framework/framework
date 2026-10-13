@@ -11,6 +11,7 @@ The runtime keeps request context isolated, validates JSON-RPC input and typed s
 ## Requirements
 
 - Python 3.14 or newer.
+- RFC 6570 expansion uses `uritemplate`, installed by Orionis. Resource matching retains strict template validation, UTF-8 encoding, scalar formatting and mapping order.
 - A booted Orionis application for transport registration, dependency injection, authentication, and the `Mcp` facade.
 - Input/output types supported by Orionis schemas and `msgspec` when using typed tools.
 - Explicit trusted origins when browser clients send an HTTP `Origin` header.
@@ -120,6 +121,12 @@ The MIME type describes content, not transport: HTTP and STDIO JSON-RPC envelope
 `McpManager` provides `web`, `local`, `getWebServer`, `getLocalServer`, `servers`, `dispatchHttp`, `startLocal`, change notifications, and `shutdown`. Application code normally reaches the same singleton through `orionis.support.facades.Mcp`.
 
 ## Common workflows
+
+### URI template dependency
+
+Orionis uses [uritemplate 4.2+](https://pypi.org/project/uritemplate/) for RFC 6570 level-four expansion. It supports Python 3.9+ and has no runtime dependencies. The migration fixes unescaped associative keys in exploded queries and four-digit prefix modifiers observed with `uri-template` 1.3. Orionis retains strict syntax validation, literal UTF-8 encoding, lowercase booleans, mapping insertion order, and rejection of prefix modifiers on composite values. Complex templates still require an explicit `Resource.match(uri)` inverse, whose output must expand back to the requested URI.
+
+The comparison used the [URI Templates test corpus](https://github.com/uri-templates/uritemplate-test) and fixed regression fixtures. `std-uritemplate` also passed the positive corpus, but accepts a prefix modifier on list values and lacks the compiled-template/variable-name API already used here. The standard library provides URI parsing and quoting, not RFC 6570 expansion. The established `uritemplate` API therefore keeps the integration small while correcting the observed defects.
 
 ### Register web and local endpoints
 

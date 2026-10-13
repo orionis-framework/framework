@@ -1,10 +1,10 @@
 import inspect
 import re
-from collections.abc import Callable, Mapping
+from collections.abc import Callable, Mapping, Sequence
 from dataclasses import dataclass
 from typing import TYPE_CHECKING
-from urllib.parse import unquote
-from uri_template import URITemplate
+from urllib.parse import quote, unquote
+from uritemplate import URITemplate
 
 if TYPE_CHECKING:
     from orionis.mcp.server.primitives import Resource
@@ -89,7 +89,7 @@ def validate_uri(uri: str) -> None:
 
 def _validate_template(template: str) -> None:
     """
-    Accept RFC 6570 syntax while excluding the dependency's draft extensions.
+    Require RFC 6570 syntax before compiling a resource template.
 
     Parameters
     ----------
@@ -142,6 +142,28 @@ def _simple_pattern(template: str) -> tuple[re.Pattern[str], tuple[str, ...]] | 
     pieces.append(re.escape(template[position:]))
     return re.compile("".join(pieces)), tuple(names)
 
+def _expansion_value(value: object) -> object:
+    """
+    Preserve Orionis scalar formatting and mapping order during RFC expansion.
+
+    Parameters
+    ----------
+    value : object
+        One value returned by the resource inverse.
+
+    Returns
+    -------
+    object
+        Library-compatible value with booleans formatted as lowercase strings.
+    """
+    if isinstance(value, bool):
+        return "true" if value else "false"
+    if isinstance(value, Mapping):
+        return [(str(key), _expansion_value(item)) for key, item in value.items()]
+    if isinstance(value, Sequence) and not isinstance(value, str):
+        return [_expansion_value(item) for item in value]
+    return value if value is None or isinstance(value, str) else str(value)
+
 @dataclass(frozen=True, slots=True)
 class UriMatcher:
     """Compile expansion once and verify every inverse result by expansion."""
@@ -170,7 +192,10 @@ class UriMatcher:
         """
         template = definition.uri_template
         _validate_template(template)
-        expander = URITemplate(template)
+        # The library preserves literal text. Encode Unicode literals while
+        # retaining URI delimiters, existing escapes and validated expressions.
+        compiled_template = quote(template, safe=":/?#[]@!$&'()*+,;=%{}")
+        expander = URITemplate(compiled_template)
         custom = None
         if hasattr(definition, "match"):
             descriptor = inspect.getattr_static(definition, "match")
@@ -184,7 +209,7 @@ class UriMatcher:
             ):
                 message = "Resource.match must synchronously accept exactly one URI."
                 raise TypeError(message)
-        simple = _simple_pattern(template)
+        simple = _simple_pattern(compiled_template)
         if custom is None and simple is None:
             message = (
                 "This RFC 6570 template needs an explicit Resource.match(uri) inverse."
@@ -236,7 +261,22 @@ class UriMatcher:
             values = _decode_captures(self.captures, match.groups())
             if values is None:
                 return None
-        expanded = self.expander.expand(**values)
+        prefix_values = (
+            values.get(name)
+            for expression in self.expander.variables
+            for name, options in expression.variables
+            if options["prefix"]
+        )
+        if any(
+            isinstance(value, Mapping)
+            or (isinstance(value, Sequence) and not isinstance(value, str))
+            for value in prefix_values
+        ):
+            message = "URI template prefix modifiers require scalar values."
+            raise ValueError(message)
+        expanded = self.expander.expand({
+            name: _expansion_value(value) for name, value in values.items()
+        })
         if _ESCAPE.sub(_uppercase_escape, expanded) != _ESCAPE.sub(
             _uppercase_escape, uri,
         ):

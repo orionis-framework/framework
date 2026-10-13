@@ -13,6 +13,7 @@ Este módulo es el runtime bajo query builder y ORM. `ConnectionManager` convier
 - Python 3.14 o posterior.
 - `sqlalchemy[asyncio]>=2.0.54,<3.0` y `aiosqlite>=0.22.1`.
 - Extras `orionis[mysql]`, `[pgsql]`, `[oracle]`, `[sqlserver]` o `[redshift]` para otros drivers.
+- Los drivers PostgreSQL (`asyncpg` y `psycopg2-binary`) son opcionales: instale `orionis[pgsql]`, o `orionis[database]` para todos los drivers. La instalación básica funciona con SQLite; la ausencia de un driver se informa al utilizar su backend por primera vez.
 - Servidor/credenciales para bases remotas; SQLite admite archivo o `:memory:`.
 - Directorios de migraciones/seeders relativos a base path.
 

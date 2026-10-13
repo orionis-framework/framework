@@ -1,0 +1,1142 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+          "DTD/xhtml1-strict.dtd">
+<html>
+  
+
+  <head>
+  
+  <title>API Reference | Orionis Framework</title>
+  <meta name="generator" content="pydoctor 25.10.1">
+    
+  </meta>
+  <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="color-scheme" content="dark light" />
+  <link rel="icon" type="image/svg+xml" href="orionis-icon.svg" />
+  <script src="orionis-theme.js" type="text/javascript"></script>
+  <link rel="stylesheet" type="text/css" href="apidocs.css" />
+  <link rel="stylesheet" type="text/css" href="extra.css" />
+  <script src="orionis-ui.js" type="text/javascript" defer="defer"></script>
+  
+</head>
+
+  <body>
+
+    <header class="orionis-header">
+  <div class="orionis-header-inner">
+    <a class="orionis-brand" href="index.html" aria-label="Orionis API reference home">
+      <img class="orionis-brand-icon" src="orionis-icon.svg" width="38" height="38" alt="" />
+      <span class="orionis-brand-copy">
+        <span class="orionis-wordmark">ORIONIS</span>
+        <span class="orionis-brand-caption">API REFERENCE</span>
+      </span>
+    </a>
+    <div class="orionis-header-actions">
+      <nav class="orionis-header-links" aria-label="Orionis resources">
+        <a href="https://docs.orionis-framework.com">Guide <span aria-hidden="true">↗</span></a>
+        <a href="https://github.com/orionis-framework/framework">GitHub <span aria-hidden="true">↗</span></a>
+      </nav>
+      <button class="orionis-icon-button" id="orionis-theme-toggle" type="button" aria-label="Toggle color theme" hidden="hidden">
+        <svg class="orionis-icon-sun" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="12" cy="12" r="4"></circle>
+          <path d="M12 2v2m0 16v2M2 12h2m16 0h2M4.93 4.93l1.42 1.42m11.3 11.3 1.42 1.42M4.93 19.07l1.42-1.42m11.3-11.3 1.42-1.42"></path>
+        </svg>
+        <svg class="orionis-icon-moon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg">
+          <path d="M20.5 13.1A8.7 8.7 0 0 1 10.9 3.5 8.7 8.7 0 1 0 20.5 13.1Z"></path>
+        </svg>
+      </button>
+      <button class="orionis-icon-button" id="orionis-menu-toggle" type="button" aria-label="Open API navigation" aria-expanded="false" hidden="hidden">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg">
+          <path d="M4 6h16M4 12h16M4 18h16"></path>
+        </svg>
+      </button>
+    </div>
+  </div>
+</header>
+
+    <nav class="navbar navbar-default mainnavbar">
+      
+  
+  <div class="container-fluid">
+
+
+    <div class="navbar-header">
+      
+      <div class="navlinks">
+        <span class="navbar-brand">
+          <a href="https://orionis-framework.com/" class="projecthome">Orionis</a> <a href="index.html">API Documentation</a>
+        </span>
+
+        <a href="moduleIndex.html">
+          Modules
+        </a>
+
+        <a href="classIndex.html">
+          Classes
+        </a>
+
+        <a href="nameIndex.html">
+          Names
+        </a>
+
+        <div id="search-box-container">
+          <div class="input-group">
+            <input id="search-box" type="search" name="search-query" placeholder="Search..." aria-label="Search" minlength="2" class="form-control" autocomplete="off" />
+            
+            <span class="input-group-btn">
+              <a style="display: none;" class="btn btn-default" id="search-clear-button" title="Clear" onclick="clearSearch()"><img src="fonts/x-circle.svg" alt="Clear" /></a>
+              <a class="btn btn-default" id="apidocs-help-button" title="Help" href="apidocs-help.html"><img src="fonts/info.svg" alt="Help" /></a>
+            </span>
+          </div>
+        </div>
+
+      </div>
+
+      <div id="search-results-container" style="display: none;">
+        
+        <div id="search-buttons">
+          <span class="label label-default" id="search-docstrings-button">
+          <label class="checkbox-inline">
+            <input type="checkbox" id="toggle-search-in-docstrings-checkbox" value="false" onclick="toggleSearchInDocstrings()">
+              search in docstrings
+            </input>
+          </label>
+          </span>
+          
+        </div>
+        
+        <noscript>
+            <h1>Cannot search: JavaScript is not supported/enabled in your browser.</h1>
+        </noscript>
+
+        <div id="search-status"> </div>
+
+        <div class="warning" id="search-warn-box" style="display: none;">
+          <p class="rst-last"><span id="search-warn"></span></p>
+        </div>
+
+        <table id="search-results">
+          <!-- Filled dynamically by JS -->
+        </table>
+        
+        <div style="margin-top: 10px;">
+          <p>For more information on the search, visit the <a href="apidocs-help.html#rst-search">help page</a>.</p>
+        </div>
+      </div>
+
+    </div>
+
+
+  </div>
+</nav>
+    
+    <div class="container-fluid">
+
+      <!-- Side navigation -->
+      <div class="sidebarcontainer" style="display: none;">
+        
+        <div class="sidebar"><nav class="sidebar">
+  
+
+  <div>
+
+      <div class="thingTitle">
+        <span>Class</span>
+        <code class="thisobject"><a href="orionis.console.startup._StartupFeedback.html" class="internal-link" title="This class">_<wbr></wbr>Startup<wbr></wbr>Feedback</a></code> 
+      </div>
+      
+      <div>
+        
+
+        
+         
+
+        
+        
+
+        <div class="childrenKindTitle">Methods</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#__init__" class="internal-link" title="orionis.console.startup._StartupFeedback.__init__">__init__</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#clear" class="internal-link" title="orionis.console.startup._StartupFeedback.clear">clear</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#finish" class="internal-link" title="orionis.console.startup._StartupFeedback.finish">finish</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#start" class="internal-link" title="orionis.console.startup._StartupFeedback.start">start</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+         
+
+        <div class="childrenKindTitle">Attributes</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#active" class="internal-link" title="orionis.console.startup._StartupFeedback.active">active</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#frame" class="internal-link" title="orionis.console.startup._StartupFeedback.frame">frame</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#lock" class="internal-link" title="orionis.console.startup._StartupFeedback.lock">lock</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#stderr" class="internal-link" title="orionis.console.startup._StartupFeedback.stderr">stderr</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#stderr_proxy" class="internal-link" title="orionis.console.startup._StartupFeedback.stderr_proxy">stderr<wbr></wbr>_proxy</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#stdout" class="internal-link" title="orionis.console.startup._StartupFeedback.stdout">stdout</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#stdout_proxy" class="internal-link" title="orionis.console.startup._StartupFeedback.stdout_proxy">stdout<wbr></wbr>_proxy</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+         
+        
+      </div>
+  </div><div>
+
+      <div class="thingTitle">
+        <span>Module</span>
+        <code><a href="orionis.console.startup.html" class="internal-link" title="The parent of this class">startup</a></code> 
+      </div>
+      
+      <div>
+        
+
+        
+         
+
+        <div class="childrenKindTitle">Classes</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+            <div class="itemName expandableItem">
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId4073"> 
+                    
+                </input>
+
+                <label class="lbl-toggle" for="expandableItemId4073">
+                    
+                    
+                </label>
+
+                <code><a href="orionis.console.startup._OutputProxy.html" class="internal-link" title="orionis.console.startup._OutputProxy">_<wbr></wbr>Output<wbr></wbr>Proxy</a></code>
+
+                <div class="expandableContent">
+                    <div>
+        
+
+        
+         
+
+        
+        
+
+        <div class="childrenKindTitle">Methods</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.console.startup._OutputProxy.html#__enter__" class="internal-link" title="orionis.console.startup._OutputProxy.__enter__">__enter__</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.console.startup._OutputProxy.html#__exit__" class="internal-link" title="orionis.console.startup._OutputProxy.__exit__">__exit__</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.console.startup._OutputProxy.html#__getattr__" class="internal-link" title="orionis.console.startup._OutputProxy.__getattr__">__getattr__</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.console.startup._OutputProxy.html#__init__" class="internal-link" title="orionis.console.startup._OutputProxy.__init__">__init__</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.console.startup._OutputProxy.html#write" class="internal-link" title="orionis.console.startup._OutputProxy.write">write</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.console.startup._OutputProxy.html#writelines" class="internal-link" title="orionis.console.startup._OutputProxy.writelines">writelines</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+         
+
+        <div class="childrenKindTitle">Attributes</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.console.startup._OutputProxy.html#_buffer_proxy" class="internal-link" title="orionis.console.startup._OutputProxy._buffer_proxy">_buffer<wbr></wbr>_proxy</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.console.startup._OutputProxy.html#_stream" class="internal-link" title="orionis.console.startup._OutputProxy._stream">_stream</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.console.startup._OutputProxy.html#feedback" class="internal-link" title="orionis.console.startup._OutputProxy.feedback">feedback</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.console.startup._OutputProxy.html#buffer" class="internal-link" title="orionis.console.startup._OutputProxy.buffer">buffer</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+         
+        
+      </div>
+                </div>
+            </div>
+            
+        
+
+        
+
+    </li><li class=" thisobject">
+        
+        
+        
+            <div class="itemName expandableItem">
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId4074"> 
+                    
+                </input>
+
+                <label class="lbl-toggle notExpandable" for="">
+                    
+                    
+                </label>
+
+                <code><a href="orionis.console.startup._StartupFeedback.html" class="internal-link" title="orionis.console.startup._StartupFeedback">_<wbr></wbr>Startup<wbr></wbr>Feedback</a></code>
+
+                <div class="expandableContent">
+                    <div>
+        
+
+        
+         
+
+        
+        
+
+        <div class="childrenKindTitle">Methods</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#__init__" class="internal-link" title="orionis.console.startup._StartupFeedback.__init__">__init__</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#clear" class="internal-link" title="orionis.console.startup._StartupFeedback.clear">clear</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#finish" class="internal-link" title="orionis.console.startup._StartupFeedback.finish">finish</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#start" class="internal-link" title="orionis.console.startup._StartupFeedback.start">start</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+         
+
+        <div class="childrenKindTitle">Attributes</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#active" class="internal-link" title="orionis.console.startup._StartupFeedback.active">active</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#frame" class="internal-link" title="orionis.console.startup._StartupFeedback.frame">frame</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#lock" class="internal-link" title="orionis.console.startup._StartupFeedback.lock">lock</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#stderr" class="internal-link" title="orionis.console.startup._StartupFeedback.stderr">stderr</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#stderr_proxy" class="internal-link" title="orionis.console.startup._StartupFeedback.stderr_proxy">stderr<wbr></wbr>_proxy</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#stdout" class="internal-link" title="orionis.console.startup._StartupFeedback.stdout">stdout</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#stdout_proxy" class="internal-link" title="orionis.console.startup._StartupFeedback.stdout_proxy">stdout<wbr></wbr>_proxy</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+         
+        
+      </div>
+                </div>
+            </div>
+            
+        
+
+        
+
+    </li>
+</ul>
+
+        <div class="childrenKindTitle">Functions</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.console.startup.html#_interactive_frame" class="internal-link" title="orionis.console.startup._interactive_frame">_interactive<wbr></wbr>_frame</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.console.startup.html#startup_feedback" class="internal-link" title="orionis.console.startup.startup_feedback">startup<wbr></wbr>_feedback</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.console.startup.html#stop_startup_feedback" class="internal-link" title="orionis.console.startup.stop_startup_feedback">stop<wbr></wbr>_startup<wbr></wbr>_feedback</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+         
+
+        <div class="childrenKindTitle">Variables</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.console.startup.html#_ASCII_FRAME" class="internal-link" title="orionis.console.startup._ASCII_FRAME">_ASCII<wbr></wbr>_FRAME</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.console.startup.html#_FRAME" class="internal-link" title="orionis.console.startup._FRAME">_FRAME</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+         
+        
+      </div>
+  </div>
+
+</nav>
+        </div>
+        <div id="collapse-sidebar">
+          <a class="btn btn-link" onclick="toggleSideBarCollapse()" title="Toggle Sidebar Collapse">
+          </a>
+        </div> 
+        <script src="sidebartoggle.js" type="text/javascript"></script>
+       
+      </div>
+
+      <main class="">
+        
+
+        <div class="orionis-subheader">
+  <nav class="orionis-breadcrumb" aria-label="Documentation breadcrumb">
+    <a href="index.html">REFERENCE</a>
+    <span aria-hidden="true">/</span>
+    <span>ORIONIS FRAMEWORK</span>
+  </nav>
+  <section class="orionis-hero" aria-labelledby="orionis-hero-title">
+    <div class="orionis-hero-content">
+      <p class="orionis-eyebrow"><span class="orionis-status-dot" aria-hidden="true"></span> THE ORIONIS API</p>
+      <h2 id="orionis-hero-title">Build with <span class="orionis-accent">clarity.</span></h2>
+      <p class="orionis-hero-description">Explore the building blocks of an async-first Python framework. Every module, class, and method — connected, searchable, and ready to build with.</p>
+      <div class="orionis-hero-actions">
+        <a class="orionis-button" href="moduleIndex.html">Explore modules <span aria-hidden="true">→</span></a>
+        <a class="orionis-button orionis-button-secondary" href="classIndex.html">View classes</a>
+      </div>
+    </div>
+    <div class="orionis-hero-constellation" aria-hidden="true">
+      <span class="orionis-star orionis-star-one"></span>
+      <span class="orionis-star orionis-star-two"></span>
+      <span class="orionis-star orionis-star-three"></span>
+      <span class="orionis-star orionis-star-four"></span>
+    </div>
+  </section>
+</div>
+
+        <div class="page-header">
+          <h1 class="class"><code><code><a href="index.html" class="internal-link">orionis</a></code><wbr></wbr>.<code><a href="orionis.console.html" class="internal-link" title="orionis.console">console</a></code><wbr></wbr>.<code><a href="orionis.console.startup.html" class="internal-link" title="orionis.console.startup">startup</a></code><wbr></wbr>.<code><a href="orionis.console.startup._StartupFeedback.html" class="internal-link" title="orionis.console.startup._StartupFeedback">_StartupFeedback</a></code></code></h1>
+          <div id="show-private">
+            <button class="btn btn-link" onclick="togglePrivate()">Toggle Private API</button>
+          </div>
+        </div>
+
+        <div class="categoryHeader">
+          class documentation
+        </div>
+
+        <div class="extrasDocstring">
+          <p class="class-signature"><code><span class="py-keyword">class</span> <span class="py-defname">_StartupFeedback</span>: <a href="https://github.com/orionis-framework/framework/tree/08c105e4983e2c51914cd1c0455c06ed2f599081/orionis/console/startup.py#L135" class="sourceLink">(source)</a></code></p><p>Constructor: <code><a href="#__init__" class="internal-link" title="orionis.console.startup._StartupFeedback.__init__">_StartupFeedback(stdout, stderr, frame)</a></code></p><p><a href="classIndex.html#orionis.console.startup._StartupFeedback">View In Hierarchy</a></p>
+        </div>
+
+        <div class="moduleDocstring">
+          <div><p>Own the temporary streams and clear the message once, without a thread.</p></div>
+        </div>
+
+        <div id="split-tables">
+          <table class="children sortable" id="id408">
+  
+  
+  <tr class="method">
+    
+    <td>Method</td>
+    <td><code><a href="#__init__" class="internal-link" title="orionis.console.startup._StartupFeedback.__init__">__init__</a></code></td>
+    <td>Initialize inactive startup feedback and its stream proxies.</td>
+  </tr><tr class="method">
+    
+    <td>Method</td>
+    <td><code><a href="#clear" class="internal-link" title="orionis.console.startup._StartupFeedback.clear">clear</a></code></td>
+    <td>Clear active feedback and restore the original standard streams.</td>
+  </tr><tr class="method">
+    
+    <td>Method</td>
+    <td><code><a href="#finish" class="internal-link" title="orionis.console.startup._StartupFeedback.finish">finish</a></code></td>
+    <td>Retire startup feedback while holding its lock.</td>
+  </tr><tr class="method">
+    
+    <td>Method</td>
+    <td><code><a href="#start" class="internal-link" title="orionis.console.startup._StartupFeedback.start">start</a></code></td>
+    <td>Display the startup message and install temporary stream proxies.</td>
+  </tr><tr class="instancevariable">
+    
+    <td>Instance Variable</td>
+    <td><code><a href="#active" class="internal-link" title="orionis.console.startup._StartupFeedback.active">active</a></code></td>
+    <td><span class="rst-undocumented">Undocumented</span></td>
+  </tr><tr class="instancevariable">
+    
+    <td>Instance Variable</td>
+    <td><code><a href="#frame" class="internal-link" title="orionis.console.startup._StartupFeedback.frame">frame</a></code></td>
+    <td><span class="rst-undocumented">Undocumented</span></td>
+  </tr><tr class="instancevariable">
+    
+    <td>Instance Variable</td>
+    <td><code><a href="#lock" class="internal-link" title="orionis.console.startup._StartupFeedback.lock">lock</a></code></td>
+    <td><span class="rst-undocumented">Undocumented</span></td>
+  </tr><tr class="instancevariable">
+    
+    <td>Instance Variable</td>
+    <td><code><a href="#stderr" class="internal-link" title="orionis.console.startup._StartupFeedback.stderr">stderr</a></code></td>
+    <td><span class="rst-undocumented">Undocumented</span></td>
+  </tr><tr class="instancevariable">
+    
+    <td>Instance Variable</td>
+    <td><code><a href="#stderr_proxy" class="internal-link" title="orionis.console.startup._StartupFeedback.stderr_proxy">stderr<wbr></wbr>_proxy</a></code></td>
+    <td><span class="rst-undocumented">Undocumented</span></td>
+  </tr><tr class="instancevariable">
+    
+    <td>Instance Variable</td>
+    <td><code><a href="#stdout" class="internal-link" title="orionis.console.startup._StartupFeedback.stdout">stdout</a></code></td>
+    <td><span class="rst-undocumented">Undocumented</span></td>
+  </tr><tr class="instancevariable">
+    
+    <td>Instance Variable</td>
+    <td><code><a href="#stdout_proxy" class="internal-link" title="orionis.console.startup._StartupFeedback.stdout_proxy">stdout<wbr></wbr>_proxy</a></code></td>
+    <td><span class="rst-undocumented">Undocumented</span></td>
+  </tr>
+</table>
+          
+
+            
+        </div>
+
+        <div id="child-list">
+          <div class="basemethod">
+  
+  
+  <a name="orionis.console.startup._StartupFeedback.__init__">
+    
+  </a>
+  <a name="__init__">
+    
+  </a>
+  <div class="functionHeader">
+    
+    
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">__init__</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">stdout: <code><a href="https://docs.python.org/3/library/typing.html#typing.TextIO" class="intersphinx-link">TextIO</a></code>, </span><span class="rst-sig-param">stderr: <code><a href="https://docs.python.org/3/library/typing.html#typing.TextIO" class="intersphinx-link">TextIO</a></code>, </span><span class="rst-sig-param">frame: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></span>):</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/08c105e4983e2c51914cd1c0455c06ed2f599081/orionis/console/startup.py#L138">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#__init__" title="orionis.console.startup._StartupFeedback.__init__">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    
+    <div><p>Initialize inactive startup feedback and its stream proxies.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">stdout:</span><code><a href="https://docs.python.org/3/library/typing.html#typing.TextIO" class="intersphinx-link">TextIO</a></code></td><td class="fieldArgDesc">Original standard output stream to restore after feedback.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">stderr:</span><code><a href="https://docs.python.org/3/library/typing.html#typing.TextIO" class="intersphinx-link">TextIO</a></code></td><td class="fieldArgDesc">Original error stream used to display and clear the message.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">frame:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Single-line startup message to display on <tt class="rst-docutils rst-literal">stderr</tt>.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">Store the streams and prepare their proxies and shared lock.</td></tr></table></div>
+  </div>
+</div><div class="basemethod">
+  
+  
+  <a name="orionis.console.startup._StartupFeedback.clear">
+    
+  </a>
+  <a name="clear">
+    
+  </a>
+  <div class="functionHeader">
+    
+    
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">clear</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>):</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/08c105e4983e2c51914cd1c0455c06ed2f599081/orionis/console/startup.py#L180">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#clear" title="orionis.console.startup._StartupFeedback.clear">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    
+    <div><p>Clear active feedback and restore the original standard streams.</p>
+<p>Call while holding <tt class="rst-docutils rst-literal">lock</tt>. Suppress display I/O errors and restore
+only standard streams that still reference this controller's proxies.</p>
+<table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">Deactivate feedback even if clearing the display fails.</td></tr></table></div>
+  </div>
+</div><div class="basemethod">
+  
+  
+  <a name="orionis.console.startup._StartupFeedback.finish">
+    
+  </a>
+  <a name="finish">
+    
+  </a>
+  <div class="functionHeader">
+    
+    
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">finish</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>):</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/08c105e4983e2c51914cd1c0455c06ed2f599081/orionis/console/startup.py#L207">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#finish" title="orionis.console.startup._StartupFeedback.finish">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    
+    <div><p>Retire startup feedback while holding its lock.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">Clear active feedback and restore the original streams.</td></tr></table></div>
+  </div>
+</div><div class="basemethod">
+  
+  
+  <a name="orionis.console.startup._StartupFeedback.start">
+    
+  </a>
+  <a name="start">
+    
+  </a>
+  <div class="functionHeader">
+    
+    
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">start</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>):</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/08c105e4983e2c51914cd1c0455c06ed2f599081/orionis/console/startup.py#L164">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#start" title="orionis.console.startup._StartupFeedback.start">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    
+    <div><p>Display the startup message and install temporary stream proxies.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">Activate feedback, replace both streams, and flush the message.</td></tr></table></div>
+  </div>
+</div><div class="baseinstancevariable">
+  
+  
+  <a name="orionis.console.startup._StartupFeedback.active">
+    
+  </a>
+  <a name="active">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <span class="py-defname">active</span>: <code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code> =
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/08c105e4983e2c51914cd1c0455c06ed2f599081/orionis/console/startup.py#L159">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#active" title="orionis.console.startup._StartupFeedback.active">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="functionBody">
+    
+    <div><p class="undocumented">Undocumented</p></div>
+    
+  </div>
+</div><div class="baseinstancevariable">
+  
+  
+  <a name="orionis.console.startup._StartupFeedback.frame">
+    
+  </a>
+  <a name="frame">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <span class="py-defname">frame</span> =
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/08c105e4983e2c51914cd1c0455c06ed2f599081/orionis/console/startup.py#L158">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#frame" title="orionis.console.startup._StartupFeedback.frame">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="functionBody">
+    
+    <div><p class="undocumented">Undocumented</p></div>
+    
+  </div>
+</div><div class="baseinstancevariable">
+  
+  
+  <a name="orionis.console.startup._StartupFeedback.lock">
+    
+  </a>
+  <a name="lock">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <span class="py-defname">lock</span> =
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/08c105e4983e2c51914cd1c0455c06ed2f599081/orionis/console/startup.py#L160">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#lock" title="orionis.console.startup._StartupFeedback.lock">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="functionBody">
+    
+    <div><p class="undocumented">Undocumented</p></div>
+    
+  </div>
+</div><div class="baseinstancevariable">
+  
+  
+  <a name="orionis.console.startup._StartupFeedback.stderr">
+    
+  </a>
+  <a name="stderr">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <span class="py-defname">stderr</span> =
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/08c105e4983e2c51914cd1c0455c06ed2f599081/orionis/console/startup.py#L157">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#stderr" title="orionis.console.startup._StartupFeedback.stderr">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="functionBody">
+    
+    <div><p class="undocumented">Undocumented</p></div>
+    
+  </div>
+</div><div class="baseinstancevariable">
+  
+  
+  <a name="orionis.console.startup._StartupFeedback.stderr_proxy">
+    
+  </a>
+  <a name="stderr_proxy">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <span class="py-defname">stderr_proxy</span> =
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/08c105e4983e2c51914cd1c0455c06ed2f599081/orionis/console/startup.py#L162">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#stderr_proxy" title="orionis.console.startup._StartupFeedback.stderr_proxy">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="functionBody">
+    
+    <div><p class="undocumented">Undocumented</p></div>
+    
+  </div>
+</div><div class="baseinstancevariable">
+  
+  
+  <a name="orionis.console.startup._StartupFeedback.stdout">
+    
+  </a>
+  <a name="stdout">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <span class="py-defname">stdout</span> =
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/08c105e4983e2c51914cd1c0455c06ed2f599081/orionis/console/startup.py#L156">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#stdout" title="orionis.console.startup._StartupFeedback.stdout">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="functionBody">
+    
+    <div><p class="undocumented">Undocumented</p></div>
+    
+  </div>
+</div><div class="baseinstancevariable">
+  
+  
+  <a name="orionis.console.startup._StartupFeedback.stdout_proxy">
+    
+  </a>
+  <a name="stdout_proxy">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <span class="py-defname">stdout_proxy</span> =
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/08c105e4983e2c51914cd1c0455c06ed2f599081/orionis/console/startup.py#L161">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#stdout_proxy" title="orionis.console.startup._StartupFeedback.stdout_proxy">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="functionBody">
+    
+    <div><p class="undocumented">Undocumented</p></div>
+    
+  </div>
+</div>
+        </div>
+      
+      </main>
+    </div>
+
+    <footer class="orionis-footer">
+  
+  <div class="orionis-footer-inner">
+    <div class="orionis-footer-copy">
+      <p>API documentation for <a href="https://orionis-framework.com/" class="projecthome">Orionis</a>.</p>
+      <p class="orionis-footer-meta">Generated with <a href="https://github.com/twisted/pydoctor/">Pydoctor</a> 25.10.1.<span class="orionis-footer-build"> Built 2026-10-13 12:49:02.</span></p>
+    </div>
+    <nav class="orionis-footer-links" aria-label="Additional resources">
+      <a href="https://docs.orionis-framework.com">Read the guide <span aria-hidden="true">↗</span></a>
+      <a href="https://github.com/orionis-framework/framework">Source on GitHub <span aria-hidden="true">↗</span></a>
+    </nav>
+  </div>
+  <!-- Keep Pydoctor's search engine and its required load order intact. -->
+  <script src="ajax.js" type="text/javascript"></script>
+  <script src="searchlib.js" type="text/javascript"></script>
+  <script src="search.js" type="text/javascript"></script>
+</footer>
+  
+    <script src="pydoctor.js" type="text/javascript"></script>
+
+  </body>
+</html>

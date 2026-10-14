@@ -1,9 +1,8 @@
 import importlib
 from typing import Any
-from pwdlib.exceptions import HasherNotAvailable
 from orionis.hashing.exceptions import MissingHashDependencyException
 
-# ruff: noqa: ANN401
+# ruff: noqa: ANN401, PLC0415
 
 def import_hasher_backend(module: str, attribute: str, package: str) -> Any:
     """
@@ -28,6 +27,8 @@ def import_hasher_backend(module: str, attribute: str, package: str) -> Any:
     MissingHashDependencyException
         If the backend package is not installed.
     """
+    from pwdlib.exceptions import HasherNotAvailable
+
     try:
         imported = importlib.import_module(module)
     except (ImportError, HasherNotAvailable) as exc:

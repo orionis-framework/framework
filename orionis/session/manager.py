@@ -5,14 +5,9 @@ from orionis.cache.contracts.cache_manager import ICacheManager
 from orionis.foundation.config.session.enums.drivers import SessionDriver
 from orionis.foundation.config.session.entities.session import Session as SessionConfig
 from orionis.foundation.contracts.application import IApplication
-from orionis.orm.resolver import ConnectionResolver
 from orionis.session.contracts.session import ISession
 from orionis.session.entities.record import SessionRecord
 from orionis.session.session import Session
-from orionis.session.stores.cache import CacheSessionStore
-from orionis.session.stores.database import DatabaseSessionStore
-from orionis.session.stores.file import FileSessionStore
-from orionis.session.stores.memory import MemorySessionStore
 
 if TYPE_CHECKING:
     from pathlib import Path
@@ -38,7 +33,7 @@ class SessionManager:
         Pre-built backing-store instance.
     """
 
-    # ruff: noqa: TC001
+    # ruff: noqa: PLC0415, SLF001, TC001
 
     __slots__ = (
         "_app",
@@ -143,7 +138,7 @@ class SessionManager:
         # create a new lazy session.
         session_id: str | None = request.cookies.get(self._cookie_name)
         session = await self.__restore(session_id) if session_id else Session()
-        session._ageFlashData()  # noqa: SLF001
+        session._ageFlashData()
 
         # Register the session in the application container so that it can be
         # injected into any service that needs it.
@@ -182,7 +177,7 @@ class SessionManager:
 
         if (
             self._renewal_delta is not None
-            and not session._needsPersistence(datetime.now(UTC))  # noqa: SLF001
+            and not session._needsPersistence(datetime.now(UTC))
         ):
             return
 
@@ -252,19 +247,30 @@ class SessionManager:
         Returns
         -------
         ISessionStore
-            File-backed store when the file driver is selected; otherwise
-            an in-memory store.
+            Store implementing the selected file, cache, database or memory driver.
         """
         driver = config.driver
         if driver == SessionDriver.FILE:
+
+            from orionis.session.stores.file import FileSessionStore
             return FileSessionStore(directory=base_path / config.files)
+
         if driver == SessionDriver.CACHE:
+
+            from orionis.session.stores.cache import CacheSessionStore
             return CacheSessionStore(cache=cache, store=config.cache)
+
         if driver == SessionDriver.DATABASE:
+
+            from orionis.orm.resolver import ConnectionResolver
+            from orionis.session.stores.database import DatabaseSessionStore
             return DatabaseSessionStore(
                 connection=ConnectionResolver.connection(config.connection),
                 table=config.table or "sessions",
             )
+
+        from orionis.session.stores.memory import MemorySessionStore
+
         return MemorySessionStore()
 
     async def __restore(self, session_id: str) -> Session:
@@ -296,7 +302,7 @@ class SessionManager:
             return Session()
         session = Session(id=record.id, data=record.data, started=True, is_new=False)
         if self._renewal_window is not None:
-            session._setRenewalDeadline(  # noqa: SLF001
+            session._setRenewalDeadline(
                 record.expires_at - self._renewal_window,
             )
         return session
@@ -326,9 +332,9 @@ class SessionManager:
         elif not await self._store.update(record):
             session.invalidate()
             return False
-        session._markClean()  # noqa: SLF001
+        session._markClean()
         if self._renewal_delta is not None:
-            session._setRenewalDeadline(now + self._renewal_delta)  # noqa: SLF001
+            session._setRenewalDeadline(now + self._renewal_delta)
         return True
 
     async def __rotateId(self, session: Session) -> bool:
@@ -351,7 +357,7 @@ class SessionManager:
             if not session.isNew and not removed:
                 session.invalidate()
                 return False
-        session._rotateId()  # noqa: SLF001
+        session._rotateId()
         return True
 
     async def __invalidateSession(

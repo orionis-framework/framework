@@ -1,5 +1,4 @@
 from typing import Any
-from orionis.database.connection import Connection
 from orionis.database.contracts.connection import IConnection
 from orionis.database.contracts.connection_manager import IConnectionManager
 from orionis.database.exceptions import ConnectionNotFoundException
@@ -10,7 +9,7 @@ from orionis.foundation.config.database.entities.database import (
 
 class ConnectionManager(IConnectionManager):
 
-    # ruff: noqa: TC001
+    # ruff: noqa: PLC0415, TC001
 
     __slots__ = ("_cached_connections", "_connections", "_default")
 
@@ -78,6 +77,8 @@ class ConnectionManager(IConnectionManager):
             raise ConnectionNotFoundException(self.__unknownConnectionMessage(
                 resolved_name,
             ))
+
+        from orionis.database.connection import Connection
 
         instance = Connection(resolved_name, config)
         self._cached_connections[resolved_name] = instance

@@ -1,15 +1,35 @@
 from __future__ import annotations
 import asyncio
+import sys
 import uuid
 from typing import TYPE_CHECKING, Any, Self
 from weakref import WeakValueDictionary
-from aiocache.lock import RedLock
-from orionis.cache.stores.database import DatabaseCacheBackend
-from orionis.cache.stores.file import FileCacheBackend
 
 if TYPE_CHECKING:
     import types
+    from aiocache.lock import RedLock
     from pathlib import Path
+
+def _is_backend(backend: object, module_name: str, class_name: str) -> bool:
+    """
+    Check backend identity without importing an unused store.
+
+    Parameters
+    ----------
+    backend : object
+        Backend instance, including subclasses of built-in stores.
+    module_name : str
+        Defining module already loaded when its backend instance exists.
+    class_name : str
+        Backend class exported by the defining module.
+
+    Returns
+    -------
+    bool
+        Whether the instance belongs to the loaded backend class.
+    """
+    module = sys.modules.get(module_name)
+    return module is not None and isinstance(backend, getattr(module, class_name))
 
 # Share active file-cache locks within each event loop and storage directory.
 _FILE_LOCKS: WeakValueDictionary[
@@ -24,7 +44,7 @@ _POLL_INTERVAL: float = 0.05
 
 class CacheLock:
 
-    # ruff: noqa: ANN401
+    # ruff: noqa: ANN401, PLC0415
 
     __slots__ = ("_backend", "_impl", "_key", "_owner", "_timeout")
 
@@ -66,7 +86,9 @@ class CacheLock:
         Self
             This ``CacheLock`` instance.
         """
-        if isinstance(self._backend, FileCacheBackend):
+        if _is_backend(
+            self._backend, "orionis.cache.stores.file", "FileCacheBackend",
+        ):
             identity = (
                 asyncio.get_running_loop(), self._backend.lockNamespace, self._key,
             )
@@ -79,9 +101,13 @@ class CacheLock:
             else:
                 await lock.acquire()
             self._impl = lock
-        elif isinstance(self._backend, DatabaseCacheBackend):
+        elif _is_backend(
+            self._backend, "orionis.cache.stores.database", "DatabaseCacheBackend",
+        ):
             await self.__acquireDatabaseLock()
         else:
+            from aiocache.lock import RedLock
+
             self._impl = RedLock(
                 self._backend,
                 self._key,
@@ -144,12 +170,16 @@ class CacheLock:
         None
             Complete the documented operation without returning a value.
         """
-        if isinstance(self._backend, FileCacheBackend):
+        if _is_backend(
+            self._backend, "orionis.cache.stores.file", "FileCacheBackend",
+        ):
             if isinstance(self._impl, asyncio.Lock):
                 self._impl.release()
                 self._impl = None
-        elif isinstance(self._backend, DatabaseCacheBackend):
+        elif _is_backend(
+            self._backend, "orionis.cache.stores.database", "DatabaseCacheBackend",
+        ):
             if self._owner is not None:
                 await self._backend.releaseLock(self._key, self._owner)
-        elif isinstance(self._impl, RedLock):
+        elif self._impl is not None:
             await self._impl.__aexit__(exc_type, exc_val, exc_tb)

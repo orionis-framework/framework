@@ -24,7 +24,6 @@ from orionis.http.adapters.request.rsgi import RSGITransportAdapter
 from orionis.http.adapters.response.asgi import ASGIResponseAdapter
 from orionis.http.adapters.response.rsgi import RSGIResponseAdapter
 from orionis.http.adapters.websocket.asgi import ASGIWebSocketTransport
-from orionis.http.adapters.websocket.rsgi import RSGIWebSocketTransport
 from orionis.http.contracts.kernel import IKernelHTTP
 from orionis.http.contracts.endpoint_policy import IHttpEndpointPolicy
 from orionis.http.default.responses import DefaultResponses
@@ -207,7 +206,7 @@ class _MiddlewarePipeline[T]:
 
 class KernelHTTP(IKernelHTTP):
 
-    # ruff: noqa:TC001 - For Dependency injection
+    # ruff: noqa: BLE001, PLC0415, TC001, TRY400
 
     __slots__ = (
         "__api_middleware",
@@ -1122,7 +1121,7 @@ class KernelHTTP(IKernelHTTP):
             # Dispatch through the web or API middleware pipeline.
             return await self.__routeLayer(request, resolved_route)
 
-        except Exception as e:  # noqa: BLE001
+        except Exception as e:
             # Delegate all exceptions to the unified exception handler.
             return await self.__handleException(e, request, policy)
 
@@ -1318,19 +1317,19 @@ class KernelHTTP(IKernelHTTP):
         Returns
         -------
         None
-            Await the connection pipeline and always release admission.
+            Complete connection handling and release acquired admission.
         """
-        transport = (
-            ASGIWebSocketTransport(
+        if interface is Interface.ASGI:
+            transport = ASGIWebSocketTransport(
                 adapter.getScope(),
                 cast("Callable[[], Awaitable[dict]]", receive_or_protocol),
                 cast("Callable[[dict], Awaitable[None]]", send),
             )
-            if interface is Interface.ASGI
-            else RSGIWebSocketTransport(
+        else:
+            from orionis.http.adapters.websocket.rsgi import RSGIWebSocketTransport
+            transport = RSGIWebSocketTransport(
                 cast("RSGIWebsocketProtocol", receive_or_protocol),
             )
-        )
         socket = WebSocket(
             transport, adapter,
             max_message_size=self.__websocket_config.max_message_size,
@@ -1351,7 +1350,7 @@ class KernelHTTP(IKernelHTTP):
                     pass
                 except Exception:
                     # Application exception strings may contain credentials.
-                    _LOGGER.error("WebSocket handler failed")  # noqa: TRY400
+                    _LOGGER.error("WebSocket handler failed")
                     if socket.accepted:
                         # Cleanup failure must not replace the handler's error.
                         with suppress(Exception):

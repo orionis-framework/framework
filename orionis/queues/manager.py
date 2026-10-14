@@ -6,16 +6,12 @@ from typing import TYPE_CHECKING
 from uuid import uuid4
 from orionis.database.contracts.connection_manager import IConnectionManager
 from orionis.foundation.config.queue import Queue as QueueConfig, Redis as RedisConfig
-from orionis.foundation.contracts.application import IApplication  # noqa: TC001
+from orionis.foundation.contracts.application import IApplication
 from orionis.introspection.modules.inspector import ModuleInspector
 from orionis.queues.contracts.manager import IQueueManager
-from orionis.queues.contracts.serializer import IJobSerializer  # noqa: TC001
-from orionis.queues.drivers.database import DatabaseQueueDriver
-from orionis.queues.drivers.redis import RedisQueueDriver
-from orionis.queues.drivers.sync import SyncQueueDriver
+from orionis.queues.contracts.serializer import IJobSerializer
 from orionis.queues.entities.envelope import JobEnvelope
 from orionis.queues.exceptions import QueueConfigurationError, QueueRetryError
-from orionis.queues.failed.repository import DatabaseFailedJobRepository
 from orionis.queues.functions import current_time, validate_name, validate_seconds
 from orionis.queues.job import BaseJob
 from orionis.queues.pending import PendingDispatch
@@ -71,6 +67,8 @@ def _discover_jobs(base_path: Path, jobs_path: Path) -> tuple[type[BaseJob], ...
 
 class QueueManager(IQueueManager):
     """Resolve lazy connections and expose the canonical deferred dispatch API."""
+
+    # ruff: noqa: PLC0415, TC001
 
     __slots__ = (
         "_app",
@@ -266,13 +264,22 @@ class QueueManager(IQueueManager):
         """
         options = self._config["connections"][name]
         if options["driver"] == "sync":
+
+            from orionis.queues.drivers.sync import SyncQueueDriver
             return SyncQueueDriver(self._app, self._serializer, name, self.failed,
                                    retry_after=options["retry_after"])
         if options["driver"] == "redis":
+
+            from orionis.queues.drivers.redis import RedisQueueDriver
             return RedisQueueDriver(RedisConfig(**options))
+
+        from orionis.queues.drivers.database import DatabaseQueueDriver
         manager = await self._app.make(IConnectionManager)
-        return DatabaseQueueDriver(manager.connection(options["connection"]),
-                                   options["table"])
+
+        return DatabaseQueueDriver(
+            manager.connection(options["connection"]),
+            options["table"],
+        )
 
     async def worker(
         self,
@@ -331,6 +338,8 @@ class QueueManager(IQueueManager):
             return self._failed
         async with self._failed_lock:
             if self._failed is None:
+
+                from orionis.queues.failed.repository import DatabaseFailedJobRepository
                 manager = await self._app.make(IConnectionManager)
                 options = self._config["failed"]
                 self._failed = DatabaseFailedJobRepository(

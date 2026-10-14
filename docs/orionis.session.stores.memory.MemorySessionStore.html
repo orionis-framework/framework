@@ -470,7 +470,7 @@
         </div>
 
         <div class="extrasDocstring">
-          <p class="class-signature"><code><span class="py-keyword">class</span> <span class="py-defname">MemorySessionStore</span>(<a href="orionis.session.contracts.ISessionStore.html" class="internal-link" title="orionis.session.contracts.ISessionStore">ISessionStore</a>): <a href="https://github.com/orionis-framework/framework/tree/08c105e4983e2c51914cd1c0455c06ed2f599081/orionis/session/stores/memory.py#L9" class="sourceLink">(source)</a></code></p><p>Constructor: <code><a href="#__init__" class="internal-link" title="orionis.session.stores.memory.MemorySessionStore.__init__">MemorySessionStore()</a></code></p><p><a href="classIndex.html#orionis.session.stores.memory.MemorySessionStore">View In Hierarchy</a></p>
+          <p class="class-signature"><code><span class="py-keyword">class</span> <span class="py-defname">MemorySessionStore</span>(ISessionStore): <a href="https://github.com/orionis-framework/framework/tree/3bc4637841eddeece959e261ee2a9ae345b041c3/orionis/session/stores/memory.py#L9" class="sourceLink">(source)</a></code></p><p>Constructor: <code><a href="#__init__" class="internal-link" title="orionis.session.stores.memory.MemorySessionStore.__init__">MemorySessionStore()</a></code></p><p><a href="classIndex.html#orionis.session.stores.memory.MemorySessionStore">View In Hierarchy</a></p>
         </div>
 
         <div class="moduleDocstring">
@@ -486,7 +486,7 @@ threaded event-loop environments (the standard asyncio model).</p>
         </div>
 
         <div id="split-tables">
-          <table class="children sortable" id="id1925">
+          <table class="children sortable" id="id1926">
   
   
   <tr class="method">
@@ -550,7 +550,7 @@ threaded event-loop environments (the standard asyncio model).</p>
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">__init__</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>):</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/08c105e4983e2c51914cd1c0455c06ed2f599081/orionis/session/stores/memory.py#L24">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/3bc4637841eddeece959e261ee2a9ae345b041c3/orionis/session/stores/memory.py#L24">
       
       (source)
     </a>
@@ -577,7 +577,7 @@ threaded event-loop environments (the standard asyncio model).</p>
     
     
     <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">delete</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">session_id: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/08c105e4983e2c51914cd1c0455c06ed2f599081/orionis/session/stores/memory.py#L93">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/3bc4637841eddeece959e261ee2a9ae345b041c3/orionis/session/stores/memory.py#L93">
       
       (source)
     </a>
@@ -588,7 +588,7 @@ threaded event-loop environments (the standard asyncio model).</p>
     </a>
   </div>
   <div class="docstring functionBody">
-    <div class="interfaceinfo">overrides <code><a href="orionis.session.contracts.ISessionStore.html#delete" class="internal-link">orionis.session.contracts.ISessionStore.delete</a></code></div>
+    
     <div><p>Remove the record for <em>session_id</em> (no-op when absent).</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">session<wbr></wbr>_id:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Unique session identifier to remove.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code></td><td class="fieldArgDesc">True only when a stored record was removed.</td></tr></table></div>
   </div>
 </div><div class="basemethod">
@@ -604,7 +604,7 @@ threaded event-loop environments (the standard asyncio model).</p>
     
     
     <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">gc</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>):</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/08c105e4983e2c51914cd1c0455c06ed2f599081/orionis/session/stores/memory.py#L109">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/3bc4637841eddeece959e261ee2a9ae345b041c3/orionis/session/stores/memory.py#L109">
       
       (source)
     </a>
@@ -615,7 +615,7 @@ threaded event-loop environments (the standard asyncio model).</p>
     </a>
   </div>
   <div class="docstring functionBody">
-    <div class="interfaceinfo">overrides <code><a href="orionis.session.contracts.ISessionStore.html#gc" class="internal-link">orionis.session.contracts.ISessionStore.gc</a></code></div>
+    
     <div><p>Evict all records whose <tt class="rst-docutils rst-literal">expires_at</tt> is in the past.</p>
 <p>Collects expired keys before mutating the dictionary to avoid
 modifying a collection during iteration.</p>
@@ -634,7 +634,7 @@ modifying a collection during iteration.</p>
     
     
     <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">read</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">session_id: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></span>) -&gt; <code><a href="orionis.session.entities.record.SessionRecord.html" class="internal-link" title="orionis.session.entities.record.SessionRecord">SessionRecord</a> | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/08c105e4983e2c51914cd1c0455c06ed2f599081/orionis/session/stores/memory.py#L34">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/3bc4637841eddeece959e261ee2a9ae345b041c3/orionis/session/stores/memory.py#L34">
       
       (source)
     </a>
@@ -645,7 +645,7 @@ modifying a collection during iteration.</p>
     </a>
   </div>
   <div class="docstring functionBody">
-    <div class="interfaceinfo">overrides <code><a href="orionis.session.contracts.ISessionStore.html#read" class="internal-link">orionis.session.contracts.ISessionStore.read</a></code></div>
+    
     <div><p>Return the stored record for <em>session_id</em>, or <tt class="rst-docutils rst-literal">None</tt>.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">session<wbr></wbr>_id:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Unique session identifier to look up.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code>SessionRecord | None</code></td><td class="fieldArgDesc">The stored record, or <tt class="rst-docutils rst-literal">None</tt> when absent.</td></tr></table></div>
   </div>
 </div><div class="basemethod">
@@ -661,7 +661,7 @@ modifying a collection during iteration.</p>
     
     
     <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">update</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">record: <code><a href="orionis.session.entities.record.SessionRecord.html" class="internal-link" title="orionis.session.entities.record.SessionRecord">SessionRecord</a></code></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/08c105e4983e2c51914cd1c0455c06ed2f599081/orionis/session/stores/memory.py#L74">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/3bc4637841eddeece959e261ee2a9ae345b041c3/orionis/session/stores/memory.py#L74">
       
       (source)
     </a>
@@ -672,7 +672,7 @@ modifying a collection during iteration.</p>
     </a>
   </div>
   <div class="docstring functionBody">
-    <div class="interfaceinfo">overrides <code><a href="orionis.session.contracts.ISessionStore.html#update" class="internal-link">orionis.session.contracts.ISessionStore.update</a></code></div>
+    
     <div><p>Replace a live record without yielding between checking and writing.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">record:</span><code><a href="orionis.session.entities.record.SessionRecord.html" class="internal-link" title="orionis.session.entities.record.SessionRecord">SessionRecord</a></code></td><td class="fieldArgDesc">Replacement record.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code></td><td class="fieldArgDesc">Whether a live session still existed at the time of the update.</td></tr></table></div>
   </div>
 </div><div class="basemethod">
@@ -688,7 +688,7 @@ modifying a collection during iteration.</p>
     
     
     <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">write</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">record: <code><a href="orionis.session.entities.record.SessionRecord.html" class="internal-link" title="orionis.session.entities.record.SessionRecord">SessionRecord</a></code></span>):</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/08c105e4983e2c51914cd1c0455c06ed2f599081/orionis/session/stores/memory.py#L59">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/3bc4637841eddeece959e261ee2a9ae345b041c3/orionis/session/stores/memory.py#L59">
       
       (source)
     </a>
@@ -699,7 +699,7 @@ modifying a collection during iteration.</p>
     </a>
   </div>
   <div class="docstring functionBody">
-    <div class="interfaceinfo">overrides <code><a href="orionis.session.contracts.ISessionStore.html#write" class="internal-link">orionis.session.contracts.ISessionStore.write</a></code></div>
+    
     <div><p>Insert or replace the record keyed by its identifier.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">record:</span><code><a href="orionis.session.entities.record.SessionRecord.html" class="internal-link" title="orionis.session.entities.record.SessionRecord">SessionRecord</a></code></td><td class="fieldArgDesc">The record to persist.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc"><span class="undocumented">Undocumented</span></td></tr></table></div>
   </div>
 </div><div class="baseclassvariable">
@@ -714,7 +714,7 @@ modifying a collection during iteration.</p>
   <div class="functionHeader">
     
     <span class="py-defname">__slots__</span>: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" class="intersphinx-link">tuple</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <wbr></wbr><span class="rst-variable-ellipsis">...</span>]</code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/08c105e4983e2c51914cd1c0455c06ed2f599081/orionis/session/stores/memory.py#L22">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/3bc4637841eddeece959e261ee2a9ae345b041c3/orionis/session/stores/memory.py#L22">
       
       (source)
     </a>
@@ -725,7 +725,7 @@ modifying a collection during iteration.</p>
     </a>
   </div>
   <div class="functionBody">
-    <div class="interfaceinfo">overrides <code><a href="orionis.session.contracts.ISessionStore.html#__slots__" class="internal-link">orionis.session.contracts.ISessionStore.__slots__</a></code></div>
+    
     <div><p class="undocumented">Undocumented</p></div>
     
   </div>
@@ -741,7 +741,7 @@ modifying a collection during iteration.</p>
   <div class="functionHeader">
     
     <span class="py-defname">_storage</span>: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#dict" class="intersphinx-link">dict</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <wbr></wbr><a href="orionis.session.entities.record.SessionRecord.html" class="internal-link" title="orionis.session.entities.record.SessionRecord">SessionRecord</a>]</code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/08c105e4983e2c51914cd1c0455c06ed2f599081/orionis/session/stores/memory.py#L32">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/3bc4637841eddeece959e261ee2a9ae345b041c3/orionis/session/stores/memory.py#L32">
       
       (source)
     </a>
@@ -767,7 +767,7 @@ modifying a collection during iteration.</p>
   <div class="orionis-footer-inner">
     <div class="orionis-footer-copy">
       <p>API documentation for <a href="https://orionis-framework.com/" class="projecthome">Orionis</a>.</p>
-      <p class="orionis-footer-meta">Generated with <a href="https://github.com/twisted/pydoctor/">Pydoctor</a> 25.10.1.<span class="orionis-footer-build"> Built 2026-10-13 12:49:02.</span></p>
+      <p class="orionis-footer-meta">Generated with <a href="https://github.com/twisted/pydoctor/">Pydoctor</a> 25.10.1.<span class="orionis-footer-build"> Built 2026-10-14 00:13:36.</span></p>
     </div>
     <nav class="orionis-footer-links" aria-label="Additional resources">
       <a href="https://docs.orionis-framework.com">Read the guide <span aria-hidden="true">↗</span></a>

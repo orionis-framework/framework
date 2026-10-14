@@ -364,7 +364,7 @@
         </div>
 
         <div class="extrasDocstring">
-          <p class="class-signature"><code><span class="py-keyword">class</span> <span class="py-defname">StorageProvider</span>(ServiceProvider, DeferrableProvider): <a href="https://github.com/orionis-framework/framework/tree/08c105e4983e2c51914cd1c0455c06ed2f599081/orionis/storage/provider.py#L8" class="sourceLink">(source)</a></code></p><p><a href="classIndex.html#orionis.storage.provider.StorageProvider">View In Hierarchy</a></p>
+          <p class="class-signature"><code><span class="py-keyword">class</span> <span class="py-defname">StorageProvider</span>(ServiceProvider, DeferrableProvider): <a href="https://github.com/orionis-framework/framework/tree/3bc4637841eddeece959e261ee2a9ae345b041c3/orionis/storage/provider.py#L7" class="sourceLink">(source)</a></code></p><p><a href="classIndex.html#orionis.storage.provider.StorageProvider">View In Hierarchy</a></p>
         </div>
 
         <div class="moduleDocstring">
@@ -377,7 +377,7 @@ call.</p>
         </div>
 
         <div id="split-tables">
-          <table class="children sortable" id="id1960">
+          <table class="children sortable" id="id1961">
   
   
   <tr class="classmethod">
@@ -416,7 +416,7 @@ call.</p>
     
     <div><span class="decorator">@<a href="https://docs.python.org/3/builtins/functions.html#classmethod" class="intersphinx-link">classmethod</a><br /></span></div>
     <span class="py-keyword">def</span>&#160;<span class="py-defname">provides</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">cls</span></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/stdtypes.html#list" class="intersphinx-link">list</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/functions.html#type" class="intersphinx-link">type</a>]</code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/08c105e4983e2c51914cd1c0455c06ed2f599081/orionis/storage/provider.py#L18">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/3bc4637841eddeece959e261ee2a9ae345b041c3/orionis/storage/provider.py#L19">
       
       (source)
     </a>
@@ -443,7 +443,7 @@ call.</p>
     
     
     <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">boot</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>):</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/08c105e4983e2c51914cd1c0455c06ed2f599081/orionis/storage/provider.py#L40">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/3bc4637841eddeece959e261ee2a9ae345b041c3/orionis/storage/provider.py#L44">
       
       (source)
     </a>
@@ -455,7 +455,7 @@ call.</p>
   </div>
   <div class="docstring functionBody">
     
-    <div><p>Pin the Storage facade after all services are registered.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc"><span class="undocumented">Undocumented</span></td></tr></table></div>
+    <div><p>Pin the Storage facade after all services are registered.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">Enable direct facade access to the resolved manager.</td></tr></table></div>
   </div>
 </div><div class="basemethod">
   
@@ -470,7 +470,7 @@ call.</p>
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">register</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>):</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/08c105e4983e2c51914cd1c0455c06ed2f599081/orionis/storage/provider.py#L30">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/3bc4637841eddeece959e261ee2a9ae345b041c3/orionis/storage/provider.py#L31">
       
       (source)
     </a>
@@ -482,7 +482,7 @@ call.</p>
   </div>
   <div class="docstring functionBody">
     
-    <div><p>Bind IStorageManager to StorageManager as a singleton.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc"><span class="undocumented">Undocumented</span></td></tr></table></div>
+    <div><p>Bind IStorageManager to StorageManager as a singleton.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">Register the storage manager binding.</td></tr></table></div>
   </div>
 </div>
         </div>
@@ -495,7 +495,7 @@ call.</p>
   <div class="orionis-footer-inner">
     <div class="orionis-footer-copy">
       <p>API documentation for <a href="https://orionis-framework.com/" class="projecthome">Orionis</a>.</p>
-      <p class="orionis-footer-meta">Generated with <a href="https://github.com/twisted/pydoctor/">Pydoctor</a> 25.10.1.<span class="orionis-footer-build"> Built 2026-10-13 12:49:02.</span></p>
+      <p class="orionis-footer-meta">Generated with <a href="https://github.com/twisted/pydoctor/">Pydoctor</a> 25.10.1.<span class="orionis-footer-build"> Built 2026-10-14 00:13:36.</span></p>
     </div>
     <nav class="orionis-footer-links" aria-label="Additional resources">
       <a href="https://docs.orionis-framework.com">Read the guide <span aria-hidden="true">↗</span></a>

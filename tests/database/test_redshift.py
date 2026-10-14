@@ -346,7 +346,7 @@ class TestRedshiftConsumerCapabilities(TestCase):
         manager.configFor.return_value = {"driver": "redshift"}
         store = ScheduleStore(application, manager)
         with (
-            patch("orionis.console.tasks.store.SQLAlchemyJobStore") as factory,
+            patch("apscheduler.jobstores.sqlalchemy.SQLAlchemyJobStore") as factory,
             self.assertRaisesRegex(RuntimeError, "unique constraints and indexes"),
         ):
             store.database()
@@ -797,6 +797,18 @@ class TestThreadedRedshiftConnection(TestCase):
         rollback = dialect.do_rollback
 
         def blocked(connection):
+            """Block rollback until the cancellation test releases its gate.
+
+            Parameters
+            ----------
+            connection : object
+                DBAPI connection passed to the original rollback callback.
+
+            Returns
+            -------
+            object
+                Result of the original rollback callback.
+            """
             gate.wait()
             return rollback(connection)
 
@@ -897,6 +909,8 @@ class TestThreadedRedshiftConnection(TestCase):
 class TestRedshiftOptionalDependencies(TestCase):
     """Keep ordinary framework imports independent of the optional AWS packages."""
 
+    # ruff: noqa: S603
+
     def testMissingExtraFailsOnlyWhenTheRedshiftEngineIsRequested(self) -> None:
         """Reject missing dialect or driver lazily with the official extra hint.
 
@@ -912,6 +926,27 @@ import sys
 
 class BlockPackage(importlib.abc.MetaPathFinder):
     def find_spec(self, fullname, path=None, target=None):
+        \"\"\"Reject imports from the selected optional package.
+
+        Parameters
+        ----------
+        fullname : str
+            Fully qualified module name requested by the importer.
+        path : Sequence[str] | None, optional
+            Parent package search paths, unused by this blocker.
+        target : ModuleType | None, optional
+            Reload target, unused by this blocker.
+
+        Returns
+        -------
+        None
+            Allow other finders to resolve packages that are not blocked.
+
+        Raises
+        ------
+        ModuleNotFoundError
+            If the module belongs to the selected optional package.
+        \"\"\"
         if fullname.split('.')[0] == sys.argv[1]:
             raise ModuleNotFoundError('Optional package unavailable', name=fullname)
         return None
@@ -935,6 +970,13 @@ else:
     raise AssertionError('The missing optional dependency was not reported')
 
 async def check_schema():
+    \"\"\"Verify schema creation reports the missing optional dependency.
+
+    Returns
+    -------
+    None
+        Assert the extra hint and disconnect the deferred connection.
+    \"\"\"
     table = TableDefinition(
         name='items', columns={'id': Integer().primary().autoIncrement()},
     )
@@ -952,7 +994,7 @@ print('Optional dependency isolation passed')
 """
         for package in ("sqlalchemy_redshift", "redshift_connector"):
             with self.subTest(package=package), TemporaryDirectory() as directory:
-                result = subprocess.run(  # noqa: S603
+                result = subprocess.run(
                     [sys.executable, "-B", "-c", script, package],
                     cwd=directory, env={**os.environ, "PYTHONPATH": str(root)},
                     capture_output=True, text=True, encoding="utf-8",

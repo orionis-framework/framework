@@ -1,3 +1,6 @@
+> Informe histórico del 23 de septiembre de 2026, conservado como evidencia de aquella revisión. Las cifras, herramientas y fallos mencionados describen ese momento; no son validación actual ni contrato operativo.
+> Manual actual: [Español](../../docs/es/default-responses.md) · [English](../../docs/en/default-responses.md).
+
 # Respuestas predeterminadas: revisión de rendimiento
 
 Revisión del 23 de septiembre de 2026 sobre `responses.py`, con CPython 3.14.3

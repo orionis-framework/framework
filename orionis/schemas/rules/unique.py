@@ -1,9 +1,5 @@
 import asyncio
 from typing import TYPE_CHECKING
-from orionis.aio.loop import Loop
-from orionis.database.connection import Connection
-from orionis.orm.query.raw_builder import RawQueryBuilder
-from orionis.orm.resolver import ConnectionResolver
 from orionis.schemas.rule import Rule
 
 if TYPE_CHECKING:
@@ -34,14 +30,14 @@ class Unique(Rule):
     synchronous call made inside an event loop uses an isolated connection.
     """
 
-    # ruff: noqa: ARG002
+    # ruff: noqa: ARG002, PLC0415, PLR0913
 
     __message__ = "Value must be unique."
     __code__ = "unique"
 
     __slots__ = ("_column", "_connection", "_ignore", "_ignore_column", "_table")
 
-    def __init__(  # noqa: PLR0913
+    def __init__(
         self,
         table: str,
         column: str,
@@ -110,6 +106,8 @@ class Unique(Rule):
         if value is None:
             return True
 
+        from orionis.aio import Loop
+
         plan = self.__plan(value)
 
         # A running loop means ``runSync`` bridges to a worker thread with its
@@ -162,6 +160,8 @@ class Unique(Rule):
         SelectPlan
             Plan matching at most one row that breaks uniqueness.
         """
+        from orionis.orm.query.raw_builder import RawQueryBuilder
+
         builder = RawQueryBuilder().table(self._table)
         builder.where(self._column, "=", value)
 
@@ -187,6 +187,8 @@ class Unique(Rule):
         bool
             Return ``True`` when a conflicting row exists.
         """
+        from orionis.orm.resolver import ConnectionResolver
+
         connection = ConnectionResolver.connection(self._connection)
         return bool(await connection.select(plan))
 
@@ -204,6 +206,9 @@ class Unique(Rule):
         bool
             Return ``True`` when a conflicting row exists.
         """
+        from orionis.database import Connection
+        from orionis.orm.resolver import ConnectionResolver
+
         manager = ConnectionResolver.manager()
         name = self._connection or manager.getDefaultName()
         connection = Connection(name, manager.configFor(name))

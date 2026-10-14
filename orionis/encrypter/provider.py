@@ -1,7 +1,6 @@
 from __future__ import annotations
 from orionis.container.providers.service_provider import ServiceProvider
 from orionis.encrypter.contracts.encrypter import IEncrypter
-from orionis.encrypter.encrypter import Encrypter
 from orionis.support.facades.encrypter import Crypt as CryptFacade
 
 class EncrypterProvider(ServiceProvider):
@@ -13,18 +12,18 @@ class EncrypterProvider(ServiceProvider):
     ``Crypt.decrypt(...)`` calls resolve without container overhead.
     """
 
+    # ruff: noqa: PLC0415
+
     def register(self) -> None:
         """
-        Register the encrypter service in the application container.
-
-        This method binds the IEncrypter interface to its concrete implementation
-        as a singleton, ensuring a single instance is shared across the application.
+        Bind the encrypter contract to its singleton implementation.
 
         Returns
         -------
         None
-            This method does not return a value.
+            Register the encrypter binding.
         """
+        from orionis.encrypter import Encrypter
         self.app.singleton(IEncrypter, Encrypter)
 
     async def boot(self) -> None:

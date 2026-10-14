@@ -1,7 +1,5 @@
 import inspect
 from typing import TYPE_CHECKING, Any
-from aiocache import BaseCache
-from aiocache.lock import OptimisticLock, OptimisticLockError
 from orionis.cache.contracts.repository import ICacheRepository
 from orionis.cache.exceptions import CacheStoreException
 from orionis.cache.locks.lock import CacheLock
@@ -19,7 +17,7 @@ class CacheRepository(ICacheRepository):
     a higher-level API (get, set, remember, lock, …).
     """
 
-    # ruff: noqa: ANN401
+    # ruff: noqa: ANN401, PLC0415, SLF001
 
     __slots__ = ("_backend", "_prefix")
 
@@ -91,11 +89,15 @@ class CacheRepository(ICacheRepository):
         replace = getattr(backend, "replace", None)
         if callable(replace):
             return bool(await replace(prefixed, value, ttl=ttl))
+
+        from aiocache import BaseCache
+        from aiocache.lock import OptimisticLock, OptimisticLockError
+
         if not isinstance(backend, BaseCache):
             error_msg = "This cache backend does not support atomic replacement."
             raise CacheStoreException(error_msg)
         async with OptimisticLock(backend, prefixed) as lock:
-            if lock._token is None:  # noqa: SLF001
+            if lock._token is None:
                 return False
             try:
                 return await lock.cas(value, ttl=ttl)

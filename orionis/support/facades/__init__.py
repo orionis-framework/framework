@@ -76,7 +76,8 @@ _EXPORTS = {
 }
 
 def __getattr__(name: str) -> object:
-    """Resolve and cache a public package export.
+    """
+    Resolve and cache a public package export.
 
     Parameters
     ----------
@@ -96,7 +97,8 @@ def __getattr__(name: str) -> object:
     return _resolve_export(globals(), _EXPORTS, name)
 
 def __dir__() -> list[str]:
-    """List loaded attributes and declared public exports.
+    """
+    List loaded attributes and declared public exports.
 
     Returns
     -------

@@ -12,8 +12,6 @@ from orionis.mail.exceptions import MailConfigurationException
 from orionis.mail.functions import freeze_owned
 from orionis.mail.mailable import Mailable
 from orionis.mail.pending import PendingMail
-from orionis.mail.transports.file import create_file_transport
-from orionis.mail.transports.smtp import create_smtp_transport
 from orionis.support.entities.base import BaseEntity
 
 if TYPE_CHECKING:
@@ -42,7 +40,7 @@ class MailManager(PendingMail, IMailManager):
     resolution and preparation keep all per-operation state in local variables.
     """
 
-    # ruff: noqa: TC001
+    # ruff: noqa: PLC0415, TC001
 
     __slots__ = ("_app", "_composer", "_factories")
 
@@ -60,14 +58,11 @@ class MailManager(PendingMail, IMailManager):
         Returns
         -------
         None
-            Initialize built-in factories and an empty immutable fluent chain.
+            Initialize an empty fluent chain and defer built-in factories.
         """
         self._app = app
         self._composer = composer
-        self._factories: dict[str, TransportFactory] = {
-            "smtp": create_smtp_transport,
-            "file": create_file_transport,
-        }
+        self._factories: dict[str, TransportFactory] = {}
         super().__init__(self._deliver, mailable_builder=self._buildMailable)
 
     async def _buildMailable(self, mailable: type[Mailable]) -> Mailable:
@@ -115,7 +110,7 @@ class MailManager(PendingMail, IMailManager):
         if not isinstance(driver, str) or not driver.strip() or not callable(factory):
             error_msg = "extend() requires a non-empty driver and a callable factory."
             raise MailConfigurationException(error_msg)
-        if driver in self._factories:
+        if driver in self._factories or driver in _CONVENTIONAL_DRIVERS:
             error_msg = f"Mail driver [{driver}] is already registered."
             raise MailConfigurationException(error_msg)
         self._factories[driver] = factory
@@ -155,7 +150,7 @@ class MailManager(PendingMail, IMailManager):
         """
         mailer, driver, config = self._resolveMailer(name)
         factory = self._factories.get(driver)
-        if factory is None:
+        if factory is None and driver not in _CONVENTIONAL_DRIVERS:
             error_msg = f"Mail driver [{driver}] has no registered implementation."
             raise MailConfigurationException(error_msg)
 
@@ -166,6 +161,20 @@ class MailManager(PendingMail, IMailManager):
         # Preparation runs first so a rendering or attachment failure never
         # opens a connection or publishes a file.
         prepared = await self._composer.prepare(envelope, content, attachments)
+
+        if factory is None:
+
+            if driver == "smtp":
+
+                from orionis.mail.transports.smtp import create_smtp_transport
+                factory = create_smtp_transport
+
+            else:
+
+                from orionis.mail.transports.file import create_file_transport
+                factory = create_file_transport
+
+            self._factories[driver] = factory
 
         transport = factory(self._app, config)
         if isawaitable(transport):

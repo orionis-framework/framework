@@ -1,4 +1,3 @@
-from orionis.cache.cache_manager import CacheManager
 from orionis.cache.contracts.cache_manager import ICacheManager
 from orionis.container.providers.deferrable_provider import DeferrableProvider
 from orionis.container.providers.service_provider import ServiceProvider
@@ -12,6 +11,8 @@ class CacheProvider(ServiceProvider, DeferrableProvider):
     and pins the :class:`Cache` facade so that attribute access is direct
     without container resolution overhead on every call.
     """
+
+    # ruff: noqa: PLC0415
 
     @classmethod
     def provides(cls) -> list[type]:
@@ -32,7 +33,9 @@ class CacheProvider(ServiceProvider, DeferrableProvider):
         Returns
         -------
         None
+            Register the cache manager binding.
         """
+        from orionis.cache import CacheManager
         self.app.singleton(ICacheManager, CacheManager)
 
     async def boot(self) -> None:
@@ -42,5 +45,6 @@ class CacheProvider(ServiceProvider, DeferrableProvider):
         Returns
         -------
         None
+            Enable direct facade access to the resolved manager.
         """
         await CacheFacade.pin()

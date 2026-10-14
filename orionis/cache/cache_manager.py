@@ -3,22 +3,16 @@ from typing import TYPE_CHECKING, Any
 from orionis.cache.contracts.cache_manager import ICacheManager
 from orionis.cache.exceptions import CacheStoreException
 from orionis.cache.repository import CacheRepository
-from orionis.cache.stores.database import build as _build_database
-from orionis.cache.stores.file import FileCacheBackend
-from orionis.cache.stores.memcached import build as _build_memcached
-from orionis.cache.stores.memory import build as _build_memory
-from orionis.cache.stores.redis import build as _build_redis
 from orionis.foundation.config.cache.entities.cache import Cache as _CacheConfig
 from orionis.foundation.config.cache.enums.drivers import Drivers
 from orionis.foundation.contracts.application import IApplication
-from orionis.orm.resolver import ConnectionResolver
 
 if TYPE_CHECKING:
     from collections.abc import Callable
 
 class CacheManager(ICacheManager):
 
-    # ruff: noqa: ANN401, TC001
+    # ruff: noqa: ANN401, PLC0415, TC001
 
     __slots__ = (
         "_app",
@@ -98,8 +92,7 @@ class CacheManager(ICacheManager):
         Parameters
         ----------
         name : str
-            Driver name (``'file'``, ``'memory'``, ``'redis'``,
-            ``'memcached'``).
+            Driver name: file, memory, Redis, Memcached or database.
 
         Returns
         -------
@@ -115,6 +108,8 @@ class CacheManager(ICacheManager):
         stores = self._config.stores
 
         if name == Drivers.MEMORY.value:
+
+            from orionis.cache.stores.memory import build as _build_memory
             return _build_memory()
 
         if name == Drivers.REDIS.value:
@@ -122,6 +117,8 @@ class CacheManager(ICacheManager):
             if cfg is None:
                 msg = "Redis store is not configured."
                 raise CacheStoreException(msg)
+
+            from orionis.cache.stores.redis import build as _build_redis
             return _build_redis(
                 endpoint=getattr(cfg, "endpoint", None) or "127.0.0.1",
                 port=int(getattr(cfg, "port", 6379)),
@@ -134,6 +131,8 @@ class CacheManager(ICacheManager):
             if cfg is None:
                 msg = "Memcached store is not configured."
                 raise CacheStoreException(msg)
+
+            from orionis.cache.stores.memcached import build as _build_memcached
             return _build_memcached(
                 endpoint=getattr(cfg, "endpoint", None) or "127.0.0.1",
                 port=int(getattr(cfg, "port", 11211)),
@@ -157,6 +156,7 @@ class CacheManager(ICacheManager):
         if not resolved_path.is_absolute():
             resolved_path = self._base_path / resolved_path
 
+        from orionis.cache.stores.file import FileCacheBackend
         return FileCacheBackend(path=resolved_path)
 
     def _buildDatabaseBackend(self) -> Any:
@@ -177,6 +177,9 @@ class CacheManager(ICacheManager):
         if cfg is None:
             msg = "Database store is not configured."
             raise CacheStoreException(msg)
+
+        from orionis.cache.stores.database import build as _build_database
+        from orionis.orm.resolver import ConnectionResolver
 
         return _build_database(
             connection=ConnectionResolver.connection(

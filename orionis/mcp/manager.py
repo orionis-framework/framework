@@ -1,27 +1,30 @@
 from __future__ import annotations
 import re
 from typing import TYPE_CHECKING
-from orionis.foundation.contracts.application import IApplication  # noqa: TC001 - Constructor DI.
-from orionis.http.routes.contracts.router import IRouter  # noqa: TC001 - Constructor DI.
+from orionis.foundation.contracts.application import IApplication
+from orionis.http.routes.contracts.router import IRouter
 from orionis.http.routes.functions import normalize_path, normalize_request_path
-from orionis.mcp.config import McpConfig  # noqa: TC001 - Constructor DI.
-from orionis.mcp.contracts.event_bus import IMcpEventBus  # noqa: TC001 - Constructor DI.
+from orionis.mcp.config import McpConfig
+from orionis.mcp.contracts.event_bus import IMcpEventBus
 from orionis.mcp.contracts.manager import IMcpManager
-from orionis.mcp.routing import McpController
-from orionis.mcp.server.compiler import CompiledMcpServer, compile_server
+from orionis.mcp.server.compiler import (
+    CompiledMcpServer,
+    compile_server,
+)
 from orionis.mcp.server.primitives import Server
-from orionis.mcp.transport.http import McpHttpTransport
-from orionis.mcp.transport.stdio import McpStdioTransport
 
 if TYPE_CHECKING:
     from orionis.http.request import Request
     from orionis.http.responses import Response
     from orionis.http.routes.fluent import FluentRoute
+    from orionis.mcp.transport.http import McpHttpTransport
 
 _LOCAL_NAME = re.compile(r"[A-Za-z0-9][A-Za-z0-9_.-]{0,127}")
 
 class McpManager(IMcpManager):
     """Own one compiled registry shared by native HTTP, STDIO, DI and the facade."""
+
+    # ruff: noqa: PLC0415, SLF001, TC001
 
     __slots__ = ("_app", "_bus", "_compiled", "_config", "_local", "_router", "_web")
 
@@ -89,14 +92,21 @@ class McpManager(IMcpManager):
         Parameters
         ----------
         path : str
-            Value supplied for ``path``.
+            Fixed endpoint path without URI parameters, query strings or fragments.
         server : type[Server]
-            Value supplied for ``server``.
+            Server declaration to compile and bind to the endpoint.
 
         Returns
         -------
         FluentRoute
-            Result of the operation described above.
+            API POST route bound to the server's HTTP transport.
+
+        Raises
+        ------
+        TypeError
+            If the path is not a string or the declaration is not a Server subclass.
+        ValueError
+            If the endpoint is invalid, already registered or its metadata is invalid.
         """
         if not isinstance(path, str):
             message = "MCP endpoint paths must be strings"
@@ -110,8 +120,12 @@ class McpManager(IMcpManager):
             message = f"An MCP HTTP server is already registered at {path!r}"
             raise ValueError(message)
         compiled = self._compile(server)
+
+        from orionis.mcp.routing import McpController
+        from orionis.mcp.transport.http import McpHttpTransport
+
         route = self._router.post(path, [McpController, "handle"])
-        route._kind("api")  # noqa: SLF001 - Native router's registration boundary.
+        route._kind("api")
         transport = McpHttpTransport(self._app, compiled, self._config, self._bus)
         self._web[path] = (route, compiled, transport)
         return route
@@ -242,14 +256,21 @@ class McpManager(IMcpManager):
         Parameters
         ----------
         name : str
-            Value supplied for ``name``.
+            Handle of an explicitly registered local server.
 
         Returns
         -------
         None
-            Complete the documented operation without returning a value.
+            Finish when the STDIO transport closes.
+
+        Raises
+        ------
+        KeyError
+            If no local server is registered under the handle.
         """
         compiled = self.getLocalServer(name)
+        from orionis.mcp.transport.stdio import McpStdioTransport
+
         transport = McpStdioTransport(self._app, compiled, self._config, self._bus)
         await transport.runStandardStreams()
 

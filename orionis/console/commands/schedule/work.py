@@ -1,10 +1,9 @@
 import asyncio
 import os
-from redis.exceptions import RedisError
-from rich.console import Console  # noqa: TC002
+import sys
+from rich.console import Console
 from rich.panel import Panel
 from rich.text import Text
-from sqlalchemy.exc import SQLAlchemyError
 from orionis.console.base.command import BaseCommand
 from orionis.console.contracts.schedule import ISchedule
 from orionis.console.enums.events import SchedulerEvent
@@ -24,7 +23,7 @@ _LISTENER_MAP: tuple[tuple[str, SchedulerEvent], ...] = (
 class ScheduleWorkCommand(BaseCommand):
     """Register and run the application's scheduled tasks."""
 
-    # ruff: noqa: TC001
+    # ruff: noqa: TC001, TC002
 
     # Indicates whether timestamps will be shown in the command output
     timestamps: bool = False
@@ -167,12 +166,18 @@ class ScheduleWorkCommand(BaseCommand):
         except (KeyboardInterrupt, asyncio.CancelledError):
             if started:
                 await self.__shutdownSchedule(schedule_service)
-        except (DatabaseException, OSError, RedisError, SQLAlchemyError) as error:
+        except Exception as error:
             if started:
                 await self.__shutdownSchedule(schedule_service)
+            backend_errors = tuple(
+                getattr(module, name)
+                for module_name, name in (
+                    ("redis.exceptions", "RedisError"),
+                    ("sqlalchemy.exc", "SQLAlchemyError"),
+                )
+                if (module := sys.modules.get(module_name)) is not None
+            )
+            if not isinstance(error, (DatabaseException, OSError, *backend_errors)):
+                raise
             console.print(Text(f"Scheduler backend error: {error}", style="red"))
             return 1
-        except Exception:
-            if started:
-                await self.__shutdownSchedule(schedule_service)
-            raise

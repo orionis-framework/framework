@@ -12,8 +12,6 @@ from orionis.container.entities.binding import Binding
 from orionis.container.entities.invocation import callable_plan, constructor_plan
 from orionis.container.enums.lifetimes import Lifetime
 from orionis.container.exceptions import CircularDependencyException
-from orionis.http.request import Request
-from orionis.schemas.validator import Schema
 
 if TYPE_CHECKING:
     import msgspec
@@ -52,7 +50,7 @@ class Container(IContainer):
     loops fall back to per-loop serialisation only.
     """
 
-    # ruff: noqa: ANN401, FBT001, ARG004, C901
+    # ruff: noqa: ANN401, FBT001, ARG004, C901, PLC0415, PLR0912
 
     # Dictionary to hold singleton instances for each class
     # This allows proper inheritance of the singleton pattern
@@ -1397,7 +1395,7 @@ class Container(IContainer):
             return await type_(*final_args, **final_kwargs)
         return type_(*final_args, **final_kwargs)
 
-    async def __resolveSignature(  # noqa: PLR0912  # NOSONAR
+    async def __resolveSignature(  # NOSONAR
         self,
         arguments: tuple[Argument, ...],
         *args: object,
@@ -1520,24 +1518,27 @@ class Container(IContainer):
         argument: Argument,
     ) -> msgspec.Struct:
         """
-        Resolve an argument that is a subclass of msgspec.Struct.
+        Validate a schema argument using the active HTTP request payload.
 
         Parameters
         ----------
         argument : Argument
-            The argument metadata to resolve.
+            Parameter metadata declaring the schema to construct.
 
         Returns
         -------
         msgspec.Struct
-            The resolved value for the msgspec.Struct argument.
+            Schema instance populated from the request body.
 
         Raises
         ------
         Exception
-            If there is an error during resolution of the msgspec.Struct argument.
+            If request resolution, body parsing or schema validation fails.
         """
         # Create a request instance to access the request data
+        from orionis.http import Request
+        from orionis.schemas.validator import Schema
+
         request: IRequest = await self.make(Request)
 
         # Retrieve the raw data from the request body

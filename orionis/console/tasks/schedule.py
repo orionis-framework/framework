@@ -3,7 +3,6 @@ import functools
 import inspect
 import logging
 from typing import Self, TYPE_CHECKING
-from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from orionis.console.contracts.schedule import ISchedule
 from orionis.console.core.contracts.reactor import IReactor
 from orionis.console.entities.scheduler_event import (
@@ -11,7 +10,6 @@ from orionis.console.entities.scheduler_event import (
 )
 from orionis.console.enums.events import SchedulerEvent, TaskEvent
 from orionis.console.fluent.contracts.task import ITask
-from orionis.console.fluent.task import Task
 from orionis.console.enums.states import ScheduleStates
 from orionis.console.contracts.store import IScheduleStore
 from orionis.failure.contracts.catch import ICatch
@@ -22,6 +20,7 @@ from orionis.console.entities.task_event import TaskEvent as TaskEventEntity
 
 if TYPE_CHECKING:
     from collections.abc import Callable, Coroutine
+    from apscheduler.schedulers.asyncio import AsyncIOScheduler
     from apscheduler.events import JobEvent as APJobEvent
     from apscheduler.events import SchedulerEvent as APSchedulerEvent
     from orionis.console.entities.task import Task as TaskEntity
@@ -66,7 +65,7 @@ globals()["_executeScheduledCommand"] = _execute_scheduled_command
 
 class Schedule(ISchedule):
 
-    # ruff: noqa: BLE001, TC001
+    # ruff: noqa: BLE001, PLC0415, TC001
 
     _SCHEDULER_NOT_STARTED_ERROR = "The Orionis task scheduler has not been started."
 
@@ -484,16 +483,12 @@ class Schedule(ISchedule):
 
     async def boot(self) -> None:
         """
-        Boot the scheduler and register all configured tasks.
-
-        Load available command signatures, validate and load fluent tasks,
-        initialize the scheduler, register event listeners, and add all jobs
-        to the scheduler.
+        Initialize the scheduler and register configured tasks and listeners.
 
         Returns
         -------
         None
-            This method does not return a value but initializes the scheduler.
+            Start the configured scheduler and its jobs.
         """
         # Load available command signatures from the CLI reactor
         await self.__loadAvailableCommands()
@@ -502,6 +497,8 @@ class Schedule(ISchedule):
         await self.__validateAndLoadFluentTasks()
 
         # Get the current asyncio event loop for scheduling async tasks
+        from apscheduler.schedulers.asyncio import AsyncIOScheduler
+
         loop = asyncio.get_running_loop()
         self.__scheduler = AsyncIOScheduler(
             event_loop=loop,
@@ -765,6 +762,8 @@ class Schedule(ISchedule):
         # (signature, args, kwargs=None, purpose=None) — passing `purpose`
         # positionally silently binds it to `kwargs` instead, corrupting the
         # kwargs field and always dropping the task's purpose.
+        from orionis.console.fluent import Task
+
         self.__fluent_tasks[signature] = Task(
             signature,
             args or [],

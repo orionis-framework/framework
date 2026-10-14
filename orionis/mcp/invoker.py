@@ -1,10 +1,10 @@
 import inspect
+import sys
 from dataclasses import dataclass
 from typing import TYPE_CHECKING, Literal, cast, get_type_hints
 import msgspec
 from orionis.auth.contracts.context import IAuthenticationContext
 from orionis.http.contracts.request import IRequest
-from orionis.http.request import Request
 from orionis.mcp.context import McpRequest
 
 if TYPE_CHECKING:
@@ -42,30 +42,40 @@ def _classify(
     Parameters
     ----------
     parameter : inspect.Parameter
-        Value supplied for ``parameter``.
+        Handler parameter whose source and positional mode are classified.
     annotation : object
         Native type annotation to inspect or validate.
     payload_type : object
-        Value supplied for ``payload_type``.
+        Declared payload type, or None when the handler has no payload.
     argument_names : tuple[str, ...]
-        Value supplied for ``argument_names``.
+        Named prompt arguments supplied by the protocol.
     uri_names : tuple[str, ...]
-        Value supplied for ``uri_names``.
+        Variables extracted from the resource URI template.
 
     Returns
     -------
     _Parameter
-        Result of the operation described above.
+        Immutable binding plan with its trusted source, value and positional mode.
+
+    Raises
+    ------
+    TypeError
+        If the annotation is unsupported or refers to an undeclared payload type.
     """
     source = "dependency"
     value = annotation
+    # A native Request annotation already has its defining module loaded.
+    # Keep STDIO-only handler compilation independent of HTTP payload parsing.
+    request_module = sys.modules.get("orionis.http.request")
     if payload_type is not None and annotation == payload_type:
         source = "payload"
     elif annotation is McpRequest:
         source = "request"
     elif annotation is IAuthenticationContext:
         source = "authentication"
-    elif annotation in (Request, IRequest):
+    elif annotation is IRequest or (
+        request_module is not None and annotation is request_module.Request
+    ):
         source = "http"
     elif parameter.name in argument_names and annotation is str:
         source, value = "argument", parameter.default

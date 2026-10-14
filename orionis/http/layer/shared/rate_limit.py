@@ -1,9 +1,8 @@
 from __future__ import annotations
+import sys
 from typing import TYPE_CHECKING
-from redis.exceptions import RedisError
 from orionis.foundation.config.http.entitites.rate_limit import HTTPRateLimit
 from orionis.http.layer.store.memory_rate_limit import MemoryRateLimitStore
-from orionis.http.layer.store.redis_rate_limit import RedisRateLimitStore
 
 if TYPE_CHECKING:
     from orionis.http.adapters.request.contracts.transport import TransportAdapter
@@ -11,6 +10,8 @@ if TYPE_CHECKING:
     from orionis.http.responses import Response
 
 class RateLimitMiddleware:
+
+    # ruff: noqa: PLC0415
 
     __slots__ = (
         "__default_responses",
@@ -38,6 +39,7 @@ class RateLimitMiddleware:
         Returns
         -------
         None
+            Configure the limiter and its enabled storage backend.
         """
         # Validate the raw configuration through the entity dataclass.
         cfg = HTTPRateLimit(**config)
@@ -50,14 +52,17 @@ class RateLimitMiddleware:
 
         self.__store = None
         if cfg.rate_limit_enabled:
-            self.__store = (
-                RedisRateLimitStore(cfg)
-                if cfg.rate_limit_store == "redis"
-                else MemoryRateLimitStore(
+            if cfg.rate_limit_store == "redis":
+                from orionis.http.layer.store.redis_rate_limit import (
+                    RedisRateLimitStore,
+                )
+
+                self.__store = RedisRateLimitStore(cfg)
+            else:
+                self.__store = MemoryRateLimitStore(
                     max_keys=cfg.rate_limit_max_keys,
                     max_events=cfg.rate_limit_max_events,
                 )
-            )
         self.__default_responses = default_responses
 
     async def close(self) -> None:
@@ -69,6 +74,11 @@ class RateLimitMiddleware:
         None
             Leave quota state intact while closing network resources.
         """
+        if self.__store is None or isinstance(self.__store, MemoryRateLimitStore):
+            return
+
+        from orionis.http.layer.store.redis_rate_limit import RedisRateLimitStore
+
         if isinstance(self.__store, RedisRateLimitStore):
             await self.__store.close()
 
@@ -89,10 +99,7 @@ class RateLimitMiddleware:
     ) -> Response | None:
         """Enforce the sliding-window rate limit for the incoming request.
 
-        Skips enforcement when rate limiting is disabled or when the
-        client IP cannot be resolved.  Returns a ``429`` response on
-        the first request that exceeds the configured quota, or
-        ``None`` when the request is within the allowed limit.
+        Skip disabled limits and unresolved client addresses.
 
         Parameters
         ----------
@@ -103,7 +110,7 @@ class RateLimitMiddleware:
         Returns
         -------
         Response | None
-            A ``429`` HTTP response when the limit is exceeded, or
+            Return 429 for exhausted quotas, 503 for Redis failures, or
             ``None`` when the request is allowed to proceed.
         """
         if not self.__rate_limit_enabled:
@@ -120,7 +127,13 @@ class RateLimitMiddleware:
                 self.__rate_limit_requests,
                 self.__rate_limit_window_seconds,
             )
-        except RedisError:
+        except Exception as exc:
+            # A Redis exception can only originate from an already loaded SDK.
+            redis_exceptions = sys.modules.get("redis.exceptions")
+            if redis_exceptions is None or not isinstance(
+                exc, redis_exceptions.RedisError,
+            ):
+                raise
             return await self.__default_responses.error(
                 status_code=503,
                 content="Rate limit service unavailable",

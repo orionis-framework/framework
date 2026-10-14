@@ -3,9 +3,10 @@ from orionis.container.providers.deferrable_provider import DeferrableProvider
 from orionis.container.providers.service_provider import ServiceProvider
 from orionis.support.facades.testing import Test as TestFacade
 from orionis.test.contracts.engine import ITestingEngine
-from orionis.test.core.engine import TestingEngine
 
 class TestingProvider(ServiceProvider, DeferrableProvider):
+
+    # ruff: noqa: PLC0415
 
     @classmethod
     def provides(cls) -> list[type]:
@@ -22,17 +23,14 @@ class TestingProvider(ServiceProvider, DeferrableProvider):
 
     def register(self) -> None:
         """
-        Register the unit testing service in the application container.
-
-        Retrieves the application's testing configuration, creates a UnitTest
-        service instance, and registers it as a singleton in the dependency
-        injection container. The service is bound to the ITestingEngine interface.
+        Bind the deferred testing engine as a singleton.
 
         Returns
         -------
         None
-            This method does not return a value.
+            Register the engine implementation under its contract.
         """
+        from orionis.test.core.engine import TestingEngine
         self.app.singleton(ITestingEngine, TestingEngine)
 
     async def boot(self) -> None:

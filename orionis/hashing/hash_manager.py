@@ -5,8 +5,6 @@ from orionis.foundation.contracts.application import IApplication
 from orionis.hashing.contracts.hash_manager import IHashManager
 from orionis.hashing.contracts.hasher import IHasher
 from orionis.hashing.exceptions import HashDriverNotSupportedException
-from orionis.hashing.hashers.argon2_hasher import Argon2Hasher
-from orionis.hashing.hashers.bcrypt_hasher import BcryptHasher
 
 class HashManager(IHashManager):
     """Expose an algorithm-agnostic hashing API.
@@ -28,7 +26,7 @@ class HashManager(IHashManager):
     application.
     """
 
-    # ruff: noqa: TC001
+    # ruff: noqa: PLC0415, TC001
 
     __slots__ = ("_config", "_default", "_drivers")
 
@@ -120,6 +118,8 @@ class HashManager(IHashManager):
             If *name* does not match any supported driver.
         """
         if name == Drivers.ARGON2.value:
+
+            from orionis.hashing.hashers.argon2_hasher import Argon2Hasher
             options = self._config.argon2
             return Argon2Hasher(
                 memory=options.memory,
@@ -128,6 +128,8 @@ class HashManager(IHashManager):
             )
 
         if name == Drivers.BCRYPT.value:
+
+            from orionis.hashing.hashers.bcrypt_hasher import BcryptHasher
             return BcryptHasher(rounds=self._config.bcrypt.rounds)
 
         error_msg = (

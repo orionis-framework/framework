@@ -56,8 +56,9 @@ class TestHashingPackageSurface(TestCase):
     def testExposesNoUndocumentedPublicObjects(self) -> None:
         """Keep every non-module public attribute inside ``__all__``.
 
-        Validates that no helper or imported symbol leaks into the package
-        namespace without being declared as part of the public API.
+        Inspect the advertised surface without assuming deferred symbols
+        already exist in the package namespace. Resolve each advertised
+        attribute to detect helpers accidentally exposed by ``__dir__``.
 
         Returns
         -------
@@ -66,7 +67,8 @@ class TestHashingPackageSurface(TestCase):
         """
         exported = {
             name
-            for name, value in vars(hashing_package).items()
-            if not name.startswith("_") and not isinstance(value, ModuleType)
+            for name in dir(hashing_package)
+            if not name.startswith("_")
+            and not isinstance(getattr(hashing_package, name), ModuleType)
         }
         self.assertEqual(exported, set(hashing_package.__all__))

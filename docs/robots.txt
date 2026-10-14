@@ -1,0 +1,13 @@
+User-agent: OAI-SearchBot
+Allow: /
+
+User-agent: GPTBot
+Allow: /
+
+User-agent: ChatGPT-User
+Allow: /
+
+User-agent: *
+Allow: /
+
+Sitemap: https://api.orionis-framework.com/sitemap.xml

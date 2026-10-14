@@ -3,10 +3,11 @@ from typing import TYPE_CHECKING
 from urllib.parse import parse_qsl
 import msgspec.json as _msgspec_json
 import msgspec.msgpack as _msgspec_msgpack
-from defusedxml.ElementTree import fromstring as _xml_fromstring
 
 if TYPE_CHECKING:
     from xml.etree.ElementTree import Element as XMLElement
+
+# ruff: noqa: PLC0415
 
 def _split_header_parameters( # NOSONAR
     header: str, *, quote_chars: str = '"',
@@ -211,6 +212,7 @@ def parse_xml(raw: bytes) -> XMLElement:
         subclass of ``defusedxml.common.DefusedXmlException``, not ParseError.
     """
     # Defaults forbid entities and external access, but allow DTD declarations.
+    from defusedxml.ElementTree import fromstring as _xml_fromstring
     return _xml_fromstring(raw)
 
 def parse_text(raw: bytes) -> str:

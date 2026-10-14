@@ -1,0 +1,50 @@
+# Comandos incluidos
+
+El registro incluido se define en `orionis/console/core/commands.py`; la aplicación puede añadir comandos propios. Consulta `python reactor list` y la ayuda de cada firma antes de operaciones con efectos persistentes. Esta guía organiza el catálogo por tarea, no reemplaza los argumentos específicos de cada ayuda.
+
+## Crear componentes
+
+Los generadores `make:console-command`, `make:model`, `make:factory`, `make:job`, `make:mail`, generadores HTTP, providers, facades, servicios, contratos, tests y MCP utilizan stubs y rutas de aplicación. La firma de cada generador se puede consultar en `list`; no deduzcas opciones de comandos con nombres similares de otro framework.
+
+```shell
+python reactor make:job SendWelcomeEmail --help
+python reactor make:factory ProductFactory --help
+```
+
+Generar un modelo no migra su tabla; generar un job no inicia workers. Revisa los imports, dependencias y configuración del componente generado antes de usarlo.
+
+## Evolucionar datos
+
+`migrate`, `migrate:status`, `migrate:rollback`, `migrate:reset`, `migrate:refresh`, `migrate:fresh`, `seed` y `db:seed` se explican en [migraciones y seeders](../../../database/docs/es/migrations-and-seeders.md). Comparten `--database`/`-d` para seleccionar conexión. Rollback `--step` cuenta lotes. `db:show` muestra información de la base; `db:table` inspecciona tablas; `db:wipe` elimina datos estructurales según su flujo y exige cuidado operativo.
+
+```shell
+python reactor migrate:status --database sqlite
+python reactor db:show --help
+python reactor db:table --help
+```
+
+No programes `migrate:fresh`, `db:wipe` ni `queue:clear` como mantenimiento rutinario de producción. Borran datos o trabajo pendiente; no equivalen a limpieza de registros completados.
+
+## Servir, inspeccionar y probar
+
+`serve` inicia el servidor de desarrollo según los argumentos disponibles; revisa [HTTP](../../../http/docs/es/README.md) para el ciclo web. `route:list` inspecciona rutas registradas. `test` ejecuta el sistema de pruebas de Orionis; su modo y selección pertenecen a [Testing](../../../test/docs/es/README.md). Las tareas de desarrollo y workers son procesos de larga duración: necesitan supervisión si se usan en un entorno operativo.
+
+`schedule:list` y `schedule:work` pertenecen al [scheduler](task-scheduling.md). `queue:work`, `queue:failed`, `queue:retry`, `queue:forget` y `queue:clear` operan [colas](../../../queues/docs/es/workers-and-failures.md). Los comandos MCP se documentan en [MCP](../../../mcp/docs/es/README.md).
+
+## Optimizar y mantener
+
+El catálogo también incluye optimización y su limpieza, estado de entorno/aplicación, generación de clave, mantenimiento y limpieza de caché, logs, vistas y artefactos de pruebas. Consulta sus firmas/ayuda reales. Generar una nueva clave en una aplicación con datos cifrados tiene efectos sobre esos datos: coordina ese cambio con [cifrado](../../../encrypter/docs/es/README.md). Limpiar caches de compilación invalida metadatos y puede cambiar el tiempo del siguiente arranque.
+
+## Instalar extras desde el catálogo
+
+La firma pública es `packages`, aunque la clase de implementación se llame `InstallCommand`:
+
+```shell
+orionis packages --list
+orionis packages s3 redshift --yes
+orionis packages group:dev --yes
+```
+
+`--list` solo muestra el catálogo; los otros ejemplos instalan paquetes con `uv` para el intérprete que ejecuta Orionis. `--yes` suprime confirmación interactiva. No ejecutarlos equivale a revisar el catálogo, no a instalar dependencias automáticamente durante lectura de este manual.
+
+El comando usa primero el manifiesto empaquetado `orionis/pyproject.toml`, después el manifiesto raíz del framework en instalaciones source/editable y, como fallback, el manifiesto raíz de la aplicación. Los textos de propósito provienen de `[tool.orionis.packages]`, con claves `extra:s3` o `group:dev`. Respeta extras, marcadores, grupos y deduplicación; no reescribe el manifiesto ni lockfile de la aplicación. Si falta un catálogo esperado, verifica qué manifiesto está disponible y el entorno Python activo.

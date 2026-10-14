@@ -2,7 +2,6 @@ from __future__ import annotations
 from orionis.container.providers.deferrable_provider import DeferrableProvider
 from orionis.container.providers.service_provider import ServiceProvider
 from orionis.storage.contracts.manager import IStorageManager
-from orionis.storage.manager import StorageManager
 from orionis.support.facades.storage import Storage as StorageFacade
 
 class StorageProvider(ServiceProvider, DeferrableProvider):
@@ -14,6 +13,8 @@ class StorageProvider(ServiceProvider, DeferrableProvider):
     access is direct without container resolution overhead on every
     call.
     """
+
+    # ruff: noqa: PLC0415
 
     @classmethod
     def provides(cls) -> list[type]:
@@ -34,7 +35,9 @@ class StorageProvider(ServiceProvider, DeferrableProvider):
         Returns
         -------
         None
+            Register the storage manager binding.
         """
+        from orionis.storage import StorageManager
         self.app.singleton(IStorageManager, StorageManager)
 
     async def boot(self) -> None:
@@ -44,5 +47,6 @@ class StorageProvider(ServiceProvider, DeferrableProvider):
         Returns
         -------
         None
+            Enable direct facade access to the resolved manager.
         """
         await StorageFacade.pin()

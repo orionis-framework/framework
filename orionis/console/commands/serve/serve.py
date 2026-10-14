@@ -3,9 +3,6 @@ import os
 import sys
 from pathlib import Path
 from typing import TYPE_CHECKING, ClassVar
-from anyio import Path as AnyPath
-from granian.constants import Interfaces, Loops
-from granian.log import LogLevels
 from orionis.console.args.argument import Argument
 from orionis.console.base.command import BaseCommand
 from orionis.foundation.contracts.application import IApplication
@@ -157,8 +154,10 @@ class ServerCommand(BaseCommand):
         Returns
         -------
         None
-            This method does not return a value.
+            Append flags and record the selected interface.
         """
+        from granian.constants import Interfaces
+
         interface: str = (
             self.getArgument("interface") or Interfaces.RSGI.value
         )
@@ -190,9 +189,11 @@ class ServerCommand(BaseCommand):
         Returns
         -------
         None
-            This method does not return a value.
+            Append the loop flag and record its selection.
         """
         # Select the event loop backend for the current platform.
+        from granian.constants import Loops
+
         event_loop: str = (
             Loops.uvloop.value if os.name != "nt" else Loops.auto.value
         )
@@ -384,20 +385,17 @@ class ServerCommand(BaseCommand):
         Returns
         -------
         None
-            This method does not return a value.
+            Complete the embedded server lifecycle.
 
         Notes
         -----
-        Used on Windows when a debugger is attached. Workers run as
-        asyncio tasks so debugpy breakpoints work without subprocess
-        interception issues.
-
-        Lifecycle is managed explicitly because
-        ``Application.__rsgi_init__`` calls ``loop.run_until_complete()``,
-        which raises ``RuntimeError`` when the loop is already running,
-        and ``asyncio.ensure_future(loop=)`` was removed in Python 3.12+.
+        Windows debugger sessions use asyncio tasks. Drive RSGI startup and
+        shutdown explicitly because the application's synchronous RSGI hooks
+        cannot run inside an active event loop.
         """
         from granian.server.embed import Server as EmbedServer
+        from granian.constants import Interfaces
+        from granian.log import LogLevels
 
         class _RSGIProxy:
             """Delegate RSGI calls and suppress framework lifecycle hooks."""
@@ -602,16 +600,12 @@ class ServerCommand(BaseCommand):
         Returns
         -------
         None
-            This method does not return a value.
+            Launch the selected runtime or report an exported command.
 
         Notes
         -----
-        Dispatches to the appropriate server strategy:
-
-        - **Unix**: replaces the process via ``execvpe``.
-        - **Windows + debugger**: uses the Granian embedded server
-          (in-process asyncio tasks) for full breakpoint support.
-        - **Windows**: launches Granian as a managed subprocess.
+        Replace the process on Unix. On Windows, use the embedded server for
+        debugger sessions and a managed subprocess otherwise.
         """
         async with self.__lock:
             self.__env = self.__initNewEnvironment()
@@ -638,6 +632,8 @@ class ServerCommand(BaseCommand):
                 process_name = "orionis-app"
 
             self.__appendProcessNameToCommand(process_name)
+
+            from anyio import Path as AnyPath
 
             root_path: str = (await AnyPath(app.basePath).resolve()).as_posix()
             self.__env["ORIONIS_BUILD_TIMESTAMP_NS"] = str(app.startAt)

@@ -4,7 +4,6 @@ from typing import TYPE_CHECKING, Any, ClassVar
 import sqlalchemy
 from sqlalchemy import Column as SqlColumn
 from sqlalchemy import ForeignKey, MetaData, Table, and_, func, or_
-from sqlalchemy.dialects.oracle import FLOAT
 from sqlalchemy.exc import NoSuchModuleError
 from sqlalchemy.schema import CreateTable, DropTable
 from sqlalchemy.sql import CompoundSelect
@@ -102,6 +101,8 @@ class SQLCompiler:
     :class:`TableDefinition` objects into engine table metadata (cached
     per compiler) and query plans into executable statements.
     """
+
+    # ruff: noqa: ANN401, PLC0415
 
     __slots__ = ("_definitions", "_driver", "_metadata", "_prefix", "_tables")
 
@@ -1436,6 +1437,8 @@ class SQLCompiler:
             and definition.column_type is ColumnType.FLOAT
             and definition.precision is not None
         ):
+            from sqlalchemy.dialects.oracle import FLOAT
+
             # Follow SQLAlchemy's decimal-to-binary precision estimate for
             # Oracle FLOAT, retaining the result conversion options.
             return column_type.with_variant(
@@ -1699,7 +1702,7 @@ class SQLCompiler:
             raise QueryException(error_msg)
         return handler(column, self._clauseValue(sources, clause.value))
 
-    def _clauseValue(self, sources: SourceMap, value: Any) -> Any:  # noqa: ANN401
+    def _clauseValue(self, sources: SourceMap, value: Any) -> Any:
         """
         Compile a SELECT value or return a non-query value unchanged.
 

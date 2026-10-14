@@ -1,0 +1,4 @@
+from orionis.support.facades import Route
+
+# Register WebSocket and Hub routes here.
+# ...

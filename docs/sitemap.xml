@@ -517,7 +517,73 @@
     <loc>https://api.orionis-framework.com/orionis.console.base.scheduler.html</loc>
   </url>
   <url>
+    <loc>https://api.orionis-framework.com/orionis.console.bootstrap.html</loc>
+  </url>
+  <url>
     <loc>https://api.orionis-framework.com/orionis.console.cli.html</loc>
+  </url>
+  <url>
+    <loc>https://api.orionis-framework.com/orionis.console.commands.bootstrap._base.BootstrapCommand.html</loc>
+  </url>
+  <url>
+    <loc>https://api.orionis-framework.com/orionis.console.commands.bootstrap._base.html</loc>
+  </url>
+  <url>
+    <loc>https://api.orionis-framework.com/orionis.console.commands.bootstrap._config.ConfigBootstrapper.html</loc>
+  </url>
+  <url>
+    <loc>https://api.orionis-framework.com/orionis.console.commands.bootstrap._config.html</loc>
+  </url>
+  <url>
+    <loc>https://api.orionis-framework.com/orionis.console.commands.bootstrap._editor.BootstrapEditError.html</loc>
+  </url>
+  <url>
+    <loc>https://api.orionis-framework.com/orionis.console.commands.bootstrap._editor.BootstrapEditor.html</loc>
+  </url>
+  <url>
+    <loc>https://api.orionis-framework.com/orionis.console.commands.bootstrap._editor.html</loc>
+  </url>
+  <url>
+    <loc>https://api.orionis-framework.com/orionis.console.commands.bootstrap._paths.html</loc>
+  </url>
+  <url>
+    <loc>https://api.orionis-framework.com/orionis.console.commands.bootstrap._service.Bootstrapper.html</loc>
+  </url>
+  <url>
+    <loc>https://api.orionis-framework.com/orionis.console.commands.bootstrap._service.html</loc>
+  </url>
+  <url>
+    <loc>https://api.orionis-framework.com/orionis.console.commands.bootstrap.config.BootstrapConfigCommand.html</loc>
+  </url>
+  <url>
+    <loc>https://api.orionis-framework.com/orionis.console.commands.bootstrap.config.html</loc>
+  </url>
+  <url>
+    <loc>https://api.orionis-framework.com/orionis.console.commands.bootstrap.html</loc>
+  </url>
+  <url>
+    <loc>https://api.orionis-framework.com/orionis.console.commands.bootstrap.lifespan.BootstrapLifespanCommand.html</loc>
+  </url>
+  <url>
+    <loc>https://api.orionis-framework.com/orionis.console.commands.bootstrap.lifespan.html</loc>
+  </url>
+  <url>
+    <loc>https://api.orionis-framework.com/orionis.console.commands.bootstrap.routes.BootstrapAiCommand.html</loc>
+  </url>
+  <url>
+    <loc>https://api.orionis-framework.com/orionis.console.commands.bootstrap.routes.BootstrapApiCommand.html</loc>
+  </url>
+  <url>
+    <loc>https://api.orionis-framework.com/orionis.console.commands.bootstrap.routes.BootstrapConsoleCommand.html</loc>
+  </url>
+  <url>
+    <loc>https://api.orionis-framework.com/orionis.console.commands.bootstrap.routes.BootstrapWebCommand.html</loc>
+  </url>
+  <url>
+    <loc>https://api.orionis-framework.com/orionis.console.commands.bootstrap.routes.BootstrapWebsocketCommand.html</loc>
+  </url>
+  <url>
+    <loc>https://api.orionis-framework.com/orionis.console.commands.bootstrap.routes.html</loc>
   </url>
   <url>
     <loc>https://api.orionis-framework.com/orionis.console.commands.db._inspection.DatabaseInspector.html</loc>

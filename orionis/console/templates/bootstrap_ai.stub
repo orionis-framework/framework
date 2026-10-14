@@ -1,0 +1,4 @@
+from orionis.support.facades import Mcp
+
+# Register MCP servers, tools, resources, and prompts here.
+# ...

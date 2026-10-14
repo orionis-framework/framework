@@ -4,6 +4,7 @@ import sys
 from _thread import allocate_lock
 from contextlib import contextmanager
 from typing import TYPE_CHECKING
+from orionis.console.bootstrap import bootstrap_recovery
 
 if TYPE_CHECKING:
     from collections.abc import Generator, Iterable, Sequence
@@ -194,7 +195,7 @@ class _StartupFeedback:
         try:
             self.stderr.write("\r" + " " * len(self.frame) + "\r")
             self.stderr.flush()
-        except (OSError, ValueError, UnicodeError):
+        except (OSError, ValueError, UnicodeError): # NOSONAR
             # Feedback must never replace a command's error or exit status.
             pass
         finally:
@@ -216,7 +217,7 @@ class _StartupFeedback:
         with self.lock:
             self.clear()
 
-def _interactive_frame(arguments: Sequence[str] | None) -> str | None:
+def _interactive_frame(arguments: Sequence[str] | None) -> str | None: # NOSONAR
     """
     Select a startup message for an eligible interactive console.
 
@@ -224,6 +225,11 @@ def _interactive_frame(arguments: Sequence[str] | None) -> str | None:
     ----------
     arguments : Sequence[str] | None
         Reactor arguments, including the optional executable token.
+
+    Returns
+    -------
+    None
+        Finish feedback and restore the prior recovery context on completion.
 
     Returns
     -------
@@ -300,16 +306,18 @@ def startup_feedback(arguments: Sequence[str] | None) -> Generator[None]:
     None
         Control to application bootstrap and command execution.
     """
-    frame = _interactive_frame(arguments)
-    if frame is None:
-        yield
-        return
-    feedback = _StartupFeedback(sys.stdout, sys.stderr, frame)
-    try:
+    # Keep missing-route recovery scoped to this CLI startup invocation.
+    with bootstrap_recovery(arguments):
+        frame = _interactive_frame(arguments)
+        if frame is None:
+            yield
+            return
+        feedback = _StartupFeedback(sys.stdout, sys.stderr, frame)
         try:
-            feedback.start()
-        except (OSError, ValueError, UnicodeError):
+            try:
+                feedback.start()
+            except (OSError, ValueError, UnicodeError): # NOSONAR
+                feedback.finish()
+            yield
+        finally:
             feedback.finish()
-        yield
-    finally:
-        feedback.finish()

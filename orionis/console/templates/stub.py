@@ -217,6 +217,19 @@ class Stub:
         # Return the content after all replacements have been applied.
         return content
 
+    def render(self) -> str:
+        """
+        Render a packaged template without choosing a destination.
+
+        Returns
+        -------
+        str
+            Template content with its class name and replacements applied.
+        """
+        # Reuse the same name and placeholder handling as filesystem generation.
+        self.__compileFilenameAndClassname()
+        return self.__replaceTemplateContent(self.__loadTemplate())
+
     def create(
         self,
         directory: Path,
@@ -260,13 +273,8 @@ class Stub:
             error_msg = f"Invalid file extension '{extension}'."
             raise ValueError(error_msg)
 
-        self.__compileFilenameAndClassname()
-
-        # Load the template content from the package directory.
-        content: str = self.__loadTemplate()
-
-        # Replace template placeholders with the provided values.
-        content = self.__replaceTemplateContent(content)
+        # Render through the shared entry point before creating the destination.
+        content = self.render()
 
         target_directory = directory.joinpath(*self._directory_parts)
         target_directory.mkdir(parents=True, exist_ok=True)

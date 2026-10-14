@@ -8,6 +8,7 @@ from orionis.cache.file_based_cache import FileBasedCache
 from orionis.console.args.argument import Argument
 from orionis.console.base.command import BaseCommand
 from orionis.console.base.contracts.command import IBaseCommand
+from orionis.console.bootstrap import bootstrap_recovery_active, recovering_route
 from orionis.console.core.contracts.loader import ILoader
 from orionis.console.entities.command import Command
 from orionis.console.enums.actions import ArgumentAction as _ArgumentAction
@@ -64,6 +65,10 @@ class Loader(ILoader):
             FileBasedCache instance for command caching, or None if no cache
             configuration is available.
         """
+        # Rebuild metadata from source while optional components are enabled.
+        if bootstrap_recovery_active():
+            return None
+
         # Extract cache configuration from application
         compiled = self.__app.compiled
 
@@ -277,7 +282,9 @@ class Loader(ILoader):
             Imports route modules without returning a value.
         """
         # Retrieve the routes file paths from application configuration
-        routes_path: list[Path] | Path = self.__app.routingPaths("console")
+        routes_path: list[Path] | Path | None = self.__app.routingPaths("console")
+        if not routes_path:
+            return
         routes_path = routes_path if isinstance(routes_path, list) else [routes_path]
 
         # Get the application root directory
@@ -285,6 +292,9 @@ class Loader(ILoader):
 
         # Iterate through each route file path
         for route_file in routes_path:
+            # Defer only the missing console file explicitly being recovered.
+            if recovering_route("console") and not route_file.exists():
+                continue
             # Convert file path to relative path from application root
             relative_path = route_file.relative_to(app_root)
 

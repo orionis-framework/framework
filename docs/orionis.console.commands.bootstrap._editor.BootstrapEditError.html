@@ -1,0 +1,915 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+          "DTD/xhtml1-strict.dtd">
+<html>
+  
+
+  <head>
+  
+  <title>API Reference | Orionis Framework</title>
+  <meta name="generator" content="pydoctor 25.10.1">
+    
+  </meta>
+  <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="color-scheme" content="dark light" />
+  <link rel="icon" type="image/svg+xml" href="orionis-icon.svg" />
+  <script src="orionis-theme.js" type="text/javascript"></script>
+  <link rel="stylesheet" type="text/css" href="apidocs.css" />
+  <link rel="stylesheet" type="text/css" href="extra.css" />
+  <script src="orionis-ui.js" type="text/javascript" defer="defer"></script>
+  
+</head>
+
+  <body>
+
+    <header class="orionis-header">
+  <div class="orionis-header-inner">
+    <a class="orionis-brand" href="index.html" aria-label="Orionis API reference home">
+      <img class="orionis-brand-icon" src="orionis-icon.svg" width="38" height="38" alt="" />
+      <span class="orionis-brand-copy">
+        <span class="orionis-wordmark">ORIONIS</span>
+        <span class="orionis-brand-caption">API REFERENCE</span>
+      </span>
+    </a>
+    <div class="orionis-header-actions">
+      <nav class="orionis-header-links" aria-label="Orionis resources">
+        <a href="https://docs.orionis-framework.com">Guide <span aria-hidden="true">↗</span></a>
+        <a href="https://github.com/orionis-framework/framework">GitHub <span aria-hidden="true">↗</span></a>
+      </nav>
+      <button class="orionis-icon-button" id="orionis-theme-toggle" type="button" aria-label="Toggle color theme" hidden="hidden">
+        <svg class="orionis-icon-sun" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="12" cy="12" r="4"></circle>
+          <path d="M12 2v2m0 16v2M2 12h2m16 0h2M4.93 4.93l1.42 1.42m11.3 11.3 1.42 1.42M4.93 19.07l1.42-1.42m11.3-11.3 1.42-1.42"></path>
+        </svg>
+        <svg class="orionis-icon-moon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg">
+          <path d="M20.5 13.1A8.7 8.7 0 0 1 10.9 3.5 8.7 8.7 0 1 0 20.5 13.1Z"></path>
+        </svg>
+      </button>
+      <button class="orionis-icon-button" id="orionis-menu-toggle" type="button" aria-label="Open API navigation" aria-expanded="false" hidden="hidden">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg">
+          <path d="M4 6h16M4 12h16M4 18h16"></path>
+        </svg>
+      </button>
+    </div>
+  </div>
+</header>
+
+    <nav class="navbar navbar-default mainnavbar">
+      
+  
+  <div class="container-fluid">
+
+
+    <div class="navbar-header">
+      
+      <div class="navlinks">
+        <span class="navbar-brand">
+          <a href="https://orionis-framework.com/" class="projecthome">Orionis</a> <a href="index.html">API Documentation</a>
+        </span>
+
+        <a href="moduleIndex.html">
+          Modules
+        </a>
+
+        <a href="classIndex.html">
+          Classes
+        </a>
+
+        <a href="nameIndex.html">
+          Names
+        </a>
+
+        <div id="search-box-container">
+          <div class="input-group">
+            <input id="search-box" type="search" name="search-query" placeholder="Search..." aria-label="Search" minlength="2" class="form-control" autocomplete="off" />
+            
+            <span class="input-group-btn">
+              <a style="display: none;" class="btn btn-default" id="search-clear-button" title="Clear" onclick="clearSearch()"><img src="fonts/x-circle.svg" alt="Clear" /></a>
+              <a class="btn btn-default" id="apidocs-help-button" title="Help" href="apidocs-help.html"><img src="fonts/info.svg" alt="Help" /></a>
+            </span>
+          </div>
+        </div>
+
+      </div>
+
+      <div id="search-results-container" style="display: none;">
+        
+        <div id="search-buttons">
+          <span class="label label-default" id="search-docstrings-button">
+          <label class="checkbox-inline">
+            <input type="checkbox" id="toggle-search-in-docstrings-checkbox" value="false" onclick="toggleSearchInDocstrings()">
+              search in docstrings
+            </input>
+          </label>
+          </span>
+          
+        </div>
+        
+        <noscript>
+            <h1>Cannot search: JavaScript is not supported/enabled in your browser.</h1>
+        </noscript>
+
+        <div id="search-status"> </div>
+
+        <div class="warning" id="search-warn-box" style="display: none;">
+          <p class="rst-last"><span id="search-warn"></span></p>
+        </div>
+
+        <table id="search-results">
+          <!-- Filled dynamically by JS -->
+        </table>
+        
+        <div style="margin-top: 10px;">
+          <p>For more information on the search, visit the <a href="apidocs-help.html#rst-search">help page</a>.</p>
+        </div>
+      </div>
+
+    </div>
+
+
+  </div>
+</nav>
+    
+    <div class="container-fluid">
+
+      <!-- Side navigation -->
+      <div class="sidebarcontainer" style="display: none;">
+        
+        <div class="sidebar"><nav class="sidebar">
+  
+
+  <div>
+
+      <div class="thingTitle">
+        <span>Exception</span>
+        <code class="thisobject"><a href="orionis.console.commands.bootstrap._editor.BootstrapEditError.html" class="internal-link" title="This exception"><wbr></wbr>Bootstrap<wbr></wbr>Edit<wbr></wbr>Error</a></code> 
+      </div>
+      
+      <div>
+        
+
+        
+         
+
+        
+        
+
+        
+         
+
+        
+         
+
+        
+         
+
+        
+         
+        
+      </div>
+  </div><div>
+
+      <div class="thingTitle">
+        <span>Module</span>
+        <code><a href="orionis.console.commands.bootstrap._editor.html" class="internal-link" title="The parent of this exception">_editor</a></code> 
+      </div>
+      
+      <div>
+        
+
+        
+         
+
+        <div class="childrenKindTitle">Classes</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+            <div class="itemName expandableItem">
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId2420"> 
+                    
+                </input>
+
+                <label class="lbl-toggle" for="expandableItemId2420">
+                    
+                    
+                </label>
+
+                <code><a href="orionis.console.commands.bootstrap._editor.BootstrapEditor.html" class="internal-link" title="orionis.console.commands.bootstrap._editor.BootstrapEditor"><wbr></wbr>Bootstrap<wbr></wbr>Editor</a></code>
+
+                <div class="expandableContent">
+                    <div>
+        
+
+        
+         
+
+        
+        
+
+        <div class="childrenKindTitle">Methods</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.console.commands.bootstrap._editor.BootstrapEditor.html#_is_constructor" class="internal-link" title="orionis.console.commands.bootstrap._editor.BootstrapEditor._is_constructor">_is<wbr></wbr>_constructor</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.console.commands.bootstrap._editor.BootstrapEditor.html#_root_name" class="internal-link" title="orionis.console.commands.bootstrap._editor.BootstrapEditor._root_name">_root<wbr></wbr>_name</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.console.commands.bootstrap._editor.BootstrapEditor.html#_routing_value" class="internal-link" title="orionis.console.commands.bootstrap._editor.BootstrapEditor._routing_value">_routing<wbr></wbr>_value</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.console.commands.bootstrap._editor.BootstrapEditor.html#_scope_nodes" class="internal-link" title="orionis.console.commands.bootstrap._editor.BootstrapEditor._scope_nodes">_scope<wbr></wbr>_nodes</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.console.commands.bootstrap._editor.BootstrapEditor.html#__init__" class="internal-link" title="orionis.console.commands.bootstrap._editor.BootstrapEditor.__init__">__init__</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.console.commands.bootstrap._editor.BootstrapEditor.html#_after" class="internal-link" title="orionis.console.commands.bootstrap._editor.BootstrapEditor._after">_after</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.console.commands.bootstrap._editor.BootstrapEditor.html#_append_keyword" class="internal-link" title="orionis.console.commands.bootstrap._editor.BootstrapEditor._append_keyword">_append<wbr></wbr>_keyword</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.console.commands.bootstrap._editor.BootstrapEditor.html#_application_names" class="internal-link" title="orionis.console.commands.bootstrap._editor.BootstrapEditor._application_names">_application<wbr></wbr>_names</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.console.commands.bootstrap._editor.BootstrapEditor.html#_argument_tail" class="internal-link" title="orionis.console.commands.bootstrap._editor.BootstrapEditor._argument_tail">_argument<wbr></wbr>_tail</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.console.commands.bootstrap._editor.BootstrapEditor.html#_before" class="internal-link" title="orionis.console.commands.bootstrap._editor.BootstrapEditor._before">_before</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.console.commands.bootstrap._editor.BootstrapEditor.html#_callback_import" class="internal-link" title="orionis.console.commands.bootstrap._editor.BootstrapEditor._callback_import">_callback<wbr></wbr>_import</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.console.commands.bootstrap._editor.BootstrapEditor.html#_calls" class="internal-link" title="orionis.console.commands.bootstrap._editor.BootstrapEditor._calls">_calls</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.console.commands.bootstrap._editor.BootstrapEditor.html#_check_assignments" class="internal-link" title="orionis.console.commands.bootstrap._editor.BootstrapEditor._check_assignments">_check<wbr></wbr>_assignments</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.console.commands.bootstrap._editor.BootstrapEditor.html#_check_indirect_routing" class="internal-link" title="orionis.console.commands.bootstrap._editor.BootstrapEditor._check_indirect_routing">_check<wbr></wbr>_indirect<wbr></wbr>_routing</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.console.commands.bootstrap._editor.BootstrapEditor.html#_check_routing_order" class="internal-link" title="orionis.console.commands.bootstrap._editor.BootstrapEditor._check_routing_order">_check<wbr></wbr>_routing<wbr></wbr>_order</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.console.commands.bootstrap._editor.BootstrapEditor.html#_edited" class="internal-link" title="orionis.console.commands.bootstrap._editor.BootstrapEditor._edited">_edited</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.console.commands.bootstrap._editor.BootstrapEditor.html#_end" class="internal-link" title="orionis.console.commands.bootstrap._editor.BootstrapEditor._end">_end</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.console.commands.bootstrap._editor.BootstrapEditor.html#_find_application" class="internal-link" title="orionis.console.commands.bootstrap._editor.BootstrapEditor._find_application">_find<wbr></wbr>_application</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.console.commands.bootstrap._editor.BootstrapEditor.html#_fresh_callback_name" class="internal-link" title="orionis.console.commands.bootstrap._editor.BootstrapEditor._fresh_callback_name">_fresh<wbr></wbr>_callback<wbr></wbr>_name</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.console.commands.bootstrap._editor.BootstrapEditor.html#_has_lifespan_registration" class="internal-link" title="orionis.console.commands.bootstrap._editor.BootstrapEditor._has_lifespan_registration">_has<wbr></wbr>_lifespan<wbr></wbr>_registration</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.console.commands.bootstrap._editor.BootstrapEditor.html#_helper_application_parameters" class="internal-link" title="orionis.console.commands.bootstrap._editor.BootstrapEditor._helper_application_parameters">_helper<wbr></wbr>_application<wbr></wbr>_parameters</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.console.commands.bootstrap._editor.BootstrapEditor.html#_helper_replaces_routing" class="internal-link" title="orionis.console.commands.bootstrap._editor.BootstrapEditor._helper_replaces_routing">_helper<wbr></wbr>_replaces<wbr></wbr>_routing</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.console.commands.bootstrap._editor.BootstrapEditor.html#_import_module" class="internal-link" title="orionis.console.commands.bootstrap._editor.BootstrapEditor._import_module">_import<wbr></wbr>_module</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.console.commands.bootstrap._editor.BootstrapEditor.html#_initializer_calls" class="internal-link" title="orionis.console.commands.bootstrap._editor.BootstrapEditor._initializer_calls">_initializer<wbr></wbr>_calls</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.console.commands.bootstrap._editor.BootstrapEditor.html#_lifespan_bindings" class="internal-link" title="orionis.console.commands.bootstrap._editor.BootstrapEditor._lifespan_bindings">_lifespan<wbr></wbr>_bindings</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.console.commands.bootstrap._editor.BootstrapEditor.html#_path_literal" class="internal-link" title="orionis.console.commands.bootstrap._editor.BootstrapEditor._path_literal">_path<wbr></wbr>_literal</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.console.commands.bootstrap._editor.BootstrapEditor.html#_position" class="internal-link" title="orionis.console.commands.bootstrap._editor.BootstrapEditor._position">_position</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.console.commands.bootstrap._editor.BootstrapEditor.html#_registration" class="internal-link" title="orionis.console.commands.bootstrap._editor.BootstrapEditor._registration">_registration</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.console.commands.bootstrap._editor.BootstrapEditor.html#_routing_call" class="internal-link" title="orionis.console.commands.bootstrap._editor.BootstrapEditor._routing_call">_routing<wbr></wbr>_call</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.console.commands.bootstrap._editor.BootstrapEditor.html#_start" class="internal-link" title="orionis.console.commands.bootstrap._editor.BootstrapEditor._start">_start</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.console.commands.bootstrap._editor.BootstrapEditor.html#_statement" class="internal-link" title="orionis.console.commands.bootstrap._editor.BootstrapEditor._statement">_statement</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.console.commands.bootstrap._editor.BootstrapEditor.html#commit" class="internal-link" title="orionis.console.commands.bootstrap._editor.BootstrapEditor.commit">commit</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.console.commands.bootstrap._editor.BootstrapEditor.html#encode" class="internal-link" title="orionis.console.commands.bootstrap._editor.BootstrapEditor.encode">encode</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.console.commands.bootstrap._editor.BootstrapEditor.html#lifespan" class="internal-link" title="orionis.console.commands.bootstrap._editor.BootstrapEditor.lifespan">lifespan</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.console.commands.bootstrap._editor.BootstrapEditor.html#routePaths" class="internal-link" title="orionis.console.commands.bootstrap._editor.BootstrapEditor.routePaths">route<wbr></wbr>Paths</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.console.commands.bootstrap._editor.BootstrapEditor.html#routing" class="internal-link" title="orionis.console.commands.bootstrap._editor.BootstrapEditor.routing">routing</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+         
+
+        <div class="childrenKindTitle">Attributes</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.console.commands.bootstrap._editor.BootstrapEditor.html#_lines" class="internal-link" title="orionis.console.commands.bootstrap._editor.BootstrapEditor._lines">_lines</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.console.commands.bootstrap._editor.BootstrapEditor.html#_nodes" class="internal-link" title="orionis.console.commands.bootstrap._editor.BootstrapEditor._nodes">_nodes</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.console.commands.bootstrap._editor.BootstrapEditor.html#_offsets" class="internal-link" title="orionis.console.commands.bootstrap._editor.BootstrapEditor._offsets">_offsets</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.console.commands.bootstrap._editor.BootstrapEditor.html#_original" class="internal-link" title="orionis.console.commands.bootstrap._editor.BootstrapEditor._original">_original</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.console.commands.bootstrap._editor.BootstrapEditor.html#_parents" class="internal-link" title="orionis.console.commands.bootstrap._editor.BootstrapEditor._parents">_parents</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.console.commands.bootstrap._editor.BootstrapEditor.html#app_name" class="internal-link" title="orionis.console.commands.bootstrap._editor.BootstrapEditor.app_name">app<wbr></wbr>_name</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.console.commands.bootstrap._editor.BootstrapEditor.html#assignment" class="internal-link" title="orionis.console.commands.bootstrap._editor.BootstrapEditor.assignment">assignment</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.console.commands.bootstrap._editor.BootstrapEditor.html#base_path" class="internal-link" title="orionis.console.commands.bootstrap._editor.BootstrapEditor.base_path">base<wbr></wbr>_path</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.console.commands.bootstrap._editor.BootstrapEditor.html#body" class="internal-link" title="orionis.console.commands.bootstrap._editor.BootstrapEditor.body">body</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.console.commands.bootstrap._editor.BootstrapEditor.html#encoding" class="internal-link" title="orionis.console.commands.bootstrap._editor.BootstrapEditor.encoding">encoding</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.console.commands.bootstrap._editor.BootstrapEditor.html#newline" class="internal-link" title="orionis.console.commands.bootstrap._editor.BootstrapEditor.newline">newline</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.console.commands.bootstrap._editor.BootstrapEditor.html#path" class="internal-link" title="orionis.console.commands.bootstrap._editor.BootstrapEditor.path">path</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.console.commands.bootstrap._editor.BootstrapEditor.html#scope" class="internal-link" title="orionis.console.commands.bootstrap._editor.BootstrapEditor.scope">scope</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.console.commands.bootstrap._editor.BootstrapEditor.html#source" class="internal-link" title="orionis.console.commands.bootstrap._editor.BootstrapEditor.source">source</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.console.commands.bootstrap._editor.BootstrapEditor.html#tree" class="internal-link" title="orionis.console.commands.bootstrap._editor.BootstrapEditor.tree">tree</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.console.commands.bootstrap._editor.BootstrapEditor.html#hasRouting" class="internal-link" title="orionis.console.commands.bootstrap._editor.BootstrapEditor.hasRouting">has<wbr></wbr>Routing</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+         
+        
+      </div>
+                </div>
+            </div>
+            
+        
+
+        
+
+    </li><li class=" thisobject">
+        
+        
+        
+            <div class="itemName expandableItem">
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId2421"> 
+                    
+                </input>
+
+                <label class="lbl-toggle notExpandable" for="">
+                    
+                    
+                </label>
+
+                <code><a href="orionis.console.commands.bootstrap._editor.BootstrapEditError.html" class="internal-link" title="orionis.console.commands.bootstrap._editor.BootstrapEditError"><wbr></wbr>Bootstrap<wbr></wbr>Edit<wbr></wbr>Error</a></code>
+
+                <div class="expandableContent">
+                    <div>
+        
+
+        
+         
+
+        
+        
+
+        
+         
+
+        
+         
+
+        
+         
+
+        
+         
+        
+      </div>
+                </div>
+            </div>
+            
+        
+
+        
+
+    </li>
+</ul>
+
+        
+         
+
+        
+         
+
+        
+         
+
+        
+         
+        
+      </div>
+  </div>
+
+</nav>
+        </div>
+        <div id="collapse-sidebar">
+          <a class="btn btn-link" onclick="toggleSideBarCollapse()" title="Toggle Sidebar Collapse">
+          </a>
+        </div> 
+        <script src="sidebartoggle.js" type="text/javascript"></script>
+       
+      </div>
+
+      <main class="">
+        
+
+        <div class="orionis-subheader">
+  <nav class="orionis-breadcrumb" aria-label="Documentation breadcrumb">
+    <a href="index.html">REFERENCE</a>
+    <span aria-hidden="true">/</span>
+    <span>ORIONIS FRAMEWORK</span>
+  </nav>
+  <section class="orionis-hero" aria-labelledby="orionis-hero-title">
+    <div class="orionis-hero-content">
+      <p class="orionis-eyebrow"><span class="orionis-status-dot" aria-hidden="true"></span> THE ORIONIS API</p>
+      <h2 id="orionis-hero-title">Build with <span class="orionis-accent">clarity.</span></h2>
+      <p class="orionis-hero-description">Explore the building blocks of an async-first Python framework. Every module, class, and method — connected, searchable, and ready to build with.</p>
+      <div class="orionis-hero-actions">
+        <a class="orionis-button" href="moduleIndex.html">Explore modules <span aria-hidden="true">→</span></a>
+        <a class="orionis-button orionis-button-secondary" href="classIndex.html">View classes</a>
+      </div>
+    </div>
+    <div class="orionis-hero-constellation" aria-hidden="true">
+      <span class="orionis-star orionis-star-one"></span>
+      <span class="orionis-star orionis-star-two"></span>
+      <span class="orionis-star orionis-star-three"></span>
+      <span class="orionis-star orionis-star-four"></span>
+    </div>
+  </section>
+</div>
+
+        <div class="page-header">
+          <h1 class="exception"><code><code><a href="index.html" class="internal-link">orionis</a></code><wbr></wbr>.<code><a href="orionis.console.html" class="internal-link" title="orionis.console">console</a></code><wbr></wbr>.<code><a href="orionis.console.commands.html" class="internal-link" title="orionis.console.commands">commands</a></code><wbr></wbr>.<code><a href="orionis.console.commands.bootstrap.html" class="internal-link" title="orionis.console.commands.bootstrap">bootstrap</a></code><wbr></wbr>.<code><a href="orionis.console.commands.bootstrap._editor.html" class="internal-link" title="orionis.console.commands.bootstrap._editor">_editor</a></code><wbr></wbr>.<code><a href="orionis.console.commands.bootstrap._editor.BootstrapEditError.html" class="internal-link" title="orionis.console.commands.bootstrap._editor.BootstrapEditError">BootstrapEditError</a></code></code></h1>
+          <div id="show-private">
+            <button class="btn btn-link" onclick="togglePrivate()">Toggle Private API</button>
+          </div>
+        </div>
+
+        <div class="categoryHeader">
+          exception documentation
+        </div>
+
+        <div class="extrasDocstring">
+          <p class="class-signature"><code><span class="py-keyword">class</span> <span class="py-defname">BootstrapEditError</span>(<a href="https://docs.python.org/3/builtins/exceptions.html#ValueError" class="intersphinx-link">ValueError</a>): <a href="https://github.com/orionis-framework/framework/tree/430867188a07b101483d6d767cbc42e5fc91cd36/orionis/console/commands/bootstrap/_editor.py#L14" class="sourceLink">(source)</a></code></p><p><a href="classIndex.html#orionis.console.commands.bootstrap._editor.BootstrapEditError">View In Hierarchy</a></p>
+        </div>
+
+        <div class="moduleDocstring">
+          <div><p>A bootstrap cannot be updated without guessing about application flow.</p></div>
+        </div>
+
+        <div id="split-tables">
+          
+          
+
+            
+        </div>
+
+        <div id="child-list">
+          
+        </div>
+      
+      </main>
+    </div>
+
+    <footer class="orionis-footer">
+  
+  <div class="orionis-footer-inner">
+    <div class="orionis-footer-copy">
+      <p>API documentation for <a href="https://orionis-framework.com/" class="projecthome">Orionis</a>.</p>
+      <p class="orionis-footer-meta">Generated with <a href="https://github.com/twisted/pydoctor/">Pydoctor</a> 25.10.1.<span class="orionis-footer-build"> Built 2026-10-14 15:50:06.</span></p>
+    </div>
+    <nav class="orionis-footer-links" aria-label="Additional resources">
+      <a href="https://docs.orionis-framework.com">Read the guide <span aria-hidden="true">↗</span></a>
+      <a href="https://github.com/orionis-framework/framework">Source on GitHub <span aria-hidden="true">↗</span></a>
+    </nav>
+  </div>
+  <!-- Keep Pydoctor's search engine and its required load order intact. -->
+  <script src="ajax.js" type="text/javascript"></script>
+  <script src="searchlib.js" type="text/javascript"></script>
+  <script src="search.js" type="text/javascript"></script>
+</footer>
+  
+    <script src="pydoctor.js" type="text/javascript"></script>
+
+  </body>
+</html>

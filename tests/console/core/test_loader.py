@@ -64,7 +64,13 @@ class TestLoader(TestCase):
             ----------
             value : str
                 Value to store.
+
+            Returns
+            -------
+            None
+                Store the converted argument value on the test double.
             """
+            # Retain the value produced by the nested argument conversion.
             self.value = value
 
     def setUp(self) -> None:
@@ -771,7 +777,14 @@ class TestLoader(TestCase):
         self.assertIsInstance(arguments[0], dict)
 
     def testArgumentRoundTripResolvesNestedType(self) -> None:
-        """Restore a callable nested within an importable class."""
+        """Restore a callable nested within an importable class.
+
+        Returns
+        -------
+        None
+            Assert that argument serialization retains the nested callable.
+        """
+        # Round-trip an importable nested type through command metadata.
         loader = Loader(self.mock_app)
         argument = Argument(
             name_or_flags="--nested",
@@ -784,7 +797,14 @@ class TestLoader(TestCase):
         self.assertIs(decoded.type_, self.NestedArgumentType)
 
     async def testCustomDiscoveryIgnoresImportedCommands(self) -> None:
-        """Register only command classes defined in the discovered module."""
+        """Register only command classes defined in the discovered module.
+
+        Returns
+        -------
+        None
+            Assert that imported commands are excluded from local discovery.
+        """
+        # Expose a local command beside a reexported command in the same module.
         module_name = "app.console.commands.sample"
         local_command = type(
             "LocalCommand",
@@ -813,6 +833,25 @@ class TestLoader(TestCase):
             set(loader._Loader__metadata),
             {"test:local"},
         )
+
+    def testMissingConsoleRoutesAllowSlimCommandDiscovery(self) -> None:
+        """Keep core commands available before console routing is enabled.
+
+        Returns
+        -------
+        None
+            Assert that absent console routes do not trigger module imports.
+        """
+        # Check both absent and explicitly empty route registrations.
+        for routes in (None, []):
+            with self.subTest(routes=routes):
+                self.mock_app.routingPaths.return_value = routes
+                loader = Loader(self.mock_app)
+                with patch(
+                    "orionis.console.core.loader.importlib.import_module",
+                ) as import_module:
+                    loader._Loader__importFluentCommandRoutes()
+                import_module.assert_not_called()
 
     def testGetArgumentsInvalidType(self) -> None:
         """

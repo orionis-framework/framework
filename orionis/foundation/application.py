@@ -1379,6 +1379,9 @@ class Application(Container, IApplication):
         This method sets up the cache driver and loads cached configuration
         if available. It also tracks directories and files for cache invalidation.
         """
+        # Load lightweight recovery state without expanding cold import paths.
+        from orionis.console.bootstrap import bootstrap_recovery_active
+
         # Mark the application as compiled to activate caching logic.
         self.__compiled = True
 
@@ -1409,6 +1412,11 @@ class Application(Container, IApplication):
             monitored_files=self.compiledInvalidationPathsFiles,
         )
 
+        # Keep the effective cache path so successful bootstrap commands can
+        # invalidate it, without loading or storing transient recovery state.
+        if bootstrap_recovery_active():
+            return
+
         # Retrieve the current cache if available.
         bootstrapt_cache = self.__compiled_state_store.get()
 
@@ -1431,8 +1439,11 @@ class Application(Container, IApplication):
             This method does not return a value. It persists the configuration
             state to cache if applicable.
         """
-        # Skip if not running in compiled mode
-        if not self.__compiled:
+        # Inspect scoped recovery state before persisting compiled configuration.
+        from orionis.console.bootstrap import bootstrap_recovery_active
+
+        # Skip transient recovery state as well as uncompiled applications.
+        if not self.__compiled or bootstrap_recovery_active():
             return
 
         # Save the current bootstrap configuration to cache if cache driver exists
@@ -1925,26 +1936,31 @@ class Application(Container, IApplication):
         api_routers = self.__resolveAndValidateRoutingFiles(
             api,
             {_ROUTER_FACADE_MODULE},
+            context="api",
         )
 
         # Resolve and validate web routing files
         web_routers = self.__resolveAndValidateRoutingFiles(
             web,
             {_ROUTER_FACADE_MODULE},
+            context="web",
         )
 
         # Resolve and validate console routing files
         console_routers = self.__resolveAndValidateRoutingFiles(
             console,
             {_ROUTER_FACADE_MODULE},
+            context="console",
         )
         ai_routers = self.__resolveAndValidateRoutingFiles(
             ai,
             {_ROUTER_FACADE_MODULE},
+            context="ai",
         )
         websocket_routers = self.__resolveAndValidateRoutingFiles(
             websocket,
             {_ROUTER_FACADE_MODULE},
+            context="websocket",
         )
 
         # Validate health route type
@@ -1971,6 +1987,8 @@ class Application(Container, IApplication):
         self,
         paths: str | list[str] | None,
         required_imports: set[str],
+        *,
+        context: str = "",
     ) -> list[Path]:
         """
         Resolve and validate routing file paths.
@@ -1981,6 +1999,8 @@ class Application(Container, IApplication):
             Routing file path(s) to validate and resolve.
         required_imports : set[str]
             Set of required module imports for validation.
+        context : str
+            Context whose missing files may be explicitly repaired by Reactor.
 
         Returns
         -------
@@ -1995,6 +2015,9 @@ class Application(Container, IApplication):
         FileNotFoundError
             If a specified routing file does not exist.
         """
+        # Keep missing-file recovery scoped to the explicitly requested context.
+        from orionis.console.bootstrap import recovering_route
+
         # Ensure the routing argument is of the expected type
         if not isinstance(paths, (str, list, type(None))):
             error_msg = "Expected str, list[str], or None for routing paths"
@@ -2014,6 +2037,9 @@ class Application(Container, IApplication):
 
             # Check if the file exists before validating its contents
             if not file_path.exists():
+                if recovering_route(context):
+                    final_paths.append(file_path)
+                    continue
                 error_msg = f"Routing file does not exist: {file_path}"
                 raise FileNotFoundError(error_msg)
 

@@ -5,87 +5,87 @@ from orionis.foundation.enums.runtimes import Runtime
 if TYPE_CHECKING:
     from orionis.foundation.contracts.application import IApplication
 
-# Register callbacks for the generic startup event.
 async def on_startup() -> None:
     """
-    Handle the generic application startup event.
+    Handle application startup.
 
     Returns
     -------
     None
-        Completes without registering additional startup behavior.
+        Complete the callback without additional startup behavior.
     """
+    # Add application startup behavior here.
 
-# Register callbacks for the generic shutdown event.
 async def on_shutdown() -> None:
     """
-    Handle the generic application shutdown event.
+    Handle application shutdown.
 
     Returns
     -------
     None
-        Completes without registering additional shutdown behavior.
+        Complete the callback without additional shutdown behavior.
     """
+    # Add application shutdown behavior here.
 
-# Register callbacks for CLI startup.
 async def on_startup_cli() -> None:
     """
-    Handle the CLI startup event.
+    Handle CLI startup.
 
     Returns
     -------
     None
-        Completes without registering additional CLI startup behavior.
+        Complete the callback without additional CLI startup behavior.
     """
+    # Add CLI startup behavior here.
 
-# Register callbacks for CLI shutdown.
 async def on_shutdown_cli() -> None:
     """
-    Handle the CLI shutdown event.
+    Handle CLI shutdown.
 
     Returns
     -------
     None
-        Completes without registering additional CLI shutdown behavior.
+        Complete the callback without additional CLI shutdown behavior.
     """
+    # Add CLI shutdown behavior here.
 
-# Register callbacks for HTTP startup.
 async def on_startup_http() -> None:
     """
-    Handle the HTTP startup event.
+    Handle HTTP startup.
 
     Returns
     -------
     None
-        Completes without registering additional HTTP startup behavior.
+        Complete the callback without additional HTTP startup behavior.
     """
+    # Add HTTP startup behavior here.
 
-# Register callbacks for HTTP shutdown.
 async def on_shutdown_http() -> None:
     """
-    Handle the HTTP shutdown event.
+    Handle HTTP shutdown.
 
     Returns
     -------
     None
-        Completes without registering additional HTTP shutdown behavior.
+        Complete the callback without additional HTTP shutdown behavior.
     """
+    # Add HTTP shutdown behavior here.
 
-# Register all application lifespan callbacks.
 def register_lifespan_callbacks(app: IApplication) -> None:
     """
-    Register callbacks for application lifespan events.
+    Register application callbacks through the native lifecycle API.
 
     Parameters
     ----------
     app : IApplication
-        Application instance that receives the lifespan callbacks.
+        Application receiving the generic and runtime-specific callbacks.
 
     Returns
     -------
     None
-        Registers generic, CLI, and HTTP startup and shutdown callbacks.
+        Attach startup and shutdown callbacks to the application.
     """
+    # Register generic callbacks before the runtime-specific callbacks.
     app.on(Lifespan.STARTUP, on_startup)
     app.on(Lifespan.SHUTDOWN, on_shutdown)
     app.on(Lifespan.STARTUP, on_startup_cli, runtime=Runtime.CLI)

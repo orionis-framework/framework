@@ -1,0 +1,3112 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+          "DTD/xhtml1-strict.dtd">
+<html>
+  
+
+  <head>
+  
+  <title>API Reference | Orionis Framework</title>
+  <meta name="generator" content="pydoctor 25.10.1">
+    
+  </meta>
+  <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="color-scheme" content="dark light" />
+  <link rel="icon" type="image/svg+xml" href="orionis-icon.svg" />
+  <script src="orionis-theme.js" type="text/javascript"></script>
+  <link rel="stylesheet" type="text/css" href="apidocs.css" />
+  <link rel="stylesheet" type="text/css" href="extra.css" />
+  <script src="orionis-ui.js" type="text/javascript" defer="defer"></script>
+  
+</head>
+
+  <body>
+
+    <header class="orionis-header">
+  <div class="orionis-header-inner">
+    <a class="orionis-brand" href="index.html" aria-label="Orionis API reference home">
+      <img class="orionis-brand-icon" src="orionis-icon.svg" width="38" height="38" alt="" />
+      <span class="orionis-brand-copy">
+        <span class="orionis-wordmark">ORIONIS</span>
+        <span class="orionis-brand-caption">API REFERENCE</span>
+      </span>
+    </a>
+    <div class="orionis-header-actions">
+      <nav class="orionis-header-links" aria-label="Orionis resources">
+        <a href="https://docs.orionis-framework.com">Guide <span aria-hidden="true">↗</span></a>
+        <a href="https://github.com/orionis-framework/framework">GitHub <span aria-hidden="true">↗</span></a>
+      </nav>
+      <button class="orionis-icon-button" id="orionis-theme-toggle" type="button" aria-label="Toggle color theme" hidden="hidden">
+        <svg class="orionis-icon-sun" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="12" cy="12" r="4"></circle>
+          <path d="M12 2v2m0 16v2M2 12h2m16 0h2M4.93 4.93l1.42 1.42m11.3 11.3 1.42 1.42M4.93 19.07l1.42-1.42m11.3-11.3 1.42-1.42"></path>
+        </svg>
+        <svg class="orionis-icon-moon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg">
+          <path d="M20.5 13.1A8.7 8.7 0 0 1 10.9 3.5 8.7 8.7 0 1 0 20.5 13.1Z"></path>
+        </svg>
+      </button>
+      <button class="orionis-icon-button" id="orionis-menu-toggle" type="button" aria-label="Open API navigation" aria-expanded="false" hidden="hidden">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg">
+          <path d="M4 6h16M4 12h16M4 18h16"></path>
+        </svg>
+      </button>
+    </div>
+  </div>
+</header>
+
+    <nav class="navbar navbar-default mainnavbar">
+      
+  
+  <div class="container-fluid">
+
+
+    <div class="navbar-header">
+      
+      <div class="navlinks">
+        <span class="navbar-brand">
+          <a href="https://orionis-framework.com/" class="projecthome">Orionis</a> <a href="index.html">API Documentation</a>
+        </span>
+
+        <a href="moduleIndex.html">
+          Modules
+        </a>
+
+        <a href="classIndex.html">
+          Classes
+        </a>
+
+        <a href="nameIndex.html">
+          Names
+        </a>
+
+        <div id="search-box-container">
+          <div class="input-group">
+            <input id="search-box" type="search" name="search-query" placeholder="Search..." aria-label="Search" minlength="2" class="form-control" autocomplete="off" />
+            
+            <span class="input-group-btn">
+              <a style="display: none;" class="btn btn-default" id="search-clear-button" title="Clear" onclick="clearSearch()"><img src="fonts/x-circle.svg" alt="Clear" /></a>
+              <a class="btn btn-default" id="apidocs-help-button" title="Help" href="apidocs-help.html"><img src="fonts/info.svg" alt="Help" /></a>
+            </span>
+          </div>
+        </div>
+
+      </div>
+
+      <div id="search-results-container" style="display: none;">
+        
+        <div id="search-buttons">
+          <span class="label label-default" id="search-docstrings-button">
+          <label class="checkbox-inline">
+            <input type="checkbox" id="toggle-search-in-docstrings-checkbox" value="false" onclick="toggleSearchInDocstrings()">
+              search in docstrings
+            </input>
+          </label>
+          </span>
+          
+        </div>
+        
+        <noscript>
+            <h1>Cannot search: JavaScript is not supported/enabled in your browser.</h1>
+        </noscript>
+
+        <div id="search-status"> </div>
+
+        <div class="warning" id="search-warn-box" style="display: none;">
+          <p class="rst-last"><span id="search-warn"></span></p>
+        </div>
+
+        <table id="search-results">
+          <!-- Filled dynamically by JS -->
+        </table>
+        
+        <div style="margin-top: 10px;">
+          <p>For more information on the search, visit the <a href="apidocs-help.html#rst-search">help page</a>.</p>
+        </div>
+      </div>
+
+    </div>
+
+
+  </div>
+</nav>
+    
+    <div class="container-fluid">
+
+      <!-- Side navigation -->
+      <div class="sidebarcontainer" style="display: none;">
+        
+        <div class="sidebar"><nav class="sidebar">
+  
+
+  <div>
+
+      <div class="thingTitle">
+        <span>Class</span>
+        <code class="thisobject"><a href="orionis.console.commands.bootstrap._editor.BootstrapEditor.html" class="internal-link" title="This class"><wbr></wbr>Bootstrap<wbr></wbr>Editor</a></code> 
+      </div>
+      
+      <div>
+        
+
+        
+         
+
+        
+        
+
+        <div class="childrenKindTitle">Methods</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#_is_constructor" class="internal-link" title="orionis.console.commands.bootstrap._editor.BootstrapEditor._is_constructor">_is<wbr></wbr>_constructor</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#_root_name" class="internal-link" title="orionis.console.commands.bootstrap._editor.BootstrapEditor._root_name">_root<wbr></wbr>_name</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#_routing_value" class="internal-link" title="orionis.console.commands.bootstrap._editor.BootstrapEditor._routing_value">_routing<wbr></wbr>_value</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#_scope_nodes" class="internal-link" title="orionis.console.commands.bootstrap._editor.BootstrapEditor._scope_nodes">_scope<wbr></wbr>_nodes</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#__init__" class="internal-link" title="orionis.console.commands.bootstrap._editor.BootstrapEditor.__init__">__init__</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#_after" class="internal-link" title="orionis.console.commands.bootstrap._editor.BootstrapEditor._after">_after</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#_append_keyword" class="internal-link" title="orionis.console.commands.bootstrap._editor.BootstrapEditor._append_keyword">_append<wbr></wbr>_keyword</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#_application_names" class="internal-link" title="orionis.console.commands.bootstrap._editor.BootstrapEditor._application_names">_application<wbr></wbr>_names</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#_argument_tail" class="internal-link" title="orionis.console.commands.bootstrap._editor.BootstrapEditor._argument_tail">_argument<wbr></wbr>_tail</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#_before" class="internal-link" title="orionis.console.commands.bootstrap._editor.BootstrapEditor._before">_before</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#_callback_import" class="internal-link" title="orionis.console.commands.bootstrap._editor.BootstrapEditor._callback_import">_callback<wbr></wbr>_import</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#_calls" class="internal-link" title="orionis.console.commands.bootstrap._editor.BootstrapEditor._calls">_calls</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#_check_assignments" class="internal-link" title="orionis.console.commands.bootstrap._editor.BootstrapEditor._check_assignments">_check<wbr></wbr>_assignments</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#_check_indirect_routing" class="internal-link" title="orionis.console.commands.bootstrap._editor.BootstrapEditor._check_indirect_routing">_check<wbr></wbr>_indirect<wbr></wbr>_routing</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#_check_routing_order" class="internal-link" title="orionis.console.commands.bootstrap._editor.BootstrapEditor._check_routing_order">_check<wbr></wbr>_routing<wbr></wbr>_order</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#_edited" class="internal-link" title="orionis.console.commands.bootstrap._editor.BootstrapEditor._edited">_edited</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#_end" class="internal-link" title="orionis.console.commands.bootstrap._editor.BootstrapEditor._end">_end</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#_find_application" class="internal-link" title="orionis.console.commands.bootstrap._editor.BootstrapEditor._find_application">_find<wbr></wbr>_application</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#_fresh_callback_name" class="internal-link" title="orionis.console.commands.bootstrap._editor.BootstrapEditor._fresh_callback_name">_fresh<wbr></wbr>_callback<wbr></wbr>_name</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#_has_lifespan_registration" class="internal-link" title="orionis.console.commands.bootstrap._editor.BootstrapEditor._has_lifespan_registration">_has<wbr></wbr>_lifespan<wbr></wbr>_registration</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#_helper_application_parameters" class="internal-link" title="orionis.console.commands.bootstrap._editor.BootstrapEditor._helper_application_parameters">_helper<wbr></wbr>_application<wbr></wbr>_parameters</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#_helper_replaces_routing" class="internal-link" title="orionis.console.commands.bootstrap._editor.BootstrapEditor._helper_replaces_routing">_helper<wbr></wbr>_replaces<wbr></wbr>_routing</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#_import_module" class="internal-link" title="orionis.console.commands.bootstrap._editor.BootstrapEditor._import_module">_import<wbr></wbr>_module</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#_initializer_calls" class="internal-link" title="orionis.console.commands.bootstrap._editor.BootstrapEditor._initializer_calls">_initializer<wbr></wbr>_calls</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#_lifespan_bindings" class="internal-link" title="orionis.console.commands.bootstrap._editor.BootstrapEditor._lifespan_bindings">_lifespan<wbr></wbr>_bindings</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#_path_literal" class="internal-link" title="orionis.console.commands.bootstrap._editor.BootstrapEditor._path_literal">_path<wbr></wbr>_literal</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#_position" class="internal-link" title="orionis.console.commands.bootstrap._editor.BootstrapEditor._position">_position</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#_registration" class="internal-link" title="orionis.console.commands.bootstrap._editor.BootstrapEditor._registration">_registration</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#_routing_call" class="internal-link" title="orionis.console.commands.bootstrap._editor.BootstrapEditor._routing_call">_routing<wbr></wbr>_call</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#_start" class="internal-link" title="orionis.console.commands.bootstrap._editor.BootstrapEditor._start">_start</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#_statement" class="internal-link" title="orionis.console.commands.bootstrap._editor.BootstrapEditor._statement">_statement</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#commit" class="internal-link" title="orionis.console.commands.bootstrap._editor.BootstrapEditor.commit">commit</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#encode" class="internal-link" title="orionis.console.commands.bootstrap._editor.BootstrapEditor.encode">encode</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#lifespan" class="internal-link" title="orionis.console.commands.bootstrap._editor.BootstrapEditor.lifespan">lifespan</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#routePaths" class="internal-link" title="orionis.console.commands.bootstrap._editor.BootstrapEditor.routePaths">route<wbr></wbr>Paths</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#routing" class="internal-link" title="orionis.console.commands.bootstrap._editor.BootstrapEditor.routing">routing</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+         
+
+        <div class="childrenKindTitle">Attributes</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#_lines" class="internal-link" title="orionis.console.commands.bootstrap._editor.BootstrapEditor._lines">_lines</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#_nodes" class="internal-link" title="orionis.console.commands.bootstrap._editor.BootstrapEditor._nodes">_nodes</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#_offsets" class="internal-link" title="orionis.console.commands.bootstrap._editor.BootstrapEditor._offsets">_offsets</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#_original" class="internal-link" title="orionis.console.commands.bootstrap._editor.BootstrapEditor._original">_original</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#_parents" class="internal-link" title="orionis.console.commands.bootstrap._editor.BootstrapEditor._parents">_parents</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#app_name" class="internal-link" title="orionis.console.commands.bootstrap._editor.BootstrapEditor.app_name">app<wbr></wbr>_name</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#assignment" class="internal-link" title="orionis.console.commands.bootstrap._editor.BootstrapEditor.assignment">assignment</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#base_path" class="internal-link" title="orionis.console.commands.bootstrap._editor.BootstrapEditor.base_path">base<wbr></wbr>_path</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#body" class="internal-link" title="orionis.console.commands.bootstrap._editor.BootstrapEditor.body">body</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#encoding" class="internal-link" title="orionis.console.commands.bootstrap._editor.BootstrapEditor.encoding">encoding</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#newline" class="internal-link" title="orionis.console.commands.bootstrap._editor.BootstrapEditor.newline">newline</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#path" class="internal-link" title="orionis.console.commands.bootstrap._editor.BootstrapEditor.path">path</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#scope" class="internal-link" title="orionis.console.commands.bootstrap._editor.BootstrapEditor.scope">scope</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#source" class="internal-link" title="orionis.console.commands.bootstrap._editor.BootstrapEditor.source">source</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#tree" class="internal-link" title="orionis.console.commands.bootstrap._editor.BootstrapEditor.tree">tree</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#hasRouting" class="internal-link" title="orionis.console.commands.bootstrap._editor.BootstrapEditor.hasRouting">has<wbr></wbr>Routing</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+         
+        
+      </div>
+  </div><div>
+
+      <div class="thingTitle">
+        <span>Module</span>
+        <code><a href="orionis.console.commands.bootstrap._editor.html" class="internal-link" title="The parent of this class">_editor</a></code> 
+      </div>
+      
+      <div>
+        
+
+        
+         
+
+        <div class="childrenKindTitle">Classes</div>
+        <ul>
+    
+    <li class=" thisobject">
+        
+        
+        
+            <div class="itemName expandableItem">
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId2422"> 
+                    
+                </input>
+
+                <label class="lbl-toggle notExpandable" for="">
+                    
+                    
+                </label>
+
+                <code><a href="orionis.console.commands.bootstrap._editor.BootstrapEditor.html" class="internal-link" title="orionis.console.commands.bootstrap._editor.BootstrapEditor"><wbr></wbr>Bootstrap<wbr></wbr>Editor</a></code>
+
+                <div class="expandableContent">
+                    <div>
+        
+
+        
+         
+
+        
+        
+
+        <div class="childrenKindTitle">Methods</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#_is_constructor" class="internal-link" title="orionis.console.commands.bootstrap._editor.BootstrapEditor._is_constructor">_is<wbr></wbr>_constructor</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#_root_name" class="internal-link" title="orionis.console.commands.bootstrap._editor.BootstrapEditor._root_name">_root<wbr></wbr>_name</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#_routing_value" class="internal-link" title="orionis.console.commands.bootstrap._editor.BootstrapEditor._routing_value">_routing<wbr></wbr>_value</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#_scope_nodes" class="internal-link" title="orionis.console.commands.bootstrap._editor.BootstrapEditor._scope_nodes">_scope<wbr></wbr>_nodes</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#__init__" class="internal-link" title="orionis.console.commands.bootstrap._editor.BootstrapEditor.__init__">__init__</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#_after" class="internal-link" title="orionis.console.commands.bootstrap._editor.BootstrapEditor._after">_after</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#_append_keyword" class="internal-link" title="orionis.console.commands.bootstrap._editor.BootstrapEditor._append_keyword">_append<wbr></wbr>_keyword</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#_application_names" class="internal-link" title="orionis.console.commands.bootstrap._editor.BootstrapEditor._application_names">_application<wbr></wbr>_names</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#_argument_tail" class="internal-link" title="orionis.console.commands.bootstrap._editor.BootstrapEditor._argument_tail">_argument<wbr></wbr>_tail</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#_before" class="internal-link" title="orionis.console.commands.bootstrap._editor.BootstrapEditor._before">_before</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#_callback_import" class="internal-link" title="orionis.console.commands.bootstrap._editor.BootstrapEditor._callback_import">_callback<wbr></wbr>_import</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#_calls" class="internal-link" title="orionis.console.commands.bootstrap._editor.BootstrapEditor._calls">_calls</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#_check_assignments" class="internal-link" title="orionis.console.commands.bootstrap._editor.BootstrapEditor._check_assignments">_check<wbr></wbr>_assignments</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#_check_indirect_routing" class="internal-link" title="orionis.console.commands.bootstrap._editor.BootstrapEditor._check_indirect_routing">_check<wbr></wbr>_indirect<wbr></wbr>_routing</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#_check_routing_order" class="internal-link" title="orionis.console.commands.bootstrap._editor.BootstrapEditor._check_routing_order">_check<wbr></wbr>_routing<wbr></wbr>_order</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#_edited" class="internal-link" title="orionis.console.commands.bootstrap._editor.BootstrapEditor._edited">_edited</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#_end" class="internal-link" title="orionis.console.commands.bootstrap._editor.BootstrapEditor._end">_end</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#_find_application" class="internal-link" title="orionis.console.commands.bootstrap._editor.BootstrapEditor._find_application">_find<wbr></wbr>_application</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#_fresh_callback_name" class="internal-link" title="orionis.console.commands.bootstrap._editor.BootstrapEditor._fresh_callback_name">_fresh<wbr></wbr>_callback<wbr></wbr>_name</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#_has_lifespan_registration" class="internal-link" title="orionis.console.commands.bootstrap._editor.BootstrapEditor._has_lifespan_registration">_has<wbr></wbr>_lifespan<wbr></wbr>_registration</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#_helper_application_parameters" class="internal-link" title="orionis.console.commands.bootstrap._editor.BootstrapEditor._helper_application_parameters">_helper<wbr></wbr>_application<wbr></wbr>_parameters</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#_helper_replaces_routing" class="internal-link" title="orionis.console.commands.bootstrap._editor.BootstrapEditor._helper_replaces_routing">_helper<wbr></wbr>_replaces<wbr></wbr>_routing</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#_import_module" class="internal-link" title="orionis.console.commands.bootstrap._editor.BootstrapEditor._import_module">_import<wbr></wbr>_module</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#_initializer_calls" class="internal-link" title="orionis.console.commands.bootstrap._editor.BootstrapEditor._initializer_calls">_initializer<wbr></wbr>_calls</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#_lifespan_bindings" class="internal-link" title="orionis.console.commands.bootstrap._editor.BootstrapEditor._lifespan_bindings">_lifespan<wbr></wbr>_bindings</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#_path_literal" class="internal-link" title="orionis.console.commands.bootstrap._editor.BootstrapEditor._path_literal">_path<wbr></wbr>_literal</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#_position" class="internal-link" title="orionis.console.commands.bootstrap._editor.BootstrapEditor._position">_position</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#_registration" class="internal-link" title="orionis.console.commands.bootstrap._editor.BootstrapEditor._registration">_registration</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#_routing_call" class="internal-link" title="orionis.console.commands.bootstrap._editor.BootstrapEditor._routing_call">_routing<wbr></wbr>_call</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#_start" class="internal-link" title="orionis.console.commands.bootstrap._editor.BootstrapEditor._start">_start</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#_statement" class="internal-link" title="orionis.console.commands.bootstrap._editor.BootstrapEditor._statement">_statement</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#commit" class="internal-link" title="orionis.console.commands.bootstrap._editor.BootstrapEditor.commit">commit</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#encode" class="internal-link" title="orionis.console.commands.bootstrap._editor.BootstrapEditor.encode">encode</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#lifespan" class="internal-link" title="orionis.console.commands.bootstrap._editor.BootstrapEditor.lifespan">lifespan</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#routePaths" class="internal-link" title="orionis.console.commands.bootstrap._editor.BootstrapEditor.routePaths">route<wbr></wbr>Paths</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#routing" class="internal-link" title="orionis.console.commands.bootstrap._editor.BootstrapEditor.routing">routing</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+         
+
+        <div class="childrenKindTitle">Attributes</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#_lines" class="internal-link" title="orionis.console.commands.bootstrap._editor.BootstrapEditor._lines">_lines</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#_nodes" class="internal-link" title="orionis.console.commands.bootstrap._editor.BootstrapEditor._nodes">_nodes</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#_offsets" class="internal-link" title="orionis.console.commands.bootstrap._editor.BootstrapEditor._offsets">_offsets</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#_original" class="internal-link" title="orionis.console.commands.bootstrap._editor.BootstrapEditor._original">_original</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#_parents" class="internal-link" title="orionis.console.commands.bootstrap._editor.BootstrapEditor._parents">_parents</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#app_name" class="internal-link" title="orionis.console.commands.bootstrap._editor.BootstrapEditor.app_name">app<wbr></wbr>_name</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#assignment" class="internal-link" title="orionis.console.commands.bootstrap._editor.BootstrapEditor.assignment">assignment</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#base_path" class="internal-link" title="orionis.console.commands.bootstrap._editor.BootstrapEditor.base_path">base<wbr></wbr>_path</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#body" class="internal-link" title="orionis.console.commands.bootstrap._editor.BootstrapEditor.body">body</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#encoding" class="internal-link" title="orionis.console.commands.bootstrap._editor.BootstrapEditor.encoding">encoding</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#newline" class="internal-link" title="orionis.console.commands.bootstrap._editor.BootstrapEditor.newline">newline</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#path" class="internal-link" title="orionis.console.commands.bootstrap._editor.BootstrapEditor.path">path</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#scope" class="internal-link" title="orionis.console.commands.bootstrap._editor.BootstrapEditor.scope">scope</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#source" class="internal-link" title="orionis.console.commands.bootstrap._editor.BootstrapEditor.source">source</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#tree" class="internal-link" title="orionis.console.commands.bootstrap._editor.BootstrapEditor.tree">tree</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#hasRouting" class="internal-link" title="orionis.console.commands.bootstrap._editor.BootstrapEditor.hasRouting">has<wbr></wbr>Routing</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+         
+        
+      </div>
+                </div>
+            </div>
+            
+        
+
+        
+
+    </li><li class="">
+        
+        
+        
+            <div class="itemName expandableItem">
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId2423"> 
+                    
+                </input>
+
+                <label class="lbl-toggle notExpandable" for="">
+                    
+                    
+                </label>
+
+                <code><a href="orionis.console.commands.bootstrap._editor.BootstrapEditError.html" class="internal-link" title="orionis.console.commands.bootstrap._editor.BootstrapEditError"><wbr></wbr>Bootstrap<wbr></wbr>Edit<wbr></wbr>Error</a></code>
+
+                <div class="expandableContent">
+                    <div>
+        
+
+        
+         
+
+        
+        
+
+        
+         
+
+        
+         
+
+        
+         
+
+        
+         
+        
+      </div>
+                </div>
+            </div>
+            
+        
+
+        
+
+    </li>
+</ul>
+
+        
+         
+
+        
+         
+
+        
+         
+
+        
+         
+        
+      </div>
+  </div>
+
+</nav>
+        </div>
+        <div id="collapse-sidebar">
+          <a class="btn btn-link" onclick="toggleSideBarCollapse()" title="Toggle Sidebar Collapse">
+          </a>
+        </div> 
+        <script src="sidebartoggle.js" type="text/javascript"></script>
+       
+      </div>
+
+      <main class="">
+        
+
+        <div class="orionis-subheader">
+  <nav class="orionis-breadcrumb" aria-label="Documentation breadcrumb">
+    <a href="index.html">REFERENCE</a>
+    <span aria-hidden="true">/</span>
+    <span>ORIONIS FRAMEWORK</span>
+  </nav>
+  <section class="orionis-hero" aria-labelledby="orionis-hero-title">
+    <div class="orionis-hero-content">
+      <p class="orionis-eyebrow"><span class="orionis-status-dot" aria-hidden="true"></span> THE ORIONIS API</p>
+      <h2 id="orionis-hero-title">Build with <span class="orionis-accent">clarity.</span></h2>
+      <p class="orionis-hero-description">Explore the building blocks of an async-first Python framework. Every module, class, and method — connected, searchable, and ready to build with.</p>
+      <div class="orionis-hero-actions">
+        <a class="orionis-button" href="moduleIndex.html">Explore modules <span aria-hidden="true">→</span></a>
+        <a class="orionis-button orionis-button-secondary" href="classIndex.html">View classes</a>
+      </div>
+    </div>
+    <div class="orionis-hero-constellation" aria-hidden="true">
+      <span class="orionis-star orionis-star-one"></span>
+      <span class="orionis-star orionis-star-two"></span>
+      <span class="orionis-star orionis-star-three"></span>
+      <span class="orionis-star orionis-star-four"></span>
+    </div>
+  </section>
+</div>
+
+        <div class="page-header">
+          <h1 class="class"><code><code><a href="index.html" class="internal-link">orionis</a></code><wbr></wbr>.<code><a href="orionis.console.html" class="internal-link" title="orionis.console">console</a></code><wbr></wbr>.<code><a href="orionis.console.commands.html" class="internal-link" title="orionis.console.commands">commands</a></code><wbr></wbr>.<code><a href="orionis.console.commands.bootstrap.html" class="internal-link" title="orionis.console.commands.bootstrap">bootstrap</a></code><wbr></wbr>.<code><a href="orionis.console.commands.bootstrap._editor.html" class="internal-link" title="orionis.console.commands.bootstrap._editor">_editor</a></code><wbr></wbr>.<code><a href="orionis.console.commands.bootstrap._editor.BootstrapEditor.html" class="internal-link" title="orionis.console.commands.bootstrap._editor.BootstrapEditor">BootstrapEditor</a></code></code></h1>
+          <div id="show-private">
+            <button class="btn btn-link" onclick="togglePrivate()">Toggle Private API</button>
+          </div>
+        </div>
+
+        <div class="categoryHeader">
+          class documentation
+        </div>
+
+        <div class="extrasDocstring">
+          <p class="class-signature"><code><span class="py-keyword">class</span> <span class="py-defname">BootstrapEditor</span>: <a href="https://github.com/orionis-framework/framework/tree/430867188a07b101483d6d767cbc42e5fc91cd36/orionis/console/commands/bootstrap/_editor.py#L17" class="sourceLink">(source)</a></code></p><p>Constructor: <code><a href="#__init__" class="internal-link" title="orionis.console.commands.bootstrap._editor.BootstrapEditor.__init__">BootstrapEditor(path, base_path)</a></code></p><p><a href="classIndex.html#orionis.console.commands.bootstrap._editor.BootstrapEditor">View In Hierarchy</a></p>
+        </div>
+
+        <div class="moduleDocstring">
+          <div><p>Plan surgical Python edits and publish them without clobbering changes.</p>
+<p>The editor deliberately does not execute user code. Unsupported or ambiguous
+construction flows fail before any file is changed.</p>
+</div>
+        </div>
+
+        <div id="split-tables">
+          <table class="children sortable" id="id161">
+  
+  
+  <tr class="staticmethod">
+    
+    <td>Static Method</td>
+    <td><code><a href="#_is_constructor" class="internal-link" title="orionis.console.commands.bootstrap._editor.BootstrapEditor._is_constructor">_is<wbr></wbr>_constructor</a></code></td>
+    <td>Identify an application constructor beneath chained builder calls.</td>
+  </tr><tr class="staticmethod">
+    
+    <td>Static Method</td>
+    <td><code><a href="#_root_name" class="internal-link" title="orionis.console.commands.bootstrap._editor.BootstrapEditor._root_name">_root<wbr></wbr>_name</a></code></td>
+    <td>Resolve the named receiver beneath a fluent method-call chain.</td>
+  </tr><tr class="staticmethod">
+    
+    <td>Static Method</td>
+    <td><code><a href="#_routing_value" class="internal-link" title="orionis.console.commands.bootstrap._editor.BootstrapEditor._routing_value">_routing<wbr></wbr>_value</a></code></td>
+    <td>Find a context argument in a supported routing call.</td>
+  </tr><tr class="staticmethod">
+    
+    <td>Static Method</td>
+    <td><code><a href="#_scope_nodes" class="internal-link" title="orionis.console.commands.bootstrap._editor.BootstrapEditor._scope_nodes">_scope<wbr></wbr>_nodes</a></code></td>
+    <td>Walk a lexical scope without entering unrelated nested definitions.</td>
+  </tr><tr class="method">
+    
+    <td>Method</td>
+    <td><code><a href="#__init__" class="internal-link" title="orionis.console.commands.bootstrap._editor.BootstrapEditor.__init__">__init__</a></code></td>
+    <td>Initialize a source-preserving application bootstrap edit session.</td>
+  </tr><tr class="method">
+    
+    <td>Method</td>
+    <td><code><a href="#_after" class="internal-link" title="orionis.console.commands.bootstrap._editor.BootstrapEditor._after">_after</a></code></td>
+    <td>Plan an insertion after a standalone statement.</td>
+  </tr><tr class="method">
+    
+    <td>Method</td>
+    <td><code><a href="#_append_keyword" class="internal-link" title="orionis.console.commands.bootstrap._editor.BootstrapEditor._append_keyword">_append<wbr></wbr>_keyword</a></code></td>
+    <td>Extend a routing argument list while retaining its source layout.</td>
+  </tr><tr class="method">
+    
+    <td>Method</td>
+    <td><code><a href="#_application_names" class="internal-link" title="orionis.console.commands.bootstrap._editor.BootstrapEditor._application_names">_application<wbr></wbr>_names</a></code></td>
+    <td>Collect supported application constructor and module aliases.</td>
+  </tr><tr class="method">
+    
+    <td>Method</td>
+    <td><code><a href="#_argument_tail" class="internal-link" title="orionis.console.commands.bootstrap._editor.BootstrapEditor._argument_tail">_argument<wbr></wbr>_tail</a></code></td>
+    <td>Find grouping parentheses beyond a positional argument AST node.</td>
+  </tr><tr class="method">
+    
+    <td>Method</td>
+    <td><code><a href="#_before" class="internal-link" title="orionis.console.commands.bootstrap._editor.BootstrapEditor._before">_before</a></code></td>
+    <td>Plan an insertion before a statement and its leading comments.</td>
+  </tr><tr class="method">
+    
+    <td>Method</td>
+    <td><code><a href="#_callback_import" class="internal-link" title="orionis.console.commands.bootstrap._editor.BootstrapEditor._callback_import">_callback<wbr></wbr>_import</a></code></td>
+    <td>Extend the visible import block without adding an empty import group.</td>
+  </tr><tr class="method">
+    
+    <td>Method</td>
+    <td><code><a href="#_calls" class="internal-link" title="orionis.console.commands.bootstrap._editor.BootstrapEditor._calls">_calls</a></code></td>
+    <td>Collect editable calls to an application builder method.</td>
+  </tr><tr class="method">
+    
+    <td>Method</td>
+    <td><code><a href="#_check_assignments" class="internal-link" title="orionis.console.commands.bootstrap._editor.BootstrapEditor._check_assignments">_check<wbr></wbr>_assignments</a></code></td>
+    <td>Reject application reassignments that obscure the selected receiver.</td>
+  </tr><tr class="method">
+    
+    <td>Method</td>
+    <td><code><a href="#_check_indirect_routing" class="internal-link" title="orionis.console.commands.bootstrap._editor.BootstrapEditor._check_indirect_routing">_check<wbr></wbr>_indirect<wbr></wbr>_routing</a></code></td>
+    <td>Reject later helpers that can replace the selected routing setup.</td>
+  </tr><tr class="method">
+    
+    <td>Method</td>
+    <td><code><a href="#_check_routing_order" class="internal-link" title="orionis.console.commands.bootstrap._editor.BootstrapEditor._check_routing_order">_check<wbr></wbr>_routing<wbr></wbr>_order</a></code></td>
+    <td>Reject routing configuration placed after application initialization.</td>
+  </tr><tr class="method">
+    
+    <td>Method</td>
+    <td><code><a href="#_edited" class="internal-link" title="orionis.console.commands.bootstrap._editor.BootstrapEditor._edited">_edited</a></code></td>
+    <td>Apply planned source edits and validate the resulting Python module.</td>
+  </tr><tr class="method">
+    
+    <td>Method</td>
+    <td><code><a href="#_end" class="internal-link" title="orionis.console.commands.bootstrap._editor.BootstrapEditor._end">_end</a></code></td>
+    <td>Locate the source character immediately after a syntax node.</td>
+  </tr><tr class="method">
+    
+    <td>Method</td>
+    <td><code><a href="#_find_application" class="internal-link" title="orionis.console.commands.bootstrap._editor.BootstrapEditor._find_application">_find<wbr></wbr>_application</a></code></td>
+    <td>Locate the unique named application construction assignment.</td>
+  </tr><tr class="method">
+    
+    <td>Method</td>
+    <td><code><a href="#_fresh_callback_name" class="internal-link" title="orionis.console.commands.bootstrap._editor.BootstrapEditor._fresh_callback_name">_fresh<wbr></wbr>_callback<wbr></wbr>_name</a></code></td>
+    <td>Choose an unused callback import name in the application scope.</td>
+  </tr><tr class="method">
+    
+    <td>Method</td>
+    <td><code><a href="#_has_lifespan_registration" class="internal-link" title="orionis.console.commands.bootstrap._editor.BootstrapEditor._has_lifespan_registration">_has<wbr></wbr>_lifespan<wbr></wbr>_registration</a></code></td>
+    <td>Detect existing callback registration for the selected application.</td>
+  </tr><tr class="method">
+    
+    <td>Method</td>
+    <td><code><a href="#_helper_application_parameters" class="internal-link" title="orionis.console.commands.bootstrap._editor.BootstrapEditor._helper_application_parameters">_helper<wbr></wbr>_application<wbr></wbr>_parameters</a></code></td>
+    <td>Identify helper names that can reference the selected application.</td>
+  </tr><tr class="method">
+    
+    <td>Method</td>
+    <td><code><a href="#_helper_replaces_routing" class="internal-link" title="orionis.console.commands.bootstrap._editor.BootstrapEditor._helper_replaces_routing">_helper<wbr></wbr>_replaces<wbr></wbr>_routing</a></code></td>
+    <td>Detect routing mutations through helper parameters or closures.</td>
+  </tr><tr class="method">
+    
+    <td>Method</td>
+    <td><code><a href="#_import_module" class="internal-link" title="orionis.console.commands.bootstrap._editor.BootstrapEditor._import_module">_import<wbr></wbr>_module</a></code></td>
+    <td>Resolve an import node to its absolute application module path.</td>
+  </tr><tr class="method">
+    
+    <td>Method</td>
+    <td><code><a href="#_initializer_calls" class="internal-link" title="orionis.console.commands.bootstrap._editor.BootstrapEditor._initializer_calls">_initializer<wbr></wbr>_calls</a></code></td>
+    <td>Collect fluent calls that construct the named application.</td>
+  </tr><tr class="method">
+    
+    <td>Method</td>
+    <td><code><a href="#_lifespan_bindings" class="internal-link" title="orionis.console.commands.bootstrap._editor.BootstrapEditor._lifespan_bindings">_lifespan<wbr></wbr>_bindings</a></code></td>
+    <td>Recognize visible direct and module imports for lifespan callbacks.</td>
+  </tr><tr class="method">
+    
+    <td>Method</td>
+    <td><code><a href="#_path_literal" class="internal-link" title="orionis.console.commands.bootstrap._editor.BootstrapEditor._path_literal">_path<wbr></wbr>_literal</a></code></td>
+    <td>Encode a route path as a project-relative Python string literal.</td>
+  </tr><tr class="method">
+    
+    <td>Method</td>
+    <td><code><a href="#_position" class="internal-link" title="orionis.console.commands.bootstrap._editor.BootstrapEditor._position">_position</a></code></td>
+    <td>Translate an AST byte position into a source character offset.</td>
+  </tr><tr class="method">
+    
+    <td>Method</td>
+    <td><code><a href="#_registration" class="internal-link" title="orionis.console.commands.bootstrap._editor.BootstrapEditor._registration">_registration</a></code></td>
+    <td>Plan registration before application initialization or factory return.</td>
+  </tr><tr class="method">
+    
+    <td>Method</td>
+    <td><code><a href="#_routing_call" class="internal-link" title="orionis.console.commands.bootstrap._editor.BootstrapEditor._routing_call">_routing<wbr></wbr>_call</a></code></td>
+    <td>Find the final directly editable application routing call.</td>
+  </tr><tr class="method">
+    
+    <td>Method</td>
+    <td><code><a href="#_start" class="internal-link" title="orionis.console.commands.bootstrap._editor.BootstrapEditor._start">_start</a></code></td>
+    <td>Locate the first source character belonging to a syntax node.</td>
+  </tr><tr class="method">
+    
+    <td>Method</td>
+    <td><code><a href="#_statement" class="internal-link" title="orionis.console.commands.bootstrap._editor.BootstrapEditor._statement">_statement</a></code></td>
+    <td>Find the enclosing statement in the application construction scope.</td>
+  </tr><tr class="method">
+    
+    <td>Method</td>
+    <td><code><a href="#commit" class="internal-link" title="orionis.console.commands.bootstrap._editor.BootstrapEditor.commit">commit</a></code></td>
+    <td>Publish validated source atomically while preserving concurrent edits.</td>
+  </tr><tr class="method">
+    
+    <td>Method</td>
+    <td><code><a href="#encode" class="internal-link" title="orionis.console.commands.bootstrap._editor.BootstrapEditor.encode">encode</a></code></td>
+    <td>Encode planned source using the original coding cookie and BOM.</td>
+  </tr><tr class="method">
+    
+    <td>Method</td>
+    <td><code><a href="#lifespan" class="internal-link" title="orionis.console.commands.bootstrap._editor.BootstrapEditor.lifespan">lifespan</a></code></td>
+    <td>Import and register application callbacks before initialization.</td>
+  </tr><tr class="method">
+    
+    <td>Method</td>
+    <td><code><a href="#routePaths" class="internal-link" title="orionis.console.commands.bootstrap._editor.BootstrapEditor.routePaths">route<wbr></wbr>Paths</a></code></td>
+    <td>Read literal route paths from the effective routing configuration.</td>
+  </tr><tr class="method">
+    
+    <td>Method</td>
+    <td><code><a href="#routing" class="internal-link" title="orionis.console.commands.bootstrap._editor.BootstrapEditor.routing">routing</a></code></td>
+    <td>Register a missing route context while preserving other arguments.</td>
+  </tr><tr class="instancevariable">
+    
+    <td>Instance Variable</td>
+    <td><code><a href="#_lines" class="internal-link" title="orionis.console.commands.bootstrap._editor.BootstrapEditor._lines">_lines</a></code></td>
+    <td><span class="rst-undocumented">Undocumented</span></td>
+  </tr><tr class="instancevariable">
+    
+    <td>Instance Variable</td>
+    <td><code><a href="#_nodes" class="internal-link" title="orionis.console.commands.bootstrap._editor.BootstrapEditor._nodes">_nodes</a></code></td>
+    <td><span class="rst-undocumented">Undocumented</span></td>
+  </tr><tr class="instancevariable">
+    
+    <td>Instance Variable</td>
+    <td><code><a href="#_offsets" class="internal-link" title="orionis.console.commands.bootstrap._editor.BootstrapEditor._offsets">_offsets</a></code></td>
+    <td><span class="rst-undocumented">Undocumented</span></td>
+  </tr><tr class="instancevariable">
+    
+    <td>Instance Variable</td>
+    <td><code><a href="#_original" class="internal-link" title="orionis.console.commands.bootstrap._editor.BootstrapEditor._original">_original</a></code></td>
+    <td><span class="rst-undocumented">Undocumented</span></td>
+  </tr><tr class="instancevariable">
+    
+    <td>Instance Variable</td>
+    <td><code><a href="#_parents" class="internal-link" title="orionis.console.commands.bootstrap._editor.BootstrapEditor._parents">_parents</a></code></td>
+    <td><span class="rst-undocumented">Undocumented</span></td>
+  </tr><tr class="instancevariable">
+    
+    <td>Instance Variable</td>
+    <td><code><a href="#app_name" class="internal-link" title="orionis.console.commands.bootstrap._editor.BootstrapEditor.app_name">app<wbr></wbr>_name</a></code></td>
+    <td><span class="rst-undocumented">Undocumented</span></td>
+  </tr><tr class="instancevariable">
+    
+    <td>Instance Variable</td>
+    <td><code><a href="#assignment" class="internal-link" title="orionis.console.commands.bootstrap._editor.BootstrapEditor.assignment">assignment</a></code></td>
+    <td><span class="rst-undocumented">Undocumented</span></td>
+  </tr><tr class="instancevariable">
+    
+    <td>Instance Variable</td>
+    <td><code><a href="#base_path" class="internal-link" title="orionis.console.commands.bootstrap._editor.BootstrapEditor.base_path">base<wbr></wbr>_path</a></code></td>
+    <td><span class="rst-undocumented">Undocumented</span></td>
+  </tr><tr class="instancevariable">
+    
+    <td>Instance Variable</td>
+    <td><code><a href="#body" class="internal-link" title="orionis.console.commands.bootstrap._editor.BootstrapEditor.body">body</a></code></td>
+    <td><span class="rst-undocumented">Undocumented</span></td>
+  </tr><tr class="instancevariable">
+    
+    <td>Instance Variable</td>
+    <td><code><a href="#encoding" class="internal-link" title="orionis.console.commands.bootstrap._editor.BootstrapEditor.encoding">encoding</a></code></td>
+    <td><span class="rst-undocumented">Undocumented</span></td>
+  </tr><tr class="instancevariable">
+    
+    <td>Instance Variable</td>
+    <td><code><a href="#newline" class="internal-link" title="orionis.console.commands.bootstrap._editor.BootstrapEditor.newline">newline</a></code></td>
+    <td><span class="rst-undocumented">Undocumented</span></td>
+  </tr><tr class="instancevariable">
+    
+    <td>Instance Variable</td>
+    <td><code><a href="#path" class="internal-link" title="orionis.console.commands.bootstrap._editor.BootstrapEditor.path">path</a></code></td>
+    <td><span class="rst-undocumented">Undocumented</span></td>
+  </tr><tr class="instancevariable">
+    
+    <td>Instance Variable</td>
+    <td><code><a href="#scope" class="internal-link" title="orionis.console.commands.bootstrap._editor.BootstrapEditor.scope">scope</a></code></td>
+    <td><span class="rst-undocumented">Undocumented</span></td>
+  </tr><tr class="instancevariable">
+    
+    <td>Instance Variable</td>
+    <td><code><a href="#source" class="internal-link" title="orionis.console.commands.bootstrap._editor.BootstrapEditor.source">source</a></code></td>
+    <td><span class="rst-undocumented">Undocumented</span></td>
+  </tr><tr class="instancevariable">
+    
+    <td>Instance Variable</td>
+    <td><code><a href="#tree" class="internal-link" title="orionis.console.commands.bootstrap._editor.BootstrapEditor.tree">tree</a></code></td>
+    <td><span class="rst-undocumented">Undocumented</span></td>
+  </tr><tr class="property">
+    
+    <td>Property</td>
+    <td><code><a href="#hasRouting" class="internal-link" title="orionis.console.commands.bootstrap._editor.BootstrapEditor.hasRouting">has<wbr></wbr>Routing</a></code></td>
+    <td>Report whether the application exposes a directly editable routing call.</td>
+  </tr>
+</table>
+          
+
+            
+        </div>
+
+        <div id="child-list">
+          <div class="basestaticmethod">
+  
+  
+  <a name="orionis.console.commands.bootstrap._editor.BootstrapEditor._is_constructor">
+    
+  </a>
+  <a name="_is_constructor">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <div><span class="decorator">@<a href="https://docs.python.org/3/builtins/functions.html#staticmethod" class="intersphinx-link">staticmethod</a><br /></span></div>
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">_is_constructor</span><span class="function-signature">(<span class="rst-sig-param">node: <code><a href="https://docs.python.org/3/library/ast.html#ast.AST" class="intersphinx-link">ast.AST</a></code>, </span><span class="rst-sig-param">constructors: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#set" class="intersphinx-link">set</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>]</code>, </span><span class="rst-sig-param">modules: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#set" class="intersphinx-link">set</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>]</code></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code>:</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/430867188a07b101483d6d767cbc42e5fc91cd36/orionis/console/commands/bootstrap/_editor.py#L106">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#_is_constructor" title="orionis.console.commands.bootstrap._editor.BootstrapEditor._is_constructor">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    
+    <div><p>Identify an application constructor beneath chained builder calls.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">node:</span><code><a href="https://docs.python.org/3/library/ast.html#ast.AST" class="intersphinx-link">ast.AST</a></code></td><td class="fieldArgDesc">Expression to inspect.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">constructors:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#set" class="intersphinx-link">set</a>[<a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>]</code></td><td class="fieldArgDesc">Recognized direct application constructor names.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">modules:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#set" class="intersphinx-link">set</a>[<a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>]</code></td><td class="fieldArgDesc">Recognized imported application module names.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code></td><td class="fieldArgDesc">Return whether the expression constructs the application.</td></tr></table></div>
+  </div>
+</div><div class="basestaticmethod">
+  
+  
+  <a name="orionis.console.commands.bootstrap._editor.BootstrapEditor._root_name">
+    
+  </a>
+  <a name="_root_name">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <div><span class="decorator">@<a href="https://docs.python.org/3/builtins/functions.html#staticmethod" class="intersphinx-link">staticmethod</a><br /></span></div>
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">_root_name</span><span class="function-signature">(<span class="rst-sig-param">node: <code><a href="https://docs.python.org/3/library/ast.html#ast.AST" class="intersphinx-link">ast.AST</a> | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a> | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code>:</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/430867188a07b101483d6d767cbc42e5fc91cd36/orionis/console/commands/bootstrap/_editor.py#L228">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#_root_name" title="orionis.console.commands.bootstrap._editor.BootstrapEditor._root_name">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    
+    <div><p>Resolve the named receiver beneath a fluent method-call chain.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">node:</span><code>ast.AST | None</code></td><td class="fieldArgDesc">Expression to inspect, or None when no expression exists.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code>str | None</code></td><td class="fieldArgDesc">Return the receiver name, or None for an unnamed expression.</td></tr></table></div>
+  </div>
+</div><div class="basestaticmethod">
+  
+  
+  <a name="orionis.console.commands.bootstrap._editor.BootstrapEditor._routing_value">
+    
+  </a>
+  <a name="_routing_value">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <div><span class="decorator">@<a href="https://docs.python.org/3/builtins/functions.html#staticmethod" class="intersphinx-link">staticmethod</a><br /></span></div>
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">_routing_value</span><span class="function-signature">(<span class="rst-sig-param">call: <code><a href="https://docs.python.org/3/library/ast.html#ast.Call" class="intersphinx-link">ast.Call</a></code>, </span><span class="rst-sig-param">context: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></span>) -&gt; <code><a href="https://docs.python.org/3/library/ast.html#ast.AST" class="intersphinx-link">ast.AST</a> | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code>:</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/430867188a07b101483d6d767cbc42e5fc91cd36/orionis/console/commands/bootstrap/_editor.py#L410">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#_routing_value" title="orionis.console.commands.bootstrap._editor.BootstrapEditor._routing_value">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    
+    <div><p>Find a context argument in a supported routing call.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">call:</span><code><a href="https://docs.python.org/3/library/ast.html#ast.Call" class="intersphinx-link">ast.Call</a></code></td><td class="fieldArgDesc">Routing call to inspect.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">context:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Runtime context whose route argument is needed.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code>ast.AST | None</code></td><td class="fieldArgDesc">Return the argument expression, or None when it is absent.</td></tr></table></div>
+  </div>
+</div><div class="basestaticmethod">
+  
+  
+  <a name="orionis.console.commands.bootstrap._editor.BootstrapEditor._scope_nodes">
+    
+  </a>
+  <a name="_scope_nodes">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <div><span class="decorator">@<a href="https://docs.python.org/3/builtins/functions.html#staticmethod" class="intersphinx-link">staticmethod</a><br /></span></div>
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">_scope_nodes</span><span class="function-signature">(<span class="rst-sig-param">scope: <code><a href="https://docs.python.org/3/library/ast.html#ast.AST" class="intersphinx-link">ast.AST</a></code></span>) -&gt; <code><a href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Iterator" class="intersphinx-link">Iterator</a>[<wbr></wbr><a href="https://docs.python.org/3/library/ast.html#ast.AST" class="intersphinx-link">ast.AST</a>]</code>:</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/430867188a07b101483d6d767cbc42e5fc91cd36/orionis/console/commands/bootstrap/_editor.py#L198">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#_scope_nodes" title="orionis.console.commands.bootstrap._editor.BootstrapEditor._scope_nodes">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    
+    <div><p>Walk a lexical scope without entering unrelated nested definitions.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">scope:</span><code><a href="https://docs.python.org/3/library/ast.html#ast.AST" class="intersphinx-link">ast.AST</a></code></td><td class="fieldArgDesc">Lexical scope or descendant node to traverse.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">Finish traversal without returning a value.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Yields</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/library/ast.html#ast.AST" class="intersphinx-link">ast.AST</a></code></td><td class="fieldArgDesc">Emit nodes from the selected lexical scope.</td></tr></table></div>
+  </div>
+</div><div class="basemethod">
+  
+  
+  <a name="orionis.console.commands.bootstrap._editor.BootstrapEditor.__init__">
+    
+  </a>
+  <a name="__init__">
+    
+  </a>
+  <div class="functionHeader">
+    
+    
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">__init__</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">path: <code><a href="https://docs.python.org/3/library/pathlib.html#pathlib.Path" class="intersphinx-link">Path</a></code>, </span><span class="rst-sig-param">base_path: <code><a href="https://docs.python.org/3/library/pathlib.html#pathlib.Path" class="intersphinx-link">Path</a></code></span>):</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/430867188a07b101483d6d767cbc42e5fc91cd36/orionis/console/commands/bootstrap/_editor.py#L26">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#__init__" title="orionis.console.commands.bootstrap._editor.BootstrapEditor.__init__">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    
+    <div><p>Initialize a source-preserving application bootstrap edit session.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">path:</span><code><a href="https://docs.python.org/3/library/pathlib.html#pathlib.Path" class="intersphinx-link">Path</a></code></td><td class="fieldArgDesc">Bootstrap Python module to inspect.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">base<wbr></wbr>_path:</span><code><a href="https://docs.python.org/3/library/pathlib.html#pathlib.Path" class="intersphinx-link">Path</a></code></td><td class="fieldArgDesc">Application root used for relative route and import paths.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">Store the original source, syntax tree, and application binding.</td></tr></table></div>
+  </div>
+</div><div class="basemethod">
+  
+  
+  <a name="orionis.console.commands.bootstrap._editor.BootstrapEditor._after">
+    
+  </a>
+  <a name="_after">
+    
+  </a>
+  <div class="functionHeader">
+    
+    
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">_after</span><span class="function-signature long-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">statement: <code>ast.stmt</code>, </span><span class="rst-sig-param">lines: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#list" class="intersphinx-link">list</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>]</code>, </span><span class="rst-sig-symbol">*, </span><span class="rst-sig-param">separate: <code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code> = <a href="https://docs.python.org/3/builtins/constants.html#True" class="intersphinx-link">True</a></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" class="intersphinx-link">tuple</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a>, <wbr></wbr><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a>, <wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>]</code>:</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/430867188a07b101483d6d767cbc42e5fc91cd36/orionis/console/commands/bootstrap/_editor.py#L557">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#_after" title="orionis.console.commands.bootstrap._editor.BootstrapEditor._after">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    
+    <div><p>Plan an insertion after a standalone statement.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">statement:</span><code>ast.stmt</code></td><td class="fieldArgDesc">Standalone statement that precedes the inserted lines.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">lines:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#list" class="intersphinx-link">list</a>[<a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>]</code></td><td class="fieldArgDesc">Unindented source lines to insert.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">separate:</span><code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code></td><td class="fieldArgDesc">Whether to separate the insertion with a leading blank line.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" class="intersphinx-link">tuple</a>[<a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a>, <a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a>, <a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>]</code></td><td class="fieldArgDesc">Return the insertion offsets and correctly indented source text.</td></tr></table></div>
+  </div>
+</div><div class="basemethod">
+  
+  
+  <a name="orionis.console.commands.bootstrap._editor.BootstrapEditor._append_keyword">
+    
+  </a>
+  <a name="_append_keyword">
+    
+  </a>
+  <div class="functionHeader">
+    
+    
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">_append_keyword</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">call: <code><a href="https://docs.python.org/3/library/ast.html#ast.Call" class="intersphinx-link">ast.Call</a></code>, </span><span class="rst-sig-param">context: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code>, </span><span class="rst-sig-param">literal: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code>:</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/430867188a07b101483d6d767cbc42e5fc91cd36/orionis/console/commands/bootstrap/_editor.py#L870">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#_append_keyword" title="orionis.console.commands.bootstrap._editor.BootstrapEditor._append_keyword">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    
+    <div><p>Extend a routing argument list while retaining its source layout.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">call:</span><code><a href="https://docs.python.org/3/library/ast.html#ast.Call" class="intersphinx-link">ast.Call</a></code></td><td class="fieldArgDesc">Routing call whose argument list must be extended.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">context:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Runtime context to add as a keyword argument.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">literal:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Validated Python literal representing the route paths.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Return updated source with the additional routing keyword.</td></tr></table></div>
+  </div>
+</div><div class="basemethod">
+  
+  
+  <a name="orionis.console.commands.bootstrap._editor.BootstrapEditor._application_names">
+    
+  </a>
+  <a name="_application_names">
+    
+  </a>
+  <div class="functionHeader">
+    
+    
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">_application_names</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" class="intersphinx-link">tuple</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#set" class="intersphinx-link">set</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>], <wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#set" class="intersphinx-link">set</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>]]</code>:</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/430867188a07b101483d6d767cbc42e5fc91cd36/orionis/console/commands/bootstrap/_editor.py#L77">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#_application_names" title="orionis.console.commands.bootstrap._editor.BootstrapEditor._application_names">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    
+    <div><p>Collect supported application constructor and module aliases.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" class="intersphinx-link">tuple</a>[<a href="https://docs.python.org/3/builtins/stdtypes.html#set" class="intersphinx-link">set</a>[<a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>], <a href="https://docs.python.org/3/builtins/stdtypes.html#set" class="intersphinx-link">set</a>[<a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>]]</code></td><td class="fieldArgDesc">Return constructor names and imported application module names.</td></tr></table></div>
+  </div>
+</div><div class="basemethod">
+  
+  
+  <a name="orionis.console.commands.bootstrap._editor.BootstrapEditor._argument_tail">
+    
+  </a>
+  <a name="_argument_tail">
+    
+  </a>
+  <div class="functionHeader">
+    
+    
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">_argument_tail</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">last: <code><a href="https://docs.python.org/3/library/ast.html#ast.AST" class="intersphinx-link">ast.AST</a></code>, </span><span class="rst-sig-param">call_end: <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" class="intersphinx-link">tuple</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a>, <wbr></wbr><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a>]</code>:</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/430867188a07b101483d6d767cbc42e5fc91cd36/orionis/console/commands/bootstrap/_editor.py#L932">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#_argument_tail" title="orionis.console.commands.bootstrap._editor.BootstrapEditor._argument_tail">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    
+    <div><p>Find grouping parentheses beyond a positional argument AST node.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">last:</span><code><a href="https://docs.python.org/3/library/ast.html#ast.AST" class="intersphinx-link">ast.AST</a></code></td><td class="fieldArgDesc">Final argument node in the routing call.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">call<wbr></wbr>_end:</span><code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code></td><td class="fieldArgDesc">Character offset immediately before the closing parenthesis.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" class="intersphinx-link">tuple</a>[<a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a>, <a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a>]</code></td><td class="fieldArgDesc">Return the complete argument end offset and trailing-comma presence.</td></tr></table></div>
+  </div>
+</div><div class="basemethod">
+  
+  
+  <a name="orionis.console.commands.bootstrap._editor.BootstrapEditor._before">
+    
+  </a>
+  <a name="_before">
+    
+  </a>
+  <div class="functionHeader">
+    
+    
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">_before</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">statement: <code>ast.stmt</code>, </span><span class="rst-sig-param">lines: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#list" class="intersphinx-link">list</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>]</code></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" class="intersphinx-link">tuple</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a>, <wbr></wbr><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a>, <wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>]</code>:</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/430867188a07b101483d6d767cbc42e5fc91cd36/orionis/console/commands/bootstrap/_editor.py#L523">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#_before" title="orionis.console.commands.bootstrap._editor.BootstrapEditor._before">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    
+    <div><p>Plan an insertion before a statement and its leading comments.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">statement:</span><code>ast.stmt</code></td><td class="fieldArgDesc">Standalone statement that follows the inserted lines.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">lines:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#list" class="intersphinx-link">list</a>[<a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>]</code></td><td class="fieldArgDesc">Unindented source lines to insert.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" class="intersphinx-link">tuple</a>[<a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a>, <a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a>, <a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>]</code></td><td class="fieldArgDesc">Return the insertion offsets and correctly indented source text.</td></tr></table></div>
+  </div>
+</div><div class="basemethod">
+  
+  
+  <a name="orionis.console.commands.bootstrap._editor.BootstrapEditor._callback_import">
+    
+  </a>
+  <a name="_callback_import">
+    
+  </a>
+  <div class="functionHeader">
+    
+    
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">_callback_import</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">import_line: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" class="intersphinx-link">tuple</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a>, <wbr></wbr><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a>, <wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>]</code>:</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/430867188a07b101483d6d767cbc42e5fc91cd36/orionis/console/commands/bootstrap/_editor.py#L601">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#_callback_import" title="orionis.console.commands.bootstrap._editor.BootstrapEditor._callback_import">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    
+    <div><p>Extend the visible import block without adding an empty import group.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">import<wbr></wbr>_line:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Callback import to insert in the application construction scope.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" class="intersphinx-link">tuple</a>[<a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a>, <a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a>, <a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>]</code></td><td class="fieldArgDesc">Return insertion offsets and source with existing spacing preserved.</td></tr></table></div>
+  </div>
+</div><div class="basemethod">
+  
+  
+  <a name="orionis.console.commands.bootstrap._editor.BootstrapEditor._calls">
+    
+  </a>
+  <a name="_calls">
+    
+  </a>
+  <div class="functionHeader">
+    
+    
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">_calls</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">method: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/stdtypes.html#list" class="intersphinx-link">list</a>[<wbr></wbr><a href="https://docs.python.org/3/library/ast.html#ast.Call" class="intersphinx-link">ast.Call</a>]</code>:</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/430867188a07b101483d6d767cbc42e5fc91cd36/orionis/console/commands/bootstrap/_editor.py#L326">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#_calls" title="orionis.console.commands.bootstrap._editor.BootstrapEditor._calls">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    
+    <div><p>Collect editable calls to an application builder method.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">method:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Application method name to locate.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/stdtypes.html#list" class="intersphinx-link">list</a>[<a href="https://docs.python.org/3/library/ast.html#ast.Call" class="intersphinx-link">ast.Call</a>]</code></td><td class="fieldArgDesc">Return matching calls ordered by their source end offsets.</td></tr></table></div>
+  </div>
+</div><div class="basemethod">
+  
+  
+  <a name="orionis.console.commands.bootstrap._editor.BootstrapEditor._check_assignments">
+    
+  </a>
+  <a name="_check_assignments">
+    
+  </a>
+  <div class="functionHeader">
+    
+    
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">_check_assignments</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>):</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/430867188a07b101483d6d767cbc42e5fc91cd36/orionis/console/commands/bootstrap/_editor.py#L169">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#_check_assignments" title="orionis.console.commands.bootstrap._editor.BootstrapEditor._check_assignments">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    
+    <div><p>Reject application reassignments that obscure the selected receiver.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">Complete validation without changing the application source.</td></tr></table></div>
+  </div>
+</div><div class="basemethod">
+  
+  
+  <a name="orionis.console.commands.bootstrap._editor.BootstrapEditor._check_indirect_routing">
+    
+  </a>
+  <a name="_check_indirect_routing">
+    
+  </a>
+  <div class="functionHeader">
+    
+    
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">_check_indirect_routing</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">routing: <code><a href="https://docs.python.org/3/library/ast.html#ast.Call" class="intersphinx-link">ast.Call</a> | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></span>):</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/430867188a07b101483d6d767cbc42e5fc91cd36/orionis/console/commands/bootstrap/_editor.py#L756">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#_check_indirect_routing" title="orionis.console.commands.bootstrap._editor.BootstrapEditor._check_indirect_routing">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    
+    <div><p>Reject later helpers that can replace the selected routing setup.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">routing:</span><code>ast.Call | None</code></td><td class="fieldArgDesc">Selected routing call, or None when registration is absent.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">Complete validation without changing the application source.</td></tr></table></div>
+  </div>
+</div><div class="basemethod">
+  
+  
+  <a name="orionis.console.commands.bootstrap._editor.BootstrapEditor._check_routing_order">
+    
+  </a>
+  <a name="_check_routing_order">
+    
+  </a>
+  <div class="functionHeader">
+    
+    
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">_check_routing_order</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">call: <code><a href="https://docs.python.org/3/library/ast.html#ast.Call" class="intersphinx-link">ast.Call</a></code></span>):</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/430867188a07b101483d6d767cbc42e5fc91cd36/orionis/console/commands/bootstrap/_editor.py#L976">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#_check_routing_order" title="orionis.console.commands.bootstrap._editor.BootstrapEditor._check_routing_order">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    
+    <div><p>Reject routing configuration placed after application initialization.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">call:</span><code><a href="https://docs.python.org/3/library/ast.html#ast.Call" class="intersphinx-link">ast.Call</a></code></td><td class="fieldArgDesc">Routing call whose initialization order must be validated.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">Complete validation without changing the application source.</td></tr></table></div>
+  </div>
+</div><div class="basemethod">
+  
+  
+  <a name="orionis.console.commands.bootstrap._editor.BootstrapEditor._edited">
+    
+  </a>
+  <a name="_edited">
+    
+  </a>
+  <div class="functionHeader">
+    
+    
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">_edited</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">edits: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#list" class="intersphinx-link">list</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" class="intersphinx-link">tuple</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a>, <wbr></wbr><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a>, <wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>]]</code></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code>:</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/430867188a07b101483d6d767cbc42e5fc91cd36/orionis/console/commands/bootstrap/_editor.py#L496">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#_edited" title="orionis.console.commands.bootstrap._editor.BootstrapEditor._edited">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    
+    <div><p>Apply planned source edits and validate the resulting Python module.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">edits:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#list" class="intersphinx-link">list</a>[<a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" class="intersphinx-link">tuple</a>[<a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a>, <a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a>, <a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>]]</code></td><td class="fieldArgDesc">Start offsets, exclusive end offsets, and replacement text.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Return syntactically valid source in the original encoding.</td></tr></table></div>
+  </div>
+</div><div class="basemethod">
+  
+  
+  <a name="orionis.console.commands.bootstrap._editor.BootstrapEditor._end">
+    
+  </a>
+  <a name="_end">
+    
+  </a>
+  <div class="functionHeader">
+    
+    
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">_end</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">node: <code><a href="https://docs.python.org/3/library/ast.html#ast.AST" class="intersphinx-link">ast.AST</a></code></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code>:</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/430867188a07b101483d6d767cbc42e5fc91cd36/orionis/console/commands/bootstrap/_editor.py#L287">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#_end" title="orionis.console.commands.bootstrap._editor.BootstrapEditor._end">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    
+    <div><p>Locate the source character immediately after a syntax node.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">node:</span><code><a href="https://docs.python.org/3/library/ast.html#ast.AST" class="intersphinx-link">ast.AST</a></code></td><td class="fieldArgDesc">Syntax node with complete source location information.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code></td><td class="fieldArgDesc">Return the exclusive end offset in the original source.</td></tr></table></div>
+  </div>
+</div><div class="basemethod">
+  
+  
+  <a name="orionis.console.commands.bootstrap._editor.BootstrapEditor._find_application">
+    
+  </a>
+  <a name="_find_application">
+    
+  </a>
+  <div class="functionHeader">
+    
+    
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">_find_application</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" class="intersphinx-link">tuple</a>[<wbr></wbr><a href="https://docs.python.org/3/library/ast.html#ast.Assign" class="intersphinx-link">ast.Assign</a> | <a href="https://docs.python.org/3/library/ast.html#ast.AnnAssign" class="intersphinx-link">ast.AnnAssign</a>, <wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>]</code>:</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/430867188a07b101483d6d767cbc42e5fc91cd36/orionis/console/commands/bootstrap/_editor.py#L140">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#_find_application" title="orionis.console.commands.bootstrap._editor.BootstrapEditor._find_application">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    
+    <div><p>Locate the unique named application construction assignment.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" class="intersphinx-link">tuple</a>[ast.Assign | ast.AnnAssign, <a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>]</code></td><td class="fieldArgDesc">Return the assignment node and its application variable name.</td></tr></table></div>
+  </div>
+</div><div class="basemethod">
+  
+  
+  <a name="orionis.console.commands.bootstrap._editor.BootstrapEditor._fresh_callback_name">
+    
+  </a>
+  <a name="_fresh_callback_name">
+    
+  </a>
+  <div class="functionHeader">
+    
+    
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">_fresh_callback_name</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code>:</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/430867188a07b101483d6d767cbc42e5fc91cd36/orionis/console/commands/bootstrap/_editor.py#L1154">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#_fresh_callback_name" title="orionis.console.commands.bootstrap._editor.BootstrapEditor._fresh_callback_name">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    
+    <div><p>Choose an unused callback import name in the application scope.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Return the standard callback name or a collision-free generated alias.</td></tr></table></div>
+  </div>
+</div><div class="basemethod">
+  
+  
+  <a name="orionis.console.commands.bootstrap._editor.BootstrapEditor._has_lifespan_registration">
+    
+  </a>
+  <a name="_has_lifespan_registration">
+    
+  </a>
+  <div class="functionHeader">
+    
+    
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">_has_lifespan_registration</span><span class="function-signature long-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">names: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#set" class="intersphinx-link">set</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>]</code>, </span><span class="rst-sig-param">modules: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#set" class="intersphinx-link">set</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>]</code>, </span><span class="rst-sig-param">custom_names: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#set" class="intersphinx-link">set</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>]</code></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code>:</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/430867188a07b101483d6d767cbc42e5fc91cd36/orionis/console/commands/bootstrap/_editor.py#L1104">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#_has_lifespan_registration" title="orionis.console.commands.bootstrap._editor.BootstrapEditor._has_lifespan_registration">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    
+    <div><p>Detect existing callback registration for the selected application.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">names:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#set" class="intersphinx-link">set</a>[<a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>]</code></td><td class="fieldArgDesc">Directly imported names for the requested callback function.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">modules:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#set" class="intersphinx-link">set</a>[<a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>]</code></td><td class="fieldArgDesc">Imported modules that expose the callback function.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">custom<wbr></wbr>_names:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#set" class="intersphinx-link">set</a>[<a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>]</code></td><td class="fieldArgDesc">Custom callback names whose registrations are preserved.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code></td><td class="fieldArgDesc">Return whether an unambiguous callback registration already exists.</td></tr></table></div>
+  </div>
+</div><div class="basemethod">
+  
+  
+  <a name="orionis.console.commands.bootstrap._editor.BootstrapEditor._helper_application_parameters">
+    
+  </a>
+  <a name="_helper_application_parameters">
+    
+  </a>
+  <div class="functionHeader">
+    
+    
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">_helper_application_parameters</span><span class="function-signature long-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">helper: <code><a href="https://docs.python.org/3/library/ast.html#ast.FunctionDef" class="intersphinx-link">ast.FunctionDef</a> | <a href="https://docs.python.org/3/library/ast.html#ast.AsyncFunctionDef" class="intersphinx-link">ast.AsyncFunctionDef</a></code>, </span><span class="rst-sig-param">call: <code><a href="https://docs.python.org/3/library/ast.html#ast.Call" class="intersphinx-link">ast.Call</a></code></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/stdtypes.html#set" class="intersphinx-link">set</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>]</code>:</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/430867188a07b101483d6d767cbc42e5fc91cd36/orionis/console/commands/bootstrap/_editor.py#L796">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#_helper_application_parameters" title="orionis.console.commands.bootstrap._editor.BootstrapEditor._helper_application_parameters">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    
+    <div><p>Identify helper names that can reference the selected application.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">helper:</span><code>ast.FunctionDef | ast.AsyncFunctionDef</code></td><td class="fieldArgDesc">Helper definition whose argument bindings are inspected.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">call:</span><code><a href="https://docs.python.org/3/library/ast.html#ast.Call" class="intersphinx-link">ast.Call</a></code></td><td class="fieldArgDesc">Invocation that can pass the selected application.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/stdtypes.html#set" class="intersphinx-link">set</a>[<a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>]</code></td><td class="fieldArgDesc">Return parameter and closure names that can reference the application.</td></tr></table></div>
+  </div>
+</div><div class="basemethod">
+  
+  
+  <a name="orionis.console.commands.bootstrap._editor.BootstrapEditor._helper_replaces_routing">
+    
+  </a>
+  <a name="_helper_replaces_routing">
+    
+  </a>
+  <div class="functionHeader">
+    
+    
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">_helper_replaces_routing</span><span class="function-signature long-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">helper: <code><a href="https://docs.python.org/3/library/ast.html#ast.FunctionDef" class="intersphinx-link">ast.FunctionDef</a> | <a href="https://docs.python.org/3/library/ast.html#ast.AsyncFunctionDef" class="intersphinx-link">ast.AsyncFunctionDef</a></code>, </span><span class="rst-sig-param">parameters: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#set" class="intersphinx-link">set</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>]</code></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code>:</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/430867188a07b101483d6d767cbc42e5fc91cd36/orionis/console/commands/bootstrap/_editor.py#L841">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#_helper_replaces_routing" title="orionis.console.commands.bootstrap._editor.BootstrapEditor._helper_replaces_routing">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    
+    <div><p>Detect routing mutations through helper parameters or closures.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">helper:</span><code>ast.FunctionDef | ast.AsyncFunctionDef</code></td><td class="fieldArgDesc">Helper definition to inspect within its lexical scope.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">parameters:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#set" class="intersphinx-link">set</a>[<a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>]</code></td><td class="fieldArgDesc">Names that can still reference the application instance.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code></td><td class="fieldArgDesc">Return whether the helper can replace application routing.</td></tr></table></div>
+  </div>
+</div><div class="basemethod">
+  
+  
+  <a name="orionis.console.commands.bootstrap._editor.BootstrapEditor._import_module">
+    
+  </a>
+  <a name="_import_module">
+    
+  </a>
+  <div class="functionHeader">
+    
+    
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">_import_module</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">node: <code><a href="https://docs.python.org/3/library/ast.html#ast.ImportFrom" class="intersphinx-link">ast.ImportFrom</a></code></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a> | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code>:</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/430867188a07b101483d6d767cbc42e5fc91cd36/orionis/console/commands/bootstrap/_editor.py#L1185">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#_import_module" title="orionis.console.commands.bootstrap._editor.BootstrapEditor._import_module">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    
+    <div><p>Resolve an import node to its absolute application module path.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">node:</span><code><a href="https://docs.python.org/3/library/ast.html#ast.ImportFrom" class="intersphinx-link">ast.ImportFrom</a></code></td><td class="fieldArgDesc">Import-from node whose module path must be resolved.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code>str | None</code></td><td class="fieldArgDesc">Return the dotted module path, or None for an invalid relative import.</td></tr></table></div>
+  </div>
+</div><div class="basemethod">
+  
+  
+  <a name="orionis.console.commands.bootstrap._editor.BootstrapEditor._initializer_calls">
+    
+  </a>
+  <a name="_initializer_calls">
+    
+  </a>
+  <div class="functionHeader">
+    
+    
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">_initializer_calls</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/stdtypes.html#set" class="intersphinx-link">set</a>[<wbr></wbr><a href="https://docs.python.org/3/library/ast.html#ast.Call" class="intersphinx-link">ast.Call</a>]</code>:</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/430867188a07b101483d6d767cbc42e5fc91cd36/orionis/console/commands/bootstrap/_editor.py#L365">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#_initializer_calls" title="orionis.console.commands.bootstrap._editor.BootstrapEditor._initializer_calls">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    
+    <div><p>Collect fluent calls that construct the named application.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/stdtypes.html#set" class="intersphinx-link">set</a>[<a href="https://docs.python.org/3/library/ast.html#ast.Call" class="intersphinx-link">ast.Call</a>]</code></td><td class="fieldArgDesc">Return the calls in the application assignment value chain.</td></tr></table></div>
+  </div>
+</div><div class="basemethod">
+  
+  
+  <a name="orionis.console.commands.bootstrap._editor.BootstrapEditor._lifespan_bindings">
+    
+  </a>
+  <a name="_lifespan_bindings">
+    
+  </a>
+  <div class="functionHeader">
+    
+    
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">_lifespan_bindings</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">module: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" class="intersphinx-link">tuple</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#set" class="intersphinx-link">set</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>], <wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#set" class="intersphinx-link">set</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>], <wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#set" class="intersphinx-link">set</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>]]</code>:</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/430867188a07b101483d6d767cbc42e5fc91cd36/orionis/console/commands/bootstrap/_editor.py#L1051">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#_lifespan_bindings" title="orionis.console.commands.bootstrap._editor.BootstrapEditor._lifespan_bindings">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    
+    <div><p>Recognize visible direct and module imports for lifespan callbacks.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">module:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Dotted module path that supplies the generated callbacks.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" class="intersphinx-link">tuple</a>[<a href="https://docs.python.org/3/builtins/stdtypes.html#set" class="intersphinx-link">set</a>[<a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>], <a href="https://docs.python.org/3/builtins/stdtypes.html#set" class="intersphinx-link">set</a>[<a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>], <a href="https://docs.python.org/3/builtins/stdtypes.html#set" class="intersphinx-link">set</a>[<a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>]]</code></td><td class="fieldArgDesc">Return direct names, module names, and custom callback names.</td></tr></table></div>
+  </div>
+</div><div class="basemethod">
+  
+  
+  <a name="orionis.console.commands.bootstrap._editor.BootstrapEditor._path_literal">
+    
+  </a>
+  <a name="_path_literal">
+    
+  </a>
+  <div class="functionHeader">
+    
+    
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">_path_literal</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">path: <code><a href="https://docs.python.org/3/library/pathlib.html#pathlib.Path" class="intersphinx-link">Path</a></code></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code>:</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/430867188a07b101483d6d767cbc42e5fc91cd36/orionis/console/commands/bootstrap/_editor.py#L473">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#_path_literal" title="orionis.console.commands.bootstrap._editor.BootstrapEditor._path_literal">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    
+    <div><p>Encode a route path as a project-relative Python string literal.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">path:</span><code><a href="https://docs.python.org/3/library/pathlib.html#pathlib.Path" class="intersphinx-link">Path</a></code></td><td class="fieldArgDesc">Effective route file path to represent.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Return a quoted relative path, or an absolute path outside the root.</td></tr></table></div>
+  </div>
+</div><div class="basemethod">
+  
+  
+  <a name="orionis.console.commands.bootstrap._editor.BootstrapEditor._position">
+    
+  </a>
+  <a name="_position">
+    
+  </a>
+  <div class="functionHeader">
+    
+    
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">_position</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">lineno: <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code>, </span><span class="rst-sig-param">byte_column: <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code>:</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/430867188a07b101483d6d767cbc42e5fc91cd36/orionis/console/commands/bootstrap/_editor.py#L248">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#_position" title="orionis.console.commands.bootstrap._editor.BootstrapEditor._position">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    
+    <div><p>Translate an AST byte position into a source character offset.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">lineno:</span><code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code></td><td class="fieldArgDesc">One-based source line number.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">byte<wbr></wbr>_column:</span><code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code></td><td class="fieldArgDesc">Zero-based UTF-8 byte column from the AST.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code></td><td class="fieldArgDesc">Return the absolute character offset in the original source.</td></tr></table></div>
+  </div>
+</div><div class="basemethod">
+  
+  
+  <a name="orionis.console.commands.bootstrap._editor.BootstrapEditor._registration">
+    
+  </a>
+  <a name="_registration">
+    
+  </a>
+  <div class="functionHeader">
+    
+    
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">_registration</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">lines: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#list" class="intersphinx-link">list</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>]</code></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/stdtypes.html#list" class="intersphinx-link">list</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" class="intersphinx-link">tuple</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a>, <wbr></wbr><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a>, <wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>]]</code>:</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/430867188a07b101483d6d767cbc42e5fc91cd36/orionis/console/commands/bootstrap/_editor.py#L633">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#_registration" title="orionis.console.commands.bootstrap._editor.BootstrapEditor._registration">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    
+    <div><p>Plan registration before application initialization or factory return.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">lines:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#list" class="intersphinx-link">list</a>[<a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>]</code></td><td class="fieldArgDesc">Unindented registration source lines to insert.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/stdtypes.html#list" class="intersphinx-link">list</a>[<a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" class="intersphinx-link">tuple</a>[<a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a>, <a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a>, <a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>]]</code></td><td class="fieldArgDesc">Return source edits that preserve the initialization order.</td></tr></table></div>
+  </div>
+</div><div class="basemethod">
+  
+  
+  <a name="orionis.console.commands.bootstrap._editor.BootstrapEditor._routing_call">
+    
+  </a>
+  <a name="_routing_call">
+    
+  </a>
+  <div class="functionHeader">
+    
+    
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">_routing_call</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>) -&gt; <code><a href="https://docs.python.org/3/library/ast.html#ast.Call" class="intersphinx-link">ast.Call</a> | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code>:</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/430867188a07b101483d6d767cbc42e5fc91cd36/orionis/console/commands/bootstrap/_editor.py#L384">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#_routing_call" title="orionis.console.commands.bootstrap._editor.BootstrapEditor._routing_call">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    
+    <div><p>Find the final directly editable application routing call.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code>ast.Call | None</code></td><td class="fieldArgDesc">Return the effective routing call, or None when it is absent.</td></tr></table></div>
+  </div>
+</div><div class="basemethod">
+  
+  
+  <a name="orionis.console.commands.bootstrap._editor.BootstrapEditor._start">
+    
+  </a>
+  <a name="_start">
+    
+  </a>
+  <div class="functionHeader">
+    
+    
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">_start</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">node: <code><a href="https://docs.python.org/3/library/ast.html#ast.AST" class="intersphinx-link">ast.AST</a></code></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code>:</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/430867188a07b101483d6d767cbc42e5fc91cd36/orionis/console/commands/bootstrap/_editor.py#L270">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#_start" title="orionis.console.commands.bootstrap._editor.BootstrapEditor._start">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    
+    <div><p>Locate the first source character belonging to a syntax node.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">node:</span><code><a href="https://docs.python.org/3/library/ast.html#ast.AST" class="intersphinx-link">ast.AST</a></code></td><td class="fieldArgDesc">Syntax node with source location information.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code></td><td class="fieldArgDesc">Return the absolute start offset in the original source.</td></tr></table></div>
+  </div>
+</div><div class="basemethod">
+  
+  
+  <a name="orionis.console.commands.bootstrap._editor.BootstrapEditor._statement">
+    
+  </a>
+  <a name="_statement">
+    
+  </a>
+  <div class="functionHeader">
+    
+    
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">_statement</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">node: <code><a href="https://docs.python.org/3/library/ast.html#ast.AST" class="intersphinx-link">ast.AST</a></code></span>) -&gt; <code>ast.stmt</code>:</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/430867188a07b101483d6d767cbc42e5fc91cd36/orionis/console/commands/bootstrap/_editor.py#L304">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#_statement" title="orionis.console.commands.bootstrap._editor.BootstrapEditor._statement">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    
+    <div><p>Find the enclosing statement in the application construction scope.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">node:</span><code><a href="https://docs.python.org/3/library/ast.html#ast.AST" class="intersphinx-link">ast.AST</a></code></td><td class="fieldArgDesc">Descendant syntax node whose enclosing statement is needed.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code>ast.stmt</code></td><td class="fieldArgDesc">Return the statement that belongs directly to the selected scope.</td></tr></table></div>
+  </div>
+</div><div class="basemethod">
+  
+  
+  <a name="orionis.console.commands.bootstrap._editor.BootstrapEditor.commit">
+    
+  </a>
+  <a name="commit">
+    
+  </a>
+  <div class="functionHeader">
+    
+    
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">commit</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">source: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a> | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code>:</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/430867188a07b101483d6d767cbc42e5fc91cd36/orionis/console/commands/bootstrap/_editor.py#L1230">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#commit" title="orionis.console.commands.bootstrap._editor.BootstrapEditor.commit">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    
+    <div><p>Publish validated source atomically while preserving concurrent edits.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">source:</span><code>str | None</code></td><td class="fieldArgDesc">Planned source, or None when no update is required.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code></td><td class="fieldArgDesc">Return whether updated source was written to the bootstrap module.</td></tr></table></div>
+  </div>
+</div><div class="basemethod">
+  
+  
+  <a name="orionis.console.commands.bootstrap._editor.BootstrapEditor.encode">
+    
+  </a>
+  <a name="encode">
+    
+  </a>
+  <div class="functionHeader">
+    
+    
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">encode</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">source: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/stdtypes.html#bytes" class="intersphinx-link">bytes</a></code>:</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/430867188a07b101483d6d767cbc42e5fc91cd36/orionis/console/commands/bootstrap/_editor.py#L1213">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#encode" title="orionis.console.commands.bootstrap._editor.BootstrapEditor.encode">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    
+    <div><p>Encode planned source using the original coding cookie and BOM.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">source:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Validated Python source to encode.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/stdtypes.html#bytes" class="intersphinx-link">bytes</a></code></td><td class="fieldArgDesc">Return source bytes in the original bootstrap encoding.</td></tr></table></div>
+  </div>
+</div><div class="basemethod">
+  
+  
+  <a name="orionis.console.commands.bootstrap._editor.BootstrapEditor.lifespan">
+    
+  </a>
+  <a name="lifespan">
+    
+  </a>
+  <div class="functionHeader">
+    
+    
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">lifespan</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">lifespan_path: <code><a href="https://docs.python.org/3/library/pathlib.html#pathlib.Path" class="intersphinx-link">Path</a></code></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a> | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code>:</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/430867188a07b101483d6d767cbc42e5fc91cd36/orionis/console/commands/bootstrap/_editor.py#L1001">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#lifespan" title="orionis.console.commands.bootstrap._editor.BootstrapEditor.lifespan">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    
+    <div><p>Import and register application callbacks before initialization.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">lifespan<wbr></wbr>_path:</span><code><a href="https://docs.python.org/3/library/pathlib.html#pathlib.Path" class="intersphinx-link">Path</a></code></td><td class="fieldArgDesc">Effective Python module containing lifespan callbacks.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code>str | None</code></td><td class="fieldArgDesc">Return updated source, or None when callbacks are already registered.</td></tr></table></div>
+  </div>
+</div><div class="basemethod">
+  
+  
+  <a name="orionis.console.commands.bootstrap._editor.BootstrapEditor.routePaths">
+    
+  </a>
+  <a name="routePaths">
+    
+  </a>
+  <div class="functionHeader">
+    
+    
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">routePaths</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">context: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/stdtypes.html#list" class="intersphinx-link">list</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>] | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code>:</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/430867188a07b101483d6d767cbc42e5fc91cd36/orionis/console/commands/bootstrap/_editor.py#L439">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#routePaths" title="orionis.console.commands.bootstrap._editor.BootstrapEditor.routePaths">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    
+    <div><p>Read literal route paths from the effective routing configuration.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">context:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Runtime context whose configured paths are needed.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/stdtypes.html#list" class="intersphinx-link">list</a>[<a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>] | None</code></td><td class="fieldArgDesc">Return literal paths, an empty list if unset, or None if dynamic.</td></tr></table></div>
+  </div>
+</div><div class="basemethod">
+  
+  
+  <a name="orionis.console.commands.bootstrap._editor.BootstrapEditor.routing">
+    
+  </a>
+  <a name="routing">
+    
+  </a>
+  <div class="functionHeader">
+    
+    
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">routing</span><span class="function-signature long-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">context: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code>, </span><span class="rst-sig-param">route_path: <code><a href="https://docs.python.org/3/library/pathlib.html#pathlib.Path" class="intersphinx-link">Path</a> | <a href="https://docs.python.org/3/builtins/stdtypes.html#list" class="intersphinx-link">list</a>[<wbr></wbr><a href="https://docs.python.org/3/library/pathlib.html#pathlib.Path" class="intersphinx-link">Path</a>]</code>, </span><span class="rst-sig-symbol">*, </span><span class="rst-sig-param">registered: <code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code> = <a href="https://docs.python.org/3/builtins/constants.html#False" class="intersphinx-link">False</a></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a> | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code>:</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/430867188a07b101483d6d767cbc42e5fc91cd36/orionis/console/commands/bootstrap/_editor.py#L695">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#routing" title="orionis.console.commands.bootstrap._editor.BootstrapEditor.routing">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    
+    <div><p>Register a missing route context while preserving other arguments.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">context:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Runtime context to register.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">route<wbr></wbr>_path:</span><code>Path | list[<a href="https://docs.python.org/3/library/pathlib.html#pathlib.Path" class="intersphinx-link">Path</a>]</code></td><td class="fieldArgDesc">Effective route file path or paths to register.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">registered:</span><code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code></td><td class="fieldArgDesc">Whether runtime paths confirm a dynamic registration.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code>str | None</code></td><td class="fieldArgDesc">Return updated source, or None when the context is already enabled.</td></tr></table></div>
+  </div>
+</div><div class="baseinstancevariable">
+  
+  
+  <a name="orionis.console.commands.bootstrap._editor.BootstrapEditor._lines">
+    
+  </a>
+  <a name="_lines">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <span class="py-defname">_lines</span> =
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/430867188a07b101483d6d767cbc42e5fc91cd36/orionis/console/commands/bootstrap/_editor.py#L54">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#_lines" title="orionis.console.commands.bootstrap._editor.BootstrapEditor._lines">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="functionBody">
+    
+    <div><p class="undocumented">Undocumented</p></div>
+    
+  </div>
+</div><div class="baseinstancevariable">
+  
+  
+  <a name="orionis.console.commands.bootstrap._editor.BootstrapEditor._nodes">
+    
+  </a>
+  <a name="_nodes">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <span class="py-defname">_nodes</span> =
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/430867188a07b101483d6d767cbc42e5fc91cd36/orionis/console/commands/bootstrap/_editor.py#L74">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#_nodes" title="orionis.console.commands.bootstrap._editor.BootstrapEditor._nodes">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="functionBody">
+    
+    <div><p class="undocumented">Undocumented</p></div>
+    
+  </div>
+</div><div class="baseinstancevariable">
+  
+  
+  <a name="orionis.console.commands.bootstrap._editor.BootstrapEditor._offsets">
+    
+  </a>
+  <a name="_offsets">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <span class="py-defname">_offsets</span>: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#list" class="intersphinx-link">list</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a>]</code> =
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/430867188a07b101483d6d767cbc42e5fc91cd36/orionis/console/commands/bootstrap/_editor.py#L55">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#_offsets" title="orionis.console.commands.bootstrap._editor.BootstrapEditor._offsets">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="functionBody">
+    
+    <div><p class="undocumented">Undocumented</p></div>
+    
+  </div>
+</div><div class="baseinstancevariable">
+  
+  
+  <a name="orionis.console.commands.bootstrap._editor.BootstrapEditor._original">
+    
+  </a>
+  <a name="_original">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <span class="py-defname">_original</span> =
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/430867188a07b101483d6d767cbc42e5fc91cd36/orionis/console/commands/bootstrap/_editor.py#L45">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#_original" title="orionis.console.commands.bootstrap._editor.BootstrapEditor._original">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="functionBody">
+    
+    <div><p class="undocumented">Undocumented</p></div>
+    
+  </div>
+</div><div class="baseinstancevariable">
+  
+  
+  <a name="orionis.console.commands.bootstrap._editor.BootstrapEditor._parents">
+    
+  </a>
+  <a name="_parents">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <span class="py-defname">_parents</span> =
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/430867188a07b101483d6d767cbc42e5fc91cd36/orionis/console/commands/bootstrap/_editor.py#L58">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#_parents" title="orionis.console.commands.bootstrap._editor.BootstrapEditor._parents">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="functionBody">
+    
+    <div><p class="undocumented">Undocumented</p></div>
+    
+  </div>
+</div><div class="baseinstancevariable">
+  
+  
+  <a name="orionis.console.commands.bootstrap._editor.BootstrapEditor.app_name">
+    
+  </a>
+  <a name="app_name">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <span class="py-defname">app_name</span> =
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/430867188a07b101483d6d767cbc42e5fc91cd36/orionis/console/commands/bootstrap/_editor.py#L63">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#app_name" title="orionis.console.commands.bootstrap._editor.BootstrapEditor.app_name">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="functionBody">
+    
+    <div><p class="undocumented">Undocumented</p></div>
+    
+  </div>
+</div><div class="baseinstancevariable">
+  
+  
+  <a name="orionis.console.commands.bootstrap._editor.BootstrapEditor.assignment">
+    
+  </a>
+  <a name="assignment">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <span class="py-defname">assignment</span> =
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/430867188a07b101483d6d767cbc42e5fc91cd36/orionis/console/commands/bootstrap/_editor.py#L63">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#assignment" title="orionis.console.commands.bootstrap._editor.BootstrapEditor.assignment">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="functionBody">
+    
+    <div><p class="undocumented">Undocumented</p></div>
+    
+  </div>
+</div><div class="baseinstancevariable">
+  
+  
+  <a name="orionis.console.commands.bootstrap._editor.BootstrapEditor.base_path">
+    
+  </a>
+  <a name="base_path">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <span class="py-defname">base_path</span> =
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/430867188a07b101483d6d767cbc42e5fc91cd36/orionis/console/commands/bootstrap/_editor.py#L44">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#base_path" title="orionis.console.commands.bootstrap._editor.BootstrapEditor.base_path">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="functionBody">
+    
+    <div><p class="undocumented">Undocumented</p></div>
+    
+  </div>
+</div><div class="baseinstancevariable">
+  
+  
+  <a name="orionis.console.commands.bootstrap._editor.BootstrapEditor.body">
+    
+  </a>
+  <a name="body">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <span class="py-defname">body</span> =
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/430867188a07b101483d6d767cbc42e5fc91cd36/orionis/console/commands/bootstrap/_editor.py#L73">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#body" title="orionis.console.commands.bootstrap._editor.BootstrapEditor.body">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="functionBody">
+    
+    <div><p class="undocumented">Undocumented</p></div>
+    
+  </div>
+</div><div class="baseinstancevariable">
+  
+  
+  <a name="orionis.console.commands.bootstrap._editor.BootstrapEditor.encoding">
+    
+  </a>
+  <a name="encoding">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <span class="py-defname">encoding</span> =
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/430867188a07b101483d6d767cbc42e5fc91cd36/orionis/console/commands/bootstrap/_editor.py#L46">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#encoding" title="orionis.console.commands.bootstrap._editor.BootstrapEditor.encoding">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="functionBody">
+    
+    <div><p class="undocumented">Undocumented</p></div>
+    
+  </div>
+</div><div class="baseinstancevariable">
+  
+  
+  <a name="orionis.console.commands.bootstrap._editor.BootstrapEditor.newline">
+    
+  </a>
+  <a name="newline">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <span class="py-defname">newline</span> =
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/430867188a07b101483d6d767cbc42e5fc91cd36/orionis/console/commands/bootstrap/_editor.py#L48">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#newline" title="orionis.console.commands.bootstrap._editor.BootstrapEditor.newline">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="functionBody">
+    
+    <div><p class="undocumented">Undocumented</p></div>
+    
+  </div>
+</div><div class="baseinstancevariable">
+  
+  
+  <a name="orionis.console.commands.bootstrap._editor.BootstrapEditor.path">
+    
+  </a>
+  <a name="path">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <span class="py-defname">path</span> =
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/430867188a07b101483d6d767cbc42e5fc91cd36/orionis/console/commands/bootstrap/_editor.py#L43">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#path" title="orionis.console.commands.bootstrap._editor.BootstrapEditor.path">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="functionBody">
+    
+    <div><p class="undocumented">Undocumented</p></div>
+    
+  </div>
+</div><div class="baseinstancevariable">
+  
+  
+  <a name="orionis.console.commands.bootstrap._editor.BootstrapEditor.scope">
+    
+  </a>
+  <a name="scope">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <span class="py-defname">scope</span> =
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/430867188a07b101483d6d767cbc42e5fc91cd36/orionis/console/commands/bootstrap/_editor.py#L64">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#scope" title="orionis.console.commands.bootstrap._editor.BootstrapEditor.scope">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="functionBody">
+    
+    <div><p class="undocumented">Undocumented</p></div>
+    
+  </div>
+</div><div class="baseinstancevariable">
+  
+  
+  <a name="orionis.console.commands.bootstrap._editor.BootstrapEditor.source">
+    
+  </a>
+  <a name="source">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <span class="py-defname">source</span> =
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/430867188a07b101483d6d767cbc42e5fc91cd36/orionis/console/commands/bootstrap/_editor.py#L47">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#source" title="orionis.console.commands.bootstrap._editor.BootstrapEditor.source">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="functionBody">
+    
+    <div><p class="undocumented">Undocumented</p></div>
+    
+  </div>
+</div><div class="baseinstancevariable">
+  
+  
+  <a name="orionis.console.commands.bootstrap._editor.BootstrapEditor.tree">
+    
+  </a>
+  <a name="tree">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <span class="py-defname">tree</span> =
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/430867188a07b101483d6d767cbc42e5fc91cd36/orionis/console/commands/bootstrap/_editor.py#L50">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#tree" title="orionis.console.commands.bootstrap._editor.BootstrapEditor.tree">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="functionBody">
+    
+    <div><p class="undocumented">Undocumented</p></div>
+    
+  </div>
+</div><div class="baseproperty">
+  
+  
+  <a name="orionis.console.commands.bootstrap._editor.BootstrapEditor.hasRouting">
+    
+  </a>
+  <a name="hasRouting">
+    
+  </a>
+  <div class="functionHeader">
+    <div><span class="decorator">@<a href="https://docs.python.org/3/builtins/functions.html#property" class="intersphinx-link">property</a><br /></span></div>
+    <span class="py-defname">hasRouting</span>: <code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code> =
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/430867188a07b101483d6d767cbc42e5fc91cd36/orionis/console/commands/bootstrap/_editor.py#L397">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#hasRouting" title="orionis.console.commands.bootstrap._editor.BootstrapEditor.hasRouting">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="functionBody">
+    
+    <div><p>Report whether the application exposes a directly editable routing call.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code></td><td class="fieldArgDesc">Return whether a supported routing call exists.</td></tr></table></div>
+    
+  </div>
+</div>
+        </div>
+      
+      </main>
+    </div>
+
+    <footer class="orionis-footer">
+  
+  <div class="orionis-footer-inner">
+    <div class="orionis-footer-copy">
+      <p>API documentation for <a href="https://orionis-framework.com/" class="projecthome">Orionis</a>.</p>
+      <p class="orionis-footer-meta">Generated with <a href="https://github.com/twisted/pydoctor/">Pydoctor</a> 25.10.1.<span class="orionis-footer-build"> Built 2026-10-14 15:50:06.</span></p>
+    </div>
+    <nav class="orionis-footer-links" aria-label="Additional resources">
+      <a href="https://docs.orionis-framework.com">Read the guide <span aria-hidden="true">↗</span></a>
+      <a href="https://github.com/orionis-framework/framework">Source on GitHub <span aria-hidden="true">↗</span></a>
+    </nav>
+  </div>
+  <!-- Keep Pydoctor's search engine and its required load order intact. -->
+  <script src="ajax.js" type="text/javascript"></script>
+  <script src="searchlib.js" type="text/javascript"></script>
+  <script src="search.js" type="text/javascript"></script>
+</footer>
+  
+    <script src="pydoctor.js" type="text/javascript"></script>
+
+  </body>
+</html>

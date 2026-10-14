@@ -1,8 +1,7 @@
 from __future__ import annotations
 from typing import Any
-import markdown as markdown_lib
 
-# ruff: noqa: ANN401
+# ruff: noqa: ANN401, PLC0415
 
 def _filter_markdown() -> Any:
     """
@@ -27,6 +26,7 @@ def _filter_markdown() -> Any:
         str
             HTML-rendered string.
         """
+        import markdown as markdown_lib
         return markdown_lib.markdown(
             str(value),
             extensions=["extra", "codehilite", "toc"],

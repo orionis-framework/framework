@@ -1,7 +1,5 @@
 from __future__ import annotations
 from typing import TYPE_CHECKING, Any
-from sqlalchemy.exc import SQLAlchemyError
-from orionis.database.dialect import resolve_driver
 from orionis.database.exceptions import QueryException
 
 if TYPE_CHECKING:
@@ -10,6 +8,8 @@ if TYPE_CHECKING:
 
 class DatabaseInspector:
     """Inspect user objects without opening a separate database engine."""
+
+    # ruff: noqa: PLC0415, S608
 
     __slots__ = ("config", "connection", "driver", "name")
 
@@ -31,8 +31,10 @@ class DatabaseInspector:
         Returns
         -------
         None
-            Complete the documented operation without returning a value.
+            Store the configuration and selected connection.
         """
+        from orionis.database.dialect import resolve_driver
+
         self.name = name or manager.getDefaultName()
         self.config = manager.configFor(self.name)
         self.driver = resolve_driver(self.config)
@@ -483,6 +485,8 @@ class DatabaseInspector:
         """
         if self.driver == "sqlite":
             return None
+        from sqlalchemy.exc import SQLAlchemyError
+
         try:
             if self.driver == "redshift":
                 rows = await self.connection.select(
@@ -546,7 +550,7 @@ class DatabaseInspector:
         quoted = self.quoteIdentifier(name)
         # Quoting is dialect-aware, and callers use catalog-sourced names.
         rows = await self.connection.select(
-            f"SELECT COUNT(*) AS count FROM {quoted}",  # noqa: S608
+            f"SELECT COUNT(*) AS count FROM {quoted}",
         )
         return int(rows[0]["count"])
 
@@ -564,6 +568,8 @@ class DatabaseInspector:
         int | None
             Physical size, or ``None`` when unavailable.
         """
+        from sqlalchemy.exc import SQLAlchemyError
+
         if self.driver == "redshift":
             rows = await self._redshiftSizeRows(name)
         elif self.driver == "sqlite":
@@ -635,6 +641,8 @@ class DatabaseInspector:
         """
         if not tables:
             return {}
+        from sqlalchemy.exc import SQLAlchemyError
+
         driver = self.driver
         if driver == "redshift":
             rows = await self._redshiftSizeRows()
@@ -1320,6 +1328,8 @@ class DatabaseInspector:
         list[dict[str, Any]] | None
             Sizes in bytes, or None when optional metadata access is unavailable.
         """
+        from sqlalchemy.exc import SQLAlchemyError
+
         projection = (
             "SELECT COALESCE(SUM(size), 0) * 1048576 AS bytes"
             if aggregate else

@@ -1,10 +1,10 @@
 from __future__ import annotations
 from orionis.container.providers.service_provider import ServiceProvider
-from orionis.database.connection_manager import ConnectionManager
 from orionis.database.contracts.connection_manager import IConnectionManager
-from orionis.orm.resolver import ConnectionResolver
 
 class ConnectionManagerProvider(ServiceProvider):
+
+    # ruff: noqa: PLC0415
 
     def register(self) -> None:
         """
@@ -13,8 +13,9 @@ class ConnectionManagerProvider(ServiceProvider):
         Returns
         -------
         None
-            This method does not return a value.
+            Register the connection manager binding.
         """
+        from orionis.database import ConnectionManager
         self.app.singleton(IConnectionManager, ConnectionManager)
 
     async def boot(self) -> None:
@@ -24,7 +25,9 @@ class ConnectionManagerProvider(ServiceProvider):
         Returns
         -------
         None
-            This method does not return a value.
+            Install the resolved manager in the ORM resolver.
         """
+        from orionis.orm.resolver import ConnectionResolver
+
         manager: IConnectionManager = await self.app.make(IConnectionManager)
         ConnectionResolver.setManager(manager)

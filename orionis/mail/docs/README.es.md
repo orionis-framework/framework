@@ -1,19 +1,6 @@
-# orionis.mail
+# Mail: ejemplos de compatibilidad
 
-> `orionis.mail` compone declaraciones inmutables, renderiza vistas, resuelve adjuntos de storage y entrega por SMTP, archivo o transportes personalizados.
-
-## Descripción general
-
-El pipeline separa declaración de efectos. `Envelope`, `Content` y `Attachment` validan intención inmutable; `Mailable` empaqueta intención reutilizable; `PendingMail` crea ramas fluidas independientes; `MailComposer` renderiza y serializa MIME completo; `MailManager` resuelve el transporte solo al esperar `send`, `raw` o `html`.
-
-Los drivers incluidos son `smtp` y `file`. SMTP informa aceptación del servidor, no entrega final. File publica atómicamente archivos `.eml` privados y sirve para desarrollo, pruebas o archivo.
-
-## Requisitos
-
-- Python 3.14 o posterior.
-- Una aplicación Orionis iniciada para facade `Mail`, inyección, vistas y discos configurados.
-- Servidor SMTP accesible, o filesystem local con hard links para file.
-- Remitente y destinatarios válidos; al menos un cuerpo y un destinatario por envío.
+La documentación oficial está en [el índice español](es/README.md). Esta ruta conserva el catálogo de ejemplos exigido por `tests/mail/test_docs.py` y enlaces existentes. Los ejemplos que inspeccionan atributos privados son pruebas aisladas de compatibilidad; utiliza las APIs públicas enseñadas en los capítulos oficiales. No implica que las facades puedan ejecutarse antes del boot.
 
 ## Inicio rápido
 
@@ -33,86 +20,8 @@ assert content.text == "Welcome to Orionis."
 print(sender.asHeader())
 ```
 
-Validación: **Ejecutado correctamente** en CPython 3.14.6; declarar no realiza I/O.
 
-## Conceptos principales
 
-### Declaraciones inmutables
-
-Direcciones, envelopes, contenido, adjuntos, preparados y resultados son snapshots inmutables. `Content.data` congela recursivamente contenedores propios. Los métodos `Mailable` son síncronos y declarativos, por lo que una instancia puede reutilizarse concurrentemente.
-
-### Operaciones fluidas
-
-Cada método de `PendingMail` devuelve una cadena nueva. `mailer`, `fromAddress`, `to`, `cc`, `bcc`, `replyTo`, `subject` y `attach` no renderizan, leen ni resuelven transporte. Los terminales son asíncronos. Un callback recibe un `Message` local, se ejecuta una vez y puede ser sync o async.
-
-### Límite de composición
-
-`MailComposer` renderiza vistas HTML/texto, lee adjuntos con `IStorageManager`, valida, construye MIME estándar y excluye Bcc de headers visibles mientras lo conserva en el envelope de transporte. La preparación termina antes de crear transporte, así que errores previos no abren SMTP ni publican parciales.
-
-### Resultados
-
-`MailStatus.ACCEPTED` significa que SMTP aceptó todos, `PARTIAL` algunos y `STORED` que se publicó un `.eml` completo. Ninguno demuestra entrega al buzón ni lectura.
-
-## Estructura del módulo
-
-| Ruta | Responsabilidad |
-|---|---|
-| `entities/` | Direcciones, envelopes, contenido, adjuntos, opciones, MIME, settings y resultados. |
-| `mailable.py` | Abstracción declarativa reutilizable. |
-| `message.py` | Configurador local del callback. |
-| `pending.py` | Cadenas inmutables y terminales async. |
-| `composer.py` | Vistas, storage, MIME y separación Bcc. |
-| `manager.py` | Configuración, registro de drivers, remitente global y entrega. |
-| `transports/smtp.py` | Frontera SMTP bloqueante fuera del event loop. |
-| `transports/file.py` | Publicación atómica de `.eml` únicos. |
-| `contracts/` | Interfaces de manager y transporte. |
-| `provider.py`, `exceptions.py`, `enums/`, `types.py` | Wiring y tipos auxiliares. |
-
-## API pública
-
-La raíz exporta `Address`, `Attachment`, `Content`, `Envelope`, `MailResult`, `MailStatus`, `Mailable`, `Message` y `PendingMail`.
-
-### Objetos de valor
-
-- `Address(address, name=None)` acepta un addr-spec y normaliza su dominio IDNA.
-- `Envelope(...)` valida headers, normaliza/deduplica destinatarios e impide que uno sea visible y Bcc.
-- `Content(...)` requiere un cuerpo e impide conflictos view/literal por alternativa.
-- `Attachment.fromStorage(...)` declara I/O diferido con rutas/metadatos seguros.
-- `MailResult` devuelve ID, mailer/driver, destinatarios, estado y ruta opcional.
-
-### `Mailable`
-
-Implemente `envelope()` y `content()`; opcionalmente `attachments()`. Pase instancia a `Mail.send()` o la clase para construcción por contenedor en cada envío.
-
-### Manager/facade fluida
-
-`IMailManager` y `Mail` ofrecen `mailer`, `fromAddress`, `to`, `cc`, `bcc`, `replyTo`, `subject`, `attach`, `send`, `raw`, `html` y `extend`. El mailer es una entrada de configuración; `driver` elige implementación.
-
-### Sobrecargas terminales
-
-- `await Mail.send(mailable_or_class)`
-- `await Mail.send("emails.welcome", data, callback)`
-- `await Mail.send(Content(...), callback=callback)`
-- `await Mail.raw(text, callback=None)`
-- `await Mail.html(html, callback=None)`
-
-## Flujos de trabajo comunes
-
-### Crear correo reutilizable
-
-Ponga destinatarios, asunto, cuerpo y adjuntos en `Mailable`. Mantenga sus métodos deterministas y sin I/O. Agregue destinatarios por envío o seleccione mailer derivando una cadena antes de `send`.
-
-### Enviar vista o literal
-
-Pase vista y datos a `send`, o use `raw`/`html`. Configure headers mediante callback o cadena previa. El callback debe devolver `None` o el mismo `Message`; sus excepciones son fallos de composición.
-
-### Adjuntar archivos de storage
-
-Declare una ruta lógica. El composer resuelve el disco durante envío, lee asíncronamente, elige media type explícito/storage/inferido y usa nombre override o basename.
-
-### Agregar driver
-
-Implemente `IMailTransport`, cree factory sync o async `(app, normalized_config)`, llame `manager.extend()` en startup y configure un mailer con ese driver. Duplicados se rechazan.
 
 ## Ejemplos
 
@@ -143,7 +52,6 @@ assert mail.attachments() == ()
 print(mail.content().text)
 ```
 
-Validación: **Ejecutado correctamente** en CPython 3.14.6.
 
 ### Configurar un mensaje
 
@@ -164,7 +72,6 @@ assert snapshot.attachments[0].path == "invoices/42.pdf"
 print(snapshot.subject)
 ```
 
-Validación: **Ejecutado correctamente** en CPython 3.14.6; `_snapshot()` solo inspecciona la declaración.
 
 ### Declarar adjunto nombrado
 
@@ -183,7 +90,6 @@ assert attachment.name == "Annual Report.pdf"
 print(attachment.mime_type)
 ```
 
-Validación: **Ejecutado correctamente** en CPython 3.14.6; no hubo acceso a storage.
 
 ### Construir ramas independientes
 
@@ -205,7 +111,6 @@ assert second._options.to[0].address == "second@example.com"
 print("branches are isolated")
 ```
 
-Validación: **Ejecutado correctamente** en CPython 3.14.6; se inspecciona estado protegido solo para demostrar aislamiento.
 
 ### Publicar un preparado con file
 
@@ -235,7 +140,6 @@ async def main() -> None:
 asyncio.run(main())
 ```
 
-Validación: **Ejecutado correctamente** en CPython 3.14.6; `.eml` solo temporal.
 
 ### Validar SMTP sin conectar
 
@@ -259,7 +163,6 @@ assert "secret" not in repr(settings)
 print(settings.host)
 ```
 
-Validación: **Ejecutado correctamente** en CPython 3.14.6; no abrió red.
 
 ### Inspeccionar resultado
 
@@ -281,7 +184,6 @@ assert result.file_path.name == "message.eml"
 print(result.mailer)
 ```
 
-Validación: **Ejecutado correctamente** en CPython 3.14.6.
 
 ### Configurar callback directo
 
@@ -301,7 +203,6 @@ assert probe._snapshot().envelope().subject == "Your invoice"
 print(probe._snapshot().to[0].address)
 ```
 
-Validación: **Ejecutado correctamente** en CPython 3.14.6.
 
 ### Implementar factory asíncrona
 
@@ -323,7 +224,6 @@ async def archive_factory(
     return FileTransport(path)
 ```
 
-Validación: **Ejecutado por la prueba documental de mail** con `Application` real y ruta temporal.
 
 ### Registrar el driver
 
@@ -335,7 +235,6 @@ def register_archive(manager: MailManager) -> None:
     manager.extend("custom_archive", archive_factory)
 ```
 
-Validación: **Importación y sintaxis verificadas**; el manager se resuelve en startup.
 
 ### Enviar mediante facade
 
@@ -356,7 +255,6 @@ async def send_status():
 # asyncio.run(send_status())  # Run only after the Orionis application boots.
 ```
 
-Validación: **Importación y sintaxis verificadas**; requiere aplicación iniciada.
 
 ### Enviar mailable con inyección
 
@@ -368,55 +266,3 @@ async def send_welcome() -> None:
     result = await Mail.to("ana@example.com").send(WelcomeMail("Ana"))
     assert result.status in {"accepted", "partial", "stored"}
 ```
-
-Validación: **Importación y sintaxis verificadas**; requiere vistas, remitente y transporte.
-
-## Configuración
-
-`config/mail.py` define:
-
-| Ajuste | Entorno | Predeterminado |
-|---|---|---|
-| Mailer predeterminado | `MAIL_MAILER` | `smtp` |
-| Remitente | `MAIL_FROM_ADDRESS` | vacío |
-| Nombre remitente | `MAIL_FROM_NAME` | `APP_NAME`, luego `Orionis` |
-| URL SMTP | `MAIL_URL` | vacío |
-| Endpoint | `MAIL_HOST`, `MAIL_PORT` | host vacío, 587 |
-| Seguridad | `MAIL_ENCRYPTION` | `TLS` |
-| Credenciales | `MAIL_USERNAME`, `MAIL_PASSWORD` | par vacío |
-| Timeout | `MAIL_TIMEOUT` | `None` |
-| Salida file | `MAIL_FILE_PATH` | `storage/mail` |
-
-Una URL `smtp://` o `smtps://` prevalece sobre endpoint/seguridad y reemplaza credenciales como par. Mailers llamados `smtp` y `file` infieren driver; otros requieren `driver` explícito.
-
-## Integración con Orionis
-
-`MailProvider` enlaza `MailComposer` e `IMailManager` como singletons y fija `Mail` sin conectar. El composer inyecta `IViewEngine` e `IStorageManager`; clases Mailable se construyen por contenedor. Autenticación usa mail para verificación y reset.
-
-Use `IMailManager` inyectado para dependencias explícitas y `Mail` en entry points concisos. Ambos apuntan al mismo singleton; cada operación fluida queda aislada.
-
-## Errores y casos límite
-
-- Controles en headers, direcciones ambiguas, dominios inválidos, vistas vacías, conflictos de cuerpo, adjuntos inseguros y solape Bcc generan errores de composición.
-- Enviar sin remitente o destinatarios falla al componer. Asunto/cuerpo literal vacío sí es válido.
-- Fallos de adjunto son `MailAttachmentException`; archivos ausentes no se detectan al declarar.
-- Mailers/drivers desconocidos, extensiones duplicadas, SMTP mal configurado y factories inválidas generan `MailConfigurationException`.
-- Fallos SMTP se vuelven `MailTransportException` con diagnóstico acotado, una línea y credenciales redactadas.
-- STARTTLS obligatorio falla si no se anuncia. Local parts internacionales requieren SMTPUTF8.
-- File nunca sobrescribe y falla si no hay hard links atómicos.
-- Bcc está en el envelope de transporte, nunca en MIME.
-- Un resultado parcial exige política de retry/idempotencia; reenviar ciegamente puede duplicar aceptados.
-
-## Rendimiento y concurrencia
-
-Render y lecturas se ejecutan concurrentemente cuando es seguro; storage/file y SMTP síncronos salen del event loop mediante el executor. MIME se construye completo en memoria, así que adjuntos grandes elevan memoria pico. Imponga límites antes de declarar.
-
-Opciones fluidas y Mailable son inmutables y reutilizables. Factories corren por envío y deben ser stateless o sincronizadas. Registre drivers en startup. File usa nombres únicos/links atómicos; SMTP crea conexión por operación. Use colas y concurrencia acotada para volumen.
-
-## Compatibilidad
-
-Orionis declara Python 3.14+. MIME usa políticas `email`, dominios IDNA, nombres Unicode y SMTPUTF8 solo si el addr-spec lo exige. SMTP soporta STARTTLS obligatorio, SSL implícito y plaintext explícito. File requiere filesystem local con hard links atómicos, como NTFS o POSIX regular.
-
-## Notas de verificación
-
-La validación usó CPython 3.14.6. Se inspeccionaron exports, entidades, sobrecargas, composición, vistas, storage, transportes, factories, configuración, provider/facade e integraciones. Los **193** métodos de prueba pasaron, incluido el contrato documental. Nueve ejemplos directos se ejecutaron, la factory personalizada corrió con aplicación real y tres ejemplos dependientes del contenedor se validaron por compilación/importación.

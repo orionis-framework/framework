@@ -1,16 +1,7 @@
-from typing import Any
-from apscheduler.jobstores.redis import RedisJobStore
-from apscheduler.jobstores.sqlalchemy import SQLAlchemyJobStore
-from sqlalchemy.dialects.oracle import FLOAT
-from sqlalchemy.engine.url import URL
+from __future__ import annotations
+from typing import TYPE_CHECKING, Any
 from orionis.console.contracts.store import IScheduleStore
 from orionis.database.contracts.connection_manager import IConnectionManager
-from orionis.database.dialect import (
-    build_engine_url,
-    engine_options,
-    missing_dependency_error,
-    resolve_driver,
-)
 from orionis.foundation.config.scheduler.entities.database import Database
 from orionis.foundation.config.scheduler.entities.redis import Redis
 from orionis.foundation.config.scheduler.entities.scheduler import (
@@ -18,9 +9,14 @@ from orionis.foundation.config.scheduler.entities.scheduler import (
 )
 from orionis.foundation.contracts.application import IApplication
 
+if TYPE_CHECKING:
+    from apscheduler.jobstores.redis import RedisJobStore
+    from apscheduler.jobstores.sqlalchemy import SQLAlchemyJobStore
+    from sqlalchemy.engine.url import URL
+
 class ScheduleStore(IScheduleStore):
 
-    # ruff: noqa: TC001, TC002
+    # ruff: noqa: PLC0415, TC001
 
     def __init__(
         self,
@@ -98,6 +94,8 @@ class ScheduleStore(IScheduleStore):
             raise RuntimeError(error_msg)
 
         # Build the job store from the resolved Redis configuration.
+        from apscheduler.jobstores.redis import RedisJobStore
+
         return RedisJobStore(
             jobs_key=redis_store.key,
             run_times_key=redis_store.run_times_key,
@@ -133,6 +131,13 @@ class ScheduleStore(IScheduleStore):
             raise RuntimeError(error_msg)
 
         # Resolve the connection config and derive the sync engine URL.
+        from orionis.database.dialect import (
+            build_engine_url,
+            engine_options,
+            missing_dependency_error,
+            resolve_driver,
+        )
+
         config: dict[str, Any] = self._db_manager.configFor(database_store.connection)
         if resolve_driver(config) == "redshift":
             message = (
@@ -143,21 +148,29 @@ class ScheduleStore(IScheduleStore):
         url: URL = build_engine_url(config, sync=True)
         options: dict[str, Any] = engine_options(config, sync=True)
         try:
+
             # Build the job store; the sync driver may be missing.
+            from apscheduler.jobstores.sqlalchemy import SQLAlchemyJobStore
             store = SQLAlchemyJobStore(
                 url=url,
                 tablename=database_store.table,
                 engine_options=options,
             )
+
+            # Apply Oracle-specific column type adjustments for
+            # the next_run_time column.
             if resolve_driver(config) == "oracle":
-                # APScheduler declares Float(25), whereas Oracle requires an
-                # explicit binary precision for this DDL column.
+                from sqlalchemy.dialects.oracle import FLOAT
                 column = store.jobs_t.c.next_run_time
                 column.type = column.type.with_variant(
                     FLOAT(binary_precision=83), "oracle",
                 )
+
+            # Return the fully configured job store instance.
             return store
+
         except ModuleNotFoundError as exc:
+
             # Map the missing package to an actionable framework error.
             raise missing_dependency_error(
                 resolve_driver(config), exc, sync=True,

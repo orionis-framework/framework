@@ -1,6 +1,4 @@
-from aiomcache.exceptions import ClientException
-from redis.exceptions import RedisError
-from sqlalchemy.exc import SQLAlchemyError
+import sys
 from orionis.cache.contracts.cache_manager import ICacheManager
 from orionis.cache.exceptions import CacheException
 from orionis.console.base.command import BaseCommand
@@ -34,14 +32,22 @@ class ClearCacheCommand(BaseCommand):
         """
         try:
             cleared = await cache.clear()
-        except (
-            CacheException,
-            ClientException,
-            DatabaseException,
-            OSError,
-            RedisError,
-            SQLAlchemyError,
-        ) as error:
+        except Exception as error:
+            # Exception instances retain the native SDK class identity; their
+            # defining modules are already loaded by the selected backend.
+            backend_errors = tuple(
+                getattr(module, name)
+                for module_name, name in (
+                    ("aiomcache.exceptions", "ClientException"),
+                    ("redis.exceptions", "RedisError"),
+                    ("sqlalchemy.exc", "SQLAlchemyError"),
+                )
+                if (module := sys.modules.get(module_name)) is not None
+            )
+            if not isinstance(
+                error, (CacheException, DatabaseException, OSError, *backend_errors),
+            ):
+                raise
             console.error(
                 "The application cache could not be cleared "
                 f"({type(error).__name__}: {error}).",

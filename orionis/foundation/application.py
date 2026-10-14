@@ -36,7 +36,6 @@ from orionis.http.layer.contracts.middleware import IBaseMiddleware
 from orionis.http.routes.functions import normalize_request_path
 from orionis.introspection.modules.inspector import ModuleInspector
 from orionis.metadata.framework import PYTHON_REQUIRES
-from orionis.support.facades.datetime import DateTime
 from orionis.support.structures.freezer import FreezeThaw
 
 if TYPE_CHECKING:
@@ -227,7 +226,7 @@ class Application(Container, IApplication):
     Python and RSGI special methods retain their protocol-defined names.
     """
 
-    # ruff: noqa: SLF001, ANN401
+    # ruff: noqa: SLF001, ANN401, BLE001, PLC0415, PLR0913
 
     # --- ASGI Application Handling ---
 
@@ -334,7 +333,7 @@ class Application(Container, IApplication):
                 if event is Lifespan.SHUTDOWN:
                     return
 
-            except Exception as exc:  # noqa: BLE001
+            except Exception as exc:
                 error_msg: str = str(exc)
                 await send(
                     {
@@ -1874,7 +1873,7 @@ class Application(Container, IApplication):
 
     # --- Routing Configuration and Validation ---
 
-    def withRouting(  # noqa: PLR0913
+    def withRouting(
         self,
         api: str | list[str] | None = None,
         web: str | list[str] | None = None,
@@ -2777,17 +2776,12 @@ class Application(Container, IApplication):
 
     def __setTimezoneAndLocale(self) -> None:
         """
-        Set system timezone and locale from application configuration.
-
-        Uses the application's configuration to set the system timezone and
-        locale. This method updates environment variables and system locale
-        settings if the relevant configuration values are present.
+        Apply the configured timezone and locale to dates and the environment.
 
         Returns
         -------
         None
-            This method updates environment variables and system locale settings
-            in place. It does not return a value.
+            Configure DateTime and update the supplied timezone and locale values.
         """
         # Retrieve timezone and locale from configuration
         tz: str | None = self.config("app.timezone")  # NOSONAR
@@ -2798,6 +2792,7 @@ class Application(Container, IApplication):
             return
 
         # Load local date-time configuration for the application
+        from orionis.support.facades import DateTime
         DateTime._loadConfig(timezone_name=tz, locale=lc)
 
         # Update environment variables only for values that are set

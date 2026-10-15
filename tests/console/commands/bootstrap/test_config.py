@@ -2,6 +2,7 @@ from __future__ import annotations
 import hashlib
 import json
 import unittest
+from asyncio import run
 from http.client import IncompleteRead
 from io import BytesIO
 from pathlib import Path
@@ -15,6 +16,7 @@ from orionis.console.commands.bootstrap._config import (
     _TREE_URL,
     ConfigBootstrapper,
 )
+from orionis.console.commands.bootstrap.config import BootstrapConfigCommand
 
 if TYPE_CHECKING:
     from urllib.request import Request
@@ -215,6 +217,191 @@ class TestConfigBootstrapper(unittest.TestCase):
         self.assertEqual(existing.stat().st_mtime_ns, original_mtime)
         self.assertEqual((config / "database.py").stat().st_mtime_ns, created_mtime)
 
+    def test_selected_file_downloads_only_requested_configuration(self) -> None:
+        """Restore one requested module without downloading its siblings.
+
+        Returns
+        -------
+        None
+            Complete the assertions without returning a value.
+        """
+        # Include other modules and support files to detect broader recovery.
+        self._fixtures({
+            "config/app.py": b"selected\r\n",
+            "config/auth.py": b"unselected",
+            "config/__init__.py": b"package",
+            "config/nested/app.py": b"nested",
+            "config/readme.txt": b"documentation",
+        })
+
+        result = ConfigBootstrapper(self.app).bootstrap("app")
+
+        self.assertEqual(self.urls, [_TREE_URL, _RAW_ROOT + "config/app.py"])
+        self.assertEqual(
+            (self.base / "config" / "app.py").read_bytes(), b"selected\r\n",
+        )
+        self.assertIn(("CREATED", "config/app.py"), result)
+        self.assertEqual(
+            {path.name for path in (self.base / "config").iterdir()}, {"app.py"},
+        )
+
+    def test_selection_accepts_new_names_from_remote_tree(self) -> None:
+        """Discover selectable modules from GitHub instead of a fixed list.
+
+        Returns
+        -------
+        None
+            Complete the assertions without returning a value.
+        """
+        # Advertise a future official module absent from the current defaults.
+        self._fixtures({
+            "config/app.py": b"unselected",
+            "config/observability.py": b"future configuration",
+        })
+
+        result = ConfigBootstrapper(self.app).bootstrap("observability")
+
+        self.assertEqual(
+            self.urls, [_TREE_URL, _RAW_ROOT + "config/observability.py"],
+        )
+        self.assertEqual(
+            (self.base / "config" / "observability.py").read_bytes(),
+            b"future configuration",
+        )
+        self.assertIn(("CREATED", "config/observability.py"), result)
+        self.assertFalse((self.base / "config" / "app.py").exists())
+
+    def test_selection_preserves_existing_file_without_blob_requests(self) -> None:
+        """Keep selected local bytes and timestamps without fetching any blob.
+
+        Returns
+        -------
+        None
+            Complete the assertions without returning a value.
+        """
+        # A selected local file remains authoritative over the official bytes.
+        self._fixtures({"config/app.py": b"official", "config/auth.py": b"auth"})
+        existing = self.base / "config" / "app.py"
+        existing.parent.mkdir()
+        existing.write_bytes(b"custom\r\n")
+        original_mtime = existing.stat().st_mtime_ns
+
+        result = ConfigBootstrapper(self.app).bootstrap("app")
+
+        self.assertEqual(self.urls, [_TREE_URL])
+        self.assertIn(("EXISTS", "config/app.py"), result)
+        self.assertEqual(existing.read_bytes(), b"custom\r\n")
+        self.assertEqual(existing.stat().st_mtime_ns, original_mtime)
+        self.assertFalse((self.base / "config" / "auth.py").exists())
+
+    def test_unknown_selection_lists_only_remote_modules_before_writes(self) -> None:
+        """Reject unknown names and list sorted top-level Python module names.
+
+        Returns
+        -------
+        None
+            Complete the assertions without returning a value.
+        """
+        # Nested modules, package initializers and non-Python files are excluded.
+        self._fixtures({
+            "config/observability.py": b"future",
+            "config/__init__.py": b"package",
+            "config/cache.py": b"cache",
+            "config/nested/secret.py": b"nested",
+            "config/readme.txt": b"documentation",
+            "config/app.py": b"app",
+        })
+        for selection in ["missing", "../app", "app.py", "", "__init__", "secret"]:
+            with self.subTest(file=selection):
+                self.urls.clear()
+                with self.assertRaises(ValueError) as raised:
+                    ConfigBootstrapper(self.app).bootstrap(selection)
+                message = str(raised.exception)
+                self.assertIn("does not exist", message)
+                self.assertRegex(
+                    message,
+                    r"Available options:\s+app,\s+cache,\s+observability\.?$",
+                )
+                self.assertEqual(self.urls, [_TREE_URL])
+                self.assertEqual(list(self.base.iterdir()), [])
+
+    def test_command_reports_created_then_exists_for_selected_file(self) -> None:
+        """Pass parsed selection through handle and report both resource states.
+
+        Returns
+        -------
+        None
+            Complete the assertions without returning a value.
+        """
+        # Execute the real async command and downloader against isolated fixtures.
+        self._fixtures({"config/app.py": b"app", "config/auth.py": b"auth"})
+        command = BootstrapConfigCommand()
+        command.setArguments({"file": "app"})
+        for status in ["CREATED", "EXISTS"]:
+            with (
+                self.subTest(status=status),
+                patch.object(command, "newLine"),
+                patch.object(command, "write") as write,
+                patch.object(command, "error") as error,
+            ):
+                self.assertEqual(run(command.handle(self.app)), 0)
+                error.assert_not_called()
+                rows = [call.args[0] for call in write.call_args_list]
+                self.assertTrue(any(
+                    status in row and "config/app.py" in row for row in rows
+                ))
+        self.assertEqual((self.base / "config" / "app.py").read_bytes(), b"app")
+        self.assertFalse((self.base / "config" / "auth.py").exists())
+        self.assertEqual(self.urls.count(_RAW_ROOT + "config/app.py"), 1)
+
+    def test_command_without_file_restores_all_configuration(self) -> None:
+        """Retain complete restoration when the optional argument is omitted.
+
+        Returns
+        -------
+        None
+            Complete the assertions without returning a value.
+        """
+        # Empty parsed arguments preserve the original command behavior.
+        self._fixtures({"config/app.py": b"app", "config/auth.py": b"auth"})
+        command = BootstrapConfigCommand()
+        command.setArguments({})
+        with (
+            patch.object(command, "newLine"),
+            patch.object(command, "write"),
+            patch.object(command, "error") as error,
+        ):
+            self.assertEqual(run(command.handle(self.app)), 0)
+            error.assert_not_called()
+        self.assertEqual((self.base / "config" / "app.py").read_bytes(), b"app")
+        self.assertEqual((self.base / "config" / "auth.py").read_bytes(), b"auth")
+
+    def test_command_reports_unknown_selection_and_returns_one(self) -> None:
+        """Surface unknown selections through command output and a failing code.
+
+        Returns
+        -------
+        None
+            Complete the assertions without returning a value.
+        """
+        # Remote names reach the user while validation leaves the project intact.
+        self._fixtures({"config/cache.py": b"cache", "config/app.py": b"app"})
+        command = BootstrapConfigCommand()
+        command.setArguments({"file": "missing"})
+        with (
+            patch.object(command, "newLine"),
+            patch.object(command, "write") as write,
+            patch.object(command, "error") as error,
+        ):
+            self.assertEqual(run(command.handle(self.app)), 1)
+            write.assert_not_called()
+            error.assert_called_once()
+            message = error.call_args.args[0]
+            self.assertIn("does not exist", message)
+            self.assertIn("Available options: app, cache", message)
+        self.assertEqual(self.urls, [_TREE_URL])
+        self.assertEqual(list(self.base.iterdir()), [])
+
     def test_respects_effective_custom_config_path(self) -> None:
         """Use the application's loaded path instead of hardcoding config/.
 
@@ -245,7 +432,7 @@ class TestConfigBootstrapper(unittest.TestCase):
 
         self.app.path = custom_path
 
-        result = ConfigBootstrapper(self.app).bootstrap()
+        result = ConfigBootstrapper(self.app).bootstrap("app")
 
         self.assertEqual((destination / "app.py").read_bytes(), b"custom destination")
         self.assertIn(("CREATED", "settings/runtime/app.py"), result)

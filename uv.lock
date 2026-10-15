@@ -1520,7 +1520,7 @@ wheels = [
 
 [[package]]
 name = "orionis"
-version = "0.923.0"
+version = "0.930.0"
 source = { editable = "." }
 dependencies = [
     { name = "aiocache", extra = ["memcached", "redis"] },

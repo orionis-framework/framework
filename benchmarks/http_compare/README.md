@@ -107,6 +107,7 @@ La carpeta de salida por defecto es `benchmark-results/http-compare/`:
 | `summary.json` | Resumen estructurado por framework y workers, estado y métricas válidas. |
 | `summary.csv` | El mismo resumen para hojas de cálculo y análisis posterior. |
 | `summary.md` | Tabla legible para revisar o compartir los resultados. |
+| `throughput-N-workers.svg` | Gráfica de throughput por cantidad de workers; solo se genera si toda la comparación termina sin errores. |
 | `environment.json` | Versiones y características del entorno de ejecución. |
 | `commands.json` | Comandos utilizados para reproducir y auditar la ejecución. |
 | `raw/` | Salida JSON original de oha y archivos `.stderr.log`, incluidos los disponibles si hay fallos. |
@@ -118,6 +119,23 @@ iniciarla desde **Actions → HTTP Framework Comparison → Run workflow**.
 La tabla aparece en el resumen del job y los archivos se descargan desde
 `http-framework-comparison-…`, incluso cuando hay mediciones fallidas.
 
+Después de una ejecución exitosa en `1.x`, un job con permiso `contents: write`
+publica las gráficas, los resúmenes y el entorno en la rama `benchmark-results`,
+dentro de `http-compare/`. La rama se crea automáticamente en la primera
+publicación. El README principal muestra una gráfica por configuración de
+**1, 2, 3 y 4 workers** y enlaza la tabla completa. Las imágenes estarán
+disponibles después de la primera publicación exitosa.
+
+Las barras se ordenan por solicitudes HTTP 200 por segundo y usan las mismas
+medianas de `summary.json`, sin combinar cantidades de workers ni tomar la mejor
+muestra. Cada gráfica incluye los parámetros de carga, las versiones de Python y
+Granian, la fecha y el commit medido.
+
+Las ejecuciones fallidas o iniciadas desde otra rama no reemplazan los
+resultados publicados. El job de medición conserva permisos de solo lectura;
+la publicación no modifica `1.x` ni dispara otro benchmark. Las ejecuciones de
+una misma rama se serializan para evitar publicaciones fuera de orden.
+
 ## Pruebas unitarias
 
 ```text
@@ -125,7 +143,8 @@ uv run --no-sync python -B -m unittest tests.test_http_compare -v
 ```
 
 Estas pruebas no generan carga: verifican contabilidad, medianas, exclusión del
-calentamiento, parámetros compartidos, limpieza, fallos y coherencia de reportes.
+calentamiento, parámetros compartidos, limpieza, fallos, coherencia de reportes
+y generación de las gráficas SVG.
 
 ## Límites
 

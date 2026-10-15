@@ -20,13 +20,12 @@ from importlib import metadata
 from pathlib import Path
 from tempfile import TemporaryDirectory
 from typing import Any
-
 import psutil
-
 from benchmarks.http_compare.client import OHA_VERSION, install_oha, parse_measurement
 from benchmarks.http_compare.report import (
     METRICS,
     aggregate_samples,
+    render_throughput_svg,
     write_json,
     write_reports,
 )
@@ -39,7 +38,6 @@ GRANIAN_VERSION = "2.8.4"
 STARTUP_TIMEOUT = 60
 HTTP_1_1 = 11
 WINDOWS_LIMIT = "Granian cannot run multiple workers on Windows; use --workers 1."
-
 
 @dataclass(frozen=True)
 class Framework:
@@ -62,7 +60,6 @@ class Framework:
         # Resolve the target without importing optional framework dependencies.
         return f"benchmarks.http_compare.apps.{self.module}:create_application"
 
-
 FRAMEWORKS = {
     item.name: item
     for item in (
@@ -73,7 +70,6 @@ FRAMEWORKS = {
         Framework("starlette", "asgi", "starlette"),
     )
 }
-
 
 def positive_number(value: str) -> float:
     """
@@ -103,7 +99,6 @@ def positive_number(value: str) -> float:
         raise argparse.ArgumentTypeError(error_msg)
     return number
 
-
 def positive_integer(value: str) -> int:
     """
     Parse a positive connection or repetition count.
@@ -131,7 +126,6 @@ def positive_integer(value: str) -> int:
         error_msg = "must be greater than zero"
         raise argparse.ArgumentTypeError(error_msg)
     return number
-
 
 def build_parser() -> argparse.ArgumentParser:
     """
@@ -171,7 +165,6 @@ def build_parser() -> argparse.ArgumentParser:
     )
     return parser
 
-
 def _git(*arguments: str) -> str:
     """
     Read repository metadata through a bounded Git command.
@@ -201,7 +194,6 @@ def _git(*arguments: str) -> str:
         creationflags=subprocess.CREATE_NO_WINDOW if sys.platform == "win32" else 0,
     )
     return result.stdout.strip() if result.returncode == 0 else "unknown"
-
 
 def collect_environment() -> dict[str, Any]:
     """
@@ -268,7 +260,6 @@ def collect_environment() -> dict[str, Any]:
         ),
     }
 
-
 def server_command(framework: Framework, workers: int, port: int) -> list[str]:
     """
     Build a Granian command with shared comparison settings.
@@ -321,7 +312,6 @@ def server_command(framework: Framework, workers: int, port: int) -> list[str]:
         "--no-metrics",
     ]
 
-
 def track_children(
     process: subprocess.Popen[bytes], known: dict[int, psutil.Process],
 ) -> None:
@@ -344,7 +334,6 @@ def track_children(
     with suppress(psutil.NoSuchProcess):
         for child in psutil.Process(process.pid).children(recursive=True):
             known[child.pid] = child
-
 
 def stop_server(
     process: subprocess.Popen[bytes], known: dict[int, psutil.Process] | None = None,
@@ -407,7 +396,6 @@ def stop_server(
         )
         raise RuntimeError(error_msg)
 
-
 def check_workers(
     process: subprocess.Popen[bytes], ready: Path, workers: int,
     known: dict[int, psutil.Process],
@@ -456,7 +444,6 @@ def check_workers(
                 f"Worker {marker.name} exited or does not belong to this server"
             )
             raise RuntimeError(error_msg)
-
 
 def wait_until_ready( # NOSONAR
     process: subprocess.Popen[bytes], port: int, ready: Path, workers: int,
@@ -533,7 +520,6 @@ def wait_until_ready( # NOSONAR
         time.sleep(0.1)
     error_msg = f"Not all {workers} workers became ready within {STARTUP_TIMEOUT}s"
     raise TimeoutError(error_msg)
-
 
 def run_load(  # noqa: PLR0913
     oha: Path,
@@ -615,7 +601,6 @@ def run_load(  # noqa: PLR0913
     output.with_suffix(".stderr.log").write_text(result.stderr, encoding="utf-8")
     result.check_returncode()
     return parse_measurement(json.loads(result.stdout))
-
 
 def benchmark_case(  # noqa: PLR0913
     framework: Framework,
@@ -729,7 +714,6 @@ def benchmark_case(  # noqa: PLR0913
                 # Clean up even when readiness, warmup, or measurement fails.
                 stop_server(process, known)
 
-
 def resolve_oha(explicit: Path | None, directory: Path) -> Path:
     """
     Locate or download oha and require the pinned version.
@@ -774,7 +758,6 @@ def resolve_oha(explicit: Path | None, directory: Path) -> Path:
         error_msg = f"Expected oha {OHA_VERSION}; found {result.stdout.strip()!r}"
         raise RuntimeError(error_msg)
     return path
-
 
 def main(argv: list[str] | None = None) -> int:  # noqa: C901, PLR0912, PLR0915 # NOSONAR
     """
@@ -918,8 +901,12 @@ def main(argv: list[str] | None = None) -> int:  # noqa: C901, PLR0912, PLR0915 
             with Path(summary).open("a", encoding="utf-8") as stream:
                 stream.write(markdown)
         print(markdown)
+    if not failed:
+        for workers in report["settings"]["workers"]:
+            (output / f"throughput-{workers}-workers.svg").write_text(
+                render_throughput_svg(report, workers), encoding="utf-8",
+            )
     return int(failed)
-
 
 if __name__ == "__main__":
     raise SystemExit(main())

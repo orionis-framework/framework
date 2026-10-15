@@ -10,9 +10,15 @@ from pathlib import Path
 from tempfile import TemporaryDirectory
 from typing import Any
 from unittest.mock import Mock, patch
+from defusedxml import ElementTree
 from benchmarks.http_compare import run as compare_run
 from benchmarks.http_compare.client import parse_measurement
-from benchmarks.http_compare.report import METRICS, aggregate_samples, write_reports
+from benchmarks.http_compare.report import (
+    METRICS,
+    aggregate_samples,
+    render_throughput_svg,
+    write_reports,
+)
 
 def _measurement() -> dict[str, Any]:
     """
@@ -54,6 +60,45 @@ def _successful_runs() -> list[dict[str, int | float]]:
             "latencyPercentiles": {"p50": p50, "p95": p95, "p99": p99},
         }))
     return samples
+
+def _chart_report() -> dict[str, Any]:
+    """
+    Build a synthetic comparison with distinct aggregated throughput values.
+
+    Returns
+    -------
+    dict[str, Any]
+        Complete five-framework fixture for chart rendering, not published data.
+    """
+    rates = {
+        "fastapi": 17200,
+        "orionis-rsgi": 21050,
+        "starlette": 29800,
+        "litestar": 20900,
+        "orionis-asgi": 21100,
+    }
+    return {
+        "settings": {
+            "frameworks": list(rates), "workers": [3],
+            "connections": 100, "warmup_seconds": 2,
+            "repetitions": 3, "duration_seconds": 10,
+        },
+        "environment": {
+            "python": "3.14.8", "commit": "abc123456",
+            "recorded_at": "2026-10-15T16:00:00+00:00",
+            "versions": {"granian": "2.8.4"},
+        },
+        "results": [
+            {
+                "framework": name,
+                "interface": "rsgi" if name == "orionis-rsgi" else "asgi",
+                "workers": 3,
+                **aggregate_samples(_successful_runs()),
+                "requests_per_second": rate,
+            }
+            for name, rate in rates.items()
+        ],
+    }
 
 class TestMeasurements(unittest.TestCase):
     """Verify successful throughput, latency units, and independent samples."""
@@ -414,8 +459,10 @@ class TestBenchmarkRunner(unittest.TestCase):
                 ])
             saved = json.loads((output / "summary.json").read_text(encoding="utf-8"))
             markdown = (output / "summary.md").read_text(encoding="utf-8")
+            charts = list(output.glob("throughput-*.svg"))
 
         self.assertEqual(exit_code, 1)
+        self.assertEqual(charts, [])
         self.assertEqual(run.call_count, 2)
         failed, successful = saved["results"]
         self.assertEqual(failed["framework"], "fastapi")
@@ -429,6 +476,170 @@ class TestBenchmarkRunner(unittest.TestCase):
         self.assertEqual(successful["requests_per_second"], 100)
         self.assertIn("| fastapi | asgi | 1 | failed | - | - | - | - | - |", markdown)
         self.assertIn("| starlette | asgi | 1 | ok | 100.00 |", markdown)
+
+    def test_successful_main_writes_chart_from_saved_report(self) -> None:
+        """
+        Verify chart persistence only after a successful comparison.
+
+        Returns
+        -------
+        None
+            Assert that the saved chart exactly represents the saved report.
+        """
+        with TemporaryDirectory() as temporary:
+            output = Path(temporary) / "results"
+            with (
+                patch.object(compare_run.sys, "platform", "linux"),
+                patch.object(
+                    compare_run, "collect_environment",
+                    return_value=_chart_report()["environment"],
+                ),
+                patch.object(
+                    compare_run, "resolve_oha", return_value=Path(temporary) / "oha",
+                ),
+                patch.object(
+                    compare_run, "benchmark_case",
+                    side_effect=lambda *args: args[-1].update(
+                        aggregate_samples(_successful_runs()),
+                    ),
+                ),
+                patch.dict(os.environ, {"GITHUB_STEP_SUMMARY": ""}),
+                redirect_stdout(StringIO()),
+            ):
+                exit_code = compare_run.main([
+                    "--workers", "1", "2", "3", "4",
+                    "--frameworks", "fastapi", "starlette",
+                    "--output-dir", str(output),
+                ])
+            saved = json.loads((output / "summary.json").read_text(encoding="utf-8"))
+            charts = {
+                path.name: path.read_text(encoding="utf-8")
+                for path in output.glob("throughput-*.svg")
+            }
+
+        self.assertEqual(exit_code, 0)
+        self.assertEqual(
+            set(charts),
+            {f"throughput-{workers}-workers.svg" for workers in range(1, 5)},
+        )
+        for workers in range(1, 5):
+            self.assertEqual(
+                charts[f"throughput-{workers}-workers.svg"],
+                render_throughput_svg(saved, workers),
+            )
+        self.assertIn(
+            "Throughput with 1 worker</title>", charts["throughput-1-workers.svg"],
+        )
+        self.assertIn(
+            "Throughput with 3 workers</title>", charts["throughput-3-workers.svg"],
+        )
+
+class TestThroughputCharts(unittest.TestCase):
+    """Verify comparable, ranked, accessible SVG charts without invented data."""
+
+    def test_svg_uses_sorted_three_worker_medians(self) -> None:
+        """
+        Verify ranking, exact scaling, worker filtering, and measurement context.
+
+        Returns
+        -------
+        None
+            Assert XML structure, bar widths, rate labels, and environment text.
+        """
+        report = _chart_report()
+        report["results"].append({
+            **report["results"][0], "workers": 1, "requests_per_second": 999999,
+        })
+        svg = render_throughput_svg(report, 3)
+        root = ElementTree.fromstring(svg)
+        namespace = {"svg": "http://www.w3.org/2000/svg"}
+        groups = root.findall("svg:g", namespace)
+        expected = [
+            ("starlette", 29800), ("orionis-asgi", 21100),
+            ("orionis-rsgi", 21050), ("litestar", 20900), ("fastapi", 17200),
+        ]
+        self.assertEqual(
+            [group.attrib["data-framework"] for group in groups],
+            [name for name, _ in expected],
+        )
+        for group, (_, rate) in zip(groups, expected, strict=True):
+            bars = group.findall("svg:rect", namespace)
+            self.assertEqual(len(bars), 1)
+            self.assertAlmostEqual(
+                float(bars[0].attrib["width"]), rate / 32000 * 620, places=2,
+            )
+            self.assertIn(f"{rate:,.2f}", "".join(group.itertext()))
+        self.assertEqual(root.attrib["role"], "img")
+        self.assertIn("Throughput with 3 workers", svg)
+        self.assertIn("HTTP 200 requests per second. Higher is better.", svg)
+        self.assertIn(">32,000</text>", svg)
+        self.assertIn("Median of 3 x 10s | 100 connections | 2s warmup", svg)
+        self.assertIn("Python 3.14.8 | Granian 2.8.4 | Commit abc1234", svg)
+        self.assertIn("2026-10-15", svg)
+        self.assertNotIn("999,999", svg)
+
+    def test_chart_rejects_incomplete_failed_or_errored_results(self) -> None:
+        """
+        Reject comparisons that would omit or misrepresent selected frameworks.
+
+        Returns
+        -------
+        None
+            Assert explicit errors for missing, duplicate, and failed results.
+        """
+        for scenario in ("missing", "duplicate", "failed", "errors", "setup"):
+            with self.subTest(scenario=scenario):
+                report = _chart_report()
+                if scenario == "missing":
+                    report["results"].pop()
+                elif scenario == "duplicate":
+                    report["results"].append(report["results"][0])
+                elif scenario == "failed":
+                    report["results"][0]["status"] = "failed"
+                elif scenario == "errors":
+                    report["results"][0]["errors"] = 1
+                else:
+                    report["error"] = "Setup failed"
+                with self.assertRaisesRegex(ValueError, "complete, error-free"):
+                    render_throughput_svg(report, 3)
+        with self.assertRaisesRegex(ValueError, "complete, error-free"): # NOSONAR
+            render_throughput_svg(_chart_report(), 4)
+
+    def test_chart_rejects_invalid_rates(self) -> None:
+        """
+        Reject invalid numeric values rather than drawing misleading bars.
+
+        Returns
+        -------
+        None
+            Assert that invalid rates cannot produce a successful chart.
+        """
+        for rate in (0, -1, math.nan, math.inf, -math.inf, True, "100"):
+            with self.subTest(rate=rate):
+                report = _chart_report()
+                report["results"][0]["requests_per_second"] = rate
+                with self.assertRaisesRegex(ValueError, "finite and greater"):
+                    render_throughput_svg(report, 3)
+
+    def test_chart_escapes_labels_and_environment(self) -> None:
+        """
+        Preserve dynamic text without allowing it to become SVG markup.
+
+        Returns
+        -------
+        None
+            Assert valid XML and literal framework and environment labels.
+        """
+        report = _chart_report()
+        label = 'Framework <preview> & "quoted"'
+        report["settings"]["frameworks"][0] = label
+        report["results"][0]["framework"] = label
+        report["environment"]["python"] = "3.14.8 <preview> & build"
+        root = ElementTree.fromstring(render_throughput_svg(report, 3))
+        text = "".join(root.itertext())
+        self.assertIn(label, text)
+        self.assertIn("Python 3.14.8 <preview> & build", text)
+        self.assertEqual(root.findall(".//preview"), [])
 
 class TestComparisonReports(unittest.TestCase):
     """Verify that every artifact publishes the same comparative results."""

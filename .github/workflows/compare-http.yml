@@ -9,6 +9,10 @@ on:
 permissions:
   contents: read
 
+concurrency:
+  group: http-framework-comparison-${{ github.ref }}
+  cancel-in-progress: false
+
 jobs:
   compare:
     name: Orionis, FastAPI, Litestar and Starlette
@@ -56,3 +60,87 @@ jobs:
           path: benchmark-results/http-compare/
           if-no-files-found: warn
           retention-days: 30
+
+  publish:
+    name: Publish README benchmark chart
+    needs: compare
+    if: github.ref == 'refs/heads/1.x'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    permissions:
+      contents: write
+
+    steps:
+      - name: Download successful comparison
+        uses: actions/download-artifact@v4
+        with:
+          name: http-framework-comparison-${{ github.run_id }}-${{ github.run_attempt }}
+          path: benchmark-results/http-compare
+
+      - name: Publish charts and reports to results branch
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('node:fs/promises');
+            const { owner, repo } = context.repo;
+            const branch = 'benchmark-results';
+            const directory = 'benchmark-results/http-compare';
+            const files = [
+              'throughput-1-workers.svg',
+              'throughput-2-workers.svg',
+              'throughput-3-workers.svg',
+              'throughput-4-workers.svg',
+              'summary.json',
+              'summary.csv',
+              'summary.md',
+              'environment.json',
+            ];
+            const tree = await Promise.all(files.map(async (file) => ({
+              path: `http-compare/${file}`,
+              mode: '100644',
+              type: 'blob',
+              content: await fs.readFile(`${directory}/${file}`, 'utf8'),
+            })));
+
+            let parent;
+            let baseTree;
+            try {
+              const reference = await github.rest.git.getRef({
+                owner, repo, ref: `heads/${branch}`,
+              });
+              parent = reference.data.object.sha;
+              const commit = await github.rest.git.getCommit({
+                owner, repo, commit_sha: parent,
+              });
+              baseTree = commit.data.tree.sha;
+            } catch (error) {
+              if (error.status !== 404 || parent) throw error;
+            }
+
+            const createdTree = await github.rest.git.createTree({
+              owner, repo, base_tree: baseTree, tree,
+            });
+            const commit = await github.rest.git.createCommit({
+              owner, repo,
+              message: [
+                `Update HTTP benchmark results for ${context.sha}`,
+                '',
+                `${context.serverUrl}/${owner}/${repo}/actions/runs/${context.runId}`,
+                '',
+                'Co-authored-by: Copilot <223556219+Copilot@users.noreply.github.com>',
+              ].join('\n'),
+              tree: createdTree.data.sha,
+              parents: parent ? [parent] : [],
+            });
+            if (parent) {
+              await github.rest.git.updateRef({
+                owner, repo, ref: `heads/${branch}`,
+                sha: commit.data.sha, force: false,
+              });
+            } else {
+              await github.rest.git.createRef({
+                owner, repo, ref: `refs/heads/${branch}`,
+                sha: commit.data.sha,
+              });
+            }
+            core.notice(`Published HTTP benchmark results to ${branch}`);

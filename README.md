@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="https://docs.orionis-framework.com/prologue/logo.png" alt="Orionis Framework" width="180" />
+  <img src="https://orionis-framework.com/favicon.svg" alt="Orionis Framework" width="180" />
 </p>
 
 <h1 align="center">Orionis Framework</h1>
@@ -49,7 +49,7 @@ point:
 ```shell
 uv sync
 uv run orionis serve
-uv run list
+uv run orionis list
 ```
 
 ## Repositories
@@ -73,6 +73,30 @@ The [HTTP comparison suite](benchmarks/http_compare/README.md) measures Orionis
 load settings. Run it locally or start the **HTTP Framework Comparison** workflow
 manually from GitHub Actions to download the reports and raw measurements.
 Cross-framework benchmarks run separately from the regular test suite.
+
+The charts update automatically after each successful comparison on `1.x`.
+They show median successful HTTP 200 requests per second with **1, 2, 3 and 4
+Granian workers**; higher is better. [Full results for 1–4 workers](https://github.com/orionis-framework/framework/blob/benchmark-results/http-compare/summary.md)
+include latency, environment details and the source workflow run.
+
+This Hello World microbenchmark does not represent a full application.
+GitHub-hosted runner performance varies between runs.
+
+### 1 worker
+
+[![HTTP throughput with 1 worker](https://raw.githubusercontent.com/orionis-framework/framework/benchmark-results/http-compare/throughput-1-workers.svg)](https://github.com/orionis-framework/framework/blob/benchmark-results/http-compare/summary.md)
+
+### 2 workers
+
+[![HTTP throughput with 2 workers](https://raw.githubusercontent.com/orionis-framework/framework/benchmark-results/http-compare/throughput-2-workers.svg)](https://github.com/orionis-framework/framework/blob/benchmark-results/http-compare/summary.md)
+
+### 3 workers
+
+[![HTTP throughput with 3 workers](https://raw.githubusercontent.com/orionis-framework/framework/benchmark-results/http-compare/throughput-3-workers.svg)](https://github.com/orionis-framework/framework/blob/benchmark-results/http-compare/summary.md)
+
+### 4 workers
+
+[![HTTP throughput with 4 workers](https://raw.githubusercontent.com/orionis-framework/framework/benchmark-results/http-compare/throughput-4-workers.svg)](https://github.com/orionis-framework/framework/blob/benchmark-results/http-compare/summary.md)
 
 ## Sponsors
 

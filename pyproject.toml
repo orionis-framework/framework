@@ -25,7 +25,7 @@ exclude = [
 
 [project]
 name = "orionis"
-version = "0.921.0"
+version = "0.922.0"
 description = "Orionis Framework — Async-first full-stack framework for modern Python applications."
 readme = { file = "README.md", content-type = "text/markdown" }
 requires-python = ">=3.14"
@@ -185,6 +185,7 @@ docs = [
 "extra:sqlserver" = "Microsoft SQL Server connections."
 "extra:redshift" = "Amazon Redshift connections."
 "extra:database" = "All optional database drivers."
+"group:benchmark" = "HTTP framework performance comparisons."
 "group:dev" = "Development and quality checks."
 "group:docs" = "API reference generation."
 

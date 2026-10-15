@@ -6,6 +6,7 @@ recursive-include orionis/http/default/assets *.css *.js *.ttf *.woff *.woff2 *.
 
 exclude app/*
 exclude bootstrap/*
+exclude benchmarks/*
 exclude config/*
 exclude database/*
 exclude routes/*
@@ -14,6 +15,7 @@ exclude tests/*
 
 recursive-exclude app *
 recursive-exclude bootstrap *
+recursive-exclude benchmarks *
 recursive-exclude config *
 recursive-exclude database *
 recursive-exclude routes *

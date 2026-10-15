@@ -7,6 +7,7 @@ where = ["."]
 exclude = [
     "app*",
     "bootstrap*",
+    "benchmarks*",
     "config*",
     "database*",
     "docs*",
@@ -24,7 +25,7 @@ exclude = [
 
 [project]
 name = "orionis"
-version = "0.920.2"
+version = "0.921.0"
 description = "Orionis Framework — Async-first full-stack framework for modern Python applications."
 readme = { file = "README.md", content-type = "text/markdown" }
 requires-python = ">=3.14"
@@ -155,8 +156,14 @@ database = [
     "sqlalchemy-redshift>=1.0.0,<2.0",
 ]
 
-# Development and documentation tooling; these groups are not package extras.
+# Development, documentation and benchmark tooling; not package extras.
 [dependency-groups]
+benchmark = [
+    "fastapi==0.143.1",
+    "granian==2.8.4",
+    "litestar==2.24.0",
+    "starlette==1.8.0",
+]
 dev = [
     "coverage>=7.16.1",
     "ruff>=0.16.8",

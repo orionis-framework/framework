@@ -1,0 +1,55 @@
+name: HTTP Framework Comparison
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  compare:
+    name: Orionis, FastAPI, Litestar and Starlette
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    env:
+      PYTHONIOENCODING: utf-8
+      UV_PYTHON: '3.14.8'
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.14.8'
+          architecture: x64
+
+      - name: Set up uv
+        uses: astral-sh/setup-uv@v3
+        with:
+          version: '0.11.30'
+
+      - name: Install locked dependencies
+        run: uv sync --locked --group benchmark --no-default-groups --python 3.14.8
+
+      # All configurations share this machine and run sequentially in one job.
+      - name: Run HTTP comparison
+        run: >-
+          uv run --no-sync python -B -m benchmarks.http_compare.run
+          --workers 1 2 3 4
+          --connections 100
+          --warmup 2
+          --duration 10
+          --repetitions 3
+          --seed 42
+          --output-dir benchmark-results/http-compare
+
+      - name: Upload raw measurements, logs and reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: http-framework-comparison-${{ github.run_id }}-${{ github.run_attempt }}
+          path: benchmark-results/http-compare/
+          if-no-files-found: warn
+          retention-days: 30

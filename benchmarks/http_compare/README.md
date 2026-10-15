@@ -1,0 +1,134 @@
+# Comparación HTTP de Orionis, FastAPI, Litestar y Starlette
+
+Esta suite compara cinco configuraciones en una misma máquina: Orionis RSGI,
+Orionis ASGI, FastAPI, Litestar y Starlette. Todas usan Granian y una ruta `GET /`
+que construye una respuesta de texto `200 OK` con el cuerpo exacto `Hello World`
+(11 bytes, sin comillas ni salto de línea).
+
+Orionis utiliza `Application`, su cargador real de rutas y `response.text()`.
+Las dos interfaces comparten la misma aplicación. Así se puede comparar Orionis
+con los otros frameworks sobre ASGI y observar por separado el efecto de RSGI.
+El resto de las aplicaciones también usa las rutas y respuestas de su framework.
+
+## Entorno y parámetros
+
+Las dependencias directas del grupo `benchmark` tienen versiones exactas y sus
+dependencias transitivas están registradas en el `uv.lock` del repositorio.
+Python y oha se fijan por separado para completar el entorno de referencia:
+
+| Componente | Versión |
+| --- | --- |
+| Python | 3.14.8 |
+| Granian | 2.8.4 |
+| oha | 1.16.0 |
+| FastAPI | 0.143.1 |
+| Litestar | 2.24.0 |
+| Starlette | 1.8.0 |
+
+La ejecución de referencia es Ubuntu 24.04 en GitHub Actions, con CPython normal,
+sin usar la variante freethreaded. Los valores por defecto del ejecutor son:
+
+| Parámetro | Valor |
+| --- | --- |
+| Workers de Granian | 1, 2, 3 y 4 |
+| Hilos de red de Granian por worker | 1 |
+| Event loop | `asyncio` |
+| Implementación de tareas de Granian | `asyncio` |
+| HTTP | HTTP/1.1 con keep-alive |
+| WebSockets | Deshabilitados |
+| Conexiones concurrentes de oha | 100 |
+| Hilos de trabajo de oha | 1 |
+| Calentamiento por configuración | 2 segundos |
+| Mediciones por configuración | 3 de 10 segundos |
+| Semilla del orden de ejecución | 42 |
+
+El orden de los frameworks se aleatoriza de forma reproducible para cada número
+de workers mediante `--seed`. Se ejecuta una configuración a la vez. Esto reduce
+la dependencia de un orden fijo; no elimina la variación de la máquina.
+
+## Instalación y ejecución
+
+Desde la raíz del repositorio, instala el entorno de referencia y ejecuta:
+
+```text
+uv python install 3.14.8
+uv sync --locked --group benchmark --no-default-groups --python 3.14.8
+uv run --no-sync python -B -m benchmarks.http_compare.run
+```
+
+`--no-sync` conserva las dependencias del grupo `benchmark` ya instaladas.
+La comparación completa se ejecuta en Ubuntu. En Windows, Granian admite
+únicamente un worker; para una comprobación rápida de los cinco casos:
+
+```text
+uv run --no-sync python -B -m benchmarks.http_compare.run --workers 1 --warmup 0.5 --duration 1 --repetitions 3 --connections 10 --output-dir benchmark-results/http-compare-smoke
+```
+
+Usa `--frameworks` para seleccionar casos, `--workers` para seleccionar
+cantidades de workers y `--help` para consultar todas las opciones.
+Cada ejecución requiere una carpeta de salida nueva o vacía.
+
+El ejecutor exige oha 1.16.0: lo busca en `PATH` o descarga temporalmente el
+binario oficial y verifica su SHA-256. Puedes proporcionar uno existente con
+`--oha C:\herramientas\oha.exe`.
+
+## Cómo se mide
+
+Cada caso inicia un servidor aislado, verifica sus workers y comprueba dos
+respuestas consecutivas en la misma conexión: HTTP/1.1, `200`, `text/plain` y
+el cuerpo exacto `Hello World`. Después realiza el calentamiento, las mediciones
+y la limpieza del servidor antes de pasar al siguiente caso.
+
+Todos los frameworks comparten los parámetros de servidor y carga de la tabla
+anterior; solo cambian la aplicación y su interfaz. El cliente espera las
+solicitudes en curso al terminar cada medición, con un timeout de 5 segundos por
+solicitud. La tasa se calcula con el tiempo real, no con la duración nominal:
+
+```text
+solicitudes por segundo = statusCodeDistribution["200"] / summary.total
+```
+
+Solo se publican métricas si todas las muestras son válidas y no hay errores
+HTTP ni de transporte. Un fallo conserva el diagnóstico y las muestras
+disponibles, deja las métricas vacías y hace que el comando termine con error.
+No se descartan muestras fallidas para mejorar el resultado.
+
+Se publica la mediana de las tasas y, por separado, de la latencia media, p50,
+p95 y p99 de cada ejecución, convertidas a milisegundos. No son percentiles de
+solicitudes agrupadas. El calentamiento se conserva, pero no entra en las
+métricas ni en los totales.
+
+## Resultados y trazabilidad
+
+La carpeta de salida por defecto es `benchmark-results/http-compare/`:
+
+| Archivo o carpeta | Contenido |
+| --- | --- |
+| `summary.json` | Resumen estructurado por framework y workers, estado y métricas válidas. |
+| `summary.csv` | El mismo resumen para hojas de cálculo y análisis posterior. |
+| `summary.md` | Tabla legible para revisar o compartir los resultados. |
+| `environment.json` | Versiones y características del entorno de ejecución. |
+| `commands.json` | Comandos utilizados para reproducir y auditar la ejecución. |
+| `raw/` | Salida JSON original de oha y archivos `.stderr.log`, incluidos los disponibles si hay fallos. |
+| `logs/` | Registros de los servidores. |
+
+En GitHub Actions, abre **Actions → HTTP Framework Comparison → Run workflow**
+para iniciar la matriz completa, separada del workflow de pruebas unitarias.
+La tabla aparece en el resumen del job y los archivos se descargan desde
+`http-framework-comparison-…`, incluso cuando hay mediciones fallidas.
+
+## Pruebas unitarias
+
+```text
+uv run --no-sync python -B -m unittest tests.test_http_compare -v
+```
+
+Estas pruebas no generan carga: verifican contabilidad, medianas, exclusión del
+calentamiento, parámetros compartidos, limpieza, fallos y coherencia de reportes.
+
+## Límites
+
+Hello World no representa una aplicación completa. Cliente y servidor comparten
+CPU; los runners de GitHub varían y el cliente puede limitar el rendimiento.
+No mezcles sistemas operativos ni parámetros en una clasificación. Conserva el
+entorno, el commit, el lock y los datos originales; repite diferencias pequeñas.

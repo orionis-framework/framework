@@ -66,6 +66,14 @@ Contributions and feedback are welcome. Report bugs or request features in
 [GitHub Issues](https://github.com/orionis-framework/framework/issues), or join
 the conversation in [GitHub Discussions](https://github.com/orgs/orionis-framework/discussions).
 
+## HTTP benchmarks
+
+The [HTTP comparison suite](benchmarks/http_compare/README.md) measures Orionis
+(RSGI and ASGI), FastAPI, Litestar and Starlette with the same Granian server and
+load settings. Run it locally or start the **HTTP Framework Comparison** workflow
+manually from GitHub Actions to download the reports and raw measurements.
+Cross-framework benchmarks run separately from the regular test suite.
+
 ## Sponsors
 
 <a href="https://github.com/sponsors/rmunate"><img src="https://img.shields.io/badge/Sponsor_Orionis-GitHub-db2777?style=for-the-badge&amp;logo=github-sponsors&amp;logoColor=white" alt="Sponsor Orionis" /></a>

@@ -13,6 +13,17 @@ python reactor make:factory ProductFactory --help
 
 Generating a model does not migrate its table; generating a job does not start workers. Review generated imports, dependencies, and configuration before use.
 
+## Restore configuration
+
+`bootstrap:config [file]` restores missing configuration from the official skeleton's `master` branch.
+
+```shell
+orionis bootstrap:config
+orionis bootstrap:config app
+```
+
+Omit `file` to restore all missing files, or pass a configuration name without `.py` to restore only that file. Available names come from the remote `master` tree; an unknown name produces an error listing those options. Existing files are preserved without being overwritten.
+
 ## Evolve data
 
 `migrate`, `migrate:status`, `migrate:rollback`, `migrate:reset`, `migrate:refresh`, `migrate:fresh`, `seed`, and `db:seed` are covered in [migrations and seeders](../../../database/docs/en/migrations-and-seeders.md). They share `--database`/`-d` connection selection. Rollback `--step` counts batches. `db:show` displays database information; `db:table` inspects tables; `db:wipe` removes schema data through its workflow and requires operational care.

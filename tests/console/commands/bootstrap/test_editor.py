@@ -14,7 +14,7 @@ from orionis.console.commands.bootstrap._editor import (
 class TestBootstrapEditor(TestCase):
     def setUp(self) -> None:
         """
-        Create an isolated application bootstrap for each test.
+        Create an isolated application bootstrap with a canonical root.
 
         Returns
         -------
@@ -24,7 +24,7 @@ class TestBootstrapEditor(TestCase):
         # Isolate each test from project files and other test runs.
         self.directory = TemporaryDirectory()
         self.addCleanup(self.directory.cleanup)
-        self.base = Path(self.directory.name)
+        self.base = Path(self.directory.name).resolve()
         self.path = self.base / "bootstrap" / "app.py"
         self.path.parent.mkdir()
 

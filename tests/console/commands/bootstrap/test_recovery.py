@@ -201,7 +201,7 @@ class TestBootstrapRecovery(unittest.TestCase):
             self.assertEqual(list(cache_path.iterdir()), [])
 
     def test_compiled_state_is_neither_read_nor_written_in_recovery(self) -> None:
-        """Bypass stale configuration loads and transient configuration saves.
+        """Expose a resolved cache path without reading or writing compiled state.
 
         Returns
         -------
@@ -221,7 +221,7 @@ class TestBootstrapRecovery(unittest.TestCase):
                 self.assertTrue(app.compiled)
                 self.assertEqual(
                     app.compiledPath,
-                    Path(temporary) / "storage" / "framework" / "cache",
+                    (Path(temporary) / "storage" / "framework" / "cache").resolve(),
                 )
                 cache.assert_called_once()
                 cache.return_value.get.assert_not_called()

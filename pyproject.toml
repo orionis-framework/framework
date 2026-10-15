@@ -24,7 +24,7 @@ exclude = [
 
 [project]
 name = "orionis"
-version = "0.920.1"
+version = "0.920.2"
 description = "Orionis Framework — Async-first full-stack framework for modern Python applications."
 readme = { file = "README.md", content-type = "text/markdown" }
 requires-python = ">=3.14"

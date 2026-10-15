@@ -681,19 +681,25 @@ class TestBootstrapCommands(TestCase):
         None
             Complete the assertions without returning a value.
         """
-        # Reload real application configuration after each context is added.
-        with TemporaryDirectory() as temporary:
-            root = Path(temporary)
-            _, bootstrap = _project(root)
-            app = _execute_bootstrap(bootstrap)
-            self.assertEqual(app.path("routes"), root / "routes")
-            for context in _COMMANDS:
-                Bootstrapper(app).routing(context)
+        # Application paths are canonical, including Windows short TEMP names.
+        for parent_reference in (False, True):
+            with (
+                self.subTest(parent_reference=parent_reference),
+                TemporaryDirectory() as temporary,
+            ):
+                root = Path(temporary)
+                if parent_reference:
+                    root = root / ".." / root.name
+                _, bootstrap = _project(root)
                 app = _execute_bootstrap(bootstrap)
-                self.assertEqual(
-                    app.routingPaths(context),
-                    [(root / "routes" / f"{context}.py").resolve()],
-                )
+                self.assertEqual(app.path("routes"), (root / "routes").resolve())
+                for context in _COMMANDS:
+                    Bootstrapper(app).routing(context)
+                    app = _execute_bootstrap(bootstrap)
+                    self.assertEqual(
+                        app.routingPaths(context),
+                        [(root / "routes" / f"{context}.py").resolve()],
+                    )
 
     def testCompleteApplicationRemainsUnchangedAndBootable(self) -> None:
         """

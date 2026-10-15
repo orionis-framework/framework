@@ -39,10 +39,7 @@ or find the package on [PyPI](https://pypi.org/project/orionis/).
 
 ## Installation
 
-Install the framework with `uv add orionis`. Faker and SQLite support are included.
-Use `uv add 'orionis[pgsql]'` for PostgreSQL (async and synchronous drivers), or
-`uv add 'orionis[database]'` for all optional database drivers. Cloud storage
-SDKs and other database backends remain optional; see `pyproject.toml` for extras.
+Install the framework with `uvx --from orionis-installer orionis new`.
 
 ## Application CLI
 
@@ -52,47 +49,8 @@ point:
 ```shell
 uv sync
 uv run orionis serve
+uv run list
 ```
-
-With the project's virtual environment activated, run `orionis serve` directly.
-The entry point loads the project's `bootstrap.app` and runs commands in the
-same process with bytecode writes disabled; it does not require a `reactor`
-script. Command arguments and exit codes are preserved. The legacy command
-`python -B reactor serve` remains available.
-
-## Native MCP servers
-
-Expose application services through MCP **2026-07-28** using the existing Orionis
-container, schemas, authentication and HTTP pipeline. The same server declaration
-supports Streamable HTTP through ASGI/RSGI and local STDIO:
-
-```python
-# routes/ai.py
-from orionis.mcp import McpResponse, Server, Tool
-from orionis.support.facades.mcp import Mcp
-
-
-class StatusTool(Tool):
-    async def handle(self) -> McpResponse:
-        return McpResponse.text("ready")
-
-
-class StatusServer(Server):
-    name = "Status"
-    tools = (StatusTool,)
-
-
-Mcp.web("/mcp/status", StatusServer)
-Mcp.local("status", StatusServer)
-```
-
-Configure `app.withRouting(ai="routes/ai.py")` before `app.create()`. Start the
-local server with `python reactor mcp:start status`. Every request declares its
-version and capabilities; no initialization session is required.
-
-Read the [MCP guide](orionis/mcp/docs/README.md) or [guía en español](orionis/mcp/docs/README.es.md)
-for typed tools, resources, prompts, HTTP headers, security, subscriptions and
-verification commands.
 
 ## Repositories
 
@@ -101,15 +59,8 @@ verification commands.
 - [Documentation](https://github.com/orionis-framework/docs) — source for the documentation website.
 - [CLI Installer](https://github.com/orionis-framework/installer) — command-line installer.
 - [Website](https://github.com/orionis-framework/web) — source for the project website.
-- [Inertia Adapter](https://github.com/orionis-framework/inertia-orionis) — Orionis integration for Inertia.js.
 
 ## Contributing
-
-API documentation uses `[tool.pydoctor]`. Pydoctor reads that table, not PEP 621
-metadata, so the display name and link URLs must remain explicit. `DOCS.ps1`
-already reads the version from `[project]` and supplies the Git revision through
-supported CLI options; no metadata synchronization layer is needed. See the
-[official configuration reference](https://pydoctor.readthedocs.io/en/latest/help.html).
 
 Contributions and feedback are welcome. Report bugs or request features in
 [GitHub Issues](https://github.com/orionis-framework/framework/issues), or join

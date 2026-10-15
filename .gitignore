@@ -37,6 +37,9 @@ env/
 htmlcov/
 .pytest_cache/
 .mypy_cache/
+/benchmark-results/
+/benchmark-artifacts/
+/benchmark-report/
 
 # ========================
 # Distribution and packaging

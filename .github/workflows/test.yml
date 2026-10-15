@@ -38,3 +38,90 @@ jobs:
 
       - name: 🧪 Run All Test Suites
         run: uv run python -B .github/scripts/run_tests.py
+
+  benchmark-http:
+    name: HTTP benchmark (${{ matrix.os }})
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+    runs-on: ${{ matrix.os }}
+    env:
+      PYTHONIOENCODING: utf-8
+    timeout-minutes: 15
+
+    steps:
+      - name: 📥 Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: 🦀 Install uv
+        uses: astral-sh/setup-uv@v3
+
+      - name: 🐍 Set Python Version
+        run: uv python install 3.14
+
+      - name: 📦 Sync Dependencies
+        run: uv sync --locked
+
+      - name: 🚀 Benchmark Hello World
+        run: >-
+          uv run python -B .github/scripts/benchmark_http.py
+          --output-dir benchmark-results
+          --workers 1 2 3 4
+          --duration 10
+          --warmup 2
+          --repetitions 3
+          --connections 100
+
+      - name: 📊 Upload Platform Benchmark Results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: http-benchmark-${{ matrix.os }}
+          path: benchmark-results/
+          if-no-files-found: warn
+          retention-days: 30
+          overwrite: true
+
+  benchmark-report:
+    name: HTTP benchmark report
+    needs: benchmark-http
+    if: always()
+    runs-on: ubuntu-latest
+    env:
+      PYTHONIOENCODING: utf-8
+    timeout-minutes: 5
+
+    steps:
+      - name: 📥 Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: 🦀 Install uv
+        uses: astral-sh/setup-uv@v3
+
+      - name: 🐍 Set Python Version
+        run: uv python install 3.14
+
+      - name: 📥 Download Platform Benchmark Results
+        uses: actions/download-artifact@v4
+        with:
+          pattern: http-benchmark-*-latest
+          path: benchmark-artifacts
+
+      - name: 📊 Build Combined Benchmark Report
+        if: always()
+        run: >-
+          uv run --no-project --python 3.14 python -B
+          .github/scripts/summarize_benchmarks.py
+          --input-dir benchmark-artifacts
+          --output-dir benchmark-report
+
+      - name: 📊 Upload Combined Benchmark Report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: http-benchmark-report
+          path: benchmark-report/
+          if-no-files-found: warn
+          retention-days: 30
+          overwrite: true

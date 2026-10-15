@@ -41,9 +41,15 @@ class ConfigBootstrapper:
         # Retain the configured application without resolving paths early.
         self.app = app
 
-    def bootstrap(self) -> list[tuple[str, str]]:
+    def bootstrap(self, file: str | None = None) -> list[tuple[str, str]]:
         """
-        Restore the complete configuration subtree without replacing files.
+        Restore selected configuration without replacing existing files.
+
+        Parameters
+        ----------
+        file : str | None, optional
+            Remote configuration name without the Python extension, or None
+            to restore the complete configuration subtree.
 
         Returns
         -------
@@ -54,12 +60,16 @@ class ConfigBootstrapper:
         ------
         RuntimeError
             If GitHub cannot supply a complete, valid master configuration tree.
+        ValueError
+            If the selected file is absent from the remote configuration options.
         OSError
             If a local path is unsafe or cannot be created.
         """
         # Resolve and validate resources before creating local files.
         root = application_path(self.app, "config")
         entries = self._entries()
+        if file is not None:
+            entries = self._selectFile(entries, file)
         pending: dict[Path, bytes] = {}
         resources: list[tuple[Path, str]] = [(root, "tree")]
         for entry in entries:
@@ -80,6 +90,51 @@ class ConfigBootstrapper:
                 display_path(self.app, destination),
             ))
         return result
+
+    @staticmethod
+    def _selectFile(
+        entries: list[dict[str, Any]],
+        file: str,
+    ) -> list[dict[str, Any]]:
+        """
+        Select one configuration module using the validated remote tree.
+
+        Parameters
+        ----------
+        entries : list[dict[str, Any]]
+            Validated configuration entries from the official master branch.
+        file : str
+            Requested configuration module name without its Python extension.
+
+        Returns
+        -------
+        list[dict[str, Any]]
+            The single matching remote configuration file.
+
+        Raises
+        ------
+        ValueError
+            If the name is absent, with the available remote names in the message.
+        """
+        # Expose top-level Python configuration modules as selectable names.
+        available = {}
+        for entry in entries:
+            path = PurePosixPath(entry["path"])
+            if (
+                entry["type"] == "blob"
+                and path.parent == PurePosixPath("config")
+                and path.suffix == ".py"
+                and path.name != "__init__.py"
+            ):
+                available[path.stem] = entry
+        if file not in available:
+            options = ", ".join(sorted(available)) or "(none)"
+            error_msg = (
+                f"Configuration file '{file}' does not exist in the official "
+                f"master branch.\nAvailable options: {options}."
+            )
+            raise ValueError(error_msg)
+        return [available[file]]
 
     @staticmethod
     def _validateLocalResource(destination: Path, kind: str) -> None:

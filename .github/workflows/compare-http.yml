@@ -1,6 +1,9 @@
 name: HTTP Framework Comparison
 
 on:
+  push:
+    branches:
+      - 1.x
   workflow_dispatch:
 
 permissions:

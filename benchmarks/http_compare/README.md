@@ -112,8 +112,9 @@ La carpeta de salida por defecto es `benchmark-results/http-compare/`:
 | `raw/` | Salida JSON original de oha y archivos `.stderr.log`, incluidos los disponibles si hay fallos. |
 | `logs/` | Registros de los servidores. |
 
-En GitHub Actions, abre **Actions → HTTP Framework Comparison → Run workflow**
-para iniciar la matriz completa, separada del workflow de pruebas unitarias.
+En GitHub Actions, la matriz completa se ejecuta automáticamente con cada `push`
+a la rama `1.x`, separada del workflow de pruebas unitarias. También puedes
+iniciarla desde **Actions → HTTP Framework Comparison → Run workflow**.
 La tabla aparece en el resumen del job y los archivos se descargan desde
 `http-framework-comparison-…`, incluso cuando hay mediciones fallidas.
 

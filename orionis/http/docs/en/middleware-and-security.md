@@ -27,6 +27,8 @@ The web pipeline restores the session, checks CSRF and resolves identity, in tha
 
 An empty `ALLOWED_HOSTS` accepts every host; configure it when deployment depends on a public hostname. Security middleware rejects CR/LF in headers and multiple Host headers. `TRUSTED_PROXIES` determines which peers may change scheme/IP through forwarded headers; bootstrap trusts localhost. Trust only your proxies so rate limits and URLs do not depend on forged headers.
 
+Single-host proxy addresses are indexed when the middleware is initialized, avoiding repeated IP parsing for exact peer matches. CIDR ranges and equivalent IPv6 spellings still use network validation. Forwarded hops are parsed and checked on every request; request metadata and trust decisions are not cached.
+
 CORS uses `CORS_ALLOW_ORIGINS`, `CORS_ALLOW_ORIGIN_REGEX`, `CORS_ALLOW_METHODS`, `CORS_ALLOW_HEADERS`, `CORS_EXPOSE_HEADERS`, `CORS_ALLOW_CREDENTIALS` and `CORS_MAX_AGE` (600 seconds). Credentials are disabled by default. Use explicit origins for cookies. CORS is browser policy, not server authentication. WebSocket and MCP read the same bootstrap `CORS_ALLOW_ORIGINS` but apply their own validation rules; MCP rejects wildcards.
 
 ## Capacity and rate limiting
@@ -35,4 +37,4 @@ CORS uses `CORS_ALLOW_ORIGINS`, `CORS_ALLOW_ORIGIN_REGEX`, `CORS_ALLOW_METHODS`,
 
 Excess requests receive 429 with `Retry-After`; recognized Redis errors receive 503 and a short retry interval. Memory storage is worker-local and does not enforce a global quota. HTTP concurrency admission includes response delivery and rejects excess work instead of building an unbounded queue.
 
-Evidence: [kernel](../../kernel.py), [CSRF](../../layer/web/csrf_token.py), [proxies](../../layer/shared/proxies.py), [rate limiting](../../layer/shared/rate_limit.py), [config](../../../../config/http.py). Tests: [pipeline](../../../../tests/http/test_middleware.py), [security](../../../../tests/http/layer/shared/test_security.py), [CORS](../../../../tests/http/layer/shared/test_cors.py), [CSRF](../../../../tests/http/layer/web/test_csrf_token.py). Identity protection: [Auth](../../../auth/docs/en/README.md).
+Evidence: [kernel](../../kernel.py), [CSRF](../../layer/web/csrf_token.py), [proxies](../../layer/shared/proxies.py), [rate limiting](../../layer/shared/rate_limit.py), [config](../../../../config/http.py). Tests: [pipeline](../../../../tests/http/test_middleware.py), [security](../../../../tests/http/layer/shared/test_security.py), [proxies](../../../../tests/http/layer/shared/test_proxies.py), [CORS](../../../../tests/http/layer/shared/test_cors.py), [CSRF](../../../../tests/http/layer/web/test_csrf_token.py). Identity protection: [Auth](../../../auth/docs/en/README.md).

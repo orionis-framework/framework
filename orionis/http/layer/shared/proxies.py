@@ -35,7 +35,7 @@ class ProxiesMiddleware:
     _IP_HEADER: str = "x-forwarded-for"
     _PROTO_HEADER: str = "x-forwarded-proto"
 
-    __slots__ = ("__enabled", "__trusted_networks")
+    __slots__ = ("__enabled", "__trusted_networks", "__trusted_peers")
 
     def __init__(
         self,
@@ -56,8 +56,13 @@ class ProxiesMiddleware:
         # Validate the raw configuration through the entity dataclass.
         cfg = HTTPProxies(**config)
 
-        # Pre-compile proxy CIDRs into network objects for fast membership tests.
+        # Pre-compile networks and index single-host peers for exact matches.
         self.__trusted_networks = self.__compile(cfg.trusted_proxies)
+        self.__trusted_peers = frozenset(
+            str(network.network_address)
+            for network in self.__trusted_networks
+            if network.prefixlen == network.max_prefixlen
+        )
 
         # Requests are only rewritten when at least one proxy is trusted.
         self.__enabled = bool(self.__trusted_networks)
@@ -102,9 +107,10 @@ class ProxiesMiddleware:
             return
 
         # Skip requests that do not originate from a trusted proxy.
-        client_addr = self.__parseIp(client_ip)
-        if client_addr is None or not self.__isTrustedAddress(client_addr):
-            return
+        if client_ip not in self.__trusted_peers:
+            client_addr = self.__parseIp(client_ip)
+            if client_addr is None or not self.__isTrustedAddress(client_addr):
+                return
 
         real_ip, proxies, chain = self.__resolveForwardedChain(
             adapter, client_ip,

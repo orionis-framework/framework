@@ -211,11 +211,19 @@ async def verify_success(
         .onConnection(driver_name).onQueue("emails").delay(seconds=0.03)
     )
     verify_equal(await driver.size("emails"), 0, "Pending dispatch performs no push")
-    await delayed
-    verify_equal(
-        await driver.reserve(("emails",), 2.0), None, "Delayed job not ready early",
-    )
-    await asyncio.sleep(0.04)
+    driver_module = import_module(f"orionis.queues.drivers.{driver_name}")
+    original_time = driver_module.current_time
+    dispatch_time = original_time()
+    driver_module.current_time = lambda: dispatch_time
+    try:
+        await delayed
+        await asyncio.sleep(0.04)
+        verify_equal(
+            await driver.reserve(("emails",), 2.0), None,
+            "Delayed job not ready early",
+        )
+    finally:
+        driver_module.current_time = original_time
     state.events.clear()
     await call_command(
         app, "queue:work", driver_name, "--queue=high,default,emails",

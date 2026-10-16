@@ -402,22 +402,7 @@ def configure_engine(
         return
 
     if sqlite:
-        @event.listens_for(engine.sync_engine, "begin")
-        def _begin_sqlite_transaction(connection: SqlConnection) -> None:
-            """
-            Start a database transaction before statements or savepoints.
-
-            Parameters
-            ----------
-            connection : SqlConnection
-                Value supplied for ``connection``.
-
-            Returns
-            -------
-            None
-                Complete the documented operation without returning a value.
-            """
-            connection.exec_driver_sql("BEGIN")
+        event.listen(engine.sync_engine, "begin", _begin_sqlite_transaction)
 
     # Register a Core pool event on the underlying sync engine; the async
     # adapters expose a synchronous cursor facade suitable for session setup.
@@ -453,6 +438,28 @@ def configure_engine(
                 cursor.execute(statement)
         finally:
             cursor.close()
+
+
+def _begin_sqlite_transaction(connection: SqlConnection) -> None:
+    """
+    Start a SQLite transaction using the requested write reservation.
+
+    Parameters
+    ----------
+    connection : SqlConnection
+        Connection whose execution options select the transaction mode.
+
+    Returns
+    -------
+    None
+        Start the transaction before statements or savepoints.
+    """
+    statement = (
+        "BEGIN IMMEDIATE"
+        if connection.get_execution_options().get("sqlite_begin_immediate")
+        else "BEGIN"
+    )
+    connection.exec_driver_sql(statement)
 
 
 class _AsyncDBAPIClient(Protocol):

@@ -461,6 +461,36 @@ class TestDatabaseQueueDriver(DurableDriverContract, TestCase):
         finally:
             await independent.disconnect()
 
+    async def testIndependentDriverWaitsForSchemaCommit(self) -> None:
+        """Wait for another connection to commit the queue schema.
+
+        Returns
+        -------
+        None
+            Assert a concurrent creator cannot expose an uncommitted table.
+        """
+        independent = Connection("bootstrap", {
+            "driver": "sqlite", "database": self._path, "prefix": "q_",
+            "journal_mode": "WAL", "busy_timeout": 30000,
+        })
+        producer = DatabaseQueueDriver(self._connection, "pending_jobs")
+        consumer = DatabaseQueueDriver(independent, "pending_jobs")
+        bootstrap = None
+        try:
+            async with self._connection.transaction():
+                self.assertEqual(await producer.size("default"), 0)
+                bootstrap = asyncio.create_task(consumer.size("default"))
+                completed, _ = await asyncio.wait({bootstrap}, timeout=1.0)
+                self.assertFalse(
+                    completed,
+                    "Schema initialization must wait for the creator's commit.",
+                )
+            self.assertEqual(await asyncio.wait_for(bootstrap, 5.0), 0)
+        finally:
+            if bootstrap is not None:
+                await asyncio.gather(bootstrap, return_exceptions=True)
+            await independent.disconnect()
+
     async def testIndependentDriversBootstrapAndClaimAtomically(self) -> None:
         """Arbitrate cold schema creation and claims across independent engines.
 
@@ -481,7 +511,13 @@ class TestDatabaseQueueDriver(DurableDriverContract, TestCase):
             sizes = await asyncio.gather(*(
                 driver.size("default") for driver in drivers
             ), return_exceptions=True)
-            self.assertEqual(sizes, [0] * len(drivers))
+            self.assertEqual(
+                sizes, [0] * len(drivers),
+                "\n".join(
+                    str(size.__context__ or size)
+                    for size in sizes if isinstance(size, BaseException)
+                ),
+            )
             for _ in range(3):
                 envelope = make_envelope()
                 await drivers[0].push(envelope)

@@ -469,7 +469,7 @@ class Connection(IConnection):
         statement = self._compiler.compileCreateTable(
             table, if_not_exists=if_not_exists,
         )
-        async with self._acquire() as connection:
+        async with self._acquire(sqlite_immediate=True) as connection:
             try:
                 run_sync = (
                     connection.runSync
@@ -768,6 +768,8 @@ class Connection(IConnection):
 
     def _acquire(
         self,
+        *,
+        sqlite_immediate: bool = False,
     ) -> (
         AbstractAsyncContextManager[AsyncConnection | ThreadedConnection]
         | _TransactionState
@@ -777,6 +779,12 @@ class Connection(IConnection):
 
         Reuse an owned transaction without committing it; otherwise open a
         temporary transaction and close its connection on exit.
+
+        Parameters
+        ----------
+        sqlite_immediate : bool, optional
+            Reserve SQLite writes before starting a temporary transaction.
+            Leave existing transactions and other database drivers unchanged.
 
         Returns
         -------
@@ -796,8 +804,11 @@ class Connection(IConnection):
             return state
 
         engine = self._getEngine()
-        if resolve_driver(self._config) == "redshift":
+        driver = resolve_driver(self._config)
+        if driver == "redshift":
             return engine.begin()
+        if sqlite_immediate and driver == "sqlite" and isinstance(engine, AsyncEngine):
+            engine = engine.execution_options(sqlite_begin_immediate=True)
 
         @asynccontextmanager
         async def protected() -> AsyncGenerator[AsyncConnection | ThreadedConnection]:

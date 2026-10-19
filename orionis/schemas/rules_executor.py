@@ -13,12 +13,10 @@ if TYPE_CHECKING:
 # values are tuples of field validation plans as returned by _build_plan().
 # Populated on demand by _build_plan and warmed at class creation time.
 _PLAN_CACHE: dict[type, tuple] = {}
-_ASYNC_PLAN_CACHE: dict[type, tuple | None] = {}
 
 # Alias for faster local access in hot path.
 # Avoids global dict lookup on every nested validation call.
 _cache_get = _PLAN_CACHE.get
-_async_cache_get = _ASYNC_PLAN_CACHE.get
 
 # Shared empty mapping returned for schemas without Orionis metadata.
 # Reused instead of allocating a fresh dict on every plan build.
@@ -130,48 +128,6 @@ def _field_rules(
             raise TypeError(message)
     return tuple(rules)
 
-def _async_validators(validators: tuple) -> tuple:
-    """
-    Bind native asynchronous rule overrides once for a validation plan.
-
-    Parameters
-    ----------
-    validators : tuple
-        Synchronous bound Rule.validate methods.
-
-    Returns
-    -------
-    tuple
-        Pairs of bound validators and whether their result must be awaited.
-    """
-    result = []
-    for validate in validators:
-        rule = validate.__self__
-        asynchronous = type(rule).enforceAsync is not Rule.enforceAsync
-        result.append((rule.validateAsync if asynchronous else validate, asynchronous))
-    return tuple(result)
-
-def _type_uses_async(field_type: object) -> bool:
-    """
-    Inspect warmed nested schemas for native asynchronous rules.
-
-    Parameters
-    ----------
-    field_type : object
-        Field annotation, possibly an Annotated type or union.
-
-    Returns
-    -------
-    bool
-        Whether a nested schema requires asynchronous validation.
-    """
-    origin = get_origin(field_type)
-    if origin is Annotated:
-        return _type_uses_async(get_args(field_type)[0])
-    if origin is Union or origin is types.UnionType:
-        return any(_type_uses_async(member) for member in get_args(field_type))
-    return isinstance(field_type, type) and bool(_async_cache_get(field_type))
-
 def _build_plan(klass: type) -> tuple:
     """
     Build and cache a validation plan for a schema type.
@@ -188,8 +144,8 @@ def _build_plan(klass: type) -> tuple:
         Cached plan entries as ``(field_name, field_name_dot, getter,
         validators, is_nested)`` tuples. Each entry stores the field name,
         the precomputed dotted field prefix, an ``operator.attrgetter`` for
-        field access, the field's bound validator callables, and whether the
-        field contains a nested Orionis schema.
+        field access, the field's bound asynchronous validator callables,
+        and whether the field contains a nested Orionis schema.
 
     Raises
     ------
@@ -201,33 +157,21 @@ def _build_plan(klass: type) -> tuple:
         klass, "__orionis_meta__", _EMPTY_META,
     )
     plan: list = []
-    async_plan: list = []
-    requires_async = False
     for field in msgspec.structs.fields(klass):
         rules = _field_rules(klass, field.name, orionis_meta.get(field.name, ()))
         is_nested = _type_contains_nested(field.type)
         if rules or is_nested:
             getter = operator.attrgetter(field.name)
             validators = tuple(rule.validate for rule in rules)
-            async_validators = _async_validators(validators)
             field_name_dot = field.name + "."
             plan.append((field.name, field_name_dot, getter, validators, is_nested))
-            async_plan.append((
-                field.name, field_name_dot, getter, async_validators, is_nested,
-            ))
             if is_nested:
                 _warm_child_plan(field.type)
-            requires_async = (
-                requires_async
-                or any(asynchronous for _, asynchronous in async_validators)
-                or _type_uses_async(field.type)
-            )
     result = tuple(plan)
     _PLAN_CACHE[klass] = result
-    _ASYNC_PLAN_CACHE[klass] = tuple(async_plan) if requires_async else None
     return result
 
-def _collect_nested(
+async def _collect_nested(
     value: object,
     prefix: str,
     failures: list,
@@ -259,9 +203,9 @@ def _collect_nested(
 
     # Skip schemas that declare neither rules nor further nesting.
     if child_plan:
-        _collect_with_plan(child_plan, value, prefix, failures)
+        await _collect_with_plan(child_plan, value, prefix, failures)
 
-def _collect_with_plan(
+async def _collect_with_plan(
     plan: tuple,
     instance: object,
     prefix: str,
@@ -305,7 +249,7 @@ def _collect_with_plan(
 
         # Recursively validate the nested object.
         if is_nested and value is not None:
-            _collect_nested(value, prefix + field_name_dot, failures)
+            await _collect_nested(value, prefix + field_name_dot, failures)
 
         # Skip fields that only exist in the plan for nested traversal.
         if not validators:
@@ -316,105 +260,8 @@ def _collect_with_plan(
         for validate in validators:
 
             # Run each validator for the current field.
-            failure = validate(qualified, value, instance)
+            failure = await validate(qualified, value, instance)
 
             # Keep going so sibling rules and fields are reported too.
             if failure is not None:
                 append(failure)
-
-async def _collect_async_rules(
-    validators: tuple,
-    field: str,
-    value: object,
-    instance: object,
-    failures: list,
-) -> None:
-    """
-    Run preclassified rule callables in declaration order.
-
-    Parameters
-    ----------
-    validators : tuple
-        Pairs of bound validators and their asynchronous flags.
-    field : str
-        Fully qualified field path.
-    value : object
-        Converted field value.
-    instance : object
-        Schema instance or namespace of successfully converted fields.
-    failures : list
-        Accumulator for validation failures.
-
-    Returns
-    -------
-    None
-        Every rule result has been collected without parallel database access.
-    """
-    for validate, asynchronous in validators:
-        failure = (
-            await validate(field, value, instance)
-            if asynchronous else validate(field, value, instance)
-        )
-        if failure is not None:
-            failures.append(failure)
-
-async def _collect_async_nested(value: object, prefix: str, failures: list) -> None:
-    """
-    Validate a nested schema while preserving non-schema union members.
-
-    Parameters
-    ----------
-    value : object
-        Converted nested value.
-    prefix : str
-        Dot-terminated field path.
-    failures : list
-        Accumulator for validation failures.
-
-    Returns
-    -------
-    None
-        Nested rules have completed, or the value required no schema traversal.
-    """
-    child_type = type(value)
-    plan = _cache_get(child_type)
-    if plan is None:
-        if "__orionis_meta__" not in child_type.__dict__:
-            return
-        plan = _build_plan(child_type)
-    async_plan = _async_cache_get(child_type)
-    if async_plan:
-        await _collect_with_async_plan(async_plan, value, prefix, failures)
-    elif plan:
-        _collect_with_plan(plan, value, prefix, failures)
-
-async def _collect_with_async_plan(
-    plan: tuple, instance: object, prefix: str, failures: list,
-) -> None:
-    """
-    Execute a plan containing native asynchronous rules or nested schemas.
-
-    Parameters
-    ----------
-    plan : tuple
-        Precompiled asynchronous field plan.
-    instance : object
-        Converted schema instance.
-    prefix : str
-        Dot-terminated prefix for nested paths.
-    failures : list
-        Accumulator for all failures in declaration order.
-
-    Returns
-    -------
-    None
-        Synchronous and asynchronous rule results have been collected.
-    """
-    for field, field_dot, getter, validators, nested in plan:
-        value = getter(instance)
-        if nested and value is not None:
-            await _collect_async_nested(value, prefix + field_dot, failures)
-        if validators:
-            await _collect_async_rules(
-                validators, prefix + field, value, instance, failures,
-            )

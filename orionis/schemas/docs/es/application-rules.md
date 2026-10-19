@@ -26,13 +26,13 @@ El ejemplo completo inferior valida un registro con aceptación explícita y con
 
 ## Validación que consulta otros servicios
 
-`ActiveUrl` comprueba resolución DNS del hostname, no que el recurso HTTP exista o sea seguro para descargar. La variante síncrona bloquea; la asíncrona usa resolución mediante el loop. Para solicitudes utiliza `validateAsync()` y una política de acceso a recursos independiente de la validación del formato.
+`ActiveUrl` comprueba resolución DNS del hostname, no que el recurso HTTP exista o sea seguro para descargar. `await Validator.validate(...)` usa resolución mediante el loop sin bloquearlo. Aplica una política de acceso a recursos independiente de la validación del formato.
 
-`Unique` necesita Database preparado. Su variante async conserva la conexión/transacción activa. La variante sync puede puentear a un loop y, si ya existe un loop, usar una conexión aislada: no asumas visibilidad de los cambios no confirmados de otra conexión. La consulta de validación no garantiza unicidad frente a carreras; define también la restricción de unicidad en la base de datos y maneja el conflicto al persistir. Nunca derives `table`, `column`, `ignore_column` o la conexión directamente de entrada no confiable.
+`Unique` necesita Database preparado. La validación espera su I/O nativo y conserva la conexión/transacción activa. La consulta de validación no garantiza unicidad frente a carreras; define también la restricción de unicidad en la base de datos y maneja el conflicto al persistir. Nunca derives `table`, `column`, `ignore_column` o la conexión directamente de entrada no confiable.
 
 ## Escribir una regla propia
 
-Hereda de `Rule`, define `__code__` y `__message__` e implementa `enforce(field, value, instance) -> bool`. El retorno falso crea un fallo; `instance` permite consultar campos hermanos. La base ofrece `enforceAsync` que usa `enforce`, por lo que una regla CPU breve funciona en ambos caminos. Para I/O nativo, sobrescribe `async enforceAsync(...)` y espera el servicio; no escondas I/O bloqueante dentro de `enforce` en un handler async. Conserva las reglas sin estado mutable por solicitud: el schema y sus planes se reutilizan.
+Hereda de `Rule`, define `__code__` y `__message__` e implementa `enforce(field, value, instance) -> bool`. El retorno falso crea un fallo; `instance` permite consultar campos hermanos. `Rule.validate` siempre es asíncrono: llama directamente a predicados `enforce` puros y breves, sin hilos auxiliares. Para I/O nativo, sobrescribe `async enforceAsync(...)`; la validación espera ese método en lugar del predicado síncrono. No escondas I/O bloqueante dentro de `enforce`. Conserva las reglas sin estado mutable por solicitud: el schema y sus planes se reutilizan.
 
 ```python
 from orionis.schemas.rule import Rule
@@ -47,6 +47,8 @@ class Even(Rule):
 
 Puedes combinar `Even()` con `Field[int, Even()]`. Las opciones inválidas o constraints incompatibles fallan al declarar el schema; corrige la declaración en lugar de convertir el error de programación en un fallo de usuario.
 
+Ejecuta el siguiente fragmento de validación dentro de una función async o una consola que admite `await`.
+
 ```python
 from orionis.schemas import Schema
 from orionis.schemas.fields import Field
@@ -59,7 +61,7 @@ class Registration(Schema):
     password_confirmation: Field[str, ConfirmPassword()]
     accepted_terms: Field[bool, Accepted()]
 
-registration = Validator.validate({
+registration = await Validator.validate({
     "email": "ada@example.com",
     "password": "Example42",
     "password_confirmation": "Example42",

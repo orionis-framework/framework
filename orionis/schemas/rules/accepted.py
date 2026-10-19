@@ -18,7 +18,7 @@ class Accepted(Rule):
     __message__ = "Value must be accepted."
     __code__ = "accepted"
 
-    def enforce(
+    async def enforce(
         self,
         field: str,
         value: object,

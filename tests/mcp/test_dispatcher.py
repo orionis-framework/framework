@@ -8,12 +8,64 @@ from orionis.mcp.protocol.constants import (
     SUBSCRIPTION_ID,
 )
 from orionis.mcp.protocol.metadata import PromptArgument
-from orionis.mcp.protocol.results import Completion, InputRequiredResult
+from orionis.mcp.protocol.results import CallToolResult, Completion, InputRequiredResult
 from orionis.mcp.responses import McpResponse
 from orionis.mcp.server.catalog import ToolCatalog
 from orionis.mcp.server.primitives import Prompt, Resource, Server, Tool
 from orionis.schemas import Schema
+from orionis.schemas.fields import Field  # noqa: TC001
+from orionis.schemas.rule import Rule
 from orionis.test import TestCase
+
+class _NonNegativeAsync(Rule):
+    """Reject invalid values only through native asynchronous enforcement."""
+
+    async def enforceAsync(
+        self,
+        _field: str,
+        value: object,
+        _instance: object,
+    ) -> bool:
+        """Suspend before checking the value on the current event loop."""
+        await asyncio.sleep(0)
+        return isinstance(value, int) and value >= 0
+
+class _ValidatedValue(Schema):
+    value: Field[int, _NonNegativeAsync()]
+
+class _ValidatedInput(_ValidatedValue):
+    invalid_output: bool = False
+
+class _AsyncOutputTool(Tool[_ValidatedInput, _ValidatedValue]):
+    name = "async-output"
+
+    async def handle(self, payload: _ValidatedInput):
+        """Return structured content requiring asynchronous output validation."""
+        return McpResponse.structured({
+            "value": -1 if payload.invalid_output else payload.value,
+        })
+
+class _AsyncProtocolOutputTool(Tool[_ValidatedInput, _ValidatedValue]):
+    name = "async-protocol-output"
+
+    async def handle(self, payload: _ValidatedInput):
+        """Return a protocol result requiring the same output validation."""
+        return CallToolResult(content=(), structuredContent={
+            "value": -1 if payload.invalid_output else payload.value,
+        })
+
+class _AsyncStreamingOutputTool(Tool[_ValidatedInput, _ValidatedValue]):
+    name = "async-streaming-output"
+
+    async def handle(self, payload: _ValidatedInput):
+        """Yield structured content validated before the final stream result."""
+        yield McpResponse.structured({
+            "value": -1 if payload.invalid_output else payload.value,
+        })
+
+class _AsyncValidationServer(Server):
+    name = "Async Validation"
+    tools = (_AsyncOutputTool, _AsyncProtocolOutputTool, _AsyncStreamingOutputTool)
 
 class _Repository:
     """A trusted injectable dependency."""
@@ -259,6 +311,33 @@ class TestDispatcher(TestCase):
 
         self.app = _TestContainer()
         self.client = await self.mcp(_Server, app=self.app)
+
+    async def test_async_rules_validate_inputs_and_every_output_path(self):
+        """Await native schema rules for regular, protocol and streaming results."""
+        client = await self.mcp(_AsyncValidationServer, app=self.app)
+        for tool in _AsyncValidationServer.tools:
+            with self.subTest(tool=tool.name):
+                valid = await client.tool(tool.name, {"value": 2})
+                valid.assertOk()
+                self.assertEqual(
+                    valid.message["result"]["structuredContent"], {"value": 2},
+                )
+
+                invalid_input = await client.tool(tool.name, {"value": -1})
+                self.assertTrue(invalid_input.message["result"]["isError"])
+                self.assertEqual(
+                    invalid_input.message["result"]["content"][0]["text"],
+                    "Invalid tool arguments",
+                )
+
+                invalid_output = await client.tool(
+                    tool.name, {"value": 2, "invalid_output": True},
+                )
+                self.assertTrue(invalid_output.message["result"]["isError"])
+                self.assertEqual(
+                    invalid_output.message["result"]["content"][0]["text"],
+                    "Tool execution failed",
+                )
 
     async def test_discovery_and_cache_metadata(self):
         """Discovery advertises only implemented modern capabilities.

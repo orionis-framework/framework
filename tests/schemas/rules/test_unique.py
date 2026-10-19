@@ -28,6 +28,11 @@ class _NestedPayload(Schema):
 
     child: _UniquePayload | int
 
+class _CollectionPayload(Schema):
+    values: list[_UniquePayload]
+    mapping: dict[str, _UniquePayload]
+    quantity: int = 1
+
 class _SchemaContainer(Container):
     """Keep validation bindings independent of the application's container."""
 
@@ -202,10 +207,10 @@ class TestUniqueAsync(TestCase):
                 table=self._table, values=[{"code": "taken"}],
             ))
             rule = Unique("unique_values", "code")
-            self.assertFalse(await rule.enforceAsync("code", "taken", None))
-            self.assertTrue(await rule.enforceAsync("code", "available", None))
+            self.assertFalse(await rule.enforce("code", "taken", None))
+            self.assertTrue(await rule.enforce("code", "available", None))
             ignored = Unique("unique_values", "code", ignore=inserted.last_insert_id)
-            self.assertTrue(await ignored.enforceAsync("code", "taken", None))
+            self.assertTrue(await ignored.enforce("code", "taken", None))
 
     async def testProbeYieldsControlToTheCurrentLoop(self) -> None:
         """Keep the event loop available while a database probe is suspended.
@@ -218,7 +223,7 @@ class TestUniqueAsync(TestCase):
         connection = _WaitingConnection()
         self._manager.current = connection
         rule = Unique("unique_values", "code")
-        pending = asyncio.create_task(rule.enforceAsync("code", "available", None))
+        pending = asyncio.create_task(rule.enforce("code", "available", None))
         try:
             await asyncio.wait_for(connection.entered.wait(), timeout=1)
             self.assertFalse(pending.done())
@@ -237,7 +242,7 @@ class TestUniqueAsync(TestCase):
         """
         connection = _WaitingConnection()
         self._manager.current = connection
-        self.assertTrue(await Unique("unique_values", "code").enforceAsync(
+        self.assertTrue(await Unique("unique_values", "code").enforce(
             "code", None, None,
         ))
         self.assertFalse(connection.entered.is_set())
@@ -291,6 +296,59 @@ class TestUniqueAsync(TestCase):
         self.assertEqual(
             (await Validator.validate({"child": 3}, _NestedPayload)).child, 3,
         )
+
+    async def testCollectionsPreserveTheActiveTransactionOnBothPaths(self) -> None:
+        """Await list and map probes against uncommitted rows on the current loop."""
+        async with self._connection.transaction():
+            await self._connection.insert(InsertPlan(
+                table=self._table, values=[{"code": "taken"}],
+            ))
+            for quantity in (1, "invalid"):
+                with self.assertRaises(ValidationException) as caught:
+                    await Validator.validate({
+                        "values": [{"code": "taken"}],
+                        "mapping": {"main": {"code": "taken"}},
+                        "quantity": quantity,
+                    }, _CollectionPayload)
+                self.assertEqual(
+                    set(caught.exception.errors) - {"quantity"},
+                    {"values[0].code", "mapping['main'].code"},
+                )
+                self.assertEqual(
+                    "quantity" in caught.exception.errors, quantity != 1,
+                )
+
+    async def testFailedCollectionItemsStillAwaitTheirValidDatabaseFields(self) -> None:
+        """Collect nested type failures without skipping valid database probes."""
+        await self._connection.insert(InsertPlan(
+            table=self._table, values=[{"code": "taken"}],
+        ))
+        with self.assertRaises(ValidationException) as caught:
+            await Validator.validate({
+                "values": [
+                    {"code": "taken", "quantity": "bad"},
+                    {"code": "taken"},
+                ],
+                "mapping": {"main": {"code": "taken", "quantity": "bad"}},
+            }, _CollectionPayload)
+        self.assertEqual(set(caught.exception.errors), {
+            "values[0].code", "values[0].quantity", "values[1].code",
+            "mapping['main'].code", "mapping['main'].quantity",
+        })
+
+    async def testCollectionValidationPropagatesCancellation(self) -> None:
+        """Cancel a suspended child probe without swallowing cancellation."""
+        connection = _WaitingConnection()
+        self._manager.current = connection
+        pending = asyncio.create_task(Validator.validate({
+            "values": [{"code": "available"}], "mapping": {},
+        }, _CollectionPayload))
+        try:
+            await asyncio.wait_for(connection.entered.wait(), timeout=1)
+        finally:
+            pending.cancel()
+        with self.assertRaises(asyncio.CancelledError):
+            await pending
 
     async def testValidatorPropagatesCancellationWhileTheQueryWaits(self) -> None:
         """Let cancellation reach a pending native database rule.

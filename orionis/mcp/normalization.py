@@ -51,7 +51,7 @@ def response_items(result: object) -> tuple[McpResponse, ...]:
         raise TypeError(message)
     return responses
 
-def tool_result(
+async def tool_result(
     primitive: CompiledPrimitive,
     responses: tuple[McpResponse, ...],
 ) -> CallToolResult:
@@ -81,7 +81,7 @@ def tool_result(
     value = values[0] if values else msgspec.UNSET
     is_error = any(item.is_error for item in responses)
     if not is_error:
-        validate_output(primitive, value)
+        await validate_output(primitive, value)
     return CallToolResult(
         content=tuple(part for item in responses for part in item.content),
         structuredContent=value,

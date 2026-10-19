@@ -332,7 +332,7 @@ class TestBuildPlan(TestCase):
 
 class TestCollectNested(TestCase):
 
-    def testUncachedChildPlanIsBuiltOnDemand(self) -> None:
+    async def testUncachedChildPlanIsBuiltOnDemand(self) -> None:
         """Build the child plan when the nested type is not cached yet.
 
         Validates the cache-miss branch of the nested traversal.
@@ -344,11 +344,11 @@ class TestCollectNested(TestCase):
         """
         klass = _uncached_struct("_NestedColdPlan")
         failures: list[ValidationFailure] = []
-        _collect_nested(klass(code="abc"), "child.", failures)
+        await _collect_nested(klass(code="abc"), "child.", failures)
         self.assertIn(klass, _PLAN_CACHE)
         self.assertEqual(failures, [])
 
-    def testChildFailuresAreQualifiedWithThePrefix(self) -> None:
+    async def testChildFailuresAreQualifiedWithThePrefix(self) -> None:
         """Prefix nested failures with the dotted path of the parent field.
 
         Validates the path composition applied to child failures.
@@ -359,14 +359,14 @@ class TestCollectNested(TestCase):
             Assertions verify the behavior described above.
         """
         failures: list[ValidationFailure] = []
-        _collect_nested(_RejectingChild(code="abc"), "child.", failures)
+        await _collect_nested(_RejectingChild(code="abc"), "child.", failures)
         self.assertEqual(len(failures), 1)
         self.assertIsInstance(failures[0], ValidationFailure)
         self.assertEqual(failures[0].field, "child.code")
 
 class TestCollectWithPlan(TestCase):
 
-    def testNestedFailuresAreAccumulated(self) -> None:
+    async def testNestedFailuresAreAccumulated(self) -> None:
         """Accumulate failures found inside a nested schema.
 
         Validates that the parent plan drives the nested traversal.
@@ -378,10 +378,10 @@ class TestCollectWithPlan(TestCase):
         """
         instance = _ParentSchema(child=_RejectingChild(code="abc"), label="ok")
         failures: list[ValidationFailure] = []
-        _collect_with_plan(_PLAN_CACHE[_ParentSchema], instance, "", failures)
+        await _collect_with_plan(_PLAN_CACHE[_ParentSchema], instance, "", failures)
         self.assertEqual([f.field for f in failures], ["child.code"])
 
-    def testNoneNestedValueIsSkipped(self) -> None:
+    async def testNoneNestedValueIsSkipped(self) -> None:
         """Skip traversal when the nested value is None.
 
         Validates that optional nested schemas never raise on absence.
@@ -393,10 +393,12 @@ class TestCollectWithPlan(TestCase):
         """
         instance = _OptionalParentSchema(child=None)
         failures: list[ValidationFailure] = []
-        _collect_with_plan(_PLAN_CACHE[_OptionalParentSchema], instance, "", failures)
+        await _collect_with_plan(
+            _PLAN_CACHE[_OptionalParentSchema], instance, "", failures,
+        )
         self.assertEqual(failures, [])
 
-    def testEveryFailingRuleIsReported(self) -> None:
+    async def testEveryFailingRuleIsReported(self) -> None:
         """Report every rule failure instead of stopping at the first one.
 
         Validates the accumulating behaviour of the inner loop.
@@ -409,8 +411,8 @@ class TestCollectWithPlan(TestCase):
         instance = _RejectingChild(code="abc")
         failures: list[ValidationFailure] = []
         plan = _PLAN_CACHE[_RejectingChild]
-        _collect_with_plan(plan, instance, "", failures)
-        _collect_with_plan(plan, instance, "other.", failures)
+        await _collect_with_plan(plan, instance, "", failures)
+        await _collect_with_plan(plan, instance, "other.", failures)
         self.assertEqual([f.field for f in failures], ["code", "other.code"])
         self.assertEqual({f.rule for f in failures}, {"reject"})
         self.assertEqual({f.message for f in failures}, {"Rejected."})

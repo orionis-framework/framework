@@ -10,7 +10,7 @@ class Uppercase(Rule):
     __message__ = "Value must be uppercase."
     __code__ = "uppercase"
 
-    def enforce(
+    async def enforce(
         self,
         field: str,
         value: object,

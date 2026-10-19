@@ -21,7 +21,7 @@ class _RejectRule(Rule):
     __code__ = "reject"
     __message__ = "Rejected."
 
-    def enforce(
+    async def enforce(
         self,
         _field: str,
         _value: object,

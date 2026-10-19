@@ -254,7 +254,7 @@ class TestFieldPlan(TestCase):
 
 class TestFailureCollectorCollect(TestCase):
 
-    def testEveryMissingRequiredFieldIsReported(self) -> None:
+    async def testEveryMissingRequiredFieldIsReported(self) -> None:
         """Report each required field absent from the payload.
 
         Validates that reporting does not stop at the first missing field.
@@ -265,11 +265,11 @@ class TestFailureCollectorCollect(TestCase):
             Assertions verify the behavior described above.
         """
         error = _conversion_error({}, _Person)
-        failures = FailureCollector.collect({}, _Person, error)
+        failures = await FailureCollector.collect({}, _Person, error)
         self.assertEqual({f.field for f in failures}, {"name", "age"})
         self.assertEqual({f.rule for f in failures}, {"missing"})
 
-    def testOptionalMissingFieldIsIgnored(self) -> None:
+    async def testOptionalMissingFieldIsIgnored(self) -> None:
         """Skip fields that are absent but carry a default value.
 
         Validates that defaults never produce a missing-field failure.
@@ -281,10 +281,10 @@ class TestFailureCollectorCollect(TestCase):
         """
         payload = {"age": "not-an-int"}
         error = _conversion_error(payload, _PartialDefaults)
-        failures = FailureCollector.collect(payload, _PartialDefaults, error)
+        failures = await FailureCollector.collect(payload, _PartialDefaults, error)
         self.assertEqual([f.field for f in failures], ["age"])
 
-    def testNonMappingPayloadKeepsTheOriginalError(self) -> None:
+    async def testNonMappingPayloadKeepsTheOriginalError(self) -> None:
         """Keep the parsed original error when no field can be blamed.
 
         Validates the fallback used for payloads that are not mappings.
@@ -296,11 +296,11 @@ class TestFailureCollectorCollect(TestCase):
         """
         payload = [1, 2]
         error = _conversion_error(payload, _Person)
-        failures = FailureCollector.collect(payload, _Person, error)
+        failures = await FailureCollector.collect(payload, _Person, error)
         self.assertEqual(len(failures), 1)
         self.assertIsInstance(failures[0], ValidationFailure)
 
-    def testCollectReturnsATuple(self) -> None:
+    async def testCollectReturnsATuple(self) -> None:
         """Return the collected failures as an immutable tuple.
 
         Validates the contract consumed by the validation exception.
@@ -311,9 +311,9 @@ class TestFailureCollectorCollect(TestCase):
             Assertions verify the behavior described above.
         """
         error = _conversion_error({}, _Person)
-        self.assertIsInstance(FailureCollector.collect({}, _Person, error), tuple)
+        self.assertIsInstance(await FailureCollector.collect({}, _Person, error), tuple)
 
-    def testNestedMappingFailuresAreExpanded(self) -> None:
+    async def testNestedMappingFailuresAreExpanded(self) -> None:
         """Expand a rejected nested mapping into its own field failures.
 
         Validates the recursion applied to nested schema payloads.
@@ -325,10 +325,10 @@ class TestFailureCollectorCollect(TestCase):
         """
         payload = {"child": {"code": 123}, "count": 1}
         error = _conversion_error(payload, _NestedParent)
-        failures = FailureCollector.collect(payload, _NestedParent, error)
+        failures = await FailureCollector.collect(payload, _NestedParent, error)
         self.assertEqual([f.field for f in failures], ["child.code"])
 
-    def testNestedNonMappingValueIsParsedAsOneFailure(self) -> None:
+    async def testNestedNonMappingValueIsParsedAsOneFailure(self) -> None:
         """Report a single failure when a nested value is not a mapping.
 
         Validates the fallback of the blame helper.
@@ -340,10 +340,10 @@ class TestFailureCollectorCollect(TestCase):
         """
         payload = {"child": 5, "count": 1}
         error = _conversion_error(payload, _NestedParent)
-        failures = FailureCollector.collect(payload, _NestedParent, error)
+        failures = await FailureCollector.collect(payload, _NestedParent, error)
         self.assertEqual([f.field for f in failures], ["child"])
 
-    def testRulesRunForFieldsThatConverted(self) -> None:
+    async def testRulesRunForFieldsThatConverted(self) -> None:
         """Run custom rules on values that converted successfully.
 
         Validates that type errors and rule errors are reported together.
@@ -355,11 +355,11 @@ class TestFailureCollectorCollect(TestCase):
         """
         payload = {"code": "abc", "count": "not-an-int"}
         error = _conversion_error(payload, _RuledParent)
-        failures = FailureCollector.collect(payload, _RuledParent, error)
+        failures = await FailureCollector.collect(payload, _RuledParent, error)
         self.assertEqual({f.field for f in failures}, {"code", "count"})
         self.assertIn("reject", {f.rule for f in failures})
 
-    def testNestedRulesRunWhenASiblingFieldFails(self) -> None:
+    async def testNestedRulesRunWhenASiblingFieldFails(self) -> None:
         """Run the rules of a nested schema that converted cleanly.
 
         Validates that nested rules are reached from the slow path.
@@ -371,12 +371,12 @@ class TestFailureCollectorCollect(TestCase):
         """
         payload = {"child": {"code": "abc"}, "count": "not-an-int"}
         error = _conversion_error(payload, _NestedParent)
-        failures = FailureCollector.collect(payload, _NestedParent, error)
+        failures = await FailureCollector.collect(payload, _NestedParent, error)
         self.assertEqual({f.field for f in failures}, {"child.code", "count"})
 
 class TestFailureCollectorEnforce(TestCase):
 
-    def testUncachedNestedPlanIsBuiltOnDemand(self) -> None:
+    async def testUncachedNestedPlanIsBuiltOnDemand(self) -> None:
         """Build the nested rule plan when the value type is not cached.
 
         Validates the cache-miss branch of the rule enforcement pass.
@@ -388,12 +388,12 @@ class TestFailureCollectorEnforce(TestCase):
         """
         klass = _uncached_struct("_EnforceColdChild", {"code": [_RejectRule()]})
         failures: list[ValidationFailure] = []
-        FailureCollector._enforce(
+        await FailureCollector._enforce(
             [("child", klass(code="abc"), (), klass)], {}, failures,
         )
         self.assertEqual([f.field for f in failures], ["child.code"])
 
-    def testNoneNestedValueIsSkipped(self) -> None:
+    async def testNoneNestedValueIsSkipped(self) -> None:
         """Skip nested enforcement when the converted value is None.
 
         Validates that optional nested schemas never raise on absence.
@@ -404,10 +404,10 @@ class TestFailureCollectorEnforce(TestCase):
             Assertions verify the behavior described above.
         """
         failures: list[ValidationFailure] = []
-        FailureCollector._enforce([("address", None, (), _Address)], {}, failures)
+        await FailureCollector._enforce([("address", None, (), _Address)], {}, failures)
         self.assertEqual(failures, [])
 
-    def testEmptyNestedPlanProducesNoFailure(self) -> None:
+    async def testEmptyNestedPlanProducesNoFailure(self) -> None:
         """Produce no failure when the nested schema declares no rule.
 
         Validates the guard applied before running a nested plan.
@@ -418,14 +418,14 @@ class TestFailureCollectorEnforce(TestCase):
             Assertions verify the behavior described above.
         """
         failures: list[ValidationFailure] = []
-        FailureCollector._enforce(
+        await FailureCollector._enforce(
             [("address", _Address(zip_code="10001"), (), _Address)], {}, failures,
         )
         self.assertEqual(failures, [])
 
 class TestFailureCollectorBlame(TestCase):
 
-    def testCleanNestedMappingFallsBackToTheParsedError(self) -> None:
+    async def testCleanNestedMappingFallsBackToTheParsedError(self) -> None:
         """Report the parsed error when the nested mapping blames no field.
 
         Validates the fallback used when the rejection comes from outside
@@ -437,7 +437,7 @@ class TestFailureCollectorBlame(TestCase):
             Assertions verify the behavior described above.
         """
         error = _conversion_error({"zip_code": 1}, _Address)
-        failures = FailureCollector._blame(
+        failures = await FailureCollector._blame(
             error, {"zip_code": "10001"}, _Address, _OptionalNested, "address",
         )
         self.assertEqual([f.field for f in failures], ["address.zip_code"])

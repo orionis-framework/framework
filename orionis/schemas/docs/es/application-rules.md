@@ -2,6 +2,8 @@
 
 Las constraints describen límites estructurales que se compilan al declarar la clase. Una `Rule` comprueba una condición de aplicación después de convertir los tipos. Combínalas con `Field[T, ...]`; `Field` es un alias de `typing.Annotated`, no una función que reciba `default=`.
 
+Las 47 validaciones incluidas se componen de 37 reglas ejecutables y 10 constraints estructurales compilados. Todas las reglas ejecutables exponen el mismo método `enforce` obligatoriamente asíncrono; los constraints estructurales siguen siendo metadata de declaración, no una segunda API de ejecución.
+
 ## Elegir una regla incluida
 
 | Necesidad | Reglas y parámetros relevantes |
@@ -32,7 +34,7 @@ El ejemplo completo inferior valida un registro con aceptación explícita y con
 
 ## Escribir una regla propia
 
-Hereda de `Rule`, define `__code__` y `__message__` e implementa `enforce(field, value, instance) -> bool`. El retorno falso crea un fallo; `instance` permite consultar campos hermanos. `Rule.validate` siempre es asíncrono: llama directamente a predicados `enforce` puros y breves, sin hilos auxiliares. Para I/O nativo, sobrescribe `async enforceAsync(...)`; la validación espera ese método en lugar del predicado síncrono. No escondas I/O bloqueante dentro de `enforce`. Conserva las reglas sin estado mutable por solicitud: el schema y sus planes se reutilizan.
+Hereda de `Rule`, define `__code__` y `__message__` e implementa `async def enforce(field, value, instance) -> bool`, incluso para predicados puros. El retorno falso crea un fallo; `instance` permite consultar campos hermanos. `Rule.validate` siempre espera `enforce`; no hay otro método de evaluación ni un camino síncrono alternativo. Un override síncrono produce `TypeError` al crear la clase de la regla. Usa `await` nativo para I/O y no escondas operaciones bloqueantes dentro de `enforce`. Los checks puros breves permanecen en el hilo del llamador, sin hilos auxiliares. Conserva las reglas sin estado mutable por solicitud: el schema y sus planes se reutilizan.
 
 ```python
 from orionis.schemas.rule import Rule
@@ -41,11 +43,11 @@ class Even(Rule):
     __code__ = "even"
     __message__ = "Value must be even."
 
-    def enforce(self, field: str, value: object, instance: object) -> bool:
+    async def enforce(self, field: str, value: object, instance: object) -> bool:
         return isinstance(value, int) and value % 2 == 0
 ```
 
-Puedes combinar `Even()` con `Field[int, Even()]`. Las opciones inválidas o constraints incompatibles fallan al declarar el schema; corrige la declaración en lugar de convertir el error de programación en un fallo de usuario.
+Puedes combinar `Even()` con `Field[int, Even()]`. Las opciones inválidas o constraints incompatibles fallan al declarar el schema; corrige la declaración en lugar de convertir el error de programación en un fallo de usuario. Las reglas que leen contenido de uploads delegan la lectura síncrona a un hilo auxiliar para no bloquear el loop cuando el archivo reside en disco.
 
 Ejecuta el siguiente fragmento de validación dentro de una función async o una consola que admite `await`.
 

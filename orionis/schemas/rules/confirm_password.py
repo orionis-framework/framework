@@ -50,7 +50,7 @@ class ConfirmPassword(Rule):
             raise ValueError(error_msg)
         self._other_field: str = other_field
 
-    def enforce(
+    async def enforce(
         self,
         field: str,
         value: object,

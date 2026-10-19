@@ -131,7 +131,7 @@ class Dimensions(Rule):
         self._min_ratio: float | None = _parse_ratio(min_ratio, "min_ratio")
         self._max_ratio: float | None = _parse_ratio(max_ratio, "max_ratio")
 
-    def enforce(
+    async def enforce(
         self,
         field: str,
         value: object,
@@ -155,7 +155,7 @@ class Dimensions(Rule):
         bool
             Return ``True`` when the value passes validation.
         """
-        content = read_content(value)
+        content = await read_content(value)
         if content is None:
             return False
 

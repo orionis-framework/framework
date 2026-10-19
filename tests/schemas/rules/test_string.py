@@ -28,7 +28,7 @@ _ULID = "01ARZ3NDEKTSV4RRFFQ69G5FAV"
 
 class TestAccepted(TestCase):
 
-    def testAcceptsTruthyStrings(self) -> None:
+    async def testAcceptsTruthyStrings(self) -> None:
         """Return True for every textual representation of an acceptance.
 
         Validates that ``yes``, ``on``, ``1`` and ``true`` are accepted
@@ -41,9 +41,9 @@ class TestAccepted(TestCase):
         """
         rule = Accepted()
         for value in ("yes", "on", "1", "true", "YES", "True"):
-            self.assertTrue(rule.enforce("terms", value, _OWNER))
+            self.assertTrue(await rule.enforce("terms", value, _OWNER))
 
-    def testAcceptsBooleanAndInteger(self) -> None:
+    async def testAcceptsBooleanAndInteger(self) -> None:
         """Return True for the boolean and integer acceptance values.
 
         Validates that ``True`` and ``1`` are treated as an acceptance.
@@ -54,10 +54,10 @@ class TestAccepted(TestCase):
             Assertions verify the behavior described above.
         """
         rule = Accepted()
-        self.assertTrue(rule.enforce("terms", True, _OWNER))
-        self.assertTrue(rule.enforce("terms", 1, _OWNER))
+        self.assertTrue(await rule.enforce("terms", True, _OWNER))
+        self.assertTrue(await rule.enforce("terms", 1, _OWNER))
 
-    def testRejectsFalsyValues(self) -> None:
+    async def testRejectsFalsyValues(self) -> None:
         """Return False for values that do not express an acceptance.
 
         Validates that negatives, zero, ``None`` and unrelated types fail.
@@ -69,7 +69,7 @@ class TestAccepted(TestCase):
         """
         rule = Accepted()
         for value in (False, 0, 2, "no", "off", "", None, [], object()):
-            self.assertFalse(rule.enforce("terms", value, _OWNER))
+            self.assertFalse(await rule.enforce("terms", value, _OWNER))
 
     async def testCodeAndDefaultMessage(self) -> None:
         """Expose the documented rule code in the reported failure.
@@ -88,7 +88,7 @@ class TestAccepted(TestCase):
 
 class TestActiveUrl(TestCase):
 
-    def testResolvableHostnamePasses(self) -> None:
+    async def testResolvableHostnamePasses(self) -> None:
         """Return True when the hostname resolves through the system resolver.
 
         Validates the success path without depending on real DNS traffic.
@@ -101,9 +101,9 @@ class TestActiveUrl(TestCase):
         rule = ActiveUrl()
         target = "orionis.schemas.rules.active_url.socket.getaddrinfo"
         with patch(target, return_value=[("family", "type", 6, "", ("1.2.3.4", 0))]):
-            self.assertTrue(rule.enforce("url", "https://example.com/a", _OWNER))
+            self.assertTrue(await rule.enforce("url", "https://example.com/a", _OWNER))
 
-    def testUnresolvableHostnameFails(self) -> None:
+    async def testUnresolvableHostnameFails(self) -> None:
         """Return False when the resolver reports an unknown hostname.
 
         Validates that a ``gaierror`` is translated into a failed check.
@@ -116,9 +116,9 @@ class TestActiveUrl(TestCase):
         rule = ActiveUrl()
         target = "orionis.schemas.rules.active_url.socket.getaddrinfo"
         with patch(target, side_effect=socket.gaierror):
-            self.assertFalse(rule.enforce("url", "https://example.com", _OWNER))
+            self.assertFalse(await rule.enforce("url", "https://example.com", _OWNER))
 
-    def testUrlWithoutHostnameFails(self) -> None:
+    async def testUrlWithoutHostnameFails(self) -> None:
         """Return False when the value carries no hostname component.
 
         Validates that relative paths and bare words are rejected before
@@ -130,10 +130,10 @@ class TestActiveUrl(TestCase):
             Assertions verify the behavior described above.
         """
         rule = ActiveUrl()
-        self.assertFalse(rule.enforce("url", "/relative/path", _OWNER))
-        self.assertFalse(rule.enforce("url", "", _OWNER))
+        self.assertFalse(await rule.enforce("url", "/relative/path", _OWNER))
+        self.assertFalse(await rule.enforce("url", "", _OWNER))
 
-    def testMalformedUrlFails(self) -> None:
+    async def testMalformedUrlFails(self) -> None:
         """Return False when the value cannot be split into URL components.
 
         Validates that a malformed IPv6 literal does not raise.
@@ -144,9 +144,9 @@ class TestActiveUrl(TestCase):
             Assertions verify the behavior described above.
         """
         rule = ActiveUrl()
-        self.assertFalse(rule.enforce("url", "http://[oops", _OWNER))
+        self.assertFalse(await rule.enforce("url", "http://[oops", _OWNER))
 
-    def testNonStringValuePasses(self) -> None:
+    async def testNonStringValuePasses(self) -> None:
         """Return True when the value is not a string.
 
         Validates that type reporting is delegated to the type layer.
@@ -156,11 +156,11 @@ class TestActiveUrl(TestCase):
         None
             Assertions verify the behavior described above.
         """
-        self.assertTrue(ActiveUrl().enforce("url", 123, _OWNER))
+        self.assertTrue(await ActiveUrl().enforce("url", 123, _OWNER))
 
 class TestAlpha(TestCase):
 
-    def testUnicodeLettersPass(self) -> None:
+    async def testUnicodeLettersPass(self) -> None:
         """Return True for Unicode letters and combining marks.
 
         Validates that accented text and decomposed characters are
@@ -172,10 +172,10 @@ class TestAlpha(TestCase):
             Assertions verify the behavior described above.
         """
         rule = Alpha()
-        self.assertTrue(rule.enforce("name", "José", _OWNER))
-        self.assertTrue(rule.enforce("name", "e\u0301", _OWNER))
+        self.assertTrue(await rule.enforce("name", "José", _OWNER))
+        self.assertTrue(await rule.enforce("name", "e\u0301", _OWNER))
 
-    def testNonLettersFail(self) -> None:
+    async def testNonLettersFail(self) -> None:
         """Return False when the value carries digits, spaces or symbols.
 
         Validates that only alphabetic content is accepted.
@@ -187,9 +187,9 @@ class TestAlpha(TestCase):
         """
         rule = Alpha()
         for value in ("abc1", "ab c", "ab-c", ""):
-            self.assertFalse(rule.enforce("name", value, _OWNER))
+            self.assertFalse(await rule.enforce("name", value, _OWNER))
 
-    def testAsciiOnlyRejectsAccents(self) -> None:
+    async def testAsciiOnlyRejectsAccents(self) -> None:
         """Return False for non-ASCII letters when ``ascii_only`` is enabled.
 
         Validates that the restricted mode narrows the accepted range to
@@ -201,10 +201,10 @@ class TestAlpha(TestCase):
             Assertions verify the behavior described above.
         """
         rule = Alpha(ascii_only=True)
-        self.assertTrue(rule.enforce("name", "Jose", _OWNER))
-        self.assertFalse(rule.enforce("name", "José", _OWNER))
+        self.assertTrue(await rule.enforce("name", "Jose", _OWNER))
+        self.assertFalse(await rule.enforce("name", "José", _OWNER))
 
-    def testNonStringValuePasses(self) -> None:
+    async def testNonStringValuePasses(self) -> None:
         """Return True when the value is not a string.
 
         Validates that type reporting is delegated to the type layer.
@@ -214,11 +214,11 @@ class TestAlpha(TestCase):
         None
             Assertions verify the behavior described above.
         """
-        self.assertTrue(Alpha().enforce("name", 10, _OWNER))
+        self.assertTrue(await Alpha().enforce("name", 10, _OWNER))
 
 class TestAscii(TestCase):
 
-    def testSevenBitContentPasses(self) -> None:
+    async def testSevenBitContentPasses(self) -> None:
         """Return True for content limited to the 7-bit ASCII range.
 
         Validates that letters, digits and punctuation are accepted.
@@ -228,9 +228,9 @@ class TestAscii(TestCase):
         None
             Assertions verify the behavior described above.
         """
-        self.assertTrue(Ascii().enforce("tag", "abc-123_!", _OWNER))
+        self.assertTrue(await Ascii().enforce("tag", "abc-123_!", _OWNER))
 
-    def testNonAsciiContentFails(self) -> None:
+    async def testNonAsciiContentFails(self) -> None:
         """Return False when the value carries characters beyond ASCII.
 
         Validates that accented and emoji content is rejected.
@@ -241,10 +241,10 @@ class TestAscii(TestCase):
             Assertions verify the behavior described above.
         """
         rule = Ascii()
-        self.assertFalse(rule.enforce("tag", "ñandú", _OWNER))
-        self.assertFalse(rule.enforce("tag", "a€", _OWNER))
+        self.assertFalse(await rule.enforce("tag", "ñandú", _OWNER))
+        self.assertFalse(await rule.enforce("tag", "a€", _OWNER))
 
-    def testNonStringValuePasses(self) -> None:
+    async def testNonStringValuePasses(self) -> None:
         """Return True when the value is not a string.
 
         Validates that type reporting is delegated to the type layer.
@@ -254,11 +254,11 @@ class TestAscii(TestCase):
         None
             Assertions verify the behavior described above.
         """
-        self.assertTrue(Ascii().enforce("tag", None, _OWNER))
+        self.assertTrue(await Ascii().enforce("tag", None, _OWNER))
 
 class TestEndsWith(TestCase):
 
-    def testMatchingSuffixPasses(self) -> None:
+    async def testMatchingSuffixPasses(self) -> None:
         """Return True when the value ends with one of the suffixes.
 
         Validates that any configured suffix satisfies the rule.
@@ -269,10 +269,10 @@ class TestEndsWith(TestCase):
             Assertions verify the behavior described above.
         """
         rule = EndsWith(".png", ".jpg")
-        self.assertTrue(rule.enforce("file", "photo.png", _OWNER))
-        self.assertTrue(rule.enforce("file", "photo.jpg", _OWNER))
+        self.assertTrue(await rule.enforce("file", "photo.png", _OWNER))
+        self.assertTrue(await rule.enforce("file", "photo.jpg", _OWNER))
 
-    def testMissingSuffixFails(self) -> None:
+    async def testMissingSuffixFails(self) -> None:
         """Return False when the value ends with none of the suffixes.
 
         Validates that unrelated extensions are rejected.
@@ -282,9 +282,9 @@ class TestEndsWith(TestCase):
         None
             Assertions verify the behavior described above.
         """
-        self.assertFalse(EndsWith(".png").enforce("file", "photo.gif", _OWNER))
+        self.assertFalse(await EndsWith(".png").enforce("file", "photo.gif", _OWNER))
 
-    def testSuffixMatchIsCaseSensitive(self) -> None:
+    async def testSuffixMatchIsCaseSensitive(self) -> None:
         """Return False when only the casing differs from the suffix.
 
         Validates that comparison never folds the case.
@@ -294,9 +294,9 @@ class TestEndsWith(TestCase):
         None
             Assertions verify the behavior described above.
         """
-        self.assertFalse(EndsWith(".png").enforce("file", "photo.PNG", _OWNER))
+        self.assertFalse(await EndsWith(".png").enforce("file", "photo.PNG", _OWNER))
 
-    def testNonStringValuePasses(self) -> None:
+    async def testNonStringValuePasses(self) -> None:
         """Return True when the value is not a string.
 
         Validates that type reporting is delegated to the type layer.
@@ -306,7 +306,7 @@ class TestEndsWith(TestCase):
         None
             Assertions verify the behavior described above.
         """
-        self.assertTrue(EndsWith(".png").enforce("file", 5, _OWNER))
+        self.assertTrue(await EndsWith(".png").enforce("file", 5, _OWNER))
 
     def testEmptyConfigurationRaises(self) -> None:
         """Raise ValueError when no suffix is supplied.
@@ -324,7 +324,7 @@ class TestEndsWith(TestCase):
 
 class TestDoesntEndWith(TestCase):
 
-    def testForbiddenSuffixFails(self) -> None:
+    async def testForbiddenSuffixFails(self) -> None:
         """Return False when the value ends with a forbidden suffix.
 
         Validates that any configured suffix rejects the value.
@@ -335,10 +335,10 @@ class TestDoesntEndWith(TestCase):
             Assertions verify the behavior described above.
         """
         rule = DoesntEndWith(".exe", ".bat")
-        self.assertFalse(rule.enforce("file", "setup.exe", _OWNER))
-        self.assertFalse(rule.enforce("file", "setup.bat", _OWNER))
+        self.assertFalse(await rule.enforce("file", "setup.exe", _OWNER))
+        self.assertFalse(await rule.enforce("file", "setup.bat", _OWNER))
 
-    def testOtherSuffixPasses(self) -> None:
+    async def testOtherSuffixPasses(self) -> None:
         """Return True when the value ends with an unrelated suffix.
 
         Validates that only the configured suffixes are rejected.
@@ -348,9 +348,9 @@ class TestDoesntEndWith(TestCase):
         None
             Assertions verify the behavior described above.
         """
-        self.assertTrue(DoesntEndWith(".exe").enforce("file", "a.txt", _OWNER))
+        self.assertTrue(await DoesntEndWith(".exe").enforce("file", "a.txt", _OWNER))
 
-    def testNonStringValuePasses(self) -> None:
+    async def testNonStringValuePasses(self) -> None:
         """Return True when the value is not a string.
 
         Validates that type reporting is delegated to the type layer.
@@ -360,7 +360,7 @@ class TestDoesntEndWith(TestCase):
         None
             Assertions verify the behavior described above.
         """
-        self.assertTrue(DoesntEndWith(".exe").enforce("file", None, _OWNER))
+        self.assertTrue(await DoesntEndWith(".exe").enforce("file", None, _OWNER))
 
     def testEmptyConfigurationRaises(self) -> None:
         """Raise ValueError when no suffix is supplied.
@@ -377,7 +377,7 @@ class TestDoesntEndWith(TestCase):
 
 class TestStartsWith(TestCase):
 
-    def testMatchingPrefixPasses(self) -> None:
+    async def testMatchingPrefixPasses(self) -> None:
         """Return True when the value starts with one of the prefixes.
 
         Validates that any configured prefix satisfies the rule.
@@ -388,10 +388,10 @@ class TestStartsWith(TestCase):
             Assertions verify the behavior described above.
         """
         rule = StartsWith("https://", "http://")
-        self.assertTrue(rule.enforce("url", "https://a.test", _OWNER))
-        self.assertTrue(rule.enforce("url", "http://a.test", _OWNER))
+        self.assertTrue(await rule.enforce("url", "https://a.test", _OWNER))
+        self.assertTrue(await rule.enforce("url", "http://a.test", _OWNER))
 
-    def testMissingPrefixFails(self) -> None:
+    async def testMissingPrefixFails(self) -> None:
         """Return False when the value starts with none of the prefixes.
 
         Validates that unrelated schemes are rejected.
@@ -401,9 +401,9 @@ class TestStartsWith(TestCase):
         None
             Assertions verify the behavior described above.
         """
-        self.assertFalse(StartsWith("https://").enforce("url", "ftp://a", _OWNER))
+        self.assertFalse(await StartsWith("https://").enforce("url", "ftp://a", _OWNER))
 
-    def testNonStringValuePasses(self) -> None:
+    async def testNonStringValuePasses(self) -> None:
         """Return True when the value is not a string.
 
         Validates that type reporting is delegated to the type layer.
@@ -413,7 +413,7 @@ class TestStartsWith(TestCase):
         None
             Assertions verify the behavior described above.
         """
-        self.assertTrue(StartsWith("a").enforce("url", 1, _OWNER))
+        self.assertTrue(await StartsWith("a").enforce("url", 1, _OWNER))
 
     def testEmptyConfigurationRaises(self) -> None:
         """Raise ValueError when no prefix is supplied.
@@ -430,7 +430,7 @@ class TestStartsWith(TestCase):
 
 class TestDoesntStartWith(TestCase):
 
-    def testForbiddenPrefixFails(self) -> None:
+    async def testForbiddenPrefixFails(self) -> None:
         """Return False when the value starts with a forbidden prefix.
 
         Validates that any configured prefix rejects the value.
@@ -441,10 +441,10 @@ class TestDoesntStartWith(TestCase):
             Assertions verify the behavior described above.
         """
         rule = DoesntStartWith("tmp_", "draft_")
-        self.assertFalse(rule.enforce("name", "tmp_report", _OWNER))
-        self.assertFalse(rule.enforce("name", "draft_report", _OWNER))
+        self.assertFalse(await rule.enforce("name", "tmp_report", _OWNER))
+        self.assertFalse(await rule.enforce("name", "draft_report", _OWNER))
 
-    def testOtherPrefixPasses(self) -> None:
+    async def testOtherPrefixPasses(self) -> None:
         """Return True when the value starts with an unrelated prefix.
 
         Validates that only the configured prefixes are rejected.
@@ -454,9 +454,9 @@ class TestDoesntStartWith(TestCase):
         None
             Assertions verify the behavior described above.
         """
-        self.assertTrue(DoesntStartWith("tmp_").enforce("name", "report", _OWNER))
+        self.assertTrue(await DoesntStartWith("tmp_").enforce("name", "report", _OWNER))
 
-    def testNonStringValuePasses(self) -> None:
+    async def testNonStringValuePasses(self) -> None:
         """Return True when the value is not a string.
 
         Validates that type reporting is delegated to the type layer.
@@ -466,7 +466,7 @@ class TestDoesntStartWith(TestCase):
         None
             Assertions verify the behavior described above.
         """
-        self.assertTrue(DoesntStartWith("tmp_").enforce("name", 0, _OWNER))
+        self.assertTrue(await DoesntStartWith("tmp_").enforce("name", 0, _OWNER))
 
     def testEmptyConfigurationRaises(self) -> None:
         """Raise ValueError when no prefix is supplied.
@@ -483,7 +483,7 @@ class TestDoesntStartWith(TestCase):
 
 class TestIpAddress(TestCase):
 
-    def testDefaultsToVersionFour(self) -> None:
+    async def testDefaultsToVersionFour(self) -> None:
         """Return True only for IPv4 literals under the default configuration.
 
         Validates that IPv6 values are rejected unless requested.
@@ -494,10 +494,10 @@ class TestIpAddress(TestCase):
             Assertions verify the behavior described above.
         """
         rule = IpAddress()
-        self.assertTrue(rule.enforce("ip", "192.168.0.1", _OWNER))
-        self.assertFalse(rule.enforce("ip", "::1", _OWNER))
+        self.assertTrue(await rule.enforce("ip", "192.168.0.1", _OWNER))
+        self.assertFalse(await rule.enforce("ip", "::1", _OWNER))
 
-    def testVersionSixAcceptsIpv6Only(self) -> None:
+    async def testVersionSixAcceptsIpv6Only(self) -> None:
         """Return True only for IPv6 literals when version six is required.
 
         Validates that the version filter is applied after parsing.
@@ -508,10 +508,10 @@ class TestIpAddress(TestCase):
             Assertions verify the behavior described above.
         """
         rule = IpAddress(6)
-        self.assertTrue(rule.enforce("ip", "2001:db8::1", _OWNER))
-        self.assertFalse(rule.enforce("ip", "192.168.0.1", _OWNER))
+        self.assertTrue(await rule.enforce("ip", "2001:db8::1", _OWNER))
+        self.assertFalse(await rule.enforce("ip", "192.168.0.1", _OWNER))
 
-    def testVersionNoneAcceptsBothFamilies(self) -> None:
+    async def testVersionNoneAcceptsBothFamilies(self) -> None:
         """Return True for either family when no version is required.
 
         Validates that ``None`` disables the version filter.
@@ -522,10 +522,10 @@ class TestIpAddress(TestCase):
             Assertions verify the behavior described above.
         """
         rule = IpAddress(None)
-        self.assertTrue(rule.enforce("ip", "10.0.0.1", _OWNER))
-        self.assertTrue(rule.enforce("ip", "::1", _OWNER))
+        self.assertTrue(await rule.enforce("ip", "10.0.0.1", _OWNER))
+        self.assertTrue(await rule.enforce("ip", "::1", _OWNER))
 
-    def testInvalidLiteralFails(self) -> None:
+    async def testInvalidLiteralFails(self) -> None:
         """Return False when the value is not a parsable IP address.
 
         Validates that out-of-range octets and free text are rejected.
@@ -536,8 +536,8 @@ class TestIpAddress(TestCase):
             Assertions verify the behavior described above.
         """
         rule = IpAddress()
-        self.assertFalse(rule.enforce("ip", "999.1.1.1", _OWNER))
-        self.assertFalse(rule.enforce("ip", "not-an-ip", _OWNER))
+        self.assertFalse(await rule.enforce("ip", "999.1.1.1", _OWNER))
+        self.assertFalse(await rule.enforce("ip", "not-an-ip", _OWNER))
 
     def testUnsupportedVersionRaises(self) -> None:
         """Raise ValueError when the configured version is unknown.
@@ -552,7 +552,7 @@ class TestIpAddress(TestCase):
         with self.assertRaises(ValueError):
             IpAddress(5)
 
-    def testNonStringValuePasses(self) -> None:
+    async def testNonStringValuePasses(self) -> None:
         """Return True when the value is not a string.
 
         Validates that type reporting is delegated to the type layer.
@@ -562,11 +562,11 @@ class TestIpAddress(TestCase):
         None
             Assertions verify the behavior described above.
         """
-        self.assertTrue(IpAddress().enforce("ip", None, _OWNER))
+        self.assertTrue(await IpAddress().enforce("ip", None, _OWNER))
 
 class TestJson(TestCase):
 
-    def testValidDocumentsPass(self) -> None:
+    async def testValidDocumentsPass(self) -> None:
         """Return True for objects, arrays and scalars encoded as JSON.
 
         Validates that every JSON production is accepted.
@@ -578,9 +578,9 @@ class TestJson(TestCase):
         """
         rule = Json()
         for value in ('{"a": 1}', "[1, 2]", "123", '"text"', "null"):
-            self.assertTrue(rule.enforce("payload", value, _OWNER))
+            self.assertTrue(await rule.enforce("payload", value, _OWNER))
 
-    def testInvalidDocumentsFail(self) -> None:
+    async def testInvalidDocumentsFail(self) -> None:
         """Return False when the value is not parsable JSON.
 
         Validates that truncated and free-form text is rejected.
@@ -592,9 +592,9 @@ class TestJson(TestCase):
         """
         rule = Json()
         for value in ("{", "{'a': 1}", "", "undefined"):
-            self.assertFalse(rule.enforce("payload", value, _OWNER))
+            self.assertFalse(await rule.enforce("payload", value, _OWNER))
 
-    def testNonStringValuePasses(self) -> None:
+    async def testNonStringValuePasses(self) -> None:
         """Return True when the value is not a string.
 
         Validates that type reporting is delegated to the type layer.
@@ -604,11 +604,11 @@ class TestJson(TestCase):
         None
             Assertions verify the behavior described above.
         """
-        self.assertTrue(Json().enforce("payload", {"a": 1}, _OWNER))
+        self.assertTrue(await Json().enforce("payload", {"a": 1}, _OWNER))
 
 class TestLowercase(TestCase):
 
-    def testLowercaseContentPasses(self) -> None:
+    async def testLowercaseContentPasses(self) -> None:
         """Return True when the value carries no uppercase character.
 
         Validates that caseless characters such as digits still pass.
@@ -619,11 +619,11 @@ class TestLowercase(TestCase):
             Assertions verify the behavior described above.
         """
         rule = Lowercase()
-        self.assertTrue(rule.enforce("tag", "abc-123", _OWNER))
-        self.assertTrue(rule.enforce("tag", "123", _OWNER))
-        self.assertTrue(rule.enforce("tag", "ñandú", _OWNER))
+        self.assertTrue(await rule.enforce("tag", "abc-123", _OWNER))
+        self.assertTrue(await rule.enforce("tag", "123", _OWNER))
+        self.assertTrue(await rule.enforce("tag", "ñandú", _OWNER))
 
-    def testUppercaseContentFails(self) -> None:
+    async def testUppercaseContentFails(self) -> None:
         """Return False when the value carries an uppercase character.
 
         Validates that a single capital letter rejects the value.
@@ -633,9 +633,9 @@ class TestLowercase(TestCase):
         None
             Assertions verify the behavior described above.
         """
-        self.assertFalse(Lowercase().enforce("tag", "Abc", _OWNER))
+        self.assertFalse(await Lowercase().enforce("tag", "Abc", _OWNER))
 
-    def testNonStringValuePasses(self) -> None:
+    async def testNonStringValuePasses(self) -> None:
         """Return True when the value is not a string.
 
         Validates that type reporting is delegated to the type layer.
@@ -645,11 +645,11 @@ class TestLowercase(TestCase):
         None
             Assertions verify the behavior described above.
         """
-        self.assertTrue(Lowercase().enforce("tag", 1, _OWNER))
+        self.assertTrue(await Lowercase().enforce("tag", 1, _OWNER))
 
 class TestUppercase(TestCase):
 
-    def testUppercaseContentPasses(self) -> None:
+    async def testUppercaseContentPasses(self) -> None:
         """Return True when the value carries no lowercase character.
 
         Validates that caseless characters such as digits still pass.
@@ -660,10 +660,10 @@ class TestUppercase(TestCase):
             Assertions verify the behavior described above.
         """
         rule = Uppercase()
-        self.assertTrue(rule.enforce("code", "ABC-123", _OWNER))
-        self.assertTrue(rule.enforce("code", "123", _OWNER))
+        self.assertTrue(await rule.enforce("code", "ABC-123", _OWNER))
+        self.assertTrue(await rule.enforce("code", "123", _OWNER))
 
-    def testLowercaseContentFails(self) -> None:
+    async def testLowercaseContentFails(self) -> None:
         """Return False when the value carries a lowercase character.
 
         Validates that a single small letter rejects the value.
@@ -673,9 +673,9 @@ class TestUppercase(TestCase):
         None
             Assertions verify the behavior described above.
         """
-        self.assertFalse(Uppercase().enforce("code", "ABc", _OWNER))
+        self.assertFalse(await Uppercase().enforce("code", "ABc", _OWNER))
 
-    def testNonStringValuePasses(self) -> None:
+    async def testNonStringValuePasses(self) -> None:
         """Return True when the value is not a string.
 
         Validates that type reporting is delegated to the type layer.
@@ -685,11 +685,11 @@ class TestUppercase(TestCase):
         None
             Assertions verify the behavior described above.
         """
-        self.assertTrue(Uppercase().enforce("code", 1, _OWNER))
+        self.assertTrue(await Uppercase().enforce("code", 1, _OWNER))
 
 class TestMacAddress(TestCase):
 
-    def testEveryNotationPasses(self) -> None:
+    async def testEveryNotationPasses(self) -> None:
         """Return True for the colon, hyphen and dotted notations.
 
         Validates that all three canonical spellings are accepted.
@@ -701,9 +701,9 @@ class TestMacAddress(TestCase):
         """
         rule = MacAddress()
         for value in ("00:1B:44:11:3A:B7", "00-1b-44-11-3a-b7", "001b.4411.3ab7"):
-            self.assertTrue(rule.enforce("mac", value, _OWNER))
+            self.assertTrue(await rule.enforce("mac", value, _OWNER))
 
-    def testInvalidAddressFails(self) -> None:
+    async def testInvalidAddressFails(self) -> None:
         """Return False when the value is not a 48-bit hardware address.
 
         Validates that wrong lengths, separators and digits are rejected.
@@ -715,9 +715,9 @@ class TestMacAddress(TestCase):
         """
         rule = MacAddress()
         for value in ("00:1B:44:11:3A", "zz:1B:44:11:3A:B7", "001b44113ab7", ""):
-            self.assertFalse(rule.enforce("mac", value, _OWNER))
+            self.assertFalse(await rule.enforce("mac", value, _OWNER))
 
-    def testNonStringValuePasses(self) -> None:
+    async def testNonStringValuePasses(self) -> None:
         """Return True when the value is not a string.
 
         Validates that type reporting is delegated to the type layer.
@@ -727,11 +727,11 @@ class TestMacAddress(TestCase):
         None
             Assertions verify the behavior described above.
         """
-        self.assertTrue(MacAddress().enforce("mac", None, _OWNER))
+        self.assertTrue(await MacAddress().enforce("mac", None, _OWNER))
 
 class TestUuid(TestCase):
 
-    def testAnyVersionPassesByDefault(self) -> None:
+    async def testAnyVersionPassesByDefault(self) -> None:
         """Return True for every canonical identifier when no version is set.
 
         Validates that the nil identifier and all versions are accepted.
@@ -743,9 +743,9 @@ class TestUuid(TestCase):
         """
         rule = Uuid()
         for value in (_UUID_V4, _UUID_V1, _UUID_NIL):
-            self.assertTrue(rule.enforce("ident", value, _OWNER))
+            self.assertTrue(await rule.enforce("ident", value, _OWNER))
 
-    def testVersionFilterIsApplied(self) -> None:
+    async def testVersionFilterIsApplied(self) -> None:
         """Return True only when the identifier matches the required version.
 
         Validates that the version nibble is compared against the setting.
@@ -755,11 +755,11 @@ class TestUuid(TestCase):
         None
             Assertions verify the behavior described above.
         """
-        self.assertTrue(Uuid(4).enforce("ident", _UUID_V4, _OWNER))
-        self.assertFalse(Uuid(1).enforce("ident", _UUID_V4, _OWNER))
-        self.assertTrue(Uuid(1).enforce("ident", _UUID_V1, _OWNER))
+        self.assertTrue(await Uuid(4).enforce("ident", _UUID_V4, _OWNER))
+        self.assertFalse(await Uuid(1).enforce("ident", _UUID_V4, _OWNER))
+        self.assertTrue(await Uuid(1).enforce("ident", _UUID_V1, _OWNER))
 
-    def testVersionFilterRejectsNilIdentifier(self) -> None:
+    async def testVersionFilterRejectsNilIdentifier(self) -> None:
         """Return False for the nil identifier when a version is required.
 
         Validates that the variant nibble is also verified.
@@ -769,9 +769,9 @@ class TestUuid(TestCase):
         None
             Assertions verify the behavior described above.
         """
-        self.assertFalse(Uuid(4).enforce("ident", _UUID_NIL, _OWNER))
+        self.assertFalse(await Uuid(4).enforce("ident", _UUID_NIL, _OWNER))
 
-    def testMalformedIdentifierFails(self) -> None:
+    async def testMalformedIdentifierFails(self) -> None:
         """Return False when the value is not a canonical identifier.
 
         Validates that wrong lengths and characters are rejected.
@@ -783,7 +783,7 @@ class TestUuid(TestCase):
         """
         rule = Uuid()
         for value in ("not-a-uuid", _UUID_V4.replace("-", ""), ""):
-            self.assertFalse(rule.enforce("ident", value, _OWNER))
+            self.assertFalse(await rule.enforce("ident", value, _OWNER))
 
     def testUnsupportedVersionRaises(self) -> None:
         """Raise ValueError when the configured version is not in RFC 9562.
@@ -798,7 +798,7 @@ class TestUuid(TestCase):
         with self.assertRaises(ValueError):
             Uuid(2)
 
-    def testNonStringValuePasses(self) -> None:
+    async def testNonStringValuePasses(self) -> None:
         """Return True when the value is not a string.
 
         Validates that type reporting is delegated to the type layer.
@@ -808,11 +808,11 @@ class TestUuid(TestCase):
         None
             Assertions verify the behavior described above.
         """
-        self.assertTrue(Uuid().enforce("ident", None, _OWNER))
+        self.assertTrue(await Uuid().enforce("ident", None, _OWNER))
 
 class TestUlid(TestCase):
 
-    def testCanonicalIdentifierPasses(self) -> None:
+    async def testCanonicalIdentifierPasses(self) -> None:
         """Return True for a canonical identifier in either casing.
 
         Validates that the textual form is compared case-insensitively.
@@ -823,10 +823,10 @@ class TestUlid(TestCase):
             Assertions verify the behavior described above.
         """
         rule = Ulid()
-        self.assertTrue(rule.enforce("sortable", _ULID, _OWNER))
-        self.assertTrue(rule.enforce("sortable", _ULID.lower(), _OWNER))
+        self.assertTrue(await rule.enforce("sortable", _ULID, _OWNER))
+        self.assertTrue(await rule.enforce("sortable", _ULID.lower(), _OWNER))
 
-    def testWrongLengthFails(self) -> None:
+    async def testWrongLengthFails(self) -> None:
         """Return False when the value is not 26 characters long.
 
         Validates that truncated and padded values are rejected.
@@ -837,10 +837,10 @@ class TestUlid(TestCase):
             Assertions verify the behavior described above.
         """
         rule = Ulid()
-        self.assertFalse(rule.enforce("sortable", _ULID[:-1], _OWNER))
-        self.assertFalse(rule.enforce("sortable", _ULID + "A", _OWNER))
+        self.assertFalse(await rule.enforce("sortable", _ULID[:-1], _OWNER))
+        self.assertFalse(await rule.enforce("sortable", _ULID + "A", _OWNER))
 
-    def testExcludedAlphabetFails(self) -> None:
+    async def testExcludedAlphabetFails(self) -> None:
         """Return False when the value uses a character outside the alphabet.
 
         Validates that the ambiguous letters I, L, O and U are rejected.
@@ -850,9 +850,9 @@ class TestUlid(TestCase):
         None
             Assertions verify the behavior described above.
         """
-        self.assertFalse(Ulid().enforce("sortable", "I" + _ULID[1:], _OWNER))
+        self.assertFalse(await Ulid().enforce("sortable", "I" + _ULID[1:], _OWNER))
 
-    def testTimestampOverflowFails(self) -> None:
+    async def testTimestampOverflowFails(self) -> None:
         """Return False when the leading character overflows the timestamp.
 
         Validates that anything above ``7`` is rejected.
@@ -862,9 +862,9 @@ class TestUlid(TestCase):
         None
             Assertions verify the behavior described above.
         """
-        self.assertFalse(Ulid().enforce("sortable", "8" + _ULID[1:], _OWNER))
+        self.assertFalse(await Ulid().enforce("sortable", "8" + _ULID[1:], _OWNER))
 
-    def testNonStringValuePasses(self) -> None:
+    async def testNonStringValuePasses(self) -> None:
         """Return True when the value is not a string.
 
         Validates that type reporting is delegated to the type layer.
@@ -874,4 +874,4 @@ class TestUlid(TestCase):
         None
             Assertions verify the behavior described above.
         """
-        self.assertTrue(Ulid().enforce("sortable", None, _OWNER))
+        self.assertTrue(await Ulid().enforce("sortable", None, _OWNER))

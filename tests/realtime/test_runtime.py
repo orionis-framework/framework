@@ -1,6 +1,6 @@
 import asyncio
 from collections.abc import AsyncIterator  # noqa: TC003 - Hub annotation reflection.
-from typing import TYPE_CHECKING, cast
+from typing import TYPE_CHECKING, Annotated, cast
 import msgspec
 from orionis.auth.context.context import AuthenticationContext
 from orionis.auth.context.functions import bind_auth_context, current_auth_context
@@ -14,6 +14,8 @@ from orionis.realtime.decorators import remote
 from orionis.realtime.hub import Hub, HubContext
 from orionis.realtime.manager import ConnectionManager
 from orionis.realtime.runtime import HubRuntime
+from orionis.schemas.rule import Rule
+from orionis.schemas.schema import Schema
 from orionis.test import TestCase
 from tests.realtime.test_connection import _RealtimePeer
 
@@ -37,11 +39,37 @@ class _Marker:
         """
         self.label = ""
 
-class _Payload(msgspec.Struct, forbid_unknown_fields=True):
-    """Require structurally typed client data."""
+class _PositiveAmount(Rule):
+    """Reject nonpositive amounts after an asynchronous suspension."""
+
+    async def enforceAsync(
+        self, _field: str, value: object, _instance: object,
+    ) -> bool:
+        """
+        Apply a native asynchronous custom validation rule.
+
+        Parameters
+        ----------
+        _field : str
+            Name of the field being validated.
+        value : object
+            Converted amount supplied by the client.
+        _instance : object
+            Schema owning the amount.
+
+        Returns
+        -------
+        bool
+            Whether the amount is a positive integer.
+        """
+        await asyncio.sleep(0)
+        return isinstance(value, int) and value > 0
+
+class _Payload(Schema, forbid_unknown_fields=True):
+    """Require typed client data and an asynchronous custom rule."""
 
     name: str
-    amount: int
+    amount: Annotated[int, _PositiveAmount()]
 
 class _Probe:
     """Collect lifecycle evidence while coordinating concurrent invocations."""
@@ -760,16 +788,18 @@ class TestHubRuntime(TestCase):
         Returns
         -------
         None
-            Verify schema validation and safe internal/auth error classification.
+            Verify type/custom rules and safe internal/auth error classification.
         """
         peer, _manager, _task, _ready = await self.connect()
-        peer.input({
-            "type": "invoke", "id": "invalid", "target": "validated",
-            "args": [{"name": "test", "amount": "not-an-int"}],
-        })
-        self.assertEqual(
-            (await peer.nextEnvelope())["error"]["code"], "validation_error",
-        )
+        for amount in ("not-an-int", 0):
+            with self.subTest(amount=amount):
+                peer.input({
+                    "type": "invoke", "id": f"invalid-{amount}",
+                    "target": "validated", "args": [{"name": "test", "amount": amount}],
+                })
+                self.assertEqual(
+                    (await peer.nextEnvelope())["error"]["code"], "validation_error",
+                )
         for kind in ("internal", "unauthorized", "forbidden"):
             peer.input({
                 "type": "invoke", "id": kind, "target": "fail", "args": [kind],

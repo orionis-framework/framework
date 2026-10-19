@@ -1,3 +1,6 @@
+import asyncio
+from inspect import iscoroutinefunction
+from unittest.mock import patch
 from orionis.schemas.contracts.constraint import IRule
 from orionis.schemas.entities.failure import ValidationFailure
 from orionis.schemas.rule import Rule
@@ -125,7 +128,32 @@ class _DelegatingRule(Rule):
         """
         return super().enforce(field, value, instance)
 
+class _NativeAsyncRule(Rule):
+    """Require awaiting native enforcement instead of calling the sync fallback."""
+
+    __code__ = "native_async"
+    __message__ = "Value was rejected asynchronously."
+
+    async def enforceAsync(
+        self,
+        _field: str,
+        value: object,
+        _instance: object,
+    ) -> bool:
+        """Yield to the caller's loop before evaluating the value."""
+        await asyncio.sleep(0)
+        return value == "allowed"
+
 class TestRuleContract(TestCase):
+
+    def testValidateIsAlwaysAsync(self) -> None:
+        """Require asynchronous validation in the interface and implementation."""
+        self.assertTrue(iscoroutinefunction(IRule.validate))
+        self.assertTrue(iscoroutinefunction(Rule.validate))
+
+    def testRuleHasNoAlternateEntryPoint(self) -> None:
+        """Keep custom rules on the same single validation API as schemas."""
+        self.assertFalse(hasattr(Rule, "validateAsync"))
 
     def testRuleImplementsTheRuleInterface(self) -> None:
         """Confirm Rule implements the IRule contract.
@@ -171,7 +199,36 @@ class TestRuleEnforce(TestCase):
 
 class TestRuleValidate(TestCase):
 
-    def testValidateReturnsNoneOnSuccess(self) -> None:
+    async def testNativeAsyncEnforcementIsAwaited(self) -> None:
+        """Use native enforcement for both accepted and rejected values."""
+        rule = _NativeAsyncRule(message="Custom async error.")
+        self.assertIsNone(await rule.validate("field", "allowed", object()))
+        failure = await rule.validate("field", "rejected", object())
+        self.assertIsInstance(failure, ValidationFailure)
+        self.assertEqual(failure.field, "field")
+        self.assertEqual(failure.rule, "native_async")
+        self.assertEqual(failure.message, "Custom async error.")
+
+    async def testSynchronousRulesDoNotUseWorkerThreads(self) -> None:
+        """Keep inexpensive synchronous predicates on the caller's thread."""
+        with patch("orionis.schemas.rule.asyncio.to_thread") as offload:
+            self.assertIsNone(
+                await _AlwaysValidRule().validate("field", "value", object()),
+            )
+        offload.assert_not_called()
+
+    async def testNativeAsyncErrorsPropagate(self) -> None:
+        """Do not turn an unexpected native I/O failure into validation success."""
+        message = "Native service failed."
+        with (
+            patch.object(
+                _NativeAsyncRule, "enforceAsync", side_effect=RuntimeError(message),
+            ),
+            self.assertRaisesRegex(RuntimeError, message),
+        ):
+            await _NativeAsyncRule().validate("field", "value", object())
+
+    async def testValidateReturnsNoneOnSuccess(self) -> None:
         """Return None when the rule accepts the value.
 
         Validates that a passing rule produces no failure entity.
@@ -182,9 +239,9 @@ class TestRuleValidate(TestCase):
             Assertions verify the behavior described above.
         """
         rule = _AlwaysValidRule()
-        self.assertIsNone(rule.validate("field", "any_value", object()))
+        self.assertIsNone(await rule.validate("field", "any_value", object()))
 
-    def testValidateReturnsFailureOnRejection(self) -> None:
+    async def testValidateReturnsFailureOnRejection(self) -> None:
         """Return a ValidationFailure when the rule rejects the value.
 
         Validates the failure field and rule code reported to the caller.
@@ -194,12 +251,12 @@ class TestRuleValidate(TestCase):
         None
             Assertions verify the behavior described above.
         """
-        result = _AlwaysInvalidRule().validate("age", 0, object())
+        result = await _AlwaysInvalidRule().validate("age", 0, object())
         self.assertIsInstance(result, ValidationFailure)
         self.assertEqual(result.field, "age")
         self.assertEqual(result.rule, "always_invalid")
 
-    def testValidateUsesClassMessageByDefault(self) -> None:
+    async def testValidateUsesClassMessageByDefault(self) -> None:
         """Fall back to the class-level message when none is supplied.
 
         Validates the message resolution performed at construction time.
@@ -209,10 +266,10 @@ class TestRuleValidate(TestCase):
         None
             Assertions verify the behavior described above.
         """
-        result = _AlwaysInvalidRule().validate("field", "value", object())
+        result = await _AlwaysInvalidRule().validate("field", "value", object())
         self.assertEqual(result.message, "Value is always invalid.")
 
-    def testValidateUsesConstructorMessageWhenProvided(self) -> None:
+    async def testValidateUsesConstructorMessageWhenProvided(self) -> None:
         """Prefer the constructor message over the class-level message.
 
         Validates that per-instance overrides reach the failure entity.
@@ -223,10 +280,10 @@ class TestRuleValidate(TestCase):
             Assertions verify the behavior described above.
         """
         rule = _AlwaysInvalidRule(message="Custom error.")
-        result = rule.validate("field", "value", object())
+        result = await rule.validate("field", "value", object())
         self.assertEqual(result.message, "Custom error.")
 
-    def testMessageDefaultsToNoneWithoutDeclaration(self) -> None:
+    async def testMessageDefaultsToNoneWithoutDeclaration(self) -> None:
         """Report a None message when the class declares no message.
 
         Validates that missing class attributes do not break resolution.
@@ -236,10 +293,10 @@ class TestRuleValidate(TestCase):
         None
             Assertions verify the behavior described above.
         """
-        result = _BareRule().validate("field", "value", object())
+        result = await _BareRule().validate("field", "value", object())
         self.assertIsNone(result.message)
 
-    def testCodeDefaultsToLowercasedClassName(self) -> None:
+    async def testCodeDefaultsToLowercasedClassName(self) -> None:
         """Derive the rule code from the class name when undeclared.
 
         Validates the fallback applied when ``__code__`` is missing.
@@ -249,5 +306,5 @@ class TestRuleValidate(TestCase):
         None
             Assertions verify the behavior described above.
         """
-        result = _BareRule().validate("field", "value", object())
+        result = await _BareRule().validate("field", "value", object())
         self.assertEqual(result.rule, "_barerule")

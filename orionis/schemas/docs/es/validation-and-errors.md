@@ -2,7 +2,7 @@
 
 ## Integración con Orionis
 
-El contenedor detecta parámetros `Schema`, selecciona entrada y llama `validateAsync`. El kernel HTTP renderiza `ValidationException`. Realtime compila schemas para remotos y MCP los usa para entradas, JSON Schema de salida y errores de parámetros.
+El contenedor detecta parámetros `Schema`, selecciona entrada y espera `validate`. El kernel HTTP renderiza `ValidationException`. Realtime compila schemas para remotos y MCP espera la validación de entradas y salidas estructuradas, incluidos los resultados en streaming.
 
 La metadata documental alimenta compiladores JSON Schema/OpenAPI sin formar parte de la validación de instancia.
 
@@ -20,11 +20,13 @@ La metadata documental alimenta compiladores JSON Schema/OpenAPI sin formar part
 
 Metadata estructural y planes se compilan al crear la clase y cachean por tipo. La conversión exitosa usa una llamada optimizada `msgspec.convert`; inspección detallada se reserva para errores.
 
-Instancias y planes son compactos y no retienen estado global. Reglas async preservan loop/transacción. Evite reglas síncronas con I/O en event loop y use `validateAsync`.
+Instancias y planes son compactos y no retienen estado global. Las reglas async nativas preservan loop/transacción. Espere siempre `validate`, incluso en schemas sin reglas de I/O. Los predicados puros breves se ejecutan directamente; implemente el I/O nativo en `enforceAsync` para no bloquear el loop.
 
 ## Compatibilidad
 
 Los schemas son `msgspec.Struct` y pueden codificarse con codecs compatibles. La declaración pública depende de anotaciones diferidas Python 3.14. Use metadata Orionis en vez de construir `msgspec.Meta` para conservar mensajes/documentación consistentes.
+
+La validación ahora solo ofrece la entrada asíncrona `validate`. Migre cada llamada a `await Validator.validate(...)`; ya no se admiten llamadas síncronas ni el método alternativo anterior. Las reglas personalizadas también exponen `validate` asíncrono y la recolección de fallos espera las reglas tras errores de conversión.
 
 ## Validar una orden con registros anidados
 
@@ -32,7 +34,7 @@ El siguiente programa es independiente. Declara el formato de entrada, transform
 
 La validación de conversión y constraints ocurre antes de las reglas de aplicación. Una conversión fallida recoge errores de esa fase; no garantiza que también se hayan ejecutado todas las reglas de negocio. En la fase de reglas sí se recorren los valores convertidos y sus objetos anidados. No bases la lógica de cliente en el número exacto de fallos de varias fases a la vez.
 
-Los mensajes se agrupan en `exception.errors`, la lista completa está en `exception.failures` y `exception.error()` ofrece el cuerpo serializable. Devuelve campos y mensajes permitidos al cliente; evita incluir contraseñas o el payload íntegro en logs. El flujo HTTP y el contenedor eligen la entrada y esperan `validateAsync`; este programa valida explícitamente para ser reproducible fuera de un servidor.
+Los mensajes se agrupan en `exception.errors`, la lista completa está en `exception.failures` y `exception.error()` ofrece el cuerpo serializable. Devuelve campos y mensajes permitidos al cliente; evita incluir contraseñas o el payload íntegro en logs. El flujo HTTP y el contenedor eligen la entrada y esperan `validate`; este programa valida explícitamente para ser reproducible fuera de un servidor.
 
 ```python
 import asyncio
@@ -53,14 +55,14 @@ class Order(Schema, forbid_unknown_fields=True):
     note: str | None = None
 
 async def main() -> None:
-    order = await Validator.validateAsync({
+    order = await Validator.validate({
         "email": "ada@example.com",
         "lines": [{"sku": "BK-1", "quantity": 2}],
     }, Order)
     assert order.lines[0].quantity == 2
     assert order.note is None
     try:
-        await Validator.validateAsync({
+        await Validator.validate({
             "email": "ada@example.com",
             "lines": [{"sku": "BK-1", "quantity": 0}],
         }, Order)

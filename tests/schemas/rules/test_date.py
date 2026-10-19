@@ -18,7 +18,7 @@ _LATER = datetime(2024, 12, 31, 0, 0, 0)
 
 class TestAfter(TestCase):
 
-    def testValueAfterLiteralReferencePasses(self) -> None:
+    async def testValueAfterLiteralReferencePasses(self) -> None:
         """Return True when the value comes after the referenced date.
 
         Validates the comparison against a parsable date string.
@@ -29,10 +29,10 @@ class TestAfter(TestCase):
             Assertions verify the behavior described above.
         """
         rule = After("2024-01-01")
-        self.assertTrue(rule.enforce("born", _MOMENT, _OWNER))
-        self.assertFalse(rule.enforce("born", _EARLIER, _OWNER))
+        self.assertTrue(await rule.enforce("born", _MOMENT, _OWNER))
+        self.assertFalse(await rule.enforce("born", _EARLIER, _OWNER))
 
-    def testEqualMomentFails(self) -> None:
+    async def testEqualMomentFails(self) -> None:
         """Return False when the value equals the referenced moment.
 
         Validates that the comparison is strict.
@@ -42,9 +42,9 @@ class TestAfter(TestCase):
         None
             Assertions verify the behavior described above.
         """
-        self.assertFalse(After(_MOMENT).enforce("born", _MOMENT, _OWNER))
+        self.assertFalse(await After(_MOMENT).enforce("born", _MOMENT, _OWNER))
 
-    def testSiblingFieldIsResolved(self) -> None:
+    async def testSiblingFieldIsResolved(self) -> None:
         """Resolve a string reference as a sibling field when one exists.
 
         Validates the cross-field comparison path.
@@ -56,10 +56,10 @@ class TestAfter(TestCase):
         """
         rule = After("start")
         instance = SimpleNamespace(start=_MOMENT)
-        self.assertTrue(rule.enforce("end", _LATER, instance))
-        self.assertFalse(rule.enforce("end", _EARLIER, instance))
+        self.assertTrue(await rule.enforce("end", _LATER, instance))
+        self.assertFalse(await rule.enforce("end", _EARLIER, instance))
 
-    def testDefaultReferenceIsTheCurrentMoment(self) -> None:
+    async def testDefaultReferenceIsTheCurrentMoment(self) -> None:
         """Compare against the current moment when no reference is supplied.
 
         Validates that future dates pass and past dates fail.
@@ -70,10 +70,12 @@ class TestAfter(TestCase):
             Assertions verify the behavior described above.
         """
         rule = After()
-        self.assertTrue(rule.enforce("when", DateTime.now().add(days=1), _OWNER))
-        self.assertFalse(rule.enforce("when", DateTime.now().subtract(days=1), _OWNER))
+        self.assertTrue(await rule.enforce("when", DateTime.now().add(days=1), _OWNER))
+        self.assertFalse(
+            await rule.enforce("when", DateTime.now().subtract(days=1), _OWNER),
+        )
 
-    def testRelativeKeywordsAreAccepted(self) -> None:
+    async def testRelativeKeywordsAreAccepted(self) -> None:
         """Accept the relative keywords understood by the temporal helper.
 
         Validates that ``yesterday`` resolves to a concrete moment.
@@ -84,9 +86,9 @@ class TestAfter(TestCase):
             Assertions verify the behavior described above.
         """
         rule = After("yesterday")
-        self.assertTrue(rule.enforce("when", DateTime.now(), _OWNER))
+        self.assertTrue(await rule.enforce("when", DateTime.now(), _OWNER))
 
-    def testStringValueIsParsed(self) -> None:
+    async def testStringValueIsParsed(self) -> None:
         """Parse a textual value before comparing it with the reference.
 
         Validates that ISO strings are supported as field values.
@@ -97,10 +99,10 @@ class TestAfter(TestCase):
             Assertions verify the behavior described above.
         """
         rule = After("2024-01-01")
-        self.assertTrue(rule.enforce("born", "2024-06-15", _OWNER))
-        self.assertFalse(rule.enforce("born", "2023-06-15", _OWNER))
+        self.assertTrue(await rule.enforce("born", "2024-06-15", _OWNER))
+        self.assertFalse(await rule.enforce("born", "2023-06-15", _OWNER))
 
-    def testDateValueIsSupported(self) -> None:
+    async def testDateValueIsSupported(self) -> None:
         """Accept a plain ``date`` as the value under validation.
 
         Validates the promotion of dates to the configured timezone.
@@ -111,9 +113,9 @@ class TestAfter(TestCase):
             Assertions verify the behavior described above.
         """
         rule = After("2024-01-01")
-        self.assertTrue(rule.enforce("born", date(2024, 6, 15), _OWNER))
+        self.assertTrue(await rule.enforce("born", date(2024, 6, 15), _OWNER))
 
-    def testUnresolvableReferenceFails(self) -> None:
+    async def testUnresolvableReferenceFails(self) -> None:
         """Return False when the reference cannot be resolved into a moment.
 
         Validates that an unknown field name never passes silently.
@@ -123,9 +125,9 @@ class TestAfter(TestCase):
         None
             Assertions verify the behavior described above.
         """
-        self.assertFalse(After("missing").enforce("born", _MOMENT, _OWNER))
+        self.assertFalse(await After("missing").enforce("born", _MOMENT, _OWNER))
 
-    def testNonDateValuePasses(self) -> None:
+    async def testNonDateValuePasses(self) -> None:
         """Return True when the value is not a moment at all.
 
         Validates that type reporting is delegated to the type layer.
@@ -136,12 +138,12 @@ class TestAfter(TestCase):
             Assertions verify the behavior described above.
         """
         rule = After("2024-01-01")
-        self.assertTrue(rule.enforce("born", None, _OWNER))
-        self.assertTrue(rule.enforce("born", 123, _OWNER))
+        self.assertTrue(await rule.enforce("born", None, _OWNER))
+        self.assertTrue(await rule.enforce("born", 123, _OWNER))
 
 class TestAfterOrEqual(TestCase):
 
-    def testEqualMomentPasses(self) -> None:
+    async def testEqualMomentPasses(self) -> None:
         """Return True when the value equals the referenced moment.
 
         Validates that the bound is inclusive.
@@ -151,9 +153,9 @@ class TestAfterOrEqual(TestCase):
         None
             Assertions verify the behavior described above.
         """
-        self.assertTrue(AfterOrEqual(_MOMENT).enforce("born", _MOMENT, _OWNER))
+        self.assertTrue(await AfterOrEqual(_MOMENT).enforce("born", _MOMENT, _OWNER))
 
-    def testLaterMomentPasses(self) -> None:
+    async def testLaterMomentPasses(self) -> None:
         """Return True when the value comes after the referenced moment.
 
         Validates the ordinary success path.
@@ -163,9 +165,9 @@ class TestAfterOrEqual(TestCase):
         None
             Assertions verify the behavior described above.
         """
-        self.assertTrue(AfterOrEqual(_MOMENT).enforce("born", _LATER, _OWNER))
+        self.assertTrue(await AfterOrEqual(_MOMENT).enforce("born", _LATER, _OWNER))
 
-    def testEarlierMomentFails(self) -> None:
+    async def testEarlierMomentFails(self) -> None:
         """Return False when the value comes before the referenced moment.
 
         Validates that earlier dates are rejected.
@@ -175,9 +177,9 @@ class TestAfterOrEqual(TestCase):
         None
             Assertions verify the behavior described above.
         """
-        self.assertFalse(AfterOrEqual(_MOMENT).enforce("born", _EARLIER, _OWNER))
+        self.assertFalse(await AfterOrEqual(_MOMENT).enforce("born", _EARLIER, _OWNER))
 
-    def testUnresolvableReferenceFails(self) -> None:
+    async def testUnresolvableReferenceFails(self) -> None:
         """Return False when the reference cannot be resolved into a moment.
 
         Validates that an unknown field name never passes silently.
@@ -187,11 +189,11 @@ class TestAfterOrEqual(TestCase):
         None
             Assertions verify the behavior described above.
         """
-        self.assertFalse(AfterOrEqual("missing").enforce("born", _MOMENT, _OWNER))
+        self.assertFalse(await AfterOrEqual("missing").enforce("born", _MOMENT, _OWNER))
 
 class TestBefore(TestCase):
 
-    def testEarlierMomentPasses(self) -> None:
+    async def testEarlierMomentPasses(self) -> None:
         """Return True when the value comes before the referenced moment.
 
         Validates the ordinary success path.
@@ -201,9 +203,9 @@ class TestBefore(TestCase):
         None
             Assertions verify the behavior described above.
         """
-        self.assertTrue(Before(_MOMENT).enforce("born", _EARLIER, _OWNER))
+        self.assertTrue(await Before(_MOMENT).enforce("born", _EARLIER, _OWNER))
 
-    def testEqualMomentFails(self) -> None:
+    async def testEqualMomentFails(self) -> None:
         """Return False when the value equals the referenced moment.
 
         Validates that the comparison is strict.
@@ -213,9 +215,9 @@ class TestBefore(TestCase):
         None
             Assertions verify the behavior described above.
         """
-        self.assertFalse(Before(_MOMENT).enforce("born", _MOMENT, _OWNER))
+        self.assertFalse(await Before(_MOMENT).enforce("born", _MOMENT, _OWNER))
 
-    def testSiblingFieldIsResolved(self) -> None:
+    async def testSiblingFieldIsResolved(self) -> None:
         """Resolve a string reference as a sibling field when one exists.
 
         Validates the cross-field comparison path.
@@ -227,10 +229,10 @@ class TestBefore(TestCase):
         """
         rule = Before("end")
         instance = SimpleNamespace(end=_MOMENT)
-        self.assertTrue(rule.enforce("start", _EARLIER, instance))
-        self.assertFalse(rule.enforce("start", _LATER, instance))
+        self.assertTrue(await rule.enforce("start", _EARLIER, instance))
+        self.assertFalse(await rule.enforce("start", _LATER, instance))
 
-    def testDefaultReferenceIsTheCurrentMoment(self) -> None:
+    async def testDefaultReferenceIsTheCurrentMoment(self) -> None:
         """Compare against the current moment when no reference is supplied.
 
         Validates that past dates pass and future dates fail.
@@ -241,10 +243,12 @@ class TestBefore(TestCase):
             Assertions verify the behavior described above.
         """
         rule = Before()
-        self.assertTrue(rule.enforce("when", DateTime.now().subtract(days=1), _OWNER))
-        self.assertFalse(rule.enforce("when", DateTime.now().add(days=1), _OWNER))
+        self.assertTrue(
+            await rule.enforce("when", DateTime.now().subtract(days=1), _OWNER),
+        )
+        self.assertFalse(await rule.enforce("when", DateTime.now().add(days=1), _OWNER))
 
-    def testNonDateValuePasses(self) -> None:
+    async def testNonDateValuePasses(self) -> None:
         """Return True when the value is not a moment at all.
 
         Validates that type reporting is delegated to the type layer.
@@ -254,11 +258,11 @@ class TestBefore(TestCase):
         None
             Assertions verify the behavior described above.
         """
-        self.assertTrue(Before(_MOMENT).enforce("born", None, _OWNER))
+        self.assertTrue(await Before(_MOMENT).enforce("born", None, _OWNER))
 
 class TestBeforeOrEqual(TestCase):
 
-    def testEqualMomentPasses(self) -> None:
+    async def testEqualMomentPasses(self) -> None:
         """Return True when the value equals the referenced moment.
 
         Validates that the bound is inclusive.
@@ -268,9 +272,9 @@ class TestBeforeOrEqual(TestCase):
         None
             Assertions verify the behavior described above.
         """
-        self.assertTrue(BeforeOrEqual(_MOMENT).enforce("born", _MOMENT, _OWNER))
+        self.assertTrue(await BeforeOrEqual(_MOMENT).enforce("born", _MOMENT, _OWNER))
 
-    def testEarlierMomentPasses(self) -> None:
+    async def testEarlierMomentPasses(self) -> None:
         """Return True when the value comes before the referenced moment.
 
         Validates the ordinary success path.
@@ -280,9 +284,9 @@ class TestBeforeOrEqual(TestCase):
         None
             Assertions verify the behavior described above.
         """
-        self.assertTrue(BeforeOrEqual(_MOMENT).enforce("born", _EARLIER, _OWNER))
+        self.assertTrue(await BeforeOrEqual(_MOMENT).enforce("born", _EARLIER, _OWNER))
 
-    def testLaterMomentFails(self) -> None:
+    async def testLaterMomentFails(self) -> None:
         """Return False when the value comes after the referenced moment.
 
         Validates that later dates are rejected.
@@ -292,9 +296,9 @@ class TestBeforeOrEqual(TestCase):
         None
             Assertions verify the behavior described above.
         """
-        self.assertFalse(BeforeOrEqual(_MOMENT).enforce("born", _LATER, _OWNER))
+        self.assertFalse(await BeforeOrEqual(_MOMENT).enforce("born", _LATER, _OWNER))
 
-    def testUnresolvableReferenceFails(self) -> None:
+    async def testUnresolvableReferenceFails(self) -> None:
         """Return False when the reference cannot be resolved into a moment.
 
         Validates that an unknown field name never passes silently.
@@ -304,11 +308,13 @@ class TestBeforeOrEqual(TestCase):
         None
             Assertions verify the behavior described above.
         """
-        self.assertFalse(BeforeOrEqual("missing").enforce("born", _MOMENT, _OWNER))
+        self.assertFalse(
+            await BeforeOrEqual("missing").enforce("born", _MOMENT, _OWNER),
+        )
 
 class TestDateFormat(TestCase):
 
-    def testMatchingFormatPasses(self) -> None:
+    async def testMatchingFormatPasses(self) -> None:
         """Return True when the value matches the configured format.
 
         Validates the single-format success path.
@@ -318,9 +324,11 @@ class TestDateFormat(TestCase):
         None
             Assertions verify the behavior described above.
         """
-        self.assertTrue(DateFormat("YYYY-MM-DD").enforce("born", "2024-01-31", _OWNER))
+        self.assertTrue(
+            await DateFormat("YYYY-MM-DD").enforce("born", "2024-01-31", _OWNER),
+        )
 
-    def testAnyConfiguredFormatIsAccepted(self) -> None:
+    async def testAnyConfiguredFormatIsAccepted(self) -> None:
         """Return True when the value matches one of several formats.
 
         Validates that every configured format is attempted.
@@ -331,10 +339,10 @@ class TestDateFormat(TestCase):
             Assertions verify the behavior described above.
         """
         rule = DateFormat("YYYY-MM-DD", "DD/MM/YYYY")
-        self.assertTrue(rule.enforce("born", "2024-01-31", _OWNER))
-        self.assertTrue(rule.enforce("born", "31/01/2024", _OWNER))
+        self.assertTrue(await rule.enforce("born", "2024-01-31", _OWNER))
+        self.assertTrue(await rule.enforce("born", "31/01/2024", _OWNER))
 
-    def testMismatchedFormatFails(self) -> None:
+    async def testMismatchedFormatFails(self) -> None:
         """Return False when the value matches none of the formats.
 
         Validates that a different layout is rejected.
@@ -345,10 +353,10 @@ class TestDateFormat(TestCase):
             Assertions verify the behavior described above.
         """
         rule = DateFormat("YYYY-MM-DD")
-        self.assertFalse(rule.enforce("born", "31/01/2024", _OWNER))
-        self.assertFalse(rule.enforce("born", "not-a-date", _OWNER))
+        self.assertFalse(await rule.enforce("born", "31/01/2024", _OWNER))
+        self.assertFalse(await rule.enforce("born", "not-a-date", _OWNER))
 
-    def testNonStringValuePasses(self) -> None:
+    async def testNonStringValuePasses(self) -> None:
         """Return True when the value is not a string.
 
         Validates that type reporting is delegated to the type layer.
@@ -359,7 +367,7 @@ class TestDateFormat(TestCase):
             Assertions verify the behavior described above.
         """
         rule = DateFormat("YYYY-MM-DD")
-        self.assertTrue(rule.enforce("born", _MOMENT + timedelta(days=1), _OWNER))
+        self.assertTrue(await rule.enforce("born", _MOMENT + timedelta(days=1), _OWNER))
 
     def testEmptyConfigurationRaises(self) -> None:
         """Raise ValueError when no format is supplied.

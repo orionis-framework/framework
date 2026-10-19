@@ -200,6 +200,16 @@
         
 
         
+            <div class="itemName"><code><a href="orionis.schemas.failure_collector.FailureCollector.html#_blameCollection" class="internal-link" title="orionis.schemas.failure_collector.FailureCollector._blameCollection">_blame<wbr></wbr>Collection</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
             <div class="itemName"><code><a href="orionis.schemas.failure_collector.FailureCollector.html#_collect" class="internal-link" title="orionis.schemas.failure_collector.FailureCollector._collect">_collect</a></code>
             </div>
         
@@ -211,6 +221,16 @@
 
         
             <div class="itemName"><code><a href="orionis.schemas.failure_collector.FailureCollector.html#_enforce" class="internal-link" title="orionis.schemas.failure_collector.FailureCollector._enforce">_enforce</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.schemas.failure_collector.FailureCollector.html#_matchingType" class="internal-link" title="orionis.schemas.failure_collector.FailureCollector._matchingType">_matching<wbr></wbr>Type</a></code>
             </div>
         
 
@@ -766,6 +786,16 @@
 
         
             <div class="itemName"><code><a href="orionis.schemas.exception_parser.html#_PATH_MARKER_LEN" class="internal-link" title="orionis.schemas.exception_parser._PATH_MARKER_LEN">_PATH<wbr></wbr>_MARKER<wbr></wbr>_LEN</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.schemas.exception_parser.html#_PATH_PART_RE" class="internal-link" title="orionis.schemas.exception_parser._PATH_PART_RE">_PATH<wbr></wbr>_PART<wbr></wbr>_RE</a></code>
             </div>
         
 
@@ -2186,6 +2216,16 @@
         
 
         
+            <div class="itemName"><code><a href="orionis.schemas.rules_executor.html#_collection_item_type" class="internal-link" title="orionis.schemas.rules_executor._collection_item_type">_collection<wbr></wbr>_item<wbr></wbr>_type</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
             <div class="itemName"><code><a href="orionis.schemas.rules_executor.html#_field_rules" class="internal-link" title="orionis.schemas.rules_executor._field_rules">_field<wbr></wbr>_rules</a></code>
             </div>
         
@@ -2563,7 +2603,7 @@
         </div>
 
         <div class="extrasDocstring">
-          <a href="https://github.com/orionis-framework/framework/tree/bd628468b11e1f90093178da422364984111d868/orionis/schemas/failure_collector.py" class="sourceLink">(source)</a>
+          <a href="https://github.com/orionis-framework/framework/tree/e2b6f2ca96f1ff7bc566601c50beda9c3224b87b/orionis/schemas/failure_collector.py" class="sourceLink">(source)</a>
         </div>
 
         <div class="moduleDocstring">
@@ -2578,7 +2618,7 @@
     
     <td>Class</td>
     <td><code><a href="orionis.schemas.failure_collector.FailureCollector.html" class="internal-link" title="orionis.schemas.failure_collector.FailureCollector"><wbr></wbr>Failure<wbr></wbr>Collector</a></code></td>
-    <td><span class="rst-undocumented">No class docstring; 0/1 class variable, 4/4 class methods documented</span></td>
+    <td><span class="rst-undocumented">No class docstring; 0/1 class variable, 6/6 class methods documented</span></td>
   </tr><tr class="function">
     
     <td>Function</td>
@@ -2615,7 +2655,7 @@
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">_field_plan</span><span class="function-signature">(<span class="rst-sig-param">schema: <code><a href="https://docs.python.org/3/builtins/functions.html#type" class="intersphinx-link">type</a></code></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" class="intersphinx-link">tuple</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/bd628468b11e1f90093178da422364984111d868/orionis/schemas/failure_collector.py#L58">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/e2b6f2ca96f1ff7bc566601c50beda9c3224b87b/orionis/schemas/failure_collector.py#L67">
       
       (source)
     </a>
@@ -2627,7 +2667,7 @@
   </div>
   <div class="docstring functionBody">
     
-    <div><p>Return a cached per-field plan used to convert a payload field by field.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">schema:</span><code><a href="https://docs.python.org/3/builtins/functions.html#type" class="intersphinx-link">type</a></code></td><td class="fieldArgDesc">Schema class whose msgspec fields are inspected.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" class="intersphinx-link">tuple</a></code></td><td class="fieldArgDesc">Entries of <tt class="rst-docutils rst-literal">(encode_name, field_type, required, nested_schema,
+    <div><p>Return a cached per-field plan used to convert a payload field by field.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">schema:</span><code><a href="https://docs.python.org/3/builtins/functions.html#type" class="intersphinx-link">type</a></code></td><td class="fieldArgDesc">Schema class whose msgspec fields are inspected.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" class="intersphinx-link">tuple</a></code></td><td class="fieldArgDesc">Entries of <tt class="rst-docutils rst-literal">(encode_name, field_type, required, nested_annotation,
 rules)</tt>, where <tt class="rst-docutils rst-literal">rules</tt> holds the bound custom rule validators
 declared for the field.</td></tr></table></div>
   </div>
@@ -2643,8 +2683,8 @@ declared for the field.</td></tr></table></div>
   <div class="functionHeader">
     
     
-    <span class="py-keyword">def</span>&#160;<span class="py-defname">_nested_schema</span><span class="function-signature">(<span class="rst-sig-param">tp: <code><a href="https://docs.python.org/3/builtins/functions.html#object" class="intersphinx-link">object</a></code></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/functions.html#type" class="intersphinx-link">type</a> | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/bd628468b11e1f90093178da422364984111d868/orionis/schemas/failure_collector.py#L26">
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">_nested_schema</span><span class="function-signature">(<span class="rst-sig-param">tp: <code><a href="https://docs.python.org/3/builtins/functions.html#object" class="intersphinx-link">object</a></code></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/functions.html#type" class="intersphinx-link">type</a>[<wbr></wbr>msgspec.Struct] | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code>:</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/e2b6f2ca96f1ff7bc566601c50beda9c3224b87b/orionis/schemas/failure_collector.py#L31">
       
       (source)
     </a>
@@ -2656,7 +2696,7 @@ declared for the field.</td></tr></table></div>
   </div>
   <div class="docstring functionBody">
     
-    <div><p>Return the Orionis schema wrapped by a field annotation, if any.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">tp:</span><code><a href="https://docs.python.org/3/builtins/functions.html#object" class="intersphinx-link">object</a></code></td><td class="fieldArgDesc">Field annotation, possibly wrapped in <tt class="rst-docutils rst-literal">Annotated</tt> or a union.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code>type | None</code></td><td class="fieldArgDesc">Nested schema class, or <tt class="rst-docutils rst-literal">None</tt> when the field holds no schema.</td></tr></table></div>
+    <div><p>Return the Orionis schema wrapped by a field annotation, if any.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">tp:</span><code><a href="https://docs.python.org/3/builtins/functions.html#object" class="intersphinx-link">object</a></code></td><td class="fieldArgDesc">Field annotation, possibly wrapped in <tt class="rst-docutils rst-literal">Annotated</tt> or a union.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/functions.html#type" class="intersphinx-link">type</a>[msgspec.Struct] | None</code></td><td class="fieldArgDesc">Nested schema class, or <tt class="rst-docutils rst-literal">None</tt> when the field holds no schema.</td></tr></table></div>
   </div>
 </div><div class="baseconstant">
   
@@ -2670,7 +2710,7 @@ declared for the field.</td></tr></table></div>
   <div class="functionHeader">
     
     <span class="py-defname">_FIELD_PLAN_CACHE</span>: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#dict" class="intersphinx-link">dict</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/functions.html#type" class="intersphinx-link">type</a>, <wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" class="intersphinx-link">tuple</a>]</code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/bd628468b11e1f90093178da422364984111d868/orionis/schemas/failure_collector.py#L21">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/e2b6f2ca96f1ff7bc566601c50beda9c3224b87b/orionis/schemas/failure_collector.py#L26">
       
       (source)
     </a>
@@ -2696,7 +2736,7 @@ declared for the field.</td></tr></table></div>
   <div class="orionis-footer-inner">
     <div class="orionis-footer-copy">
       <p>API documentation for <a href="https://orionis-framework.com/" class="projecthome">Orionis</a>.</p>
-      <p class="orionis-footer-meta">Generated with <a href="https://github.com/twisted/pydoctor/">Pydoctor</a> 25.10.1.<span class="orionis-footer-build"> Built 2026-10-19 15:13:09.</span></p>
+      <p class="orionis-footer-meta">Generated with <a href="https://github.com/twisted/pydoctor/">Pydoctor</a> 25.10.1.<span class="orionis-footer-build"> Built 2026-10-19 17:50:46.</span></p>
     </div>
     <nav class="orionis-footer-links" aria-label="Additional resources">
       <a href="https://docs.orionis-framework.com">Read the guide <span aria-hidden="true">↗</span></a>

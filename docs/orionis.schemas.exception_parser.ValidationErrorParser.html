@@ -214,6 +214,16 @@
         
 
         
+            <div class="itemName"><code><a href="#_nestedType" class="internal-link" title="orionis.schemas.exception_parser.ValidationErrorParser._nestedType">_nested<wbr></wbr>Type</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
             <div class="itemName"><code><a href="#_resolveNestedType" class="internal-link" title="orionis.schemas.exception_parser.ValidationErrorParser._resolveNestedType">_resolve<wbr></wbr>Nested<wbr></wbr>Type</a></code>
             </div>
         
@@ -355,6 +365,16 @@
         
 
         
+            <div class="itemName"><code><a href="#_nestedType" class="internal-link" title="orionis.schemas.exception_parser.ValidationErrorParser._nestedType">_nested<wbr></wbr>Type</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
             <div class="itemName"><code><a href="#_resolveNestedType" class="internal-link" title="orionis.schemas.exception_parser.ValidationErrorParser._resolveNestedType">_resolve<wbr></wbr>Nested<wbr></wbr>Type</a></code>
             </div>
         
@@ -483,6 +503,16 @@
         
 
         
+            <div class="itemName"><code><a href="orionis.schemas.exception_parser.html#_PATH_PART_RE" class="internal-link" title="orionis.schemas.exception_parser._PATH_PART_RE">_PATH<wbr></wbr>_PART<wbr></wbr>_RE</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
             <div class="itemName"><code><a href="orionis.schemas.exception_parser.html#_STRUCT_FIELDS_MAP" class="internal-link" title="orionis.schemas.exception_parser._STRUCT_FIELDS_MAP">_STRUCT<wbr></wbr>_FIELDS<wbr></wbr>_MAP</a></code>
             </div>
         
@@ -556,7 +586,7 @@
         </div>
 
         <div class="extrasDocstring">
-          <p class="class-signature"><code><span class="py-keyword">class</span> <span class="py-defname">ValidationErrorParser</span>: <a href="https://github.com/orionis-framework/framework/tree/bd628468b11e1f90093178da422364984111d868/orionis/schemas/exception_parser.py#L62" class="sourceLink">(source)</a></code></p><p><a href="classIndex.html#orionis.schemas.exception_parser.ValidationErrorParser">View In Hierarchy</a></p>
+          <p class="class-signature"><code><span class="py-keyword">class</span> <span class="py-defname">ValidationErrorParser</span>: <a href="https://github.com/orionis-framework/framework/tree/e2b6f2ca96f1ff7bc566601c50beda9c3224b87b/orionis/schemas/exception_parser.py#L69" class="sourceLink">(source)</a></code></p><p><a href="classIndex.html#orionis.schemas.exception_parser.ValidationErrorParser">View In Hierarchy</a></p>
         </div>
 
         <div class="moduleDocstring">
@@ -595,6 +625,11 @@
   </tr><tr class="staticmethod">
     
     <td>Static Method</td>
+    <td><code><a href="#_nestedType" class="internal-link" title="orionis.schemas.exception_parser.ValidationErrorParser._nestedType">_nested<wbr></wbr>Type</a></code></td>
+    <td>Follow collection selectors to the schema owning a nested field.</td>
+  </tr><tr class="staticmethod">
+    
+    <td>Static Method</td>
     <td><code><a href="#_resolveNestedType" class="internal-link" title="orionis.schemas.exception_parser.ValidationErrorParser._resolveNestedType">_resolve<wbr></wbr>Nested<wbr></wbr>Type</a></code></td>
     <td>Return the nested schema type for <tt class="rst-docutils rst-literal">field_name</tt> within <tt class="rst-docutils rst-literal">schema</tt>.</td>
   </tr><tr class="staticmethod">
@@ -628,7 +663,7 @@
     
     <div><span class="decorator">@<a href="https://docs.python.org/3/builtins/functions.html#classmethod" class="intersphinx-link">classmethod</a><br /></span></div>
     <span class="py-keyword">def</span>&#160;<span class="py-defname">_customMessage</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">cls</span>, </span><span class="rst-sig-param">schema: <code><a href="https://docs.python.org/3/builtins/functions.html#type" class="intersphinx-link">type</a></code>, </span><span class="rst-sig-param">field_path: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code>, </span><span class="rst-sig-param">raw_msg: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a> | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/bd628468b11e1f90093178da422364984111d868/orionis/schemas/exception_parser.py#L184">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/e2b6f2ca96f1ff7bc566601c50beda9c3224b87b/orionis/schemas/exception_parser.py#L191">
       
       (source)
     </a>
@@ -656,7 +691,7 @@ as produced by parsing the msgspec error.</td></tr><tr><td class="fieldArgContai
     
     <div><span class="decorator">@<a href="https://docs.python.org/3/builtins/functions.html#classmethod" class="intersphinx-link">classmethod</a><br /></span></div>
     <span class="py-keyword">def</span>&#160;<span class="py-defname">parse</span><span class="function-signature long-signature">(<span class="rst-sig-param"><span class="rst-undocumented">cls</span>, </span><span class="rst-sig-param">error: <code>msgspec.ValidationError</code>, </span><span class="rst-sig-param">schema: <code><a href="https://docs.python.org/3/builtins/functions.html#type" class="intersphinx-link">type</a> | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code> = <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></span>) -&gt; <code><a href="orionis.schemas.entities.failure.ValidationFailure.html" class="internal-link" title="orionis.schemas.entities.failure.ValidationFailure">ValidationFailure</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/bd628468b11e1f90093178da422364984111d868/orionis/schemas/exception_parser.py#L67">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/e2b6f2ca96f1ff7bc566601c50beda9c3224b87b/orionis/schemas/exception_parser.py#L74">
       
       (source)
     </a>
@@ -683,7 +718,7 @@ as produced by parsing the msgspec error.</td></tr><tr><td class="fieldArgContai
     
     <div><span class="decorator">@<a href="https://docs.python.org/3/builtins/functions.html#classmethod" class="intersphinx-link">classmethod</a><br /></span></div>
     <span class="py-keyword">def</span>&#160;<span class="py-defname">parseAt</span><span class="function-signature long-signature">(<span class="rst-sig-param"><span class="rst-undocumented">cls</span>, </span><span class="rst-sig-param">error: <code>msgspec.ValidationError</code>, </span><span class="rst-sig-param">schema: <code><a href="https://docs.python.org/3/builtins/functions.html#type" class="intersphinx-link">type</a> | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code>, </span><span class="rst-sig-param">base: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></span>) -&gt; <code><a href="orionis.schemas.entities.failure.ValidationFailure.html" class="internal-link" title="orionis.schemas.entities.failure.ValidationFailure">ValidationFailure</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/bd628468b11e1f90093178da422364984111d868/orionis/schemas/exception_parser.py#L90">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/e2b6f2ca96f1ff7bc566601c50beda9c3224b87b/orionis/schemas/exception_parser.py#L97">
       
       (source)
     </a>
@@ -711,7 +746,7 @@ schema (<tt class="rst-docutils rst-literal">""</tt> when the error comes from t
     
     <div><span class="decorator">@<a href="https://docs.python.org/3/builtins/functions.html#staticmethod" class="intersphinx-link">staticmethod</a><br /></span></div>
     <span class="py-keyword">def</span>&#160;<span class="py-defname">_joinPath</span><span class="function-signature">(<span class="rst-sig-param">base: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code>, </span><span class="rst-sig-param">relative: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/bd628468b11e1f90093178da422364984111d868/orionis/schemas/exception_parser.py#L157">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/e2b6f2ca96f1ff7bc566601c50beda9c3224b87b/orionis/schemas/exception_parser.py#L164">
       
       (source)
     </a>
@@ -738,7 +773,7 @@ schema (<tt class="rst-docutils rst-literal">""</tt> when the error comes from t
     
     <div><span class="decorator">@<a href="https://docs.python.org/3/builtins/functions.html#staticmethod" class="intersphinx-link">staticmethod</a><br /></span></div>
     <span class="py-keyword">def</span>&#160;<span class="py-defname">_matchConstraintKey</span><span class="function-signature">(<span class="rst-sig-param">message: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a> | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/bd628468b11e1f90093178da422364984111d868/orionis/schemas/exception_parser.py#L299">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/e2b6f2ca96f1ff7bc566601c50beda9c3224b87b/orionis/schemas/exception_parser.py#L342">
       
       (source)
     </a>
@@ -756,6 +791,33 @@ schema (<tt class="rst-docutils rst-literal">""</tt> when the error comes from t
 </div><div class="basestaticmethod">
   
   
+  <a name="orionis.schemas.exception_parser.ValidationErrorParser._nestedType">
+    
+  </a>
+  <a name="_nestedType">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <div><span class="decorator">@<a href="https://docs.python.org/3/builtins/functions.html#staticmethod" class="intersphinx-link">staticmethod</a><br /></span></div>
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">_nestedType</span><span class="function-signature">(<span class="rst-sig-param">tp: <code><a href="https://docs.python.org/3/builtins/functions.html#object" class="intersphinx-link">object</a></code>, </span><span class="rst-sig-param">selectors: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" class="intersphinx-link">tuple</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <wbr></wbr><span class="rst-variable-ellipsis">...</span>]</code></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/functions.html#type" class="intersphinx-link">type</a> | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code>:</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/e2b6f2ca96f1ff7bc566601c50beda9c3224b87b/orionis/schemas/exception_parser.py#L307">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#_nestedType" title="orionis.schemas.exception_parser.ValidationErrorParser._nestedType">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    
+    <div><p>Follow collection selectors to the schema owning a nested field.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">tp:</span><code><a href="https://docs.python.org/3/builtins/functions.html#object" class="intersphinx-link">object</a></code></td><td class="fieldArgDesc">Annotation of the parent field.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">selectors:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" class="intersphinx-link">tuple</a>[<a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, ...]</code></td><td class="fieldArgDesc">Sequence indices or dictionary keys preceding the nested field.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code>type | None</code></td><td class="fieldArgDesc">Schema selected by the annotation and collection path.</td></tr></table></div>
+  </div>
+</div><div class="basestaticmethod">
+  
+  
   <a name="orionis.schemas.exception_parser.ValidationErrorParser._resolveNestedType">
     
   </a>
@@ -766,7 +828,7 @@ schema (<tt class="rst-docutils rst-literal">""</tt> when the error comes from t
     
     <div><span class="decorator">@<a href="https://docs.python.org/3/builtins/functions.html#staticmethod" class="intersphinx-link">staticmethod</a><br /></span></div>
     <span class="py-keyword">def</span>&#160;<span class="py-defname">_resolveNestedType</span><span class="function-signature">(<span class="rst-sig-param">schema: <code><a href="https://docs.python.org/3/builtins/functions.html#type" class="intersphinx-link">type</a></code>, </span><span class="rst-sig-param">field_name: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/functions.html#type" class="intersphinx-link">type</a> | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/bd628468b11e1f90093178da422364984111d868/orionis/schemas/exception_parser.py#L256">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/e2b6f2ca96f1ff7bc566601c50beda9c3224b87b/orionis/schemas/exception_parser.py#L268">
       
       (source)
     </a>
@@ -793,7 +855,7 @@ schema (<tt class="rst-docutils rst-literal">""</tt> when the error comes from t
     
     <div><span class="decorator">@<a href="https://docs.python.org/3/builtins/functions.html#staticmethod" class="intersphinx-link">staticmethod</a><br /></span></div>
     <span class="py-keyword">def</span>&#160;<span class="py-defname">_resolveSchema</span><span class="function-signature">(<span class="rst-sig-param">schema: <code><a href="https://docs.python.org/3/builtins/functions.html#type" class="intersphinx-link">type</a></code>, </span><span class="rst-sig-param">field_path: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" class="intersphinx-link">tuple</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/functions.html#type" class="intersphinx-link">type</a>, <wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>]</code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/bd628468b11e1f90093178da422364984111d868/orionis/schemas/exception_parser.py#L221">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/e2b6f2ca96f1ff7bc566601c50beda9c3224b87b/orionis/schemas/exception_parser.py#L228">
       
       (source)
     </a>
@@ -822,7 +884,7 @@ this returns <tt class="rst-docutils rst-literal">(AddressSchema, "zip_code")</t
   <div class="functionHeader">
     
     <span class="py-defname">__slots__</span>: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" class="intersphinx-link">tuple</a></code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/bd628468b11e1f90093178da422364984111d868/orionis/schemas/exception_parser.py#L65">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/e2b6f2ca96f1ff7bc566601c50beda9c3224b87b/orionis/schemas/exception_parser.py#L72">
       
       (source)
     </a>
@@ -848,7 +910,7 @@ this returns <tt class="rst-docutils rst-literal">(AddressSchema, "zip_code")</t
   <div class="orionis-footer-inner">
     <div class="orionis-footer-copy">
       <p>API documentation for <a href="https://orionis-framework.com/" class="projecthome">Orionis</a>.</p>
-      <p class="orionis-footer-meta">Generated with <a href="https://github.com/twisted/pydoctor/">Pydoctor</a> 25.10.1.<span class="orionis-footer-build"> Built 2026-10-19 15:13:09.</span></p>
+      <p class="orionis-footer-meta">Generated with <a href="https://github.com/twisted/pydoctor/">Pydoctor</a> 25.10.1.<span class="orionis-footer-build"> Built 2026-10-19 17:50:46.</span></p>
     </div>
     <nav class="orionis-footer-links" aria-label="Additional resources">
       <a href="https://docs.orionis-framework.com">Read the guide <span aria-hidden="true">↗</span></a>

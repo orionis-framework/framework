@@ -194,6 +194,16 @@
         
 
         
+            <div class="itemName"><code><a href="#_collection_item_type" class="internal-link" title="orionis.schemas.rules_executor._collection_item_type">_collection<wbr></wbr>_item<wbr></wbr>_type</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
             <div class="itemName"><code><a href="#_field_rules" class="internal-link" title="orionis.schemas.rules_executor._field_rules">_field<wbr></wbr>_rules</a></code>
             </div>
         
@@ -711,6 +721,16 @@
 
         
             <div class="itemName"><code><a href="orionis.schemas.exception_parser.html#_PATH_MARKER_LEN" class="internal-link" title="orionis.schemas.exception_parser._PATH_MARKER_LEN">_PATH<wbr></wbr>_MARKER<wbr></wbr>_LEN</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.schemas.exception_parser.html#_PATH_PART_RE" class="internal-link" title="orionis.schemas.exception_parser._PATH_PART_RE">_PATH<wbr></wbr>_PART<wbr></wbr>_RE</a></code>
             </div>
         
 
@@ -2131,6 +2151,16 @@
         
 
         
+            <div class="itemName"><code><a href="#_collection_item_type" class="internal-link" title="orionis.schemas.rules_executor._collection_item_type">_collection<wbr></wbr>_item<wbr></wbr>_type</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
             <div class="itemName"><code><a href="#_field_rules" class="internal-link" title="orionis.schemas.rules_executor._field_rules">_field<wbr></wbr>_rules</a></code>
             </div>
         
@@ -2508,7 +2538,7 @@
         </div>
 
         <div class="extrasDocstring">
-          <a href="https://github.com/orionis-framework/framework/tree/bd628468b11e1f90093178da422364984111d868/orionis/schemas/rules_executor.py" class="sourceLink">(source)</a>
+          <a href="https://github.com/orionis-framework/framework/tree/e2b6f2ca96f1ff7bc566601c50beda9c3224b87b/orionis/schemas/rules_executor.py" class="sourceLink">(source)</a>
         </div>
 
         <div class="moduleDocstring">
@@ -2516,7 +2546,7 @@
         </div>
 
         <div id="split-tables">
-          <table class="children sortable" id="id1925">
+          <table class="children sortable" id="id1924">
   
   
   <tr class="function">
@@ -2528,12 +2558,17 @@
     
     <td>Async Function</td>
     <td><code><a href="#_collect_nested" class="internal-link" title="orionis.schemas.rules_executor._collect_nested">_collect<wbr></wbr>_nested</a></code></td>
-    <td>Validate a nested schema value using its own cached plan.</td>
+    <td>Validate nested schemas, including schemas held inside collections.</td>
   </tr><tr class="function">
     
     <td>Async Function</td>
     <td><code><a href="#_collect_with_plan" class="internal-link" title="orionis.schemas.rules_executor._collect_with_plan">_collect<wbr></wbr>_with<wbr></wbr>_plan</a></code></td>
     <td>Inner validation loop: execute a pre-resolved plan against an instance.</td>
+  </tr><tr class="function">
+    
+    <td>Function</td>
+    <td><code><a href="#_collection_item_type" class="internal-link" title="orionis.schemas.rules_executor._collection_item_type">_collection<wbr></wbr>_item<wbr></wbr>_type</a></code></td>
+    <td>Resolve the element annotation selected from a concrete collection type.</td>
   </tr><tr class="function">
     
     <td>Function</td>
@@ -2580,7 +2615,7 @@
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">_build_plan</span><span class="function-signature">(<span class="rst-sig-param">klass: <code><a href="https://docs.python.org/3/builtins/functions.html#type" class="intersphinx-link">type</a></code></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" class="intersphinx-link">tuple</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/bd628468b11e1f90093178da422364984111d868/orionis/schemas/rules_executor.py#L131">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/e2b6f2ca96f1ff7bc566601c50beda9c3224b87b/orionis/schemas/rules_executor.py#L175">
       
       (source)
     </a>
@@ -2613,7 +2648,7 @@ and whether the field contains a nested Orionis schema.</td></tr></table><table 
     
     
     <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">_collect_nested</span><span class="function-signature">(<span class="rst-sig-param">value: <code><a href="https://docs.python.org/3/builtins/functions.html#object" class="intersphinx-link">object</a></code>, </span><span class="rst-sig-param">prefix: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code>, </span><span class="rst-sig-param">failures: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#list" class="intersphinx-link">list</a></code></span>):</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/bd628468b11e1f90093178da422364984111d868/orionis/schemas/rules_executor.py#L174">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/e2b6f2ca96f1ff7bc566601c50beda9c3224b87b/orionis/schemas/rules_executor.py#L221">
       
       (source)
     </a>
@@ -2625,7 +2660,7 @@ and whether the field contains a nested Orionis schema.</td></tr></table><table 
   </div>
   <div class="docstring functionBody">
     
-    <div><p>Validate a nested schema value using its own cached plan.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">value:</span><code><a href="https://docs.python.org/3/builtins/functions.html#object" class="intersphinx-link">object</a></code></td><td class="fieldArgDesc">Nested schema instance held by the parent field.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">prefix:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Dot-terminated path prefix already qualified with the parent field.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">failures:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#list" class="intersphinx-link">list</a></code></td><td class="fieldArgDesc">Accumulator receiving every <tt class="rst-docutils rst-literal">ValidationFailure</tt> found.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">Return <tt class="rst-docutils rst-literal">None</tt> after running the nested plan, if any.</td></tr></table></div>
+    <div><p>Validate nested schemas, including schemas held inside collections.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">value:</span><code><a href="https://docs.python.org/3/builtins/functions.html#object" class="intersphinx-link">object</a></code></td><td class="fieldArgDesc">Nested schema or collection held by the parent field.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">prefix:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Dot-terminated path prefix already qualified with the parent field.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">failures:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#list" class="intersphinx-link">list</a></code></td><td class="fieldArgDesc">Accumulator receiving every <tt class="rst-docutils rst-literal">ValidationFailure</tt> found.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">Return <tt class="rst-docutils rst-literal">None</tt> after running the nested plan, if any.</td></tr></table></div>
   </div>
 </div><div class="basefunction">
   
@@ -2640,7 +2675,7 @@ and whether the field contains a nested Orionis schema.</td></tr></table><table 
     
     
     <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">_collect_with_plan</span><span class="function-signature">(<span class="rst-sig-param">plan: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" class="intersphinx-link">tuple</a></code>, </span><span class="rst-sig-param">instance: <code><a href="https://docs.python.org/3/builtins/functions.html#object" class="intersphinx-link">object</a></code>, </span><span class="rst-sig-param">prefix: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code>, </span><span class="rst-sig-param">failures: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#list" class="intersphinx-link">list</a></code></span>):</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/bd628468b11e1f90093178da422364984111d868/orionis/schemas/rules_executor.py#L208">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/e2b6f2ca96f1ff7bc566601c50beda9c3224b87b/orionis/schemas/rules_executor.py#L267">
       
       (source)
     </a>
@@ -2664,6 +2699,33 @@ Pass <tt class="rst-docutils rst-literal">""</tt> at the top level.</td></tr><tr
 </div><div class="basefunction">
   
   
+  <a name="orionis.schemas.rules_executor._collection_item_type">
+    
+  </a>
+  <a name="_collection_item_type">
+    
+  </a>
+  <div class="functionHeader">
+    
+    
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">_collection_item_type</span><span class="function-signature">(<span class="rst-sig-param">tp: <code><a href="https://docs.python.org/3/builtins/functions.html#object" class="intersphinx-link">object</a></code>, </span><span class="rst-sig-param">selector: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/functions.html#object" class="intersphinx-link">object</a> | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code>:</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/e2b6f2ca96f1ff7bc566601c50beda9c3224b87b/orionis/schemas/rules_executor.py#L107">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#_collection_item_type" title="orionis.schemas.rules_executor._collection_item_type">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    
+    <div><p>Resolve the element annotation selected from a concrete collection type.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">tp:</span><code><a href="https://docs.python.org/3/builtins/functions.html#object" class="intersphinx-link">object</a></code></td><td class="fieldArgDesc">Unwrapped collection annotation.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">selector:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Sequence index or dictionary key.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code>object | None</code></td><td class="fieldArgDesc">Element annotation, or <tt class="rst-docutils rst-literal">None</tt> for an incompatible selector.</td></tr></table></div>
+  </div>
+</div><div class="basefunction">
+  
+  
   <a name="orionis.schemas.rules_executor._field_rules">
     
   </a>
@@ -2674,7 +2736,7 @@ Pass <tt class="rst-docutils rst-literal">""</tt> at the top level.</td></tr><tr
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">_field_rules</span><span class="function-signature">(<span class="rst-sig-param">klass: <code><a href="https://docs.python.org/3/builtins/functions.html#type" class="intersphinx-link">type</a></code>, </span><span class="rst-sig-param">field_name: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code>, </span><span class="rst-sig-param">items: <code><a href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Iterable" class="intersphinx-link">Iterable</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/functions.html#object" class="intersphinx-link">object</a>]</code></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" class="intersphinx-link">tuple</a>[<wbr></wbr><a href="orionis.schemas.rule.Rule.html" class="internal-link" title="orionis.schemas.rule.Rule">Rule</a>, <wbr></wbr><span class="rst-variable-ellipsis">...</span>]</code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/bd628468b11e1f90093178da422364984111d868/orionis/schemas/rules_executor.py#L93">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/e2b6f2ca96f1ff7bc566601c50beda9c3224b87b/orionis/schemas/rules_executor.py#L137">
       
       (source)
     </a>
@@ -2701,7 +2763,7 @@ Pass <tt class="rst-docutils rst-literal">""</tt> at the top level.</td></tr><tr
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">_type_contains_nested</span><span class="function-signature">(<span class="rst-sig-param">tp: <code><a href="https://docs.python.org/3/builtins/functions.html#object" class="intersphinx-link">object</a></code></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/bd628468b11e1f90093178da422364984111d868/orionis/schemas/rules_executor.py#L25">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/e2b6f2ca96f1ff7bc566601c50beda9c3224b87b/orionis/schemas/rules_executor.py#L26">
       
       (source)
     </a>
@@ -2714,7 +2776,7 @@ Pass <tt class="rst-docutils rst-literal">""</tt> at the top level.</td></tr><tr
   <div class="docstring functionBody">
     
     <div><p>Check whether a type annotation contains a nested Orionis schema.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">tp:</span><code><a href="https://docs.python.org/3/builtins/functions.html#object" class="intersphinx-link">object</a></code></td><td class="fieldArgDesc">Type annotation to inspect. May be a plain type or wrapped in
-<tt class="rst-docutils rst-literal">Union</tt>/<tt class="rst-docutils rst-literal">|</tt> or <tt class="rst-docutils rst-literal">Annotated</tt>.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code></td><td class="fieldArgDesc">Return <tt class="rst-docutils rst-literal">True</tt> if <tt class="rst-docutils rst-literal">tp</tt> itself, or any nested/union member, is a
+<tt class="rst-docutils rst-literal">Union</tt>/<tt class="rst-docutils rst-literal">|</tt>, <tt class="rst-docutils rst-literal">Annotated</tt> or a collection.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code></td><td class="fieldArgDesc">Return <tt class="rst-docutils rst-literal">True</tt> if <tt class="rst-docutils rst-literal">tp</tt> itself, or any nested/union member, is a
 schema type defining <tt class="rst-docutils rst-literal">__orionis_meta__</tt>; otherwise return <tt class="rst-docutils rst-literal">False</tt>.</td></tr></table></div>
   </div>
 </div><div class="basefunction">
@@ -2730,7 +2792,7 @@ schema type defining <tt class="rst-docutils rst-literal">__orionis_meta__</tt>;
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">_warm_child_plan</span><span class="function-signature">(<span class="rst-sig-param">tp: <code><a href="https://docs.python.org/3/builtins/functions.html#object" class="intersphinx-link">object</a></code></span>):</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/bd628468b11e1f90093178da422364984111d868/orionis/schemas/rules_executor.py#L55">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/e2b6f2ca96f1ff7bc566601c50beda9c3224b87b/orionis/schemas/rules_executor.py#L62">
       
       (source)
     </a>
@@ -2746,7 +2808,7 @@ schema type defining <tt class="rst-docutils rst-literal">__orionis_meta__</tt>;
 <p>Called from <tt class="rst-docutils rst-literal">_build_plan</tt> so that the first real validation call for a
 nested field always hits the cache instead of triggering a cold build.</p>
 <table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">tp:</span><code><a href="https://docs.python.org/3/builtins/functions.html#object" class="intersphinx-link">object</a></code></td><td class="fieldArgDesc">Field type annotation, potentially an <tt class="rst-docutils rst-literal">Annotated</tt> type, <tt class="rst-docutils rst-literal">Union</tt>
-or bare class.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">Complete the documented operation without returning a value.</td></tr></table></div>
+or collection, or a bare class.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">Complete the documented operation without returning a value.</td></tr></table></div>
   </div>
 </div><div class="baseconstant">
   
@@ -2760,7 +2822,7 @@ or bare class.</td></tr></table><table class="fieldTable"><tr class="fieldStart"
   <div class="functionHeader">
     
     <span class="py-defname">_EMPTY_META</span>: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#dict" class="intersphinx-link">dict</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#list" class="intersphinx-link">list</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/functions.html#object" class="intersphinx-link">object</a>]]</code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/bd628468b11e1f90093178da422364984111d868/orionis/schemas/rules_executor.py#L23">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/e2b6f2ca96f1ff7bc566601c50beda9c3224b87b/orionis/schemas/rules_executor.py#L24">
       
       (source)
     </a>
@@ -2787,7 +2849,7 @@ or bare class.</td></tr></table><table class="fieldTable"><tr class="fieldStart"
   <div class="functionHeader">
     
     <span class="py-defname">_PLAN_CACHE</span>: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#dict" class="intersphinx-link">dict</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/functions.html#type" class="intersphinx-link">type</a>, <wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" class="intersphinx-link">tuple</a>]</code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/bd628468b11e1f90093178da422364984111d868/orionis/schemas/rules_executor.py#L15">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/e2b6f2ca96f1ff7bc566601c50beda9c3224b87b/orionis/schemas/rules_executor.py#L16">
       
       (source)
     </a>
@@ -2813,7 +2875,7 @@ or bare class.</td></tr></table><table class="fieldTable"><tr class="fieldStart"
   <div class="orionis-footer-inner">
     <div class="orionis-footer-copy">
       <p>API documentation for <a href="https://orionis-framework.com/" class="projecthome">Orionis</a>.</p>
-      <p class="orionis-footer-meta">Generated with <a href="https://github.com/twisted/pydoctor/">Pydoctor</a> 25.10.1.<span class="orionis-footer-build"> Built 2026-10-19 15:13:09.</span></p>
+      <p class="orionis-footer-meta">Generated with <a href="https://github.com/twisted/pydoctor/">Pydoctor</a> 25.10.1.<span class="orionis-footer-build"> Built 2026-10-19 17:50:46.</span></p>
     </div>
     <nav class="orionis-footer-links" aria-label="Additional resources">
       <a href="https://docs.orionis-framework.com">Read the guide <span aria-hidden="true">↗</span></a>

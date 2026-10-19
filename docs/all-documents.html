@@ -7515,7 +7515,7 @@
             <div class="type">Module</div>
             <div class="kind">Module</div>
             <div class="privacy">PUBLIC</div>
-            <div class="summary"><span class="rst-undocumented">No module docstring; 0/7 constant, 1/1 function, 0/1 class documented</span></div>
+            <div class="summary"><span class="rst-undocumented">No module docstring; 0/8 constant, 1/1 function, 0/1 class documented</span></div>
           </li><li id="orionis.schemas.exceptions">
             
             <div class="fullName">orionis<wbr></wbr>.schemas<wbr></wbr>.exceptions</div>
@@ -7907,7 +7907,7 @@
             <div class="type">Module</div>
             <div class="kind">Module</div>
             <div class="privacy">PUBLIC</div>
-            <div class="summary"><span class="rst-undocumented">No module docstring; 1/1 function documented</span></div>
+            <div class="summary"><span class="rst-undocumented">Undocumented</span></div>
           </li><li id="orionis.schemas.rules.uppercase">
             
             <div class="fullName">orionis<wbr></wbr>.schemas<wbr></wbr>.rules<wbr></wbr>.uppercase</div>
@@ -7931,7 +7931,7 @@
             <div class="type">Module</div>
             <div class="kind">Module</div>
             <div class="privacy">PUBLIC</div>
-            <div class="summary"><span class="rst-undocumented">No module docstring; 0/2 constant, 6/6 functions documented</span></div>
+            <div class="summary"><span class="rst-undocumented">No module docstring; 0/2 constant, 7/7 functions documented</span></div>
           </li><li id="orionis.schemas.schema">
             
             <div class="fullName">orionis<wbr></wbr>.schemas<wbr></wbr>.schema</div>
@@ -63683,7 +63683,7 @@
             <div class="type">Function</div>
             <div class="kind">Method</div>
             <div class="privacy">PUBLIC</div>
-            <div class="summary">Evaluate whether the current value satisfies this rule.</div>
+            <div class="summary">Asynchronously evaluate whether the current value satisfies this rule.</div>
           </li><li id="orionis.schemas.contracts.constraint.IRule.validate">
             
             <div class="fullName">orionis<wbr></wbr>.schemas<wbr></wbr>.contracts<wbr></wbr>.constraint<wbr></wbr>.<wbr></wbr>IRule<wbr></wbr>.validate</div>
@@ -63708,6 +63708,14 @@
             <div class="kind">Class Variable</div>
             <div class="privacy">PUBLIC</div>
             <div class="summary"><span class="rst-undocumented">Undocumented</span></div>
+          </li><li id="orionis.schemas.rule.Rule.__init_subclass__">
+            
+            <div class="fullName">orionis<wbr></wbr>.schemas<wbr></wbr>.rule<wbr></wbr>.<wbr></wbr>Rule<wbr></wbr>.__init<wbr></wbr>_subclass__</div>
+            <div class="url">orionis.schemas.rule.Rule.html#__init_subclass__</div>
+            <div class="type">Function</div>
+            <div class="kind">Method</div>
+            <div class="privacy">PUBLIC</div>
+            <div class="summary">Require asynchronous enforcement on every rule subclass.</div>
           </li><li id="orionis.schemas.rule.Rule.__init__">
             
             <div class="fullName">orionis<wbr></wbr>.schemas<wbr></wbr>.rule<wbr></wbr>.<wbr></wbr>Rule<wbr></wbr>.__init__</div>
@@ -63739,15 +63747,7 @@
             <div class="type">Function</div>
             <div class="kind">Method</div>
             <div class="privacy">PUBLIC</div>
-            <div class="summary">Evaluate whether the current value satisfies this rule.</div>
-          </li><li id="orionis.schemas.rule.Rule.enforceAsync">
-            
-            <div class="fullName">orionis<wbr></wbr>.schemas<wbr></wbr>.rule<wbr></wbr>.<wbr></wbr>Rule<wbr></wbr>.enforce<wbr></wbr>Async</div>
-            <div class="url">orionis.schemas.rule.Rule.html#enforceAsync</div>
-            <div class="type">Function</div>
-            <div class="kind">Method</div>
-            <div class="privacy">PUBLIC</div>
-            <div class="summary">Run an explicitly asynchronous rule check without blocking the loop.</div>
+            <div class="summary">Asynchronously evaluate whether the current value satisfies this rule.</div>
           </li><li id="orionis.schemas.rule.Rule.validate">
             
             <div class="fullName">orionis<wbr></wbr>.schemas<wbr></wbr>.rule<wbr></wbr>.<wbr></wbr>Rule<wbr></wbr>.validate</div>
@@ -63755,7 +63755,7 @@
             <div class="type">Function</div>
             <div class="kind">Method</div>
             <div class="privacy">PUBLIC</div>
-            <div class="summary">Validate the field, awaiting native asynchronous enforcement when present.</div>
+            <div class="summary">Validate the field by awaiting its asynchronous enforcement.</div>
           </li><li id="orionis.schemas.rules.accepted._ACCEPTED_TEXT">
             
             <div class="fullName">orionis<wbr></wbr>.schemas<wbr></wbr>.rules<wbr></wbr>.accepted<wbr></wbr>._ACCEPTED<wbr></wbr>_TEXT</div>
@@ -63827,7 +63827,7 @@
             <div class="type">Function</div>
             <div class="kind">Function</div>
             <div class="privacy">PUBLIC</div>
-            <div class="summary">Read the whole content of an uploaded file.</div>
+            <div class="summary">Read uploaded-file content without blocking the event loop.</div>
           </li><li id="orionis.schemas.rules.measure.measure">
             
             <div class="fullName">orionis<wbr></wbr>.schemas<wbr></wbr>.rules<wbr></wbr>.measure<wbr></wbr>.measure</div>
@@ -64140,14 +64140,6 @@
             <div class="kind">Constant</div>
             <div class="privacy">PUBLIC</div>
             <div class="summary"><span class="rst-undocumented">Undocumented</span></div>
-          </li><li id="orionis.schemas.rules.unique._has_running_loop">
-            
-            <div class="fullName">orionis<wbr></wbr>.schemas<wbr></wbr>.rules<wbr></wbr>.unique<wbr></wbr>._has<wbr></wbr>_running<wbr></wbr>_loop</div>
-            <div class="url">orionis.schemas.rules.unique.html#_has_running_loop</div>
-            <div class="type">Function</div>
-            <div class="kind">Function</div>
-            <div class="privacy">PUBLIC</div>
-            <div class="summary">Report whether the calling thread already runs an event loop.</div>
           </li><li id="orionis.schemas.rules.uuid_string._UUID_PATTERN">
             
             <div class="fullName">orionis<wbr></wbr>.schemas<wbr></wbr>.rules<wbr></wbr>.uuid<wbr></wbr>_string<wbr></wbr>._UUID<wbr></wbr>_PATTERN</div>
@@ -64764,10 +64756,90 @@
             <div class="kind">Constant</div>
             <div class="privacy">PUBLIC</div>
             <div class="summary"><span class="rst-undocumented">Undocumented</span></div>
+          </li><li id="orionis.schemas.rules_executor._PLAN_CACHE">
+            
+            <div class="fullName">orionis<wbr></wbr>.schemas<wbr></wbr>.rules<wbr></wbr>_executor<wbr></wbr>._PLAN<wbr></wbr>_CACHE</div>
+            <div class="url">orionis.schemas.rules_executor.html#_PLAN_CACHE</div>
+            <div class="type">Attribute</div>
+            <div class="kind">Constant</div>
+            <div class="privacy">PUBLIC</div>
+            <div class="summary"><span class="rst-undocumented">Undocumented</span></div>
+          </li><li id="orionis.schemas.rules_executor._EMPTY_META">
+            
+            <div class="fullName">orionis<wbr></wbr>.schemas<wbr></wbr>.rules<wbr></wbr>_executor<wbr></wbr>._EMPTY<wbr></wbr>_META</div>
+            <div class="url">orionis.schemas.rules_executor.html#_EMPTY_META</div>
+            <div class="type">Attribute</div>
+            <div class="kind">Constant</div>
+            <div class="privacy">PUBLIC</div>
+            <div class="summary"><span class="rst-undocumented">Undocumented</span></div>
+          </li><li id="orionis.schemas.rules_executor._type_contains_nested">
+            
+            <div class="fullName">orionis<wbr></wbr>.schemas<wbr></wbr>.rules<wbr></wbr>_executor<wbr></wbr>._type<wbr></wbr>_contains<wbr></wbr>_nested</div>
+            <div class="url">orionis.schemas.rules_executor.html#_type_contains_nested</div>
+            <div class="type">Function</div>
+            <div class="kind">Function</div>
+            <div class="privacy">PUBLIC</div>
+            <div class="summary">Check whether a type annotation contains a nested Orionis schema.</div>
+          </li><li id="orionis.schemas.rules_executor._warm_child_plan">
+            
+            <div class="fullName">orionis<wbr></wbr>.schemas<wbr></wbr>.rules<wbr></wbr>_executor<wbr></wbr>._warm<wbr></wbr>_child<wbr></wbr>_plan</div>
+            <div class="url">orionis.schemas.rules_executor.html#_warm_child_plan</div>
+            <div class="type">Function</div>
+            <div class="kind">Function</div>
+            <div class="privacy">PUBLIC</div>
+            <div class="summary">Eagerly populate <tt class="rst-docutils rst-literal">_PLAN_CACHE</tt> for any nested Orionis schema type.</div>
+          </li><li id="orionis.schemas.rules_executor._collection_item_type">
+            
+            <div class="fullName">orionis<wbr></wbr>.schemas<wbr></wbr>.rules<wbr></wbr>_executor<wbr></wbr>._collection<wbr></wbr>_item<wbr></wbr>_type</div>
+            <div class="url">orionis.schemas.rules_executor.html#_collection_item_type</div>
+            <div class="type">Function</div>
+            <div class="kind">Function</div>
+            <div class="privacy">PUBLIC</div>
+            <div class="summary">Resolve the element annotation selected from a concrete collection type.</div>
+          </li><li id="orionis.schemas.rules_executor._field_rules">
+            
+            <div class="fullName">orionis<wbr></wbr>.schemas<wbr></wbr>.rules<wbr></wbr>_executor<wbr></wbr>._field<wbr></wbr>_rules</div>
+            <div class="url">orionis.schemas.rules_executor.html#_field_rules</div>
+            <div class="type">Function</div>
+            <div class="kind">Function</div>
+            <div class="privacy">PUBLIC</div>
+            <div class="summary">Select executable rules from a field's validated metadata.</div>
+          </li><li id="orionis.schemas.rules_executor._build_plan">
+            
+            <div class="fullName">orionis<wbr></wbr>.schemas<wbr></wbr>.rules<wbr></wbr>_executor<wbr></wbr>._build<wbr></wbr>_plan</div>
+            <div class="url">orionis.schemas.rules_executor.html#_build_plan</div>
+            <div class="type">Function</div>
+            <div class="kind">Function</div>
+            <div class="privacy">PUBLIC</div>
+            <div class="summary">Build and cache a validation plan for a schema type.</div>
+          </li><li id="orionis.schemas.rules_executor._collect_nested">
+            
+            <div class="fullName">orionis<wbr></wbr>.schemas<wbr></wbr>.rules<wbr></wbr>_executor<wbr></wbr>._collect<wbr></wbr>_nested</div>
+            <div class="url">orionis.schemas.rules_executor.html#_collect_nested</div>
+            <div class="type">Function</div>
+            <div class="kind">Function</div>
+            <div class="privacy">PUBLIC</div>
+            <div class="summary">Validate nested schemas, including schemas held inside collections.</div>
+          </li><li id="orionis.schemas.rules_executor._collect_with_plan">
+            
+            <div class="fullName">orionis<wbr></wbr>.schemas<wbr></wbr>.rules<wbr></wbr>_executor<wbr></wbr>._collect<wbr></wbr>_with<wbr></wbr>_plan</div>
+            <div class="url">orionis.schemas.rules_executor.html#_collect_with_plan</div>
+            <div class="type">Function</div>
+            <div class="kind">Function</div>
+            <div class="privacy">PUBLIC</div>
+            <div class="summary">Inner validation loop: execute a pre-resolved plan against an instance.</div>
           </li><li id="orionis.schemas.exception_parser.MISSING_FIELD_RE">
             
             <div class="fullName">orionis<wbr></wbr>.schemas<wbr></wbr>.exception<wbr></wbr>_parser<wbr></wbr>.MISSING<wbr></wbr>_FIELD<wbr></wbr>_RE</div>
             <div class="url">orionis.schemas.exception_parser.html#MISSING_FIELD_RE</div>
+            <div class="type">Attribute</div>
+            <div class="kind">Constant</div>
+            <div class="privacy">PUBLIC</div>
+            <div class="summary"><span class="rst-undocumented">Undocumented</span></div>
+          </li><li id="orionis.schemas.exception_parser._PATH_PART_RE">
+            
+            <div class="fullName">orionis<wbr></wbr>.schemas<wbr></wbr>.exception<wbr></wbr>_parser<wbr></wbr>._PATH<wbr></wbr>_PART<wbr></wbr>_RE</div>
+            <div class="url">orionis.schemas.exception_parser.html#_PATH_PART_RE</div>
             <div class="type">Attribute</div>
             <div class="kind">Constant</div>
             <div class="privacy">PUBLIC</div>
@@ -64835,7 +64907,7 @@
             <div class="type">Class</div>
             <div class="kind">Class</div>
             <div class="privacy">PUBLIC</div>
-            <div class="summary"><span class="rst-undocumented">No class docstring; 0/1 class variable, 4/4 static methods, 3/3 class methods documented</span></div>
+            <div class="summary"><span class="rst-undocumented">No class docstring; 0/1 class variable, 5/5 static methods, 3/3 class methods documented</span></div>
           </li><li id="orionis.schemas.exception_parser.ValidationErrorParser.__slots__">
             
             <div class="fullName">orionis<wbr></wbr>.schemas<wbr></wbr>.exception<wbr></wbr>_parser<wbr></wbr>.<wbr></wbr>Validation<wbr></wbr>Error<wbr></wbr>Parser<wbr></wbr>.__slots__</div>
@@ -64892,6 +64964,14 @@
             <div class="kind">Static Method</div>
             <div class="privacy">PUBLIC</div>
             <div class="summary">Return the nested schema type for <tt class="rst-docutils rst-literal">field_name</tt> within <tt class="rst-docutils rst-literal">schema</tt>.</div>
+          </li><li id="orionis.schemas.exception_parser.ValidationErrorParser._nestedType">
+            
+            <div class="fullName">orionis<wbr></wbr>.schemas<wbr></wbr>.exception<wbr></wbr>_parser<wbr></wbr>.<wbr></wbr>Validation<wbr></wbr>Error<wbr></wbr>Parser<wbr></wbr>._nested<wbr></wbr>Type</div>
+            <div class="url">orionis.schemas.exception_parser.ValidationErrorParser.html#_nestedType</div>
+            <div class="type">Function</div>
+            <div class="kind">Static Method</div>
+            <div class="privacy">PUBLIC</div>
+            <div class="summary">Follow collection selectors to the schema owning a nested field.</div>
           </li><li id="orionis.schemas.exception_parser.ValidationErrorParser._matchConstraintKey">
             
             <div class="fullName">orionis<wbr></wbr>.schemas<wbr></wbr>.exception<wbr></wbr>_parser<wbr></wbr>.<wbr></wbr>Validation<wbr></wbr>Error<wbr></wbr>Parser<wbr></wbr>._match<wbr></wbr>Constraint<wbr></wbr>Key</div>
@@ -64900,70 +64980,6 @@
             <div class="kind">Static Method</div>
             <div class="privacy">PUBLIC</div>
             <div class="summary">Identify the constraint type from a raw msgspec error message.</div>
-          </li><li id="orionis.schemas.rules_executor._PLAN_CACHE">
-            
-            <div class="fullName">orionis<wbr></wbr>.schemas<wbr></wbr>.rules<wbr></wbr>_executor<wbr></wbr>._PLAN<wbr></wbr>_CACHE</div>
-            <div class="url">orionis.schemas.rules_executor.html#_PLAN_CACHE</div>
-            <div class="type">Attribute</div>
-            <div class="kind">Constant</div>
-            <div class="privacy">PUBLIC</div>
-            <div class="summary"><span class="rst-undocumented">Undocumented</span></div>
-          </li><li id="orionis.schemas.rules_executor._EMPTY_META">
-            
-            <div class="fullName">orionis<wbr></wbr>.schemas<wbr></wbr>.rules<wbr></wbr>_executor<wbr></wbr>._EMPTY<wbr></wbr>_META</div>
-            <div class="url">orionis.schemas.rules_executor.html#_EMPTY_META</div>
-            <div class="type">Attribute</div>
-            <div class="kind">Constant</div>
-            <div class="privacy">PUBLIC</div>
-            <div class="summary"><span class="rst-undocumented">Undocumented</span></div>
-          </li><li id="orionis.schemas.rules_executor._type_contains_nested">
-            
-            <div class="fullName">orionis<wbr></wbr>.schemas<wbr></wbr>.rules<wbr></wbr>_executor<wbr></wbr>._type<wbr></wbr>_contains<wbr></wbr>_nested</div>
-            <div class="url">orionis.schemas.rules_executor.html#_type_contains_nested</div>
-            <div class="type">Function</div>
-            <div class="kind">Function</div>
-            <div class="privacy">PUBLIC</div>
-            <div class="summary">Check whether a type annotation contains a nested Orionis schema.</div>
-          </li><li id="orionis.schemas.rules_executor._warm_child_plan">
-            
-            <div class="fullName">orionis<wbr></wbr>.schemas<wbr></wbr>.rules<wbr></wbr>_executor<wbr></wbr>._warm<wbr></wbr>_child<wbr></wbr>_plan</div>
-            <div class="url">orionis.schemas.rules_executor.html#_warm_child_plan</div>
-            <div class="type">Function</div>
-            <div class="kind">Function</div>
-            <div class="privacy">PUBLIC</div>
-            <div class="summary">Eagerly populate <tt class="rst-docutils rst-literal">_PLAN_CACHE</tt> for any nested Orionis schema type.</div>
-          </li><li id="orionis.schemas.rules_executor._field_rules">
-            
-            <div class="fullName">orionis<wbr></wbr>.schemas<wbr></wbr>.rules<wbr></wbr>_executor<wbr></wbr>._field<wbr></wbr>_rules</div>
-            <div class="url">orionis.schemas.rules_executor.html#_field_rules</div>
-            <div class="type">Function</div>
-            <div class="kind">Function</div>
-            <div class="privacy">PUBLIC</div>
-            <div class="summary">Select executable rules from a field's validated metadata.</div>
-          </li><li id="orionis.schemas.rules_executor._build_plan">
-            
-            <div class="fullName">orionis<wbr></wbr>.schemas<wbr></wbr>.rules<wbr></wbr>_executor<wbr></wbr>._build<wbr></wbr>_plan</div>
-            <div class="url">orionis.schemas.rules_executor.html#_build_plan</div>
-            <div class="type">Function</div>
-            <div class="kind">Function</div>
-            <div class="privacy">PUBLIC</div>
-            <div class="summary">Build and cache a validation plan for a schema type.</div>
-          </li><li id="orionis.schemas.rules_executor._collect_nested">
-            
-            <div class="fullName">orionis<wbr></wbr>.schemas<wbr></wbr>.rules<wbr></wbr>_executor<wbr></wbr>._collect<wbr></wbr>_nested</div>
-            <div class="url">orionis.schemas.rules_executor.html#_collect_nested</div>
-            <div class="type">Function</div>
-            <div class="kind">Function</div>
-            <div class="privacy">PUBLIC</div>
-            <div class="summary">Validate a nested schema value using its own cached plan.</div>
-          </li><li id="orionis.schemas.rules_executor._collect_with_plan">
-            
-            <div class="fullName">orionis<wbr></wbr>.schemas<wbr></wbr>.rules<wbr></wbr>_executor<wbr></wbr>._collect<wbr></wbr>_with<wbr></wbr>_plan</div>
-            <div class="url">orionis.schemas.rules_executor.html#_collect_with_plan</div>
-            <div class="type">Function</div>
-            <div class="kind">Function</div>
-            <div class="privacy">PUBLIC</div>
-            <div class="summary">Inner validation loop: execute a pre-resolved plan against an instance.</div>
           </li><li id="orionis.schemas.failure_collector._FIELD_PLAN_CACHE">
             
             <div class="fullName">orionis<wbr></wbr>.schemas<wbr></wbr>.failure<wbr></wbr>_collector<wbr></wbr>._FIELD<wbr></wbr>_PLAN<wbr></wbr>_CACHE</div>
@@ -64995,7 +65011,7 @@
             <div class="type">Class</div>
             <div class="kind">Class</div>
             <div class="privacy">PUBLIC</div>
-            <div class="summary"><span class="rst-undocumented">No class docstring; 0/1 class variable, 4/4 class methods documented</span></div>
+            <div class="summary"><span class="rst-undocumented">No class docstring; 0/1 class variable, 6/6 class methods documented</span></div>
           </li><li id="orionis.schemas.failure_collector.FailureCollector.__slots__">
             
             <div class="fullName">orionis<wbr></wbr>.schemas<wbr></wbr>.failure<wbr></wbr>_collector<wbr></wbr>.<wbr></wbr>Failure<wbr></wbr>Collector<wbr></wbr>.__slots__</div>
@@ -65036,6 +65052,22 @@
             <div class="kind">Class Method</div>
             <div class="privacy">PUBLIC</div>
             <div class="summary">Describe every failure behind a single rejected field value.</div>
+          </li><li id="orionis.schemas.failure_collector.FailureCollector._matchingType">
+            
+            <div class="fullName">orionis<wbr></wbr>.schemas<wbr></wbr>.failure<wbr></wbr>_collector<wbr></wbr>.<wbr></wbr>Failure<wbr></wbr>Collector<wbr></wbr>._matching<wbr></wbr>Type</div>
+            <div class="url">orionis.schemas.failure_collector.FailureCollector.html#_matchingType</div>
+            <div class="type">Function</div>
+            <div class="kind">Class Method</div>
+            <div class="privacy">PUBLIC</div>
+            <div class="summary">Select the nested annotation matching a rejected value's shape.</div>
+          </li><li id="orionis.schemas.failure_collector.FailureCollector._blameCollection">
+            
+            <div class="fullName">orionis<wbr></wbr>.schemas<wbr></wbr>.failure<wbr></wbr>_collector<wbr></wbr>.<wbr></wbr>Failure<wbr></wbr>Collector<wbr></wbr>._blame<wbr></wbr>Collection</div>
+            <div class="url">orionis.schemas.failure_collector.FailureCollector.html#_blameCollection</div>
+            <div class="type">Function</div>
+            <div class="kind">Class Method</div>
+            <div class="privacy">PUBLIC</div>
+            <div class="summary">Collect conversion and rule failures independently for each child.</div>
           </li><li id="orionis.schemas.validator.Schema">
             
             <div class="fullName">orionis<wbr></wbr>.schemas<wbr></wbr>.validator<wbr></wbr>.<wbr></wbr>Schema</div>
@@ -87387,14 +87419,6 @@
             <div class="type">Function</div>
             <div class="kind">Method</div>
             <div class="privacy">PUBLIC</div>
-            <div class="summary">Validate a field value as an active URL.</div>
-          </li><li id="orionis.schemas.rules.ActiveUrl.enforceAsync">
-            
-            <div class="fullName">orionis<wbr></wbr>.schemas<wbr></wbr>.rules<wbr></wbr>.<wbr></wbr>Active<wbr></wbr>Url<wbr></wbr>.enforce<wbr></wbr>Async</div>
-            <div class="url">orionis.schemas.rules.ActiveUrl.html#enforceAsync</div>
-            <div class="type">Function</div>
-            <div class="kind">Method</div>
-            <div class="privacy">PUBLIC</div>
             <div class="summary">Resolve a URL hostname without blocking the current event loop.</div>
           </li><li id="orionis.schemas.rules.After">
             
@@ -89219,14 +89243,6 @@
             <div class="type">Function</div>
             <div class="kind">Method</div>
             <div class="privacy">PUBLIC</div>
-            <div class="summary">Validate a field value as unique.</div>
-          </li><li id="orionis.schemas.rules.Unique.enforceAsync">
-            
-            <div class="fullName">orionis<wbr></wbr>.schemas<wbr></wbr>.rules<wbr></wbr>.<wbr></wbr>Unique<wbr></wbr>.enforce<wbr></wbr>Async</div>
-            <div class="url">orionis.schemas.rules.Unique.html#enforceAsync</div>
-            <div class="type">Function</div>
-            <div class="kind">Method</div>
-            <div class="privacy">PUBLIC</div>
             <div class="summary">Check uniqueness on the current loop and its active transaction.</div>
           </li><li id="orionis.schemas.rules.Unique.__plan">
             
@@ -89236,22 +89252,6 @@
             <div class="kind">Method</div>
             <div class="privacy">PUBLIC</div>
             <div class="summary">Build the query plan probing for a conflicting row.</div>
-          </li><li id="orionis.schemas.rules.Unique.__existsShared">
-            
-            <div class="fullName">orionis<wbr></wbr>.schemas<wbr></wbr>.rules<wbr></wbr>.<wbr></wbr>Unique<wbr></wbr>.__exists<wbr></wbr>Shared</div>
-            <div class="url">orionis.schemas.rules.Unique.html#__existsShared</div>
-            <div class="type">Function</div>
-            <div class="kind">Method</div>
-            <div class="privacy">PUBLIC</div>
-            <div class="summary">Run the probe on the connection shared by the application.</div>
-          </li><li id="orionis.schemas.rules.Unique.__existsIsolated">
-            
-            <div class="fullName">orionis<wbr></wbr>.schemas<wbr></wbr>.rules<wbr></wbr>.<wbr></wbr>Unique<wbr></wbr>.__exists<wbr></wbr>Isolated</div>
-            <div class="url">orionis.schemas.rules.Unique.html#__existsIsolated</div>
-            <div class="type">Function</div>
-            <div class="kind">Method</div>
-            <div class="privacy">PUBLIC</div>
-            <div class="summary">Run the probe on a connection owned by the calling event loop.</div>
           </li><li id="orionis.schemas.rules.Uppercase">
             
             <div class="fullName">orionis<wbr></wbr>.schemas<wbr></wbr>.rules<wbr></wbr>.<wbr></wbr>Uppercase</div>

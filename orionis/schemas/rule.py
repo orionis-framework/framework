@@ -1,4 +1,4 @@
-import asyncio
+from inspect import iscoroutinefunction
 from orionis.schemas.contracts.constraint import IRule
 from orionis.schemas.entities.failure import ValidationFailure
 
@@ -6,6 +6,30 @@ class Rule(IRule):
 
     # Restrict rule instances to their declared attributes.
     __slots__ = ("_code", "_message")
+
+    def __init_subclass__(cls, **kwargs: object) -> None:
+        """
+        Require asynchronous enforcement on every rule subclass.
+
+        Parameters
+        ----------
+        **kwargs : object
+            Class options forwarded to the next base class.
+
+        Returns
+        -------
+        None
+            Complete subclass creation when enforcement is asynchronous.
+
+        Raises
+        ------
+        TypeError
+            If a subclass declares synchronous enforcement.
+        """
+        super().__init_subclass__(**kwargs)
+        if not iscoroutinefunction(cls.enforce):
+            message = f"{cls.__name__}.enforce must be declared with 'async def'."
+            raise TypeError(message)
 
     def __init__(self, *, message: str | None = None) -> None:
         """
@@ -29,14 +53,14 @@ class Rule(IRule):
             message if message is not None else getattr(klass, "__message__", None)
         )
 
-    def enforce(
+    async def enforce(
         self,
         field: str,
         value: object,
         instance: object,
     ) -> bool:
         """
-        Evaluate whether the current value satisfies this rule.
+        Asynchronously evaluate whether the current value satisfies this rule.
 
         Parameters
         ----------
@@ -55,36 +79,6 @@ class Rule(IRule):
         error_msg = "Subclasses must implement the enforce method."
         raise NotImplementedError(error_msg)
 
-    async def enforceAsync(
-        self,
-        field: str,
-        value: object,
-        instance: object,
-    ) -> bool:
-        """
-        Run an explicitly asynchronous rule check without blocking the loop.
-
-        Parameters
-        ----------
-        field : str
-            Field name associated with the value.
-        value : object
-            Current field value to validate.
-        instance : object
-            Schema instance owning the field value.
-
-        Returns
-        -------
-        bool
-            Whether the synchronous rule accepts the value in a worker thread.
-
-        Notes
-        -----
-        Rules with native asynchronous I/O should override this method. Schema
-        plans call ordinary synchronous rules directly, without using a worker.
-        """
-        return await asyncio.to_thread(self.enforce, field, value, instance)
-
     async def validate(
         self,
         field: str,
@@ -92,7 +86,7 @@ class Rule(IRule):
         instance: object,
     ) -> ValidationFailure | None:
         """
-        Validate the field, awaiting native asynchronous enforcement when present.
+        Validate the field by awaiting its asynchronous enforcement.
 
         Parameters
         ----------
@@ -108,11 +102,7 @@ class Rule(IRule):
         ValidationFailure | None
             Failure details when validation fails; otherwise ``None``.
         """
-        valid = (
-            self.enforce(field, value, instance)
-            if type(self).enforceAsync is Rule.enforceAsync
-            else await self.enforceAsync(field, value, instance)
-        )
+        valid = await self.enforce(field, value, instance)
         if not valid:
             return ValidationFailure(
                 field=field,

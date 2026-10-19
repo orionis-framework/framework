@@ -24,7 +24,7 @@ class StrongPassword(Rule):
     )
     __code__ = "strong_password"
 
-    def enforce(
+    async def enforce(
         self,
         field: str,
         value: object,

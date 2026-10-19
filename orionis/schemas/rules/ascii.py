@@ -10,7 +10,7 @@ class Ascii(Rule):
     __message__ = "Value must contain only 7-bit ASCII characters."
     __code__ = "ascii"
 
-    def enforce(
+    async def enforce(
         self,
         field: str,
         value: object,

@@ -43,7 +43,7 @@ class Alpha(Rule):
         super().__init__(message=message)
         self._ascii_only: bool = ascii_only
 
-    def enforce(
+    async def enforce(
         self,
         field: str,
         value: object,

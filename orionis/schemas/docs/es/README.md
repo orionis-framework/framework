@@ -4,7 +4,7 @@
 
 Un `Schema` Orionis es un `msgspec.Struct` procesado por `SchemaMeta`. Los campos usan anotaciones Python; `Annotated`—alias `Field`—adjunta constraints, reglas, documentación y mensajes. La metaclase compila constraints y planes al crear la clase para mantener pequeño el camino exitoso.
 
-Declaración y validación están separadas. La construcción directa confía en valores ya tipados bajo la semántica del constructor `msgspec`. `orionis.schemas.validator.Schema.validate()` y `validateAsync()` convierten payloads no confiables y lanzan `ValidationException` con fallos por campo.
+Declaración y validación están separadas. La construcción directa confía en valores ya tipados bajo la semántica del constructor `msgspec`. `await orionis.schemas.validator.Schema.validate(payload, schema)` convierte payloads no confiables y lanza `ValidationException` con fallos por campo. La validación tiene una única entrada y siempre es asíncrona, incluso en schemas sin reglas personalizadas.
 
 ## Requisitos
 

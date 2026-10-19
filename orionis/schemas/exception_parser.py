@@ -3,11 +3,18 @@ import re
 import types
 import msgspec
 import msgspec.structs
-from typing import Union, get_args, get_origin
+from typing import Annotated, Union, get_args, get_origin
 from orionis.schemas.entities.failure import ValidationFailure
+from orionis.schemas.rules_executor import _collection_item_type
 
 # Regular expressions for parsing msgspec error messages.
 MISSING_FIELD_RE = re.compile(r"missing required field `(?P<field>[^`]+)`")
+
+# Keep quoted dictionary keys intact even when they contain dots or brackets.
+_PATH_PART_RE = re.compile(
+    r"""(?:^|\.)(?P<field>[^.\[\]]+)|"""
+    r"""\[(?P<key>'(?:\\.|[^'\\])*'|"(?:\\.|[^"\\])*"|[^\]'"]*)\]""",
+)
 
 # Suffix msgspec appends to report the location of the offending value.
 _PATH_MARKER = " - at `$"
@@ -242,7 +249,12 @@ class ValidationErrorParser:
         if "." not in field_path:
             return schema, field_path
 
-        parts = field_path.split(".")
+        parts: list[str] = []
+        for match in _PATH_PART_RE.finditer(field_path):
+            if match.group("field") is not None:
+                parts.append(match.group("field"))
+            elif parts:
+                parts[-1] += match.group(0)
         current: type = schema
 
         for part in parts[:-1]:
@@ -270,31 +282,62 @@ class ValidationErrorParser:
         type | None
             The nested schema class, or ``None`` when not found.
         """
-        # Cache lookup: avoids repeated calls to get_fields_map and redundant type
+        # Do not retain request-owned dictionary keys in the type cache.
+        indexed = "[" in field_name
         key = (schema, field_name)
-        cached = _NESTED_TYPE_CACHE.get(key, _MISSING)
-        if cached is not _MISSING:
-            return cached
+        if not indexed:
+            cached = _NESTED_TYPE_CACHE.get(key, _MISSING)
+            if cached is not _MISSING:
+                return cached
 
         # Get the declared type of the field from the schema's fields map.
-        field_type = _get_fields_map(schema).get(field_name)
-        result: type | None = None
-        if field_type is not None:
-            origin = get_origin(field_type)
-            candidates = (
-                get_args(field_type)
-                if (origin is Union or origin is types.UnionType)
-                else (field_type,)
-            )
-            for arg in candidates:
-                if isinstance(arg, type) and hasattr(arg, "__orionis_constraints__"):
-                    result = arg
-                    break
+        field_type = _get_fields_map(schema).get(field_name.partition("[")[0])
+        selectors = tuple(
+            match.group("key") for match in _PATH_PART_RE.finditer(field_name)
+            if match.group("key") is not None
+        )
+        result = ValidationErrorParser._nestedType(field_type, selectors)
 
         # Cache the result (including None)
         # to avoid redundant lookups on the error path.
-        _NESTED_TYPE_CACHE[key] = result
+        if not indexed:
+            _NESTED_TYPE_CACHE[key] = result
         return result
+
+    @staticmethod
+    def _nestedType(tp: object, selectors: tuple[str, ...]) -> type | None:
+        """
+        Follow collection selectors to the schema owning a nested field.
+
+        Parameters
+        ----------
+        tp : object
+            Annotation of the parent field.
+        selectors : tuple[str, ...]
+            Sequence indices or dictionary keys preceding the nested field.
+
+        Returns
+        -------
+        type | None
+            Schema selected by the annotation and collection path.
+        """
+        origin = get_origin(tp)
+        args = get_args(tp)
+        if origin is Annotated:
+            return ValidationErrorParser._nestedType(args[0], selectors)
+        if origin is Union or origin is types.UnionType:
+            for arg in args:
+                result = ValidationErrorParser._nestedType(arg, selectors)
+                if result is not None:
+                    return result
+            return None
+        if selectors:
+            item_type = _collection_item_type(tp, selectors[0])
+            return ValidationErrorParser._nestedType(item_type, selectors[1:])
+        return (
+            tp if isinstance(tp, type) and hasattr(tp, "__orionis_constraints__")
+            else None
+        )
 
     @staticmethod
     def _matchConstraintKey(message: str) -> str | None:

@@ -16,7 +16,7 @@ class _AlwaysValidRule(Rule):
     __code__ = "always_valid"
     __message__ = "Should not appear."
 
-    def enforce(
+    async def enforce(
         self,
         _field: str,
         _value: object,
@@ -47,7 +47,7 @@ class _AlwaysInvalidRule(Rule):
     __code__ = "always_invalid"
     __message__ = "Value is always invalid."
 
-    def enforce(
+    async def enforce(
         self,
         _field: str,
         _value: object,
@@ -75,7 +75,7 @@ class _AlwaysInvalidRule(Rule):
 class _BareRule(Rule):
     """Concrete Rule declaring neither ``__code__`` nor ``__message__``."""
 
-    def enforce(
+    async def enforce(
         self,
         _field: str,
         _value: object,
@@ -103,7 +103,7 @@ class _BareRule(Rule):
 class _DelegatingRule(Rule):
     """Concrete Rule delegating ``enforce`` back to the abstract base."""
 
-    def enforce(
+    async def enforce(
         self,
         field: str,
         value: object,
@@ -126,15 +126,15 @@ class _DelegatingRule(Rule):
         bool
             Never returns; the base implementation raises.
         """
-        return super().enforce(field, value, instance)
+        return await super().enforce(field, value, instance)
 
 class _NativeAsyncRule(Rule):
-    """Require awaiting native enforcement instead of calling the sync fallback."""
+    """Require awaiting enforcement on the caller's event loop."""
 
     __code__ = "native_async"
     __message__ = "Value was rejected asynchronously."
 
-    async def enforceAsync(
+    async def enforce(
         self,
         _field: str,
         value: object,
@@ -146,6 +146,11 @@ class _NativeAsyncRule(Rule):
 
 class TestRuleContract(TestCase):
 
+    def testEnforceIsAlwaysAsync(self) -> None:
+        """Require coroutine enforcement in both the interface and base class."""
+        self.assertTrue(iscoroutinefunction(IRule.enforce))
+        self.assertTrue(iscoroutinefunction(Rule.enforce))
+
     def testValidateIsAlwaysAsync(self) -> None:
         """Require asynchronous validation in the interface and implementation."""
         self.assertTrue(iscoroutinefunction(IRule.validate))
@@ -154,6 +159,24 @@ class TestRuleContract(TestCase):
     def testRuleHasNoAlternateEntryPoint(self) -> None:
         """Keep custom rules on the same single validation API as schemas."""
         self.assertFalse(hasattr(Rule, "validateAsync"))
+        self.assertFalse(hasattr(Rule, "enforceAsync"))
+
+    def testSynchronousEnforcementIsRejectedAtClassDeclaration(self) -> None:
+        """Reject a synchronous override before it can enter a schema plan."""
+        with self.assertRaisesRegex(TypeError, r"\.enforce must.*async def"):
+            class _SynchronousRule(Rule):
+                def enforce(
+                    self, _field: str, _value: object, _instance: object,
+                ) -> bool:
+                    """Declare an invalid synchronous predicate."""
+                    return True
+
+    def testAsyncEnforcementCanBeInherited(self) -> None:
+        """Allow subclasses to reuse an already asynchronous implementation."""
+        class _InheritedRule(_AlwaysValidRule):
+            pass
+
+        self.assertTrue(iscoroutinefunction(_InheritedRule.enforce))
 
     def testRuleImplementsTheRuleInterface(self) -> None:
         """Confirm Rule implements the IRule contract.
@@ -182,7 +205,7 @@ class TestRuleContract(TestCase):
 
 class TestRuleEnforce(TestCase):
 
-    def testBaseEnforceRaisesNotImplementedError(self) -> None:
+    async def testBaseEnforceRaisesNotImplementedError(self) -> None:
         """Raise NotImplementedError when the base enforce is reached.
 
         Validates that subclasses are required to provide their own
@@ -195,7 +218,7 @@ class TestRuleEnforce(TestCase):
         """
         rule = _DelegatingRule()
         with self.assertRaises(NotImplementedError):
-            rule.enforce("field", "value", object())
+            await rule.enforce("field", "value", object())
 
 class TestRuleValidate(TestCase):
 
@@ -209,9 +232,9 @@ class TestRuleValidate(TestCase):
         self.assertEqual(failure.rule, "native_async")
         self.assertEqual(failure.message, "Custom async error.")
 
-    async def testSynchronousRulesDoNotUseWorkerThreads(self) -> None:
-        """Keep inexpensive synchronous predicates on the caller's thread."""
-        with patch("orionis.schemas.rule.asyncio.to_thread") as offload:
+    async def testPureRulesDoNotUseWorkerThreads(self) -> None:
+        """Await inexpensive pure predicates on the caller's thread."""
+        with patch("asyncio.to_thread") as offload:
             self.assertIsNone(
                 await _AlwaysValidRule().validate("field", "value", object()),
             )
@@ -222,7 +245,7 @@ class TestRuleValidate(TestCase):
         message = "Native service failed."
         with (
             patch.object(
-                _NativeAsyncRule, "enforceAsync", side_effect=RuntimeError(message),
+                _NativeAsyncRule, "enforce", side_effect=RuntimeError(message),
             ),
             self.assertRaisesRegex(RuntimeError, message),
         ):

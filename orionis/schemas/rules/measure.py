@@ -1,3 +1,4 @@
+import asyncio
 from collections.abc import Sized
 from decimal import Decimal
 
@@ -24,9 +25,9 @@ def is_file(value: object) -> bool:
     """
     return all(hasattr(value, name) for name in _FILE_ATTRIBUTES)
 
-def read_content(value: object) -> bytes | None:
+async def read_content(value: object) -> bytes | None:
     """
-    Read the whole content of an uploaded file.
+    Read uploaded-file content without blocking the event loop.
 
     Parameters
     ----------
@@ -46,7 +47,7 @@ def read_content(value: object) -> bytes | None:
         return None
 
     try:
-        content = reader()
+        content = await asyncio.to_thread(reader)
     except OSError:
         return None
 

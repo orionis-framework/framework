@@ -57,7 +57,7 @@ class DecimalPlaces(Rule):
         self._minimum: int = minimum
         self._maximum: int = upper
 
-    def enforce(
+    async def enforce(
         self,
         field: str,
         value: object,

@@ -187,7 +187,7 @@ class TestRemoteMetadata(TestCase):
             mutable = cast("MutableMapping[str, RemoteMethod]", methods)
             mutable["helper"] = methods["sum"]
 
-    def testArgumentsExcludeDependenciesAndCannotOverrideThem(self) -> None:
+    async def testArgumentsExcludeDependenciesAndCannotOverrideThem(self) -> None:
         """
         Interpret positional indexes only across client-bound parameters.
 
@@ -198,8 +198,8 @@ class TestRemoteMetadata(TestCase):
         """
         method = compile_hub(_MethodsHub)["sum"]
         self.assertEqual(method.dependencies, {"service": _Service})
-        self.assertEqual(method.bind([3, 4], {}), {"first": 3, "second": 4})
-        self.assertEqual(method.bind([], {"first": 3}), {"first": 3, "second": 2})
+        self.assertEqual(await method.bind([3, 4], {}), {"first": 3, "second": 4})
+        self.assertEqual(await method.bind([], {"first": 3}), {"first": 3, "second": 2})
         cases = [
             ([3], {"service": "malicious"}),
             ([3, "malicious", 4], {}),
@@ -212,10 +212,10 @@ class TestRemoteMetadata(TestCase):
                 self.subTest(args=args, kwargs=kwargs),
                 self.assertRaises(RPCError) as exc,
             ):
-                method.bind(args, kwargs)
+                await method.bind(args, kwargs)
             self.assertEqual(exc.exception.code, "invalid_arguments")
 
-    def testDefaultsRetainAnnotationsAndDoNotCoerceClientTypes(self) -> None:
+    async def testDefaultsRetainAnnotationsAndDoNotCoerceClientTypes(self) -> None:
         """
         Prevent strings or booleans from replacing integer parameters.
 
@@ -227,15 +227,15 @@ class TestRemoteMetadata(TestCase):
         method = compile_hub(_MethodsHub)["sum"]
         for args in (["3"], [True], [3, "4"]):
             with self.subTest(args=args), self.assertRaises(RPCError) as exc:
-                method.bind(list(args), {})
+                await method.bind(list(args), {})
             self.assertEqual(exc.exception.code, "validation_error")
         dependency = compile_hub(_MethodsHub)["dependency"]
         self.assertEqual(dependency.dependencies, {"service": _Service})
-        self.assertEqual(dependency.bind([], {}), {})
+        self.assertEqual(await dependency.bind([], {}), {})
         with self.assertRaises(RPCError):
-            dependency.bind([], {"service": None})
+            await dependency.bind([], {"service": None})
 
-    def testKeywordOnlyParametersCannotConsumePositionalArguments(self) -> None:
+    async def testKeywordOnlyParametersCannotConsumePositionalArguments(self) -> None:
         """
         Keep keyword-only parameters explicit on the wire.
 
@@ -246,12 +246,12 @@ class TestRemoteMetadata(TestCase):
         """
         method = compile_hub(_MethodsHub)["sync"]
         self.assertEqual(
-            method.bind(["a"], {"upper": True}), {"value": "a", "upper": True},
+            await method.bind(["a"], {"upper": True}), {"value": "a", "upper": True},
         )
         with self.assertRaises(RPCError):
-            method.bind(["a", True], {})
+            await method.bind(["a", True], {})
 
-    def testSchemasUseFrameworkConversionAndCustomRules(self) -> None:
+    async def testSchemasUseFrameworkConversionAndCustomRules(self) -> None:
         """
         Reuse schema rules with RPC values without resolving Request.data().
 
@@ -261,18 +261,18 @@ class TestRemoteMetadata(TestCase):
             The nullable default and framework password rule are respected.
         """
         method = compile_hub(_MethodsHub)["payload"]
-        self.assertEqual(method.bind([], {}), {"value": None})
+        self.assertEqual(await method.bind([], {}), {"value": None})
         data = {"count": 2, "password": "CorrectHorse9!Battery"}
-        bound = method.bind([data], {})
+        bound = await method.bind([data], {})
         value = bound["value"]
         if not isinstance(value, _Payload):
             self.fail("Expected a converted payload schema")
         self.assertEqual(value.count, 2)
         with self.assertRaises(RPCError) as exc:
-            method.bind([{"count": 2, "password": "weak"}], {})
+            await method.bind([{"count": 2, "password": "weak"}], {})
         self.assertEqual(exc.exception.code, "validation_error")
 
-    def testSchemaCollectionsCannotBypassCustomValidationRules(self) -> None:
+    async def testSchemaCollectionsCannotBypassCustomValidationRules(self) -> None:
         """
         Apply custom rules to schemas nested inside RPC data collections.
 
@@ -296,6 +296,38 @@ class TestRemoteMetadata(TestCase):
                 -------
                 None
                     Provide a typed no-op endpoint for binding assertions.
+                """
+
+            @remote
+            def tupled(self, values: tuple[_Payload, ...]) -> None:
+                """
+                Declare a tuple requiring contained schema validation.
+
+                Parameters
+                ----------
+                values : tuple[_Payload, ...]
+                    Client schemas whose nested rules must be enforced.
+
+                Returns
+                -------
+                None
+                    Provide a typed no-op endpoint for tuple assertions.
+                """
+
+            @remote
+            def mapped(self, values: dict[str, _Payload]) -> None:
+                """
+                Declare a mapping requiring contained schema validation.
+
+                Parameters
+                ----------
+                values : dict[str, _Payload]
+                    Client schemas whose nested rules must be enforced.
+
+                Returns
+                -------
+                None
+                    Provide a typed no-op endpoint for mapping assertions.
                 """
 
             @remote
@@ -330,17 +362,32 @@ class TestRemoteMetadata(TestCase):
                     Provide a typed no-op endpoint for nested rule assertions.
                 """
 
-        method = compile_hub(CollectionHub)["many"]
-        with self.assertRaises(RPCError) as exc:
-            method.bind([[{"count": 1, "password": "weak"}]], {})
-        self.assertEqual(exc.exception.code, "validation_error")
-        self.assertEqual(method.bind([[]], {}), {"values": []})
-        for name in ("wrapped", "collection"):
+        methods = compile_hub(CollectionHub)
+        invalid = {"count": 1, "password": "weak"}
+        valid = {"count": 1, "password": "CorrectHorse9!Battery"}
+        payload = _Payload(1, "CorrectHorse9!Battery")
+        for name, invalid_values, valid_values, expected in (
+            ("many", [invalid], [valid], [payload]),
+            ("tupled", [invalid], [valid], (payload,)),
+            ("mapped", {"item": invalid}, {"item": valid}, {"item": payload}),
+        ):
             with self.subTest(name=name), self.assertRaises(RPCError) as exc:
-                compile_hub(CollectionHub)[name].bind([
-                    {"values": [{"count": 1, "password": "weak"}]},
-                ], {})
+                await methods[name].bind([invalid_values], {})
             self.assertEqual(exc.exception.code, "validation_error")
+            self.assertEqual(
+                await methods[name].bind([valid_values], {}), {"values": expected},
+            )
+        self.assertEqual(await methods["many"].bind([[]], {}), {"values": []})
+        for name, wrapper in (
+            ("wrapped", _Envelope), ("collection", _SchemaCollection),
+        ):
+            with self.subTest(name=name), self.assertRaises(RPCError) as exc:
+                await methods[name].bind([{"values": [invalid]}], {})
+            self.assertEqual(exc.exception.code, "validation_error")
+            self.assertEqual(
+                await methods[name].bind([{"values": [valid]}], {}),
+                {"value": wrapper(values=[payload])},
+            )
 
     async def testFreshContainerScopesPreserveConstructorAndMethodInjection(
         self,
@@ -369,7 +416,7 @@ class TestRemoteMetadata(TestCase):
             """
             async with container.beginScope():
                 hub = await container.build(_MethodsHub)
-                bound = method.bind([3, 4], {})
+                bound = await method.bind([3, 4], {})
                 for name, service in method.dependencies.items():
                     bound[name] = await container.make(service)
                 await asyncio.sleep(0)

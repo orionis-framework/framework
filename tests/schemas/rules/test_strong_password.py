@@ -105,7 +105,7 @@ class TestStrongPasswordEnforce(TestCase):
 
 class TestStrongPasswordValidate(TestCase):
 
-    def testValidateReturnsNoneForStrongPassword(self) -> None:
+    async def testValidateReturnsNoneForStrongPassword(self) -> None:
         """Return None when the password satisfies the rule.
 
         Validates the success path of the inherited validate method.
@@ -115,9 +115,9 @@ class TestStrongPasswordValidate(TestCase):
         None
             Assertions verify the behavior described above.
         """
-        self.assertIsNone(StrongPassword().validate("pwd", "Secure1!", object()))
+        self.assertIsNone(await StrongPassword().validate("pwd", "Secure1!", object()))
 
-    def testValidateReturnsFailureForWeakPassword(self) -> None:
+    async def testValidateReturnsFailureForWeakPassword(self) -> None:
         """Return a ValidationFailure for a rejected password.
 
         Validates the rule code carried by the reported failure.
@@ -127,7 +127,7 @@ class TestStrongPasswordValidate(TestCase):
         None
             Assertions verify the behavior described above.
         """
-        result = StrongPassword().validate("pwd", "weakpass", object())
+        result = await StrongPassword().validate("pwd", "weakpass", object())
         self.assertIsInstance(result, ValidationFailure)
         self.assertEqual(result.rule, "strong_password")
 

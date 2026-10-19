@@ -43,7 +43,7 @@ class DateFormat(Rule):
             raise ValueError(error_msg)
         self._formats: tuple[str, ...] = formats
 
-    def enforce(
+    async def enforce(
         self,
         field: str,
         value: object,

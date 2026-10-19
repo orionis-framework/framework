@@ -3,6 +3,7 @@
 Use a Hub to group operations sharing an audience and protocol. Only ordinary instance methods marked `@remote` are callable remotely. A public method without the decorator remains outside the remote surface.
 
 ```python
+import asyncio
 from orionis.realtime import Hub, remote
 from orionis.realtime.metadata import compile_hub
 
@@ -12,14 +13,14 @@ class MathHub(Hub):
         return first + second
 
 methods = compile_hub(MathHub)
-assert methods["sum"].bind([3], {}) == {"first": 3, "second": 2}
+assert asyncio.run(methods["sum"].bind([3], {})) == {"first": 3, "second": 2}
 ```
 
 This example compiles without a server. Serve it through `Route.hub("/realtime/math", MathHub)`, importing Route from `orionis.support.facades`. `protocol="msgpack"` selects binary MessagePack for the whole connection; JSON text is default. Codecs are not negotiated per message.
 
 ## Data and services
 
-Annotate every remote argument. Msgspec-compatible data types convert client arguments; service types resolve through the container and cannot be replaced by payload values. Nested Orionis schemas also run their rules. Defaults and keyword-only parameters are supported.
+Annotate every remote argument. Msgspec-compatible data types convert client arguments; service types resolve through the container and cannot be replaced by payload values. Nested Orionis schemas, including those inside collections or plain structs, run their synchronous or asynchronous rules before dispatch. Direct calls to `bind()` must be awaited; inside an existing event loop use `await methods["sum"].bind([3], {})`. Defaults and keyword-only parameters are supported.
 
 For an importable application `Calculator` service, a method can declare `async def add(self, first: int, calculator: Calculator, second: int = 2) -> int`. Register/resolve Calculator normally. Keep imports available at runtime when reflection requires them; do not hide every injectable annotation under `TYPE_CHECKING` without a resolution strategy.
 

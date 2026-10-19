@@ -56,7 +56,7 @@ class MimeTypes(Rule):
         self._exact: frozenset[str] = frozenset(exact)
         self._prefixes: tuple[str, ...] = tuple(prefixes)
 
-    def enforce(
+    async def enforce(
         self,
         field: str,
         value: object,

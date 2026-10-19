@@ -71,7 +71,7 @@ class TestAccepted(TestCase):
         for value in (False, 0, 2, "no", "off", "", None, [], object()):
             self.assertFalse(rule.enforce("terms", value, _OWNER))
 
-    def testCodeAndDefaultMessage(self) -> None:
+    async def testCodeAndDefaultMessage(self) -> None:
         """Expose the documented rule code in the reported failure.
 
         Validates that a rejected value produces a failure carrying the
@@ -82,7 +82,7 @@ class TestAccepted(TestCase):
         None
             Assertions verify the behavior described above.
         """
-        failure = Accepted().validate("terms", "no", _OWNER)
+        failure = await Accepted().validate("terms", "no", _OWNER)
         self.assertIsNotNone(failure)
         self.assertEqual(failure.rule, "accepted")
 

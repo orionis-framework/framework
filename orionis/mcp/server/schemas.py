@@ -242,7 +242,7 @@ def _inline(
         if key != _DEFINITIONS
     }
 
-def convert_payload(value: object, annotation: object) -> object:
+async def convert_payload(value: object, annotation: object) -> object:
     """
     Validate and convert a payload to its declared native type.
 
@@ -262,5 +262,5 @@ def convert_payload(value: object, annotation: object) -> object:
 
     if isinstance(annotation, type) and issubclass(annotation, Schema):
         from orionis.schemas.validator import Schema as Validator
-        return Validator.validate(value, annotation)
+        return await Validator.validate(value, annotation)
     return msgspec.convert(value, type=annotation, strict=True)

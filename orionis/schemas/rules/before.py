@@ -42,7 +42,7 @@ class Before(Rule):
         super().__init__(message=message)
         self._reference: object = reference
 
-    def enforce(
+    async def enforce(
         self,
         field: str,
         value: object,

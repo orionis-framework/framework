@@ -113,15 +113,13 @@ class TestContainerLazyImports(TestCase):
             "from orionis.schemas.rules import Unique\n"
             "from orionis.schemas.rules.unique import Unique as Direct\n"
             "rule = Unique('users', 'name')\n"
-            "sync = rule.enforce('name', None, None)\n"
-            "async_result = asyncio.run(rule.enforceAsync('name', None, None))\n"
+            "async_result = asyncio.run(rule.enforce('name', None, None))\n"
             "excluded = ('orionis.database.connection', 'orionis.orm.resolver',\n"
             "    'orionis.orm.query.raw_builder', 'orionis.aio.loop', 'sqlalchemy')\n"
-            "print(json.dumps({'same': Unique is Direct, 'sync': sync,\n"
+            "print(json.dumps({'same': Unique is Direct,\n"
             "    'async': async_result, 'loaded': [name for name in excluded\n"
             "        if name in sys.modules]}))\n",
         )
         self.assertTrue(result["same"])
-        self.assertTrue(result["sync"])
         self.assertTrue(result["async"])
         self.assertEqual(result["loaded"], [])

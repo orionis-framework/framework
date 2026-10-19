@@ -36,7 +36,7 @@ class GreaterThanOrEqualField(Rule):
         super().__init__(message=message)
         self._other_field: str = other_field
 
-    def enforce(
+    async def enforce(
         self,
         field: str,
         value: object,

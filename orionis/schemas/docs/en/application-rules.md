@@ -26,13 +26,13 @@ The complete example below validates registration with explicit acceptance and c
 
 ## Validation that queries other services
 
-`ActiveUrl` checks hostname DNS resolution, not whether an HTTP resource exists or is safe to download. Its synchronous variant blocks; its asynchronous variant uses loop-based resolution. In requests, use `validateAsync()` and a resource-access policy independent of format validation.
+`ActiveUrl` checks hostname DNS resolution, not whether an HTTP resource exists or is safe to download. `await Validator.validate(...)` uses loop-based resolution without blocking the caller's event loop. Apply a resource-access policy independent of format validation.
 
-`Unique` needs a ready Database service. Its async variant preserves the active connection/transaction. Its sync variant may bridge to a loop and use an isolated connection when a loop is already running: do not assume visibility into another connection's uncommitted changes. Validation does not guarantee uniqueness against races; also define a database uniqueness constraint and handle persistence conflicts. Never derive `table`, `column`, `ignore_column`, or the connection directly from untrusted input.
+`Unique` needs a ready Database service. Validation awaits its native I/O and preserves the active connection/transaction. Validation does not guarantee uniqueness against races; also define a database uniqueness constraint and handle persistence conflicts. Never derive `table`, `column`, `ignore_column`, or the connection directly from untrusted input.
 
 ## Write a custom rule
 
-Inherit from `Rule`, set `__code__` and `__message__`, and implement `enforce(field, value, instance) -> bool`. Returning false creates a failure; `instance` allows sibling-field checks. The base `enforceAsync` uses `enforce`, so a short CPU rule works on both paths. For native I/O, override `async enforceAsync(...)` and await the service; do not hide blocking I/O inside `enforce` in an async handler. Keep rules free from mutable per-request state: schemas and their plans are reused.
+Inherit from `Rule`, set `__code__` and `__message__`, and implement `enforce(field, value, instance) -> bool`. Returning false creates a failure; `instance` allows sibling-field checks. `Rule.validate` is always asynchronous: it calls short pure `enforce` predicates directly, without a worker thread. For native I/O, override `async enforceAsync(...)`; validation awaits that override instead of calling the synchronous predicate. Do not hide blocking I/O inside `enforce`. Keep rules free from mutable per-request state: schemas and their plans are reused.
 
 ```python
 from orionis.schemas.rule import Rule
@@ -47,6 +47,8 @@ class Even(Rule):
 
 Combine `Even()` with `Field[int, Even()]`. Invalid options or incompatible constraints fail at schema declaration; fix the declaration instead of converting a programming error into a user failure.
 
+Run the validation snippet below inside an async function or an async-aware shell.
+
 ```python
 from orionis.schemas import Schema
 from orionis.schemas.fields import Field
@@ -59,7 +61,7 @@ class Registration(Schema):
     password_confirmation: Field[str, ConfirmPassword()]
     accepted_terms: Field[bool, Accepted()]
 
-registration = Validator.validate({
+registration = await Validator.validate({
     "email": "ada@example.com",
     "password": "Example42",
     "password_confirmation": "Example42",

@@ -31,7 +31,7 @@ class Email(Rule):
     __message__ = "Value must be a valid email address."
     __code__ = "email"
 
-    def enforce(
+    async def enforce(
         self,
         field: str,
         value: object,

@@ -2,6 +2,8 @@
 
 Constraints describe structural bounds compiled at class declaration. A `Rule` checks an application condition after type conversion. Combine them using `Field[T, ...]`; `Field` aliases `typing.Annotated`, not a function accepting `default=`.
 
+The 47 bundled validations comprise 37 executable rules and 10 compiled structural constraints. All executable rules expose the same mandatory asynchronous `enforce` method; structural constraints remain declaration metadata, not a second execution API.
+
 ## Choose a bundled rule
 
 | Need | Rules and relevant parameters |
@@ -16,7 +18,7 @@ Constraints describe structural bounds compiled at class declaration. A `Rule` c
 | Files | `File`, `Image`, `MimeTypes(*mime_types)`, `Dimensions(...)`. They require a compatible file object; a client-provided path is not an upload. |
 | External services | `ActiveUrl`, `Unique(table, column, *, ignore=None, ignore_column="id", connection=None)`. |
 
-All accept the keyword option `message=`. `Between` and `Size` measure numeric magnitude, text/collection length, and upload size in kilobytes. `Dimensions` accepts `width`, `height`, `min_width`, `max_width`, `min_height`, `max_height`, `ratio`, `min_ratio`, and `max_ratio`; ratios may be numbers or strings such as `"3/2"`. Image inspection reads headers; it does not convert or sanitize a file.
+All accept the keyword option `message=`. `Between` and `Size` measure numeric magnitude, text/collection length, and upload size in kilobytes. `Dimensions` accepts `width`, `height`, `min_width`, `max_width`, `min_height`, `max_height`, `ratio`, `min_ratio`, and `max_ratio`; ratios may be numbers or strings such as `"3/2"`. Image inspection reads headers; it does not convert or sanitize a file. Rules that read upload contents offload the synchronous file reader so disk-backed uploads do not block the event loop.
 
 `StrongPassword` requires at least eight characters, an ASCII uppercase letter, an ASCII lowercase letter, and a digit. It does not require a symbol or check breached passwords. Validation does not replace [hashing](../../../hashing/docs/en/README.md).
 
@@ -32,7 +34,7 @@ The complete example below validates registration with explicit acceptance and c
 
 ## Write a custom rule
 
-Inherit from `Rule`, set `__code__` and `__message__`, and implement `enforce(field, value, instance) -> bool`. Returning false creates a failure; `instance` allows sibling-field checks. `Rule.validate` is always asynchronous: it calls short pure `enforce` predicates directly, without a worker thread. For native I/O, override `async enforceAsync(...)`; validation awaits that override instead of calling the synchronous predicate. Do not hide blocking I/O inside `enforce`. Keep rules free from mutable per-request state: schemas and their plans are reused.
+Inherit from `Rule`, set `__code__` and `__message__`, and implement `async def enforce(field, value, instance) -> bool`, including for pure predicates. Returning false creates a failure; `instance` allows sibling-field checks. `Rule.validate` always awaits `enforce`; there is no alternate enforcement method or synchronous fallback. Declaring a synchronous override raises `TypeError` when the rule class is created. Use native `await` for I/O, and do not hide blocking I/O inside `enforce`. Short pure checks remain on the caller's thread without worker offloading. Keep rules free from mutable per-request state: schemas and their plans are reused.
 
 ```python
 from orionis.schemas.rule import Rule
@@ -41,7 +43,7 @@ class Even(Rule):
     __code__ = "even"
     __message__ = "Value must be even."
 
-    def enforce(self, field: str, value: object, instance: object) -> bool:
+    async def enforce(self, field: str, value: object, instance: object) -> bool:
         return isinstance(value, int) and value % 2 == 0
 ```
 

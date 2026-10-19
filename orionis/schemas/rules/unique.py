@@ -1,33 +1,15 @@
-import asyncio
 from typing import TYPE_CHECKING
 from orionis.schemas.rule import Rule
 
 if TYPE_CHECKING:
     from orionis.orm.query.expressions import SelectPlan
 
-def _has_running_loop() -> bool:
-    """
-    Report whether the calling thread already runs an event loop.
-
-    Returns
-    -------
-    bool
-        Return ``True`` when a loop is running in the current thread.
-    """
-    try:
-        asyncio.get_running_loop()
-    except RuntimeError:
-        return False
-    return True
-
 class Unique(Rule):
     """
     Ensure a value is not already stored in a database column.
 
-    Asynchronous schema validation awaits the current connection and preserves
-    its transaction. Explicit synchronous validation bridges through
-    :meth:`orionis.aio.loop.Loop.runSync` and blocks the calling thread. A
-    synchronous call made inside an event loop uses an isolated connection.
+    Validation awaits the current connection and preserves its event loop
+    and active transaction.
     """
 
     # ruff: noqa: ARG002, PLC0415, PLR0913
@@ -78,48 +60,7 @@ class Unique(Rule):
         self._ignore_column: str = ignore_column
         self._connection: str | None = connection
 
-    def enforce(
-        self,
-        field: str,
-        value: object,
-        instance: object,
-    ) -> bool:
-        """
-        Validate a field value as unique.
-
-        Parameters
-        ----------
-        field : str
-            Field name associated with the value.
-        value : object
-            Value to validate.
-        instance : object
-            Owning object instance. This argument is accepted for
-            interface compatibility.
-
-        Returns
-        -------
-        bool
-            Return ``True`` when the value passes validation.
-        """
-        # Leave missing values to the type layer, which already reports them.
-        if value is None:
-            return True
-
-        from orionis.aio import Loop
-
-        plan = self.__plan(value)
-
-        # A running loop means ``runSync`` bridges to a worker thread with its
-        # own loop. Pooled connections belong to the caller's loop and drivers
-        # such as asyncpg reject cross-loop use ("another operation is in
-        # progress"), so the probe gets a throwaway connection instead.
-        if _has_running_loop():
-            return not Loop.runSync(self.__existsIsolated(plan))
-
-        return not Loop.runSync(self.__existsShared(plan))
-
-    async def enforceAsync(
+    async def enforce(
         self,
         field: str,
         value: object,
@@ -144,7 +85,12 @@ class Unique(Rule):
         """
         if value is None:
             return True
-        return not await self.__existsShared(self.__plan(value))
+
+        from orionis.orm.resolver import ConnectionResolver
+
+        plan = self.__plan(value)
+        connection = ConnectionResolver.connection(self._connection)
+        return not bool(await connection.select(plan))
 
     def __plan(self, value: object) -> SelectPlan:
         """
@@ -172,48 +118,3 @@ class Unique(Rule):
         plan = builder.toPlan()
         plan.limit_value = 1
         return plan
-
-    async def __existsShared(self, plan: SelectPlan) -> bool:
-        """
-        Run the probe on the connection shared by the application.
-
-        Parameters
-        ----------
-        plan : SelectPlan
-            Plan matching the rows that break uniqueness.
-
-        Returns
-        -------
-        bool
-            Return ``True`` when a conflicting row exists.
-        """
-        from orionis.orm.resolver import ConnectionResolver
-
-        connection = ConnectionResolver.connection(self._connection)
-        return bool(await connection.select(plan))
-
-    async def __existsIsolated(self, plan: SelectPlan) -> bool:
-        """
-        Run the probe on a connection owned by the calling event loop.
-
-        Parameters
-        ----------
-        plan : SelectPlan
-            Plan matching the rows that break uniqueness.
-
-        Returns
-        -------
-        bool
-            Return ``True`` when a conflicting row exists.
-        """
-        from orionis.database import Connection
-        from orionis.orm.resolver import ConnectionResolver
-
-        manager = ConnectionResolver.manager()
-        name = self._connection or manager.getDefaultName()
-        connection = Connection(name, manager.configFor(name))
-        try:
-            return bool(await connection.select(plan))
-        finally:
-            # Never leave the engine behind: it belongs to this short-lived loop.
-            await connection.disconnect()

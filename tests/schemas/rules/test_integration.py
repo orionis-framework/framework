@@ -1,4 +1,5 @@
 from datetime import datetime
+from inspect import iscoroutinefunction
 from orionis.schemas import Schema
 from orionis.schemas import constraints as constraints_module
 from orionis.schemas import rules as rules_module
@@ -149,6 +150,14 @@ class TestRulesThroughValidator(TestCase):
         self.assertEqual(ctx.exception.failure.message, "End must follow start.")
 
 class TestRuleExports(TestCase):
+
+    def testEveryBundledRuleHasOnlyAsyncEnforcement(self) -> None:
+        """Require the same single asynchronous contract for every public rule."""
+        for name in rules_module.__all__:
+            with self.subTest(rule=name):
+                rule = getattr(rules_module, name)
+                self.assertTrue(iscoroutinefunction(rule.enforce))
+                self.assertFalse(hasattr(rule, "enforceAsync"))
 
     def testPackageExportsMatchItsPublicApi(self) -> None:
         """Resolve every name declared in the rules package ``__all__``.

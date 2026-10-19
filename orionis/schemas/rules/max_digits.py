@@ -44,7 +44,7 @@ class MaxDigits(Rule):
             raise ValueError(error_msg)
         self._maximum: int = maximum
 
-    def enforce(
+    async def enforce(
         self,
         field: str,
         value: object,

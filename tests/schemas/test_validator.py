@@ -72,7 +72,7 @@ class _RejectAsyncRule(Rule):
     __code__ = "reject_async"
     __message__ = "Rejected asynchronously."
 
-    async def enforceAsync(
+    async def enforce(
         self,
         _field: str,
         _value: object,

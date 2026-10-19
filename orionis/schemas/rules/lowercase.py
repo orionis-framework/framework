@@ -10,7 +10,7 @@ class Lowercase(Rule):
     __message__ = "Value must be lowercase."
     __code__ = "lowercase"
 
-    def enforce(
+    async def enforce(
         self,
         field: str,
         value: object,

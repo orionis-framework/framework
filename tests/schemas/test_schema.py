@@ -1,4 +1,7 @@
+from datetime import UTC, datetime
+from decimal import Decimal
 from typing import Annotated, get_args, get_origin
+from uuid import UUID
 import msgspec
 from orionis.schemas.constraints import (
     GreaterThan,
@@ -39,6 +42,13 @@ class _NestedChild(Schema):
 class _ParentWithNested(Schema):
     child: _NestedChild
     count: int
+
+class _ValueSchema(Schema):
+    value: object
+
+class _PlainStruct(msgspec.Struct, rename="camel", tag="location", omit_defaults=True):
+    city_name: str
+    country_code: str = "PE"
 
 class _FieldlessSchema(Schema):
     pass
@@ -324,10 +334,10 @@ class TestSchemaToDict(TestCase):
         """
         self.assertEqual(_DefaultSchema().toDict(), {"label": "default", "count": 0})
 
-    def testToDictKeepsNestedSchemasAsInstances(self) -> None:
-        """Keep nested schema values as instances in the dictionary.
+    def testToDictConvertsNestedSchemas(self) -> None:
+        """Convert nested schema values into dictionaries.
 
-        Validates that the conversion is shallow by design.
+        Validates that nested schemas are recursively converted.
 
         Returns
         -------
@@ -335,4 +345,94 @@ class TestSchemaToDict(TestCase):
             Assertions verify the behavior described above.
         """
         instance = _ParentWithNested(child=_NestedChild(city="Lima"), count=1)
-        self.assertIsInstance(instance.toDict()["child"], _NestedChild)
+        self.assertEqual(
+            instance.toDict(),
+            {"child": {"city": "Lima"}, "count": 1},
+        )
+
+    def testToDictConvertsMultipleSchemaLevels(self) -> None:
+        """Convert schemas nested more than one level deep."""
+        instance = _ValueSchema(
+            value=_ParentWithNested(child=_NestedChild(city="Lima"), count=1),
+        )
+        self.assertEqual(
+            instance.toDict(),
+            {"value": {"child": {"city": "Lima"}, "count": 1}},
+        )
+
+    def testToDictConvertsPlainStructsWithoutEncodingFields(self) -> None:
+        """Retain Python field names and defaults without adding struct tags."""
+        instance = _ValueSchema(value=_PlainStruct(city_name="Lima"))
+        self.assertEqual(
+            instance.toDict(),
+            {"value": {"city_name": "Lima", "country_code": "PE"}},
+        )
+
+    def testToDictConvertsStructsInsideContainers(self) -> None:
+        """Traverse mixed containers while preserving their types and keys."""
+        child = _NestedChild(city="Lima")
+        plain = _PlainStruct(city_name="Paris", country_code="FR")
+        child_dict = {"city": "Lima"}
+        plain_dict = {"city_name": "Paris", "country_code": "FR"}
+        cases: tuple[tuple[str, object, object], ...] = (
+            ("list", [child, plain], [child_dict, plain_dict]),
+            ("tuple", (child, plain), (child_dict, plain_dict)),
+            (
+                "dict",
+                {1: child, ("location", 2): plain},
+                {1: child_dict, ("location", 2): plain_dict},
+            ),
+            (
+                "mixed",
+                [{"children": (child, [plain])}],
+                [{"children": (child_dict, [plain_dict])}],
+            ),
+            ("empty-list", [], []),
+            ("empty-tuple", (), ()),
+            ("empty-dict", {}, {}),
+        )
+        for name, value, expected in cases:
+            with self.subTest(container=name):
+                result = _ValueSchema(value=value).toDict()
+                self.assertEqual(result, {"value": expected})
+                self.assertIs(type(result["value"]), type(value))
+
+    def testToDictPreservesOtherValues(self) -> None:
+        """Leave scalar and unsupported object values unchanged."""
+        values = (
+            None,
+            True,
+            7,
+            1.25,
+            "text",
+            b"raw",
+            datetime(2026, 1, 1, tzinfo=UTC),
+            Decimal("1.20"),
+            UUID(int=1),
+            object(),
+        )
+        for value in values:
+            with self.subTest(value_type=type(value).__name__):
+                self.assertIs(_ValueSchema(value=value).toDict()["value"], value)
+
+    def testToDictDoesNotMutateSourceOrReuseConvertedContainers(self) -> None:
+        """Keep source references intact and return independent converted data."""
+        child = _NestedChild(city="Lima")
+        source = {"children": [child]}
+        instance = _ValueSchema(value=source)
+
+        result = instance.toDict()
+
+        self.assertIs(instance.value, source)
+        self.assertIs(source["children"][0], child)
+        child.city = "Cusco"
+        source["children"].append(_NestedChild(city="Quito"))
+        self.assertEqual(result, {"value": {"children": [{"city": "Lima"}]}})
+        self.assertEqual(
+            instance.toDict(),
+            {"value": {"children": [{"city": "Cusco"}, {"city": "Quito"}]}},
+        )
+
+    def testToDictConvertsFieldlessSchemas(self) -> None:
+        """Return an empty dictionary for a schema without fields."""
+        self.assertEqual(_FieldlessSchema().toDict(), {})

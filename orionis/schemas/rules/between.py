@@ -55,7 +55,7 @@ class Between(Rule):
         self._minimum: float = minimum
         self._maximum: float = maximum
 
-    def enforce(
+    async def enforce(
         self,
         field: str,
         value: object,

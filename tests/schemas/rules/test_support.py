@@ -1,5 +1,6 @@
 from datetime import date, datetime
 from decimal import Decimal
+from threading import get_ident
 from types import SimpleNamespace
 from orionis.http.payload.uploaded_file import UploadedFile
 from orionis.schemas.rules.measure import KILOBYTE, is_file, measure, read_content
@@ -55,7 +56,21 @@ class TestIsFile(TestCase):
 
 class TestReadContent(TestCase):
 
-    def testUploadContentIsReturned(self) -> None:
+    async def testFileReadsDoNotBlockTheEventLoopThread(self) -> None:
+        """Offload the synchronous upload protocol, including disk-backed files."""
+        threads: list[int] = []
+
+        def read() -> bytes:
+            """Record the reader's thread and return deterministic content."""
+            threads.append(get_ident())
+            return b"payload"
+
+        upload = SimpleNamespace(read=read, size=7, filename="upload.txt")
+        self.assertEqual(await read_content(upload), b"payload")
+        self.assertEqual(len(threads), 1)
+        self.assertNotEqual(threads[0], get_ident())
+
+    async def testUploadContentIsReturned(self) -> None:
         """Return the whole buffered content of an uploaded file.
 
         Validates that the buffer is rewound before reading.
@@ -65,9 +80,9 @@ class TestReadContent(TestCase):
         None
             Assertions verify the behavior described above.
         """
-        self.assertEqual(read_content(_upload(b"payload")), b"payload")
+        self.assertEqual(await read_content(_upload(b"payload")), b"payload")
 
-    def testForeignValueReturnsNone(self) -> None:
+    async def testForeignValueReturnsNone(self) -> None:
         """Return None when the value is not a readable upload.
 
         Validates that plain data never reaches the reading path.
@@ -77,8 +92,8 @@ class TestReadContent(TestCase):
         None
             Assertions verify the behavior described above.
         """
-        self.assertIsNone(read_content("text"))
-        self.assertIsNone(read_content(None))
+        self.assertIsNone(await read_content("text"))
+        self.assertIsNone(await read_content(None))
 
 class TestMeasure(TestCase):
 

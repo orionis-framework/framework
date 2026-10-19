@@ -7,8 +7,8 @@
 - `orionis.schemas.fields`: `Field`, `Choice`, `Nullable`, `AnyOf`, `Constant`, `Alias`, `Static`.
 - `orionis.schemas.constraints`: constraints estructurales y reglas incluidas.
 - `orionis.schemas.metadata`: `Title`, `Description`, `Examples`, `ExtraJsonSchema`, `Extra`, `Message`.
-- `orionis.schemas.validator.Schema`: `validate`/`validateAsync`; use alias `Validator`.
-- `orionis.schemas.rule.Rule`: base de reglas personalizadas.
+- `orionis.schemas.validator.Schema`: utilidad estática asíncrona `validate(payload, schema)`; use alias `Validator` y espere siempre con `await`.
+- `orionis.schemas.rule.Rule`: base de reglas personalizadas con `validate(field, value, instance)` asíncrono.
 - `ValidationException`: `failures`, `failure`, `errors`, `message` y `error()`.
 
 ## Estructura del módulo
@@ -18,7 +18,7 @@
 | `schema.py` | `Schema`, metaclase PEP 649, constraints y calentamiento de planes. |
 | `fields.py` | Aliases legibles de typing. |
 | `constraints.py`, `compiler.py` | Metadata estructural y compilación segura. |
-| `rule.py`, `rules/` | Base y reglas síncronas/asíncronas. |
+| `rule.py`, `rules/` | Validación asíncrona con predicados puros o I/O nativo. |
 | `validator.py`, `rules_executor.py` | Conversión y ejecución anidada cacheada. |
 | `failure_collector.py`, `exception_parser.py` | Recuperación multicausa y mensajes. |
 | `metadata.py`, `meta/` | Metadata documental y de validación. |

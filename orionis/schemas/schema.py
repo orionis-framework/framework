@@ -318,14 +318,33 @@ class Schema(msgspec.Struct, metaclass=SchemaMeta):
 
     def toDict(self) -> dict[str, object]:
         """
-        Convert the schema instance into a dictionary.
+        Recursively convert the schema instance into a dictionary.
+
+        Convert nested ``msgspec.Struct`` instances, including those inside
+        dictionary values, lists, and tuples. Preserve field names, container
+        types, and all other values without modifying the source.
 
         Returns
         -------
         dict[str, object]
-            Dictionary containing the schema fields and their values.
+            Dictionary containing recursively converted schema field values.
         """
-        return msgspec.structs.asdict(self)
+        def _convert(value: object) -> object:
+            """Recursively convert structs and their supported containers."""
+            if isinstance(value, msgspec.Struct):
+                value = msgspec.structs.asdict(value)
+            if isinstance(value, dict):
+                return {key: _convert(item) for key, item in value.items()}
+            if isinstance(value, list):
+                return [_convert(item) for item in value]
+            if isinstance(value, tuple):
+                return tuple(_convert(item) for item in value)
+            return value
+
+        return {
+            name: _convert(value)
+            for name, value in msgspec.structs.asdict(self).items()
+        }
 
 __all__: list[str] = [
     "Schema",

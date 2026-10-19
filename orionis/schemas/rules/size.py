@@ -46,7 +46,7 @@ class Size(Rule):
             raise ValueError(error_msg)
         self._size: float = size
 
-    def enforce(
+    async def enforce(
         self,
         field: str,
         value: object,

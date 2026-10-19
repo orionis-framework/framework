@@ -3,6 +3,7 @@
 Usa un Hub para agrupar operaciones que comparten audiencia y protocolo. Solo métodos de instancia ordinarios marcados con `@remote` son invocables. Un método público sin ese decorador permanece fuera de la superficie remota.
 
 ```python
+import asyncio
 from orionis.realtime import Hub, remote
 from orionis.realtime.metadata import compile_hub
 
@@ -12,14 +13,14 @@ class MathHub(Hub):
         return first + second
 
 methods = compile_hub(MathHub)
-assert methods["sum"].bind([3], {}) == {"first": 3, "second": 2}
+assert asyncio.run(methods["sum"].bind([3], {})) == {"first": 3, "second": 2}
 ```
 
 El ejemplo puede compilarse sin servidor. Para servirlo declara `Route.hub("/realtime/math", MathHub)` desde rutas, importando Route de `orionis.support.facades`. `protocol="msgpack"` selecciona MessagePack binario para toda la conexión; el default es JSON texto. La selección no se negocia por cada mensaje.
 
 ## Datos y servicios
 
-Anota cada argumento remoto. Tipos de datos compatibles con msgspec se convierten desde argumentos del cliente; tipos de servicios se resuelven con el contenedor y no pueden ser suplantados por un valor del payload. Los schemas Orionis anidados ejecutan además sus reglas. Se admiten defaults y parámetros keyword-only.
+Anota cada argumento remoto. Tipos de datos compatibles con msgspec se convierten desde argumentos del cliente; tipos de servicios se resuelven con el contenedor y no pueden ser suplantados por un valor del payload. Los schemas Orionis anidados, incluidos los contenidos en colecciones o structs ordinarios, ejecutan sus reglas síncronas o asíncronas antes del despacho. Las llamadas directas a `bind()` requieren `await`; dentro de un loop existente usa `await methods["sum"].bind([3], {})`. Se admiten defaults y parámetros keyword-only.
 
 Para un servicio de aplicación importable `Calculator`, un método puede declarar `async def add(self, first: int, calculator: Calculator, second: int = 2) -> int`. Registra/resuelve Calculator normalmente en el contenedor. Mantén el import disponible en runtime cuando la reflexión lo requiera; no escondas todas las anotaciones de inyección en `TYPE_CHECKING` sin una estrategia de resolución.
 

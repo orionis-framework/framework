@@ -28,14 +28,14 @@ class IRule(ABC):
         """
 
     @abstractmethod
-    def enforce(
+    async def enforce(
         self,
         field: str,
         value: object,
         instance: object,
     ) -> bool:
         """
-        Evaluate whether the current value satisfies this rule.
+        Asynchronously evaluate whether the current value satisfies this rule.
 
         Parameters
         ----------

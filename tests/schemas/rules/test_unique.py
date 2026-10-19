@@ -255,7 +255,7 @@ class TestUniqueAsync(TestCase):
                 table=self._table, values=[{"code": "taken"}],
             ))
             with self.assertRaises(ValidationException) as caught:
-                await Validator.validateAsync(
+                await Validator.validate(
                     {"code": "taken", "quantity": "invalid"}, _UniquePayload,
                 )
             self.assertEqual(set(caught.exception.errors), {"code", "quantity"})
@@ -273,7 +273,7 @@ class TestUniqueAsync(TestCase):
         ))
         for quantity in (1, "invalid"):
             with self.assertRaises(ValidationException) as caught:
-                await Validator.validateAsync(
+                await Validator.validate(
                     {"child": {"code": "taken", "quantity": quantity}},
                     _NestedPayload,
                 )
@@ -286,11 +286,10 @@ class TestUniqueAsync(TestCase):
         Returns
         -------
         None
-            Both validator entry points preserve the scalar union member.
+            Validation preserves the scalar union member.
         """
-        self.assertEqual(Validator.validate({"child": 3}, _NestedPayload).child, 3)
         self.assertEqual(
-            (await Validator.validateAsync({"child": 3}, _NestedPayload)).child, 3,
+            (await Validator.validate({"child": 3}, _NestedPayload)).child, 3,
         )
 
     async def testValidatorPropagatesCancellationWhileTheQueryWaits(self) -> None:
@@ -303,7 +302,7 @@ class TestUniqueAsync(TestCase):
         """
         connection = _WaitingConnection()
         self._manager.current = connection
-        pending = asyncio.create_task(Validator.validateAsync(
+        pending = asyncio.create_task(Validator.validate(
             {"code": "available"}, _UniquePayload,
         ))
         try:

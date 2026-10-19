@@ -98,7 +98,7 @@ class TestConfirmPasswordEnforce(TestCase):
 
 class TestConfirmPasswordValidate(TestCase):
 
-    def testValidateReturnsNoneForMatchingValue(self) -> None:
+    async def testValidateReturnsNoneForMatchingValue(self) -> None:
         """Return None when both values match.
 
         Validates the success path of the inherited validate method.
@@ -110,9 +110,11 @@ class TestConfirmPasswordValidate(TestCase):
         """
         instance = SimpleNamespace(password=_CREDENTIAL)
         rule = ConfirmPassword()
-        self.assertIsNone(rule.validate("password_confirmation", _CREDENTIAL, instance))
+        self.assertIsNone(
+            await rule.validate("password_confirmation", _CREDENTIAL, instance),
+        )
 
-    def testValidateReturnsFailureWithCustomMessage(self) -> None:
+    async def testValidateReturnsFailureWithCustomMessage(self) -> None:
         """Return a ValidationFailure carrying the overridden message.
 
         Validates the rule code and the custom message resolution.
@@ -124,7 +126,7 @@ class TestConfirmPasswordValidate(TestCase):
         """
         instance = SimpleNamespace(password=_CREDENTIAL)
         rule = ConfirmPassword(message="Passwords do not match.")
-        result = rule.validate("password_confirmation", _OTHER, instance)
+        result = await rule.validate("password_confirmation", _OTHER, instance)
         self.assertIsInstance(result, ValidationFailure)
         self.assertEqual(result.rule, "confirm_password")
         self.assertEqual(result.message, "Passwords do not match.")

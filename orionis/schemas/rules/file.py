@@ -11,7 +11,7 @@ class File(Rule):
     __message__ = "Value must be an uploaded file."
     __code__ = "file"
 
-    def enforce(
+    async def enforce(
         self,
         field: str,
         value: object,

@@ -23,7 +23,7 @@ class MacAddress(Rule):
     __message__ = "Value must be a valid MAC address."
     __code__ = "mac_address"
 
-    def enforce(
+    async def enforce(
         self,
         field: str,
         value: object,

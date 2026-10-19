@@ -37,7 +37,7 @@ class StartsWith(Rule):
             raise ValueError(error_msg)
         self._prefixes: tuple[str, ...] = prefixes
 
-    def enforce(
+    async def enforce(
         self,
         field: str,
         value: object,

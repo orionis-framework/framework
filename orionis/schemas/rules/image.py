@@ -18,7 +18,7 @@ class Image(Rule):
     __message__ = "File must be a valid image."
     __code__ = "image"
 
-    def enforce(
+    async def enforce(
         self,
         field: str,
         value: object,
@@ -42,7 +42,7 @@ class Image(Rule):
         bool
             Return ``True`` when the value passes validation.
         """
-        content = read_content(value)
+        content = await read_content(value)
         if content is None:
             return False
 

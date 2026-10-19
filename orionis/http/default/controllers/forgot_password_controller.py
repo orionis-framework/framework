@@ -186,7 +186,7 @@ class ForgotPasswordController(BaseController):
 
         # Validate the reset form data against the schema.
         try:
-            payload = Validator.validate(data, ResetPasswordSchema)
+            payload = await Validator.validate(data, ResetPasswordSchema)
         except ValidationException as exc:
             return await self._form(email, token, valid=True, errors=exc)
 

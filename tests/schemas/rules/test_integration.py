@@ -64,7 +64,7 @@ def _payload(**overrides: object) -> dict:
 
 class TestRulesThroughValidator(TestCase):
 
-    def testValidPayloadIsDecoded(self) -> None:
+    async def testValidPayloadIsDecoded(self) -> None:
         """Return a typed instance when every custom rule passes.
 
         Validates that the rules do not reject a well-formed payload.
@@ -74,11 +74,11 @@ class TestRulesThroughValidator(TestCase):
         None
             Assertions verify the behavior described above.
         """
-        instance = Validator.validate(_payload(), _Registration)
+        instance = await Validator.validate(_payload(), _Registration)
         self.assertEqual(instance.ident, _UUID_V4)
         self.assertEqual(instance.quantity, 5)
 
-    def testFailingRuleRaisesWithItsCode(self) -> None:
+    async def testFailingRuleRaisesWithItsCode(self) -> None:
         """Raise ValidationException carrying the failing rule code.
 
         Validates that the rule identifier reaches the reported failure.
@@ -89,11 +89,11 @@ class TestRulesThroughValidator(TestCase):
             Assertions verify the behavior described above.
         """
         with self.assertRaises(ValidationException) as ctx:
-            Validator.validate(_payload(terms="no"), _Registration)
+            await Validator.validate(_payload(terms="no"), _Registration)
         self.assertEqual(ctx.exception.failure.rule, "accepted")
         self.assertEqual(ctx.exception.failure.field, "terms")
 
-    def testEveryRuleIsEvaluatedOnItsField(self) -> None:
+    async def testEveryRuleIsEvaluatedOnItsField(self) -> None:
         """Report the expected rule code for each failing field.
 
         Validates that the rules are bound to the field they annotate.
@@ -116,11 +116,11 @@ class TestRulesThroughValidator(TestCase):
         )
         for overrides, field, code in cases:
             with self.assertRaises(ValidationException) as ctx:
-                Validator.validate(_payload(**overrides), _Registration)
+                await Validator.validate(_payload(**overrides), _Registration)
             self.assertEqual(ctx.exception.failure.field, field)
             self.assertEqual(ctx.exception.failure.rule, code)
 
-    def testCrossFieldRuleReadsTheDecodedInstance(self) -> None:
+    async def testCrossFieldRuleReadsTheDecodedInstance(self) -> None:
         """Compare a field against a sibling resolved on the instance.
 
         Validates that the schema instance reaches the rule at run time.
@@ -131,9 +131,9 @@ class TestRulesThroughValidator(TestCase):
             Assertions verify the behavior described above.
         """
         payload = {"start": "2024-01-01T00:00:00", "end": "2024-06-01T00:00:00"}
-        self.assertIsNotNone(Validator.validate(payload, _Booking))
+        self.assertIsNotNone(await Validator.validate(payload, _Booking))
 
-    def testCustomMessageOverridesTheDefault(self) -> None:
+    async def testCustomMessageOverridesTheDefault(self) -> None:
         """Report the message supplied when the rule was declared.
 
         Validates that per-instance messages reach the failure entity.
@@ -145,7 +145,7 @@ class TestRulesThroughValidator(TestCase):
         """
         payload = {"start": "2024-06-01T00:00:00", "end": "2024-01-01T00:00:00"}
         with self.assertRaises(ValidationException) as ctx:
-            Validator.validate(payload, _Booking)
+            await Validator.validate(payload, _Booking)
         self.assertEqual(ctx.exception.failure.message, "End must follow start.")
 
 class TestRuleExports(TestCase):

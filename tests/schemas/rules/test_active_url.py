@@ -90,7 +90,7 @@ class TestActiveUrlAsync(TestCase):
             The URL is accepted and the resolver runs in another thread.
         """
         thread_id = get_ident()
-        payload = await Validator.validateAsync(
+        payload = await Validator.validate(
             {"url": "https://service.example/path"}, _UrlPayload,
         )
         self.assertEqual(payload.url, "https://service.example/path")
@@ -125,7 +125,7 @@ class TestActiveUrlAsync(TestCase):
         message = "Resolver rejected the hostname"
         for failure in (socket.gaierror(message), UnicodeError(message)):
             self._resolver.failure = failure
-            result = await ActiveUrl().validateAsync(
+            result = await ActiveUrl().validate(
                 "url", "https://service.example", None,
             )
             self.assertIsNotNone(result)

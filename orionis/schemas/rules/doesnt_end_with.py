@@ -37,7 +37,7 @@ class DoesntEndWith(Rule):
             raise ValueError(error_msg)
         self._suffixes: tuple[str, ...] = suffixes
 
-    def enforce(
+    async def enforce(
         self,
         field: str,
         value: object,

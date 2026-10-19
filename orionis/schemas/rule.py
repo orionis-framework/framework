@@ -85,14 +85,14 @@ class Rule(IRule):
         """
         return await asyncio.to_thread(self.enforce, field, value, instance)
 
-    def validate(
+    async def validate(
         self,
         field: str,
         value: object,
         instance: object,
     ) -> ValidationFailure | None:
         """
-        Validate the field value and return a failure when invalid.
+        Validate the field, awaiting native asynchronous enforcement when present.
 
         Parameters
         ----------
@@ -108,8 +108,12 @@ class Rule(IRule):
         ValidationFailure | None
             Failure details when validation fails; otherwise ``None``.
         """
-        # Call the enforce method to check if the value satisfies the rule.
-        if not self.enforce(field, value, instance):
+        valid = (
+            self.enforce(field, value, instance)
+            if type(self).enforceAsync is Rule.enforceAsync
+            else await self.enforceAsync(field, value, instance)
+        )
+        if not valid:
             return ValidationFailure(
                 field=field,
                 rule=self._code,
@@ -117,32 +121,4 @@ class Rule(IRule):
             )
 
         # If validation passes, return None to indicate success.
-        return None
-
-    async def validateAsync(
-        self,
-        field: str,
-        value: object,
-        instance: object,
-    ) -> ValidationFailure | None:
-        """Await the rule and describe an invalid field value.
-
-        Parameters
-        ----------
-        field : str
-            Field name associated with the value.
-        value : object
-            Current field value to validate.
-        instance : object
-            Schema instance owning the field value.
-
-        Returns
-        -------
-        ValidationFailure | None
-            Failure details when validation fails, otherwise None.
-        """
-        if not await self.enforceAsync(field, value, instance):
-            return ValidationFailure(
-                field=field, rule=self._code, message=self._message,
-            )
         return None

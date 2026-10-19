@@ -67,7 +67,7 @@ class Uuid(Rule):
             raise ValueError(error_msg)
         self._version: int | None = version
 
-    def enforce(
+    async def enforce(
         self,
         field: str,
         value: object,

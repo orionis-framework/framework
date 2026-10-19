@@ -15,7 +15,7 @@ class Preferences(Schema):
 
 async def save_preferences(request: Request):
     values = await request.data()
-    preferences = await Validator.validateAsync(values, Preferences)
+    preferences = await Validator.validate(values, Preferences)
     return response.json({"theme": preferences.theme, "compact": preferences.compact})
 ```
 

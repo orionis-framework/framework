@@ -2,7 +2,7 @@
 
 ## Integration with Orionis
 
-The container detects `Schema` parameters, selects route input, and calls `validateAsync`. The HTTP kernel renders `ValidationException` as structured validation errors. Realtime compiles schema parameter plans for remote methods, and MCP uses schemas for tool inputs, output JSON Schema, and invalid-parameter responses.
+The container detects `Schema` parameters, selects route input, and awaits `validate`. The HTTP kernel renders `ValidationException` as structured validation errors. Realtime compiles schema parameter plans for remote methods, and MCP awaits schema validation for tool inputs and structured output, including streamed results.
 
 Schema documentation metadata is consumed by JSON Schema/OpenAPI-related compilers without making those concerns part of instance validation.
 
@@ -20,11 +20,13 @@ Schema documentation metadata is consumed by JSON Schema/OpenAPI-related compile
 
 Structural metadata and rule traversal plans are compiled at class creation and cached by schema type. Successful conversion uses a single optimized `msgspec.convert` call. Detailed field-by-field inspection is reserved for failure reporting.
 
-Schema instances and metadata plans are compact; validation itself retains no global request state. Async rules preserve the caller's event loop and transaction when implemented natively. Avoid synchronous I/O rules in event-loop code and use `validateAsync` for predictable concurrency.
+Schema instances and metadata plans are compact; validation itself retains no global request state. Native async rules preserve the caller's event loop and transaction. Always await `validate`, even for schemas with no I/O rules. Short pure predicates run directly; implement native I/O in `enforceAsync` to avoid blocking the loop.
 
 ## Compatibility
 
 Schema classes are `msgspec.Struct` subclasses and can be encoded by supported `msgspec` codecs. Public declaration relies on Python 3.14 deferred annotations. Constraint semantics follow Orionis' compiler; application code should import Orionis metadata rather than constructing `msgspec.Meta` directly when it needs consistent messages and documentation.
+
+Validation now has only the asynchronous `validate` entry point. Migrate every caller to `await Validator.validate(...)`; synchronous calls and the former alternate entry point are no longer supported. Custom rules also expose asynchronous `validate`, and failure collection awaits rules on conversion-error paths.
 
 ## Validate an order with nested records
 
@@ -32,7 +34,7 @@ This is a standalone program. It declares the input shape, converts an external 
 
 Conversion and structural constraints run before application rules. Failed conversion collects errors from that stage; it does not guarantee that every business rule also ran. The rule stage traverses converted values and their nested objects. Client logic should not depend on an exact count of failures from several stages at once.
 
-Messages are grouped in `exception.errors`, the full list is in `exception.failures`, and `exception.error()` supplies a serializable body. Return permitted fields and messages to clients; avoid logging passwords or complete payloads. HTTP/container invocation chooses input and awaits `validateAsync`; this program validates explicitly so it can run without a server.
+Messages are grouped in `exception.errors`, the full list is in `exception.failures`, and `exception.error()` supplies a serializable body. Return permitted fields and messages to clients; avoid logging passwords or complete payloads. HTTP/container invocation chooses input and awaits `validate`; this program validates explicitly so it can run without a server.
 
 ```python
 import asyncio
@@ -53,14 +55,14 @@ class Order(Schema, forbid_unknown_fields=True):
     note: str | None = None
 
 async def main() -> None:
-    order = await Validator.validateAsync({
+    order = await Validator.validate({
         "email": "ada@example.com",
         "lines": [{"sku": "BK-1", "quantity": 2}],
     }, Order)
     assert order.lines[0].quantity == 2
     assert order.note is None
     try:
-        await Validator.validateAsync({
+        await Validator.validate({
             "email": "ada@example.com",
             "lines": [{"sku": "BK-1", "quantity": 0}],
         }, Order)

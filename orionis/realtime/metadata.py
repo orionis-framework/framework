@@ -164,12 +164,12 @@ def _schema_plans(annotation: object) -> Mapping[type, _SchemaPlan]: # NOSONAR
     visit(annotation)
     return MappingProxyType(plans)
 
-def _validate_schemas( # NOSONAR
+async def _validate_schemas( # NOSONAR
     value: object,
     plans: Mapping[type, _SchemaPlan],
 ) -> None:
     """
-    Run existing schema rules across an already converted RPC data value.
+    Await existing schema rules across an already converted RPC data value.
 
     Parameters
     ----------
@@ -193,18 +193,18 @@ def _validate_schemas( # NOSONAR
         if plan is not None:
             if plan.rules:
                 failures = []
-                _collect_with_plan(plan.rules, value, "", failures)
+                await _collect_with_plan(plan.rules, value, "", failures)
                 if failures:
                     raise ValidationException(failures)
             for name in plan.fields:
-                _validate_schemas(getattr(value, name), plans)
+                await _validate_schemas(getattr(value, name), plans)
     elif isinstance(value, (list, tuple, set, frozenset)):
         for item in value:
-            _validate_schemas(item, plans)
+            await _validate_schemas(item, plans)
     elif isinstance(value, dict):
         for key, item in value.items():
-            _validate_schemas(key, plans)
-            _validate_schemas(item, plans)
+            await _validate_schemas(key, plans)
+            await _validate_schemas(item, plans)
 
 @dataclass(frozen=True, slots=True)
 class _ClientParameter:
@@ -216,9 +216,9 @@ class _ClientParameter:
     keyword_only: bool
     schema_plans: Mapping[type, _SchemaPlan]
 
-    def convert(self, value: object) -> object:
+    async def convert(self, value: object) -> object:
         """
-        Convert one RPC value without accessing an HTTP request body.
+        Convert and validate one RPC value without accessing an HTTP request body.
 
         Parameters
         ----------
@@ -238,7 +238,7 @@ class _ClientParameter:
         try:
             converted = msgspec.convert(value, type=cast("type", self.annotation))
             if self.schema_plans:
-                _validate_schemas(converted, self.schema_plans)
+                await _validate_schemas(converted, self.schema_plans)
             return converted
         except (msgspec.ValidationError, ValidationException, TypeError) as exc:
             raise RPCError(_VALIDATION_ERROR, _ARGUMENTS_MESSAGE) from exc
@@ -254,9 +254,11 @@ class RemoteMethod:
     positional: tuple[_ClientParameter, ...]
     client_names: frozenset[str]
 
-    def bind(self, args: list[object], kwargs: dict[str, object]) -> dict[str, object]:
+    async def bind(
+        self, args: list[object], kwargs: dict[str, object],
+    ) -> dict[str, object]:
         """
-        Bind only client-owned parameters and provide all declared defaults.
+        Bind and validate client-owned parameters, providing declared defaults.
 
         Parameters
         ----------
@@ -293,7 +295,7 @@ class RemoteMethod:
             value = provided.get(parameter.name, parameter.default)
             if value is _EMPTY:
                 raise RPCError(_INVALID_ARGUMENTS, _ARGUMENTS_MESSAGE)
-            result[parameter.name] = parameter.convert(value)
+            result[parameter.name] = await parameter.convert(value)
         return result
 
 def _method_plan(hub: type[Hub], name: str, function: FunctionType) -> RemoteMethod:

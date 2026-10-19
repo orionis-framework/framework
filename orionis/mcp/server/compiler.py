@@ -875,7 +875,7 @@ def compile_server(definition: type[Server]) -> CompiledMcpServer:
         catalogs=catalogs,
     )
 
-def validate_payload(primitive: CompiledPrimitive, arguments: object) -> object:
+async def validate_payload(primitive: CompiledPrimitive, arguments: object) -> object:
     """
     Validate only the tool's argument object, never the HTTP JSON-RPC envelope.
 
@@ -900,9 +900,9 @@ def validate_payload(primitive: CompiledPrimitive, arguments: object) -> object:
             message = "This tool does not accept arguments."
             raise msgspec.ValidationError(message)
         return msgspec.UNSET
-    return convert_payload(payload, primitive.input_type)
+    return await convert_payload(payload, primitive.input_type)
 
-def validate_output(primitive: CompiledPrimitive, value: object) -> object:
+async def validate_output(primitive: CompiledPrimitive, value: object) -> object:
     """
     Enforce the advertised native output type before encoding structured data.
 
@@ -925,7 +925,7 @@ def validate_output(primitive: CompiledPrimitive, value: object) -> object:
             "The tool declares an output schema but returned no structured content."
         )
         raise msgspec.ValidationError(message)
-    return convert_payload(value, primitive.output_type)
+    return await convert_payload(value, primitive.output_type)
 
 def validate_prompt_arguments(
     primitive: CompiledPrimitive, arguments: Mapping[str, object],

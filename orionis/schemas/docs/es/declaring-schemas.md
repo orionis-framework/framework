@@ -40,7 +40,7 @@ Las reglas hacen checks de dominio tras convertir: strings, fechas, números, ca
 
 ### Validación siempre asíncrona
 
-`await Validator.validate(payload, schema)` convierte y completa todas las reglas aplicables antes de devolver la instancia. No existe una entrada de validación síncrona. Los predicados puros breves se ejecutan directamente; las reglas de I/O nativo se esperan en el loop del llamador. `Unique` conserva la conexión y transacción activas.
+`await Validator.validate(payload, schema)` convierte y completa todas las reglas aplicables antes de devolver la instancia. No existe una entrada de validación síncrona. Cada regla ejecutable implementa `async def enforce` y la validación siempre espera ese método. Los checks puros breves permanecen en el hilo del llamador; el I/O nativo usa su event loop. `Unique` conserva la conexión y transacción activas.
 
 ### Metadata documental
 
@@ -62,7 +62,7 @@ Adjunte `Message("...")` para tipo erróneo y `message=` en el constraint/regla 
 
 ### Escribir regla personalizada
 
-Subclasifique `Rule`, defina `__code__`/`__message__` e implemente `enforce` para un predicado puro breve. Para I/O async nativo sobrescriba `enforceAsync`. El método heredado `validate` siempre es asíncrono y espera la evaluación nativa.
+Subclasifique `Rule`, defina `__code__`/`__message__` e implemente `async def enforce` tanto para checks puros como para I/O asíncrono nativo. El método heredado `validate` siempre espera esa evaluación. Los overrides síncronos se rechazan al declarar la clase.
 
 ## Ejemplos
 
@@ -110,7 +110,7 @@ class Even(Rule):
     __code__ = "even"
     __message__ = "Value must be even."
 
-    def enforce(self, field: str, value: object, instance: object) -> bool:
+    async def enforce(self, field: str, value: object, instance: object) -> bool:
         return isinstance(value, int) and value % 2 == 0
 
 

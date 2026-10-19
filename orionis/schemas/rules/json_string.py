@@ -11,7 +11,7 @@ class Json(Rule):
     __message__ = "Value must be a valid JSON string."
     __code__ = "json"
 
-    def enforce(
+    async def enforce(
         self,
         field: str,
         value: object,

@@ -1,4 +1,5 @@
 from __future__ import annotations
+from collections.abc import Collection, Mapping
 from typing import TYPE_CHECKING, Annotated, Union, get_args, get_origin
 import operator
 import types
@@ -30,7 +31,7 @@ def _type_contains_nested(tp: object) -> bool:
     ----------
     tp : object
         Type annotation to inspect. May be a plain type or wrapped in
-        ``Union``/``|`` or ``Annotated``.
+        ``Union``/``|``, ``Annotated`` or a collection.
 
     Returns
     -------
@@ -49,6 +50,12 @@ def _type_contains_nested(tp: object) -> bool:
     if origin is Annotated:
         return _type_contains_nested(get_args(tp)[0])
 
+    if isinstance(origin, type) and issubclass(origin, Collection):
+        args = get_args(tp)
+        if issubclass(origin, Mapping):
+            args = args[1:]
+        return any(_type_contains_nested(arg) for arg in args)
+
     # Finally, check if this is a schema type by looking for the marker attribute.
     return isinstance(tp, type) and "__orionis_meta__" in tp.__dict__
 
@@ -62,7 +69,7 @@ def _warm_child_plan(tp: object) -> None:
     ----------
     tp : object
         Field type annotation, potentially an ``Annotated`` type, ``Union``
-        or bare class.
+        or collection, or a bare class.
 
     Returns
     -------
@@ -82,6 +89,13 @@ def _warm_child_plan(tp: object) -> None:
         for arg in get_args(tp):
             _warm_child_plan(arg)
 
+    elif isinstance(origin, type) and issubclass(origin, Collection):
+        args = get_args(tp)
+        if issubclass(origin, Mapping):
+            args = args[1:]
+        for arg in args:
+            _warm_child_plan(arg)
+
     # Build a plan for a bare schema type when it has no existing plan.
     elif (
         isinstance(tp, type)
@@ -89,6 +103,36 @@ def _warm_child_plan(tp: object) -> None:
         and _cache_get(tp) is None
     ):
         _build_plan(tp)
+
+def _collection_item_type(tp: object, selector: str) -> object | None:
+    """
+    Resolve the element annotation selected from a concrete collection type.
+
+    Parameters
+    ----------
+    tp : object
+        Unwrapped collection annotation.
+    selector : str
+        Sequence index or dictionary key.
+
+    Returns
+    -------
+    object | None
+        Element annotation, or ``None`` for an incompatible selector.
+    """
+    origin = get_origin(tp)
+    args = get_args(tp)
+    if not args:
+        return None
+    if isinstance(origin, type) and issubclass(origin, Mapping):
+        return args[1]
+    if origin is tuple and args[-1] is not Ellipsis:
+        if selector.isdecimal() and int(selector) < len(args):
+            return args[int(selector)]
+        return None
+    if isinstance(origin, type) and issubclass(origin, Collection):
+        return args[0]
+    return None
 
 def _field_rules(
     klass: type, field_name: str, items: Iterable[object],
@@ -157,6 +201,7 @@ def _build_plan(klass: type) -> tuple:
         klass, "__orionis_meta__", _EMPTY_META,
     )
     plan: list = []
+    nested_types: list[object] = []
     for field in msgspec.structs.fields(klass):
         rules = _field_rules(klass, field.name, orionis_meta.get(field.name, ()))
         is_nested = _type_contains_nested(field.type)
@@ -166,9 +211,11 @@ def _build_plan(klass: type) -> tuple:
             field_name_dot = field.name + "."
             plan.append((field.name, field_name_dot, getter, validators, is_nested))
             if is_nested:
-                _warm_child_plan(field.type)
+                nested_types.append(field.type)
     result = tuple(plan)
     _PLAN_CACHE[klass] = result
+    for field_type in nested_types:
+        _warm_child_plan(field_type)
     return result
 
 async def _collect_nested(
@@ -177,12 +224,12 @@ async def _collect_nested(
     failures: list,
 ) -> None:
     """
-    Validate a nested schema value using its own cached plan.
+    Validate nested schemas, including schemas held inside collections.
 
     Parameters
     ----------
     value : object
-        Nested schema instance held by the parent field.
+        Nested schema or collection held by the parent field.
     prefix : str
         Dot-terminated path prefix already qualified with the parent field.
     failures : list
@@ -193,6 +240,18 @@ async def _collect_nested(
     None
         Return ``None`` after running the nested plan, if any.
     """
+    if isinstance(value, Mapping):
+        base = prefix[:-1]
+        for key, item in value.items():
+            await _collect_nested(item, f"{base}[{key!r}].", failures)
+        return
+
+    if isinstance(value, list | tuple | set | frozenset):
+        base = prefix[:-1]
+        for index, item in enumerate(value):
+            await _collect_nested(item, f"{base}[{index}].", failures)
+        return
+
     # Resolve the child schema plan, building it only on a cache miss.
     child_klass = type(value)
     child_plan = _cache_get(child_klass)

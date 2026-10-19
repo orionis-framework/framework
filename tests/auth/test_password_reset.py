@@ -316,7 +316,7 @@ class TestPasswordReset(TestCase):
 class TestPasswordResetValidation(TestCase):
     """Enforce credential policy and trusted link configuration."""
 
-    def testRejectsWeakMismatchedAndOversizedPasswords(self) -> None:
+    async def testRejectsWeakMismatchedAndOversizedPasswords(self) -> None:
         """Schema validation includes inherited email rules and confirmation.
 
         Returns
@@ -330,7 +330,7 @@ class TestPasswordResetValidation(TestCase):
             "password": "NewPassword1!",
             "password_confirmation": "NewPassword1!",
         }
-        Validator.validate(valid, ResetPasswordSchema)
+        await Validator.validate(valid, ResetPasswordSchema)
         for changes in (
             {"password": "weak"},
             {"password_confirmation": "Mismatch1!"},
@@ -339,7 +339,7 @@ class TestPasswordResetValidation(TestCase):
             {"token": "short"},
         ):
             with self.subTest(changes=changes), self.assertRaises(ValidationException):
-                Validator.validate({**valid, **changes}, ResetPasswordSchema)
+                await Validator.validate({**valid, **changes}, ResetPasswordSchema)
 
     def testPasswordResetLimitsMustBePositive(self) -> None:
         """Reset lifetime and cooldown must be positive integers.

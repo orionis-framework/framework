@@ -523,7 +523,7 @@ class McpDispatcher:
         validate_input_responses(request.input_responses)
         try:
             payload = (
-                validate_payload(primitive, request.arguments)
+                await validate_payload(primitive, request.arguments)
                 if request.method == _TOOL_METHOD
                 else msgspec.UNSET
             )
@@ -552,7 +552,7 @@ class McpDispatcher:
             if inspect.isgenerator(result):
                 source = OwnedStream(result)
                 return OwnedStream(self._stream(primitive, request, source), source)
-            return self._normalize(primitive, request, result)
+            return await self._normalize(primitive, request, result)
         except McpProtocolException:
             raise
         except Exception as exc:
@@ -564,7 +564,7 @@ class McpDispatcher:
                 )
             raise McpProtocolException(-32603, _INTERNAL_ERROR, status=500) from exc
 
-    def _normalize(
+    async def _normalize(
         self,
         primitive: CompiledPrimitive,
         request: McpRequest,
@@ -594,7 +594,7 @@ class McpDispatcher:
         expected = _RESULT_TYPES[request.method]
         if isinstance(result, expected):
             if isinstance(result, CallToolResult) and result.isError is not True:
-                validate_output(primitive, result.structuredContent)
+                await validate_output(primitive, result.structuredContent)
             if isinstance(result, ReadResourceResult):
                 result = msgspec.structs.replace(
                     result, **self._cache(primitive, request),
@@ -603,7 +603,7 @@ class McpDispatcher:
             return result
         responses = response_items(result)
         if request.method == _TOOL_METHOD:
-            normalized = tool_result(primitive, responses)
+            normalized = await tool_result(primitive, responses)
         elif request.method == _PROMPT_METHOD:
             normalized = prompt_result(primitive.description, responses)
         else:
@@ -657,7 +657,7 @@ class McpDispatcher:
                     error = "Response exceeds configured budget"
                     raise ValueError(error)
                 responses.append(item)
-            result = self._normalize(
+            result = await self._normalize(
                 primitive,
                 request,
                 responses[0] if len(responses) == 1 else responses,

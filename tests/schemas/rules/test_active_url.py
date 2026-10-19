@@ -109,9 +109,9 @@ class TestActiveUrlAsync(TestCase):
         """
         rule = ActiveUrl()
         for value in (None, 42):
-            self.assertTrue(await rule.enforceAsync("url", value, None))
+            self.assertTrue(await rule.enforce("url", value, None))
         for value in ("", "relative/path", "https://["):
-            self.assertFalse(await rule.enforceAsync("url", value, None))
+            self.assertFalse(await rule.enforce("url", value, None))
         self.assertEqual(self._resolver.calls, [])
 
     async def testResolverFailuresProduceValidationFailures(self) -> None:

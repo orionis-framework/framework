@@ -53,7 +53,7 @@ class Encoding(Rule):
             raise ValueError(error_msg) from exc
         self._encoding: str = encoding
 
-    def enforce(
+    async def enforce(
         self,
         field: str,
         value: object,
@@ -77,7 +77,7 @@ class Encoding(Rule):
         bool
             Return ``True`` when the value passes validation.
         """
-        content = read_content(value)
+        content = await read_content(value)
 
         # Textual fields are checked by re-encoding them into the codec.
         if content is None:

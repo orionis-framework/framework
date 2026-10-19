@@ -40,7 +40,7 @@ Rules implement domain checks after conversion. They include strings, dates, num
 
 ### Always-asynchronous validation
 
-`await Validator.validate(payload, schema)` converts the payload and completes every applicable rule before returning. There is no synchronous validation entry point. Short pure rules run directly; native I/O rules are awaited on the caller's event loop. `Unique` preserves the active connection and transaction.
+`await Validator.validate(payload, schema)` converts the payload and completes every applicable rule before returning. There is no synchronous validation entry point. Every executable rule implements `async def enforce`, and validation always awaits it. Short pure checks stay on the caller's thread; native I/O uses the caller's event loop. `Unique` preserves the active connection and transaction.
 
 ### Documentation metadata
 
@@ -62,7 +62,7 @@ Attach `Message("...")` for wrong-type errors and `message=` on a constraint/rul
 
 ### Write a custom rule
 
-Subclass `Rule`, define stable `__code__`/`__message__`, and implement `enforce` for a short pure predicate. For native async I/O, override `enforceAsync`. The inherited `validate` is always asynchronous and awaits native enforcement.
+Subclass `Rule`, define stable `__code__`/`__message__`, and implement `async def enforce` for both pure checks and native asynchronous I/O. The inherited `validate` always awaits that method. Synchronous overrides are rejected at class declaration.
 
 ## Examples
 
@@ -110,7 +110,7 @@ class Even(Rule):
     __code__ = "even"
     __message__ = "Value must be even."
 
-    def enforce(self, field: str, value: object, instance: object) -> bool:
+    async def enforce(self, field: str, value: object, instance: object) -> bool:
         return isinstance(value, int) and value % 2 == 0
 
 

@@ -2,6 +2,8 @@
 
 Los bloques del ejemplo `Profile` se ejecutan en orden dentro del mismo módulo; los ejemplos de `Batch` y el handler muestran casos separados. `Validator` es el alias de la utilidad de validación, distinto de la clase base de declaración.
 
+Los fragmentos de validación se ejecutan dentro de una función async o una consola que admite `await`. El ejemplo con un runner independiente muestra cómo entrar en código async desde una aplicación síncrona.
+
 ## Inicio rápido
 
 ```python
@@ -26,6 +28,8 @@ assert profile.toDict() == {"name": "Ada", "age": 36, "newsletter": False}
 
 `Schema` ofrece almacenamiento compacto y `toDict()`. `Field` es `typing.Annotated`, no descriptor runtime: `Field[str, MinLength(2)]` conserva `str` y adjunta metadata. `Choice`, `Nullable`, `AnyOf`, `Constant`, `Alias` y `Static` son aliases legibles de typing estándar.
 
+`toDict()` convierte recursivamente las instancias anidadas de `Schema` y de `msgspec.Struct` en diccionarios, incluso dentro de valores de diccionarios, listas y tuplas. Conserva los nombres de campos de Python, las claves de diccionarios y los tipos lista/tupla; los demás valores hoja, como objetos `datetime` y `Decimal`, permanecen sin cambios. La conversión no modifica la instancia original ni sus contenedores.
+
 ### Constraints estructurales
 
 `GreaterThan`, `GreaterThanOrEqual`, `LessThan`, `LessThanOrEqual`, `MultipleOf`, `Pattern`, `MinLength`, `MaxLength`, `TimezoneAware` y `TimezoneNaive` compilan al descriptor de conversión. Combinaciones duplicadas, incompatibles, imposibles o inválidas fallan al crear la clase.
@@ -34,9 +38,9 @@ assert profile.toDict() == {"name": "Ada", "age": 36, "newsletter": False}
 
 Las reglas hacen checks de dominio tras convertir: strings, fechas, números, campos cruzados, aceptación, passwords, archivos/imágenes, red, URL, JSON, UUID/ULID, MIME/tamaño/dimensiones y unicidad database. Un plan recorre schemas/contenedores y acumula fallos.
 
-### Validación síncrona y asíncrona
+### Validación siempre asíncrona
 
-`validate()` convierte y ejecuta reglas síncronas. `validateAsync()` también espera reglas async y es preferido por DI. `Unique` usa la conexión/transacción activa async; su puente síncrono puede necesitar conexión aislada dentro de event loop.
+`await Validator.validate(payload, schema)` convierte y completa todas las reglas aplicables antes de devolver la instancia. No existe una entrada de validación síncrona. Los predicados puros breves se ejecutan directamente; las reglas de I/O nativo se esperan en el loop del llamador. `Unique` conserva la conexión y transacción activas.
 
 ### Metadata documental
 
@@ -50,7 +54,7 @@ Anote un parámetro invocado por contenedor con un `Schema`. Orionis convierte l
 
 ### Validar manualmente
 
-Use `Validator.validate` en código síncrono y `await Validator.validateAsync` en async. No use construcción directa para diccionarios no confiables.
+Use siempre `await Validator.validate`. En el límite externo de una aplicación síncrona, ejecute una entrada async mediante `asyncio.run(main())`; no inicie otro loop dentro de uno activo. No use construcción directa para diccionarios no confiables.
 
 ### Personalizar mensajes
 
@@ -58,7 +62,7 @@ Adjunte `Message("...")` para tipo erróneo y `message=` en el constraint/regla 
 
 ### Escribir regla personalizada
 
-Subclasifique `Rule`, defina `__code__`/`__message__` e implemente `enforce`. Para I/O async nativo sobrescriba `enforceAsync` y valide async.
+Subclasifique `Rule`, defina `__code__`/`__message__` e implemente `enforce` para un predicado puro breve. Para I/O async nativo sobrescriba `enforceAsync`. El método heredado `validate` siempre es asíncrono y espera la evaluación nativa.
 
 ## Ejemplos
 
@@ -67,7 +71,7 @@ Subclasifique `Rule`, defina `__code__`/`__message__` e implemente `enforce`. Pa
 ```python
 from orionis.schemas.validator import Schema as Validator
 
-profile = Validator.validate(
+profile = await Validator.validate(
     {"name": "Grace", "age": 37, "newsletter": True},
     Profile,
 )
@@ -82,7 +86,7 @@ assert profile.newsletter is True
 from orionis.schemas.exceptions import ValidationException
 
 try:
-    Validator.validate({"name": "x", "age": 12}, Profile)
+    await Validator.validate({"name": "x", "age": 12}, Profile)
 except ValidationException as exception:
     assert set(exception.errors) == {"name", "age"}
     assert len(exception.failures) == 2
@@ -114,7 +118,7 @@ class Batch(Schema):
     size: Field[int, Even()]
 
 
-assert Validator.validate({"size": 4}, Batch).size == 4
+assert (await Validator.validate({"size": 4}, Batch)).size == 4
 ```
 
 
@@ -126,7 +130,7 @@ from orionis.schemas.validator import Schema as Validator
 
 
 async def example() -> None:
-    profile = await Validator.validateAsync({"name": "Lin", "age": 21}, Profile)
+    profile = await Validator.validate({"name": "Lin", "age": 21}, Profile)
     assert profile.name == "Lin"
 
 

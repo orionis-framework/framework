@@ -133,7 +133,7 @@ class TestCompiledServer(TestCase):
         self.assertEqual(metadata["outputSchema"]["type"], "array")
         self.assertIn("completions", compiled.capabilities)
 
-    def test_native_validation_and_output(self):
+    async def test_native_validation_and_output(self):
         """Validate constraints and reject output that violates the advertised type.
 
         Returns
@@ -143,14 +143,14 @@ class TestCompiledServer(TestCase):
         """
         tool = compile_server(DemoServer).tools["current-weather"]
         self.assertEqual(
-            validate_payload(tool, {"location": "Bogota"}).location,
+            (await validate_payload(tool, {"location": "Bogota"})).location,
             "Bogota",
         )
         with self.assertRaises(ValidationException):
-            validate_payload(tool, {"location": "x"})
+            await validate_payload(tool, {"location": "x"})
         with self.assertRaises(msgspec.ValidationError):
-            validate_output(tool, ["wrong"])
-        self.assertEqual(validate_output(tool, [1, 2]), [1, 2])
+            await validate_output(tool, ["wrong"])
+        self.assertEqual(await validate_output(tool, [1, 2]), [1, 2])
 
     def test_immutable_snapshot(self):
         """Compiled metadata and registries cannot be mutated between callers.
@@ -300,7 +300,7 @@ class TestCompiledServer(TestCase):
         self.assertEqual(schema["type"], "object")
         self.assertIn("Node", schema["$defs"])
 
-    def test_noarg_tool_rejects_payload(self):
+    async def test_noarg_tool_rejects_payload(self):
         """The advertised empty object schema is enforced at runtime.
 
         Returns
@@ -321,9 +321,9 @@ class TestCompiledServer(TestCase):
 
         server = type("Empty", (Server,), {"name": "Empty", "tools": (EmptyTool,)})
         primitive = compile_server(server).tools["empty"]
-        self.assertIs(validate_payload(primitive, {}), msgspec.UNSET)
+        self.assertIs(await validate_payload(primitive, {}), msgspec.UNSET)
         with self.assertRaises(msgspec.ValidationError):
-            validate_payload(primitive, {"unexpected": True})
+            await validate_payload(primitive, {"unexpected": True})
 
     def test_extensions_require_decoders_and_cannot_override_core(self):
         """Extension routing is explicit and collision checked before boot.

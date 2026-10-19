@@ -42,7 +42,7 @@ class _Marker:
 class _PositiveAmount(Rule):
     """Reject nonpositive amounts after an asynchronous suspension."""
 
-    async def enforceAsync(
+    async def enforce(
         self, _field: str, value: object, _instance: object,
     ) -> bool:
         """

@@ -102,7 +102,7 @@ class TestInvoker(TestCase):
             method="tools/call",
             arguments={"repository": "attacker"},
         )
-        payload = validate_payload(primitive, request.arguments)
+        payload = await validate_payload(primitive, request.arguments)
         instance = await self.app.build(primitive.definition)
         result = await primitive.handler.invoke(instance, self.app, request, payload)
         self.assertEqual(result, ("attacker", repository, 1, "native"))

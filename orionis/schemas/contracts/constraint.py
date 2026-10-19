@@ -53,14 +53,14 @@ class IRule(ABC):
         """
 
     @abstractmethod
-    def validate(
+    async def validate(
         self,
         field: str,
         value: object,
         instance: object,
     ) -> ValidationFailure | None:
         """
-        Validate the provided value and return a failure or ``None``.
+        Await validation and return a failure or ``None``.
 
         Parameters
         ----------

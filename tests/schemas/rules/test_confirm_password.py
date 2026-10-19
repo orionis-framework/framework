@@ -9,7 +9,7 @@ _OTHER = "Other1!"
 
 class TestConfirmPasswordEnforce(TestCase):
 
-    def testMatchingConfirmationPasses(self) -> None:
+    async def testMatchingConfirmationPasses(self) -> None:
         """Accept a confirmation equal to the compared field.
 
         Validates the success path against the default sibling field.
@@ -21,9 +21,11 @@ class TestConfirmPasswordEnforce(TestCase):
         """
         instance = SimpleNamespace(password=_CREDENTIAL)
         rule = ConfirmPassword()
-        self.assertTrue(rule.enforce("password_confirmation", _CREDENTIAL, instance))
+        self.assertTrue(
+            await rule.enforce("password_confirmation", _CREDENTIAL, instance),
+        )
 
-    def testMismatchedConfirmationFails(self) -> None:
+    async def testMismatchedConfirmationFails(self) -> None:
         """Reject a confirmation differing from the compared field.
 
         Validates that any difference, including case, is rejected.
@@ -35,10 +37,12 @@ class TestConfirmPasswordEnforce(TestCase):
         """
         instance = SimpleNamespace(password=_CREDENTIAL)
         rule = ConfirmPassword()
-        self.assertFalse(rule.enforce("password_confirmation", _OTHER, instance))
-        self.assertFalse(rule.enforce("password_confirmation", "secure1!", instance))
+        self.assertFalse(await rule.enforce("password_confirmation", _OTHER, instance))
+        self.assertFalse(
+            await rule.enforce("password_confirmation", "secure1!", instance),
+        )
 
-    def testCustomSiblingFieldIsCompared(self) -> None:
+    async def testCustomSiblingFieldIsCompared(self) -> None:
         """Compare against the sibling field supplied at construction time.
 
         Validates that the default field name can be overridden.
@@ -50,10 +54,10 @@ class TestConfirmPasswordEnforce(TestCase):
         """
         rule = ConfirmPassword("new_password")
         instance = SimpleNamespace(new_password=_CREDENTIAL, password=_OTHER)
-        self.assertTrue(rule.enforce("confirmation", _CREDENTIAL, instance))
-        self.assertFalse(rule.enforce("confirmation", _OTHER, instance))
+        self.assertTrue(await rule.enforce("confirmation", _CREDENTIAL, instance))
+        self.assertFalse(await rule.enforce("confirmation", _OTHER, instance))
 
-    def testMissingSiblingPasses(self) -> None:
+    async def testMissingSiblingPasses(self) -> None:
         """Accept the value when the compared field is absent.
 
         Validates that a failed sibling conversion is not reported twice.
@@ -65,10 +69,10 @@ class TestConfirmPasswordEnforce(TestCase):
         """
         rule = ConfirmPassword()
         self.assertTrue(
-            rule.enforce("password_confirmation", _CREDENTIAL, SimpleNamespace()),
+            await rule.enforce("password_confirmation", _CREDENTIAL, SimpleNamespace()),
         )
 
-    def testPresentNoneSiblingIsStillCompared(self) -> None:
+    async def testPresentNoneSiblingIsStillCompared(self) -> None:
         """Compare a sibling field that is present and holds None.
 
         Validates that an absent field is distinguished from a None value.
@@ -80,8 +84,10 @@ class TestConfirmPasswordEnforce(TestCase):
         """
         instance = SimpleNamespace(password=None)
         rule = ConfirmPassword()
-        self.assertTrue(rule.enforce("password_confirmation", None, instance))
-        self.assertFalse(rule.enforce("password_confirmation", _CREDENTIAL, instance))
+        self.assertTrue(await rule.enforce("password_confirmation", None, instance))
+        self.assertFalse(
+            await rule.enforce("password_confirmation", _CREDENTIAL, instance),
+        )
 
     def testEmptyFieldNameRaises(self) -> None:
         """Raise ValueError when no sibling field name is supplied.

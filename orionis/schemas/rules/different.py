@@ -37,7 +37,7 @@ class Different(Rule):
             raise ValueError(error_msg)
         self._forbidden: tuple[object, ...] = values
 
-    def enforce(
+    async def enforce(
         self,
         field: str,
         value: object,

@@ -364,7 +364,7 @@ class HubRuntime:
             ):
                 self._bindContext(scope, connection)
                 bind_auth_context(auth)
-                kwargs = method.bind(envelope.args, envelope.kwargs)
+                kwargs = await method.bind(envelope.args, envelope.kwargs)
                 for name, dependency in method.dependencies.items():
                     kwargs[name] = await self._app.make(dependency)
                 instance = await self._buildHub(connection)

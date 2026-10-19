@@ -20,7 +20,7 @@ from orionis.test import TestCase
 class _NonNegativeAsync(Rule):
     """Reject invalid values only through native asynchronous enforcement."""
 
-    async def enforceAsync(
+    async def enforce(
         self,
         _field: str,
         value: object,

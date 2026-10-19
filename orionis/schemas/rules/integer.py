@@ -19,7 +19,7 @@ class Integer(Rule):
     __message__ = "Value must be an integer."
     __code__ = "integer"
 
-    def enforce(
+    async def enforce(
         self,
         field: str,
         value: object,

@@ -2,6 +2,25 @@
 
 Use a Hub to group operations sharing an audience and protocol. Only ordinary instance methods marked `@remote` are callable remotely. A public method without the decorator remains outside the remote surface.
 
+## Generate a hub
+
+```shell
+python -B reactor make:realtime-hub chat
+```
+
+This creates `app/realtime/hubs/chat_hub.py` with `ChatHub(Hub)` and an asynchronous `echo(message: str) -> str` method marked with `@remote`. Register it explicitly in your WebSocket routes:
+
+```python
+from app.realtime.hubs.chat_hub import ChatHub
+from orionis.support.facades import Route
+
+Route.hub("/realtime/chat", ChatHub)
+```
+
+The generator respects `app_realtime_hubs`, supports nested directories and never overwrites existing files. The `Hub` suffix is appended only once. For text connections without RPC, use `make:realtime-socket`, described under [WebSocket](../../../http/docs/en/websockets.md).
+
+## Typed operations
+
 ```python
 import asyncio
 from orionis.realtime import Hub, remote

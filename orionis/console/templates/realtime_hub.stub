@@ -1,0 +1,21 @@
+from orionis.realtime import Hub, remote
+
+class {{ class_name }}(Hub):
+    """Group explicitly exposed realtime operations."""
+
+    @remote
+    async def echo(self, message: str) -> str:
+        """
+        Return the message supplied by the client.
+
+        Parameters
+        ----------
+        message : str
+            Validated text supplied by the realtime client.
+
+        Returns
+        -------
+        str
+            Original client message.
+        """
+        return message

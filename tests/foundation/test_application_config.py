@@ -1,6 +1,7 @@
 from __future__ import annotations
 import tempfile
 from pathlib import Path
+from unittest.mock import patch
 import orionis.foundation.application as application_module
 from orionis.cache.file_based_cache import FileBasedCache
 from orionis.container.context.scope import ScopedContext
@@ -338,6 +339,59 @@ class TestApplicationConfiguration(TestCase):
             self.assertEqual(second.config("app.settings.values"), [1, 2])
             second.withConfigApp(debug=True)
             self.assertFalse(second.config("app.debug"))
+
+    def testCompiledPathsInvalidateWhenCorePathDefinitionsChange(self) -> None:
+        """
+        Rebuild older path snapshots when framework directory definitions change.
+
+        Returns
+        -------
+        None
+            Assert invalidation adds new paths and warm caches remain reusable.
+        """
+        realtime_keys = (
+            "app_realtime", "app_realtime_sockets", "app_realtime_hubs",
+        )
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            definitions = root / "core_paths.py"
+            definitions.write_text("paths = ('app',)\n", encoding="utf-8")
+            cache_path = str(root / "cache")
+            with patch.object(application_module, "_CORE_PATHS_PATH", definitions):
+                first = make_application()
+                first.compile(path=cache_path)
+                first.withConfigPaths(app_services="custom/services")
+                for key in realtime_keys:
+                    first._Application__bootstrap["paths"].pop(key)
+                first._Application__persistCompiledState()
+
+                warm = make_application()
+                warm.compile(path=cache_path)
+                self.assertTrue(warm._Application__is_compiled)
+                self.assertIsNone(warm.path("app_realtime_sockets"))
+
+                definitions.write_text(
+                    f"paths = ('app', {realtime_keys!r})\n", encoding="utf-8",
+                )
+                updated = make_application()
+                updated.compile(path=cache_path)
+                self.assertFalse(updated._Application__is_compiled)
+                updated.withConfigPaths(app_services="custom/services")
+                updated._Application__persistCompiledState()
+                updated._Application__commitConfig()
+                for key in realtime_keys:
+                    self.assertEqual(
+                        updated.path(key), updated.basePath / CORE_APP_PATHS[key],
+                    )
+                self.assertEqual(
+                    updated.path("app_services"),
+                    updated.basePath / "custom" / "services",
+                )
+                cached = make_application()
+                cached.compile(path=cache_path)
+                self.assertTrue(cached._Application__is_compiled)
+                for key in realtime_keys:
+                    self.assertEqual(cached.path(key), updated.path(key))
 
     def testRoutingResultsRemainIsolatedMutableLists(self) -> None:
         """

@@ -53,6 +53,7 @@ if TYPE_CHECKING:
 _SENTINEL = object()
 _ASGI_BODY_QUEUE_SIZE = 8
 _CWD = Path.cwd()
+_CORE_PATHS_PATH = Path(__file__).with_name("core_paths.py").resolve()
 _CONFIG_KEY_CACHE_SIZE = 256
 _MAINTENANCE_REFRESH_NS = 100_000_000
 _ROUTER_FACADE_MODULE = "orionis.support.facades"
@@ -1004,6 +1005,11 @@ class Application(Container, IApplication):
         -------
         None
             This method does not return a value.
+
+        Notes
+        -----
+        Core application path definitions are always monitored so framework
+        updates invalidate snapshots containing outdated directory keys.
         """
         self.__bootCompiledState(
             compiled_path=path,
@@ -1409,7 +1415,10 @@ class Application(Container, IApplication):
             path=self.__compiled_path,
             filename="config",
             monitored_dirs=self.compiledInvalidationPathsDirs,
-            monitored_files=self.compiledInvalidationPathsFiles,
+            monitored_files=[
+                *self.compiledInvalidationPathsFiles,
+                _CORE_PATHS_PATH,
+            ],
         )
 
         # Keep the effective cache path so successful bootstrap commands can

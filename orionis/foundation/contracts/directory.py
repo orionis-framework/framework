@@ -439,3 +439,33 @@ class IDirectory(ABC):
         Path
             The configured application directory.
         """
+
+    @abstractmethod
+    def appRealtime(self) -> Path:
+        """Return the realtime application directory.
+
+        Returns
+        -------
+        Path
+            The configured realtime application directory.
+        """
+
+    @abstractmethod
+    def appRealtimeSockets(self) -> Path:
+        """Return the realtime WebSocket handlers directory.
+
+        Returns
+        -------
+        Path
+            The configured realtime WebSocket handlers directory.
+        """
+
+    @abstractmethod
+    def appRealtimeHubs(self) -> Path:
+        """Return the realtime hubs directory.
+
+        Returns
+        -------
+        Path
+            The configured realtime hubs directory.
+        """

@@ -211,6 +211,36 @@ class Directory(IDirectory):
         """
         return self._path("app_mcp_prompts")
 
+    def appRealtime(self) -> Path:
+        """Return the realtime application directory.
+
+        Returns
+        -------
+        Path
+            The configured realtime application directory.
+        """
+        return self._path("app_realtime")
+
+    def appRealtimeSockets(self) -> Path:
+        """Return the realtime WebSocket handlers directory.
+
+        Returns
+        -------
+        Path
+            The configured realtime WebSocket handlers directory.
+        """
+        return self._path("app_realtime_sockets")
+
+    def appRealtimeHubs(self) -> Path:
+        """Return the realtime hubs directory.
+
+        Returns
+        -------
+        Path
+            The configured realtime hubs directory.
+        """
+        return self._path("app_realtime_hubs")
+
     def appProviders(self) -> Path:
         """Return the application providers directory.
 

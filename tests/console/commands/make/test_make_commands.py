@@ -1,11 +1,12 @@
 import ast
 import importlib.util
-from asyncio import gather
+from asyncio import CancelledError, gather
 from datetime import UTC, datetime
 from itertools import pairwise
 from pathlib import Path
 from tempfile import TemporaryDirectory
 from threading import get_ident
+from unittest.mock import patch
 from orionis.console.commands.make import database_migration as migration_module
 from orionis.console.commands.make._base import MakeStubCommand
 from orionis.console.commands.make.console import MakeConsoleCommand
@@ -22,13 +23,18 @@ from orionis.console.commands.make.http_schema_rule import MakeHttpSchemaRule
 from orionis.console.commands.make.mail import MakeMail
 from orionis.console.commands.make.model import MakeModel
 from orionis.console.commands.make.provider import MakeProvider
+from orionis.console.commands.make.realtime import MakeRealtimeHub, MakeRealtimeSocket
 from orionis.console.commands.make.service import MakeService
 from orionis.console.commands.make.test import MakeTest
 from orionis.console.core.commands import CORE_COMMANDS
 from orionis.database.contracts.migration import Migration
 from orionis.foundation.contracts.application import IApplication
 from orionis.foundation.core_paths import CORE_APP_PATHS
+from orionis.http import WebSocket
+from orionis.realtime import Hub
+from orionis.realtime.metadata import compile_hub
 from orionis.test import TestCase
+from tests.http.test_websocket import _ASGIPeer
 
 class _RecordedMakeCommand(MakeStubCommand):
     """Record output and file creation while retaining each command's behavior."""
@@ -190,7 +196,7 @@ class _Clock:
 class _Application:
     """Resolve core application paths inside a temporary project directory."""
 
-    __slots__ = ("basePath",)
+    __slots__ = ("basePath", "paths")
 
     def __init__(self, base_path: Path) -> None:
         """Store the temporary project root for generated files.
@@ -206,6 +212,10 @@ class _Application:
             Assign the project root to ``basePath``.
         """
         self.basePath = base_path
+        self.paths = {
+            key: base_path.joinpath(*value.split("/"))
+            for key, value in CORE_APP_PATHS.items()
+        }
 
     def path(self, key: str) -> Path:
         """Resolve a core application path relative to the project root.
@@ -225,7 +235,7 @@ class _Application:
         KeyError
             If the key is not declared in ``CORE_APP_PATHS``.
         """
-        return self.basePath.joinpath(*CORE_APP_PATHS[key].split("/"))
+        return self.paths[key]
 
     def config(self, key: str) -> object:
         """Look up a fixed mail sender setting by configuration key.
@@ -818,6 +828,195 @@ class TestMakeCommands(TestCase):
             self.assertEqual(sender.address, "notifications@example.test")
             self.assertEqual(sender.name, "Example Notifications")
 
+    async def testMakeRealtimeCreatesNestedFilesWithSingleSuffixes(self) -> None:
+        """Verify realtime names, suffixes, paths and worker-thread creation.
+
+        Returns
+        -------
+        None
+            Assert both generators create the expected documented classes.
+        """
+        cases = (
+            (MakeRealtimeSocket, "sockets", "Socket"),
+            (MakeRealtimeHub, "hubs", "Hub"),
+        )
+        for command_type, directory, suffix in cases:
+            filename = f"chat_{suffix.lower()}.py"
+            for name, nested in (
+                ("chat", False),
+                (filename, False),
+                ("rooms\\chat.py", True),
+                (f"rooms\\{filename}", True),
+            ):
+                with (
+                    self.subTest(command=command_type.signature, name=name),
+                    TemporaryDirectory() as temporary,
+                ):
+                    root = Path(temporary)
+                    command = _record_command(command_type)
+                    command.setArguments({"name": name})
+
+                    await command.handle(_Application(root))
+
+                    target = root / "app" / "realtime" / directory
+                    if nested:
+                        target /= "rooms"
+                    target /= filename
+                    self.assertEqual(_get_python_sources(root), {target})
+                    module = ast.parse(target.read_text(encoding="utf-8"))
+                    generated_class = next(
+                        node
+                        for node in module.body
+                        if isinstance(node, ast.ClassDef)
+                    )
+                    self.assertEqual(generated_class.name, f"Chat{suffix}")
+                    self.assertEqual(command.errors, [])
+                    self.assertEqual(len(command.successes), 1)
+                    self.assertEqual(command.lines, 2)
+                    self.assertEqual(len(command.creation_threads), 1)
+                    self.assertNotEqual(
+                        command.creation_threads[0], get_ident(),
+                    )
+
+    async def testMakeRealtimeUsesCustomPathsWithoutOverwritingFiles(self) -> None:
+        """Verify configured paths are authoritative and existing files survive.
+
+        Returns
+        -------
+        None
+            Assert repeated generation reports an error and preserves file bytes.
+        """
+        for command_type, filename in (
+            (MakeRealtimeSocket, "chat_socket.py"),
+            (MakeRealtimeHub, "chat_hub.py"),
+        ):
+            with (
+                self.subTest(command=command_type.signature),
+                TemporaryDirectory() as temporary,
+            ):
+                root = Path(temporary)
+                app = _Application(root)
+                destination = root / "custom" / "endpoints"
+                app.paths[command_type.path_key] = destination
+                command = _record_command(command_type)
+                command.setArguments({"name": "chat"})
+
+                await command.handle(app)
+                target = destination / filename
+                original = target.read_bytes()
+                await command.handle(app)
+
+                self.assertEqual(_get_python_sources(root), {target})
+                self.assertEqual(target.read_bytes(), original)
+                self.assertEqual(len(command.successes), 1)
+                self.assertEqual(len(command.errors), 1)
+                self.assertIn("already exists", command.errors[0])
+
+    async def testMakeRealtimeRejectsMissingAndUnsafeNames(self) -> None:
+        """Verify invalid realtime names fail before creating source files.
+
+        Returns
+        -------
+        None
+            Assert missing names and unsafe paths produce errors, not successes.
+        """
+        for command_type in (MakeRealtimeSocket, MakeRealtimeHub):
+            with TemporaryDirectory() as temporary:
+                root = Path(temporary)
+                for name in (
+                    None, "", "..\\chat", "rooms\\..\\chat", "\\chat",
+                    "C:\\chat", "invalid-name",
+                ):
+                    with self.subTest(command=command_type.signature, name=name):
+                        command = _record_command(command_type)
+                        command.setArguments({"name": name})
+
+                        await command.handle(_Application(root))
+
+                        self.assertEqual(command.successes, [])
+                        self.assertEqual(len(command.errors), 1)
+                        self.assertEqual(_get_python_sources(root), set())
+
+    async def testMakeRealtimeSocketProducesAWorkingConnectionHandler(self) -> None:
+        """Verify generated sockets echo text and close without hiding failures.
+
+        Returns
+        -------
+        None
+            Assert runtime annotations, text echo, disconnects and error cleanup.
+        """
+        with TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            command = MakeRealtimeSocket()
+            target = root / command.createFile(_Application(root), "chat")
+            spec = importlib.util.spec_from_file_location(
+                "generated_chat_socket", target,
+            )
+            if spec is None or spec.loader is None:
+                self.fail("Generated socket module must be importable.")
+            module = importlib.util.module_from_spec(spec)
+            spec.loader.exec_module(module)
+            self.assertIs(
+                module.ChatSocket.__call__.__annotations__["socket"], WebSocket,
+            )
+            peer = _ASGIPeer()
+            for message in ("Hello", "Realtime"):
+                peer.events.put_nowait({
+                    "type": "websocket.receive", "text": message,
+                })
+            peer.events.put_nowait({"type": "websocket.disconnect", "code": 1000})
+            socket = peer.socket()
+
+            await module.ChatSocket()(socket)
+
+            self.assertTrue(socket.closed)
+            self.assertEqual(
+                [event["type"] for event in peer.sent],
+                ["websocket.accept", "websocket.send", "websocket.send"],
+            )
+            self.assertEqual(
+                [event["text"] for event in peer.sent[1:]], ["Hello", "Realtime"],
+            )
+            for failure in (RuntimeError("Receive failed"), CancelledError()):
+                with self.subTest(failure=type(failure).__name__):
+                    peer = _ASGIPeer()
+                    socket = peer.socket()
+                    with (
+                        patch.object(WebSocket, "receiveText", side_effect=failure),
+                        self.assertRaises(type(failure)),
+                    ):
+                        await module.ChatSocket()(socket)
+                    self.assertTrue(socket.closed)
+                    self.assertEqual(peer.sent[-1]["type"], "websocket.close")
+
+    async def testMakeRealtimeHubProducesACompilableTypedRemoteMethod(self) -> None:
+        """Verify generated hubs can bind and invoke their declared operation.
+
+        Returns
+        -------
+        None
+            Assert Hub inheritance, explicit remote exposure and typed arguments.
+        """
+        with TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            command = MakeRealtimeHub()
+            target = root / command.createFile(_Application(root), "chat")
+            spec = importlib.util.spec_from_file_location(
+                "generated_chat_hub", target,
+            )
+            if spec is None or spec.loader is None:
+                self.fail("Generated hub module must be importable.")
+            module = importlib.util.module_from_spec(spec)
+            spec.loader.exec_module(module)
+            self.assertTrue(issubclass(module.ChatHub, Hub))
+            methods = compile_hub(module.ChatHub)
+            self.assertEqual(set(methods), {"echo"})
+            bound = await methods["echo"].bind(["Hello"], {})
+            self.assertEqual(bound, {"message": "Hello"})
+            self.assertIs(module.ChatHub.echo.__annotations__["message"], str)
+            self.assertIs(module.ChatHub.echo.__annotations__["return"], str)
+            self.assertEqual(await module.ChatHub().echo(**bound), "Hello")
+
     async def testEveryMakeStubProducesDocumentedPython(self) -> None:
         """Verify every make template renders documented Python declarations.
 
@@ -843,6 +1042,8 @@ class TestMakeCommands(TestCase):
             (MakeHttpMiddleware, {}),
             (MakeHttpSchema, {}),
             (MakeHttpSchemaRule, {}),
+            (MakeRealtimeSocket, {}),
+            (MakeRealtimeHub, {}),
             (MakeTest, {}),
             (MakeDatabaseMigration, {}),
             (MakeDatabaseSeeder, {}),
@@ -931,6 +1132,8 @@ class TestMakeCommands(TestCase):
             "make:http-middleware",
             "make:http-schema",
             "make:http-schema-rule",
+            "make:realtime-socket",
+            "make:realtime-hub",
             "make:test",
             "make:database-migration",
             "make:database-seeder",

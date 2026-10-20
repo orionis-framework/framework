@@ -1,11 +1,11 @@
 {
-  "recorded_at": "2026-10-19T23:09:12.660744+00:00",
+  "recorded_at": "2026-10-20T20:45:26.021805+00:00",
   "os": "Linux-7.0.0-1017-azure-x86_64-with-glibc2.39",
   "architecture": "x86_64",
-  "cpu": "INTEL(R) XEON(R) PLATINUM 8573C",
+  "cpu": "AMD EPYC 9V74 80-Core Processor",
   "logical_cpus": 4,
   "physical_cpus": 2,
-  "memory_bytes": 16759304192,
+  "memory_bytes": 16760344576,
   "python": "3.14.8",
   "python_executable": "/home/runner/work/framework/framework/.venv/bin/python3",
   "versions": {
@@ -16,7 +16,7 @@
     "starlette": "1.8.0",
     "oha": "1.16.0"
   },
-  "commit": "a8eb83b5557779772bbd38a193459ee77f7849c6",
+  "commit": "821e90c3667eb7b88c0aefcb037ba6f77337fcff",
   "dirty": false,
   "uv_lock_sha256": "a28dc0497ff42a548dbe34a593a87c1d19b4dcfcc7510c9e828dd655b89595dd",
   "dependencies": [
@@ -85,6 +85,6 @@
     "uvloop==0.23.0",
     "watchfiles==1.3.0"
   ],
-  "run_url": "https://github.com/orionis-framework/framework/actions/runs/39338527556",
-  "oha_executable": "/tmp/http-compare-oha-68ja9j4a/oha-linux-amd64"
+  "run_url": "https://github.com/orionis-framework/framework/actions/runs/39494644920",
+  "oha_executable": "/tmp/http-compare-oha-wcv2lrnp/oha-linux-amd64"
 }

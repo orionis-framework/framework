@@ -13,6 +13,19 @@ python reactor make:factory ProductFactory --help
 
 Generating a model does not migrate its table; generating a job does not start workers. Review generated imports, dependencies, and configuration before use.
 
+### Realtime sockets and hubs
+
+```shell
+python -B reactor make:realtime-socket chat
+python -B reactor make:realtime-hub chat
+```
+
+The first command creates `ChatSocket` in `app/realtime/sockets/chat_socket.py`; the second creates `ChatHub` in `app/realtime/hubs/chat_hub.py`. The invokable socket accepts the connection, echoes text messages and handles disconnects. The hub extends `Hub` and includes an `echo(message: str) -> str` method exposed with `@remote`.
+
+The generators respect configured `app_realtime_sockets` and `app_realtime_hubs` paths, create nested directories, append each suffix only once and never overwrite existing files. For example, `make:realtime-hub rooms/chat_hub.py` creates `rooms/chat_hub.py` inside the configured hubs directory.
+
+Generation does not modify routes or open connections. Register the classes with `Route.websocket("/ws/chat", ChatSocket)` or `Route.hub("/realtime/chat", ChatHub)` in your WebSocket routes. See [WebSocket](../../../http/docs/en/websockets.md) and [hubs](../../../realtime/docs/en/hubs-and-methods.md) for integration and authorization.
+
 ## Restore configuration
 
 `bootstrap:config [file]` restores missing configuration from the official skeleton's `master` branch.

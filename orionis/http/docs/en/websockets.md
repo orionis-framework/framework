@@ -2,6 +2,23 @@
 
 `WebSocket` exposes the same API over ASGI and RSGI. Register a handler with `Route.websocket(path, action)`; the connection has converted parameters, headers and its own state. An HTTP GET route at the same path does not replace a WebSocket route.
 
+## Generate an invokable handler
+
+```shell
+python -B reactor make:realtime-socket chat
+```
+
+This creates `app/realtime/sockets/chat_socket.py` with `ChatSocket`, an asynchronous handler that echoes text messages and closes the connection on completion. Register it explicitly in your WebSocket routes:
+
+```python
+from app.realtime.sockets.chat_socket import ChatSocket
+from orionis.support.facades import Route
+
+Route.websocket("/ws/chat", ChatSocket)
+```
+
+Names can include nested directories; the generator respects `app_realtime_sockets` and never overwrites existing files. For typed RPC, generate a [hub](../../../realtime/docs/en/hubs-and-methods.md) instead of a text socket.
+
 ## A JSON echo
 
 ```python

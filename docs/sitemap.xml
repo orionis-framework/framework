@@ -748,6 +748,15 @@
     <loc>https://api.orionis-framework.com/orionis.console.commands.make.provider.MakeProvider.html</loc>
   </url>
   <url>
+    <loc>https://api.orionis-framework.com/orionis.console.commands.make.realtime.html</loc>
+  </url>
+  <url>
+    <loc>https://api.orionis-framework.com/orionis.console.commands.make.realtime.MakeRealtimeHub.html</loc>
+  </url>
+  <url>
+    <loc>https://api.orionis-framework.com/orionis.console.commands.make.realtime.MakeRealtimeSocket.html</loc>
+  </url>
+  <url>
     <loc>https://api.orionis-framework.com/orionis.console.commands.make.service.html</loc>
   </url>
   <url>

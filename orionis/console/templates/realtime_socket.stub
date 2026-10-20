@@ -1,0 +1,28 @@
+from orionis.http import WebSocket, WebSocketDisconnected
+
+class {{ class_name }}:
+    """Handle a realtime WebSocket connection."""
+
+    async def __call__(self, socket: WebSocket) -> None:
+        """
+        Accept the connection and echo incoming text messages.
+
+        Parameters
+        ----------
+        socket : WebSocket
+            Connection supplied by the WebSocket kernel.
+
+        Returns
+        -------
+        None
+            Complete the handler when the peer disconnects.
+        """
+        try:
+            await socket.accept()
+            while True:
+                message = await socket.receiveText()
+                await socket.sendText(message)
+        except WebSocketDisconnected:
+            return
+        finally:
+            await socket.close()

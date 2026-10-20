@@ -33,6 +33,7 @@ from orionis.console.commands.make.mcp import (
 )
 from orionis.console.commands.make.model import MakeModel
 from orionis.console.commands.make.provider import MakeProvider
+from orionis.console.commands.make.realtime import MakeRealtimeHub, MakeRealtimeSocket
 from orionis.console.commands.make.service import MakeService
 from orionis.console.commands.make.test import MakeTest
 from orionis.console.commands.mcp.list import McpListCommand
@@ -118,6 +119,8 @@ def get_core_commands_mapping() -> tuple[type, ...]:
         MakeHttpMiddleware,
         MakeHttpSchema,
         MakeHttpSchemaRule,
+        MakeRealtimeSocket,
+        MakeRealtimeHub,
         MakeDatabaseMigration,
         MakeDatabaseSeeder,
         MakeDatabaseSchema,

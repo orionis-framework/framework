@@ -1,13 +1,13 @@
 from contextlib import asynccontextmanager
 from typing import TYPE_CHECKING
-from starlette.applications import Starlette
-from starlette.responses import PlainTextResponse
-from starlette.routing import Route
+from starlette.applications import Starlette # pyright: ignore[reportMissingImports]
+from starlette.responses import PlainTextResponse # pyright: ignore[reportMissingImports]
+from starlette.routing import Route # pyright: ignore[reportMissingImports]
 from benchmarks.http_compare.apps._ready import mark_ready
 
 if TYPE_CHECKING:
     from collections.abc import AsyncIterator
-    from starlette.requests import Request
+    from starlette.requests import Request # pyright: ignore[reportMissingImports]
 
 @asynccontextmanager
 async def _lifespan(_app: Starlette) -> AsyncIterator[None]:

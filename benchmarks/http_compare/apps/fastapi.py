@@ -1,7 +1,7 @@
 from contextlib import asynccontextmanager
 from typing import TYPE_CHECKING
 from fastapi import FastAPI
-from fastapi.responses import PlainTextResponse
+from fastapi.responses import PlainTextResponse # pyright: ignore[reportMissingImports]
 from benchmarks.http_compare.apps._ready import mark_ready
 
 if TYPE_CHECKING:

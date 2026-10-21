@@ -175,7 +175,7 @@ class TestSchemaCollections(TestCase):
         ):
             with self.subTest(annotation=annotation):
                 class _CollectionSchema(Schema):
-                    contacts: annotation # noqa
+                    contacts: annotation  # pyright: ignore[reportInvalidTypeForm]
 
                 with self.assertRaises(ValidationException) as caught:
                     await Validator.validate({

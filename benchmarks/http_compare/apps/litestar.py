@@ -1,4 +1,4 @@
-from litestar import Litestar, MediaType, Response, get
+from litestar import Litestar, MediaType, Response, get # pyright: ignore[reportMissingImports]
 from benchmarks.http_compare.apps._ready import mark_ready
 
 async def hello() -> Response[str]: # NOSONAR

@@ -1,5 +1,9 @@
 from typing import Literal
 import msgspec
+
+# Protocol fields retain the official MCP property names.
+# ruff: noqa: N815
+
 type RequestId = str | int
 type Metadata = dict[str, object]
 type LoggingLevel = Literal[

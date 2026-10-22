@@ -776,9 +776,9 @@ class ResponseTemplate:
         response = object.__new__(Response)
         response.status_code = self.status_code
         response.media_type = self.media_type
-        response._body = self.body  # noqa: SLF001 - Initialize a response owned by this factory.
-        response._stream = None  # noqa: SLF001 - Initialize a response owned by this factory.
-        response._flash = None  # noqa: SLF001 - Initialize a response owned by this factory.
+        response._body = self.body
+        response._stream = None
+        response._flash = None
         response.background = None
         headers: dict[str, str | list[str]] = {}
         for key, value in self._headers:
@@ -789,8 +789,8 @@ class ResponseTemplate:
                 previous.append(value)
             else:
                 headers[key] = [previous, value]
-        response._headers = headers  # noqa: SLF001 - Initialize a response owned by this factory.
-        response._raw_headers = self._raw_headers  # noqa: SLF001 - Initialize a response owned by this factory.
+        response._headers = headers
+        response._raw_headers = self._raw_headers
         return response
 
 class HTMLResponse(Response):

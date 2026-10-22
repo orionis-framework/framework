@@ -1,11 +1,11 @@
 {
-  "recorded_at": "2026-10-21T23:01:17.821504+00:00",
-  "os": "Linux-7.0.0-1017-azure-x86_64-with-glibc2.39",
+  "recorded_at": "2026-10-22T13:11:06.859560+00:00",
+  "os": "Linux-6.17.0-1022-azure-x86_64-with-glibc2.39",
   "architecture": "x86_64",
-  "cpu": "AMD EPYC 9V74 80-Core Processor",
+  "cpu": "AMD EPYC 7763 64-Core Processor",
   "logical_cpus": 4,
   "physical_cpus": 2,
-  "memory_bytes": 16760344576,
+  "memory_bytes": 16766414848,
   "python": "3.14.8",
   "python_executable": "/home/runner/work/framework/framework/.venv/bin/python3",
   "versions": {
@@ -16,9 +16,9 @@
     "starlette": "1.8.0",
     "oha": "1.16.0"
   },
-  "commit": "556ad8188c961d05fcb4b3c4630b626100494d72",
+  "commit": "0f0900de6721509cef5996617aa84a495c3d37eb",
   "dirty": false,
-  "uv_lock_sha256": "c016032d4b2518d7edfe469ba0fb7091e83ac8e66d0c328178e9027c9e0593a4",
+  "uv_lock_sha256": "f60cf8b4dc0c1f9a828ecc08bc5f2ce251c768bbab81fff101ac54fb2de29d40",
   "dependencies": [
     "APScheduler==3.11.3",
     "Faker==40.43.0",
@@ -85,6 +85,6 @@
     "uvloop==0.23.0",
     "watchfiles==1.3.0"
   ],
-  "run_url": "https://github.com/orionis-framework/framework/actions/runs/39690556448",
-  "oha_executable": "/tmp/http-compare-oha-_q6puiu1/oha-linux-amd64"
+  "run_url": "https://github.com/orionis-framework/framework/actions/runs/39784581581",
+  "oha_executable": "/tmp/http-compare-oha-stduyhae/oha-linux-amd64"
 }

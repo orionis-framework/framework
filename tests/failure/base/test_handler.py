@@ -1,4 +1,5 @@
 from __future__ import annotations
+import logging
 from unittest.mock import MagicMock
 from orionis.failure.base.handler import BaseExceptionHandler
 from orionis.failure.entities.throwable import Throwable
@@ -8,6 +9,7 @@ from orionis.http.payload.body import PayloadTooLargeException
 from orionis.http.request import UnsupportedMediaTypeException
 from orionis.http.routes.exceptions.method_not_allowed import MethodNotAllowed
 from orionis.http.routes.exceptions.route_not_found import RouteNotFound
+from orionis.logging.contracts.logger import ILogger
 from orionis.test import TestCase
 
 def _make_application() -> MagicMock:
@@ -289,10 +291,10 @@ class TestBaseExceptionHandlerReport(TestCase):
         self.assertIsInstance(result, Throwable)
 
     async def testCallsLogErrorWhenNotIgnored(self) -> None:
-        """Invoke log.error exactly once when the exception is not ignored.
+        """Invoke the native logger once when the exception is not ignored.
 
-        Validates that the logger receives one call containing both the
-        exception class name and the message.
+        Validate that the error record includes the class, message and
+        explicit exception information without a separate traceback entry.
 
         Returns
         -------
@@ -300,13 +302,176 @@ class TestBaseExceptionHandlerReport(TestCase):
             Assertions verify the behavior described above.
         """
         handler = _make_handler(dont_catch=frozenset())
-        log = MagicMock()
+        log = MagicMock(spec=ILogger)
         exc = RuntimeError("test error")
         await handler.report(exc, log)
-        log.error.assert_called_once()
-        call_args = log.error.call_args[0][0]
-        self.assertIn("RuntimeError", call_args)
-        self.assertIn("test error", call_args)
+        log.getLogger.assert_called_once_with()
+        log.getLogger.return_value.error.assert_called_once_with(
+            "[%s] %s",
+            "RuntimeError",
+            "test error",
+            exc_info=(RuntimeError, exc, None),
+        )
+        log.error.assert_not_called()
+
+    async def testLogsFullTracebackOutsideExcept(self) -> None:
+        """Preserve the original traceback, full message and exception notes.
+
+        Returns
+        -------
+        None
+            Assertions verify the rendered error and original exception info.
+
+        Raises
+        ------
+        ValueError
+            Raised and caught to capture the original traceback.
+        """
+        handler = _make_handler()
+        logger = logging.getLogger(__name__)
+        log = MagicMock(spec=ILogger)
+        log.getLogger.return_value = logger
+        exc = ValueError("bad input", 42)
+        exc.add_note("Request ID: test-request")
+        try:
+            raise exc
+        except ValueError:
+            pass
+
+        with self.assertLogs(logger, level="ERROR") as captured:
+            result = await handler.report(exc, log)
+
+        self.assertEqual(result, handler.toThrowable(exc))
+        self.assertEqual(len(captured.records), 1)
+        self.assertEqual(
+            captured.records[0].exc_info,
+            (ValueError, exc, exc.__traceback__),
+        )
+        output = captured.output[0]
+        self.assertIn("[ValueError] bad input", output)
+        self.assertIn("Traceback (most recent call last):", output)
+        self.assertIn(__file__, output)
+        self.assertIn("testLogsFullTracebackOutsideExcept", output)
+        self.assertIn("ValueError: ('bad input', 42)", output)
+        self.assertIn("Request ID: test-request", output)
+
+    async def testLogsExceptionChaining(self) -> None:
+        """Preserve causes and context while respecting context suppression.
+
+        Returns
+        -------
+        None
+            Assertions verify native exception chaining in one error record.
+
+        Raises
+        ------
+        RuntimeError
+            Raised and caught with each supported chaining behavior.
+        ValueError
+            Raised and caught as the original failure.
+        """
+        handler = _make_handler()
+        logger = logging.getLogger(__name__)
+        log = MagicMock(spec=ILogger)
+        log.getLogger.return_value = logger
+
+        for chaining in ("cause", "context", "suppressed"):
+            with self.subTest(chaining=chaining):
+                exc = RuntimeError("operation failed")
+                cause = ValueError("original failure")
+                try:
+                    try:
+                        raise cause
+                    except ValueError as caught:
+                        if chaining == "cause":
+                            raise exc from caught
+                        if chaining == "suppressed":
+                            raise exc from None
+                        raise exc  # noqa: B904 - Exercise implicit context.
+                except RuntimeError:
+                    pass
+
+                with self.assertLogs(logger, level="ERROR") as captured:
+                    await handler.report(exc, log)
+
+                self.assertEqual(len(captured.records), 1)
+                output = captured.output[0]
+                self.assertIn("RuntimeError: operation failed", output)
+                if chaining == "suppressed":
+                    self.assertNotIn("ValueError: original failure", output)
+                else:
+                    self.assertIn("ValueError: original failure", output)
+                    self.assertIn(
+                        "direct cause" if chaining == "cause"
+                        else "During handling of the above exception",
+                        output,
+                    )
+
+    async def testLogsNestedExceptionGroups(self) -> None:
+        """Include nested exception groups, their individual errors and notes.
+
+        Returns
+        -------
+        None
+            Assertions verify the complete group in one error record.
+        """
+        handler = _make_handler()
+        logger = logging.getLogger(__name__)
+        log = MagicMock(spec=ILogger)
+        log.getLogger.return_value = logger
+        child = ValueError("invalid item")
+        child.add_note("Item ID: 42")
+        exc = ExceptionGroup(
+            "batch failed",
+            [child, ExceptionGroup("nested failure", [TypeError("wrong type")])],
+        )
+
+        with self.assertLogs(logger, level="ERROR") as captured:
+            await handler.report(exc, log)
+
+        self.assertEqual(len(captured.records), 1)
+        output = captured.output[0]
+        self.assertIn("ExceptionGroup: batch failed", output)
+        self.assertIn("ExceptionGroup: nested failure", output)
+        self.assertIn("ValueError: invalid item", output)
+        self.assertIn("TypeError: wrong type", output)
+        self.assertIn("Item ID: 42", output)
+
+    async def testLogsSuppliedExceptionWithoutTraceback(self) -> None:
+        """Log an unraised exception instead of an unrelated active exception.
+
+        Returns
+        -------
+        None
+            Assertions verify explicit exception info without a traceback.
+
+        Raises
+        ------
+        ValueError
+            Raised and caught to create an unrelated active exception.
+        """
+        handler = _make_handler()
+        logger = logging.getLogger(__name__)
+        log = MagicMock(spec=ILogger)
+        log.getLogger.return_value = logger
+        exc = RuntimeError("never raised")
+        active = ValueError("unrelated active exception")
+        try:
+            raise active
+        except ValueError:
+            with self.assertLogs(logger, level="ERROR") as captured:
+                await handler.report(exc, log)
+
+        self.assertEqual(len(captured.records), 1)
+        self.assertEqual(
+            captured.records[0].exc_info,
+            (RuntimeError, exc, None),
+        )
+        output = captured.output[0]
+        self.assertIn("RuntimeError: never raised", output)
+        self.assertNotIn("unrelated active exception", output)
+        self.assertNotIn("NoneType: None", output)
+        self.assertNotIn("No traceback available.", output)
 
     async def testReturnsNoneWhenIgnored(self) -> None:
         """Return None without logging when the exception type is ignored.
@@ -326,7 +491,7 @@ class TestBaseExceptionHandlerReport(TestCase):
         self.assertIsNone(result)
 
     async def testDoesNotCallLogWhenIgnored(self) -> None:
-        """Skip the log.error call when the exception is on the ignore list.
+        """Skip logging when the exception is on the ignore list.
 
         Validates that no logging side effects occur for silenced
         exception types.
@@ -337,10 +502,11 @@ class TestBaseExceptionHandlerReport(TestCase):
             Assertions verify the behavior described above.
         """
         handler = _make_handler(dont_catch=frozenset({ValueError}))
-        log = MagicMock()
+        log = MagicMock(spec=ILogger)
         exc = ValueError("silent")
         await handler.report(exc, log)
         log.error.assert_not_called()
+        log.getLogger.assert_not_called()
 
 class TestBaseExceptionHandlerHandleCLI(TestCase):
 

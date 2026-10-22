@@ -32,7 +32,7 @@ _HTTP_STATUS_MAP: dict[type[BaseException], tuple[int, str]] = {
 
 class BaseExceptionHandler(IBaseExceptionHandler):
 
-    # ruff: noqa: G004, TC001
+    # ruff: noqa: TC001
 
     # Exceptions that should not be caught by the handler
     dont_catch: ClassVar[frozenset[type[BaseException]]] = frozenset()
@@ -124,7 +124,10 @@ class BaseExceptionHandler(IBaseExceptionHandler):
         log: ILogger,
     ) -> Throwable | None:
         """
-        Report or log an exception.
+        Log an exception and its traceback as a single error record.
+
+        Preserve chained exceptions and notes using the original exception
+        information, even when reporting outside an active ``except`` block.
 
         Parameters
         ----------
@@ -145,8 +148,12 @@ class BaseExceptionHandler(IBaseExceptionHandler):
         # Convert the exception into a structured Throwable object
         throwable = self.toThrowable(exception)
 
-        # Log the exception details
-        log.error(f"[{throwable.classtype.__name__}] {throwable.message}")
+        log.getLogger().error(
+            "[%s] %s",
+            throwable.classtype.__name__,
+            throwable.message,
+            exc_info=(type(exception), exception, throwable.traceback),
+        )
 
         # Return the structured exception
         return throwable

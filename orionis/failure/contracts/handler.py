@@ -58,7 +58,7 @@ class IBaseExceptionHandler(ABC):
         log: ILogger,
     ) -> Throwable | None:
         """
-        Report or log an exception.
+        Log an exception and its traceback as a single error record.
 
         Parameters
         ----------

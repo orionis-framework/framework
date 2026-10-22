@@ -83,5 +83,4 @@ class Inspire(IInspire):
             Write the quote and its author.
         """
         quote = self.random()
-        console.writeLine(f'"{quote["quote"]}" - {quote["author"]}') # ruff: noqa: T201
-
+        console.writeLine(f'"{quote["quote"]}" - {quote["author"]}')

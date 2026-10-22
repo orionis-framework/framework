@@ -1,6 +1,9 @@
 from typing import Literal
 import msgspec
 
+# Protocol fields retain the official MCP property names.
+# ruff: noqa: N815
+
 class Annotations(msgspec.Struct, frozen=True, kw_only=True):
     """Optional audience, priority and modification hints."""
 

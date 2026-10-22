@@ -1,6 +1,9 @@
 from typing import Literal
 import msgspec
 
+# Protocol fields retain the official MCP property names.
+# ruff: noqa: N815
+
 class Error(msgspec.Struct, frozen=True, kw_only=True):
     """A safe protocol error."""
 

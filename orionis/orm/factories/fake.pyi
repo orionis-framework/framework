@@ -1,10 +1,10 @@
 # Provider signatures are checked by tests/orm/factories/test_fake.py.
-# Signatures derived from Faker 40.40.0 proxy.pyi.
+# Signatures derived from Faker 40.43.0 proxy.pyi.
 # Parameter names remain native to each provider.
 # Dynamic custom providers remain accessible through __getattr__.
 # Preserve upstream parameter names and provider type annotations.
 # Upstream provider prose retains Faker's MIT license; see LICENCE.
-# ruff: noqa: A002, ANN401, PYI021, PYI041, PYI051
+# ruff: noqa: A002, ANN401, ICN001, PYI021, PYI041, PYI051
 
 from collections import OrderedDict
 from collections.abc import Callable
@@ -14471,6 +14471,135 @@ class _ProviderMethods:
         Notes
         -----
         Faker formatter: ``full_name``.
+        Localized formatters require a supporting locale.
+        Provider reference:
+        https://faker.readthedocs.io/en/master/providers.html
+        """
+
+    def communeName(self) -> str:
+        """Generate a localized commune name.
+
+        Returns
+        -------
+        str
+            Value produced by Faker's ``commune_name`` provider.
+
+        Notes
+        -----
+        Faker formatter: ``commune_name``.
+        Localized formatters require a supporting locale.
+        Provider reference:
+        https://faker.readthedocs.io/en/master/providers.html
+        """
+
+    def communePrefix(self) -> Any:
+        """Generate a localized commune prefix.
+
+        Returns
+        -------
+        Any
+            Value produced by Faker's ``commune_prefix`` provider.
+            The upstream signature leaves the result type unspecified.
+
+        Notes
+        -----
+        Faker formatter: ``commune_prefix``.
+        Localized formatters require a supporting locale.
+        Provider reference:
+        https://faker.readthedocs.io/en/master/providers.html
+        """
+
+    def numberedStreet(self) -> str:
+        """Generate a localized street number with at most three digits.
+
+        Returns
+        -------
+        str
+            Value produced by Faker's ``numbered_street`` provider.
+
+        Notes
+        -----
+        Faker formatter: ``numbered_street``.
+        Localized formatters require a supporting locale.
+        Provider reference:
+        https://faker.readthedocs.io/en/master/providers.html
+        """
+
+    def provinceName(self) -> str:
+        """Generate a localized province name.
+
+        Returns
+        -------
+        str
+            Value produced by Faker's ``province_name`` provider.
+
+        Notes
+        -----
+        Faker formatter: ``province_name``.
+        Localized formatters require a supporting locale.
+        Provider reference:
+        https://faker.readthedocs.io/en/master/providers.html
+        """
+
+    def provincePrefix(self) -> str:
+        """Generate a localized province prefix.
+
+        Returns
+        -------
+        str
+            Value produced by Faker's ``province_prefix`` provider.
+
+        Notes
+        -----
+        Faker formatter: ``province_prefix``.
+        Localized formatters require a supporting locale.
+        Provider reference:
+        https://faker.readthedocs.io/en/master/providers.html
+        """
+
+    def subStreet(self) -> str:
+        """Generate a localized sub-street address component.
+
+        Returns
+        -------
+        str
+            Value produced by Faker's ``sub_street`` provider.
+
+        Notes
+        -----
+        Faker formatter: ``sub_street``.
+        Localized formatters require a supporting locale.
+        Provider reference:
+        https://faker.readthedocs.io/en/master/providers.html
+        """
+
+    def subStreetPrefix(self) -> str:
+        """Generate a localized sub-street prefix.
+
+        Returns
+        -------
+        str
+            Value produced by Faker's ``sub_street_prefix`` provider.
+
+        Notes
+        -----
+        Faker formatter: ``sub_street_prefix``.
+        Localized formatters require a supporting locale.
+        Provider reference:
+        https://faker.readthedocs.io/en/master/providers.html
+        """
+
+    def viBuildingNumberFormat(self) -> str:
+        """Select a Vietnamese building-number format.
+
+        Returns
+        -------
+        str
+            Value produced by Faker's ``vi_building_number_format`` provider.
+
+        Notes
+        -----
+        Faker formatter: ``vi_building_number_format``.
         Localized formatters require a supporting locale.
         Provider reference:
         https://faker.readthedocs.io/en/master/providers.html
@@ -36264,6 +36393,223 @@ class _OptionalProviderMethods:
         Notes
         -----
         Faker formatter: ``full_name``.
+        Localized formatters require a supporting locale.
+        Provider reference:
+        https://faker.readthedocs.io/en/master/providers.html
+        """
+
+    def communeName(self, *, prob: float = ...) -> str | None:
+        """Generate a localized commune name.
+
+        Parameters
+        ----------
+        prob : float, optional
+            Probability of generating a value, in (0, 1]; defaults to 0.5.
+
+        Returns
+        -------
+        str or None
+            Value produced by Faker's ``commune_name`` provider. Return None when
+            the probability check does not select a value.
+
+        Raises
+        ------
+        ValueError
+            If prob is outside (0, 1].
+
+        Notes
+        -----
+        Faker formatter: ``commune_name``.
+        Localized formatters require a supporting locale.
+        Provider reference:
+        https://faker.readthedocs.io/en/master/providers.html
+        """
+
+    def communePrefix(self, *, prob: float = ...) -> Any | None:
+        """Generate a localized commune prefix.
+
+        Parameters
+        ----------
+        prob : float, optional
+            Probability of generating a value, in (0, 1]; defaults to 0.5.
+
+        Returns
+        -------
+        Any or None
+            Value produced by Faker's ``commune_prefix`` provider. Return None
+            when the probability check does not select a value.
+            The upstream signature leaves the result type unspecified.
+
+        Raises
+        ------
+        ValueError
+            If prob is outside (0, 1].
+
+        Notes
+        -----
+        Faker formatter: ``commune_prefix``.
+        Localized formatters require a supporting locale.
+        Provider reference:
+        https://faker.readthedocs.io/en/master/providers.html
+        """
+
+    def numberedStreet(self, *, prob: float = ...) -> str | None:
+        """Generate a localized street number with at most three digits.
+
+        Parameters
+        ----------
+        prob : float, optional
+            Probability of generating a value, in (0, 1]; defaults to 0.5.
+
+        Returns
+        -------
+        str or None
+            Value produced by Faker's ``numbered_street`` provider. Return None
+            when the probability check does not select a value.
+
+        Raises
+        ------
+        ValueError
+            If prob is outside (0, 1].
+
+        Notes
+        -----
+        Faker formatter: ``numbered_street``.
+        Localized formatters require a supporting locale.
+        Provider reference:
+        https://faker.readthedocs.io/en/master/providers.html
+        """
+
+    def provinceName(self, *, prob: float = ...) -> str | None:
+        """Generate a localized province name.
+
+        Parameters
+        ----------
+        prob : float, optional
+            Probability of generating a value, in (0, 1]; defaults to 0.5.
+
+        Returns
+        -------
+        str or None
+            Value produced by Faker's ``province_name`` provider. Return None when
+            the probability check does not select a value.
+
+        Raises
+        ------
+        ValueError
+            If prob is outside (0, 1].
+
+        Notes
+        -----
+        Faker formatter: ``province_name``.
+        Localized formatters require a supporting locale.
+        Provider reference:
+        https://faker.readthedocs.io/en/master/providers.html
+        """
+
+    def provincePrefix(self, *, prob: float = ...) -> str | None:
+        """Generate a localized province prefix.
+
+        Parameters
+        ----------
+        prob : float, optional
+            Probability of generating a value, in (0, 1]; defaults to 0.5.
+
+        Returns
+        -------
+        str or None
+            Value produced by Faker's ``province_prefix`` provider. Return None
+            when the probability check does not select a value.
+
+        Raises
+        ------
+        ValueError
+            If prob is outside (0, 1].
+
+        Notes
+        -----
+        Faker formatter: ``province_prefix``.
+        Localized formatters require a supporting locale.
+        Provider reference:
+        https://faker.readthedocs.io/en/master/providers.html
+        """
+
+    def subStreet(self, *, prob: float = ...) -> str | None:
+        """Generate a localized sub-street address component.
+
+        Parameters
+        ----------
+        prob : float, optional
+            Probability of generating a value, in (0, 1]; defaults to 0.5.
+
+        Returns
+        -------
+        str or None
+            Value produced by Faker's ``sub_street`` provider. Return None when
+            the probability check does not select a value.
+
+        Raises
+        ------
+        ValueError
+            If prob is outside (0, 1].
+
+        Notes
+        -----
+        Faker formatter: ``sub_street``.
+        Localized formatters require a supporting locale.
+        Provider reference:
+        https://faker.readthedocs.io/en/master/providers.html
+        """
+
+    def subStreetPrefix(self, *, prob: float = ...) -> str | None:
+        """Generate a localized sub-street prefix.
+
+        Parameters
+        ----------
+        prob : float, optional
+            Probability of generating a value, in (0, 1]; defaults to 0.5.
+
+        Returns
+        -------
+        str or None
+            Value produced by Faker's ``sub_street_prefix`` provider. Return None
+            when the probability check does not select a value.
+
+        Raises
+        ------
+        ValueError
+            If prob is outside (0, 1].
+
+        Notes
+        -----
+        Faker formatter: ``sub_street_prefix``.
+        Localized formatters require a supporting locale.
+        Provider reference:
+        https://faker.readthedocs.io/en/master/providers.html
+        """
+
+    def viBuildingNumberFormat(self, *, prob: float = ...) -> str | None:
+        """Select a Vietnamese building-number format.
+
+        Parameters
+        ----------
+        prob : float, optional
+            Probability of generating a value, in (0, 1]; defaults to 0.5.
+
+        Returns
+        -------
+        str or None
+            Value produced by Faker's ``vi_building_number_format`` provider.
+            Return None when the probability check does not select a value.
+
+        Raises
+        ------
+        ValueError
+            If prob is outside (0, 1].
+
+        Notes
+        -----
+        Faker formatter: ``vi_building_number_format``.
         Localized formatters require a supporting locale.
         Provider reference:
         https://faker.readthedocs.io/en/master/providers.html

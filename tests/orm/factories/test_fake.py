@@ -95,7 +95,7 @@ def _type_surface(annotation: ast.expr | None) -> str:
     Parameters
     ----------
     annotation : ast.expr or None
-        Parsed annotation, or an absent annotation.
+        Parsed annotation, or an absent annotation with an implicit Any type.
 
     Returns
     -------
@@ -103,7 +103,7 @@ def _type_surface(annotation: ast.expr | None) -> str:
         Comparable annotation without importing or evaluating provider types.
     """
     if annotation is None:
-        return ""
+        return "Any"
     members = _union_members(annotation)
     if len(members) > 1:
         return " | ".join(sorted({_type_surface(member) for member in members}))
@@ -366,6 +366,46 @@ class TestFake(TestCase):
                 getattr(native.optional, native_name)(prob=1),
             )
 
+    def testVietnameseAddressProvidersPreserveNativeSeededOutput(self) -> None:
+        """Expose Vietnamese address methods on all camelCase provider views.
+
+        Returns
+        -------
+        None
+            Verify provider results, return types, and normalized discovery.
+        """
+        providers = (
+            ("commune_name", "communeName"),
+            ("commune_prefix", "communePrefix"),
+            ("numbered_street", "numberedStreet"),
+            ("province_name", "provinceName"),
+            ("province_prefix", "provincePrefix"),
+            ("sub_street", "subStreet"),
+            ("sub_street_prefix", "subStreetPrefix"),
+            ("vi_building_number_format", "viBuildingNumberFormat"),
+        )
+        for view_name in ("normal", "unique", "optional"):
+            fake = UserFactory(locale="vi_VN", seed=42).fake
+            native = Faker("vi_VN")
+            native.seed_instance(42)
+            fake_view = fake if view_name == "normal" else getattr(fake, view_name)
+            native_view = (
+                native if view_name == "normal" else getattr(native, view_name)
+            )
+            kwargs = {"prob": 1} if view_name == "optional" else {}
+            for native_name, public_name in providers:
+                with self.subTest(view=view_name, provider=public_name):
+                    result = getattr(fake_view, public_name)(**kwargs)
+                    self.assertIsInstance(result, str)
+                    self.assertEqual(
+                        result,
+                        getattr(native_view, native_name)(**kwargs),
+                    )
+                    self.assertIn(public_name, dir(fake_view))
+                    self.assertNotIn(native_name, dir(fake_view))
+                    with self.assertRaises(AttributeError):
+                        getattr(fake_view, native_name)
+
     def testSeedInstanceOnlyResetsTheCurrentFacade(self) -> None:
         """Retain independent random generators when a factory is reseeded.
 
@@ -580,6 +620,22 @@ class TestFake(TestCase):
 class TestFakeStub(TestCase):
     """Keep provider signatures and IDE documentation aligned with Faker."""
 
+    def testMissingAnnotationsMatchExplicitAny(self) -> None:
+        """Treat unannotated upstream types as their explicit Any equivalent.
+
+        Returns
+        -------
+        None
+            Preserve signature comparisons when upstream omits an annotation.
+        """
+        self.assertEqual(_type_surface(None), "Any")
+        self.assertEqual(
+            _type_surface(None),
+            _type_surface(ast.Name(id="Any")),
+        )
+        self.assertNotEqual(_type_surface(None), _type_surface(ast.Name(id="str")))
+        self.assertNotEqual(_type_surface(None), _type_surface(ast.Constant(None)))
+
     def testBundledProviderSignaturesMatchTheInstalledFakerStub(self) -> None:
         """Match names, types, parameter kinds, and overloads against Faker.
 
@@ -777,4 +833,3 @@ class TestFakeStub(TestCase):
                 start_line = min(declaration_lines)
                 self.assertGreater(start_line, previous.end_lineno + 1, current.name)
                 self.assertEqual(lines[start_line - 2], "", current.name)
-

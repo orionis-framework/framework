@@ -1,6 +1,6 @@
 from __future__ import annotations
 import base64
-import datetime
+import datetime as dt
 import decimal
 import enum
 import importlib
@@ -71,17 +71,17 @@ def _encode_subclass(obj: Any, t: type) -> Any:  # NOSONAR
             _VK: str(obj),
         }
     # datetime.datetime must be checked before datetime.date (it is a subclass)
-    if isinstance(obj, datetime.datetime):
+    if isinstance(obj, dt.datetime):
         return {
             _TK: "datetime",
             _VK: obj.isoformat(),
         }
-    if isinstance(obj, datetime.date):
+    if isinstance(obj, dt.date):
         return {
             _TK: "date",
             _VK: obj.isoformat(),
         }
-    if isinstance(obj, datetime.time):
+    if isinstance(obj, dt.time):
         return {
             _TK: "time",
             _VK: obj.isoformat(),
@@ -142,19 +142,19 @@ _ENCODE_EXACT: dict[type, Callable[[Any], Any]] = {
         _TK: "bytes",
         _VK: base64.b64encode(o).decode(),
     },
-    datetime.datetime: lambda o: {
+    dt.datetime: lambda o: {
         _TK: "datetime",
         _VK: o.isoformat(),
     },
-    datetime.date: lambda o: {
+    dt.date: lambda o: {
         _TK: "date",
         _VK: o.isoformat(),
     },
-    datetime.time: lambda o: {
+    dt.time: lambda o: {
         _TK: "time",
         _VK: o.isoformat(),
     },
-    datetime.timedelta: lambda o: {
+    dt.timedelta: lambda o: {
         _TK: "timedelta",
         _VK: {"days": o.days, "seconds": o.seconds, "microseconds": o.microseconds},
     },
@@ -259,7 +259,7 @@ def _dec_enum(val: dict) -> Any:
     mod = sys.modules.get(module_name) or importlib.import_module(module_name)
     return getattr(mod, class_name)(val["value"])
 
-def _dec_timedelta(v: Any) -> datetime.timedelta:
+def _dec_timedelta(v: Any) -> dt.timedelta:
     """
     Decode a mapping into a ``datetime.timedelta``.
 
@@ -273,7 +273,7 @@ def _dec_timedelta(v: Any) -> datetime.timedelta:
     datetime.timedelta
         Decoded time delta value.
     """
-    return datetime.timedelta(**v)
+    return dt.timedelta(**v)
 
 def _dec_tuple(v: Any) -> tuple:
     """
@@ -344,9 +344,9 @@ _DECODE_DISPATCH: dict[str, Callable[[Any], Any]] = {
     "missing": _dec_missing,
     "path": Path,
     "bytes": base64.b64decode,
-    "datetime": datetime.datetime.fromisoformat,
-    "date": datetime.date.fromisoformat,
-    "time": datetime.time.fromisoformat,
+    "datetime": dt.datetime.fromisoformat,
+    "date": dt.date.fromisoformat,
+    "time": dt.time.fromisoformat,
     "timedelta": _dec_timedelta,
     "decimal": decimal.Decimal,
     "uuid": uuid.UUID,

@@ -166,7 +166,7 @@ benchmark = [
 ]
 dev = [
     "coverage>=7.16.1",
-    "ruff>=0.16.8",
+    "ruff>=0.17.1",
     "setuptools>=84.0.0",
 ]
 docs = [

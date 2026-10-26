@@ -592,9 +592,9 @@ class TestStartupEntryPoints(unittest.TestCase):
                 self.assertEqual(result.stderr, _FRAME + _CLEAR)
                 self._assertRestored(metadata)
 
-    def testBootstrapExceptionsAndInterruptsKeepExitCodesAndCleanUp(self) -> None:
+    def testExceptionsAndInterruptsKeepExitCodesAndCleanUp(self) -> None:
         """
-        Verify bootstrap error and interruption exit codes with cleanup.
+        Verify bootstrap and command interruption exit codes with cleanup.
 
         Returns
         -------
@@ -606,14 +606,15 @@ class TestStartupEntryPoints(unittest.TestCase):
             capture_output=True, check=False, timeout=10,
         ).returncode
         cases = (
-            ("bootstrap_exit", 23, "SystemExit"),
-            ("bootstrap_interrupt", interruption, "KeyboardInterrupt"),
-            ("bootstrap_error", 1, "RuntimeError"),
+            ("bootstrap_exit", 23, "SystemExit", "list"),
+            ("bootstrap_interrupt", interruption, "KeyboardInterrupt", "list"),
+            ("bootstrap_error", 1, "RuntimeError", "list"),
+            ("command_interrupt", interruption, "KeyboardInterrupt", "long"),
         )
         for entry in ("console", "reactor"):
-            for scenario, status, error in cases:
+            for scenario, status, error, argument in cases:
                 with self.subTest(entry=entry, scenario=scenario):
-                    result, output, metadata = self._run(entry, scenario, "list")
+                    result, output, metadata = self._run(entry, scenario, argument)
                     self.assertEqual(result.returncode, status, result.stderr)
                     self.assertEqual(output, b"")
                     self.assertTrue(result.stderr.startswith(_FRAME + _CLEAR))
@@ -623,23 +624,6 @@ class TestStartupEntryPoints(unittest.TestCase):
                             error.encode(), result.stderr[len(_FRAME + _CLEAR):],
                         )
                     self._assertRestored(metadata)
-
-    def testCommandInterruptPreservesExistingLoopExitPolicy(self) -> None:
-        """
-        Verify that command interruption follows the successful loop-exit policy.
-
-        Returns
-        -------
-        None
-            Assert exit code zero, cleared feedback, and restored streams.
-        """
-        for entry in ("console", "reactor"):
-            with self.subTest(entry=entry):
-                result, output, metadata = self._run(entry, "command_interrupt", "long")
-                self.assertEqual(result.returncode, 0, result.stderr)
-                self.assertEqual(output, b"")
-                self.assertEqual(result.stderr, _FRAME + _CLEAR)
-                self._assertRestored(metadata)
 
     def testSlowDynamicCommandPreservesAnsiAndCarriageReturns(self) -> None:
         """

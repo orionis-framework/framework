@@ -596,7 +596,7 @@ class TestRealUvloopIntegration(TestCase):
 
     def testRunsOnUvloopAndRestoresThePreviousLoop(self) -> None:
         """Execute work on uvloop and preserve the caller's registered loop."""
-        import uvloop
+        import uvloop # pyright: ignore[reportMissingImports]
 
         probe = new_loop_probe()
 
@@ -627,7 +627,7 @@ class TestRealUvloopIntegration(TestCase):
 
     def testOwnsUvloopAndCancelsPendingTasksOnContextExit(self) -> None:
         """Close a real uvloop and drain its pending tasks through Runner."""
-        import uvloop
+        import uvloop # pyright: ignore[reportMissingImports]
 
         probe = new_loop_probe()
 

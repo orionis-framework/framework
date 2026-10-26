@@ -52,7 +52,7 @@ def _track_readiness(app: IApplication) -> None:
         if app.isHttpReady:
             mark_ready()
         else:
-            loop.call_later(0.01, publish_when_ready)
+            loop.call_later(0.1, publish_when_ready)
 
     loop.call_soon(publish_when_ready)
 

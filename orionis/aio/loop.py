@@ -1,7 +1,5 @@
 from __future__ import annotations
 import asyncio
-import concurrent.futures
-import functools
 import inspect
 import sys
 import threading
@@ -20,10 +18,10 @@ class Loop:
 
     - Optimal factory selection: uvloop (non-Windows) → ProactorEventLoop
       (Windows) → stdlib default.
-    - Per-thread loop creation and caching to prevent cross-thread sharing.
-    - Transparent bridging between synchronous and asynchronous execution
-      contexts without deadlocking a running loop.
-    - Cooperative task cancellation and cleanup on context-manager exit.
+    - Per-thread loop registration through asyncio as the source of truth.
+    - Synchronous entry points that reject calls from a running loop.
+    - Context-preserving execution of synchronous callables in worker threads.
+    - Runner-managed cleanup for owned loops, without modifying borrowed loops.
 
     All state is class-level; no instance creation is required or intended.
     """
@@ -34,9 +32,6 @@ class Loop:
 
     # True when running on Windows; evaluated once at class definition.
     _IS_WIN32: ClassVar[bool] = sys.platform == "win32"
-
-    # Per-thread event loop cache; prevents cross-thread loop sharing.
-    _loop_local: ClassVar[threading.local] = threading.local()
 
     # Cached uvloop factory; ``None`` until detection completes.
     _uvloop_factory: ClassVar[Callable[[], asyncio.AbstractEventLoop] | None] = None
@@ -55,12 +50,6 @@ class Loop:
     _loop_factory_cached: ClassVar[
         Callable[[], asyncio.AbstractEventLoop] | None
     ] = None
-
-    # Shared single-worker pool for sync↔async bridging; created on demand.
-    _sync_executor: ClassVar[concurrent.futures.ThreadPoolExecutor | None] = None
-
-    # Serialises lazy initialisation of ``_sync_executor``.
-    _sync_executor_lock: ClassVar[threading.Lock] = threading.Lock()
 
     # ------------------------------------------------------------------
     # Internal helpers
@@ -83,6 +72,22 @@ class Loop:
             return asyncio.get_running_loop()
         except RuntimeError:
             return None
+
+    @staticmethod
+    def _getRegisteredLoop() -> asyncio.AbstractEventLoop | None:
+        """
+        Return the thread's registered loop if it is still open.
+
+        Returns
+        -------
+        asyncio.AbstractEventLoop or None
+            The current loop, or ``None`` when absent or closed.
+        """
+        try:
+            loop = asyncio.get_event_loop()
+        except RuntimeError:
+            return None
+        return None if loop.is_closed() else loop
 
     # ------------------------------------------------------------------
     # Loop factory resolution
@@ -157,26 +162,56 @@ class Loop:
         return result
 
     @classmethod
-    def _getSyncExecutor(cls) -> concurrent.futures.ThreadPoolExecutor:
+    def _newEventLoop(cls) -> asyncio.AbstractEventLoop:
         """
-        Return the shared single-worker thread pool used for sync↔async bridging.
-
-        The pool is created lazily on first access via double-checked locking
-        and reused for all subsequent calls, keeping thread-creation overhead
-        off hot paths.
+        Create and register a loop using the selected platform factory.
 
         Returns
         -------
-        concurrent.futures.ThreadPoolExecutor
+        asyncio.AbstractEventLoop
+            A new loop registered in the calling thread.
         """
-        if cls._sync_executor is None:
-            with cls._sync_executor_lock:
-                if cls._sync_executor is None:
-                    cls._sync_executor = concurrent.futures.ThreadPoolExecutor(
-                        max_workers=1,
-                        thread_name_prefix="orionis-sync",
-                    )
-        return cls._sync_executor
+        factory = cls._getLoopFactory()
+        loop = factory() if factory is not None else asyncio.new_event_loop()
+        asyncio.set_event_loop(loop)
+        return loop
+
+    @classmethod
+    @contextmanager
+    def _runnerContext(cls) -> Generator[asyncio.Runner]:
+        """
+        Own a Runner and restore the thread's previous loop on exit.
+
+        Yields
+        ------
+        asyncio.Runner
+            Runner whose loop is registered before execution begins.
+
+        Raises
+        ------
+        RuntimeError
+            If the owned loop is closed prematurely or left running on exit.
+        """
+        previous = cls._getRegisteredLoop()
+        runner = asyncio.Runner(loop_factory=cls._newEventLoop)
+        try:
+            loop = runner.get_loop()
+            try:
+                yield runner
+            finally:
+                if loop.is_closed():
+                    error_msg = "The managed event loop was closed before cleanup"
+                    raise RuntimeError(error_msg)
+                if loop.is_running():
+                    error_msg = "The managed event loop is still running during cleanup"
+                    raise RuntimeError(error_msg)
+                runner.close()
+        finally:
+            asyncio.set_event_loop(
+                previous
+                if previous is not None and not previous.is_closed()
+                else None,
+            )
 
     # ------------------------------------------------------------------
     # Public API
@@ -188,8 +223,12 @@ class Loop:
         Return the event loop for the current thread, creating one if necessary.
 
         If a loop is already running in the calling thread it is returned
-        immediately.  Otherwise the per-thread cached loop is returned; a
-        fresh loop is created and registered when no valid cached one exists.
+        immediately. Otherwise asyncio's current registered loop is returned.
+        A fresh loop is created and registered when none is open; the caller
+        owns that newly created loop and must close it explicitly. A subsequent
+        :meth:`eventLoopContext` borrows the registered loop and will not close
+        it. For automatic ownership and cleanup, enter :meth:`eventLoopContext`
+        directly when no open loop is registered.
 
         Returns
         -------
@@ -199,24 +238,18 @@ class Loop:
         if running is not None:
             return running
 
-        loop = cls._loop_local.__dict__.get("loop")
-        if loop and not loop.is_closed():
-            return loop
+        loop = cls._getRegisteredLoop()
+        return loop if loop is not None else cls._newEventLoop()
 
-        factory = cls._getLoopFactory()
-        loop = factory() if factory else asyncio.new_event_loop()
-        asyncio.set_event_loop(loop)
-        cls._loop_local.loop = loop
-        return loop
-
-    @staticmethod
-    def run[T](coro: Coroutine[Any, Any, T]) -> T:
+    @classmethod
+    def run[T](cls, coro: Coroutine[Any, Any, T]) -> T:
         """
         Execute a coroutine as the application entry point.
 
         Designed to be called from a context with **no** running event loop
-        (e.g. CLI ``__main__``).  Passes ``KeyboardInterrupt`` cleanly so
-        the process exits with code ``0`` on ``Ctrl+C``.
+        (e.g. CLI ``__main__``). The owned loop is registered before execution,
+        fully shut down on exit, and the previous open loop is restored.
+        ``KeyboardInterrupt`` and coroutine failures propagate to the caller.
 
         Parameters
         ----------
@@ -225,9 +258,8 @@ class Loop:
 
         Returns
         -------
-        Any
-            The value returned by the coroutine, or ``0`` on
-            ``KeyboardInterrupt``.
+        T
+            The value returned by the coroutine.
 
         Raises
         ------
@@ -235,32 +267,23 @@ class Loop:
             If *coro* is not a coroutine object.
         RuntimeError
             Raised when a loop is already running in the calling thread.
-            The message matches the relevant standard library
-            entry point (``asyncio.Runner`` or ``asyncio.run``); *coro* is left
-            unconsumed. Use :meth:`runSync` to bridge into a running loop.
+            Await *coro* directly instead. A rejected coroutine is left
+            unconsumed; the caller must await or close it.
+        KeyboardInterrupt
+            If execution is interrupted by the user.
         """
         if not isinstance(coro, types.CoroutineType):
             error_msg = "A coroutine object is required"
             raise TypeError(error_msg)
 
-        factory = Loop._getLoopFactory()
-        if Loop._getRunningLoop() is not None:
-            # Runner.close() tries to shut down asynchronous generators even
-            # when Runner.run() refused a nested loop. Check before entering
-            # the context so its cleanup cannot leave that coroutine unawaited.
+        if cls._getRunningLoop() is not None:
             error_msg = (
-                "Runner.run() cannot be called from a running event loop"
-                if factory else
-                "asyncio.run() cannot be called from a running event loop"
+                "Cannot run a coroutine synchronously from a running event loop; "
+                "await the coroutine instead"
             )
             raise RuntimeError(error_msg)
-        try:
-            if factory:
-                with asyncio.Runner(loop_factory=factory) as runner:
-                    return runner.run(coro)
-            return asyncio.run(coro)
-        except KeyboardInterrupt:
-            return 0
+        with cls._runnerContext() as runner:
+            return runner.run(coro)
 
     @staticmethod
     async def execute(
@@ -273,8 +296,10 @@ class Loop:
         Transparently execute a sync or async callable.
 
         Async callables are awaited directly; synchronous callables are
-        offloaded to the event loop's default executor to avoid blocking
-        the loop thread.
+        offloaded with ``asyncio.to_thread`` to avoid blocking the loop thread
+        while preserving the calling context's ``contextvars``.
+        If a synchronous callable returns an awaitable, including a
+        generator-based coroutine, that result is awaited on the calling loop.
 
         Parameters
         ----------
@@ -301,39 +326,43 @@ class Loop:
         if inspect.iscoroutinefunction(func):
             return await func(*args, **kwargs)
 
-        loop = asyncio.get_running_loop()
-        result = await loop.run_in_executor(
-            None, functools.partial(func, *args, **kwargs),
-        )
-        if hasattr(result, "__await__"):
+        result = await asyncio.to_thread(func, *args, **kwargs)
+        if inspect.isawaitable(result):
             return await result
         return result
 
-    @staticmethod
+    @classmethod
     @contextmanager
-    def eventLoopContext() -> Generator[asyncio.AbstractEventLoop]:
+    def eventLoopContext(cls) -> Generator[asyncio.AbstractEventLoop]:
         """
-        Context manager that provides an event loop and cleans up on exit.
+        Borrow the current open loop, or create and own one for the block.
 
-        Pending tasks are cancelled cooperatively and awaited with
-        ``return_exceptions=True`` so no exception escapes the ``finally``
-        block.
+        Borrowed loops, including running loops and loops previously returned by
+        :meth:`getEventLoop`, are never closed and their tasks are not cancelled.
+        Nested contexts borrow the outer context's loop. Ownership remains with
+        the original caller or context.
+
+        An owned loop uses Runner cleanup: cancel and drain tasks, finalize
+        asynchronous generators, shut down the default executor, close the loop,
+        and clear its registration. Do not close an owned loop manually or leave
+        it running on exit.
 
         Yields
         ------
         asyncio.AbstractEventLoop
+
+        Raises
+        ------
+        RuntimeError
+            If an owned loop cannot be cleaned up because it was already
+            closed or is still running.
         """
-        loop = Loop.getEventLoop()
-        try:
+        loop = cls._getRegisteredLoop()
+        if loop is not None:
             yield loop
-        finally:
-            with suppress(RuntimeError, asyncio.CancelledError):
-                if not loop.is_running() and (pending := asyncio.all_tasks(loop)):
-                    for task in pending:
-                        task.cancel()
-                    loop.run_until_complete(
-                        asyncio.gather(*pending, return_exceptions=True),
-                    )
+            return
+        with cls._runnerContext() as runner:
+            yield runner.get_loop()
 
     @staticmethod
     def isLoopRunning() -> bool:
@@ -347,13 +376,16 @@ class Loop:
         return Loop._getRunningLoop() is not None
 
     @staticmethod
-    async def createTask[T](
+    def createTask[T](
         coro: Coroutine[Any, Any, T],
         *,
         name: str | None = None,
     ) -> asyncio.Task[T]:
         """
-        Create and schedule a new asyncio task for *coro*.
+        Create and schedule a new asyncio task for *coro* immediately.
+
+        This method is synchronous. Await the returned task for its result,
+        not to create the task.
 
         Parameters
         ----------
@@ -366,17 +398,16 @@ class Loop:
         -------
         asyncio.Task
         """
-        return asyncio.get_running_loop().create_task(coro, name=name)
+        return asyncio.create_task(coro, name=name)
 
     @classmethod
     def runSync[T](cls, coro: Coroutine[Any, Any, T]) -> T:
         """
-        Run a coroutine synchronously from any context.
+        Run a coroutine synchronously from a thread without a running loop.
 
-        When no loop is running, delegates directly to :meth:`run`.
-        When a loop is already running (e.g. inside an async framework),
-        the coroutine is dispatched to the shared single-worker thread pool
-        so it runs its own loop without deadlocking the caller.
+        Delegates to :meth:`run` in the calling thread, preserving its context
+        without a shared executor. From asynchronous code, await the coroutine
+        directly; blocking the loop thread is deliberately unsupported.
 
         Parameters
         ----------
@@ -384,8 +415,17 @@ class Loop:
 
         Returns
         -------
-        Any
+        T
+            The value returned by the coroutine.
+
+        Raises
+        ------
+        TypeError
+            If *coro* is not a coroutine object.
+        RuntimeError
+            If a loop is running in the calling thread. The coroutine remains
+            unconsumed and must be awaited or closed by the caller.
+        KeyboardInterrupt
+            If execution is interrupted by the user.
         """
-        if cls._getRunningLoop() is None:
-            return cls.run(coro)
-        return cls._getSyncExecutor().submit(cls.run, coro).result()
+        return cls.run(coro)

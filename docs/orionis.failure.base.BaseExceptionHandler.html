@@ -588,7 +588,7 @@
         </div>
 
         <div class="extrasDocstring">
-          <p class="class-signature"><code><span class="py-keyword">class</span> <span class="py-defname">BaseExceptionHandler</span>(<a href="orionis.failure.contracts.handler.IBaseExceptionHandler.html" class="internal-link" title="orionis.failure.contracts.handler.IBaseExceptionHandler">IBaseExceptionHandler</a>): <a href="https://github.com/orionis-framework/framework/tree/556ad8188c961d05fcb4b3c4630b626100494d72/orionis/failure/base/handler.py#L33" class="sourceLink">(source)</a></code></p><p>Constructor: <code><a href="#__init__" class="internal-link" title="orionis.failure.base.BaseExceptionHandler.__init__">BaseExceptionHandler(default_responses, application)</a></code></p><p><a href="classIndex.html#orionis.failure.base.BaseExceptionHandler">View In Hierarchy</a></p>
+          <p class="class-signature"><code><span class="py-keyword">class</span> <span class="py-defname">BaseExceptionHandler</span>(<a href="orionis.failure.contracts.handler.IBaseExceptionHandler.html" class="internal-link" title="orionis.failure.contracts.handler.IBaseExceptionHandler">IBaseExceptionHandler</a>): <a href="https://github.com/orionis-framework/framework/tree/3342f87f6813af8adb112c7acef6132d0a5cb7f0/orionis/failure/base/handler.py#L33" class="sourceLink">(source)</a></code></p><p>Constructor: <code><a href="#__init__" class="internal-link" title="orionis.failure.base.BaseExceptionHandler.__init__">BaseExceptionHandler(default_responses, application)</a></code></p><p><a href="classIndex.html#orionis.failure.base.BaseExceptionHandler">View In Hierarchy</a></p>
         </div>
 
         <div class="moduleDocstring">
@@ -623,7 +623,7 @@
     
     <td>Async Method</td>
     <td><code><a href="#report" class="internal-link" title="orionis.failure.base.BaseExceptionHandler.report">report</a></code></td>
-    <td>Report or log an exception.</td>
+    <td>Log an exception and its traceback as a single error record.</td>
   </tr><tr class="method">
     
     <td>Method</td>
@@ -665,7 +665,7 @@
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">__init__</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">default_responses: <code>DefaultResponses</code>, </span><span class="rst-sig-param">application: <code>IApplication</code></span>):</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/556ad8188c961d05fcb4b3c4630b626100494d72/orionis/failure/base/handler.py#L40">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/3342f87f6813af8adb112c7acef6132d0a5cb7f0/orionis/failure/base/handler.py#L40">
       
       (source)
     </a>
@@ -692,7 +692,7 @@
     
     
     <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">handleCLI</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">exception: <code><a href="https://docs.python.org/3/builtins/exceptions.html#BaseException" class="intersphinx-link">BaseException</a></code>, </span><span class="rst-sig-param">console: <code>Console</code></span>):</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/556ad8188c961d05fcb4b3c4630b626100494d72/orionis/failure/base/handler.py#L154">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/3342f87f6813af8adb112c7acef6132d0a5cb7f0/orionis/failure/base/handler.py#L161">
       
       (source)
     </a>
@@ -719,7 +719,7 @@
     
     
     <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">handleHTTP</span><span class="function-signature long-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">exception: <code><a href="https://docs.python.org/3/builtins/exceptions.html#BaseException" class="intersphinx-link">BaseException</a></code>, </span><span class="rst-sig-param">request: <code>Request | TransportAdapter</code></span>) -&gt; <code>Response | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/556ad8188c961d05fcb4b3c4630b626100494d72/orionis/failure/base/handler.py#L181">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/3342f87f6813af8adb112c7acef6132d0a5cb7f0/orionis/failure/base/handler.py#L188">
       
       (source)
     </a>
@@ -746,7 +746,7 @@
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">isExceptionIgnored</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">exception: <code><a href="https://docs.python.org/3/builtins/exceptions.html#BaseException" class="intersphinx-link">BaseException</a></code></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/556ad8188c961d05fcb4b3c4630b626100494d72/orionis/failure/base/handler.py#L94">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/3342f87f6813af8adb112c7acef6132d0a5cb7f0/orionis/failure/base/handler.py#L94">
       
       (source)
     </a>
@@ -773,7 +773,7 @@
     
     
     <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">report</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">exception: <code><a href="https://docs.python.org/3/builtins/exceptions.html#BaseException" class="intersphinx-link">BaseException</a></code>, </span><span class="rst-sig-param">log: <code>ILogger</code></span>) -&gt; <code>Throwable | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/556ad8188c961d05fcb4b3c4630b626100494d72/orionis/failure/base/handler.py#L121">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/3342f87f6813af8adb112c7acef6132d0a5cb7f0/orionis/failure/base/handler.py#L121">
       
       (source)
     </a>
@@ -785,7 +785,10 @@
   </div>
   <div class="docstring functionBody">
     <div class="interfaceinfo">overrides <code><a href="orionis.failure.contracts.handler.IBaseExceptionHandler.html#report" class="internal-link">orionis.failure.contracts.handler.IBaseExceptionHandler.report</a></code></div>
-    <div><p>Report or log an exception.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">exception:</span><code><a href="https://docs.python.org/3/builtins/exceptions.html#BaseException" class="intersphinx-link">BaseException</a></code></td><td class="fieldArgDesc">The exception instance that was caught.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">log:</span><code><a href="orionis.logging.contracts.ILogger.html" class="internal-link" title="orionis.logging.contracts.ILogger">ILogger</a></code></td><td class="fieldArgDesc">The logger instance for error reporting.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.failure.entities.Throwable.html" class="internal-link" title="orionis.failure.entities.Throwable">Throwable</a> or <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">The structured Throwable object if reported, otherwise None.</td></tr></table></div>
+    <div><p>Log an exception and its traceback as a single error record.</p>
+<p>Preserve chained exceptions and notes using the original exception
+information, even when reporting outside an active <tt class="rst-docutils rst-literal">except</tt> block.</p>
+<table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">exception:</span><code><a href="https://docs.python.org/3/builtins/exceptions.html#BaseException" class="intersphinx-link">BaseException</a></code></td><td class="fieldArgDesc">The exception instance that was caught.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">log:</span><code><a href="orionis.logging.contracts.ILogger.html" class="internal-link" title="orionis.logging.contracts.ILogger">ILogger</a></code></td><td class="fieldArgDesc">The logger instance for error reporting.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.failure.entities.Throwable.html" class="internal-link" title="orionis.failure.entities.Throwable">Throwable</a> or <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">The structured Throwable object if reported, otherwise None.</td></tr></table></div>
   </div>
 </div><div class="basemethod">
   
@@ -800,7 +803,7 @@
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">toThrowable</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">exception: <code><a href="https://docs.python.org/3/builtins/exceptions.html#BaseException" class="intersphinx-link">BaseException</a></code></span>) -&gt; <code>Throwable</code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/556ad8188c961d05fcb4b3c4630b626100494d72/orionis/failure/base/handler.py#L64">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/3342f87f6813af8adb112c7acef6132d0a5cb7f0/orionis/failure/base/handler.py#L64">
       
       (source)
     </a>
@@ -827,7 +830,7 @@ and traceback.</td></tr></table></div>
   <div class="functionHeader">
     
     <span class="py-defname">dont_catch</span>: <code>ClassVar[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#frozenset" class="intersphinx-link">frozenset</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/functions.html#type" class="intersphinx-link">type</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/exceptions.html#BaseException" class="intersphinx-link">BaseException</a>]]]</code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/556ad8188c961d05fcb4b3c4630b626100494d72/orionis/failure/base/handler.py#L38">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/3342f87f6813af8adb112c7acef6132d0a5cb7f0/orionis/failure/base/handler.py#L38">
       
       (source)
     </a>
@@ -854,7 +857,7 @@ and traceback.</td></tr></table></div>
   <div class="functionHeader">
     
     <span class="py-defname">__application</span> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/556ad8188c961d05fcb4b3c4630b626100494d72/orionis/failure/base/handler.py#L62">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/3342f87f6813af8adb112c7acef6132d0a5cb7f0/orionis/failure/base/handler.py#L62">
       
       (source)
     </a>
@@ -881,7 +884,7 @@ and traceback.</td></tr></table></div>
   <div class="functionHeader">
     
     <span class="py-defname">__default_responses</span> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/556ad8188c961d05fcb4b3c4630b626100494d72/orionis/failure/base/handler.py#L61">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/3342f87f6813af8adb112c7acef6132d0a5cb7f0/orionis/failure/base/handler.py#L61">
       
       (source)
     </a>
@@ -907,7 +910,7 @@ and traceback.</td></tr></table></div>
   <div class="orionis-footer-inner">
     <div class="orionis-footer-copy">
       <p>API documentation for <a href="https://orionis-framework.com/" class="projecthome">Orionis</a>.</p>
-      <p class="orionis-footer-meta">Generated with <a href="https://github.com/twisted/pydoctor/">Pydoctor</a> 25.10.1.<span class="orionis-footer-build"> Built 2026-10-22 07:59:42.</span></p>
+      <p class="orionis-footer-meta">Generated with <a href="https://github.com/twisted/pydoctor/">Pydoctor</a> 25.10.1.<span class="orionis-footer-build"> Built 2026-10-26 10:42:24.</span></p>
     </div>
     <nav class="orionis-footer-links" aria-label="Additional resources">
       <a href="https://docs.orionis-framework.com">Read the guide <span aria-hidden="true">↗</span></a>

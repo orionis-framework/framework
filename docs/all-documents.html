@@ -14923,7 +14923,7 @@
             <div class="type">Function</div>
             <div class="kind">Method</div>
             <div class="privacy">PUBLIC</div>
-            <div class="summary">Report or log an exception.</div>
+            <div class="summary">Log an exception and its traceback as a single error record.</div>
           </li><li id="orionis.failure.contracts.handler.IBaseExceptionHandler.handleCLI">
             
             <div class="fullName">orionis<wbr></wbr>.failure<wbr></wbr>.contracts<wbr></wbr>.handler<wbr></wbr>.<wbr></wbr>IBase<wbr></wbr>Exception<wbr></wbr>Handler<wbr></wbr>.handle<wbr></wbr>CLI</div>
@@ -20732,14 +20732,6 @@
             <div class="kind">Constant</div>
             <div class="privacy">PUBLIC</div>
             <div class="summary"><span class="rst-undocumented">Undocumented</span></div>
-          </li><li id="orionis.aio.Loop._loop_local">
-            
-            <div class="fullName">orionis<wbr></wbr>.aio<wbr></wbr>.<wbr></wbr>Loop<wbr></wbr>._loop<wbr></wbr>_local</div>
-            <div class="url">orionis.aio.Loop.html#_loop_local</div>
-            <div class="type">Attribute</div>
-            <div class="kind">Class Variable</div>
-            <div class="privacy">PUBLIC</div>
-            <div class="summary"><span class="rst-undocumented">Undocumented</span></div>
           </li><li id="orionis.aio.Loop._uvloop_factory">
             
             <div class="fullName">orionis<wbr></wbr>.aio<wbr></wbr>.<wbr></wbr>Loop<wbr></wbr>._uvloop<wbr></wbr>_factory</div>
@@ -20780,22 +20772,6 @@
             <div class="kind">Class Variable</div>
             <div class="privacy">PUBLIC</div>
             <div class="summary"><span class="rst-undocumented">Undocumented</span></div>
-          </li><li id="orionis.aio.Loop._sync_executor">
-            
-            <div class="fullName">orionis<wbr></wbr>.aio<wbr></wbr>.<wbr></wbr>Loop<wbr></wbr>._sync<wbr></wbr>_executor</div>
-            <div class="url">orionis.aio.Loop.html#_sync_executor</div>
-            <div class="type">Attribute</div>
-            <div class="kind">Class Variable</div>
-            <div class="privacy">PUBLIC</div>
-            <div class="summary"><span class="rst-undocumented">Undocumented</span></div>
-          </li><li id="orionis.aio.Loop._sync_executor_lock">
-            
-            <div class="fullName">orionis<wbr></wbr>.aio<wbr></wbr>.<wbr></wbr>Loop<wbr></wbr>._sync<wbr></wbr>_executor<wbr></wbr>_lock</div>
-            <div class="url">orionis.aio.Loop.html#_sync_executor_lock</div>
-            <div class="type">Attribute</div>
-            <div class="kind">Class Variable</div>
-            <div class="privacy">PUBLIC</div>
-            <div class="summary"><span class="rst-undocumented">Undocumented</span></div>
           </li><li id="orionis.aio.Loop._getRunningLoop">
             
             <div class="fullName">orionis<wbr></wbr>.aio<wbr></wbr>.<wbr></wbr>Loop<wbr></wbr>._get<wbr></wbr>Running<wbr></wbr>Loop</div>
@@ -20804,6 +20780,14 @@
             <div class="kind">Static Method</div>
             <div class="privacy">PUBLIC</div>
             <div class="summary">Return the event loop currently running in this thread, or <tt class="rst-docutils rst-literal">None</tt>.</div>
+          </li><li id="orionis.aio.Loop._getRegisteredLoop">
+            
+            <div class="fullName">orionis<wbr></wbr>.aio<wbr></wbr>.<wbr></wbr>Loop<wbr></wbr>._get<wbr></wbr>Registered<wbr></wbr>Loop</div>
+            <div class="url">orionis.aio.Loop.html#_getRegisteredLoop</div>
+            <div class="type">Function</div>
+            <div class="kind">Static Method</div>
+            <div class="privacy">PUBLIC</div>
+            <div class="summary">Return the thread's registered loop if it is still open.</div>
           </li><li id="orionis.aio.Loop._detectUvloop">
             
             <div class="fullName">orionis<wbr></wbr>.aio<wbr></wbr>.<wbr></wbr>Loop<wbr></wbr>._detect<wbr></wbr>Uvloop</div>
@@ -20820,14 +20804,22 @@
             <div class="kind">Class Method</div>
             <div class="privacy">PUBLIC</div>
             <div class="summary">Return the best available event loop factory for the current platform.</div>
-          </li><li id="orionis.aio.Loop._getSyncExecutor">
+          </li><li id="orionis.aio.Loop._newEventLoop">
             
-            <div class="fullName">orionis<wbr></wbr>.aio<wbr></wbr>.<wbr></wbr>Loop<wbr></wbr>._get<wbr></wbr>Sync<wbr></wbr>Executor</div>
-            <div class="url">orionis.aio.Loop.html#_getSyncExecutor</div>
+            <div class="fullName">orionis<wbr></wbr>.aio<wbr></wbr>.<wbr></wbr>Loop<wbr></wbr>._new<wbr></wbr>Event<wbr></wbr>Loop</div>
+            <div class="url">orionis.aio.Loop.html#_newEventLoop</div>
             <div class="type">Function</div>
             <div class="kind">Class Method</div>
             <div class="privacy">PUBLIC</div>
-            <div class="summary">Return the shared single-worker thread pool used for sync↔async bridging.</div>
+            <div class="summary">Create and register a loop using the selected platform factory.</div>
+          </li><li id="orionis.aio.Loop._runnerContext">
+            
+            <div class="fullName">orionis<wbr></wbr>.aio<wbr></wbr>.<wbr></wbr>Loop<wbr></wbr>._runner<wbr></wbr>Context</div>
+            <div class="url">orionis.aio.Loop.html#_runnerContext</div>
+            <div class="type">Function</div>
+            <div class="kind">Class Method</div>
+            <div class="privacy">PUBLIC</div>
+            <div class="summary">Own a Runner and restore the thread's previous loop on exit.</div>
           </li><li id="orionis.aio.Loop.getEventLoop">
             
             <div class="fullName">orionis<wbr></wbr>.aio<wbr></wbr>.<wbr></wbr>Loop<wbr></wbr>.get<wbr></wbr>Event<wbr></wbr>Loop</div>
@@ -20841,7 +20833,7 @@
             <div class="fullName">orionis<wbr></wbr>.aio<wbr></wbr>.<wbr></wbr>Loop<wbr></wbr>.run</div>
             <div class="url">orionis.aio.Loop.html#run</div>
             <div class="type">Function</div>
-            <div class="kind">Static Method</div>
+            <div class="kind">Class Method</div>
             <div class="privacy">PUBLIC</div>
             <div class="summary">Execute a coroutine as the application entry point.</div>
           </li><li id="orionis.aio.Loop.execute">
@@ -20857,9 +20849,9 @@
             <div class="fullName">orionis<wbr></wbr>.aio<wbr></wbr>.<wbr></wbr>Loop<wbr></wbr>.event<wbr></wbr>Loop<wbr></wbr>Context</div>
             <div class="url">orionis.aio.Loop.html#eventLoopContext</div>
             <div class="type">Function</div>
-            <div class="kind">Static Method</div>
+            <div class="kind">Class Method</div>
             <div class="privacy">PUBLIC</div>
-            <div class="summary">Context manager that provides an event loop and cleans up on exit.</div>
+            <div class="summary">Borrow the current open loop, or create and own one for the block.</div>
           </li><li id="orionis.aio.Loop.isLoopRunning">
             
             <div class="fullName">orionis<wbr></wbr>.aio<wbr></wbr>.<wbr></wbr>Loop<wbr></wbr>.is<wbr></wbr>Loop<wbr></wbr>Running</div>
@@ -20875,7 +20867,7 @@
             <div class="type">Function</div>
             <div class="kind">Static Method</div>
             <div class="privacy">PUBLIC</div>
-            <div class="summary">Create and schedule a new asyncio task for <em>coro</em>.</div>
+            <div class="summary">Create and schedule a new asyncio task for <em>coro</em> immediately.</div>
           </li><li id="orionis.aio.Loop.runSync">
             
             <div class="fullName">orionis<wbr></wbr>.aio<wbr></wbr>.<wbr></wbr>Loop<wbr></wbr>.run<wbr></wbr>Sync</div>
@@ -20883,7 +20875,7 @@
             <div class="type">Function</div>
             <div class="kind">Class Method</div>
             <div class="privacy">PUBLIC</div>
-            <div class="summary">Run a coroutine synchronously from any context.</div>
+            <div class="summary">Run a coroutine synchronously from a thread without a running loop.</div>
           </li><li id="orionis.aio._EXPORTS">
             
             <div class="fullName">orionis<wbr></wbr>.aio<wbr></wbr>._EXPORTS</div>
@@ -52451,7 +52443,7 @@
             <div class="type">Function</div>
             <div class="kind">Method</div>
             <div class="privacy">PUBLIC</div>
-            <div class="summary">Report or log an exception.</div>
+            <div class="summary">Log an exception and its traceback as a single error record.</div>
           </li><li id="orionis.failure.base.BaseExceptionHandler.handleCLI">
             
             <div class="fullName">orionis<wbr></wbr>.failure<wbr></wbr>.base<wbr></wbr>.<wbr></wbr>Base<wbr></wbr>Exception<wbr></wbr>Handler<wbr></wbr>.handle<wbr></wbr>CLI</div>

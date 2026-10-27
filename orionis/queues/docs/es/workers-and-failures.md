@@ -2,6 +2,8 @@
 
 ## Consumir trabajo durable
 
+Para preparar todas las tablas SQL de colas configuradas y el almacenamiento de fallos antes de iniciar workers, ejecuta `python reactor queue:migrate`; consulta la [configuración del backend](drivers-and-configuration.md#preparar-las-tablas-de-colas). La creación perezosa de tablas sigue disponible.
+
 Arranca un worker desde la raíz de la aplicación con la misma versión de código y configuración que el productor:
 
 ```shell

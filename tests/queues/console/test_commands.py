@@ -9,10 +9,14 @@ from orionis.console.commands.make.job import MakeJob
 from orionis.console.commands.queue.clear import QueueClearCommand
 from orionis.console.commands.queue.failed import QueueFailedCommand
 from orionis.console.commands.queue.forget import QueueForgetCommand
+from orionis.console.commands.queue.migrate import QueueMigrateCommand
 from orionis.console.commands.queue.retry import QueueRetryCommand
 from orionis.console.commands.queue.work import QueueWorkCommand
 from orionis.console.core.commands import CORE_COMMANDS
 from orionis.console.core.loader import Loader
+from orionis.database.exceptions import (
+    ConnectionNotFoundException, DatabaseException, QueryException,
+)
 from orionis.queues.entities.failed_job import FailedJob
 from orionis.queues.exceptions import QueueConfigurationError
 from orionis.test import TestCase
@@ -189,7 +193,8 @@ class _Manager:
     """Provide queue administration services with controllable errors."""
 
     __slots__ = (
-        "driver", "error", "repository", "retried", "selected", "worker_object",
+        "driver", "error", "migrations", "repository", "retried", "selected",
+        "worker_object",
     )
 
     def __init__(self) -> None:
@@ -197,7 +202,8 @@ class _Manager:
         self.driver = _Driver()
         self.repository = _Repository()
         self.worker_object = _Worker()
-        self.error: QueueConfigurationError | None = None
+        self.error: QueueConfigurationError | DatabaseException | None = None
+        self.migrations = 0
         self.retried: list[str] = []
         self.selected: dict[str, object] = {}
 
@@ -248,6 +254,12 @@ class _Manager:
         if self.error is not None:
             raise self.error
         return self.repository
+
+    async def migrate(self) -> None:
+        """Record explicit storage preparation or propagate its configured error."""
+        if self.error is not None:
+            raise self.error
+        self.migrations += 1
 
     async def retryFailed(self, failed_id: str) -> str:
         """Record retry selection and return a fresh dispatch identifier.
@@ -341,7 +353,7 @@ class TestQueueCommands(TestCase):
         """Discover canonical command classes through the real core Loader."""
         expected = {
             "make:job", "queue:work", "queue:failed", "queue:retry",
-            "queue:forget", "queue:clear",
+            "queue:forget", "queue:clear", "queue:migrate",
         }
         self.assertTrue(expected <= {command.signature for command in CORE_COMMANDS})
         with TemporaryDirectory() as directory:
@@ -350,6 +362,32 @@ class TestQueueCommands(TestCase):
                 command = await loader.get(signature)
                 self.assertIsNotNone(command)
                 self.assertEqual(command.signature, signature)
+
+    async def testMigratePreparesConfiguredStorage(self) -> None:
+        """Delegate migrations to the manager and report successful completion."""
+        manager = _Manager()
+        command = _record(QueueMigrateCommand)
+        self.assertEqual(await command.handle(manager), 0)
+        self.assertEqual(manager.migrations, 1)
+        self.assertEqual(command.messages, [
+            ("success", "Queue tables migrated successfully.", False),
+        ])
+
+    async def testMigrateReportsDatabaseErrors(self) -> None:
+        """Report connection and DDL failures without a successful exit code."""
+        for error in (
+            ConnectionNotFoundException("SQL connection is not configured."),
+            QueryException("Queue table could not be created."),
+        ):
+            with self.subTest(error=type(error).__name__):
+                manager = _Manager()
+                manager.error = error
+                command = _record(QueueMigrateCommand)
+                self.assertEqual(await command.handle(manager), 1)
+                self.assertEqual(manager.migrations, 0)
+                self.assertEqual(command.messages, [
+                    ("error", str(error), False),
+                ])
 
     def testWorkArgumentsPreservePriorityAndFlags(self) -> None:
         """Parse the documented worker invocation with Reactor Argument."""
@@ -424,7 +462,7 @@ class TestQueueCommands(TestCase):
         manager.error = QueueConfigurationError("Unknown connection 'missing'.")
         command_types = (
             QueueWorkCommand, QueueFailedCommand, QueueRetryCommand,
-            QueueForgetCommand, QueueClearCommand,
+            QueueForgetCommand, QueueClearCommand, QueueMigrateCommand,
         )
         for command_type in command_types:
             with self.subTest(command=command_type.signature):

@@ -30,6 +30,8 @@ Escribe `async def` para operaciones con I/O y espera las APIs asíncronas. El s
 
 La solicitud y su identidad viven en un scope. No conserves el `Request`, la sesión ni el contexto autenticado en singletons o variables globales. El kernel precarga y reutiliza instancias de middleware: almacena datos de cada petición en variables locales o `request.state`.
 
+Cada aplicación y kernel HTTP pertenece al event loop de un worker; no los compartas entre hilos ni entre event loops. El kernel aplica `http.body_limits.max_concurrent_requests` al conjunto de peticiones ASGI y RSGI sin bloquear el loop. Cada petición conserva su plaza hasta completar el envío y la limpieza de recursos, incluso si se cancela. Las peticiones que exceden el límite reciben `503` con `Retry-After: 1` antes de asignar otro scope.
+
 Las excepciones de validación y autenticación se convierten mediante los manejadores del framework. Una excepción después de enviar encabezados de streaming ya no puede reemplazar el estado HTTP enviado. Diseña el trabajo de preparación para fallar antes de devolver el stream.
 
 ## Evidencia y continuación

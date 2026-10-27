@@ -1,7 +1,7 @@
 from orionis.console.commands.make._base import MakeStubCommand
 
 class MakeDatabaseSchema(MakeStubCommand):
-    """Generate a reusable database table definition holder."""
+    """Generate a reusable database table definition module."""
 
     timestamps: bool = False
     signature: str = "make:database-schema"

@@ -47,12 +47,11 @@ def _track_readiness(app: IApplication) -> None:
         None
             Create the marker or schedule another readiness check.
         """
-        # Startup callbacks run before kernel initialization. Check the public
-        # readiness flag on subsequent loop turns without wrapping requests.
+        # Startup callbacks run before kernel initialization.
         if app.isHttpReady:
             mark_ready()
         else:
-            loop.call_later(0.1, publish_when_ready)
+            loop.call_later(2, publish_when_ready)
 
     loop.call_soon(publish_when_ready)
 

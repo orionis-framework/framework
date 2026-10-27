@@ -204,6 +204,16 @@
         
 
         
+            <div class="itemName"><code><a href="#migrate" class="internal-link" title="orionis.queues.contracts.manager.IQueueManager.migrate">migrate</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
             <div class="itemName"><code><a href="#retryFailed" class="internal-link" title="orionis.queues.contracts.manager.IQueueManager.retryFailed">retry<wbr></wbr>Failed</a></code>
             </div>
         
@@ -265,7 +275,7 @@
         
         
             <div class="itemName expandableItem">
-                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId24378"> 
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId24394"> 
                     
                 </input>
 
@@ -326,6 +336,16 @@
 
         
             <div class="itemName"><code><a href="#failed" class="internal-link" title="orionis.queues.contracts.manager.IQueueManager.failed">failed</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#migrate" class="internal-link" title="orionis.queues.contracts.manager.IQueueManager.migrate">migrate</a></code>
             </div>
         
 
@@ -450,7 +470,7 @@
         </div>
 
         <div class="extrasDocstring">
-          <p class="class-signature"><code><span class="py-keyword">class</span> <span class="py-defname">IQueueManager</span>(<a href="https://docs.python.org/3/library/abc.html#abc.ABC" class="intersphinx-link">ABC</a>): <a href="https://github.com/orionis-framework/framework/tree/cd986045be361834e5464443ca50bc88182ee159/orionis/queues/contracts/manager.py#L11" class="sourceLink">(source)</a></code></p><p>Known subclasses: <code><a href="orionis.queues.manager.QueueManager.html" class="internal-link">orionis.queues.manager.QueueManager</a></code></p><p><a href="classIndex.html#orionis.queues.contracts.manager.IQueueManager">View In Hierarchy</a></p>
+          <p class="class-signature"><code><span class="py-keyword">class</span> <span class="py-defname">IQueueManager</span>(<a href="https://docs.python.org/3/library/abc.html#abc.ABC" class="intersphinx-link">ABC</a>): <a href="https://github.com/orionis-framework/framework/tree/d3e0ca8010b6fec48a4a8ecf49e1fba164858e53/orionis/queues/contracts/manager.py#L11" class="sourceLink">(source)</a></code></p><p>Known subclasses: <code><a href="orionis.queues.manager.QueueManager.html" class="internal-link">orionis.queues.manager.QueueManager</a></code></p><p><a href="classIndex.html#orionis.queues.contracts.manager.IQueueManager">View In Hierarchy</a></p>
         </div>
 
         <div class="moduleDocstring">
@@ -458,7 +478,7 @@
         </div>
 
         <div id="split-tables">
-          <table class="children sortable" id="id1689">
+          <table class="children sortable" id="id1691">
   
   
   <tr class="method">
@@ -481,6 +501,11 @@
     <td>Async Method</td>
     <td><code><a href="#failed" class="internal-link" title="orionis.queues.contracts.manager.IQueueManager.failed">failed</a></code></td>
     <td>Resolve the durable failure repository lazily.</td>
+  </tr><tr class="method">
+    
+    <td>Async Method</td>
+    <td><code><a href="#migrate" class="internal-link" title="orionis.queues.contracts.manager.IQueueManager.migrate">migrate</a></code></td>
+    <td>Create missing database queue tables and central failed-job storage.</td>
   </tr><tr class="method">
     
     <td>Async Method</td>
@@ -517,7 +542,7 @@
     
     <div><span class="decorator">@<a href="https://docs.python.org/3/library/abc.html#abc.abstractmethod" class="intersphinx-link">abstractmethod</a><br /></span></div>
     <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">close</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>):</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/cd986045be361834e5464443ca50bc88182ee159/orionis/queues/contracts/manager.py#L100">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/d3e0ca8010b6fec48a4a8ecf49e1fba164858e53/orionis/queues/contracts/manager.py#L112">
       
       (source)
     </a>
@@ -544,7 +569,7 @@
     
     <div><span class="decorator">@<a href="https://docs.python.org/3/library/abc.html#abc.abstractmethod" class="intersphinx-link">abstractmethod</a><br /></span></div>
     <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">connection</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">name: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a> | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code> = <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></span>) -&gt; <code><a href="orionis.queues.contracts.driver.IQueueDriver.html" class="internal-link" title="orionis.queues.contracts.driver.IQueueDriver">IQueueDriver</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/cd986045be361834e5464443ca50bc88182ee159/orionis/queues/contracts/manager.py#L32">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/d3e0ca8010b6fec48a4a8ecf49e1fba164858e53/orionis/queues/contracts/manager.py#L32">
       
       (source)
     </a>
@@ -571,7 +596,7 @@
     
     <div><span class="decorator">@<a href="https://docs.python.org/3/library/abc.html#abc.abstractmethod" class="intersphinx-link">abstractmethod</a><br /></span></div>
     <span class="py-keyword">def</span>&#160;<span class="py-defname">dispatch</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">job: <code>BaseJob</code></span>) -&gt; <code>PendingDispatch</code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/cd986045be361834e5464443ca50bc88182ee159/orionis/queues/contracts/manager.py#L16">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/d3e0ca8010b6fec48a4a8ecf49e1fba164858e53/orionis/queues/contracts/manager.py#L16">
       
       (source)
     </a>
@@ -598,7 +623,7 @@
     
     <div><span class="decorator">@<a href="https://docs.python.org/3/library/abc.html#abc.abstractmethod" class="intersphinx-link">abstractmethod</a><br /></span></div>
     <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">failed</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>) -&gt; <code><a href="orionis.queues.contracts.failed_repository.IFailedJobRepository.html" class="internal-link" title="orionis.queues.contracts.failed_repository.IFailedJobRepository">IFailedJobRepository</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/cd986045be361834e5464443ca50bc88182ee159/orionis/queues/contracts/manager.py#L73">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/d3e0ca8010b6fec48a4a8ecf49e1fba164858e53/orionis/queues/contracts/manager.py#L73">
       
       (source)
     </a>
@@ -615,6 +640,34 @@
 </div><div class="basemethod">
   
   
+  <a name="orionis.queues.contracts.manager.IQueueManager.migrate">
+    
+  </a>
+  <a name="migrate">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <div><span class="decorator">@<a href="https://docs.python.org/3/library/abc.html#abc.abstractmethod" class="intersphinx-link">abstractmethod</a><br /></span></div>
+    <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">migrate</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>):</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/d3e0ca8010b6fec48a4a8ecf49e1fba164858e53/orionis/queues/contracts/manager.py#L84">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#migrate" title="orionis.queues.contracts.manager.IQueueManager.migrate">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    <div class="interfaceinfo">overridden in <code><a href="orionis.queues.manager.QueueManager.html" class="internal-link">orionis.queues.manager.QueueManager</a></code></div>
+    <div><p>Create missing database queue tables and central failed-job storage.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">Prepare every configured database queue connection and the failure
+repository without modifying existing tables or their data.</td></tr></table></div>
+  </div>
+</div><div class="basemethod">
+  
+  
   <a name="orionis.queues.contracts.manager.IQueueManager.retryFailed">
     
   </a>
@@ -625,7 +678,7 @@
     
     <div><span class="decorator">@<a href="https://docs.python.org/3/library/abc.html#abc.abstractmethod" class="intersphinx-link">abstractmethod</a><br /></span></div>
     <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">retryFailed</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">failed_id: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/cd986045be361834e5464443ca50bc88182ee159/orionis/queues/contracts/manager.py#L84">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/d3e0ca8010b6fec48a4a8ecf49e1fba164858e53/orionis/queues/contracts/manager.py#L96">
       
       (source)
     </a>
@@ -652,7 +705,7 @@
     
     <div><span class="decorator">@<a href="https://docs.python.org/3/library/abc.html#abc.abstractmethod" class="intersphinx-link">abstractmethod</a><br /></span></div>
     <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">worker</span><span class="function-signature long-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">connection: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a> | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code> = <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a>, </span><span class="rst-sig-param">queues: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" class="intersphinx-link">tuple</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <wbr></wbr><span class="rst-variable-ellipsis">...</span>] | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code> = <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a>, </span><span class="rst-sig-param">concurrency: <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a> | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code> = <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></span>) -&gt; <code><a href="orionis.queues.contracts.worker.IWorker.html" class="internal-link" title="orionis.queues.contracts.worker.IWorker">IWorker</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/cd986045be361834e5464443ca50bc88182ee159/orionis/queues/contracts/manager.py#L48">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/d3e0ca8010b6fec48a4a8ecf49e1fba164858e53/orionis/queues/contracts/manager.py#L48">
       
       (source)
     </a>
@@ -678,7 +731,7 @@
   <div class="functionHeader">
     
     <span class="py-defname">__slots__</span>: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" class="intersphinx-link">tuple</a></code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/cd986045be361834e5464443ca50bc88182ee159/orionis/queues/contracts/manager.py#L14">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/d3e0ca8010b6fec48a4a8ecf49e1fba164858e53/orionis/queues/contracts/manager.py#L14">
       
       (source)
     </a>
@@ -704,7 +757,7 @@
   <div class="orionis-footer-inner">
     <div class="orionis-footer-copy">
       <p>API documentation for <a href="https://orionis-framework.com/" class="projecthome">Orionis</a>.</p>
-      <p class="orionis-footer-meta">Generated with <a href="https://github.com/twisted/pydoctor/">Pydoctor</a> 25.10.1.<span class="orionis-footer-build"> Built 2026-10-27 11:27:07.</span></p>
+      <p class="orionis-footer-meta">Generated with <a href="https://github.com/twisted/pydoctor/">Pydoctor</a> 25.10.1.<span class="orionis-footer-build"> Built 2026-10-27 12:04:06.</span></p>
     </div>
     <nav class="orionis-footer-links" aria-label="Additional resources">
       <a href="https://docs.orionis-framework.com">Read the guide <span aria-hidden="true">↗</span></a>

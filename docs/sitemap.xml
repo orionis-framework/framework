@@ -856,6 +856,12 @@
     <loc>https://api.orionis-framework.com/orionis.console.commands.queue.html</loc>
   </url>
   <url>
+    <loc>https://api.orionis-framework.com/orionis.console.commands.queue.migrate.html</loc>
+  </url>
+  <url>
+    <loc>https://api.orionis-framework.com/orionis.console.commands.queue.migrate.QueueMigrateCommand.html</loc>
+  </url>
+  <url>
     <loc>https://api.orionis-framework.com/orionis.console.commands.queue.retry.html</loc>
   </url>
   <url>

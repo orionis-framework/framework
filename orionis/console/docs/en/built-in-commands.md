@@ -53,7 +53,7 @@ Do not schedule `migrate:fresh`, `db:wipe`, or `queue:clear` as routine producti
 
 `serve` starts the development server with its supported options; see [HTTP](../../../http/docs/en/README.md) for the web lifecycle. `route:list` inspects registered routes. `test` runs Orionis testing; selection and modes belong to [Testing](../../../test/docs/en/README.md). Development servers and workers are long-running processes and need supervision in operational environments.
 
-`schedule:list` and `schedule:work` belong to the [scheduler](task-scheduling.md). `queue:work`, `queue:failed`, `queue:retry`, `queue:forget`, and `queue:clear` operate [queues](../../../queues/docs/en/workers-and-failures.md). MCP commands are covered under [MCP](../../../mcp/docs/en/README.md).
+`schedule:list` and `schedule:work` belong to the [scheduler](task-scheduling.md). `queue:migrate` prepares all configured SQL queue tables and failed-job storage without removing data. `queue:work`, `queue:failed`, `queue:retry`, `queue:forget`, and `queue:clear` operate [queues](../../../queues/docs/en/workers-and-failures.md). MCP commands are covered under [MCP](../../../mcp/docs/en/README.md).
 
 ## Optimize and maintain
 

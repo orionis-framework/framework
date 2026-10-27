@@ -11,10 +11,13 @@ from orionis.introspection.modules.inspector import ModuleInspector
 from orionis.queues.contracts.manager import IQueueManager
 from orionis.queues.contracts.serializer import IJobSerializer
 from orionis.queues.entities.envelope import JobEnvelope
-from orionis.queues.exceptions import QueueConfigurationError, QueueRetryError
+from orionis.queues.exceptions import (
+    QueueConfigurationError, QueueRetryError, QueueStorageError,
+)
 from orionis.queues.functions import current_time, validate_name, validate_seconds
 from orionis.queues.job import BaseJob
 from orionis.queues.pending import PendingDispatch
+from orionis.queues.schema import build_failed_jobs_table, build_jobs_table
 from orionis.queues.worker import Worker, WorkerOptions
 
 if TYPE_CHECKING:
@@ -346,6 +349,43 @@ class QueueManager(IQueueManager):
                     manager.connection(options["connection"]), options["table"],
                 )
             return self._failed
+
+    async def migrate(self) -> None:
+        """
+        Create every configured database queue table and failed-job storage.
+
+        Returns
+        -------
+        None
+            Create missing tables with their configured names and SQL connection
+            prefixes, preserving existing data and lazy backend initialization.
+
+        Raises
+        ------
+        DatabaseException
+            If a configured SQL connection cannot be resolved or its DDL fails.
+        QueueStorageError
+            If a database does not enforce the required unique constraints.
+        """
+        manager = await self._app.make(IConnectionManager)
+        definitions = [
+            (options["connection"], build_jobs_table(options["table"]))
+            for options in self._config["connections"].values()
+            if options["driver"] == "database"
+        ]
+        failed = self._config["failed"]
+        definitions.append((
+            failed["connection"], build_failed_jobs_table(failed["table"]),
+        ))
+        for name, definition in definitions:
+            connection = manager.connection(name)
+            if not connection.supportsUniqueConstraints():
+                message = (
+                    f"Queue table '{definition.name}' requires "
+                    "enforced unique constraints."
+                )
+                raise QueueStorageError(message)
+            await connection.createTable(definition)
 
     async def retryFailed(self, failed_id: str) -> str:
         """

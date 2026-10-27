@@ -6,6 +6,7 @@ from itertools import pairwise
 from pathlib import Path
 from tempfile import TemporaryDirectory
 from threading import get_ident
+from typing import Final, get_type_hints
 from unittest.mock import patch
 from orionis.console.commands.make import database_migration as migration_module
 from orionis.console.commands.make._base import MakeStubCommand
@@ -31,6 +32,7 @@ from orionis.database.contracts.migration import Migration
 from orionis.foundation.contracts.application import IApplication
 from orionis.foundation.core_paths import CORE_APP_PATHS
 from orionis.http import WebSocket
+from orionis.orm.schema import TableDefinition
 from orionis.realtime import Hub
 from orionis.realtime.metadata import compile_hub
 from orionis.test import TestCase
@@ -555,8 +557,8 @@ class TestMakeCommands(TestCase):
             )
             self.assertEqual(command.errors, [])
 
-    async def testMakeDatabaseSeederAndSchemaUseConfiguredPaths(self) -> None:
-        """Verify seeders and schemas use configured paths and single suffixes.
+    async def testMakeDatabaseSeederUsesConfiguredPaths(self) -> None:
+        """Verify seeders use configured paths and single suffixes.
 
         Returns
         -------
@@ -565,28 +567,20 @@ class TestMakeCommands(TestCase):
         """
         cases = (
             (
-                MakeDatabaseSeeder,
                 "sales/account.py",
                 Path("database/seeders/sales/account_seeder.py"),
                 "AccountSeeder",
             ),
             (
-                MakeDatabaseSeeder,
                 "sales/account_seeder.py",
                 Path("database/seeders/sales/account_seeder.py"),
                 "AccountSeeder",
             ),
-            (
-                MakeDatabaseSchema,
-                "sales/account_schema.py",
-                Path("database/schemas/sales/account_schema.py"),
-                "AccountSchema",
-            ),
         )
-        for command_type, name, relative_path, expected_class in cases:
+        for name, relative_path, expected_class in cases:
             with TemporaryDirectory() as temporary:
                 root = Path(temporary)
-                command = _record_command(command_type)
+                command = _record_command(MakeDatabaseSeeder)
                 command.setArguments({"name": name})
                 await command.handle(_Application(root))
 
@@ -597,37 +591,72 @@ class TestMakeCommands(TestCase):
                     node for node in module.body if isinstance(node, ast.ClassDef)
                 )
                 self.assertEqual(generated_class.name, expected_class)
-                if command_type is MakeDatabaseSeeder:
-                    self.assertEqual(
-                        [ast.unparse(base) for base in generated_class.bases],
-                        ["Seeder"],
-                    )
-                    self.assertIn(
-                        "from orionis.database.seeders.seeder import Seeder",
-                        target.read_text(encoding="utf-8"),
-                    )
-                if command_type is MakeDatabaseSchema:
-                    self.assertIn(
-                        "table_definition", target.read_text(encoding="utf-8"),
-                    )
-                    spec = importlib.util.spec_from_file_location(
-                        "generated_database_schema",
-                        target,
-                    )
-                    module_instance = importlib.util.module_from_spec(spec)
-                    spec.loader.exec_module(module_instance)
-                    self.assertIsNone(
-                        getattr(module_instance, expected_class).table_definition,
-                    )
-                else:
-                    self.assertTrue(
-                        any(
-                            isinstance(node, ast.AsyncFunctionDef)
-                            and node.name == "run"
-                            for node in generated_class.body
-                        ),
-                    )
+                self.assertEqual(
+                    [ast.unparse(base) for base in generated_class.bases],
+                    ["Seeder"],
+                )
+                self.assertIn(
+                    "from orionis.database.seeders.seeder import Seeder",
+                    target.read_text(encoding="utf-8"),
+                )
+                self.assertTrue(
+                    any(
+                        isinstance(node, ast.AsyncFunctionDef)
+                        and node.name == "run"
+                        for node in generated_class.body
+                    ),
+                )
                 self.assertEqual(command.errors, [])
+
+    async def testMakeDatabaseSchemaCreatesModuleLevelTableDefinition(self) -> None:
+        """Verify schemas expose a final table definition without a holder class.
+
+        Returns
+        -------
+        None
+            Assert nested paths, single suffixes, stub content, and runtime types.
+        """
+        cases = (
+            ("sales/account.py", Path("database/schemas/sales/account_schema.py")),
+            (
+                "sales/account_schema.py",
+                Path("database/schemas/sales/account_schema.py"),
+            ),
+        )
+        for name, relative_path in cases:
+            with self.subTest(name=name), TemporaryDirectory() as temporary:
+                root = Path(temporary)
+                command = _record_command(MakeDatabaseSchema)
+                command.setArguments({"name": name})
+
+                await command.handle(_Application(root))
+
+                self.assertEqual(command.errors, [])
+                self.assertEqual(len(command.successes), 1)
+                target = root / relative_path
+                self.assertTrue(target.is_file())
+                self.assertEqual(
+                    target.read_text(encoding="utf-8").splitlines(),
+                    [
+                        "from typing import Final",
+                        "from orionis.orm.schema import TableDefinition",
+                        "",
+                        "TABLE: Final[TableDefinition | None] = None",
+                    ],
+                )
+                spec = importlib.util.spec_from_file_location(
+                    "generated_database_schema",
+                    target,
+                )
+                if spec is None or spec.loader is None:
+                    self.fail("Generated database schema must be importable.")
+                module_instance = importlib.util.module_from_spec(spec)
+                spec.loader.exec_module(module_instance)
+                self.assertIsNone(module_instance.TABLE)
+                self.assertEqual(
+                    get_type_hints(module_instance),
+                    {"TABLE": Final[TableDefinition | None]},
+                )
 
     async def testMakeServiceCreatesNestedFileAfterRemovingExtension(self) -> None:
         """Verify service generation strips extensions and preserves nested paths.
@@ -1018,12 +1047,12 @@ class TestMakeCommands(TestCase):
             self.assertEqual(await module.ChatHub().echo(**bound), "Hello")
 
     async def testEveryMakeStubProducesDocumentedPython(self) -> None:
-        """Verify every make template renders documented Python declarations.
+        """Verify make templates render valid Python and document their classes.
 
         Returns
         -------
         None
-            Assert syntax, runtime imports, and class and method documentation.
+            Assert syntax, import style, and documentation for class-based stubs.
         """
         cases = (
             (
@@ -1083,6 +1112,9 @@ class TestMakeCommands(TestCase):
                         for node in module.body
                         if isinstance(node, ast.ClassDef)
                     ]
+                    if command_type is MakeDatabaseSchema:
+                        self.assertEqual(classes, [])
+                        continue
                     self.assertTrue(classes, str(file_path))
                     for class_node in classes:
                         if file_path.suffix == ".pyi":

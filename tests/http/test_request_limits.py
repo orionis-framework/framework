@@ -1,5 +1,6 @@
 from __future__ import annotations
 import asyncio
+from functools import partial
 from threading import Event
 from typing import TYPE_CHECKING
 from orionis.http.adapters.request.asgi import ASGITransportAdapter
@@ -128,6 +129,108 @@ class _BlockingAdapter:
 
 class TestKernelBodyLimits(TestCase):
     """Verify limits are effective through complete kernel request lifecycles."""
+
+    async def testBothTransportsRetainAdmissionUntilCompletion(self) -> None:
+        """Share capacity and recover after delivery or cancellation.
+
+        Returns
+        -------
+        None
+            Check admission in both directions without allocating excess scopes.
+        """
+        for interface in ("asgi", "rsgi"):
+            for cancelled in (False, True):
+                with self.subTest(interface=interface, cancelled=cancelled):
+                    kernel, app, _responses, _catch = await boot_kernel(
+                        body_limits={"max_concurrent_requests": 1},
+                    )
+                    adapter = _BlockingAdapter()
+                    kernel._KernelHTTP__asgi_adapter = adapter
+                    kernel._KernelHTTP__rsgi_adapter = adapter
+
+                    asgi_request = partial(
+                        kernel.handleASGI,
+                        make_asgi_scope("/api"), receive_empty, send_noop,
+                    )
+                    rsgi_request = partial(
+                        kernel.handleRSGI, _StubRsgiScope("/api"), _StubRsgiProtocol(),
+                    )
+                    first, other = (
+                        (asgi_request, rsgi_request)
+                        if interface == "asgi" else (rsgi_request, asgi_request)
+                    )
+                    task = asyncio.create_task(first())
+                    try:
+                        await asyncio.wait_for(adapter.started.wait(), timeout=5)
+                        rejected = await other()
+                        self.assertEqual(rejected.getStatusCode(), 503)
+                        self.assertEqual(rejected.getHeader("retry-after"), ["1"])
+                        self.assertEqual(len(app.scopes), 1)
+                    finally:
+                        if cancelled:
+                            task.cancel()
+                            with self.assertRaises(asyncio.CancelledError):
+                                await task
+                        else:
+                            adapter.release.set()
+                            await task
+                    adapter.release.set()
+                    self.assertEqual((await other()).getStatusCode(), 200)
+                    self.assertEqual(len(app.scopes), 2)
+
+    async def testTransportFailuresReleaseAdmissionForBothInterfaces(self) -> None:
+        """Release the active slot even when response transmission raises.
+
+        Returns
+        -------
+        None
+            Verify the original error propagates and subsequent requests succeed.
+        """
+        async def fail_send(*_args: object) -> None:
+            """Raise the transport failure after a request has been admitted.
+
+            Parameters
+            ----------
+            *_args : object
+                Adapter, response, and transport arguments.
+
+            Returns
+            -------
+            None
+                The transport does not complete.
+
+            Raises
+            ------
+            OSError
+                Always, to simulate failed delivery.
+            """
+            error_msg = "response transmission failed"
+            raise OSError(error_msg)
+
+        for interface in ("asgi", "rsgi"):
+            with self.subTest(interface=interface):
+                kernel, app, _responses, _catch = await boot_kernel(
+                    body_limits={"max_concurrent_requests": 1},
+                )
+                adapter = getattr(kernel, f"_KernelHTTP__{interface}_adapter")
+                with (
+                    replace_attribute(type(adapter), "send", fail_send),
+                    self.assertRaisesRegex(OSError, "response transmission failed"),
+                ):
+                    if interface == "asgi":
+                        await kernel.handleASGI(
+                            make_asgi_scope("/api"), receive_empty, send_noop,
+                        )
+                    else:
+                        await kernel.handleRSGI(
+                            _StubRsgiScope("/api"), _StubRsgiProtocol(),
+                        )
+                self.assertEqual(len(app.scopes), 1)
+                self.assertEqual((await dispatch(kernel, "/api")).getStatusCode(), 200)
+                recovered = await kernel.handleRSGI(
+                    _StubRsgiScope("/api"), _StubRsgiProtocol(),
+                )
+                self.assertEqual(recovered.getStatusCode(), 200)
 
     async def testRejectsDeclaredOversizeBeforeReadingTheTransport(self) -> None:
         """Return 413 for oversized declarations without allocating request bytes.

@@ -329,6 +329,7 @@ async def run_probe(driver_name: str = "database") -> dict[str, object]:
             )
             driver = await manager.connection(driver_name)
             await verify_transactions(app, manager)
+            await call_command(app, "queue:migrate")
             await verify_success(app, driver_name, driver, state)
             await verify_failures(app, manager, driver_name, driver, state)
         finally:
@@ -342,7 +343,7 @@ async def run_probe(driver_name: str = "database") -> dict[str, object]:
         "driver": driver_name, "success_jobs": 3, "scoped_services": 3,
         "job_discovery": "app_jobs",
         "failure_attempts": 6, "transactions": "cold/warm rollback and commit",
-        "cli": "work/failed/retry/forget/clear",
+        "cli": "work/failed/retry/forget/clear/migrate",
     }
 
 async def main() -> None:
@@ -382,7 +383,7 @@ class TestQueueApplicationIntegration(TestCase):
         self.assertEqual(result["success_jobs"], 3)
         self.assertEqual(result["scoped_services"], 3)
         self.assertEqual(result["failure_attempts"], 6)
-        self.assertEqual(result["cli"], "work/failed/retry/forget/clear")
+        self.assertEqual(result["cli"], "work/failed/retry/forget/clear/migrate")
 
 if __name__ == "__main__":
     asyncio.run(main())

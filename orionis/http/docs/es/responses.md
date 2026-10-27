@@ -38,6 +38,8 @@ La aplicación web aplica estos datos a la sesión. `withErrors()` admite errore
 
 `setHeader()` reemplaza todos los valores de una cabecera; `addHeader()` añade otro. `getHeader()` devuelve una lista o `None`; las búsquedas ignoran mayúsculas. No añadas saltos de línea en nombres o valores. `withCookie()` permite encadenamiento; `setCookie()` devuelve `None`.
 
+Los tipos de respuesta incorporados inicializan sus metadatos estándar directamente cuando es posible, sin compartir cabeceras mutables entre respuestas. Se conserva la precedencia de las cabeceras personalizadas, incluidas las sustituciones de metadatos de redirección y archivo. Las subclases siguen utilizando sus hooks de cabeceras durante la construcción; la serialización JSON y el consumo de streams no cambian.
+
 ```python
 from orionis.http import response
 

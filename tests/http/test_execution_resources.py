@@ -19,6 +19,8 @@ from orionis.test import TestCase
 from tests.http.test_kernel import (
     _RecordingMiddleware,
     _SessionMiddlewareDouble,
+    _StubRsgiProtocol,
+    _StubRsgiScope,
     boot_kernel,
     dispatch,
     make_asgi_scope,
@@ -27,9 +29,11 @@ from tests.http.test_kernel import (
     send_noop,
     web_handler,
 )
+from tests.http.test_support import replace_attribute
 
 if TYPE_CHECKING:
     from collections.abc import AsyncIterator, Awaitable, Callable
+    from tests.http.test_kernel import _StubApp
 
 class _HookResponse(Response):
     """Expose a background hook independent of the optional task attribute."""
@@ -81,6 +85,44 @@ class _CountingAdapter(ASGITransportAdapter):
 
 class TestExecutionResources(TestCase):
     """Cover lazy allocations, immutable templates, and continuation isolation."""
+
+    async def testEmptyEndpointPoliciesSkipPathNormalization(self) -> None:
+        """Avoid a redundant policy lookup when no endpoint has a policy.
+
+        Returns
+        -------
+        None
+            Both interfaces still route while the unused policy path stays idle.
+        """
+        kernel, _app, _responses, _catch = await boot_kernel()
+        paths = []
+        original = kernel_module.normalize_request_path
+
+        def normalize(path: str) -> str:
+            """Record paths normalized by the endpoint policy lookup.
+
+            Parameters
+            ----------
+            path : str
+                Incoming transport path.
+
+            Returns
+            -------
+            str
+                Normalized policy lookup key.
+            """
+            paths.append(path)
+            return original(path)
+
+        with replace_attribute(kernel_module, "normalize_request_path", normalize):
+            asgi = await kernel.handleASGI(
+                make_asgi_scope("/api"), receive_empty, send_noop,
+            )
+            rsgi = await kernel.handleRSGI(
+                _StubRsgiScope("/api"), _StubRsgiProtocol(),
+            )
+        self.assertEqual((asgi.getStatusCode(), rsgi.getStatusCode()), (200, 200))
+        self.assertEqual(paths, [])
 
     def testHeaderFlagsAreIndependentOfCallerMutation(self) -> None:
         """Keep the index and format flags consistent after input mutation.
@@ -391,6 +433,59 @@ class TestExecutionResources(TestCase):
 
 class TestPublicRouteProfile(TestCase):
     """Exercise stateless profiles without weakening existing route defaults."""
+
+    async def testEmptyPublicPipelinesKeepInvocationAndRequestScopes(self) -> None:
+        """Retain container dispatch and fresh scopes without empty pipelines.
+
+        Returns
+        -------
+        None
+            Both interfaces invoke through the container with isolated requests.
+        """
+        route = replace(make_route("/public", function="web_handler"), public=True)
+        routes = {"GET": {"static": {"/public": route}, "dynamic": []}}
+        kernel, app, _, _ = await boot_kernel(routes=routes)
+        invoked = []
+        original = type(app).invoke
+
+        async def invoke(
+            container: _StubApp,
+            function: Callable[..., object],
+            **kwargs: object,
+        ) -> object:
+            """Record a handler invocation and delegate dependency resolution.
+
+            Parameters
+            ----------
+            container : _StubApp
+                Request container used by the kernel.
+            function : Callable
+                Handler selected by the compiled route.
+            **kwargs : object
+                Request-local route arguments.
+
+            Returns
+            -------
+            object
+                Result returned by the container.
+            """
+            invoked.append(function)
+            return await original(container, function, **kwargs)
+
+        with replace_attribute(type(app), "invoke", invoke):
+            asgi = await kernel.handleASGI(
+                make_asgi_scope("/public"), receive_empty, send_noop,
+            )
+            rsgi = await kernel.handleRSGI(
+                _StubRsgiScope("/public"), _StubRsgiProtocol(),
+            )
+        self.assertEqual((asgi.getBody(), rsgi.getBody()), (b"web", b"web"))
+        self.assertEqual(invoked, [web_handler, web_handler])
+        self.assertEqual(len(app.scopes), 2)
+        first, second = [scope.entries[Request] for scope in app.scopes]
+        self.assertIsInstance(first, Request)
+        self.assertIsInstance(second, Request)
+        self.assertIsNot(first, second)
 
     def testPublicProfileSurvivesCompilerAndCache(self) -> None:
         """Persist an explicitly public profile through route compilation.

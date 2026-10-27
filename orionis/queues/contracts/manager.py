@@ -82,6 +82,18 @@ class IQueueManager(ABC):
         """
 
     @abstractmethod
+    async def migrate(self) -> None:
+        """
+        Create missing database queue tables and central failed-job storage.
+
+        Returns
+        -------
+        None
+            Prepare every configured database queue connection and the failure
+            repository without modifying existing tables or their data.
+        """
+
+    @abstractmethod
     async def retryFailed(self, failed_id: str) -> str:
         """
         Requeue a failed job with a fresh attempt budget.

@@ -2,6 +2,8 @@
 
 ## Consume durable work
 
+To prepare all configured SQL queue tables and failed-job storage before starting workers, run `python reactor queue:migrate`; see [backend configuration](drivers-and-configuration.md#prepare-queue-tables). Lazy table creation remains supported.
+
 Start a worker from the application root with the same code version and configuration as the producer:
 
 ```shell

@@ -34,6 +34,18 @@ Named durable connections must use distinct tables or Redis prefixes. Failed sto
 
 The built-in failed-job repository uses the database. It initializes lazily when required; choosing Redis or sync does not remove this requirement for terminal failures. Prepare its connection and permissions before production. Redshift is rejected for database queues and failed-job storage because it does not enforce required unique keys.
 
+## Prepare queue tables
+
+Create queue storage before dispatching jobs or starting workers:
+
+```shell
+python reactor queue:migrate
+```
+
+The command creates missing jobs tables for **every** configured `database` queue connection and the central failed-job table, even when the default queue connection is `sync` or `redis`. It respects configured SQL connections, table names, and database prefixes, without connecting to Redis.
+
+It is safe to repeat: existing tables and their data are preserved. It does not alter existing schemas or run application migrations. Automatic lazy table creation remains available. The equivalent service operation is `await Queue.migrate()`.
+
 Inspect schemas without database access:
 
 ```python

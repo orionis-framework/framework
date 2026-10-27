@@ -1,8 +1,8 @@
 {
-  "recorded_at": "2026-10-27T17:30:20.086516+00:00",
+  "recorded_at": "2026-10-27T20:33:47.331487+00:00",
   "os": "Linux-6.17.0-1022-azure-x86_64-with-glibc2.39",
   "architecture": "x86_64",
-  "cpu": "AMD EPYC 9V45 96-Core Processor",
+  "cpu": "AMD EPYC 7763 64-Core Processor",
   "logical_cpus": 4,
   "physical_cpus": 2,
   "memory_bytes": 16766414848,
@@ -16,7 +16,7 @@
     "starlette": "1.8.0",
     "oha": "1.16.0"
   },
-  "commit": "63118a323607916eaf89992769fe1f9b31fbe1c4",
+  "commit": "f88e40fa6bacbde74c6697b08481386ffd1000bb",
   "dirty": false,
   "uv_lock_sha256": "88bff25e1939d490492b276ef93f8cb5d805d60eb32109a64d5f19fdb8c8d241",
   "dependencies": [
@@ -85,6 +85,6 @@
     "uvloop==0.23.0",
     "watchfiles==1.3.0"
   ],
-  "run_url": "https://github.com/orionis-framework/framework/actions/runs/40549561045",
-  "oha_executable": "/tmp/http-compare-oha-dc4r2qxs/oha-linux-amd64"
+  "run_url": "https://github.com/orionis-framework/framework/actions/runs/40579116867",
+  "oha_executable": "/tmp/http-compare-oha-c6l7jtu2/oha-linux-amd64"
 }

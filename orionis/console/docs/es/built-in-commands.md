@@ -53,7 +53,7 @@ No programes `migrate:fresh`, `db:wipe` ni `queue:clear` como mantenimiento ruti
 
 `serve` inicia el servidor de desarrollo según los argumentos disponibles; revisa [HTTP](../../../http/docs/es/README.md) para el ciclo web. `route:list` inspecciona rutas registradas. `test` ejecuta el sistema de pruebas de Orionis; su modo y selección pertenecen a [Testing](../../../test/docs/es/README.md). Las tareas de desarrollo y workers son procesos de larga duración: necesitan supervisión si se usan en un entorno operativo.
 
-`schedule:list` y `schedule:work` pertenecen al [scheduler](task-scheduling.md). `queue:work`, `queue:failed`, `queue:retry`, `queue:forget` y `queue:clear` operan [colas](../../../queues/docs/es/workers-and-failures.md). Los comandos MCP se documentan en [MCP](../../../mcp/docs/es/README.md).
+`schedule:list` y `schedule:work` pertenecen al [scheduler](task-scheduling.md). `queue:migrate` prepara todas las tablas SQL de colas configuradas y el almacenamiento de fallos sin borrar datos. `queue:work`, `queue:failed`, `queue:retry`, `queue:forget` y `queue:clear` operan [colas](../../../queues/docs/es/workers-and-failures.md). Los comandos MCP se documentan en [MCP](../../../mcp/docs/es/README.md).
 
 ## Optimizar y mantener
 

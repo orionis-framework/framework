@@ -38,6 +38,8 @@ The web application applies this data to its session. `withErrors()` accepts nor
 
 `setHeader()` replaces a header's values; `addHeader()` appends one. `getHeader()` returns a list or `None`; lookups ignore case. Do not insert newlines in names or values. `withCookie()` supports chaining; `setCookie()` returns `None`.
 
+Built-in response types initialize standard metadata directly where possible, without sharing mutable headers between responses. Custom headers keep their existing precedence, including redirect and file metadata overrides. Subclasses still use their header hooks during construction; JSON serialization and stream consumption remain unchanged.
+
 ```python
 from orionis.http import response
 

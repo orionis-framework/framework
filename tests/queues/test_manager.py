@@ -4,23 +4,31 @@ from importlib import import_module
 from pathlib import Path
 from tempfile import TemporaryDirectory
 from typing import TYPE_CHECKING
+from unittest.mock import patch
 from uuid import uuid4
 from orionis.container.providers.deferrable_provider import DeferrableProvider
 from orionis.container.context.scope import ScopedContext
+from orionis.database.connection import Connection
+from orionis.database.connection_manager import ConnectionManager
+from orionis.database.contracts.connection_manager import IConnectionManager
+from orionis.database.exceptions import QueryException
 from orionis.foundation.config.queue import Redis as RedisConfig
 from orionis.queues.context import JobContext
 from orionis.foundation.enums.lifespan import Lifespan
 from orionis.queues.contracts.manager import IQueueManager
 from orionis.queues.drivers.sync import SyncQueueDriver
 from orionis.queues.exceptions import (
-    QueueConfigurationError, QueueDispatchError, QueueRetryError, UnknownJobError,
+    QueueConfigurationError, QueueDispatchError, QueueRetryError, QueueStorageError,
+    UnknownJobError,
 )
 from orionis.queues.manager import QueueManager
 from orionis.queues.provider import QueueProvider
+from orionis.queues.schema import build_failed_jobs_table, build_jobs_table
 from orionis.queues.serializer import JobSerializer
 from orionis.queues.worker import Worker, WorkerOptions
 from orionis.support.facades.queue import Queue
 from orionis.test import TestCase
+from tests.queues.drivers.test_database import make_envelope
 from tests.queues.test_worker import (
     FailJob, FailedRepository, FakeApp, GateJob, MemoryDriver, RecordJob, ScopedService,
     State, envelope,
@@ -256,6 +264,147 @@ class TestQueueManager(TestCase):
         finally:
             Queue._pinned_instance = previous_pin # NOSONAR
             Queue._application = previous # NOSONAR
+
+class TestQueueMigrations(TestCase):
+    """Prepare real isolated databases without constructing queue clients."""
+
+    async def asyncSetUp(self) -> None:
+        """Configure separate prefixed databases for jobs, reports, and failures."""
+        self.directory = TemporaryDirectory()
+        directory = Path(self.directory.name)
+        self.databases = ConnectionManager(FakeApp({
+            "default": "primary",
+            "connections": {
+                name: {
+                    "driver": "sqlite",
+                    "database": str(directory / f"{name}.sqlite"),
+                    "prefix": prefix,
+                }
+                for name, prefix in (
+                    ("primary", "q_"), ("reports", "r_"), ("failures", "f_"),
+                )
+            },
+        }))
+        self.app = FakeApp({
+            "default": "sync",
+            "connections": {
+                "sync": {"driver": "sync"},
+                "database": {
+                    "driver": "database", "connection": None,
+                    "table": "pending_jobs",
+                },
+                "reports": {
+                    "driver": "database", "connection": "reports",
+                    "table": "report_jobs",
+                },
+                "redis": {"driver": "redis", "endpoint": "redis.invalid"},
+            },
+            "failed": {"connection": "failures", "table": "queue_failures"},
+        })
+        token = ScopedContext.setCurrentScope(None)
+        try:
+            self.app.instance(IConnectionManager, self.databases)
+        finally:
+            ScopedContext.reset(token)
+        self.manager = QueueManager(self.app, JobSerializer())
+
+    async def asyncTearDown(self) -> None:
+        """Release shared database handles before removing the temporary files."""
+        await self.manager.close()
+        await self.databases.disconnect()
+        self.directory.cleanup()
+
+    async def testMigrateCreatesAllConfiguredTablesAndIndexes(self) -> None:
+        """Create complete prefixed schemas even when the default queue is sync."""
+        await self.manager.migrate()
+        expected = (
+            ("primary", "q_pending_jobs", build_jobs_table("pending_jobs"),
+             ("queue", "available_at", "reserved_until")),
+            ("reports", "r_report_jobs", build_jobs_table("report_jobs"),
+             ("queue", "available_at", "reserved_until")),
+            ("failures", "f_queue_failures",
+             build_failed_jobs_table("queue_failures"), ("failed_at",)),
+        )
+        for name, table, definition, index_columns in expected:
+            with self.subTest(connection=name, table=table):
+                connection = self.databases.connection(name)
+                tables = await connection.select(
+                    "SELECT name FROM sqlite_master WHERE type = 'table'",
+                )
+                self.assertEqual({row["name"] for row in tables}, {table})
+                columns = await connection.select(
+                    "SELECT name FROM pragma_table_info(:table)", {"table": table},
+                )
+                self.assertEqual(
+                    {row["name"] for row in columns}, set(definition.columns),
+                )
+                indexes = await connection.select(
+                    "SELECT name FROM pragma_index_list(:table) WHERE origin = 'c'",
+                    {"table": table},
+                )
+                self.assertEqual(len(indexes), 1)
+                indexed = await connection.select(
+                    "SELECT name FROM pragma_index_info(:index_name)",
+                    {"index_name": indexes[0]["name"]},
+                )
+                self.assertEqual(
+                    tuple(row["name"] for row in indexed), index_columns,
+                )
+        self.assertEqual(self.manager._drivers, {})
+        self.assertIsNone(self.manager._failed)
+
+    async def testRepeatedMigrationsPreserveJobsAndFailures(self) -> None:
+        """Keep pending reservations and failure records across repeated calls."""
+        await self.manager.migrate()
+        driver = await self.manager.connection("database")
+        queued = make_envelope()
+        await driver.push(queued)
+        reserved = await driver.reserve(("default",), 90)
+        repository = await self.manager.failed()
+        failure = await repository.record(
+            reserved, "database", ValueError("Preserved failure"),
+        )
+        await self.manager.migrate()
+        await self.manager.migrate()
+        self.assertEqual(await driver.size("default"), 1)
+        self.assertTrue(await driver.delete(reserved))
+        self.assertEqual(await repository.all(), (failure,))
+
+    async def testMigratePreparesFailuresWithoutDatabaseQueueConnections(self) -> None:
+        """Prepare failure storage without opening sync or Redis queue clients."""
+        self.app.settings["connections"] = {
+            "sync": {"driver": "sync"},
+            "redis": {"driver": "redis", "endpoint": "redis.invalid"},
+        }
+        self.manager = QueueManager(self.app, JobSerializer())
+        await self.manager.migrate()
+        self.assertEqual(
+            set(self.databases._cached_connections), {"failures"},
+        )
+        tables = await self.databases.connection("failures").select(
+            "SELECT name FROM sqlite_master WHERE type = 'table'",
+        )
+        self.assertEqual(
+            {row["name"] for row in tables}, {"f_queue_failures"},
+        )
+        self.assertEqual(self.manager._drivers, {})
+        self.assertIsNone(self.manager._failed)
+
+    async def testMigratePropagatesStorageErrors(self) -> None:
+        """Preserve the database error when queue DDL cannot execute."""
+        error = QueryException("Queue schema creation failed.")
+        with patch.object(Connection, "createTable", side_effect=error), \
+                self.assertRaises(QueryException) as raised:
+            await self.manager.migrate()
+        self.assertIs(raised.exception, error)
+
+    async def testMigrateRejectsUnenforcedUniqueConstraints(self) -> None:
+        """Reject database storage that cannot enforce unique job identifiers."""
+        with (
+            patch.object(Connection, "supportsUniqueConstraints", return_value=False),
+            self.assertRaisesRegex(QueueStorageError, "unique constraints"),
+        ):
+            await self.manager.migrate()
 
 class TestQueueJobDiscovery(TestCase):
     """Discover jobs from resolved paths without queue module configuration."""

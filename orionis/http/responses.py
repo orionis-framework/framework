@@ -143,6 +143,9 @@ class Response(IResponse):
         if content is None:
             return b""
 
+        if type(content) is str:
+            return content.encode(self.charset)
+
         # Preserve immutable byte content.
         if isinstance(content, bytes):
             return content
@@ -834,7 +837,9 @@ class HTMLResponse(Response):
             background=background,
         )
 
-        if not self.hasHeader("content-type"):
+        if type(self) is HTMLResponse and not self._headers:
+            self._headers["content-type"] = self._CONTENT_TYPE
+        elif not self.hasHeader("content-type"):
             self.setHeader("content-type", self._CONTENT_TYPE)
 
 class PlainTextResponse(Response):
@@ -878,7 +883,9 @@ class PlainTextResponse(Response):
             background=background,
         )
 
-        if not self.hasHeader("content-type"):
+        if type(self) is PlainTextResponse and not self._headers:
+            self._headers["content-type"] = self._CONTENT_TYPE
+        elif not self.hasHeader("content-type"):
             self.setHeader("content-type", self._CONTENT_TYPE)
 
 class JSONResponse(Response):
@@ -951,7 +958,9 @@ class JSONResponse(Response):
         )
 
         # Ensure the Content-Type header is set for JSON responses
-        if not self.hasHeader("content-type"):
+        if type(self) is JSONResponse and not self._headers:
+            self._headers["content-type"] = self._CONTENT_TYPE
+        elif not self.hasHeader("content-type"):
             self.setHeader("content-type", self._CONTENT_TYPE)
 
     def render(self, content: Any) -> bytes:
@@ -1089,16 +1098,19 @@ class RedirectResponse(Response):
             background=background,
         )
 
-        self.setHeader("location", url)
-
-        if not self.hasHeader("content-type"):
-            self.setHeader("content-type", self._CONTENT_TYPE)
+        if type(self) is RedirectResponse and not self._headers:
+            self._headers["location"] = url
+            self._headers["content-type"] = self._CONTENT_TYPE
+        else:
+            self.setHeader("location", url)
+            if not self.hasHeader("content-type"):
+                self.setHeader("content-type", self._CONTENT_TYPE)
 
 class StreamingResponse(Response):
 
     __slots__ = ()
 
-    def __init__(
+    def __init__( # NOSONAR
         self,
         content: AsyncIterable[bytes] | Iterable[bytes],
         status_code: HTTPStatus | int = 200,
@@ -1148,13 +1160,27 @@ class StreamingResponse(Response):
 
         self._body = None
 
-        if media_type and not self.hasHeader("content-type"):
-            self.setHeader(
-                "content-type",
-                f"{media_type}; charset={self.charset}"
-                if media_type.startswith("text/")
-                else media_type,
-            )
+        if media_type:
+            response_type = type(self)
+            # Subclasses retain their header hooks and evaluation order.
+            if (
+                response_type is StreamingResponse
+                or response_type is EventStreamResponse
+                or response_type is FileResponse
+            ):
+                if "content-type" not in self._headers:
+                    self._headers["content-type"] = (
+                        f"{media_type}; charset={self.charset}"
+                        if media_type.startswith("text/")
+                        else media_type
+                    )
+            elif not self.hasHeader("content-type"):
+                self.setHeader(
+                    "content-type",
+                    f"{media_type}; charset={self.charset}"
+                    if media_type.startswith("text/")
+                    else media_type,
+                )
 
     async def _wrapSyncIterable(
         self,
@@ -1231,11 +1257,16 @@ class EventStreamResponse(StreamingResponse):
             media_type="text/event-stream",
             background=background,
         )
-        if not self.hasHeader("cache-control"):
-            self.setHeader("cache-control", "no-cache")
-        if not self.hasHeader("x-accel-buffering"):
-            self.setHeader("x-accel-buffering", "no")
-        self.removeHeader("content-length")
+        if type(self) is EventStreamResponse:
+            self._headers.setdefault("cache-control", "no-cache")
+            self._headers.setdefault("x-accel-buffering", "no")
+            self._headers.pop("content-length", None)
+        else:
+            if not self.hasHeader("cache-control"):
+                self.setHeader("cache-control", "no-cache")
+            if not self.hasHeader("x-accel-buffering"):
+                self.setHeader("x-accel-buffering", "no")
+            self.removeHeader("content-length")
 
     def getStream(self) -> _EventStreamIterator:
         """
@@ -1346,11 +1377,17 @@ class FileResponse(StreamingResponse):
 
         # Advertise the file size recorded during validation.
         self._file_size = file_stat.st_size
-        self.setHeader("content-length", str(self._file_size))
-
-        if filename:
-            disposition = f'attachment; filename="{filename}"'
-            self.setHeader("content-disposition", disposition)
+        if type(self) is FileResponse:
+            self._headers["content-length"] = str(self._file_size)
+            if filename:
+                self._headers["content-disposition"] = (
+                    f'attachment; filename="{filename}"'
+                )
+        else:
+            self.setHeader("content-length", str(self._file_size))
+            if filename:
+                disposition = f'attachment; filename="{filename}"'
+                self.setHeader("content-disposition", disposition)
 
     def getPath(self) -> Path:
         """

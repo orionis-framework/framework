@@ -30,6 +30,8 @@ Use `async def` for I/O and await asynchronous APIs. Support for synchronous han
 
 Requests and identities live in a scope. Do not retain `Request`, session or authentication context in singletons or globals. The kernel preloads and reuses middleware instances: keep per-request data in local variables or `request.state`.
 
+Each application and HTTP kernel belongs to one worker event loop; do not share them across threads or event loops. The kernel enforces `http.body_limits.max_concurrent_requests` across ASGI and RSGI requests without blocking the loop. A request retains its slot through response delivery and resource cleanup, including cancellation. Excess requests receive `503` with `Retry-After: 1` before another request scope is allocated.
+
 Framework handlers convert validation and authentication exceptions. An exception after streaming headers have been sent cannot replace the HTTP status already delivered. Arrange preparation work to fail before returning a stream.
 
 ## Evidence and next steps

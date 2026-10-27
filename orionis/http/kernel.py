@@ -205,6 +205,7 @@ class _MiddlewarePipeline[T]:
         return await self._instances[depth].handle(self._request, continuation)
 
 class KernelHTTP(IKernelHTTP):
+    """Serve concurrent requests within one worker event loop."""
 
     # ruff: noqa: BLE001, PLC0415, TC001, TRY400
 
@@ -264,9 +265,7 @@ class KernelHTTP(IKernelHTTP):
         self.__boot: bool = False
         self.__catch: ICatch = catch
         self.__body_limits = HTTPBodyLimits()
-        self.__request_slots = BoundedSemaphore(
-            self.__body_limits.max_concurrent_requests,
-        )
+        self.__request_slots = self.__body_limits.max_concurrent_requests
         self.__websocket_config = HTTPWebSocket()
         self.__websocket_slots = BoundedSemaphore(
             self.__websocket_config.max_connections,
@@ -541,9 +540,7 @@ class KernelHTTP(IKernelHTTP):
         self.__body_limits = (
             limits if isinstance(limits, HTTPBodyLimits) else HTTPBodyLimits(**limits)
         )
-        self.__request_slots = BoundedSemaphore(
-            self.__body_limits.max_concurrent_requests,
-        )
+        self.__request_slots = self.__body_limits.max_concurrent_requests
         self.__proxies = ProxiesMiddleware(
             config=http_config.get("proxies"),
         )
@@ -749,6 +746,8 @@ class KernelHTTP(IKernelHTTP):
             HTTP response produced by the middleware pipeline.
         """
         if resolved_route.route.public:
+            if not resolved_route.route.compiled_middlewares:
+                return await self.__callHandler(resolved_route, request)
             return await self.__requestLayer(request, resolved_route)
         if resolved_route.kind == "web":
             instances = self.__web_middleware
@@ -1150,15 +1149,20 @@ class KernelHTTP(IKernelHTTP):
             return await self.__handleWebSocket(
                 Interface.RSGI, adapter, protocol,
             )
-        policy = self.__endpoint_policies.get(normalize_request_path(adapter.path()))
+        policy = (
+            self.__endpoint_policies.get(normalize_request_path(adapter.path()))
+            if self.__endpoint_policies else None
+        )
         if policy is not None and (response := policy.before(adapter)) is not None:
             return await self.__rsgiResponse(adapter, response, protocol, policy)
-        if not self.__request_slots.acquire(blocking=False):
+        if not self.__request_slots:
             response = Response(
                 status_code=503, headers={"Retry-After": "1"},
                 content="HTTP request capacity exceeded.",
             )
             return await self.__rsgiResponse(adapter, response, protocol, policy)
+        # Admission cannot interleave with another task before the first await.
+        self.__request_slots -= 1
         try:
             async with self.__app.beginScope() as request_context:
                 try:
@@ -1173,7 +1177,7 @@ class KernelHTTP(IKernelHTTP):
                     if isinstance(request, Request):
                         request.close()
         finally:
-            self.__request_slots.release()
+            self.__request_slots += 1
 
     async def handleASGI(
         self,
@@ -1203,15 +1207,19 @@ class KernelHTTP(IKernelHTTP):
             return await self.__handleWebSocket(
                 Interface.ASGI, adapter, receive, send,
             )
-        policy = self.__endpoint_policies.get(normalize_request_path(adapter.path()))
+        policy = (
+            self.__endpoint_policies.get(normalize_request_path(adapter.path()))
+            if self.__endpoint_policies else None
+        )
         if policy is not None and (response := policy.before(adapter)) is not None:
             return await self.__asgiResponse(adapter, response, receive, send, policy)
-        if not self.__request_slots.acquire(blocking=False):
+        if not self.__request_slots:
             response = Response(
                 status_code=503, headers={"Retry-After": "1"},
                 content="HTTP request capacity exceeded.",
             )
             return await self.__asgiResponse(adapter, response, receive, send, policy)
+        self.__request_slots -= 1
         try:
             async with self.__app.beginScope() as request_context:
                 try:
@@ -1226,7 +1234,7 @@ class KernelHTTP(IKernelHTTP):
                     if isinstance(request, Request):
                         request.close()
         finally:
-            self.__request_slots.release()
+            self.__request_slots += 1
 
     def __websocketOriginAllowed(self, adapter: TransportAdapter) -> bool:
         """

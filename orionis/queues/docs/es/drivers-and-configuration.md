@@ -34,6 +34,18 @@ Conexiones durables con nombre deben usar tablas o prefijos Redis distintos. La 
 
 El repositorio de fallos incluido es database. Se resuelve de manera perezosa cuando se necesita; utilizar Redis o sync no elimina ese requisito para fallos terminales. Prepara su conexión y permisos antes de producción. Redshift se rechaza como backend database y como repositorio de fallos porque no impone las claves únicas requeridas.
 
+## Preparar las tablas de colas
+
+Crea el almacenamiento antes de enviar jobs o iniciar workers:
+
+```shell
+python reactor queue:migrate
+```
+
+El comando crea las tablas de jobs faltantes de **todas** las conexiones de colas `database` configuradas y la tabla central de fallos, incluso si la conexión de colas predeterminada es `sync` o `redis`. Respeta las conexiones SQL, nombres de tabla y prefijos configurados, sin conectarse a Redis.
+
+Puedes repetirlo: conserva las tablas existentes y sus datos. No modifica esquemas existentes ni ejecuta migraciones de la aplicación. La creación automática y perezosa de tablas sigue disponible. La operación de servicio equivalente es `await Queue.migrate()`.
+
 Puedes comprobar los esquemas sin acceder a una base:
 
 ```python

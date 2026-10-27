@@ -47,6 +47,7 @@ from orionis.console.commands.migrate.status import MigrateStatusCommand
 from orionis.console.commands.queue.clear import QueueClearCommand
 from orionis.console.commands.queue.failed import QueueFailedCommand
 from orionis.console.commands.queue.forget import QueueForgetCommand
+from orionis.console.commands.queue.migrate import QueueMigrateCommand
 from orionis.console.commands.queue.retry import QueueRetryCommand
 from orionis.console.commands.queue.work import QueueWorkCommand
 from orionis.console.commands.route.list import RouteListCommand
@@ -138,6 +139,7 @@ def get_core_commands_mapping() -> tuple[type, ...]:
         SeedCommand,
         ScheduleListCommand,
         ScheduleWorkCommand,
+        QueueMigrateCommand,
         QueueWorkCommand,
         QueueFailedCommand,
         QueueRetryCommand,

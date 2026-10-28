@@ -57,11 +57,25 @@ class TestIsFile(TestCase):
 class TestReadContent(TestCase):
 
     async def testFileReadsDoNotBlockTheEventLoopThread(self) -> None:
-        """Offload the synchronous upload protocol, including disk-backed files."""
+        """
+        Offload the synchronous upload protocol, including disk-backed files.
+
+        Returns
+        -------
+        None
+            Assert off-loop reads for synchronous upload implementations.
+        """
         threads: list[int] = []
 
         def read() -> bytes:
-            """Record the reader's thread and return deterministic content."""
+            """
+            Record the reader's thread and return deterministic content.
+
+            Returns
+            -------
+            bytes
+                Fixed upload content after recording the reader thread.
+            """
             threads.append(get_ident())
             return b"payload"
 

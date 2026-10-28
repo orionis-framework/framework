@@ -3,7 +3,9 @@ import copy
 import inspect
 import os
 import sys
-from typing import Any, TypeVar
+from html import escape
+from io import StringIO
+from typing import Any, TextIO, TypeVar
 from rich.console import Console
 from rich.panel import Panel
 from rich.pretty import Pretty
@@ -13,42 +15,61 @@ from orionis.console.output.contracts.var_dumper import IVarDumper
 
 T = TypeVar("T")
 
-# Light palette applied only on HTML export; terminal output is untouched.
-# Pale ANSI slots (white, bright white) are mapped to dark ink so the dump
-# stays legible on a light page background.
+# Match the diagnostic pages without changing the terminal's palette.
 _HTML_TERMINAL_THEME = TerminalTheme(
-    (247, 248, 250),
-    (31, 41, 51),
+    (255, 255, 255),
+    (24, 36, 51),
     [
-        (31, 41, 51),
-        (176, 32, 48),
-        (16, 112, 72),
-        (146, 96, 0),
-        (28, 84, 176),
-        (146, 48, 160),
-        (0, 108, 120),
-        (85, 96, 110),
+        (24, 36, 51),
+        (180, 35, 24),
+        (20, 118, 109),
+        (145, 103, 0),
+        (23, 79, 134),
+        (121, 83, 168),
+        (8, 107, 134),
+        (98, 110, 127),
     ],
     [
-        (108, 118, 132),
-        (200, 48, 64),
-        (24, 136, 88),
-        (168, 112, 0),
-        (40, 100, 200),
-        (168, 64, 184),
-        (0, 128, 140),
-        (55, 65, 81),
+        (98, 110, 127),
+        (180, 35, 24),
+        (20, 118, 109),
+        (145, 103, 0),
+        (32, 107, 196),
+        (121, 83, 168),
+        (8, 107, 134),
+        (24, 36, 51),
     ],
 )
 
-# Embeddable fragment: light surface so dumps stay legible inside a page.
 _HTML_DUMP_FORMAT = (
-    '<pre style="margin:0;padding:12px;overflow:auto;'
-    "background-color:#f7f8fa;color:#1f2933;"
-    "border:1px solid #d9dee5;border-radius:6px;"
-    'font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;'
-    'font-size:13px;line-height:1.4"><code style="font-family:inherit">'
-    "{code}</code></pre>"
+    '<pre class="dump-output" tabindex="0" role="region" aria-label="Dumped value" '
+    'style="margin:0;padding:16px;overflow:auto;'
+    "background-color:var(--orionis-surface,#fff);"
+    "color:var(--orionis-text,#182433);"
+    "font-family:var(--orionis-mono,'Fira Code','Cascadia Code',Consolas,monospace);"
+    'font-size:13px;line-height:1.75;white-space:pre;overflow-wrap:normal;'
+    'scrollbar-width:thin"><code style="font:inherit">{code}</code></pre>'
+)
+_HTML_DUMP_PANEL_FORMAT = (
+    '<section class="code-container dump-panel" style="min-width:0;'
+    "border:1px solid var(--orionis-border,#dce1e7);"
+    "border-radius:var(--orionis-radius,6px);overflow:hidden;"
+    "background-color:var(--orionis-surface,#fff);"
+    'box-shadow:0 1px 3px rgb(24 36 51 / 4%)">'
+    '<div class="code-header" style="display:flex;align-items:center;'
+    "justify-content:space-between;flex-wrap:nowrap;gap:12px;padding:12px 16px;"
+    "border-bottom:1px solid var(--orionis-border,#dce1e7);"
+    "background-color:var(--orionis-soft,#edf3f9);"
+    "font-family:var(--orionis-font,'Titillium Web',sans-serif);"
+    'font-size:12px">'
+    '<span class="code-filename" style="min-width:0;max-width:100%;'
+    'overflow-wrap:anywhere;color:var(--orionis-primary-hover,#1a569d);'
+    'font-weight:600">{source}</span>'
+    '<span class="code-header-info" style="display:flex;align-items:center;'
+    'min-width:min-content;'
+    "gap:10px;color:var(--orionis-muted,#626e7f);"
+    "font-family:var(--orionis-mono,'Fira Code','Cascadia Code',Consolas,monospace);"
+    'overflow-wrap:anywhere">{title}</span></div>{code}</section>'
 )
 
 class VarDumper(IVarDumper):
@@ -83,10 +104,11 @@ class VarDumper(IVarDumper):
         self.__module_path: str | None = None
 
         # Store the line number for display in the header
-        self.__line_number: int | None = None
+        self.__line_number: int | str | None = None
 
-        # Set whether to print the module/line header before the panels
-        self.__show_header: bool = True
+        # HTML capture must not replace the terminal's module header.
+        self.__html_module_path: str | None = None
+        self.__html_line_number: int | str | None = None
 
         # Set whether to force program exit after dumping
         self.__force_exit: bool = False
@@ -129,7 +151,7 @@ class VarDumper(IVarDumper):
             else:
                 sys.exit(1)
 
-    def __resolveCallerInfo(self) -> None:
+    def __resolveCallerInfo(self, *, html: bool = False) -> None: # NOSONAR
         """
         Resolve and set the caller's module path and line number.
 
@@ -138,39 +160,56 @@ class VarDumper(IVarDumper):
         relevant information. If the frame is unavailable, it sets default
         values.
 
+        Parameters
+        ----------
+        html : bool, optional
+            Capture the filename separately from the terminal's module name.
+
         Returns
         -------
         None
             This method does not return any value.
         """
-        # Only proceed if either module path or line number is missing
-        if self.__module_path and self.__line_number:
+        module_path = self.__html_module_path if html else self.__module_path
+        line_number = self.__html_line_number if html else self.__line_number
+        if module_path and line_number:
             return
 
-        # Get the current frame using inspect
         caller_frame = inspect.currentframe()
-
-        # Move back two frames to the caller if possible
-        if caller_frame is not None:
-            caller_frame = caller_frame.f_back
+        try:
             if caller_frame is not None:
                 caller_frame = caller_frame.f_back
+                if caller_frame is not None:
+                    caller_frame = caller_frame.f_back
+            if caller_frame is not None:
+                if not module_path:
+                    module_path = (
+                        caller_frame.f_code.co_filename if html
+                        else caller_frame.f_globals.get("__name__", "unknown")
+                    )
+                if not line_number:
+                    line_number = caller_frame.f_lineno
+            else:
+                module_path = module_path or "unknown"
+                line_number = line_number or "?"
+        finally:
+            del caller_frame
 
-        # If the caller frame exists, extract module and line number
-        if caller_frame is not None:
-            if not self.__module_path:
-                self.__module_path = caller_frame.f_globals.get("__name__", "unknown")
-            if not self.__line_number:
-                self.__line_number = caller_frame.f_lineno
+        if html:
+            self.__html_module_path = module_path
+            self.__html_line_number = line_number
         else:
-            if not self.__module_path:
-                self.__module_path = "unknown"
-            if not self.__line_number:
-                self.__line_number = "?"
+            self.__module_path = module_path
+            self.__line_number = line_number
 
-    def __makeConsole(self) -> Console:
+    def __makeConsole(self, *, file: TextIO | None = None) -> Console:
         """
         Create and return a configured Console instance for output formatting.
+
+        Parameters
+        ----------
+        file : TextIO or None, optional
+            Output stream; None uses the terminal's standard output.
 
         Returns
         -------
@@ -180,6 +219,7 @@ class VarDumper(IVarDumper):
         """
         # Configure the Console with a custom theme for variable dumping
         return Console(
+            file=file,
             theme=Theme({
                 "dump.index": "bold bright_blue",
                 "dump.type": "bold green",
@@ -260,7 +300,33 @@ class VarDumper(IVarDumper):
         if insert_line:
             print()
 
-    def __makePanel(self, value: type[T], _type: str) -> Panel:
+    def __makePretty(self, value: object) -> Pretty:
+        """
+        Format a value consistently for terminal and HTML output.
+
+        Parameters
+        ----------
+        value : object
+            Stored value to format.
+
+        Returns
+        -------
+        Pretty
+            Value formatted with the configured expansion and depth.
+        """
+        return Pretty(
+            value,
+            indent_size=2,
+            indent_guides=True,
+            expand_all=self.__expand_all,
+            max_depth=self.__max_depth,
+            margin=1,
+            insert_line=True,
+        )
+
+    def __makePanel(
+        self, value: type[T], _type: str, *, console: Console,
+    ) -> Panel:
         """
         Create a Rich Panel with a pretty-printed representation of the value.
 
@@ -270,6 +336,8 @@ class VarDumper(IVarDumper):
             Object to be pretty-printed inside the panel.
         _type : str
             Type name of the value for display in the panel title.
+        console : Console
+            Console whose width is used to size the panel.
 
         Returns
         -------
@@ -281,24 +349,14 @@ class VarDumper(IVarDumper):
         Uses internal configuration for indentation, expansion, and panel width.
         """
         # Cache attrs as locals: LOAD_FAST vs LOAD_ATTR chain for each access
-        expand_all = self.__expand_all
-        max_depth = self.__max_depth
         show_index = self.__show_index
         show_types = self.__show_types
 
         # console.size is a property call; cache width once for the panel width calc
-        console_width = self.__console.size.width
+        console_width = console.size.width
 
         # Build the Pretty object with configured formatting options
-        pretty_obj = Pretty(
-            value,
-            indent_size=2,
-            indent_guides=True,
-            expand_all=expand_all,
-            max_depth=max_depth,
-            margin=1,
-            insert_line=True,
-        )
+        pretty_obj = self.__makePretty(value)
 
         # Construct the panel title based on settings
         title = None
@@ -321,6 +379,39 @@ class VarDumper(IVarDumper):
             width=min(int(console_width * 0.85), 120),
             padding=(0, 1),
         )
+
+    def __render(self, console: Console, *, show_header: bool) -> None:
+        """
+        Render the stored values to the selected console without exiting.
+
+        Parameters
+        ----------
+        console : Console
+            Destination for the formatted output.
+        show_header : bool
+            Whether to include the caller's module and line.
+
+        Returns
+        -------
+        None
+            Write the formatted values to the selected console.
+        """
+        if show_header:
+            header = (
+                f"🐞 [white]Module([/white][bold blue]{self.__module_path}"
+                f"[/bold blue][white]) [/white]"
+                f"[bright_black]#{self.__line_number}[/bright_black]"
+            )
+            console.print(header)
+
+        _console_print = console.print
+        _make_panel = self.__makePanel
+        for item in self.__args:
+            _console_print(
+                _make_panel(
+                    value=item["value"], _type=item["type"], console=console,
+                ),
+            )
 
     def showTypes(self, *, show: bool = True) -> VarDumper:
         """
@@ -451,6 +542,7 @@ class VarDumper(IVarDumper):
 
         # Set the internal module path for header display
         self.__module_path = path
+        self.__html_module_path = path
         return self
 
     def lineNumber(self, number: int | None) -> VarDumper:
@@ -479,6 +571,7 @@ class VarDumper(IVarDumper):
 
         # Update the internal line number for header display
         self.__line_number = number
+        self.__html_line_number = number
         return self
 
     def forceExit(self, *, force: bool = True) -> VarDumper:
@@ -597,7 +690,7 @@ class VarDumper(IVarDumper):
 
     def print(self, *, insert_line: bool = False) -> None:
         """
-        Print the stored values in a formatted manner and return HTML output.
+        Print the stored values to the console in a formatted manner.
 
         Optionally inserts a blank line before and after the output, resolves
         caller information, prints a header with module and line details, and
@@ -622,27 +715,8 @@ class VarDumper(IVarDumper):
             # Optionally insert a blank line before the dump output
             self.__printLine(insert_line=insert_line)
 
-            if self.__show_header:
-
-                # Resolve caller information if not already set
-                self.__resolveCallerInfo()
-
-                # Print header with module and line information
-                header = (
-                    f"🐞 [white]Module([/white][bold blue]{self.__module_path}"
-                    f"[/bold blue][white]) [/white]"
-                    f"[bright_black]#{self.__line_number}[/bright_black]"
-                )
-                self.__console.print(header)
-
-            # Cache console.print and args list as locals: LOAD_FAST in the loop
-            _console_print = self.__console.print
-            _make_panel = self.__makePanel
-
-            # Iterate over each argument and display it in a styled panel
-            for item in self.__args:
-                # Unpack dict values to locals: 2x LOAD_FAST vs 2x dict hash lookup
-                _console_print(_make_panel(value=item["value"], _type=item["type"]))
+            self.__resolveCallerInfo()
+            self.__render(self.__console, show_header=True)
 
             # Optionally insert a blank line after the dump output
             self.__printLine(insert_line=insert_line)
@@ -672,21 +746,39 @@ class VarDumper(IVarDumper):
 
         Notes
         -----
-        Calls the print method to prepare the output and then exports it
-        with a light terminal palette and inline styles, so the dump is
-        readable and self-contained when embedded in a page. The module
-        and line header is omitted from the HTML output.
+        Renders to an isolated in-memory console and exports with a light
+        diagnostic palette and native HTML panels with inline styles. Does not
+        write to stdout or stderr, redirect streams, or terminate execution,
+        regardless of console options. Panel headers show the source filename
+        and line, using configured values or the first HTML export's caller.
+        HTML source metadata and indices do not affect terminal output.
         """
-        # Print the output to prepare for HTML conversion
-        self.__show_header = False
-        try:
-            self.print(insert_line=insert_line)
-        finally:
-            self.__show_header = True
-
-        # Export and return the recorded output as HTML
-        return self.__console.export_html(
-            theme=_HTML_TERMINAL_THEME,
-            code_format=_HTML_DUMP_FORMAT,
-            inline_styles=True,
+        self.__resolveCallerInfo(html=True)
+        source = escape(f"{self.__html_module_path}:{self.__html_line_number}")
+        console = self.__makeConsole(file=StringIO())
+        panels: list[str] = []
+        for index, item in enumerate(self.__args, start=1):
+            if insert_line and index == 1:
+                console.print()
+            console.print(self.__makePretty(item["value"]))
+            if insert_line and index == len(self.__args):
+                console.print()
+            code = console.export_html(
+                theme=_HTML_TERMINAL_THEME,
+                code_format=_HTML_DUMP_FORMAT,
+                inline_styles=True,
+            )
+            labels: list[str] = []
+            if self.__show_index:
+                labels.append(f"#{index}")
+            if self.__show_types:
+                labels.append(escape(item["type"]))
+            panels.append(_HTML_DUMP_PANEL_FORMAT.format(
+                source=source,
+                title=" &middot; ".join(labels),
+                code=code,
+            ))
+        return (
+            '<div class="orionis-dump" style="display:grid;gap:16px;min-width:0">'
+            f'{"".join(panels)}</div>'
         )

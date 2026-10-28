@@ -78,7 +78,23 @@ class _RejectAsyncRule(Rule):
         _value: object,
         _instance: object,
     ) -> bool:
-        """Reject the converted value without using synchronous enforcement."""
+        """
+        Reject the converted value without using synchronous enforcement.
+
+        Parameters
+        ----------
+        _field : str
+            Unused name of the field under validation.
+        _value : object
+            Unused value of the field under validation.
+        _instance : object
+            Unused schema instance containing the field.
+
+        Returns
+        -------
+        bool
+            False after yielding control to the caller's event loop.
+        """
         await asyncio.sleep(0)
         return False
 
@@ -89,11 +105,25 @@ class _MixedRulesSchema(Schema):
 class TestValidatorBasic(TestCase):
 
     def testValidateIsAlwaysAsync(self) -> None:
-        """Expose validation as a coroutine even for schemas without rules."""
+        """
+        Expose validation as a coroutine even for schemas without rules.
+
+        Returns
+        -------
+        None
+            Assert coroutine validation even when no custom rules exist.
+        """
         self.assertTrue(iscoroutinefunction(Validator.validate))
 
     def testValidatorHasNoAlternateEntryPoint(self) -> None:
-        """Expose only one validation entry point."""
+        """
+        Expose only one validation entry point.
+
+        Returns
+        -------
+        None
+            Assert a single public validation entry point.
+        """
         self.assertFalse(hasattr(Validator, "validateAsync"))
 
     async def testValidPayloadReturnsInstance(self) -> None:
@@ -295,7 +325,14 @@ class TestValidatorConstraints(TestCase):
 class TestValidatorCustomRules(TestCase):
 
     async def testMixedRulesKeepTheirOrderOnBothConversionPaths(self) -> None:
-        """Collect sync and native async failures even after a sibling type error."""
+        """
+        Collect sync and native async failures even after a sibling type error.
+
+        Returns
+        -------
+        None
+            Assert rule order and collected failures on both conversion paths.
+        """
         for count in (1, "invalid"):
             with (
                 self.subTest(count=count),
@@ -323,7 +360,14 @@ class TestValidatorCustomRules(TestCase):
                 )
 
     async def testAsyncRulesSkipTheirOwnUnconvertedField(self) -> None:
-        """Report a type error without invoking rules on an invalid field value."""
+        """
+        Report a type error without invoking rules on an invalid field value.
+
+        Returns
+        -------
+        None
+            Assert skipped rules for a field that could not be converted.
+        """
         with self.assertRaises(ValidationException) as caught:
             await Validator.validate(
                 {"password": 123, "count": 1}, _MixedRulesSchema,

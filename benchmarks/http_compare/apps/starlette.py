@@ -3,7 +3,7 @@ from typing import TYPE_CHECKING
 from starlette.applications import Starlette # pyright: ignore[reportMissingImports]
 from starlette.responses import PlainTextResponse # pyright: ignore[reportMissingImports]
 from starlette.routing import Route # pyright: ignore[reportMissingImports]
-from benchmarks.http_compare.apps._ready import mark_ready
+from benchmarks.http_compare.apps._ready import WORKER_PATH, mark_ready, worker_id
 
 if TYPE_CHECKING:
     from collections.abc import AsyncIterator
@@ -45,6 +45,22 @@ async def hello(_request: Request) -> PlainTextResponse: # NOSONAR
     # Allocate each response inside the handler to avoid cached-response bias.
     return PlainTextResponse("Hello World", status_code=200)
 
+async def worker(_request: Request) -> PlainTextResponse: # NOSONAR
+    """
+    Identify the process serving an unmeasured preparation connection.
+
+    Parameters
+    ----------
+    _request : Request
+        Incoming request, unused by this preparation handler.
+
+    Returns
+    -------
+    PlainTextResponse
+        HTTP 200 response containing the current worker's process ID.
+    """
+    return PlainTextResponse(worker_id(), status_code=200)
+
 def create_application() -> Starlette:
     """
     Build the comparison application through Starlette's public routing API.
@@ -52,9 +68,13 @@ def create_application() -> Starlette:
     Returns
     -------
     Starlette
-        Application with one text route and worker readiness tracking.
+        Application with the measured route and an unmeasured worker probe.
     """
     # Keep the route on Starlette's native router with lifecycle-based readiness.
     return Starlette(
-        routes=[Route("/", hello, methods=["GET"])], lifespan=_lifespan,
+        routes=[
+            Route("/", hello, methods=["GET"]),
+            Route(WORKER_PATH, worker, methods=["GET"]),
+        ],
+        lifespan=_lifespan,
     )

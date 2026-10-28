@@ -42,7 +42,26 @@ class _StubEngine:
         self.calls: list[tuple[str, dict[str, Any]]] = []
 
     async def render(self, template: str, context: dict[str, Any]) -> str:
-        """Return the canned HTML or raise the configured error."""
+        """
+        Return the canned HTML or raise the configured error.
+
+        Parameters
+        ----------
+        template : str
+            Template name captured for rendering assertions.
+        context : dict[str, Any]
+            Template values captured with the render call.
+
+        Returns
+        -------
+        str
+            Configured HTML output.
+
+        Raises
+        ------
+        Exception
+            If a rendering failure is configured on the engine double.
+        """
         self.calls.append((template, context))
         if self.error is not None:
             raise self.error
@@ -54,21 +73,66 @@ class _StubSession:
     __slots__ = ("errors", "inputs", "messages")
 
     def __init__(self) -> None:
-        """Initialize empty bags for messages, old input, and errors."""
+        """
+        Initialize empty bags for messages, old input, and errors.
+
+        Returns
+        -------
+        None
+            Prepare separate message, old-input, and validation-error bags.
+        """
         self.messages: dict[str, Any] = {}
         self.inputs: dict[str, Any] = {}
         self.errors: dict[str, Any] = {}
 
     def flash(self, key: str, value: object) -> None:
-        """Store a single flash message."""
+        """
+        Store a single flash message.
+
+        Parameters
+        ----------
+        key : str
+            Flash message name.
+        value : object
+            Value stored under the flash message name.
+
+        Returns
+        -------
+        None
+            Store the message in the captured flash bag.
+        """
         self.messages[key] = value
 
     def flashInput(self, values: dict[str, Any]) -> None:
-        """Merge old-input values into the captured bag."""
+        """
+        Merge old-input values into the captured bag.
+
+        Parameters
+        ----------
+        values : dict[str, Any]
+            Old-input values merged into the captured bag.
+
+        Returns
+        -------
+        None
+            Update the captured old-input values.
+        """
         self.inputs.update(values)
 
     def flashErrors(self, errors: dict[str, Any]) -> None:
-        """Merge validation errors into the captured bag."""
+        """
+        Merge validation errors into the captured bag.
+
+        Parameters
+        ----------
+        errors : dict[str, Any]
+            Validation errors merged into the captured bag.
+
+        Returns
+        -------
+        None
+            Update the captured validation errors.
+        """
         self.errors.update(errors)
 
 class _StubSessionFacade:
@@ -95,7 +159,19 @@ class _StubSessionFacade:
         self.resolved: int = 0
 
     async def resolve(self) -> _StubSession | None:
-        """Return the stubbed session or raise the configured failure."""
+        """
+        Return the stubbed session or raise the configured failure.
+
+        Returns
+        -------
+        _StubSession | None
+            Configured session after recording the resolution.
+
+        Raises
+        ------
+        Exception
+            If session resolution is configured to fail.
+        """
         self.resolved += 1
         if self.failure is not None:
             raise self.failure
@@ -156,7 +232,14 @@ class TestPendingViewConstruction(TestCase):
 class TestPendingViewFlashMutators(TestCase):
 
     def _make(self) -> PendingView:
-        """Build a pending view backed by a stub engine."""
+        """
+        Build a pending view backed by a stub engine.
+
+        Returns
+        -------
+        PendingView
+            Pending users.index view with a stub engine and empty context.
+        """
         return PendingView(_StubEngine(), "users.index", {})
 
     def testWithFlashReturnsSameInstance(self) -> None:
@@ -301,7 +384,14 @@ class TestPendingViewFlashMutators(TestCase):
 class TestPendingViewAttributeQueue(TestCase):
 
     def _make(self) -> PendingView:
-        """Build a pending view backed by a stub engine."""
+        """
+        Build a pending view backed by a stub engine.
+
+        Returns
+        -------
+        PendingView
+            Pending users.index view with a stub engine and empty context.
+        """
         return PendingView(_StubEngine(), "users.index", {})
 
     def testUnknownAttributeRaisesAttributeError(self) -> None:
@@ -368,7 +458,21 @@ class TestPendingViewRender(TestCase):
         html: str = "<p>ok</p>",
         error: Exception | None = None,
     ) -> tuple[PendingView, _StubEngine]:
-        """Build a pending view together with its stub engine."""
+        """
+        Build a pending view together with its stub engine.
+
+        Parameters
+        ----------
+        html : str, optional
+            HTML returned by the stub engine.
+        error : Exception | None, optional
+            Rendering failure raised by the stub engine, if any.
+
+        Returns
+        -------
+        tuple[PendingView, _StubEngine]
+            Pending view and its configured engine for render assertions.
+        """
         engine = _StubEngine(html=html, error=error)
         return PendingView(engine, "users.index", {"name": "World"}), engine
 
@@ -527,7 +631,14 @@ class TestPendingViewSessionFlashing(TestCase):
         pending_module.Session = self._original_facade
 
     def _make(self) -> PendingView:
-        """Build a pending view backed by a stub engine."""
+        """
+        Build a pending view backed by a stub engine.
+
+        Returns
+        -------
+        PendingView
+            Pending users.index view with a stub engine and empty context.
+        """
         return PendingView(_StubEngine(), "users.index", {})
 
     async def testRenderSkipsSessionWhenNothingQueued(self) -> None:

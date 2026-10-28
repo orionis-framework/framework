@@ -31,7 +31,14 @@ class _RecordingProcesses:
     __slots__ = ("calls", "error", "statuses")
 
     def __init__(self) -> None:
-        """Initialize process outcomes and the invocation log."""
+        """
+        Initialize process outcomes and the invocation log.
+
+        Returns
+        -------
+        None
+            Prepare independent exit statuses and subprocess call records.
+        """
         self.calls = []
         self.statuses = []
         self.error = None
@@ -65,7 +72,14 @@ class TestSharedCiRunner(TestCase):
     """Validate suite discovery and publication gate exit statuses."""
 
     def setUp(self) -> None:
-        """Prepare an isolated runner and a temporary repository fixture."""
+        """
+        Prepare an isolated runner and a temporary repository fixture.
+
+        Returns
+        -------
+        None
+            Prepare an isolated runner, repository fixture, and output buffers.
+        """
         self.runner = _load_runner()
         self.processes = _RecordingProcesses()
         self.runner.subprocess = self.processes
@@ -132,7 +146,14 @@ class TestSharedCiRunner(TestCase):
             return self.runner.main(arguments)
 
     def testDiscoveryIncludesNestedModulesAndEveryRootFile(self) -> None:
-        """Discover all test groups once in deterministic order."""
+        """
+        Discover all test groups once in deterministic order.
+
+        Returns
+        -------
+        None
+            Assert complete and deterministic test-group discovery.
+        """
         for path in (
             "tests/zeta/nested/test_nested.py",
             "tests/alpha/test_first.py",
@@ -155,11 +176,25 @@ class TestSharedCiRunner(TestCase):
         )
 
     def testDiscoveryReturnsNoSuitesForAnEmptyRepository(self) -> None:
-        """Return an empty inventory when no matching test files exist."""
+        """
+        Return an empty inventory when no matching test files exist.
+
+        Returns
+        -------
+        None
+            Assert an empty suite inventory for an empty repository.
+        """
         self.assertEqual(self.runner.discover_suites(self.repo), [])
 
     def testDiscoveryExcludesOnlyTheLocalRealDatabaseDirectory(self) -> None:
-        """Exclude local tests while preserving similarly named public paths."""
+        """
+        Exclude local tests while preserving similarly named public paths.
+
+        Returns
+        -------
+        None
+            Assert exclusion of only the local real-database test directory.
+        """
         for path in (
             "tests/real_database/test_local.py",
             "tests/real_database/pgsql/nested/test_connection.py",
@@ -179,26 +214,54 @@ class TestSharedCiRunner(TestCase):
         )
 
     def testDiscoveryReturnsNoSuitesForOnlyLocalRealDatabaseTests(self) -> None:
-        """Keep an exclusively local test tree out of automatic execution."""
+        """
+        Keep an exclusively local test tree out of automatic execution.
+
+        Returns
+        -------
+        None
+            Assert no automatic suites for an exclusively local test tree.
+        """
         self._createFile("tests/real_database/test_local.py")
         self._createFile("tests/real_database/mysql/test_connection.py")
         self.assertEqual(self.runner.discover_suites(self.repo), [])
 
     def testFailureStopsBeforeStartingTheNextSuite(self) -> None:
-        """Preserve the failing exit code and stop subsequent processes."""
+        """
+        Preserve the failing exit code and stop subsequent processes.
+
+        Returns
+        -------
+        None
+            Assert early termination with the failing suite's exit code.
+        """
         self.processes.statuses = [7, 0, 0]
         self.assertEqual(self._runSuites(), 7)
         self.assertEqual(len(self.processes.calls), 1)
         self.assertIn("FAILED: tests/alpha (exit 7)", self.errors.getvalue())
 
     def testContinueOnErrorRetainsTheFirstFailure(self) -> None:
-        """Run remaining suites without losing an earlier failure code."""
+        """
+        Run remaining suites without losing an earlier failure code.
+
+        Returns
+        -------
+        None
+            Assert continued execution without losing the first failure status.
+        """
         self.processes.statuses = [7, 0, 3]
         self.assertEqual(self._runSuites(continue_on_error=True), 7)
         self.assertEqual(len(self.processes.calls), 3)
 
     def testSuccessfulSuitesUseTheActivePythonAndRepository(self) -> None:
-        """Pass default verbosity, active Python, repository and UTF-8 settings."""
+        """
+        Pass default verbosity, active Python, repository and UTF-8 settings.
+
+        Returns
+        -------
+        None
+            Assert use of the active interpreter, repository, and UTF-8 settings.
+        """
         self.assertEqual(self._runSuites(), 0)
         self.assertEqual(len(self.processes.calls), 3)
         command, cwd, environment, check = self.processes.calls[0]
@@ -210,12 +273,26 @@ class TestSharedCiRunner(TestCase):
         self.assertFalse(check)
 
     def testSignalTerminationProducesAFailingPortableStatus(self) -> None:
-        """Convert a process signal into a nonzero portable exit status."""
+        """
+        Convert a process signal into a nonzero portable exit status.
+
+        Returns
+        -------
+        None
+            Assert a portable nonzero status for signal termination.
+        """
         self.processes.statuses = [-9]
         self.assertEqual(self._runSuites(), 1)
 
     def testListIncludesQueuesRealtimeAndRootWithoutExecution(self) -> None:
-        """List the repository inventory without launching child processes."""
+        """
+        List the repository inventory without launching child processes.
+
+        Returns
+        -------
+        None
+            Assert inventory listing without starting test subprocesses.
+        """
         self.assertEqual(self._main(["--list"]), 0)
         output = self.output.getvalue()
         self.assertIn("tests/queues", output)
@@ -225,7 +302,14 @@ class TestSharedCiRunner(TestCase):
         self.assertEqual(self.processes.calls, [])
 
     def testCliUsesDetailedOutputByDefault(self) -> None:
-        """Pass verbosity two to every suite when the CLI option is omitted."""
+        """
+        Pass verbosity two to every suite when the CLI option is omitted.
+
+        Returns
+        -------
+        None
+            Assert detailed CLI output when verbosity is not specified.
+        """
         self.assertEqual(self._main([]), 0)
         self.assertTrue(self.processes.calls)
         for command, _, _, _ in self.processes.calls:
@@ -233,7 +317,14 @@ class TestSharedCiRunner(TestCase):
             self.assertNotIn("--start-dir=tests/real_database", command)
 
     def testCliAppliesContinueAndVerbosityToAllDiscoveredSuites(self) -> None:
-        """Forward CLI settings while returning an earlier module failure."""
+        """
+        Forward CLI settings while returning an earlier module failure.
+
+        Returns
+        -------
+        None
+            Assert forwarding of CLI options and preservation of prior failure.
+        """
         self.processes.statuses = [7]
         self.assertEqual(
             self._main(["--continue-on-error", "--verbosity=0"]), 7,
@@ -254,7 +345,14 @@ class TestSharedCiRunner(TestCase):
         self.assertIn("--start-dir=tests", root_commands[0])
 
     def testCliReportsProcessStartupFailure(self) -> None:
-        """Return a failing status when a child process cannot start."""
+        """
+        Return a failing status when a child process cannot start.
+
+        Returns
+        -------
+        None
+            Assert a failing CLI status for subprocess startup errors.
+        """
         self.processes.error = OSError("process startup failed")
         self.assertEqual(self._main([]), 2)
         self.assertIn("Unable to start test suite", self.errors.getvalue())

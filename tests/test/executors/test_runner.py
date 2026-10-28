@@ -10,15 +10,48 @@ from orionis.test.executors.runner import TestRunner
 _SUITE_FAILURE: str = "suite exploded"
 
 def _probe_test(_self: object) -> None:
-    """Describe the probe method used as the subject of a report."""
+    """
+    Provide a no-op test method for report metadata.
+
+    Parameters
+    ----------
+    _self : object
+        Unused instance receiving the probe test call.
+
+    Returns
+    -------
+    None
+        Complete without assertions or side effects.
+    """
 
 def _make_case() -> CoreTestCase:
-    """Create a test case instance used as the subject of a report."""
+    """
+    Create a test case instance used as the subject of a report.
+
+    Returns
+    -------
+    CoreTestCase
+        Test case instance selecting the generated probe method.
+    """
     probe = type("_ProbeCase", (CoreTestCase,), {"testProbe": _probe_test})
     return probe("testProbe")
 
 def _bind_console(runner: TestRunner, width: int = 120) -> io.StringIO:
-    """Redirect the runner console to an in-memory buffer."""
+    """
+    Redirect the runner console to an in-memory buffer.
+
+    Parameters
+    ----------
+    runner : TestRunner
+        Runner whose Rich console is redirected.
+    width : int, optional
+        Width of the captured Rich console.
+
+    Returns
+    -------
+    io.StringIO
+        Buffer receiving the runner's rendered output.
+    """
     buffer = io.StringIO()
     runner._TestRunner__console = Console(file=buffer, width=width)
     return buffer
@@ -40,14 +73,40 @@ class _StubSuite:
         self.statuses = statuses
 
     def __call__(self, result: TestResultProcessor) -> None:
-        """Report every predefined outcome to the given result object."""
+        """
+        Report every predefined outcome to the given result object.
+
+        Parameters
+        ----------
+        result : TestResultProcessor
+            Processor receiving the predefined suite outcomes.
+
+        Returns
+        -------
+        None
+            Report each outcome between its start and stop notifications.
+        """
         for status in self.statuses:
             result.startTest(self.case)
             self._report(result, status)
             result.stopTest(self.case)
 
     def _report(self, result: TestResultProcessor, status: TestStatus) -> None:
-        """Publish a single outcome matching the requested status."""
+        """
+        Publish a single outcome matching the requested status.
+
+        Parameters
+        ----------
+        result : TestResultProcessor
+            Processor receiving the selected probe outcome.
+        status : TestStatus
+            Outcome status to publish for the probe case.
+
+        Returns
+        -------
+        None
+            Record the requested success, skip, failure, or error.
+        """
         if status is TestStatus.PASSED:
             result.addSuccess(self.case)
         elif status is TestStatus.SKIPPED:
@@ -68,14 +127,40 @@ class _ExplodingSuite:
     __slots__ = ()
 
     def __call__(self, _result: TestResultProcessor) -> None:
-        """Raise unconditionally to exercise the cleanup path."""
+        """
+        Raise unconditionally to exercise the cleanup path.
+
+        Parameters
+        ----------
+        _result : TestResultProcessor
+            Unused processor supplied by the runner.
+
+        Raises
+        ------
+        RuntimeError
+            Always raised to exercise runner cleanup.
+        """
         raise RuntimeError(_SUITE_FAILURE)
 
 class _RunnerTestCase(TestCase):
     """Base scenario running suite doubles through the runner."""
 
     def _run(self, runner: TestRunner, suite: object) -> TestResultProcessor:
-        """Execute a suite double and return the produced result object."""
+        """
+        Execute a suite double and return the produced result object.
+
+        Parameters
+        ----------
+        runner : TestRunner
+            Runner used to execute the suite double.
+        suite : object
+            Callable suite double reporting its predefined outcomes.
+
+        Returns
+        -------
+        TestResultProcessor
+            Result processor produced by the runner.
+        """
         return runner.run(suite)  # type: ignore[arg-type]
 
 class TestTestRunnerDefinition(_RunnerTestCase):

@@ -82,17 +82,27 @@ _PACKAGES = (
 )
 
 def run_import_probe(source: str) -> dict[str, object]:
-    """Execute an import assertion in an independent Python interpreter.
+    """
+    Run an import probe in a fresh Python interpreter.
 
     Parameters
     ----------
     source : str
-        Python statements printing one JSON object to standard output.
+        Python statements that print a single JSON object to standard output.
 
     Returns
     -------
     dict[str, object]
-        Structured result from the child process.
+        JSON object decoded from the child interpreter's standard output.
+
+    Raises
+    ------
+    subprocess.CalledProcessError
+        If the child interpreter exits with a nonzero status.
+    subprocess.TimeoutExpired
+        If the probe runs for more than 60 seconds.
+    json.JSONDecodeError
+        If standard output is not valid JSON.
     """
     completed = subprocess.run(
         [sys.executable, "-B", "-c", source],
@@ -109,12 +119,13 @@ class TestLazyImports(TestCase):
     """Exercise public exports without requiring eager subsystem imports."""
 
     def testCoreCommandsImportInColdInterpreter(self) -> None:
-        """Import the built-in command registry without prior application imports.
+        """
+        Verify that core commands load in a fresh interpreter.
 
         Returns
         -------
         None
-            Assertions verify the cold import resolves the key command.
+            This test does not return a value.
         """
         result = run_import_probe(
             "import json\n"
@@ -125,12 +136,13 @@ class TestLazyImports(TestCase):
         self.assertTrue(result["key_command"])
 
     def testPackageImportsLeaveImplementationsUnloaded(self) -> None:
-        """Keep package inspection independent of implementation imports.
+        """
+        Verify that package imports leave implementations unloaded.
 
         Returns
         -------
         None
-            Assertions verify cold imports and public attribute discovery.
+            This test does not return a value.
         """
         result = run_import_probe(
             "import importlib, json, sys\n"
@@ -154,13 +166,65 @@ class TestLazyImports(TestCase):
         self.assertEqual(result["implementations"], [])
         self.assertTrue(result["visible"])
 
-    def testLeafImportsDoNotLoadSiblingFeatures(self) -> None:
-        """Keep direct leaf imports independent of their package aggregators.
+    def testDebugFacadeImportLeavesTheImplementationUnloaded(self) -> None:
+        """
+        Verify that the debug facade imports without loading its service.
 
         Returns
         -------
         None
-            Lightweight imports leave unrelated implementations unloaded.
+            This test does not return a value.
+        """
+        result = run_import_probe(
+            "import json, sys\n"
+            "from orionis.support.facades import Debug\n"
+            "print(json.dumps({\n"
+            "    'accessor': Debug.getFacadeAccessor(),\n"
+            "    'service': 'orionis.console.debug.dumper' in sys.modules,\n"
+            "    'application': 'orionis.foundation.application' in sys.modules,\n"
+            "    'rich': 'rich' in sys.modules,\n"
+            "}))\n",
+        )
+        self.assertEqual(result["accessor"], "x-orionis-IDumper")
+        self.assertFalse(result["service"])
+        self.assertFalse(result["application"])
+        self.assertFalse(result["rich"])
+
+    def testConcreteDumperStillWorksBeforeApplicationBoot(self) -> None:
+        """
+        Verify that the console dumper works before application boot.
+
+        Returns
+        -------
+        None
+            This test does not return a value.
+        """
+        result = run_import_probe(
+            "import json, sys\n"
+            "from contextlib import redirect_stdout\n"
+            "from io import StringIO\n"
+            "from orionis.console import Dumper\n"
+            "output = StringIO()\n"
+            "with redirect_stdout(output):\n"
+            "    result = Dumper.dump('before-boot')\n"
+            "print(json.dumps({\n"
+            "    'output': output.getvalue(),\n"
+            "    'returned_none': result is None,\n"
+            "    'application': 'orionis.foundation.application' in sys.modules,\n"
+            "}))\n",
+        )
+        self.assertIn("before-boot", result["output"])
+        self.assertTrue(result["returned_none"])
+        self.assertFalse(result["application"])
+
+    def testLeafImportsDoNotLoadSiblingFeatures(self) -> None:
+        """
+        Verify that leaf imports leave sibling implementations unloaded.
+
+        Returns
+        -------
+        None
+            This test does not return a value.
         """
         probes = (
             (
@@ -212,12 +276,13 @@ class TestLazyImports(TestCase):
                 self.assertEqual(result["loaded"], [])
 
     def testColdImportsResolveFormerCircularDependencies(self) -> None:
-        """Resolve session, ORM and HTTP entry points in fresh interpreters.
+        """
+        Verify that formerly circular imports succeed in fresh interpreters.
 
         Returns
         -------
         None
-            Import order cannot recreate eager query or migration cycles.
+            This test does not return a value.
         """
         for module in (
             "orionis.session.manager",
@@ -235,12 +300,13 @@ class TestLazyImports(TestCase):
                 self.assertEqual(result["name"], module)
 
     def testApplicationImportExcludesUnusedSubsystems(self) -> None:
-        """Import Application without loading optional service implementations.
+        """
+        Verify that ``Application`` imports without unused subsystems.
 
         Returns
         -------
         None
-            Assertions reject eager kernel, provider and backend imports.
+            This test does not return a value.
         """
         result = run_import_probe(
             "import json, sys\n"
@@ -254,12 +320,13 @@ class TestLazyImports(TestCase):
         self.assertEqual(result["loaded"], [])
 
     def testSqliteImportLeavesOtherDatabaseConfigurationsUnloaded(self) -> None:
-        """Import one database entity without evaluating other driver catalogs.
+        """
+        Verify that SQLite imports leave other driver configurations unloaded.
 
         Returns
         -------
         None
-            Direct and public imports share the same selectively loaded class.
+            This test does not return a value.
         """
         result = run_import_probe(
             "import json, sys\n"
@@ -277,12 +344,13 @@ class TestLazyImports(TestCase):
         self.assertEqual(result["loaded"], [])
 
     def testPublicExportsResolveAndCacheTheirOriginalObjects(self) -> None:
-        """Preserve named exports, repeated access and importlib identities.
+        """
+        Verify that public exports resolve to cached original objects.
 
         Returns
         -------
         None
-            Every declared export remains importable and cached on its package.
+            This test does not return a value.
         """
         for name in _PACKAGES:
             package = importlib.import_module(name)
@@ -300,12 +368,13 @@ class TestLazyImports(TestCase):
                 _ = package.missing_public_export
 
     def testWildcardAndDirectImportsKeepExportIdentities(self) -> None:
-        """Support wildcard and named imports alongside direct module access.
+        """
+        Verify that wildcard and direct imports share export identities.
 
         Returns
         -------
         None
-            Representative exports resolve to the same classes and functions.
+            This test does not return a value.
         """
         result = run_import_probe(
             "import json\n"
@@ -323,12 +392,13 @@ class TestLazyImports(TestCase):
         self.assertTrue(result["same"])
 
     def testSubmoduleImportsDoNotShadowPublicExports(self) -> None:
-        """Resolve defining modules before named package imports in a cold process.
+        """
+        Verify that submodule imports do not shadow public exports.
 
         Returns
         -------
         None
-            Submodule bindings preserve every exported class and function.
+            This test does not return a value.
         """
         result = run_import_probe(
             "import importlib, json\n"
@@ -348,12 +418,13 @@ class TestLazyImports(TestCase):
         self.assertEqual(result["errors"], [])
 
     def testCoreMetadataMatchesDefiningClasses(self) -> None:
-        """Resolve each built-in metadata entry to its original class.
+        """
+        Verify that core metadata resolves to the defining classes.
 
         Returns
         -------
         None
-            Kernel, exception handler and scheduler descriptors remain valid.
+            This test does not return a value.
         """
         from orionis.foundation.core_exception_handler import CORE_EXCEPTION_HANDLER
         from orionis.foundation.core_kernels import CORE_KERNELS
@@ -369,12 +440,13 @@ class TestLazyImports(TestCase):
             self.assertEqual(implementation.__name__, metadata["class"])
 
     def testCoreProvidersPreserveRegistrationOrder(self) -> None:
-        """Resolve provider descriptors to the existing ordered class tuple.
+        """
+        Verify that core provider descriptors preserve registration order.
 
         Returns
         -------
         None
-            The compatibility tuple and explicit loader expose identical classes.
+            This test does not return a value.
         """
         from orionis.foundation.core_providers import (
             CORE_PROVIDER_METADATA,
@@ -388,15 +460,16 @@ class TestLazyImports(TestCase):
             [(provider.__module__, provider.__name__) for provider in CORE_PROVIDERS],
             list(CORE_PROVIDER_METADATA),
         )
-        self.assertEqual(len(CORE_PROVIDERS), 20)
+        self.assertEqual(len(CORE_PROVIDERS), 21)
 
     def testConfigurationMappingsHaveIndependentNestedDefaults(self) -> None:
-        """Keep configuration edits isolated from subsequent application defaults.
+        """
+        Verify that configuration mappings isolate nested defaults.
 
         Returns
         -------
         None
-            Fresh mappings and the compatibility export do not share dictionaries.
+            This test does not return a value.
         """
         from orionis.foundation.core_config import CORE_CONFIG, get_core_config_mapping
 

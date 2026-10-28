@@ -21,6 +21,7 @@ from pathlib import Path
 from tempfile import TemporaryDirectory
 from typing import Any
 import psutil
+from benchmarks.http_compare.apps._ready import WORKER_PATH
 from benchmarks.http_compare.client import OHA_VERSION, install_oha, parse_measurement
 from benchmarks.http_compare.report import (
     METRICS,
@@ -445,12 +446,62 @@ def check_workers(
             )
             raise RuntimeError(error_msg)
 
+def _probe_response(
+    connection: http.client.HTTPConnection,
+    path: str,
+    expected_body: bytes | None = None,
+) -> bytes:
+    """
+    Complete and validate one unmeasured keep-alive request.
+
+    Parameters
+    ----------
+    connection : http.client.HTTPConnection
+        Preparation connection shared by payload and worker probes.
+    path : str
+        Endpoint to request.
+    expected_body : bytes | None
+        Exact payload to require, or None for the worker identity response.
+
+    Returns
+    -------
+    bytes
+        Fully consumed HTTP response body.
+
+    Raises
+    ------
+    RuntimeError
+        If status, media type, payload, protocol or keep-alive is invalid.
+    OSError
+        If the connection fails.
+    http.client.HTTPException
+        If the server does not send a valid HTTP response.
+    """
+    connection.request("GET", path)
+    response = connection.getresponse()
+    body = response.read()
+    content_type = response.getheader("content-type", "").split(";", 1)[0].lower()
+    if (
+        response.status != HTTPStatus.OK
+        or content_type != "text/plain"
+        or (expected_body is not None and body != expected_body)
+    ):
+        error_msg = (
+            f"Unexpected response for {path}: {response.status}, "
+            f"{content_type}, {body!r}"
+        )
+        raise RuntimeError(error_msg)
+    if response.version != HTTP_1_1 or response.will_close:
+        error_msg = "Endpoint did not preserve HTTP/1.1 keep-alive"
+        raise RuntimeError(error_msg)
+    return body
+
 def wait_until_ready( # NOSONAR
     process: subprocess.Popen[bytes], port: int, ready: Path, workers: int,
     known: dict[int, psutil.Process],
 ) -> None:
     """
-    Wait for healthy workers and verify the exact keep-alive response.
+    Complete unmeasured payload requests on every healthy worker.
 
     Parameters
     ----------
@@ -461,24 +512,25 @@ def wait_until_ready( # NOSONAR
     ready : Path
         Directory containing worker startup markers.
     workers : int
-        Expected number of ready workers.
+        Expected number of workers to prime through real HTTP requests.
     known : dict[int, psutil.Process]
         Mapping updated with observed server descendants.
 
     Returns
     -------
     None
-        Confirm worker health and two exact HTTP/1.1 keep-alive responses.
+        Confirm every worker served two exact HTTP/1.1 keep-alive responses.
 
     Raises
     ------
     RuntimeError
         If a process fails or the endpoint returns an unexpected response.
     TimeoutError
-        If all workers and the endpoint are not ready before the deadline.
+        If any worker remains unprimed before the startup deadline.
     """
     # Verify worker ownership before probing HTTP to avoid false readiness.
     deadline = time.monotonic() + STARTUP_TIMEOUT
+    primed_workers: set[bytes] = set()
     while time.monotonic() < deadline:
         track_children(process, known)
         if process.poll() is not None:
@@ -486,39 +538,33 @@ def wait_until_ready( # NOSONAR
                 f"Granian exited with code {process.returncode}; see server log"
             )
             raise RuntimeError(error_msg)
-        if len(list(ready.glob("*"))) == workers:
+        markers = list(ready.glob("*"))
+        if len(markers) == workers:
             check_workers(process, ready, workers, known)
+            expected_workers = {marker.name.encode("ascii") for marker in markers}
             connection = http.client.HTTPConnection("127.0.0.1", port, timeout=1)
             try:
-                # Two requests on the same connection verify the keep-alive path.
+                # Discard the cold request and verify a second on the same worker.
                 for _ in range(2):
-                    connection.request("GET", "/")
-                    response = connection.getresponse()
-                    body = response.read()
-                    content_type = (
-                        response.getheader("content-type", "").split(";", 1)[0].lower()
-                    )
-                    if (
-                        response.status != HTTPStatus.OK
-                        or body != b"Hello World"
-                        or content_type != "text/plain"
-                    ):
-                        error_msg = (
-                            f"Unexpected response: {response.status}, "
-                            f"{content_type}, {body!r}"
-                        )
-                        raise RuntimeError(error_msg)
-                    if response.version != HTTP_1_1 or response.will_close:
-                        error_msg = "Endpoint did not preserve HTTP/1.1 keep-alive"
-                        raise RuntimeError(error_msg)
-                return
+                    _probe_response(connection, "/", b"Hello World")
+                worker = _probe_response(connection, WORKER_PATH)
+                if worker not in expected_workers:
+                    error_msg = f"Unexpected worker identity: {worker!r}"
+                    raise RuntimeError(error_msg)
+                primed_workers.add(worker)
+                if primed_workers == expected_workers:
+                    check_workers(process, ready, workers, known)
+                    return
             except OSError, http.client.HTTPException:
                 # Retry transient connection errors while startup completes.
                 pass
             finally:
                 connection.close()
         time.sleep(0.1)
-    error_msg = f"Not all {workers} workers became ready within {STARTUP_TIMEOUT}s"
+    error_msg = (
+        f"Not all {workers} workers completed HTTP preparation within "
+        f"{STARTUP_TIMEOUT}s ({len(primed_workers)}/{workers} primed)"
+    )
     raise TimeoutError(error_msg)
 
 def run_load(  # noqa: PLR0913

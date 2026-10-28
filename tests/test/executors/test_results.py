@@ -1,3 +1,4 @@
+import inspect
 import io
 import json
 from typing import TYPE_CHECKING
@@ -14,28 +15,80 @@ if TYPE_CHECKING:
 _MISSING_MODULE: str = "_orionis_missing_module"
 
 def _probe_test(_self: object) -> None:
-    """Describe the probe method used as the subject of a report."""
+    """
+    Provide a no-op test method for report metadata.
+
+    Parameters
+    ----------
+    _self : object
+        Unused instance receiving the probe test call.
+
+    Returns
+    -------
+    None
+        Complete without assertions or side effects.
+    """
 
 def _make_case(*, module: str | None = None) -> CoreTestCase:
-    """Create a test case instance used as the subject of a report."""
+    """
+    Create a test case instance used as the subject of a report.
+
+    Parameters
+    ----------
+    module : str | None, optional
+        Module name assigned to the generated case class.
+
+    Returns
+    -------
+    CoreTestCase
+        Test case instance selecting the generated probe method.
+    """
     probe = type("_ProbeCase", (CoreTestCase,), {"testProbe": _probe_test})
     if module is not None:
         probe.__module__ = module
     return probe("testProbe")
 
 def _raise_failure() -> None:
-    """Raise an assertion error from a known source line."""
+    """
+    Raise an assertion error from a known source line.
+
+    Raises
+    ------
+    AssertionError
+        Always raised with the probe failure message.
+    """
     error_msg = "probe failure"
     # A deliberately long comment line used to exercise the source code trimming
     raise AssertionError(error_msg)
 
 def _raise_error() -> None:
-    """Raise a runtime error from a known source line."""
+    """
+    Raise a runtime error from a known source line.
+
+    Raises
+    ------
+    RuntimeError
+        Always raised with the probe error message.
+    """
     error_msg = "probe error"
     raise RuntimeError(error_msg)
 
 def _bind_console(processor: TestResultProcessor, width: int) -> io.StringIO:
-    """Redirect the processor console to an in-memory buffer."""
+    """
+    Redirect the processor console to an in-memory buffer.
+
+    Parameters
+    ----------
+    processor : TestResultProcessor
+        Processor whose Rich console is redirected.
+    width : int
+        Console width used for rendering and truncation checks.
+
+    Returns
+    -------
+    io.StringIO
+        Buffer receiving the processor's rendered output.
+    """
     buffer = io.StringIO()
     processor._TestResultProcessor__console = Console(file=buffer, width=width)
     processor._TestResultProcessor__max_width = width * 0.8
@@ -49,17 +102,50 @@ class _ProcessorTestCase(TestCase):
         width: int = 120,
         verbosity: int | None = None,
     ) -> TestResultProcessor:
-        """Build a processor writing to an in-memory console."""
+        """
+        Build a processor writing to an in-memory console.
+
+        Parameters
+        ----------
+        width : int, optional
+            Width of the captured Rich console.
+        verbosity : int | None, optional
+            Reporting verbosity passed to the processor.
+
+        Returns
+        -------
+        TestResultProcessor
+            Processor writing to the fixture's in-memory buffer.
+        """
         processor = TestResultProcessor(verbosity=verbosity)
         self._buffer = _bind_console(processor, width)
         return processor
 
     def _output(self) -> str:
-        """Return everything rendered by the in-memory console."""
+        """
+        Return everything rendered by the in-memory console.
+
+        Returns
+        -------
+        str
+            Complete output captured from the processor console.
+        """
         return self._buffer.getvalue()
 
     def _addSuccess(self, processor: TestResultProcessor) -> TestResult:
-        """Record a successful outcome and return the produced report."""
+        """
+        Record a successful outcome and return the produced report.
+
+        Parameters
+        ----------
+        processor : TestResultProcessor
+            Processor receiving the successful probe outcome.
+
+        Returns
+        -------
+        TestResult
+            Report produced for the successful probe case.
+        """
         case = _make_case()
         processor.startTest(case)
         processor.addSuccess(case)
@@ -72,7 +158,23 @@ class _ProcessorTestCase(TestCase):
         errored: bool,
         module: str | None = None,
     ) -> TestResult:
-        """Record a failing outcome and return the produced report."""
+        """
+        Record a failing outcome and return the produced report.
+
+        Parameters
+        ----------
+        processor : TestResultProcessor
+            Processor receiving the failing probe outcome.
+        errored : bool
+            Whether to record a runtime error instead of an assertion failure.
+        module : str | None, optional
+            Module name assigned to the generated case class.
+
+        Returns
+        -------
+        TestResult
+            Report produced for the selected failing outcome.
+        """
         case = _make_case(module=module)
         raiser = _raise_error if errored else _raise_failure
         record = processor.addError if errored else processor.addFailure
@@ -164,7 +266,7 @@ class TestTestResultProcessorOutcomes(_ProcessorTestCase):
         self.assertEqual(result.class_name, "_ProbeCase")
         self.assertEqual(result.method, "testProbe")
         self.assertEqual(result.module, __name__)
-        self.assertEqual(result.doc_string, _probe_test.__doc__)
+        self.assertEqual(result.doc_string, inspect.getdoc(_probe_test))
         self.assertIn("test_results.py", str(result.file_path))
 
     def testSuccessCarriesNoDiagnostics(self) -> None:

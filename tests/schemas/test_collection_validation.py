@@ -61,7 +61,23 @@ class _WaitingRule(Rule):
     async def enforce(
         self, _field: str, _value: object, instance: object,
     ) -> bool:
-        """Yield before checking a sibling on the converted child instance."""
+        """
+        Yield before checking a sibling on the converted child instance.
+
+        Parameters
+        ----------
+        _field : str
+            Unused name of the field under validation.
+        _value : object
+            Unused value of the field under validation.
+        instance : object
+            Converted child instance containing the sibling flag.
+
+        Returns
+        -------
+        bool
+            Whether the child instance's allowed flag permits validation.
+        """
         await asyncio.sleep(0)
         return getattr(instance, "allowed", False)
 
@@ -79,35 +95,92 @@ class _SchemaRequest(Request):
     __slots__ = ("_data",)
 
     def __init__(self, data: dict[str, object]) -> None:
-        """Retain the decoded body used by schema injection."""
+        """
+        Retain the decoded body used by schema injection.
+
+        Parameters
+        ----------
+        data : dict[str, object]
+            Decoded request body supplied to schema injection.
+
+        Returns
+        -------
+        None
+            Store the supplied request body without converting it.
+        """
         self._data = data
 
     async def data(self) -> dict[str, object]:
-        """Return the body supplied by the test."""
+        """
+        Return the body supplied by the test.
+
+        Returns
+        -------
+        dict[str, object]
+            Decoded request body retained by the request double.
+        """
         return self._data
 
 
 class _AccountController(BaseController):
     async def __call__(self, payload: _Account) -> dict:
-        """Return the direct nested schema only after container validation."""
+        """
+        Return the direct nested schema only after container validation.
+
+        Parameters
+        ----------
+        payload : _Account
+            Validated payload containing a directly nested schema.
+
+        Returns
+        -------
+        dict
+            Dictionary representation of the validated account payload.
+        """
         return payload.toDict()
 
 
 class _ListController(BaseController):
     async def __call__(self, payload: _ListAccount) -> dict:
-        """Return the schema collection only after container validation."""
+        """
+        Return the schema collection only after container validation.
+
+        Parameters
+        ----------
+        payload : _ListAccount
+            Validated payload containing a collection of schemas.
+
+        Returns
+        -------
+        dict
+            Dictionary representation of the validated schema collection.
+        """
         return payload.toDict()
 
 
 class TestSchemaCollections(TestCase):
     async def testDirectNestedSchemaStillRunsItsRules(self) -> None:
-        """Preserve validation of a directly declared child schema."""
+        """
+        Preserve validation of a directly declared child schema.
+
+        Returns
+        -------
+        None
+            Assert rule execution for a directly nested schema.
+        """
         with self.assertRaises(ValidationException) as caught:
             await Validator.validate({"contact": {"email": "invalid"}}, _Account)
         self.assertEqual(set(caught.exception.errors), {"contact.email"})
 
     async def testListRunsEveryChildRule(self) -> None:
-        """Reject invalid children with distinct indexed paths."""
+        """
+        Reject invalid children with distinct indexed paths.
+
+        Returns
+        -------
+        None
+            Assert indexed validation errors for each invalid list child.
+        """
         with self.assertRaises(ValidationException) as caught:
             await Validator.validate({
                 "contacts": [{"email": "invalid"}, {"email": "also-invalid"}],
@@ -120,7 +193,14 @@ class TestSchemaCollections(TestCase):
         )
 
     async def testDictRunsRulesWithActualKeys(self) -> None:
-        """Retain dictionary keys instead of msgspec's anonymous placeholder."""
+        """
+        Retain dictionary keys instead of msgspec's anonymous placeholder.
+
+        Returns
+        -------
+        None
+            Assert validation paths containing the actual dictionary keys.
+        """
         with self.assertRaises(ValidationException) as caught:
             await Validator.validate({
                 "contacts": {"primary": {"email": "invalid"}},
@@ -128,7 +208,14 @@ class TestSchemaCollections(TestCase):
         self.assertEqual(set(caught.exception.errors), {"contacts['primary'].email"})
 
     async def testValidCollectionsPreserveConversionAndInput(self) -> None:
-        """Return typed children without mutating the caller's containers."""
+        """
+        Return typed children without mutating the caller's containers.
+
+        Returns
+        -------
+        None
+            Assert typed conversion without mutation of caller containers.
+        """
         payload = {"contacts": [{"email": "ada@example.com"}]}
         result = await Validator.validate(payload, _ListAccount)
         self.assertIsInstance(result.contacts[0], _Contact)
@@ -139,7 +226,14 @@ class TestSchemaCollections(TestCase):
         self.assertIsNot(result.contacts, payload["contacts"])
 
     async def testEmptyAndOptionalCollectionsAreAccepted(self) -> None:
-        """Skip absent children without losing optional collection semantics."""
+        """
+        Skip absent children without losing optional collection semantics.
+
+        Returns
+        -------
+        None
+            Assert acceptance of empty and absent optional collections.
+        """
         class _Optional(Schema):
             contacts: list[_Contact | None] | None = None
 
@@ -149,7 +243,14 @@ class TestSchemaCollections(TestCase):
             )
 
     async def testNestedAnnotatedCollectionsAreTraversed(self) -> None:
-        """Follow annotations, optional children, maps and nested tuples."""
+        """
+        Follow annotations, optional children, maps and nested tuples.
+
+        Returns
+        -------
+        None
+            Assert traversal through annotated nested collection types.
+        """
         class _Nested(Schema):
             contacts: Annotated[
                 list[dict[str, tuple[
@@ -167,7 +268,14 @@ class TestSchemaCollections(TestCase):
         )
 
     async def testEverySupportedCollectionRunsChildRules(self) -> None:
-        """Cover concrete containers and msgspec-supported collection aliases."""
+        """
+        Cover concrete containers and msgspec-supported collection aliases.
+
+        Returns
+        -------
+        None
+            Assert child-rule execution for every supported collection form.
+        """
         for annotation in (
             tuple[_FrozenContact, ...], set[_FrozenContact],
             frozenset[_FrozenContact], Sequence[_FrozenContact],
@@ -184,7 +292,14 @@ class TestSchemaCollections(TestCase):
                 self.assertEqual(set(caught.exception.errors), {"contacts[0].email"})
 
     async def testMappingAliasAndCollectionUnionRunChildRules(self) -> None:
-        """Select collection traversal from the converted runtime value."""
+        """
+        Select collection traversal from the converted runtime value.
+
+        Returns
+        -------
+        None
+            Assert traversal of the selected runtime collection type.
+        """
         class _UnionAccount(Schema):
             contacts: list[_Contact] | Mapping[str, _Contact]
 
@@ -200,7 +315,14 @@ class TestSchemaCollections(TestCase):
             self.assertEqual(set(caught.exception.errors), {path})
 
     async def testSiblingTypeErrorsStillRunCollectionRules(self) -> None:
-        """Traverse converted collections on the partial-conversion path."""
+        """
+        Traverse converted collections on the partial-conversion path.
+
+        Returns
+        -------
+        None
+            Assert collection-rule execution after a sibling conversion error.
+        """
         for schema, contacts, path in (
             (_ListAccount, [{"email": "invalid"}], "contacts[0].email"),
             (_DictAccount, {"main": {"email": "invalid"}}, "contacts['main'].email"),
@@ -213,7 +335,14 @@ class TestSchemaCollections(TestCase):
             self.assertEqual(set(caught.exception.errors), {path, "count"})
 
     async def testListTypeConstraintAndRuleFailuresAreCollectedTogether(self) -> None:
-        """Validate unaffected items even when another child cannot convert."""
+        """
+        Validate unaffected items even when another child cannot convert.
+
+        Returns
+        -------
+        None
+            Assert combined type, constraint, and rule failures for list items.
+        """
         with self.assertRaises(ValidationException) as caught:
             await Validator.validate({
                 "contacts": [
@@ -235,7 +364,14 @@ class TestSchemaCollections(TestCase):
         )
 
     async def testDictFailuresKeepKeysAndCustomMessages(self) -> None:
-        """Preserve quoted keys, including punctuation, in both failure phases."""
+        """
+        Preserve quoted keys, including punctuation, in both failure phases.
+
+        Returns
+        -------
+        None
+            Assert key preservation and custom messages across failure phases.
+        """
         with self.assertRaises(ValidationException) as caught:
             await Validator.validate({
                 "contacts": {
@@ -255,7 +391,14 @@ class TestSchemaCollections(TestCase):
         )
 
     async def testFixedTupleUsesEachElementsDeclaredType(self) -> None:
-        """Resolve errors and custom messages through the correct tuple member."""
+        """
+        Resolve errors and custom messages through the correct tuple member.
+
+        Returns
+        -------
+        None
+            Assert tuple-member-specific validation types and messages.
+        """
         class _TupleAccount(Schema):
             contacts: tuple[_PlainChild, _Contact]
 
@@ -274,7 +417,14 @@ class TestSchemaCollections(TestCase):
         )
 
     async def testCollectionBoundsAreNotHiddenByChildFailures(self) -> None:
-        """Preserve the original collection constraint alongside child errors."""
+        """
+        Preserve the original collection constraint alongside child errors.
+
+        Returns
+        -------
+        None
+            Assert collection bounds alongside nested child failures.
+        """
         class _Bounded(Schema):
             contacts: Field[
                 list[_Contact], MinLength(3, message="Three contacts required."),
@@ -292,7 +442,14 @@ class TestSchemaCollections(TestCase):
         )
 
     async def testTupleLengthFailuresAreNotHiddenByChildRules(self) -> None:
-        """Keep fixed-tuple length validation when a present child is invalid."""
+        """
+        Keep fixed-tuple length validation when a present child is invalid.
+
+        Returns
+        -------
+        None
+            Assert tuple-length errors alongside child-rule failures.
+        """
         class _Tuple(Schema):
             contacts: tuple[_Contact, _PlainChild]
 
@@ -303,7 +460,14 @@ class TestSchemaCollections(TestCase):
         )
 
     async def testTaggedChildUnionsKeepTheSelectedSchema(self) -> None:
-        """Respect discriminators while collecting partially converted children."""
+        """
+        Respect discriminators while collecting partially converted children.
+
+        Returns
+        -------
+        None
+            Assert discriminator-based selection of partially converted children.
+        """
         class _Tagged(Schema):
             contacts: list[_TaggedPlainContact | _TaggedEmailContact]
 
@@ -319,12 +483,35 @@ class TestSchemaCollections(TestCase):
         })
 
     async def testUnexpectedChildRuleErrorsPropagate(self) -> None:
-        """Never disguise an unexpected service error as a validation result."""
+        """
+        Propagate unexpected child service errors without hiding them.
+
+        Returns
+        -------
+        None
+            Assert propagation of unexpected errors from child services.
+        """
         class _FailingRule(Rule):
             async def enforce(
                 self, _field: str, _value: object, _instance: object,
             ) -> bool:
-                """Simulate an unavailable application service."""
+                """
+                Simulate an unavailable application service.
+
+                Parameters
+                ----------
+                _field : str
+                    Unused name of the field under validation.
+                _value : object
+                    Unused value of the field under validation.
+                _instance : object
+                    Unused schema instance containing the field.
+
+                Raises
+                ------
+                RuntimeError
+                    Always raised to simulate an unavailable child service.
+                """
                 message = "Child service unavailable."
                 raise RuntimeError(message)
 
@@ -342,7 +529,14 @@ class TestSchemaCollections(TestCase):
                 }, _FailingCollection)
 
     async def testUnionChildrenUseTheirOwnConstraintMessages(self) -> None:
-        """Resolve messages from the selected child, not the first union member."""
+        """
+        Resolve messages from the selected child, not the first union member.
+
+        Returns
+        -------
+        None
+            Assert constraint messages from the selected union member.
+        """
         class _First(Schema, tag="first"):
             label: Field[str, MinLength(3, message="First child label is too short.")]
 
@@ -374,7 +568,14 @@ class TestSchemaCollections(TestCase):
         )
 
     async def testChildRulesReadChildSiblingsOnBothConversionPaths(self) -> None:
-        """Keep sibling-field checks local to each child inside a collection."""
+        """
+        Keep sibling-field checks local to each child inside a collection.
+
+        Returns
+        -------
+        None
+            Assert sibling-field checks against each converted child instance.
+        """
         class _Confirmation(Schema):
             original: str
             confirmation: Field[str, ConfirmPassword("original")]
@@ -396,7 +597,14 @@ class TestSchemaCollections(TestCase):
             self.assertEqual("count" in caught.exception.errors, count == "bad")
 
     async def testAsyncChildRulesAreAwaitedOnBothConversionPaths(self) -> None:
-        """Await child predicates rather than treating coroutine objects as true."""
+        """
+        Await child predicates rather than treating coroutine objects as true.
+
+        Returns
+        -------
+        None
+            Assert awaited child rules on both conversion paths.
+        """
         class _AsyncCollection(Schema):
             contacts: list[_AsyncChild]
             count: int
@@ -412,7 +620,14 @@ class TestSchemaCollections(TestCase):
             self.assertIn("contacts[0].value", caught.exception.errors)
 
     async def testContainerAwaitsDirectAndCollectedControllerSchemas(self) -> None:
-        """Exercise the controller contract through real request injection."""
+        """
+        Exercise the controller contract through real request injection.
+
+        Returns
+        -------
+        None
+            Assert validated controller schemas through real request injection.
+        """
         container = _SchemaContainer()
         try:
             for controller, payload, path in (

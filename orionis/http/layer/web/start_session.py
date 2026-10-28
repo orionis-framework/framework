@@ -1,4 +1,5 @@
 from typing import TYPE_CHECKING
+from orionis.console.debug.dumper import HttpDump
 from orionis.failure.contracts.catch import ICatch
 from orionis.http.middleware import BaseMiddleware
 from orionis.session.flash import apply_flash
@@ -19,7 +20,7 @@ _SUCCESS_MAX: int = 300
 
 class StartSessionMiddleware(BaseMiddleware):
 
-    # ruff: noqa: TC001 (Dependency Injection)
+    # ruff: noqa: TC001, BLE001
 
     __slots__ = ("_catch", "_manager", "_track_previous_url")
 
@@ -100,10 +101,17 @@ class StartSessionMiddleware(BaseMiddleware):
         -------
         Response
             Normal response or the framework's exception response.
+
+        Raises
+        ------
+        HttpDump
+            If a dump must propagate to the HTTP kernel after session cleanup.
         """
         try:
             return await call_next()
-        except Exception as exc:  # noqa: BLE001
+        except HttpDump:
+            raise
+        except Exception as exc:
             return await self._catch.exception(exc, request)
 
     @staticmethod

@@ -1,0 +1,32 @@
+{% extends "__orionis__/default/base.html" %}
+
+{% block title %}{% autoescape true %}Variable Dump | {{ app_name }}{% endautoescape %}{% endblock %}
+
+{% block content %}{% autoescape true %}
+<main id="main-content" class="main-container" tabindex="-1" aria-labelledby="dump-title">
+    <div class="content-wrapper">
+        <div class="header-bar">
+            <div class="error-summary">
+                <p class="page-eyebrow">Debug Output</p>
+                <h1 id="dump-title" class="error-badge">
+                    <span class="error-badge-dot" aria-hidden="true"></span>
+                    <span class="error-badge-text">Variable Dump</span>
+                </h1>
+                <p class="error-message">Execution stopped for this request. The application is still running.</p>
+            </div>
+        </div>
+        <section class="diagnostic-section" aria-labelledby="dump-values-title">
+            <div class="card-header">
+                <h2 id="dump-values-title" class="card-header-title">Dumped Values</h2>
+            </div>
+            {{ dump_html }}
+        </section>
+    </div>
+</main>
+<template id="dump-copy-action">
+    <span class="dump-copy-status" data-dump-copy-status role="status"></span>
+    <button class="btn dump-copy" type="button" data-copy-dump aria-label="Copy dump content" title="Copy dump content">
+        {{ icon('copy') }}
+    </button>
+</template>
+{% endautoescape %}{% endblock %}

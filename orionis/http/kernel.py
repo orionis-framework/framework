@@ -10,7 +10,9 @@ from orionis.auth.middleware.resolve_identity import (
     ResolveSessionIdentityMiddleware,
     ResolveTokenIdentityMiddleware,
 )
+from orionis.console.debug.dumper import HttpDump
 from orionis.console.output.http_request import HTTPRequestPrinter
+from orionis.container.context.manager import ScopeManager
 from orionis.container.entities.invocation import callable_plan, warm_controller_plan
 from orionis.failure.contracts.catch import ICatch
 from orionis.failure.enums.kernel_type import KernelContext
@@ -973,6 +975,45 @@ class KernelHTTP(IKernelHTTP):
         -------
         Response
             Appropriate HTTP response for the given exception type.
+
+        """
+        try:
+            if isinstance(exc, HttpDump):
+                raise exc
+            return await self.__exceptionResponse(exc, request, policy)
+        except HttpDump as dump:
+            if not self.__app.isDebug():
+                return await self.__exceptionResponse(
+                    RuntimeError(str(dump)), request, policy,
+                )
+            try:
+                html = dump.dumper.toHtml(insert_line=dump.insert_line)
+                return await self.__default_responses.dump(html)
+            except Exception as error:
+                return await self.__exceptionResponse(error, request, policy)
+
+    async def __exceptionResponse(
+        self,
+        exc: Exception,
+        request: object,
+        policy: IHttpEndpointPolicy | None,
+    ) -> Response:
+        """
+        Apply endpoint policies and application handling to an ordinary error.
+
+        Parameters
+        ----------
+        exc : Exception
+            Error to report or translate.
+        request : object
+            Typed request or the adapter used before routing.
+        policy : IHttpEndpointPolicy | None
+            Optional endpoint-specific failure policy.
+
+        Returns
+        -------
+        Response
+            Response produced by ordinary failure handling.
         """
         if policy is not None:
             return await policy.exception(exc, request)
@@ -1038,15 +1079,15 @@ class KernelHTTP(IKernelHTTP):
         interface: Interface,
         adapter: TransportAdapter,
         receive_or_protocol: object,
-        request_context: object,
+        request_context: ScopeManager,
         policy: IHttpEndpointPolicy | None = None,
     ) -> Response:
         """
         Build the HTTP response for this request.
 
         Runs global middleware, rate limiting, route resolution, and the
-        handler pipeline.  All exceptions are delegated to
-        ``__handleException``.
+        handler pipeline. Debug dumps interrupt only this request with an
+        HTML response; ordinary errors are delegated to ``__handleException``.
 
         Parameters
         ----------
@@ -1056,7 +1097,7 @@ class KernelHTTP(IKernelHTTP):
             Protocol adapter carrying request metadata.
         receive_or_protocol : object
             ASGI receive callable or RSGI HTTPProtocol instance.
-        request_context : object
+        request_context : ScopeManager
             Active DI request scope for per-request bindings.
 
         policy : IHttpEndpointPolicy | None
@@ -1067,8 +1108,7 @@ class KernelHTTP(IKernelHTTP):
         Response
             The fully constructed HTTP response.
         """
-        # Tag the active scope with the HTTP kernel context identifier.
-        request_context.set("kernel", _KERNEL_CONTEXT)  # type: ignore[union-attr]
+        request_context.set("kernel", _KERNEL_CONTEXT)
         # Start the request timer only when the debug printer is active.
         if self.__printer_enabled:
             self.__request_printer.startTimer()
@@ -1115,13 +1155,13 @@ class KernelHTTP(IKernelHTTP):
                 params=resolved_route.params,
                 body_limits=self.__body_limits,
             )
-            request_context[Request] = request  # type: ignore[index]
+            request_context[Request] = request
 
             # Dispatch through the web or API middleware pipeline.
             return await self.__routeLayer(request, resolved_route)
 
         except Exception as e:
-            # Delegate all exceptions to the unified exception handler.
+            # Delegate all ordinary exceptions to the unified exception handler.
             return await self.__handleException(e, request, policy)
 
     async def handleRSGI(

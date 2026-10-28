@@ -9,6 +9,7 @@ CORE_PROVIDER_METADATA: tuple[tuple[str, str], ...] = (
     ("orionis.cache.provider", "CacheProvider"),
     ("orionis.failure.provider", "CatchProvider"),
     ("orionis.database.provider", "ConnectionManagerProvider"),
+    ("orionis.console.debug.provider", "DumperProvider"),
     ("orionis.encrypter.provider", "EncrypterProvider"),
     ("orionis.hashing.provider", "HashProvider"),
     ("orionis.localization.provider", "LocalizationProvider"),

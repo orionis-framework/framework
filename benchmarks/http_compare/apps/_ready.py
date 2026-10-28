@@ -1,6 +1,19 @@
 import os
 from pathlib import Path
 
+WORKER_PATH = "/_benchmark/worker"
+
+def worker_id() -> str:
+    """
+    Return the process identity used by startup markers and HTTP probes.
+
+    Returns
+    -------
+    str
+        Current worker process ID.
+    """
+    return str(os.getpid())
+
 def mark_ready() -> None:
     """
     Publish the current worker's readiness marker when tracking is enabled.
@@ -15,4 +28,4 @@ def mark_ready() -> None:
     if directory:
         ready_directory = Path(directory)
         ready_directory.mkdir(parents=True, exist_ok=True)
-        (ready_directory / str(os.getpid())).touch()
+        (ready_directory / worker_id()).touch()

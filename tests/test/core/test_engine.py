@@ -89,11 +89,35 @@ class _StubApp:
             self._config.update(config)
 
     def config(self, key: str) -> object:
-        """Return the configured value, or None when the key is unknown."""
+        """
+        Return the configured value, or None when the key is unknown.
+
+        Parameters
+        ----------
+        key : str
+            Configuration key requested by the testing engine.
+
+        Returns
+        -------
+        object
+            Configured value, or None when the key is absent.
+        """
         return self._config.get(key)
 
     def path(self, key: str) -> Path:
-        """Return the requested application path used by the engine."""
+        """
+        Return the requested application path used by the engine.
+
+        Parameters
+        ----------
+        key : str
+            Application path key requested by the testing engine.
+
+        Returns
+        -------
+        Path
+            Framework storage path for its dedicated key, otherwise storage.
+        """
         if key == "storage_framework":
             return self._storage / "framework"
         return self._storage
@@ -117,26 +141,92 @@ class _BareApp:
         self._storage: Path = storage
 
     def config(self, _key: str) -> object:
-        """Return None for every key, as an application without the section."""
+        """
+        Return None for every key, as an application without the section.
+
+        Parameters
+        ----------
+        _key : str
+            Unused configuration key requested by the engine.
+
+        Returns
+        -------
+        None
+            Signal that the application has no matching configuration.
+        """
         return None
 
     def path(self, key: str) -> Path:
-        """Return the requested application path used by the engine."""
+        """
+        Return the requested application path used by the engine.
+
+        Parameters
+        ----------
+        key : str
+            Application path key requested by the testing engine.
+
+        Returns
+        -------
+        Path
+            Framework storage path for its dedicated key, otherwise storage.
+        """
         if key == "storage_framework":
             return self._storage / "framework"
         return self._storage
 
 def _engine_state(engine: TestingEngine, name: str) -> object:
-    """Read a private engine attribute to verify configuration handling."""
+    """
+    Read a private engine attribute to verify configuration handling.
+
+    Parameters
+    ----------
+    engine : TestingEngine
+        Engine whose private configuration state is inspected.
+    name : str
+        Unmangled name of the private attribute.
+
+    Returns
+    -------
+    object
+        Value stored in the requested private engine attribute.
+    """
     return getattr(engine, f"_TestingEngine__{name}")
 
 def _write_module(directory: Path, name: str, source: str) -> None:
-    """Write a generated module inside the given directory."""
+    """
+    Write a generated module inside the given directory.
+
+    Parameters
+    ----------
+    directory : Path
+        Destination directory created when necessary.
+    name : str
+        Module name without the Python file suffix.
+    source : str
+        Python source written with UTF-8 encoding.
+
+    Returns
+    -------
+    None
+        Create the directory and write the generated module.
+    """
     directory.mkdir(parents=True, exist_ok=True)
     (directory / f"{name}.py").write_text(source, encoding="utf-8")
 
 def _count_import_entries(entry: str) -> int:
-    """Count how many times a directory is registered for imports."""
+    """
+    Count how many times a directory is registered for imports.
+
+    Parameters
+    ----------
+    entry : str
+        Directory entry to count in the import search path.
+
+    Returns
+    -------
+    int
+        Number of matching entries registered in sys.path.
+    """
     return sys.path.count(entry)
 
 def _project_alias(directory: Path) -> Path:
@@ -203,12 +293,31 @@ class _EngineTestCase(TestCase):
         shutil.rmtree(self._root, ignore_errors=True)
 
     def _makeEngine(self, config: dict[str, object] | None = None) -> TestingEngine:
-        """Build an engine bound to a stubbed application."""
+        """
+        Build an engine bound to a stubbed application.
+
+        Parameters
+        ----------
+        config : dict[str, object] | None, optional
+            Configuration overrides passed to the application double.
+
+        Returns
+        -------
+        TestingEngine
+            Engine using the fixture's application and storage paths.
+        """
         app = _StubApp(self._root, self._storage, config)
         return TestingEngine(app)  # type: ignore[arg-type]
 
     def _cacheFolder(self) -> Path:
-        """Return the folder where cached reports are expected."""
+        """
+        Return the folder where cached reports are expected.
+
+        Returns
+        -------
+        Path
+            Testing report cache directory under framework storage.
+        """
         return self._storage / "framework" / "cache" / "testing"
 
 class TestTestingEngineConfiguration(_EngineTestCase):
@@ -283,7 +392,14 @@ class TestTestingEngineConfiguration(_EngineTestCase):
 class TestTestingEngineConfigurationFallbacks(_EngineTestCase):
 
     def _makeBareEngine(self) -> TestingEngine:
-        """Build an engine bound to an application without configuration."""
+        """
+        Build an engine bound to an application without configuration.
+
+        Returns
+        -------
+        TestingEngine
+            Engine bound to an application with no configuration section.
+        """
         return TestingEngine(_BareApp(self._root, self._storage))  # type: ignore[arg-type]
 
     def testMissingVerbosityFallsBackToTheDetailedLevel(self) -> None:
@@ -447,7 +563,14 @@ class TestTestingEngineSetters(_EngineTestCase):
 class TestTestingEngineDiscovery(_EngineTestCase):
 
     async def testDiscoverResolvesProjectAliases(self) -> None:
-        """Import and run tests when the project root uses a filesystem alias."""
+        """
+        Import and run tests when the project root uses a filesystem alias.
+
+        Returns
+        -------
+        None
+            Assert discovery and execution through an aliased project root.
+        """
         _write_module(self._suite_dir, "test_passing", _PASSING_SOURCE)
         try:
             alias = _project_alias(self._root)
@@ -504,14 +627,28 @@ class TestTestingEngineDiscovery(_EngineTestCase):
         self.assertEqual(engine.discover().countTestCases(), 1)
 
     def testDiscoverRejectsModulesThatCannotBeImported(self) -> None:
-        """Propagate syntax errors instead of silently omitting a test module."""
+        """
+        Propagate syntax errors instead of silently omitting a test module.
+
+        Returns
+        -------
+        None
+            Assert propagation of syntax errors during module discovery.
+        """
         _write_module(self._suite_dir, "test_passing", _PASSING_SOURCE)
         _write_module(self._suite_dir, "test_broken", _BROKEN_SOURCE)
         with self.assertRaises(SyntaxError):
             self._makeEngine().discover()
 
     async def testImportFailureSurvivesMethodFilter(self) -> None:
-        """Report import failures even when no method matches the filter."""
+        """
+        Report import failures even when no method matches the filter.
+
+        Returns
+        -------
+        None
+            Assert import failure reporting despite an unmatched method filter.
+        """
         _write_module(
             self._suite_dir, "test_broken", "import _orionis_missing_test_dependency\n",
         )

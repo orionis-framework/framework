@@ -24,23 +24,51 @@ class TestIDirectoryContract(TestCase):
     """Test the application directory contract."""
 
     def testIsAnAbstractClass(self) -> None:
-        """Verify that IDirectory is an abstract ABC."""
+        """
+        Verify that IDirectory is an abstract ABC.
+
+        Returns
+        -------
+        None
+            Assert that the directory contract is an abstract base class.
+        """
         self.assertTrue(issubclass(IDirectory, ABC))
         self.assertTrue(isabstract(IDirectory))
         with self.assertRaises(TypeError):
             IDirectory()  # type: ignore[abstract]
 
     def testDeclaresEveryCorePathAccessor(self) -> None:
-        """Verify that the contract mirrors CORE_APP_PATHS exactly."""
+        """
+        Verify that the contract mirrors CORE_APP_PATHS exactly.
+
+        Returns
+        -------
+        None
+            Assert an exact match between contract accessors and core paths.
+        """
         expected = {"root", *(_method_name(key) for key in CORE_APP_PATHS)}
         self.assertEqual(IDirectory.__abstractmethods__, expected)
 
     def testDeclaresEmptySlots(self) -> None:
-        """Verify that the contract does not add instance attributes."""
+        """
+        Verify that the contract does not add instance attributes.
+
+        Returns
+        -------
+        None
+            Assert that the contract declares empty slots.
+        """
         self.assertEqual(IDirectory.__slots__, ())
 
     def testAccessorSignaturesAcceptOnlySelf(self) -> None:
-        """Verify that each accessor has the expected method signature."""
+        """
+        Verify that each accessor has the expected method signature.
+
+        Returns
+        -------
+        None
+            Assert that every accessor accepts only the instance parameter.
+        """
         for method_name in IDirectory.__abstractmethods__:
             self.assertEqual(
                 list(signature(getattr(IDirectory, method_name)).parameters),

@@ -4,14 +4,15 @@ import math
 import os
 import unittest
 from argparse import Namespace
-from contextlib import redirect_stderr, redirect_stdout
+from contextlib import chdir, redirect_stderr, redirect_stdout
 from io import StringIO
 from pathlib import Path
 from tempfile import TemporaryDirectory
 from typing import Any
-from unittest.mock import Mock, patch
+from unittest.mock import Mock, call, patch
 from defusedxml import ElementTree
 from benchmarks.http_compare import run as compare_run
+from benchmarks.http_compare.apps import orionis as orionis_benchmark
 from benchmarks.http_compare.client import parse_measurement
 from benchmarks.http_compare.report import (
     METRICS,
@@ -22,12 +23,12 @@ from benchmarks.http_compare.report import (
 
 def _measurement() -> dict[str, Any]:
     """
-    Build realistic oha output with HTTP and transport failures.
+    Build an oha payload with HTTP errors and transport failures.
 
     Returns
     -------
     dict[str, Any]
-        Raw payload with mixed outcomes, timings, and an inflated client rate.
+        Mixed outcomes and timings with a deliberately inflated client rate.
     """
     # Inflate the client rate to prove throughput is recomputed from HTTP 200.
     return {
@@ -39,12 +40,12 @@ def _measurement() -> dict[str, Any]:
 
 def _successful_runs() -> list[dict[str, int | float]]:
     """
-    Build three successful runs with unequal load and latency distributions.
+    Build three normalized runs with unequal durations and latencies.
 
     Returns
     -------
     list[dict[str, int | float]]
-        Normalized runs with distinct durations, rates, and latency statistics.
+        Successful per-run measurements for unweighted-median assertions.
     """
     # Unequal durations expose accidental pooling or weighted averages.
     samples = []
@@ -61,14 +62,38 @@ def _successful_runs() -> list[dict[str, int | float]]:
         }))
     return samples
 
+def _probe_connection(worker_pid: int) -> Mock:
+    """
+    Mock two text responses followed by a worker-identity response.
+
+    Parameters
+    ----------
+    worker_pid : int
+        Process ID returned by the worker-discovery response.
+
+    Returns
+    -------
+    Mock
+        Persistent HTTP connection yielding the three prepared responses.
+    """
+    responses = []
+    for body in (b"Hello World", b"Hello World", str(worker_pid).encode("ascii")):
+        response = Mock(status=200, version=11, will_close=False)
+        response.read.return_value = body
+        response.getheader.return_value = "text/plain; charset=utf-8"
+        responses.append(response)
+    connection = Mock()
+    connection.getresponse.side_effect = responses
+    return connection
+
 def _chart_report() -> dict[str, Any]:
     """
-    Build a synthetic comparison with distinct aggregated throughput values.
+    Build a synthetic five-framework throughput comparison.
 
     Returns
     -------
     dict[str, Any]
-        Complete five-framework fixture for chart rendering, not published data.
+        Complete chart input with fixture values, not published measurements.
     """
     rates = {
         "fastapi": 17200,
@@ -105,12 +130,12 @@ class TestMeasurements(unittest.TestCase):
 
     def test_success_throughput_and_latency_units(self) -> None:
         """
-        Verify HTTP 200 throughput and latency conversion to milliseconds.
+        Verify HTTP 200 throughput, error counts, and millisecond latencies.
 
         Returns
         -------
         None
-            Assert exact counts, elapsed time, successful throughput, and latencies.
+            This test does not return a value.
         """
         # Compare the complete shape so missing or additional metrics are visible.
         self.assertEqual(parse_measurement(_measurement()), {
@@ -126,12 +151,12 @@ class TestMeasurements(unittest.TestCase):
 
     def test_measurement_rejects_absent_successes_or_zero_elapsed(self) -> None:
         """
-        Reject runs that cannot define successful-request throughput.
+        Verify that missing successes or zero elapsed time invalidate a run.
 
         Returns
         -------
         None
-            Assert rejection of absent HTTP 200 responses and zero elapsed time.
+            This test does not return a value.
         """
         # Keep one rate component valid while invalidating the other.
         for statuses, elapsed in (
@@ -149,12 +174,12 @@ class TestMeasurements(unittest.TestCase):
 
     def test_measurement_rejects_invalid_numbers(self) -> None:
         """
-        Reject invalid numeric counts and timings.
+        Verify that measurements reject invalid counts and timings.
 
         Returns
         -------
         None
-            Assert rejection of invalid values and fractional request counts.
+            This test does not return a value.
         """
         # Cover every numeric payload field, not only successful-request counts.
         fields = (
@@ -184,12 +209,12 @@ class TestMeasurements(unittest.TestCase):
 
     def test_statistics_are_medians_of_individual_runs(self) -> None:
         """
-        Verify equally weighted medians across independent runs.
+        Verify equally weighted per-run medians and accumulated totals.
 
         Returns
         -------
         None
-            Assert per-run medians and totals that exclude duration weighting.
+            This test does not return a value.
         """
         result = aggregate_samples(_successful_runs())
 
@@ -206,12 +231,12 @@ class TestMeasurements(unittest.TestCase):
 
     def test_one_failing_run_invalidates_comparative_metrics(self) -> None:
         """
-        Verify that one failing run invalidates all comparative metrics.
+        Verify that one failing run suppresses all comparative metrics.
 
         Returns
         -------
         None
-            Assert retained samples and diagnostics without published medians.
+            This test does not return a value.
         """
         # Mix healthy and errored samples to prevent cherry-picking valid runs.
         runs = _successful_runs()
@@ -228,28 +253,153 @@ class TestMeasurements(unittest.TestCase):
 
     def test_empty_measurements_cannot_publish_a_result(self) -> None:
         """
-        Require at least one measured run before aggregation.
+        Verify that aggregation rejects an empty sample sequence.
 
         Returns
         -------
         None
-            Assert that an empty sample sequence raises ``ValueError``.
+            This test does not return a value.
         """
         # An empty run must fail rather than publish a success-shaped result.
         with self.assertRaises(ValueError):
             aggregate_samples([])
+
+class TestOrionisApplication(unittest.TestCase):
+    """Verify isolated routes and nonblocking worker readiness tracking."""
+
+    def test_ready_kernel_is_published_without_fixed_delay(self) -> None:
+        """
+        Verify that a ready kernel publishes readiness without a fixed delay.
+
+        Returns
+        -------
+        None
+            This test does not return a value.
+        """
+        loop = Mock()
+        app = Mock(isHttpReady=True)
+        with (
+            patch.dict(os.environ, {"BENCHMARK_READY_DIR": "enabled"}),
+            patch.object(
+                orionis_benchmark.asyncio, "get_running_loop", return_value=loop,
+            ),
+            patch.object(orionis_benchmark, "mark_ready") as ready,
+        ):
+            orionis_benchmark._track_readiness(app)
+
+            loop.call_soon.assert_called_once()
+            loop.call_later.assert_not_called()
+            publish = loop.call_soon.call_args.args[0]
+            ready.assert_not_called()
+
+            publish()
+
+            ready.assert_called_once_with()
+            loop.call_later.assert_not_called()
+
+    def test_slow_kernel_is_not_published_before_it_is_ready(self) -> None:
+        """
+        Verify that readiness retries stop once the HTTP kernel is ready.
+
+        Returns
+        -------
+        None
+            This test does not return a value.
+        """
+        loop = Mock()
+        app = Mock(isHttpReady=False)
+        with (
+            patch.dict(os.environ, {"BENCHMARK_READY_DIR": "enabled"}),
+            patch.object(
+                orionis_benchmark.asyncio, "get_running_loop", return_value=loop,
+            ),
+            patch.object(orionis_benchmark, "mark_ready") as ready,
+        ):
+            orionis_benchmark._track_readiness(app)
+            loop.call_soon.assert_called_once()
+            publish = loop.call_soon.call_args.args[0]
+
+            publish()
+
+            ready.assert_not_called()
+            loop.call_later.assert_called_once_with(0.01, publish)
+
+            app.isHttpReady = True
+            publish()
+
+            ready.assert_called_once_with()
+            loop.call_later.assert_called_once_with(0.01, publish)
+
+    def test_standalone_startup_does_not_schedule_tracking(self) -> None:
+        """
+        Verify that standalone startup skips benchmark readiness tracking.
+
+        Returns
+        -------
+        None
+            This test does not return a value.
+        """
+        with (
+            patch.dict(os.environ, {"BENCHMARK_READY_DIR": ""}),
+            patch.object(orionis_benchmark.asyncio, "get_running_loop") as loop,
+            patch.object(orionis_benchmark, "mark_ready") as ready,
+        ):
+            orionis_benchmark._track_readiness(Mock(isHttpReady=True))
+
+        loop.assert_not_called()
+        ready.assert_not_called()
+
+    def test_factory_stages_static_routes_inside_isolated_directory(self) -> None:
+        """
+        Verify isolated route staging and production HTTP startup.
+
+        Returns
+        -------
+        None
+            This test does not return a value.
+        """
+        app = Mock()
+        app.withRouting.return_value = app
+        app.withConfigApp.return_value = app
+        app.on.return_value = app
+        app.create.return_value = app
+        source = Path(orionis_benchmark.__file__).parent / "routes" / "web.py"
+        with (
+            TemporaryDirectory() as temporary,
+            chdir(temporary),
+            patch.object(
+                orionis_benchmark, "Application", return_value=app,
+            ) as application,
+        ):
+            result = orionis_benchmark.create_application()
+            directory = Path(temporary).resolve()
+            route_file = directory / f"_orionis_http_benchmark_{os.getpid()}.py"
+
+            self.assertEqual(route_file.read_bytes(), source.read_bytes())
+            application.assert_called_once_with(base_path=directory)
+            app.withRouting.assert_called_once_with(api=route_file.name)
+            app.withConfigApp.assert_called_once_with(
+                env="production", debug=False, maintenance=False,
+            )
+            app.on.assert_called_once_with(
+                orionis_benchmark.Lifespan.STARTUP,
+                orionis_benchmark._track_readiness,
+                runtime=orionis_benchmark.Runtime.HTTP,
+            )
+            app.create.assert_called_once_with()
+            self.assertIs(result, app)
 
 class TestBenchmarkRunner(unittest.TestCase):
     """Verify equal server settings, warmup isolation, and worker cleanup."""
 
     def test_frameworks_share_server_settings(self) -> None:
         """
-        Verify identical server settings across framework configurations.
+        Verify equal server settings across framework configurations.
 
         Returns
         -------
         None
-            Assert that only the application target and native interface differ.
+            This test does not return a value.
         """
         # Normalize only permitted differences before comparing full commands.
         reference = compare_run.server_command(
@@ -265,15 +415,183 @@ class TestBenchmarkRunner(unittest.TestCase):
                 command[interface_index] = reference[interface_index]
                 self.assertEqual(command, reference)
 
-    def test_warmup_is_retained_but_excluded_from_measured_results(self) -> None:
+    def test_first_requests_prime_every_worker_before_readiness(self) -> None:
         """
-        Verify that retained warmup data cannot affect measured results.
+        Verify that readiness requires real requests on every worker.
 
         Returns
         -------
         None
-            Assert measured totals, medians, run durations, and server cleanup.
+            This test does not return a value.
         """
+        process = Mock()
+        process.poll.return_value = None
+        for workers in range(1, 5):
+            with self.subTest(workers=workers), TemporaryDirectory() as temporary:
+                ready = Path(temporary)
+                pids = list(range(5678, 5678 + workers))
+                for pid in pids:
+                    (ready / str(pid)).touch()
+                visits = [pids[0], *pids] if workers > 1 else pids
+                connections = [_probe_connection(pid) for pid in visits]
+                with (
+                    patch.object(compare_run, "track_children"),
+                    patch.object(compare_run, "check_workers"),
+                    patch.object(
+                        compare_run.http.client, "HTTPConnection",
+                        side_effect=connections,
+                    ) as connect,
+                    patch.object(compare_run.time, "sleep"),
+                ):
+                    compare_run.wait_until_ready(process, 8000, ready, workers, {})
+
+                self.assertEqual(connect.call_count, len(visits))
+                for connection in connections:
+                    self.assertEqual(connection.request.call_args_list, [
+                        call("GET", "/"),
+                        call("GET", "/"),
+                        call("GET", "/_benchmark/worker"),
+                    ])
+                    self.assertEqual(connection.getresponse.call_count, 3)
+                    connection.close.assert_called_once_with()
+
+    def test_missing_worker_times_out_before_measurements(self) -> None:
+        """
+        Verify that an unvisited live worker causes readiness to time out.
+
+        Returns
+        -------
+        None
+            This test does not return a value.
+        """
+        process = Mock()
+        process.poll.return_value = None
+        connection = _probe_connection(5678)
+        with TemporaryDirectory() as temporary:
+            ready = Path(temporary)
+            for pid in (5678, 5679):
+                (ready / str(pid)).touch()
+            with (
+                patch.object(compare_run, "track_children"),
+                patch.object(compare_run, "check_workers"),
+                patch.object(
+                    compare_run.http.client, "HTTPConnection",
+                    return_value=connection,
+                ),
+                patch.object(compare_run.time, "sleep"),
+                patch.object(
+                    compare_run.time, "monotonic", side_effect=[0, 0, 61],
+                ),
+                self.assertRaisesRegex(TimeoutError, "1/2"),
+            ):
+                compare_run.wait_until_ready(process, 8000, ready, 2, {})
+
+        connection.close.assert_called_once_with()
+
+    def test_probe_rejects_an_unowned_worker_identity(self) -> None:
+        """
+        Verify that readiness rejects worker identities outside the owned set.
+
+        Returns
+        -------
+        None
+            This test does not return a value.
+        """
+        process = Mock()
+        process.poll.return_value = None
+        connection = _probe_connection(9999)
+        with TemporaryDirectory() as temporary:
+            ready = Path(temporary)
+            (ready / "5678").touch()
+            with (
+                patch.object(compare_run, "track_children"),
+                patch.object(compare_run, "check_workers"),
+                patch.object(
+                    compare_run.http.client, "HTTPConnection",
+                    return_value=connection,
+                ),
+                self.assertRaisesRegex(RuntimeError, "9999"),
+            ):
+                compare_run.wait_until_ready(process, 8000, ready, 1, {})
+
+        connection.close.assert_called_once_with()
+
+    def test_preparation_rejects_invalid_http_responses(self) -> None:
+        """
+        Verify probe status, payload, media type, and keep-alive checks.
+
+        Returns
+        -------
+        None
+            This test does not return a value.
+        """
+        for status, body, content_type, version, will_close in (
+            (500, b"Hello World", "text/plain", 11, False),
+            (200, b"Hello World\n", "text/plain", 11, False),
+            (200, b"Hello World", "application/json", 11, False),
+            (200, b"Hello World", "text/plain", 10, False),
+            (200, b"Hello World", "text/plain", 11, True),
+        ):
+            with self.subTest(
+                status=status, body=body, content_type=content_type,
+                version=version, will_close=will_close,
+            ):
+                response = Mock(
+                    status=status, version=version, will_close=will_close,
+                )
+                response.read.return_value = body
+                response.getheader.return_value = content_type
+                connection = Mock()
+                connection.getresponse.return_value = response
+                with self.assertRaises(RuntimeError):
+                    compare_run._probe_response(connection, "/", b"Hello World")
+                response.read.assert_called_once_with()
+
+    def test_failed_preparation_never_starts_load(self) -> None:
+        """
+        Verify that failed preparation prevents load and cleans up the server.
+
+        Returns
+        -------
+        None
+            This test does not return a value.
+        """
+        process = Mock()
+        args = Namespace(warmup=2, duration=10, connections=100, repetitions=3)
+        row = {"status": "pending"}
+        with TemporaryDirectory() as temporary:
+            output = Path(temporary)
+            (output / "logs").mkdir()
+            with (
+                patch.object(compare_run.subprocess, "Popen", return_value=process),
+                patch.object(
+                    compare_run, "wait_until_ready",
+                    side_effect=TimeoutError("1/2 workers primed"),
+                ),
+                patch.object(compare_run, "run_load") as load,
+                patch.object(compare_run, "stop_server") as stop,
+                self.assertRaisesRegex(TimeoutError, "1/2"),
+            ):
+                compare_run.benchmark_case(
+                    compare_run.FRAMEWORKS["orionis-rsgi"], 2, args,
+                    output / "oha", output, [], row,
+                )
+
+        load.assert_not_called()
+        stop.assert_called_once_with(process, {})
+        self.assertNotIn("warmup", row)
+        self.assertNotIn("samples", row)
+
+    def test_warmup_is_retained_but_excluded_from_measured_results(self) -> None:
+        """
+        Verify that retained warmup samples never affect measured results.
+
+        Returns
+        -------
+        None
+            This test does not return a value.
+        """
+        self.assertEqual(compare_run.build_parser().parse_args([]).warmup, 2)
         # Make warmup much faster than measured runs to expose contamination.
         raw = _measurement()
         raw["statusCodeDistribution"] = {"200": 1000000}
@@ -285,6 +603,7 @@ class TestBenchmarkRunner(unittest.TestCase):
         process.poll.return_value = None
         args = Namespace(warmup=2, duration=10, connections=100, repetitions=3)
         row = {"status": "pending"}
+        order = Mock()
 
         with TemporaryDirectory() as temporary:
             output = Path(temporary)
@@ -292,13 +611,15 @@ class TestBenchmarkRunner(unittest.TestCase):
             (output / "raw").mkdir()
             with (
                 patch.object(compare_run.subprocess, "Popen", return_value=process),
-                patch.object(compare_run, "wait_until_ready"),
+                patch.object(compare_run, "wait_until_ready") as prepare,
                 patch.object(compare_run, "check_workers") as check,
                 patch.object(compare_run, "stop_server") as stop,
                 patch.object(
                     compare_run, "run_load", side_effect=[warmup, *measured],
                 ) as load,
             ):
+                order.attach_mock(prepare, "prepare")
+                order.attach_mock(load, "load")
                 compare_run.benchmark_case(
                     compare_run.FRAMEWORKS["starlette"], 1, args,
                     output / "oha", output, [], row,
@@ -312,17 +633,21 @@ class TestBenchmarkRunner(unittest.TestCase):
         self.assertEqual(
             [call.args[2] for call in load.call_args_list], [2, 10, 10, 10],
         )
+        self.assertEqual(
+            [entry[0] for entry in order.mock_calls],
+            ["prepare", "load", "load", "load", "load"],
+        )
         self.assertEqual(check.call_count, 4)
         stop.assert_called_once_with(process, {})
 
     def test_cleanup_stops_known_workers_after_supervisor_has_exited(self) -> None:
         """
-        Verify cleanup of a known Windows worker after its supervisor exits.
+        Verify cleanup and kill escalation for an orphaned Windows worker.
 
         Returns
         -------
         None
-            Assert termination, kill escalation, and reaping of the owned worker.
+            This test does not return a value.
         """
         # Model an orphan that survives graceful termination and requires a kill.
         process = Mock(pid=1234)
@@ -349,12 +674,12 @@ class TestBenchmarkRunner(unittest.TestCase):
 
     def test_worker_markers_require_a_living_owned_process(self) -> None:
         """
-        Reject startup markers without a live owned worker.
+        Verify that readiness markers identify live, owned workers.
 
         Returns
         -------
         None
-            Assert rejection of both dead workers and unrelated process IDs.
+            This test does not return a value.
         """
         # A live foreign PID must fail just as a dead owned worker does.
         for scenario, marker_pid in (("dead", 5678), ("foreign", 9999)):
@@ -375,12 +700,12 @@ class TestBenchmarkRunner(unittest.TestCase):
 
     def test_main_preserves_partial_samples_and_continues(self) -> None:
         """
-        Verify partial failure reporting and continuation to subsequent cases.
+        Verify that partial failures retain samples and allow later cases.
 
         Returns
         -------
         None
-            Assert failure status, retained samples, and later valid results.
+            This test does not return a value.
         """
         # Keep actual CLI orchestration and artifact persistence under test.
         samples = _successful_runs()
@@ -399,34 +724,34 @@ class TestBenchmarkRunner(unittest.TestCase):
             row: dict[str, Any],
         ) -> None:
             """
-            Simulate a late worker failure or aggregate a healthy configuration.
+            Simulate a late FastAPI failure or aggregate healthy measurements.
 
             Parameters
             ----------
             framework : compare_run.Framework
-                Framework selecting the simulated execution outcome.
+                Framework whose name selects failure or success.
             _workers : int
-                Requested worker count, unused by the simulation.
+                Worker count, unused by this test double.
             _args : Namespace
-                Parsed load settings, unused by the simulation.
+                Parsed settings, unused by this test double.
             _oha : Path
-                Load-generator path, unused by the simulation.
+                Load-generator path, unused by this test double.
             _output : Path
-                Artifact directory, unused by the simulation.
+                Output directory, unused by this test double.
             _commands : list[dict[str, Any]]
-                Invocation log, unused by the simulation.
+                Command log, unused by this test double.
             row : dict[str, Any]
-                Result row to mutate before returning or raising.
+                Result row populated with complete or partial measurements.
 
             Returns
             -------
             None
-                Update a healthy row with aggregate metrics.
+                Update the result row with successful aggregate metrics.
 
             Raises
             ------
             RuntimeError
-                If FastAPI is selected, after storing partial measurements.
+                If FastAPI is selected, after recording one partial sample.
             """
             # Leave partial metrics behind to exercise late-failure cleanup.
             if framework.name == "fastapi":
@@ -479,12 +804,12 @@ class TestBenchmarkRunner(unittest.TestCase):
 
     def test_successful_main_writes_chart_from_saved_report(self) -> None:
         """
-        Verify chart persistence only after a successful comparison.
+        Verify that a successful run saves charts matching its saved report.
 
         Returns
         -------
         None
-            Assert that the saved chart exactly represents the saved report.
+            This test does not return a value.
         """
         with TemporaryDirectory() as temporary:
             output = Path(temporary) / "results"
@@ -539,12 +864,12 @@ class TestThroughputCharts(unittest.TestCase):
 
     def test_svg_uses_sorted_three_worker_medians(self) -> None:
         """
-        Verify ranking, exact scaling, worker filtering, and measurement context.
+        Verify SVG ranking, scaling, worker filtering, and benchmark context.
 
         Returns
         -------
         None
-            Assert XML structure, bar widths, rate labels, and environment text.
+            This test does not return a value.
         """
         report = _chart_report()
         report["results"].append({
@@ -580,12 +905,12 @@ class TestThroughputCharts(unittest.TestCase):
 
     def test_chart_rejects_incomplete_failed_or_errored_results(self) -> None:
         """
-        Reject comparisons that would omit or misrepresent selected frameworks.
+        Verify that charts reject incomplete or failed comparison data.
 
         Returns
         -------
         None
-            Assert explicit errors for missing, duplicate, and failed results.
+            This test does not return a value.
         """
         for scenario in ("missing", "duplicate", "failed", "errors", "setup"):
             with self.subTest(scenario=scenario):
@@ -607,12 +932,12 @@ class TestThroughputCharts(unittest.TestCase):
 
     def test_chart_rejects_invalid_rates(self) -> None:
         """
-        Reject invalid numeric values rather than drawing misleading bars.
+        Verify that charts reject invalid numeric throughput rates.
 
         Returns
         -------
         None
-            Assert that invalid rates cannot produce a successful chart.
+            This test does not return a value.
         """
         for rate in (0, -1, math.nan, math.inf, -math.inf, True, "100"):
             with self.subTest(rate=rate):
@@ -623,12 +948,12 @@ class TestThroughputCharts(unittest.TestCase):
 
     def test_chart_escapes_labels_and_environment(self) -> None:
         """
-        Preserve dynamic text without allowing it to become SVG markup.
+        Verify that SVG labels and environment values remain escaped text.
 
         Returns
         -------
         None
-            Assert valid XML and literal framework and environment labels.
+            This test does not return a value.
         """
         report = _chart_report()
         label = 'Framework <preview> & "quoted"'
@@ -646,12 +971,12 @@ class TestComparisonReports(unittest.TestCase):
 
     def test_artifacts_preserve_valid_data_and_label_failures(self) -> None:
         """
-        Verify consistent artifacts with explicit failed-result placeholders.
+        Verify consistent report artifacts and explicit failure placeholders.
 
         Returns
         -------
         None
-            Assert matching JSON, CSV, Markdown, and environment metadata.
+            This test does not return a value.
         """
         # Pair a valid row with an errored row to expose invented failure metrics.
         good = {

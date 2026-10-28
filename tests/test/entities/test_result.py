@@ -31,7 +31,19 @@ _REQUIRED_FIELDS: frozenset[str] = frozenset({
 })
 
 def _make_result(**overrides: object) -> TestResult:
-    """Build a TestResult supplying only the required fields by default."""
+    """
+    Build a TestResult supplying only the required fields by default.
+
+    Parameters
+    ----------
+    **overrides : object
+        Result fields replacing the minimal fixture values.
+
+    Returns
+    -------
+    TestResult
+        Result built from the required defaults and supplied overrides.
+    """
     values: dict[str, object] = {
         "id": 1,
         "name": "tests.sample.TestSample.testSample",

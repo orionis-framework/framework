@@ -16,11 +16,39 @@ _CONTRACT_METHODS: tuple[str, ...] = (
 )
 
 def _noop_implementation(self: object, *_args: object, **_kwargs: object) -> object:
-    """Return the instance itself, satisfying the fluent contract."""
+    """
+    Return the instance itself, satisfying the fluent contract.
+
+    Parameters
+    ----------
+    self : object
+        Engine double returned to satisfy the fluent contract.
+    *_args : object
+        Unused positional arguments accepted by contract methods.
+    **_kwargs : object
+        Unused keyword arguments accepted by contract methods.
+
+    Returns
+    -------
+    object
+        The same engine double supplied as the instance.
+    """
     return self
 
 def _make_engine(*, skip: str | None = None) -> type:
-    """Create a concrete engine implementing the contract except one member."""
+    """
+    Create a concrete engine implementing the contract except one member.
+
+    Parameters
+    ----------
+    skip : str | None, optional
+        Contract member to leave unimplemented, if any.
+
+    Returns
+    -------
+    type
+        Generated engine class with the selected concrete implementations.
+    """
     namespace = {
         name: _noop_implementation
         for name in _CONTRACT_METHODS

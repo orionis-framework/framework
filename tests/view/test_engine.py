@@ -29,7 +29,24 @@ class _StubTemplate:
         self.calls: list[dict[str, object]] = []
 
     async def render_async(self, **context: object) -> str:
-        """Return the canned HTML or raise the configured error."""
+        """
+        Return the canned HTML or raise the configured error.
+
+        Parameters
+        ----------
+        **context : object
+            Template values captured for rendering assertions.
+
+        Returns
+        -------
+        str
+            Configured HTML output.
+
+        Raises
+        ------
+        Exception
+            If a rendering failure is configured on the template double.
+        """
         self.calls.append(context)
         if self.error is not None:
             raise self.error
@@ -59,7 +76,24 @@ class _StubJinjaEnvironment:
         self.requested: list[str] = []
 
     def get_template(self, path: str) -> _StubTemplate | None:
-        """Return the stubbed template or raise the configured error."""
+        """
+        Return the stubbed template or raise the configured error.
+
+        Parameters
+        ----------
+        path : str
+            Template path captured for lookup assertions.
+
+        Returns
+        -------
+        _StubTemplate | None
+            Configured template lookup result.
+
+        Raises
+        ------
+        Exception
+            If a lookup failure is configured on the environment double.
+        """
         self.requested.append(path)
         if self.error is not None:
             raise self.error
@@ -82,7 +116,14 @@ class _StubViewEnvironment:
         self.calls: int = 0
 
     def getJinjaEnvironment(self) -> _StubJinjaEnvironment:
-        """Return the stubbed Jinja2 environment."""
+        """
+        Return the stubbed Jinja2 environment.
+
+        Returns
+        -------
+        _StubJinjaEnvironment
+            Stored Jinja2 environment after recording the lookup.
+        """
         self.calls += 1
         return self.jinja
 
@@ -216,7 +257,14 @@ class TestJinja2EngineNormalisePath(TestCase):
                       engine_module._PATH_CACHE)
 
     def testNormalisePathCacheHandlesConcurrentMisses(self) -> None:
-        """Keep cache insertion and eviction valid across concurrent misses."""
+        """
+        Keep cache insertion and eviction valid across concurrent misses.
+
+        Returns
+        -------
+        None
+            Assert valid cache insertion and eviction under concurrent misses.
+        """
         templates = [f"concurrent{index}" for index in range(2048)]
 
         with ThreadPoolExecutor(max_workers=16) as workers:

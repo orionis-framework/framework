@@ -27,7 +27,19 @@ class _StubApp:
         self.requested: list[str] = []
 
     def config(self, key: str) -> object:
-        """Return the stubbed view configuration for the requested key."""
+        """
+        Return the stubbed view configuration for the requested key.
+
+        Parameters
+        ----------
+        key : str
+            Configuration key captured by the application double.
+
+        Returns
+        -------
+        object
+            Stubbed view configuration regardless of the requested key.
+        """
         self.requested.append(key)
         return self.view_config
 
@@ -364,7 +376,14 @@ class TestViewEnvironment(TestCase):
         self.assertTrue(env.getJinjaEnvironment().autoescape("application.html"))
 
     def testBuiltinAutoescapeDoesNotChangeApplicationConfiguration(self) -> None:
-        """Always escape built-ins while honouring the application's flag."""
+        """
+        Always escape built-ins while honouring the application's flag.
+
+        Returns
+        -------
+        None
+            Assert built-in escaping independently of the application flag.
+        """
         app = self._buildApp()
         app.view_config["autoescape"] = False
         env = ViewEnvironment(app).getJinjaEnvironment()

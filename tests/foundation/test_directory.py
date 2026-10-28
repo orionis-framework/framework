@@ -59,11 +59,25 @@ class TestDirectory(TestCase):
     """Test the application directory accessors."""
 
     def testImplementsIDirectory(self) -> None:
-        """Verify that Directory implements its public contract."""
+        """
+        Verify that Directory implements its public contract.
+
+        Returns
+        -------
+        None
+            Assert implementation of the public directory contract.
+        """
         self.assertIsInstance(Directory(_StubApplication()), IDirectory)
 
     def testExposesEveryCorePath(self) -> None:
-        """Verify that every CORE_APP_PATHS key has a matching accessor."""
+        """
+        Verify that every CORE_APP_PATHS key has a matching accessor.
+
+        Returns
+        -------
+        None
+            Assert an accessor for every configured core path.
+        """
         directory = Directory(_StubApplication())
         expected = {"root", *(_method_name(key) for key in CORE_APP_PATHS)}
         actual = {
@@ -76,7 +90,14 @@ class TestDirectory(TestCase):
             self.assertIsInstance(getattr(directory, method_name)(), Path)
 
     def testAccessorsReturnTheConfiguredPaths(self) -> None:
-        """Verify that accessors return values from application.path()."""
+        """
+        Verify that accessors return values from application.path().
+
+        Returns
+        -------
+        None
+            Assert that accessors return the application's configured paths.
+        """
         app = _StubApplication()
         directory = Directory(app)
         self.assertEqual(directory.root(), app.paths["root"])

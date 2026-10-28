@@ -1,9 +1,9 @@
 # Comparación HTTP de Orionis, FastAPI, Litestar y Starlette
 
 Esta suite compara cinco configuraciones en una misma máquina: Orionis RSGI,
-Orionis ASGI, FastAPI, Litestar y Starlette. Todas usan Granian y una ruta `GET /`
-que construye una respuesta de texto `200 OK` con el cuerpo exacto `Hello World`
-(11 bytes, sin comillas ni salto de línea).
+Orionis ASGI, FastAPI, Litestar y Starlette. Todas usan Granian y miden una ruta
+`GET /` que construye una respuesta de texto `200 OK` con el cuerpo exacto
+`Hello World` (11 bytes, sin comillas ni salto de línea).
 
 Orionis utiliza `Application`, su cargador real de rutas y `response.text()`.
 Las dos interfaces comparten la misma aplicación. Así se puede comparar Orionis
@@ -74,10 +74,36 @@ binario oficial y verifica su SHA-256. Puedes proporcionar uno existente con
 
 ## Cómo se mide
 
-Cada caso inicia un servidor aislado, verifica sus workers y comprueba dos
-respuestas consecutivas en la misma conexión: HTTP/1.1, `200`, `text/plain` y
-el cuerpo exacto `Hello World`. Después realiza el calentamiento, las mediciones
-y la limpieza del servidor antes de pasar al siguiente caso.
+Cada caso sigue estas fases, iguales para todos los frameworks:
+
+1. Inicia un servidor aislado y verifica que todos sus workers estén vivos.
+2. Envía dos `GET /` consecutivos sobre una misma conexión keep-alive y consume
+   ambas respuestas completas: HTTP/1.1, `200`, `text/plain` y el cuerpo exacto
+   `Hello World`. La primera petición permite inicializar cachés del recorrido
+   HTTP; la segunda comprueba la respuesta en caliente. Ninguna se mide.
+3. En esa misma conexión consulta `GET /_benchmark/worker`, un endpoint auxiliar
+   que devuelve el PID. Solo considera preparado ese worker si el PID pertenece
+   al servidor. Abre conexiones nuevas hasta haber preparado **cada worker**,
+   sin confundir varias peticiones al mismo proceso con varios workers.
+4. Ejecuta `--warmup`: **2 segundos de tráfico HTTP real por defecto**, no una
+   pausa fija. Conserva este resultado separado de las métricas.
+5. Inicia las mediciones y finalmente limpia el servidor.
+
+Si un worker no llega a completar la preparación dentro del timeout de inicio,
+el caso falla en lugar de medirlo en frío. No se incluyen las peticiones de
+preparación ni las de calentamiento en los conteos, tiempos, latencias o tasas
+publicados.
+
+Orionis no espera artificialmente 2 segundos al arrancar: publica su señal nativa
+cuando `isHttpReady` es verdadero. Eso no sustituye la primera petición HTTP real
+descartada de cada worker. La ruta medida no lleva contadores, escritura de
+marcadores ni cabeceras adicionales de seguimiento; el endpoint de PID solo se
+usa durante la preparación, fuera de las mediciones.
+
+El archivo de rutas de Orionis, [`apps/routes/web.py`](apps/routes/web.py),
+se copia una sola vez por worker al directorio aislado, con un nombre de módulo
+único. Así se conserva el cargador real sin importar rutas del proyecto anfitrión
+ni escribir archivos compartidos entre workers.
 
 Todos los frameworks comparten los parámetros de servidor y carga de la tabla
 anterior; solo cambian la aplicación y su interfaz. El cliente espera las
@@ -142,9 +168,9 @@ una misma rama se serializan para evitar publicaciones fuera de orden.
 uv run --no-sync python -B -m unittest tests.test_http_compare -v
 ```
 
-Estas pruebas no generan carga: verifican contabilidad, medianas, exclusión del
-calentamiento, parámetros compartidos, limpieza, fallos, coherencia de reportes
-y generación de las gráficas SVG.
+Estas pruebas no generan carga: verifican contabilidad, medianas, preparación
+de cada worker y exclusión de la primera petición y del calentamiento, parámetros
+compartidos, limpieza, fallos, coherencia de reportes y gráficas SVG.
 
 ## Límites
 

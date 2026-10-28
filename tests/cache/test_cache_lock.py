@@ -251,7 +251,14 @@ class TestCacheLock(TestCase):
         await holder_task
 
     async def testSeparateDirectoriesHaveIndependentLocks(self) -> None:
-        """Allow equal keys in separate cache directories to acquire together."""
+        """
+        Allow equal keys in separate cache directories to acquire together.
+
+        Returns
+        -------
+        None
+            Assert independent lock acquisition for separate directories.
+        """
         other = FileCacheBackend(Path(self._tmpdir.name) / "other")
         async with (
             CacheLock(self._backend, "shared") as first,
@@ -260,7 +267,14 @@ class TestCacheLock(TestCase):
             self.assertIsNot(first._impl, second._impl)
 
     async def testSameDirectorySharesLocksAcrossBackends(self) -> None:
-        """Serialize backends that address the same cache directory."""
+        """
+        Serialize backends that address the same cache directory.
+
+        Returns
+        -------
+        None
+            Assert mutual exclusion across backends sharing a directory.
+        """
         other = FileCacheBackend(Path(self._tmpdir.name) / ".")
         async with CacheLock(self._backend, "shared"):
             with self.assertRaises(TimeoutError):
@@ -268,14 +282,28 @@ class TestCacheLock(TestCase):
                     self.fail("The second backend acquired a held lock.")
 
     async def testReleasedLocksDoNotAccumulate(self) -> None:
-        """Discard registry entries after their last holder and waiter leave."""
+        """
+        Discard registry entries after their last holder and waiter leave.
+
+        Returns
+        -------
+        None
+            Assert removal of unused lock registry entries.
+        """
         for index in range(100):
             async with CacheLock(self._backend, str(index)):
                 self.assertEqual(len(_FILE_LOCKS), 1)
         self.assertEqual(len(_FILE_LOCKS), 0)
 
     async def testCanceledWaiterPreservesHolder(self) -> None:
-        """Keep the held lock registered when another task stops waiting."""
+        """
+        Keep the held lock registered when another task stops waiting.
+
+        Returns
+        -------
+        None
+            Assert that a cancelled waiter does not release the holder's lock.
+        """
         async with CacheLock(self._backend, "shared") as holder:
             waiter = CacheLock(self._backend, "shared")
             task = asyncio.create_task(waiter.__aenter__())
@@ -289,7 +317,14 @@ class TestCacheLock(TestCase):
                     self.fail("The canceled waiter replaced the held lock.")
 
     async def testDifferentEventLoopsHaveIndependentLocks(self) -> None:
-        """Keep asyncio locks isolated between event loops."""
+        """
+        Keep asyncio locks isolated between event loops.
+
+        Returns
+        -------
+        None
+            Assert that different event loops use independent locks.
+        """
         async def acquire_lock() -> asyncio.Lock:
             """Acquire the key within the worker event loop.
 

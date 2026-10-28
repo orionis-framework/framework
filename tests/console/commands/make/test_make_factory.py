@@ -55,7 +55,14 @@ class _RecordedFactory(MakeFactory):
     """Capture command output with an explicit console test double."""
 
     def __init__(self) -> None:
-        """Initialize independent argument and output collections."""
+        """
+        Initialize independent argument and output collections.
+
+        Returns
+        -------
+        None
+            Prepare separate collections for captured arguments and output.
+        """
         super().__init__()
         self.successes: list[str] = []
         self.errors: list[str] = []
@@ -125,7 +132,14 @@ class TestMakeFactory(TestCase):
     """Verify factory generation, import conventions, and CLI registration."""
 
     async def testAsyncHandleCreatesFilesOutsideTheEventLoopThread(self) -> None:
-        """Run stub rendering and writes in a worker without changing output."""
+        """
+        Run stub rendering and writes in a worker without changing output.
+
+        Returns
+        -------
+        None
+            Assert worker-thread file generation and unchanged command output.
+        """
         with TemporaryDirectory() as temporary:
             command = _ThreadRecordedFactory()
             command.setArguments({"name": "UserFactory"})
@@ -135,7 +149,14 @@ class TestMakeFactory(TestCase):
             self.assertEqual(command.errors, [])
 
     def testRegistersCommandAndParsesOptionalModel(self) -> None:
-        """Register one factory command and parse the standard argument forms."""
+        """
+        Register one factory command and parse the standard argument forms.
+
+        Returns
+        -------
+        None
+            Assert command registration and optional model argument parsing.
+        """
         self.assertEqual(
             sum(command.signature == "make:factory" for command in CORE_COMMANDS),
             1,
@@ -149,7 +170,14 @@ class TestMakeFactory(TestCase):
             self.assertEqual(parsed.model, "User" if flags else MISSING)
 
     async def testInfersModelAndCreatesSnakeCaseFile(self) -> None:
-        """Infer User and generate a minimal, documented Python factory."""
+        """
+        Infer User and generate a minimal, documented Python factory.
+
+        Returns
+        -------
+        None
+            Assert model inference and the generated factory's file contents.
+        """
         with TemporaryDirectory() as temporary:
             root = Path(temporary)
             command = _RecordedFactory()
@@ -179,7 +207,14 @@ class TestMakeFactory(TestCase):
             self.assertEqual(command.errors, [])
 
     def testExplicitModelOverridesInference(self) -> None:
-        """Generate a named scenario factory for an explicit application model."""
+        """
+        Generate a named scenario factory for an explicit application model.
+
+        Returns
+        -------
+        None
+            Assert that an explicit model takes precedence over inference.
+        """
         with TemporaryDirectory() as temporary:
             root = Path(temporary)
             command = MakeFactory()
@@ -192,7 +227,14 @@ class TestMakeFactory(TestCase):
             self.assertIn("from app.models.user import User", content)
 
     def testGeneratedFactoryImportsAndMakesTheRealModel(self) -> None:
-        """Execute the generated skeleton against the real application model."""
+        """
+        Execute the generated skeleton against the real application model.
+
+        Returns
+        -------
+        None
+            Assert that the generated factory instantiates the real model.
+        """
         with TemporaryDirectory() as temporary:
             root = Path(temporary)
             MakeFactory().createFiles(_Application(root), "UserFactory")
@@ -208,7 +250,14 @@ class TestMakeFactory(TestCase):
             self.assertIsNone(user.id)
 
     def testNestedNamesAndSuffixesFollowPythonConventions(self) -> None:
-        """Preserve nested packages and add the factory suffix exactly once."""
+        """
+        Preserve nested packages and add the factory suffix exactly once.
+
+        Returns
+        -------
+        None
+            Assert nested package naming and a single factory suffix.
+        """
         for name in (
             "sales/OrderFactory",
             "sales/order_factory.py",
@@ -224,7 +273,14 @@ class TestMakeFactory(TestCase):
                 self.assertIn("from app.models.sales.order import Order", content)
 
     def testExplicitNestedModelUsesConfiguredPackage(self) -> None:
-        """Resolve the import from the actual configured models directory."""
+        """
+        Resolve the import from the actual configured models directory.
+
+        Returns
+        -------
+        None
+            Assert imports based on the configured models directory.
+        """
         with TemporaryDirectory() as temporary:
             root = Path(temporary)
             command = MakeFactory()
@@ -240,7 +296,14 @@ class TestMakeFactory(TestCase):
             self.assertIn("class PaidInvoiceFactory(Factory[Invoice]):", content)
 
     def testAcronymsRetainTheirClassName(self) -> None:
-        """Keep explicit acronym class names while producing snake case files."""
+        """
+        Keep explicit acronym class names while producing snake case files.
+
+        Returns
+        -------
+        None
+            Assert preservation of acronym class names and snake case paths.
+        """
         with TemporaryDirectory() as temporary:
             root = Path(temporary)
             MakeFactory().createFiles(_Application(root), "APIKeyFactory")
@@ -251,7 +314,14 @@ class TestMakeFactory(TestCase):
             self.assertIn("from app.models.api_key import APIKey", content)
 
     async def testExistingFactoryIsNeverOverwritten(self) -> None:
-        """Report a duplicate target without replacing application code."""
+        """
+        Report a duplicate target without replacing application code.
+
+        Returns
+        -------
+        None
+            Assert that duplicate generation leaves the existing file intact.
+        """
         with TemporaryDirectory() as temporary:
             root = Path(temporary)
             target = root / "database/factories/user_factory.py"
@@ -269,7 +339,14 @@ class TestMakeFactory(TestCase):
             self.assertIn("already exists", command.errors[0])
 
     def testUnsafeNamesFailBeforeWriting(self) -> None:
-        """Reject traversals, invalid identifiers, and empty inferred models."""
+        """
+        Reject traversals, invalid identifiers, and empty inferred models.
+
+        Returns
+        -------
+        None
+            Assert rejection of unsafe names before any file is written.
+        """
         for name in (
             "../User", "/User", "C:/User", "a//User", "Factory", "class",
             "Us\u00e9r", "User\u0661",
@@ -281,7 +358,14 @@ class TestMakeFactory(TestCase):
                 self.assertEqual(list(root.rglob("*.py")), [])
 
     def testInvalidModelNamesFailBeforeWriting(self) -> None:
-        """Reject model names that could create invalid or injected imports."""
+        """
+        Reject model names that could create invalid or injected imports.
+
+        Returns
+        -------
+        None
+            Assert rejection of model names that would produce invalid imports.
+        """
         for model in (
             "", "../User", "User; pass", "user\nimport os", "class", "False", 1,
             "Us\u00e9r", "User\u0661",
@@ -295,7 +379,14 @@ class TestMakeFactory(TestCase):
                 self.assertEqual(list(root.rglob("*.py")), [])
 
     async def testMissingNameUsesTheStandardCommandErrorFlow(self) -> None:
-        """Report missing positional input through inherited generator output."""
+        """
+        Report missing positional input through inherited generator output.
+
+        Returns
+        -------
+        None
+            Assert the standard error output for a missing factory name.
+        """
         with TemporaryDirectory() as temporary:
             command = _RecordedFactory()
             await command.handle(_Application(Path(temporary)))

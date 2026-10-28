@@ -29,11 +29,37 @@ _EXPECTED_HOOKS: frozenset[str] = frozenset({
 })
 
 def _probe_method(_self: object) -> str:
-    """Return a sentinel value so wrapped execution can be observed."""
+    """
+    Return a sentinel value so wrapped execution can be observed.
+
+    Parameters
+    ----------
+    _self : object
+        Unused instance receiving the wrapped probe call.
+
+    Returns
+    -------
+    str
+        Sentinel proving that wrapped execution forwards the result.
+    """
     return _PROBE_RESULT
 
 def _make_probe(name: str, member: object) -> type:
-    """Create a throwaway TestCase subclass exposing a single member."""
+    """
+    Create a throwaway TestCase subclass exposing a single member.
+
+    Parameters
+    ----------
+    name : str
+        Attribute name exposed on the generated test class.
+    member : object
+        Member assigned to that attribute.
+
+    Returns
+    -------
+    type
+        Temporary TestCase subclass exposing the supplied member.
+    """
     return type("_Probe", (CoreTestCase,), {name: member})
 
 class _McpServer(Server):
@@ -65,7 +91,14 @@ class TestTestCaseDefinition(TestCase):
         self.assertIn("TestCase", ancestors)
 
     async def testAsyncioDebugUsesPracticalSlowCallbackThreshold(self) -> None:
-        """Keep debug enabled while avoiding routine slow-task messages."""
+        """
+        Keep debug enabled while avoiding routine slow-task messages.
+
+        Returns
+        -------
+        None
+            Assert enabled debugging with a practical slow-callback threshold.
+        """
         loop = asyncio.get_running_loop()
         self.assertTrue(loop.get_debug())
         self.assertEqual(loop.slow_callback_duration, 1.0)

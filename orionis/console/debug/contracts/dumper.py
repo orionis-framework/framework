@@ -20,7 +20,7 @@ class IDumper(ABC):
         insert_line: bool = False,
     ) -> None:
         """
-        Dump variables to the console and terminate execution.
+        Dump variables and stop the current execution context.
 
         Parameters
         ----------
@@ -35,7 +35,7 @@ class IDumper(ABC):
         max_depth : int or None, optional
             Maximum depth for expansion. Default is None.
         module_path : str or None, optional
-            Path of the calling module. Default is None.
+            Source path for the header. HTTP defaults to the caller's filename.
         line_number : int or None, optional
             Line number of the call. Default is None.
         redirect_output : bool, optional
@@ -47,6 +47,17 @@ class IDumper(ABC):
         -------
         None
             This method does not return a value.
+
+        Raises
+        ------
+        RuntimeError
+            If HTTP dumping is attempted outside debug request dispatch.
+
+        Notes
+        -----
+        Debug HTTP requests receive an HTML response without terminating the
+        server. Source filename and line are captured at the dump call, before
+        HTTP exception handling. Console calls retain their termination behavior.
         """
 
     @staticmethod

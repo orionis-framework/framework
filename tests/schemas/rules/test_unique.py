@@ -298,7 +298,14 @@ class TestUniqueAsync(TestCase):
         )
 
     async def testCollectionsPreserveTheActiveTransactionOnBothPaths(self) -> None:
-        """Await list and map probes against uncommitted rows on the current loop."""
+        """
+        Await list and map probes against uncommitted rows on the current loop.
+
+        Returns
+        -------
+        None
+            Assert database probes within the active collection transaction.
+        """
         async with self._connection.transaction():
             await self._connection.insert(InsertPlan(
                 table=self._table, values=[{"code": "taken"}],
@@ -319,7 +326,14 @@ class TestUniqueAsync(TestCase):
                 )
 
     async def testFailedCollectionItemsStillAwaitTheirValidDatabaseFields(self) -> None:
-        """Collect nested type failures without skipping valid database probes."""
+        """
+        Collect nested type failures without skipping valid database probes.
+
+        Returns
+        -------
+        None
+            Assert valid database probes despite sibling conversion failures.
+        """
         await self._connection.insert(InsertPlan(
             table=self._table, values=[{"code": "taken"}],
         ))
@@ -337,7 +351,14 @@ class TestUniqueAsync(TestCase):
         })
 
     async def testCollectionValidationPropagatesCancellation(self) -> None:
-        """Cancel a suspended child probe without swallowing cancellation."""
+        """
+        Cancel a suspended child probe without swallowing cancellation.
+
+        Returns
+        -------
+        None
+            Assert propagation of cancellation from a suspended child probe.
+        """
         connection = _WaitingConnection()
         self._manager.current = connection
         pending = asyncio.create_task(Validator.validate({

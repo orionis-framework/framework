@@ -743,10 +743,42 @@ class TestThreadedRedshiftConnection(TestCase):
                 operation = getattr(dialect, "do_" + control)
 
                 def blocked(raw, callback=operation, blocker=gate):
+                    """
+                    Block transaction control until the test releases its gate.
+
+                    Parameters
+                    ----------
+                    raw : object
+                        Driver connection passed to transaction control.
+                    callback : Callable[[object], object], optional
+                        Original transaction-control callback captured for this case.
+                    blocker : _BlockingQuery, optional
+                        Gate delaying the driver callback.
+
+                    Returns
+                    -------
+                    object
+                        Result of the original transaction-control callback.
+                    """
                     blocker.wait()
                     return callback(raw)
 
                 async def transaction(operation=control, ready=reached_control):
+                    """
+                    Apply transaction control when the suspended task is cancelled.
+
+                    Parameters
+                    ----------
+                    operation : str, optional
+                        Commit or rollback method captured for this case.
+                    ready : asyncio.Event, optional
+                        Signal set after the insert and before waiting for cancellation.
+
+                    Returns
+                    -------
+                    None
+                        Finish the selected transaction control after cancellation.
+                    """
                     await self._connection.begin()
                     try:
                         await self._connection.execute(
@@ -840,6 +872,19 @@ class TestThreadedRedshiftConnection(TestCase):
             with self.subTest(control=control):
                 if control == "begin":
                     def fail_begin(_raw):
+                        """
+                        Simulate a driver failure while beginning a transaction.
+
+                        Parameters
+                        ----------
+                        _raw : object
+                            Unused connection supplied to the begin event.
+
+                        Raises
+                        ------
+                        SQLAlchemyError
+                            Always raised with the private driver payload.
+                        """
                         raise SQLAlchemyError(driver_payload)
 
                     event.listen(self._engine.sync_engine, "begin", fail_begin)
@@ -852,6 +897,22 @@ class TestThreadedRedshiftConnection(TestCase):
                     original = getattr(dialect, "do_" + control)
 
                     def fail_control(raw, callback=original):
+                        """
+                        Raise a driver error after completing transaction control.
+
+                        Parameters
+                        ----------
+                        raw : object
+                            Driver connection passed to transaction control.
+                        callback : Callable[[object], object], optional
+                            Original transaction-control callback captured for this
+                            case.
+
+                        Raises
+                        ------
+                        SQLAlchemyError
+                            Always raised after the original callback completes.
+                        """
                         callback(raw)
                         raise SQLAlchemyError(driver_payload)
 
@@ -888,6 +949,21 @@ class TestThreadedRedshiftConnection(TestCase):
                 original = getattr(dialect, "do_" + control)
 
                 def fail_control(raw, callback=original):
+                    """
+                    Simulate a driver failure after manual transaction control.
+
+                    Parameters
+                    ----------
+                    raw : object
+                        Driver connection passed to transaction control.
+                    callback : Callable[[object], object], optional
+                        Original transaction-control callback captured for this case.
+
+                    Raises
+                    ------
+                    SQLAlchemyError
+                        Always raised with a private driver message.
+                    """
                     callback(raw)
                     message = "private-driver-payload"
                     raise SQLAlchemyError(message)

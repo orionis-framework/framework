@@ -33,7 +33,26 @@ class _StubEngine:
         self.calls: list[tuple[str, dict[str, Any]]] = []
 
     async def render(self, template: str, context: dict[str, Any]) -> str:
-        """Return the canned HTML or raise the configured error."""
+        """
+        Return the canned HTML or raise the configured error.
+
+        Parameters
+        ----------
+        template : str
+            Template name captured for rendering assertions.
+        context : dict[str, Any]
+            Template values captured with the render call.
+
+        Returns
+        -------
+        str
+            Configured HTML output.
+
+        Raises
+        ------
+        Exception
+            If a rendering failure is configured on the engine double.
+        """
         self.calls.append((template, context))
         if self.error is not None:
             raise self.error

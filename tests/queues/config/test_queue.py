@@ -16,7 +16,14 @@ class TestQueueConfiguration(ConfigurationTestCase):
     __slots__ = ()
 
     def testQueueTuningReadsEnvironmentInBothLayers(self) -> None:
-        """Read worker limits and backend tuning from dedicated environment keys."""
+        """
+        Read worker limits and backend tuning from dedicated environment keys.
+
+        Returns
+        -------
+        None
+            Assert environment-backed worker and backend tuning in both layers.
+        """
         self.environment.values.update(
             QUEUE_SYNC_QUEUE="inline",
             QUEUE_SYNC_RETRY_AFTER=30.0,
@@ -51,7 +58,14 @@ class TestQueueConfiguration(ConfigurationTestCase):
         self.assertEqual(Worker().concurrency, 8)
 
     def testQueueTuningEnvironmentRemainsStrict(self) -> None:
-        """Reject invalid environment values without coercing configuration."""
+        """
+        Reject invalid environment values without coercing configuration.
+
+        Returns
+        -------
+        None
+            Assert strict rejection of invalid environment values.
+        """
         for name, value in (
             ("QUEUE_SYNC_QUEUE", False), ("QUEUE_SYNC_RETRY_AFTER", True),
             ("QUEUE_DB_QUEUE", "../escape"), ("QUEUE_DB_RETRY_AFTER", 0.0),
@@ -68,7 +82,14 @@ class TestQueueConfiguration(ConfigurationTestCase):
                     entity_type()
 
     def testExplicitSettingsOverrideEnvironmentAndOwnRetryLists(self) -> None:
-        """Prefer developer overrides and isolate environment-provided retries."""
+        """
+        Prefer developer overrides and isolate environment-provided retries.
+
+        Returns
+        -------
+        None
+            Assert override precedence and independent retry schedules.
+        """
         delays = [0.0, 1.0]
         self.environment.values.update(
             QUEUE_SYNC_QUEUE="environment",
@@ -87,7 +108,14 @@ class TestQueueConfiguration(ConfigurationTestCase):
         self.assertEqual(second.backoff, (0.0, 1.0))
 
     def testJobDiscoveryIsNotQueueConfiguration(self) -> None:
-        """Keep the application jobs path out of queue connection settings."""
+        """
+        Keep the application jobs path out of queue connection settings.
+
+        Returns
+        -------
+        None
+            Assert that job discovery is absent from connection configuration.
+        """
         for entity_type in (Queue, BootstrapQueue):
             self.assertNotIn("job_modules", {item.name for item in fields(entity_type)})
             self.assertNotIn("job_modules", entity_type().toDict())
@@ -95,7 +123,14 @@ class TestQueueConfiguration(ConfigurationTestCase):
             Queue(job_modules=("app.jobs",))
 
     def testRedisUsesStructuredSettingsInBothLayers(self) -> None:
-        """Read Redis host, port, database, and credentials without a URL field."""
+        """
+        Read Redis host, port, database, and credentials without a URL field.
+
+        Returns
+        -------
+        None
+            Assert structured Redis settings without a URL field.
+        """
         self.assertEqual(
             {item.name for item in fields(Redis)},
             {
@@ -117,7 +152,14 @@ class TestQueueConfiguration(ConfigurationTestCase):
             self.assertNotIn("url", config.toDict())
 
     def testNestedSettingsAreDataclasses(self) -> None:
-        """Keep backend, failure, and worker settings in validated dataclasses."""
+        """
+        Keep backend, failure, and worker settings in validated dataclasses.
+
+        Returns
+        -------
+        None
+            Assert dataclass-backed backend, failure, and worker settings.
+        """
         config = Queue()
         self.assertTrue(is_dataclass(config.connections))
         self.assertTrue(is_dataclass(config.failed))
@@ -126,7 +168,14 @@ class TestQueueConfiguration(ConfigurationTestCase):
             self.assertTrue(is_dataclass(getattr(config.connections, backend.name)))
 
     def testDefaultsAndBootstrapMatch(self) -> None:
-        """Produce independent canonical defaults in core and application config."""
+        """
+        Produce independent canonical defaults in core and application config.
+
+        Returns
+        -------
+        None
+            Assert matching defaults and independent configuration instances.
+        """
         config = Queue()
         self.assertEqual(config.toDict(), BootstrapQueue().toDict())
         self.assertEqual(config.default, "sync")
@@ -140,7 +189,14 @@ class TestQueueConfiguration(ConfigurationTestCase):
             config.default = "redis"
 
     def testEnvironmentValuesReachConnections(self) -> None:
-        """Read backend selection and credentials through the real Env contract."""
+        """
+        Read backend selection and credentials through the real Env contract.
+
+        Returns
+        -------
+        None
+            Assert environment-based connection and credential selection.
+        """
         self.environment.values.update(
             QUEUE_CONNECTION="redis",
             REDIS_HOST="redis.example.test", REDIS_PORT=6380, REDIS_DB=2,
@@ -163,7 +219,14 @@ class TestQueueConfiguration(ConfigurationTestCase):
         )
 
     def testCustomConnectionsAndPartialDefaults(self) -> None:
-        """Normalize named backends while preserving explicit worker values."""
+        """
+        Normalize named backends while preserving explicit worker values.
+
+        Returns
+        -------
+        None
+            Assert named backend normalization and explicit worker overrides.
+        """
         config = Queue(
             default="reports",
             connections={"reports": {"driver": "database", "queue": "high"}},
@@ -178,7 +241,14 @@ class TestQueueConfiguration(ConfigurationTestCase):
         self.assertIsNone(config.failed.connection)
 
     def testSettingsDoNotShareCallerState(self) -> None:
-        """Copy caller mappings and keep separate configuration instances."""
+        """
+        Copy caller mappings and keep separate configuration instances.
+
+        Returns
+        -------
+        None
+            Assert isolation from caller mappings and other instances.
+        """
         connections = {"local": {"driver": "sync", "queue": "emails"}}
         worker = {"backoff": [1.0]}
         failed = {"table": "failures"}
@@ -199,7 +269,14 @@ class TestQueueConfiguration(ConfigurationTestCase):
             second.connections["local"].queue = "changed"
 
     def testRejectsInvalidRoutingAndUnsupportedSettings(self) -> None:
-        """Reject unknown backends, unsafe names, and dead configuration keys."""
+        """
+        Reject unknown backends, unsafe names, and dead configuration keys.
+
+        Returns
+        -------
+        None
+            Assert rejection of unsafe routing and unsupported settings.
+        """
         cases = (
             {"default": "missing"},
             {"connections": []},
@@ -226,7 +303,14 @@ class TestQueueConfiguration(ConfigurationTestCase):
                 Queue(**settings)
 
     def testRejectsUnsafeLeaseAndRetryValues(self) -> None:
-        """Fail configuration before a worker can outlive its reservation."""
+        """
+        Fail configuration before a worker can outlive its reservation.
+
+        Returns
+        -------
+        None
+            Assert lease and retry validation before worker execution.
+        """
         cases = (
             {"timeout": 90.0},
             {"timeout": 0.0},
@@ -252,7 +336,14 @@ class TestQueueConfiguration(ConfigurationTestCase):
                 Queue(worker=worker)
 
     def testCompiledConfigurationWireRoundTrip(self) -> None:
-        """Restore msgspec retry lists to normalized tuple settings."""
+        """
+        Restore msgspec retry lists to normalized tuple settings.
+
+        Returns
+        -------
+        None
+            Assert normalized retry tuples after a msgspec wire round trip.
+        """
         original = Queue().toDict()
         restored = msgspec.msgpack.decode(msgspec.msgpack.encode(original))
         self.assertIsInstance(restored["worker"]["backoff"], list)
@@ -264,7 +355,14 @@ class TestQueueConfiguration(ConfigurationTestCase):
         self.assertIsInstance(normalized.connections["database"], Database)
 
     def testRejectsSharedDurableStorageNamespaces(self) -> None:
-        """Prevent named backend aliases from consuming another connection's jobs."""
+        """
+        Prevent named backend aliases from consuming another connection's jobs.
+
+        Returns
+        -------
+        None
+            Assert isolation of durable storage namespaces between backends.
+        """
         for driver in ("database", "redis"):
             with self.subTest(driver=driver), self.assertRaises(ValueError):
                 Queue(default="first", connections={
@@ -277,14 +375,28 @@ class TestQueueConfiguration(ConfigurationTestCase):
         self.assertEqual(len(config.connections), 2)
 
     def testRejectsFailureStorageSharingJobsTable(self) -> None:
-        """Reject incompatible job and failure schemas on the same database table."""
+        """
+        Reject incompatible job and failure schemas on the same database table.
+
+        Returns
+        -------
+        None
+            Assert rejection of a shared jobs and failures table.
+        """
         with self.assertRaises(ValueError):
             Queue(failed={"table": "jobs"})
         config = Queue(failed={"connection": "audit", "table": "jobs"})
         self.assertEqual(config.failed.connection, "audit")
 
     def testBootstrapExposesEveryCustomizableField(self) -> None:
-        """Keep all queue settings explicitly editable in application config."""
+        """
+        Keep all queue settings explicitly editable in application config.
+
+        Returns
+        -------
+        None
+            Assert that bootstrap configuration exposes every queue field.
+        """
         self.assertEqual(
             set(BootstrapQueue.__annotations__),
             {"default", "connections", "failed", "worker"},
@@ -303,7 +415,14 @@ class TestQueueConfiguration(ConfigurationTestCase):
             BootstrapQueue(worker=Worker(timeout=90.0))
 
     def testConventionalConnectionsConvertNestedMappings(self) -> None:
-        """Convert conventional backend mappings to their declared entities."""
+        """
+        Convert conventional backend mappings to their declared entities.
+
+        Returns
+        -------
+        None
+            Assert conversion of nested mappings into backend entities.
+        """
         connections = Connections(
             sync={"queue": "inline"},
             database={"table": "pending_jobs"},
@@ -324,7 +443,14 @@ class TestQueueConfiguration(ConfigurationTestCase):
                 Connections(**{name: value})
 
     def testNamedConnectionsAcceptTypedEntities(self) -> None:
-        """Preserve custom names without requiring untyped backend dictionaries."""
+        """
+        Preserve custom names without requiring untyped backend dictionaries.
+
+        Returns
+        -------
+        None
+            Assert support for typed entities under custom connection names.
+        """
         connection = Database(table="report_jobs", queue="high")
         config = Queue(
             default="reports", connections={"reports": connection},
@@ -340,7 +466,14 @@ class TestQueueConfiguration(ConfigurationTestCase):
             )
 
     def testConnectionEntitiesValidateWithoutQueue(self) -> None:
-        """Reject invalid driver, channel, and lease settings at entity creation."""
+        """
+        Reject invalid driver, channel, and lease settings at entity creation.
+
+        Returns
+        -------
+        None
+            Assert direct validation of backend routing and lease settings.
+        """
         for entity_type in (Sync, Database, Redis):
             for settings in (
                 {"driver": 1}, {"driver": "unsupported"},
@@ -357,7 +490,14 @@ class TestQueueConfiguration(ConfigurationTestCase):
             Redis(driver=Drivers.DATABASE)
 
     def testBackendAndFailureEntitiesValidateStorage(self) -> None:
-        """Reject malformed storage identifiers and Redis settings directly."""
+        """
+        Reject malformed storage identifiers and Redis settings directly.
+
+        Returns
+        -------
+        None
+            Assert direct validation of storage identifiers and Redis settings.
+        """
         for entity_type in (Database, Failed):
             for settings in (
                 {"connection": 1}, {"connection": "../escape"},
@@ -374,7 +514,14 @@ class TestQueueConfiguration(ConfigurationTestCase):
                 Redis(**settings)
 
     def testWorkerEntityOwnsBackoffAndRejectsInvalidValues(self) -> None:
-        """Validate worker values independently and freeze caller retry lists."""
+        """
+        Validate worker values independently and freeze caller retry lists.
+
+        Returns
+        -------
+        None
+            Assert worker validation and ownership of immutable retry values.
+        """
         delays = [0.0, 1.0]
         worker = Worker(backoff=delays)
         delays.append(2.0)
@@ -391,7 +538,14 @@ class TestQueueConfiguration(ConfigurationTestCase):
             worker.timeout = 1.0
 
     def testEnvironmentValuesRemainStrictInBothLayers(self) -> None:
-        """Reject invalid environment settings in core and bootstrap factories."""
+        """
+        Reject invalid environment settings in core and bootstrap factories.
+
+        Returns
+        -------
+        None
+            Assert strict environment validation in both configuration layers.
+        """
         for name, value in (
             ("QUEUE_CONNECTION", False), ("QUEUE_TABLE", "jobs.invalid"),
             ("REDIS_HOST", 1), ("QUEUE_DB_CONNECTION", False),
@@ -405,7 +559,14 @@ class TestQueueConfiguration(ConfigurationTestCase):
                     entity_type()
 
     def testRedisRejectsInvalidStructuredSettings(self) -> None:
-        """Enforce host, TCP port, database, and optional password types."""
+        """
+        Enforce host, TCP port, database, and optional password types.
+
+        Returns
+        -------
+        None
+            Assert type and value validation for structured Redis settings.
+        """
         for settings in (
             {"endpoint": 1}, {"endpoint": None}, {"endpoint": " "},
             {"port": True}, {"port": "6379"}, {"port": 1.5},
@@ -422,7 +583,14 @@ class TestQueueConfiguration(ConfigurationTestCase):
             Redis(url="redis://127.0.0.1:6379/0")
 
     def testRedisStorageNamespacesExcludeCredentials(self) -> None:
-        """Isolate storage by host, port, database, and prefix, not credentials."""
+        """
+        Isolate storage by host, port, database, and prefix, not credentials.
+
+        Returns
+        -------
+        None
+            Assert storage namespaces independent of authentication credentials.
+        """
         first = Redis(password=_CREDENTIAL)
         with self.assertRaises(ValueError):
             Queue(default="first", connections={

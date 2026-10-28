@@ -85,17 +85,38 @@ class TestExplicitInjection(TestCase):
     """Preserve caller arguments in the presence of dependency bindings."""
 
     def setUp(self) -> None:
-        """Create a container without an inherited request scope."""
+        """
+        Create a container without an inherited request scope.
+
+        Returns
+        -------
+        None
+            Prepare an isolated container and save the previous request scope.
+        """
         self.token = ScopedContext.setCurrentScope(None)
         self.container = object.__new__(Container)
         Container.__init__(self.container)
 
     def tearDown(self) -> None:
-        """Restore the request scope active before the test."""
+        """
+        Restore the request scope active before the test.
+
+        Returns
+        -------
+        None
+            Restore the request scope saved before the test.
+        """
         ScopedContext.reset(self.token)
 
     async def testExplicitConstructorArgumentWinsOverBinding(self) -> None:
-        """Use an explicit positional service in a bound constructor."""
+        """
+        Use an explicit positional service in a bound constructor.
+
+        Returns
+        -------
+        None
+            Assert that an explicit constructor service overrides its binding.
+        """
         bound = _Dependency()
         explicit = _Dependency()
         self.container.instance(None, bound)
@@ -105,7 +126,14 @@ class TestExplicitInjection(TestCase):
         self.assertIs(built.dependency, explicit)
 
     async def testExplicitActionArgumentWinsOverBinding(self) -> None:
-        """Use an explicit positional service in a bound action."""
+        """
+        Use an explicit positional service in a bound action.
+
+        Returns
+        -------
+        None
+            Assert that an explicit action service overrides its binding.
+        """
         bound = _Dependency()
         explicit = _Dependency()
         self.container.instance(None, bound)
@@ -115,7 +143,14 @@ class TestExplicitInjection(TestCase):
         self.assertIs(result, explicit)
 
     async def testExplicitPayloadSkipsRequestResolution(self) -> None:
-        """Use a supplied schema without resolving a request service."""
+        """
+        Use a supplied schema without resolving a request service.
+
+        Returns
+        -------
+        None
+            Assert that supplied schema data avoids request resolution.
+        """
         payload = _Payload(value=7)
 
         built = await self.container.build(_NeedsPayload, payload)
@@ -123,7 +158,14 @@ class TestExplicitInjection(TestCase):
         self.assertIs(built.payload, payload)
 
     async def testExplicitDependencySkipsDeferredProvider(self) -> None:
-        """Avoid starting a provider for a caller-supplied dependency."""
+        """
+        Avoid starting a provider for a caller-supplied dependency.
+
+        Returns
+        -------
+        None
+            Assert that explicit dependencies do not start deferred providers.
+        """
         path = f"{_Dependency.__module__}.{_Dependency.__name__}"
         self.container._deferred_providers[path] = {
             "module": "missing_provider_module",
@@ -136,12 +178,26 @@ class TestExplicitInjection(TestCase):
         self.assertIs(built.dependency, explicit)
 
     async def testUnhashableBuildTargetGetsClassError(self) -> None:
-        """Reject an invalid build target before dictionary lookups."""
+        """
+        Reject an invalid build target before dictionary lookups.
+
+        Returns
+        -------
+        None
+            Assert a class validation error for an unhashable build target.
+        """
         with self.assertRaisesRegex(TypeError, "expects a class type"):
             await self.container.build([])
 
     async def testNamedArgsAndKwargsRemainInjectable(self) -> None:
-        """Inject ordinary parameters named args and kwargs."""
+        """
+        Inject ordinary parameters named args and kwargs.
+
+        Returns
+        -------
+        None
+            Assert injection into ordinary parameters named args and kwargs.
+        """
         shared = _Dependency()
         self.container.instance(None, shared)
 

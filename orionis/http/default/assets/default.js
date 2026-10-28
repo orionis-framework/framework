@@ -52,8 +52,8 @@
             if (selectFrame(this.getAttribute('data-frame-target'))) {
                 event.preventDefault();
                 var selected = document.getElementById(this.getAttribute('data-frame-target'));
-                selected.focus({preventScroll: true});
-                selected.scrollIntoView({block: 'nearest'});
+                selected.focus({ preventScroll: true });
+                selected.scrollIntoView({ block: 'nearest' });
             }
         }
         function selectLocationFrame() {
@@ -69,6 +69,23 @@
         window.addEventListener('hashchange', selectLocationFrame);
     }
 
+    function copyText(button, status, text, messages) {
+        button.disabled = true;
+        status.textContent = '';
+        status.removeAttribute('data-copy-state');
+        navigator.clipboard.writeText(text).then(function () {
+            button.disabled = false;
+            button.title = messages.copiedTitle;
+            status.setAttribute('data-copy-state', 'success');
+            status.textContent = messages.success;
+        }, function () {
+            button.disabled = false;
+            button.title = messages.copyTitle;
+            status.setAttribute('data-copy-state', 'error');
+            status.textContent = messages.error;
+        });
+    }
+
     function enableCopyReport() {
         var button = document.getElementById('copy-exception');
         var status = document.getElementById('copy-status');
@@ -81,7 +98,7 @@
                 document.getElementById('main-error').textContent,
                 document.getElementById('main-description').textContent,
                 document.getElementById('request-method').textContent + ' ' +
-                    document.getElementById('request-path').textContent
+                document.getElementById('request-path').textContent
             ];
             var frames = document.querySelectorAll('[data-trace-frame]');
             for (var index = 0; index < frames.length; index += 1) {
@@ -93,18 +110,37 @@
                         rows[row].querySelector('.source-code').textContent);
                 }
             }
-            button.disabled = true;
-            status.textContent = '';
-            navigator.clipboard.writeText(report.join('\n')).then(function () {
-                button.disabled = false;
-                button.title = 'Report copied';
-                status.textContent = 'Exception report copied.';
-            }, function () {
-                button.disabled = false;
-                button.title = 'Copy exception report';
-                status.textContent = 'The exception report could not be copied.';
+            copyText(button, status, report.join('\n'), {
+                copyTitle: 'Copy exception report',
+                copiedTitle: 'Report copied',
+                success: 'Exception report copied.',
+                error: 'The exception report could not be copied.'
             });
         });
+    }
+
+    function enableDumpCopy() {
+        var template = document.getElementById('dump-copy-action');
+        if (!template || !navigator.clipboard || !navigator.clipboard.writeText) {
+            return;
+        }
+        function copyDump() {
+            var panel = this.closest('.dump-panel');
+            var code = panel.querySelector('.dump-output code');
+            var status = panel.querySelector('[data-dump-copy-status]');
+            copyText(this, status, code.textContent, {
+                copyTitle: 'Copy dump content',
+                copiedTitle: 'Dump content copied',
+                success: 'Copied',
+                error: 'Copy failed'
+            });
+        }
+        var panels = document.querySelectorAll('.dump-panel');
+        for (var index = 0; index < panels.length; index += 1) {
+            var action = template.content.cloneNode(true);
+            action.querySelector('[data-copy-dump]').addEventListener('click', copyDump);
+            panels[index].querySelector('.code-header-info').appendChild(action);
+        }
     }
 
     function highlightSource() {
@@ -128,7 +164,7 @@
                 var first = match[0].charAt(0);
                 token.className = first === '#' ? 'syntax-comment' :
                     (first === '"' || first === "'") ? 'syntax-string' :
-                    /[0-9]/.test(first) ? 'syntax-number' : 'syntax-keyword';
+                        /[0-9]/.test(first) ? 'syntax-number' : 'syntax-keyword';
                 token.textContent = match[0];
                 fragment.appendChild(token);
                 cursor = tokens.lastIndex;
@@ -146,6 +182,7 @@
         enableTraceNavigation();
         highlightSource();
         enableCopyReport();
+        enableDumpCopy();
     }
     if (document.readyState === 'loading') {
         document.addEventListener('DOMContentLoaded', initialize);

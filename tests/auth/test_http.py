@@ -244,7 +244,14 @@ class _HttpApp(auth_fixtures._StubApp):
 
     @property
     def routeHealthCheck(self) -> str:
-        """Provide the health route required by the HTTP kernel."""
+        """
+        Provide the health route required by the HTTP kernel.
+
+        Returns
+        -------
+        str
+            Health-check route path exposed by the application double.
+        """
         return "/health"
 
 class _HttpCatch:

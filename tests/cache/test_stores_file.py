@@ -598,7 +598,14 @@ class TestFileCacheBackendConcurrency(TestCase):
         self.assertEqual(await self._backend.get("hits"), 25)
 
     async def testConcurrentIncrementsAcrossBackendsDoNotLoseUpdates(self) -> None:
-        """Apply every increment from backends sharing one directory."""
+        """
+        Apply every increment from backends sharing one directory.
+
+        Returns
+        -------
+        None
+            Assert that concurrent backend increments preserve every update.
+        """
         other = FileCacheBackend(self._path)
         backends = (self._backend, other)
 
@@ -609,7 +616,14 @@ class TestFileCacheBackendConcurrency(TestCase):
         self.assertEqual(await self._backend.get("shared"), 60)
 
     async def testClearWaitsForStagedWriteBeforeRemovingTemp(self) -> None:
-        """Keep an active staging file until its write completes."""
+        """
+        Keep an active staging file until its write completes.
+
+        Returns
+        -------
+        None
+            Assert that cache clearing waits for an active staged write.
+        """
         staged = threading.Event()
         resume = threading.Event()
         original = FileCacheBackend._FileCacheBackend__replaceSync

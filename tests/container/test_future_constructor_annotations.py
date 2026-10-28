@@ -166,7 +166,14 @@ class TestFutureConstructorAnnotations(TestCase):
         self.assertEqual(plan.arguments[0].class_name, "UnknownDependency")
 
     async def testBuildInjectsMultipleDeferredConstructorTypes(self) -> None:
-        """Resolve all known constructor references into registered types."""
+        """
+        Resolve all known constructor references into registered types.
+
+        Returns
+        -------
+        None
+            Assert resolution and injection of deferred constructor types.
+        """
         first = _Dependency()
         second = _OtherDependency()
         self.container.instance(None, first)
@@ -178,7 +185,14 @@ class TestFutureConstructorAnnotations(TestCase):
         self.assertIs(built.second, second)
 
     def testUnknownReferencePreservesOtherResolvedHints(self) -> None:
-        """Resolve known hints when another constructor hint is unavailable."""
+        """
+        Resolve known hints when another constructor hint is unavailable.
+
+        Returns
+        -------
+        None
+            Assert that an unknown reference preserves other resolved hints.
+        """
         plan = constructor_plan(
             _NeedsKnownAndUnknown,
             _NeedsKnownAndUnknown.__init__,
@@ -188,7 +202,14 @@ class TestFutureConstructorAnnotations(TestCase):
         self.assertIs(plan.arguments[1].type, str)
 
     def testClassLocalReferencePreservesOtherResolvedHints(self) -> None:
-        """Resolve a local self reference alongside a module-level service."""
+        """
+        Resolve a local self reference alongside a module-level service.
+
+        Returns
+        -------
+        None
+            Assert resolution of class-local and module-level references.
+        """
 
         class LocalSelf:
             """Refer to its own class in a deferred constructor hint."""
@@ -216,7 +237,14 @@ class TestFutureConstructorAnnotations(TestCase):
         self.assertIs(plan.arguments[1].type, LocalSelf)
 
     async def testUnknownReferenceDoesNotInjectRegisteredString(self) -> None:
-        """Reject an unknown hint even when a string service is registered."""
+        """
+        Reject an unknown hint even when a string service is registered.
+
+        Returns
+        -------
+        None
+            Assert that an unresolved hint cannot select a string binding.
+        """
         self.container.instance(None, "string service")
 
         with self.assertRaisesRegex(TypeError, "Cannot resolve forward reference"):

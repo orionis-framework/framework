@@ -97,7 +97,14 @@ class _Worker:
     __slots__ = ("options", "stopped")
 
     def __init__(self) -> None:
-        """Initialize empty execution and shutdown records."""
+        """
+        Initialize empty execution and shutdown records.
+
+        Returns
+        -------
+        None
+            Prepare empty worker options and an unset shutdown flag.
+        """
         self.options: dict[str, object] = {}
         self.stopped = False
 
@@ -122,7 +129,14 @@ class _Worker:
         return 4
 
     def stop(self) -> None:
-        """Record a graceful shutdown request."""
+        """
+        Record a graceful shutdown request.
+
+        Returns
+        -------
+        None
+            Mark the worker as stopped.
+        """
         self.stopped = True
 
 
@@ -132,7 +146,14 @@ class _Repository:
     __slots__ = ("failures", "forgotten")
 
     def __init__(self) -> None:
-        """Initialize empty persistent failure records."""
+        """
+        Initialize empty persistent failure records.
+
+        Returns
+        -------
+        None
+            Prepare independent failure and deletion records.
+        """
         self.failures: tuple[FailedJob, ...] = ()
         self.forgotten: list[str] = []
 
@@ -169,7 +190,14 @@ class _Driver:
     __slots__ = ("cleared",)
 
     def __init__(self) -> None:
-        """Initialize cleared queue records."""
+        """
+        Initialize cleared queue records.
+
+        Returns
+        -------
+        None
+            Prepare an empty record of cleared queues.
+        """
         self.cleared: list[str] = []
 
     async def clear(self, queue: str) -> int:
@@ -198,7 +226,14 @@ class _Manager:
     )
 
     def __init__(self) -> None:
-        """Prepare independent command service doubles."""
+        """
+        Prepare independent command service doubles.
+
+        Returns
+        -------
+        None
+            Prepare isolated drivers, repositories, and worker observations.
+        """
         self.driver = _Driver()
         self.repository = _Repository()
         self.worker_object = _Worker()
@@ -256,7 +291,21 @@ class _Manager:
         return self.repository
 
     async def migrate(self) -> None:
-        """Record explicit storage preparation or propagate its configured error."""
+        """
+        Record explicit storage preparation or propagate its configured error.
+
+        Returns
+        -------
+        None
+            Increment the recorded migration count on success.
+
+        Raises
+        ------
+        QueueConfigurationError
+            If the configured failure is a queue configuration error.
+        DatabaseException
+            If the configured failure is a database error.
+        """
         if self.error is not None:
             raise self.error
         self.migrations += 1
@@ -350,7 +399,14 @@ class TestQueueCommands(TestCase):
     __slots__ = ()
 
     async def testCoreLoaderDiscoversEveryQueueCommand(self) -> None:
-        """Discover canonical command classes through the real core Loader."""
+        """
+        Discover canonical command classes through the real core Loader.
+
+        Returns
+        -------
+        None
+            Assert discovery of every canonical queue command.
+        """
         expected = {
             "make:job", "queue:work", "queue:failed", "queue:retry",
             "queue:forget", "queue:clear", "queue:migrate",
@@ -364,7 +420,14 @@ class TestQueueCommands(TestCase):
                 self.assertEqual(command.signature, signature)
 
     async def testMigratePreparesConfiguredStorage(self) -> None:
-        """Delegate migrations to the manager and report successful completion."""
+        """
+        Delegate migrations to the manager and report successful completion.
+
+        Returns
+        -------
+        None
+            Assert migration delegation and successful command output.
+        """
         manager = _Manager()
         command = _record(QueueMigrateCommand)
         self.assertEqual(await command.handle(manager), 0)
@@ -374,7 +437,14 @@ class TestQueueCommands(TestCase):
         ])
 
     async def testMigrateReportsDatabaseErrors(self) -> None:
-        """Report connection and DDL failures without a successful exit code."""
+        """
+        Report connection and DDL failures without a successful exit code.
+
+        Returns
+        -------
+        None
+            Assert failure reporting and a nonzero migration exit code.
+        """
         for error in (
             ConnectionNotFoundException("SQL connection is not configured."),
             QueryException("Queue table could not be created."),
@@ -390,7 +460,14 @@ class TestQueueCommands(TestCase):
                 ])
 
     def testWorkArgumentsPreservePriorityAndFlags(self) -> None:
-        """Parse the documented worker invocation with Reactor Argument."""
+        """
+        Parse the documented worker invocation with Reactor Argument.
+
+        Returns
+        -------
+        None
+            Assert parsing of worker priority and command flags.
+        """
         parser = argparse.ArgumentParser()
         for argument in QueueWorkCommand.arguments:
             argument.addToParser(parser)
@@ -404,7 +481,14 @@ class TestQueueCommands(TestCase):
         })
 
     async def testWorkRunsWithSelectedOptions(self) -> None:
-        """Forward priority, concurrency, and stopping options to the worker."""
+        """
+        Forward priority, concurrency, and stopping options to the worker.
+
+        Returns
+        -------
+        None
+            Assert forwarding of worker selection and stopping options.
+        """
         manager = _Manager()
         command = _record(QueueWorkCommand)
         command.setArguments({
@@ -421,7 +505,14 @@ class TestQueueCommands(TestCase):
         self.assertIn("4 attempt(s)", command.messages[0][1])
 
     async def testFailureListingAndEmptyOutput(self) -> None:
-        """Display stored original failures and the empty repository state."""
+        """
+        Display stored original failures and the empty repository state.
+
+        Returns
+        -------
+        None
+            Assert failure listing and empty-state output.
+        """
         manager = _Manager()
         command = _record(QueueFailedCommand)
         self.assertEqual(await command.handle(manager), 0)
@@ -436,7 +527,14 @@ class TestQueueCommands(TestCase):
         self.assertIn("ValueError: broken", message)
 
     async def testRetryForgetAndClearUseCanonicalServices(self) -> None:
-        """Retry failures, delete records, and clear only the selected channel."""
+        """
+        Retry failures, delete records, and clear only the selected channel.
+
+        Returns
+        -------
+        None
+            Assert retry, deletion, and clearing through canonical services.
+        """
         manager = _Manager()
         retry = _record(QueueRetryCommand)
         retry.setArguments({"id": "failed-id"})
@@ -457,7 +555,14 @@ class TestQueueCommands(TestCase):
         self.assertIn("2 job(s)", clear.messages[0][1])
 
     async def testInvalidBackendProducesFailureExitCode(self) -> None:
-        """Report queue service errors without successful command exit codes."""
+        """
+        Report queue service errors without successful command exit codes.
+
+        Returns
+        -------
+        None
+            Assert nonzero command exit codes for queue service failures.
+        """
         manager = _Manager()
         manager.error = QueueConfigurationError("Unknown connection 'missing'.")
         command_types = (
@@ -472,7 +577,14 @@ class TestQueueCommands(TestCase):
                 self.assertEqual(command.messages[0][0], "error")
 
     async def testMakeJobCreatesPersistentStateAndRuntimeDependencies(self) -> None:
-        """Generate an importable annotated job without service constructor state."""
+        """
+        Generate an importable annotated job without service constructor state.
+
+        Returns
+        -------
+        None
+            Assert generation of an importable job with runtime dependencies.
+        """
         with TemporaryDirectory() as directory:
             app = _Application(directory)
             command = _record(MakeJob)
@@ -499,7 +611,14 @@ class TestQueueCommands(TestCase):
             self.assertNotIn("NotImplementedError", source)
 
     async def testSignalsStopWorkerAndRestorePreviousHandlers(self) -> None:
-        """Request graceful shutdown and restore interpreter signal handlers."""
+        """
+        Request graceful shutdown and restore interpreter signal handlers.
+
+        Returns
+        -------
+        None
+            Assert graceful worker shutdown and restoration of signal handlers.
+        """
         script = '''
 import asyncio
 import signal

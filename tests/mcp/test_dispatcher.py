@@ -26,7 +26,23 @@ class _NonNegativeAsync(Rule):
         value: object,
         _instance: object,
     ) -> bool:
-        """Suspend before checking the value on the current event loop."""
+        """
+        Suspend before checking the value on the current event loop.
+
+        Parameters
+        ----------
+        _field : str
+            Unused name of the field under validation.
+        value : object
+            Candidate value checked after suspension.
+        _instance : object
+            Unused schema instance containing the field.
+
+        Returns
+        -------
+        bool
+            Whether the value is a non-negative integer.
+        """
         await asyncio.sleep(0)
         return isinstance(value, int) and value >= 0
 
@@ -40,7 +56,19 @@ class _AsyncOutputTool(Tool[_ValidatedInput, _ValidatedValue]):
     name = "async-output"
 
     async def handle(self, payload: _ValidatedInput):
-        """Return structured content requiring asynchronous output validation."""
+        """
+        Return structured content requiring asynchronous output validation.
+
+        Parameters
+        ----------
+        payload : _ValidatedInput
+            Validated input controlling the output value.
+
+        Returns
+        -------
+        McpResponse
+            Structured response subject to asynchronous schema validation.
+        """
         return McpResponse.structured({
             "value": -1 if payload.invalid_output else payload.value,
         })
@@ -49,7 +77,19 @@ class _AsyncProtocolOutputTool(Tool[_ValidatedInput, _ValidatedValue]):
     name = "async-protocol-output"
 
     async def handle(self, payload: _ValidatedInput):
-        """Return a protocol result requiring the same output validation."""
+        """
+        Return a protocol result requiring the same output validation.
+
+        Parameters
+        ----------
+        payload : _ValidatedInput
+            Validated input controlling the output value.
+
+        Returns
+        -------
+        CallToolResult
+            Protocol result subject to asynchronous schema validation.
+        """
         return CallToolResult(content=(), structuredContent={
             "value": -1 if payload.invalid_output else payload.value,
         })
@@ -58,7 +98,19 @@ class _AsyncStreamingOutputTool(Tool[_ValidatedInput, _ValidatedValue]):
     name = "async-streaming-output"
 
     async def handle(self, payload: _ValidatedInput):
-        """Yield structured content validated before the final stream result."""
+        """
+        Yield structured content validated before the final stream result.
+
+        Parameters
+        ----------
+        payload : _ValidatedInput
+            Validated input controlling the output value.
+
+        Yields
+        ------
+        McpResponse
+            Structured response validated before the stream completes.
+        """
         yield McpResponse.structured({
             "value": -1 if payload.invalid_output else payload.value,
         })
@@ -313,7 +365,14 @@ class TestDispatcher(TestCase):
         self.client = await self.mcp(_Server, app=self.app)
 
     async def test_async_rules_validate_inputs_and_every_output_path(self):
-        """Await native schema rules for regular, protocol and streaming results."""
+        """
+        Await native schema rules for regular, protocol and streaming results.
+
+        Returns
+        -------
+        None
+            Assert awaited input and output rules across all response paths.
+        """
         client = await self.mcp(_AsyncValidationServer, app=self.app)
         for tool in _AsyncValidationServer.tools:
             with self.subTest(tool=tool.name):

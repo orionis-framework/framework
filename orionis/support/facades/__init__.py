@@ -8,6 +8,7 @@ if _TYPE_CHECKING:
     from orionis.support.facades.catch import Catch
     from orionis.support.facades.datetime import DateTime
     from orionis.support.facades.db import DB
+    from orionis.support.facades.debug import Debug
     from orionis.support.facades.encrypter import Crypt
     from orionis.support.facades.hash import Hash
     from orionis.support.facades.lang import Lang
@@ -33,6 +34,7 @@ __all__ = [
     "Catch",
     "Crypt",
     "DateTime",
+    "Debug",
     "Hash",
     "Lang",
     "Log",
@@ -58,6 +60,7 @@ _EXPORTS = {
     "Catch": ("orionis.support.facades.catch", "Catch"),
     "Crypt": ("orionis.support.facades.encrypter", "Crypt"),
     "DateTime": ("orionis.support.facades.datetime", "DateTime"),
+    "Debug": ("orionis.support.facades.debug", "Debug"),
     "Hash": ("orionis.support.facades.hash", "Hash"),
     "Lang": ("orionis.support.facades.lang", "Lang"),
     "Log": ("orionis.support.facades.logger", "Log"),

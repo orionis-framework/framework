@@ -149,7 +149,14 @@ class _NativeTool(Tool[_SerializationInput, _NativePayload]):
     name = "native-data"
 
     def handle(self) -> McpResponse:
-        """Return a native Schema without application-side conversion."""
+        """
+        Return a native Schema without application-side conversion.
+
+        Returns
+        -------
+        McpResponse
+            Structured response containing the native schema data.
+        """
         return McpResponse.structured(_NATIVE_DATA)
 
 class _NativeResource(Resource):
@@ -157,14 +164,28 @@ class _NativeResource(Resource):
     mime_type = "application/json"
 
     def handle(self) -> McpResponse:
-        """Return a native Schema using the resource MIME type."""
+        """
+        Return a native Schema using the resource MIME type.
+
+        Returns
+        -------
+        McpResponse
+            Structured resource response containing native schema data.
+        """
         return McpResponse.structured(_NATIVE_DATA)
 
 class _NativePrompt(Prompt):
     name = "native-data"
 
     def handle(self) -> McpResponse:
-        """Embed native Schema data in a prompt."""
+        """
+        Embed native Schema data in a prompt.
+
+        Returns
+        -------
+        McpResponse
+            Assistant prompt containing an embedded native-data resource.
+        """
         return McpResponse.resource("demo://native", _NATIVE_DATA).asAssistant()
 
 class _NativeServer(Server):
@@ -199,7 +220,14 @@ class TestResponses(TestCase):
             self.assertEqual(wire["resultType"], "complete")
 
     def testNativeJsonValuesAreNormalized(self) -> None:
-        """Normalize native types recursively while honoring Struct settings."""
+        """
+        Normalize native types recursively while honoring Struct settings.
+
+        Returns
+        -------
+        None
+            Assert recursive normalization with the declared Struct settings.
+        """
         class _TaggedPayload(msgspec.Struct, tag=True):
             payload: _NativePayload
             optional: str | msgspec.UnsetType = msgspec.UNSET
@@ -228,7 +256,14 @@ class TestResponses(TestCase):
         self.assertIsInstance(_NATIVE_DATA.amount, Decimal)
 
     def testNativeJsonResponsesCaptureIndependentSnapshots(self) -> None:
-        """Keep normalized response content independent of native mutations."""
+        """
+        Keep normalized response content independent of native mutations.
+
+        Returns
+        -------
+        None
+            Assert that responses retain independent normalized snapshots.
+        """
         payload = msgspec.structs.replace(_NATIVE_DATA)
         response = McpResponse.structured(payload)
         resource = McpResponse.resource("docs://native", payload)
@@ -242,7 +277,14 @@ class TestResponses(TestCase):
         )
 
     def testNativeJsonValuesStillRejectInvalidData(self) -> None:
-        """Normalization must not hide invalid nested JSON values."""
+        """
+        Reject invalid nested JSON values after normalization.
+
+        Returns
+        -------
+        None
+            Assert rejection of invalid nested values after normalization.
+        """
         class _InvalidPayload(Schema):
             value: object
 
@@ -258,7 +300,14 @@ class TestResponses(TestCase):
                     McpResponse.resource("docs://native", payload)
 
     async def testNativeSerializationWorksAcrossPrimitives(self) -> None:
-        """Dispatch normalized Schema output through the real MCP wire path."""
+        """
+        Dispatch normalized Schema output through the real MCP wire path.
+
+        Returns
+        -------
+        None
+            Assert native Schema serialization through the MCP dispatcher.
+        """
         class _NativeContainer(Container):
             pass
 

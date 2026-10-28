@@ -85,7 +85,14 @@ class TestQueueManager(TestCase):
     """Verify lazy canonical dispatch, provider pinning and administration."""
 
     def setUp(self) -> None:
-        """Prepare a real container with isolated queue dependencies."""
+        """
+        Prepare a real container with isolated queue dependencies.
+
+        Returns
+        -------
+        None
+            Prepare a real container and isolated queue service dependencies.
+        """
         self.app = FakeApp()
         self.state = State()
         token = ScopedContext.setCurrentScope(None)
@@ -100,7 +107,14 @@ class TestQueueManager(TestCase):
         self.manager._failed = self.failed
 
     async def testDeferredSyncDispatchUsesQueueAndDi(self) -> None:
-        """Execute a sync job only when its selected pending operation is awaited."""
+        """
+        Execute a sync job only when its selected pending operation is awaited.
+
+        Returns
+        -------
+        None
+            Assert that synchronous dispatch remains deferred until awaited.
+        """
         pending = self.manager.dispatch(RecordJob(8)).onQueue("emails")
         self.assertEqual(self.state.events, [])
         dispatch_id = await pending
@@ -111,7 +125,14 @@ class TestQueueManager(TestCase):
         self.assertIsInstance(await self.manager.connection(), SyncQueueDriver)
 
     async def testSyncFailurePreservesAndPropagatesOriginalException(self) -> None:
-        """Preserve terminal diagnostics and expose the application exception."""
+        """
+        Preserve terminal diagnostics and expose the application exception.
+
+        Returns
+        -------
+        None
+            Assert preservation of the original synchronous job exception.
+        """
         with self.assertLogs("orionis.queues.worker", level="ERROR"), \
                 self.assertRaisesRegex(ValueError, "Application job failure"):
             await self.manager.dispatch(FailJob(1))
@@ -119,14 +140,28 @@ class TestQueueManager(TestCase):
         self.assertEqual((await self.failed.all())[0].attempts, 1)
 
     async def testSyncRejectsDelayAndPersistentWorker(self) -> None:
-        """Reject durability-dependent behavior on immediate connections."""
+        """
+        Reject durability-dependent behavior on immediate connections.
+
+        Returns
+        -------
+        None
+            Assert rejection of delayed dispatch and persistent sync workers.
+        """
         with self.assertRaises(QueueDispatchError):
             await self.manager.dispatch(RecordJob(1)).delay(1)
         with self.assertRaises(QueueConfigurationError):
             await self.manager.worker("sync")
 
     async def testSyncCancellationPropagatesOriginalCancellation(self) -> None:
-        """Preserve immediate cancellation when persistent release is unavailable."""
+        """
+        Preserve immediate cancellation when persistent release is unavailable.
+
+        Returns
+        -------
+        None
+            Assert preservation of the original synchronous cancellation.
+        """
         task = asyncio.ensure_future(self.manager.dispatch(GateJob(1)))
         await self.state.entered.wait()
         with self.assertLogs("orionis.queues.worker", level="ERROR"):
@@ -136,7 +171,14 @@ class TestQueueManager(TestCase):
         self.assertEqual(await self.failed.all(), ())
 
     async def testConnectionAndQueueSelectionShareDriver(self) -> None:
-        """Persist selected queues through one shared connection instance."""
+        """
+        Persist selected queues through one shared connection instance.
+
+        Returns
+        -------
+        None
+            Assert shared driver ownership across selected logical queues.
+        """
         driver = MemoryDriver(self.serializer)
         self.manager._drivers["database"] = driver
         await self.manager.dispatch(RecordJob(1)).onConnection("database").onQueue(
@@ -149,12 +191,26 @@ class TestQueueManager(TestCase):
         self.assertIsNone(await driver.reserve(("high",), 90))
 
     async def testUnknownConnectionFailsBeforePersistence(self) -> None:
-        """Reject unknown connection selections with a module-specific error."""
+        """
+        Reject unknown connection selections with a module-specific error.
+
+        Returns
+        -------
+        None
+            Assert rejection of unknown connections before persistence.
+        """
         with self.assertRaises(QueueConfigurationError):
             await self.manager.dispatch(RecordJob(1)).onConnection("missing")
 
     async def testRedisConnectionUsesStructuredSettingsWithoutConnecting(self) -> None:
-        """Pass Redis fields directly to a lazy, manager-owned client."""
+        """
+        Pass Redis fields directly to a lazy, manager-owned client.
+
+        Returns
+        -------
+        None
+            Assert lazy Redis client creation with structured connection fields.
+        """
         app = FakeApp({
             "default": "redis",
             "connections": {
@@ -182,7 +238,14 @@ class TestQueueManager(TestCase):
             await manager.close()
 
     async def testCustomDefaultsFeedEnvelopeAndWorker(self) -> None:
-        """Normalize application defaults into dispatch and worker settings."""
+        """
+        Normalize application defaults into dispatch and worker settings.
+
+        Returns
+        -------
+        None
+            Assert propagation of custom defaults into envelopes and workers.
+        """
         app = FakeApp({"default": "database", "worker": {
             "concurrency": 3, "tries": 4, "timeout": 10.0, "backoff": (1.0, 2.0),
         }})
@@ -198,7 +261,14 @@ class TestQueueManager(TestCase):
         self.assertEqual(worker._queues, ("high", "default"))
 
     async def testManualRetryRestoresAttemptsAndForgetsFailure(self) -> None:
-        """Preserve envelope identity while resetting backend attempt state."""
+        """
+        Preserve envelope identity while resetting backend attempt state.
+
+        Returns
+        -------
+        None
+            Assert reset attempts, preserved identity, and failure deletion.
+        """
         driver = MemoryDriver(self.serializer)
         self.manager._drivers["database"] = driver
         queued = envelope(self.serializer, RecordJob(1))
@@ -213,7 +283,14 @@ class TestQueueManager(TestCase):
             await self.manager.retryFailed("missing")
 
     async def testRetryKeepsAConcurrentNewFailureEvent(self) -> None:
-        """Forget only the old failure when a fast retry fails before push returns."""
+        """
+        Forget only the old failure when a fast retry fails before push returns.
+
+        Returns
+        -------
+        None
+            Assert that retry cleanup preserves a newly recorded failure.
+        """
         original = MemoryDriver(self.serializer)
         queued = envelope(self.serializer, FailJob(1), tries=1)
         await original.push(queued)
@@ -231,7 +308,14 @@ class TestQueueManager(TestCase):
         self.assertEqual(remaining[0].exception_message, "Application job failure")
 
     async def testCloseReleasesOwnedClients(self) -> None:
-        """Close initialized queue clients and preserve application services."""
+        """
+        Close initialized queue clients and preserve application services.
+
+        Returns
+        -------
+        None
+            Assert cleanup of owned clients without closing application services.
+        """
         driver = MemoryDriver(self.serializer)
         self.manager._drivers["database"] = driver
         await self.manager.close()
@@ -240,7 +324,14 @@ class TestQueueManager(TestCase):
         self.assertEqual(self.manager._drivers, {})
 
     async def testEagerProviderPinsImmediateFluentFacade(self) -> None:
-        """Expose PendingDispatch directly after eager provider startup."""
+        """
+        Expose PendingDispatch directly after eager provider startup.
+
+        Returns
+        -------
+        None
+            Assert immediate fluent dispatch through the eagerly pinned facade.
+        """
         previous = Queue._application
         previous_pin = Queue._pinned_instance
         Queue._application = self.app # NOSONAR
@@ -269,7 +360,14 @@ class TestQueueMigrations(TestCase):
     """Prepare real isolated databases without constructing queue clients."""
 
     async def asyncSetUp(self) -> None:
-        """Configure separate prefixed databases for jobs, reports, and failures."""
+        """
+        Configure separate prefixed databases for jobs, reports, and failures.
+
+        Returns
+        -------
+        None
+            Prepare isolated prefixed databases for queue migration tests.
+        """
         self.directory = TemporaryDirectory()
         directory = Path(self.directory.name)
         self.databases = ConnectionManager(FakeApp({
@@ -309,13 +407,27 @@ class TestQueueMigrations(TestCase):
         self.manager = QueueManager(self.app, JobSerializer())
 
     async def asyncTearDown(self) -> None:
-        """Release shared database handles before removing the temporary files."""
+        """
+        Release shared database handles before removing the temporary files.
+
+        Returns
+        -------
+        None
+            Close shared handles and remove the temporary database files.
+        """
         await self.manager.close()
         await self.databases.disconnect()
         self.directory.cleanup()
 
     async def testMigrateCreatesAllConfiguredTablesAndIndexes(self) -> None:
-        """Create complete prefixed schemas even when the default queue is sync."""
+        """
+        Create complete prefixed schemas even when the default queue is sync.
+
+        Returns
+        -------
+        None
+            Assert creation of all configured tables and indexes.
+        """
         await self.manager.migrate()
         expected = (
             ("primary", "q_pending_jobs", build_jobs_table("pending_jobs"),
@@ -354,7 +466,14 @@ class TestQueueMigrations(TestCase):
         self.assertIsNone(self.manager._failed)
 
     async def testRepeatedMigrationsPreserveJobsAndFailures(self) -> None:
-        """Keep pending reservations and failure records across repeated calls."""
+        """
+        Keep pending reservations and failure records across repeated calls.
+
+        Returns
+        -------
+        None
+            Assert that repeated migrations preserve queued and failed jobs.
+        """
         await self.manager.migrate()
         driver = await self.manager.connection("database")
         queued = make_envelope()
@@ -371,7 +490,14 @@ class TestQueueMigrations(TestCase):
         self.assertEqual(await repository.all(), (failure,))
 
     async def testMigratePreparesFailuresWithoutDatabaseQueueConnections(self) -> None:
-        """Prepare failure storage without opening sync or Redis queue clients."""
+        """
+        Prepare failure storage without opening sync or Redis queue clients.
+
+        Returns
+        -------
+        None
+            Assert failure storage preparation without opening queue clients.
+        """
         self.app.settings["connections"] = {
             "sync": {"driver": "sync"},
             "redis": {"driver": "redis", "endpoint": "redis.invalid"},
@@ -391,7 +517,14 @@ class TestQueueMigrations(TestCase):
         self.assertIsNone(self.manager._failed)
 
     async def testMigratePropagatesStorageErrors(self) -> None:
-        """Preserve the database error when queue DDL cannot execute."""
+        """
+        Preserve the database error when queue DDL cannot execute.
+
+        Returns
+        -------
+        None
+            Assert propagation of database errors during migration.
+        """
         error = QueryException("Queue schema creation failed.")
         with patch.object(Connection, "createTable", side_effect=error), \
                 self.assertRaises(QueryException) as raised:
@@ -399,7 +532,14 @@ class TestQueueMigrations(TestCase):
         self.assertIs(raised.exception, error)
 
     async def testMigrateRejectsUnenforcedUniqueConstraints(self) -> None:
-        """Reject database storage that cannot enforce unique job identifiers."""
+        """
+        Reject database storage that cannot enforce unique job identifiers.
+
+        Returns
+        -------
+        None
+            Assert rejection of storage without enforced unique job identifiers.
+        """
         with (
             patch.object(Connection, "supportsUniqueConstraints", return_value=False),
             self.assertRaisesRegex(QueueStorageError, "unique constraints"),
@@ -461,7 +601,14 @@ class TestQueueJobDiscovery(TestCase):
         self.directory.cleanup()
 
     async def testCustomJobsPathRegistersNestedConcreteJobs(self) -> None:
-        """Discover nested modules and preserve canonical job identities."""
+        """
+        Discover nested modules and preserve canonical job identities.
+
+        Returns
+        -------
+        None
+            Assert nested job discovery and canonical registered identities.
+        """
         await self.manager.boot()
         module = import_module(self.package_name + ".custom_jobs.nested.discovered")
         source = JobSerializer()
@@ -475,20 +622,41 @@ class TestQueueJobDiscovery(TestCase):
             self.serializer.decode(identity, payload)
 
     async def testMissingDefaultJobsDirectoryDoesNotBlockStartup(self) -> None:
-        """Allow an application to start before its first job is generated."""
+        """
+        Allow an application to start before its first job is generated.
+
+        Returns
+        -------
+        None
+            Assert startup without an application jobs directory.
+        """
         app = FakeApp(base_path=self.base_path)
         self.assertEqual(app.path("app_jobs"), self.base_path / "app/jobs")
         manager = QueueManager(app, JobSerializer())
         await manager.boot()
 
     async def testMissingJobsPathReportsConfigurationError(self) -> None:
-        """Reject a missing central path instead of inventing a queue default."""
+        """
+        Reject a missing central path instead of inventing a queue default.
+
+        Returns
+        -------
+        None
+            Assert a configuration error for a missing central jobs path.
+        """
         self.app._paths.clear()
         with self.assertRaises(QueueConfigurationError):
             await self.manager.boot()
 
     async def testUnimportableJobModulePreservesTheOriginalCause(self) -> None:
-        """Report imports that fail inside the resolved application jobs path."""
+        """
+        Report imports that fail inside the resolved application jobs path.
+
+        Returns
+        -------
+        None
+            Assert preservation of the original job-module import failure.
+        """
         (self.jobs_path / "broken.py").write_text(
             "import orionis_queue_missing_dependency\n", encoding="utf-8",
         )

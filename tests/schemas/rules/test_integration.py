@@ -152,7 +152,14 @@ class TestRulesThroughValidator(TestCase):
 class TestRuleExports(TestCase):
 
     def testEveryBundledRuleHasOnlyAsyncEnforcement(self) -> None:
-        """Require the same single asynchronous contract for every public rule."""
+        """
+        Require the same single asynchronous contract for every public rule.
+
+        Returns
+        -------
+        None
+            Assert a single asynchronous enforcement contract for every rule.
+        """
         for name in rules_module.__all__:
             with self.subTest(rule=name):
                 rule = getattr(rules_module, name)

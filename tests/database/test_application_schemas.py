@@ -328,7 +328,14 @@ class TestApplicationSchemas(TestCase):
         self.assertEqual(await User.query().count(), 0)
 
     async def testUserMassAssignmentAcceptsDeclaredActiveFlag(self) -> None:
-        """Persist the active flag declared in the User fillable policy."""
+        """
+        Persist the active flag declared in the User fillable policy.
+
+        Returns
+        -------
+        None
+            Assert persistence of the explicitly fillable active flag.
+        """
         user = await User.create({
             "name": "Ada", "email": "inactive@example.test",
             "password": "digest", "active": False,

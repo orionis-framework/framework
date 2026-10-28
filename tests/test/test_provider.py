@@ -12,11 +12,32 @@ class _StubApp:
     __slots__ = ("singletons",)
 
     def __init__(self) -> None:
-        """Initialize an empty binding recorder."""
+        """
+        Initialize an empty binding recorder.
+
+        Returns
+        -------
+        None
+            Prepare an independent list of singleton bindings.
+        """
         self.singletons: list[tuple[object, object]] = []
 
     def singleton(self, abstract: object, concrete: object) -> None:
-        """Record a singleton binding request."""
+        """
+        Record a singleton binding request.
+
+        Parameters
+        ----------
+        abstract : object
+            Service contract requested by the provider.
+        concrete : object
+            Implementation registered for the contract.
+
+        Returns
+        -------
+        None
+            Append the requested binding to the captured singleton list.
+        """
         self.singletons.append((abstract, concrete))
 
 class _StubFacade:
@@ -25,11 +46,25 @@ class _StubFacade:
     __slots__ = ("pinned",)
 
     def __init__(self) -> None:
-        """Initialize the facade pin counter."""
+        """
+        Initialize the facade pin counter.
+
+        Returns
+        -------
+        None
+            Set the facade pin counter to zero.
+        """
         self.pinned: int = 0
 
     async def pin(self) -> None:
-        """Count a pin invocation."""
+        """
+        Count a pin invocation.
+
+        Returns
+        -------
+        None
+            Increment the facade pin counter.
+        """
         self.pinned += 1
 
 class TestTestingProviderDefinition(TestCase):

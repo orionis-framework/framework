@@ -351,7 +351,14 @@ class TestSchemaToDict(TestCase):
         )
 
     def testToDictConvertsMultipleSchemaLevels(self) -> None:
-        """Convert schemas nested more than one level deep."""
+        """
+        Convert schemas nested more than one level deep.
+
+        Returns
+        -------
+        None
+            Assert recursive conversion across multiple schema levels.
+        """
         instance = _ValueSchema(
             value=_ParentWithNested(child=_NestedChild(city="Lima"), count=1),
         )
@@ -361,7 +368,14 @@ class TestSchemaToDict(TestCase):
         )
 
     def testToDictConvertsPlainStructsWithoutEncodingFields(self) -> None:
-        """Retain Python field names and defaults without adding struct tags."""
+        """
+        Retain Python field names and defaults without adding struct tags.
+
+        Returns
+        -------
+        None
+            Assert preservation of Python field names and default values.
+        """
         instance = _ValueSchema(value=_PlainStruct(city_name="Lima"))
         self.assertEqual(
             instance.toDict(),
@@ -369,7 +383,14 @@ class TestSchemaToDict(TestCase):
         )
 
     def testToDictConvertsStructsInsideContainers(self) -> None:
-        """Traverse mixed containers while preserving their types and keys."""
+        """
+        Traverse mixed containers while preserving their types and keys.
+
+        Returns
+        -------
+        None
+            Assert conversion within containers without changing types or keys.
+        """
         child = _NestedChild(city="Lima")
         plain = _PlainStruct(city_name="Paris", country_code="FR")
         child_dict = {"city": "Lima"}
@@ -398,7 +419,14 @@ class TestSchemaToDict(TestCase):
                 self.assertIs(type(result["value"]), type(value))
 
     def testToDictPreservesOtherValues(self) -> None:
-        """Leave scalar and unsupported object values unchanged."""
+        """
+        Leave scalar and unsupported object values unchanged.
+
+        Returns
+        -------
+        None
+            Assert preservation of scalar and unsupported object values.
+        """
         values = (
             None,
             True,
@@ -416,7 +444,14 @@ class TestSchemaToDict(TestCase):
                 self.assertIs(_ValueSchema(value=value).toDict()["value"], value)
 
     def testToDictDoesNotMutateSourceOrReuseConvertedContainers(self) -> None:
-        """Keep source references intact and return independent converted data."""
+        """
+        Keep source references intact and return independent converted data.
+
+        Returns
+        -------
+        None
+            Assert source ownership and independent converted containers.
+        """
         child = _NestedChild(city="Lima")
         source = {"children": [child]}
         instance = _ValueSchema(value=source)
@@ -434,5 +469,12 @@ class TestSchemaToDict(TestCase):
         )
 
     def testToDictConvertsFieldlessSchemas(self) -> None:
-        """Return an empty dictionary for a schema without fields."""
+        """
+        Return an empty dictionary for a schema without fields.
+
+        Returns
+        -------
+        None
+            Assert an empty dictionary for a fieldless schema.
+        """
         self.assertEqual(_FieldlessSchema().toDict(), {})

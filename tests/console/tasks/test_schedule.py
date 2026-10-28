@@ -11,7 +11,14 @@ from orionis.test import TestCase
 class TestSchedule(TestCase):
 
     def testLegacyScheduledCallableRemainsImportable(self) -> None:
-        """Resolve jobs stored with the earlier callable path."""
+        """
+        Resolve jobs stored with the earlier callable path.
+
+        Returns
+        -------
+        None
+            Assert compatibility with the earlier scheduled callable path.
+        """
         self.assertIs(
             vars(schedule_module)["_executeScheduledCommand"],
             schedule_module._execute_scheduled_command,

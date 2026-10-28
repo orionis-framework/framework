@@ -54,21 +54,68 @@ class _StubEnvironment:
     __slots__ = ("extensions", "filters", "globals")
 
     def __init__(self) -> None:
-        """Initialize empty template registration collections."""
+        """
+        Initialize empty template registration collections.
+
+        Returns
+        -------
+        None
+            Prepare independent global, filter, and extension records.
+        """
         self.globals: dict[str, object] = {}
         self.filters: dict[str, object] = {}
         self.extensions: list[object] = []
 
     def addGlobal(self, name: str, value: object) -> None:
-        """Record a template global."""
+        """
+        Record a template global.
+
+        Parameters
+        ----------
+        name : str
+            Template global name.
+        value : object
+            Value registered as the template global.
+
+        Returns
+        -------
+        None
+            Store the captured global registration.
+        """
         self.globals[name] = value
 
     def addFilter(self, name: str, callback: object) -> None:
-        """Record a template filter."""
+        """
+        Record a template filter.
+
+        Parameters
+        ----------
+        name : str
+            Template filter name.
+        callback : object
+            Callable registered as the template filter.
+
+        Returns
+        -------
+        None
+            Store the captured filter registration.
+        """
         self.filters[name] = callback
 
     def addExtension(self, extension: object) -> None:
-        """Record a Jinja2 extension."""
+        """
+        Record a Jinja2 extension.
+
+        Parameters
+        ----------
+        extension : object
+            Jinja2 extension selected by the provider.
+
+        Returns
+        -------
+        None
+            Append the extension to the captured registrations.
+        """
         self.extensions.append(extension)
 
 class _StubApp:
@@ -89,15 +136,53 @@ class _StubApp:
         self.resolved: list[object] = []
 
     def singleton(self, abstract: object, concrete: object) -> None:
-        """Record a singleton binding."""
+        """
+        Record a singleton binding.
+
+        Parameters
+        ----------
+        abstract : object
+            Service contract requested by the provider.
+        concrete : object
+            Implementation registered for the contract.
+
+        Returns
+        -------
+        None
+            Append the requested binding to the captured singleton list.
+        """
         self.singletons.append((abstract, concrete))
 
     def config(self, _key: str) -> object:
-        """Return no configured value so builders use their defaults."""
+        """
+        Return no configured value so builders use their defaults.
+
+        Parameters
+        ----------
+        _key : str
+            Unused configuration key requested by the provider.
+
+        Returns
+        -------
+        None
+            Signal that the provider should use configuration defaults.
+        """
         return None
 
     async def make(self, abstract: object) -> object:
-        """Return the stubbed environment for any requested abstract."""
+        """
+        Return the stubbed environment for any requested abstract.
+
+        Parameters
+        ----------
+        abstract : object
+            Requested service recorded for resolution assertions.
+
+        Returns
+        -------
+        object
+            Configured environment double for the requested service.
+        """
         self.resolved.append(abstract)
         return self.environment
 
@@ -107,11 +192,25 @@ class _StubViewFacade:
     __slots__ = ("pinned",)
 
     def __init__(self) -> None:
-        """Initialize the facade pin counter."""
+        """
+        Initialize the facade pin counter.
+
+        Returns
+        -------
+        None
+            Set the facade pin counter to zero.
+        """
         self.pinned: int = 0
 
     async def pin(self) -> None:
-        """Count a pin invocation."""
+        """
+        Count a pin invocation.
+
+        Returns
+        -------
+        None
+            Increment the facade pin counter.
+        """
         self.pinned += 1
 
 class TestViewServiceProviderDefinition(TestCase):
@@ -231,7 +330,14 @@ class TestViewServiceProviderBoot(TestCase):
         provider_module.ViewFacade = self._original_facade
 
     async def _boot(self) -> None:
-        """Run the boot phase against the stubbed application."""
+        """
+        Run the boot phase against the stubbed application.
+
+        Returns
+        -------
+        None
+            Boot the provider with the configured application double.
+        """
         await ViewServiceProvider(self._app).boot()
 
     async def testBootResolvesEnvironmentSingleton(self) -> None:

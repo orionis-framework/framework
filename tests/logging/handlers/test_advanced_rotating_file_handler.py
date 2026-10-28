@@ -1021,7 +1021,14 @@ class TestAdvancedRotatingFileHandlerCleanup(TestCase):
         self.assertTrue(foreign.exists())
 
     def testCleanupDoesNotTreatTemplatePunctuationAsRegex(self) -> None:
-        """Keep files whose names only match regex interpretations of a template."""
+        """
+        Keep files whose names only match regex interpretations of a template.
+
+        Returns
+        -------
+        None
+            Assert that cleanup treats template punctuation literally.
+        """
         newest = _seed_file(self._logs, "app_1.log", 2000)
         foreign = _seed_file(self._logs, "app_0xlog", 1000)
         handler = self._makeHandler(1)

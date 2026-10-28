@@ -351,7 +351,7 @@ class TestOrionisApplication(unittest.TestCase):
 
     def test_factory_stages_static_routes_inside_isolated_directory(self) -> None:
         """
-        Verify isolated route staging and production HTTP startup.
+        Verify isolated route staging and startup with native directory paths.
 
         Returns
         -------
@@ -372,7 +372,9 @@ class TestOrionisApplication(unittest.TestCase):
             ) as application,
         ):
             result = orionis_benchmark.create_application()
-            directory = Path(temporary).resolve()
+            # Windows cwd may retain an 8.3 alias for the temporary directory.
+            directory = Path.cwd()
+            self.assertTrue(directory.samefile(temporary))
             route_file = directory / f"_orionis_http_benchmark_{os.getpid()}.py"
 
             self.assertEqual(route_file.read_bytes(), source.read_bytes())

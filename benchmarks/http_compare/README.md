@@ -171,6 +171,8 @@ uv run --no-sync python -B -m unittest tests.test_http_compare -v
 Estas pruebas no generan carga: verifican contabilidad, medianas, preparación
 de cada worker y exclusión de la primera petición y del calentamiento, parámetros
 compartidos, limpieza, fallos, coherencia de reportes y gráficas SVG.
+La comprobación del directorio aislado admite los alias de ruta corta 8.3 de
+Windows sin confundirlos con un directorio diferente.
 
 ## Límites
 

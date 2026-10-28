@@ -1,4 +1,8 @@
 from __future__ import annotations
+import inspect
+from contextlib import redirect_stderr, redirect_stdout
+from html import escape
+from io import StringIO
 from unittest.mock import MagicMock, patch
 from orionis.console.output.contracts.var_dumper import IVarDumper
 from orionis.console.output.var_dumper import VarDumper
@@ -12,63 +16,56 @@ class TestVarDumper(TestCase):
 
     def _make(self) -> VarDumper:
         """
-        Create a VarDumper instance with a mocked Rich Console.
+        Create a dumper backed by a mocked Rich console.
 
         Returns
         -------
         VarDumper
-            A VarDumper instance whose internal Console is replaced by a
-            MagicMock so no real terminal output is produced.
+            Dumper with a mock console configured for 120-column output.
         """
-        with patch("orionis.console.output.var_dumper.Console") as mock_console:
-            mock_con = MagicMock()
-            mock_con.size.width = 120
-            mock_console.return_value = mock_con
-            dumper = VarDumper()
-        dumper._VarDumper__console = mock_con
-        return dumper
+        mock_console = self.enterContext(
+            patch("orionis.console.output.var_dumper.Console"),
+        )
+        mock_con = MagicMock()
+        mock_con.size.width = 120
+        mock_console.return_value = mock_con
+        return VarDumper()
 
     # ------------------------------------------------------------------ #
     #  Instantiation & interface                                         #
     # ------------------------------------------------------------------ #
 
     def testInstantiation(self) -> None:
-        """Verify that VarDumper can be instantiated without errors.
-
-        Ensures the constructor completes without raising any exception
-        and returns a valid instance.
+        """
+        Verify that the dumper can be instantiated.
 
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            This test does not return a value.
         """
         dumper = self._make()
         self.assertIsInstance(dumper, VarDumper)
 
     def testIsSubclassOfIVarDumper(self) -> None:
-        """Verify that VarDumper is a subclass of IVarDumper.
-
-        Ensures the concrete implementation satisfies the abstract interface
-        so it can be used polymorphically wherever IVarDumper is expected.
+        """
+        Verify that ``VarDumper`` is a subclass of ``IVarDumper``.
 
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            This test does not return a value.
         """
         self.assertTrue(issubclass(VarDumper, IVarDumper))
 
     def testInstanceIsIVarDumper(self) -> None:
-        """Verify that a VarDumper instance satisfies isinstance(obj, IVarDumper).
-
-        Ensures polymorphic usage is valid and the object passes type checks
-        against the abstract interface.
+        """
+        Verify that a dumper instance satisfies ``IVarDumper``.
 
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            This test does not return a value.
         """
         dumper = self._make()
         self.assertIsInstance(dumper, IVarDumper)
@@ -78,60 +75,52 @@ class TestVarDumper(TestCase):
     # ------------------------------------------------------------------ #
 
     def testShowTypesReturnsSelf(self) -> None:
-        """Verify that showTypes returns the VarDumper instance for method chaining.
-
-        Ensures the fluent interface contract is honoured so callers can
-        chain configuration calls without capturing intermediate results.
+        """
+        Verify that ``showTypes`` returns the dumper for chaining.
 
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            This test does not return a value.
         """
         dumper = self._make()
         result = dumper.showTypes()
         self.assertIs(result, dumper)
 
     def testShowTypesDefaultTrue(self) -> None:
-        """Verify that showTypes() called with its default argument stores True.
-
-        Ensures that omitting the keyword argument uses the documented
-        default value of True.
+        """
+        Verify that ``showTypes`` enables type labels by default.
 
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            This test does not return a value.
         """
         dumper = self._make()
         dumper.showTypes()
         self.assertTrue(dumper._VarDumper__show_types)
 
     def testShowTypesFalse(self) -> None:
-        """Verify that showTypes(show=False) stores False.
-
-        Ensures the flag can be explicitly disabled so type information
-        is omitted from panel titles.
+        """
+        Verify that ``showTypes`` stores an explicitly disabled flag.
 
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            This test does not return a value.
         """
         dumper = self._make()
         dumper.showTypes(show=False)
         self.assertFalse(dumper._VarDumper__show_types)
 
     def testShowTypesRaisesTypeError(self) -> None:
-        """Verify that showTypes raises TypeError when show is not a bool.
-
-        Ensures invalid argument types are rejected early with a descriptive
-        error rather than silently mis-configuring the dumper.
+        """
+        Verify that ``showTypes`` rejects a non-boolean flag.
 
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            This test does not return a value.
         """
         dumper = self._make()
         with self.assertRaises(TypeError):
@@ -142,60 +131,52 @@ class TestVarDumper(TestCase):
     # ------------------------------------------------------------------ #
 
     def testShowIndexReturnsSelf(self) -> None:
-        """Verify that showIndex returns the VarDumper instance for method chaining.
-
-        Ensures the fluent interface contract is honoured so callers can
-        chain configuration calls without capturing intermediate results.
+        """
+        Verify that ``showIndex`` returns the dumper for chaining.
 
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            This test does not return a value.
         """
         dumper = self._make()
         result = dumper.showIndex()
         self.assertIs(result, dumper)
 
     def testShowIndexDefaultTrue(self) -> None:
-        """Verify that showIndex() called with its default argument stores True.
-
-        Ensures that omitting the keyword argument uses the documented
-        default value of True.
+        """
+        Verify that ``showIndex`` enables index labels by default.
 
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            This test does not return a value.
         """
         dumper = self._make()
         dumper.showIndex()
         self.assertTrue(dumper._VarDumper__show_index)
 
     def testShowIndexFalse(self) -> None:
-        """Verify that showIndex(show=False) stores False.
-
-        Ensures the flag can be explicitly disabled so index numbers
-        are omitted from panel titles.
+        """
+        Verify that ``showIndex`` stores an explicitly disabled flag.
 
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            This test does not return a value.
         """
         dumper = self._make()
         dumper.showIndex(show=False)
         self.assertFalse(dumper._VarDumper__show_index)
 
     def testShowIndexRaisesTypeError(self) -> None:
-        """Verify that showIndex raises TypeError when show is not a bool.
-
-        Ensures invalid argument types are rejected early with a descriptive
-        error rather than silently mis-configuring the dumper.
+        """
+        Verify that ``showIndex`` rejects a non-boolean flag.
 
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            This test does not return a value.
         """
         dumper = self._make()
         with self.assertRaises(TypeError):
@@ -206,60 +187,52 @@ class TestVarDumper(TestCase):
     # ------------------------------------------------------------------ #
 
     def testExpandAllReturnsSelf(self) -> None:
-        """Verify that expandAll returns the VarDumper instance for method chaining.
-
-        Ensures the fluent interface contract is honoured so callers can
-        chain configuration calls without capturing intermediate results.
+        """
+        Verify that ``expandAll`` returns the dumper for chaining.
 
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            This test does not return a value.
         """
         dumper = self._make()
         result = dumper.expandAll()
         self.assertIs(result, dumper)
 
     def testExpandAllDefaultTrue(self) -> None:
-        """Verify that expandAll() called with its default argument stores True.
-
-        Ensures that omitting the keyword argument uses the documented
-        default value of True.
+        """
+        Verify that ``expandAll`` enables expansion by default.
 
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            This test does not return a value.
         """
         dumper = self._make()
         dumper.expandAll()
         self.assertTrue(dumper._VarDumper__expand_all)
 
     def testExpandAllFalse(self) -> None:
-        """Verify that expandAll(expand=False) stores False.
-
-        Ensures nested data structures can be rendered collapsed by
-        explicitly disabling full expansion.
+        """
+        Verify that ``expandAll`` stores an explicitly disabled flag.
 
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            This test does not return a value.
         """
         dumper = self._make()
         dumper.expandAll(expand=False)
         self.assertFalse(dumper._VarDumper__expand_all)
 
     def testExpandAllRaisesTypeError(self) -> None:
-        """Verify that expandAll raises TypeError when expand is not a bool.
-
-        Ensures invalid argument types are rejected early with a descriptive
-        error rather than silently mis-configuring the dumper.
+        """
+        Verify that ``expandAll`` rejects a non-boolean flag.
 
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            This test does not return a value.
         """
         dumper = self._make()
         with self.assertRaises(TypeError):
@@ -270,75 +243,65 @@ class TestVarDumper(TestCase):
     # ------------------------------------------------------------------ #
 
     def testMaxDepthReturnsSelf(self) -> None:
-        """Verify that maxDepth returns the VarDumper instance for method chaining.
-
-        Ensures the fluent interface contract is honoured so callers can
-        chain configuration calls without capturing intermediate results.
+        """
+        Verify that ``maxDepth`` returns the dumper for chaining.
 
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            This test does not return a value.
         """
         dumper = self._make()
         result = dumper.maxDepth(5)
         self.assertIs(result, dumper)
 
     def testMaxDepthNone(self) -> None:
-        """Verify that maxDepth(None) stores None to indicate unlimited depth.
-
-        Ensures callers can explicitly configure the dumper to traverse
-        nested structures without any depth restriction.
+        """
+        Verify that ``maxDepth`` accepts ``None`` for unlimited depth.
 
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            This test does not return a value.
         """
         dumper = self._make()
         dumper.maxDepth(None)
         self.assertIsNone(dumper._VarDumper__max_depth)
 
     def testMaxDepthPositiveInt(self) -> None:
-        """Verify that maxDepth stores a positive integer depth limit.
-
-        Ensures the configured depth is preserved exactly and passed on
-        to the Rich Pretty renderer for nested structure formatting.
+        """
+        Verify that ``maxDepth`` stores a positive integer limit.
 
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            This test does not return a value.
         """
         dumper = self._make()
         dumper.maxDepth(3)
         self.assertEqual(dumper._VarDumper__max_depth, 3)
 
     def testMaxDepthZero(self) -> None:
-        """Verify that maxDepth(0) is accepted as a valid edge case.
-
-        Ensures the boundary value of zero is treated as a legal integer
-        and stored without raising any exception.
+        """
+        Verify that ``maxDepth`` accepts and stores a zero limit.
 
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            This test does not return a value.
         """
         dumper = self._make()
         dumper.maxDepth(0)
         self.assertEqual(dumper._VarDumper__max_depth, 0)
 
     def testMaxDepthRaisesTypeError(self) -> None:
-        """Verify that maxDepth raises TypeError for a non-int, non-None argument.
-
-        Ensures strings, floats, and other invalid types are rejected
-        before they can corrupt the internal configuration.
+        """
+        Verify that ``maxDepth`` rejects a string depth limit.
 
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            This test does not return a value.
         """
         dumper = self._make()
         with self.assertRaises(TypeError):
@@ -349,60 +312,52 @@ class TestVarDumper(TestCase):
     # ------------------------------------------------------------------ #
 
     def testModulePathReturnsSelf(self) -> None:
-        """Verify that modulePath returns the VarDumper instance for method chaining.
-
-        Ensures the fluent interface contract is honoured so callers can
-        chain configuration calls without capturing intermediate results.
+        """
+        Verify that ``modulePath`` returns the dumper for chaining.
 
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            This test does not return a value.
         """
         dumper = self._make()
         result = dumper.modulePath("some.module")
         self.assertIs(result, dumper)
 
     def testModulePathNone(self) -> None:
-        """Verify that modulePath(None) stores None.
-
-        Ensures the module path can be cleared or left unset, causing the
-        dumper to resolve the caller's module automatically at print time.
+        """
+        Verify that ``modulePath`` accepts and stores ``None``.
 
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            This test does not return a value.
         """
         dumper = self._make()
         dumper.modulePath(None)
         self.assertIsNone(dumper._VarDumper__module_path)
 
     def testModulePathString(self) -> None:
-        """Verify that modulePath stores the provided module path string verbatim.
-
-        Ensures the configured value is preserved exactly and used in the
-        dump header instead of the auto-resolved caller module name.
+        """
+        Verify that ``modulePath`` preserves the supplied string.
 
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            This test does not return a value.
         """
         dumper = self._make()
         dumper.modulePath("orionis.app.module")
         self.assertEqual(dumper._VarDumper__module_path, "orionis.app.module")
 
     def testModulePathRaisesTypeError(self) -> None:
-        """Verify that modulePath raises TypeError for a non-str, non-None argument.
-
-        Ensures numeric values and other invalid types are rejected before
-        they can produce malformed header output.
+        """
+        Verify that ``modulePath`` rejects an integer argument.
 
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            This test does not return a value.
         """
         dumper = self._make()
         with self.assertRaises(TypeError):
@@ -413,60 +368,52 @@ class TestVarDumper(TestCase):
     # ------------------------------------------------------------------ #
 
     def testLineNumberReturnsSelf(self) -> None:
-        """Verify that lineNumber returns the VarDumper instance for method chaining.
-
-        Ensures the fluent interface contract is honoured so callers can
-        chain configuration calls without capturing intermediate results.
+        """
+        Verify that ``lineNumber`` returns the dumper for chaining.
 
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            This test does not return a value.
         """
         dumper = self._make()
         result = dumper.lineNumber(42)
         self.assertIs(result, dumper)
 
     def testLineNumberNone(self) -> None:
-        """Verify that lineNumber(None) stores None.
-
-        Ensures the line number can be cleared so the dumper resolves
-        the caller's line automatically at print time.
+        """
+        Verify that ``lineNumber`` accepts and stores ``None``.
 
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            This test does not return a value.
         """
         dumper = self._make()
         dumper.lineNumber(None)
         self.assertIsNone(dumper._VarDumper__line_number)
 
     def testLineNumberPositiveInt(self) -> None:
-        """Verify that lineNumber stores the provided integer line number.
-
-        Ensures the configured line number is preserved exactly and shown
-        in the dump header without modification.
+        """
+        Verify that ``lineNumber`` preserves the supplied integer.
 
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            This test does not return a value.
         """
         dumper = self._make()
         dumper.lineNumber(99)
         self.assertEqual(dumper._VarDumper__line_number, 99)
 
     def testLineNumberRaisesTypeError(self) -> None:
-        """Verify that lineNumber raises TypeError for a non-int, non-None argument.
-
-        Ensures string values and other invalid types are rejected before
-        they can produce invalid header output.
+        """
+        Verify that ``lineNumber`` rejects a string argument.
 
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            This test does not return a value.
         """
         dumper = self._make()
         with self.assertRaises(TypeError):
@@ -477,60 +424,52 @@ class TestVarDumper(TestCase):
     # ------------------------------------------------------------------ #
 
     def testForceExitReturnsSelf(self) -> None:
-        """Verify that forceExit returns the VarDumper instance for method chaining.
-
-        Ensures the fluent interface contract is honoured so callers can
-        chain configuration calls without capturing intermediate results.
+        """
+        Verify that ``forceExit`` returns the dumper for chaining.
 
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            This test does not return a value.
         """
         dumper = self._make()
         result = dumper.forceExit()
         self.assertIs(result, dumper)
 
     def testForceExitDefaultTrue(self) -> None:
-        """Verify that forceExit() called with its default argument stores True.
-
-        Ensures that calling forceExit() without an explicit argument
-        enables the force-exit behaviour as documented.
+        """
+        Verify that ``forceExit`` enables termination by default.
 
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            This test does not return a value.
         """
         dumper = self._make()
         dumper.forceExit()
         self.assertTrue(dumper._VarDumper__force_exit)
 
     def testForceExitFalse(self) -> None:
-        """Verify that forceExit(force=False) stores False.
-
-        Ensures the flag can be explicitly disabled so the dumper does
-        not terminate the process after printing.
+        """
+        Verify that ``forceExit`` stores an explicitly disabled flag.
 
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            This test does not return a value.
         """
         dumper = self._make()
         dumper.forceExit(force=False)
         self.assertFalse(dumper._VarDumper__force_exit)
 
     def testForceExitRaisesTypeError(self) -> None:
-        """Verify that forceExit raises TypeError when force is not a bool.
-
-        Ensures non-boolean values like integers are rejected with a
-        descriptive error rather than silently mis-configuring the dumper.
+        """
+        Verify that ``forceExit`` rejects a non-boolean flag.
 
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            This test does not return a value.
         """
         dumper = self._make()
         with self.assertRaises(TypeError):
@@ -541,60 +480,52 @@ class TestVarDumper(TestCase):
     # ------------------------------------------------------------------ #
 
     def testRedirectOutputReturnsSelf(self) -> None:
-        """Verify that redirectOutput returns the VarDumper instance for chaining.
-
-        Ensures the fluent interface contract is honoured so callers can
-        chain configuration calls without capturing intermediate results.
+        """
+        Verify that ``redirectOutput`` returns the dumper for chaining.
 
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            This test does not return a value.
         """
         dumper = self._make()
         result = dumper.redirectOutput()
         self.assertIs(result, dumper)
 
     def testRedirectOutputDefaultTrue(self) -> None:
-        """Verify that redirectOutput() called with its default argument stores True.
-
-        Ensures that omitting the keyword argument enables output redirection
-        as documented.
+        """
+        Verify that ``redirectOutput`` enables redirection by default.
 
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            This test does not return a value.
         """
         dumper = self._make()
         dumper.redirectOutput()
         self.assertTrue(dumper._VarDumper__redirect_output)
 
     def testRedirectOutputFalse(self) -> None:
-        """Verify that redirectOutput(redirect=False) stores False.
-
-        Ensures stdout and stderr restoration can be explicitly disabled
-        when the caller manages streams independently.
+        """
+        Verify that ``redirectOutput`` stores an explicitly disabled flag.
 
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            This test does not return a value.
         """
         dumper = self._make()
         dumper.redirectOutput(redirect=False)
         self.assertFalse(dumper._VarDumper__redirect_output)
 
     def testRedirectOutputRaisesTypeError(self) -> None:
-        """Verify that redirectOutput raises TypeError when redirect is not a bool.
-
-        Ensures invalid argument types are rejected early with a descriptive
-        error rather than silently mis-configuring the dumper.
+        """
+        Verify that ``redirectOutput`` rejects a non-boolean flag.
 
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            This test does not return a value.
         """
         dumper = self._make()
         with self.assertRaises(TypeError):
@@ -605,30 +536,26 @@ class TestVarDumper(TestCase):
     # ------------------------------------------------------------------ #
 
     def testValueReturnsSelf(self) -> None:
-        """Verify that value returns the VarDumper instance for method chaining.
-
-        Ensures the fluent interface contract is honoured so multiple
-        values can be added with consecutive chained calls.
+        """
+        Verify that ``value`` returns the dumper for chaining.
 
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            This test does not return a value.
         """
         dumper = self._make()
         result = dumper.value("hello")
         self.assertIs(result, dumper)
 
     def testValueStoresSingleValue(self) -> None:
-        """Verify that a single call to value adds exactly one entry to the args list.
-
-        Ensures that each call to value produces exactly one stored entry
-        without duplicating or discarding the argument.
+        """
+        Verify that ``value`` adds exactly one stored entry.
 
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            This test does not return a value.
         """
         dumper = self._make()
         self.assertEqual(len(dumper._VarDumper__args), 0)
@@ -636,15 +563,13 @@ class TestVarDumper(TestCase):
         self.assertEqual(len(dumper._VarDumper__args), 1)
 
     def testValueStoresTypeInfo(self) -> None:
-        """Verify that value records the type name alongside the stored value.
-
-        Ensures the internal entry contains a 'type' key with the
-        class name so it can be rendered in the panel title.
+        """
+        Verify that ``value`` records the stored argument's type name.
 
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            This test does not return a value.
         """
         dumper = self._make()
         dumper.value(42)
@@ -653,15 +578,13 @@ class TestVarDumper(TestCase):
         self.assertEqual(entry["type"], "int")
 
     def testValueDeepCopies(self) -> None:
-        """Verify that value deep-copies the argument so later mutations are isolated.
-
-        Ensures mutations to the original object after calling value do not
-        affect the data that will be rendered at print time.
+        """
+        Verify that later mutations leave a stored value unchanged.
 
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            This test does not return a value.
         """
         dumper = self._make()
         original = [1, 2, 3]
@@ -671,15 +594,13 @@ class TestVarDumper(TestCase):
         self.assertNotIn(4, stored)
 
     def testValueAcceptsDiverseTypes(self) -> None:
-        """Verify that value accepts Python built-in types without raising errors.
-
-        Ensures None, bool, float, dict, tuple, and list are all accepted
-        so the dumper can handle any value a caller might pass.
+        """
+        Verify that ``value`` accepts common built-in Python types.
 
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            This test does not return a value.
         """
         dumper = self._make()
         for v in (None, True, 3.14, {"key": "val"}, (1, 2), [1, 2]):
@@ -691,45 +612,39 @@ class TestVarDumper(TestCase):
     # ------------------------------------------------------------------ #
 
     def testValuesReturnsSelf(self) -> None:
-        """Verify that values returns the VarDumper instance for method chaining.
-
-        Ensures the fluent interface contract is honoured so callers can
-        continue configuring the dumper after providing their data.
+        """
+        Verify that ``values`` returns the dumper for chaining.
 
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            This test does not return a value.
         """
         dumper = self._make()
         result = dumper.values(1, 2, 3)
         self.assertIs(result, dumper)
 
     def testValuesStoresAllArguments(self) -> None:
-        """Verify that all positional arguments provided to values are stored.
-
-        Ensures every argument passed to values ends up as a separate
-        entry in the internal args list ready for rendering.
+        """
+        Verify that ``values`` stores one entry per positional argument.
 
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            This test does not return a value.
         """
         dumper = self._make()
         dumper.values("a", "b", "c")
         self.assertEqual(len(dumper._VarDumper__args), 3)
 
     def testValuesWithNoArguments(self) -> None:
-        """Verify that calling values with no arguments does not raise an error.
-
-        Ensures the empty-call edge case is handled gracefully and the
-        instance remains valid for subsequent use.
+        """
+        Verify that an empty ``values`` call returns the unchanged dumper.
 
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            This test does not return a value.
         """
         dumper = self._make()
         result = dumper.values()
@@ -737,15 +652,13 @@ class TestVarDumper(TestCase):
         self.assertEqual(len(dumper._VarDumper__args), 0)
 
     def testValuesCumulatesWithValue(self) -> None:
-        """Verify that values and value calls accumulate entries together.
-
-        Ensures entries added via value and values are combined in the
-        same internal list so the full set is printed together.
+        """
+        Verify that ``value`` and ``values`` accumulate entries together.
 
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            This test does not return a value.
         """
         dumper = self._make()
         dumper.value("first")
@@ -757,15 +670,13 @@ class TestVarDumper(TestCase):
     # ------------------------------------------------------------------ #
 
     def testPrintReturnsNone(self) -> None:
-        """Verify that the print method always returns None.
-
-        Ensures print is a pure side-effect method that does not
-        accidentally return a value that callers might depend on.
+        """
+        Verify that ``print`` returns ``None`` after rendering a value.
 
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            This test does not return a value.
         """
         dumper = self._make()
         dumper.value("test")
@@ -773,15 +684,13 @@ class TestVarDumper(TestCase):
         self.assertIsNone(result)
 
     def testPrintCallsConsole(self) -> None:
-        """Verify that print delegates rendering to the internal Rich Console.
-
-        Ensures all formatted output goes through the Console instance
-        and is not written directly to stdout.
+        """
+        Verify that ``print`` delegates output to the Rich console.
 
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            This test does not return a value.
         """
         dumper = self._make()
         mock_con = dumper._VarDumper__console
@@ -790,15 +699,13 @@ class TestVarDumper(TestCase):
         self.assertTrue(mock_con.print.called)
 
     def testPrintCallsConsoleMultipleTimesWithValue(self) -> None:
-        """Verify that print calls Console.print at least twice when a value is stored.
-
-        Ensures the header and the value panel are printed as separate
-        Console.print calls rather than combined into one.
+        """
+        Verify that printing one value makes at least two console calls.
 
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            This test does not return a value.
         """
         dumper = self._make()
         mock_con = dumper._VarDumper__console
@@ -807,15 +714,13 @@ class TestVarDumper(TestCase):
         self.assertGreaterEqual(mock_con.print.call_count, 2)
 
     def testPrintWithInsertLine(self) -> None:
-        """Verify that print(insert_line=True) completes without errors.
-
-        Ensures the optional blank-line padding around output can be
-        enabled without raising any exception.
+        """
+        Verify that ``print`` accepts blank-line padding.
 
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            This test does not return a value.
         """
         dumper = self._make()
         dumper.value("test")
@@ -824,15 +729,13 @@ class TestVarDumper(TestCase):
         self.assertIsNone(result)
 
     def testPrintWithPresetModuleAndLine(self) -> None:
-        """Verify that print uses the pre-configured module path and line number.
-
-        Ensures that when both modulePath and lineNumber are set manually
-        the auto-resolver is bypassed and print completes normally.
+        """
+        Verify that ``print`` accepts a preset module path and line number.
 
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            This test does not return a value.
         """
         dumper = self._make()
         dumper.modulePath("custom.module")
@@ -842,30 +745,26 @@ class TestVarDumper(TestCase):
         self.assertIsNone(result)
 
     def testPrintWithNoStoredValues(self) -> None:
-        """Verify that print completes without error when no values have been stored.
-
-        Ensures the empty-args edge case is handled gracefully and only a
-        header is rendered without attempting to iterate over panels.
+        """
+        Verify that ``print`` returns ``None`` when no values are stored.
 
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            This test does not return a value.
         """
         dumper = self._make()
         result = dumper.print()
         self.assertIsNone(result)
 
     def testPrintWithShowTypesDisabled(self) -> None:
-        """Verify that print works correctly when type display is disabled.
-
-        Ensures disabling showTypes produces no error and the panel
-        is rendered without a type annotation in the title.
+        """
+        Verify that ``print`` succeeds with type labels disabled.
 
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            This test does not return a value.
         """
         dumper = self._make()
         dumper.showTypes(show=False)
@@ -874,15 +773,13 @@ class TestVarDumper(TestCase):
         self.assertIsNone(result)
 
     def testPrintWithShowIndexDisabled(self) -> None:
-        """Verify that print works correctly when index display is disabled.
-
-        Ensures disabling showIndex produces no error and the panel
-        is rendered without an index number in the title.
+        """
+        Verify that ``print`` succeeds with index labels disabled.
 
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            This test does not return a value.
         """
         dumper = self._make()
         dumper.showIndex(show=False)
@@ -891,15 +788,13 @@ class TestVarDumper(TestCase):
         self.assertIsNone(result)
 
     def testPrintWithBothFlagsDisabled(self) -> None:
-        """Verify that print works when both showTypes and showIndex are disabled.
-
-        Ensures the panel is rendered with no title when both display
-        flags are False without causing any exception.
+        """
+        Verify that ``print`` succeeds with both display labels disabled.
 
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            This test does not return a value.
         """
         dumper = self._make()
         dumper.showTypes(show=False)
@@ -909,15 +804,13 @@ class TestVarDumper(TestCase):
         self.assertIsNone(result)
 
     def testPrintWithMaxDepthSet(self) -> None:
-        """Verify that print works correctly with a non-default max depth.
-
-        Ensures that setting a depth limit propagates to the panel
-        renderer without raising errors.
+        """
+        Verify that ``print`` accepts a configured depth limit.
 
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            This test does not return a value.
         """
         dumper = self._make()
         dumper.maxDepth(2)
@@ -930,15 +823,13 @@ class TestVarDumper(TestCase):
     # ------------------------------------------------------------------ #
 
     def testToHtmlReturnsString(self) -> None:
-        """Verify that toHtml returns a string value.
-
-        Ensures the method produces a serialisable HTML representation
-        that callers can write to a file or send over HTTP.
+        """
+        Verify that ``toHtml`` returns a string for stored values.
 
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            This test does not return a value.
         """
         dumper = self._make()
         mock_con = dumper._VarDumper__console
@@ -948,15 +839,13 @@ class TestVarDumper(TestCase):
         self.assertIsInstance(result, str)
 
     def testToHtmlCallsExportHtml(self) -> None:
-        """Verify that toHtml delegates to Console.export_html for HTML generation.
-
-        Ensures the method uses the Rich Console's built-in export feature
-        rather than implementing its own serialisation logic.
+        """
+        Verify that ``toHtml`` delegates to the console's HTML exporter.
 
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            This test does not return a value.
         """
         dumper = self._make()
         mock_con = dumper._VarDumper__console
@@ -966,15 +855,13 @@ class TestVarDumper(TestCase):
         mock_con.export_html.assert_called_once()
 
     def testToHtmlWithInsertLine(self) -> None:
-        """Verify that toHtml(insert_line=True) completes without errors.
-
-        Ensures the optional blank-line padding can be enabled in the
-        HTML export path without raising any exception.
+        """
+        Verify that ``toHtml`` accepts the blank-line padding option.
 
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            This test does not return a value.
         """
         dumper = self._make()
         mock_con = dumper._VarDumper__console
@@ -985,15 +872,13 @@ class TestVarDumper(TestCase):
         self.assertIsInstance(result, str)
 
     def testToHtmlWithNoValues(self) -> None:
-        """Verify that toHtml completes without error when no values are stored.
-
-        Ensures callers can obtain an HTML export of an empty dump session
-        without having to add any values first.
+        """
+        Verify that ``toHtml`` returns a string without stored values.
 
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            This test does not return a value.
         """
         dumper = self._make()
         mock_con = dumper._VarDumper__console
@@ -1001,20 +886,287 @@ class TestVarDumper(TestCase):
         result = dumper.toHtml()
         self.assertIsInstance(result, str)
 
+    def testToHtmlDoesNotPrintRedirectOrExit(self) -> None:
+        """
+        Verify that HTML export neither writes to streams nor exits.
+
+        Returns
+        -------
+        None
+            This test does not return a value.
+        """
+        dumper = (
+            VarDumper()
+            .values({"marker": "html-only-marker"})
+            .forceExit(force=True)
+            .redirectOutput(redirect=True)
+        )
+        stdout, stderr = StringIO(), StringIO()
+        with (
+            patch("sys.exit") as sys_exit,
+            patch("os._exit") as os_exit,
+            redirect_stdout(stdout),
+            redirect_stderr(stderr),
+        ):
+            html = dumper.toHtml(insert_line=True)
+
+        self.assertIn("html-only-marker", html)
+        self.assertEqual(stdout.getvalue(), "")
+        self.assertEqual(stderr.getvalue(), "")
+        sys_exit.assert_not_called()
+        os_exit.assert_not_called()
+
+    def testToHtmlEscapesValuesAndOmitsTheConsoleHeader(self) -> None:
+        """
+        Verify that HTML export escapes values and omits the console header.
+
+        Returns
+        -------
+        None
+            This test does not return a value.
+        """
+        dumper = VarDumper().values("<script>alert('dump')</script>")
+        stdout = StringIO()
+        with redirect_stdout(stdout):
+            dumper.print()
+            html = dumper.toHtml()
+
+        self.assertIn("&lt;script&gt;", html)
+        self.assertNotIn("<script>", html)
+        self.assertNotIn("Module(", html)
+        self.assertEqual(html.count("&lt;script&gt;"), 1)
+
+    def testToHtmlDoesNotAccumulatePreviousExports(self) -> None:
+        """
+        Verify that repeated HTML exports do not accumulate prior output.
+
+        Returns
+        -------
+        None
+            This test does not return a value.
+        """
+        dumper = (
+            VarDumper()
+            .showIndex(show=False)
+            .showTypes(show=False)
+            .values("repeat-html-marker")
+        )
+        with redirect_stdout(StringIO()):
+            first = dumper.toHtml()
+            second = dumper.toHtml()
+
+        self.assertEqual(first, second)
+        self.assertEqual(second.count("repeat-html-marker"), 1)
+
+    def testToHtmlUsesNativeDiagnosticPanels(self) -> None:
+        """
+        Verify that HTML uses themed value panels without terminal borders.
+
+        Returns
+        -------
+        None
+            This test does not return a value.
+        """
+        html = VarDumper().values({"message": "Hola"}, [1, 2]).toHtml()
+
+        self.assertEqual(html.count('class="code-container dump-panel"'), 2)
+        self.assertEqual(html.count('class="dump-output"'), 2)
+        self.assertIn("var(--orionis-border,#dce1e7)", html)
+        self.assertIn("var(--orionis-mono,", html)
+        self.assertIn("min-width:min-content", html)
+        self.assertIn("#1", html)
+        self.assertIn("#2", html)
+        self.assertIn("dict", html)
+        self.assertIn("list", html)
+        self.assertNotIn("\u256d", html)
+        self.assertNotIn("\u256e", html)
+
+    def testToHtmlShowsConfiguredLocation(self) -> None:
+        """
+        Verify that HTML panel headers show the configured file and line.
+
+        Returns
+        -------
+        None
+            This test does not return a value.
+        """
+        filename = r"app\http\controllers\auth\login_controller.py"
+        html = (
+            VarDumper()
+            .modulePath(filename)
+            .lineNumber(23)
+            .values("first", "second")
+            .toHtml()
+        )
+
+        self.assertEqual(html.count(f">{filename}:23</span>"), 2)
+        self.assertNotIn(">Python</span>", html)
+
+    def testToHtmlCapturesCallerLocation(self) -> None:
+        """
+        Verify that HTML captures caller location without changing metadata.
+
+        Returns
+        -------
+        None
+            This test does not return a value.
+        """
+        dumper = VarDumper().values("caller-location")
+        frame = inspect.currentframe()
+        if frame is None:
+            self.fail("The test requires Python frame support.")
+        filename = frame.f_code.co_filename
+        line_number = frame.f_lineno + 1
+        html = dumper.toHtml()
+        del frame
+
+        self.assertIn(f">{escape(filename)}:{line_number}</span>", html)
+        self.assertIsNone(dumper._VarDumper__module_path)
+        self.assertIsNone(dumper._VarDumper__line_number)
+        self.assertEqual(html, dumper.toHtml())
+        with redirect_stdout(StringIO()) as stdout:
+            dumper.print()
+        self.assertIn(__name__, stdout.getvalue())
+
+    def testToHtmlEscapesSourceLocation(self) -> None:
+        """
+        Verify that HTML escapes source filenames in panel headers.
+
+        Returns
+        -------
+        None
+            This test does not return a value.
+        """
+        filename = '<img src=x onerror="alert(1)">.py'
+        html = VarDumper().modulePath(filename).lineNumber(42).values("x").toHtml()
+
+        self.assertIn(f">{escape(filename)}:42</span>", html)
+        self.assertNotIn("<img", html)
+
+    def testToHtmlShowsUnknownLocationWithoutAFrame(self) -> None:
+        """
+        Verify that HTML marks the source unknown when no frame is available.
+
+        Returns
+        -------
+        None
+            This test does not return a value.
+        """
+        dumper = VarDumper().values("no-frame")
+        with patch(
+            "orionis.console.output.var_dumper.inspect.currentframe",
+            return_value=None,
+        ):
+            html = dumper.toHtml()
+
+        self.assertIn(">unknown:?</span>", html)
+
+    def testToHtmlLeavesConsoleIndicesUnchanged(self) -> None:
+        """
+        Verify that HTML exports leave terminal indices unchanged.
+
+        Returns
+        -------
+        None
+            This test does not return a value.
+        """
+        dumper = VarDumper().values("repeat-native-panel")
+        first = dumper.toHtml()
+        second = dumper.toHtml()
+
+        self.assertEqual(first, second)
+        self.assertEqual(dumper._VarDumper__last_index, 0)
+        with redirect_stdout(StringIO()):
+            dumper.print()
+        self.assertEqual(dumper._VarDumper__last_index, 1)
+
+    def testToHtmlEscapesTypeLabels(self) -> None:
+        """
+        Verify that HTML escapes custom type names in panel labels.
+
+        Returns
+        -------
+        None
+            This test does not return a value.
+        """
+        value = type("</span><img src=x onerror=alert(1)>", (), {})()
+        html = VarDumper().values(value).toHtml()
+
+        self.assertIn("&lt;/span&gt;&lt;img src=x onerror=alert(1)&gt;", html)
+        self.assertNotIn("<img", html)
+
+    def testToHtmlRespectsHiddenLabelsAndDepth(self) -> None:
+        """
+        Verify that HTML honors hidden labels and the configured depth limit.
+
+        Returns
+        -------
+        None
+            This test does not return a value.
+        """
+        html = (
+            VarDumper()
+            .showIndex(show=False)
+            .showTypes(show=False)
+            .expandAll(expand=True)
+            .maxDepth(1)
+            .values({"nested": {"marker": "hidden-depth-marker"}})
+            .toHtml()
+        )
+
+        self.assertNotIn(">#1", html)
+        self.assertNotIn(">dict<", html)
+        self.assertNotIn("hidden-depth-marker", html)
+        self.assertIn("...", html)
+
+    def testToHtmlPreservesConsoleExitConfiguration(self) -> None:
+        """
+        Verify that HTML export preserves the console's termination setting.
+
+        Returns
+        -------
+        None
+            This test does not return a value.
+        """
+        dumper = VarDumper().values("preserved-exit").forceExit(force=True)
+        with (
+            redirect_stdout(StringIO()),
+            patch("sys.exit") as sys_exit,
+        ):
+            dumper.toHtml()
+            sys_exit.assert_not_called()
+            dumper.print()
+
+        sys_exit.assert_called_once_with(1)
+
+    def testPrintPreservesTheCallingModuleHeader(self) -> None:
+        """
+        Verify that the console header identifies the calling module.
+
+        Returns
+        -------
+        None
+            This test does not return a value.
+        """
+        dumper = VarDumper().values("caller-header")
+        stdout = StringIO()
+        with redirect_stdout(stdout):
+            dumper.print()
+
+        self.assertIn(__name__, stdout.getvalue())
+
     # ------------------------------------------------------------------ #
     #  forceExit behaviour                                               #
     # ------------------------------------------------------------------ #
 
     def testForceExitTriggersSysExit(self) -> None:
-        """Verify that print calls sys.exit(1) after dumping when forceExit is enabled.
-
-        Ensures the process-termination behaviour is triggered at the
-        correct point in the output pipeline with the expected exit code.
+        """
+        Verify that ``print`` calls ``sys.exit(1)`` when forced to exit.
 
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            This test does not return a value.
         """
         dumper = self._make()
         dumper.forceExit()
@@ -1028,15 +1180,13 @@ class TestVarDumper(TestCase):
     # ------------------------------------------------------------------ #
 
     def testMethodChainingCompletes(self) -> None:
-        """Verify that all setter methods can be chained on a single instance.
-
-        Ensures the fluent API is consistent across all configuration
-        methods and that the final reference is the original VarDumper.
+        """
+        Verify that configuration methods and ``value`` support chaining.
 
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            This test does not return a value.
         """
         dumper = self._make()
         result = (
@@ -1054,15 +1204,13 @@ class TestVarDumper(TestCase):
         self.assertIs(result, dumper)
 
     def testMethodChainingWithValues(self) -> None:
-        """Verify that value and values can be chained alongside configuration methods.
-
-        Ensures the fluent API allows interleaving configuration and data
-        additions without losing the instance reference.
+        """
+        Verify that chained ``value`` and ``values`` calls retain all entries.
 
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            This test does not return a value.
         """
         dumper = self._make()
         result = dumper.value("a").value("b").values("c", "d")

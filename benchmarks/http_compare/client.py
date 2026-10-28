@@ -1,5 +1,3 @@
-"""Install the pinned load generator and normalize its measured results."""
-
 import hashlib
 import math
 import platform
@@ -9,7 +7,9 @@ from typing import TYPE_CHECKING, Any
 if TYPE_CHECKING:
     from pathlib import Path
 
+# Pinned oha version and asset digests for supported platforms.
 OHA_VERSION = "1.16.0"
+
 # SHA-256 digests of the official release assets.
 OHA_ASSETS = {
     ("Linux", "amd64"): (
@@ -33,7 +33,6 @@ OHA_ASSETS = {
         "d692d392e958e7e8e1b16810287e74a835a62255b079ba2766a4b3b04499f267",
     ),
 }
-
 
 def install_oha(directory: Path) -> Path:
     """
@@ -74,7 +73,6 @@ def install_oha(directory: Path) -> Path:
     destination.chmod(0o755)
     return destination
 
-
 def _nonnegative_number(value: object) -> float:
     """
     Validate and convert a finite nonnegative measurement.
@@ -105,7 +103,6 @@ def _nonnegative_number(value: object) -> float:
         raise ValueError(error_msg)
     return number
 
-
 def _count(value: object) -> int:
     """
     Validate an integral request or error count.
@@ -131,7 +128,6 @@ def _count(value: object) -> int:
         error_msg = "Expected an integer request count in oha output"
         raise ValueError(error_msg)
     return int(number)
-
 
 def parse_measurement(raw: dict[str, Any]) -> dict[str, int | float]:
     """

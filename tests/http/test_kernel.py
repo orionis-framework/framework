@@ -20,7 +20,7 @@ from orionis.http.layer.web.start_session import StartSessionMiddleware
 from orionis.http.middleware import BaseMiddleware
 from orionis.http.payload.body import BodyStream
 from orionis.http.request import Request
-from orionis.http.responses import JSONResponse, Response
+from orionis.http.responses import HTMLResponse, JSONResponse, Response
 from orionis.http.routes.entities.compiled_route import CompiledRoute
 from orionis.http.routes.enums.route_types import RouteType
 from orionis.http.routes.exceptions.route_not_found import RouteNotFound
@@ -394,7 +394,7 @@ class _StubScope:
         return self.entries.get(key)
 
 class _StubDefaultResponses:
-    """Default response factory double returning JSON payloads."""
+    """Default response factory double preserving the response formats."""
 
     __slots__ = ("asset_paths", "calls", "health_calls")
 
@@ -471,6 +471,22 @@ class _StubDefaultResponses:
             status_code=status_code,
             headers=headers,
         )
+
+    async def dump(self, content: str) -> HTMLResponse:
+        """
+        Return the dump fragment without exercising the template engine.
+
+        Parameters
+        ----------
+        content : str
+            Escaped dump fragment supplied by the kernel.
+
+        Returns
+        -------
+        HTMLResponse
+            Uncached HTML response matching the default factory's contract.
+        """
+        return HTMLResponse(content=content, headers={"Cache-Control": "no-store"})
 
 class _StubCatch:
     """Failure handler double translating exceptions into responses."""

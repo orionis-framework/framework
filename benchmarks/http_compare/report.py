@@ -33,7 +33,6 @@ FRAMEWORK_LABELS = {
     "starlette": "Starlette",
 }
 
-
 def aggregate_samples(samples: list[dict[str, Any]]) -> dict[str, Any]:
     """
     Aggregate independent runs without publishing metrics for failed samples.
@@ -77,7 +76,6 @@ def aggregate_samples(samples: list[dict[str, Any]]) -> dict[str, Any]:
         )
     return result
 
-
 def write_json(path: Path, value: object) -> None:
     """
     Write strict UTF-8 JSON with a trailing newline.
@@ -99,7 +97,6 @@ def write_json(path: Path, value: object) -> None:
         json.dumps(value, indent=2, ensure_ascii=False, allow_nan=False) + "\n",
         encoding="utf-8",
     )
-
 
 def render_summary(report: dict[str, Any]) -> str:
     """
@@ -178,7 +175,6 @@ def render_summary(report: dict[str, Any]) -> str:
             for row in failures
         )
     return "\n".join(lines) + "\n"
-
 
 def render_throughput_svg(report: dict[str, Any], workers: int) -> str:
     """
@@ -317,7 +313,6 @@ def render_throughput_svg(report: dict[str, Any], workers: int) -> str:
         )
     lines.append("</svg>")
     return "\n".join(lines) + "\n"
-
 
 def write_reports(output: Path, report: dict[str, Any]) -> str:
     """

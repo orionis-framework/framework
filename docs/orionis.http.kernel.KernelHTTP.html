@@ -224,6 +224,16 @@
         
 
         
+            <div class="itemName"><code><a href="#__exceptionResponse" class="internal-link" title="orionis.http.kernel.KernelHTTP.__exceptionResponse">__exception<wbr></wbr>Response</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
             <div class="itemName"><code><a href="#__globalMiddleware" class="internal-link" title="orionis.http.kernel.KernelHTTP.__globalMiddleware">__global<wbr></wbr>Middleware</a></code>
             </div>
         
@@ -765,11 +775,11 @@
         
         
             <div class="itemName expandableItem">
-                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId10156"> 
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId10166"> 
                     
                 </input>
 
-                <label class="lbl-toggle" for="expandableItemId10156">
+                <label class="lbl-toggle" for="expandableItemId10166">
                     
                     
                 </label>
@@ -877,11 +887,11 @@
         
         
             <div class="itemName expandableItem">
-                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId10157"> 
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId10167"> 
                     
                 </input>
 
-                <label class="lbl-toggle" for="expandableItemId10157">
+                <label class="lbl-toggle" for="expandableItemId10167">
                     
                     
                 </label>
@@ -1029,7 +1039,7 @@
         
         
             <div class="itemName expandableItem">
-                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId10158"> 
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId10168"> 
                     
                 </input>
 
@@ -1110,6 +1120,16 @@
 
         
             <div class="itemName"><code><a href="#__defaultMiddleware" class="internal-link" title="orionis.http.kernel.KernelHTTP.__defaultMiddleware">__default<wbr></wbr>Middleware</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#__exceptionResponse" class="internal-link" title="orionis.http.kernel.KernelHTTP.__exceptionResponse">__exception<wbr></wbr>Response</a></code>
             </div>
         
 
@@ -1747,7 +1767,7 @@
         </div>
 
         <div class="extrasDocstring">
-          <p class="class-signature"><code><span class="py-keyword">class</span> <span class="py-defname">KernelHTTP</span>(<a href="orionis.http.contracts.kernel.IKernelHTTP.html" class="internal-link" title="orionis.http.contracts.kernel.IKernelHTTP">IKernelHTTP</a>): <a href="https://github.com/orionis-framework/framework/tree/63118a323607916eaf89992769fe1f9b31fbe1c4/orionis/http/kernel.py#L207" class="sourceLink">(source)</a></code></p><p>Constructor: <code><a href="#__init__" class="internal-link" title="orionis.http.kernel.KernelHTTP.__init__">KernelHTTP(app, catch)</a></code></p><p><a href="classIndex.html#orionis.http.kernel.KernelHTTP">View In Hierarchy</a></p>
+          <p class="class-signature"><code><span class="py-keyword">class</span> <span class="py-defname">KernelHTTP</span>(<a href="orionis.http.contracts.kernel.IKernelHTTP.html" class="internal-link" title="orionis.http.contracts.kernel.IKernelHTTP">IKernelHTTP</a>): <a href="https://github.com/orionis-framework/framework/tree/49353208eff746554bbd833a5cdbf03d9e7f7ccc/orionis/http/kernel.py#L209" class="sourceLink">(source)</a></code></p><p>Constructor: <code><a href="#__init__" class="internal-link" title="orionis.http.kernel.KernelHTTP.__init__">KernelHTTP(app, catch)</a></code></p><p><a href="classIndex.html#orionis.http.kernel.KernelHTTP">View In Hierarchy</a></p>
         </div>
 
         <div class="moduleDocstring">
@@ -1755,7 +1775,7 @@
         </div>
 
         <div id="split-tables">
-          <table class="children sortable" id="id1026">
+          <table class="children sortable" id="id1031">
   
   
   <tr class="method">
@@ -1788,6 +1808,11 @@
     <td>Method</td>
     <td><code><a href="#__defaultMiddleware" class="internal-link" title="orionis.http.kernel.KernelHTTP.__defaultMiddleware">__default<wbr></wbr>Middleware</a></code></td>
     <td>Initialize default HTTP middleware stack.</td>
+  </tr><tr class="method">
+    
+    <td>Async Method</td>
+    <td><code><a href="#__exceptionResponse" class="internal-link" title="orionis.http.kernel.KernelHTTP.__exceptionResponse">__exception<wbr></wbr>Response</a></code></td>
+    <td>Apply endpoint policies and application handling to an ordinary error.</td>
   </tr><tr class="method">
     
     <td>Async Method</td>
@@ -2064,7 +2089,7 @@
     
     
     <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">__asgiResponse</span><span class="function-signature long-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">adapter: <code><a href="orionis.http.adapters.request.contracts.transport.TransportAdapter.html" class="internal-link" title="orionis.http.adapters.request.contracts.transport.TransportAdapter">TransportAdapter</a></code>, </span><span class="rst-sig-param">response: <code>Response</code>, </span><span class="rst-sig-param">receive: <code><a href="https://docs.python.org/3/builtins/functions.html#object" class="intersphinx-link">object</a></code>, </span><span class="rst-sig-param">send: <code><a href="https://docs.python.org/3/builtins/functions.html#object" class="intersphinx-link">object</a></code>, </span><span class="rst-sig-param">policy: <code><a href="orionis.http.contracts.endpoint_policy.IHttpEndpointPolicy.html" class="internal-link" title="orionis.http.contracts.endpoint_policy.IHttpEndpointPolicy">IHttpEndpointPolicy</a> | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code> = <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></span>):</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/63118a323607916eaf89992769fe1f9b31fbe1c4/orionis/http/kernel.py#L609">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/49353208eff746554bbd833a5cdbf03d9e7f7ccc/orionis/http/kernel.py#L611">
       
       (source)
     </a>
@@ -2094,7 +2119,7 @@ the response back to the client via ASGI protocol adapter.</p>
     
     
     <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">__bodyLengthResponse</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">adapter: <code><a href="orionis.http.adapters.request.contracts.transport.TransportAdapter.html" class="internal-link" title="orionis.http.adapters.request.contracts.transport.TransportAdapter">TransportAdapter</a></code></span>) -&gt; <code>Response | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/63118a323607916eaf89992769fe1f9b31fbe1c4/orionis/http/kernel.py#L999">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/49353208eff746554bbd833a5cdbf03d9e7f7ccc/orionis/http/kernel.py#L1040">
       
       (source)
     </a>
@@ -2122,7 +2147,7 @@ byte counting remains authoritative when length is absent or false.</td></tr></t
     
     
     <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">__callFallback</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">fallback: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" class="intersphinx-link">tuple</a></code></span>) -&gt; <code>Response</code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/63118a323607916eaf89992769fe1f9b31fbe1c4/orionis/http/kernel.py#L914">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/49353208eff746554bbd833a5cdbf03d9e7f7ccc/orionis/http/kernel.py#L916">
       
       (source)
     </a>
@@ -2149,7 +2174,7 @@ byte counting remains authoritative when length is absent or false.</td></tr></t
     
     
     <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">__callHandler</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">resolved_route: <code><a href="orionis.http.routes.entities.resolved_route.ResolvedRoute.html" class="internal-link" title="orionis.http.routes.entities.resolved_route.ResolvedRoute">ResolvedRoute</a></code>, </span><span class="rst-sig-param">request: <code>Request</code></span>) -&gt; <code>Response</code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/63118a323607916eaf89992769fe1f9b31fbe1c4/orionis/http/kernel.py#L849">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/49353208eff746554bbd833a5cdbf03d9e7f7ccc/orionis/http/kernel.py#L851">
       
       (source)
     </a>
@@ -2179,7 +2204,7 @@ eliminating per-request module imports and attribute lookups.</p>
     
     
     <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">__callWebSocketHandler</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">resolved_route: <code><a href="orionis.http.routes.entities.resolved_route.ResolvedRoute.html" class="internal-link" title="orionis.http.routes.entities.resolved_route.ResolvedRoute">ResolvedRoute</a></code>, </span><span class="rst-sig-param">socket: <code>WebSocket</code></span>):</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/63118a323607916eaf89992769fe1f9b31fbe1c4/orionis/http/kernel.py#L1265">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/49353208eff746554bbd833a5cdbf03d9e7f7ccc/orionis/http/kernel.py#L1305">
       
       (source)
     </a>
@@ -2206,7 +2231,7 @@ eliminating per-request module imports and attribute lookups.</p>
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">__defaultMiddleware</span><span class="function-signature long-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">http_config: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#dict" class="intersphinx-link">dict</a></code>, </span><span class="rst-sig-param">default_responses: <code><a href="orionis.http.default.contracts.responses.IDefaultResponses.html" class="internal-link" title="orionis.http.default.contracts.responses.IDefaultResponses">IDefaultResponses</a></code>, </span><span class="rst-sig-symbol">*, </span><span class="rst-sig-param">under_maintenance: <code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code> = <a href="https://docs.python.org/3/builtins/constants.html#False" class="intersphinx-link">False</a></span>):</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/63118a323607916eaf89992769fe1f9b31fbe1c4/orionis/http/kernel.py#L504">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/49353208eff746554bbd833a5cdbf03d9e7f7ccc/orionis/http/kernel.py#L506">
       
       (source)
     </a>
@@ -2226,6 +2251,33 @@ proxies, security, CORS, and rate limiting middleware.</p>
 </div><div class="basemethod">
   
   
+  <a name="orionis.http.kernel.KernelHTTP.__exceptionResponse">
+    
+  </a>
+  <a name="__exceptionResponse">
+    
+  </a>
+  <div class="functionHeader">
+    
+    
+    <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">__exceptionResponse</span><span class="function-signature long-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">exc: <code><a href="https://docs.python.org/3/builtins/exceptions.html#Exception" class="intersphinx-link">Exception</a></code>, </span><span class="rst-sig-param">request: <code><a href="https://docs.python.org/3/builtins/functions.html#object" class="intersphinx-link">object</a></code>, </span><span class="rst-sig-param">policy: <code><a href="orionis.http.contracts.endpoint_policy.IHttpEndpointPolicy.html" class="internal-link" title="orionis.http.contracts.endpoint_policy.IHttpEndpointPolicy">IHttpEndpointPolicy</a> | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></span>) -&gt; <code>Response</code>:</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/49353208eff746554bbd833a5cdbf03d9e7f7ccc/orionis/http/kernel.py#L995">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#__exceptionResponse" title="orionis.http.kernel.KernelHTTP.__exceptionResponse">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    
+    <div><p>Apply endpoint policies and application handling to an ordinary error.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">exc:</span><code><a href="https://docs.python.org/3/builtins/exceptions.html#Exception" class="intersphinx-link">Exception</a></code></td><td class="fieldArgDesc">Error to report or translate.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">request:</span><code><a href="https://docs.python.org/3/builtins/functions.html#object" class="intersphinx-link">object</a></code></td><td class="fieldArgDesc">Typed request or the adapter used before routing.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">policy:</span><code>IHttpEndpointPolicy | None</code></td><td class="fieldArgDesc">Optional endpoint-specific failure policy.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.http.Response.html" class="internal-link" title="orionis.http.Response">Response</a></code></td><td class="fieldArgDesc">Response produced by ordinary failure handling.</td></tr></table></div>
+  </div>
+</div><div class="basemethod">
+  
+  
   <a name="orionis.http.kernel.KernelHTTP.__globalMiddleware">
     
   </a>
@@ -2236,7 +2288,7 @@ proxies, security, CORS, and rate limiting middleware.</p>
     
     
     <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">__globalMiddleware</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">adapter: <code><a href="orionis.http.adapters.request.contracts.transport.TransportAdapter.html" class="internal-link" title="orionis.http.adapters.request.contracts.transport.TransportAdapter">TransportAdapter</a></code></span>) -&gt; <code>Response | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/63118a323607916eaf89992769fe1f9b31fbe1c4/orionis/http/kernel.py#L651">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/49353208eff746554bbd833a5cdbf03d9e7f7ccc/orionis/http/kernel.py#L653">
       
       (source)
     </a>
@@ -2268,7 +2320,7 @@ passes all middleware checks.</td></tr></table></div>
     
     
     <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">__handleException</span><span class="function-signature long-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">exc: <code><a href="https://docs.python.org/3/builtins/exceptions.html#Exception" class="intersphinx-link">Exception</a></code>, </span><span class="rst-sig-param">request: <code><a href="https://docs.python.org/3/builtins/functions.html#object" class="intersphinx-link">object</a></code>, </span><span class="rst-sig-param">policy: <code><a href="orionis.http.contracts.endpoint_policy.IHttpEndpointPolicy.html" class="internal-link" title="orionis.http.contracts.endpoint_policy.IHttpEndpointPolicy">IHttpEndpointPolicy</a> | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code> = <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></span>) -&gt; <code>Response</code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/63118a323607916eaf89992769fe1f9b31fbe1c4/orionis/http/kernel.py#L952">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/49353208eff746554bbd833a5cdbf03d9e7f7ccc/orionis/http/kernel.py#L954">
       
       (source)
     </a>
@@ -2296,7 +2348,7 @@ pre-routing errors).</td></tr><tr><td class="fieldArgContainer"><span class="fie
     
     
     <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">__handleWebSocket</span><span class="function-signature long-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">interface: <code>Interface</code>, </span><span class="rst-sig-param">adapter: <code><a href="orionis.http.adapters.request.contracts.transport.TransportAdapter.html" class="internal-link" title="orionis.http.adapters.request.contracts.transport.TransportAdapter">TransportAdapter</a></code>, </span><span class="rst-sig-param">receive_or_protocol: <code><a href="https://docs.python.org/3/builtins/functions.html#object" class="intersphinx-link">object</a></code>, </span><span class="rst-sig-param">send: <code><a href="https://docs.python.org/3/builtins/functions.html#object" class="intersphinx-link">object</a></code> = <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></span>):</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/63118a323607916eaf89992769fe1f9b31fbe1c4/orionis/http/kernel.py#L1304">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/49353208eff746554bbd833a5cdbf03d9e7f7ccc/orionis/http/kernel.py#L1344">
       
       (source)
     </a>
@@ -2323,7 +2375,7 @@ pre-routing errors).</td></tr><tr><td class="fieldArgContainer"><span class="fie
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">__init__</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">app: <code>IApplication</code>, </span><span class="rst-sig-param">catch: <code>ICatch</code></span>):</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/63118a323607916eaf89992769fe1f9b31fbe1c4/orionis/http/kernel.py#L245">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/49353208eff746554bbd833a5cdbf03d9e7f7ccc/orionis/http/kernel.py#L247">
       
       (source)
     </a>
@@ -2350,7 +2402,7 @@ pre-routing errors).</td></tr><tr><td class="fieldArgContainer"><span class="fie
     
     
     <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">__preloadEndpointPolicy</span><span class="function-signature long-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">controller: <code><a href="https://docs.python.org/3/builtins/functions.html#type" class="intersphinx-link">type</a></code>, </span><span class="rst-sig-param">route: <code><a href="orionis.http.routes.entities.compiled_route.CompiledRoute.html" class="internal-link" title="orionis.http.routes.entities.compiled_route.CompiledRoute">CompiledRoute</a></code>, </span><span class="rst-sig-param">policy_instances: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#dict" class="intersphinx-link">dict</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/functions.html#type" class="intersphinx-link">type</a>[<wbr></wbr><a href="orionis.http.contracts.endpoint_policy.IHttpEndpointPolicy.html" class="internal-link" title="orionis.http.contracts.endpoint_policy.IHttpEndpointPolicy">IHttpEndpointPolicy</a>], <wbr></wbr><a href="orionis.http.contracts.endpoint_policy.IHttpEndpointPolicy.html" class="internal-link" title="orionis.http.contracts.endpoint_policy.IHttpEndpointPolicy">IHttpEndpointPolicy</a>]</code></span>):</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/63118a323607916eaf89992769fe1f9b31fbe1c4/orionis/http/kernel.py#L458">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/49353208eff746554bbd833a5cdbf03d9e7f7ccc/orionis/http/kernel.py#L460">
       
       (source)
     </a>
@@ -2377,7 +2429,7 @@ pre-routing errors).</td></tr><tr><td class="fieldArgContainer"><span class="fie
     
     
     <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">__preloadHandlers</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>):</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/63118a323607916eaf89992769fe1f9b31fbe1c4/orionis/http/kernel.py#L392">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/49353208eff746554bbd833a5cdbf03d9e7f7ccc/orionis/http/kernel.py#L394">
       
       (source)
     </a>
@@ -2411,7 +2463,7 @@ or creating controller instances. Custom descriptors remain lazy.</p>
     
     
     <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">__preloadMiddleware</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>):</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/63118a323607916eaf89992769fe1f9b31fbe1c4/orionis/http/kernel.py#L704">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/49353208eff746554bbd833a5cdbf03d9e7f7ccc/orionis/http/kernel.py#L706">
       
       (source)
     </a>
@@ -2441,8 +2493,8 @@ immutable stack tuple so identical stacks share the same instances.</p>
   <div class="functionHeader">
     
     
-    <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">__processRequest</span><span class="function-signature long-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">interface: <code>Interface</code>, </span><span class="rst-sig-param">adapter: <code><a href="orionis.http.adapters.request.contracts.transport.TransportAdapter.html" class="internal-link" title="orionis.http.adapters.request.contracts.transport.TransportAdapter">TransportAdapter</a></code>, </span><span class="rst-sig-param">receive_or_protocol: <code><a href="https://docs.python.org/3/builtins/functions.html#object" class="intersphinx-link">object</a></code>, </span><span class="rst-sig-param">request_context: <code><a href="https://docs.python.org/3/builtins/functions.html#object" class="intersphinx-link">object</a></code>, </span><span class="rst-sig-param">policy: <code><a href="orionis.http.contracts.endpoint_policy.IHttpEndpointPolicy.html" class="internal-link" title="orionis.http.contracts.endpoint_policy.IHttpEndpointPolicy">IHttpEndpointPolicy</a> | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code> = <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></span>) -&gt; <code>Response</code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/63118a323607916eaf89992769fe1f9b31fbe1c4/orionis/http/kernel.py#L1036">
+    <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">__processRequest</span><span class="function-signature long-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">interface: <code>Interface</code>, </span><span class="rst-sig-param">adapter: <code><a href="orionis.http.adapters.request.contracts.transport.TransportAdapter.html" class="internal-link" title="orionis.http.adapters.request.contracts.transport.TransportAdapter">TransportAdapter</a></code>, </span><span class="rst-sig-param">receive_or_protocol: <code><a href="https://docs.python.org/3/builtins/functions.html#object" class="intersphinx-link">object</a></code>, </span><span class="rst-sig-param">request_context: <code><a href="orionis.container.context.manager.ScopeManager.html" class="internal-link" title="orionis.container.context.manager.ScopeManager">ScopeManager</a></code>, </span><span class="rst-sig-param">policy: <code><a href="orionis.http.contracts.endpoint_policy.IHttpEndpointPolicy.html" class="internal-link" title="orionis.http.contracts.endpoint_policy.IHttpEndpointPolicy">IHttpEndpointPolicy</a> | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code> = <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></span>) -&gt; <code>Response</code>:</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/49353208eff746554bbd833a5cdbf03d9e7f7ccc/orionis/http/kernel.py#L1077">
       
       (source)
     </a>
@@ -2456,9 +2508,9 @@ immutable stack tuple so identical stacks share the same instances.</p>
     
     <div><p>Build the HTTP response for this request.</p>
 <p>Runs global middleware, rate limiting, route resolution, and the
-handler pipeline.  All exceptions are delegated to
-<tt class="rst-docutils rst-literal">__handleException</tt>.</p>
-<table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">interface:</span><code><a href="orionis.http.enums.Interface.html" class="internal-link" title="orionis.http.enums.Interface">Interface</a></code></td><td class="fieldArgDesc">Transport interface type used to construct the BodyStream.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">adapter:</span><code><a href="orionis.http.adapters.request.contracts.transport.TransportAdapter.html" class="internal-link" title="orionis.http.adapters.request.contracts.transport.TransportAdapter">TransportAdapter</a></code></td><td class="fieldArgDesc">Protocol adapter carrying request metadata.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">receive<wbr></wbr>_or<wbr></wbr>_protocol:</span><code><a href="https://docs.python.org/3/builtins/functions.html#object" class="intersphinx-link">object</a></code></td><td class="fieldArgDesc">ASGI receive callable or RSGI HTTPProtocol instance.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">request<wbr></wbr>_context:</span><code><a href="https://docs.python.org/3/builtins/functions.html#object" class="intersphinx-link">object</a></code></td><td class="fieldArgDesc">Active DI request scope for per-request bindings.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">policy:</span><code>IHttpEndpointPolicy | None</code></td><td class="fieldArgDesc">Value supplied for <tt class="rst-docutils rst-literal">policy</tt>.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.http.Response.html" class="internal-link" title="orionis.http.Response">Response</a></code></td><td class="fieldArgDesc">The fully constructed HTTP response.</td></tr></table></div>
+handler pipeline. Debug dumps interrupt only this request with an
+HTML response; ordinary errors are delegated to <tt class="rst-docutils rst-literal">__handleException</tt>.</p>
+<table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">interface:</span><code><a href="orionis.http.enums.Interface.html" class="internal-link" title="orionis.http.enums.Interface">Interface</a></code></td><td class="fieldArgDesc">Transport interface type used to construct the BodyStream.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">adapter:</span><code><a href="orionis.http.adapters.request.contracts.transport.TransportAdapter.html" class="internal-link" title="orionis.http.adapters.request.contracts.transport.TransportAdapter">TransportAdapter</a></code></td><td class="fieldArgDesc">Protocol adapter carrying request metadata.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">receive<wbr></wbr>_or<wbr></wbr>_protocol:</span><code><a href="https://docs.python.org/3/builtins/functions.html#object" class="intersphinx-link">object</a></code></td><td class="fieldArgDesc">ASGI receive callable or RSGI HTTPProtocol instance.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">request<wbr></wbr>_context:</span><code><a href="orionis.container.context.manager.ScopeManager.html" class="internal-link" title="orionis.container.context.manager.ScopeManager">ScopeManager</a></code></td><td class="fieldArgDesc">Active DI request scope for per-request bindings.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">policy:</span><code>IHttpEndpointPolicy | None</code></td><td class="fieldArgDesc">Value supplied for <tt class="rst-docutils rst-literal">policy</tt>.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.http.Response.html" class="internal-link" title="orionis.http.Response">Response</a></code></td><td class="fieldArgDesc">The fully constructed HTTP response.</td></tr></table></div>
   </div>
 </div><div class="basemethod">
   
@@ -2473,7 +2525,7 @@ handler pipeline.  All exceptions are delegated to
     
     
     <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">__processWebSocket</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">adapter: <code><a href="orionis.http.adapters.request.contracts.transport.TransportAdapter.html" class="internal-link" title="orionis.http.adapters.request.contracts.transport.TransportAdapter">TransportAdapter</a></code>, </span><span class="rst-sig-param">socket: <code>WebSocket</code></span>):</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/63118a323607916eaf89992769fe1f9b31fbe1c4/orionis/http/kernel.py#L1394">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/49353208eff746554bbd833a5cdbf03d9e7f7ccc/orionis/http/kernel.py#L1434">
       
       (source)
     </a>
@@ -2500,7 +2552,7 @@ handler pipeline.  All exceptions are delegated to
     
     
     <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">__requestLayer</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">request: <code>Request</code>, </span><span class="rst-sig-param">resolved_route: <code><a href="orionis.http.routes.entities.resolved_route.ResolvedRoute.html" class="internal-link" title="orionis.http.routes.entities.resolved_route.ResolvedRoute">ResolvedRoute</a></code></span>) -&gt; <code>Response</code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/63118a323607916eaf89992769fe1f9b31fbe1c4/orionis/http/kernel.py#L803">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/49353208eff746554bbd833a5cdbf03d9e7f7ccc/orionis/http/kernel.py#L805">
       
       (source)
     </a>
@@ -2527,7 +2579,7 @@ handler pipeline.  All exceptions are delegated to
     
     
     <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">__routeLayer</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">request: <code>Request</code>, </span><span class="rst-sig-param">resolved_route: <code><a href="orionis.http.routes.entities.resolved_route.ResolvedRoute.html" class="internal-link" title="orionis.http.routes.entities.resolved_route.ResolvedRoute">ResolvedRoute</a></code></span>) -&gt; <code>Response</code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/63118a323607916eaf89992769fe1f9b31fbe1c4/orionis/http/kernel.py#L724">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/49353208eff746554bbd833a5cdbf03d9e7f7ccc/orionis/http/kernel.py#L726">
       
       (source)
     </a>
@@ -2558,7 +2610,7 @@ access restrictions belong to the application's route middleware.</p>
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">__routeResolve</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">route_loader: <code><a href="orionis.http.routes.contracts.loader.IRouteLoader.html" class="internal-link" title="orionis.http.routes.contracts.loader.IRouteLoader">IRouteLoader</a></code></span>):</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/63118a323607916eaf89992769fe1f9b31fbe1c4/orionis/http/kernel.py#L366">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/49353208eff746554bbd833a5cdbf03d9e7f7ccc/orionis/http/kernel.py#L368">
       
       (source)
     </a>
@@ -2588,7 +2640,7 @@ from the provided route loader and cache settings.</p>
     
     
     <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">__rsgiResponse</span><span class="function-signature long-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">adapter: <code><a href="orionis.http.adapters.request.rsgi.RSGITransportAdapter.html" class="internal-link" title="orionis.http.adapters.request.rsgi.RSGITransportAdapter">RSGITransportAdapter</a></code>, </span><span class="rst-sig-param">response: <code>Response</code>, </span><span class="rst-sig-param">protocol: <code>HTTPProtocol</code>, </span><span class="rst-sig-param">policy: <code><a href="orionis.http.contracts.endpoint_policy.IHttpEndpointPolicy.html" class="internal-link" title="orionis.http.contracts.endpoint_policy.IHttpEndpointPolicy">IHttpEndpointPolicy</a> | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code> = <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></span>):</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/63118a323607916eaf89992769fe1f9b31fbe1c4/orionis/http/kernel.py#L572">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/49353208eff746554bbd833a5cdbf03d9e7f7ccc/orionis/http/kernel.py#L574">
       
       (source)
     </a>
@@ -2618,7 +2670,7 @@ the response back to the client via the RSGI protocol adapter.</p>
     
     
     <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">__shutdownWebSockets</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>):</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/63118a323607916eaf89992769fe1f9b31fbe1c4/orionis/http/kernel.py#L1377">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/49353208eff746554bbd833a5cdbf03d9e7f7ccc/orionis/http/kernel.py#L1417">
       
       (source)
     </a>
@@ -2645,7 +2697,7 @@ the response back to the client via the RSGI protocol adapter.</p>
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">__websocketOriginAllowed</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">adapter: <code><a href="orionis.http.adapters.request.contracts.transport.TransportAdapter.html" class="internal-link" title="orionis.http.adapters.request.contracts.transport.TransportAdapter">TransportAdapter</a></code></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/63118a323607916eaf89992769fe1f9b31fbe1c4/orionis/http/kernel.py#L1239">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/49353208eff746554bbd833a5cdbf03d9e7f7ccc/orionis/http/kernel.py#L1279">
       
       (source)
     </a>
@@ -2672,7 +2724,7 @@ the response back to the client via the RSGI protocol adapter.</p>
     
     
     <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">__webTerminal</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">request: <code>Request</code>, </span><span class="rst-sig-param">resolved_route: <code><a href="orionis.http.routes.entities.resolved_route.ResolvedRoute.html" class="internal-link" title="orionis.http.routes.entities.resolved_route.ResolvedRoute">ResolvedRoute</a></code></span>) -&gt; <code>Response</code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/63118a323607916eaf89992769fe1f9b31fbe1c4/orionis/http/kernel.py#L775">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/49353208eff746554bbd833a5cdbf03d9e7f7ccc/orionis/http/kernel.py#L777">
       
       (source)
     </a>
@@ -2702,7 +2754,7 @@ the resulting redirect still gets its flash bag persisted.</p>
     
     
     <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">boot</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>):</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/63118a323607916eaf89992769fe1f9b31fbe1c4/orionis/http/kernel.py#L292">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/49353208eff746554bbd833a5cdbf03d9e7f7ccc/orionis/http/kernel.py#L294">
       
       (source)
     </a>
@@ -2729,7 +2781,7 @@ the resulting redirect still gets its flash bag persisted.</p>
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">disconnectPaths</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/stdtypes.html#frozenset" class="intersphinx-link">frozenset</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>]</code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/63118a323607916eaf89992769fe1f9b31fbe1c4/orionis/http/kernel.py#L278">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/49353208eff746554bbd833a5cdbf03d9e7f7ccc/orionis/http/kernel.py#L280">
       
       (source)
     </a>
@@ -2756,7 +2808,7 @@ the resulting redirect still gets its flash bag persisted.</p>
     
     
     <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">handleASGI</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">scope: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#dict" class="intersphinx-link">dict</a></code>, </span><span class="rst-sig-param">receive: <code><a href="https://docs.python.org/3/builtins/functions.html#object" class="intersphinx-link">object</a></code>, </span><span class="rst-sig-param">send: <code><a href="https://docs.python.org/3/builtins/functions.html#object" class="intersphinx-link">object</a></code></span>):</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/63118a323607916eaf89992769fe1f9b31fbe1c4/orionis/http/kernel.py#L1182">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/49353208eff746554bbd833a5cdbf03d9e7f7ccc/orionis/http/kernel.py#L1222">
       
       (source)
     </a>
@@ -2783,7 +2835,7 @@ the resulting redirect still gets its flash bag persisted.</p>
     
     
     <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">handleRSGI</span><span class="function-signature long-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">scope: <code>Scope</code>, </span><span class="rst-sig-param">protocol: <code>HTTPProtocol | WebsocketProtocol</code></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/functions.html#object" class="intersphinx-link">object</a> | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/63118a323607916eaf89992769fe1f9b31fbe1c4/orionis/http/kernel.py#L1127">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/49353208eff746554bbd833a5cdbf03d9e7f7ccc/orionis/http/kernel.py#L1167">
       
       (source)
     </a>
@@ -2809,7 +2861,7 @@ the resulting redirect still gets its flash bag persisted.</p>
   <div class="functionHeader">
     
     <span class="py-defname">__slots__</span>: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" class="intersphinx-link">tuple</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <wbr></wbr><span class="rst-variable-ellipsis">...</span>]</code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/63118a323607916eaf89992769fe1f9b31fbe1c4/orionis/http/kernel.py#L212">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/49353208eff746554bbd833a5cdbf03d9e7f7ccc/orionis/http/kernel.py#L214">
       
       (source)
     </a>
@@ -2836,7 +2888,7 @@ the resulting redirect still gets its flash bag persisted.</p>
   <div class="functionHeader">
     
     <span class="py-defname">__api_middleware</span>: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" class="intersphinx-link">tuple</a></code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/63118a323607916eaf89992769fe1f9b31fbe1c4/orionis/http/kernel.py#L335">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/49353208eff746554bbd833a5cdbf03d9e7f7ccc/orionis/http/kernel.py#L337">
       
       (source)
     </a>
@@ -2863,7 +2915,7 @@ the resulting redirect still gets its flash bag persisted.</p>
   <div class="functionHeader">
     
     <span class="py-defname">__app</span> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/63118a323607916eaf89992769fe1f9b31fbe1c4/orionis/http/kernel.py#L264">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/49353208eff746554bbd833a5cdbf03d9e7f7ccc/orionis/http/kernel.py#L266">
       
       (source)
     </a>
@@ -2890,7 +2942,7 @@ the resulting redirect still gets its flash bag persisted.</p>
   <div class="functionHeader">
     
     <span class="py-defname">__asgi_adapter</span> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/63118a323607916eaf89992769fe1f9b31fbe1c4/orionis/http/kernel.py#L341">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/49353208eff746554bbd833a5cdbf03d9e7f7ccc/orionis/http/kernel.py#L343">
       
       (source)
     </a>
@@ -2917,7 +2969,7 @@ the resulting redirect still gets its flash bag persisted.</p>
   <div class="functionHeader">
     
     <span class="py-defname">__body_limits</span> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/63118a323607916eaf89992769fe1f9b31fbe1c4/orionis/http/kernel.py#L267">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/49353208eff746554bbd833a5cdbf03d9e7f7ccc/orionis/http/kernel.py#L269">
       
       (source)
     </a>
@@ -2944,7 +2996,7 @@ the resulting redirect still gets its flash bag persisted.</p>
   <div class="functionHeader">
     
     <span class="py-defname">__boot</span>: <code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/63118a323607916eaf89992769fe1f9b31fbe1c4/orionis/http/kernel.py#L265">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/49353208eff746554bbd833a5cdbf03d9e7f7ccc/orionis/http/kernel.py#L267">
       
       (source)
     </a>
@@ -2971,7 +3023,7 @@ the resulting redirect still gets its flash bag persisted.</p>
   <div class="functionHeader">
     
     <span class="py-defname">__catch</span>: <code>ICatch</code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/63118a323607916eaf89992769fe1f9b31fbe1c4/orionis/http/kernel.py#L266">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/49353208eff746554bbd833a5cdbf03d9e7f7ccc/orionis/http/kernel.py#L268">
       
       (source)
     </a>
@@ -2998,7 +3050,7 @@ the resulting redirect still gets its flash bag persisted.</p>
   <div class="functionHeader">
     
     <span class="py-defname">__cls_dispatch</span>: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#dict" class="intersphinx-link">dict</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a>, <wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" class="intersphinx-link">tuple</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/functions.html#type" class="intersphinx-link">type</a>, <wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>]]</code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/63118a323607916eaf89992769fe1f9b31fbe1c4/orionis/http/kernel.py#L454">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/49353208eff746554bbd833a5cdbf03d9e7f7ccc/orionis/http/kernel.py#L456">
       
       (source)
     </a>
@@ -3025,7 +3077,7 @@ the resulting redirect still gets its flash bag persisted.</p>
   <div class="functionHeader">
     
     <span class="py-defname">__cors</span> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/63118a323607916eaf89992769fe1f9b31fbe1c4/orionis/http/kernel.py#L551">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/49353208eff746554bbd833a5cdbf03d9e7f7ccc/orionis/http/kernel.py#L553">
       
       (source)
     </a>
@@ -3052,7 +3104,7 @@ the resulting redirect still gets its flash bag persisted.</p>
   <div class="functionHeader">
     
     <span class="py-defname">__default_responses</span>: <code><a href="orionis.http.default.contracts.responses.IDefaultResponses.html" class="internal-link" title="orionis.http.default.contracts.responses.IDefaultResponses">IDefaultResponses</a></code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/63118a323607916eaf89992769fe1f9b31fbe1c4/orionis/http/kernel.py#L316">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/49353208eff746554bbd833a5cdbf03d9e7f7ccc/orionis/http/kernel.py#L318">
       
       (source)
     </a>
@@ -3079,7 +3131,7 @@ the resulting redirect still gets its flash bag persisted.</p>
   <div class="functionHeader">
     
     <span class="py-defname">__endpoint_policies</span>: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#dict" class="intersphinx-link">dict</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <wbr></wbr><a href="orionis.http.contracts.endpoint_policy.IHttpEndpointPolicy.html" class="internal-link" title="orionis.http.contracts.endpoint_policy.IHttpEndpointPolicy">IHttpEndpointPolicy</a>]</code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/63118a323607916eaf89992769fe1f9b31fbe1c4/orionis/http/kernel.py#L276">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/49353208eff746554bbd833a5cdbf03d9e7f7ccc/orionis/http/kernel.py#L278">
       
       (source)
     </a>
@@ -3106,7 +3158,7 @@ the resulting redirect still gets its flash bag persisted.</p>
   <div class="functionHeader">
     
     <span class="py-defname">__fallback</span>: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" class="intersphinx-link">tuple</a> | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/63118a323607916eaf89992769fe1f9b31fbe1c4/orionis/http/kernel.py#L351">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/49353208eff746554bbd833a5cdbf03d9e7f7ccc/orionis/http/kernel.py#L353">
       
       (source)
     </a>
@@ -3133,7 +3185,7 @@ the resulting redirect still gets its flash bag persisted.</p>
   <div class="functionHeader">
     
     <span class="py-defname">__fn_dispatch</span>: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#dict" class="intersphinx-link">dict</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a>, <wbr></wbr><a href="https://docs.python.org/3/builtins/functions.html#object" class="intersphinx-link">object</a>]</code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/63118a323607916eaf89992769fe1f9b31fbe1c4/orionis/http/kernel.py#L453">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/49353208eff746554bbd833a5cdbf03d9e7f7ccc/orionis/http/kernel.py#L455">
       
       (source)
     </a>
@@ -3160,7 +3212,7 @@ the resulting redirect still gets its flash bag persisted.</p>
   <div class="functionHeader">
     
     <span class="py-defname">__health_path</span> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/63118a323607916eaf89992769fe1f9b31fbe1c4/orionis/http/kernel.py#L326">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/49353208eff746554bbd833a5cdbf03d9e7f7ccc/orionis/http/kernel.py#L328">
       
       (source)
     </a>
@@ -3187,7 +3239,7 @@ the resulting redirect still gets its flash bag persisted.</p>
   <div class="functionHeader">
     
     <span class="py-defname">__hub_dispatch</span> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/63118a323607916eaf89992769fe1f9b31fbe1c4/orionis/http/kernel.py#L456">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/49353208eff746554bbd833a5cdbf03d9e7f7ccc/orionis/http/kernel.py#L458">
       
       (source)
     </a>
@@ -3214,7 +3266,7 @@ the resulting redirect still gets its flash bag persisted.</p>
   <div class="functionHeader">
     
     <span class="py-defname">__middleware_cache</span>: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#dict" class="intersphinx-link">dict</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" class="intersphinx-link">tuple</a>, <wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" class="intersphinx-link">tuple</a>]</code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/63118a323607916eaf89992769fe1f9b31fbe1c4/orionis/http/kernel.py#L275">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/49353208eff746554bbd833a5cdbf03d9e7f7ccc/orionis/http/kernel.py#L277">
       
       (source)
     </a>
@@ -3241,7 +3293,7 @@ the resulting redirect still gets its flash bag persisted.</p>
   <div class="functionHeader">
     
     <span class="py-defname">__printer_enabled</span>: <code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/63118a323607916eaf89992769fe1f9b31fbe1c4/orionis/http/kernel.py#L347">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/49353208eff746554bbd833a5cdbf03d9e7f7ccc/orionis/http/kernel.py#L349">
       
       (source)
     </a>
@@ -3268,7 +3320,7 @@ the resulting redirect still gets its flash bag persisted.</p>
   <div class="functionHeader">
     
     <span class="py-defname">__proxies</span> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/63118a323607916eaf89992769fe1f9b31fbe1c4/orionis/http/kernel.py#L544">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/49353208eff746554bbd833a5cdbf03d9e7f7ccc/orionis/http/kernel.py#L546">
       
       (source)
     </a>
@@ -3295,7 +3347,7 @@ the resulting redirect still gets its flash bag persisted.</p>
   <div class="functionHeader">
     
     <span class="py-defname">__rate_limit</span> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/63118a323607916eaf89992769fe1f9b31fbe1c4/orionis/http/kernel.py#L554">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/49353208eff746554bbd833a5cdbf03d9e7f7ccc/orionis/http/kernel.py#L556">
       
       (source)
     </a>
@@ -3322,7 +3374,7 @@ the resulting redirect still gets its flash bag persisted.</p>
   <div class="functionHeader">
     
     <span class="py-defname">__rate_limit_enabled</span> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/63118a323607916eaf89992769fe1f9b31fbe1c4/orionis/http/kernel.py#L563">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/49353208eff746554bbd833a5cdbf03d9e7f7ccc/orionis/http/kernel.py#L565">
       
       (source)
     </a>
@@ -3349,7 +3401,7 @@ the resulting redirect still gets its flash bag persisted.</p>
   <div class="functionHeader">
     
     <span class="py-defname">__request_printer</span> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/63118a323607916eaf89992769fe1f9b31fbe1c4/orionis/http/kernel.py#L344">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/49353208eff746554bbd833a5cdbf03d9e7f7ccc/orionis/http/kernel.py#L346">
       
       (source)
     </a>
@@ -3376,7 +3428,7 @@ the resulting redirect still gets its flash bag persisted.</p>
   <div class="functionHeader">
     
     <span class="py-defname">__request_slots</span> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/63118a323607916eaf89992769fe1f9b31fbe1c4/orionis/http/kernel.py#L268">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/49353208eff746554bbd833a5cdbf03d9e7f7ccc/orionis/http/kernel.py#L270">
       
       (source)
     </a>
@@ -3403,7 +3455,7 @@ the resulting redirect still gets its flash bag persisted.</p>
   <div class="functionHeader">
     
     <span class="py-defname">__routes</span> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/63118a323607916eaf89992769fe1f9b31fbe1c4/orionis/http/kernel.py#L386">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/49353208eff746554bbd833a5cdbf03d9e7f7ccc/orionis/http/kernel.py#L388">
       
       (source)
     </a>
@@ -3430,7 +3482,7 @@ the resulting redirect still gets its flash bag persisted.</p>
   <div class="functionHeader">
     
     <span class="py-defname">__rsgi_adapter</span> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/63118a323607916eaf89992769fe1f9b31fbe1c4/orionis/http/kernel.py#L340">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/49353208eff746554bbd833a5cdbf03d9e7f7ccc/orionis/http/kernel.py#L342">
       
       (source)
     </a>
@@ -3457,7 +3509,7 @@ the resulting redirect still gets its flash bag persisted.</p>
   <div class="functionHeader">
     
     <span class="py-defname">__security</span> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/63118a323607916eaf89992769fe1f9b31fbe1c4/orionis/http/kernel.py#L547">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/49353208eff746554bbd833a5cdbf03d9e7f7ccc/orionis/http/kernel.py#L549">
       
       (source)
     </a>
@@ -3484,7 +3536,7 @@ the resulting redirect still gets its flash bag persisted.</p>
   <div class="functionHeader">
     
     <span class="py-defname">__under_maintenance</span> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/63118a323607916eaf89992769fe1f9b31fbe1c4/orionis/http/kernel.py#L558">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/49353208eff746554bbd833a5cdbf03d9e7f7ccc/orionis/http/kernel.py#L560">
       
       (source)
     </a>
@@ -3511,7 +3563,7 @@ the resulting redirect still gets its flash bag persisted.</p>
   <div class="functionHeader">
     
     <span class="py-defname">__view_dispatch</span>: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#dict" class="intersphinx-link">dict</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a>, <wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>]</code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/63118a323607916eaf89992769fe1f9b31fbe1c4/orionis/http/kernel.py#L455">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/49353208eff746554bbd833a5cdbf03d9e7f7ccc/orionis/http/kernel.py#L457">
       
       (source)
     </a>
@@ -3538,7 +3590,7 @@ the resulting redirect still gets its flash bag persisted.</p>
   <div class="functionHeader">
     
     <span class="py-defname">__web_middleware</span>: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" class="intersphinx-link">tuple</a></code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/63118a323607916eaf89992769fe1f9b31fbe1c4/orionis/http/kernel.py#L329">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/49353208eff746554bbd833a5cdbf03d9e7f7ccc/orionis/http/kernel.py#L331">
       
       (source)
     </a>
@@ -3565,7 +3617,7 @@ the resulting redirect still gets its flash bag persisted.</p>
   <div class="functionHeader">
     
     <span class="py-defname">__websocket_config</span> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/63118a323607916eaf89992769fe1f9b31fbe1c4/orionis/http/kernel.py#L269">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/49353208eff746554bbd833a5cdbf03d9e7f7ccc/orionis/http/kernel.py#L271">
       
       (source)
     </a>
@@ -3592,7 +3644,7 @@ the resulting redirect still gets its flash bag persisted.</p>
   <div class="functionHeader">
     
     <span class="py-defname">__websocket_slots</span> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/63118a323607916eaf89992769fe1f9b31fbe1c4/orionis/http/kernel.py#L270">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/49353208eff746554bbd833a5cdbf03d9e7f7ccc/orionis/http/kernel.py#L272">
       
       (source)
     </a>
@@ -3619,7 +3671,7 @@ the resulting redirect still gets its flash bag persisted.</p>
   <div class="functionHeader">
     
     <span class="py-defname">__websocket_tasks</span>: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#set" class="intersphinx-link">set</a>[<wbr></wbr><a href="https://docs.python.org/3/library/asyncio-task.html#asyncio.Task" class="intersphinx-link">asyncio.Task</a>]</code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/63118a323607916eaf89992769fe1f9b31fbe1c4/orionis/http/kernel.py#L273">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/49353208eff746554bbd833a5cdbf03d9e7f7ccc/orionis/http/kernel.py#L275">
       
       (source)
     </a>
@@ -3645,7 +3697,7 @@ the resulting redirect still gets its flash bag persisted.</p>
   <div class="orionis-footer-inner">
     <div class="orionis-footer-copy">
       <p>API documentation for <a href="https://orionis-framework.com/" class="projecthome">Orionis</a>.</p>
-      <p class="orionis-footer-meta">Generated with <a href="https://github.com/twisted/pydoctor/">Pydoctor</a> 25.10.1.<span class="orionis-footer-build"> Built 2026-10-27 15:19:58.</span></p>
+      <p class="orionis-footer-meta">Generated with <a href="https://github.com/twisted/pydoctor/">Pydoctor</a> 25.10.1.<span class="orionis-footer-build"> Built 2026-10-28 09:28:01.</span></p>
     </div>
     <nav class="orionis-footer-links" aria-label="Additional resources">
       <a href="https://docs.orionis-framework.com">Read the guide <span aria-hidden="true">↗</span></a>

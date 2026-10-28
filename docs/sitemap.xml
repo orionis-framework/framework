@@ -1084,7 +1084,16 @@
     <loc>https://api.orionis-framework.com/orionis.console.debug.dumper.html</loc>
   </url>
   <url>
+    <loc>https://api.orionis-framework.com/orionis.console.debug.dumper.HttpDump.html</loc>
+  </url>
+  <url>
     <loc>https://api.orionis-framework.com/orionis.console.debug.html</loc>
+  </url>
+  <url>
+    <loc>https://api.orionis-framework.com/orionis.console.debug.provider.DumperProvider.html</loc>
+  </url>
+  <url>
+    <loc>https://api.orionis-framework.com/orionis.console.debug.provider.html</loc>
   </url>
   <url>
     <loc>https://api.orionis-framework.com/orionis.console.Dumper.html</loc>
@@ -5777,6 +5786,9 @@
   </url>
   <url>
     <loc>https://api.orionis-framework.com/orionis.support.facades.db.html</loc>
+  </url>
+  <url>
+    <loc>https://api.orionis-framework.com/orionis.support.facades.debug.html</loc>
   </url>
   <url>
     <loc>https://api.orionis-framework.com/orionis.support.facades.encrypter.html</loc>

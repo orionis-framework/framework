@@ -140,39 +140,106 @@ class _NativeAsyncRule(Rule):
         value: object,
         _instance: object,
     ) -> bool:
-        """Yield to the caller's loop before evaluating the value."""
+        """
+        Yield to the caller's loop before evaluating the value.
+
+        Parameters
+        ----------
+        _field : str
+            Unused name of the field under validation.
+        value : object
+            Candidate value checked after suspension.
+        _instance : object
+            Unused schema instance containing the field.
+
+        Returns
+        -------
+        bool
+            Whether the candidate equals the allowed sentinel.
+        """
         await asyncio.sleep(0)
         return value == "allowed"
 
 class TestRuleContract(TestCase):
 
     def testEnforceIsAlwaysAsync(self) -> None:
-        """Require coroutine enforcement in both the interface and base class."""
+        """
+        Require coroutine enforcement in both the interface and base class.
+
+        Returns
+        -------
+        None
+            Assert coroutine enforcement in the rule interface and base class.
+        """
         self.assertTrue(iscoroutinefunction(IRule.enforce))
         self.assertTrue(iscoroutinefunction(Rule.enforce))
 
     def testValidateIsAlwaysAsync(self) -> None:
-        """Require asynchronous validation in the interface and implementation."""
+        """
+        Require asynchronous validation in the interface and implementation.
+
+        Returns
+        -------
+        None
+            Assert asynchronous validation in the interface and implementation.
+        """
         self.assertTrue(iscoroutinefunction(IRule.validate))
         self.assertTrue(iscoroutinefunction(Rule.validate))
 
     def testRuleHasNoAlternateEntryPoint(self) -> None:
-        """Keep custom rules on the same single validation API as schemas."""
+        """
+        Keep custom rules on the same single validation API as schemas.
+
+        Returns
+        -------
+        None
+            Assert a single validation entry point for custom rules.
+        """
         self.assertFalse(hasattr(Rule, "validateAsync"))
         self.assertFalse(hasattr(Rule, "enforceAsync"))
 
     def testSynchronousEnforcementIsRejectedAtClassDeclaration(self) -> None:
-        """Reject a synchronous override before it can enter a schema plan."""
+        """
+        Reject a synchronous override before it can enter a schema plan.
+
+        Returns
+        -------
+        None
+            Assert rejection of synchronous enforcement at class declaration.
+        """
         with self.assertRaisesRegex(TypeError, r"\.enforce must.*async def"):
             class _SynchronousRule(Rule):
                 def enforce(
                     self, _field: str, _value: object, _instance: object,
                 ) -> bool:
-                    """Declare an invalid synchronous predicate."""
+                    """
+                    Declare an invalid synchronous predicate.
+
+                    Parameters
+                    ----------
+                    _field : str
+                        Unused name of the field under validation.
+                    _value : object
+                        Unused value of the field under validation.
+                    _instance : object
+                        Unused schema instance containing the field.
+
+                    Returns
+                    -------
+                    bool
+                        True if invoked; the enclosing class declaration is rejected.
+                    """
                     return True
 
     def testAsyncEnforcementCanBeInherited(self) -> None:
-        """Allow subclasses to reuse an already asynchronous implementation."""
+        """
+        Allow subclasses to reuse an already asynchronous implementation.
+
+        Returns
+        -------
+        None
+            Assert inheritance of an asynchronous enforcement implementation.
+        """
         class _InheritedRule(_AlwaysValidRule):
             pass
 
@@ -223,7 +290,14 @@ class TestRuleEnforce(TestCase):
 class TestRuleValidate(TestCase):
 
     async def testNativeAsyncEnforcementIsAwaited(self) -> None:
-        """Use native enforcement for both accepted and rejected values."""
+        """
+        Use native enforcement for both accepted and rejected values.
+
+        Returns
+        -------
+        None
+            Assert awaited enforcement for accepted and rejected values.
+        """
         rule = _NativeAsyncRule(message="Custom async error.")
         self.assertIsNone(await rule.validate("field", "allowed", object()))
         failure = await rule.validate("field", "rejected", object())
@@ -233,7 +307,14 @@ class TestRuleValidate(TestCase):
         self.assertEqual(failure.message, "Custom async error.")
 
     async def testPureRulesDoNotUseWorkerThreads(self) -> None:
-        """Await inexpensive pure predicates on the caller's thread."""
+        """
+        Await inexpensive pure predicates on the caller's thread.
+
+        Returns
+        -------
+        None
+            Assert pure-rule execution on the caller's thread.
+        """
         with patch("asyncio.to_thread") as offload:
             self.assertIsNone(
                 await _AlwaysValidRule().validate("field", "value", object()),
@@ -241,7 +322,14 @@ class TestRuleValidate(TestCase):
         offload.assert_not_called()
 
     async def testNativeAsyncErrorsPropagate(self) -> None:
-        """Do not turn an unexpected native I/O failure into validation success."""
+        """
+        Do not turn an unexpected native I/O failure into validation success.
+
+        Returns
+        -------
+        None
+            Assert propagation of unexpected asynchronous rule errors.
+        """
         message = "Native service failed."
         with (
             patch.object(

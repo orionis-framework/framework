@@ -1,8 +1,8 @@
 {
-  "recorded_at": "2026-10-28T15:00:45.868953+00:00",
+  "recorded_at": "2026-10-28T19:04:04.381447+00:00",
   "os": "Linux-7.0.0-1017-azure-x86_64-with-glibc2.39",
   "architecture": "x86_64",
-  "cpu": "AMD EPYC 9V45 96-Core Processor",
+  "cpu": "AMD EPYC 7763 64-Core Processor",
   "logical_cpus": 4,
   "physical_cpus": 2,
   "memory_bytes": 16760340480,
@@ -85,6 +85,6 @@
     "uvloop==0.23.0",
     "watchfiles==1.3.0"
   ],
-  "run_url": "https://github.com/orionis-framework/framework/actions/runs/40711551008",
-  "oha_executable": "/tmp/http-compare-oha-4p0pmi9p/oha-linux-amd64"
+  "run_url": "https://github.com/orionis-framework/framework/actions/runs/40750829235",
+  "oha_executable": "/tmp/http-compare-oha-rx8fixca/oha-linux-amd64"
 }

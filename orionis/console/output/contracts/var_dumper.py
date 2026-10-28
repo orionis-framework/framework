@@ -206,7 +206,7 @@ class IVarDumper(ABC):
     @abstractmethod
     def print(self, *, insert_line: bool = False) -> None:
         """
-        Print the stored values in a formatted manner and return HTML output.
+        Print the stored values to the console in a formatted manner.
 
         Optionally inserts a blank line before and after the output, resolves
         caller information, prints a header with module and line details, and
@@ -243,5 +243,10 @@ class IVarDumper(ABC):
 
         Notes
         -----
-        Calls the print method to prepare the output and then exports it as HTML.
+        Render to an isolated in-memory console without writing to standard
+        output, redirecting streams, or terminating execution. Export a
+        self-contained fragment with native HTML panels and the framework's
+        diagnostic palette. Each panel identifies the source filename and line,
+        using configured values or the first HTML export's caller. Do not alter
+        the terminal's module header or index counter.
         """

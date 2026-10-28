@@ -347,7 +347,14 @@ async def run_probe(driver_name: str = "database") -> dict[str, object]:
     }
 
 async def main() -> None:
-    """Run a bounded probe and emit its verified result as JSON."""
+    """
+    Run a bounded probe and emit its verified result as JSON.
+
+    Returns
+    -------
+    None
+        Print the verified integration result as a JSON record.
+    """
     driver_name = sys.argv[1] if len(sys.argv) > 1 else "database"
     async with asyncio.timeout(30):
         result = await run_probe(driver_name)
@@ -359,7 +366,14 @@ class TestQueueApplicationIntegration(TestCase):
     __slots__ = ()
 
     async def testRealApplicationDispatchWorkerFailureAndTransactions(self) -> None:
-        """Exercise persisted dispatch, scoped DI, retries, CLI, and transactions."""
+        """
+        Exercise persisted dispatch, scoped DI, retries, CLI, and transactions.
+
+        Returns
+        -------
+        None
+            Assert the subprocess's persisted queue and CLI integration results.
+        """
         process = await asyncio.create_subprocess_exec(
             sys.executable, "-B", "-X", "utf8", "-m",
             "tests.queues.test_integration",

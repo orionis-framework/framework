@@ -148,6 +148,23 @@ class IDefaultResponses(ABC):
         """
 
     @abstractmethod
+    async def dump(self, content: str) -> HTMLResponse:
+        """
+        Wrap an escaped variable dump in the framework's diagnostic layout.
+
+        Parameters
+        ----------
+        content : str
+            Trusted HTML fragment produced by ``VarDumper.toHtml()``.
+            Variable values and type labels must already be escaped.
+
+        Returns
+        -------
+        HTMLResponse
+            Uncached debug page using the shared local styles and fonts.
+        """
+
+    @abstractmethod
     def asset(self, path: str) -> FileResponse | Response:
         """Return an allowlisted framework asset, or a 404 response.
 

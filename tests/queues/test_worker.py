@@ -169,7 +169,14 @@ class State:
     __slots__ = ("active", "entered", "events", "gate", "maximum")
 
     def __init__(self) -> None:
-        """Initialize isolated execution observations."""
+        """
+        Initialize isolated execution observations.
+
+        Returns
+        -------
+        None
+            Prepare independent records of job execution.
+        """
         self.events: list[tuple[int, str, int, object]] = []
         self.active = self.maximum = 0
         self.entered = asyncio.Event()
@@ -468,7 +475,14 @@ class MemoryDriver(IQueueDriver):
         return len(identifiers)
 
     async def close(self) -> None:
-        """Record closure of resources owned by this fake."""
+        """
+        Record closure of resources owned by this fake.
+
+        Returns
+        -------
+        None
+            Mark the fake driver's owned resources as closed.
+        """
         self.closed = True
 
 class FailedRepository(IFailedJobRepository):
@@ -477,7 +491,14 @@ class FailedRepository(IFailedJobRepository):
     __slots__ = ("broken", "closed", "items")
 
     def __init__(self) -> None:
-        """Initialize isolated failed-job records."""
+        """
+        Initialize isolated failed-job records.
+
+        Returns
+        -------
+        None
+            Prepare independent storage for failed-job observations.
+        """
         self.items: dict[str, FailedJob] = {}
         self.closed = self.broken = False
 
@@ -555,7 +576,14 @@ class FailedRepository(IFailedJobRepository):
         return self.items.pop(failed_id, None) is not None
 
     async def close(self) -> None:
-        """Record repository resource cleanup."""
+        """
+        Record repository resource cleanup.
+
+        Returns
+        -------
+        None
+            Mark the fake failure repository as closed.
+        """
         self.closed = True
 
 def envelope(serializer: JobSerializer, job: BaseJob, *, tries: int = 3,
@@ -592,7 +620,14 @@ class TestWorker(TestCase):
     """Verify scoped execution and resilient reservation completion."""
 
     def setUp(self) -> None:
-        """Prepare real DI, wire serialization and isolated backend fakes."""
+        """
+        Prepare real DI, wire serialization and isolated backend fakes.
+
+        Returns
+        -------
+        None
+            Prepare real dependency injection and isolated queue backends.
+        """
         self.app = FakeApp()
         self.state = State()
         token = ScopedContext.setCurrentScope(None)
@@ -608,7 +643,14 @@ class TestWorker(TestCase):
                              WorkerOptions("database", sleep=0.001), self.failed)
 
     async def testSuccessUsesDistinctDependencyScopes(self) -> None:
-        """Inject operational context and isolate each scoped service."""
+        """
+        Inject operational context and isolate each scoped service.
+
+        Returns
+        -------
+        None
+            Assert a distinct dependency scope for each successful job.
+        """
         for value in range(3):
             await self.driver.push(envelope(self.serializer, RecordJob(value)))
         self.assertEqual(await self.worker.run(stop_when_empty=True), 3)
@@ -619,7 +661,14 @@ class TestWorker(TestCase):
         self.assertEqual(await self.driver.size("default"), 0)
 
     async def testRetryExhaustionPersistsOriginalFailure(self) -> None:
-        """Apply backoff once per failed reservation and preserve the last error."""
+        """
+        Apply backoff once per failed reservation and preserve the last error.
+
+        Returns
+        -------
+        None
+            Assert retry backoff and persistence of the final original error.
+        """
         await self.driver.push(envelope(self.serializer, FailJob(1), options={
             "backoff": (0.0, 0.001, 0.1),
         }))
@@ -634,14 +683,28 @@ class TestWorker(TestCase):
         self.assertNotIn(JobContext, self.app.getCurrentScope() or {})
 
     async def testExplicitReleaseSkipsAutomaticAcknowledgement(self) -> None:
-        """Reserve an explicitly released job again with the next attempt."""
+        """
+        Reserve an explicitly released job again with the next attempt.
+
+        Returns
+        -------
+        None
+            Assert a new reservation after an explicit release.
+        """
         await self.driver.push(envelope(self.serializer, ReleaseJob(2)))
         self.assertEqual(await self.worker.run(stop_when_empty=True), 2)
         self.assertEqual([event[2] for event in self.state.events], [1, 2])
         self.assertEqual(self.driver.releases, [0.0])
 
     async def testExceptionDoesNotStopOtherJobs(self) -> None:
-        """Continue processing healthy work after an individual failure."""
+        """
+        Continue processing healthy work after an individual failure.
+
+        Returns
+        -------
+        None
+            Assert continued processing after an individual job fails.
+        """
         await self.driver.push(envelope(self.serializer, FailJob(1), tries=1))
         await self.driver.push(envelope(self.serializer, RecordJob(2)))
         with self.assertLogs("orionis.queues.worker", level="ERROR"):
@@ -650,7 +713,14 @@ class TestWorker(TestCase):
         self.assertEqual([event[0] for event in self.state.events], [1, 2])
 
     async def testTransitionFailureRetainsLeaseAndContinues(self) -> None:
-        """Keep an unacknowledged retry when storage completion fails."""
+        """
+        Keep an unacknowledged retry when storage completion fails.
+
+        Returns
+        -------
+        None
+            Assert lease retention and continued work after a transition error.
+        """
         self.driver.broken = True
         await self.driver.push(envelope(self.serializer, FailJob(1)))
         await self.driver.push(envelope(self.serializer, RecordJob(2)))
@@ -662,7 +732,14 @@ class TestWorker(TestCase):
                            current_time())
 
     async def testRepositoryFailureRetainsLeaseAndContinues(self) -> None:
-        """Retain a terminal job until storage can preserve its failure."""
+        """
+        Retain a terminal job until storage can preserve its failure.
+
+        Returns
+        -------
+        None
+            Assert lease retention when terminal failure persistence fails.
+        """
         self.failed.broken = True
         await self.driver.push(envelope(self.serializer, FailJob(1), tries=1))
         await self.driver.push(envelope(self.serializer, RecordJob(2)))
@@ -671,7 +748,14 @@ class TestWorker(TestCase):
         self.assertEqual(await self.driver.size("default"), 1)
 
     async def testTimeoutClosesScopeAndPersistsFailure(self) -> None:
-        """Cancel a suspended handler cooperatively and preserve TimeoutError."""
+        """
+        Cancel a suspended handler cooperatively and preserve TimeoutError.
+
+        Returns
+        -------
+        None
+            Assert cooperative timeout cleanup and failure persistence.
+        """
         await self.driver.push(envelope(self.serializer, GateJob(1), tries=1,
                                         timeout=0.01))
         with self.assertLogs("orionis.queues.worker", level="ERROR"):
@@ -681,7 +765,14 @@ class TestWorker(TestCase):
         self.assertNotIn(JobContext, self.app.getCurrentScope() or {})
 
     async def testNearExpiredLeaseBoundsExecutionTimeout(self) -> None:
-        """Shorten a job timeout to the remaining reservation lifetime."""
+        """
+        Shorten a job timeout to the remaining reservation lifetime.
+
+        Returns
+        -------
+        None
+            Assert that the remaining lease bounds execution time.
+        """
         await self.driver.push(envelope(self.serializer, GateJob(1), tries=1))
         reserved = await self.driver.reserve(("default",), 0.04)
         started = current_time()
@@ -693,7 +784,14 @@ class TestWorker(TestCase):
         self.assertFalse(self.state.gate.is_set())
 
     async def testTimeoutIncludesAsyncDependencyResolution(self) -> None:
-        """Bound service injection and close its scope when DI suspends too long."""
+        """
+        Bound service injection and close its scope when DI suspends too long.
+
+        Returns
+        -------
+        None
+            Assert that timeout includes dependency resolution and scope cleanup.
+        """
         app = SlowApp()
         token = ScopedContext.setCurrentScope(None)
         try:
@@ -713,7 +811,14 @@ class TestWorker(TestCase):
         self.assertNotIn(JobContext, app.getCurrentScope() or {})
 
     async def testExpiredLeaseNeverExecutesSideEffects(self) -> None:
-        """Skip a stale claim before invoking the job handler."""
+        """
+        Skip a stale claim before invoking the job handler.
+
+        Returns
+        -------
+        None
+            Assert that an expired reservation never invokes the handler.
+        """
         await self.driver.push(envelope(self.serializer, RecordJob(1)))
         reserved = await self.driver.reserve(("default",), 1)
         expired = ReservedJob(**{
@@ -726,7 +831,14 @@ class TestWorker(TestCase):
         self.assertEqual(await self.failed.all(), ())
 
     async def testCrashExhaustionRejectsExtraExecution(self) -> None:
-        """Fail a recovered claim whose attempt budget was already consumed."""
+        """
+        Fail a recovered claim whose attempt budget was already consumed.
+
+        Returns
+        -------
+        None
+            Assert rejection of a recovered claim with no remaining attempts.
+        """
         await self.driver.push(envelope(self.serializer, RecordJob(1), tries=1))
         entry = next(iter(self.driver.entries.values()))
         entry.attempts = 1
@@ -738,7 +850,14 @@ class TestWorker(TestCase):
                          "QueueRetryError")
 
     async def testRetryDeadlineFailsBeforeInvocation(self) -> None:
-        """Reject a job whose absolute retry deadline already expired."""
+        """
+        Reject a job whose absolute retry deadline already expired.
+
+        Returns
+        -------
+        None
+            Assert deadline rejection before invoking job side effects.
+        """
         await self.driver.push(envelope(self.serializer, RecordJob(1), options={
             "retry_until": current_time() - 1,
         }))
@@ -748,7 +867,14 @@ class TestWorker(TestCase):
         self.assertEqual(len(await self.failed.all()), 1)
 
     async def testConcurrencyLimitAndAttemptBudget(self) -> None:
-        """Process many jobs without exceeding concurrency or max_jobs."""
+        """
+        Process many jobs without exceeding concurrency or max_jobs.
+
+        Returns
+        -------
+        None
+            Assert concurrency and processed-attempt limits.
+        """
         for value in range(20):
             await self.driver.push(envelope(self.serializer, RecordJob(value)))
         worker = Worker(self.app, self.driver, self.serializer,
@@ -760,7 +886,14 @@ class TestWorker(TestCase):
         self.assertEqual(await self.driver.size("default"), 15)
 
     async def testStopDrainsCurrentExecution(self) -> None:
-        """Stop new reservations while allowing an active handler to finish."""
+        """
+        Stop new reservations while allowing an active handler to finish.
+
+        Returns
+        -------
+        None
+            Assert that graceful stop drains the current handler.
+        """
         await self.driver.push(envelope(self.serializer, GateJob(1)))
         await self.driver.push(envelope(self.serializer, RecordJob(2)))
         task = asyncio.create_task(self.worker.run())
@@ -772,7 +905,14 @@ class TestWorker(TestCase):
         self.assertEqual(await self.driver.size("default"), 1)
 
     async def testCancellationDrainsCurrentExecution(self) -> None:
-        """Drain handler tasks before propagating external cancellation."""
+        """
+        Drain handler tasks before propagating external cancellation.
+
+        Returns
+        -------
+        None
+            Assert handler drainage before external cancellation propagates.
+        """
         await self.driver.push(envelope(self.serializer, GateJob(1)))
         task = asyncio.create_task(self.worker.run())
         await self.state.entered.wait()
@@ -785,14 +925,28 @@ class TestWorker(TestCase):
         self.assertEqual(await self.driver.size("default"), 0)
 
     async def testIdleStopInterruptsPollingSleep(self) -> None:
-        """Wake an idle worker immediately when graceful shutdown begins."""
+        """
+        Wake an idle worker immediately when graceful shutdown begins.
+
+        Returns
+        -------
+        None
+            Assert prompt shutdown while the worker is sleeping.
+        """
         task = asyncio.create_task(self.worker.run())
         await asyncio.sleep(0)
         self.worker.stop()
         self.assertEqual(await asyncio.wait_for(task, 0.1), 0)
 
     async def testCancellationPreservesOriginalWhenReleaseFails(self) -> None:
-        """Expose cancellation even when its backend release operation fails."""
+        """
+        Expose cancellation even when its backend release operation fails.
+
+        Returns
+        -------
+        None
+            Assert preservation of cancellation despite a release failure.
+        """
         await self.driver.push(envelope(self.serializer, GateJob(1)))
         reserved = await self.driver.reserve(("default",), 90)
         task = asyncio.create_task(self.worker.execute(reserved))
@@ -805,7 +959,14 @@ class TestWorker(TestCase):
         self.assertEqual(await self.driver.size("default"), 1)
 
     async def testExplicitContextFailurePersistsImmediately(self) -> None:
-        """Preserve an explicitly reported failure without automatic retry."""
+        """
+        Preserve an explicitly reported failure without automatic retry.
+
+        Returns
+        -------
+        None
+            Assert immediate persistence of an explicitly reported failure.
+        """
         await self.driver.push(envelope(self.serializer, RecordJob(1)))
         reserved = await self.driver.reserve(("default",), 90)
         context = JobContext(self.driver, reserved, "database", self.worker._fail)
@@ -817,7 +978,14 @@ class TestWorker(TestCase):
         self.assertEqual(len(await self.failed.all()), 1)
 
     async def testCorruptEnvelopePersistsFailureWithoutInvocation(self) -> None:
-        """Fail malformed persisted data without executing job side effects."""
+        """
+        Fail malformed persisted data without executing job side effects.
+
+        Returns
+        -------
+        None
+            Assert failure persistence without invoking a corrupt job.
+        """
         queued = envelope(self.serializer, RecordJob(1))
         await self.driver.push(queued)
         reserved = await self.driver.reserve(("default",), 90)
@@ -831,7 +999,14 @@ class TestWorker(TestCase):
         self.assertEqual(len(await self.failed.all()), 1)
 
     async def testContextPreventsRepeatedTransitions(self) -> None:
-        """Expose reservation metadata and reject duplicate lifecycle actions."""
+        """
+        Expose reservation metadata and reject duplicate lifecycle actions.
+
+        Returns
+        -------
+        None
+            Assert reservation metadata and rejection of duplicate transitions.
+        """
         payload = envelope(self.serializer, RecordJob(1))
         await self.driver.push(payload)
         reserved = await self.driver.reserve(("default",), 1)
@@ -843,7 +1018,14 @@ class TestWorker(TestCase):
             await context.release()
 
     def testInvalidDirectWorkerSettingsFailEarly(self) -> None:
-        """Reject invalid counts, finite durations and direct queue selections."""
+        """
+        Reject invalid counts, finite durations and direct queue selections.
+
+        Returns
+        -------
+        None
+            Assert early validation of direct worker settings.
+        """
         base = WorkerOptions("database")
         for changes in ({"concurrency": True}, {"retry_after": float("nan")},
                         {"sleep": -1}, {"queues": ()}, {"queues": ("bad key",)}):

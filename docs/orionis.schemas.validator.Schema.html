@@ -215,7 +215,7 @@
         
         
             <div class="itemName expandableItem">
-                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId31953"> 
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId32029"> 
                     
                 </input>
 
@@ -350,7 +350,7 @@
         </div>
 
         <div class="extrasDocstring">
-          <p class="class-signature"><code><span class="py-keyword">class</span> <span class="py-defname">Schema</span>: <a href="https://github.com/orionis-framework/framework/tree/64fd20a920efb384453ce9004dfb94027a97d501/orionis/schemas/validator.py#L24" class="sourceLink">(source)</a></code></p><p><a href="classIndex.html#orionis.schemas.validator.Schema">View In Hierarchy</a></p>
+          <p class="class-signature"><code><span class="py-keyword">class</span> <span class="py-defname">Schema</span>: <a href="https://github.com/orionis-framework/framework/tree/1a90e0381e41a3cba706978fb1697063551425e9/orionis/schemas/validator.py#L26" class="sourceLink">(source)</a></code></p><p><a href="classIndex.html#orionis.schemas.validator.Schema">View In Hierarchy</a></p>
         </div>
 
         <div class="moduleDocstring">
@@ -358,14 +358,14 @@
         </div>
 
         <div id="split-tables">
-          <table class="children sortable" id="id1940">
+          <table class="children sortable" id="id1944">
   
   
   <tr class="staticmethod">
     
     <td>Async Static Method</td>
     <td><code><a href="#validate" class="internal-link" title="orionis.schemas.validator.Schema.validate">validate</a></code></td>
-    <td>Convert a payload and await all schema rules before returning an instance.</td>
+    <td>Validate a payload or existing struct and await its schema rules.</td>
   </tr><tr class="classvariable">
     
     <td>Class Variable</td>
@@ -392,7 +392,7 @@
     
     <div><span class="decorator">@<a href="https://docs.python.org/3/builtins/functions.html#staticmethod" class="intersphinx-link">staticmethod</a><br /></span></div>
     <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">validate</span><span class="function-signature">(<span class="rst-sig-param">payload: <code><a href="https://docs.python.org/3/builtins/functions.html#object" class="intersphinx-link">object</a></code>, </span><span class="rst-sig-param">schema: <code><a href="https://docs.python.org/3/builtins/functions.html#type" class="intersphinx-link">type</a>[<wbr></wbr>SchemaType]</code></span>) -&gt; <code>SchemaType</code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/64fd20a920efb384453ce9004dfb94027a97d501/orionis/schemas/validator.py#L29">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1a90e0381e41a3cba706978fb1697063551425e9/orionis/schemas/validator.py#L31">
       
       (source)
     </a>
@@ -404,9 +404,8 @@
   </div>
   <div class="docstring functionBody">
     
-    <div><p>Convert a payload and await all schema rules before returning an instance.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">payload:</span><code><a href="https://docs.python.org/3/builtins/functions.html#object" class="intersphinx-link">object</a></code></td><td class="fieldArgDesc">Input data to convert and validate.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">schema:</span><code><a href="https://docs.python.org/3/builtins/functions.html#type" class="intersphinx-link">type</a>[<a href="orionis.schemas.validator.Schema.html" class="internal-link" title="orionis.schemas.validator.Schema">Schema</a>]</code></td><td class="fieldArgDesc">Schema class used for conversion and rule validation.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.schemas.validator.Schema.html" class="internal-link" title="orionis.schemas.validator.Schema">Schema</a></code></td><td class="fieldArgDesc">Converted schema instance.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code>ValidationException</code></td><td>If payload conversion fails or schema rules raise validation
-errors. The exception carries every failure found, indexed by
-field name.</td></tr></table></div>
+    <div><p>Validate a payload or existing struct and await its schema rules.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">payload:</span><code><a href="https://docs.python.org/3/builtins/functions.html#object" class="intersphinx-link">object</a></code></td><td class="fieldArgDesc">Input data or root struct to expand and revalidate.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">schema:</span><code><a href="https://docs.python.org/3/builtins/functions.html#type" class="intersphinx-link">type</a>[<a href="orionis.orm.schema.types.SchemaType.html" class="internal-link" title="orionis.orm.schema.types.SchemaType">SchemaType</a>]</code></td><td class="fieldArgDesc">Schema class used for conversion and rule validation.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.orm.schema.types.SchemaType.html" class="internal-link" title="orionis.orm.schema.types.SchemaType">SchemaType</a></code></td><td class="fieldArgDesc">Converted instance satisfying structural constraints and rules.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code>ValidationException</code></td><td>If conversion, constraints or rules reject the payload. Include
+collected failures grouped by field.</td></tr></table></div>
   </div>
 </div><div class="baseclassvariable">
   
@@ -420,7 +419,7 @@ field name.</td></tr></table></div>
   <div class="functionHeader">
     
     <span class="py-defname">__slots__</span>: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" class="intersphinx-link">tuple</a></code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/64fd20a920efb384453ce9004dfb94027a97d501/orionis/schemas/validator.py#L27">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1a90e0381e41a3cba706978fb1697063551425e9/orionis/schemas/validator.py#L29">
       
       (source)
     </a>
@@ -446,7 +445,7 @@ field name.</td></tr></table></div>
   <div class="orionis-footer-inner">
     <div class="orionis-footer-copy">
       <p>API documentation for <a href="https://orionis-framework.com/" class="projecthome">Orionis</a>.</p>
-      <p class="orionis-footer-meta">Generated with <a href="https://github.com/twisted/pydoctor/">Pydoctor</a> 25.10.1.<span class="orionis-footer-build"> Built 2026-10-29 12:18:41.</span></p>
+      <p class="orionis-footer-meta">Generated with <a href="https://github.com/twisted/pydoctor/">Pydoctor</a> 25.10.1.<span class="orionis-footer-build"> Built 2026-10-29 16:36:38.</span></p>
     </div>
     <nav class="orionis-footer-links" aria-label="Additional resources">
       <a href="https://docs.orionis-framework.com">Read the guide <span aria-hidden="true">↗</span></a>

@@ -2926,6 +2926,12 @@
     <loc>https://api.orionis-framework.com/orionis.http.exceptions.html</loc>
   </url>
   <url>
+    <loc>https://api.orionis-framework.com/orionis.http.exceptions.response_validation.html</loc>
+  </url>
+  <url>
+    <loc>https://api.orionis-framework.com/orionis.http.exceptions.response_validation.ResponseValidationException.html</loc>
+  </url>
+  <url>
     <loc>https://api.orionis-framework.com/orionis.http.exceptions.websocket.html</loc>
   </url>
   <url>
@@ -5194,6 +5200,12 @@
     <loc>https://api.orionis-framework.com/orionis.schemas.compiler.MetadataConflictError.html</loc>
   </url>
   <url>
+    <loc>https://api.orionis-framework.com/orionis.schemas.constraint_plan._ConstraintMessages.html</loc>
+  </url>
+  <url>
+    <loc>https://api.orionis-framework.com/orionis.schemas.constraint_plan.html</loc>
+  </url>
+  <url>
     <loc>https://api.orionis-framework.com/orionis.schemas.constraints.GreaterThan.html</loc>
   </url>
   <url>
@@ -5270,6 +5282,9 @@
   </url>
   <url>
     <loc>https://api.orionis-framework.com/orionis.schemas.html</loc>
+  </url>
+  <url>
+    <loc>https://api.orionis-framework.com/orionis.schemas.instance_payload.html</loc>
   </url>
   <url>
     <loc>https://api.orionis-framework.com/orionis.schemas.meta.constraint.ConstraintMetadata.html</loc>

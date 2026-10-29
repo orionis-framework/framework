@@ -3,6 +3,7 @@ from typing import TYPE_CHECKING
 import msgspec
 from orionis.schemas.exceptions.validation import ValidationException
 from orionis.schemas.failure_collector import FailureCollector
+from orionis.schemas.instance_payload import instance_payload
 from orionis.schemas.rules_executor import (
     _build_plan,
     _cache_get,
@@ -20,6 +21,7 @@ _convert = msgspec.convert
 # Alias msgspec's ValidationError to avoid direct
 # dependency on msgspec in the rest of the codebase.
 _ValidationError = msgspec.ValidationError
+_Struct = msgspec.Struct
 
 class Schema:
 
@@ -29,27 +31,32 @@ class Schema:
     @staticmethod
     async def validate(payload: object, schema: type[SchemaType]) -> SchemaType:
         """
-        Convert a payload and await all schema rules before returning an instance.
+        Validate a payload or existing struct and await its schema rules.
 
         Parameters
         ----------
         payload : object
-            Input data to convert and validate.
-        schema : type[Schema]
+            Input data or root struct to expand and revalidate.
+        schema : type[SchemaType]
             Schema class used for conversion and rule validation.
 
         Returns
         -------
-        Schema
-            Converted schema instance.
+        SchemaType
+            Converted instance satisfying structural constraints and rules.
 
         Raises
         ------
         ValidationException
-            If payload conversion fails or schema rules raise validation
-            errors. The exception carries every failure found, indexed by
-            field name.
+            If conversion, constraints or rules reject the payload. Include
+            collected failures grouped by field.
         """
+        # Struct constructors and mutation do not validate their values.
+        # Only existing structs need this expansion; ordinary decoded request
+        # mappings retain the single C-level conversion below.
+        if type(payload) is not dict and isinstance(payload, _Struct):
+            payload = instance_payload(payload)
+
         # Convert the payload into a schema instance using msgspec. A single
         # C-level call handles the successful path; only when it fails is the
         # payload re-inspected field by field to report every error.

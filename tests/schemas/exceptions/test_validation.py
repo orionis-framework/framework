@@ -43,15 +43,13 @@ class TestValidationException(TestCase):
         self.assertEqual(str(exc), "Age must be positive.")
 
     def testErrorReturnsDict(self) -> None:
-        """Return a Laravel-style payload from the error() method.
-
-        Validates that error() exposes a summary message and the field
-        errors indexed by field name.
+        """
+        Verify that ``error()`` returns the summary and structured field errors.
 
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            Assert the payload's type, summary, rule code, and field message.
         """
         failure = ValidationFailure(
             field="name",
@@ -62,7 +60,9 @@ class TestValidationException(TestCase):
         result = exc.error()
         self.assertIsInstance(result, dict)
         self.assertEqual(result["message"], "Name is required.")
-        self.assertEqual(result["errors"], {"name": ["Name is required."]})
+        self.assertEqual(result["errors"], {
+            "name": [{"rule": "required", "message": "Name is required."}],
+        })
 
     def testErrorDictContainsExactlyTwoKeys(self) -> None:
         """Ensure error() dict contains exactly the two expected keys.
@@ -85,15 +85,13 @@ class TestValidationException(TestCase):
         self.assertEqual(set(result.keys()), {"message", "errors"})
 
     def testMultipleFailuresAreGroupedByField(self) -> None:
-        """Group every failure message under its own field name.
-
-        Validates that two failures on the same field are reported as a
-        list of messages, and that distinct fields get their own entry.
+        """
+        Verify that every failure code and message is grouped by field.
 
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            Assert grouped details, the summary count, and preserved failures.
         """
         exc = ValidationException([
             ValidationFailure(field="email", rule="pattern", message="Bad."),
@@ -102,8 +100,66 @@ class TestValidationException(TestCase):
         ])
         self.assertEqual(
             exc.errors,
-            {"email": ["Bad.", "Short."], "age": ["Too young."]},
+            {
+                "email": [
+                    {"rule": "pattern", "message": "Bad."},
+                    {"rule": "min_length", "message": "Short."},
+                ],
+                "age": [{"rule": "ge", "message": "Too young."}],
+            },
         )
+        self.assertEqual(str(exc), "Bad. (and 2 more errors)")
+        self.assertEqual(len(exc.failures), 3)
+        self.assertIs(exc.failure, exc.failures[0])
+
+    def testSummaryCountsTwoFailuresOnOneField(self) -> None:
+        """
+        Verify that the summary counts every failure on the same field.
+
+        Returns
+        -------
+        None
+            Assert the remaining-error suffix for two failures on one field.
+        """
+        exc = ValidationException([
+            ValidationFailure(field="name", rule="min_length", message="Short."),
+            ValidationFailure(field="name", rule="pattern", message="Bad."),
+        ])
+        self.assertEqual(str(exc), "Short. (and 1 more error)")
+
+    def testEmptyFailuresUseDefaultMessage(self) -> None:
+        """
+        Verify the default payload when no failures are supplied.
+
+        Returns
+        -------
+        None
+            Assert the default summary, empty errors, and absent first failure.
+        """
+        exc = ValidationException([])
+        self.assertEqual(exc.error(), {
+            "message": "The given data was invalid.", "errors": {},
+        })
+        self.assertEqual(exc.failures, ())
+        self.assertIsNone(exc.failure)
+
+    def testExplicitSummaryPreservesFailureDetails(self) -> None:
+        """
+        Verify that a custom summary preserves the original failure details.
+
+        Returns
+        -------
+        None
+            Assert the custom summary alongside the field's rule and message.
+        """
+        failure = ValidationFailure("name", "application_code", "Invalid.")
+        exc = ValidationException(failure, message="Check this form.")
+        self.assertEqual(exc.error(), {
+            "message": "Check this form.",
+            "errors": {
+                "name": [{"rule": "application_code", "message": "Invalid."}],
+            },
+        })
 
     def testSummaryMessageCountsRemainingErrors(self) -> None:
         """Suffix the summary message with the remaining error count.

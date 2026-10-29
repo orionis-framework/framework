@@ -574,23 +574,23 @@ class TestValidatorMultipleErrors(TestCase):
             {"address.zip_code", "age"},
         )
 
-    async def testMessagesAreListsOfStrings(self) -> None:
-        """Expose every field error as a list of message strings.
-
-        Validates the response contract consumed by the HTTP layer, where
-        each field maps to an array of messages.
+    async def testErrorsContainRuleCodesAndMessages(self) -> None:
+        """
+        Verify that field errors contain structured rule codes and messages.
 
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            Assert each field's error list, detail keys, and message type.
         """
         with self.assertRaises(ValidationException) as ctx:
             await Validator.validate({"name": 1, "age": "x"}, _PersonSchema)
-        for messages in ctx.exception.errors.values():
-            self.assertIsInstance(messages, list)
-            for message in messages:
-                self.assertIsInstance(message, str)
+        for details in ctx.exception.errors.values():
+            self.assertIsInstance(details, list)
+            for detail in details:
+                self.assertEqual(set(detail), {"rule", "message"})
+                self.assertEqual(detail["rule"], "type")
+                self.assertIsInstance(detail["message"], str)
 
     async def testCustomRulesRunWhenAnotherFieldFailsConversion(self) -> None:
         """Run custom rules even when a sibling field breaks a constraint.
@@ -612,23 +612,22 @@ class TestValidatorMultipleErrors(TestCase):
             {"email", "password"},
         )
 
-    async def testCustomRuleIsSkippedWhenItsOwnFieldIsInvalid(self) -> None:
-        """Skip a custom rule when its own field failed conversion.
-
-        Validates that only the constraint failure is reported, since the
-        rule has no converted value to inspect.
+    async def testCustomRulesRunAfterConstraintFailuresOnCompatibleTypes(self) -> None:
+        """
+        Verify that compatible values run rules after constraint failures.
 
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            Assert both length and email failures for the same string value.
         """
         payload = {"email": "a@b", "password": "12345678"}
         with self.assertRaises(ValidationException) as ctx:
             await Validator.validate(payload, _CredentialsSchema)
-        messages = ctx.exception.errors["email"]
-        self.assertEqual(len(messages), 1)
-        self.assertNotIn("email address", messages[0])
+        details = ctx.exception.errors["email"]
+        self.assertEqual(
+            [detail["rule"] for detail in details], ["min_length", "email"],
+        )
 
 class TestValidatorGreaterThan(TestCase):
 

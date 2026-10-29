@@ -161,9 +161,9 @@ class BootstrapHTTP(HTTP):
 
             # --------------------------------------------------------------------------
             # allow_origins : list[str], optional
-            # --- List of allowed origins. Defaults to [].
+            # --- List of allowed origins. Defaults to ["*"] (all origins).
             # --------------------------------------------------------------------------
-            allow_origins=Env.get("CORS_ALLOW_ORIGINS", []),
+            allow_origins=Env.get("CORS_ALLOW_ORIGINS", ["*"]),
 
             # --------------------------------------------------------------------------
             # allow_origin_regex : str | None, optional

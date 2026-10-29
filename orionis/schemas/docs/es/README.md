@@ -6,6 +6,8 @@ Un `Schema` Orionis es un `msgspec.Struct` procesado por `SchemaMeta`. Los campo
 
 Declaración y validación están separadas. La construcción directa confía en valores ya tipados bajo la semántica del constructor `msgspec`. `await orionis.schemas.validator.Schema.validate(payload, schema)` convierte payloads no confiables y lanza `ValidationException` con fallos por campo. La validación tiene una única entrada y siempre es asíncrona, incluso en schemas sin reglas personalizadas.
 
+Cada elemento de `errors[campo]` contiene `rule` y `message`; los códigos de reglas personalizadas provienen de `__code__`. Se acumulan las restricciones y reglas aplicables al mismo campo. Si el tipo es incompatible, sus reglas de valor no se ejecutan. Cuando un controlador HTTP devuelve directamente una instancia `Schema`, el kernel la valida antes de serializarla; una salida inválida produce un error de servidor.
+
 ## Requisitos
 
 - Python 3.14 o posterior; la compilación usa evaluación diferida de anotaciones.

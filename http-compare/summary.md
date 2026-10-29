@@ -6,36 +6,36 @@ Medians of individual runs; throughput counts HTTP 200 only. Latency is in ms.
 
 | Framework | Interface | Workers | Status | Requests/s | Mean | p50 | p95 | p99 | Errors |
 | --- | --- | ---: | --- | ---: | ---: | ---: | ---: | ---: | ---: |
-| litestar | asgi | 1 | ok | 28142.10 | 3.55 | 3.78 | 4.54 | 4.97 | 0 |
-| orionis-asgi | asgi | 1 | ok | 30875.72 | 3.24 | 3.43 | 4.06 | 4.37 | 0 |
-| fastapi | asgi | 1 | ok | 19027.42 | 5.25 | 5.48 | 6.53 | 6.91 | 0 |
-| starlette | asgi | 1 | ok | 43342.62 | 2.30 | 2.39 | 2.97 | 3.29 | 0 |
-| orionis-rsgi | rsgi | 1 | ok | 26694.70 | 3.74 | 3.87 | 4.22 | 4.32 | 0 |
-| litestar | asgi | 2 | ok | 40749.30 | 2.45 | 2.44 | 3.24 | 3.74 | 0 |
-| fastapi | asgi | 2 | ok | 28947.83 | 3.45 | 3.48 | 4.27 | 4.60 | 0 |
-| orionis-rsgi | rsgi | 2 | ok | 48833.93 | 2.05 | 2.00 | 2.84 | 3.29 | 0 |
-| starlette | asgi | 2 | ok | 64205.01 | 1.56 | 1.49 | 2.40 | 2.91 | 0 |
-| orionis-asgi | asgi | 2 | ok | 47331.75 | 2.11 | 2.10 | 3.00 | 3.59 | 0 |
-| litestar | asgi | 3 | ok | 49928.51 | 2.00 | 1.89 | 3.30 | 4.20 | 0 |
-| orionis-asgi | asgi | 3 | ok | 55689.41 | 1.79 | 1.71 | 2.95 | 3.74 | 0 |
-| fastapi | asgi | 3 | ok | 40523.88 | 2.46 | 2.34 | 3.84 | 4.57 | 0 |
-| orionis-rsgi | rsgi | 3 | ok | 57077.55 | 1.75 | 1.68 | 2.80 | 3.61 | 0 |
-| starlette | asgi | 3 | ok | 65686.75 | 1.52 | 1.46 | 2.48 | 3.19 | 0 |
-| orionis-asgi | asgi | 4 | ok | 53644.50 | 1.86 | 1.75 | 3.27 | 4.25 | 0 |
-| fastapi | asgi | 4 | ok | 37451.54 | 2.67 | 2.46 | 4.79 | 6.23 | 0 |
-| litestar | asgi | 4 | ok | 48094.43 | 2.08 | 1.96 | 3.64 | 4.80 | 0 |
-| starlette | asgi | 4 | ok | 64308.04 | 1.55 | 1.46 | 2.76 | 3.68 | 0 |
-| orionis-rsgi | rsgi | 4 | ok | 55547.01 | 1.80 | 1.69 | 3.17 | 4.20 | 0 |
+| litestar | asgi | 1 | ok | 10734.36 | 9.31 | 7.68 | 13.47 | 13.88 | 0 |
+| orionis-asgi | asgi | 1 | ok | 13702.42 | 7.29 | 5.92 | 11.18 | 11.58 | 0 |
+| fastapi | asgi | 1 | ok | 7666.32 | 13.03 | 12.10 | 17.03 | 17.42 | 0 |
+| starlette | asgi | 1 | ok | 19545.83 | 5.11 | 4.04 | 9.20 | 9.60 | 0 |
+| orionis-rsgi | rsgi | 1 | ok | 11569.20 | 8.63 | 8.17 | 11.81 | 12.08 | 0 |
+| litestar | asgi | 2 | ok | 16221.33 | 6.16 | 6.17 | 7.53 | 8.28 | 0 |
+| fastapi | asgi | 2 | ok | 11821.57 | 8.45 | 8.43 | 10.32 | 11.05 | 0 |
+| orionis-rsgi | rsgi | 2 | ok | 18997.61 | 5.26 | 5.15 | 7.38 | 7.99 | 0 |
+| starlette | asgi | 2 | ok | 27081.35 | 3.69 | 3.61 | 5.33 | 6.42 | 0 |
+| orionis-asgi | asgi | 2 | ok | 19876.87 | 5.02 | 4.91 | 6.99 | 7.83 | 0 |
+| litestar | asgi | 3 | ok | 21730.83 | 4.60 | 4.40 | 6.85 | 8.33 | 0 |
+| orionis-asgi | asgi | 3 | ok | 25172.72 | 3.97 | 3.83 | 6.04 | 7.44 | 0 |
+| fastapi | asgi | 3 | ok | 16495.30 | 6.05 | 5.88 | 8.75 | 9.49 | 0 |
+| orionis-rsgi | rsgi | 3 | ok | 25058.01 | 3.99 | 3.83 | 6.02 | 7.32 | 0 |
+| starlette | asgi | 3 | ok | 30518.55 | 3.27 | 3.19 | 5.07 | 6.12 | 0 |
+| orionis-asgi | asgi | 4 | ok | 24811.09 | 4.03 | 3.82 | 6.68 | 8.32 | 0 |
+| fastapi | asgi | 4 | ok | 16780.36 | 5.95 | 5.56 | 9.81 | 12.02 | 0 |
+| litestar | asgi | 4 | ok | 21628.42 | 4.62 | 4.41 | 7.52 | 9.54 | 0 |
+| starlette | asgi | 4 | ok | 29724.87 | 3.36 | 3.25 | 5.45 | 6.80 | 0 |
+| orionis-rsgi | rsgi | 4 | ok | 25040.11 | 3.99 | 3.83 | 6.57 | 8.18 | 0 |
 
 ## Environment
 
 - os: Linux-7.0.0-1017-azure-x86_64-with-glibc2.39
-- cpu: AMD EPYC 9V45 96-Core Processor
+- cpu: AMD EPYC 7763 64-Core Processor
 - logical_cpus: 4
 - python: 3.14.8
-- commit: 7bfbc060da6adb4ebbfb11d7818ac498e333d2ba
+- commit: 07cb89a856b780c4272f052557e51392824e6dca
 - dirty: False
-- run_url: https://github.com/orionis-framework/framework/actions/runs/40935979878
+- run_url: https://github.com/orionis-framework/framework/actions/runs/40960718446
 - orionis: 1.0.13
 - granian: 2.8.4
 - fastapi: 0.143.1

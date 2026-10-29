@@ -1,8 +1,12 @@
 from __future__ import annotations
-from typing import TYPE_CHECKING, Annotated, get_args, get_origin
+from annotationlib import Format, call_annotate_function
+import types
+from typing import TYPE_CHECKING, Annotated, Union, get_args, get_origin
 import msgspec
 from orionis.schemas.compiler import MetaCompiler
+from orionis.schemas.constraint_plan import _ConstraintMessages, register_messages
 from orionis.schemas.meta.validation import ValidationMetadata
+from orionis.schemas.rule import Rule
 from orionis.schemas.metadata import (
     Message,
 )
@@ -31,13 +35,114 @@ _CONSTRAINT_MSGSPEC_KEYS: dict[type, str] = {
     TimezoneNaive: "tz_naive",
 }
 
+def _compile_annotation(
+    annotation: object, *, nested: bool = False,
+) -> tuple[object, dict[str, str]]:
+    """
+    Compile constraints throughout an annotation and its nested types.
+
+    Parameters
+    ----------
+    annotation : object
+        Field or element annotation to compile.
+    nested : bool, optional
+        Whether the annotation belongs to a collection item or union branch.
+
+    Returns
+    -------
+    tuple[object, dict[str, str]]
+        Compiled annotation and messages declared on its outer metadata layer.
+
+    Raises
+    ------
+    TypeError
+        If a collection item or union branch declares an unsupported rule.
+    MetadataConflictError
+        If constraint declarations are invalid or incompatible.
+    """
+    origin = get_origin(annotation)
+    arguments = get_args(annotation)
+    if origin is Annotated:
+        return _compile_annotated(annotation, arguments, nested=nested)
+
+    if not arguments:
+        return annotation, {}
+    rewritten = tuple(
+        _compile_annotation(item, nested=True)[0] for item in arguments
+    )
+    if all(old is new for old, new in zip(arguments, rewritten, strict=True)):
+        return annotation, {}
+    if origin is Union or origin is types.UnionType:
+        return Union[rewritten], {}  # noqa: UP007
+    copy_with = getattr(annotation, "copy_with", None)
+    if copy_with is not None:
+        return copy_with(rewritten), {}
+    return origin[rewritten], {}
+
+
+def _compile_annotated(
+    annotation: object, arguments: tuple, *, nested: bool,
+) -> tuple[object, dict[str, str]]:
+    """
+    Compile an Annotated layer and preserve its local error messages.
+
+    Parameters
+    ----------
+    annotation : object
+        Original Annotated declaration.
+    arguments : tuple
+        Base type followed by the declaration's metadata items.
+    nested : bool
+        Whether the declaration belongs to a collection item or union branch.
+
+    Returns
+    -------
+    tuple[object, dict[str, str]]
+        Rebuilt annotation and its messages indexed by validation code.
+
+    Raises
+    ------
+    TypeError
+        If nested metadata contains a rule requiring field-level execution.
+    MetadataConflictError
+        If constraint declarations are invalid or incompatible.
+    """
+    base, *metadata = arguments
+    compiled_base, _ = _compile_annotation(base, nested=nested)
+    validation = []
+    custom = []
+    messages = {}
+    for item in metadata:
+        if nested and isinstance(item, Rule):
+            error_msg = (
+                "Rules inside collection items or union branches are not supported. "
+                "Use a child Schema for item rules or an outer Field for field rules."
+            )
+            raise TypeError(error_msg)
+        if isinstance(item, Message):
+            messages.setdefault("type", item.text)
+        elif isinstance(item, ValidationMetadata):
+            validation.append(item)
+            key = _CONSTRAINT_MSGSPEC_KEYS.get(type(item))
+            if key is not None and item.message is not None:
+                messages[key] = item.message
+        else:
+            custom.append(item)
+    if validation:
+        compiled = Annotated[
+            (compiled_base, MetaCompiler.compile(validation), *custom)
+        ]
+    elif compiled_base is base:
+        compiled = annotation
+    else:
+        compiled = Annotated[(compiled_base, *metadata)]
+    return register_messages(compiled, messages), messages
+
 # The metaclass for all Schema subclasses.  Intercept class creation to compile
 # ValidationMetadata into msgspec.Meta and collect custom metadata for later use.
 _StructMeta = type(msgspec.Struct)
 
 class SchemaMeta(_StructMeta):
-
-    # ruff: noqa: C901
 
     def __new__(
         cls,
@@ -47,29 +152,35 @@ class SchemaMeta(_StructMeta):
         **kwargs: object,
     ) -> SchemaMeta:
         """
-        Build a new ``Schema`` subclass with compiled metadata.
+        Build a Schema subclass with compiled metadata and rule plans.
 
-        Wrap ``__annotate_func__`` (PEP 649) so ``ValidationMetadata`` objects
-        become ``msgspec.Meta`` instances, then attach ``__orionis_meta__``
-        and ``__orionis_constraints__`` to the finished class.
+        Compile lazy annotations, merge inherited messages and index errors
+        by encoded field name before preparing the validation plan.
 
         Parameters
         ----------
         cls : type
-            Provide the metaclass itself.
+            Metaclass constructing the schema.
         name : str
-            Define the class name.
+            Name of the schema class.
         bases : tuple[type, ...]
-            Define the direct base classes.
+            Direct base classes.
         namespace : dict[str, object]
-            Provide the class body namespace.
+            Class body namespace.
         **kwargs : object
-            Forward metaclass keyword arguments to ``msgspec.Struct``.
+            Options forwarded to the ``msgspec.Struct`` metaclass.
 
         Returns
         -------
         SchemaMeta
-            Return the created schema class.
+            Prepared schema class.
+
+        Raises
+        ------
+        TypeError
+            If field metadata contains an unsupported rule declaration.
+        MetadataConflictError
+            If constraint declarations are invalid or incompatible.
         """
         # Read the lazy annotation callback from the class namespace.
         annotate_func: Callable[[int], dict[str, object]] | None = (
@@ -93,7 +204,16 @@ class SchemaMeta(_StructMeta):
         klass.__orionis_meta__ = SchemaMeta._collect(klass)
 
         # Persist custom constraint messages indexed by field and constraint key.
-        klass.__orionis_constraints__ = constraint_msgs
+        inherited_messages = {}
+        for base in reversed(bases):
+            inherited_messages.update(getattr(base, "__orionis_field_messages__", {}))
+        inherited_messages.update(constraint_msgs)
+        klass.__orionis_field_messages__ = inherited_messages
+        klass.__orionis_constraints__ = {
+            field.encode_name: inherited_messages[field.name]
+            for field in msgspec.structs.fields(klass)
+            if inherited_messages.get(field.name)
+        }
 
         # Import lazily to avoid module-level circular dependencies.
         from orionis.schemas.rules_executor import _build_plan  # noqa: PLC0415
@@ -105,181 +225,82 @@ class SchemaMeta(_StructMeta):
         return klass
 
     @staticmethod
-    def _wrap( # NOSONAR
+    def _wrap(
         original_func: Callable[[int], dict[str, object]],
         constraint_msgs: dict[str, dict[str, str]],
     ) -> Callable[[int], dict[str, object]]:
         """
-        Return a wrapped annotate callable for the Python 3.14 lazy protocol.
-
-        Call the original annotate function to obtain raw annotations, compile
-        ``ValidationMetadata`` items into ``msgspec.Meta``, and extract custom
-        error messages into ``constraint_msgs``.
-
-        Capture module-level globals as closure locals so the inner
-        ``_annotate`` uses ``LOAD_DEREF`` rather than ``LOAD_GLOBAL``.
+        Wrap lazy annotation resolution with recursive metadata compilation.
 
         Parameters
         ----------
         original_func : Callable[[int], dict[str, object]]
-            Provide the original PEP 649 annotation callback.
+            Original PEP 649 annotation callback.
         constraint_msgs : dict[str, dict[str, str]]
-            Store per-field custom error messages keyed by constraint name.
+            Mapping populated with each field's local validation messages.
 
         Returns
         -------
         Callable[[int], dict[str, object]]
-            Return the wrapped annotation callback.
+            Callback that compiles metadata while preserving string requests.
         """
-        # Bind the metadata compiler for schema construction.
-        _meta_compiler = MetaCompiler
-
-        # Cache validation metadata type for isinstance checks.
-        _validation_metadata = ValidationMetadata
-
-        # Cache message metadata type for isinstance checks.
-        _message_type = Message
-
-        # Cache map from metadata class to msgspec key.
-        _constraint_keys = _CONSTRAINT_MSGSPEC_KEYS
-
-        # Bind the generic type origin helper.
-        _get_origin = get_origin
-
-        # Bind the generic type argument helper.
-        _get_args = get_args
-
-        # Cache Annotated marker type for identity checks.
-        _annotated_type = Annotated
-
         def _annotate(fmt: int) -> dict[str, object]:
             """
-            Resolve schema field annotations for a requested format.
+            Resolve annotations and compile metadata for the requested format.
 
             Parameters
             ----------
             fmt : int
-                Annotation evaluation format.
+                Annotation evaluation format requested by the caller.
 
             Returns
             -------
             dict[str, object]
-                Resolved schema field annotations.
+                Compiled field annotations, or original string annotations.
+
+            Raises
+            ------
+            TypeError
+                If nested metadata contains an unsupported rule declaration.
+            MetadataConflictError
+                If constraint declarations are invalid or incompatible.
             """
-            # Resolve deferred annotations for the given format.
-            annotations: dict[str, object] = original_func(fmt)
-
-            # Prepare output annotations dictionary.
-            result: dict[str, object] = {}
-            for k, v in annotations.items():
-
-                # Keep non-Annotated entries unchanged.
-                if _get_origin(v) is not _annotated_type:
-
-                    # Preserve original annotation.
-                    result[k] = v
-
-                    # Skip metadata processing for non-Annotated fields.
-                    continue
-
-                # Split Annotated into base type and metadata payload.
-                args = _get_args(v)
-
-                # Extract the original field type.
-                base_type: object = args[0]
-
-                # Extract all metadata objects.
-                metadata: tuple[object, ...] = args[1:]
-
-                # Single-pass classification: avoids iterating `metadata`.
-                # Hold optional type-level message metadata.
-                type_msg: Message | None = None
-
-                # Collect validation metadata for compilation.
-                validation_meta: list[ValidationMetadata] = []
-
-                # Collect non-validation metadata to preserve.
-                custom_meta: list[object] = []
-                for m in metadata:
-
-                    # Keep only the first Message instance as type message.
-                    if isinstance(m, _message_type):
-                        # Save the first type message found.
-                        if type_msg is None:
-                            type_msg = m
-
-                    # Collect validation metadata used to build msgspec.Meta.
-                    elif isinstance(m, _validation_metadata):
-                        # Queue validation rule metadata.
-                        validation_meta.append(m)
-
-                    # Preserve any other metadata untouched.
-                    else:
-                        # Keep custom metadata for final Annotated.
-                        custom_meta.append(m)
-
-                # Collect custom messages keyed by their msgspec constraint name.
-                # Direct slot read (m.message) instead of getattr(m, "message", None):
-                # all ConstraintMetadata subclasses declare the slot, so the 3-arg
-                # getattr fallback machinery is never needed.
-                msgs: dict[str, str] = {
-                    key: m.message
-                    for m in validation_meta
-                    if (key := _constraint_keys.get(type(m))) is not None
-                    and m.message is not None  # direct slot read; no getattr overhead
-                }
-
-                # Register the Message text under the reserved "type" key.
-                if type_msg is not None:
-                    # Add custom type error message when provided.
-                    msgs["type"] = type_msg.text
-                if msgs:
-                    # Persist field-level custom messages.
-                    constraint_msgs[k] = msgs
-
-                # If there are no validation rules, keep the annotation as-is.
-                if not validation_meta:
-                    # Return original Annotated with unchanged metadata.
-                    result[k] = v
-                    # Skip compilation for this field.
-                    continue
-
-                # Compile validation metadata once.
-                compiled: msgspec.Meta = _meta_compiler.compile(validation_meta)
-                # Rebuild Annotated with compiled + custom meta.
-                result[k] = Annotated[(base_type, compiled, *custom_meta)]
-
-            # Return rewritten annotations dictionary.
+            annotations = call_annotate_function(original_func, fmt)
+            if fmt == Format.STRING:
+                return annotations
+            result = {}
+            for name, annotation in annotations.items():
+                compiled, messages = _compile_annotation(annotation)
+                result[name] = compiled
+                # Empty overrides also clear messages inherited from a base.
+                constraint_msgs[name] = messages
             return result
 
-        # Return wrapped callback compatible with lazy annotation protocol.
         return _annotate
 
     @staticmethod
     def _collect(klass: type) -> dict[str, list[object]]:
         """
-        Collect custom non-msgspec metadata from a freshly created struct.
+        Collect application metadata from a newly created schema class.
 
-        Iterate over each field of ``klass`` and collect ``Annotated``
-        arguments that are not ``msgspec.Meta`` instances into a
-        ``field_name -> [custom_items]`` mapping.
+        Exclude native constraint metadata and internal message markers.
 
         Parameters
         ----------
-        klass :
-            The newly created ``Schema`` subclass.
+        klass : type
+            Schema class whose field metadata is inspected.
 
         Returns
         -------
         dict[str, list[object]]
-            A mapping of field names to their custom metadata objects.
-            Fields with no custom metadata are omitted.
+            Field names mapped to their application metadata items, omitting
+            fields with no such items.
         """
         # Initialize the output mapping.
         result: dict[str, list[object]] = {}
 
         # Bind the metadata annotation type.
-        _msgspec_meta = msgspec.Meta
+        _msgspec_meta = (msgspec.Meta, _ConstraintMessages)
 
         # Bind the generic type origin helper.
         _get_origin = get_origin

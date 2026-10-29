@@ -27,9 +27,9 @@ class Cors(BaseEntity):
     allow_origin_regex : str | None
         Regular expression to match allowed origins. Defaults to None.
     allow_methods : list[str]
-        List of allowed HTTP methods. Defaults to []. Use ["*"] to allow all methods.
+        List of allowed HTTP methods. Defaults to ["*"] to allow all methods.
     allow_headers : list[str]
-        List of allowed HTTP headers. Defaults to []. Use ["*"] to allow all headers.
+        List of allowed HTTP headers. Defaults to ["*"] to allow all headers.
     expose_headers : list[str]
         List of headers exposed to the browser. Defaults to [].
     allow_credentials : bool
@@ -57,22 +57,22 @@ class Cors(BaseEntity):
     )
 
     allow_methods: list[str] = field(
-        default_factory=lambda: Env.get("CORS_ALLOW_METHODS", []),
+        default_factory=lambda: Env.get("CORS_ALLOW_METHODS", ["*"]),
         metadata={
             "description": (
                 'List of allowed HTTP methods. Use ["*"] to allow all methods.'
             ),
-            "default": [],
+            "default": ["*"],
         },
     )
 
     allow_headers: list[str] = field(
-        default_factory=lambda: Env.get("CORS_ALLOW_HEADERS", []),
+        default_factory=lambda: Env.get("CORS_ALLOW_HEADERS", ["*"]),
         metadata={
             "description": (
                 'List of allowed HTTP headers. Use ["*"] to allow all headers.'
             ),
-            "default": [],
+            "default": ["*"],
         },
     )
 
@@ -138,7 +138,7 @@ class Cors(BaseEntity):
 
     def __post_init__(self) -> None:
         """
-        Normalize origins, validate CORS options and own the supplied mutable lists.
+        Normalize allowlists, validate CORS options and own supplied mutable lists.
 
         Returns
         -------
@@ -147,12 +147,10 @@ class Cors(BaseEntity):
         """
         super().__post_init__()
 
-        # Ensure 'allow_origins' has a default value of ["*"] if it is empty or None.
-        if (
-            self.allow_origins in ([], {}, (), "*") or
-            self.allow_origins is None
-        ):
-            object.__setattr__(self, "allow_origins", ["*"])
+        for name in ("allow_origins", "allow_methods", "allow_headers"):
+            value = getattr(self, name)
+            if value in ([], {}, (), "*") or value is None:
+                object.__setattr__(self, name, ["*"])
 
         for name in (
             "allow_origins",

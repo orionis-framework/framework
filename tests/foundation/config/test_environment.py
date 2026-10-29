@@ -207,40 +207,44 @@ class TestConfigurationEnvironment(ConfigurationTestCase):
             with self.subTest(entity=cls.__name__), self.assertRaises(ValueError):
                 cls()
 
-    def testCorsDefaultsAllowAllOrigins(self) -> None:
+    def testCorsDefaultsAllowAllOriginsMethodsAndHeaders(self) -> None:
         """Use independent wildcard defaults in entities and application settings.
 
         Returns
         -------
         None
-            Default origins and their metadata consistently allow all origins.
+            Default allowlists and their metadata consistently use wildcards.
         """
         first = Cors()
-        self.assertEqual(first.allow_origins, ["*"])
-        first.allow_origins.append("https://example.com")
-        self.assertEqual(Cors().allow_origins, ["*"])
-        origins_field = next(
-            field for field in fields(Cors) if field.name == "allow_origins"
-        )
-        self.assertEqual(origins_field.metadata["default"], ["*"])
-        for cls in (HTTP, BootstrapHTTP):
-            with self.subTest(entity=cls.__name__):
-                self.assertEqual(cls().cors.allow_origins, ["*"])
+        for name in ("allow_origins", "allow_methods", "allow_headers"):
+            with self.subTest(field=name):
+                self.assertEqual(getattr(first, name), ["*"])
+                getattr(first, name).append("another")
+                self.assertEqual(getattr(Cors(), name), ["*"])
+                definition = next(
+                    field for field in fields(Cors) if field.name == name
+                )
+                self.assertEqual(definition.metadata["default"], ["*"])
+                for cls in (HTTP, BootstrapHTTP):
+                    with self.subTest(entity=cls.__name__):
+                        self.assertEqual(getattr(cls().cors, name), ["*"])
+        self.assertEqual(Cors().expose_headers, [])
 
-    def testCorsEmptyOriginsNormalizeToWildcard(self) -> None:
-        """Normalize supported empty origin settings and the scalar wildcard.
+    def testCorsEmptyAllowlistsNormalizeToWildcard(self) -> None:
+        """Normalize supported empty allowlists and the scalar wildcard.
 
         Returns
         -------
         None
             Constructor and environment values produce the same wildcard list.
         """
-        for value in (None, [], {}, (), "*"):
-            with self.subTest(origins=value):
-                config = {"allow_origins": value}
-                self.assertEqual(Cors(**config).allow_origins, ["*"])
-                self.environment.values["CORS_ALLOW_ORIGINS"] = value
-                self.assertEqual(Cors().allow_origins, ["*"])
+        for name in ("allow_origins", "allow_methods", "allow_headers"):
+            for value in (None, [], {}, (), "*"):
+                with self.subTest(field=name, value=value):
+                    config = {name: value}
+                    self.assertEqual(getattr(Cors(**config), name), ["*"])
+                    self.environment.values[f"CORS_{name.upper()}"] = value
+                    self.assertEqual(getattr(Cors(), name), ["*"])
 
     def testEnvironmentListsDoNotBecomeSharedInstanceDefaults(self) -> None:
         """Own collections even when the environment returns the same list.
@@ -250,16 +254,21 @@ class TestConfigurationEnvironment(ConfigurationTestCase):
         None
             Assertions verify the behavior described above.
         """
-        values = ["https://example.com"]
-        self.environment.values["CORS_ALLOW_ORIGINS"] = values
-        first = Cors()
-        second = Cors()
-        first.allow_origins.clear()
-        self.assertEqual(second.allow_origins, values)
-        self.assertIsNot(second.allow_origins, values)
-        for cls in (HTTP, BootstrapHTTP):
-            with self.subTest(entity=cls.__name__):
-                self.assertEqual(cls().cors.allow_origins, values)
+        for name, values in (
+            ("allow_origins", ["https://example.com"]),
+            ("allow_methods", ["GET", "POST"]),
+            ("allow_headers", ["X-Token"]),
+        ):
+            with self.subTest(field=name):
+                self.environment.values[f"CORS_{name.upper()}"] = values
+                first = Cors()
+                second = Cors()
+                getattr(first, name).clear()
+                self.assertEqual(getattr(second, name), values)
+                self.assertIsNot(getattr(second, name), values)
+                for cls in (HTTP, BootstrapHTTP):
+                    with self.subTest(entity=cls.__name__):
+                        self.assertEqual(getattr(cls().cors, name), values)
 
     def testEnvironmentFalsyValuesAreNotReplacedByDefaults(self) -> None:
         """Keep explicitly disabled template and bytecode caches.

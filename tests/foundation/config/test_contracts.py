@@ -56,9 +56,11 @@ class TestConfigurationContracts(ConfigurationTestCase):
             annotations = get_type_hints(cls)
             for field in fields(cls):
                 with self.subTest(entity=cls.__name__, field=field.name):
-                    if issubclass(cls, Cors) and field.name == "allow_origins":
+                    if issubclass(cls, Cors) and field.name in (
+                        "allow_origins", "allow_methods", "allow_headers",
+                    ):
                         self.assertEqual(
-                            cls(**{field.name: None}).allow_origins, ["*"],
+                            getattr(cls(**{field.name: None}), field.name), ["*"],
                         )
                     elif type(None) in get_args(annotations[field.name]):
                         values = {field.name: None}

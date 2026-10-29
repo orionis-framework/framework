@@ -173,15 +173,15 @@ class BootstrapHTTP(HTTP):
 
             # --------------------------------------------------------------------------
             # allow_methods : list[str], optional
-            # --- List of allowed HTTP methods. Defaults to [].
+            # --- List of allowed HTTP methods. Defaults to ["*"] (all methods).
             # --------------------------------------------------------------------------
-            allow_methods=Env.get("CORS_ALLOW_METHODS", []),
+            allow_methods=Env.get("CORS_ALLOW_METHODS", ["*"]),
 
             # --------------------------------------------------------------------------
             # allow_headers : list[str], optional
-            # --- List of allowed HTTP headers. Defaults to [].
+            # --- List of allowed HTTP headers. Defaults to ["*"] (all headers).
             # --------------------------------------------------------------------------
-            allow_headers=Env.get("CORS_ALLOW_HEADERS", []),
+            allow_headers=Env.get("CORS_ALLOW_HEADERS", ["*"]),
 
             # --------------------------------------------------------------------------
             # expose_headers : list[str], optional

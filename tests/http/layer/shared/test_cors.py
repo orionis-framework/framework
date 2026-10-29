@@ -7,13 +7,13 @@ from tests.http.test_support import make_adapter, replace_attribute
 class TestCORSLifecycle(TestCase):
     """Exercise preflight and ordinary cross-origin response behavior."""
 
-    def testDefaultOriginsAllowAnyOriginForRequestsAndPreflights(self) -> None:
-        """Publish wildcard origins when no origin policy was configured.
+    def testDefaultsAllowAllOriginsMethodsAndHeaders(self) -> None:
+        """Publish wildcard policies when no CORS allowlists were configured.
 
         Returns
         -------
         None
-            Ordinary and preflight responses allow arbitrary request origins.
+            Responses allow arbitrary origins, methods and requested headers.
         """
         with replace_attribute(
             Env, "get", lambda _key, default=None: default,
@@ -34,7 +34,8 @@ class TestCORSLifecycle(TestCase):
 
                 preflight = make_adapter([
                     (b"origin", origin),
-                    (b"access-control-request-method", b"GET"),
+                    (b"access-control-request-method", b"PATCH"),
+                    (b"access-control-request-headers", b"x-token, content-type"),
                 ], method="OPTIONS")
                 preflight_response = middleware.before(preflight)
                 if preflight_response is None:
@@ -43,6 +44,14 @@ class TestCORSLifecycle(TestCase):
                 self.assertEqual(
                     preflight_response.getHeader("access-control-allow-origin"),
                     ["*"],
+                )
+                self.assertEqual(
+                    preflight_response.getHeader("access-control-allow-methods"),
+                    [CORSMiddleware.ALL_METHODS],
+                )
+                self.assertEqual(
+                    preflight_response.getHeader("access-control-allow-headers"),
+                    ["x-token, content-type"],
                 )
 
     def testDefaultWildcardOriginsStillRejectCredentials(self) -> None:

@@ -5,6 +5,7 @@ from typing import TYPE_CHECKING, Annotated, Union, get_args, get_origin
 import msgspec
 import msgspec.structs
 from orionis.schemas.entities.failure import ValidationFailure
+from orionis.schemas.constraint_plan import annotation_messages, constraint_plan
 from orionis.schemas.exception_parser import ValidationErrorParser
 from orionis.schemas.rules_executor import (
     _build_plan as _build_rule_plan,
@@ -20,9 +21,10 @@ if TYPE_CHECKING:
 # Bind the msgspec conversion entry point.
 _convert = msgspec.convert
 _ValidationError = msgspec.ValidationError
+_INVALID = object()
 
 # Cache: schema type -> tuple of
-# (encode_name, field_type, required, nested, rules).
+# (encode_name, field_type, required, nested, rules, attribute, default, factory).
 _FIELD_PLAN_CACHE: dict[type, tuple] = {}
 
 # Bind the field plan lookup.
@@ -66,7 +68,7 @@ def _nested_schema(tp: object) -> type[msgspec.Struct] | None:
 
 def _field_plan(schema: type) -> tuple:
     """
-    Return a cached per-field plan used to convert a payload field by field.
+    Return a cached plan for collecting field validation failures.
 
     Parameters
     ----------
@@ -77,8 +79,8 @@ def _field_plan(schema: type) -> tuple:
     -------
     tuple
         Entries of ``(encode_name, field_type, required, nested_annotation,
-        rules)``, where ``rules`` holds the bound custom rule validators
-        declared for the field.
+        rules, attribute, default, factory)``, where ``rules`` holds the bound
+        custom validators and ``attribute`` is the Python field name.
     """
     cached = _plan_get(schema)
     if cached is not None:
@@ -99,12 +101,39 @@ def _field_plan(schema: type) -> tuple:
             _nested_schema(f.type) or (
                 f.type if _type_contains_nested(f.type) else None
             ),
-            rules_by_name.get(f.name, ()),
+            rules_by_name.get(f.encode_name, ()),
+            f.name,
+            f.default,
+            f.default_factory,
         )
         for f in msgspec.structs.fields(schema)
     )
     _FIELD_PLAN_CACHE[schema] = plan
     return plan
+
+def _payload_fields(payload: Mapping | list | tuple, schema: type) -> Mapping:
+    """
+    Map array-like schema positions to encoded field names.
+
+    Parameters
+    ----------
+    payload : Mapping | list | tuple
+        Field mapping or positional schema data, including any tag.
+    schema : type
+        Schema defining field order, encoded names and tag configuration.
+
+    Returns
+    -------
+    Mapping
+        Original mapping or positional values keyed by encoded field name.
+    """
+    if isinstance(payload, Mapping):
+        return payload
+    offset = int(schema.__struct_config__.tag is not None)
+    return {
+        entry[0]: value
+        for entry, value in zip(_field_plan(schema), payload[offset:], strict=False)
+    }
 
 class FailureCollector:
 
@@ -119,13 +148,10 @@ class FailureCollector:
         error: msgspec.ValidationError,
     ) -> tuple[ValidationFailure, ...]:
         """
-        Collect every conversion and rule failure contained in a payload.
+        Collect conversion, constraint and rule failures from a rejected payload.
 
-        msgspec stops at the first offending value, so the payload is
-        re-converted field by field to report all of them at once. Fields that
-        convert cleanly still run their custom rules, so type and rule errors
-        are reported together. This runs only after a whole-payload conversion
-        has already failed, keeping the successful path at full msgspec speed.
+        Inspect fields only after whole-payload conversion fails. Run custom
+        rules on type-compatible values, even when their constraints fail.
 
         Parameters
         ----------
@@ -145,7 +171,10 @@ class FailureCollector:
         failures: list[ValidationFailure] = []
         blamed = False
 
-        if isinstance(payload, Mapping):
+        if isinstance(payload, Mapping) or (
+            schema.__struct_config__.array_like
+            and isinstance(payload, list | tuple)
+        ):
             blamed = await cls._collect(payload, schema, schema, "", failures)
 
         # Keep the original error when no field could be blamed for it
@@ -158,19 +187,19 @@ class FailureCollector:
     @classmethod
     async def _collect(
         cls,
-        payload: Mapping,
+        payload: Mapping | list | tuple,
         schema: type,
         root: type,
         base: str,
         failures: list[ValidationFailure],
     ) -> bool:
         """
-        Convert each declared field of a mapping and accumulate its failures.
+        Convert declared fields and accumulate their validation failures.
 
         Parameters
         ----------
-        payload : Mapping
-            Mapping holding the values for ``schema``.
+        payload : Mapping | list | tuple
+            Field mapping or positional data for an array-like schema.
         schema : type
             Schema class owning the fields being converted.
         root : type
@@ -183,11 +212,12 @@ class FailureCollector:
         Returns
         -------
         bool
-            Return ``True`` when at least one declared field was blamed for a
-            conversion error, so the original error needs no separate report.
+            Whether a declared field explains the original conversion error.
         """
         # Whether a concrete field explained the original conversion error.
         blamed = False
+
+        payload = _payload_fields(payload, schema)
 
         # Values that converted cleanly, reused to run custom rules afterwards.
         converted_values: dict[str, object] = {}
@@ -196,27 +226,33 @@ class FailureCollector:
         # value is known so rules can inspect their sibling fields.
         pending: list[tuple[str, object, tuple, object | None]] = []
 
-        for name, field_type, required, nested, rules in _field_plan(schema):
+        for (
+            name, field_type, required, nested, rules, attribute, default, factory,
+        ) in _field_plan(schema):
 
-            # Report absent values instead of letting the conversion fail.
-            if name not in payload:
-                if required:
-                    blamed = True
-                    failures.append(
-                        ValidationFailure(
-                            field=base + name,
-                            rule="missing",
-                            message=f"Object missing required field `{name}`",
-                        ),
-                    )
+            if name in payload:
+                value = payload[name]
+            elif required:
+                blamed = True
+                failures.append(
+                    ValidationFailure(
+                        field=base + name,
+                        rule="missing",
+                        message=f"Object missing required field `{name}`",
+                    ),
+                )
                 continue
-
-            value = payload[name]
+            elif default is not msgspec.NODEFAULT:
+                value = default
+            elif factory is not msgspec.NODEFAULT:
+                value = factory()
+            else:
+                continue
             try:
                 converted = _convert(value, type=field_type)
             except _ValidationError as exc:
                 blamed = True
-                field_failures = await cls._blame(
+                converted, field_failures = await cls._recover(
                     exc, value, field_type, root, name,
                 )
                 failures.extend(
@@ -227,16 +263,98 @@ class FailureCollector:
                     )
                     for failure in field_failures
                 )
-                continue
+                if converted is _INVALID:
+                    continue
 
-            converted_values[name] = converted
+            converted_values[attribute] = converted
             if rules or nested is not None:
                 pending.append((base + name, converted, rules, nested))
 
-        if pending:
-            await cls._enforce(pending, converted_values, failures)
+        await cls._enforce(pending, converted_values, failures)
 
         return blamed
+
+    @classmethod
+    async def _recover(
+        cls, error: msgspec.ValidationError, value: object,
+        annotation: object, root: type, path: str,
+    ) -> tuple[object, list[ValidationFailure]]:
+        """
+        Recover a type-compatible value and collect its validation failures.
+
+        Parameters
+        ----------
+        error : msgspec.ValidationError
+            Error raised by the original field conversion.
+        value : object
+            Rejected field value.
+        annotation : object
+            Declared field type and metadata.
+        root : type
+            Schema used to resolve custom messages.
+        path : str
+            Field path relative to ``root``.
+
+        Returns
+        -------
+        tuple[object, list[ValidationFailure]]
+            Converted value and failures, or ``_INVALID`` and failures when
+            the value remains structurally incompatible.
+        """
+        base_type, probes = constraint_plan(annotation)
+        if probes:
+            try:
+                converted = _convert(value, type=base_type)
+            except _ValidationError:
+                pass
+            else:
+                # Failed constraints do not make a correctly typed value
+                # unsafe for rules, including checks against sibling values.
+                return converted, cls._constraints(value, probes, root, path)
+        return _INVALID, await cls._blame(error, value, annotation, root, path)
+
+    @staticmethod
+    def _constraints(
+        value: object, probes: tuple, root: type, path: str,
+    ) -> list[ValidationFailure]:
+        """
+        Collect independent constraint failures with their declared codes.
+
+        Parameters
+        ----------
+        value : object
+            Field value checked by each constraint probe.
+        probes : tuple
+            Entries of ``(rule_code, annotation, custom_message)``.
+        root : type
+            Schema supplying fallback field messages.
+        path : str
+            Field path used to locate messages and report failures.
+
+        Returns
+        -------
+        list[ValidationFailure]
+            Local constraint failures, excluding type and child errors.
+        """
+        failures = []
+        for code, annotation, local_message in probes:
+            try:
+                _convert(value, type=annotation)
+            except _ValidationError as exc:
+                failure = ValidationErrorParser.parseAt(exc, root, path)
+                # Ignore incompatible types and failures belonging to children;
+                # those are reported by the structural traversal instead.
+                if failure.field == path and failure.rule != "type":
+                    messages = getattr(root, "__orionis_constraints__", {})
+                    custom = (
+                        local_message if local_message is not None
+                        else messages.get(path, {}).get(code)
+                    )
+                    failures.append(ValidationFailure(
+                        field=path, rule=code,
+                        message=custom if custom is not None else failure.message,
+                    ))
+        return failures
 
     @classmethod
     async def _enforce(
@@ -246,27 +364,27 @@ class FailureCollector:
         failures: list[ValidationFailure],
     ) -> None:
         """
-        Run custom rules over the field values that converted successfully.
+        Run nested and field rules over type-compatible values.
 
-        Type errors abort the whole-payload conversion, so no schema instance
-        exists on this path. Rules receive a namespace holding only the fields
-        that converted cleanly, which keeps cross-field rules usable while
-        still reporting type and rule failures together.
+        Supply converted sibling values through a namespace because the
+        failed whole-payload conversion produced no schema instance.
 
         Parameters
         ----------
         pending : list[tuple[str, object, tuple, object | None]]
             Entries of ``(path, value, rules, nested_annotation)`` to check.
         converted_values : dict[str, object]
-            Successfully converted values, keyed by encoded field name.
+            Type-compatible values, including defaults, keyed by attribute name.
         failures : list[ValidationFailure]
             Accumulator receiving every failure found.
 
         Returns
         -------
         None
-            Return ``None`` after running every pending rule.
+            Append rule failures to ``failures``.
         """
+        if not pending:
+            return
         instance = types.SimpleNamespace(**converted_values)
 
         for path, value, rules, nested in pending:
@@ -290,7 +408,7 @@ class FailureCollector:
         path: str,
     ) -> list[ValidationFailure]:
         """
-        Describe every failure behind a single rejected field value.
+        Collect local and nested failures for a rejected field value.
 
         Parameters
         ----------
@@ -308,35 +426,48 @@ class FailureCollector:
         Returns
         -------
         list[ValidationFailure]
-            Failures of the nested schema, or a single parsed failure.
+            Constraint and child failures, or the parsed original error.
         """
-        annotation = (
-            cls._matchingType(nested, value)
-            if _type_contains_nested(nested) else None
-        )
+        base_type, probes = constraint_plan(nested)
+        failures = cls._constraints(value, probes, root, path)
+        annotation = cls._matchingType(base_type, value)
         schema = _nested_schema(annotation)
-        if schema is not None and isinstance(value, Mapping):
+        if schema is not None:
             nested_failures: list[ValidationFailure] = []
             await cls._collect(value, schema, schema, path + ".", nested_failures)
             if nested_failures:
-                return nested_failures
+                return failures + nested_failures
 
         if annotation is not None and get_origin(annotation) is not None:
-            return await cls._blameCollection(error, value, annotation, root, path)
+            children = await cls._blameCollection(error, value, annotation, root, path)
+            known = {(failure.field, failure.rule) for failure in failures}
+            failures.extend(
+                failure for failure in children
+                if (failure.field, failure.rule) not in known
+            )
+            return failures
 
-        return [ValidationErrorParser.parseAt(error, root, path)]
+        if failures:
+            return failures
+        original = ValidationErrorParser.parseAt(error, root, path)
+        custom = annotation_messages(nested).get(original.rule)
+        if custom is not None:
+            original = ValidationFailure(
+                field=original.field, rule=original.rule, message=custom,
+            )
+        return [original]
 
     @classmethod
     def _matchingType(cls, annotation: object, value: object) -> object | None:
         """
-        Select the nested annotation matching a rejected value's shape.
+        Select a nested annotation matching the value's shape and schema tag.
 
         Parameters
         ----------
         annotation : object
             Field or element annotation, possibly annotated or a union.
         value : object
-            Rejected input used to distinguish maps from sequences.
+            Rejected input used to match object or array-like representations.
 
         Returns
         -------
@@ -353,11 +484,7 @@ class FailureCollector:
             ), None)
         schema = _nested_schema(annotation)
         if schema is not None:
-            config = schema.__struct_config__
-            return schema if (
-                isinstance(value, Mapping)
-                and (config.tag is None or value.get(config.tag_field) == config.tag)
-            ) else None
+            return cls._matchingSchema(schema, value)
         if not isinstance(origin, type):
             return None
         expected = (
@@ -365,6 +492,36 @@ class FailureCollector:
         )
         return annotation if (
             issubclass(origin, Collection) and isinstance(value, expected)
+        ) else None
+
+    @staticmethod
+    def _matchingSchema(
+        schema: type[msgspec.Struct], value: object,
+    ) -> type[msgspec.Struct] | None:
+        """
+        Match a schema's object or array representation and optional tag.
+
+        Parameters
+        ----------
+        schema : type[msgspec.Struct]
+            Schema class whose representation is checked.
+        value : object
+            Rejected input to compare with the schema configuration.
+
+        Returns
+        -------
+        type[msgspec.Struct] | None
+            Schema when its shape and tag match, otherwise ``None``.
+        """
+        config = schema.__struct_config__
+        if config.array_like:
+            return schema if (
+                isinstance(value, list | tuple)
+                and (config.tag is None or (value and value[0] == config.tag))
+            ) else None
+        return schema if (
+            isinstance(value, Mapping)
+            and (config.tag is None or value.get(config.tag_field) == config.tag)
         ) else None
 
     @classmethod

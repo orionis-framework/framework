@@ -23,41 +23,50 @@ _cache_get = _PLAN_CACHE.get
 # Reused instead of allocating a fresh dict on every plan build.
 _EMPTY_META: dict[str, list[object]] = {}
 
-def _type_contains_nested(tp: object) -> bool:
+def _type_contains_nested(tp: object, *, rules_only: bool = False) -> bool:
     """
-    Check whether a type annotation contains a nested Orionis schema.
+    Check an annotation for nested schemas requiring traversal.
 
     Parameters
     ----------
     tp : object
         Type annotation to inspect. May be a plain type or wrapped in
         ``Union``/``|``, ``Annotated`` or a collection.
+    rules_only : bool, optional
+        Exclude child schemas with an empty cached rule plan when ``True``.
 
     Returns
     -------
     bool
-        Return ``True`` if ``tp`` itself, or any nested/union member, is a
-        schema type defining ``__orionis_meta__``; otherwise return ``False``.
+        Whether a direct, collection or union member is an Orionis schema
+        satisfying the ``rules_only`` filter.
     """
     # Fast path for common case: a non-generic schema type.
     origin = get_origin(tp)
 
     # Unions may contain nested schemas in any member, so check all members.
     if origin is Union or origin is types.UnionType:
-        return any(_type_contains_nested(a) for a in get_args(tp))
+        return any(
+            _type_contains_nested(a, rules_only=rules_only) for a in get_args(tp)
+        )
 
     # Annotated may wrap a nested schema, but the metadata items it carries are
     if origin is Annotated:
-        return _type_contains_nested(get_args(tp)[0])
+        return _type_contains_nested(get_args(tp)[0], rules_only=rules_only)
 
     if isinstance(origin, type) and issubclass(origin, Collection):
         args = get_args(tp)
         if issubclass(origin, Mapping):
             args = args[1:]
-        return any(_type_contains_nested(arg) for arg in args)
+        return any(
+            _type_contains_nested(arg, rules_only=rules_only) for arg in args
+        )
 
     # Finally, check if this is a schema type by looking for the marker attribute.
-    return isinstance(tp, type) and "__orionis_meta__" in tp.__dict__
+    return (
+        isinstance(tp, type) and "__orionis_meta__" in tp.__dict__
+        and (not rules_only or _cache_get(tp) != ())
+    )
 
 def _warm_child_plan(tp: object) -> None:
     """Eagerly populate ``_PLAN_CACHE`` for any nested Orionis schema type.
@@ -174,7 +183,7 @@ def _field_rules(
 
 def _build_plan(klass: type) -> tuple:
     """
-    Build and cache a validation plan for a schema type.
+    Build and cache the custom-rule execution plan for a schema.
 
     Parameters
     ----------
@@ -185,11 +194,8 @@ def _build_plan(klass: type) -> tuple:
     Returns
     -------
     tuple
-        Cached plan entries as ``(field_name, field_name_dot, getter,
-        validators, is_nested)`` tuples. Each entry stores the field name,
-        the precomputed dotted field prefix, an ``operator.attrgetter`` for
-        field access, the field's bound asynchronous validator callables,
-        and whether the field contains a nested Orionis schema.
+        Entries of ``(encoded_name, dotted_prefix, getter, validators,
+        is_nested)``. Omit fields and descendants with no custom rules.
 
     Raises
     ------
@@ -204,12 +210,16 @@ def _build_plan(klass: type) -> tuple:
     nested_types: list[object] = []
     for field in msgspec.structs.fields(klass):
         rules = _field_rules(klass, field.name, orionis_meta.get(field.name, ()))
-        is_nested = _type_contains_nested(field.type)
+        # Native conversion has already validated these children. Do not walk
+        # them again in Python when no descendant has a custom rule to run.
+        is_nested = _type_contains_nested(field.type, rules_only=True)
         if rules or is_nested:
             getter = operator.attrgetter(field.name)
             validators = tuple(rule.validate for rule in rules)
-            field_name_dot = field.name + "."
-            plan.append((field.name, field_name_dot, getter, validators, is_nested))
+            field_name_dot = field.encode_name + "."
+            plan.append((
+                field.encode_name, field_name_dot, getter, validators, is_nested,
+            ))
             if is_nested:
                 nested_types.append(field.type)
     result = tuple(plan)

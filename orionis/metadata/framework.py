@@ -29,4 +29,4 @@ PYTHON_REQUIRES = (3, 14)
 SKELETON = "https://github.com/orionis-framework/skeleton"
 
 # Current version of the framework
-VERSION = "1.0.12"
+VERSION = "1.0.13"

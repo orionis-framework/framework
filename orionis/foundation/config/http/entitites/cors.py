@@ -23,7 +23,7 @@ class Cors(BaseEntity):
     Attributes
     ----------
     allow_origins : list[str]
-        List of allowed origins. Defaults to []. Use ["*"] to allow all origins.
+        List of allowed origins. Defaults to ["*"] to allow all origins.
     allow_origin_regex : str | None
         Regular expression to match allowed origins. Defaults to None.
     allow_methods : list[str]
@@ -41,10 +41,10 @@ class Cors(BaseEntity):
     """
 
     allow_origins: list[str] = field(
-        default_factory=lambda: Env.get("CORS_ALLOW_ORIGINS", []),
+        default_factory=lambda: Env.get("CORS_ALLOW_ORIGINS", ["*"]),
         metadata={
             "description": 'List of allowed origins. Use ["*"] to allow all origins.',
-            "default": [],
+            "default": ["*"],
         },
     )
 
@@ -138,7 +138,7 @@ class Cors(BaseEntity):
 
     def __post_init__(self) -> None:
         """
-        Validate CORS options and own the supplied mutable lists.
+        Normalize origins, validate CORS options and own the supplied mutable lists.
 
         Returns
         -------
@@ -146,6 +146,14 @@ class Cors(BaseEntity):
             This method does not return a value.
         """
         super().__post_init__()
+
+        # Ensure 'allow_origins' has a default value of ["*"] if it is empty or None.
+        if (
+            self.allow_origins in ([], {}, (), "*") or
+            self.allow_origins is None
+        ):
+            object.__setattr__(self, "allow_origins", ["*"])
+
         for name in (
             "allow_origins",
             "allow_methods",

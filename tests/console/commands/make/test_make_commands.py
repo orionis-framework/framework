@@ -2,6 +2,7 @@ import ast
 import importlib.util
 from asyncio import CancelledError, gather
 from datetime import UTC, datetime
+from inspect import iscoroutinefunction
 from itertools import pairwise
 from pathlib import Path
 from tempfile import TemporaryDirectory
@@ -35,6 +36,7 @@ from orionis.http import WebSocket
 from orionis.orm.schema import TableDefinition
 from orionis.realtime import Hub
 from orionis.realtime.metadata import compile_hub
+from orionis.schemas.rule import Rule
 from orionis.test import TestCase
 from tests.http.test_websocket import _ASGIPeer
 
@@ -1045,6 +1047,37 @@ class TestMakeCommands(TestCase):
             self.assertIs(module.ChatHub.echo.__annotations__["message"], str)
             self.assertIs(module.ChatHub.echo.__annotations__["return"], str)
             self.assertEqual(await module.ChatHub().echo(**bound), "Hello")
+
+    async def testMakeHttpSchemaRuleProducesAnImportableAsyncRule(self) -> None:
+        """
+        Verify that the generator produces an importable asynchronous rule.
+
+        Returns
+        -------
+        None
+            Assert the generated rule's inheritance, metadata, and enforcement.
+        """
+        with TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            command = MakeHttpSchemaRule()
+            target = root / command.createFile(_Application(root), "availability")
+            spec = importlib.util.spec_from_file_location(
+                "generated_availability_rule", target,
+            )
+            if spec is None or spec.loader is None:
+                self.fail("Generated rule module must be importable.")
+            module = importlib.util.module_from_spec(spec)
+            spec.loader.exec_module(module)
+            rule_class = module.AvailabilityRule
+            self.assertTrue(issubclass(rule_class, Rule))
+            self.assertTrue(iscoroutinefunction(rule_class.enforce))
+            rule = rule_class()
+            self.assertEqual(rule._code, "custom_rule")
+            self.assertEqual(rule._message, "The value is invalid.")
+            with self.assertRaisesRegex(
+                NotImplementedError, "Implement the custom validation rule",
+            ):
+                await rule.validate("quantity", 1, object())
 
     async def testEveryMakeStubProducesDocumentedPython(self) -> None:
         """Verify make templates render valid Python and document their classes.

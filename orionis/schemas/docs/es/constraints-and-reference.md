@@ -21,6 +21,8 @@
 | `rule.py`, `rules/` | Validación asíncrona con predicados puros o I/O nativo. |
 | `validator.py`, `rules_executor.py` | Conversión y ejecución anidada cacheada. |
 | `failure_collector.py`, `exception_parser.py` | Recuperación multicausa y mensajes. |
+| `constraint_plan.py` | Planes de constraints independientes para enumerar fallos cuando la conversión falla. |
+| `instance_payload.py` | Expansión de instancias existentes para validar respuestas sin omitir defaults ni convertir hojas a JSON. |
 | `metadata.py`, `meta/` | Metadata documental y de validación. |
 | `entities/failure.py`, `exceptions/validation.py` | Fallos inmutables y excepción agrupada. |
 

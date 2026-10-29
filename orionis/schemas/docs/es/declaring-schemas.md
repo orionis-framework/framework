@@ -28,11 +28,126 @@ assert profile.toDict() == {"name": "Ada", "age": 36, "newsletter": False}
 
 `Schema` ofrece almacenamiento compacto y `toDict()`. `Field` es `typing.Annotated`, no descriptor runtime: `Field[str, MinLength(2)]` conserva `str` y adjunta metadata. `Choice`, `Nullable`, `AnyOf`, `Constant`, `Alias` y `Static` son aliases legibles de typing estándar.
 
+| Alias | Equivalente | Uso |
+| --- | --- | --- |
+| `Field` | `Annotated` | Adjuntar constraints, reglas y metadatos al tipo de un campo. |
+| `Choice` | `Literal` | Admitir únicamente los valores literales enumerados. |
+| `Nullable` | `Optional` | Permitir `None`; el campo sigue siendo obligatorio si no tiene default. |
+| `AnyOf` | `Union` | Admitir tipos alternativos compatibles con `msgspec`. |
+| `Constant` | `Final` | Indicar intención a las herramientas de tipos; no valida ni impide asignaciones en ejecución. |
+| `Alias` | `TypeAlias` | Declarar aliases de tipos reutilizables. |
+| `Static` | `ClassVar` | Declarar un atributo de clase que no pertenece al payload. |
+
+Este programa utiliza los siete aliases. El alias de tipo y la constante se declaran a nivel de módulo; `Constant` no se usa como tipo de un campo del schema:
+
+```python
+import asyncio
+from orionis.schemas import Schema
+from orionis.schemas.constraints import MinLength
+from orionis.schemas.exceptions import ValidationException
+from orionis.schemas.fields import Alias, AnyOf, Choice, Constant, Field, Nullable, Static
+from orionis.schemas.validator import Schema as Validator
+
+DisplayName: Alias = Field[str, MinLength(2)]
+DEFAULT_PAGE_SIZE: Constant[int] = 20
+
+class Search(Schema):
+    name: DisplayName
+    reference: AnyOf[int, str]
+    note: Nullable[str]
+    priority: Choice["low", "normal", "high"] = "normal"
+    page_size: int = DEFAULT_PAGE_SIZE
+    source: Static[str] = "web"
+
+class OptionalNote(Schema):
+    note: Nullable[str] = None
+
+async def main() -> None:
+    search = await Validator.validate({
+        "name": "Ada", "reference": 42, "note": None, "page_size": 50,
+    }, Search)
+    assert search.reference == 42
+    assert search.note is None
+    assert search.priority == "normal"
+    assert search.page_size == 50  # Constant no obliga a utilizar 20.
+    assert Search.source == "web"
+    assert "source" not in search.toDict()
+    assert (await Validator.validate({}, OptionalNote)).note is None
+
+    alternate = await Validator.validate({
+        "name": "Ada", "reference": "INV-42", "note": "Urgent",
+    }, Search)
+    assert alternate.reference == "INV-42"
+
+    for invalid in (
+        {"name": "A", "reference": 42, "note": None},
+        {"name": "Ada", "reference": [], "note": None},
+        {"name": "Ada", "reference": 42},
+        {"name": "Ada", "reference": 42, "note": None, "priority": "urgent"},
+    ):
+        try:
+            await Validator.validate(invalid, Search)
+        except ValidationException:
+            pass
+        else:
+            raise AssertionError("invalid search accepted")
+
+asyncio.run(main())
+```
+
+`AnyOf[int, str]` permite distinguir ambos tipos. No todas las uniones admitidas por las herramientas de tipos son convertibles con `msgspec`; por ejemplo, `AnyOf[str, bytes]` no es una alternativa compatible. Para comprobar valores concretos use `Choice`, no `Constant`. Para datos opcionales que puedan omitirse combine `Nullable[T]` con `= None`.
+
 `toDict()` convierte recursivamente las instancias anidadas de `Schema` y de `msgspec.Struct` en diccionarios, incluso dentro de valores de diccionarios, listas y tuplas. Conserva los nombres de campos de Python, las claves de diccionarios y los tipos lista/tupla; los demás valores hoja, como objetos `datetime` y `Decimal`, permanecen sin cambios. La conversión no modifica la instancia original ni sus contenedores.
 
 ### Constraints estructurales
 
 `GreaterThan`, `GreaterThanOrEqual`, `LessThan`, `LessThanOrEqual`, `MultipleOf`, `Pattern`, `MinLength`, `MaxLength`, `TimezoneAware` y `TimezoneNaive` compilan al descriptor de conversión. Combinaciones duplicadas, incompatibles, imposibles o inválidas fallan al crear la clase.
+
+También se compilan dentro de anotaciones de colecciones y uniones compatibles. `list[Field[int, GreaterThanOrEqual(1)]]` restringe cada elemento; `Field[list[int], MinLength(1)]` restringe el tamaño de la lista. Para un número nullable, coloque `Nullable` alrededor del tipo restringido: `Nullable[Field[int, GreaterThanOrEqual(1)]]`, no `Field[Nullable[int], GreaterThanOrEqual(1)]`.
+
+Este programa independiente comprueba colecciones, `None` y varios fallos sobre un mismo valor:
+
+```python
+import asyncio
+
+from orionis.schemas import Schema
+from orionis.schemas.constraints import GreaterThanOrEqual, MultipleOf
+from orionis.schemas.exceptions import ValidationException
+from orionis.schemas.fields import Field, Nullable
+from orionis.schemas.validator import Schema as Validator
+
+
+class Quantities(Schema):
+    items: list[Field[int, GreaterThanOrEqual(1), MultipleOf(2)]]
+    limit: Nullable[Field[int, GreaterThanOrEqual(1), MultipleOf(2)]]
+
+
+async def main() -> None:
+    result = await Validator.validate({"items": [2, 4], "limit": None}, Quantities)
+    assert result.items == [2, 4]
+    assert result.limit is None
+
+    try:
+        await Validator.validate({"items": [-1, 0], "limit": -1}, Quantities)
+    except ValidationException as error:
+        codes = {
+            field: {detail["rule"] for detail in details}
+            for field, details in error.errors.items()
+        }
+        assert codes == {
+            "items[0]": {"ge", "multiple_of"},
+            "items[1]": {"ge"},
+            "limit": {"ge", "multiple_of"},
+        }
+        print(error.error())
+    else:
+        raise AssertionError("Expected invalid quantities.")
+
+
+asyncio.run(main())
+```
+
+El valor `-1` produce dos fallos en su campo; `0` sólo incumple el mínimo. `limit` sigue siendo obligatorio aunque admita `None`. Las reglas `Rule` internas, como `list[Field[str, Email()]]`, se rechazan con `TypeError` al declarar el schema: para reglas por elemento use un schema hijo con `email: Field[str, Email()]`; una regla en el `Field` exterior de la lista comprueba la colección completa.
 
 ### Reglas de aplicación
 
@@ -51,6 +166,8 @@ Las reglas hacen checks de dominio tras convertir: strings, fechas, números, ca
 ### Validar payload HTTP/controlador
 
 Anote un parámetro invocado por contenedor con un `Schema`. Orionis convierte la entrada apropiada y espera validación antes del handler. Un fallo se vuelve respuesta normal de validación.
+
+Si el controlador devuelve directamente una instancia `Schema`, Orionis valida su contenido antes de responder JSON. La construcción directa y las mutaciones no ejecutan validación por sí mismas; una salida inválida se trata como fallo de servidor (`500`). Devolver un diccionario con una anotación `-> Profile` no activa esta comprobación.
 
 ### Validar manualmente
 
@@ -90,6 +207,7 @@ try:
 except ValidationException as exception:
     assert set(exception.errors) == {"name", "age"}
     assert len(exception.failures) == 2
+    assert exception.errors["name"][0]["rule"] == "min_length"
     payload = exception.error()
     assert payload["message"]
 else:

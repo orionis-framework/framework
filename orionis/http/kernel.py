@@ -31,6 +31,7 @@ from orionis.http.contracts.endpoint_policy import IHttpEndpointPolicy
 from orionis.http.default.responses import DefaultResponses
 from orionis.http.enums.interfaces import Interface
 from orionis.http.enums.status import HTTPStatus
+from orionis.http.exceptions.response_validation import ResponseValidationException
 from orionis.http.layer.shared.cors import CORSMiddleware
 from orionis.http.layer.shared.maintenance import UnderMaintenanceMiddleware
 from orionis.http.layer.shared.proxies import ProxiesMiddleware
@@ -51,6 +52,8 @@ from orionis.http.routes.route_resolver import RouteResolver
 from orionis.http.validation import validation_response
 from orionis.http.websocket import WebSocket, WebSocketDisconnected
 from orionis.schemas.exceptions.validation import ValidationException
+from orionis.schemas.schema import Schema
+from orionis.schemas.validator import Schema as SchemaValidator
 from orionis.support.facades.view import View
 
 if TYPE_CHECKING:
@@ -63,9 +66,6 @@ if TYPE_CHECKING:
     from orionis.http.routes.entities.compiled_route import CompiledRoute
     from orionis.http.routes.entities.resolved_route import ResolvedRoute
     from orionis.realtime.runtime import HubRuntime
-
-# Handler return types that are serialized as JSON.
-_JSON_RESPONSE_TYPES: tuple[type, ...] = (dict, msgspec.Struct)
 
 # Kernel context identifier reused across all request scopes.
 _KERNEL_CONTEXT: KernelContext = KernelContext.HTTP
@@ -848,16 +848,16 @@ class KernelHTTP(IKernelHTTP):
         )
         return await pipeline()
 
-    async def __callHandler(
+    async def __callHandler( # NOSONAR
         self,
         resolved_route: ResolvedRoute,
         request: Request,
     ) -> Response:
         """
-        Dispatch the request to the pre-resolved route handler.
+        Dispatch the route handler and validate direct schema results.
 
-        Uses boot-time dispatch tables keyed by route object identity,
-        eliminating per-request module imports and attribute lookups.
+        Reuse boot-time dispatch tables and serialize structured results.
+        Return explicit responses unchanged.
 
         Parameters
         ----------
@@ -869,12 +869,14 @@ class KernelHTTP(IKernelHTTP):
         Returns
         -------
         Response
-            HTTP response produced by the handler.
+            Handler response or JSON response containing the handler result.
 
         Raises
         ------
         TypeError
             If the handler does not return a Response, dict, or msgspec.Struct.
+        ResponseValidationException
+            If a returned Orionis schema violates its output contract.
         """
         route = resolved_route.route
         params = request.routeParams()
@@ -906,8 +908,20 @@ class KernelHTTP(IKernelHTTP):
         if isinstance(response, Response):
             return response
 
-        # Serialize structured handler results as JSON.
-        if isinstance(response, _JSON_RESPONSE_TYPES):
+        # Ordinary response objects and mappings never enter schema validation.
+        if isinstance(response, dict):
+            return JSONResponse(status_code=200, content=response)
+
+        # Schema-based response objects require validation against their contract.
+        if isinstance(response, msgspec.Struct):
+            if isinstance(response, Schema):
+                try:
+                    response = await SchemaValidator.validate(response, type(response))
+                except ValidationException as exc:
+                    # A broken output contract is an application failure, not
+                    # invalid client input eligible for 422 or a form redirect.
+                    error_msg = "The response schema is invalid."
+                    raise ResponseValidationException(error_msg) from exc
             return JSONResponse(status_code=200, content=response)
 
         error_msg = "Route handler must return a Response object"

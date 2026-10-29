@@ -1,4 +1,5 @@
 from typing import Any
+import msgspec
 from orionis.http.adapters.request.asgi import ASGITransportAdapter
 from orionis.http.enums.interfaces import Interface
 from orionis.http.payload.body import BodyStream
@@ -181,22 +182,29 @@ class TestValidationResponseForJson(TestCase):
         self.assertIsInstance(response, JSONResponse)
 
     async def testJsonPayloadCarriesFieldErrors(self) -> None:
-        """Expose every field error in the JSON payload.
-
-        Validates the ``message`` plus ``errors`` contract consumed by
-        front-end clients.
+        """
+        Verify the summary and structured field errors in the JSON response.
 
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            Assert each field's rule code and message in the response payload.
         """
         request = _make_request(
             extra_headers=[(b"accept", b"application/json")],
         )
         responses = _FakeDefaultResponses()
-        await validation_response(_make_exception(), request, responses)
+        response = await validation_response(_make_exception(), request, responses)
         self.assertTrue(responses.expects_json)
+        self.assertEqual(msgspec.json.decode(response.getBody()), {
+            "message": "Invalid email. (and 1 more error)",
+            "errors": {
+                "email": [{"rule": "pattern", "message": "Invalid email."}],
+                "password": [{
+                    "rule": "min_length", "message": "Password too short.",
+                }],
+            },
+        })
 
 class TestValidationResponseForWeb(TestCase):
 

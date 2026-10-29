@@ -1,24 +1,24 @@
 {
-  "recorded_at": "2026-10-29T17:34:00.156753+00:00",
+  "recorded_at": "2026-10-29T19:00:08.633459+00:00",
   "os": "Linux-7.0.0-1017-azure-x86_64-with-glibc2.39",
   "architecture": "x86_64",
-  "cpu": "AMD EPYC 7763 64-Core Processor",
+  "cpu": "AMD EPYC 9V45 96-Core Processor",
   "logical_cpus": 4,
   "physical_cpus": 2,
-  "memory_bytes": 16764678144,
+  "memory_bytes": 16760344576,
   "python": "3.14.8",
   "python_executable": "/home/runner/work/framework/framework/.venv/bin/python3",
   "versions": {
-    "orionis": "1.0.12",
+    "orionis": "1.0.13",
     "granian": "2.8.4",
     "fastapi": "0.143.1",
     "litestar": "2.24.0",
     "starlette": "1.8.0",
     "oha": "1.16.0"
   },
-  "commit": "a7af0099135c1f6100fc138755e8d632e3d56f02",
+  "commit": "7bfbc060da6adb4ebbfb11d7818ac498e333d2ba",
   "dirty": false,
-  "uv_lock_sha256": "af53404770c3795f21c8ca8d294d8423a1f2db3f481304b8f3e980fa7f896de0",
+  "uv_lock_sha256": "ecb55ff1c364a15f14d08c44c502856fff5ac2b117a24648ca9f7c749827eaa8",
   "dependencies": [
     "APScheduler==3.11.3",
     "Faker==40.43.0",
@@ -60,7 +60,7 @@
     "multidict==7.1.0",
     "multipart==2.0.1",
     "opentelemetry-api==1.45.1",
-    "orionis==1.0.12",
+    "orionis==1.0.13",
     "pendulum==3.3.0",
     "polyfactory==3.5.0",
     "psutil==7.2.2",
@@ -85,6 +85,6 @@
     "uvloop==0.23.0",
     "watchfiles==1.3.0"
   ],
-  "run_url": "https://github.com/orionis-framework/framework/actions/runs/40922473871",
-  "oha_executable": "/tmp/http-compare-oha-0gx3utbu/oha-linux-amd64"
+  "run_url": "https://github.com/orionis-framework/framework/actions/runs/40935979878",
+  "oha_executable": "/tmp/http-compare-oha-nrt2ym5y/oha-linux-amd64"
 }

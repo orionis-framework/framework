@@ -7,17 +7,19 @@ from orionis.test import TestCase
 class TestMcpConfig(TestCase):
     """Verify finite budgets and an explicit browser-origin trust boundary."""
 
-    def test_defaults_are_immutable_and_export_one_config_type(self):
-        """Keep shared framework and MCP configuration identical and frozen.
+    def test_defaults_export_one_config_type_with_frozen_fields(self):
+        """Keep shared configuration fields frozen and origin lists independent.
 
         Returns
         -------
         None
-            Verify the exported type, immutable defaults, and frozen fields.
+            Verify the exported type, independent defaults, and frozen fields.
         """
         self.assertIs(PublicMcpConfig, McpConfig)
         configured = McpConfig()
-        self.assertEqual(configured.allowed_origins, ())
+        self.assertEqual(configured.allowed_origins, [])
+        self.assertIsInstance(configured.allowed_origins, list)
+        self.assertIsNot(configured.allowed_origins, McpConfig().allowed_origins)
         self.assertLessEqual(configured.default_page_size, configured.max_page_size)
         with self.assertRaises(FrozenInstanceError):
             configured.max_request_size = 0
@@ -87,8 +89,8 @@ class TestMcpConfig(TestCase):
             with self.subTest(origins=origins), self.assertRaises(TypeError):
                 McpConfig(allowed_origins=origins)
 
-    def test_valid_origin_collection_is_copied_and_frozen(self):
-        """Prevent a caller from expanding the trust boundary after validation.
+    def test_valid_origin_collection_is_copied_to_a_list(self):
+        """Keep configured origin lists independent from the caller's list.
 
         Returns
         -------
@@ -98,4 +100,17 @@ class TestMcpConfig(TestCase):
         origins = ["https://example.com", "http://127.0.0.1:8000", "http://[::1]:8000"]
         configured = McpConfig(allowed_origins=origins)
         origins.append("https://evil.test")
-        self.assertEqual(configured.allowed_origins, tuple(origins[:-1]))
+        self.assertEqual(configured.allowed_origins, origins[:-1])
+        self.assertIsNot(configured.allowed_origins, origins)
+
+    def test_tuple_origins_remain_accepted_as_lists(self):
+        """Preserve existing tuple inputs while exposing origin lists.
+
+        Returns
+        -------
+        None
+            Confirm tuple inputs are copied to the public list representation.
+        """
+        origins = ("https://example.com",)
+        configured = McpConfig(allowed_origins=origins)
+        self.assertEqual(configured.allowed_origins, list(origins))

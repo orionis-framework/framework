@@ -316,16 +316,19 @@ class TestHttpTransport(TestCase):
         )
 
     async def test_origins_are_exact_allowlisted_and_checked_before_body(self):
-        """Reject null, duplicate and deceptive suffix origins before I/O.
+        """Reject later list additions, null, duplicate and deceptive origins.
 
         Returns
         -------
         None
             Complete the documented checks or setup without a return value.
         """
-        transport = self.transport(allowed_origins=("https://trusted.example",))
+        configured = McpConfig(allowed_origins=["https://trusted.example"])
+        transport = McpHttpTransport(self.state, self.compiled, configured, None)
+        configured.allowed_origins.append("https://later.example")
         for extra in (
             ((b"origin", b"null"),),
+            ((b"origin", b"https://later.example"),),
             ((b"origin", b"https://trusted.example.evil"),),
             (
                 (b"origin", b"https://trusted.example"),

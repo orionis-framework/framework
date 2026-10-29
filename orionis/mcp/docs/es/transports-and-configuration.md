@@ -47,6 +47,14 @@ El protocolo exige coincidencia entre cabeceras y cuerpo para versión, método 
 
 Una cabecera Origin ausente está permitida. Si aparece debe coincidir exactamente con `allowed_origins`, lista de orígenes HTTP(S) validados. No hay wildcard ni excepción implícita de mismo origen. Bootstrap utiliza `CORS_ALLOW_ORIGINS`; CORS HTTP o WebSocket pueden tener reglas diferentes. Se rechaza origen, método o media type antes de leer un cuerpo grande.
 
+`allowed_origins` utiliza una `list[str]` independiente por instancia. Si
+`CORS_ALLOW_ORIGINS` no está definida, el archivo editable
+[config/mcp.py](../../../../config/mcp.py) proporciona el origen del inspector MCP de
+Orionis. El núcleo `McpConfig` conserva `[]` como predeterminado, sin incorporar URLs
+de la aplicación. Define la variable de entorno o edita la lista del bootstrap para
+reemplazar ese valor; una lista vacía explícita rechaza cualquier Origin presente.
+Cada entrada contiene solo esquema, host y puerto opcional, sin ruta ni barra final.
+
 ## STDIO y consola
 
 Inicia un handle registrado con `python -B reactor mcp:start application`; `python -B reactor mcp:list` muestra servidores. Los generadores son `make:mcp-server`, `make:mcp-tool`, `make:mcp-resource` y `make:mcp-prompt`. Los comandos se ejecutan en el contexto de la aplicación configurada.

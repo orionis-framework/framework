@@ -79,13 +79,16 @@ class BootstrapMcp(McpConfig):
     )
 
     # ----------------------------------------------------------------------------------
-    # allowed_origins : tuple[str, ...], optional
-    # --- Trusted HTTP(S) browser origins. Uses CORS_ALLOW_ORIGINS or an empty tuple.
-    # --- An empty tuple rejects requests with an Origin header; requests without
+    # allowed_origins : list[str], optional
+    # --- Trusted HTTP(S) browser origins. Uses CORS_ALLOW_ORIGINS or the Orionis
+    # --- MCP Inspector origin below. Origins must not include a path or trailing slash.
+    # --- An empty list rejects requests with an Origin header; requests without
     # --- an Origin header are accepted. Wildcards are not supported.
     # ----------------------------------------------------------------------------------
-    allowed_origins: tuple[str, ...] = field(
-        default_factory=lambda: Env.get("CORS_ALLOW_ORIGINS", ()),
+    allowed_origins: list[str] = field(
+        default_factory=lambda: Env.get(
+            "CORS_ALLOW_ORIGINS", ["https://inspector.orionis-framework.com"],
+        ),
     )
 
     # ----------------------------------------------------------------------------------

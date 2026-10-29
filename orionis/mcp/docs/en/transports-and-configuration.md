@@ -47,6 +47,13 @@ Version, method and primitive name/URI headers must match the body. Parameters a
 
 Absent Origin is allowed. A present Origin must match exactly one validated HTTP(S) `allowed_origins` entry. There are no wildcards or implicit same-origin exceptions. Bootstrap reads `CORS_ALLOW_ORIGINS`; HTTP CORS and WebSocket can apply different rules. Origin, method and media-type failures are rejected before reading a large body.
 
+`allowed_origins` is an independently copied `list[str]`. When `CORS_ALLOW_ORIGINS`
+is unset, the editable [config/mcp.py](../../../../config/mcp.py) supplies the Orionis
+MCP Inspector origin. Core `McpConfig` defaults to `[]` without embedding application
+URLs. Set the environment variable or edit the bootstrap list to replace this
+default; an explicit empty list rejects every present Origin. Entries contain only
+scheme, host and optional port, without a path or trailing slash.
+
 ## STDIO and console
 
 Start a registered handle with `python -B reactor mcp:start application`; `python -B reactor mcp:list` lists servers. Generators are `make:mcp-server`, `make:mcp-tool`, `make:mcp-resource` and `make:mcp-prompt`. Commands run in the configured application's context.

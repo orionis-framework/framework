@@ -13,7 +13,7 @@ class McpConfig(BaseEntity):
     Bound MCP work and explicitly allow trusted HTTP browser origins.
 
     Read environment defaults when each instance is created. Explicit constructor
-    values take precedence and supplied origin lists are copied to immutable tuples.
+    values take precedence and supplied lists or tuples are copied to independent lists.
 
     An absent Origin is accepted by the transport. An empty ``allowed_origins``
     rejects every present Origin; there is no wildcard or implicit same-origin
@@ -46,9 +46,9 @@ class McpConfig(BaseEntity):
     subscription_keepalive : float
         Finite positive interval in seconds between subscription keepalive messages.
         Read ``MCP_SUBSCRIPTION_KEEPALIVE`` with a default of 15.0.
-    allowed_origins : tuple[str, ...]
+    allowed_origins : list[str]
         Explicit trusted HTTP(S) browser origins without wildcards.
-        Read ``CORS_ALLOW_ORIGINS`` with a default of an empty tuple.
+        Read ``CORS_ALLOW_ORIGINS`` with a default of an empty list.
     tool_search_max_results : int
         Maximum results returned by a tool catalog search.
         Read ``MCP_TOOL_SEARCH_MAX_RESULTS`` with a default of 20.
@@ -136,14 +136,14 @@ class McpConfig(BaseEntity):
         },
     )
 
-    allowed_origins: tuple[str, ...] = field(
-        default_factory=lambda: Env.get("CORS_ALLOW_ORIGINS", ()),
+    allowed_origins: list[str] = field(
+        default_factory=lambda: Env.get("CORS_ALLOW_ORIGINS", []),
         metadata={
             "description": (
                 "Explicit trusted HTTP(S) browser origins without wildcards; "
                 "empty rejects every present Origin header."
             ),
-            "default": (),
+            "default": [],
         },
     )
 
@@ -194,7 +194,7 @@ class McpConfig(BaseEntity):
         Returns
         -------
         None
-            Retain validated immutable configuration.
+            Retain validated configuration with independently copied origin lists.
 
         Raises
         ------
@@ -223,5 +223,4 @@ class McpConfig(BaseEntity):
             raise TypeError(message)
         for origin in self.allowed_origins:
             validate_http_origin(origin)
-        object.__setattr__(self, "allowed_origins", tuple(self.allowed_origins))
-
+        object.__setattr__(self, "allowed_origins", list(self.allowed_origins))

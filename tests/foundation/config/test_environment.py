@@ -491,7 +491,7 @@ class TestProtocolEnvironment(ConfigurationTestCase):
                 "max_subscriptions": 1024,
                 "max_resource_subscriptions": 64,
                 "subscription_keepalive": 15.0,
-                "allowed_origins": (),
+                "allowed_origins": [],
                 "tool_search_max_results": 20,
                 "tool_search_max_calls": 5,
                 "tool_search_max_output_bytes": 256 * 1024,
@@ -562,22 +562,53 @@ class TestProtocolEnvironment(ConfigurationTestCase):
             MCP_ALLOWED_ORIGINS=["https://mcp-only.example"],
             WEBSOCKET_ALLOW_ORIGINS=["https://websocket-only.example"],
         )
+        self.assertEqual(McpConfig().allowed_origins, origins)
+        self.assertEqual(BootstrapMcp().allowed_origins, origins)
         expected = tuple(origins)
-        self.assertEqual(McpConfig().allowed_origins, expected)
-        self.assertEqual(BootstrapMcp().allowed_origins, expected)
         self.assertEqual(HTTPWebSocket().allow_origins, expected)
         self.assertEqual(BootstrapHTTP().websocket.allow_origins, expected)
 
-    def testSharedOriginsAreReadLazilyAndFrozen(self) -> None:
+    def testMcpInspectorDefaultBelongsOnlyToBootstrap(self) -> None:
+        """Declare the inspector origin in application configuration, not the core.
+
+        Returns
+        -------
+        None
+            Verify the bootstrap default and independent list instances.
+        """
+        expected = ["https://inspector.orionis-framework.com"]
+        self.assertEqual(McpConfig().allowed_origins, [])
+        configured = BootstrapMcp()
+        self.assertEqual(configured.allowed_origins, expected)
+        self.assertIsInstance(configured.allowed_origins, list)
+        configured.allowed_origins.append("https://another.example")
+        self.assertEqual(BootstrapMcp().allowed_origins, expected)
+
+    def testEmptyMcpOriginsOverrideInspectorDefault(self) -> None:
+        """Honor explicit empty origin lists instead of restoring the inspector.
+
+        Returns
+        -------
+        None
+            Empty constructor and environment values reject all present origins.
+        """
+        self.assertEqual(BootstrapMcp(allowed_origins=[]).allowed_origins, [])
+        origins = []
+        self.environment.values["CORS_ALLOW_ORIGINS"] = origins
+        for config_type in (McpConfig, BootstrapMcp):
+            configured = config_type()
+            self.assertEqual(configured.allowed_origins, [])
+            self.assertIsNot(configured.allowed_origins, origins)
+
+    def testSharedOriginsAreReadLazilyAndCopied(self) -> None:
         """Read shared defaults for new instances without sharing mutable lists.
 
         Returns
         -------
         None
-            Verify empty defaults and preserve earlier origin snapshots.
+            Verify configured defaults and preserve earlier origin snapshots.
         """
-        self.assertEqual(McpConfig().allowed_origins, ())
-        self.assertEqual(BootstrapMcp().allowed_origins, ())
+        self.assertEqual(McpConfig().allowed_origins, [])
         self.assertEqual(HTTPWebSocket().allow_origins, ())
         self.assertEqual(BootstrapHTTP().websocket.allow_origins, ())
         origins = ["https://first.example"]
@@ -591,8 +622,14 @@ class TestProtocolEnvironment(ConfigurationTestCase):
             McpConfig().allowed_origins, BootstrapMcp().allowed_origins,
             HTTPWebSocket().allow_origins, BootstrapHTTP().websocket.allow_origins,
         )
-        self.assertEqual(first, (("https://first.example",),) * 4)
-        self.assertEqual(second, (("https://second.example",),) * 4)
+        self.assertEqual(first, (
+            ["https://first.example"], ["https://first.example"],
+            ("https://first.example",), ("https://first.example",),
+        ))
+        self.assertEqual(second, (
+            ["https://second.example"], ["https://second.example"],
+            ("https://second.example",), ("https://second.example",),
+        ))
 
     def testExplicitProtocolOriginsCanDifferFromSharedDefaults(self) -> None:
         """Leave separately supplied origins under the developer's control.
@@ -604,8 +641,12 @@ class TestProtocolEnvironment(ConfigurationTestCase):
         """
         self.environment.values["CORS_ALLOW_ORIGINS"] = ["https://shared.example"]
         origins = ("https://private.example",)
-        self.assertEqual(McpConfig(allowed_origins=origins).allowed_origins, origins)
-        self.assertEqual(BootstrapMcp(allowed_origins=origins).allowed_origins, origins)
+        self.assertEqual(
+            McpConfig(allowed_origins=origins).allowed_origins, list(origins),
+        )
+        self.assertEqual(
+            BootstrapMcp(allowed_origins=origins).allowed_origins, list(origins),
+        )
         self.assertEqual(HTTPWebSocket(allow_origins=origins).allow_origins, origins)
         config = BootstrapHTTP(websocket={"allow_origins": origins})
         self.assertEqual(config.websocket.allow_origins, origins)

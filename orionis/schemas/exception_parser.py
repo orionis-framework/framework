@@ -47,7 +47,7 @@ _NESTED_TYPE_CACHE: dict[tuple[type, str], type | None] = {}
 
 def _get_fields_map(schema: type) -> dict[str, object]:
     """
-    Return a cached field-to-type mapping for a schema.
+    Return a cached mapping from encoded field names to declared types.
 
     Parameters
     ----------
@@ -57,12 +57,12 @@ def _get_fields_map(schema: type) -> dict[str, object]:
     Returns
     -------
     dict[str, object]
-        Mapping of field names to their declared types.
+        Encoded field names mapped to their declared types.
     """
     cached = _STRUCT_FIELDS_MAP.get(schema)
     if cached is not None:
         return cached
-    m = {f.name: f.type for f in msgspec.structs.fields(schema)}
+    m = {f.encode_name: f.type for f in msgspec.structs.fields(schema)}
     _STRUCT_FIELDS_MAP[schema] = m
     return m
 

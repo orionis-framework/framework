@@ -3,7 +3,6 @@ from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
     from collections.abc import Sequence
-
     from orionis.schemas.entities.failure import ValidationFailure
 
 # Fallback used when the exception is built without any failure.
@@ -17,33 +16,34 @@ class ValidationException(Exception):
         message: str | None = None,
     ) -> None:
         """
-        Initialize the exception with one or more validation failures.
+        Initialize field errors and a summary from validation failures.
 
         Parameters
         ----------
         failures : ValidationFailure | Sequence[ValidationFailure]
-            Provide a single failure or every failure collected for a payload.
+            Single failure or collected payload failures in reporting order.
         message : str | None, optional
             Override the summary message reported to the client.
 
         Returns
         -------
         None
-            Return ``None`` after grouping the failures by field name.
+            Store failures, group rule codes and messages, and set the summary.
         """
         # Accept a single failure for convenience without importing the entity.
         collected: tuple[ValidationFailure, ...] = (
             tuple(failures) if isinstance(failures, (list, tuple)) else (failures,)
         )
 
-        # Group every message under its own field.
-        errors: dict[str, list[str]] = {}
+        # Preserve the public rule code alongside every field message.
+        errors: dict[str, list[dict[str, str]]] = {}
         for failure in collected:
+            detail = {"rule": failure.rule, "message": failure.message}
             bucket = errors.get(failure.field)
             if bucket is None:
-                errors[failure.field] = [failure.message]
+                errors[failure.field] = [detail]
             else:
-                bucket.append(failure.message)
+                bucket.append(detail)
 
         self.failures = collected
         self.failure = collected[0] if collected else None
@@ -79,13 +79,13 @@ class ValidationException(Exception):
 
     def error(self) -> dict:
         """
-        Return the validation failures as a serializable dictionary.
+        Return the summary and structured field errors as a dictionary.
 
         Returns
         -------
         dict
-            Mapping with a ``message`` summary and an ``errors`` object
-            indexing every message by field name.
+            ``message`` summary and ``errors`` mapping each field to a list
+            of ``{rule, message}`` objects.
         """
         return {
             "message": self.message,

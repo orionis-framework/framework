@@ -11,7 +11,7 @@ class {{class_name}}(Rule):
     __message__ = "The value is invalid."
     __code__ = "custom_rule"
 
-    def enforce(
+    async def enforce(
         self,
         field: str,
         value: object,
@@ -33,6 +33,11 @@ class {{class_name}}(Rule):
         -------
         bool
             Return ``True`` when the value passes validation.
+
+        Raises
+        ------
+        NotImplementedError
+            Until the application implements the validation criteria.
         """
         error_message = "Implement the custom validation rule."
         raise NotImplementedError(error_message)

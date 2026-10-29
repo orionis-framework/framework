@@ -197,6 +197,47 @@ class TestFilterInput(TestCase):
 class TestNormalizeErrors(TestCase):
     """Unit tests for normalize_errors()."""
 
+    def testStructuredErrorsKeepOnlyMessagesForTemplates(self) -> None:
+        """
+        Verify that flash normalization extracts messages from structured errors.
+
+        Returns
+        -------
+        None
+            Assert message lists for templates and preserve the source details.
+        """
+        errors = {
+            "email": [
+                {"rule": "min_length", "message": "Too short."},
+                {"rule": "email", "message": "Invalid email."},
+            ],
+            "name": {"rule": "required", "message": "Name is required."},
+        }
+        self.assertEqual(normalize_errors(errors), {
+            "email": ["Too short.", "Invalid email."],
+            "name": ["Name is required."],
+        })
+        self.assertEqual(errors["email"][0]["rule"], "min_length")
+
+    def testStructuredExceptionErrorsAreNormalized(self) -> None:
+        """
+        Verify that exception errors retain every message in flashed forms.
+
+        Returns
+        -------
+        None
+            Assert both messages from the same field's structured errors.
+        """
+        exc = _FakeValidationException(errors={
+            "quantity": [
+                {"rule": "ge", "message": "Quantity must be positive."},
+                {"rule": "multiple_of", "message": "Use multiples of five."},
+            ],
+        })
+        self.assertEqual(normalize_errors(exc), {
+            "quantity": ["Quantity must be positive.", "Use multiples of five."],
+        })
+
     def testStringValueBecomesSingleItemList(self) -> None:
         """Wrap a single message into a list.
 

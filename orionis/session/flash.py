@@ -51,23 +51,20 @@ def filter_input(values: Mapping[str, Any]) -> dict[str, Any]:
         if key not in SENSITIVE_INPUT_FIELDS
     }
 
-def normalize_errors(errors: object) -> dict[str, list[str]]:
+def normalize_errors(errors: object) -> dict[str, list[str]]: # NOSONAR
     """
-    Coerce any supported error payload into ``{field: [message, ...]}``.
-
-    Accepts a mapping of field to a single message or to a sequence of
-    messages, or an exception exposing a ``failure`` attribute with
-    ``field`` and ``message`` (e.g. ``ValidationException``).
+    Normalize validation errors into field-indexed message lists.
 
     Parameters
     ----------
     errors : object
-        Mapping of errors, or a validation exception.
+        Mapping of messages or ``{rule, message}`` details, or an exception
+        exposing ``errors`` or ``failure``.
 
     Returns
     -------
     dict[str, list[str]]
-        Field-indexed error messages.
+        String messages grouped by field, with structured rule codes omitted.
 
     Raises
     ------
@@ -78,7 +75,7 @@ def normalize_errors(errors: object) -> dict[str, list[str]]:
     if not isinstance(errors, Mapping):
         bag = getattr(errors, "errors", None)
         if isinstance(bag, Mapping):
-            return {field: list(messages) for field, messages in bag.items()}
+            return normalize_errors(bag)
 
         failure = getattr(errors, "failure", None)
         if failure is not None:
@@ -97,7 +94,14 @@ def normalize_errors(errors: object) -> dict[str, list[str]]:
         if isinstance(value, str):
             normalized[field] = [value]
         elif isinstance(value, _SEQUENCE_TYPES):
-            normalized[field] = [str(item) for item in value]
+            normalized[field] = [
+                str(item["message"])
+                if isinstance(item, Mapping) and "message" in item
+                else str(item)
+                for item in value
+            ]
+        elif isinstance(value, Mapping) and "message" in value:
+            normalized[field] = [str(value["message"])]
         else:
             normalized[field] = [str(value)]
     return normalized

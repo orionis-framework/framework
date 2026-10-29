@@ -1,11 +1,15 @@
 import os
 import sys
+from argparse import ArgumentParser
 from pathlib import Path
 from tempfile import TemporaryDirectory
 from unittest.mock import AsyncMock, Mock, patch
 from orionis.console.commands.serve.serve import ServerCommand
 from orionis.foundation.enums.runtimes import Runtime
+from orionis.support.types.sentinel import MISSING
 from orionis.test import TestCase
+
+# ruff: noqa: S104
 
 class _Application:
     """Expose server settings from an isolated application root."""
@@ -116,13 +120,60 @@ class TestServerCommand(TestCase):
         self.assertIsNot(first, second)
         self.assertEqual(second.getArguments(), {})
 
+    def testHostFlagIsOptionalAndParsesAddresses(self) -> None:
+        """Parse host addresses without requiring the flag.
+
+        Returns
+        -------
+        None
+            The parser accepts IPv4, IPv6 and hostnames.
+        """
+        command = ServerCommand()
+        parser = ArgumentParser()
+        for argument in command.arguments:
+            argument.addToParser(parser)
+
+        self.assertIs(parser.parse_args([]).host, MISSING)
+
+        for host in ("127.0.0.2", "0.0.0.0", "::1", "localhost"):
+            with self.subTest(host=host):
+                command.setArguments(vars(parser.parse_args(["--host", host])))
+                self.assertEqual(command.getArgument("host"), host)
+
+    def testHostSelectionPreservesEnvironmentDefaults(self) -> None:
+        """Override the bind address only when the host flag is provided.
+
+        Returns
+        -------
+        None
+            Command arguments and environment use the same resolved address.
+        """
+        with TemporaryDirectory() as temporary:
+            for production in (False, True):
+                for host in (None, "0.0.0.0", "127.0.0.2", "::1"):
+                    with self.subTest(production=production, host=host):
+                        app = _Application(Path(temporary), production=production)
+                        command = ServerCommand()
+                        command.setArguments({"host": host})
+                        command._ServerCommand__appendHostAndPortToCommand(app)
+
+                        default = "0.0.0.0" if production else "127.0.0.1"
+                        expected = host if host is not None else default
+                        self.assertEqual(
+                            command._ServerCommand__cmd,
+                            ["-m", "granian", "--host", expected, "--port", "8000"],
+                        )
+                        self.assertEqual(
+                            command._ServerCommand__env["GRANIAN_HOST"], expected,
+                        )
+
     async def testRepeatedExportsRebuildTheCommand(self) -> None:
         """Rebuild the launch command for each invocation of one instance.
 
         Returns
         -------
         None
-            Each export contains one port flag and the current value.
+            Each export contains one host and port flag with current values.
         """
         with TemporaryDirectory() as temporary:
             app = _Application(Path(temporary))
@@ -136,8 +187,10 @@ class TestServerCommand(TestCase):
                 patch.object(command, "textInfo"),
                 patch.object(command, "textMuted") as output,
             ):
-                for port in (9001, 9002):
-                    command.setArguments({"port": port, "export": True})
+                for host, port in (("0.0.0.0", 9001), ("::1", 9002)):
+                    command.setArguments({
+                        "host": host, "port": port, "export": True,
+                    })
                     with self.assertRaises(SystemExit):
                         await command.handle(app)
                     exported.append(output.call_args.args[0])
@@ -146,9 +199,61 @@ class TestServerCommand(TestCase):
                 [line.count("--port") for line in exported],
                 [1, 1],
             )
+            self.assertEqual(
+                [line.count("--host") for line in exported],
+                [1, 1],
+            )
+            self.assertIn("--host 0.0.0.0", exported[0])
+            self.assertIn("--host ::1", exported[1])
+            self.assertNotIn("--host 0.0.0.0", exported[1])
             self.assertIn("--port 9001", exported[0])
             self.assertIn("--port 9002", exported[1])
             self.assertNotIn("--port 9001", exported[1])
+
+    async def testEmbeddedHostFlagOverridesConfiguration(self) -> None:
+        """Resolve the debugger bind address for both server interfaces.
+
+        Returns
+        -------
+        None
+            The host flag takes precedence while existing fallbacks remain.
+        """
+        cases = (
+            (None, None, "127.0.0.1"),
+            (None, "127.0.0.2", "127.0.0.2"),
+            ("0.0.0.0", "127.0.0.2", "0.0.0.0"),
+            ("::1", "127.0.0.2", "::1"),
+        )
+        for interface in ("asgi", "rsgi"):
+            for host, configured_host, expected in cases:
+                with (
+                    self.subTest(
+                        interface=interface, host=host, config=configured_host,
+                    ),
+                    TemporaryDirectory() as temporary,
+                ):
+                    app = Mock()
+                    app.basePath = Path(temporary)
+                    app.config.side_effect = {
+                        "app.host": configured_host,
+                        "filesystems": {"disks": {"public": {}}},
+                    }.get
+                    app.isProduction.return_value = False
+                    app._Application__onStartup = AsyncMock()
+                    app._Application__onShutdown = AsyncMock()
+                    server = Mock()
+                    server.serve = AsyncMock()
+                    command = ServerCommand()
+                    command.setArguments({"host": host, "interface": interface})
+
+                    with patch(
+                        "granian.server.embed.Server",
+                        return_value=server,
+                    ) as server_type:
+                        await command._ServerCommand__embeddedServe(app)
+
+                    self.assertEqual(server_type.call_args.kwargs["address"], expected)
+                    server.serve.assert_awaited_once()
 
     async def testEmbeddedAsgiUsesApplicationLifespan(self) -> None:
         """Let the ASGI server drive startup and shutdown through lifespan.

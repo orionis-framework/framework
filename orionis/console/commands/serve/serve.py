@@ -42,6 +42,14 @@ class ServerCommand(BaseCommand):
             required=False,
         ),
         Argument(
+            name_or_flags=["--host"],
+            type_=str,
+            help="Host address to bind the server to.",
+            dest="host",
+            default=MISSING,
+            required=False,
+        ),
+        Argument(
             name_or_flags=["--port", "-p"],
             type_=int,
             help="Port number to bind the server to.",
@@ -138,7 +146,9 @@ class ServerCommand(BaseCommand):
         """
         is_production: bool = app.isProduction()
         # Default host differs between production and development.
-        host: str = "0.0.0.0" if is_production else "127.0.0.1"
+        default_host: str = "0.0.0.0" if is_production else "127.0.0.1"
+        cmd_host: str | None = self.getArgument("host")
+        host: str = cmd_host if cmd_host is not None else default_host
         cmd_port: int | None = self.getArgument("port")
         port: int = int(cmd_port) if cmd_port is not None else 8000
         self.__cmd.extend(
@@ -466,7 +476,10 @@ class ServerCommand(BaseCommand):
                     Shutdown is awaited explicitly after ``server.serve()``.
                 """
 
-        host: str = app.config("app.host") or "127.0.0.1"
+        cmd_host: str | None = self.getArgument("host")
+        host: str = (
+            cmd_host if cmd_host is not None else app.config("app.host") or "127.0.0.1"
+        )
         cmd_port: int | None = self.getArgument("port")
         if cmd_port is None:
             configured_port = app.config("app.port")

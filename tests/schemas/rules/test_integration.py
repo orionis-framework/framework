@@ -80,29 +80,30 @@ class TestRulesThroughValidator(TestCase):
         self.assertEqual(instance.quantity, 5)
 
     async def testFailingRuleRaisesWithItsCode(self) -> None:
-        """Raise ValidationException carrying the failing rule code.
-
-        Validates that the rule identifier reaches the reported failure.
+        """
+        Verify that a failing rule exposes its code in validation errors.
 
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            Assert the failure's field, rule code, and structured error details.
         """
         with self.assertRaises(ValidationException) as ctx:
             await Validator.validate(_payload(terms="no"), _Registration)
         self.assertEqual(ctx.exception.failure.rule, "accepted")
         self.assertEqual(ctx.exception.failure.field, "terms")
+        self.assertEqual(ctx.exception.errors["terms"], [{
+            "rule": "accepted", "message": ctx.exception.failure.message,
+        }])
 
     async def testEveryRuleIsEvaluatedOnItsField(self) -> None:
-        """Report the expected rule code for each failing field.
-
-        Validates that the rules are bound to the field they annotate.
+        """
+        Verify the expected rule code for each failing field.
 
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            Assert each rule's field, code, and message in the reported errors.
         """
         cases = (
             ({"ident": "not-a-uuid"}, "ident", "uuid"),
@@ -120,6 +121,9 @@ class TestRulesThroughValidator(TestCase):
                 await Validator.validate(_payload(**overrides), _Registration)
             self.assertEqual(ctx.exception.failure.field, field)
             self.assertEqual(ctx.exception.failure.rule, code)
+            self.assertEqual(ctx.exception.errors[field], [{
+                "rule": code, "message": ctx.exception.failure.message,
+            }])
 
     async def testCrossFieldRuleReadsTheDecodedInstance(self) -> None:
         """Compare a field against a sibling resolved on the instance.

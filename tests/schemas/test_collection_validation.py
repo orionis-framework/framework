@@ -336,12 +336,12 @@ class TestSchemaCollections(TestCase):
 
     async def testListTypeConstraintAndRuleFailuresAreCollectedTogether(self) -> None:
         """
-        Validate unaffected items even when another child cannot convert.
+        Verify that list items report type, constraint, and rule failures together.
 
         Returns
         -------
         None
-            Assert combined type, constraint, and rule failures for list items.
+            Assert indexed field paths and structured constraint details.
         """
         with self.assertRaises(ValidationException) as caught:
             await Validator.validate({
@@ -360,17 +360,18 @@ class TestSchemaCollections(TestCase):
             },
         )
         self.assertEqual(
-            caught.exception.errors["contacts[2].nickname"], ["Nickname is too short."],
+            caught.exception.errors["contacts[2].nickname"],
+            [{"rule": "min_length", "message": "Nickname is too short."}],
         )
 
     async def testDictFailuresKeepKeysAndCustomMessages(self) -> None:
         """
-        Preserve quoted keys, including punctuation, in both failure phases.
+        Verify that dictionary errors preserve quoted keys and custom messages.
 
         Returns
         -------
         None
-            Assert key preservation and custom messages across failure phases.
+            Assert indexed key paths and the custom constraint code and message.
         """
         with self.assertRaises(ValidationException) as caught:
             await Validator.validate({
@@ -387,17 +388,17 @@ class TestSchemaCollections(TestCase):
         })
         self.assertEqual(
             caught.exception.errors["contacts[\"a.b']\"].nickname"],
-            ["Nickname is too short."],
+            [{"rule": "min_length", "message": "Nickname is too short."}],
         )
 
     async def testFixedTupleUsesEachElementsDeclaredType(self) -> None:
         """
-        Resolve errors and custom messages through the correct tuple member.
+        Verify that each tuple member uses its declared validation type.
 
         Returns
         -------
         None
-            Assert tuple-member-specific validation types and messages.
+            Assert member-specific error paths, rule codes, and custom messages.
         """
         class _TupleAccount(Schema):
             contacts: tuple[_PlainChild, _Contact]
@@ -413,17 +414,18 @@ class TestSchemaCollections(TestCase):
             "contacts[1].nickname", "contacts[1].email",
         })
         self.assertEqual(
-            caught.exception.errors["contacts[1].nickname"], ["Nickname is too short."],
+            caught.exception.errors["contacts[1].nickname"],
+            [{"rule": "min_length", "message": "Nickname is too short."}],
         )
 
     async def testCollectionBoundsAreNotHiddenByChildFailures(self) -> None:
         """
-        Preserve the original collection constraint alongside child errors.
+        Verify that collection bounds remain visible alongside child failures.
 
         Returns
         -------
         None
-            Assert collection bounds alongside nested child failures.
+            Assert the collection's structured length error and nested failures.
         """
         class _Bounded(Schema):
             contacts: Field[
@@ -438,7 +440,8 @@ class TestSchemaCollections(TestCase):
             "contacts", "contacts[0].email", "contacts[1].email",
         })
         self.assertEqual(
-            caught.exception.errors["contacts"], ["Three contacts required."],
+            caught.exception.errors["contacts"],
+            [{"rule": "min_length", "message": "Three contacts required."}],
         )
 
     async def testTupleLengthFailuresAreNotHiddenByChildRules(self) -> None:
@@ -530,12 +533,12 @@ class TestSchemaCollections(TestCase):
 
     async def testUnionChildrenUseTheirOwnConstraintMessages(self) -> None:
         """
-        Resolve messages from the selected child, not the first union member.
+        Verify that union errors use the selected child's constraint messages.
 
         Returns
         -------
         None
-            Assert constraint messages from the selected union member.
+            Assert the selected member's code and message in lists and mappings.
         """
         class _First(Schema, tag="first"):
             label: Field[str, MinLength(3, message="First child label is too short.")]
@@ -552,7 +555,7 @@ class TestSchemaCollections(TestCase):
             }, _TaggedCollection)
         self.assertEqual(
             caught.exception.errors["contacts[0].label"],
-            ["Second child label is too short."],
+            [{"rule": "min_length", "message": "Second child label is too short."}],
         )
 
         class _CollectionUnion(Schema):
@@ -564,7 +567,7 @@ class TestSchemaCollections(TestCase):
             }, _CollectionUnion)
         self.assertEqual(
             caught.exception.errors["contacts['main'].label"],
-            ["Second child label is too short."],
+            [{"rule": "min_length", "message": "Second child label is too short."}],
         )
 
     async def testChildRulesReadChildSiblingsOnBothConversionPaths(self) -> None:

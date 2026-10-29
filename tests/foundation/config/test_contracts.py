@@ -6,6 +6,7 @@ from pathlib import Path
 from typing import get_args, get_type_hints
 from orionis.foundation.config.app import App
 from orionis.foundation.config.database import Oracle
+from orionis.foundation.config.http import Cors
 from orionis.foundation.config.startup import Configuration
 from orionis.foundation.core_config import CORE_CONFIG
 from tests.foundation.config.test_environment import (
@@ -43,8 +44,8 @@ class TestConfigurationContracts(ConfigurationTestCase):
                 ):
                     cls(**{field.name: object()})
 
-    def testNullabilityMatchesDeclaredTypes(self) -> None:
-        """Distinguish nullable options from required configuration values.
+    def testNullabilityMatchesDeclaredTypesOrNormalizedDefaults(self) -> None:
+        """Distinguish nullable options, normalized defaults and required values.
 
         Returns
         -------
@@ -55,7 +56,11 @@ class TestConfigurationContracts(ConfigurationTestCase):
             annotations = get_type_hints(cls)
             for field in fields(cls):
                 with self.subTest(entity=cls.__name__, field=field.name):
-                    if type(None) in get_args(annotations[field.name]):
+                    if issubclass(cls, Cors) and field.name == "allow_origins":
+                        self.assertEqual(
+                            cls(**{field.name: None}).allow_origins, ["*"],
+                        )
+                    elif type(None) in get_args(annotations[field.name]):
                         values = {field.name: None}
                         if cls is Oracle and field.name == "service_name":
                             values["sid"] = "XE"

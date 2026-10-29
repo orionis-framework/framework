@@ -82,6 +82,9 @@ class TestConfigurationContracts(ConfigurationTestCase):
         overrides = {
             "BootstrapAppAuth": ("session", "redirect_to", "/login"),
             "BootstrapCache": ("prefix", None, ""),
+            "BootstrapMcp": (
+                "allowed_origins", None, ["https://inspector.orionis-framework.com"],
+            ),
         }
         self.environment.values["APP_KEY"] = bytes(range(32))
         for cls in configuration_classes(self.modules):

@@ -11,7 +11,7 @@ from config.realtime import BootstrapRealtime
 from config.view import BootstrapView
 from orionis.foundation.config.database import ConnectionName, Database
 from orionis.foundation.config.http import (
-    Cors, HTTPBodyLimits, HTTPRateLimit, HTTPWebSocket, Redis,
+    HTTP, Cors, HTTPBodyLimits, HTTPRateLimit, HTTPWebSocket, Redis,
 )
 from orionis.foundation.config.logging import Logging
 from orionis.foundation.config.mcp.entities.mcp import McpConfig
@@ -207,6 +207,41 @@ class TestConfigurationEnvironment(ConfigurationTestCase):
             with self.subTest(entity=cls.__name__), self.assertRaises(ValueError):
                 cls()
 
+    def testCorsDefaultsAllowAllOrigins(self) -> None:
+        """Use independent wildcard defaults in entities and application settings.
+
+        Returns
+        -------
+        None
+            Default origins and their metadata consistently allow all origins.
+        """
+        first = Cors()
+        self.assertEqual(first.allow_origins, ["*"])
+        first.allow_origins.append("https://example.com")
+        self.assertEqual(Cors().allow_origins, ["*"])
+        origins_field = next(
+            field for field in fields(Cors) if field.name == "allow_origins"
+        )
+        self.assertEqual(origins_field.metadata["default"], ["*"])
+        for cls in (HTTP, BootstrapHTTP):
+            with self.subTest(entity=cls.__name__):
+                self.assertEqual(cls().cors.allow_origins, ["*"])
+
+    def testCorsEmptyOriginsNormalizeToWildcard(self) -> None:
+        """Normalize supported empty origin settings and the scalar wildcard.
+
+        Returns
+        -------
+        None
+            Constructor and environment values produce the same wildcard list.
+        """
+        for value in (None, [], {}, (), "*"):
+            with self.subTest(origins=value):
+                config = {"allow_origins": value}
+                self.assertEqual(Cors(**config).allow_origins, ["*"])
+                self.environment.values["CORS_ALLOW_ORIGINS"] = value
+                self.assertEqual(Cors().allow_origins, ["*"])
+
     def testEnvironmentListsDoNotBecomeSharedInstanceDefaults(self) -> None:
         """Own collections even when the environment returns the same list.
 
@@ -222,6 +257,9 @@ class TestConfigurationEnvironment(ConfigurationTestCase):
         first.allow_origins.clear()
         self.assertEqual(second.allow_origins, values)
         self.assertIsNot(second.allow_origins, values)
+        for cls in (HTTP, BootstrapHTTP):
+            with self.subTest(entity=cls.__name__):
+                self.assertEqual(cls().cors.allow_origins, values)
 
     def testEnvironmentFalsyValuesAreNotReplacedByDefaults(self) -> None:
         """Keep explicitly disabled template and bytecode caches.

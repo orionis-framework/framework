@@ -1,6 +1,6 @@
 from __future__ import annotations
 import time
-from typing import Self, TYPE_CHECKING
+from typing import TYPE_CHECKING, Self
 from orionis.support.performance.contracts.counter import IPerformanceCounter
 
 if TYPE_CHECKING:
@@ -12,13 +12,14 @@ _ERR_USE_ASTOP: str = "Cannot use stop() after astart(). Use astop() instead."
 _ERR_USE_STOP: str = "Cannot use astop() after start(). Use stop() instead."
 
 class PerformanceCounter(IPerformanceCounter):
+
     __slots__ = (
         "_diff_time",
         "_is_async_mode",
         "_start_time",
     )
 
-    def __init__(self) -> None:
+    def __init__(self: Self) -> None:
         """
         Initialize the PerformanceCounter instance.
 
@@ -34,7 +35,7 @@ class PerformanceCounter(IPerformanceCounter):
         self._diff_time: float | None = None
         self._is_async_mode: bool = False
 
-    def start(self) -> PerformanceCounter:
+    def start(self: Self) -> PerformanceCounter:
         """
         Start the performance counter.
 
@@ -51,7 +52,7 @@ class PerformanceCounter(IPerformanceCounter):
         self._is_async_mode = False
         return self
 
-    async def astart(self) -> PerformanceCounter:
+    async def astart(self: Self) -> PerformanceCounter:
         """
         Start the performance counter asynchronously.
 
@@ -68,7 +69,7 @@ class PerformanceCounter(IPerformanceCounter):
         self._is_async_mode = True
         return self
 
-    def stop(self) -> PerformanceCounter:
+    def stop(self: Self) -> PerformanceCounter:
         """
         Stop the performance counter and compute elapsed time.
 
@@ -89,15 +90,17 @@ class PerformanceCounter(IPerformanceCounter):
         """
         # Ensure synchronous mode before stopping
         if self._is_async_mode:
-            raise RuntimeError(_ERR_USE_ASTOP)
+            error_msg = _ERR_USE_ASTOP
+            raise RuntimeError(error_msg)
         start_time = self._start_time
         if start_time is None:
-            raise ValueError(_ERR_NOT_STARTED)
+            error_msg = _ERR_NOT_STARTED
+            raise ValueError(error_msg)
         # Store the elapsed duration.
         self._diff_time = time.perf_counter() - start_time
         return self
 
-    async def astop(self) -> PerformanceCounter:
+    async def astop(self: Self) -> PerformanceCounter:
         """
         Stop the performance counter asynchronously.
 
@@ -116,15 +119,17 @@ class PerformanceCounter(IPerformanceCounter):
         """
         # Ensure asynchronous mode before stopping
         if not self._is_async_mode:
-            raise RuntimeError(_ERR_USE_STOP)
+            error_msg = _ERR_USE_STOP
+            raise RuntimeError(error_msg)
         start_time = self._start_time
         if start_time is None:
-            raise ValueError(_ERR_NOT_STARTED)
+            error_msg = _ERR_NOT_STARTED
+            raise ValueError(error_msg)
         # Store the elapsed duration.
         self._diff_time = time.perf_counter() - start_time
         return self
 
-    def elapsedTime(self) -> float:
+    def elapsedTime(self: Self) -> float:
         """
         Return the elapsed time in seconds between the last start and stop calls.
 
@@ -141,10 +146,11 @@ class PerformanceCounter(IPerformanceCounter):
         # Ensure the counter has been started and stopped before returning elapsed time
         diff = self._diff_time
         if diff is None:
-            raise ValueError(_ERR_NOT_MEASURED)
+            error_msg = _ERR_NOT_MEASURED
+            raise ValueError(error_msg)
         return diff
 
-    async def aelapsedTime(self) -> float:
+    async def aelapsedTime(self: Self) -> float:
         """
         Return the elapsed time in seconds asynchronously.
 
@@ -158,13 +164,9 @@ class PerformanceCounter(IPerformanceCounter):
         ValueError
             If the counter has not been started and stopped properly.
         """
-        # Return the elapsed duration in seconds.
-        diff = self._diff_time
-        if diff is None:
-            raise ValueError(_ERR_NOT_MEASURED)
-        return diff
+        return PerformanceCounter.elapsedTime(self)
 
-    def getMicroseconds(self) -> float:
+    def getMicroseconds(self: Self) -> float:
         """
         Return the elapsed time in microseconds.
 
@@ -175,13 +177,9 @@ class PerformanceCounter(IPerformanceCounter):
         float
             Elapsed time in microseconds.
         """
-        # Return the elapsed duration in microseconds.
-        diff = self._diff_time
-        if diff is None:
-            raise ValueError(_ERR_NOT_MEASURED)
-        return diff * 1_000_000
+        return PerformanceCounter.elapsedTime(self) * 1_000_000
 
-    async def agetMicroseconds(self) -> float:
+    async def agetMicroseconds(self: Self) -> float:
         """
         Return the elapsed time in microseconds asynchronously.
 
@@ -190,13 +188,9 @@ class PerformanceCounter(IPerformanceCounter):
         float
             Elapsed time in microseconds as a float.
         """
-        # Return the elapsed duration in microseconds.
-        diff = self._diff_time
-        if diff is None:
-            raise ValueError(_ERR_NOT_MEASURED)
-        return diff * 1_000_000
+        return PerformanceCounter.getMicroseconds(self)
 
-    def getMilliseconds(self) -> float:
+    def getMilliseconds(self: Self) -> float:
         """
         Return the elapsed time in milliseconds.
 
@@ -207,13 +201,9 @@ class PerformanceCounter(IPerformanceCounter):
         float
             Elapsed time in milliseconds as a float.
         """
-        # Return the elapsed duration in milliseconds.
-        diff = self._diff_time
-        if diff is None:
-            raise ValueError(_ERR_NOT_MEASURED)
-        return diff * 1_000
+        return PerformanceCounter.elapsedTime(self) * 1_000
 
-    async def agetMilliseconds(self) -> float:
+    async def agetMilliseconds(self: Self) -> float:
         """
         Return the elapsed time in milliseconds asynchronously.
 
@@ -222,13 +212,9 @@ class PerformanceCounter(IPerformanceCounter):
         float
             Elapsed time in milliseconds as a float.
         """
-        # Return the elapsed duration in milliseconds.
-        diff = self._diff_time
-        if diff is None:
-            raise ValueError(_ERR_NOT_MEASURED)
-        return diff * 1_000
+        return PerformanceCounter.getMilliseconds(self)
 
-    def getSeconds(self) -> float:
+    def getSeconds(self: Self) -> float:
         """
         Return the elapsed time in seconds.
 
@@ -237,13 +223,9 @@ class PerformanceCounter(IPerformanceCounter):
         float
             Elapsed time in seconds as a float.
         """
-        # Return the elapsed duration in seconds.
-        diff = self._diff_time
-        if diff is None:
-            raise ValueError(_ERR_NOT_MEASURED)
-        return diff
+        return PerformanceCounter.elapsedTime(self)
 
-    async def agetSeconds(self) -> float:
+    async def agetSeconds(self: Self) -> float:
         """
         Return the elapsed time in seconds asynchronously.
 
@@ -252,13 +234,9 @@ class PerformanceCounter(IPerformanceCounter):
         float
             Elapsed time in seconds as a float.
         """
-        # Return the elapsed duration in seconds.
-        diff = self._diff_time
-        if diff is None:
-            raise ValueError(_ERR_NOT_MEASURED)
-        return diff
+        return PerformanceCounter.elapsedTime(self)
 
-    def getMinutes(self) -> float:
+    def getMinutes(self: Self) -> float:
         """
         Return the elapsed time in minutes.
 
@@ -267,13 +245,9 @@ class PerformanceCounter(IPerformanceCounter):
         float
             Elapsed time in minutes as a float.
         """
-        # Return the elapsed duration in minutes.
-        diff = self._diff_time
-        if diff is None:
-            raise ValueError(_ERR_NOT_MEASURED)
-        return diff / 60
+        return PerformanceCounter.elapsedTime(self) / 60
 
-    async def agetMinutes(self) -> float:
+    async def agetMinutes(self: Self) -> float:
         """
         Return the elapsed time in minutes asynchronously.
 
@@ -282,13 +256,9 @@ class PerformanceCounter(IPerformanceCounter):
         float
             Elapsed time in minutes as a float.
         """
-        # Return the elapsed duration in minutes.
-        diff = self._diff_time
-        if diff is None:
-            raise ValueError(_ERR_NOT_MEASURED)
-        return diff / 60
+        return PerformanceCounter.getMinutes(self)
 
-    def restart(self) -> PerformanceCounter:
+    def restart(self: Self) -> PerformanceCounter:
         """
         Restart the performance counter.
 
@@ -306,7 +276,7 @@ class PerformanceCounter(IPerformanceCounter):
         self._is_async_mode = False
         return self
 
-    async def arestart(self) -> PerformanceCounter:
+    async def arestart(self: Self) -> PerformanceCounter:
         """
         Restart the performance counter asynchronously.
 
@@ -324,7 +294,7 @@ class PerformanceCounter(IPerformanceCounter):
         self._is_async_mode = True
         return self
 
-    def __enter__(self) -> Self:
+    def __enter__(self: Self) -> Self:
         """
         Enter the context manager and start the counter.
 
@@ -337,7 +307,7 @@ class PerformanceCounter(IPerformanceCounter):
         return self.start()
 
     def __exit__(
-        self,
+        self: Self,
         exc_type: type[BaseException] | None,
         exc_val: BaseException | None,
         exc_tb: TracebackType | None,
@@ -362,7 +332,7 @@ class PerformanceCounter(IPerformanceCounter):
         # Stop the counter when exiting the context
         self.stop()
 
-    async def __aenter__(self) -> Self:
+    async def __aenter__(self: Self) -> Self:
         """
         Enter the async context manager and start the counter asynchronously.
 
@@ -375,7 +345,7 @@ class PerformanceCounter(IPerformanceCounter):
         return await self.astart()
 
     async def __aexit__(
-        self,
+        self: Self,
         exc_type: type[BaseException] | None,
         exc_val: BaseException | None,
         exc_tb: TracebackType | None,

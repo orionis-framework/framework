@@ -1,8 +1,10 @@
-from typing import TYPE_CHECKING
+from functools import lru_cache
+from hashlib import sha1
+from typing import TYPE_CHECKING, Self
 from uuid import uuid4
 import msgspec
 from redis.asyncio import Redis
-from redis.exceptions import RedisError
+from redis.exceptions import NoScriptError, RedisError
 from orionis.foundation.config.queue import Redis as RedisConfig
 from orionis.queues.contracts.driver import IQueueDriver
 from orionis.queues.entities.reserved_job import ReservedJob
@@ -14,6 +16,23 @@ if TYPE_CHECKING:
 
 _ENCODER = msgspec.json.Encoder()
 _RESERVATION_FIELDS = 3
+
+@lru_cache(maxsize=16)
+def _script_digest(script: str) -> str:
+    """
+    Return Redis's SHA-1 script identifier (not a security digest).
+
+    Parameters
+    ----------
+    script : str
+        Lua source submitted to Redis.
+
+    Returns
+    -------
+    str
+        Hexadecimal SHA-1 identifier expected by Redis EVALSHA.
+    """
+    return sha1(script.encode(), usedforsecurity=False).hexdigest()
 
 # Validate key types before any transition can remove persisted queue state.
 _CHECK_TYPES = """
@@ -27,16 +46,21 @@ end
 """
 
 # Store the envelope and availability together without exposing partial state.
-_PUSH = _CHECK_TYPES + """
+_PUSH = (
+    _CHECK_TYPES
+    + """
 if redis.call('HEXISTS', KEYS[3], ARGV[1]) == 1 then return 0 end
 redis.call('HSET', KEYS[3], ARGV[1], ARGV[2])
 redis.call('HSET', KEYS[4], ARGV[1], 0)
 redis.call('ZADD', KEYS[1], ARGV[3], ARGV[1])
 return 1
 """
+)
 
 # Reclaim expired leases and move one due job into an owned reservation.
-_RESERVE = _CHECK_TYPES + """
+_RESERVE = (
+    _CHECK_TYPES
+    + """
 local expired = redis.call('ZRANGEBYSCORE', KEYS[2], '-inf', ARGV[1],
                            'LIMIT', 0, 100)
 local due = redis.call('ZRANGEBYSCORE', KEYS[1], '-inf', ARGV[1], 'LIMIT', 0, 1)
@@ -58,9 +82,12 @@ redis.call('HSET', KEYS[5], id, ARGV[3])
 redis.call('ZADD', KEYS[2], ARGV[2], id)
 return {id, payload, attempts}
 """
+)
 
 # Release only a token that still owns an unexpired lease.
-_RELEASE = _CHECK_TYPES + """
+_RELEASE = (
+    _CHECK_TYPES
+    + """
 local lease = redis.call('ZSCORE', KEYS[2], ARGV[1])
 if redis.call('HGET', KEYS[5], ARGV[1]) ~= ARGV[2]
    or not lease or tonumber(lease) <= tonumber(ARGV[3]) then return 0 end
@@ -69,9 +96,12 @@ redis.call('HDEL', KEYS[5], ARGV[1])
 redis.call('ZADD', KEYS[1], ARGV[4], ARGV[1])
 return 1
 """
+)
 
 # Remove only a token that still owns an unexpired lease.
-_DELETE = _CHECK_TYPES + """
+_DELETE = (
+    _CHECK_TYPES
+    + """
 local lease = redis.call('ZSCORE', KEYS[2], ARGV[1])
 if redis.call('HGET', KEYS[5], ARGV[1]) ~= ARGV[2]
    or not lease or tonumber(lease) <= tonumber(ARGV[3]) then return 0 end
@@ -81,6 +111,7 @@ redis.call('HDEL', KEYS[4], ARGV[1])
 redis.call('HDEL', KEYS[5], ARGV[1])
 return 1
 """
+)
 
 # Remove a queue's complete state and report its previous number of jobs.
 _CLEAR = """
@@ -95,7 +126,7 @@ class RedisQueueDriver(IQueueDriver):
     __slots__ = ("_client", "_owns_client", "_prefix")
 
     def __init__(
-        self,
+        self: Self,
         config: RedisConfig | None = None,
         *,
         client: Redis | None = None,
@@ -127,23 +158,27 @@ class RedisQueueDriver(IQueueDriver):
         """
         settings = RedisConfig() if config is None else config
         if not isinstance(settings, RedisConfig):
-            message = "Redis queue settings must be a Redis configuration entity."
-            raise QueueStorageError(message)
+            error_msg = "Redis queue settings must be a Redis configuration entity."
+            raise QueueStorageError(error_msg)
         prefix = settings.prefix
         if not isinstance(prefix, str) or not prefix or "{" in prefix or "}" in prefix:
-            message = "Redis queue prefixes must be nonempty without braces."
-            raise QueueStorageError(message)
+            error_msg = "Redis queue prefixes must be nonempty without braces."
+            raise QueueStorageError(error_msg)
         self._prefix = prefix
         self._owns_client = client is None
-        self._client = client if client is not None else Redis(
-            host=settings.endpoint,
-            port=settings.port,
-            db=settings.db,
-            password=settings.password,
-            protocol=2,
+        self._client = (
+            client
+            if client is not None
+            else Redis(
+                host=settings.endpoint,
+                port=settings.port,
+                db=settings.db,
+                password=settings.password,
+                protocol=2,
+            )
         )
 
-    def _keys(self, queue: str) -> tuple[str, ...]:
+    def _keys(self: Self, queue: str) -> tuple[str, ...]:
         """
         Return colocated keys for one logical queue.
 
@@ -165,7 +200,7 @@ class RedisQueueDriver(IQueueDriver):
         )
 
     async def _executeScript(
-        self,
+        self: Self,
         script: str,
         keys: tuple[str, ...],
         arguments: tuple[str | bytes | float, ...],
@@ -193,12 +228,21 @@ class RedisQueueDriver(IQueueDriver):
             If Redis cannot perform the transition.
         """
         try:
-            return await self._client.eval(script, len(keys), *keys, *arguments)
+            try:
+                return await self._client.evalsha(
+                    _script_digest(script),
+                    len(keys),
+                    *keys,
+                    *arguments,
+                )
+            except NoScriptError:
+                # EVAL loads the script on the node owning these cluster keys.
+                return await self._client.eval(script, len(keys), *keys, *arguments)
         except RedisError as exception:
-            message = "Unable to execute the atomic Redis queue transition."
-            raise QueueStorageError(message) from exception
+            error_msg = "Unable to execute the atomic Redis queue transition."
+            raise QueueStorageError(error_msg) from exception
 
-    async def push(self, envelope: JobEnvelope, delay: float = 0) -> str:
+    async def push(self: Self, envelope: JobEnvelope, delay: float = 0) -> str:
         """
         Store an envelope and its availability atomically.
 
@@ -221,16 +265,19 @@ class RedisQueueDriver(IQueueDriver):
         """
         delay = validate_seconds(delay, "delay")
         result = await self._executeScript(
-            _PUSH, self._keys(envelope.queue),
+            _PUSH,
+            self._keys(envelope.queue),
             (envelope.id, _ENCODER.encode(envelope), current_time() + delay),
         )
         if result != 1:
-            message = f"Queued job {envelope.id!r} already exists."
-            raise QueueStorageError(message)
+            error_msg = f"Queued job {envelope.id!r} already exists."
+            raise QueueStorageError(error_msg)
         return envelope.id
 
     async def reserve(
-        self, queues: tuple[str, ...], retry_after: float,
+        self: Self,
+        queues: tuple[str, ...],
+        retry_after: float,
     ) -> ReservedJob | None:
         """
         Claim one due job in queue priority order.
@@ -258,30 +305,38 @@ class RedisQueueDriver(IQueueDriver):
             reserved_until = now + retry_after
             token = uuid4().hex
             result = await self._executeScript(
-                _RESERVE, self._keys(queue), (now, reserved_until, token),
+                _RESERVE,
+                self._keys(queue),
+                (now, reserved_until, token),
             )
             if result == []:
                 continue
             if (
-                not isinstance(result, list) or len(result) != _RESERVATION_FIELDS
+                not isinstance(result, list)
+                or len(result) != _RESERVATION_FIELDS
                 or not isinstance(result[0], bytes)
                 or not isinstance(result[1], bytes)
-                or not isinstance(result[2], int) or result[2] < 1
+                or not isinstance(result[2], int)
+                or result[2] < 1
             ):
-                message = "Redis returned an invalid queue reservation."
-                raise QueueStorageError(message)
+                error_msg = "Redis returned an invalid queue reservation."
+                raise QueueStorageError(error_msg)
             try:
                 job_id = result[0].decode("utf-8")
             except UnicodeDecodeError as exception:
-                message = "Redis returned an invalid job identifier."
-                raise QueueStorageError(message) from exception
+                error_msg = "Redis returned an invalid job identifier."
+                raise QueueStorageError(error_msg) from exception
             return ReservedJob(
-                id=job_id, payload=result[1], queue=queue,
-                attempts=result[2], token=token, reserved_until=reserved_until,
+                id=job_id,
+                payload=result[1],
+                queue=queue,
+                attempts=result[2],
+                token=token,
+                reserved_until=reserved_until,
             )
         return None
 
-    async def release(self, reserved: ReservedJob, delay: float = 0) -> bool:
+    async def release(self: Self, reserved: ReservedJob, delay: float = 0) -> bool:
         """
         Release a currently owned reservation with optional delay.
 
@@ -299,12 +354,16 @@ class RedisQueueDriver(IQueueDriver):
         """
         delay = validate_seconds(delay, "delay")
         now = current_time()
-        return await self._executeScript(
-            _RELEASE, self._keys(reserved.queue),
-            (reserved.id, reserved.token, now, now + delay),
-        ) == 1
+        return (
+            await self._executeScript(
+                _RELEASE,
+                self._keys(reserved.queue),
+                (reserved.id, reserved.token, now, now + delay),
+            )
+            == 1
+        )
 
-    async def delete(self, reserved: ReservedJob) -> bool:
+    async def delete(self: Self, reserved: ReservedJob) -> bool:
         """
         Acknowledge a currently owned reservation atomically.
 
@@ -318,12 +377,16 @@ class RedisQueueDriver(IQueueDriver):
         bool
             Whether an owned, unexpired reservation was removed.
         """
-        return await self._executeScript(
-            _DELETE, self._keys(reserved.queue),
-            (reserved.id, reserved.token, current_time()),
-        ) == 1
+        return (
+            await self._executeScript(
+                _DELETE,
+                self._keys(reserved.queue),
+                (reserved.id, reserved.token, current_time()),
+            )
+            == 1
+        )
 
-    async def size(self, queue: str) -> int:
+    async def size(self: Self, queue: str) -> int:
         """
         Count ready, delayed, and reserved jobs in one queue.
 
@@ -340,10 +403,10 @@ class RedisQueueDriver(IQueueDriver):
         try:
             return await self._client.hlen(self._keys(queue)[2])
         except RedisError as exception:
-            message = "Unable to count Redis queue jobs."
-            raise QueueStorageError(message) from exception
+            error_msg = "Unable to count Redis queue jobs."
+            raise QueueStorageError(error_msg) from exception
 
-    async def clear(self, queue: str) -> int:
+    async def clear(self: Self, queue: str) -> int:
         """
         Remove every job and reservation in one queue atomically.
 
@@ -359,11 +422,11 @@ class RedisQueueDriver(IQueueDriver):
         """
         result = await self._executeScript(_CLEAR, self._keys(queue), ())
         if not isinstance(result, int):
-            message = "Redis returned an invalid queue size."
-            raise QueueStorageError(message)
+            error_msg = "Redis returned an invalid queue size."
+            raise QueueStorageError(error_msg)
         return result
 
-    async def close(self) -> None:
+    async def close(self: Self) -> None:
         """
         Close the transport only when this driver owns its Redis client.
 

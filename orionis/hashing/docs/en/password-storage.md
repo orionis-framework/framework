@@ -181,7 +181,7 @@ Authentication, registration, password-reset, seeders, and user models can use t
 
 ## Performance and concurrency
 
-Every `make` and `check` uses `asyncio.to_thread`, keeping the event loop responsive but consuming the loop's worker pool. Argon2 also consumes its configured memory and parallel lanes; cap concurrent login/registration work according to host capacity.
+Every `make` and `check` uses the dedicated bounded hashing executor (two active and 14 pending calls by default), keeping the event loop responsive without occupying its default worker pool. Overload raises `WorkQueueFullError`. Argon2 also consumes its configured memory and parallel lanes; size a custom executor according to host capacity.
 
 Managers cache driver objects, and drivers lazily cache backend classes/instances. No locks protect the first cache fill, so multiple native threads may construct equivalent instances and the last write wins safely. Event-loop tasks cannot observe a partial synchronous construction. Fluent setters mutate shared driver state and should not race with requests.
 

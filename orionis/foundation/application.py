@@ -200,7 +200,7 @@ async def _await_http_tasks(
     parent_task = asyncio.current_task()
     try:
         return await handler_task
-    except asyncio.CancelledError: # NOSONAR
+    except asyncio.CancelledError:  # NOSONAR
         if parent_task.cancelling() or not disconnect_task.done():
             raise
         if not disconnect_task.result():
@@ -232,7 +232,7 @@ class Application(Container, IApplication):
     # --- ASGI Application Handling ---
 
     async def __call__(
-        self,
+        self: Self,
         scope: dict,
         receive: Callable[[], Awaitable[dict[str, Any]]],
         send: Callable[[dict[str, Any]], Awaitable[None]],
@@ -269,7 +269,7 @@ class Application(Container, IApplication):
         return None
 
     async def __asgiLifespan(
-        self,
+        self: Self,
         receive: Callable[[], Awaitable[dict]],
         send: Callable[[dict], Awaitable[None]],
     ) -> None:
@@ -345,7 +345,7 @@ class Application(Container, IApplication):
                 return
 
     async def __handleHttpAsgi(
-        self,
+        self: Self,
         scope: dict,
         receive: Callable[[], Awaitable[dict[str, Any]]],
         send: Callable[[dict[str, Any]], Awaitable[None]],
@@ -393,7 +393,8 @@ class Application(Container, IApplication):
         loop = asyncio.get_running_loop()
         request_queue: asyncio.Queue = asyncio.Queue(maxsize=_ASGI_BODY_QUEUE_SIZE)
         handler_task = _create_http_handler_task(
-            loop, handler(scope, request_queue.get, send),
+            loop,
+            handler(scope, request_queue.get, send),
         )
         if handler_task.done():
             return handler_task.result()
@@ -405,7 +406,7 @@ class Application(Container, IApplication):
     # --- RSGI Application Handling ---
 
     async def __rsgi__(
-        self,
+        self: Self,
         scope: Scope,
         protocol: HTTPProtocol | WebsocketProtocol | ProtocolError | ProtocolClosed,
     ) -> object:
@@ -432,7 +433,7 @@ class Application(Container, IApplication):
         return None
 
     def __rsgi_init__(
-        self,
+        self: Self,
         loop: asyncio.AbstractEventLoop,
     ) -> None:
         """
@@ -454,7 +455,7 @@ class Application(Container, IApplication):
         )
 
     def __rsgi_del__(
-        self,
+        self: Self,
         loop: asyncio.AbstractEventLoop,
     ) -> None:
         """
@@ -476,7 +477,7 @@ class Application(Container, IApplication):
         )
 
     async def __handleHttpRsgi(
-        self,
+        self: Self,
         scope: Scope,
         protocol: HTTPProtocol,
     ) -> object:
@@ -533,7 +534,7 @@ class Application(Container, IApplication):
 
     # --- Kernel Handling Methods ---
 
-    async def __initializeHttpKernel(self, interface: str) -> None:
+    async def __initializeHttpKernel(self: Self, interface: str) -> None:
         """
         Build and boot the HTTP kernel once for concurrent first requests.
 
@@ -559,7 +560,7 @@ class Application(Container, IApplication):
             self.__kernel_http_rsgi = rsgi_handler
 
     async def __loadHTTPKernel(
-        self,
+        self: Self,
     ) -> IKernelHTTP:
         """
         Load and return the configured HTTP kernel instance.
@@ -595,7 +596,7 @@ class Application(Container, IApplication):
         return kernel_instance
 
     async def __loadCLIKernel(
-        self,
+        self: Self,
     ) -> IKernelCLI:
         """
         Load and return the configured CLI kernel instance.
@@ -634,7 +635,7 @@ class Application(Container, IApplication):
     # --- CLI Application Handling ---
 
     async def handleCommand(
-        self,
+        self: Self,
         args: list[str] | None = None,
     ) -> int:
         """
@@ -670,7 +671,7 @@ class Application(Container, IApplication):
                 await self.__onShutdown(runtime=Runtime.CLI)
             return response
 
-    async def __initializeCliKernel(self) -> None:
+    async def __initializeCliKernel(self: Self) -> None:
         """
         Build and boot the CLI kernel once for concurrent commands.
 
@@ -691,7 +692,7 @@ class Application(Container, IApplication):
     # --- Application Properties ---
 
     @classmethod
-    def current(cls) -> Self | None:
+    def current(cls: type[Self]) -> Self | None:
         """
         Return the existing application without constructing or booting it.
 
@@ -704,7 +705,7 @@ class Application(Container, IApplication):
         return cls._instances.get(cls)
 
     @property
-    def isBooted(self) -> bool:
+    def isBooted(self: Self) -> bool:
         """
         Check whether configuration and provider registration have completed.
 
@@ -717,7 +718,7 @@ class Application(Container, IApplication):
         return self.__booted
 
     @property
-    def isCreated(self) -> bool:
+    def isCreated(self: Self) -> bool:
         """
         Check whether configuration and service registration are complete.
 
@@ -729,7 +730,7 @@ class Application(Container, IApplication):
         return self.__booted
 
     @property
-    def areProvidersBooted(self) -> bool:
+    def areProvidersBooted(self: Self) -> bool:
         """
         Check whether every registered eager provider has finished startup.
 
@@ -742,7 +743,7 @@ class Application(Container, IApplication):
         return self.__booted and not self.__pending_boot_providers
 
     @property
-    def isHttpReady(self) -> bool:
+    def isHttpReady(self: Self) -> bool:
         """
         Check whether both HTTP protocol handlers have been published.
 
@@ -759,7 +760,7 @@ class Application(Container, IApplication):
         )
 
     @property
-    def startAt(self) -> int:
+    def startAt(self: Self) -> int:
         """
         Return the application startup timestamp in nanoseconds.
 
@@ -772,7 +773,7 @@ class Application(Container, IApplication):
         return self.__start_at
 
     @property
-    def routeHealthCheck(self) -> str:
+    def routeHealthCheck(self: Self) -> str:
         """
         Return the health check route for the application.
 
@@ -786,7 +787,7 @@ class Application(Container, IApplication):
         return routing_config.get("health") or "/up"
 
     @property
-    def entryPoint(self) -> str | None:
+    def entryPoint(self: Self) -> str | None:
         """
         Return the entry point module path where the application was created.
 
@@ -824,7 +825,7 @@ class Application(Container, IApplication):
         return f"{module_path}:app"
 
     @property
-    def basePath(self) -> Path:
+    def basePath(self: Self) -> Path:
         """
         Return the base path of the application.
 
@@ -836,7 +837,7 @@ class Application(Container, IApplication):
         return self.__basePath
 
     @property
-    def compiled(self) -> bool:
+    def compiled(self: Self) -> bool:
         """
         Indicate whether the application is running in compiled mode.
 
@@ -849,7 +850,7 @@ class Application(Container, IApplication):
         return self.__compiled
 
     @property
-    def compiledPath(self) -> Path | None:
+    def compiledPath(self: Self) -> Path | None:
         """
         Return the path where compiled cache files are stored.
 
@@ -862,7 +863,7 @@ class Application(Container, IApplication):
         return self.__compiled_path
 
     @property
-    def compiledInvalidationPathsDirs(self) -> list[Path]:
+    def compiledInvalidationPathsDirs(self: Self) -> list[Path]:
         """
         Return the list of directory paths monitored for cache invalidation.
 
@@ -874,7 +875,7 @@ class Application(Container, IApplication):
         return list(self.__compiled_invalidation_paths_dirs)
 
     @property
-    def compiledInvalidationPathsFiles(self) -> list[Path]:
+    def compiledInvalidationPathsFiles(self: Self) -> list[Path]:
         """
         Return the list of file paths monitored for cache invalidation.
 
@@ -888,7 +889,7 @@ class Application(Container, IApplication):
     # --- Application Initialization ---
 
     def __init__(
-        self,
+        self: Self,
         base_path: Path = _CWD,
     ) -> None:
         """
@@ -985,7 +986,7 @@ class Application(Container, IApplication):
             self._Application__initialized = True
 
     def compile(
-        self,
+        self: Self,
         path: str | None = None,
         invalidation_paths: list[str] | None = None,
     ) -> None:
@@ -1016,7 +1017,7 @@ class Application(Container, IApplication):
             compiled_invalidation_paths=invalidation_paths,
         )
 
-    def __assertPythonVersion(self) -> None:
+    def __assertPythonVersion(self: Self) -> None:
         """
         Assert that the current Python version meets the minimum requirement.
 
@@ -1041,7 +1042,7 @@ class Application(Container, IApplication):
             raise RuntimeError(error_msg)
 
     def __validateAndReturnPath(
-        self,
+        self: Self,
         path: Path | str,
     ) -> Path:
         """
@@ -1079,7 +1080,7 @@ class Application(Container, IApplication):
     # --- Lifecycle Callbacks Registration Methods ---
 
     def on(
-        self,
+        self: Self,
         lifespan: Lifespan,
         *callbacks: Callable[..., Any] | Callable[..., Awaitable[Any]],
         runtime: Runtime | None = None,
@@ -1143,7 +1144,7 @@ class Application(Container, IApplication):
         return self
 
     async def __onStartup(
-        self,
+        self: Self,
         runtime: Runtime,
         http_interface: str = "asgi",
     ) -> None:
@@ -1197,7 +1198,7 @@ class Application(Container, IApplication):
                 await self.invoke(func)
 
     async def __onShutdown(
-        self,
+        self: Self,
         runtime: Runtime,
     ) -> None:
         """
@@ -1220,31 +1221,31 @@ class Application(Container, IApplication):
             | self.__hook_events[runtime][Lifespan.SHUTDOWN]
         )
 
-        # Trigger shutdown lifecycle events and execute registered shutdown callbacks
-        if runtime == Runtime.HTTP:
-            # Start the Orionis shutdown generator.
-            shutdown_gen = import_module(
-                "orionis.foundation.lifespan.shutdown",
-            ).shutdown_orionis_generator(self)
-            next(shutdown_gen)
-
-            # Execute all registered shutdown callbacks (sync or async).
-            for func in callbacks:
-                await self.invoke(func)
-
-            # Finalize the shutdown generator.
-            with suppress(StopIteration):
+        try:
+            # Run application hooks before draining queued logging sinks.
+            if runtime == Runtime.HTTP:
+                shutdown_gen = import_module(
+                    "orionis.foundation.lifespan.shutdown",
+                ).shutdown_orionis_generator(self)
                 next(shutdown_gen)
+                for func in callbacks:
+                    await self.invoke(func)
+                with suppress(StopIteration):
+                    next(shutdown_gen)
+            elif runtime == Runtime.CLI:
+                for func in callbacks:
+                    await self.invoke(func)
+        finally:
+            if self.__configured and self.config("logging.queue_capacity"):
+                from orionis.logging.contracts.logger import ILogger
 
-        elif runtime == Runtime.CLI:
-            # Execute all registered shutdown callbacks (sync or async).
-            for func in callbacks:
-                await self.invoke(func)
+                logger = await self.make(ILogger)
+                await logger.aclose()
 
     # --- Default Configuration Setup Methods ---
 
     def __defaultBootstrap(
-        self,
+        self: Self,
     ) -> dict[str, Any]:
         """
         Return the default bootstrap configuration.
@@ -1270,7 +1271,7 @@ class Application(Container, IApplication):
         }
 
     def __ensureDefaultBootstrap(
-        self,
+        self: Self,
     ) -> None:
         """
         Initialize the bootstrap configuration with default values.
@@ -1293,7 +1294,7 @@ class Application(Container, IApplication):
         self.__bootstrap = self.__defaultBootstrap()
 
     def __ensureDefaultPaths(
-        self,
+        self: Self,
     ) -> None:
         """
         Ensure default application paths are set in the bootstrap configuration.
@@ -1317,7 +1318,7 @@ class Application(Container, IApplication):
     # --- Utility Functions for Application Loading ---
 
     def __assertConfigMutable(
-        self,
+        self: Self,
     ) -> None:
         """
         Assert that configuration is mutable before modification.
@@ -1341,7 +1342,7 @@ class Application(Container, IApplication):
         self.__ensureDefaultBootstrap()
 
     def __lockConfig(
-        self,
+        self: Self,
     ) -> None:
         """
         Deeply freeze and lock the application configuration.
@@ -1361,7 +1362,7 @@ class Application(Container, IApplication):
     # --- Application Compilation Methods ---
 
     def __bootCompiledState(
-        self,
+        self: Self,
         compiled_path: str | None = None,
         compiled_invalidation_paths: list[str] | None = None,
     ) -> None:
@@ -1435,7 +1436,7 @@ class Application(Container, IApplication):
             self.__is_compiled = True
             self.__commitConfig()
 
-    def __persistCompiledState(self) -> None:
+    def __persistCompiledState(self: Self) -> None:
         """
         Persist the compiled application state to cache.
 
@@ -1462,7 +1463,7 @@ class Application(Container, IApplication):
     # --- Service Provider Bootstrapping Logic ---
 
     def withMiddleware(
-        self,
+        self: Self,
         *middleware: type[IBaseMiddleware],
     ) -> Self:
         """
@@ -1504,7 +1505,7 @@ class Application(Container, IApplication):
         # Return self instance for method chaining
         return self
 
-    def getMiddleware(self) -> list[type[IBaseMiddleware]]:
+    def getMiddleware(self: Self) -> list[type[IBaseMiddleware]]:
         """
         Retrieve the list of registered middleware classes.
 
@@ -1522,7 +1523,7 @@ class Application(Container, IApplication):
         return middleware_classes
 
     def withProviders(
-        self,
+        self: Self,
         *providers: type[IServiceProvider],
     ) -> Self:
         """
@@ -1559,7 +1560,7 @@ class Application(Container, IApplication):
         # Return self instance for method chaining
         return self
 
-    def __loadCoreProviders(self) -> None:
+    def __loadCoreProviders(self: Self) -> None:
         """
         Load and register core framework service providers.
 
@@ -1581,7 +1582,7 @@ class Application(Container, IApplication):
         for provider in get_core_providers_mapping():
             self.__storeProviderClass(provider)
 
-    def __ensureProvidersRegistryStructure(self) -> None:
+    def __ensureProvidersRegistryStructure(self: Self) -> None:
         """
         Ensure the providers registry structure is properly initialized.
 
@@ -1604,7 +1605,7 @@ class Application(Container, IApplication):
             self.__providers_registry_initialized = True
 
     def __validateProviderClass(
-        self,
+        self: Self,
         provider_class: type[IServiceProvider],
     ) -> None:
         """
@@ -1642,7 +1643,7 @@ class Application(Container, IApplication):
             raise TypeError(error_msg)
 
     def __storeEagerProviderClass(
-        self,
+        self: Self,
         provider: type[IServiceProvider],
     ) -> None:
         """
@@ -1677,7 +1678,7 @@ class Application(Container, IApplication):
         eager.move_to_end(provider_full_path, last=False)
 
     def __storeDeferredProviderClass(
-        self,
+        self: Self,
         provider: type[IDeferrableProvider],
     ) -> None:
         """
@@ -1725,7 +1726,7 @@ class Application(Container, IApplication):
             }
 
     def __storeProviderClass(
-        self,
+        self: Self,
         provider: type[IServiceProvider],
     ) -> None:
         """
@@ -1763,7 +1764,7 @@ class Application(Container, IApplication):
             self.__storeEagerProviderClass(provider)
 
     def __discoverProviders(
-        self,
+        self: Self,
         modules: set[str],
     ) -> None:
         """
@@ -1796,7 +1797,7 @@ class Application(Container, IApplication):
                 ):
                     self.__storeProviderClass(attribute)
 
-    def __loadProviders(self) -> None:
+    def __loadProviders(self: Self) -> None:
         """
         Load and register all service providers.
 
@@ -1828,7 +1829,7 @@ class Application(Container, IApplication):
         # Load and register core framework providers.
         self.__loadCoreProviders()
 
-    def __resolveEagerProvider(self) -> None:
+    def __resolveEagerProvider(self: Self) -> None:
         """
         Resolve and register all eager service providers.
 
@@ -1868,7 +1869,7 @@ class Application(Container, IApplication):
             # Add to resolved providers cache to prevent duplicate resolution
             self.__cache_resolved_providers.add(full_path_provider)
 
-    async def __bootEagerProviders(self) -> None:
+    async def __bootEagerProviders(self: Self) -> None:
         """
         Boot all pending eager service providers.
 
@@ -1894,7 +1895,7 @@ class Application(Container, IApplication):
     # --- Routing Configuration and Validation ---
 
     def withRouting(
-        self,
+        self: Self,
         api: str | list[str] | None = None,
         web: str | list[str] | None = None,
         console: str | list[str] | None = None,
@@ -1993,7 +1994,7 @@ class Application(Container, IApplication):
         return self
 
     def __resolveAndValidateRoutingFiles(
-        self,
+        self: Self,
         paths: str | list[str] | None,
         required_imports: set[str],
         *,
@@ -2072,7 +2073,7 @@ class Application(Container, IApplication):
     # --- Exception Handler Configuration ---
 
     def withExceptionHandler(
-        self,
+        self: Self,
         handler: type[IBaseExceptionHandler],
     ) -> Self:
         """
@@ -2130,7 +2131,7 @@ class Application(Container, IApplication):
         return self
 
     async def getExceptionHandler(
-        self,
+        self: Self,
     ) -> IBaseExceptionHandler:
         """
         Retrieve the registered exception handler instance.
@@ -2170,7 +2171,7 @@ class Application(Container, IApplication):
     # --- Scheduler Configuration ---
 
     def withScheduler(
-        self,
+        self: Self,
         scheduler: type[IBaseScheduler],
     ) -> Self:
         """
@@ -2222,7 +2223,7 @@ class Application(Container, IApplication):
         return self
 
     async def getScheduler(
-        self,
+        self: Self,
     ) -> IBaseScheduler:
         """
         Retrieve the currently registered scheduler instance.
@@ -2254,7 +2255,7 @@ class Application(Container, IApplication):
     # --- Configuration Subsystem Setup Methods ---
 
     def withConfigApp(
-        self,
+        self: Self,
         **app_config: object,
     ) -> Self:
         """
@@ -2286,7 +2287,7 @@ class Application(Container, IApplication):
         return self
 
     def withConfigAuth(
-        self,
+        self: Self,
         **auth_config: object,
     ) -> Self:
         """
@@ -2317,7 +2318,7 @@ class Application(Container, IApplication):
         # Return the application instance for method chaining
         return self
 
-    def withConfigMcp(self, **mcp_config: object) -> Self:
+    def withConfigMcp(self: Self, **mcp_config: object) -> Self:
         """Configure validated MCP limits and the explicit Origin allowlist.
 
         Parameters
@@ -2337,7 +2338,7 @@ class Application(Container, IApplication):
         return self
 
     def withConfigCache(
-        self,
+        self: Self,
         **cache_config: object,
     ) -> Self:
         """
@@ -2369,7 +2370,7 @@ class Application(Container, IApplication):
         return self
 
     def withConfigHttp(
-        self,
+        self: Self,
         **http_config: object,
     ) -> Self:
         """
@@ -2401,7 +2402,7 @@ class Application(Container, IApplication):
         return self
 
     def withConfigDatabase(
-        self,
+        self: Self,
         **database_config: object,
     ) -> Self:
         """
@@ -2433,7 +2434,7 @@ class Application(Container, IApplication):
         return self
 
     def withConfigFilesystems(
-        self,
+        self: Self,
         **filesystems_config: object,
     ) -> Self:
         """
@@ -2465,7 +2466,7 @@ class Application(Container, IApplication):
         return self
 
     def withConfigLogging(
-        self,
+        self: Self,
         **logging_config: object,
     ) -> Self:
         """
@@ -2497,7 +2498,7 @@ class Application(Container, IApplication):
         return self
 
     def withConfigMail(
-        self,
+        self: Self,
         **mail_config: object,
     ) -> Self:
         """
@@ -2529,7 +2530,7 @@ class Application(Container, IApplication):
         return self
 
     def withConfigQueue(
-        self,
+        self: Self,
         **queue_config: object,
     ) -> Self:
         """
@@ -2561,7 +2562,7 @@ class Application(Container, IApplication):
         return self
 
     def withConfigSession(
-        self,
+        self: Self,
         **session_config: object,
     ) -> Self:
         """
@@ -2593,7 +2594,7 @@ class Application(Container, IApplication):
         return self
 
     def withConfigTesting(
-        self,
+        self: Self,
         **testing_config: object,
     ) -> Self:
         """
@@ -2625,7 +2626,7 @@ class Application(Container, IApplication):
         return self
 
     def withConfigPaths(
-        self,
+        self: Self,
         **paths: str | Path | None,
     ) -> Self:
         """
@@ -2676,7 +2677,7 @@ class Application(Container, IApplication):
     # --- Configuration Loading Methods ---
 
     def __loadCustomConfig(
-        self,
+        self: Self,
         default_config: dict[str, Any],
         custom_config: dict[str, Any],
         dataclasses: set[tuple[str, str, str, type[Any]]] | None = None,
@@ -2746,7 +2747,7 @@ class Application(Container, IApplication):
         # Return merged configuration dictionary
         return default_config
 
-    def __loadConfig(self) -> None:
+    def __loadConfig(self: Self) -> None:
         """
         Load and merge the final configuration from dataclasses and custom config.
 
@@ -2787,7 +2788,7 @@ class Application(Container, IApplication):
         self.__bootstrap["config"] = final_config
 
     def __commitConfig(
-        self,
+        self: Self,
     ) -> None:
         """
         Lock configuration and mark application as initialized.
@@ -2809,7 +2810,7 @@ class Application(Container, IApplication):
 
     # --- Bootstrap Application Methods ---
 
-    def __setTimezoneAndLocale(self) -> None:
+    def __setTimezoneAndLocale(self: Self) -> None:
         """
         Apply the configured timezone and locale to dates and the environment.
 
@@ -2828,6 +2829,7 @@ class Application(Container, IApplication):
 
         # Load local date-time configuration for the application
         from orionis.support.facades import DateTime
+
         DateTime._loadConfig(timezone_name=tz, locale=lc)
 
         # Update environment variables only for values that are set
@@ -2846,7 +2848,7 @@ class Application(Container, IApplication):
             with suppress(locale.Error):
                 locale.setlocale(locale.LC_ALL, lc)
 
-    def __load(self) -> None:
+    def __load(self: Self) -> None:
         """
         Load and initialize application configuration and service providers.
 
@@ -2862,7 +2864,6 @@ class Application(Container, IApplication):
         """
         # Skip loading if already cached
         if not self.__is_compiled:
-
             # Ensure bootstrap configuration is initialized
             self.__ensureDefaultBootstrap()
 
@@ -2888,7 +2889,7 @@ class Application(Container, IApplication):
         # Register and boot all service providers.
         self.__resolveEagerProvider()
 
-    def create(self) -> Self:
+    def create(self: Self) -> Self:
         """
         Bootstrap and initialize the application framework.
 
@@ -2902,7 +2903,6 @@ class Application(Container, IApplication):
         """
         # Prevent duplicate initialization if already booted
         if not self.__booted:
-
             # Store the file path where the application was started.
             try:
                 self.__entry_point = sys._getframe(1).f_code.co_filename
@@ -2938,7 +2938,7 @@ class Application(Container, IApplication):
         # Return the application instance for method chaining
         return self
 
-    async def boot(self) -> Self:
+    async def boot(self: Self) -> Self:
         """Create the application and await eager providers for headless use.
 
         Repeated and concurrent calls share provider startup coordination.
@@ -2962,7 +2962,7 @@ class Application(Container, IApplication):
     # --- Runtime Configuration Access Methods ---
 
     def config(
-        self,
+        self: Self,
         key: str | None = None,
         value: object = _SENTINEL,
     ) -> object:
@@ -2992,7 +2992,8 @@ class Application(Container, IApplication):
         """
         # Ensure configuration is initialized before accessing or modifying it
         if not self.__configured:
-            raise RuntimeError(_ERR_NOT_CONFIGURED)
+            error_msg = _ERR_NOT_CONFIGURED
+            raise RuntimeError(error_msg)
 
         # Initialize runtime configuration from bootstrap on first access
         if not self.__runtime_config_initialized:
@@ -3016,7 +3017,7 @@ class Application(Container, IApplication):
         # Otherwise, set the configuration value and return it
         return self.__setRuntimeConfigValue(key_parts, value)
 
-    def resetRuntimeConfig(self) -> bool:
+    def resetRuntimeConfig(self: Self) -> bool:
         """
         Reset the runtime configuration to a mutable copy of the bootstrap config.
 
@@ -3042,7 +3043,7 @@ class Application(Container, IApplication):
         return True
 
     def __getRuntimeConfigValue(
-        self,
+        self: Self,
         key_parts: tuple[str, ...],
     ) -> object:
         """
@@ -3067,7 +3068,7 @@ class Application(Container, IApplication):
         return cfg
 
     def __setRuntimeConfigValue(
-        self,
+        self: Self,
         key_parts: tuple[str, ...],
         value: object,
     ) -> object:
@@ -3104,7 +3105,7 @@ class Application(Container, IApplication):
     # --- Application Path Access Method ---
 
     def path(
-        self,
+        self: Self,
         key: str | None = None,
     ) -> Path | Mapping[str, Path] | None:
         """
@@ -3130,7 +3131,8 @@ class Application(Container, IApplication):
         """
         # Ensure configuration is initialized before accessing paths
         if not self.__configured:
-            raise RuntimeError(_ERR_NOT_CONFIGURED)
+            error_msg = _ERR_NOT_CONFIGURED
+            raise RuntimeError(error_msg)
 
         # Retrieve the paths configuration from bootstrap
         paths: dict = self.__bootstrap.get("paths", {})
@@ -3150,7 +3152,7 @@ class Application(Container, IApplication):
         return paths.get(key)
 
     def routingPaths(
-        self,
+        self: Self,
         key: str | None = None,
     ) -> list[Path] | dict | None:
         """
@@ -3211,7 +3213,7 @@ class Application(Container, IApplication):
 
     # --- Environment Check Methods ---
 
-    def isProduction(self) -> bool:
+    def isProduction(self: Self) -> bool:
         """
         Determine if the application is running in a production environment.
 
@@ -3230,11 +3232,12 @@ class Application(Container, IApplication):
         """
         # Guard against access before application bootstrap is complete
         if not self.__booted:
-            raise RuntimeError(_ERR_NOT_CONFIGURED)
+            error_msg = _ERR_NOT_CONFIGURED
+            raise RuntimeError(error_msg)
         # Return pre-computed production environment flag cached at boot time
         return self.__is_production_cache
 
-    def isDebug(self) -> bool:
+    def isDebug(self: Self) -> bool:
         """
         Determine if the application is running in debug mode.
 
@@ -3250,11 +3253,12 @@ class Application(Container, IApplication):
         """
         # Guard against access before application bootstrap is complete
         if not self.__booted:
-            raise RuntimeError(_ERR_NOT_CONFIGURED)
+            error_msg = _ERR_NOT_CONFIGURED
+            raise RuntimeError(error_msg)
         # Return pre-computed debug mode flag cached at boot time
         return self.__is_debug_cache
 
-    def underMaintenance(self) -> bool:
+    def underMaintenance(self: Self) -> bool:
         """
         Determine if the application is currently in maintenance mode.
 
@@ -3274,7 +3278,8 @@ class Application(Container, IApplication):
         """
         # Guard against access before application bootstrap is complete
         if not self.__booted:
-            raise RuntimeError(_ERR_NOT_CONFIGURED)
+            error_msg = _ERR_NOT_CONFIGURED
+            raise RuntimeError(error_msg)
 
         cached = self.__maintenance_cache
         if time.monotonic_ns() < cached[0]:
@@ -3291,7 +3296,7 @@ class Application(Container, IApplication):
                 state = marker.read_text(encoding="utf-8").strip().lower()
             except FileNotFoundError:
                 maintenance = self.config("app.maintenance") is True
-            except (OSError, UnicodeError):
+            except OSError, UnicodeError:
                 maintenance = True
             else:
                 if state == "down":

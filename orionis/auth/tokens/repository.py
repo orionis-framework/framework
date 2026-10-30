@@ -1,5 +1,5 @@
 from datetime import UTC, datetime, timedelta
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Self
 import msgspec
 from orionis.auth.concerns.functions import authorizable_key
 from orionis.auth.contracts.token_repository import IAccessTokenRepository
@@ -46,7 +46,7 @@ class AccessTokenRepository(IAccessTokenRepository):
 
     __slots__ = ("__db", "__expiration", "__secret_bytes", "__table")
 
-    def __init__(self, app: IApplication, db: IQueryBuilder) -> None:
+    def __init__(self: Self, app: IApplication, db: IQueryBuilder) -> None:
         """
         Initialise the repository from the token configuration.
 
@@ -70,7 +70,7 @@ class AccessTokenRepository(IAccessTokenRepository):
         )
 
     async def create(
-        self,
+        self: Self,
         tokenable: IAuthorizable,
         name: str,
         *,
@@ -123,18 +123,20 @@ class AccessTokenRepository(IAccessTokenRepository):
         granted = _normalize_abilities(abilities)
         tokenable_type, tokenable_id = authorizable_key(tokenable)
 
-        result = await self.__db.table(self.__table).insert({
-            "tokenable_type": tokenable_type,
-            "tokenable_id": tokenable_id,
-            "name": name,
-            _TOKEN_COLUMN: digest,
-            "abilities": _encode_abilities(granted),
-            "expires_at": deadline,
-            "last_used_at": None,
-            "revoked_at": None,
-            "created_at": issued_at,
-            "updated_at": issued_at,
-        })
+        result = await self.__db.table(self.__table).insert(
+            {
+                "tokenable_type": tokenable_type,
+                "tokenable_id": tokenable_id,
+                "name": name,
+                _TOKEN_COLUMN: digest,
+                "abilities": _encode_abilities(granted),
+                "expires_at": deadline,
+                "last_used_at": None,
+                "revoked_at": None,
+                "created_at": issued_at,
+                "updated_at": issued_at,
+            },
+        )
 
         token_id = result.last_insert_id
         if token_id is None:
@@ -160,7 +162,7 @@ class AccessTokenRepository(IAccessTokenRepository):
         )
         return NewAccessToken(access_token=access_token, plain_text=plain_text)
 
-    async def findByPlainText(self, plain_text: str) -> AccessToken | None:
+    async def findByPlainText(self: Self, plain_text: str) -> AccessToken | None:
         """
         Resolve a token from the value presented by the client.
 
@@ -190,6 +192,62 @@ class AccessTokenRepository(IAccessTokenRepository):
         if row is None:
             return None
 
+        return self._fromRow(row)
+
+    async def findWithIdentity(
+        self: Self,
+        plain_text: str,
+        identities: object,
+    ) -> object:
+        """
+        Combine native ORM reads, or opt out for custom implementations.
+
+        Parameters
+        ----------
+        plain_text : str
+            Presented credential, hashed before constructing the query.
+        identities : object
+            Identity provider whose lookup semantics must be preserved.
+
+        Returns
+        -------
+        object
+            (token, identity), None for no match, or NotImplemented for fallback.
+        """
+        from orionis.auth.tokens.lookup import lookup_owner  # noqa: PLC0415
+
+        if type(self).findByPlainText is not AccessTokenRepository.findByPlainText:
+            return NotImplemented
+        if (
+            not isinstance(plain_text, str)
+            or not plain_text
+            or len(plain_text) > _MAX_TOKEN_LENGTH
+        ):
+            return None
+        return await lookup_owner(
+            self.__db.table(self.__table)
+            .where(_TOKEN_COLUMN, hash_token_secret(plain_text))
+            .whereNull("revoked_at")
+            .where(_unexpired_tokens),
+            identities,
+            self._fromRow,
+        )
+
+    @staticmethod
+    def _fromRow(row: dict) -> AccessToken | None:
+        """
+        Validate stored metadata equally for separate and combined reads.
+
+        Parameters
+        ----------
+        row : dict
+            Stored token metadata returned by the database.
+
+        Returns
+        -------
+        AccessToken | None
+            Validated token, or None for invalid, revoked or expired metadata.
+        """
         # A revoked token is treated exactly like an unknown one.
         if row.get("revoked_at") is not None:
             return None
@@ -215,7 +273,7 @@ class AccessTokenRepository(IAccessTokenRepository):
             last_used_at=last_used_at,
         )
 
-    async def touch(self, token_id: object) -> bool:
+    async def touch(self: Self, token_id: object) -> bool:
         """
         Confirm token validity and record its use atomically.
 
@@ -242,7 +300,7 @@ class AccessTokenRepository(IAccessTokenRepository):
         )
         return affected > 0
 
-    async def revoke(self, token_id: object) -> bool:
+    async def revoke(self: Self, token_id: object) -> bool:
         """
         Revoke a single token.
 
@@ -268,7 +326,7 @@ class AccessTokenRepository(IAccessTokenRepository):
         )
         return affected > 0
 
-    async def revokeAll(self, tokenable: IAuthorizable) -> int:
+    async def revokeAll(self: Self, tokenable: IAuthorizable) -> int:
         """
         Revoke every active token of an identity.
 
@@ -292,7 +350,7 @@ class AccessTokenRepository(IAccessTokenRepository):
             .update({"revoked_at": now, "updated_at": now})
         )
 
-    async def purgeExpired(self) -> int:
+    async def purgeExpired(self: Self) -> int:
         """
         Delete tokens that expired or were revoked.
 
@@ -309,9 +367,7 @@ class AccessTokenRepository(IAccessTokenRepository):
             .delete()
         )
         revoked = await (
-            self.__db.table(self.__table)
-            .whereNotNull("revoked_at")
-            .delete()
+            self.__db.table(self.__table).whereNotNull("revoked_at").delete()
         )
         return expired + revoked
 

@@ -9,3 +9,7 @@ Organize resources by locale, choose a fallback, and pass a locale explicitly wh
 Isolated examples use minimal application objects; facades require an initialized Orionis application and its providers. Source and contracts determine the documented capabilities.
 
 Related: [view](../../../view/docs/en/README.md) · [foundation](../../../foundation/docs/en/README.md)
+
+## Bounded execution and performance
+
+`TranslationRepository(loader, max_locales=256, negative_ttl=30)` bounds both successful and missing locale maps. LRU eviction releases the oldest unused map; empty maps are retried after 30 seconds by default. Hits refresh recency. `forget`, `flush` and existing reload APIs still invalidate explicitly. Positive maps do not watch files; preload required locales during bootstrap because loading remains synchronous.

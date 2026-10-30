@@ -3,12 +3,29 @@ from dataclasses import dataclass, field
 from datetime import time
 from orionis.environment import Env
 from orionis.foundation.config.logging import (
-    Channels, Chunked, Daily, Hourly, Level, Logging,
-    Monthly, Stack, Weekly,
+    Channels,
+    Chunked,
+    Daily,
+    Hourly,
+    Level,
+    Logging,
+    Monthly,
+    Stack,
+    Weekly,
 )
 
 @dataclass(frozen=True, kw_only=True)
 class BootstrapLogging(Logging):
+
+    # ----------------------------------------------------------------------------------
+    # queue_capacity : int, optional
+    # --- The capacity of the logging queue.
+    # --- Zero keeps synchronous logging. A positive capacity enables a bounded
+    # --- queue per handler; overflow raises queue.Full and shutdown drains records.
+    # ----------------------------------------------------------------------------------
+    queue_capacity: int = field(
+        default_factory=lambda: Env.get("LOG_QUEUE_CAPACITY", 0),
+    )
 
     # ----------------------------------------------------------------------------------
     # default : str, optional

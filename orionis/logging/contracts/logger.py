@@ -1,15 +1,28 @@
 from __future__ import annotations
+import asyncio
 from abc import ABC, abstractmethod
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Self
+from orionis.support.concurrency import complete_on_cancel
 
 if TYPE_CHECKING:
     import logging
 
 class ILogger(ABC):
 
+    async def aclose(self: Self) -> None:
+        """
+        Drain and close the logger without blocking the application event loop.
+
+        Returns
+        -------
+        None
+            Complete the operation without returning a value.
+        """
+        await complete_on_cancel(asyncio.to_thread(self.close))
+
     @property
     @abstractmethod
-    def name(self) -> str:
+    def name(self: Self) -> str:
         """
         Return the name of the logger service.
 
@@ -20,7 +33,7 @@ class ILogger(ABC):
         """
 
     @abstractmethod
-    def info(self, message: str) -> None:
+    def info(self: Self, message: str) -> None:
         """
         Log an informational message.
 
@@ -36,7 +49,7 @@ class ILogger(ABC):
         """
 
     @abstractmethod
-    def error(self, message: str) -> None:
+    def error(self: Self, message: str) -> None:
         """
         Log an error message.
 
@@ -52,7 +65,7 @@ class ILogger(ABC):
         """
 
     @abstractmethod
-    def warning(self, message: str) -> None:
+    def warning(self: Self, message: str) -> None:
         """
         Log a warning message.
 
@@ -68,7 +81,7 @@ class ILogger(ABC):
         """
 
     @abstractmethod
-    def debug(self, message: str) -> None:
+    def debug(self: Self, message: str) -> None:
         """
         Log a debug message.
 
@@ -84,7 +97,7 @@ class ILogger(ABC):
         """
 
     @abstractmethod
-    def critical(self, message: str) -> None:
+    def critical(self: Self, message: str) -> None:
         """
         Log a critical message.
 
@@ -100,7 +113,7 @@ class ILogger(ABC):
         """
 
     @abstractmethod
-    def getLogger(self) -> logging.Logger:
+    def getLogger(self: Self) -> logging.Logger:
         """
         Return the internal logger instance for advanced usage.
 
@@ -116,7 +129,7 @@ class ILogger(ABC):
         """
 
     @abstractmethod
-    def reloadConfiguration(self) -> None:
+    def reloadConfiguration(self: Self) -> None:
         """
         Reload the logger configuration from the application.
 
@@ -130,7 +143,7 @@ class ILogger(ABC):
         """
 
     @abstractmethod
-    def switchChannel(self, channel_name: str) -> bool:
+    def switchChannel(self: Self, channel_name: str) -> bool:
         """
         Switch to a different logging channel.
 
@@ -150,7 +163,7 @@ class ILogger(ABC):
         """
 
     @abstractmethod
-    def close(self) -> None:
+    def close(self: Self) -> None:
         """
         Close all handlers and release logger resources.
 
@@ -164,7 +177,7 @@ class ILogger(ABC):
         """
 
     @abstractmethod
-    def getActiveChannels(self) -> list[str]:
+    def getActiveChannels(self: Self) -> list[str]:
         """
         Return the names of active logging channels.
 
@@ -175,7 +188,7 @@ class ILogger(ABC):
         """
 
     @abstractmethod
-    def getActiveChannel(self) -> str | None:
+    def getActiveChannel(self: Self) -> str | None:
         """
         Return the name of the currently active logging channel.
 
@@ -186,7 +199,7 @@ class ILogger(ABC):
         """
 
     @abstractmethod
-    def getAvailableChannels(self) -> list[str]:
+    def getAvailableChannels(self: Self) -> list[str]:
         """
         Return all available logging channels from configuration.
 

@@ -181,7 +181,7 @@ Autenticación, registro, password reset, seeders y modelos pueden usar fachada 
 
 ## Rendimiento y concurrencia
 
-Cada `make` y `check` usa `asyncio.to_thread`, liberando event loop pero consumiendo su pool. Argon2 consume memoria y lanes configurados; limita concurrencia de login/registro según capacidad.
+Cada `make` y `check` usa el ejecutor dedicado de hashing, con dos llamadas activas y 14 pendientes por defecto, sin ocupar el pool predeterminado del loop. La saturación lanza `WorkQueueFullError`. Argon2 conserva sus costes de memoria y paralelismo; dimensiona un ejecutor propio según la capacidad del host.
 
 Managers cachean drivers y drivers cachean clase/instancia backend. No hay locks en primer fill: hilos nativos pueden crear equivalentes y gana última escritura. Tasks del loop no ven construcción síncrona parcial. Setters mutan estado compartido y no deben competir con requests.
 

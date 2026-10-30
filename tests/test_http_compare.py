@@ -504,6 +504,13 @@ class TestLoadGenerator(unittest.TestCase):
 class TestBenchmarkRunner(unittest.TestCase):
     """Verify equal server settings, warmup isolation, and worker cleanup."""
 
+    def test_help_omits_internal_options(self) -> None:
+        """Hide internal options without changing their accepted values."""
+        parser = compare_run.build_parser()
+        self.assertNotIn("warmup", parser.format_help().lower())
+        self.assertEqual(parser.parse_args([]).warmup, 2)
+        self.assertEqual(parser.parse_args(["--warmup", "0.5"]).warmup, 0.5)
+
     def test_frameworks_use_their_assigned_servers(self) -> None:
         """
         Verify native servers and matching settings for every framework.
@@ -1111,7 +1118,14 @@ class TestBenchmarkRunner(unittest.TestCase):
 
     def test_main_keeps_failure_reports_for_all_exit_paths(self) -> None:
         """Verify setup errors, interruptions and unsupported cases remain failures."""
-        for scenario in ("setup", "setup-empty", "interrupt", "unsupported"):
+        failure_message = "Warmup failed during preparation"
+        for scenario, setup_error, benchmark_error in (
+            ("setup", RuntimeError(failure_message), None),
+            ("setup-empty", RuntimeError(""), None),
+            ("case", None, RuntimeError(failure_message)),
+            ("interrupt", None, KeyboardInterrupt),
+            ("unsupported", None, None),
+        ):
             with self.subTest(scenario=scenario), TemporaryDirectory() as temporary:
                 output = Path(temporary) / "results"
                 with (
@@ -1123,18 +1137,15 @@ class TestBenchmarkRunner(unittest.TestCase):
                     patch.object(
                         compare_run, "resolve_oha",
                         return_value=Path(temporary) / "oha",
-                        side_effect=RuntimeError(
-                            "oha setup failed" if scenario == "setup" else "",
-                        ) if scenario.startswith("setup") else None,
+                        side_effect=setup_error,
                     ),
                     patch.object(
                         compare_run, "benchmark_case",
-                        side_effect=KeyboardInterrupt if scenario == "interrupt"
-                        else None,
+                        side_effect=benchmark_error,
                     ) as benchmark,
                     patch.dict(os.environ, {"GITHUB_STEP_SUMMARY": ""}),
-                    redirect_stdout(StringIO()),
-                    redirect_stderr(StringIO()),
+                    redirect_stdout(StringIO()) as stdout,
+                    redirect_stderr(StringIO()) as stderr,
                 ):
                     exit_code = compare_run.main([
                         "--workers", "2" if scenario == "unsupported" else "1",
@@ -1151,12 +1162,14 @@ class TestBenchmarkRunner(unittest.TestCase):
                 self.assertEqual(exit_code, 1)
                 self.assertEqual(list(output.glob("throughput-*.svg")), [])
                 self.assertTrue((output / "commands.json").is_file())
+                public_output = stdout.getvalue() + stderr.getvalue()
+                self.assertNotIn("warmup", public_output.lower())
+                self.assertNotIn("preparation", public_output.lower())
+                if scenario.startswith("setup") or scenario == "case":
+                    self.assertIn("diagnostics.json", stderr.getvalue())
                 if scenario.startswith("setup"):
                     benchmark.assert_not_called()
-                    self.assertEqual(
-                        diagnostics["error"],
-                        "oha setup failed" if scenario == "setup" else "",
-                    )
+                    self.assertEqual(diagnostics["error"], str(setup_error))
                     self.assertIn("diagnostics.json", report["error"])
                     self.assertEqual(report["results"], [])
                 else:
@@ -1170,7 +1183,8 @@ class TestBenchmarkRunner(unittest.TestCase):
                     else:
                         self.assertEqual(
                             diagnostics["results"][0]["reason"],
-                            "Interrupted by user",
+                            failure_message if scenario == "case"
+                            else "Interrupted by user",
                         )
 
     def test_windows_preserves_single_worker_comparisons(self) -> None:

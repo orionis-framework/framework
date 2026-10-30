@@ -24,6 +24,7 @@ from typing import Any
 import psutil
 from benchmarks.http_compare.client import OHA_VERSION, install_oha, parse_measurement
 from benchmarks.http_compare.report import (
+    FAILED_COMPARISON,
     METRICS,
     aggregate_samples,
     render_throughput_svg,
@@ -114,7 +115,7 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--duration", type=positive_number, default=10)
     parser.add_argument(
         "--warmup", type=positive_number, default=2,
-        help="Warmup duration in seconds for Orionis only",
+        help=argparse.SUPPRESS,
     )
     parser.add_argument("--connections", type=positive_integer, default=100)
     parser.add_argument("--repetitions", type=positive_integer, default=3)
@@ -581,7 +582,7 @@ def _run_matrix(
                 for metric in METRICS:
                     row.pop(metric, None)
                 print(
-                    f"FAILED: {name}, {workers} workers: {error}",
+                    f"FAILED: {name}, {workers} workers. {FAILED_COMPARISON}",
                     file=sys.stderr,
                     flush=True,
                 )
@@ -638,7 +639,7 @@ def main(argv: list[str] | None = None) -> int:
             _run_matrix(args, oha, output, report, commands)
     except BENCHMARK_ERRORS as error:
         report["error"] = str(error)
-        print(f"Benchmark setup failed: {error}", file=sys.stderr, flush=True)
+        print(FAILED_COMPARISON, file=sys.stderr, flush=True)
     except KeyboardInterrupt:
         report["error"] = "Interrupted by user"
         for row in report["results"]:

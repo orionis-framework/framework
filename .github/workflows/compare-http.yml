@@ -46,7 +46,6 @@ jobs:
           uv run --no-sync python -B -m benchmarks.http_compare.run
           --workers 1 2 3 4
           --connections 100
-          --warmup 2
           --duration 10
           --repetitions 3
           --seed 42

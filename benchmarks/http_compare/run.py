@@ -35,10 +35,12 @@ from benchmarks.http_compare.report import (
 # ruff: noqa: S603, T201
 
 REPO = Path(__file__).resolve().parents[2]
-GRANIAN_VERSION = "2.8.4"
+SERVER_VERSIONS = {"granian": "2.8.4", "uvicorn": "0.54.0"}
 STARTUP_TIMEOUT = 60
 HTTP_1_1 = 11
-WINDOWS_LIMIT = "Granian cannot run multiple workers on Windows; use --workers 1."
+WINDOWS_LIMIT = (
+    "Multi-worker HTTP comparisons are unsupported on Windows; use --workers 1."
+)
 PROCESS_FLAGS = subprocess.CREATE_NO_WINDOW if sys.platform == "win32" else 0
 BENCHMARK_ERRORS = (
     OSError,
@@ -62,6 +64,11 @@ class Framework:
     def target(self) -> str:
         """Return the factory target without importing optional frameworks."""
         return f"benchmarks.http_compare.apps.{self.module}:create_application"
+
+    @property
+    def server(self) -> str:
+        """Use Granian for Orionis and Uvicorn for the other frameworks."""
+        return "granian" if self.module == "orionis" else "uvicorn"
 
     @property
     def requires_warmup(self) -> bool:
@@ -148,7 +155,7 @@ def _git(*arguments: str) -> str:
 def collect_environment() -> dict[str, Any]:
     """Collect runtime, hardware, dependencies and source provenance."""
     versions = {}
-    for package in ("orionis", "granian", "fastapi", "litestar", "starlette"):
+    for package in ("orionis", *SERVER_VERSIONS, "fastapi", "litestar", "starlette"):
         try:
             versions[package] = metadata.version(package)
         except metadata.PackageNotFoundError:
@@ -201,28 +208,50 @@ def collect_environment() -> dict[str, Any]:
         ),
     }
 
+def check_server_versions(frameworks: list[str], versions: dict[str, str]) -> None:
+    """Require the pinned versions of the servers selected for this run."""
+    for server in dict.fromkeys(FRAMEWORKS[name].server for name in frameworks):
+        version = SERVER_VERSIONS[server]
+        if versions[server] != version:
+            error_msg = (
+                f"{server.capitalize()} {version} required; "
+                "run uv sync --locked --group benchmark"
+            )
+            raise RuntimeError(error_msg)
+
 def server_command(framework: Framework, workers: int, port: int) -> list[str]:
-    """Build a Granian command using shared server settings."""
-    return [
-        sys.executable, "-B", "-m", "granian",
+    """Build the assigned server command with matching HTTP and load settings."""
+    command = [
+        sys.executable, "-B", "-m", framework.server,
         framework.target,
         "--factory",
-        "--interface", framework.interface,
-        "--http", "1",
         "--host", "127.0.0.1",
         "--port", str(port),
         "--workers", str(workers),
-        "--runtime-threads", "1",
         "--loop", "asyncio",
-        "--task-impl", "asyncio",
-        "--http1-keep-alive",
-        "--no-ws",
         "--no-access-log",
         "--log-level", "info",
-        "--no-reload",
-        "--no-respawn-failed-workers",
-        "--no-metrics",
     ]
+    if framework.server == "granian":
+        command.extend([
+            "--interface", framework.interface,
+            "--http", "1",
+            "--runtime-threads", "1",
+            "--task-impl", "asyncio",
+            "--http1-keep-alive",
+            "--no-ws",
+            "--no-reload",
+            "--no-respawn-failed-workers",
+            "--no-metrics",
+        ])
+    else:
+        command.extend([
+            "--http", "h11",
+            "--ws", "none",
+            "--lifespan", "on",
+            "--no-use-colors",
+        ])
+    return command
 
 def track_children(
     process: subprocess.Popen[bytes], known: dict[int, psutil.Process],
@@ -272,19 +301,21 @@ def check_workers(
     process: subprocess.Popen[bytes], worker_pids: set[int],
     known: dict[int, psutil.Process],
 ) -> None:
-    """Require every worker announced by Granian to remain alive and owned."""
+    """Require every worker announced by the server to remain alive and owned."""
     track_children(process, known)
     if process.poll() is not None:
-        error_msg = f"Granian exited with code {process.returncode}; see server log"
+        error_msg = f"Server exited with code {process.returncode}; see server log"
         raise RuntimeError(error_msg)
     if not worker_pids:
-        error_msg = "Granian has not announced any started workers"
+        error_msg = "Server has not announced any started workers"
         raise RuntimeError(error_msg)
     for pid in worker_pids:
         worker = known.get(pid)
         alive = False
-        if worker is not None:
-            with suppress(psutil.NoSuchProcess):
+        with suppress(psutil.NoSuchProcess):
+            if pid == process.pid:
+                worker = psutil.Process(pid)
+            if worker is not None:
                 alive = worker.is_running() and worker.status() != psutil.STATUS_ZOMBIE
         if not alive:
             error_msg = (
@@ -314,34 +345,46 @@ def _probe_response(
         error_msg = "Endpoint did not preserve HTTP/1.1 keep-alive"
         raise RuntimeError(error_msg)
 
+def started_workers(events: str, framework: Framework) -> set[int]:
+    """Read native worker PIDs only after their application startup completes."""
+    if framework.server == "uvicorn":
+        pids = {
+            int(pid)
+            for pid in re.findall(r"Started server process \[(\d+)\]\r?\n", events)
+        }
+        completed = re.findall(r"Application startup complete\.\r?\n", events)
+        return pids if len(completed) == len(pids) else set()
+    started = set(re.findall(r"Started worker-(\d+)\r?\n", events))
+    return {
+        int(pid)
+        for index, pid in re.findall(
+            r"Spawning worker-(\d+) with PID: (\d+)\r?\n", events,
+        )
+        if index in started
+    }
+
 def wait_until_ready(  # noqa: PLR0913
     process: subprocess.Popen[bytes], port: int, log_path: Path, workers: int,
-    known: dict[int, psutil.Process], *, warmup: bool,
+    known: dict[int, psutil.Process], *, framework: Framework,
 ) -> set[int]:
-    """Wait for native Granian startup, probing HTTP only for Orionis."""
+    """Wait for native server startup, probing HTTP only for Orionis."""
     deadline = time.monotonic() + STARTUP_TIMEOUT
     while time.monotonic() < deadline:
         track_children(process, known)
         if process.poll() is not None:
             error_msg = (
-                f"Granian exited with code {process.returncode}; see server log"
+                f"{framework.server.capitalize()} exited with code "
+                f"{process.returncode}; see server log"
             )
             raise RuntimeError(error_msg)
         events = log_path.read_text(encoding="utf-8")
-        started = set(re.findall(r"Started worker-(\d+)\r?\n", events))
-        worker_pids = {
-            int(pid)
-            for index, pid in re.findall(
-                r"Spawning worker-(\d+) with PID: (\d+)\r?\n", events,
-            )
-            if index in started
-        }
+        worker_pids = started_workers(events, framework)
         if len(worker_pids) != workers:
             time.sleep(0.1)
             continue
         check_workers(process, worker_pids, known)
         try:
-            if warmup:
+            if framework.requires_warmup:
                 connection = http.client.HTTPConnection(
                     "127.0.0.1", port, timeout=1,
                 )
@@ -359,7 +402,7 @@ def wait_until_ready(  # noqa: PLR0913
             pass
         time.sleep(0.1)
     error_msg = (
-        f"Granian did not start {workers} ready workers within "
+        f"{framework.server.capitalize()} did not start {workers} ready workers within "
         f"{STARTUP_TIMEOUT}s; see server log"
     )
     raise TimeoutError(error_msg)
@@ -428,7 +471,7 @@ def benchmark_case(  # noqa: PLR0913
         environment = {
             key: value
             for key, value in os.environ.items()
-            if not key.startswith("GRANIAN_")
+            if not key.startswith(("GRANIAN_", "UVICORN_"))
         }
         environment.update(
             PYTHONPATH=str(REPO),
@@ -455,7 +498,7 @@ def benchmark_case(  # noqa: PLR0913
             try:
                 worker_pids = wait_until_ready(
                     process, port, log_path, workers, known,
-                    warmup=framework.requires_warmup,
+                    framework=framework,
                 )
                 url = f"http://127.0.0.1:{port}/"
                 if framework.requires_warmup:
@@ -564,6 +607,7 @@ def main(argv: list[str] | None = None) -> int:
         "settings": {
             "workers": list(dict.fromkeys(args.workers)),
             "frameworks": frameworks,
+            "servers": {name: FRAMEWORKS[name].server for name in frameworks},
             "duration_seconds": args.duration,
             "warmup_seconds": args.warmup,
             "warmup_frameworks": [
@@ -578,7 +622,7 @@ def main(argv: list[str] | None = None) -> int:
             "runtime_threads": 1,
             "oha_worker_threads": 1,
             "wait_ongoing_requests": True,
-            "readiness": "native-granian-workers-and-tcp",
+            "readiness": "native-server-workers-and-tcp",
             "seed": args.seed,
         },
         "execution_order": [],
@@ -586,12 +630,7 @@ def main(argv: list[str] | None = None) -> int:
     }
     commands: list[dict[str, Any]] = []
     try:
-        if report["environment"]["versions"]["granian"] != GRANIAN_VERSION:
-            error_msg = (
-                f"Granian {GRANIAN_VERSION} required; "
-                "run uv sync --locked --group benchmark"
-            )
-            raise RuntimeError(error_msg)
+        check_server_versions(frameworks, report["environment"]["versions"])
         with TemporaryDirectory(prefix="http-compare-oha-") as temporary:
             oha = resolve_oha(args.oha, Path(temporary))
             report["environment"]["versions"]["oha"] = OHA_VERSION

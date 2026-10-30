@@ -78,14 +78,20 @@ def _probe_connection() -> Mock:
     return connection
 
 def _startup_log(
-    directory: Path, pids: list[int], *, started: bool = True,
+    directory: Path, pids: list[int], *,
+    server: str = "granian", started: bool = True,
 ) -> Path:
-    """Write the native Granian startup events used by readiness checks."""
+    """Write the native server startup events used by readiness checks."""
     events = []
     for index, pid in enumerate(pids, 1):
-        events.append(f"[INFO] Spawning worker-{index} with PID: {pid}\n")
-        if started:
-            events.append(f"[INFO] Started worker-{index}\n")
+        if server == "uvicorn":
+            events.append(f"INFO:     Started server process [{pid}]\n")
+            if started:
+                events.append("INFO:     Application startup complete.\n")
+        else:
+            events.append(f"[INFO] Spawning worker-{index} with PID: {pid}\n")
+            if started:
+                events.append(f"[INFO] Started worker-{index}\n")
     path = directory / "server.log"
     path.write_text("".join(events), encoding="utf-8")
     return path
@@ -116,7 +122,7 @@ def _chart_report() -> dict[str, Any]:
         "environment": {
             "python": "3.14.8", "commit": "abc123456",
             "recorded_at": "2026-10-15T16:00:00+00:00",
-            "versions": {"granian": "2.8.4"},
+            "versions": {"granian": "2.8.4", "uvicorn": "0.54.0"},
         },
         "results": [
             {
@@ -299,7 +305,10 @@ class TestOrionisApplication(unittest.TestCase):
             self.assertIs(result, app)
 
 @unittest.skipUnless(
-    all(find_spec(name) is not None for name in ("fastapi", "litestar", "starlette")),
+    all(
+        find_spec(name) is not None
+        for name in ("fastapi", "litestar", "starlette", "uvicorn")
+    ),
     "Install the benchmark dependency group to test the real applications",
 )
 class TestMinimalApplications(unittest.TestCase):
@@ -350,9 +359,17 @@ class TestMinimalApplications(unittest.TestCase):
             return sample
 
         args = Namespace(warmup=0.1, duration=0.1, connections=1, repetitions=1)
-        for framework in compare_run.FRAMEWORKS.values():
+        cases = [
+            (framework, workers)
+            for framework in compare_run.FRAMEWORKS.values()
+            for workers in (1, 2)
+            if workers == 1 or (
+                framework.server == "uvicorn" and compare_run.sys.platform != "win32"
+            )
+        ]
+        for framework, workers in cases:
             with (
-                self.subTest(framework=framework.name),
+                self.subTest(framework=framework.name, workers=workers),
                 TemporaryDirectory() as temporary,
             ):
                 output = Path(temporary)
@@ -366,7 +383,7 @@ class TestMinimalApplications(unittest.TestCase):
                     ) as stop,
                 ):
                     compare_run.benchmark_case(
-                        framework, 1, args, output / "unused-oha",
+                        framework, workers, args, output / "unused-oha",
                         output, [], row,
                     )
                 self.assertEqual(row["status"], "ok")
@@ -487,28 +504,43 @@ class TestLoadGenerator(unittest.TestCase):
 class TestBenchmarkRunner(unittest.TestCase):
     """Verify equal server settings, warmup isolation, and worker cleanup."""
 
-    def test_frameworks_share_server_settings(self) -> None:
+    def test_frameworks_use_their_assigned_servers(self) -> None:
         """
-        Verify equal server settings across framework configurations.
+        Verify native servers and matching settings for every framework.
 
         Returns
         -------
         None
             This test does not return a value.
         """
-        # Normalize only permitted differences before comparing full commands.
-        reference = compare_run.server_command(
-            compare_run.FRAMEWORKS["orionis-asgi"], 2, 8000,
-        )
+        servers = {
+            "orionis-rsgi": "granian", "orionis-asgi": "granian",
+            "fastapi": "uvicorn", "litestar": "uvicorn", "starlette": "uvicorn",
+        }
         for framework in compare_run.FRAMEWORKS.values():
             with self.subTest(framework=framework.name):
+                server = servers[framework.name]
                 command = compare_run.server_command(framework, 2, 8000)
-                self.assertEqual(command[4], framework.target)
-                interface_index = command.index("--interface") + 1
-                self.assertEqual(command[interface_index], framework.interface)
-                command[4] = reference[4]
-                command[interface_index] = reference[interface_index]
-                self.assertEqual(command, reference)
+                self.assertEqual(framework.server, server)
+                native_options = [
+                    "--interface", framework.interface,
+                    "--http", "1",
+                    "--runtime-threads", "1",
+                    "--task-impl", "asyncio",
+                    "--http1-keep-alive", "--no-ws", "--no-reload",
+                    "--no-respawn-failed-workers", "--no-metrics",
+                ] if server == "granian" else [
+                    "--http", "h11", "--ws", "none",
+                    "--lifespan", "on", "--no-use-colors",
+                ]
+                self.assertEqual(command, [
+                    compare_run.sys.executable, "-B", "-m", server,
+                    framework.target, "--factory",
+                    "--host", "127.0.0.1", "--port", "8000",
+                    "--workers", "2", "--loop", "asyncio",
+                    "--no-access-log", "--log-level", "info",
+                    *native_options,
+                ])
 
     def test_orionis_preparation_uses_only_two_root_requests(self) -> None:
         """Verify Orionis preparation uses the measured route, not a PID probe."""
@@ -529,7 +561,8 @@ class TestBenchmarkRunner(unittest.TestCase):
                     patch.object(compare_run.time, "sleep"),
                 ):
                     result = compare_run.wait_until_ready(
-                        process, 8000, log_path, workers, {}, warmup=True,
+                        process, 8000, log_path, workers, {},
+                        framework=compare_run.FRAMEWORKS["orionis-rsgi"],
                     )
 
                 self.assertEqual(result, set(pids))
@@ -554,7 +587,7 @@ class TestBenchmarkRunner(unittest.TestCase):
         for workers in range(1, 5):
             with self.subTest(workers=workers), TemporaryDirectory() as temporary:
                 pids = list(range(5678, 5678 + workers))
-                log_path = _startup_log(Path(temporary), pids)
+                log_path = _startup_log(Path(temporary), pids, server="uvicorn")
                 with (
                     patch.object(compare_run, "track_children"),
                     patch.object(compare_run, "check_workers") as check,
@@ -566,7 +599,8 @@ class TestBenchmarkRunner(unittest.TestCase):
                     ) as tcp,
                 ):
                     result = compare_run.wait_until_ready(
-                        process, 8000, log_path, workers, {}, warmup=False,
+                        process, 8000, log_path, workers, {},
+                        framework=compare_run.FRAMEWORKS["fastapi"],
                     )
 
                 self.assertEqual(result, set(pids))
@@ -589,7 +623,7 @@ class TestBenchmarkRunner(unittest.TestCase):
         process = Mock()
         process.poll.return_value = None
         with TemporaryDirectory() as temporary:
-            log_path = _startup_log(Path(temporary), [5678])
+            log_path = _startup_log(Path(temporary), [5678], server="uvicorn")
             with (
                 patch.object(compare_run, "track_children"),
                 patch.object(compare_run, "check_workers") as check,
@@ -602,7 +636,8 @@ class TestBenchmarkRunner(unittest.TestCase):
                 self.assertRaisesRegex(TimeoutError, "2 ready workers"),
             ):
                 compare_run.wait_until_ready(
-                    process, 8000, log_path, 2, {}, warmup=False,
+                    process, 8000, log_path, 2, {},
+                    framework=compare_run.FRAMEWORKS["fastapi"],
                 )
 
         check.assert_not_called()
@@ -631,10 +666,39 @@ class TestBenchmarkRunner(unittest.TestCase):
                 self.assertRaisesRegex(TimeoutError, "2 ready workers"),
             ):
                 compare_run.wait_until_ready(
-                    process, 8000, log_path, 2, {}, warmup=True,
+                    process, 8000, log_path, 2, {},
+                    framework=compare_run.FRAMEWORKS["orionis-rsgi"],
                 )
 
         connect.assert_not_called()
+
+    def test_uvicorn_waits_for_every_application_startup(self) -> None:
+        """Reject started processes until every Uvicorn app has finished startup."""
+        process = Mock()
+        process.poll.return_value = None
+        for completed in (0, 1):
+            with self.subTest(completed=completed), TemporaryDirectory() as temporary:
+                log_path = _startup_log(
+                    Path(temporary), [5678, 5679], server="uvicorn", started=False,
+                )
+                with log_path.open("a", encoding="utf-8") as log:
+                    log.write("INFO:     Application startup complete.\n" * completed)
+                with (
+                    patch.object(compare_run, "track_children"),
+                    patch.object(compare_run, "check_workers") as check,
+                    patch.object(compare_run.socket, "create_connection") as tcp,
+                    patch.object(compare_run.time, "sleep"),
+                    patch.object(
+                        compare_run.time, "monotonic", side_effect=[0, 0, 61],
+                    ),
+                    self.assertRaisesRegex(TimeoutError, "Uvicorn.*2 ready workers"),
+                ):
+                    compare_run.wait_until_ready(
+                        process, 8000, log_path, 2, {},
+                        framework=compare_run.FRAMEWORKS["fastapi"],
+                    )
+                check.assert_not_called()
+                tcp.assert_not_called()
 
     def test_readiness_rejects_an_unowned_native_worker(self) -> None:
         """Verify native startup events cannot admit a foreign process."""
@@ -650,7 +714,8 @@ class TestBenchmarkRunner(unittest.TestCase):
                 self.assertRaisesRegex(RuntimeError, "9999"),
             ):
                 compare_run.wait_until_ready(
-                    process, 8000, log_path, 1, {}, warmup=True,
+                    process, 8000, log_path, 1, {},
+                    framework=compare_run.FRAMEWORKS["orionis-rsgi"],
                 )
 
         connect.assert_not_called()
@@ -740,9 +805,12 @@ class TestBenchmarkRunner(unittest.TestCase):
                 (output / "logs").mkdir()
                 (output / "raw").mkdir()
                 with (
+                    patch.dict(os.environ, {
+                        "GRANIAN_PORT": "9000", "UVICORN_PORT": "9001",
+                    }),
                     patch.object(
                         compare_run.subprocess, "Popen", return_value=process,
-                    ),
+                    ) as start,
                     patch.object(compare_run, "wait_until_ready") as prepare,
                     patch.object(compare_run, "check_workers") as check,
                     patch.object(compare_run, "stop_server") as stop,
@@ -759,7 +827,13 @@ class TestBenchmarkRunner(unittest.TestCase):
                     [entry.args[2] for entry in load.call_args_list],
                     [10, 10, 10],
                 )
-                self.assertFalse(prepare.call_args.kwargs["warmup"])
+                self.assertEqual(
+                    prepare.call_args.kwargs["framework"], compare_run.FRAMEWORKS[name],
+                )
+                self.assertFalse(any(
+                    key.startswith(("GRANIAN_", "UVICORN_"))
+                    for key in start.call_args.kwargs["env"]
+                ))
                 self.assertNotIn("warmup", row)
                 self.assertEqual(row["status"], "ok")
                 self.assertEqual(row["samples"], [sample] * args.repetitions)
@@ -811,7 +885,9 @@ class TestBenchmarkRunner(unittest.TestCase):
                         output / "oha", output, [], row,
                     )
 
-                self.assertTrue(prepare.call_args.kwargs["warmup"])
+                self.assertEqual(
+                    prepare.call_args.kwargs["framework"], compare_run.FRAMEWORKS[name],
+                )
                 self.assertEqual(row["status"], "ok")
                 self.assertEqual(row["warmup"]["requests"], 1000000)
                 self.assertEqual(row["requests"], 1110)
@@ -901,6 +977,28 @@ class TestBenchmarkRunner(unittest.TestCase):
                 ):
                     compare_run.check_workers(process, {pid}, {})
 
+    def test_uvicorn_single_worker_is_the_server_process(self) -> None:
+        """Accept Uvicorn's main PID as a worker only while it is alive."""
+        for status in ("running", "dead", "zombie"):
+            with self.subTest(status=status):
+                process = Mock(pid=1234)
+                process.poll.return_value = None
+                owner = Mock(pid=1234)
+                owner.children.return_value = []
+                owner.is_running.return_value = status != "dead"
+                owner.status.return_value = (
+                    compare_run.psutil.STATUS_ZOMBIE if status == "zombie"
+                    else compare_run.psutil.STATUS_RUNNING
+                )
+                with patch.object(
+                    compare_run.psutil, "Process", return_value=owner,
+                ):
+                    if status == "running":
+                        compare_run.check_workers(process, {1234}, {})
+                    else:
+                        with self.assertRaisesRegex(RuntimeError, "1234"):
+                            compare_run.check_workers(process, {1234}, {})
+
     def test_main_preserves_partial_samples_and_continues(self) -> None:
         """
         Verify that partial failures retain samples and allow later cases.
@@ -914,7 +1012,7 @@ class TestBenchmarkRunner(unittest.TestCase):
         samples = _successful_runs()
         environment = {
             "os": "CI test host", "python": "3.14.8",
-            "versions": {"granian": "2.8.4"},
+            "versions": {"granian": "2.8.4", "uvicorn": "0.54.0"},
         }
 
         def benchmark(
@@ -1040,7 +1138,9 @@ class TestBenchmarkRunner(unittest.TestCase):
                 ):
                     exit_code = compare_run.main([
                         "--workers", "2" if scenario == "unsupported" else "1",
-                        "--frameworks", "fastapi", "--output-dir", str(output),
+                        "--frameworks",
+                        "orionis-asgi" if scenario == "unsupported" else "fastapi",
+                        "--output-dir", str(output),
                     ])
                 report = json.loads(
                     (output / "summary.json").read_text(encoding="utf-8"),
@@ -1072,6 +1172,89 @@ class TestBenchmarkRunner(unittest.TestCase):
                             diagnostics["results"][0]["reason"],
                             "Interrupted by user",
                         )
+
+    def test_windows_preserves_single_worker_comparisons(self) -> None:
+        """Retain the Windows single-worker policy for both native servers."""
+        with TemporaryDirectory() as temporary:
+            output = Path(temporary) / "results"
+            with (
+                patch.object(compare_run.sys, "platform", "win32"),
+                patch.object(
+                    compare_run, "collect_environment",
+                    return_value=_chart_report()["environment"],
+                ),
+                patch.object(
+                    compare_run, "resolve_oha", return_value=Path(temporary) / "oha",
+                ),
+                patch.object(
+                    compare_run, "benchmark_case",
+                ) as benchmark,
+                patch.dict(os.environ, {"GITHUB_STEP_SUMMARY": ""}),
+                redirect_stdout(StringIO()),
+            ):
+                exit_code = compare_run.main([
+                    "--workers", "2", "3", "4",
+                    "--frameworks", *compare_run.FRAMEWORKS,
+                    "--output-dir", str(output),
+                ])
+            report = json.loads((output / "summary.json").read_text(encoding="utf-8"))
+        self.assertEqual(exit_code, 1)
+        benchmark.assert_not_called()
+        self.assertEqual(len(report["results"]), 15)
+        self.assertTrue(all(
+            row["status"] == "unsupported" for row in report["results"]
+        ))
+
+    def test_main_validates_only_selected_server_versions(self) -> None:
+        """Reject missing selected servers without requiring the unused server."""
+        for name, selected, unused in (
+            ("orionis-asgi", "granian", "uvicorn"),
+            ("fastapi", "uvicorn", "granian"),
+        ):
+            for missing in (selected, unused):
+                with (
+                    self.subTest(framework=name, missing=missing),
+                    TemporaryDirectory() as temporary,
+                ):
+                    output = Path(temporary) / "results"
+                    environment = _chart_report()["environment"]
+                    environment["versions"][missing] = "not installed"
+                    with (
+                        patch.object(
+                            compare_run, "collect_environment",
+                            return_value=environment,
+                        ),
+                        patch.object(
+                            compare_run, "resolve_oha",
+                            return_value=Path(temporary) / "oha",
+                        ),
+                        patch.object(
+                            compare_run, "benchmark_case",
+                            side_effect=lambda *args: args[-1].update(
+                                aggregate_samples(_successful_runs()),
+                            ),
+                        ) as benchmark,
+                        patch.dict(os.environ, {"GITHUB_STEP_SUMMARY": ""}),
+                        redirect_stdout(StringIO()),
+                        redirect_stderr(StringIO()),
+                    ):
+                        exit_code = compare_run.main([
+                            "--workers", "1", "--frameworks", name,
+                            "--output-dir", str(output),
+                        ])
+                    diagnostics = json.loads(
+                        (output / "diagnostics.json").read_text(encoding="utf-8"),
+                    )
+                    self.assertEqual(exit_code, int(missing == selected))
+                    if missing == selected:
+                        benchmark.assert_not_called()
+                        self.assertIn(
+                            f"{selected.capitalize()} "
+                            f"{compare_run.SERVER_VERSIONS[selected]} required",
+                            diagnostics["error"],
+                        )
+                    else:
+                        benchmark.assert_called_once()
 
     def test_successful_main_writes_chart_from_saved_report(self) -> None:
         """
@@ -1122,7 +1305,14 @@ class TestBenchmarkRunner(unittest.TestCase):
         self.assertEqual(set(saved["settings"]), {"frameworks", "workers"})
         self.assertEqual(diagnostics["settings"]["warmup_seconds"], 2)
         self.assertEqual(
-            diagnostics["settings"]["readiness"], "native-granian-workers-and-tcp",
+            diagnostics["settings"]["readiness"], "native-server-workers-and-tcp",
+        )
+        self.assertEqual(
+            diagnostics["settings"]["servers"],
+            {
+                "orionis-rsgi": "granian", "orionis-asgi": "granian",
+                "fastapi": "uvicorn", "litestar": "uvicorn", "starlette": "uvicorn",
+            },
         )
         self.assertEqual(
             diagnostics["settings"]["warmup_frameworks"],

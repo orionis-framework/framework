@@ -1,13 +1,15 @@
 # Comparación HTTP de Orionis, FastAPI, Litestar y Starlette
 
 Esta suite compara cinco configuraciones en una misma máquina: Orionis RSGI,
-Orionis ASGI, FastAPI, Litestar y Starlette. Todas usan Granian y miden una ruta
+Orionis ASGI, FastAPI, Litestar y Starlette. Solo Orionis usa Granian; FastAPI,
+Litestar y Starlette usan Uvicorn. Todas miden una ruta
 `GET /` que construye una respuesta de texto `200 OK` con el cuerpo exacto
 `Hello World` (11 bytes, sin comillas ni salto de línea).
 
 Orionis utiliza `Application`, su cargador real de rutas y `response.text()`.
 Las dos interfaces comparten la misma aplicación. Así se puede comparar Orionis
 con los otros frameworks sobre ASGI y observar por separado el efecto de RSGI.
+La comparación incluye también la diferencia entre los servidores utilizados.
 El resto de las aplicaciones también usa las rutas y respuestas de su framework.
 
 ## Entorno y parámetros
@@ -20,6 +22,7 @@ Python y oha se fijan por separado para completar el entorno de referencia:
 | --- | --- |
 | Python | 3.14.8 |
 | Granian | 2.8.4 |
+| Uvicorn | 0.54.0 |
 | oha | 1.16.0 |
 | FastAPI | 0.143.1 |
 | Litestar | 2.24.0 |
@@ -30,11 +33,13 @@ sin usar la variante freethreaded. Los valores por defecto del ejecutor son:
 
 | Parámetro | Valor |
 | --- | --- |
-| Workers de Granian | 1, 2, 3 y 4 |
+| Workers por servidor | 1, 2, 3 y 4 |
 | Hilos de red de Granian por worker | 1 |
 | Event loop | `asyncio` |
 | Implementación de tareas de Granian | `asyncio` |
 | HTTP | HTTP/1.1 con keep-alive |
+| Implementación HTTP de Uvicorn | `h11` |
+| Lifespan de Uvicorn | `on` |
 | WebSockets | Deshabilitados |
 | Conexiones concurrentes de oha | 100 |
 | Hilos de trabajo de oha | 1 |
@@ -58,7 +63,9 @@ uv run --no-sync python -B -m benchmarks.http_compare.run
 
 `--no-sync` conserva las dependencias del grupo `benchmark` ya instaladas.
 La comparación completa se ejecuta en Ubuntu. En Windows, Granian admite
-únicamente un worker; para una comprobación rápida de los cinco casos:
+únicamente un worker y Uvicorn con CPython 3.14 puede fallar al compartir
+sockets entre procesos. La suite conserva el límite de un worker para todos
+los servidores en Windows; para una comprobación rápida de los cinco casos:
 
 ```text
 uv run --no-sync python -B -m benchmarks.http_compare.run --workers 1 --warmup 0.5 --duration 1 --repetitions 3 --connections 10 --output-dir benchmark-results/http-compare-smoke
@@ -77,8 +84,10 @@ binario oficial y verifica su SHA-256. Puedes proporcionar uno existente con
 
 Las apps contienen únicamente la configuración nativa y la ruta `GET /`.
 No tienen endpoints auxiliares, callbacks de seguimiento ni archivos de
-marcadores. El ejecutor verifica los mensajes nativos de arranque de Granian,
-la pertenencia y vida de sus workers y la disponibilidad del servidor.
+marcadores. El ejecutor verifica los mensajes nativos de arranque del servidor
+correspondiente, la pertenencia y vida de sus workers y su disponibilidad.
+Para Uvicorn, espera también la finalización del startup de todas las apps y
+reconoce que con un solo worker el proceso principal atiende las peticiones.
 Esta política queda registrada en `settings.readiness`.
 
 Solo Orionis RSGI y Orionis ASGI realizan preparación HTTP y precalentamiento:
@@ -95,7 +104,7 @@ no reciben peticiones HTTP de preparación ni una ejecución de `--warmup`.
 Su disponibilidad se comprueba abriendo y cerrando una conexión TCP. Todos
 los casos limpian el servidor al finalizar, incluso si hay fallos.
 
-Si Granian no anuncia todos sus workers, alguno muere o el servidor no queda
+Si el servidor no anuncia todos sus workers, alguno muere o no queda
 disponible dentro del timeout de inicio, el caso falla. No se incluyen
 las peticiones de preparación ni las de calentamiento de Orionis en los
 conteos, tiempos, latencias o tasas publicados.
@@ -110,8 +119,11 @@ lo copia el ejecutor una sola vez al directorio aislado antes de iniciar Granian
 Todos los workers leen ese archivo sin modificarlo. Así se conserva el cargador
 real sin importar rutas del proyecto anfitrión ni generar archivos desde la app.
 
-Todos los frameworks comparten los parámetros de servidor y carga medida de la
-tabla anterior; el precalentamiento es exclusivo de Orionis. El cliente espera las
+Todos los frameworks comparten HTTP/1.1, keep-alive, `asyncio`, la cantidad de
+workers y la carga medida; los parámetros propios de cada servidor se indican
+en la tabla anterior. El precalentamiento es exclusivo de Orionis.
+El ejecutor descarta las variables heredadas `GRANIAN_*` y `UVICORN_*` para
+evitar ajustes externos. El cliente espera las
 solicitudes en curso al terminar cada medición, con un timeout de 5 segundos por
 solicitud. La tasa se calcula con el tiempo real, no con la duración nominal:
 
@@ -153,8 +165,8 @@ preparación, datos del entorno ni muestras sin medir. El esquema 2 de
 `summary.json` conserva solo los grupos de frameworks y workers y los resultados.
 
 La información técnica completa se conserva separada en `diagnostics.json`,
-incluidos `warmup_frameworks`, el resultado `warmup` de Orionis y los motivos
-detallados de fallo. Los informes indican los fallos sin sustituir métricas
+incluidos `settings.servers`, `warmup_frameworks`, el resultado `warmup` de Orionis
+y los motivos detallados de fallo. Los informes indican los fallos sin sustituir métricas
 ausentes por cifras inventadas. Los datos originales también permanecen en
 `raw/`, `logs/`, `commands.json` y `environment.json`.
 
@@ -181,21 +193,6 @@ Las ejecuciones fallidas o iniciadas desde otra rama no reemplazan los
 resultados publicados. El job de medición conserva permisos de solo lectura;
 la publicación no modifica `1.x` ni dispara otro benchmark. Las ejecuciones de
 una misma rama se serializan para evitar publicaciones fuera de orden.
-
-## Pruebas unitarias
-
-```text
-uv run --no-sync python -B -m unittest tests.test_http_compare -v
-```
-
-Estas pruebas verifican contabilidad, medianas, señales nativas de arranque,
-precalentamiento exclusivo de Orionis, parámetros compartidos, limpieza,
-fallos, reportes y gráficas SVG. Con el grupo `benchmark` instalado también
-comprueban las cinco configuraciones en servidores reales: cuerpo, tipo de
-contenido, keep-alive y ausencia de endpoints auxiliares. No publican métricas
-de rendimiento.
-La comprobación del directorio aislado admite los alias de ruta corta 8.3 de
-Windows sin confundirlos con un directorio diferente.
 
 ## Límites
 

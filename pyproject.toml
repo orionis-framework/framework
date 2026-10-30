@@ -163,6 +163,7 @@ benchmark = [
     "granian==2.8.4",
     "litestar==2.24.0",
     "starlette==1.8.0",
+    "uvicorn==0.54.0",
 ]
 dev = [
     "coverage>=7.16.1",

@@ -90,11 +90,11 @@ in [GitHub Discussions](https://github.com/orgs/orionis-framework/discussions).
 ## HTTP Benchmarks
 
 The [HTTP comparison suite](benchmarks/http_compare/README.md) compares Orionis
-(RSGI and ASGI), FastAPI, Litestar and Starlette on the same Granian server
+(RSGI and ASGI) on Granian against FastAPI, Litestar and Starlette on Uvicorn
 with matching load settings.
 
 The charts show median successful HTTP 200 requests per second with
-**1, 2, 3 and 4 Granian workers**. Higher is better.
+**1, 2, 3 and 4 server workers**. Higher is better.
 
 <table>
   <tr>

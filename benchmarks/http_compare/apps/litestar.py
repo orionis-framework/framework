@@ -1,4 +1,4 @@
-from litestar import Litestar, MediaType, Response, get
+from litestar import Litestar, MediaType, Response, get # pyright: ignore[reportMissingImports]
 
 async def hello() -> Response[str]:  # NOSONAR(S7503)
     """Keep native async dispatch without artificial I/O or thread offloading."""

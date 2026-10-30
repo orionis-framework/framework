@@ -1,6 +1,6 @@
 from __future__ import annotations
 from collections.abc import Mapping
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING, Any, Self
 
 if TYPE_CHECKING:
     from orionis.session.contracts.session import ISession
@@ -14,14 +14,16 @@ ERRORS_KEY: str = "_errors"
 PREVIOUS_URL_KEY: str = "_previous_url"
 
 # Never carried over when repopulating a form.
-SENSITIVE_INPUT_FIELDS: frozenset[str] = frozenset({
-    "_csrf",
-    "csrf_token",
-    "current_password",
-    "new_password",
-    "password",
-    "password_confirmation",
-})
+SENSITIVE_INPUT_FIELDS: frozenset[str] = frozenset(
+    {
+        "_csrf",
+        "csrf_token",
+        "current_password",
+        "new_password",
+        "password",
+        "password_confirmation",
+    },
+)
 
 # Hoisted so the isinstance check does not rebuild the tuple on every field.
 _SEQUENCE_TYPES: tuple[type, ...] = (list, tuple, set, frozenset)
@@ -46,12 +48,10 @@ def filter_input(values: Mapping[str, Any]) -> dict[str, Any]:
         return dict(values)
 
     return {
-        key: value
-        for key, value in values.items()
-        if key not in SENSITIVE_INPUT_FIELDS
+        key: value for key, value in values.items() if key not in SENSITIVE_INPUT_FIELDS
     }
 
-def normalize_errors(errors: object) -> dict[str, list[str]]: # NOSONAR
+def normalize_errors(errors: object) -> dict[str, list[str]]:  # NOSONAR
     """
     Normalize validation errors into field-indexed message lists.
 
@@ -84,8 +84,7 @@ def normalize_errors(errors: object) -> dict[str, list[str]]: # NOSONAR
             return {field: [message]}
 
         error_msg = (
-            "errors must be a mapping of field to message(s) "
-            "or a validation exception"
+            "errors must be a mapping of field to message(s) or a validation exception"
         )
         raise TypeError(error_msg)
 
@@ -159,3 +158,88 @@ def apply_flash(session: ISession, data: Mapping[str, Any]) -> None:
             session.flashErrors(value)
         else:
             session.flash(key, value)
+
+class _FlashData:
+    """Queue flash payloads for responses and deferred views.
+
+    Owners initialize the slot and decide when to apply it to the session.
+    Pending views apply it before rendering; responses apply it during dispatch.
+    """
+
+    __slots__ = ("_flash",)
+    _flash: dict[str, Any] | None
+
+    # ruff: noqa: ANN401
+
+    def withFlash(self: Self, key: str, value: Any | None = None) -> Self:
+        """
+        Queue a status message for the owning response or pending view.
+
+        The value survives for exactly one subsequent request and is read
+        back in templates through the ``flash()`` global.
+
+        Parameters
+        ----------
+        key : str
+            Flash data key.
+        value : Any, optional
+            Value to flash.
+
+        Returns
+        -------
+        Self
+            The same owner, allowing fluent chaining.
+        """
+        flash = self._flash
+        if flash is None:
+            flash = self._flash = {}
+
+        flash[key] = value
+        return self
+
+    def withInput(self: Self, values: Mapping[str, Any]) -> Self:
+        """
+        Flash the submitted payload so the next request can repopulate it.
+
+        Values are read back in templates through the ``old()`` global.
+        Credential-like fields such as ``password`` are stripped.
+
+        Parameters
+        ----------
+        values : Mapping[str, Any]
+            Submitted form payload to remember.
+
+        Returns
+        -------
+        Self
+            The same owner, allowing fluent chaining.
+        """
+        flash = self._flash
+        if flash is None:
+            flash = self._flash = {}
+
+        queue_bag(flash, OLD_INPUT_KEY, filter_input(values))
+        return self
+
+    def withErrors(self: Self, errors: Mapping[str, Any] | Exception) -> Self:
+        """
+        Flash validation errors for the next request.
+
+        Errors are read back in templates through the ``errors`` global.
+
+        Parameters
+        ----------
+        errors : Mapping[str, Any] | Exception
+            Mapping of field to message(s), or a validation exception.
+
+        Returns
+        -------
+        Self
+            The same owner, allowing fluent chaining.
+        """
+        flash = self._flash
+        if flash is None:
+            flash = self._flash = {}
+
+        queue_bag(flash, ERRORS_KEY, normalize_errors(errors))
+        return self

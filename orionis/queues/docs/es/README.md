@@ -9,3 +9,7 @@ Las colas separan la solicitud de trabajo de su ejecución. Un `BaseJob` declara
 Para trabajo durable elige database o Redis y opera un worker separado. `sync`, predeterminado, ejecuta dentro del envío y no conserva trabajo para otro proceso. La durabilidad del mensaje no garantiza que un efecto externo ocurra una sola vez: diseña jobs idempotentes.
 
 Las facades necesitan una aplicación [inicializada](../../../foundation/docs/es/README.md). Python 3.14+, msgspec y Redis son dependencias declaradas; el backend database usa [Database](../../../database/docs/es/README.md).
+
+## Ejecución acotada y rendimiento
+
+Las transiciones Redis envían primero `EVALSHA` con el digest cacheado. `NOSCRIPT` provoca un `EVAL` de la misma operación en el nodo propietario y carga su caché de scripts de forma atómica; la siguiente llamada vuelve a `EVALSHA`. Los scripts, hash tags, reservas y tokens de fencing no cambian. El driver añade esta recuperación exclusivamente para `NOSCRIPT`; la política de reintentos de transporte del cliente Redis sigue aplicándose. Se admite el reinicio de Redis o la expulsión del script sin una bandera global de carga.

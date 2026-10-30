@@ -4,12 +4,15 @@ import math
 import os
 import unittest
 from argparse import Namespace
-from contextlib import chdir, redirect_stderr, redirect_stdout
-from io import StringIO
+from contextlib import chdir, closing, redirect_stderr, redirect_stdout
+from importlib.util import find_spec
+from inspect import iscoroutinefunction
+from io import StringIO, TextIOWrapper
 from pathlib import Path
 from tempfile import TemporaryDirectory
-from typing import Any
+from typing import Any, TypedDict, Unpack
 from unittest.mock import Mock, call, patch
+from urllib.parse import urlsplit
 from defusedxml import ElementTree
 from benchmarks.http_compare import run as compare_run
 from benchmarks.http_compare.apps import orionis as orionis_benchmark
@@ -62,29 +65,30 @@ def _successful_runs() -> list[dict[str, int | float]]:
         }))
     return samples
 
-def _probe_connection(worker_pid: int) -> Mock:
-    """
-    Mock two text responses followed by a worker-identity response.
-
-    Parameters
-    ----------
-    worker_pid : int
-        Process ID returned by the worker-discovery response.
-
-    Returns
-    -------
-    Mock
-        Persistent HTTP connection yielding the three prepared responses.
-    """
+def _probe_connection() -> Mock:
+    """Mock two Hello World responses over a persistent connection."""
     responses = []
-    for body in (b"Hello World", b"Hello World", str(worker_pid).encode("ascii")):
+    for _ in range(2):
         response = Mock(status=200, version=11, will_close=False)
-        response.read.return_value = body
+        response.read.return_value = b"Hello World"
         response.getheader.return_value = "text/plain; charset=utf-8"
         responses.append(response)
     connection = Mock()
     connection.getresponse.side_effect = responses
     return connection
+
+def _startup_log(
+    directory: Path, pids: list[int], *, started: bool = True,
+) -> Path:
+    """Write the native Granian startup events used by readiness checks."""
+    events = []
+    for index, pid in enumerate(pids, 1):
+        events.append(f"[INFO] Spawning worker-{index} with PID: {pid}\n")
+        if started:
+            events.append(f"[INFO] Started worker-{index}\n")
+    path = directory / "server.log"
+    path.write_text("".join(events), encoding="utf-8")
+    return path
 
 def _chart_report() -> dict[str, Any]:
     """
@@ -106,6 +110,7 @@ def _chart_report() -> dict[str, Any]:
         "settings": {
             "frameworks": list(rates), "workers": [3],
             "connections": 100, "warmup_seconds": 2,
+            "warmup_frameworks": ["orionis-rsgi", "orionis-asgi"],
             "repetitions": 3, "duration_seconds": 10,
         },
         "environment": {
@@ -265,105 +270,14 @@ class TestMeasurements(unittest.TestCase):
             aggregate_samples([])
 
 class TestOrionisApplication(unittest.TestCase):
-    """Verify isolated routes and nonblocking worker readiness tracking."""
+    """Verify the Orionis factory contains only native app configuration."""
 
-    def test_ready_kernel_is_published_without_fixed_delay(self) -> None:
-        """
-        Verify that a ready kernel publishes readiness without a fixed delay.
-
-        Returns
-        -------
-        None
-            This test does not return a value.
-        """
-        loop = Mock()
-        app = Mock(isHttpReady=True)
-        with (
-            patch.dict(os.environ, {"BENCHMARK_READY_DIR": "enabled"}),
-            patch.object(
-                orionis_benchmark.asyncio, "get_running_loop", return_value=loop,
-            ),
-            patch.object(orionis_benchmark, "mark_ready") as ready,
-        ):
-            orionis_benchmark._track_readiness(app)
-
-            loop.call_soon.assert_called_once()
-            loop.call_later.assert_not_called()
-            publish = loop.call_soon.call_args.args[0]
-            ready.assert_not_called()
-
-            publish()
-
-            ready.assert_called_once_with()
-            loop.call_later.assert_not_called()
-
-    def test_slow_kernel_is_not_published_before_it_is_ready(self) -> None:
-        """
-        Verify that readiness retries stop once the HTTP kernel is ready.
-
-        Returns
-        -------
-        None
-            This test does not return a value.
-        """
-        loop = Mock()
-        app = Mock(isHttpReady=False)
-        with (
-            patch.dict(os.environ, {"BENCHMARK_READY_DIR": "enabled"}),
-            patch.object(
-                orionis_benchmark.asyncio, "get_running_loop", return_value=loop,
-            ),
-            patch.object(orionis_benchmark, "mark_ready") as ready,
-        ):
-            orionis_benchmark._track_readiness(app)
-            loop.call_soon.assert_called_once()
-            publish = loop.call_soon.call_args.args[0]
-
-            publish()
-
-            ready.assert_not_called()
-            loop.call_later.assert_called_once_with(0.01, publish)
-
-            app.isHttpReady = True
-            publish()
-
-            ready.assert_called_once_with()
-            loop.call_later.assert_called_once_with(0.01, publish)
-
-    def test_standalone_startup_does_not_schedule_tracking(self) -> None:
-        """
-        Verify that standalone startup skips benchmark readiness tracking.
-
-        Returns
-        -------
-        None
-            This test does not return a value.
-        """
-        with (
-            patch.dict(os.environ, {"BENCHMARK_READY_DIR": ""}),
-            patch.object(orionis_benchmark.asyncio, "get_running_loop") as loop,
-            patch.object(orionis_benchmark, "mark_ready") as ready,
-        ):
-            orionis_benchmark._track_readiness(Mock(isHttpReady=True))
-
-        loop.assert_not_called()
-        ready.assert_not_called()
-
-    def test_factory_stages_static_routes_inside_isolated_directory(self) -> None:
-        """
-        Verify isolated route staging and startup with native directory paths.
-
-        Returns
-        -------
-        None
-            This test does not return a value.
-        """
+    def test_factory_uses_staged_routes_without_tracking(self) -> None:
+        """Verify app creation does not copy files or register startup callbacks."""
         app = Mock()
         app.withRouting.return_value = app
         app.withConfigApp.return_value = app
-        app.on.return_value = app
         app.create.return_value = app
-        source = Path(orionis_benchmark.__file__).parent / "routes" / "web.py"
         with (
             TemporaryDirectory() as temporary,
             chdir(temporary),
@@ -372,24 +286,203 @@ class TestOrionisApplication(unittest.TestCase):
             ) as application,
         ):
             result = orionis_benchmark.create_application()
-            # Windows cwd may retain an 8.3 alias for the temporary directory.
             directory = Path.cwd()
             self.assertTrue(directory.samefile(temporary))
-            route_file = directory / f"_orionis_http_benchmark_{os.getpid()}.py"
-
-            self.assertEqual(route_file.read_bytes(), source.read_bytes())
+            self.assertEqual(list(directory.iterdir()), [])
             application.assert_called_once_with(base_path=directory)
-            app.withRouting.assert_called_once_with(api=route_file.name)
+            app.withRouting.assert_called_once_with(api="_http_compare_routes.py")
             app.withConfigApp.assert_called_once_with(
                 env="production", debug=False, maintenance=False,
             )
-            app.on.assert_called_once_with(
-                orionis_benchmark.Lifespan.STARTUP,
-                orionis_benchmark._track_readiness,
-                runtime=orionis_benchmark.Runtime.HTTP,
-            )
+            app.on.assert_not_called()
             app.create.assert_called_once_with()
             self.assertIs(result, app)
+
+@unittest.skipUnless(
+    all(find_spec(name) is not None for name in ("fastapi", "litestar", "starlette")),
+    "Install the benchmark dependency group to test the real applications",
+)
+class TestMinimalApplications(unittest.TestCase):
+    """Verify the five native servers without publishing performance results."""
+
+    def test_native_asgi_routers_have_only_the_root_route(self) -> None:
+        """Verify optional frameworks register no auxiliary or documentation routes."""
+        from benchmarks.http_compare.apps import fastapi, litestar, starlette
+
+        for module in (fastapi, litestar, starlette):
+            with self.subTest(framework=module.__name__):
+                self.assertTrue(iscoroutinefunction(module.hello))
+                app = module.create_application()
+                self.assertEqual([route.path for route in app.routes], ["/"])
+
+    def test_native_apps_serve_only_hello_world(self) -> None:
+        """Verify payload, keep-alive, removed probes and cleanup on real servers."""
+        sample = _successful_runs()[0]
+
+        def load(
+            _oha: Path,
+            url: str,
+            _seconds: float,
+            _connections: int,
+            _output: Path,
+            _commands: list[dict[str, Any]],
+        ) -> dict[str, int | float]:
+            """Use correctness requests instead of a benchmark load generator."""
+            with closing(compare_run.http.client.HTTPConnection(
+                urlsplit(url).netloc, timeout=5,
+            )) as connection:
+                for _ in range(2):
+                    connection.request("GET", "/")
+                    response = connection.getresponse()
+                    self.assertEqual(response.status, 200)
+                    self.assertEqual(response.read(), b"Hello World")
+                    self.assertEqual(
+                        response.getheader("content-type", "").split(";", 1)[0],
+                        "text/plain",
+                    )
+                    self.assertEqual(response.version, 11)
+                    self.assertFalse(response.will_close)
+                for path in ("/_benchmark/worker", "/docs", "/openapi.json"):
+                    connection.request("GET", path)
+                    response = connection.getresponse()
+                    self.assertEqual(response.status, 404, path)
+                    response.read()
+            return sample
+
+        args = Namespace(warmup=0.1, duration=0.1, connections=1, repetitions=1)
+        for framework in compare_run.FRAMEWORKS.values():
+            with (
+                self.subTest(framework=framework.name),
+                TemporaryDirectory() as temporary,
+            ):
+                output = Path(temporary)
+                (output / "logs").mkdir()
+                (output / "raw").mkdir()
+                row = {"status": "pending"}
+                with (
+                    patch.object(compare_run, "run_load", side_effect=load) as generate,
+                    patch.object(
+                        compare_run, "stop_server", wraps=compare_run.stop_server,
+                    ) as stop,
+                ):
+                    compare_run.benchmark_case(
+                        framework, 1, args, output / "unused-oha",
+                        output, [], row,
+                    )
+                self.assertEqual(row["status"], "ok")
+                self.assertEqual("warmup" in row, framework.requires_warmup)
+                self.assertEqual(generate.call_count, 1 + framework.requires_warmup)
+                self.assertIsNotNone(stop.call_args.args[0].poll())
+
+class _LoadOptions(TypedDict):
+    """Describe the subprocess options used by the load runner."""
+
+    stdout: TextIOWrapper
+    stderr: TextIOWrapper
+    timeout: float
+    check: bool
+    creationflags: int
+
+class TestLoadGenerator(unittest.TestCase):
+    """Verify measurements and raw evidence survive subprocess failures."""
+
+    def test_load_preserves_output_and_measurement_shape(self) -> None:
+        """Verify successful load retains both streams and normalized metrics."""
+        raw = json.dumps(_measurement())
+        diagnostic = "load diagnostic\n"
+        script = (
+            f"import sys; sys.stdout.write({raw!r}); "
+            f"sys.stderr.write({diagnostic!r})"
+        )
+        execute = compare_run.subprocess.run
+
+        def run(
+            _command: list[str], **kwargs: Unpack[_LoadOptions],
+        ) -> compare_run.subprocess.CompletedProcess[bytes]:
+            """Run a local Python stand-in without changing subprocess options."""
+            return execute([compare_run.sys.executable, "-B", "-c", script], **kwargs)
+
+        with TemporaryDirectory() as temporary:
+            output = Path(temporary) / "load.json"
+            commands = []
+            with patch.object(compare_run.subprocess, "run", side_effect=run) as load:
+                measured = compare_run.run_load(
+                    Path("oha"), "http://127.0.0.1:8000/", 1, 10, output, commands,
+                )
+            self.assertEqual(measured, parse_measurement(json.loads(raw)))
+            self.assertEqual(output.read_text(encoding="utf-8"), raw)
+            self.assertEqual(
+                output.with_suffix(".stderr.log").read_text(encoding="utf-8"),
+                diagnostic,
+            )
+            self.assertEqual(commands, [{
+                "kind": "oha", "argv": load.call_args.args[0], "output": str(output),
+            }])
+            self.assertEqual(load.call_args.kwargs["timeout"], 31)
+
+    def test_load_preserves_output_on_process_failure(self) -> None:
+        """Verify a nonzero exit retains diagnostics without parsing its output."""
+        execute = compare_run.subprocess.run
+
+        def run(
+            _command: list[str], **kwargs: Unpack[_LoadOptions],
+        ) -> compare_run.subprocess.CompletedProcess[bytes]:
+            """Emit partial output and an error through a real subprocess."""
+            return execute([
+                compare_run.sys.executable, "-B", "-c",
+                (
+                    "import sys; sys.stdout.write('{'); "
+                    "sys.stderr.write('load failed'); sys.exit(7)"
+                ),
+            ], **kwargs)
+
+        with TemporaryDirectory() as temporary:
+            output = Path(temporary) / "load.json"
+            with (
+                patch.object(compare_run.subprocess, "run", side_effect=run),
+                self.assertRaises(compare_run.subprocess.CalledProcessError) as raised,
+            ):
+                compare_run.run_load(
+                    Path("oha"), "http://127.0.0.1:8000/", 1, 10, output, [],
+                )
+            self.assertEqual(raised.exception.returncode, 7)
+            self.assertEqual(output.read_text(encoding="utf-8"), "{")
+            self.assertEqual(
+                output.with_suffix(".stderr.log").read_text(encoding="utf-8"),
+                "load failed",
+            )
+
+    def test_load_preserves_output_on_timeout(self) -> None:
+        """Verify a timed-out subprocess retains its flushed partial streams."""
+        execute = compare_run.subprocess.run
+
+        def run(
+            _command: list[str], **kwargs: Unpack[_LoadOptions],
+        ) -> compare_run.subprocess.CompletedProcess[bytes]:
+            """Limit the test duration while using real subprocess timeout handling."""
+            kwargs["timeout"] = 1
+            return execute([
+                compare_run.sys.executable, "-B", "-c",
+                (
+                    "import sys, time; sys.stdout.write('{'); sys.stdout.flush(); "
+                    "sys.stderr.write('unfinished'); sys.stderr.flush(); time.sleep(10)"
+                ),
+            ], **kwargs)
+
+        with TemporaryDirectory() as temporary:
+            output = Path(temporary) / "load.json"
+            with (
+                patch.object(compare_run.subprocess, "run", side_effect=run),
+                self.assertRaises(compare_run.subprocess.TimeoutExpired),
+            ):
+                compare_run.run_load(
+                    Path("oha"), "http://127.0.0.1:8000/", 1, 10, output, [],
+                )
+            self.assertEqual(output.read_text(encoding="utf-8"), "{")
+            self.assertEqual(
+                output.with_suffix(".stderr.log").read_text(encoding="utf-8"),
+                "unfinished",
+            )
 
 class TestBenchmarkRunner(unittest.TestCase):
     """Verify equal server settings, warmup isolation, and worker cleanup."""
@@ -417,9 +510,39 @@ class TestBenchmarkRunner(unittest.TestCase):
                 command[interface_index] = reference[interface_index]
                 self.assertEqual(command, reference)
 
-    def test_first_requests_prime_every_worker_before_readiness(self) -> None:
+    def test_orionis_preparation_uses_only_two_root_requests(self) -> None:
+        """Verify Orionis preparation uses the measured route, not a PID probe."""
+        process = Mock()
+        process.poll.return_value = None
+        for workers in range(1, 5):
+            with self.subTest(workers=workers), TemporaryDirectory() as temporary:
+                pids = list(range(5678, 5678 + workers))
+                log_path = _startup_log(Path(temporary), pids)
+                connection = _probe_connection()
+                with (
+                    patch.object(compare_run, "track_children"),
+                    patch.object(compare_run, "check_workers"),
+                    patch.object(
+                        compare_run.http.client, "HTTPConnection",
+                        return_value=connection,
+                    ) as connect,
+                    patch.object(compare_run.time, "sleep"),
+                ):
+                    result = compare_run.wait_until_ready(
+                        process, 8000, log_path, workers, {}, warmup=True,
+                    )
+
+                self.assertEqual(result, set(pids))
+                connect.assert_called_once_with("127.0.0.1", 8000, timeout=1)
+                self.assertEqual(connection.request.call_args_list, [
+                    call("GET", "/"), call("GET", "/"),
+                ])
+                self.assertEqual(connection.getresponse.call_count, 2)
+                connection.close.assert_called_once_with()
+
+    def test_startup_without_warmup_never_sends_http_requests(self) -> None:
         """
-        Verify that readiness requires real requests on every worker.
+        Verify other frameworks become ready without HTTP preparation.
 
         Returns
         -------
@@ -430,36 +553,33 @@ class TestBenchmarkRunner(unittest.TestCase):
         process.poll.return_value = None
         for workers in range(1, 5):
             with self.subTest(workers=workers), TemporaryDirectory() as temporary:
-                ready = Path(temporary)
                 pids = list(range(5678, 5678 + workers))
-                for pid in pids:
-                    (ready / str(pid)).touch()
-                visits = [pids[0], *pids] if workers > 1 else pids
-                connections = [_probe_connection(pid) for pid in visits]
+                log_path = _startup_log(Path(temporary), pids)
                 with (
                     patch.object(compare_run, "track_children"),
-                    patch.object(compare_run, "check_workers"),
+                    patch.object(compare_run, "check_workers") as check,
                     patch.object(
                         compare_run.http.client, "HTTPConnection",
-                        side_effect=connections,
                     ) as connect,
-                    patch.object(compare_run.time, "sleep"),
+                    patch.object(
+                        compare_run.socket, "create_connection",
+                    ) as tcp,
                 ):
-                    compare_run.wait_until_ready(process, 8000, ready, workers, {})
+                    result = compare_run.wait_until_ready(
+                        process, 8000, log_path, workers, {}, warmup=False,
+                    )
 
-                self.assertEqual(connect.call_count, len(visits))
-                for connection in connections:
-                    self.assertEqual(connection.request.call_args_list, [
-                        call("GET", "/"),
-                        call("GET", "/"),
-                        call("GET", "/_benchmark/worker"),
-                    ])
-                    self.assertEqual(connection.getresponse.call_count, 3)
-                    connection.close.assert_called_once_with()
+                self.assertEqual(result, set(pids))
+                self.assertEqual(check.call_args_list, [
+                    call(process, set(pids), {}), call(process, set(pids), {}),
+                ])
+                tcp.assert_called_once_with(("127.0.0.1", 8000), timeout=1)
+                tcp.return_value.close.assert_called_once_with()
+                connect.assert_not_called()
 
-    def test_missing_worker_times_out_before_measurements(self) -> None:
+    def test_startup_without_warmup_still_waits_for_workers(self) -> None:
         """
-        Verify that an unvisited live worker causes readiness to time out.
+        Verify skipping warmup does not bypass worker startup checks.
 
         Returns
         -------
@@ -468,55 +588,72 @@ class TestBenchmarkRunner(unittest.TestCase):
         """
         process = Mock()
         process.poll.return_value = None
-        connection = _probe_connection(5678)
         with TemporaryDirectory() as temporary:
-            ready = Path(temporary)
-            for pid in (5678, 5679):
-                (ready / str(pid)).touch()
+            log_path = _startup_log(Path(temporary), [5678])
+            with (
+                patch.object(compare_run, "track_children"),
+                patch.object(compare_run, "check_workers") as check,
+                patch.object(compare_run.http.client, "HTTPConnection") as connect,
+                patch.object(compare_run.socket, "create_connection") as tcp,
+                patch.object(compare_run.time, "sleep") as pause,
+                patch.object(
+                    compare_run.time, "monotonic", side_effect=[0, 0, 61],
+                ),
+                self.assertRaisesRegex(TimeoutError, "2 ready workers"),
+            ):
+                compare_run.wait_until_ready(
+                    process, 8000, log_path, 2, {}, warmup=False,
+                )
+
+        check.assert_not_called()
+        connect.assert_not_called()
+        tcp.assert_not_called()
+        pause.assert_called_once_with(0.1)
+
+    def test_unstarted_worker_times_out_before_measurements(self) -> None:
+        """Verify spawning a worker is not mistaken for completed native startup."""
+        process = Mock()
+        process.poll.return_value = None
+        with TemporaryDirectory() as temporary:
+            log_path = _startup_log(
+                Path(temporary), [5678, 5679], started=False,
+            )
             with (
                 patch.object(compare_run, "track_children"),
                 patch.object(compare_run, "check_workers"),
                 patch.object(
                     compare_run.http.client, "HTTPConnection",
-                    return_value=connection,
-                ),
+                ) as connect,
                 patch.object(compare_run.time, "sleep"),
                 patch.object(
                     compare_run.time, "monotonic", side_effect=[0, 0, 61],
                 ),
-                self.assertRaisesRegex(TimeoutError, "1/2"),
+                self.assertRaisesRegex(TimeoutError, "2 ready workers"),
             ):
-                compare_run.wait_until_ready(process, 8000, ready, 2, {})
+                compare_run.wait_until_ready(
+                    process, 8000, log_path, 2, {}, warmup=True,
+                )
 
-        connection.close.assert_called_once_with()
+        connect.assert_not_called()
 
-    def test_probe_rejects_an_unowned_worker_identity(self) -> None:
-        """
-        Verify that readiness rejects worker identities outside the owned set.
-
-        Returns
-        -------
-        None
-            This test does not return a value.
-        """
+    def test_readiness_rejects_an_unowned_native_worker(self) -> None:
+        """Verify native startup events cannot admit a foreign process."""
         process = Mock()
         process.poll.return_value = None
-        connection = _probe_connection(9999)
         with TemporaryDirectory() as temporary:
-            ready = Path(temporary)
-            (ready / "5678").touch()
+            log_path = _startup_log(Path(temporary), [9999])
             with (
                 patch.object(compare_run, "track_children"),
-                patch.object(compare_run, "check_workers"),
                 patch.object(
                     compare_run.http.client, "HTTPConnection",
-                    return_value=connection,
-                ),
+                ) as connect,
                 self.assertRaisesRegex(RuntimeError, "9999"),
             ):
-                compare_run.wait_until_ready(process, 8000, ready, 1, {})
+                compare_run.wait_until_ready(
+                    process, 8000, log_path, 1, {}, warmup=True,
+                )
 
-        connection.close.assert_called_once_with()
+        connect.assert_not_called()
 
     def test_preparation_rejects_invalid_http_responses(self) -> None:
         """
@@ -546,7 +683,7 @@ class TestBenchmarkRunner(unittest.TestCase):
                 connection = Mock()
                 connection.getresponse.return_value = response
                 with self.assertRaises(RuntimeError):
-                    compare_run._probe_response(connection, "/", b"Hello World")
+                    compare_run._probe_response(connection)
                 response.read.assert_called_once_with()
 
     def test_failed_preparation_never_starts_load(self) -> None:
@@ -568,11 +705,11 @@ class TestBenchmarkRunner(unittest.TestCase):
                 patch.object(compare_run.subprocess, "Popen", return_value=process),
                 patch.object(
                     compare_run, "wait_until_ready",
-                    side_effect=TimeoutError("1/2 workers primed"),
+                    side_effect=TimeoutError("server not ready"),
                 ),
                 patch.object(compare_run, "run_load") as load,
                 patch.object(compare_run, "stop_server") as stop,
-                self.assertRaisesRegex(TimeoutError, "1/2"),
+                self.assertRaisesRegex(TimeoutError, "server not ready"),
             ):
                 compare_run.benchmark_case(
                     compare_run.FRAMEWORKS["orionis-rsgi"], 2, args,
@@ -583,6 +720,51 @@ class TestBenchmarkRunner(unittest.TestCase):
         stop.assert_called_once_with(process, {})
         self.assertNotIn("warmup", row)
         self.assertNotIn("samples", row)
+
+    def test_other_frameworks_start_measurements_without_warmup(self) -> None:
+        """
+        Verify other frameworks run only the requested measurement load.
+
+        Returns
+        -------
+        None
+            This test does not return a value.
+        """
+        args = Namespace(warmup=2, duration=10, connections=100, repetitions=3)
+        sample = _successful_runs()[0]
+        for name in ("fastapi", "litestar", "starlette"):
+            with self.subTest(framework=name), TemporaryDirectory() as temporary:
+                process = Mock()
+                row = {"status": "pending"}
+                output = Path(temporary)
+                (output / "logs").mkdir()
+                (output / "raw").mkdir()
+                with (
+                    patch.object(
+                        compare_run.subprocess, "Popen", return_value=process,
+                    ),
+                    patch.object(compare_run, "wait_until_ready") as prepare,
+                    patch.object(compare_run, "check_workers") as check,
+                    patch.object(compare_run, "stop_server") as stop,
+                    patch.object(
+                        compare_run, "run_load", return_value=sample,
+                    ) as load,
+                ):
+                    compare_run.benchmark_case(
+                        compare_run.FRAMEWORKS[name], 1, args,
+                        output / "oha", output, [], row,
+                    )
+
+                self.assertEqual(
+                    [entry.args[2] for entry in load.call_args_list],
+                    [10, 10, 10],
+                )
+                self.assertFalse(prepare.call_args.kwargs["warmup"])
+                self.assertNotIn("warmup", row)
+                self.assertEqual(row["status"], "ok")
+                self.assertEqual(row["samples"], [sample] * args.repetitions)
+                self.assertEqual(check.call_count, args.repetitions)
+                stop.assert_called_once_with(process, {})
 
     def test_warmup_is_retained_but_excluded_from_measured_results(self) -> None:
         """
@@ -601,46 +783,50 @@ class TestBenchmarkRunner(unittest.TestCase):
         raw["summary"]["total"] = 2
         warmup = parse_measurement(raw)
         measured = _successful_runs()
-        process = Mock()
-        process.poll.return_value = None
         args = Namespace(warmup=2, duration=10, connections=100, repetitions=3)
-        row = {"status": "pending"}
-        order = Mock()
+        for name in ("orionis-rsgi", "orionis-asgi"):
+            with self.subTest(framework=name), TemporaryDirectory() as temporary:
+                process = Mock()
+                process.poll.return_value = None
+                row = {"status": "pending"}
+                order = Mock()
+                output = Path(temporary)
+                (output / "logs").mkdir()
+                (output / "raw").mkdir()
+                with (
+                    patch.object(
+                        compare_run.subprocess, "Popen", return_value=process,
+                    ),
+                    patch.object(compare_run, "wait_until_ready") as prepare,
+                    patch.object(compare_run, "check_workers") as check,
+                    patch.object(compare_run, "stop_server") as stop,
+                    patch.object(
+                        compare_run, "run_load", side_effect=[warmup, *measured],
+                    ) as load,
+                ):
+                    order.attach_mock(prepare, "prepare")
+                    order.attach_mock(load, "load")
+                    compare_run.benchmark_case(
+                        compare_run.FRAMEWORKS[name], 1, args,
+                        output / "oha", output, [], row,
+                    )
 
-        with TemporaryDirectory() as temporary:
-            output = Path(temporary)
-            (output / "logs").mkdir()
-            (output / "raw").mkdir()
-            with (
-                patch.object(compare_run.subprocess, "Popen", return_value=process),
-                patch.object(compare_run, "wait_until_ready") as prepare,
-                patch.object(compare_run, "check_workers") as check,
-                patch.object(compare_run, "stop_server") as stop,
-                patch.object(
-                    compare_run, "run_load", side_effect=[warmup, *measured],
-                ) as load,
-            ):
-                order.attach_mock(prepare, "prepare")
-                order.attach_mock(load, "load")
-                compare_run.benchmark_case(
-                    compare_run.FRAMEWORKS["starlette"], 1, args,
-                    output / "oha", output, [], row,
+                self.assertTrue(prepare.call_args.kwargs["warmup"])
+                self.assertEqual(row["status"], "ok")
+                self.assertEqual(row["warmup"]["requests"], 1000000)
+                self.assertEqual(row["requests"], 1110)
+                self.assertEqual(row["requests_per_second"], 100)
+                self.assertEqual(row["samples"], measured)
+                self.assertEqual(
+                    [entry.args[2] for entry in load.call_args_list],
+                    [2, 10, 10, 10],
                 )
-
-        self.assertEqual(row["status"], "ok")
-        self.assertEqual(row["warmup"]["requests"], 1000000)
-        self.assertEqual(row["requests"], 1110)
-        self.assertEqual(row["requests_per_second"], 100)
-        self.assertEqual(row["samples"], measured)
-        self.assertEqual(
-            [call.args[2] for call in load.call_args_list], [2, 10, 10, 10],
-        )
-        self.assertEqual(
-            [entry[0] for entry in order.mock_calls],
-            ["prepare", "load", "load", "load", "load"],
-        )
-        self.assertEqual(check.call_count, 4)
-        stop.assert_called_once_with(process, {})
+                self.assertEqual(
+                    [entry[0] for entry in order.mock_calls],
+                    ["prepare", "load", "load", "load", "load"],
+                )
+                self.assertEqual(check.call_count, 4)
+                stop.assert_called_once_with(process, {})
 
     def test_cleanup_stops_known_workers_after_supervisor_has_exited(self) -> None:
         """
@@ -674,31 +860,46 @@ class TestBenchmarkRunner(unittest.TestCase):
         self.assertEqual(wait.call_args_list[1].args[0], [worker])
         process.wait.assert_called_once_with(timeout=5)
 
-    def test_worker_markers_require_a_living_owned_process(self) -> None:
-        """
-        Verify that readiness markers identify live, owned workers.
+    def test_cleanup_terminates_each_owned_process_once(self) -> None:
+        """Verify cleanup does not terminate the supervisor twice."""
+        process = Mock(pid=1234)
+        parent = Mock(pid=1234)
+        worker = Mock(pid=5678)
+        with (
+            patch.object(compare_run.sys, "platform", "win32"),
+            patch.object(compare_run, "track_children"),
+            patch.object(compare_run.psutil, "Process", return_value=parent),
+            patch.object(compare_run.psutil, "wait_procs", return_value=([], [])),
+        ):
+            compare_run.stop_server(process, {worker.pid: worker})
 
-        Returns
-        -------
-        None
-            This test does not return a value.
-        """
-        # A live foreign PID must fail just as a dead owned worker does.
-        for scenario, marker_pid in (("dead", 5678), ("foreign", 9999)):
-            with self.subTest(scenario=scenario), TemporaryDirectory() as temporary:
-                ready = Path(temporary)
-                (ready / str(marker_pid)).touch()
+        parent.terminate.assert_called_once_with()
+        worker.terminate.assert_called_once_with()
+        parent.kill.assert_not_called()
+        worker.kill.assert_not_called()
+        process.wait.assert_called_once_with(timeout=5)
+
+    def test_native_workers_require_a_living_owned_process(self) -> None:
+        """Verify dead, foreign and zombie workers fail native health checks."""
+        for scenario, pid in (
+            ("dead", 5678), ("foreign", 9999), ("zombie", 5678),
+        ):
+            with self.subTest(scenario=scenario):
                 process = Mock(pid=1234)
                 process.poll.return_value = None
                 worker = Mock(pid=5678)
                 worker.is_running.return_value = scenario != "dead"
+                worker.status.return_value = (
+                    compare_run.psutil.STATUS_ZOMBIE if scenario == "zombie"
+                    else compare_run.psutil.STATUS_RUNNING
+                )
                 parent = Mock()
                 parent.children.return_value = [worker]
                 with (
                     patch.object(compare_run.psutil, "Process", return_value=parent),
-                    self.assertRaisesRegex(RuntimeError, str(marker_pid)),
+                    self.assertRaisesRegex(RuntimeError, str(pid)),
                 ):
-                    compare_run.check_workers(process, ready, 1, {})
+                    compare_run.check_workers(process, {pid}, {})
 
     def test_main_preserves_partial_samples_and_continues(self) -> None:
         """
@@ -785,17 +986,23 @@ class TestBenchmarkRunner(unittest.TestCase):
                     "--output-dir", str(output),
                 ])
             saved = json.loads((output / "summary.json").read_text(encoding="utf-8"))
+            diagnostics = json.loads(
+                (output / "diagnostics.json").read_text(encoding="utf-8"),
+            )
             markdown = (output / "summary.md").read_text(encoding="utf-8")
             charts = list(output.glob("throughput-*.svg"))
 
         self.assertEqual(exit_code, 1)
         self.assertEqual(charts, [])
         self.assertEqual(run.call_count, 2)
+        self.assertEqual(diagnostics["settings"]["warmup_frameworks"], [])
         failed, successful = saved["results"]
         self.assertEqual(failed["framework"], "fastapi")
         self.assertEqual(failed["status"], "failed")
-        self.assertEqual(failed["samples"], [samples[0]])
-        self.assertIn("worker exited", failed["reason"])
+        self.assertEqual(diagnostics["results"][0]["samples"], [samples[0]])
+        self.assertIn("worker exited", diagnostics["results"][0]["reason"])
+        self.assertNotIn("samples", failed)
+        self.assertNotIn("reason", failed)
         for metric in METRICS:
             self.assertNotIn(metric, failed)
         self.assertEqual(successful["framework"], "starlette")
@@ -803,6 +1010,68 @@ class TestBenchmarkRunner(unittest.TestCase):
         self.assertEqual(successful["requests_per_second"], 100)
         self.assertIn("| fastapi | asgi | 1 | failed | - | - | - | - | - |", markdown)
         self.assertIn("| starlette | asgi | 1 | ok | 100.00 |", markdown)
+
+    def test_main_keeps_failure_reports_for_all_exit_paths(self) -> None:
+        """Verify setup errors, interruptions and unsupported cases remain failures."""
+        for scenario in ("setup", "setup-empty", "interrupt", "unsupported"):
+            with self.subTest(scenario=scenario), TemporaryDirectory() as temporary:
+                output = Path(temporary) / "results"
+                with (
+                    patch.object(compare_run.sys, "platform", "win32"),
+                    patch.object(
+                        compare_run, "collect_environment",
+                        return_value=_chart_report()["environment"],
+                    ),
+                    patch.object(
+                        compare_run, "resolve_oha",
+                        return_value=Path(temporary) / "oha",
+                        side_effect=RuntimeError(
+                            "oha setup failed" if scenario == "setup" else "",
+                        ) if scenario.startswith("setup") else None,
+                    ),
+                    patch.object(
+                        compare_run, "benchmark_case",
+                        side_effect=KeyboardInterrupt if scenario == "interrupt"
+                        else None,
+                    ) as benchmark,
+                    patch.dict(os.environ, {"GITHUB_STEP_SUMMARY": ""}),
+                    redirect_stdout(StringIO()),
+                    redirect_stderr(StringIO()),
+                ):
+                    exit_code = compare_run.main([
+                        "--workers", "2" if scenario == "unsupported" else "1",
+                        "--frameworks", "fastapi", "--output-dir", str(output),
+                    ])
+                report = json.loads(
+                    (output / "summary.json").read_text(encoding="utf-8"),
+                )
+                diagnostics = json.loads(
+                    (output / "diagnostics.json").read_text(encoding="utf-8"),
+                )
+                self.assertEqual(exit_code, 1)
+                self.assertEqual(list(output.glob("throughput-*.svg")), [])
+                self.assertTrue((output / "commands.json").is_file())
+                if scenario.startswith("setup"):
+                    benchmark.assert_not_called()
+                    self.assertEqual(
+                        diagnostics["error"],
+                        "oha setup failed" if scenario == "setup" else "",
+                    )
+                    self.assertIn("diagnostics.json", report["error"])
+                    self.assertEqual(report["results"], [])
+                else:
+                    row = report["results"][0]
+                    expected = "unsupported" if scenario == "unsupported" else "failed"
+                    self.assertEqual(row["status"], expected)
+                    for metric in METRICS:
+                        self.assertNotIn(metric, row)
+                    if scenario == "unsupported":
+                        benchmark.assert_not_called()
+                    else:
+                        self.assertEqual(
+                            diagnostics["results"][0]["reason"],
+                            "Interrupted by user",
+                        )
 
     def test_successful_main_writes_chart_from_saved_report(self) -> None:
         """
@@ -835,16 +1104,30 @@ class TestBenchmarkRunner(unittest.TestCase):
             ):
                 exit_code = compare_run.main([
                     "--workers", "1", "2", "3", "4",
-                    "--frameworks", "fastapi", "starlette",
+                    "--frameworks", "orionis-rsgi", "orionis-asgi",
+                    "fastapi", "litestar", "starlette",
                     "--output-dir", str(output),
                 ])
             saved = json.loads((output / "summary.json").read_text(encoding="utf-8"))
+            diagnostics = json.loads(
+                (output / "diagnostics.json").read_text(encoding="utf-8"),
+            )
             charts = {
                 path.name: path.read_text(encoding="utf-8")
                 for path in output.glob("throughput-*.svg")
             }
 
         self.assertEqual(exit_code, 0)
+        self.assertEqual(saved["schema_version"], 2)
+        self.assertEqual(set(saved["settings"]), {"frameworks", "workers"})
+        self.assertEqual(diagnostics["settings"]["warmup_seconds"], 2)
+        self.assertEqual(
+            diagnostics["settings"]["readiness"], "native-granian-workers-and-tcp",
+        )
+        self.assertEqual(
+            diagnostics["settings"]["warmup_frameworks"],
+            ["orionis-rsgi", "orionis-asgi"],
+        )
         self.assertEqual(
             set(charts),
             {f"throughput-{workers}-workers.svg" for workers in range(1, 5)},
@@ -866,7 +1149,7 @@ class TestThroughputCharts(unittest.TestCase):
 
     def test_svg_uses_sorted_three_worker_medians(self) -> None:
         """
-        Verify SVG ranking, scaling, worker filtering, and benchmark context.
+        Verify SVG ranking, scaling, worker filtering, and numeric results.
 
         Returns
         -------
@@ -898,12 +1181,19 @@ class TestThroughputCharts(unittest.TestCase):
             self.assertIn(f"{rate:,.2f}", "".join(group.itertext()))
         self.assertEqual(root.attrib["role"], "img")
         self.assertIn("Throughput with 3 workers", svg)
-        self.assertIn("HTTP 200 requests per second. Higher is better.", svg)
+        self.assertIn("Successful HTTP 200 requests per second.", svg)
         self.assertIn(">32,000</text>", svg)
-        self.assertIn("Median of 3 x 10s | 100 connections | 2s warmup", svg)
-        self.assertIn("Python 3.14.8 | Granian 2.8.4 | Commit abc1234", svg)
-        self.assertIn("2026-10-15", svg)
+        for detail in ("warmup", "connections", "Python", "Granian", "2026-10-15"):
+            self.assertNotIn(detail, svg)
         self.assertNotIn("999,999", svg)
+
+    def test_chart_requires_only_result_groups_and_quantities(self) -> None:
+        """Verify public results can reproduce a chart without runtime metadata."""
+        report = _chart_report()
+        report["settings"] = {"frameworks": report["settings"]["frameworks"]}
+        report.pop("environment")
+        svg = render_throughput_svg(report, 3)
+        self.assertIn("29,800.00", svg)
 
     def test_chart_rejects_incomplete_failed_or_errored_results(self) -> None:
         """
@@ -914,7 +1204,9 @@ class TestThroughputCharts(unittest.TestCase):
         None
             This test does not return a value.
         """
-        for scenario in ("missing", "duplicate", "failed", "errors", "setup"):
+        for scenario in (
+            "missing", "duplicate", "failed", "errors", "setup", "empty-setup",
+        ):
             with self.subTest(scenario=scenario):
                 report = _chart_report()
                 if scenario == "missing":
@@ -926,7 +1218,9 @@ class TestThroughputCharts(unittest.TestCase):
                 elif scenario == "errors":
                     report["results"][0]["errors"] = 1
                 else:
-                    report["error"] = "Setup failed"
+                    report["error"] = (
+                        "" if scenario == "empty-setup" else "Setup failed"
+                    )
                 with self.assertRaisesRegex(ValueError, "complete, error-free"):
                     render_throughput_svg(report, 3)
         with self.assertRaisesRegex(ValueError, "complete, error-free"): # NOSONAR
@@ -948,9 +1242,9 @@ class TestThroughputCharts(unittest.TestCase):
                 with self.assertRaisesRegex(ValueError, "finite and greater"):
                     render_throughput_svg(report, 3)
 
-    def test_chart_escapes_labels_and_environment(self) -> None:
+    def test_chart_escapes_labels_and_omits_environment(self) -> None:
         """
-        Verify that SVG labels and environment values remain escaped text.
+        Verify labels remain escaped text without exposing environment details.
 
         Returns
         -------
@@ -965,11 +1259,33 @@ class TestThroughputCharts(unittest.TestCase):
         root = ElementTree.fromstring(render_throughput_svg(report, 3))
         text = "".join(root.itertext())
         self.assertIn(label, text)
-        self.assertIn("Python 3.14.8 <preview> & build", text)
+        self.assertNotIn("Python 3.14.8 <preview> & build", text)
         self.assertEqual(root.findall(".//preview"), [])
 
 class TestComparisonReports(unittest.TestCase):
     """Verify that every artifact publishes the same comparative results."""
+
+    def test_public_reports_omit_preparation_details(self) -> None:
+        """Verify all public formats omit warmup and its unmeasured counts."""
+        report = _chart_report()
+        orionis = next(
+            row for row in report["results"] if row["framework"] == "orionis-asgi"
+        )
+        orionis["warmup"] = {**_successful_runs()[0], "requests": 1000000}
+        with TemporaryDirectory() as temporary:
+            output = Path(temporary)
+            markdown = write_reports(output, report)
+            rendered = {
+                "Markdown": markdown,
+                "JSON": (output / "summary.json").read_text(encoding="utf-8"),
+                "CSV": (output / "summary.csv").read_text(encoding="utf-8"),
+                "SVG": render_throughput_svg(report, 3),
+            }
+
+        for name, text in rendered.items():
+            with self.subTest(format=name):
+                self.assertNotIn("warmup", text.lower())
+                self.assertNotIn("1000000", text)
 
     def test_artifacts_preserve_valid_data_and_label_failures(self) -> None:
         """
@@ -982,7 +1298,8 @@ class TestComparisonReports(unittest.TestCase):
         """
         # Pair a valid row with an errored row to expose invented failure metrics.
         good = {
-            "framework": "starlette", "interface": "asgi", "workers": 1,
+            "framework": "orionis-asgi", "interface": "asgi", "workers": 1,
+            "warmup": {**_successful_runs()[0], "requests": 1000000},
             **aggregate_samples(_successful_runs()),
         }
         failed = {
@@ -991,7 +1308,9 @@ class TestComparisonReports(unittest.TestCase):
         }
         report = {
             "settings": {
+                "frameworks": ["orionis-asgi", "fastapi"], "workers": [1, 2],
                 "connections": 100, "warmup_seconds": 2,
+                "warmup_frameworks": ["orionis-asgi"],
                 "repetitions": 3, "duration_seconds": 10,
             },
             "environment": {
@@ -1013,23 +1332,46 @@ class TestComparisonReports(unittest.TestCase):
             saved_environment = json.loads(
                 (output / "environment.json").read_text(encoding="utf-8"),
             )
+            diagnostics = json.loads(
+                (output / "diagnostics.json").read_text(encoding="utf-8"),
+            )
             markdown = (output / "summary.md").read_text(encoding="utf-8")
             with (output / "summary.csv").open(encoding="utf-8", newline="") as stream:
                 rows = list(csv.DictReader(stream))
 
-        self.assertEqual(saved_report, report)
+        self.assertEqual(saved_report, {
+            "schema_version": 2,
+            "settings": {
+                "frameworks": ["orionis-asgi", "fastapi"], "workers": [1, 2],
+            },
+            "results": [
+                {
+                    "framework": "orionis-asgi", "interface": "asgi", "workers": 1,
+                    "status": "ok", "requests": 1110, "errors": 0,
+                    "requests_per_second": 100, "mean_latency_ms": 10,
+                    "p50_latency_ms": 5, "p95_latency_ms": 20, "p99_latency_ms": 30,
+                },
+                {
+                    "framework": "fastapi", "interface": "asgi", "workers": 2,
+                    "status": "failed", "requests": 100, "errors": 16,
+                },
+            ],
+        })
+        self.assertEqual(diagnostics, report)
         self.assertEqual(saved_environment, report["environment"])
         self.assertEqual(markdown, rendered)
+        for detail in ("warmup", "## Environment", "CI CPU", "- commit:", "- granian:"):
+            self.assertNotIn(detail, markdown)
         self.assertEqual(rows[0]["status"], "ok")
         self.assertEqual(float(rows[0]["requests_per_second"]), 100)
         self.assertEqual(float(rows[0]["p99_latency_ms"]), 30)
         self.assertEqual(rows[1]["status"], "failed")
         self.assertEqual(rows[1]["errors"], "16")
-        self.assertEqual(rows[1]["reason"], failed["reason"])
+        self.assertNotIn("reason", rows[1])
         for column in METRICS:
             self.assertEqual(rows[1][column], "")
         self.assertIn(
-            "| starlette | asgi | 1 | ok | 100.00 | 10.00 | "
+            "| orionis-asgi | asgi | 1 | ok | 100.00 | 10.00 | "
             "5.00 | 20.00 | 30.00 | 0 |",
             markdown,
         )
@@ -1037,6 +1379,23 @@ class TestComparisonReports(unittest.TestCase):
             "| fastapi | asgi | 2 | failed | - | - | - | - | - | 16 |",
             markdown,
         )
-        self.assertIn(failed["reason"], markdown)
-        self.assertIn("- commit: abc123", markdown)
-        self.assertIn("- granian: 2.8.4", markdown)
+        self.assertNotIn(failed["reason"], markdown)
+        self.assertIn("Comparison failed or incomplete", markdown)
+
+    def test_setup_failure_details_stay_in_diagnostics(self) -> None:
+        """Verify preparation failures remain explicit without exposing details."""
+        report = _chart_report()
+        report["error"] = "Warmup failed during preparation"
+        with TemporaryDirectory() as temporary:
+            output = Path(temporary)
+            markdown = write_reports(output, report)
+            public = (output / "summary.json").read_text(encoding="utf-8")
+            diagnostics = json.loads(
+                (output / "diagnostics.json").read_text(encoding="utf-8"),
+            )
+
+        self.assertNotIn("warmup", markdown.lower())
+        self.assertNotIn("warmup", public.lower())
+        self.assertIn("Comparison failed or incomplete", markdown)
+        self.assertIn("diagnostics.json", json.loads(public)["error"])
+        self.assertEqual(diagnostics["error"], report["error"])

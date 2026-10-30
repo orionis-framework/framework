@@ -1,9 +1,12 @@
 from datetime import time
+from typing import Self
+from config.logging import BootstrapLogging
 from orionis.foundation.config.logging import (
     Chunked,
     Daily,
     Hourly,
     Level,
+    Logging,
     Monthly,
     Stack,
     Weekly,
@@ -12,7 +15,25 @@ from orionis.foundation.config.logging.validators import IsValidLevel, IsValidPa
 from tests.foundation.config.test_environment import ConfigurationTestCase
 
 class TestLoggingConfiguration(ConfigurationTestCase):
-    def testCallableLevelValidationStillReturnsNone(self) -> None:
+
+    def testQueueCapacityIsExplicitAndValidatedInBothLayers(self: Self) -> None:
+        """Read queue capacity lazily and reject invalid admission limits.
+
+        Returns
+        -------
+        None
+            Verify opt-in defaults and strict environment-backed configuration.
+        """
+        for entity in (Logging, BootstrapLogging):
+            self.assertEqual(entity().queue_capacity, 0)
+        self.environment.values["LOG_QUEUE_CAPACITY"] = 128
+        for entity in (Logging, BootstrapLogging):
+            self.assertEqual(entity().queue_capacity, 128)
+            for value in (-1, True, "128", None):
+                with self.assertRaises(ValueError):
+                    entity(queue_capacity=value)
+
+    def testCallableLevelValidationStillReturnsNone(self: Self) -> None:
         """Keep validation-only calls distinct from numeric normalization.
 
         Returns
@@ -24,7 +45,7 @@ class TestLoggingConfiguration(ConfigurationTestCase):
             self.assertIsNone(IsValidLevel(value))
             self.assertEqual(IsValidLevel.normalize(value), Level.INFO.value)
 
-    def testStatelessValidatorsDoNotHaveInstanceDictionaries(self) -> None:
+    def testStatelessValidatorsDoNotHaveInstanceDictionaries(self: Self) -> None:
         """Keep shared logging validators free of mutable instance attributes.
 
         Returns
@@ -35,7 +56,7 @@ class TestLoggingConfiguration(ConfigurationTestCase):
         self.assertFalse(hasattr(IsValidLevel, "__dict__"))
         self.assertFalse(hasattr(IsValidPath, "__dict__"))
 
-    def testAllChannelsNormalizeTheSameLevelRepresentations(self) -> None:
+    def testAllChannelsNormalizeTheSameLevelRepresentations(self: Self) -> None:
         """Match numeric, enum, and string log levels across every channel.
 
         Returns
@@ -49,7 +70,7 @@ class TestLoggingConfiguration(ConfigurationTestCase):
                     with self.subTest(channel=cls.__name__, level=value):
                         self.assertEqual(cls(level=value).level, level.value)
 
-    def testInvalidLevelsAreRejectedConsistently(self) -> None:
+    def testInvalidLevelsAreRejectedConsistently(self: Self) -> None:
         """Reject unknown names and numeric levels without losing type errors.
 
         Returns
@@ -65,7 +86,7 @@ class TestLoggingConfiguration(ConfigurationTestCase):
                 ):
                     cls(level=value)
 
-    def testDailyRotationTimeAcceptsItsDocumentedStringForm(self) -> None:
+    def testDailyRotationTimeAcceptsItsDocumentedStringForm(self: Self) -> None:
         """Parse daily rotation strings and preserve validation exception causes.
 
         Returns

@@ -1,6 +1,6 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="900" height="496" viewBox="0 0 900 496" role="img" aria-labelledby="title description">
+<svg xmlns="http://www.w3.org/2000/svg" width="900" height="436" viewBox="0 0 900 436" role="img" aria-labelledby="title description">
 <title id="title">Throughput with 3 workers</title>
-<desc id="description">Successful HTTP 200 requests per second. Higher is better.</desc>
+<desc id="description">Successful HTTP 200 requests per second.</desc>
 <style>
 text { font-family: system-ui, -apple-system, 'Segoe UI', sans-serif; }
 .heading { fill: #f0f6fc; font-size: 17px; font-weight: 600; }
@@ -9,50 +9,47 @@ text { font-family: system-ui, -apple-system, 'Segoe UI', sans-serif; }
 .grid { stroke: #30363d; stroke-dasharray: 3 5; }
 .bar { fill: #245493; }
 </style>
-<rect width="900" height="496" rx="8" fill="#0d1117"/>
+<rect width="900" height="436" rx="8" fill="#0d1117"/>
 <text class="heading" x="30" y="32">Throughput with 3 workers</text>
-<text class="label" x="30" y="57">Successful HTTP 200 requests per second. Higher is better.</text>
+<text class="label" x="30" y="57">Successful HTTP 200 requests per second.</text>
 <line class="grid" x1="150.00" y1="92" x2="150.00" y2="388"/>
 <text class="muted" x="150.00" y="412" text-anchor="middle">0</text>
 <line class="grid" x1="305.00" y1="92" x2="305.00" y2="388"/>
-<text class="muted" x="305.00" y="412" text-anchor="middle">20,000</text>
+<text class="muted" x="305.00" y="412" text-anchor="middle">8,000</text>
 <line class="grid" x1="460.00" y1="92" x2="460.00" y2="388"/>
-<text class="muted" x="460.00" y="412" text-anchor="middle">40,000</text>
+<text class="muted" x="460.00" y="412" text-anchor="middle">16,000</text>
 <line class="grid" x1="615.00" y1="92" x2="615.00" y2="388"/>
-<text class="muted" x="615.00" y="412" text-anchor="middle">60,000</text>
+<text class="muted" x="615.00" y="412" text-anchor="middle">24,000</text>
 <line class="grid" x1="770.00" y1="92" x2="770.00" y2="388"/>
-<text class="muted" x="770.00" y="412" text-anchor="middle">80,000</text>
+<text class="muted" x="770.00" y="412" text-anchor="middle">32,000</text>
 <g data-framework="starlette">
-<title>Starlette: 65,093.34 requests/s</title>
+<title>Starlette: 29,923.72 requests/s</title>
 <text class="label" x="138" y="127" text-anchor="end">Starlette</text>
-<rect class="bar" x="150" y="100" width="504.47" height="44" rx="6"/>
-<text class="label" x="664.47" y="127">65,093.34</text>
+<rect class="bar" x="150" y="100" width="579.77" height="44" rx="6"/>
+<text class="label" x="739.77" y="127">29,923.72</text>
 </g>
 <g data-framework="orionis-rsgi">
-<title>Orionis RSGI: 58,257.12 requests/s</title>
+<title>Orionis RSGI: 24,533.74 requests/s</title>
 <text class="label" x="138" y="187" text-anchor="end">Orionis RSGI</text>
-<rect class="bar" x="150" y="160" width="451.49" height="44" rx="6"/>
-<text class="label" x="611.49" y="187">58,257.12</text>
+<rect class="bar" x="150" y="160" width="475.34" height="44" rx="6"/>
+<text class="label" x="635.34" y="187">24,533.74</text>
 </g>
 <g data-framework="orionis-asgi">
-<title>Orionis ASGI: 56,287.19 requests/s</title>
+<title>Orionis ASGI: 24,308.54 requests/s</title>
 <text class="label" x="138" y="247" text-anchor="end">Orionis ASGI</text>
-<rect class="bar" x="150" y="220" width="436.23" height="44" rx="6"/>
-<text class="label" x="596.23" y="247">56,287.19</text>
+<rect class="bar" x="150" y="220" width="470.98" height="44" rx="6"/>
+<text class="label" x="630.98" y="247">24,308.54</text>
 </g>
 <g data-framework="litestar">
-<title>Litestar: 49,864.72 requests/s</title>
+<title>Litestar: 21,027.53 requests/s</title>
 <text class="label" x="138" y="307" text-anchor="end">Litestar</text>
-<rect class="bar" x="150" y="280" width="386.45" height="44" rx="6"/>
-<text class="label" x="546.45" y="307">49,864.72</text>
+<rect class="bar" x="150" y="280" width="407.41" height="44" rx="6"/>
+<text class="label" x="567.41" y="307">21,027.53</text>
 </g>
 <g data-framework="fastapi">
-<title>FastAPI: 41,984.77 requests/s</title>
+<title>FastAPI: 16,135.90 requests/s</title>
 <text class="label" x="138" y="367" text-anchor="end">FastAPI</text>
-<rect class="bar" x="150" y="340" width="325.38" height="44" rx="6"/>
-<text class="label" x="485.38" y="367">41,984.77</text>
+<rect class="bar" x="150" y="340" width="312.63" height="44" rx="6"/>
+<text class="label" x="472.63" y="367">16,135.90</text>
 </g>
-<text class="muted" x="30" y="442">Median of 3 x 10s | 100 connections | 2s warmup</text>
-<text class="muted" x="30" y="462">Python 3.14.8 | Granian 2.8.4 | Commit 8ae1c9c | 2026-10-30</text>
-<text class="muted" x="30" y="482">Hello World microbenchmark; GitHub-hosted runner performance varies.</text>
 </svg>

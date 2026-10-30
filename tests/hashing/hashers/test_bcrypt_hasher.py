@@ -1,4 +1,5 @@
 import threading
+from typing import Self
 from orionis.hashing.contracts.hasher import IHasher
 from orionis.hashing.exceptions import HashConfigurationException
 from orionis.hashing.hashers.bcrypt_hasher import (
@@ -36,7 +37,7 @@ class _ThreadRecordingHasher(BcryptHasher):
 
     __slots__ = ("thread_ids",)
 
-    def __init__(self, *, rounds: int = _ROUNDS) -> None:
+    def __init__(self: Self, *, rounds: int = _ROUNDS) -> None:
         """Start with an empty journal of worker threads.
 
         Parameters
@@ -53,7 +54,7 @@ class _ThreadRecordingHasher(BcryptHasher):
         self.thread_ids: list[int] = []
 
     def _make(
-        self,
+        self: Self,
         value: str,
         *,
         rounds: int | None = None,
@@ -81,7 +82,7 @@ class _ThreadRecordingHasher(BcryptHasher):
         self.thread_ids.append(threading.get_ident())
         return super()._make(value, rounds=rounds, memory=memory, threads=threads)
 
-    def _check(self, value: str, hashed: str) -> bool:
+    def _check(self: Self, value: str, hashed: str) -> bool:
         """Record the executing thread before verifying.
 
         Parameters
@@ -100,8 +101,7 @@ class _ThreadRecordingHasher(BcryptHasher):
         return super()._check(value, hashed)
 
 class TestBcryptHasherLayout(TestCase):
-
-    def testImplementsTheHasherContract(self) -> None:
+    def testImplementsTheHasherContract(self: Self) -> None:
         """Register the driver as an implementation of the hashing contract.
 
         Validates that the manager can resolve it as an IHasher.
@@ -113,7 +113,7 @@ class TestBcryptHasherLayout(TestCase):
         """
         self.assertIsInstance(cheap_hasher(), IHasher)
 
-    def testDeclaresTheExpectedSlots(self) -> None:
+    def testDeclaresTheExpectedSlots(self: Self) -> None:
         """Declare the state of the driver as explicit slots.
 
         Validates the memory layout required by the framework conventions.
@@ -125,10 +125,10 @@ class TestBcryptHasherLayout(TestCase):
         """
         self.assertEqual(
             BcryptHasher.__dict__.get("__slots__"),
-            ("_backend", "_backend_class", "_rounds"),
+            ("_backend", "_backend_class", "_executor", "_rounds"),
         )
 
-    def testDoesNotExposeAnInstanceDictionary(self) -> None:
+    def testDoesNotExposeAnInstanceDictionary(self: Self) -> None:
         """Keep instances free of an attribute dictionary.
 
         Validates that the empty slots of the contract propagate to the
@@ -141,7 +141,7 @@ class TestBcryptHasherLayout(TestCase):
         """
         self.assertFalse(hasattr(cheap_hasher(), "__dict__"))
 
-    def testReportsBcryptAsItsAlgorithm(self) -> None:
+    def testReportsBcryptAsItsAlgorithm(self: Self) -> None:
         """Report bcrypt as the algorithm identifier of the driver.
 
         Validates the value exposed to callers inspecting the driver.
@@ -154,8 +154,7 @@ class TestBcryptHasherLayout(TestCase):
         self.assertEqual(cheap_hasher().getAlgorithm(), "bcrypt")
 
 class TestBcryptHasherDefaults(TestCase):
-
-    def testDeclaresTheBoundsImposedByTheAlgorithm(self) -> None:
+    def testDeclaresTheBoundsImposedByTheAlgorithm(self: Self) -> None:
         """Declare the cost range supported by bcrypt itself.
 
         Validates the constants guarding the configuration.
@@ -169,7 +168,7 @@ class TestBcryptHasherDefaults(TestCase):
         self.assertEqual(MAX_ROUNDS, 31)
         self.assertEqual(DEFAULT_ROUNDS, 12)
 
-    def testAppliesTheDeclaredDefaultWhenNoCostIsGiven(self) -> None:
+    def testAppliesTheDeclaredDefaultWhenNoCostIsGiven(self: Self) -> None:
         """Apply the declared default to a driver built without arguments.
 
         Validates the industry baseline used when the application does
@@ -183,8 +182,7 @@ class TestBcryptHasherDefaults(TestCase):
         self.assertEqual(BcryptHasher()._rounds, DEFAULT_ROUNDS)
 
 class TestBcryptHasherValidation(TestCase):
-
-    def testRejectsACostBelowTheMinimum(self) -> None:
+    def testRejectsACostBelowTheMinimum(self: Self) -> None:
         """Reject a cost factor under the bcrypt lower bound.
 
         Validates the guard protecting the backend from an unsupported
@@ -198,7 +196,7 @@ class TestBcryptHasherValidation(TestCase):
         with self.assertRaises(HashConfigurationException):
             BcryptHasher(rounds=MIN_ROUNDS - 1)
 
-    def testRejectsACostAboveTheMaximum(self) -> None:
+    def testRejectsACostAboveTheMaximum(self: Self) -> None:
         """Reject a cost factor over the bcrypt upper bound.
 
         Validates the guard protecting the application from an
@@ -212,7 +210,7 @@ class TestBcryptHasherValidation(TestCase):
         with self.assertRaises(HashConfigurationException):
             BcryptHasher(rounds=MAX_ROUNDS + 1)
 
-    def testAcceptsBothEndsOfTheSupportedRange(self) -> None:
+    def testAcceptsBothEndsOfTheSupportedRange(self: Self) -> None:
         """Accept the two boundary values of the supported range.
 
         Validates that the guard is inclusive on both ends.
@@ -225,7 +223,7 @@ class TestBcryptHasherValidation(TestCase):
         self.assertEqual(BcryptHasher(rounds=MIN_ROUNDS)._rounds, MIN_ROUNDS)
         self.assertEqual(BcryptHasher(rounds=MAX_ROUNDS)._rounds, MAX_ROUNDS)
 
-    def testRejectsNonIntegerCostFactors(self) -> None:
+    def testRejectsNonIntegerCostFactors(self: Self) -> None:
         """Reject cost factors that are not integers.
 
         Validates that a textual or fractional value never reaches the
@@ -241,7 +239,7 @@ class TestBcryptHasherValidation(TestCase):
         with self.assertRaises(HashConfigurationException):
             BcryptHasher(rounds=10.5)  # type: ignore[arg-type]
 
-    def testRejectsBooleanCostFactors(self) -> None:
+    def testRejectsBooleanCostFactors(self: Self) -> None:
         """Reject booleans even though they are integers in Python.
 
         Validates the explicit guard that keeps a flag from being read as
@@ -255,7 +253,7 @@ class TestBcryptHasherValidation(TestCase):
         with self.assertRaises(HashConfigurationException):
             BcryptHasher(rounds=True)
 
-    def testErrorMessageNamesTheSupportedRange(self) -> None:
+    def testErrorMessageNamesTheSupportedRange(self: Self) -> None:
         """Report the supported range and the rejected value.
 
         Validates that the failure is actionable without a traceback.
@@ -272,7 +270,7 @@ class TestBcryptHasherValidation(TestCase):
         self.assertIn(str(MAX_ROUNDS), message)
         self.assertIn("99", message)
 
-    async def testRejectsAnInvalidOverrideAtCallTime(self) -> None:
+    async def testRejectsAnInvalidOverrideAtCallTime(self: Self) -> None:
         """Reject an out of range override before hashing anything.
 
         Validates that a bad override fails loudly instead of silently
@@ -286,7 +284,7 @@ class TestBcryptHasherValidation(TestCase):
         with self.assertRaises(HashConfigurationException):
             await cheap_hasher().make("secret", rounds=99)
 
-    def testRejectsAnInvalidFluentValue(self) -> None:
+    def testRejectsAnInvalidFluentValue(self: Self) -> None:
         """Reject an out of range value handed to the fluent setter.
 
         Validates that the configured state can never become unusable.
@@ -300,8 +298,7 @@ class TestBcryptHasherValidation(TestCase):
             cheap_hasher().setRounds(MIN_ROUNDS - 1)
 
 class TestBcryptHasherBackend(TestCase):
-
-    def testConstructionNeverTouchesTheBackend(self) -> None:
+    def testConstructionNeverTouchesTheBackend(self: Self) -> None:
         """Build the driver without importing its backend package.
 
         Validates that the driver stays constructible when the optional
@@ -316,7 +313,7 @@ class TestBcryptHasherBackend(TestCase):
         self.assertIsNone(hasher._backend_class)
         self.assertIsNone(hasher._backend)
 
-    def testImportsTheBackendClassOnlyOnce(self) -> None:
+    def testImportsTheBackendClassOnlyOnce(self: Self) -> None:
         """Cache the backend class after the first import.
 
         Validates that repeated operations do not pay the import cost
@@ -330,7 +327,7 @@ class TestBcryptHasherBackend(TestCase):
         hasher = cheap_hasher()
         self.assertIs(hasher._backendClass(), hasher._backendClass())
 
-    def testCachesTheDefaultBackendInstance(self) -> None:
+    def testCachesTheDefaultBackendInstance(self: Self) -> None:
         """Reuse a single backend instance for the configured cost.
 
         Validates the caching that keeps hashing free of redundant
@@ -344,7 +341,7 @@ class TestBcryptHasherBackend(TestCase):
         hasher = cheap_hasher()
         self.assertIs(hasher._default(), hasher._default())
 
-    async def testMakeReusesTheCachedBackend(self) -> None:
+    async def testMakeReusesTheCachedBackend(self: Self) -> None:
         """Reuse the cached backend when no override is provided.
 
         Validates the fast path taken by the vast majority of calls.
@@ -360,7 +357,7 @@ class TestBcryptHasherBackend(TestCase):
         await hasher.make("secret")
         self.assertIs(hasher._backend, cached)
 
-    async def testOverridesNeverReplaceTheCachedBackend(self) -> None:
+    async def testOverridesNeverReplaceTheCachedBackend(self: Self) -> None:
         """Keep the cached backend untouched when a call overrides the cost.
 
         Validates that a per-call override stays scoped to that call.
@@ -376,7 +373,7 @@ class TestBcryptHasherBackend(TestCase):
         await hasher.make("secret", rounds=5)
         self.assertIs(hasher._backend, cached)
 
-    async def testForeignHashNeverReachesTheBackendInstance(self) -> None:
+    async def testForeignHashNeverReachesTheBackendInstance(self: Self) -> None:
         """Reject a foreign hash without building the backend instance.
 
         Validates the identify guard shared by check and needsRehash, which
@@ -392,7 +389,7 @@ class TestBcryptHasherBackend(TestCase):
         self.assertTrue(hasher.needsRehash(_FOREIGN_HASH))
         self.assertIsNone(hasher._backend)
 
-    async def testHashingRunsOutsideTheEventLoopThread(self) -> None:
+    async def testHashingRunsOutsideTheEventLoopThread(self: Self) -> None:
         """Burn the hashing cost on a worker thread instead of the loop.
 
         Validates that a login never stalls the other requests served by
@@ -410,8 +407,7 @@ class TestBcryptHasherBackend(TestCase):
         self.assertNotIn(threading.get_ident(), hasher.thread_ids)
 
 class TestBcryptHasherMake(TestCase):
-
-    async def testProducesABcryptHash(self) -> None:
+    async def testProducesABcryptHash(self: Self) -> None:
         """Produce a hash carrying the bcrypt prefix and cost factor.
 
         Validates that the configured cost reaches the backend.
@@ -424,7 +420,7 @@ class TestBcryptHasherMake(TestCase):
         hashed = await cheap_hasher().make("secret")
         self.assertTrue(hashed.startswith("$2b$04$"))
 
-    async def testNeverReturnsThePlainValue(self) -> None:
+    async def testNeverReturnsThePlainValue(self: Self) -> None:
         """Keep the plain value out of the produced hash.
 
         Validates the most basic guarantee expected from the driver.
@@ -436,7 +432,7 @@ class TestBcryptHasherMake(TestCase):
         """
         self.assertNotIn("secret", await cheap_hasher().make("secret"))
 
-    async def testIsSaltedPerCall(self) -> None:
+    async def testIsSaltedPerCall(self: Self) -> None:
         """Produce a different hash for every call on the same value.
 
         Validates that a random salt is generated per call.
@@ -449,7 +445,7 @@ class TestBcryptHasherMake(TestCase):
         hasher = cheap_hasher()
         self.assertNotEqual(await hasher.make("secret"), await hasher.make("secret"))
 
-    async def testHonorsTheRoundsOverride(self) -> None:
+    async def testHonorsTheRoundsOverride(self: Self) -> None:
         """Apply the cost override to a single call.
 
         Validates the per-call tuning of the cost factor.
@@ -462,7 +458,7 @@ class TestBcryptHasherMake(TestCase):
         hashed = await cheap_hasher().make("secret", rounds=5)
         self.assertTrue(hashed.startswith("$2b$05$"))
 
-    async def testIgnoresTheOptionsOfOtherAlgorithms(self) -> None:
+    async def testIgnoresTheOptionsOfOtherAlgorithms(self: Self) -> None:
         """Ignore the memory and parallelism overrides.
 
         Validates that the shared contract stays usable even though
@@ -477,8 +473,7 @@ class TestBcryptHasherMake(TestCase):
         self.assertTrue(hashed.startswith("$2b$04$"))
 
 class TestBcryptHasherCheck(TestCase):
-
-    async def testAcceptsTheOriginalValue(self) -> None:
+    async def testAcceptsTheOriginalValue(self: Self) -> None:
         """Accept the value the hash was produced from.
 
         Validates the round trip application code depends on.
@@ -491,7 +486,7 @@ class TestBcryptHasherCheck(TestCase):
         hasher = cheap_hasher()
         self.assertTrue(await hasher.check("secret", await hasher.make("secret")))
 
-    async def testRejectsADifferentValue(self) -> None:
+    async def testRejectsADifferentValue(self: Self) -> None:
         """Reject any value other than the hashed one.
 
         Validates that verification is not vulnerable to a partial match.
@@ -504,7 +499,7 @@ class TestBcryptHasherCheck(TestCase):
         hasher = cheap_hasher()
         self.assertFalse(await hasher.check("other", await hasher.make("secret")))
 
-    async def testAcceptsAHashCreatedWithAnotherCost(self) -> None:
+    async def testAcceptsAHashCreatedWithAnotherCost(self: Self) -> None:
         """Accept a hash produced with a different cost factor.
 
         Validates that raising the cost never locks existing users out.
@@ -517,7 +512,7 @@ class TestBcryptHasherCheck(TestCase):
         legacy = await cheap_hasher().make("secret")
         self.assertTrue(await cheap_hasher(rounds=5).check("secret", legacy))
 
-    async def testRejectsAHashFromAnotherAlgorithm(self) -> None:
+    async def testRejectsAHashFromAnotherAlgorithm(self: Self) -> None:
         """Reject a hash produced by another algorithm.
 
         Validates the guard that keeps the backend from parsing a foreign
@@ -530,7 +525,7 @@ class TestBcryptHasherCheck(TestCase):
         """
         self.assertFalse(await cheap_hasher().check("secret", _FOREIGN_HASH))
 
-    async def testRejectsAMalformedHash(self) -> None:
+    async def testRejectsAMalformedHash(self: Self) -> None:
         """Reject an input that is not an encoded hash at all.
 
         Validates that unparsable data never raises through the driver.
@@ -542,7 +537,7 @@ class TestBcryptHasherCheck(TestCase):
         """
         self.assertFalse(await cheap_hasher().check("secret", "not-a-hash"))
 
-    async def testRejectsAnEmptyHash(self) -> None:
+    async def testRejectsAnEmptyHash(self: Self) -> None:
         """Reject an empty hash without touching the backend.
 
         Validates the guard protecting the verification path from a
@@ -556,8 +551,7 @@ class TestBcryptHasherCheck(TestCase):
         self.assertFalse(await cheap_hasher().check("secret", ""))
 
 class TestBcryptHasherNeedsRehash(TestCase):
-
-    async def testFreshHashIsUpToDate(self) -> None:
+    async def testFreshHashIsUpToDate(self: Self) -> None:
         """Report a hash created with the current cost as up to date.
 
         Validates that no needless rehash is triggered on login.
@@ -570,7 +564,7 @@ class TestBcryptHasherNeedsRehash(TestCase):
         hasher = cheap_hasher()
         self.assertFalse(hasher.needsRehash(await hasher.make("secret")))
 
-    async def testOutdatedCostRequiresARehash(self) -> None:
+    async def testOutdatedCostRequiresARehash(self: Self) -> None:
         """Report a hash created with a lower cost as outdated.
 
         Validates the upgrade path after raising the configured cost.
@@ -583,7 +577,7 @@ class TestBcryptHasherNeedsRehash(TestCase):
         legacy = await cheap_hasher().make("secret")
         self.assertTrue(cheap_hasher(rounds=5).needsRehash(legacy))
 
-    def testForeignAlgorithmRequiresARehash(self) -> None:
+    def testForeignAlgorithmRequiresARehash(self: Self) -> None:
         """Report a hash from another algorithm as outdated.
 
         Validates the migration path from another driver.
@@ -595,7 +589,7 @@ class TestBcryptHasherNeedsRehash(TestCase):
         """
         self.assertTrue(cheap_hasher().needsRehash(_FOREIGN_HASH))
 
-    def testMalformedHashRequiresARehash(self) -> None:
+    def testMalformedHashRequiresARehash(self: Self) -> None:
         """Report an unparsable hash as outdated.
 
         Validates that corrupted data is regenerated instead of raising.
@@ -607,7 +601,7 @@ class TestBcryptHasherNeedsRehash(TestCase):
         """
         self.assertTrue(cheap_hasher().needsRehash("not-a-hash"))
 
-    def testEmptyHashRequiresARehash(self) -> None:
+    def testEmptyHashRequiresARehash(self: Self) -> None:
         """Report an empty hash as outdated without touching the backend.
 
         Validates the guard covering a missing stored value.
@@ -620,8 +614,7 @@ class TestBcryptHasherNeedsRehash(TestCase):
         self.assertTrue(cheap_hasher().needsRehash(""))
 
 class TestBcryptHasherConfiguration(TestCase):
-
-    def testSetRoundsReturnsTheSameInstance(self) -> None:
+    def testSetRoundsReturnsTheSameInstance(self: Self) -> None:
         """Return the driver itself from the fluent setter.
 
         Validates the chaining style advertised by the contract.
@@ -634,7 +627,7 @@ class TestBcryptHasherConfiguration(TestCase):
         hasher = cheap_hasher()
         self.assertIs(hasher.setRounds(5), hasher)
 
-    async def testSetRoundsAppliesToLaterHashes(self) -> None:
+    async def testSetRoundsAppliesToLaterHashes(self: Self) -> None:
         """Apply the new cost factor to every subsequent hash.
 
         Validates that the cached backend is rebuilt after the change.
@@ -649,7 +642,7 @@ class TestBcryptHasherConfiguration(TestCase):
         hashed = await hasher.make("secret")
         self.assertTrue(hashed.startswith("$2b$05$"))
 
-    def testSetRoundsDropsTheCachedBackend(self) -> None:
+    def testSetRoundsDropsTheCachedBackend(self: Self) -> None:
         """Drop the cached backend whenever the cost factor changes.
 
         Validates the invalidation that makes the new configuration
@@ -665,7 +658,7 @@ class TestBcryptHasherConfiguration(TestCase):
         hasher.setRounds(5)
         self.assertIsNone(hasher._backend)
 
-    async def testEarlierHashesRemainVerifiable(self) -> None:
+    async def testEarlierHashesRemainVerifiable(self: Self) -> None:
         """Keep verifying hashes produced before a configuration change.
 
         Validates that reconfiguring the driver never invalidates stored

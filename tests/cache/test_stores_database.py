@@ -2,13 +2,14 @@ from __future__ import annotations
 import asyncio
 import tempfile
 from pathlib import Path
+from typing import Self
 from orionis.cache.stores.database import DatabaseCacheBackend
 from orionis.database.connection import Connection
 from orionis.test import TestCase
 
 class TestDatabaseCacheBackend(TestCase):
 
-    async def asyncSetUp(self) -> None:
+    async def asyncSetUp(self: Self) -> None:
         """Create an in-memory SQLite connection and a fresh backend per test.
 
         Provides an isolated, writable database so every test operates
@@ -30,7 +31,7 @@ class TestDatabaseCacheBackend(TestCase):
             lock_table="cache_locks",
         )
 
-    async def asyncTearDown(self) -> None:
+    async def asyncTearDown(self: Self) -> None:
         """Dispose the in-memory engine after each test.
 
         Releases the pooled in-memory database.
@@ -44,7 +45,7 @@ class TestDatabaseCacheBackend(TestCase):
 
     # ── get ──────────────────────────────────────────────────────────────────
 
-    async def testGetMissingKeyReturnsDefault(self) -> None:
+    async def testGetMissingKeyReturnsDefault(self: Self) -> None:
         """Return the default value when a key does not exist.
 
         Validates that a missing key produces the caller-supplied default
@@ -58,7 +59,7 @@ class TestDatabaseCacheBackend(TestCase):
         result = await self._backend.get("absent")
         self.assertIsNone(result)
 
-    async def testGetMissingKeyReturnsCustomDefault(self) -> None:
+    async def testGetMissingKeyReturnsCustomDefault(self: Self) -> None:
         """Return a caller-supplied default for a missing key.
 
         Validates that the default parameter is forwarded correctly and
@@ -72,7 +73,7 @@ class TestDatabaseCacheBackend(TestCase):
         result = await self._backend.get("absent", default="fallback")
         self.assertEqual(result, "fallback")
 
-    async def testGetExistingKeyReturnsValue(self) -> None:
+    async def testGetExistingKeyReturnsValue(self: Self) -> None:
         """Return the stored value for an existing key.
 
         Validates the basic happy-path: set then get recovers the value.
@@ -86,7 +87,7 @@ class TestDatabaseCacheBackend(TestCase):
         result = await self._backend.get("k1")
         self.assertEqual(result, "hello")
 
-    async def testGetAfterTtlExpiryReturnsDefault(self) -> None:
+    async def testGetAfterTtlExpiryReturnsDefault(self: Self) -> None:
         """Return the default value after a key's TTL has elapsed.
 
         Validates that expired entries are lazily evicted on first read
@@ -104,7 +105,7 @@ class TestDatabaseCacheBackend(TestCase):
 
     # ── set ──────────────────────────────────────────────────────────────────
 
-    async def testSetReturnsTrueOnSuccess(self) -> None:
+    async def testSetReturnsTrueOnSuccess(self: Self) -> None:
         """Return True after a successful set operation.
 
         Validates the documented return value contract for set.
@@ -117,7 +118,7 @@ class TestDatabaseCacheBackend(TestCase):
         result = await self._backend.set("k", "v")
         self.assertTrue(result)
 
-    async def testSetOverwritesExistingValue(self) -> None:
+    async def testSetOverwritesExistingValue(self: Self) -> None:
         """Overwrite an existing key with a new value.
 
         Validates that a second set replaces the previous value so get
@@ -133,7 +134,7 @@ class TestDatabaseCacheBackend(TestCase):
         result = await self._backend.get("k")
         self.assertEqual(result, "second")
 
-    async def testSetWithNoneTtlPersistsForever(self) -> None:
+    async def testSetWithNoneTtlPersistsForever(self: Self) -> None:
         """Persist a value with no TTL indefinitely.
 
         Validates that passing ttl=None stores the entry without an
@@ -148,7 +149,7 @@ class TestDatabaseCacheBackend(TestCase):
         result = await self._backend.get("persist")
         self.assertEqual(result, 42)
 
-    async def testSetStoresNoneValue(self) -> None:
+    async def testSetStoresNoneValue(self: Self) -> None:
         """Store and retrieve an explicit None value.
 
         Validates that None stored intentionally is recovered as None,
@@ -165,7 +166,7 @@ class TestDatabaseCacheBackend(TestCase):
 
     # ── exists ───────────────────────────────────────────────────────────────
 
-    async def testExistsTrueForExistingKey(self) -> None:
+    async def testExistsTrueForExistingKey(self: Self) -> None:
         """Return True when the key exists and has not expired.
 
         Validates the exists method for the basic present-key case.
@@ -178,7 +179,7 @@ class TestDatabaseCacheBackend(TestCase):
         await self._backend.set("ex", "val")
         self.assertTrue(await self._backend.exists("ex"))
 
-    async def testExistsFalseForMissingKey(self) -> None:
+    async def testExistsFalseForMissingKey(self: Self) -> None:
         """Return False when the key has never been stored.
 
         Validates that exists does not raise for unknown keys.
@@ -190,7 +191,7 @@ class TestDatabaseCacheBackend(TestCase):
         """
         self.assertFalse(await self._backend.exists("ghost"))
 
-    async def testExistsFalseAfterExpiry(self) -> None:
+    async def testExistsFalseAfterExpiry(self: Self) -> None:
         """Return False after a key's TTL has elapsed.
 
         Validates that exists uses the same lazy-eviction logic as get.
@@ -206,7 +207,7 @@ class TestDatabaseCacheBackend(TestCase):
 
     # ── delete ───────────────────────────────────────────────────────────────
 
-    async def testDeleteExistingKeyReturnsOne(self) -> None:
+    async def testDeleteExistingKeyReturnsOne(self: Self) -> None:
         """Remove an existing key and report it as deleted.
 
         Validates the documented int contract (1 for an existing key).
@@ -221,7 +222,7 @@ class TestDatabaseCacheBackend(TestCase):
         self.assertEqual(result, 1)
         self.assertFalse(await self._backend.exists("d"))
 
-    async def testDeleteMissingKeyReturnsZero(self) -> None:
+    async def testDeleteMissingKeyReturnsZero(self: Self) -> None:
         """Report zero affected rows when deleting an absent key.
 
         Validates that deleting a non-existent key does not raise.
@@ -236,7 +237,7 @@ class TestDatabaseCacheBackend(TestCase):
 
     # ── clear ────────────────────────────────────────────────────────────────
 
-    async def testClearRemovesAllEntries(self) -> None:
+    async def testClearRemovesAllEntries(self: Self) -> None:
         """Remove every stored entry from the table.
 
         Validates that clear wipes all rows regardless of key.
@@ -255,7 +256,7 @@ class TestDatabaseCacheBackend(TestCase):
 
     # ── multi get/set ────────────────────────────────────────────────────────
 
-    async def testMultiGetReturnsValuesInOrder(self) -> None:
+    async def testMultiGetReturnsValuesInOrder(self: Self) -> None:
         """Return values matching the order of the requested keys.
 
         Validates that missing keys map to None within the batch result.
@@ -270,7 +271,7 @@ class TestDatabaseCacheBackend(TestCase):
         result = await self._backend.multiGet(["m1", "m2", "missing"])
         self.assertEqual(result, ["one", "two", None])
 
-    async def testMultiSetStoresAllPairs(self) -> None:
+    async def testMultiSetStoresAllPairs(self: Self) -> None:
         """Store every key/value pair from a batch write.
 
         Validates that all pairs become individually retrievable.
@@ -285,7 +286,7 @@ class TestDatabaseCacheBackend(TestCase):
         self.assertEqual(await self._backend.get("s1"), "a")
         self.assertEqual(await self._backend.get("s2"), "b")
 
-    async def testAiocacheAliasesDelegateToCamelCaseMethods(self) -> None:
+    async def testAiocacheAliasesDelegateToCamelCaseMethods(self: Self) -> None:
         """Delegate the snake_case aliases to their camelCase counterparts.
 
         Validates the aiocache-compatible multi_get/multi_set aliases.
@@ -301,7 +302,7 @@ class TestDatabaseCacheBackend(TestCase):
 
     # ── add ──────────────────────────────────────────────────────────────────
 
-    async def testAddStoresValueWhenKeyIsAbsent(self) -> None:
+    async def testAddStoresValueWhenKeyIsAbsent(self: Self) -> None:
         """Store the value when the key does not already exist.
 
         Validates the happy path of the add operation.
@@ -315,7 +316,7 @@ class TestDatabaseCacheBackend(TestCase):
         self.assertTrue(result)
         self.assertEqual(await self._backend.get("new"), "val")
 
-    async def testAddRaisesWhenKeyAlreadyExists(self) -> None:
+    async def testAddRaisesWhenKeyAlreadyExists(self: Self) -> None:
         """Raise ValueError when attempting to add an existing key.
 
         Validates the documented conflict behaviour of add.
@@ -331,7 +332,7 @@ class TestDatabaseCacheBackend(TestCase):
 
     # ── increment ────────────────────────────────────────────────────────────
 
-    async def testIncrementCreatesKeyWhenAbsent(self) -> None:
+    async def testIncrementCreatesKeyWhenAbsent(self: Self) -> None:
         """Create the key with the delta value when it does not exist.
 
         Validates the documented auto-creation behaviour of increment.
@@ -344,7 +345,7 @@ class TestDatabaseCacheBackend(TestCase):
         result = await self._backend.increment("counter")
         self.assertEqual(result, 1)
 
-    async def testIncrementAddsDeltaToExistingValue(self) -> None:
+    async def testIncrementAddsDeltaToExistingValue(self: Self) -> None:
         """Add the delta to an existing integer value.
 
         Validates the basic increment happy path.
@@ -359,7 +360,7 @@ class TestDatabaseCacheBackend(TestCase):
         self.assertEqual(result, 15)
         self.assertEqual(await self._backend.get("counter2"), 15)
 
-    async def testIncrementSupportsNegativeDelta(self) -> None:
+    async def testIncrementSupportsNegativeDelta(self: Self) -> None:
         """Subtract from the stored value using a negative delta.
 
         Validates that increment doubles as decrement via sign inversion.
@@ -373,7 +374,7 @@ class TestDatabaseCacheBackend(TestCase):
         result = await self._backend.increment("counter3", delta=-4)
         self.assertEqual(result, 6)
 
-    async def testIncrementResetsAfterExpiry(self) -> None:
+    async def testIncrementResetsAfterExpiry(self: Self) -> None:
         """Restart the counter from the delta once the previous entry expired.
 
         Validates that increment treats an expired row as absent.
@@ -390,7 +391,7 @@ class TestDatabaseCacheBackend(TestCase):
 
     # ── atomic locks ─────────────────────────────────────────────────────────
 
-    async def testAcquireLockSucceedsWhenFree(self) -> None:
+    async def testAcquireLockSucceedsWhenFree(self: Self) -> None:
         """Acquire the lock when no row exists for the key yet.
 
         Validates the base case of the row-based lock.
@@ -403,7 +404,7 @@ class TestDatabaseCacheBackend(TestCase):
         acquired = await self._backend.acquireLock("res", "owner-a", lease=5)
         self.assertTrue(acquired)
 
-    async def testAcquireLockFailsWhenHeldByAnotherOwner(self) -> None:
+    async def testAcquireLockFailsWhenHeldByAnotherOwner(self: Self) -> None:
         """Refuse to grant the lock to a different owner while it is valid.
 
         Validates mutual exclusion between distinct owner tokens.
@@ -417,7 +418,7 @@ class TestDatabaseCacheBackend(TestCase):
         acquired = await self._backend.acquireLock("res2", "owner-b", lease=5)
         self.assertFalse(acquired)
 
-    async def testAcquireLockSucceedsForSameOwner(self) -> None:
+    async def testAcquireLockSucceedsForSameOwner(self: Self) -> None:
         """Allow the current owner to renew its own lock.
 
         Validates that re-acquiring with the same owner token succeeds.
@@ -431,7 +432,7 @@ class TestDatabaseCacheBackend(TestCase):
         acquired = await self._backend.acquireLock("res3", "owner-a", lease=5)
         self.assertTrue(acquired)
 
-    async def testAcquireLockSucceedsAfterExpiry(self) -> None:
+    async def testAcquireLockSucceedsAfterExpiry(self: Self) -> None:
         """Steal an expired lock row on behalf of a new owner.
 
         Validates that a lease elapsing releases the lock automatically.
@@ -446,7 +447,7 @@ class TestDatabaseCacheBackend(TestCase):
         acquired = await self._backend.acquireLock("res4", "owner-b", lease=5)
         self.assertTrue(acquired)
 
-    async def testReleaseLockAllowsReacquisitionByOtherOwner(self) -> None:
+    async def testReleaseLockAllowsReacquisitionByOtherOwner(self: Self) -> None:
         """Free the lock row so another owner can acquire it immediately.
 
         Validates the explicit release path of the row-based lock.
@@ -463,7 +464,7 @@ class TestDatabaseCacheBackend(TestCase):
 
     # ── expiration column ────────────────────────────────────────────────────
 
-    async def testEntryExpirationKeepsSubSecondPrecision(self) -> None:
+    async def testEntryExpirationKeepsSubSecondPrecision(self: Self) -> None:
         """Store a fractional TTL without losing its decimals.
 
         Validates that the expiration column is wide enough for the
@@ -486,7 +487,7 @@ class TestDatabaseCacheBackend(TestCase):
         self.assertIsInstance(stored, float)
         self.assertNotEqual(stored % 1, 0.0)
 
-    async def testLockExpirationKeepsSubSecondPrecision(self) -> None:
+    async def testLockExpirationKeepsSubSecondPrecision(self: Self) -> None:
         """Store a fractional lease without losing its decimals.
 
         Validates that a short lease is honoured with the granularity it
@@ -508,6 +509,7 @@ class TestDatabaseCacheBackend(TestCase):
         self.assertIsInstance(stored, float)
         self.assertNotEqual(stored % 1, 0.0)
 
+
 class TestDatabaseCacheBackendConcurrency(TestCase):
     """Atomicity tests for the operations several callers may race on.
 
@@ -517,7 +519,7 @@ class TestDatabaseCacheBackendConcurrency(TestCase):
     which hides the very behaviour under test.
     """
 
-    async def asyncSetUp(self) -> None:
+    async def asyncSetUp(self: Self) -> None:
         """Create a file-backed database and a ready backend per test.
 
         Gives every concurrent task its own connection, so the database
@@ -535,6 +537,10 @@ class TestDatabaseCacheBackendConcurrency(TestCase):
                 "driver": "sqlite",
                 "database": str(Path(self._tmpdir.name) / "cache.sqlite"),
                 "prefix": "",
+                # Match the concurrent SQLite queue fixture: readers must not
+                # exhaust SQLite's short default busy timeout under asyncio debug.
+                "journal_mode": "WAL",
+                "busy_timeout": 30000,
             },
         )
         self._backend = DatabaseCacheBackend(
@@ -543,7 +549,7 @@ class TestDatabaseCacheBackendConcurrency(TestCase):
         )
         await self._backend._ensureSchema()
 
-    async def asyncTearDown(self) -> None:
+    async def asyncTearDown(self: Self) -> None:
         """Dispose the engine and remove the temporary database file.
 
         Releases the file handle before the directory is cleaned up.
@@ -556,7 +562,7 @@ class TestDatabaseCacheBackendConcurrency(TestCase):
         await self._connection.disconnect()
         self._tmpdir.cleanup()
 
-    async def testConcurrentAddGrantsASingleWinner(self) -> None:
+    async def testConcurrentAddGrantsASingleWinner(self: Self) -> None:
         """Let exactly one concurrent caller create the key.
 
         Validates that add() decides the winner through the primary key
@@ -579,7 +585,7 @@ class TestDatabaseCacheBackendConcurrency(TestCase):
         self.assertEqual(len(granted), 1)
         self.assertEqual(len(rejected), 9)
 
-    async def testConcurrentIncrementsAreNotLost(self) -> None:
+    async def testConcurrentIncrementsAreNotLost(self: Self) -> None:
         """Apply every concurrent increment to the same counter.
 
         Validates the compare-and-swap retry: a plain read-modify-write
@@ -599,7 +605,7 @@ class TestDatabaseCacheBackendConcurrency(TestCase):
 
         self.assertEqual(await self._backend.get("hits"), 10)
 
-    async def testConcurrentIncrementsCreateTheCounterOnce(self) -> None:
+    async def testConcurrentIncrementsCreateTheCounterOnce(self: Self) -> None:
         """Reach the exact total when the counter does not exist yet.
 
         Validates that the creation path is retried instead of letting
@@ -616,7 +622,7 @@ class TestDatabaseCacheBackendConcurrency(TestCase):
 
         self.assertEqual(await self._backend.get("fresh"), 10)
 
-    async def testConcurrentLockAttemptsGrantASingleOwner(self) -> None:
+    async def testConcurrentLockAttemptsGrantASingleOwner(self: Self) -> None:
         """Hand the lock row to one owner when several race for it.
 
         Validates that the row-based lock keeps mutual exclusion when

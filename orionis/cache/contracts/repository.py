@@ -1,5 +1,5 @@
 from abc import ABC, abstractmethod
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING, Any, Self
 
 if TYPE_CHECKING:
     from collections.abc import Callable
@@ -10,8 +10,42 @@ class ICacheRepository(ABC):
 
     __slots__ = ()
 
+    async def rememberOnce(
+        self: Self,
+        key: str,
+        ttl: float | None,
+        resolver: Callable,
+        *,
+        wait_timeout: float = 10,
+        lease: float | None = None,
+    ) -> Any:
+        """
+        Coalesce overlapping misses, or explicitly reject unsupported stores.
+
+        Parameters
+        ----------
+        key : str
+            Cache or lease key to access.
+        ttl : float | None
+            Entry lifetime in seconds.
+        resolver : Callable
+            Callback that supplies the missing cache value.
+        wait_timeout : float
+            Maximum number of seconds to wait for ownership.
+        lease : float | None
+            Lease lifetime in seconds; use the store default when omitted.
+
+        Returns
+        -------
+        Any
+            Cached value or the result produced by the owning resolver.
+        """
+        raise NotImplementedError
+
     @abstractmethod
-    async def replace(self, key: str, value: Any, ttl: float | None = None) -> bool:
+    async def replace(
+        self: Self, key: str, value: Any, ttl: float | None = None,
+    ) -> bool:
         """Replace a live entry atomically without creating a missing key.
 
         Parameters
@@ -30,7 +64,7 @@ class ICacheRepository(ABC):
         """
 
     @abstractmethod
-    async def get(self, key: str) -> Any:
+    async def get(self: Self, key: str) -> Any:
         """
         Retrieve the cached value for *key*.
 
@@ -46,7 +80,7 @@ class ICacheRepository(ABC):
         """
 
     @abstractmethod
-    async def set(self, key: str, value: Any, ttl: float | None = None) -> bool:
+    async def set(self: Self, key: str, value: Any, ttl: float | None = None) -> bool:
         """
         Store *value* under *key* with an optional TTL.
 
@@ -66,7 +100,7 @@ class ICacheRepository(ABC):
         """
 
     @abstractmethod
-    async def has(self, key: str) -> bool:
+    async def has(self: Self, key: str) -> bool:
         """
         Check whether *key* exists and has not expired.
 
@@ -82,7 +116,7 @@ class ICacheRepository(ABC):
         """
 
     @abstractmethod
-    async def delete(self, key: str) -> bool:
+    async def delete(self: Self, key: str) -> bool:
         """
         Remove *key* from the store.
 
@@ -98,7 +132,7 @@ class ICacheRepository(ABC):
         """
 
     @abstractmethod
-    async def clear(self) -> bool:
+    async def clear(self: Self) -> bool:
         """
         Remove all entries from the store.
 
@@ -109,7 +143,7 @@ class ICacheRepository(ABC):
         """
 
     @abstractmethod
-    async def getMany(self, keys: list[str]) -> dict[str, Any]:
+    async def getMany(self: Self, keys: list[str]) -> dict[str, Any]:
         """
         Retrieve multiple values at once.
 
@@ -126,7 +160,7 @@ class ICacheRepository(ABC):
 
     @abstractmethod
     async def setMany(
-        self,
+        self: Self,
         values: dict[str, Any],
         ttl: float | None = None,
     ) -> bool:
@@ -148,7 +182,7 @@ class ICacheRepository(ABC):
 
     @abstractmethod
     async def remember(
-        self,
+        self: Self,
         key: str,
         ttl: float | None,
         resolver: Callable,
@@ -172,7 +206,7 @@ class ICacheRepository(ABC):
         """
 
     @abstractmethod
-    async def rememberForever(self, key: str, resolver: Callable) -> Any:
+    async def rememberForever(self: Self, key: str, resolver: Callable) -> Any:
         """
         Return the cached value; resolve and cache forever if absent.
 
@@ -190,7 +224,7 @@ class ICacheRepository(ABC):
         """
 
     @abstractmethod
-    async def pull(self, key: str) -> Any:
+    async def pull(self: Self, key: str) -> Any:
         """
         Return and immediately delete *key* from the store.
 
@@ -206,7 +240,7 @@ class ICacheRepository(ABC):
         """
 
     @abstractmethod
-    async def add(self, key: str, value: Any, ttl: float | None = None) -> bool:
+    async def add(self: Self, key: str, value: Any, ttl: float | None = None) -> bool:
         """
         Store *value* only if *key* does not already exist.
 
@@ -226,7 +260,7 @@ class ICacheRepository(ABC):
         """
 
     @abstractmethod
-    async def increment(self, key: str, amount: int = 1) -> int:
+    async def increment(self: Self, key: str, amount: int = 1) -> int:
         """
         Increment the integer stored at *key* by *amount*.
 
@@ -244,7 +278,7 @@ class ICacheRepository(ABC):
         """
 
     @abstractmethod
-    async def decrement(self, key: str, amount: int = 1) -> int:
+    async def decrement(self: Self, key: str, amount: int = 1) -> int:
         """
         Decrement the integer stored at *key* by *amount*.
 
@@ -260,4 +294,3 @@ class ICacheRepository(ABC):
         int
             New value after decrement.
         """
-

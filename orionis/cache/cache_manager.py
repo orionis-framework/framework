@@ -1,5 +1,5 @@
 from pathlib import Path
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING, Any, Self
 from orionis.cache.contracts.cache_manager import ICacheManager
 from orionis.cache.exceptions import CacheStoreException
 from orionis.cache.repository import CacheRepository
@@ -11,7 +11,6 @@ if TYPE_CHECKING:
     from collections.abc import Callable
 
 class CacheManager(ICacheManager):
-
     # ruff: noqa: ANN401, PLC0415, TC001
 
     __slots__ = (
@@ -23,7 +22,7 @@ class CacheManager(ICacheManager):
         "_repositories",
     )
 
-    def __init__(self, app: IApplication) -> None:
+    def __init__(self: Self, app: IApplication) -> None:
         """
         Initialize the manager and resolve the active cache configuration.
 
@@ -53,7 +52,7 @@ class CacheManager(ICacheManager):
 
     # ── Store resolution ────────────────────────────────────────────────────
 
-    def store(self, name: str | None = None) -> CacheRepository:
+    def store(self: Self, name: str | None = None) -> CacheRepository:
         """
         Return the :class:`CacheRepository` for the named (or default) store.
 
@@ -85,7 +84,7 @@ class CacheManager(ICacheManager):
         self._repositories[resolved] = repo
         return repo
 
-    def _buildBackend(self, name: str) -> Any:
+    def _buildBackend(self: Self, name: str) -> Any:
         """
         Instantiate and return the raw backend for *name*.
 
@@ -108,17 +107,18 @@ class CacheManager(ICacheManager):
         stores = self._config.stores
 
         if name == Drivers.MEMORY.value:
-
             from orionis.cache.stores.memory import build as _build_memory
+
             return _build_memory()
 
         if name == Drivers.REDIS.value:
             cfg = getattr(stores, "redis", None)
             if cfg is None:
-                msg = "Redis store is not configured."
-                raise CacheStoreException(msg)
+                error_msg = "Redis store is not configured."
+                raise CacheStoreException(error_msg)
 
             from orionis.cache.stores.redis import build as _build_redis
+
             return _build_redis(
                 endpoint=getattr(cfg, "endpoint", None) or "127.0.0.1",
                 port=int(getattr(cfg, "port", 6379)),
@@ -129,10 +129,11 @@ class CacheManager(ICacheManager):
         if name == Drivers.MEMCACHED.value:
             cfg = getattr(stores, "memcached", None)
             if cfg is None:
-                msg = "Memcached store is not configured."
-                raise CacheStoreException(msg)
+                error_msg = "Memcached store is not configured."
+                raise CacheStoreException(error_msg)
 
             from orionis.cache.stores.memcached import build as _build_memcached
+
             return _build_memcached(
                 endpoint=getattr(cfg, "endpoint", None) or "127.0.0.1",
                 port=int(getattr(cfg, "port", 11211)),
@@ -142,8 +143,8 @@ class CacheManager(ICacheManager):
             return self._buildDatabaseBackend()
 
         if name != Drivers.FILE.value:
-            msg = f"Cache store [{name}] is not configured."
-            raise CacheStoreException(msg)
+            error_msg = f"Cache store [{name}] is not configured."
+            raise CacheStoreException(error_msg)
 
         # Build the file store from its configured directory.
         cfg = getattr(stores, "file", None)
@@ -157,9 +158,10 @@ class CacheManager(ICacheManager):
             resolved_path = self._base_path / resolved_path
 
         from orionis.cache.stores.file import FileCacheBackend
+
         return FileCacheBackend(path=resolved_path)
 
-    def _buildDatabaseBackend(self) -> Any:
+    def _buildDatabaseBackend(self: Self) -> Any:
         """
         Instantiate and return the database cache backend.
 
@@ -175,8 +177,8 @@ class CacheManager(ICacheManager):
         """
         cfg = getattr(self._config.stores, "database", None)
         if cfg is None:
-            msg = "Database store is not configured."
-            raise CacheStoreException(msg)
+            error_msg = "Database store is not configured."
+            raise CacheStoreException(error_msg)
 
         from orionis.cache.stores.database import build as _build_database
         from orionis.orm.resolver import ConnectionResolver
@@ -191,7 +193,7 @@ class CacheManager(ICacheManager):
 
     # ── Default-store proxy ─────────────────────────────────────────────────
 
-    async def get(self, key: str) -> Any:
+    async def get(self: Self, key: str) -> Any:
         """
         Retrieve the value for *key* from the default store.
 
@@ -207,7 +209,7 @@ class CacheManager(ICacheManager):
         """
         return await self.store().get(key)
 
-    async def set(self, key: str, value: Any, ttl: float | None = None) -> bool:
+    async def set(self: Self, key: str, value: Any, ttl: float | None = None) -> bool:
         """
         Store *value* under *key* in the default store.
 
@@ -227,7 +229,7 @@ class CacheManager(ICacheManager):
         """
         return await self.store().set(key, value, ttl=ttl)
 
-    async def has(self, key: str) -> bool:
+    async def has(self: Self, key: str) -> bool:
         """
         Check whether *key* exists and has not expired in the default store.
 
@@ -243,7 +245,7 @@ class CacheManager(ICacheManager):
         """
         return await self.store().has(key)
 
-    async def delete(self, key: str) -> bool:
+    async def delete(self: Self, key: str) -> bool:
         """
         Remove *key* from the default store.
 
@@ -259,7 +261,7 @@ class CacheManager(ICacheManager):
         """
         return await self.store().delete(key)
 
-    async def clear(self) -> bool:
+    async def clear(self: Self) -> bool:
         """
         Remove all entries from the default store.
 
@@ -270,7 +272,7 @@ class CacheManager(ICacheManager):
         """
         return await self.store().clear()
 
-    async def getMany(self, keys: list[str]) -> dict[str, Any]:
+    async def getMany(self: Self, keys: list[str]) -> dict[str, Any]:
         """
         Retrieve multiple values from the default store.
 
@@ -287,7 +289,7 @@ class CacheManager(ICacheManager):
         return await self.store().getMany(keys)
 
     async def setMany(
-        self,
+        self: Self,
         values: dict[str, Any],
         ttl: float | None = None,
     ) -> bool:
@@ -309,7 +311,7 @@ class CacheManager(ICacheManager):
         return await self.store().setMany(values, ttl=ttl)
 
     async def remember(
-        self,
+        self: Self,
         key: str,
         ttl: float | None,
         resolver: Callable,
@@ -333,7 +335,45 @@ class CacheManager(ICacheManager):
         """
         return await self.store().remember(key, ttl, resolver)
 
-    async def rememberForever(self, key: str, resolver: Callable) -> Any:
+    async def rememberOnce(
+        self: Self,
+        key: str,
+        ttl: float | None,
+        resolver: Callable,
+        *,
+        wait_timeout: float = 10,
+        lease: float | None = None,
+    ) -> Any:
+        """
+        Coalesce misses in the default store with explicit admission bounds.
+
+        Parameters
+        ----------
+        key : str
+            Cache key.
+        ttl : float | None
+            Result lifetime according to the selected backend.
+        resolver : Callable
+            Zero-argument synchronous or asynchronous producer.
+        wait_timeout : float
+            Maximum seconds waiting for the current local resolver.
+        lease : float | None
+            Optional backend lock lease; backend lock guarantees apply.
+
+        Returns
+        -------
+        Any
+            Shared result, including None for overlapping calls.
+        """
+        return await self.store().rememberOnce(
+            key,
+            ttl,
+            resolver,
+            wait_timeout=wait_timeout,
+            lease=lease,
+        )
+
+    async def rememberForever(self: Self, key: str, resolver: Callable) -> Any:
         """
         Return the cached value for *key*; resolve and cache forever if absent.
 
@@ -351,7 +391,7 @@ class CacheManager(ICacheManager):
         """
         return await self.store().rememberForever(key, resolver)
 
-    async def pull(self, key: str) -> Any:
+    async def pull(self: Self, key: str) -> Any:
         """
         Return and immediately delete *key* from the default store.
 
@@ -367,7 +407,7 @@ class CacheManager(ICacheManager):
         """
         return await self.store().pull(key)
 
-    async def add(self, key: str, value: Any, ttl: float | None = None) -> bool:
+    async def add(self: Self, key: str, value: Any, ttl: float | None = None) -> bool:
         """
         Store *value* only if *key* is absent in the default store.
 
@@ -387,7 +427,7 @@ class CacheManager(ICacheManager):
         """
         return await self.store().add(key, value, ttl=ttl)
 
-    async def increment(self, key: str, amount: int = 1) -> int:
+    async def increment(self: Self, key: str, amount: int = 1) -> int:
         """
         Increment the integer at *key* by *amount* in the default store.
 
@@ -405,7 +445,7 @@ class CacheManager(ICacheManager):
         """
         return await self.store().increment(key, amount)
 
-    async def decrement(self, key: str, amount: int = 1) -> int:
+    async def decrement(self: Self, key: str, amount: int = 1) -> int:
         """
         Decrement the integer at *key* by *amount* in the default store.
 
@@ -423,7 +463,7 @@ class CacheManager(ICacheManager):
         """
         return await self.store().decrement(key, amount)
 
-    def lock(self, key: str, timeout: float | None = None) -> Any:
+    def lock(self: Self, key: str, timeout: float | None = None) -> Any:
         """
         Return an async context-manager lock for *key* on the default store.
 

@@ -4,7 +4,7 @@ import contextlib
 import shutil
 import sys
 import time
-from typing import ClassVar, TYPE_CHECKING
+from typing import TYPE_CHECKING, ClassVar, Self
 from orionis.console.output.contracts.http_request import IHTTPRequestPrinter
 
 if TYPE_CHECKING:
@@ -13,33 +13,30 @@ if TYPE_CHECKING:
 
 # ANSI escape codes
 _RESET = "\033[0m"
-_BOLD  = "\033[1m"
+_BOLD = "\033[1m"
 
 # Foreground
 _FG_BLACK = "\033[30m"
 _FG_WHITE = "\033[37m"
-_FG_CYAN  = "\033[36m"
-_FG_GREEN = "\033[32m"
-_FG_RED   = "\033[31m"
-_FG_GREY  = "\033[90m"
+_FG_CYAN = "\033[36m"
+_FG_GREY = "\033[90m"
 
 # Background (standard)
-_BG_RED     = "\033[41m"
-_BG_GREEN   = "\033[42m"
-_BG_YELLOW  = "\033[43m"
-_BG_BLUE    = "\033[44m"
+_BG_RED = "\033[41m"
+_BG_GREEN = "\033[42m"
+_BG_YELLOW = "\033[43m"
+_BG_BLUE = "\033[44m"
 _BG_MAGENTA = "\033[45m"
-_BG_CYAN    = "\033[46m"
-_BG_WHITE   = "\033[47m"
-_BG_BRIGHT  = "\033[100m"
+_BG_CYAN = "\033[46m"
+_BG_WHITE = "\033[47m"
+_BG_BRIGHT = "\033[100m"
 
 # Background (256-colour approximations)
-_BG_GREY37  = "\033[48;5;237m"   # ≈ grey37
-_BG_GREY50  = "\033[48;5;244m"   # ≈ grey50
-_BG_GREY70  = "\033[48;5;250m"   # ≈ grey70
+_BG_GREY37 = "\033[48;5;237m"  # ≈ grey37
+_BG_GREY50 = "\033[48;5;244m"  # ≈ grey50
+_BG_GREY70 = "\033[48;5;250m"  # ≈ grey70
 
 class HTTPRequestPrinter(IHTTPRequestPrinter):
-
     # ruff: noqa: ERA001
 
     # Minimum valid HTTP status code
@@ -47,30 +44,30 @@ class HTTPRequestPrinter(IHTTPRequestPrinter):
 
     # (bg_ansi, fg_ansi) tuples for HTTP methods
     HTTP_COLORS: ClassVar[dict] = {
-        "GET":     (_BG_GREEN,   _FG_BLACK),
-        "POST":    (_BG_BLUE,    _FG_WHITE),
-        "PUT":     (_BG_YELLOW,  _FG_BLACK),
-        "PATCH":   (_BG_MAGENTA, _FG_WHITE),
-        "DELETE":  (_BG_RED,     _FG_WHITE),
-        "OPTIONS": (_BG_CYAN,    _FG_BLACK),
-        "HEAD":    (_BG_WHITE,   _FG_BLACK),
-        "TRACE":   (_BG_GREY70,  _FG_BLACK),
-        "CONNECT": (_BG_BRIGHT,  _FG_WHITE),
-        "QUERY":   (_BG_GREY37,  _FG_WHITE),
-        "default": (_BG_GREY37,  _FG_WHITE),
+        "GET": (_BG_GREEN, _FG_BLACK),
+        "POST": (_BG_BLUE, _FG_WHITE),
+        "PUT": (_BG_YELLOW, _FG_BLACK),
+        "PATCH": (_BG_MAGENTA, _FG_WHITE),
+        "DELETE": (_BG_RED, _FG_WHITE),
+        "OPTIONS": (_BG_CYAN, _FG_BLACK),
+        "HEAD": (_BG_WHITE, _FG_BLACK),
+        "TRACE": (_BG_GREY70, _FG_BLACK),
+        "CONNECT": (_BG_BRIGHT, _FG_WHITE),
+        "QUERY": (_BG_GREY37, _FG_WHITE),
+        "default": (_BG_GREY37, _FG_WHITE),
     }
 
     # (bg_ansi, fg_ansi) tuples for HTTP status categories
     STATUS_COLORS: ClassVar[dict] = {
-        "1xx": (_BG_CYAN,    _FG_BLACK),
-        "2xx": (_BG_GREEN,   _FG_WHITE),
-        "3xx": (_BG_YELLOW,  _FG_BLACK),
+        "1xx": (_BG_CYAN, _FG_BLACK),
+        "2xx": (_BG_GREEN, _FG_WHITE),
+        "3xx": (_BG_YELLOW, _FG_BLACK),
         "4xx": (_BG_MAGENTA, _FG_WHITE),
-        "5xx": (_BG_RED,     _FG_WHITE),
+        "5xx": (_BG_RED, _FG_WHITE),
         "default": (_BG_GREY50, _FG_WHITE),
     }
 
-    def __init__(self) -> None:
+    def __init__(self: Self) -> None:
         """
         Initialize the HTTPRequestPrinter instance.
 
@@ -110,7 +107,7 @@ class HTTPRequestPrinter(IHTTPRequestPrinter):
         self._write = sys.stdout.write
         self._flush = sys.stdout.flush
 
-    def setEnabled(self, *, enabled: bool) -> None:
+    def setEnabled(self: Self, *, enabled: bool) -> None:
         """
         Set whether to enable or disable console output for HTTP requests.
 
@@ -127,7 +124,7 @@ class HTTPRequestPrinter(IHTTPRequestPrinter):
         """
         self.__enabled = enabled
 
-    async def start(self) -> None:
+    async def start(self: Self) -> None:
         """
         Start the background print worker.
 
@@ -146,7 +143,7 @@ class HTTPRequestPrinter(IHTTPRequestPrinter):
         # Spawn the background worker task
         self.__worker_task = asyncio.ensure_future(self.__worker())
 
-    async def stop(self) -> None:
+    async def stop(self: Self) -> None:
         """
         Drain remaining output and stop the background worker.
 
@@ -172,7 +169,7 @@ class HTTPRequestPrinter(IHTTPRequestPrinter):
         self.__queue = None
         self.__worker_task = None
 
-    async def __worker(self) -> None:
+    async def __worker(self: Self) -> None:
         """
         Write queued lines to stdout in the background.
 
@@ -194,7 +191,7 @@ class HTTPRequestPrinter(IHTTPRequestPrinter):
             flush()
             self.__queue.task_done()
 
-    def startTimer(self) -> float | None:
+    def startTimer(self: Self) -> float | None:
         """
         Capture the current high-resolution timestamp for request timing.
 
@@ -213,7 +210,7 @@ class HTTPRequestPrinter(IHTTPRequestPrinter):
         return self.__start_timer
 
     def printRequest(
-        self,
+        self: Self,
         adapter: TransportAdapter,
         response: Response,
     ) -> None:
@@ -262,9 +259,7 @@ class HTTPRequestPrinter(IHTTPRequestPrinter):
 
         # Format duration in milliseconds or seconds
         duration_raw = (
-            f"~ {elapsed * 1000:.0f}ms"
-            if elapsed < 1.0
-            else f"~ {elapsed:.2f}s"
+            f"~ {elapsed * 1000:.0f}ms" if elapsed < 1.0 else f"~ {elapsed:.2f}s"
         )
         duration_str = f"{_FG_CYAN}{duration_raw.rjust(8)}{_RESET}"
 
@@ -273,7 +268,7 @@ class HTTPRequestPrinter(IHTTPRequestPrinter):
         max_path = max(1, path_dots_space - 3)
         path_len = len(path)
         if path_len > max_path:
-            path_display = path[:max_path - 3] + "..."
+            path_display = path[: max_path - 3] + "..."
             display_len = max_path  # len(path[:n-3] + "...") == n always
         else:
             path_display = path
@@ -293,8 +288,7 @@ class HTTPRequestPrinter(IHTTPRequestPrinter):
 
         # Assemble the complete output line
         line = (
-            f"{method_str} {path_str}{filler_str}"
-            f"{duration_str}{status_str}{code_str}\n"
+            f"{method_str} {path_str}{filler_str}{duration_str}{status_str}{code_str}\n"
         )
 
         # Cache queue ref: avoids double LOAD_ATTR (None check + put_nowait call)

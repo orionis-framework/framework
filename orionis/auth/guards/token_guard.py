@@ -1,4 +1,4 @@
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Self
 from orionis.auth.contracts.guard import IGuard
 from orionis.auth.contracts.identity_provider import IIdentityProvider
 from orionis.auth.contracts.token_repository import IAccessTokenRepository
@@ -31,7 +31,7 @@ class TokenGuard(IGuard):
     __slots__ = ("__identities", "__tokens")
 
     def __init__(
-        self,
+        self: Self,
         tokens: IAccessTokenRepository,
         identities: IIdentityProvider,
     ) -> None:
@@ -54,7 +54,7 @@ class TokenGuard(IGuard):
         self.__identities = identities
 
     @property
-    def name(self) -> str:
+    def name(self: Self) -> str:
         """
         Return the configuration name of this guard.
 
@@ -65,7 +65,10 @@ class TokenGuard(IGuard):
         """
         return Guards.TOKEN.value
 
-    async def resolve(self, request: Request) -> GuardResult | None:
+    async def resolve(  # noqa: PLR0911
+        self: Self,
+        request: Request,
+    ) -> GuardResult | None:
         """
         Resolve the identity owning the presented access token.
 
@@ -85,11 +88,21 @@ class TokenGuard(IGuard):
             return None
 
         # Unknown, revoked and expired tokens are indistinguishable here.
-        record = await self.__tokens.findByPlainText(plain_text)
-        if record is None:
+        combined = getattr(self.__tokens, "findWithIdentity", None)
+        result = (
+            await combined(plain_text, self.__identities)
+            if combined is not None
+            else NotImplemented
+        )
+        if result is NotImplemented:
+            record = await self.__tokens.findByPlainText(plain_text)
+            if record is None:
+                return None
+            identity = await self.__identities.retrieveById(record.tokenable_id)
+        elif result is None:
             return None
-
-        identity = await self.__identities.retrieveById(record.tokenable_id)
+        else:
+            record, identity = result
         if identity is None:
             return None
 

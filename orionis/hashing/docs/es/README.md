@@ -9,3 +9,9 @@ El flujo de una contraseña consta de validación, hashing, almacenamiento del r
 Los ejemplos aislados usan objetos de aplicación mínimos; las facades requieren una aplicación Orionis inicializada y sus providers. El código fuente y los contratos determinan las capacidades descritas.
 
 Relacionados: [auth](../../../auth/docs/es/README.md) · [encrypter](../../../encrypter/docs/es/README.md)
+
+## Ejecución acotada y rendimiento
+
+Argon2 y bcrypt comparten ahora un ejecutor dedicado y acotado: dos llamadas activas y 14 pendientes por proceso, separado del ejecutor predeterminado del loop. Los parámetros criptográficos no cambian. `WorkQueueFullError` informa explícitamente la saturación; aplica la política de admisión/respuesta de la aplicación sin reducir el coste de hashing. El trabajo nativo activo retiene capacidad aunque se cancele su solicitante, hasta terminar.
+
+Para otro presupuesto de recursos, inyecta `executor=BoundedExecutor(max_workers, max_pending=...)` en cada hasher; compartir la instancia mantiene un presupuesto conjunto. El consumidor es responsable de cerrar un pool propio. Dimensiona la memoria y los threads nativos de Argon2 por operación activa, contando también los distintos procesos del servidor.

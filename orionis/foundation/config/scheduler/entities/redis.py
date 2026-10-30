@@ -1,11 +1,13 @@
 from __future__ import annotations
 from dataclasses import dataclass, field
+from typing import Self
 from orionis.environment import Env
-from orionis.foundation.config.validation import validate_string
+from orionis.foundation.config.validation import (
+    validate_store_db,
+    validate_store_port,
+    validate_string,
+)
 from orionis.support.entities.base import BaseEntity
-
-# Highest valid TCP/UDP port number.
-_MAX_PORT = 65535
 
 @dataclass(frozen=True, kw_only=True)
 class Redis(BaseEntity):
@@ -88,7 +90,7 @@ class Redis(BaseEntity):
         },
     )
 
-    def __validateDriver(self) -> None:
+    def __validateDriver(self: Self) -> None:
         """
         Validate the ``driver`` property.
 
@@ -106,10 +108,10 @@ class Redis(BaseEntity):
         """
         # Ensure the driver is set to 'redis' for this store.
         if self.driver != "redis":
-            message = f"Invalid driver for Redis store: {self.driver}"
-            raise ValueError(message)
+            error_msg = f"Invalid driver for Redis store: {self.driver}"
+            raise ValueError(error_msg)
 
-    def __validateHost(self) -> None:
+    def __validateHost(self: Self) -> None:
         """
         Validate the ``host`` property.
 
@@ -132,53 +134,7 @@ class Redis(BaseEntity):
             error_msg = "The 'host' property cannot be empty."
             raise ValueError(error_msg)
 
-    def __validatePort(self) -> None:
-        """
-        Validate the ``port`` property.
-
-        Returns
-        -------
-        None
-            This method performs validation and returns None.
-
-        Raises
-        ------
-        TypeError
-            If ``port`` is not an integer.
-        ValueError
-            If ``port`` is not between ``1`` and ``65535``.
-        """
-        if not isinstance(self.port, int) or isinstance(self.port, bool):
-            error_msg = "The 'port' property must be an integer."
-            raise TypeError(error_msg)
-        if not (1 <= self.port <= _MAX_PORT):
-            error_msg = f"The 'port' property must be between 1 and {_MAX_PORT}."
-            raise ValueError(error_msg)
-
-    def __validateDb(self) -> None:
-        """
-        Validate the ``db`` property.
-
-        Returns
-        -------
-        None
-            This method performs validation and returns None.
-
-        Raises
-        ------
-        TypeError
-            If ``db`` is not an integer.
-        ValueError
-            If ``db`` is negative.
-        """
-        if not isinstance(self.db, int) or isinstance(self.db, bool):
-            error_msg = "The 'db' property must be an integer."
-            raise TypeError(error_msg)
-        if self.db < 0:
-            error_msg = "The 'db' property cannot be negative."
-            raise ValueError(error_msg)
-
-    def __validateKey(self) -> None:
+    def __validateKey(self: Self) -> None:
         """
         Validate the ``key`` property.
 
@@ -201,7 +157,7 @@ class Redis(BaseEntity):
             error_msg = "The 'key' property cannot be empty."
             raise ValueError(error_msg)
 
-    def __validateRunTimesKey(self) -> None:
+    def __validateRunTimesKey(self: Self) -> None:
         """
         Validate the ``run_times_key`` property.
 
@@ -224,7 +180,7 @@ class Redis(BaseEntity):
             error_msg = "The 'run_times_key' property cannot be empty."
             raise ValueError(error_msg)
 
-    def __post_init__(self) -> None:
+    def __post_init__(self: Self) -> None:
         """
         Validate the Redis job store configuration after initialization.
 
@@ -246,13 +202,13 @@ class Redis(BaseEntity):
         # Validate each property according to its type hint
         self.__validateDriver()
         self.__validateHost()
-        self.__validatePort()
-        self.__validateDb()
+        validate_store_port(self.port)
+        validate_store_db(self.db)
         self.__validateKey()
         self.__validateRunTimesKey()
 
         if self.password is not None:
             validate_string(self.password, "password", allow_empty=True)
         if self.key == self.run_times_key:
-            message = "Redis job and run time keys must be different."
-            raise ValueError(message)
+            error_msg = "Redis job and run time keys must be different."
+            raise ValueError(error_msg)

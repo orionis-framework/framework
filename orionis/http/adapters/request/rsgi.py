@@ -1,5 +1,5 @@
 from __future__ import annotations
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Self
 from orionis.http.adapters.request.contracts.transport import TransportAdapter
 from orionis.http.payload.estructures.headers import Headers
 
@@ -31,7 +31,7 @@ class RSGITransportAdapter(TransportAdapter):
         "__wants_json",
     )
 
-    def __init__(self, scope: Scope) -> None:
+    def __init__(self: Self, scope: Scope) -> None:
         """
         Initialize the adapter with a Granian RSGI scope.
 
@@ -55,7 +55,7 @@ class RSGITransportAdapter(TransportAdapter):
         # Parse the request headers.
         self.__headers: Headers = self.__buildHeadersRSGI()
 
-    def __getitem__(self, key: str) -> object | None:
+    def __getitem__(self: Self, key: str) -> object | None:
         """
         Return a cached state value by key.
 
@@ -72,7 +72,7 @@ class RSGITransportAdapter(TransportAdapter):
         # Read from the override/state store.
         return self.__overrides.get(key)
 
-    def __setitem__(self, key: str, value: object) -> None:
+    def __setitem__(self: Self, key: str, value: object) -> None:
         """
         Store a state value under a key.
 
@@ -91,7 +91,7 @@ class RSGITransportAdapter(TransportAdapter):
         # Write into the override/state store.
         self.__overrides[key] = value
 
-    def __contains__(self, key: str) -> bool:
+    def __contains__(self: Self, key: str) -> bool:
         """
         Check whether a state key exists.
 
@@ -108,7 +108,7 @@ class RSGITransportAdapter(TransportAdapter):
         # Test membership in the override/state store.
         return key in self.__overrides
 
-    def __delitem__(self, key: str) -> None:
+    def __delitem__(self: Self, key: str) -> None:
         """
         Remove a state value by key.
 
@@ -125,7 +125,7 @@ class RSGITransportAdapter(TransportAdapter):
         # Remove from the override/state store if present.
         self.__overrides.pop(key, None)
 
-    def __buildHeadersRSGI(self) -> Headers:
+    def __buildHeadersRSGI(self: Self) -> Headers:
         """
         Build headers from the scope and cache them.
 
@@ -134,17 +134,9 @@ class RSGITransportAdapter(TransportAdapter):
         Headers
             Return parsed headers as lowercase name/value pairs.
         """
-        # Read the scope header collection.
-        scope_headers = self.__scope.headers
-        # Flatten multi-value headers into lowercase name/value tuples.
-        raw = (
-            (str(key).lower(), value)
-            for key in scope_headers
-            for value in scope_headers.get_all(key)
-        )
-        return Headers(raw)
+        return Headers._fromRSGI(self.__scope.headers)  # noqa: SLF001
 
-    def client(self) -> str | None:
+    def client(self: Self) -> str | None:
         """
         Return the remote client IP parsed from the scope.
 
@@ -175,7 +167,7 @@ class RSGITransportAdapter(TransportAdapter):
         self.__overrides["port"] = int(port)
         return ip
 
-    def setClient(self, ip: str) -> None:
+    def setClient(self: Self, ip: str) -> None:
         """
         Set the remote client IP in the override state.
 
@@ -193,7 +185,7 @@ class RSGITransportAdapter(TransportAdapter):
         self.__overrides["client"] = ip
         self.__client = ip
 
-    def scheme(self) -> str | None:
+    def scheme(self: Self) -> str | None:
         """
         Return the request scheme.
 
@@ -206,7 +198,7 @@ class RSGITransportAdapter(TransportAdapter):
         v = self.__overrides.get("scheme")
         return v if v is not None else self.__scope.scheme
 
-    def setScheme(self, value: str) -> None:
+    def setScheme(self: Self, value: str) -> None:
         """
         Set the request scheme in the override state.
 
@@ -223,7 +215,7 @@ class RSGITransportAdapter(TransportAdapter):
         # Persist the scheme override in state.
         self.__overrides["scheme"] = value
 
-    def method(self) -> str | None:
+    def method(self: Self) -> str | None:
         """
         Return the HTTP method.
 
@@ -236,7 +228,7 @@ class RSGITransportAdapter(TransportAdapter):
         v = self.__overrides.get("method")
         return v if v is not None else self.__scope.method
 
-    def path(self) -> str | None:
+    def path(self: Self) -> str | None:
         """
         Return the request path.
 
@@ -248,7 +240,7 @@ class RSGITransportAdapter(TransportAdapter):
         # Read path directly from the scope.
         return self.__scope.path
 
-    def headers(self) -> Headers:
+    def headers(self: Self) -> Headers:
         """
         Return parsed request headers.
 
@@ -260,7 +252,7 @@ class RSGITransportAdapter(TransportAdapter):
         # Return the cached headers object.
         return self.__headers
 
-    def setState(self, key: str, value: Any) -> None:
+    def setState(self: Self, key: str, value: Any) -> None:
         """
         Store a custom value in the override state.
 
@@ -279,7 +271,7 @@ class RSGITransportAdapter(TransportAdapter):
         # Store arbitrary state in the override layer.
         self.__overrides[key] = value
 
-    def wantsJson(self) -> bool:
+    def wantsJson(self: Self) -> bool:
         """
         Determine whether the request prefers a JSON response.
 
@@ -304,7 +296,7 @@ class RSGITransportAdapter(TransportAdapter):
         self.__wants_json = result
         return result
 
-    def getScope(self) -> dict:
+    def getScope(self: Self) -> dict:
         """
         Build and return a dictionary view of the request scope.
 

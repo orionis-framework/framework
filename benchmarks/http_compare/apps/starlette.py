@@ -1,80 +1,15 @@
-from contextlib import asynccontextmanager
 from typing import TYPE_CHECKING
-from starlette.applications import Starlette # pyright: ignore[reportMissingImports]
-from starlette.responses import PlainTextResponse # pyright: ignore[reportMissingImports]
-from starlette.routing import Route # pyright: ignore[reportMissingImports]
-from benchmarks.http_compare.apps._ready import WORKER_PATH, mark_ready, worker_id
+from starlette.applications import Starlette
+from starlette.responses import PlainTextResponse
+from starlette.routing import Route
 
 if TYPE_CHECKING:
-    from collections.abc import AsyncIterator
-    from starlette.requests import Request # pyright: ignore[reportMissingImports]
+    from starlette.requests import Request
 
-@asynccontextmanager
-async def _lifespan(_app: Starlette) -> AsyncIterator[None]:
-    """
-    Signal worker readiness within Starlette's startup lifecycle.
-
-    Parameters
-    ----------
-    _app : Starlette
-        Application owning the lifecycle context, unused by this callback.
-
-    Yields
-    ------
-    None
-        Keep the application lifecycle active until server shutdown.
-    """
-    # Publish the marker during startup, not while the module is being imported.
-    mark_ready()
-    yield
-
-async def hello(_request: Request) -> PlainTextResponse: # NOSONAR
-    """
-    Construct a fresh plain-text response for the measured request.
-
-    Parameters
-    ----------
-    _request : Request
-        Incoming request, unused by this fixed-payload handler.
-
-    Returns
-    -------
-    PlainTextResponse
-        HTTP 200 response containing exactly ``Hello World``.
-    """
-    # Allocate each response inside the handler to avoid cached-response bias.
-    return PlainTextResponse("Hello World", status_code=200)
-
-async def worker(_request: Request) -> PlainTextResponse: # NOSONAR
-    """
-    Identify the process serving an unmeasured preparation connection.
-
-    Parameters
-    ----------
-    _request : Request
-        Incoming request, unused by this preparation handler.
-
-    Returns
-    -------
-    PlainTextResponse
-        HTTP 200 response containing the current worker's process ID.
-    """
-    return PlainTextResponse(worker_id(), status_code=200)
+async def hello(_request: Request) -> PlainTextResponse:  # NOSONAR(S7503)
+    """Keep native async dispatch without artificial I/O or thread offloading."""
+    return PlainTextResponse("Hello World")
 
 def create_application() -> Starlette:
-    """
-    Build the comparison application through Starlette's public routing API.
-
-    Returns
-    -------
-    Starlette
-        Application with the measured route and an unmeasured worker probe.
-    """
-    # Keep the route on Starlette's native router with lifecycle-based readiness.
-    return Starlette(
-        routes=[
-            Route("/", hello, methods=["GET"]),
-            Route(WORKER_PATH, worker, methods=["GET"]),
-        ],
-        lifespan=_lifespan,
-    )
+    """Create an application with only GET /."""
+    return Starlette(routes=[Route("/", hello, methods=["GET"])])

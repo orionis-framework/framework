@@ -1,11 +1,13 @@
 from __future__ import annotations
-from collections.abc import Collection, Mapping
-from typing import TYPE_CHECKING, Annotated, Union, get_args, get_origin
 import operator
 import types
+from collections import OrderedDict
+from collections.abc import Collection, Mapping
+from threading import RLock
+from typing import TYPE_CHECKING, Annotated, Union, get_args, get_origin
 import msgspec.structs
-from orionis.schemas.rule import Rule
 from orionis.schemas.meta.validation import ValidationMetadata
+from orionis.schemas.rule import Rule
 
 if TYPE_CHECKING:
     from collections.abc import Iterable
@@ -13,11 +15,30 @@ if TYPE_CHECKING:
 # Cache of validation plans for schema types. Keys are schema classes;
 # values are tuples of field validation plans as returned by _build_plan().
 # Populated on demand by _build_plan and warmed at class creation time.
-_PLAN_CACHE: dict[type, tuple] = {}
+_PLAN_CACHE_MAX = 1024
+_PLAN_CACHE: OrderedDict[type, tuple] = OrderedDict()
+_PLAN_LOCK = RLock()
+_BUILDING: set[type] = set()
 
-# Alias for faster local access in hot path.
-# Avoids global dict lookup on every nested validation call.
-_cache_get = _PLAN_CACHE.get
+def _cache_get(klass: type) -> tuple | None:
+    """
+    Read and promote a bounded validation plan.
+
+    Parameters
+    ----------
+    klass : type
+        Schema class whose validation plan is requested.
+
+    Returns
+    -------
+    tuple | None
+        Cached validation plan, or None when the schema is not cached.
+    """
+    with _PLAN_LOCK:
+        result = _PLAN_CACHE.get(klass)
+        if result is not None:
+            _PLAN_CACHE.move_to_end(klass)
+        return result
 
 # Shared empty mapping returned for schemas without Orionis metadata.
 # Reused instead of allocating a fresh dict on every plan build.
@@ -58,21 +79,20 @@ def _type_contains_nested(tp: object, *, rules_only: bool = False) -> bool:
         args = get_args(tp)
         if issubclass(origin, Mapping):
             args = args[1:]
-        return any(
-            _type_contains_nested(arg, rules_only=rules_only) for arg in args
-        )
+        return any(_type_contains_nested(arg, rules_only=rules_only) for arg in args)
 
     # Finally, check if this is a schema type by looking for the marker attribute.
     return (
-        isinstance(tp, type) and "__orionis_meta__" in tp.__dict__
+        isinstance(tp, type)
+        and "__orionis_meta__" in tp.__dict__
         and (not rules_only or _cache_get(tp) != ())
     )
 
 def _warm_child_plan(tp: object) -> None:
     """Eagerly populate ``_PLAN_CACHE`` for any nested Orionis schema type.
 
-    Called from ``_build_plan`` so that the first real validation call for a
-    nested field always hits the cache instead of triggering a cold build.
+    Called from ``_build_plan`` to warm nested validation while capacity allows.
+    Evicted child plans are rebuilt on demand during later validation.
 
     Parameters
     ----------
@@ -110,6 +130,7 @@ def _warm_child_plan(tp: object) -> None:
         isinstance(tp, type)
         and "__orionis_meta__" in tp.__dict__
         and _cache_get(tp) is None
+        and tp not in _BUILDING
     ):
         _build_plan(tp)
 
@@ -144,7 +165,9 @@ def _collection_item_type(tp: object, selector: str) -> object | None:
     return None
 
 def _field_rules(
-    klass: type, field_name: str, items: Iterable[object],
+    klass: type,
+    field_name: str,
+    items: Iterable[object],
 ) -> tuple[Rule, ...]:
     """
     Select executable rules from a field's validated metadata.
@@ -173,15 +196,36 @@ def _field_rules(
         if isinstance(item, Rule):
             rules.append(item)
         elif not isinstance(item, ValidationMetadata):
-            message = (
+            error_msg = (
                 f"Field '{field_name}' on '{klass.__name__}': "
                 f"'{type(item).__name__}' is not a valid custom rule. "
                 "Custom rules must subclass 'orionis.schemas.rule.Rule'."
             )
-            raise TypeError(message)
+            raise TypeError(error_msg)
     return tuple(rules)
 
 def _build_plan(klass: type) -> tuple:
+    """
+    Compile under a reentrant lock, including recursive schema graphs.
+
+    Parameters
+    ----------
+    klass : type
+        Schema class whose validation plan is requested.
+
+    Returns
+    -------
+    tuple
+        Compiled and cached validation plan for the schema.
+    """
+    with _PLAN_LOCK:
+        _BUILDING.add(klass)
+        try:
+            return _compile_plan(klass)
+        finally:
+            _BUILDING.discard(klass)
+
+def _compile_plan(klass: type) -> tuple:
     """
     Build and cache the custom-rule execution plan for a schema.
 
@@ -204,7 +248,9 @@ def _build_plan(klass: type) -> tuple:
         ``Rule`` instance nor supported validation metadata.
     """
     orionis_meta: dict[str, list[object]] = getattr(
-        klass, "__orionis_meta__", _EMPTY_META,
+        klass,
+        "__orionis_meta__",
+        _EMPTY_META,
     )
     plan: list = []
     nested_types: list[object] = []
@@ -217,13 +263,22 @@ def _build_plan(klass: type) -> tuple:
             getter = operator.attrgetter(field.name)
             validators = tuple(rule.validate for rule in rules)
             field_name_dot = field.encode_name + "."
-            plan.append((
-                field.encode_name, field_name_dot, getter, validators, is_nested,
-            ))
+            plan.append(
+                (
+                    field.encode_name,
+                    field_name_dot,
+                    getter,
+                    validators,
+                    is_nested,
+                ),
+            )
             if is_nested:
                 nested_types.append(field.type)
     result = tuple(plan)
     _PLAN_CACHE[klass] = result
+    _PLAN_CACHE.move_to_end(klass)
+    while len(_PLAN_CACHE) > _PLAN_CACHE_MAX:
+        _PLAN_CACHE.popitem(last=False)
     for field_type in nested_types:
         _warm_child_plan(field_type)
     return result
@@ -312,7 +367,6 @@ async def _collect_with_plan(
     # Iterate over each field in the plan, which may have custom
     # rules and/or nested schemas.
     for field_name, field_name_dot, getter, validators, is_nested in plan:
-
         # Read the current field value from the instance.
         value = getter(instance)
 
@@ -327,7 +381,6 @@ async def _collect_with_plan(
         # Build the fully-qualified field path only when a rule needs it.
         qualified = prefix + field_name
         for validate in validators:
-
             # Run each validator for the current field.
             failure = await validate(qualified, value, instance)
 

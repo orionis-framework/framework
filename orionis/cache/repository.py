@@ -1,7 +1,13 @@
+import asyncio
 import inspect
-from typing import TYPE_CHECKING, Any
+import math
+from contextlib import nullcontext
+from contextvars import ContextVar
+from typing import TYPE_CHECKING, Any, Self
+from weakref import WeakValueDictionary
 from orionis.cache.contracts.repository import ICacheRepository
 from orionis.cache.exceptions import CacheStoreException
+from orionis.cache.locks.coalescing import resolver_lease
 from orionis.cache.locks.lock import CacheLock
 
 if TYPE_CHECKING:
@@ -9,6 +15,27 @@ if TYPE_CHECKING:
 
 # Sentinel that distinguishes a missing cache key from a stored None value.
 _MISSING = object()
+
+class _Flight:
+    """Retain a completed result only while its concurrent waiters exist."""
+
+    def __init__(self: Self) -> None:
+        """
+        Initialize the lock and unresolved value for concurrent cache callers.
+
+        Returns
+        -------
+        None
+            Complete the operation without returning a value.
+        """
+        self.lock = asyncio.Lock()
+        self.value = _MISSING
+
+_FLIGHTS: WeakValueDictionary[tuple, _Flight] = WeakValueDictionary()
+_RESOLVING: ContextVar[frozenset[tuple]] = ContextVar(
+    "orionis-cache-resolving",
+    default=frozenset(),
+)
 
 class CacheRepository(ICacheRepository):
     """Async cache repository backed by a configurable storage backend.
@@ -21,7 +48,7 @@ class CacheRepository(ICacheRepository):
 
     __slots__ = ("_backend", "_prefix")
 
-    def __init__(self, backend: Any, prefix: str = "") -> None:
+    def __init__(self: Self, backend: Any, prefix: str = "") -> None:
         """
         Initialise the repository with a backend and an optional key prefix.
 
@@ -43,7 +70,7 @@ class CacheRepository(ICacheRepository):
 
     # ── Key helper ──────────────────────────────────────────────────────────
 
-    def _k(self, key: str) -> str:
+    def _k(self: Self, key: str) -> str:
         """
         Return the prefixed form of *key*.
 
@@ -62,7 +89,9 @@ class CacheRepository(ICacheRepository):
 
     # ── Public API ──────────────────────────────────────────────────────────
 
-    async def replace(self, key: str, value: Any, ttl: float | None = None) -> bool:
+    async def replace(
+        self: Self, key: str, value: Any, ttl: float | None = None,
+    ) -> bool:
         """Replace a live entry without resurrecting a deleted key.
 
         Parameters
@@ -104,7 +133,7 @@ class CacheRepository(ICacheRepository):
             except OptimisticLockError:
                 return False
 
-    async def get(self, key: str) -> Any:
+    async def get(self: Self, key: str) -> Any:
         """
         Return the cached value for *key*, or ``None`` when absent.
 
@@ -122,7 +151,7 @@ class CacheRepository(ICacheRepository):
         return await self._backend.get(self._k(key))
 
     async def set(
-        self,
+        self: Self,
         key: str,
         value: Any,
         ttl: float | None = None,
@@ -147,7 +176,7 @@ class CacheRepository(ICacheRepository):
         # Coerce the backend result to bool for a consistent return type.
         return bool(await self._backend.set(self._k(key), value, ttl=ttl))
 
-    async def has(self, key: str) -> bool:
+    async def has(self: Self, key: str) -> bool:
         """
         Return ``True`` if *key* exists and has not expired.
 
@@ -164,7 +193,7 @@ class CacheRepository(ICacheRepository):
         # Check existence without fetching the value.
         return bool(await self._backend.exists(self._k(key)))
 
-    async def delete(self, key: str) -> bool:
+    async def delete(self: Self, key: str) -> bool:
         """
         Remove *key* from the cache store.
 
@@ -181,7 +210,7 @@ class CacheRepository(ICacheRepository):
         # Delegate deletion to the backend.
         return bool(await self._backend.delete(self._k(key)))
 
-    async def clear(self) -> bool:
+    async def clear(self: Self) -> bool:
         """
         Remove all entries from the cache store.
 
@@ -193,7 +222,7 @@ class CacheRepository(ICacheRepository):
         # Flush the entire backend store.
         return bool(await self._backend.clear())
 
-    async def getMany(self, keys: list[str]) -> dict[str, Any]:
+    async def getMany(self: Self, keys: list[str]) -> dict[str, Any]:
         """
         Return a mapping of key → value for all requested *keys*.
 
@@ -213,7 +242,7 @@ class CacheRepository(ICacheRepository):
         return dict(zip(keys, values, strict=True))
 
     async def setMany(
-        self,
+        self: Self,
         values: dict[str, Any],
         ttl: float | None = None,
     ) -> bool:
@@ -237,7 +266,7 @@ class CacheRepository(ICacheRepository):
         return bool(await self._backend.multi_set(pairs, ttl=ttl))
 
     async def remember(
-        self,
+        self: Self,
         key: str,
         ttl: float | None,
         resolver: Callable,
@@ -278,7 +307,80 @@ class CacheRepository(ICacheRepository):
         await self.set(key, value, ttl=ttl)
         return value
 
-    async def rememberForever(self, key: str, resolver: Callable) -> Any:
+    async def rememberOnce(
+        self: Self,
+        key: str,
+        ttl: float | None,
+        resolver: Callable,
+        *,
+        wait_timeout: float = 10,
+        lease: float | None = None,
+    ) -> Any:
+        """
+        Coalesce concurrent misses without changing ``remember`` semantics.
+
+        Parameters
+        ----------
+        key : str
+            Cache key within this repository's prefix.
+        ttl : float | None
+            Lifetime of the computed value, including a stored None.
+        resolver : Callable
+            Synchronous or asynchronous value producer.
+        wait_timeout : float
+            Maximum local or Redis admission wait in seconds, per phase.
+        lease : float | None
+            Optional backend lock lease for cross-process coalescing. Backend
+            lock guarantees apply; a resolver must finish within the lease.
+
+        Returns
+        -------
+        Any
+            Cached or freshly resolved value. Failed or cancelled owners do
+            not retain local locks; a later caller can retry.
+        """
+        if not math.isfinite(wait_timeout) or wait_timeout <= 0:
+            error_msg = "Cache wait_timeout must be finite and positive."
+            raise ValueError(error_msg)
+        if lease is not None and (not math.isfinite(lease) or lease <= 0):
+            error_msg = "Cache lease must be finite and positive."
+            raise ValueError(error_msg)
+        identity = (asyncio.get_running_loop(), id(self._backend), self._k(key))
+        resolving = _RESOLVING.get()
+        if identity in resolving:
+            error_msg = "A coalesced cache resolver cannot recursively resolve its key."
+            raise RuntimeError(error_msg)
+        cached = await self._backend.get(self._k(key), default=_MISSING)
+        if cached is not _MISSING:
+            return cached
+        flight = _FLIGHTS.get(identity)
+        if flight is None:
+            flight = _Flight()
+            _FLIGHTS[identity] = flight
+        async with asyncio.timeout(wait_timeout):
+            await flight.lock.acquire()
+        token = _RESOLVING.set(resolving | {identity})
+        try:
+            if flight.value is not _MISSING:
+                return flight.value
+            distributed = (
+                resolver_lease(
+                    self._backend,
+                    self._k(f"remember:{key}"),
+                    lease,
+                    wait_timeout,
+                )
+                if lease
+                else nullcontext()
+            )
+            async with distributed:
+                flight.value = await self.remember(key, ttl, resolver)
+                return flight.value
+        finally:
+            _RESOLVING.reset(token)
+            flight.lock.release()
+
+    async def rememberForever(self: Self, key: str, resolver: Callable) -> Any:
         """
         Cache the value for *key* indefinitely, resolving on a miss.
 
@@ -297,7 +399,7 @@ class CacheRepository(ICacheRepository):
         # Delegate to remember with no TTL so the entry never expires.
         return await self.remember(key, None, resolver)
 
-    async def pull(self, key: str) -> Any:
+    async def pull(self: Self, key: str) -> Any:
         """
         Return the cached value for *key* and immediately remove it.
 
@@ -320,7 +422,7 @@ class CacheRepository(ICacheRepository):
         return value
 
     async def add(
-        self,
+        self: Self,
         key: str,
         value: Any,
         ttl: float | None = None,
@@ -350,7 +452,7 @@ class CacheRepository(ICacheRepository):
             # Key already exists; report the conflict without re-raising.
             return False
 
-    async def increment(self, key: str, amount: int = 1) -> int:
+    async def increment(self: Self, key: str, amount: int = 1) -> int:
         """
         Increment the integer stored at *key* by *amount*.
 
@@ -369,7 +471,7 @@ class CacheRepository(ICacheRepository):
         # Delegate the positive increment to the backend.
         return await self._backend.increment(self._k(key), amount)
 
-    async def decrement(self, key: str, amount: int = 1) -> int:
+    async def decrement(self: Self, key: str, amount: int = 1) -> int:
         """
         Decrement the integer stored at *key* by *amount*.
 
@@ -388,7 +490,7 @@ class CacheRepository(ICacheRepository):
         # Negate the amount to reuse the backend's increment operation.
         return await self._backend.increment(self._k(key), -amount)
 
-    def lock(self, key: str, timeout: float | None = None) -> CacheLock:
+    def lock(self: Self, key: str, timeout: float | None = None) -> CacheLock:
         """
         Return an async context manager that acquires a distributed lock.
 

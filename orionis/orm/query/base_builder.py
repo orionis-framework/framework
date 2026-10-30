@@ -28,7 +28,7 @@ from orionis.orm.schema.table import TableDefinition
 from orionis.support.types.collection import Collection
 
 if TYPE_CHECKING:
-    from collections.abc import Callable, Iterable
+    from collections.abc import AsyncIterator, Callable, Iterable
     from orionis.database.contracts.connection import IConnection
     from orionis.database.entities.result import InsertResult
 
@@ -65,7 +65,7 @@ class QueryBuilderBase:
 
     __slots__ = ("_connection_name", "_plan")
 
-    def __init__(self, table: TableDefinition | None = None) -> None:
+    def __init__(self: Self, table: TableDefinition | None = None) -> None:
         """
         Initialize the builder with a plan for the supplied table.
 
@@ -86,7 +86,7 @@ class QueryBuilderBase:
 
     # ── Plan access ─────────────────────────────────────────────────────────
 
-    def toPlan(self) -> SelectPlan:
+    def toPlan(self: Self) -> SelectPlan:
         """
         Return the engine-agnostic plan assembled so far.
 
@@ -101,7 +101,7 @@ class QueryBuilderBase:
         """
         return self._plan
 
-    def clone(self) -> Self:
+    def clone(self: Self) -> Self:
         """
         Return an independent copy of this builder.
 
@@ -117,7 +117,7 @@ class QueryBuilderBase:
         duplicate.adoptPlan(self._plan.clone())
         return duplicate
 
-    def adoptPlan(self, plan: SelectPlan) -> Self:
+    def adoptPlan(self: Self, plan: SelectPlan) -> Self:
         """
         Replace the plan this builder assembles.
 
@@ -134,7 +134,7 @@ class QueryBuilderBase:
         self._plan = plan
         return self
 
-    def _shallowCopy(self) -> Self:
+    def _shallowCopy(self: Self) -> Self:
         """
         Build a twin of this builder still sharing its plan.
 
@@ -146,7 +146,7 @@ class QueryBuilderBase:
         """
         return copy.copy(self)
 
-    def adoptConnection(self, name: str | None) -> Self:
+    def adoptConnection(self: Self, name: str | None) -> Self:
         """
         Bind the builder to a named connection.
 
@@ -165,7 +165,7 @@ class QueryBuilderBase:
 
     # ── Subclass hooks ──────────────────────────────────────────────────────
 
-    def _connection(self) -> IConnection:
+    def _connection(self: Self) -> IConnection:
         """
         Resolve the database connection this builder runs against.
 
@@ -182,7 +182,7 @@ class QueryBuilderBase:
         error_msg = f"{type(self).__name__} must implement _connection()."
         raise NotImplementedError(error_msg)
 
-    def _newQuery(self) -> QueryBuilderBase:
+    def _newQuery(self: Self) -> QueryBuilderBase:
         """
         Create a sibling builder used for nested groups and subqueries.
 
@@ -200,7 +200,7 @@ class QueryBuilderBase:
         builder.toPlan().alias = self._plan.alias
         return builder
 
-    def _serializeValues(self, values: dict[str, Any]) -> dict[str, Any]:
+    def _serializeValues(self: Self, values: dict[str, Any]) -> dict[str, Any]:
         """
         Prepare a value mapping for storage.
 
@@ -216,7 +216,7 @@ class QueryBuilderBase:
         """
         return values
 
-    def _prepareUpdate(self, values: dict[str, Any]) -> dict[str, Any]:
+    def _prepareUpdate(self: Self, values: dict[str, Any]) -> dict[str, Any]:
         """
         Adjust an update payload before it is serialized.
 
@@ -232,7 +232,7 @@ class QueryBuilderBase:
         """
         return values
 
-    def _existsColumns(self) -> tuple[str, ...]:
+    def _existsColumns(self: Self) -> tuple[str, ...]:
         """
         Return the projection used by existence probes.
 
@@ -243,7 +243,7 @@ class QueryBuilderBase:
         """
         return ()
 
-    def _defaultTimestampColumn(self) -> str:
+    def _defaultTimestampColumn(self: Self) -> str:
         """
         Return the column :meth:`latest` and :meth:`oldest` default to.
 
@@ -254,7 +254,7 @@ class QueryBuilderBase:
         """
         return _DEFAULT_TIMESTAMP_COLUMN
 
-    def _beforeExecute(self) -> None:
+    def _beforeExecute(self: Self) -> None:
         """
         Finalize the plan right before a terminal runs it.
 
@@ -270,7 +270,7 @@ class QueryBuilderBase:
 
     # ── Projection ──────────────────────────────────────────────────────────
 
-    def select(self, *columns: str) -> Self:
+    def select(self: Self, *columns: str) -> Self:
         """
         Restrict the query projection to the given columns.
 
@@ -287,7 +287,7 @@ class QueryBuilderBase:
         self._plan.columns = columns
         return self
 
-    def addSelect(self, *columns: str) -> Self:
+    def addSelect(self: Self, *columns: str) -> Self:
         """
         Append columns to the current projection.
 
@@ -305,7 +305,7 @@ class QueryBuilderBase:
         return self
 
     def selectRaw(
-        self,
+        self: Self,
         sql: str,
         bindings: dict[str, Any] | None = None,
         alias: str | None = None,
@@ -330,12 +330,14 @@ class QueryBuilderBase:
             The same builder, enabling fluent chaining.
         """
         expression = RawExpression(
-            sql=sql, bindings=bindings.copy() if bindings else {}, alias=alias,
+            sql=sql,
+            bindings=bindings.copy() if bindings else {},
+            alias=alias,
         )
         self._plan.columns = (*self._plan.columns, expression)
         return self
 
-    def selectSub(self, query: Any, alias: str) -> Self:
+    def selectSub(self: Self, query: Any, alias: str) -> Self:
         """
         Append a scalar subquery to the projection under an alias.
 
@@ -356,7 +358,7 @@ class QueryBuilderBase:
         self._plan.columns = (*self._plan.columns, column)
         return self
 
-    def distinct(self) -> Self:
+    def distinct(self: Self) -> Self:
         """
         Collapse duplicate rows from the query results.
 
@@ -370,7 +372,7 @@ class QueryBuilderBase:
 
     # ── Where clauses ───────────────────────────────────────────────────────
 
-    def where(self, column: Any, *args: Any) -> Self:
+    def where(self: Self, column: Any, *args: Any) -> Self:
         """
         Add an AND-combined filtering condition.
 
@@ -398,7 +400,7 @@ class QueryBuilderBase:
         self._addWhere(self._plan.wheres, column, args, boolean="and")
         return self
 
-    def orWhere(self, column: Any, *args: Any) -> Self:
+    def orWhere(self: Self, column: Any, *args: Any) -> Self:
         """
         Add an OR-combined filtering condition.
 
@@ -422,7 +424,7 @@ class QueryBuilderBase:
         self._addWhere(self._plan.wheres, column, args, boolean="or")
         return self
 
-    def whereIn(self, column: str, values: Any) -> Self:
+    def whereIn(self: Self, column: str, values: Any) -> Self:
         """
         Filter rows whose column value belongs to the given set.
 
@@ -440,7 +442,7 @@ class QueryBuilderBase:
         """
         return self._addMembership(column, values, WhereType.IN, "and")
 
-    def orWhereIn(self, column: str, values: Any) -> Self:
+    def orWhereIn(self: Self, column: str, values: Any) -> Self:
         """
         Add an OR-combined set-membership condition.
 
@@ -458,7 +460,7 @@ class QueryBuilderBase:
         """
         return self._addMembership(column, values, WhereType.IN, "or")
 
-    def whereNotIn(self, column: str, values: Any) -> Self:
+    def whereNotIn(self: Self, column: str, values: Any) -> Self:
         """
         Filter rows whose column value is outside the given set.
 
@@ -476,7 +478,7 @@ class QueryBuilderBase:
         """
         return self._addMembership(column, values, WhereType.NOT_IN, "and")
 
-    def orWhereNotIn(self, column: str, values: Any) -> Self:
+    def orWhereNotIn(self: Self, column: str, values: Any) -> Self:
         """
         Add an OR-combined set-exclusion condition.
 
@@ -494,7 +496,7 @@ class QueryBuilderBase:
         """
         return self._addMembership(column, values, WhereType.NOT_IN, "or")
 
-    def whereNull(self, column: str) -> Self:
+    def whereNull(self: Self, column: str) -> Self:
         """
         Filter rows whose column value is ``NULL``.
 
@@ -510,7 +512,7 @@ class QueryBuilderBase:
         """
         return self._addTyped(column, WhereType.NULL, None, "and")
 
-    def orWhereNull(self, column: str) -> Self:
+    def orWhereNull(self: Self, column: str) -> Self:
         """
         Add an OR-combined ``IS NULL`` condition.
 
@@ -526,7 +528,7 @@ class QueryBuilderBase:
         """
         return self._addTyped(column, WhereType.NULL, None, "or")
 
-    def whereNotNull(self, column: str) -> Self:
+    def whereNotNull(self: Self, column: str) -> Self:
         """
         Filter rows whose column value is not ``NULL``.
 
@@ -542,7 +544,7 @@ class QueryBuilderBase:
         """
         return self._addTyped(column, WhereType.NOT_NULL, None, "and")
 
-    def orWhereNotNull(self, column: str) -> Self:
+    def orWhereNotNull(self: Self, column: str) -> Self:
         """
         Add an OR-combined ``IS NOT NULL`` condition.
 
@@ -558,7 +560,7 @@ class QueryBuilderBase:
         """
         return self._addTyped(column, WhereType.NOT_NULL, None, "or")
 
-    def whereBetween(self, column: str, bounds: Iterable[Any]) -> Self:
+    def whereBetween(self: Self, column: str, bounds: Iterable[Any]) -> Self:
         """
         Filter rows whose column value lies between two boundaries.
 
@@ -580,10 +582,13 @@ class QueryBuilderBase:
             If the boundaries are not exactly two values.
         """
         return self._addTyped(
-            column, WhereType.BETWEEN, self._boundaryPair(bounds), "and",
+            column,
+            WhereType.BETWEEN,
+            self._boundaryPair(bounds),
+            "and",
         )
 
-    def whereNotBetween(self, column: str, bounds: Iterable[Any]) -> Self:
+    def whereNotBetween(self: Self, column: str, bounds: Iterable[Any]) -> Self:
         """
         Filter rows whose column value lies outside two boundaries.
 
@@ -605,10 +610,13 @@ class QueryBuilderBase:
             If the boundaries are not exactly two values.
         """
         return self._addTyped(
-            column, WhereType.NOT_BETWEEN, self._boundaryPair(bounds), "and",
+            column,
+            WhereType.NOT_BETWEEN,
+            self._boundaryPair(bounds),
+            "and",
         )
 
-    def whereLike(self, column: str, pattern: str) -> Self:
+    def whereLike(self: Self, column: str, pattern: str) -> Self:
         """
         Filter rows whose column value matches an SQL LIKE pattern.
 
@@ -626,7 +634,7 @@ class QueryBuilderBase:
         """
         return self._addTyped(column, WhereType.LIKE, pattern, "and")
 
-    def whereNotLike(self, column: str, pattern: str) -> Self:
+    def whereNotLike(self: Self, column: str, pattern: str) -> Self:
         """
         Filter rows whose column value does not match an SQL LIKE pattern.
 
@@ -644,7 +652,7 @@ class QueryBuilderBase:
         """
         return self._addTyped(column, WhereType.NOT_LIKE, pattern, "and")
 
-    def whereILike(self, column: str, pattern: str) -> Self:
+    def whereILike(self: Self, column: str, pattern: str) -> Self:
         """
         Filter rows matching a case-insensitive SQL LIKE pattern.
 
@@ -662,7 +670,7 @@ class QueryBuilderBase:
         """
         return self._addTyped(column, WhereType.ILIKE, pattern, "and")
 
-    def whereNotILike(self, column: str, pattern: str) -> Self:
+    def whereNotILike(self: Self, column: str, pattern: str) -> Self:
         """
         Filter rows not matching a case-insensitive SQL LIKE pattern.
 
@@ -680,7 +688,7 @@ class QueryBuilderBase:
         """
         return self._addTyped(column, WhereType.NOT_ILIKE, pattern, "and")
 
-    def whereStartsWith(self, column: str, value: str) -> Self:
+    def whereStartsWith(self: Self, column: str, value: str) -> Self:
         """
         Filter rows whose column value starts with the given text.
 
@@ -698,7 +706,7 @@ class QueryBuilderBase:
         """
         return self._addTyped(column, WhereType.STARTS_WITH, value, "and")
 
-    def whereEndsWith(self, column: str, value: str) -> Self:
+    def whereEndsWith(self: Self, column: str, value: str) -> Self:
         """
         Filter rows whose column value ends with the given text.
 
@@ -716,7 +724,7 @@ class QueryBuilderBase:
         """
         return self._addTyped(column, WhereType.ENDS_WITH, value, "and")
 
-    def whereContains(self, column: str, value: str) -> Self:
+    def whereContains(self: Self, column: str, value: str) -> Self:
         """
         Filter rows whose column value contains the given text.
 
@@ -734,7 +742,7 @@ class QueryBuilderBase:
         """
         return self._addTyped(column, WhereType.CONTAINS, value, "and")
 
-    def whereRegexpMatch(self, column: str, pattern: str) -> Self:
+    def whereRegexpMatch(self: Self, column: str, pattern: str) -> Self:
         """
         Filter rows whose column value matches a regular expression.
 
@@ -755,7 +763,7 @@ class QueryBuilderBase:
         """
         return self._addTyped(column, WhereType.REGEXP, pattern, "and")
 
-    def whereColumn(self, first: str, operator: str, second: str) -> Self:
+    def whereColumn(self: Self, first: str, operator: str, second: str) -> Self:
         """
         Compare two columns of the query against each other.
 
@@ -780,7 +788,7 @@ class QueryBuilderBase:
         """
         return self._addColumnComparison(first, operator, second, "and")
 
-    def orWhereColumn(self, first: str, operator: str, second: str) -> Self:
+    def orWhereColumn(self: Self, first: str, operator: str, second: str) -> Self:
         """
         Add an OR-combined comparison between two columns.
 
@@ -806,7 +814,7 @@ class QueryBuilderBase:
         return self._addColumnComparison(first, operator, second, "or")
 
     def whereRaw(
-        self,
+        self: Self,
         sql: str,
         bindings: dict[str, Any] | None = None,
     ) -> Self:
@@ -832,7 +840,7 @@ class QueryBuilderBase:
         return self._addRaw(self._plan.wheres, sql, bindings, "and")
 
     def orWhereRaw(
-        self,
+        self: Self,
         sql: str,
         bindings: dict[str, Any] | None = None,
     ) -> Self:
@@ -853,7 +861,7 @@ class QueryBuilderBase:
         """
         return self._addRaw(self._plan.wheres, sql, bindings, "or")
 
-    def whereExists(self, query: Any) -> Self:
+    def whereExists(self: Self, query: Any) -> Self:
         """
         Keep rows for which a correlated subquery returns any row.
 
@@ -870,7 +878,7 @@ class QueryBuilderBase:
         """
         return self._addExists(query, WhereType.EXISTS, "and")
 
-    def orWhereExists(self, query: Any) -> Self:
+    def orWhereExists(self: Self, query: Any) -> Self:
         """
         Add an OR-combined ``EXISTS`` condition.
 
@@ -887,7 +895,7 @@ class QueryBuilderBase:
         """
         return self._addExists(query, WhereType.EXISTS, "or")
 
-    def whereNotExists(self, query: Any) -> Self:
+    def whereNotExists(self: Self, query: Any) -> Self:
         """
         Keep rows for which a correlated subquery returns no row.
 
@@ -904,7 +912,7 @@ class QueryBuilderBase:
         """
         return self._addExists(query, WhereType.NOT_EXISTS, "and")
 
-    def orWhereNotExists(self, query: Any) -> Self:
+    def orWhereNotExists(self: Self, query: Any) -> Self:
         """
         Add an OR-combined ``NOT EXISTS`` condition.
 
@@ -924,9 +932,9 @@ class QueryBuilderBase:
     # ── Joins ───────────────────────────────────────────────────────────────
 
     def join(
-        self,
+        self: Self,
         table: str | TableDefinition,
-        first: Any = None,
+        first: Any | None = None,
         operator: str | None = None,
         second: str | None = None,
         *,
@@ -961,13 +969,16 @@ class QueryBuilderBase:
             If the ON condition is incomplete.
         """
         return self._addJoin(
-            JoinType.INNER, table, (first, operator, second), alias,
+            JoinType.INNER,
+            table,
+            (first, operator, second),
+            alias,
         )
 
     def leftJoin(
-        self,
+        self: Self,
         table: str | TableDefinition,
-        first: Any = None,
+        first: Any | None = None,
         operator: str | None = None,
         second: str | None = None,
         *,
@@ -1001,13 +1012,16 @@ class QueryBuilderBase:
             If the ON condition is incomplete.
         """
         return self._addJoin(
-            JoinType.LEFT, table, (first, operator, second), alias,
+            JoinType.LEFT,
+            table,
+            (first, operator, second),
+            alias,
         )
 
     def rightJoin(
-        self,
+        self: Self,
         table: str | TableDefinition,
-        first: Any = None,
+        first: Any | None = None,
         operator: str | None = None,
         second: str | None = None,
         *,
@@ -1041,13 +1055,16 @@ class QueryBuilderBase:
             If the ON condition is incomplete.
         """
         return self._addJoin(
-            JoinType.RIGHT, table, (first, operator, second), alias,
+            JoinType.RIGHT,
+            table,
+            (first, operator, second),
+            alias,
         )
 
     def fullJoin(
-        self,
+        self: Self,
         table: str | TableDefinition,
-        first: Any = None,
+        first: Any | None = None,
         operator: str | None = None,
         second: str | None = None,
         *,
@@ -1081,11 +1098,14 @@ class QueryBuilderBase:
             If the ON condition is incomplete.
         """
         return self._addJoin(
-            JoinType.FULL, table, (first, operator, second), alias,
+            JoinType.FULL,
+            table,
+            (first, operator, second),
+            alias,
         )
 
     def crossJoin(
-        self,
+        self: Self,
         table: str | TableDefinition,
         *,
         alias: str | None = None,
@@ -1115,10 +1135,10 @@ class QueryBuilderBase:
         return self
 
     def joinSub(
-        self,
+        self: Self,
         query: Any,
         alias: str,
-        first: Any = None,
+        first: Any | None = None,
         operator: str | None = None,
         second: str | None = None,
     ) -> Self:
@@ -1151,15 +1171,17 @@ class QueryBuilderBase:
             If the ON condition is incomplete.
         """
         return self._addJoin(
-            JoinType.INNER, self._resolvePlan(query), (first, operator, second),
+            JoinType.INNER,
+            self._resolvePlan(query),
+            (first, operator, second),
             alias,
         )
 
     def leftJoinSub(
-        self,
+        self: Self,
         query: Any,
         alias: str,
-        first: Any = None,
+        first: Any | None = None,
         operator: str | None = None,
         second: str | None = None,
     ) -> Self:
@@ -1192,15 +1214,17 @@ class QueryBuilderBase:
             If the ON condition is incomplete.
         """
         return self._addJoin(
-            JoinType.LEFT, self._resolvePlan(query), (first, operator, second),
+            JoinType.LEFT,
+            self._resolvePlan(query),
+            (first, operator, second),
             alias,
         )
 
     def rightJoinSub(
-        self,
+        self: Self,
         query: Any,
         alias: str,
-        first: Any = None,
+        first: Any | None = None,
         operator: str | None = None,
         second: str | None = None,
     ) -> Self:
@@ -1233,13 +1257,15 @@ class QueryBuilderBase:
             If the ON condition is incomplete.
         """
         return self._addJoin(
-            JoinType.RIGHT, self._resolvePlan(query), (first, operator, second),
+            JoinType.RIGHT,
+            self._resolvePlan(query),
+            (first, operator, second),
             alias,
         )
 
     # ── Ordering, grouping, paging ──────────────────────────────────────────
 
-    def orderBy(self, column: str, direction: str = "asc") -> Self:
+    def orderBy(self: Self, column: str, direction: str = "asc") -> Self:
         """
         Add an ordering rule to the query.
 
@@ -1269,7 +1295,7 @@ class QueryBuilderBase:
         self._plan.orders.append(OrderClause(column=column, direction=resolved))
         return self
 
-    def latest(self, column: str | None = None) -> Self:
+    def latest(self: Self, column: str | None = None) -> Self:
         """
         Order the query by a timestamp column in descending order.
 
@@ -1285,7 +1311,7 @@ class QueryBuilderBase:
         """
         return self.orderBy(column or self._defaultTimestampColumn(), "desc")
 
-    def oldest(self, column: str | None = None) -> Self:
+    def oldest(self: Self, column: str | None = None) -> Self:
         """
         Order the query by a timestamp column in ascending order.
 
@@ -1301,7 +1327,7 @@ class QueryBuilderBase:
         """
         return self.orderBy(column or self._defaultTimestampColumn(), "asc")
 
-    def groupBy(self, *columns: str) -> Self:
+    def groupBy(self: Self, *columns: str) -> Self:
         """
         Add grouping columns to the query.
 
@@ -1318,7 +1344,7 @@ class QueryBuilderBase:
         self._plan.groups.extend(columns)
         return self
 
-    def having(self, column: Any, *args: Any) -> Self:
+    def having(self: Self, column: Any, *args: Any) -> Self:
         """
         Add a post-grouping condition to the query.
 
@@ -1342,7 +1368,7 @@ class QueryBuilderBase:
         self._addWhere(self._plan.havings, column, args, boolean="and")
         return self
 
-    def orHaving(self, column: Any, *args: Any) -> Self:
+    def orHaving(self: Self, column: Any, *args: Any) -> Self:
         """
         Add an OR-combined post-grouping condition to the query.
 
@@ -1367,7 +1393,7 @@ class QueryBuilderBase:
         return self
 
     def havingRaw(
-        self,
+        self: Self,
         sql: str,
         bindings: dict[str, Any] | None = None,
     ) -> Self:
@@ -1388,7 +1414,7 @@ class QueryBuilderBase:
         """
         return self._addRaw(self._plan.havings, sql, bindings, "and")
 
-    def limit(self, value: int) -> Self:
+    def limit(self: Self, value: int) -> Self:
         """
         Limit the number of rows returned by the query.
 
@@ -1413,7 +1439,7 @@ class QueryBuilderBase:
         self._plan.limit_value = value
         return self
 
-    def offset(self, value: int) -> Self:
+    def offset(self: Self, value: int) -> Self:
         """
         Skip the given number of rows before returning results.
 
@@ -1438,7 +1464,7 @@ class QueryBuilderBase:
         self._plan.offset_value = value
         return self
 
-    def take(self, value: int) -> Self:
+    def take(self: Self, value: int) -> Self:
         """
         Limit the number of rows returned; alias of :meth:`limit`.
 
@@ -1454,7 +1480,7 @@ class QueryBuilderBase:
         """
         return self.limit(value)
 
-    def skip(self, value: int) -> Self:
+    def skip(self: Self, value: int) -> Self:
         """
         Skip the given number of rows; alias of :meth:`offset`.
 
@@ -1470,7 +1496,7 @@ class QueryBuilderBase:
         """
         return self.offset(value)
 
-    def forPage(self, page: int, per_page: int = _DEFAULT_PER_PAGE) -> Self:
+    def forPage(self: Self, page: int, per_page: int = _DEFAULT_PER_PAGE) -> Self:
         """
         Limit the query to a single page of results.
 
@@ -1492,9 +1518,12 @@ class QueryBuilderBase:
             If the page or page size are not positive integers.
         """
         if (
-            not isinstance(page, int) or isinstance(page, bool) or page < 1
+            not isinstance(page, int)
+            or isinstance(page, bool)
+            or page < 1
             or not isinstance(per_page, int)
-            or isinstance(per_page, bool) or per_page < 1
+            or isinstance(per_page, bool)
+            or per_page < 1
         ):
             error_msg = "Page and per_page must be positive integers."
             raise InvalidQueryException(error_msg)
@@ -1504,7 +1533,7 @@ class QueryBuilderBase:
 
     # ── Locking and compounds ───────────────────────────────────────────────
 
-    def lockForUpdate(self) -> Self:
+    def lockForUpdate(self: Self) -> Self:
         """
         Lock the selected rows against concurrent writes.
 
@@ -1516,7 +1545,7 @@ class QueryBuilderBase:
         self._plan.lock = LockMode.UPDATE
         return self
 
-    def sharedLock(self) -> Self:
+    def sharedLock(self: Self) -> Self:
         """
         Lock the selected rows in shared mode.
 
@@ -1528,7 +1557,7 @@ class QueryBuilderBase:
         self._plan.lock = LockMode.SHARE
         return self
 
-    def union(self, query: Any) -> Self:
+    def union(self: Self, query: Any) -> Self:
         """
         Append another query's rows, collapsing duplicates.
 
@@ -1546,7 +1575,7 @@ class QueryBuilderBase:
         self._plan.unions.append(UnionClause(plan=self._resolvePlan(query)))
         return self
 
-    def unionAll(self, query: Any) -> Self:
+    def unionAll(self: Self, query: Any) -> Self:
         """
         Append another query's rows, keeping duplicates.
 
@@ -1568,7 +1597,7 @@ class QueryBuilderBase:
 
     # ── Aggregate terminals ─────────────────────────────────────────────────
 
-    async def count(self, column: str = "*") -> int:
+    async def count(self: Self, column: str = "*") -> int:
         """
         Count the rows matched by the query.
 
@@ -1584,7 +1613,7 @@ class QueryBuilderBase:
         """
         return int(await self._aggregate(AggregateFunction.COUNT, column) or 0)
 
-    async def exists(self) -> bool:
+    async def exists(self: Self) -> bool:
         """
         Report whether the query matches at least one row.
 
@@ -1601,7 +1630,8 @@ class QueryBuilderBase:
         probe.offset_value = None
         rows = await self._connection().select(probe)
         return bool(rows)
-    async def doesntExist(self) -> bool:
+
+    async def doesntExist(self: Self) -> bool:
         """
         Report whether the query matches no rows.
 
@@ -1612,7 +1642,7 @@ class QueryBuilderBase:
         """
         return not await self.exists()
 
-    async def max(self, column: str) -> Any:
+    async def max(self: Self, column: str) -> Any:
         """
         Return the maximum value of a column among matching rows.
 
@@ -1628,7 +1658,7 @@ class QueryBuilderBase:
         """
         return await self._aggregate(AggregateFunction.MAX, column)
 
-    async def min(self, column: str) -> Any:
+    async def min(self: Self, column: str) -> Any:
         """
         Return the minimum value of a column among matching rows.
 
@@ -1644,7 +1674,7 @@ class QueryBuilderBase:
         """
         return await self._aggregate(AggregateFunction.MIN, column)
 
-    async def avg(self, column: str) -> float | None:
+    async def avg(self: Self, column: str) -> float | None:
         """
         Return the average value of a column among matching rows.
 
@@ -1661,7 +1691,7 @@ class QueryBuilderBase:
         value = await self._aggregate(AggregateFunction.AVG, column)
         return float(value) if value is not None else None
 
-    async def sum(self, column: str) -> Any:
+    async def sum(self: Self, column: str) -> Any:
         """
         Return the sum of a column among matching rows.
 
@@ -1681,7 +1711,7 @@ class QueryBuilderBase:
     # ── Mutation terminals ──────────────────────────────────────────────────
 
     async def insert(
-        self,
+        self: Self,
         values: dict[str, Any] | list[dict[str, Any]],
     ) -> InsertResult:
         """
@@ -1712,7 +1742,49 @@ class QueryBuilderBase:
         )
         return await self._connection().insert(plan)
 
-    async def update(self, values: dict[str, Any]) -> int:
+    async def chunks(self: Self, size: int = 1000) -> AsyncIterator[Collection]:
+        """Read bounded result batches without changing the materializing get API.
+
+        Parameters
+        ----------
+        size : int
+            Maximum rows hydrated at once. Existing limit and offset are honored.
+
+        Yields
+        ------
+        Collection
+            Rows or models, with retrieved events and eager loading per batch.
+            An explicit deterministic order is required. Use a surrounding
+            transaction for a database-consistent snapshot during concurrent writes.
+            Connections/cursors are released by get before each yield.
+        """
+        if isinstance(size, bool) or not isinstance(size, int) or size < 1:
+            error_msg = "Chunk size must be a positive integer."
+            raise ValueError(error_msg)
+        query: QueryBuilderBase = self.clone()
+        query._beforeExecute()
+        if not query._plan.orders:
+            error_msg = "Chunked queries require an explicit deterministic orderBy."
+            raise InvalidQueryException(error_msg)
+        remaining = query._plan.limit_value
+        offset = query._plan.offset_value or 0
+        while remaining is None or remaining > 0:
+            page: QueryBuilderBase = query.clone()
+            requested = size if remaining is None else min(size, remaining)
+            page._plan.limit_value = requested
+            page._plan.offset_value = offset
+            batch = await page.get()
+            count = len(batch)
+            if not count:
+                return
+            yield batch
+            if count < requested:
+                return
+            offset += count
+            if remaining is not None:
+                remaining -= count
+
+    async def update(self: Self, values: dict[str, Any]) -> int:
         """
         Mass update the rows matched by the query.
 
@@ -1743,7 +1815,7 @@ class QueryBuilderBase:
         )
         return await self._connection().update(plan)
 
-    async def delete(self) -> int:
+    async def delete(self: Self) -> int:
         """
         Delete the rows matched by the query.
 
@@ -1762,7 +1834,7 @@ class QueryBuilderBase:
     # ── Internal helpers ────────────────────────────────────────────────────
 
     def _paginator(
-        self,
+        self: Self,
         items: Collection,
         total: int,
         page: int,
@@ -1790,7 +1862,7 @@ class QueryBuilderBase:
         return Paginator(items=items, total=total, page=page, per_page=size)
 
     async def _aggregate(
-        self,
+        self: Self,
         function: AggregateFunction,
         column: str,
     ) -> Any:
@@ -1817,7 +1889,7 @@ class QueryBuilderBase:
         probe.offset_value = None
         return await self._connection().scalar(probe)
 
-    def _resolvePlan(self, query: Any) -> SelectPlan:
+    def _resolvePlan(self: Self, query: Any) -> SelectPlan:
         """
         Normalize a subquery argument into a select plan.
 
@@ -1846,9 +1918,7 @@ class QueryBuilderBase:
         to_plan = getattr(query, "toPlan", None)
         if callable(to_plan):
             return to_plan()
-        error_msg = (
-            "A subquery must be a callable, a query builder, or a select plan."
-        )
+        error_msg = "A subquery must be a callable, a query builder, or a select plan."
         raise InvalidQueryException(error_msg)
 
     @staticmethod
@@ -1872,7 +1942,7 @@ class QueryBuilderBase:
         return table
 
     def _addJoin(
-        self,
+        self: Self,
         join_type: JoinType,
         table: str | TableDefinition | SelectPlan,
         on: tuple[Any, str | None, str | None],
@@ -1921,9 +1991,7 @@ class QueryBuilderBase:
             ]
 
         target = (
-            table
-            if isinstance(table, SelectPlan)
-            else self._resolveJoinTable(table)
+            table if isinstance(table, SelectPlan) else self._resolveJoinTable(table)
         )
         self._plan.joins.append(
             JoinExpression(
@@ -1936,7 +2004,7 @@ class QueryBuilderBase:
         return self
 
     def _addTyped(
-        self,
+        self: Self,
         column: str,
         where_type: WhereType,
         value: Any,
@@ -1972,7 +2040,7 @@ class QueryBuilderBase:
         return self
 
     def _addMembership(
-        self,
+        self: Self,
         column: str,
         values: Any,
         where_type: WhereType,
@@ -1998,8 +2066,13 @@ class QueryBuilderBase:
             The same builder, enabling fluent chaining.
         """
         resolved: Any
-        if isinstance(values, SelectPlan) or callable(values) or hasattr(
-            values, "toPlan",
+        if (
+            isinstance(values, SelectPlan)
+            or callable(values)
+            or hasattr(
+                values,
+                "toPlan",
+            )
         ):
             resolved = self._resolvePlan(values)
         else:
@@ -2007,7 +2080,7 @@ class QueryBuilderBase:
         return self._addTyped(column, where_type, resolved, boolean)
 
     def _addColumnComparison(
-        self,
+        self: Self,
         first: str,
         operator: str,
         second: str,
@@ -2050,7 +2123,7 @@ class QueryBuilderBase:
         return self
 
     def _addRaw(
-        self,
+        self: Self,
         target: list[WhereClause],
         sql: str,
         bindings: dict[str, Any] | None,
@@ -2080,7 +2153,8 @@ class QueryBuilderBase:
                 column="",
                 where_type=WhereType.RAW,
                 value=RawExpression(
-                    sql=sql, bindings=bindings.copy() if bindings else {},
+                    sql=sql,
+                    bindings=bindings.copy() if bindings else {},
                 ),
                 boolean=boolean,
             ),
@@ -2088,7 +2162,7 @@ class QueryBuilderBase:
         return self
 
     def _addExists(
-        self,
+        self: Self,
         query: Any,
         where_type: WhereType,
         boolean: str,
@@ -2121,7 +2195,7 @@ class QueryBuilderBase:
         return self
 
     def _addWhere(
-        self,
+        self: Self,
         target: list[WhereClause],
         column: Any,
         args: tuple[Any, ...],
@@ -2198,7 +2272,7 @@ class QueryBuilderBase:
         error_msg = "where() expects (column, value) or (column, operator, value)."
         raise InvalidQueryException(error_msg)
 
-    def _nestedClauses(self, callback: Callable[[Any], Any]) -> list[WhereClause]:
+    def _nestedClauses(self: Self, callback: Callable[[Any], Any]) -> list[WhereClause]:
         """
         Run a grouping callback and collect the conditions it declared.
 

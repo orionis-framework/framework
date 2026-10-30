@@ -1,10 +1,9 @@
 from __future__ import annotations
 from dataclasses import dataclass, field
+from typing import Self
 from orionis.environment import Env
+from orionis.foundation.config.validation import validate_store_db, validate_store_port
 from orionis.support.entities.base import BaseEntity
-
-# Highest valid TCP/UDP port number.
-_MAX_PORT = 65535
 
 @dataclass(frozen=True, kw_only=True)
 class Redis(BaseEntity):
@@ -71,7 +70,7 @@ class Redis(BaseEntity):
         },
     )
 
-    def __validateDriver(self) -> None:
+    def __validateDriver(self: Self) -> None:
         """
         Validate the ``driver`` property.
 
@@ -92,7 +91,7 @@ class Redis(BaseEntity):
             error_msg = "The 'driver' property must be 'redis'."
             raise ValueError(error_msg)
 
-    def __validateEndpoint(self) -> None:
+    def __validateEndpoint(self: Self) -> None:
         """
         Validate the ``endpoint`` property.
 
@@ -110,53 +109,7 @@ class Redis(BaseEntity):
             error_msg = "The 'endpoint' property must be a string or None."
             raise TypeError(error_msg)
 
-    def __validatePort(self) -> None:
-        """
-        Validate the ``port`` property.
-
-        Returns
-        -------
-        None
-            This method performs validation and returns None.
-
-        Raises
-        ------
-        TypeError
-            If ``port`` is not an integer.
-        ValueError
-            If ``port`` is not between ``1`` and ``65535``.
-        """
-        if not isinstance(self.port, int) or isinstance(self.port, bool):
-            error_msg = "The 'port' property must be an integer."
-            raise TypeError(error_msg)
-        if not (1 <= self.port <= _MAX_PORT):
-            error_msg = f"The 'port' property must be between 1 and {_MAX_PORT}."
-            raise ValueError(error_msg)
-
-    def __validateDb(self) -> None:
-        """
-        Validate the ``db`` property.
-
-        Returns
-        -------
-        None
-            This method performs validation and returns None.
-
-        Raises
-        ------
-        TypeError
-            If ``db`` is not an integer.
-        ValueError
-            If ``db`` is negative.
-        """
-        if not isinstance(self.db, int) or isinstance(self.db, bool):
-            error_msg = "The 'db' property must be an integer."
-            raise TypeError(error_msg)
-        if self.db < 0:
-            error_msg = "The 'db' property cannot be negative."
-            raise ValueError(error_msg)
-
-    def __validatePassword(self) -> None:
+    def __validatePassword(self: Self) -> None:
         """
         Validate the ``password`` property.
 
@@ -174,7 +127,7 @@ class Redis(BaseEntity):
             error_msg = "The 'password' property must be a string or None."
             raise TypeError(error_msg)
 
-    def __post_init__(self) -> None:
+    def __post_init__(self: Self) -> None:
         """
         Validate the Redis configuration after initialization.
 
@@ -196,6 +149,6 @@ class Redis(BaseEntity):
         # Validate each property according to its type hint
         self.__validateDriver()
         self.__validateEndpoint()
-        self.__validatePort()
-        self.__validateDb()
+        validate_store_port(self.port)
+        validate_store_db(self.db)
         self.__validatePassword()

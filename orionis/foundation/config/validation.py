@@ -3,9 +3,9 @@ import re
 from functools import lru_cache
 from http.cookies import CookieError, SimpleCookie
 from math import isfinite
-from urllib.parse import urlsplit
 from types import MappingProxyType
 from typing import TYPE_CHECKING
+from urllib.parse import urlsplit
 
 if TYPE_CHECKING:
     from enum import Enum
@@ -13,6 +13,8 @@ if TYPE_CHECKING:
 
 _NAME_PATTERN = re.compile(r"[A-Za-z0-9][A-Za-z0-9_.-]{0,127}")
 _TABLE_PATTERN = re.compile(r"[A-Za-z_]\w*", re.ASCII)
+_STORE_TABLE_PATTERN = re.compile(r"[a-z_]+")
+_MAX_STORE_PORT = 65535
 _ENUM_SCALAR_TYPES = frozenset({str, bytes, int, float, complex, bool, type(None)})
 
 def validate_integer(
@@ -56,7 +58,8 @@ def validate_integer(
         error_msg = f"'{name}' must be at least {minimum}"
         if maximum is not None:
             error_msg += f" and at most {maximum}"
-        raise ValueError(error_msg + ".")
+        error_msg = error_msg + "."
+        raise ValueError(error_msg)
 
 def validate_string(value: object, name: str, *, allow_empty: bool = False) -> None:
     """
@@ -119,7 +122,8 @@ def validate_boolean(value: object, name: str) -> None:
 
 @lru_cache(maxsize=64)
 def _enum_values(
-    enum_type: type[Enum], _member_count: int,
+    enum_type: type[Enum],
+    _member_count: int,
 ) -> MappingProxyType | None:
     """
     Index enum names and values in declaration order.
@@ -283,8 +287,8 @@ def validate_name(value: object, name: str, *, table: bool = False) -> None:
     validate_string(value, name)
     pattern = _TABLE_PATTERN if table else _NAME_PATTERN
     if pattern.fullmatch(value) is None:
-        message = f"'{name}' must be a valid identifier."
-        raise ValueError(message)
+        error_msg = f"'{name}' must be a valid identifier."
+        raise ValueError(error_msg)
 
 def validate_seconds(value: object, name: str, *, positive: bool = False) -> None:
     """
@@ -312,12 +316,12 @@ def validate_seconds(value: object, name: str, *, positive: bool = False) -> Non
         If the duration is nonfinite or outside its allowed range.
     """
     if isinstance(value, bool) or not isinstance(value, (int, float)):
-        message = f"'{name}' must be a number of seconds."
-        raise TypeError(message)
+        error_msg = f"'{name}' must be a number of seconds."
+        raise TypeError(error_msg)
     if not isfinite(value) or value < 0 or (positive and value == 0):
         constraint = "positive" if positive else "nonnegative"
-        message = f"'{name}' must contain finite {constraint} seconds."
-        raise ValueError(message)
+        error_msg = f"'{name}' must contain finite {constraint} seconds."
+        raise ValueError(error_msg)
 
 def validate_driver(value: object, expected: Drivers) -> None:
     """
@@ -344,12 +348,12 @@ def validate_driver(value: object, expected: Drivers) -> None:
     """
     validate_string(value, "driver")
     if value != expected:
-        message = f"'driver' must be '{expected}' for this queue connection."
-        raise ValueError(message)
-
+        error_msg = f"'driver' must be '{expected}' for this queue connection."
+        raise ValueError(error_msg)
 
 def validate_http_origin(origin: str) -> None:
-    """Require an explicit serialized HTTP(S) origin without wildcards.
+    """
+    Require an explicit serialized HTTP(S) origin without wildcards.
 
     Parameters
     ----------
@@ -369,13 +373,17 @@ def validate_http_origin(origin: str) -> None:
         If its syntax could permit ambiguous or unrestricted matching.
     """
     if not isinstance(origin, str):
-        message = "allowed_origins entries must be strings"
-        raise TypeError(message)
-    if not origin or not origin.isascii() or any(
-        char.isspace() or not char.isprintable() or char in "*\\" for char in origin
+        error_msg = "allowed_origins entries must be strings"
+        raise TypeError(error_msg)
+    if (
+        not origin
+        or not origin.isascii()
+        or any(
+            char.isspace() or not char.isprintable() or char in "*\\" for char in origin
+        )
     ):
-        message = "allowed_origins entries must be explicit ASCII HTTP(S) origins"
-        raise ValueError(message)
+        error_msg = "allowed_origins entries must be explicit ASCII HTTP(S) origins"
+        raise ValueError(error_msg)
     parsed = urlsplit(origin)
     if (
         parsed.scheme not in {"http", "https"}
@@ -386,8 +394,117 @@ def validate_http_origin(origin: str) -> None:
         or "?" in origin
         or "#" in origin
     ):
-        message = "allowed_origins entries must contain only scheme and authority"
-        raise ValueError(message)
+        error_msg = "allowed_origins entries must contain only scheme and authority"
+        raise ValueError(error_msg)
     if parsed.port == 0 or parsed.netloc.endswith(":"):
-        message = "allowed_origins entries must use a valid nonzero port"
-        raise ValueError(message)
+        error_msg = "allowed_origins entries must use a valid nonzero port"
+        raise ValueError(error_msg)
+
+def validate_store_table(
+    value: object,
+    name: str = "table",
+    *,
+    optional: bool = False,
+) -> None:
+    """
+    Validate cache/scheduler table names without widening their accepted syntax.
+
+    Parameters
+    ----------
+    value : object
+        Configured table name.
+    name : str
+        Property reported in validation errors.
+    optional : bool
+        Whether None is accepted for an optional lock table.
+
+    Returns
+    -------
+    None
+        Accept lowercase letters and underscores, preserving store diagnostics.
+    """
+    if optional and value is None:
+        return
+    if not isinstance(value, str):
+        suffix = " or None" if optional else ""
+        error_msg = f"The '{name}' property must be a string{suffix}."
+        raise TypeError(error_msg)
+    if not _STORE_TABLE_PATTERN.fullmatch(value):
+        error_msg = (
+            f"The '{name}' property must be a valid table name: contain "
+            "only lowercase letters or underscores (no numbers allowed)."
+        )
+        raise ValueError(error_msg)
+
+def validate_store_port(value: object) -> None:
+    """
+    Validate Redis/Memcached ports using the existing store error messages.
+
+    Parameters
+    ----------
+    value : object
+        TCP port, excluding booleans.
+
+    Returns
+    -------
+    None
+        Accept integers from one through 65535.
+    """
+    if not isinstance(value, int) or isinstance(value, bool):
+        error_msg = "The 'port' property must be an integer."
+        raise TypeError(error_msg)
+    if not 1 <= value <= _MAX_STORE_PORT:
+        error_msg = f"The 'port' property must be between 1 and {_MAX_STORE_PORT}."
+        raise ValueError(error_msg)
+
+def validate_store_db(value: object) -> None:
+    """
+    Validate the Redis database index for cache and scheduler stores.
+
+    Parameters
+    ----------
+    value : object
+        Redis database index, excluding booleans.
+
+    Returns
+    -------
+    None
+        Accept nonnegative integers.
+    """
+    if not isinstance(value, int) or isinstance(value, bool):
+        error_msg = "The 'db' property must be an integer."
+        raise TypeError(error_msg)
+    if value < 0:
+        error_msg = "The 'db' property cannot be negative."
+        raise ValueError(error_msg)
+
+def normalize_optional_store(owner: object, name: str, cls: type) -> None:
+    """
+    Convert optional cache/scheduler store dictionaries into typed entities.
+
+    Parameters
+    ----------
+    owner : object
+        Configuration entity whose field is normalized during initialization.
+    name : str
+        Field containing an entity, dict or None.
+    cls : type
+        Expected store entity type.
+
+    Returns
+    -------
+    None
+        Preserve disabled stores and assign converted entities to frozen owners.
+    """
+    value = getattr(owner, name)
+    if value is None:
+        return
+    if not isinstance(value, (cls, dict)):
+        error_msg = (
+            f"The '{name}' attribute must be an instance of "
+            f"{cls.__name__}, a dict, or None, but got "
+            f"{type(value).__name__}."
+        )
+        raise TypeError(error_msg)
+    if isinstance(value, dict):
+        object.__setattr__(owner, name, cls(**value))

@@ -1,6 +1,6 @@
 from __future__ import annotations
 from abc import ABC, abstractmethod
-from typing import Any
+from typing import Any, Self
 
 class IViewEngine(ABC):
     """
@@ -13,8 +13,24 @@ class IViewEngine(ABC):
 
     __slots__ = ()
 
+    async def warmup(self: Self, *templates: str) -> None: # NOSONAR
+        """
+        Prepare known templates without evaluating render context when supported.
+
+        Parameters
+        ----------
+        *templates : str
+            Template identifiers to prepare before rendering.
+
+        Returns
+        -------
+        None
+            Complete the operation without returning a value.
+        """
+        del templates
+
     @abstractmethod
-    async def render(self, template: str, context: dict[str, Any]) -> str:
+    async def render(self: Self, template: str, context: dict[str, Any]) -> str:
         """
         Render a template with the supplied context and return HTML.
 

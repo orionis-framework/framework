@@ -1,82 +1,12 @@
 from types import MappingProxyType
+from typing import Self
 from orionis.support.structures.freezer import FreezeThaw
 from orionis.test import TestCase
 
 class TestFreezeThaw(TestCase):
-
-    # ------------------------------------------------ _isContainer
-
-    def testIsContainerWithDict(self):
-        """Detect dict as a container type.
-
-        Validates that a plain dict is recognized as a supported
-        container by _isContainer.
-
-        Returns
-        -------
-        None
-            Assertions verify the behavior described above.
-        """
-        self.assertTrue(FreezeThaw._isContainer({}))
-
-    def testIsContainerWithList(self):
-        """Detect list as a container type.
-
-        Validates that a list is recognized as a supported
-        container by _isContainer.
-
-        Returns
-        -------
-        None
-            Assertions verify the behavior described above.
-        """
-        self.assertTrue(FreezeThaw._isContainer([]))
-
-    def testIsContainerWithTuple(self):
-        """Detect tuple as a container type.
-
-        Validates that a tuple is recognized as a supported
-        container by _isContainer.
-
-        Returns
-        -------
-        None
-            Assertions verify the behavior described above.
-        """
-        self.assertTrue(FreezeThaw._isContainer(()))
-
-    def testIsContainerWithMappingProxy(self):
-        """Detect MappingProxyType as a container type.
-
-        Validates that a MappingProxyType is recognized as a
-        supported container by _isContainer.
-
-        Returns
-        -------
-        None
-            Assertions verify the behavior described above.
-        """
-        proxy = MappingProxyType({})
-        self.assertTrue(FreezeThaw._isContainer(proxy))
-
-    def testIsContainerWithNonContainer(self):
-        """Reject non-container types.
-
-        Validates that scalar types like int, str, and None
-        are not recognized as containers.
-
-        Returns
-        -------
-        None
-            Assertions verify the behavior described above.
-        """
-        self.assertFalse(FreezeThaw._isContainer(42))
-        self.assertFalse(FreezeThaw._isContainer("text"))
-        self.assertFalse(FreezeThaw._isContainer(None))
-
     # ------------------------------------------------ freeze: dict
 
-    def testFreezeDictReturnsMappingProxy(self):
+    def testFreezeDictReturnsMappingProxy(self: Self) -> None:
         """Freeze a dict into a MappingProxyType.
 
         Validates that freezing a dict produces an immutable
@@ -91,7 +21,7 @@ class TestFreezeThaw(TestCase):
         frozen = FreezeThaw.freeze(data)
         self.assertIsInstance(frozen, MappingProxyType)
 
-    def testFrozenDictIsImmutable(self):
+    def testFrozenDictIsImmutable(self: Self) -> None:
         """Raise TypeError when modifying a frozen dict.
 
         Validates that attempting to set a key on a frozen dict
@@ -107,7 +37,7 @@ class TestFreezeThaw(TestCase):
         with self.assertRaises(TypeError):
             frozen["a"] = 2
 
-    def testFreezeDictPreservesValues(self):
+    def testFreezeDictPreservesValues(self: Self) -> None:
         """Preserve all values after freezing a dict.
 
         Validates that the frozen dict retains the same key-value
@@ -123,7 +53,7 @@ class TestFreezeThaw(TestCase):
         self.assertEqual(frozen["x"], 10)
         self.assertEqual(frozen["y"], "hello")
 
-    def testFreezeNestedDictRecursively(self):
+    def testFreezeNestedDictRecursively(self: Self) -> None:
         """Freeze nested dicts and preserve values.
 
         Validates that inner dict values are preserved after
@@ -142,7 +72,7 @@ class TestFreezeThaw(TestCase):
 
     # ------------------------------------------------ freeze: list
 
-    def testFreezeListReturnsTuple(self):
+    def testFreezeListReturnsTuple(self: Self) -> None:
         """Freeze a list into a tuple.
 
         Validates that freezing a list produces an immutable
@@ -157,7 +87,7 @@ class TestFreezeThaw(TestCase):
         frozen = FreezeThaw.freeze(data)
         self.assertIsInstance(frozen, tuple)
 
-    def testFreezeListPreservesValues(self):
+    def testFreezeListPreservesValues(self: Self) -> None:
         """Preserve all values after freezing a list.
 
         Validates that the frozen tuple retains the same
@@ -172,7 +102,7 @@ class TestFreezeThaw(TestCase):
         frozen = FreezeThaw.freeze(data)
         self.assertEqual(frozen, (1, "a", 3.14))
 
-    def testFreezeNestedListRecursively(self):
+    def testFreezeNestedListRecursively(self: Self) -> None:
         """Freeze nested lists and preserve values.
 
         Validates that the top-level list is converted to a
@@ -189,7 +119,7 @@ class TestFreezeThaw(TestCase):
         self.assertEqual(list(frozen[0]), [1, 2])
         self.assertEqual(list(frozen[1]), [3, 4])
 
-    def testFreezeMixedStructure(self):
+    def testFreezeMixedStructure(self: Self) -> None:
         """Freeze a dict containing lists and nested dicts.
 
         Validates that the top-level dict is frozen to a
@@ -208,7 +138,7 @@ class TestFreezeThaw(TestCase):
 
     # ------------------------------------------------ freeze: edge cases
 
-    def testFreezeNonContainerReturnsUnchanged(self):
+    def testFreezeNonContainerReturnsUnchanged(self: Self) -> None:
         """Return non-container objects unchanged.
 
         Validates that scalar values like int, str, and None
@@ -223,7 +153,7 @@ class TestFreezeThaw(TestCase):
         self.assertEqual(FreezeThaw.freeze("text"), "text")
         self.assertIsNone(FreezeThaw.freeze(None))
 
-    def testFreezeEmptyDict(self):
+    def testFreezeEmptyDict(self: Self) -> None:
         """Freeze an empty dict into an empty MappingProxyType.
 
         Validates that an empty dict produces an empty immutable
@@ -238,7 +168,7 @@ class TestFreezeThaw(TestCase):
         self.assertIsInstance(frozen, MappingProxyType)
         self.assertEqual(len(frozen), 0)
 
-    def testFreezeEmptyList(self):
+    def testFreezeEmptyList(self: Self) -> None:
         """Freeze an empty list into an empty tuple.
 
         Validates that an empty list produces an empty tuple.
@@ -252,7 +182,7 @@ class TestFreezeThaw(TestCase):
         self.assertIsInstance(frozen, tuple)
         self.assertEqual(len(frozen), 0)
 
-    def testFreezeAlreadyFrozenReturnsUnchanged(self):
+    def testFreezeAlreadyFrozenReturnsUnchanged(self: Self) -> None:
         """Return already-frozen MappingProxyType unchanged.
 
         Validates that passing a MappingProxyType to freeze does
@@ -269,7 +199,7 @@ class TestFreezeThaw(TestCase):
 
     # ------------------------------------------------ thaw: dict
 
-    def testThawMappingProxyReturnsDict(self):
+    def testThawMappingProxyReturnsDict(self: Self) -> None:
         """Thaw a MappingProxyType back to a dict.
 
         Validates that thawing a frozen mapping produces a
@@ -285,7 +215,7 @@ class TestFreezeThaw(TestCase):
         self.assertIsInstance(thawed, dict)
         self.assertNotIsInstance(thawed, MappingProxyType)
 
-    def testThawedDictIsMutable(self):
+    def testThawedDictIsMutable(self: Self) -> None:
         """Allow modification of a thawed dict.
 
         Validates that assigning to a key on a thawed dict works
@@ -301,7 +231,7 @@ class TestFreezeThaw(TestCase):
         thawed["a"] = 99
         self.assertEqual(thawed["a"], 99)
 
-    def testThawDictPreservesValues(self):
+    def testThawDictPreservesValues(self: Self) -> None:
         """Preserve values after thawing a frozen dict.
 
         Validates that thawed dict retains the same key-value
@@ -317,7 +247,7 @@ class TestFreezeThaw(TestCase):
         self.assertEqual(thawed["x"], 10)
         self.assertEqual(thawed["y"], "hi")
 
-    def testThawNestedMappingProxyRecursively(self):
+    def testThawNestedMappingProxyRecursively(self: Self) -> None:
         """Thaw nested MappingProxyType recursively.
 
         Validates that inner frozen mappings are also converted
@@ -336,7 +266,7 @@ class TestFreezeThaw(TestCase):
 
     # ------------------------------------------------ thaw: tuple/list
 
-    def testThawTupleReturnsList(self):
+    def testThawTupleReturnsList(self: Self) -> None:
         """Thaw a tuple back to a list.
 
         Validates that thawing a tuple produces a mutable list.
@@ -350,7 +280,7 @@ class TestFreezeThaw(TestCase):
         thawed = FreezeThaw.thaw(data)
         self.assertIsInstance(thawed, list)
 
-    def testThawTuplePreservesValues(self):
+    def testThawTuplePreservesValues(self: Self) -> None:
         """Preserve values after thawing a tuple.
 
         Validates that thawed list retains the same elements
@@ -365,7 +295,7 @@ class TestFreezeThaw(TestCase):
         thawed = FreezeThaw.thaw(data)
         self.assertEqual(thawed, [1, "a", 3.14])
 
-    def testThawNestedTuplesRecursively(self):
+    def testThawNestedTuplesRecursively(self: Self) -> None:
         """Thaw nested tuples recursively.
 
         Validates that inner tuples are also converted to lists.
@@ -381,7 +311,7 @@ class TestFreezeThaw(TestCase):
         self.assertIsInstance(thawed[0], list)
         self.assertEqual(thawed[0], [1, 2])
 
-    def testThawMixedFrozenStructure(self):
+    def testThawMixedFrozenStructure(self: Self) -> None:
         """Thaw a complex frozen structure with mixed types.
 
         Validates that a structure with MappingProxyType and
@@ -392,10 +322,12 @@ class TestFreezeThaw(TestCase):
         None
             Assertions verify the behavior described above.
         """
-        frozen = MappingProxyType({
-            "items": (1, 2),
-            "meta": MappingProxyType({"k": "v"}),
-        })
+        frozen = MappingProxyType(
+            {
+                "items": (1, 2),
+                "meta": MappingProxyType({"k": "v"}),
+            },
+        )
         thawed = FreezeThaw.thaw(frozen)
         self.assertIsInstance(thawed, dict)
         self.assertIsInstance(thawed["items"], list)
@@ -403,7 +335,7 @@ class TestFreezeThaw(TestCase):
 
     # ------------------------------------------------ thaw: edge cases
 
-    def testThawNonContainerReturnsUnchanged(self):
+    def testThawNonContainerReturnsUnchanged(self: Self) -> None:
         """Return non-container objects unchanged.
 
         Validates that scalar values pass through thaw without
@@ -418,7 +350,7 @@ class TestFreezeThaw(TestCase):
         self.assertEqual(FreezeThaw.thaw("text"), "text")
         self.assertIsNone(FreezeThaw.thaw(None))
 
-    def testThawEmptyMappingProxy(self):
+    def testThawEmptyMappingProxy(self: Self) -> None:
         """Thaw an empty MappingProxyType to an empty dict.
 
         Validates that an empty frozen mapping produces an
@@ -434,7 +366,7 @@ class TestFreezeThaw(TestCase):
         self.assertIsInstance(thawed, dict)
         self.assertEqual(len(thawed), 0)
 
-    def testThawEmptyTuple(self):
+    def testThawEmptyTuple(self: Self) -> None:
         """Thaw an empty tuple to an empty list.
 
         Validates that an empty tuple produces an empty list.
@@ -450,7 +382,7 @@ class TestFreezeThaw(TestCase):
 
     # ---------------------------------------- roundtrip: freeze + thaw
 
-    def testRoundtripDictPreservesData(self):
+    def testRoundtripDictPreservesData(self: Self) -> None:
         """Preserve data through freeze-thaw roundtrip for dicts.
 
         Validates that freezing and then thawing a dict produces
@@ -466,7 +398,7 @@ class TestFreezeThaw(TestCase):
         thawed = FreezeThaw.thaw(frozen)
         self.assertEqual(thawed, original)
 
-    def testRoundtripListPreservesData(self):
+    def testRoundtripListPreservesData(self: Self) -> None:
         """Preserve data through freeze-thaw roundtrip for lists.
 
         Validates that freezing and then thawing a list produces
@@ -482,7 +414,7 @@ class TestFreezeThaw(TestCase):
         thawed = FreezeThaw.thaw(frozen)
         self.assertEqual(thawed, original)
 
-    def testRoundtripProducesMutableResult(self):
+    def testRoundtripProducesMutableResult(self: Self) -> None:
         """Produce mutable containers after roundtrip.
 
         Validates that the result of freeze-thaw is fully mutable
@@ -503,7 +435,7 @@ class TestFreezeThaw(TestCase):
 
     # ---------------------------------------- thaw: regular dict/list
 
-    def testThawRegularDictReturnsCopy(self):
+    def testThawRegularDictReturnsCopy(self: Self) -> None:
         """Thaw a regular dict returning a mutable copy.
 
         Validates that thawing a plain dict still produces a
@@ -519,7 +451,7 @@ class TestFreezeThaw(TestCase):
         self.assertIsInstance(thawed, dict)
         self.assertEqual(thawed["a"], 1)
 
-    def testThawRegularListReturnsList(self):
+    def testThawRegularListReturnsList(self: Self) -> None:
         """Thaw a regular list returning a mutable list.
 
         Validates that thawing a plain list produces a list

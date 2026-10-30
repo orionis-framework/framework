@@ -38,7 +38,7 @@ sin usar la variante freethreaded. Los valores por defecto del ejecutor son:
 | WebSockets | Deshabilitados |
 | Conexiones concurrentes de oha | 100 |
 | Hilos de trabajo de oha | 1 |
-| Calentamiento por configuración | 2 segundos |
+| Calentamiento por configuración de Orionis | 2 segundos |
 | Mediciones por configuración | 3 de 10 segundos |
 | Semilla del orden de ejecución | 42 |
 
@@ -66,6 +66,7 @@ uv run --no-sync python -B -m benchmarks.http_compare.run --workers 1 --warmup 0
 
 Usa `--frameworks` para seleccionar casos, `--workers` para seleccionar
 cantidades de workers y `--help` para consultar todas las opciones.
+`--warmup` solo se aplica a Orionis RSGI y Orionis ASGI.
 Cada ejecución requiere una carpeta de salida nueva o vacía.
 
 El ejecutor exige oha 1.16.0: lo busca en `PATH` o descarga temporalmente el
@@ -74,39 +75,43 @@ binario oficial y verifica su SHA-256. Puedes proporcionar uno existente con
 
 ## Cómo se mide
 
-Cada caso sigue estas fases, iguales para todos los frameworks:
+Las apps contienen únicamente la configuración nativa y la ruta `GET /`.
+No tienen endpoints auxiliares, callbacks de seguimiento ni archivos de
+marcadores. El ejecutor verifica los mensajes nativos de arranque de Granian,
+la pertenencia y vida de sus workers y la disponibilidad del servidor.
+Esta política queda registrada en `settings.readiness`.
 
-1. Inicia un servidor aislado y verifica que todos sus workers estén vivos.
-2. Envía dos `GET /` consecutivos sobre una misma conexión keep-alive y consume
+Solo Orionis RSGI y Orionis ASGI realizan preparación HTTP y precalentamiento:
+
+1. Envía dos `GET /` consecutivos sobre una misma conexión keep-alive y consume
    ambas respuestas completas: HTTP/1.1, `200`, `text/plain` y el cuerpo exacto
    `Hello World`. La primera petición permite inicializar cachés del recorrido
    HTTP; la segunda comprueba la respuesta en caliente. Ninguna se mide.
-3. En esa misma conexión consulta `GET /_benchmark/worker`, un endpoint auxiliar
-   que devuelve el PID. Solo considera preparado ese worker si el PID pertenece
-   al servidor. Abre conexiones nuevas hasta haber preparado **cada worker**,
-   sin confundir varias peticiones al mismo proceso con varios workers.
-4. Ejecuta `--warmup`: **2 segundos de tráfico HTTP real por defecto**, no una
+2. Ejecuta `--warmup`: **2 segundos de tráfico HTTP real por defecto**, no una
    pausa fija. Conserva este resultado separado de las métricas.
-5. Inicia las mediciones y finalmente limpia el servidor.
 
-Si un worker no llega a completar la preparación dentro del timeout de inicio,
-el caso falla en lugar de medirlo en frío. No se incluyen las peticiones de
-preparación ni las de calentamiento en los conteos, tiempos, latencias o tasas
-publicados.
+FastAPI, Litestar y Starlette pasan directamente del arranque a las mediciones:
+no reciben peticiones HTTP de preparación ni una ejecución de `--warmup`.
+Su disponibilidad se comprueba abriendo y cerrando una conexión TCP. Todos
+los casos limpian el servidor al finalizar, incluso si hay fallos.
 
-Orionis no espera artificialmente 2 segundos al arrancar: publica su señal nativa
-cuando `isHttpReady` es verdadero. Eso no sustituye la primera petición HTTP real
-descartada de cada worker. La ruta medida no lleva contadores, escritura de
-marcadores ni cabeceras adicionales de seguimiento; el endpoint de PID solo se
-usa durante la preparación, fuera de las mediciones.
+Si Granian no anuncia todos sus workers, alguno muere o el servidor no queda
+disponible dentro del timeout de inicio, el caso falla. No se incluyen
+las peticiones de preparación ni las de calentamiento de Orionis en los
+conteos, tiempos, latencias o tasas publicados.
+
+El precalentamiento de Orionis se ejecuta desde el cliente, no dentro de la app.
+Las peticiones iniciales validan la respuesta, pero ya no identifican por HTTP
+ni garantizan la preparación individual de cada worker. La ruta medida no
+lleva contadores ni cabeceras de seguimiento.
 
 El archivo de rutas de Orionis, [`apps/routes/web.py`](apps/routes/web.py),
-se copia una sola vez por worker al directorio aislado, con un nombre de módulo
-único. Así se conserva el cargador real sin importar rutas del proyecto anfitrión
-ni escribir archivos compartidos entre workers.
+lo copia el ejecutor una sola vez al directorio aislado antes de iniciar Granian.
+Todos los workers leen ese archivo sin modificarlo. Así se conserva el cargador
+real sin importar rutas del proyecto anfitrión ni generar archivos desde la app.
 
-Todos los frameworks comparten los parámetros de servidor y carga de la tabla
-anterior; solo cambian la aplicación y su interfaz. El cliente espera las
+Todos los frameworks comparten los parámetros de servidor y carga medida de la
+tabla anterior; el precalentamiento es exclusivo de Orionis. El cliente espera las
 solicitudes en curso al terminar cada medición, con un timeout de 5 segundos por
 solicitud. La tasa se calcula con el tiempo real, no con la duración nominal:
 
@@ -118,10 +123,12 @@ Solo se publican métricas si todas las muestras son válidas y no hay errores
 HTTP ni de transporte. Un fallo conserva el diagnóstico y las muestras
 disponibles, deja las métricas vacías y hace que el comando termine con error.
 No se descartan muestras fallidas para mejorar el resultado.
+La salida de oha se escribe directamente en los archivos de diagnóstico, que
+conservan también la salida parcial si el proceso falla o agota su timeout.
 
 Se publica la mediana de las tasas y, por separado, de la latencia media, p50,
 p95 y p99 de cada ejecución, convertidas a milisegundos. No son percentiles de
-solicitudes agrupadas. El calentamiento se conserva, pero no entra en las
+solicitudes agrupadas. El calentamiento de Orionis se conserva, pero no entra en las
 métricas ni en los totales.
 
 ## Resultados y trazabilidad
@@ -130,14 +137,26 @@ La carpeta de salida por defecto es `benchmark-results/http-compare/`:
 
 | Archivo o carpeta | Contenido |
 | --- | --- |
-| `summary.json` | Resumen estructurado por framework y workers, estado y métricas válidas. |
+| `summary.json` | Resultados estructurados por framework y workers; esquema 2, sin detalles de preparación. |
 | `summary.csv` | El mismo resumen para hojas de cálculo y análisis posterior. |
 | `summary.md` | Tabla legible para revisar o compartir los resultados. |
 | `throughput-N-workers.svg` | Gráfica de throughput por cantidad de workers; solo se genera si toda la comparación termina sin errores. |
+| `diagnostics.json` | Registro completo de configuración, entorno, muestras, preparación y fallos detallados. |
 | `environment.json` | Versiones y características del entorno de ejecución. |
 | `commands.json` | Comandos utilizados para reproducir y auditar la ejecución. |
 | `raw/` | Salida JSON original de oha y archivos `.stderr.log`, incluidos los disponibles si hay fallos. |
 | `logs/` | Registros de los servidores. |
+
+Los resúmenes Markdown, CSV y JSON y las gráficas muestran únicamente los
+resultados, sus identificadores y su estado. No incluyen parámetros de carga,
+preparación, datos del entorno ni muestras sin medir. El esquema 2 de
+`summary.json` conserva solo los grupos de frameworks y workers y los resultados.
+
+La información técnica completa se conserva separada en `diagnostics.json`,
+incluidos `warmup_frameworks`, el resultado `warmup` de Orionis y los motivos
+detallados de fallo. Los informes indican los fallos sin sustituir métricas
+ausentes por cifras inventadas. Los datos originales también permanecen en
+`raw/`, `logs/`, `commands.json` y `environment.json`.
 
 En GitHub Actions, la matriz completa se ejecuta automáticamente con cada `push`
 a la rama `1.x`, separada del workflow de pruebas unitarias. También puedes
@@ -154,8 +173,9 @@ disponibles después de la primera publicación exitosa.
 
 Las barras se ordenan por solicitudes HTTP 200 por segundo y usan las mismas
 medianas de `summary.json`, sin combinar cantidades de workers ni tomar la mejor
-muestra. Cada gráfica incluye los parámetros de carga, las versiones de Python y
-Granian, la fecha y el commit medido.
+muestra. Cada gráfica muestra los frameworks, las cantidades resultantes y el
+número de workers. Los parámetros de ejecución y el entorno se consultan por
+separado en los archivos de diagnóstico.
 
 Las ejecuciones fallidas o iniciadas desde otra rama no reemplazan los
 resultados publicados. El job de medición conserva permisos de solo lectura;
@@ -168,9 +188,12 @@ una misma rama se serializan para evitar publicaciones fuera de orden.
 uv run --no-sync python -B -m unittest tests.test_http_compare -v
 ```
 
-Estas pruebas no generan carga: verifican contabilidad, medianas, preparación
-de cada worker y exclusión de la primera petición y del calentamiento, parámetros
-compartidos, limpieza, fallos, coherencia de reportes y gráficas SVG.
+Estas pruebas verifican contabilidad, medianas, señales nativas de arranque,
+precalentamiento exclusivo de Orionis, parámetros compartidos, limpieza,
+fallos, reportes y gráficas SVG. Con el grupo `benchmark` instalado también
+comprueban las cinco configuraciones en servidores reales: cuerpo, tipo de
+contenido, keep-alive y ausencia de endpoints auxiliares. No publican métricas
+de rendimiento.
 La comprobación del directorio aislado admite los alias de ruta corta 8.3 de
 Windows sin confundirlos con un directorio diferente.
 

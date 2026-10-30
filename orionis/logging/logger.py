@@ -1,15 +1,17 @@
+import asyncio
 import logging
 from contextlib import suppress
 from pathlib import Path
 from threading import Lock
-from typing import ClassVar
+from typing import ClassVar, Self
 from orionis.foundation.config.logging.enums.levels import Level
 from orionis.foundation.contracts.application import IApplication
 from orionis.logging.contracts.logger import ILogger
+from orionis.logging.handlers.queued import BoundedQueueHandler, LoggingDeliveryError
 from orionis.logging.handlers.rotating_handler_factory import RotatingHandlerFactory
+from orionis.support.concurrency import complete_on_cancel
 
 class Logger(ILogger):
-
     # ruff: noqa: RUF012, TC001
 
     # Identify the standard logger channel.
@@ -18,7 +20,7 @@ class Logger(ILogger):
     # Share formatters configured with the same message and date formats.
     _formatter_cache: dict[str, logging.Formatter] = {}
 
-    def __init__(self, app: IApplication) -> None:
+    def __init__(self: Self, app: IApplication) -> None:
         """
         Initialize the Logger instance with ultra-fast optimization.
 
@@ -43,7 +45,7 @@ class Logger(ILogger):
         self.__logger_name: str = "__orionis__"
         self.__default_level: int = logging.DEBUG
 
-    def __initializeLogger(self) -> None:
+    def __initializeLogger(self: Self) -> None:
         """
         Build the standard library logger for the default channel.
 
@@ -62,7 +64,6 @@ class Logger(ILogger):
             If the logger cannot be initialized.
         """
         try:
-
             # Retrieve the standard logger by name.
             logger = logging.getLogger(self.__logger_name)
 
@@ -84,7 +85,6 @@ class Logger(ILogger):
             app_root = self.__app.path("root")
 
             if default_channel_name in channels:
-
                 # Convert the configured logging level to an integer.
                 channel_config: dict = self.__normalizeChannelConfig(
                     channels[default_channel_name],
@@ -92,10 +92,9 @@ class Logger(ILogger):
 
                 # Create the stack channel's file handler.
                 if default_channel_name == "stack":
-                    log_path = f"{app_root}/{channel_config.get(
-                        'path',
-                        'storage/logs/stack.log'
-                    )}"
+                    log_path = f"{app_root}/{
+                        channel_config.get('path', 'storage/logs/stack.log')
+                    }"
                     # Ensure directory exists
                     Path(log_path).parent.mkdir(parents=True, exist_ok=True)
                     handler = logging.FileHandler(log_path, encoding="utf-8")
@@ -111,6 +110,7 @@ class Logger(ILogger):
                 if handler:
                     handler.setFormatter(formatter)
                     handler.setLevel(channel_config.get("level", logging.INFO))
+                    handler = self.__queueHandler(handler)
                     logger.addHandler(handler)
                     self.__handlers_cache[default_channel_name] = handler
             else:
@@ -119,6 +119,7 @@ class Logger(ILogger):
                 Path(fallback_path).parent.mkdir(parents=True, exist_ok=True)
                 handler = logging.FileHandler(fallback_path, encoding="utf-8")
                 handler.setFormatter(formatter)
+                handler = self.__queueHandler(handler)
                 logger.addHandler(handler)
                 self.__handlers_cache["fallback"] = handler
 
@@ -128,7 +129,24 @@ class Logger(ILogger):
             error_msg = f"Failed to initialize logger: {e!s}"
             raise RuntimeError(error_msg) from e
 
-    def __createFormatter(self) -> logging.Formatter:
+    def __queueHandler(self: Self, handler: logging.Handler) -> logging.Handler:
+        """
+        Enable bounded asynchronous emission only when explicitly configured.
+
+        Parameters
+        ----------
+        handler : logging.Handler
+            Owned handler to wrap when queued logging is enabled.
+
+        Returns
+        -------
+        logging.Handler
+            Queued wrapper when enabled, otherwise the original handler.
+        """
+        capacity = self.__config.get("queue_capacity", 0)
+        return BoundedQueueHandler(handler, capacity) if capacity else handler
+
+    def __createFormatter(self: Self) -> logging.Formatter:
         """
         Create and return an optimized log formatter with caching.
 
@@ -153,7 +171,7 @@ class Logger(ILogger):
         return formatter
 
     def __createChannelHandler(
-        self,
+        self: Self,
         channel_name: str,
         channel_config: dict,
         app_root: str,
@@ -185,10 +203,10 @@ class Logger(ILogger):
                 app_root=app_root,
             )
             return handler
-        except (OSError, ValueError, RuntimeError):
+        except OSError, ValueError, RuntimeError:
             return None
 
-    def __normalizeChannelConfig(self, config: dict) -> dict:
+    def __normalizeChannelConfig(self: Self, config: dict) -> dict:
         """
         Normalize the channel configuration for logging.
 
@@ -216,7 +234,7 @@ class Logger(ILogger):
 
         return normalized
 
-    def __ensureLoggerReady(self) -> None:
+    def __ensureLoggerReady(self: Self) -> None:
         """
         Ensure the logger is initialized and ready for use with ultra-fast lazy init.
 
@@ -246,7 +264,7 @@ class Logger(ILogger):
             error_msg = "Logger could not be initialized"
             raise RuntimeError(error_msg)
 
-    def info(self, message: str) -> None:
+    def info(self: Self, message: str) -> None:
         """
         Log an informational message.
 
@@ -265,7 +283,7 @@ class Logger(ILogger):
             self.__ensureLoggerReady()
         self.__logger.info(message)
 
-    def error(self, message: str) -> None:
+    def error(self: Self, message: str) -> None:
         """
         Log an error message.
 
@@ -283,7 +301,7 @@ class Logger(ILogger):
             self.__ensureLoggerReady()
         self.__logger.error(message)
 
-    def warning(self, message: str) -> None:
+    def warning(self: Self, message: str) -> None:
         """
         Log a warning message.
 
@@ -301,7 +319,7 @@ class Logger(ILogger):
             self.__ensureLoggerReady()
         self.__logger.warning(message)
 
-    def debug(self, message: str) -> None:
+    def debug(self: Self, message: str) -> None:
         """
         Log a debug message.
 
@@ -319,7 +337,7 @@ class Logger(ILogger):
             self.__ensureLoggerReady()
         self.__logger.debug(message)
 
-    def critical(self, message: str) -> None:
+    def critical(self: Self, message: str) -> None:
         """
         Log a critical message.
 
@@ -337,7 +355,7 @@ class Logger(ILogger):
             self.__ensureLoggerReady()
         self.__logger.critical(message)
 
-    def getLogger(self) -> logging.Logger:
+    def getLogger(self: Self) -> logging.Logger:
         """
         Return the internal logger instance for advanced usage.
 
@@ -354,7 +372,7 @@ class Logger(ILogger):
         self.__ensureLoggerReady()
         return self.__logger
 
-    def reloadConfiguration(self) -> None:
+    def reloadConfiguration(self: Self) -> None:
         """
         Reload the logger configuration from the application.
 
@@ -367,10 +385,8 @@ class Logger(ILogger):
             This method does not return a value.
         """
         try:
-
             # Acquire lock to ensure thread safety during reload
             with self.__init_lock:
-
                 # Close existing handlers and remove them from the logger.
                 # Iterate over a copy: removeHandler mutates the same list.
                 if self.__logger:
@@ -390,12 +406,11 @@ class Logger(ILogger):
                 self.info("Logger configuration reloaded successfully")
 
         except Exception as e:
-
             # Raise an error if reloading fails
             error_msg = f"Failed to reload logger configuration: {e}"
             raise RuntimeError(error_msg) from e
 
-    def switchChannel(self, channel_name: str) -> bool:
+    def switchChannel(self: Self, channel_name: str) -> bool:
         """
         Switch to a different logging channel.
 
@@ -424,7 +439,6 @@ class Logger(ILogger):
                 self.__ensureLoggerReady()
 
             with self.__init_lock:
-
                 # Close current handlers and remove from logger.
                 # Iterate over a copy: removeHandler mutates the same list.
                 for handler in self.__logger.handlers[:]:
@@ -450,6 +464,7 @@ class Logger(ILogger):
 
                 if handler:
                     handler.setFormatter(formatter)
+                    handler = self.__queueHandler(handler)
                     self.__logger.addHandler(handler)
                     self.__handlers_cache[channel_name] = handler
                     self.info(f"Successfully switched to channel: {channel_name}")
@@ -457,10 +472,10 @@ class Logger(ILogger):
 
                 return False
 
-        except (OSError, RuntimeError, ValueError):
+        except OSError, RuntimeError, ValueError:
             return False
 
-    def close(self) -> None:
+    def close(self: Self) -> None:
         """
         Close all handlers and release logger resources.
 
@@ -472,32 +487,39 @@ class Logger(ILogger):
         None
             This method does not return a value.
         """
-        # Suppress common exceptions to avoid errors during cleanup
-        # and acquire lock for thread-safe cleanup
-        with suppress(OSError, RuntimeError, ValueError), self.__init_lock:
-
-            # Close and remove handlers from the main logger
-            if self.__logger:
-
-                # Close and remove all handlers from the logger.
-                # Iterate over a copy: removeHandler mutates the same list.
+        errors = []
+        with self.__init_lock:
+            handlers = dict.fromkeys(self.__handlers_cache.values())
+            if self.__logger is not None:
+                handlers.update(dict.fromkeys(self.__logger.handlers))
                 for handler in self.__logger.handlers[:]:
-                    with suppress(OSError, RuntimeError, ValueError):
-                        handler.close()
                     self.__logger.removeHandler(handler)
-
-            # Close and clear cached handlers
-            for handler in self.__handlers_cache.values():
-
-                # Suppress exceptions during handler closure
-                with suppress(OSError, RuntimeError, ValueError):
+            for handler in handlers:
+                try:
                     handler.close()
-
-            # Clear the handlers cache and reset the logger reference
+                except LoggingDeliveryError as error:
+                    errors.append(error)
+                except OSError, RuntimeError, ValueError:
+                    # Preserve synchronous handler cleanup compatibility.
+                    pass
             self.__handlers_cache.clear()
             self.__logger = None
+        if errors:
+            error_msg = "One or more background logging sinks failed during shutdown."
+            raise LoggingDeliveryError(error_msg) from errors[0]
 
-    def getActiveChannels(self) -> list[str]:
+    async def aclose(self: Self) -> None:
+        """
+        Drain queued records and close handlers without blocking the event loop.
+
+        Returns
+        -------
+        None
+            Complete the operation without returning a value.
+        """
+        await complete_on_cancel(asyncio.to_thread(self.close))
+
+    def getActiveChannels(self: Self) -> list[str]:
         """
         Return the names of active logging channels.
 
@@ -509,7 +531,7 @@ class Logger(ILogger):
         # Return the keys from the handlers cache as the active channel names
         return list(self.__handlers_cache.keys())
 
-    def getActiveChannel(self) -> str | None:
+    def getActiveChannel(self: Self) -> str | None:
         """
         Return the name of the currently active logging channel.
 
@@ -522,7 +544,7 @@ class Logger(ILogger):
         # Return the first active channel if available, otherwise None
         return channels[0] if channels else None
 
-    def getAvailableChannels(self) -> list[str]:
+    def getAvailableChannels(self: Self) -> list[str]:
         """
         Return all available logging channels from configuration.
 
@@ -534,7 +556,7 @@ class Logger(ILogger):
         # Extract channel names from configuration dictionary
         return list(self.__config.get("channels", {}).keys())
 
-    def __del__(self) -> None:
+    def __del__(self: Self) -> None:
         """
         Release resources when the logger is destroyed.
 

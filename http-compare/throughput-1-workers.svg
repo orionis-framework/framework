@@ -15,41 +15,41 @@ text { font-family: system-ui, -apple-system, 'Segoe UI', sans-serif; }
 <line class="grid" x1="150.00" y1="92" x2="150.00" y2="388"/>
 <text class="muted" x="150.00" y="412" text-anchor="middle">0</text>
 <line class="grid" x1="305.00" y1="92" x2="305.00" y2="388"/>
-<text class="muted" x="305.00" y="412" text-anchor="middle">5,000</text>
+<text class="muted" x="305.00" y="412" text-anchor="middle">7,000</text>
 <line class="grid" x1="460.00" y1="92" x2="460.00" y2="388"/>
-<text class="muted" x="460.00" y="412" text-anchor="middle">10,000</text>
+<text class="muted" x="460.00" y="412" text-anchor="middle">14,000</text>
 <line class="grid" x1="615.00" y1="92" x2="615.00" y2="388"/>
-<text class="muted" x="615.00" y="412" text-anchor="middle">15,000</text>
+<text class="muted" x="615.00" y="412" text-anchor="middle">21,000</text>
 <line class="grid" x1="770.00" y1="92" x2="770.00" y2="388"/>
-<text class="muted" x="770.00" y="412" text-anchor="middle">20,000</text>
+<text class="muted" x="770.00" y="412" text-anchor="middle">28,000</text>
 <g data-framework="orionis-asgi">
-<title>Orionis ASGI: 16,357.88 requests/s</title>
+<title>Orionis ASGI: 25,832.92 requests/s</title>
 <text class="label" x="138" y="127" text-anchor="end">Orionis ASGI</text>
-<rect class="bar" x="150" y="100" width="507.09" height="44" rx="6"/>
-<text class="label" x="667.09" y="127">16,357.88</text>
+<rect class="bar" x="150" y="100" width="572.01" height="44" rx="6"/>
+<text class="label" x="732.01" y="127">25,832.92</text>
 </g>
 <g data-framework="orionis-rsgi">
-<title>Orionis RSGI: 14,306.31 requests/s</title>
+<title>Orionis RSGI: 19,296.64 requests/s</title>
 <text class="label" x="138" y="187" text-anchor="end">Orionis RSGI</text>
-<rect class="bar" x="150" y="160" width="443.50" height="44" rx="6"/>
-<text class="label" x="603.50" y="187">14,306.31</text>
+<rect class="bar" x="150" y="160" width="427.28" height="44" rx="6"/>
+<text class="label" x="587.28" y="187">19,296.64</text>
 </g>
 <g data-framework="starlette">
-<title>Starlette: 6,219.49 requests/s</title>
+<title>Starlette: 9,106.86 requests/s</title>
 <text class="label" x="138" y="247" text-anchor="end">Starlette</text>
-<rect class="bar" x="150" y="220" width="192.80" height="44" rx="6"/>
-<text class="label" x="352.80" y="247">6,219.49</text>
+<rect class="bar" x="150" y="220" width="201.65" height="44" rx="6"/>
+<text class="label" x="361.65" y="247">9,106.86</text>
 </g>
 <g data-framework="litestar">
-<title>Litestar: 5,424.91 requests/s</title>
+<title>Litestar: 7,307.89 requests/s</title>
 <text class="label" x="138" y="307" text-anchor="end">Litestar</text>
-<rect class="bar" x="150" y="280" width="168.17" height="44" rx="6"/>
-<text class="label" x="328.17" y="307">5,424.91</text>
+<rect class="bar" x="150" y="280" width="161.82" height="44" rx="6"/>
+<text class="label" x="321.82" y="307">7,307.89</text>
 </g>
 <g data-framework="fastapi">
-<title>FastAPI: 4,829.15 requests/s</title>
+<title>FastAPI: 6,325.54 requests/s</title>
 <text class="label" x="138" y="367" text-anchor="end">FastAPI</text>
-<rect class="bar" x="150" y="340" width="149.70" height="44" rx="6"/>
-<text class="label" x="309.70" y="367">4,829.15</text>
+<rect class="bar" x="150" y="340" width="140.07" height="44" rx="6"/>
+<text class="label" x="300.07" y="367">6,325.54</text>
 </g>
 </svg>

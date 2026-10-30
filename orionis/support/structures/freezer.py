@@ -12,25 +12,7 @@ class FreezeThaw:
     # ruff: noqa: PLR0912, C901
 
     @staticmethod
-    def _isContainer(obj: object) -> bool:
-        """
-        Determine if the object is a supported container type.
-
-        Parameters
-        ----------
-        obj : object
-            The object to check.
-
-        Returns
-        -------
-        bool
-            True if the object is a MappingProxyType, dict, list, or tuple;
-            otherwise, False.
-        """
-        return isinstance(obj, _CONTAINER_TYPES)
-
-    @staticmethod
-    def thaw(obj: object) -> object: # NOSONAR
+    def thaw(obj: object) -> object:  # NOSONAR
         """
         Recursively convert frozen containers to mutable equivalents.
 
@@ -144,7 +126,8 @@ class FreezeThaw:
                 new_obj_l: list[Any] = list(current)
                 cache[c_id] = new_obj_l
                 stack.extend(
-                    v for v in current
+                    v
+                    for v in current
                     if isinstance(v, _MUTABLE_TYPES) and id(v) not in cache
                 )
 

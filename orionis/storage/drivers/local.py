@@ -5,9 +5,11 @@ import mimetypes
 import secrets
 import shutil
 from datetime import UTC, datetime
+from functools import partial
 from pathlib import Path, PurePosixPath
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Self
 from urllib.parse import quote
+from orionis.storage.buffering import read_chunks
 from orionis.storage.contracts.driver import IStorageDriver
 from orionis.storage.entities.file_info import FileInfo
 from orionis.storage.enums.visibility import Visibility
@@ -30,10 +32,6 @@ _FILE_MODES: dict[str, int] = {
     Visibility.PUBLIC.value: 0o644,
     Visibility.PRIVATE.value: 0o600,
 }
-_DIR_MODES: dict[str, int] = {
-    Visibility.PUBLIC.value: 0o755,
-    Visibility.PRIVATE.value: 0o700,
-}
 
 # Binary modes accepted by open().
 _ALLOWED_MODES: frozenset[str] = frozenset(
@@ -54,7 +52,7 @@ class LocalStorageDriver(IStorageDriver):
 
     __slots__ = ("_base_url", "_root")
 
-    def __init__(self, root: Path, base_url: str | None = None) -> None:
+    def __init__(self: Self, root: Path, base_url: str | None = None) -> None:
         """
         Initialize the driver rooted at *root*.
 
@@ -79,7 +77,7 @@ class LocalStorageDriver(IStorageDriver):
 
     # ── Internal helpers (synchronous, executed on worker threads) ──────────
 
-    def __absolute(self, normalized: str) -> Path:
+    def __absolute(self: Self, normalized: str) -> Path:
         """
         Return the absolute path for an already normalized path.
 
@@ -96,7 +94,7 @@ class LocalStorageDriver(IStorageDriver):
         # Normalized paths cannot escape the root, so a plain join is safe.
         return self._root / normalized if normalized else self._root
 
-    def __relative(self, absolute: Path) -> str:
+    def __relative(self: Self, absolute: Path) -> str:
         """
         Return the canonical relative path for *absolute*.
 
@@ -112,7 +110,7 @@ class LocalStorageDriver(IStorageDriver):
         """
         return absolute.relative_to(self._root).as_posix()
 
-    def __fileMode(self, visibility: str) -> int:
+    def __fileMode(self: Self, visibility: str) -> int:
         """
         Return the POSIX file mode for *visibility*.
 
@@ -137,7 +135,7 @@ class LocalStorageDriver(IStorageDriver):
             raise UnsupportedStorageOperationException(error_msg)
         return mode
 
-    def __statOrFail(self, normalized: str) -> tuple[Path, object]:
+    def __statOrFail(self: Self, normalized: str) -> tuple[Path, object]:
         """
         Stat the file at *normalized* or raise when it is absent.
 
@@ -167,7 +165,7 @@ class LocalStorageDriver(IStorageDriver):
             raise StorageFileNotFoundException(error_msg)
         return absolute, stats
 
-    def __readSync(self, normalized: str) -> bytes:
+    def __readSync(self: Self, normalized: str) -> bytes:
         """
         Read the file at *normalized* synchronously.
 
@@ -193,7 +191,7 @@ class LocalStorageDriver(IStorageDriver):
             error_msg = f"File does not exist at path [{normalized}]."
             raise StorageFileNotFoundException(error_msg) from exc
 
-    def __openRead(self, normalized: str, mode: str) -> BinaryIO:
+    def __openRead(self: Self, normalized: str, mode: str) -> BinaryIO:
         """
         Open the file at *normalized* synchronously.
 
@@ -225,7 +223,7 @@ class LocalStorageDriver(IStorageDriver):
             error_msg = f"File does not exist at path [{normalized}]."
             raise StorageFileNotFoundException(error_msg) from exc
 
-    def __openTemp(self, tmp: Path) -> BinaryIO:
+    def __openTemp(self: Self, tmp: Path) -> BinaryIO:
         """
         Open a temporary sibling file for writing synchronously.
 
@@ -262,7 +260,7 @@ class LocalStorageDriver(IStorageDriver):
         return absolute.with_name(f"{absolute.name}.{secrets.token_hex(8)}.tmp")
 
     def __writeSync(
-        self,
+        self: Self,
         normalized: str,
         data: bytes,
         visibility: str | None,
@@ -299,7 +297,7 @@ class LocalStorageDriver(IStorageDriver):
             absolute.chmod(self.__fileMode(visibility))
 
     def __commitStream(
-        self,
+        self: Self,
         tmp: Path,
         absolute: Path,
         visibility: str | None,
@@ -324,7 +322,7 @@ class LocalStorageDriver(IStorageDriver):
         if visibility is not None:
             absolute.chmod(self.__fileMode(visibility))
 
-    def __copySync(self, source: str, target: str) -> None:
+    def __copySync(self: Self, source: str, target: str) -> None:
         """
         Copy *source* to *target* synchronously.
 
@@ -349,7 +347,7 @@ class LocalStorageDriver(IStorageDriver):
         destination.parent.mkdir(parents=True, exist_ok=True)
         shutil.copy2(origin, destination)
 
-    def __moveSync(self, source: str, target: str) -> None:
+    def __moveSync(self: Self, source: str, target: str) -> None:
         """
         Move *source* to *target* synchronously.
 
@@ -422,7 +420,7 @@ class LocalStorageDriver(IStorageDriver):
                 yield entry
 
     def __listSync(
-        self,
+        self: Self,
         normalized: str,
         *,
         recursive: bool,
@@ -460,7 +458,7 @@ class LocalStorageDriver(IStorageDriver):
         results.sort()
         return results
 
-    def __hashSync(self, normalized: str, algorithm: str) -> str:
+    def __hashSync(self: Self, normalized: str, algorithm: str) -> str:
         """
         Compute the content hash of *normalized* synchronously.
 
@@ -496,7 +494,7 @@ class LocalStorageDriver(IStorageDriver):
                 hasher.update(chunk)
         return hasher.hexdigest()
 
-    def __visibilityFromMode(self, mode: int) -> str:
+    def __visibilityFromMode(self: Self, mode: int) -> str:
         """
         Derive the visibility level from POSIX permission bits.
 
@@ -511,13 +509,9 @@ class LocalStorageDriver(IStorageDriver):
             ``'public'`` when group or others can read the file,
             otherwise ``'private'``.
         """
-        return (
-            Visibility.PUBLIC.value
-            if mode & 0o044
-            else Visibility.PRIVATE.value
-        )
+        return Visibility.PUBLIC.value if mode & 0o044 else Visibility.PRIVATE.value
 
-    def __infoSync(self, normalized: str) -> FileInfo:
+    def __infoSync(self: Self, normalized: str) -> FileInfo:
         """
         Build a metadata snapshot for *normalized* synchronously.
 
@@ -566,7 +560,7 @@ class LocalStorageDriver(IStorageDriver):
             url=self.__buildUrl(normalized) if self._base_url else None,
         )
 
-    def __buildUrl(self, normalized: str) -> str:
+    def __buildUrl(self: Self, normalized: str) -> str:
         """
         Build the public URL for *normalized*.
 
@@ -582,7 +576,7 @@ class LocalStorageDriver(IStorageDriver):
         """
         return f"{self._base_url}/{quote(normalized, safe='/')}"
 
-    def __downloadSync(self, normalized: str, destination: str | Path) -> Path:
+    def __downloadSync(self: Self, normalized: str, destination: str | Path) -> Path:
         """
         Copy *normalized* to a local destination synchronously.
 
@@ -615,7 +609,7 @@ class LocalStorageDriver(IStorageDriver):
 
     # ── Read operations ──────────────────────────────────────────────────────
 
-    async def read(self, path: str) -> bytes:
+    async def read(self: Self, path: str) -> bytes:
         """
         Read the full contents of the file at *path*.
 
@@ -638,7 +632,7 @@ class LocalStorageDriver(IStorageDriver):
         return await asyncio.to_thread(self.__readSync, normalized)
 
     async def readStream(
-        self,
+        self: Self,
         path: str,
         chunk_size: int = _CHUNK_SIZE,
     ) -> AsyncIterator[bytes]:
@@ -663,17 +657,14 @@ class LocalStorageDriver(IStorageDriver):
             If the file does not exist.
         """
         normalized = normalizeFilePath(path)
-        handle = await asyncio.to_thread(self.__openRead, normalized, "rb")
+        chunks = read_chunks(partial(self.__openRead, normalized, "rb"), chunk_size)
         try:
-            while True:
-                chunk = await asyncio.to_thread(handle.read, chunk_size)
-                if not chunk:
-                    break
+            async for chunk in chunks:
                 yield chunk
         finally:
-            await asyncio.to_thread(handle.close)
+            await chunks.aclose()
 
-    async def exists(self, path: str) -> bool:
+    async def exists(self: Self, path: str) -> bool:
         """
         Check whether a file exists at *path*.
 
@@ -693,7 +684,7 @@ class LocalStorageDriver(IStorageDriver):
     # ── Write operations ─────────────────────────────────────────────────────
 
     async def write(
-        self,
+        self: Self,
         path: str,
         contents: bytes | str,
         visibility: str | None = None,
@@ -719,14 +710,12 @@ class LocalStorageDriver(IStorageDriver):
         """
         normalized = normalizeFilePath(path)
         data = (
-            contents.encode("utf-8")
-            if isinstance(contents, str)
-            else bytes(contents)
+            contents.encode("utf-8") if isinstance(contents, str) else bytes(contents)
         )
         await asyncio.to_thread(self.__writeSync, normalized, data, visibility)
 
     async def writeStream(
-        self,
+        self: Self,
         path: str,
         stream: AsyncIterable[bytes],
         visibility: str | None = None,
@@ -769,7 +758,7 @@ class LocalStorageDriver(IStorageDriver):
 
         await asyncio.to_thread(self.__commitStream, tmp, absolute, visibility)
 
-    async def delete(self, path: str) -> bool:
+    async def delete(self: Self, path: str) -> bool:
         """
         Delete the file at *path*.
 
@@ -790,7 +779,7 @@ class LocalStorageDriver(IStorageDriver):
             return False
         return True
 
-    async def copy(self, source: str, target: str) -> None:
+    async def copy(self: Self, source: str, target: str) -> None:
         """
         Copy the file at *source* to *target*.
 
@@ -816,7 +805,7 @@ class LocalStorageDriver(IStorageDriver):
             normalizeFilePath(target),
         )
 
-    async def move(self, source: str, target: str) -> None:
+    async def move(self: Self, source: str, target: str) -> None:
         """
         Move the file at *source* to *target*.
 
@@ -844,7 +833,7 @@ class LocalStorageDriver(IStorageDriver):
 
     # ── Metadata operations ──────────────────────────────────────────────────
 
-    async def size(self, path: str) -> int:
+    async def size(self: Self, path: str) -> int:
         """
         Return the size in bytes of the file at *path*.
 
@@ -869,7 +858,7 @@ class LocalStorageDriver(IStorageDriver):
         )
         return stats.st_size
 
-    async def mimeType(self, path: str) -> str | None:
+    async def mimeType(self: Self, path: str) -> str | None:
         """
         Guess the MIME type of the file at *path*.
 
@@ -888,7 +877,7 @@ class LocalStorageDriver(IStorageDriver):
         """
         return mimetypes.guess_type(normalizeFilePath(path))[0]
 
-    async def lastModified(self, path: str) -> datetime:
+    async def lastModified(self: Self, path: str) -> datetime:
         """
         Return the last-modification timestamp of the file at *path*.
 
@@ -913,7 +902,7 @@ class LocalStorageDriver(IStorageDriver):
         )
         return datetime.fromtimestamp(stats.st_mtime, tz=UTC)
 
-    async def visibility(self, path: str) -> str:
+    async def visibility(self: Self, path: str) -> str:
         """
         Return the visibility of the file at *path*.
 
@@ -938,7 +927,7 @@ class LocalStorageDriver(IStorageDriver):
         )
         return self.__visibilityFromMode(stats.st_mode)
 
-    async def setVisibility(self, path: str, visibility: str) -> None:
+    async def setVisibility(self: Self, path: str, visibility: str) -> None:
         """
         Change the visibility of the file at *path*.
 
@@ -967,7 +956,7 @@ class LocalStorageDriver(IStorageDriver):
         )
         await asyncio.to_thread(absolute.chmod, mode)
 
-    async def hash(self, path: str, algorithm: str = "sha256") -> str:
+    async def hash(self: Self, path: str, algorithm: str = "sha256") -> str:
         """
         Compute the content hash of the file at *path*.
 
@@ -996,7 +985,7 @@ class LocalStorageDriver(IStorageDriver):
             algorithm,
         )
 
-    async def info(self, path: str) -> FileInfo:
+    async def info(self: Self, path: str) -> FileInfo:
         """
         Collect a metadata snapshot for the file at *path*.
 
@@ -1023,7 +1012,7 @@ class LocalStorageDriver(IStorageDriver):
 
     # ── Directory operations ─────────────────────────────────────────────────
 
-    async def createDirectory(self, path: str) -> None:
+    async def createDirectory(self: Self, path: str) -> None:
         """
         Create the directory at *path*, including missing parents.
 
@@ -1039,7 +1028,7 @@ class LocalStorageDriver(IStorageDriver):
         absolute = self.__absolute(normalizePath(path))
         await asyncio.to_thread(absolute.mkdir, parents=True, exist_ok=True)
 
-    async def deleteDirectory(self, path: str) -> bool:
+    async def deleteDirectory(self: Self, path: str) -> bool:
         """
         Recursively delete the directory at *path*.
 
@@ -1059,7 +1048,7 @@ class LocalStorageDriver(IStorageDriver):
         await asyncio.to_thread(shutil.rmtree, absolute)
         return True
 
-    async def directoryExists(self, path: str) -> bool:
+    async def directoryExists(self: Self, path: str) -> bool:
         """
         Check whether a directory exists at *path*.
 
@@ -1078,7 +1067,7 @@ class LocalStorageDriver(IStorageDriver):
         return await asyncio.to_thread(absolute.is_dir)
 
     async def files(
-        self,
+        self: Self,
         path: str = "",
         *,
         recursive: bool = False,
@@ -1107,7 +1096,7 @@ class LocalStorageDriver(IStorageDriver):
         )
 
     async def directories(
-        self,
+        self: Self,
         path: str = "",
         *,
         recursive: bool = False,
@@ -1137,7 +1126,7 @@ class LocalStorageDriver(IStorageDriver):
 
     # ── URLs and transfers ───────────────────────────────────────────────────
 
-    async def url(self, path: str) -> str:
+    async def url(self: Self, path: str) -> str:
         """
         Build the public URL for the file at *path*.
 
@@ -1158,13 +1147,13 @@ class LocalStorageDriver(IStorageDriver):
         """
         normalized = normalizeFilePath(path)
         if self._base_url is None:
-            error_msg = (
-                f"This disk does not expose public URLs for [{normalized}]."
-            )
+            error_msg = f"This disk does not expose public URLs for [{normalized}]."
             raise UnsupportedStorageOperationException(error_msg)
         return self.__buildUrl(normalized)
 
-    async def temporaryUrl(self, path: str, expires_in: int) -> str:  # noqa: ARG002
+    async def temporaryUrl(
+        self: Self, path: str, expires_in: int,  # noqa: ARG002
+    ) -> str:
         """
         Build a signed, time-limited URL for the file at *path*.
 
@@ -1188,12 +1177,10 @@ class LocalStorageDriver(IStorageDriver):
         UnsupportedStorageOperationException
             Always, since local disks cannot sign URLs.
         """
-        error_msg = (
-            f"The local driver does not support temporary URLs for [{path}]."
-        )
+        error_msg = f"The local driver does not support temporary URLs for [{path}]."
         raise UnsupportedStorageOperationException(error_msg)
 
-    async def download(self, path: str, destination: str | Path) -> Path:
+    async def download(self: Self, path: str, destination: str | Path) -> Path:
         """
         Copy the file at *path* to a location on the local filesystem.
 
@@ -1221,7 +1208,7 @@ class LocalStorageDriver(IStorageDriver):
             destination,
         )
 
-    def open(self, path: str, mode: str = "rb") -> AsyncStream:
+    def open(self: Self, path: str, mode: str = "rb") -> AsyncStream:
         """
         Open an asynchronous binary stream for the file at *path*.
 

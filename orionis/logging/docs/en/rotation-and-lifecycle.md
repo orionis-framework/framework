@@ -14,7 +14,7 @@ The size limit is checked before writing against bytes already recorded; one ent
 
 `getLogger()` allows standard handlers. A subsequent reload or close may remove them: coordinate ownership. For a custom rotation policy, construct `AdvancedRotatingFileHandler` with a `SuffixResolver` implementation (`getSuffix`, `getNextRotationTime`); the built-in factory only knows the six documented names. `Logger` has no channel `extend()` registry. Replace `ILogger` in your provider for another global policy.
 
-Locks are thread-level, not process-level. Workers using the same pattern can rotate or delete each other's files. Use per-worker paths or external aggregation infrastructure. Emission, compression, and cleanup are synchronous and can add event-loop latency.
+Locks are thread-level, not process-level. Workers using the same pattern can rotate or delete each other's files. Use per-worker paths or external aggregation infrastructure. With the default `queue_capacity=0`, emission, compression, and cleanup are synchronous and can add event-loop latency. A positive queue capacity moves them to the bounded listener; see the module overview for overload and shutdown behavior.
 
 
 ### Rotation
@@ -130,7 +130,7 @@ with TemporaryDirectory() as root:
 
 The hot path uses standard logger filtering and one handler. Initialization, reload, channel switch, file emission, and chunk suffix generation use locks. Rotating handlers cache up to roughly 50 resolved suffix paths for five minutes and track written encoded bytes without stat calls on every record.
 
-Locks are thread-level, not process-level. Avoid several workers targeting the same rotating filename unless the deployment supplies external coordination. File writes are synchronous and can affect event-loop latency at high volume; use an application-level queue/aggregation architecture when logging throughput is substantial.
+Locks are thread-level, not process-level. Avoid several workers targeting the same rotating filename unless the deployment supplies external coordination. File writes are synchronous by default; a positive `queue_capacity` enables bounded queues with explicit overload errors and application-shutdown draining.
 
 
 

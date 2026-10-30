@@ -6,11 +6,10 @@ import mimetypes
 import tempfile
 from contextlib import suppress
 from datetime import UTC, datetime, timedelta
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING, Any, Self
 from urllib.parse import quote
+from orionis.storage.buffering import spool_stream
 from orionis.storage.contracts.driver import IStorageDriver
-from orionis.storage.entities.file_info import FileInfo
-from orionis.storage.enums.visibility import Visibility
 from orionis.storage.drivers.functions import (
     assertBinaryMode,
     deriveDirectories,
@@ -18,6 +17,8 @@ from orionis.storage.drivers.functions import (
     importDriverDependency,
     resolveDownloadTarget,
 )
+from orionis.storage.entities.file_info import FileInfo
+from orionis.storage.enums.visibility import Visibility
 from orionis.storage.exceptions import (
     StorageFileNotFoundException,
     UnsupportedStorageOperationException,
@@ -76,7 +77,7 @@ class GoogleStorageDriver(IStorageDriver):
         "_project",
     )
 
-    def __init__(self, config: object) -> None:
+    def __init__(self: Self, config: object) -> None:
         """
         Initialize the driver from a GCS disk configuration entity.
 
@@ -106,7 +107,7 @@ class GoogleStorageDriver(IStorageDriver):
 
     # ── SDK bootstrap and low-level helpers ──────────────────────────────────
 
-    def __bucket(self) -> Any:
+    def __bucket(self: Self) -> Any:
         """
         Return the bucket handle, bootstrapping the client on first use.
 
@@ -125,10 +126,14 @@ class GoogleStorageDriver(IStorageDriver):
 
         # Import the official SDK lazily; it is an optional dependency.
         storage = importDriverDependency(
-            "google.cloud.storage", "google-cloud-storage", "gcs",
+            "google.cloud.storage",
+            "google-cloud-storage",
+            "gcs",
         )
         errors = importDriverDependency(
-            "google.cloud.exceptions", "google-cloud-storage", "gcs",
+            "google.cloud.exceptions",
+            "google-cloud-storage",
+            "gcs",
         )
 
         # Prefer the service-account key file; fall back to ADC.
@@ -143,7 +148,7 @@ class GoogleStorageDriver(IStorageDriver):
         self._bucket = client.bucket(self._bucket_name)
         return self._bucket
 
-    def __blob(self, normalized: str) -> Any:
+    def __blob(self: Self, normalized: str) -> Any:
         """
         Return a lightweight blob handle for *normalized*.
 
@@ -159,7 +164,7 @@ class GoogleStorageDriver(IStorageDriver):
         """
         return self.__bucket().blob(normalized)
 
-    def __missing(self, normalized: str) -> StorageFileNotFoundException:
+    def __missing(self: Self, normalized: str) -> StorageFileNotFoundException:
         """
         Build the framework exception for a missing object.
 
@@ -176,7 +181,7 @@ class GoogleStorageDriver(IStorageDriver):
         error_msg = f"File does not exist at path [{normalized}]."
         return StorageFileNotFoundException(error_msg)
 
-    def __blobOrFail(self, normalized: str) -> Any:
+    def __blobOrFail(self: Self, normalized: str) -> Any:
         """
         Fetch a blob with loaded metadata or raise when absent.
 
@@ -200,7 +205,7 @@ class GoogleStorageDriver(IStorageDriver):
             raise self.__missing(normalized)
         return blob
 
-    def __listKeysSync(self, prefix: str) -> list[str]:
+    def __listKeysSync(self: Self, prefix: str) -> list[str]:
         """
         List every object name under *prefix*.
 
@@ -215,12 +220,9 @@ class GoogleStorageDriver(IStorageDriver):
             All matching object names, including directory markers.
         """
         bucket = self.__bucket()
-        return [
-            blob.name
-            for blob in bucket.list_blobs(prefix=prefix or None)
-        ]
+        return [blob.name for blob in bucket.list_blobs(prefix=prefix or None)]
 
-    def __aclFor(self, visibility: str) -> str:
+    def __aclFor(self: Self, visibility: str) -> str:
         """
         Map a visibility level onto a GCS predefined ACL.
 
@@ -245,7 +247,7 @@ class GoogleStorageDriver(IStorageDriver):
             raise UnsupportedStorageOperationException(error_msg)
         return acl
 
-    def __urlFor(self, normalized: str) -> str:
+    def __urlFor(self: Self, normalized: str) -> str:
         """
         Compose the public URL of an object without SDK involvement.
 
@@ -263,11 +265,9 @@ class GoogleStorageDriver(IStorageDriver):
         encoded = quote(normalized, safe="/")
         if self._base_url:
             return f"{self._base_url}/{encoded}"
-        return (
-            f"https://storage.googleapis.com/{self._bucket_name}/{encoded}"
-        )
+        return f"https://storage.googleapis.com/{self._bucket_name}/{encoded}"
 
-    def __isPublicSync(self, blob: Any) -> bool:
+    def __isPublicSync(self: Self, blob: Any) -> bool:
         """
         Check whether a blob grants read access to anonymous users.
 
@@ -293,35 +293,9 @@ class GoogleStorageDriver(IStorageDriver):
             for entry in entries
         )
 
-    async def __spool(self, stream: AsyncIterable[bytes]) -> BinaryIO:
-        """
-        Buffer an async byte stream into a spooled temporary file.
-
-        Parameters
-        ----------
-        stream : AsyncIterable[bytes]
-            Asynchronous byte-chunk producer.
-
-        Returns
-        -------
-        BinaryIO
-            Rewound buffer holding the full payload.
-        """
-        buffer = await asyncio.to_thread(
-            tempfile.SpooledTemporaryFile, max_size=_SPOOL_THRESHOLD,
-        )
-        try:
-            async for chunk in stream:
-                await asyncio.to_thread(buffer.write, chunk)
-        except BaseException:
-            await asyncio.to_thread(buffer.close)
-            raise
-        await asyncio.to_thread(buffer.seek, 0)
-        return buffer
-
     # ── Read operations ──────────────────────────────────────────────────────
 
-    async def read(self, path: str) -> bytes:
+    async def read(self: Self, path: str) -> bytes:
         """
         Read the full contents of the object at *path*.
 
@@ -360,7 +334,7 @@ class GoogleStorageDriver(IStorageDriver):
         return await asyncio.to_thread(_read)
 
     async def readStream(
-        self,
+        self: Self,
         path: str,
         chunk_size: int = _CHUNK_SIZE,
     ) -> AsyncIterator[bytes]:
@@ -398,17 +372,16 @@ class GoogleStorageDriver(IStorageDriver):
             blob = self.__blobOrFail(normalized)
             return blob.open("rb")
 
-        handle = await asyncio.to_thread(_open)
+        from orionis.storage.buffering import read_chunks  # noqa: PLC0415
+
+        chunks = read_chunks(_open, chunk_size)
         try:
-            while True:
-                chunk = await asyncio.to_thread(handle.read, chunk_size)
-                if not chunk:
-                    break
+            async for chunk in chunks:
                 yield chunk
         finally:
-            await asyncio.to_thread(handle.close)
+            await chunks.aclose()
 
-    async def exists(self, path: str) -> bool:
+    async def exists(self: Self, path: str) -> bool:
         """
         Check whether an object exists at *path*.
 
@@ -430,7 +403,7 @@ class GoogleStorageDriver(IStorageDriver):
     # ── Write operations ─────────────────────────────────────────────────────
 
     async def write(
-        self,
+        self: Self,
         path: str,
         contents: bytes | str,
         visibility: str | None = None,
@@ -455,9 +428,7 @@ class GoogleStorageDriver(IStorageDriver):
         """
         normalized = normalizeFilePath(path)
         data = (
-            contents.encode("utf-8")
-            if isinstance(contents, str)
-            else bytes(contents)
+            contents.encode("utf-8") if isinstance(contents, str) else bytes(contents)
         )
         acl = self.__aclFor(visibility) if visibility is not None else None
 
@@ -474,8 +445,7 @@ class GoogleStorageDriver(IStorageDriver):
             blob.upload_from_string(
                 data,
                 content_type=(
-                    mimetypes.guess_type(normalized)[0]
-                    or _DEFAULT_CONTENT_TYPE
+                    mimetypes.guess_type(normalized)[0] or _DEFAULT_CONTENT_TYPE
                 ),
                 predefined_acl=acl,
             )
@@ -483,7 +453,7 @@ class GoogleStorageDriver(IStorageDriver):
         await asyncio.to_thread(_write)
 
     async def writeStream(
-        self,
+        self: Self,
         path: str,
         stream: AsyncIterable[bytes],
         visibility: str | None = None,
@@ -511,7 +481,7 @@ class GoogleStorageDriver(IStorageDriver):
         """
         normalized = normalizeFilePath(path)
         acl = self.__aclFor(visibility) if visibility is not None else None
-        buffer = await self.__spool(stream)
+        buffer = await spool_stream(stream, max_size=_SPOOL_THRESHOLD)
 
         def _upload() -> None:
             """
@@ -526,8 +496,7 @@ class GoogleStorageDriver(IStorageDriver):
             blob.upload_from_file(
                 buffer,
                 content_type=(
-                    mimetypes.guess_type(normalized)[0]
-                    or _DEFAULT_CONTENT_TYPE
+                    mimetypes.guess_type(normalized)[0] or _DEFAULT_CONTENT_TYPE
                 ),
                 predefined_acl=acl,
             )
@@ -537,7 +506,7 @@ class GoogleStorageDriver(IStorageDriver):
         finally:
             await asyncio.to_thread(buffer.close)
 
-    async def delete(self, path: str) -> bool:
+    async def delete(self: Self, path: str) -> bool:
         """
         Delete the object at *path*.
 
@@ -571,7 +540,7 @@ class GoogleStorageDriver(IStorageDriver):
 
         return await asyncio.to_thread(_delete)
 
-    async def copy(self, source: str, target: str) -> None:
+    async def copy(self: Self, source: str, target: str) -> None:
         """
         Copy the object at *source* to *target* server-side.
 
@@ -609,7 +578,7 @@ class GoogleStorageDriver(IStorageDriver):
 
         await asyncio.to_thread(_copy)
 
-    async def move(self, source: str, target: str) -> None:
+    async def move(self: Self, source: str, target: str) -> None:
         """
         Move the object at *source* to *target*.
 
@@ -652,7 +621,7 @@ class GoogleStorageDriver(IStorageDriver):
 
     # ── Metadata operations ──────────────────────────────────────────────────
 
-    async def size(self, path: str) -> int:
+    async def size(self: Self, path: str) -> int:
         """
         Return the size in bytes of the object at *path*.
 
@@ -675,7 +644,7 @@ class GoogleStorageDriver(IStorageDriver):
         blob = await asyncio.to_thread(self.__blobOrFail, normalized)
         return int(blob.size or 0)
 
-    async def mimeType(self, path: str) -> str | None:
+    async def mimeType(self: Self, path: str) -> str | None:
         """
         Return the MIME type of the object at *path*.
 
@@ -701,7 +670,7 @@ class GoogleStorageDriver(IStorageDriver):
         blob = await asyncio.to_thread(self.__blobOrFail, normalized)
         return blob.content_type or mimetypes.guess_type(normalized)[0]
 
-    async def lastModified(self, path: str) -> datetime:
+    async def lastModified(self: Self, path: str) -> datetime:
         """
         Return the last-modification timestamp of the object at *path*.
 
@@ -724,7 +693,7 @@ class GoogleStorageDriver(IStorageDriver):
         blob = await asyncio.to_thread(self.__blobOrFail, normalized)
         return blob.updated or datetime.now(tz=UTC)
 
-    async def visibility(self, path: str) -> str:
+    async def visibility(self: Self, path: str) -> str:
         """
         Return the visibility of the object at *path*.
 
@@ -764,7 +733,7 @@ class GoogleStorageDriver(IStorageDriver):
 
         return await asyncio.to_thread(_visibility)
 
-    async def setVisibility(self, path: str, visibility: str) -> None:
+    async def setVisibility(self: Self, path: str, visibility: str) -> None:
         """
         Change the visibility of the object at *path*.
 
@@ -812,7 +781,7 @@ class GoogleStorageDriver(IStorageDriver):
 
         await asyncio.to_thread(_apply)
 
-    async def hash(self, path: str, algorithm: str = "sha256") -> str:
+    async def hash(self: Self, path: str, algorithm: str = "sha256") -> str:
         """
         Compute the content hash of the object at *path*.
 
@@ -863,7 +832,7 @@ class GoogleStorageDriver(IStorageDriver):
 
         return await asyncio.to_thread(_hash)
 
-    async def info(self, path: str) -> FileInfo:
+    async def info(self: Self, path: str) -> FileInfo:
         """
         Collect a metadata snapshot for the object at *path*.
 
@@ -898,11 +867,7 @@ class GoogleStorageDriver(IStorageDriver):
                 Object metadata.
             """
             blob = self.__blobOrFail(normalized)
-            checksum = (
-                base64.b64decode(blob.md5_hash).hex()
-                if blob.md5_hash
-                else None
-            )
+            checksum = base64.b64decode(blob.md5_hash).hex() if blob.md5_hash else None
             return FileInfo(
                 path=normalized,
                 size=int(blob.size or 0),
@@ -912,10 +877,7 @@ class GoogleStorageDriver(IStorageDriver):
                     if self.__isPublicSync(blob)
                     else Visibility.PRIVATE.value
                 ),
-                mimeType=(
-                    blob.content_type
-                    or mimetypes.guess_type(normalized)[0]
-                ),
+                mimeType=(blob.content_type or mimetypes.guess_type(normalized)[0]),
                 createdAt=blob.time_created,
                 etag=blob.etag or None,
                 checksum=checksum,
@@ -926,7 +888,7 @@ class GoogleStorageDriver(IStorageDriver):
 
     # ── Directory operations ─────────────────────────────────────────────────
 
-    async def createDirectory(self, path: str) -> None:
+    async def createDirectory(self: Self, path: str) -> None:
         """
         Create a zero-byte directory marker at *path*.
 
@@ -947,7 +909,7 @@ class GoogleStorageDriver(IStorageDriver):
             lambda: self.__blob(f"{normalized}/").upload_from_string(b""),
         )
 
-    async def deleteDirectory(self, path: str) -> bool:
+    async def deleteDirectory(self: Self, path: str) -> bool:
         """
         Recursively delete every object under *path*.
 
@@ -982,7 +944,7 @@ class GoogleStorageDriver(IStorageDriver):
 
         return await asyncio.to_thread(_purge)
 
-    async def directoryExists(self, path: str) -> bool:
+    async def directoryExists(self: Self, path: str) -> bool:
         """
         Check whether any object exists under *path*.
 
@@ -1012,14 +974,15 @@ class GoogleStorageDriver(IStorageDriver):
             """
             bucket = self.__bucket()
             iterator = bucket.list_blobs(
-                prefix=f"{normalized}/", max_results=1,
+                prefix=f"{normalized}/",
+                max_results=1,
             )
             return next(iter(iterator), None) is not None
 
         return await asyncio.to_thread(_exists)
 
     async def files(
-        self,
+        self: Self,
         path: str = "",
         *,
         recursive: bool = False,
@@ -1045,7 +1008,7 @@ class GoogleStorageDriver(IStorageDriver):
         return filterFiles(keys, normalized, recursive=recursive)
 
     async def directories(
-        self,
+        self: Self,
         path: str = "",
         *,
         recursive: bool = False,
@@ -1072,7 +1035,7 @@ class GoogleStorageDriver(IStorageDriver):
 
     # ── URLs and transfers ───────────────────────────────────────────────────
 
-    async def url(self, path: str) -> str:
+    async def url(self: Self, path: str) -> str:
         """
         Build the public URL for the object at *path*.
 
@@ -1089,7 +1052,7 @@ class GoogleStorageDriver(IStorageDriver):
         """
         return self.__urlFor(normalizeFilePath(path))
 
-    async def temporaryUrl(self, path: str, expires_in: int) -> str:
+    async def temporaryUrl(self: Self, path: str, expires_in: int) -> str:
         """
         Build a V4 signed URL for the object at *path*.
 
@@ -1134,7 +1097,7 @@ class GoogleStorageDriver(IStorageDriver):
 
         return await asyncio.to_thread(_sign)
 
-    async def download(self, path: str, destination: str | Path) -> Path:
+    async def download(self: Self, path: str, destination: str | Path) -> Path:
         """
         Download the object at *path* to the local filesystem.
 
@@ -1177,7 +1140,7 @@ class GoogleStorageDriver(IStorageDriver):
 
         return await asyncio.to_thread(_download)
 
-    def open(self, path: str, mode: str = "rb") -> AsyncStream:
+    def open(self: Self, path: str, mode: str = "rb") -> AsyncStream:
         """
         Open an asynchronous binary stream for the object at *path*.
 
@@ -1253,8 +1216,7 @@ class GoogleStorageDriver(IStorageDriver):
             self.__blob(normalized).upload_from_file(
                 handle,
                 content_type=(
-                    mimetypes.guess_type(normalized)[0]
-                    or _DEFAULT_CONTENT_TYPE
+                    mimetypes.guess_type(normalized)[0] or _DEFAULT_CONTENT_TYPE
                 ),
             )
 

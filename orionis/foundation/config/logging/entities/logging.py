@@ -1,5 +1,6 @@
 from __future__ import annotations
 from dataclasses import dataclass, field, fields
+from typing import Self
 from orionis.environment import Env
 from orionis.foundation.config.logging.entities.channels import Channels
 from orionis.support.entities.base import BaseEntity
@@ -18,6 +19,8 @@ class Logging(BaseEntity):
         The default logging channel to use.
     channels : Channels or dict
         A collection of available logging channels.
+    queue_capacity : int
+        Pending records per handler; zero retains synchronous emission.
     """
 
     default: str = field(
@@ -36,7 +39,17 @@ class Logging(BaseEntity):
         },
     )
 
-    def __post_init__(self) -> None:
+    queue_capacity: int = field(
+        default_factory=lambda: Env.get("LOG_QUEUE_CAPACITY", 0),
+        metadata={
+            "description": (
+                "Bounded asynchronous log queue; zero keeps synchronous emission."
+            ),
+            "default": 0,
+        },
+    )
+
+    def __post_init__(self: Self) -> None:
         """
         Validate the logging configuration after dataclass initialization.
 
@@ -69,6 +82,13 @@ class Logging(BaseEntity):
         """
         # Call the parent class's __post_init__ method.
         super().__post_init__()
+        if (
+            isinstance(self.queue_capacity, bool)
+            or not isinstance(self.queue_capacity, int)
+            or self.queue_capacity < 0
+        ):
+            error_msg = "Logging queue_capacity must be a nonnegative integer."
+            raise ValueError(error_msg)
 
         # Validate 'default' against pre-cached channel names
         if not isinstance(self.default, str) or self.default not in _CHANNEL_OPTIONS:

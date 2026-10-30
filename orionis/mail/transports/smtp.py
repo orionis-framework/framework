@@ -1,22 +1,26 @@
 import smtplib
 import ssl
 from contextlib import suppress
-from typing import TYPE_CHECKING
+from itertools import islice
+from typing import TYPE_CHECKING, Self
 from orionis.aio import Loop
 from orionis.mail.contracts.transport import IMailTransport
 from orionis.mail.entities.result import MailResult
 from orionis.mail.entities.smtp_settings import SmtpSettings
 from orionis.mail.enums.encryption import MailEncryption
 from orionis.mail.enums.status import MailStatus
-from orionis.mail.exceptions import MailTransportException
+from orionis.mail.exceptions import MailBatchException, MailTransportException
 from orionis.mail.functions import sanitize_reason
+from orionis.support.concurrency import BoundedExecutor
 
 if TYPE_CHECKING:
-    from collections.abc import Mapping
+    from collections.abc import Iterable, Mapping
     from orionis.foundation.contracts.application import IApplication
     from orionis.mail.entities.prepared import PreparedMail
 
 _SMTP_READY = 220
+_MAX_BATCH = 100
+_BATCH_WORKERS = BoundedExecutor(4, max_pending=16, name="orionis-smtp-batch")
 
 class SmtpTransport(IMailTransport):
     """
@@ -28,7 +32,7 @@ class SmtpTransport(IMailTransport):
 
     __slots__ = ("_settings",)
 
-    def __init__(self, settings: SmtpSettings) -> None:
+    def __init__(self: Self, settings: SmtpSettings) -> None:
         """
         Retain validated settings without opening a connection.
 
@@ -45,7 +49,7 @@ class SmtpTransport(IMailTransport):
         self._settings = settings
 
     async def send(
-        self,
+        self: Self,
         message: PreparedMail,
         *,
         mailer: str,
@@ -75,8 +79,42 @@ class SmtpTransport(IMailTransport):
         """
         return await Loop.execute(self._sendSync, message, mailer, driver)
 
+    async def sendMany(
+        self: Self,
+        messages: Iterable[PreparedMail],
+        *,
+        mailer: str,
+        driver: str,
+    ) -> tuple[MailResult, ...]:
+        """
+        Send a bounded batch using one authenticated connection and no retries.
+
+        Parameters
+        ----------
+        messages : Iterable[PreparedMail]
+            At most 100 already-composed messages with these transport settings.
+        mailer : str
+            Mailer identifier included in results.
+        driver : str
+            Driver identifier included in results.
+
+        Returns
+        -------
+        tuple[MailResult, ...]
+            Ordered delivery results. MailBatchException retains completed
+            results and the uncertain message index if the batch aborts.
+            Cancellation waits for the accepted batch before closing resources.
+        """
+        batch = tuple(islice(messages, _MAX_BATCH + 1))
+        if len(batch) > _MAX_BATCH:
+            error_msg = "SMTP batches accept at most 100 messages."
+            raise ValueError(error_msg)
+        if not batch:
+            return ()
+        return await _BATCH_WORKERS.run(self._sendBatchSync, batch, mailer, driver)
+
     def _sendSync(
-        self,
+        self: Self,
         message: PreparedMail,
         mailer: str,
         driver: str,
@@ -103,9 +141,39 @@ class SmtpTransport(IMailTransport):
         MailTransportException
             Sanitized failure identifying stage, exception type, and SMTP code.
         """
+        try:
+            return self._sendBatchSync((message,), mailer, driver)[0]
+        except MailBatchException as error:
+            error_msg = str(error)
+            raise MailTransportException(error_msg) from None
+
+    def _sendBatchSync(
+        self: Self,
+        messages: tuple[PreparedMail, ...],
+        mailer: str,
+        driver: str,
+    ) -> tuple[MailResult, ...]:
+        """
+        Own one SMTP session for the complete bounded batch.
+
+        Parameters
+        ----------
+        messages : tuple[PreparedMail, ...]
+            Prepared messages to send through one SMTP session.
+        mailer : str
+            Configured mailer name attached to delivery results.
+        driver : str
+            Transport driver name attached to delivery results.
+
+        Returns
+        -------
+        tuple[MailResult, ...]
+            Delivery results in message order after the complete batch succeeds.
+        """
         settings = self._settings
         client: smtplib.SMTP | None = None
         stage = "connection"
+        results = []
         try:
             client = (
                 smtplib.SMTP_SSL(
@@ -119,7 +187,8 @@ class SmtpTransport(IMailTransport):
             )
             code, reply = client.connect(settings.host, settings.port)
             if code != _SMTP_READY:
-                raise smtplib.SMTPConnectError(code, reply)
+                error_msg = reply
+                raise smtplib.SMTPConnectError(code, error_msg)
             client.ehlo_or_helo_if_needed()
 
             # A failed or unavailable upgrade aborts the operation: plaintext
@@ -133,17 +202,18 @@ class SmtpTransport(IMailTransport):
                 stage = "authentication"
                 client.login(settings.username, settings.password)
 
-            stage = "SMTPUTF8 negotiation"
-            options = _mail_options(client, message)
-
-            stage = "message transaction"
-            refused = client.sendmail(
-                message.sender,
-                message.recipients,
-                message.mime,
-                mail_options=options,
-            )
-            return self._result(message, mailer, driver, refused)
+            for message in messages:
+                stage = "SMTPUTF8 negotiation"
+                options = _mail_options(client, message)
+                stage = "message transaction"
+                refused = client.sendmail(
+                    message.sender,
+                    message.recipients,
+                    message.mime,
+                    mail_options=options,
+                )
+                results.append(self._result(message, mailer, driver, refused))
+            return tuple(results)
         except (OSError, ValueError) as exc:
             code = None
             if isinstance(exc, smtplib.SMTPResponseException):
@@ -156,14 +226,17 @@ class SmtpTransport(IMailTransport):
 
             # The original exception is suppressed because its payload can
             # carry credentials or private server responses.
-            raise MailTransportException(error_msg) from None
+            raise MailBatchException(error_msg, tuple(results), len(results)) from None
+        except MailTransportException as error:
+            error_msg = str(error)
+            raise MailBatchException(error_msg, tuple(results), len(results)) from None
         finally:
             if client is not None:
                 with suppress(OSError):
                     client.close()
 
     def _result(
-        self,
+        self: Self,
         message: PreparedMail,
         mailer: str,
         driver: str,

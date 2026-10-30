@@ -19,19 +19,12 @@ from orionis.background.task import BackgroundTask
 from orionis.http.adapters.response.files import complete_file_read, open_file
 from orionis.http.contracts.response import IResponse
 from orionis.http.sse import ServerSentEvent, _EventStreamIterator
-from orionis.session.flash import (
-    ERRORS_KEY,
-    OLD_INPUT_KEY,
-    filter_input,
-    normalize_errors,
-    queue_bag,
-)
+from orionis.session.flash import _FlashData
 
 if TYPE_CHECKING:
     from orionis.http.enums.status import HTTPStatus
 
-class Response(IResponse):
-
+class Response(_FlashData, IResponse):
     # ruff: noqa: ANN401, C901, PLR0913, PLR2004
 
     __slots__ = (
@@ -48,9 +41,9 @@ class Response(IResponse):
     # Encode text responses using UTF-8.
     charset: ClassVar[str] = "utf-8"
 
-    def __init__( # NOSONAR
-        self,
-        content: Any = None,
+    def __init__(  # NOSONAR
+        self: Self,
+        content: Any | None = None,
         status_code: HTTPStatus | int = 200,
         headers: Mapping[str, str] | None = None,
         media_type: str | None = None,
@@ -126,7 +119,7 @@ class Response(IResponse):
 
         self.background = background
 
-    def render(self, content: Any) -> bytes:
+    def render(self: Self, content: Any) -> bytes:
         """
         Render the content to bytes.
 
@@ -157,7 +150,7 @@ class Response(IResponse):
 
         return str(content).encode(self.charset)
 
-    def addHeader(self, key: str, value: str) -> None:
+    def addHeader(self: Self, key: str, value: str) -> None:
         """
         Add a header to the response.
 
@@ -185,7 +178,7 @@ class Response(IResponse):
             headers[key_lower] = [existing, value]
         self._raw_headers = None
 
-    def setHeader(self, key: str, value: str) -> None:
+    def setHeader(self: Self, key: str, value: str) -> None:
         """
         Set a header, replacing any existing values.
 
@@ -205,12 +198,13 @@ class Response(IResponse):
         cached = self._raw_headers
         if cached is not None:
             self._raw_headers = (
-                None if key_lower in self._headers else
-                (*cached, (key_lower.encode("latin-1"), value.encode("latin-1")))
+                None
+                if key_lower in self._headers
+                else (*cached, (key_lower.encode("latin-1"), value.encode("latin-1")))
             )
         self._headers[key_lower] = value
 
-    def getHeader(self, key: str) -> list[str] | None:
+    def getHeader(self: Self, key: str) -> list[str] | None:
         """
         Get the values for a header.
 
@@ -235,7 +229,7 @@ class Response(IResponse):
         self._raw_headers = None
         return value
 
-    def hasHeader(self, key: str) -> bool:
+    def hasHeader(self: Self, key: str) -> bool:
         """
         Check if a header is present.
 
@@ -251,7 +245,7 @@ class Response(IResponse):
         """
         return key.lower() in self._headers
 
-    def removeHeader(self, key: str) -> None:
+    def removeHeader(self: Self, key: str) -> None:
         """
         Remove a header from the response.
 
@@ -268,7 +262,7 @@ class Response(IResponse):
         self._headers.pop(key.lower(), None)
         self._raw_headers = None
 
-    def getRawHeaders(self) -> list[tuple[bytes, bytes]]:
+    def getRawHeaders(self: Self) -> list[tuple[bytes, bytes]]:
         """
         Return the headers as a list of (key, value) byte tuples.
 
@@ -291,7 +285,7 @@ class Response(IResponse):
                 )
         return result
 
-    def getStringHeaders(self) -> list[tuple[str, str]]:
+    def getStringHeaders(self: Self) -> list[tuple[str, str]]:
         """
         Return the headers as a list of (key, value) string tuples.
 
@@ -308,8 +302,8 @@ class Response(IResponse):
                 result.extend((key, value) for value in values)
         return result
 
-    def setCookie( # NOSONAR
-        self,
+    def setCookie(  # NOSONAR
+        self: Self,
         key: str,
         value: str = "",
         *,
@@ -384,9 +378,7 @@ class Response(IResponse):
         if same_site is not None:
             s = same_site.lower()
             if s not in {"lax", "strict", "none"}:
-                error_msg = (
-                    "same_site must be 'lax', 'strict' or 'none'"
-                )
+                error_msg = "same_site must be 'lax', 'strict' or 'none'"
                 raise ValueError(error_msg)
             if s == "none" and not secure:
                 error_msg = "SameSite=None requires secure=True"
@@ -406,7 +398,7 @@ class Response(IResponse):
         self.addHeader("set-cookie", cookie_value)
 
     def deleteCookie(
-        self,
+        self: Self,
         key: str,
         *,
         path: str = "/",
@@ -437,8 +429,8 @@ class Response(IResponse):
             domain=domain,
         )
 
-    def withCookie( # NOSONAR
-        self,
+    def withCookie(  # NOSONAR
+        self: Self,
         key: str,
         value: str = "",
         *,
@@ -497,7 +489,7 @@ class Response(IResponse):
         return self
 
     def withCookies(
-        self,
+        self: Self,
         cookies: Mapping[str, str | Mapping[str, Any]],
     ) -> Self:
         """
@@ -522,7 +514,7 @@ class Response(IResponse):
         return self
 
     def withoutCookie(
-        self,
+        self: Self,
         key: str,
         *,
         path: str = "/",
@@ -548,80 +540,7 @@ class Response(IResponse):
         self.deleteCookie(key, path=path, domain=domain)
         return self
 
-    def withFlash(self, key: str, value: Any = None) -> Self:
-        """
-        Flash a status message into the session and return the response.
-
-        The value survives for exactly one subsequent request and is read
-        back in templates through the ``flash()`` global.
-
-        Parameters
-        ----------
-        key : str
-            Flash data key.
-        value : Any, optional
-            Value to flash.
-
-        Returns
-        -------
-        Self
-            The same response instance, allowing fluent chaining.
-        """
-        flash = self._flash
-        if flash is None:
-            flash = self._flash = {}
-
-        flash[key] = value
-        return self
-
-    def withInput(self, values: Mapping[str, Any]) -> Self:
-        """
-        Flash the submitted payload so the next request can repopulate it.
-
-        Values are read back in templates through the ``old()`` global.
-        Credential-like fields such as ``password`` are stripped.
-
-        Parameters
-        ----------
-        values : Mapping[str, Any]
-            Submitted form payload to remember.
-
-        Returns
-        -------
-        Self
-            The same response instance, allowing fluent chaining.
-        """
-        flash = self._flash
-        if flash is None:
-            flash = self._flash = {}
-
-        queue_bag(flash, OLD_INPUT_KEY, filter_input(values))
-        return self
-
-    def withErrors(self, errors: Mapping[str, Any] | Exception) -> Self:
-        """
-        Flash validation errors for the next request.
-
-        Errors are read back in templates through the ``errors`` global.
-
-        Parameters
-        ----------
-        errors : Mapping[str, Any] | Exception
-            Mapping of field to message(s), or a validation exception.
-
-        Returns
-        -------
-        Self
-            The same response instance, allowing fluent chaining.
-        """
-        flash = self._flash
-        if flash is None:
-            flash = self._flash = {}
-
-        queue_bag(flash, ERRORS_KEY, normalize_errors(errors))
-        return self
-
-    def getFlashData(self) -> dict[str, Any] | None:
+    def getFlashData(self: Self) -> dict[str, Any] | None:
         """
         Return the data queued by ``withFlash()`` for the session flash bag.
 
@@ -632,7 +551,7 @@ class Response(IResponse):
         """
         return self._flash
 
-    def getBody(self) -> bytes | None:
+    def getBody(self: Self) -> bytes | None:
         """
         Return the response body as bytes.
 
@@ -643,7 +562,7 @@ class Response(IResponse):
         """
         return self._body
 
-    def getStream(self) -> AsyncIterable[bytes] | None:
+    def getStream(self: Self) -> AsyncIterable[bytes] | None:
         """
         Return the response stream if present.
 
@@ -654,7 +573,7 @@ class Response(IResponse):
         """
         return self._stream
 
-    def hasStream(self) -> bool:
+    def hasStream(self: Self) -> bool:
         """
         Check if the response has a stream.
 
@@ -665,7 +584,7 @@ class Response(IResponse):
         """
         return self._stream is not None
 
-    async def runBackground(self) -> None:
+    async def runBackground(self: Self) -> None:
         """
         Run the background task if it exists.
 
@@ -677,7 +596,7 @@ class Response(IResponse):
         if self.background:
             await self.background()
 
-    def getStatusCode(self) -> int:
+    def getStatusCode(self: Self) -> int:
         """
         Return the HTTP status code of the response.
 
@@ -688,7 +607,7 @@ class Response(IResponse):
         """
         return self.status_code
 
-    def getMediaType(self) -> str | None:
+    def getMediaType(self: Self) -> str | None:
         """
         Return the media type of the response.
 
@@ -723,7 +642,7 @@ class ResponseTemplate:
     _raw_headers: tuple[tuple[bytes, bytes], ...] = field(repr=False)
 
     def __init__(
-        self,
+        self: Self,
         content: bytes | str = b"",
         status_code: int = 200,
         headers: Mapping[str, str] | None = None,
@@ -767,7 +686,7 @@ class ResponseTemplate:
         object.__setattr__(self, "_headers", tuple(pairs))
         object.__setattr__(self, "_raw_headers", tuple(validated.getRawHeaders()))
 
-    def make(self) -> Response:
+    def make(self: Self) -> Response:
         """
         Create a response with independent headers, cookies, and background.
 
@@ -797,14 +716,13 @@ class ResponseTemplate:
         return response
 
 class HTMLResponse(Response):
-
     __slots__ = ()
 
     # Content type advertised by this response.
     _CONTENT_TYPE: ClassVar[str] = "text/html; charset=utf-8"
 
     def __init__(
-        self,
+        self: Self,
         content: str | bytes = "",
         status_code: HTTPStatus | int = 200,
         headers: Mapping[str, str] | None = None,
@@ -843,14 +761,13 @@ class HTMLResponse(Response):
             self.setHeader("content-type", self._CONTENT_TYPE)
 
 class PlainTextResponse(Response):
-
     __slots__ = ()
 
     # Content type advertised by this response.
     _CONTENT_TYPE: ClassVar[str] = "text/plain; charset=utf-8"
 
     def __init__(
-        self,
+        self: Self,
         content: str | bytes = "",
         status_code: HTTPStatus | int = 200,
         headers: Mapping[str, str] | None = None,
@@ -889,7 +806,6 @@ class PlainTextResponse(Response):
             self.setHeader("content-type", self._CONTENT_TYPE)
 
 class JSONResponse(Response):
-
     __slots__ = (
         "_json_default",
         "_json_ensure_ascii",
@@ -901,7 +817,7 @@ class JSONResponse(Response):
     _CONTENT_TYPE: ClassVar[str] = "application/json; charset=utf-8"
 
     def __init__(
-        self,
+        self: Self,
         content: Any,
         status_code: HTTPStatus | int = 200,
         headers: Mapping[str, str] | None = None,
@@ -963,7 +879,7 @@ class JSONResponse(Response):
         elif not self.hasHeader("content-type"):
             self.setHeader("content-type", self._CONTENT_TYPE)
 
-    def render(self, content: Any) -> bytes:
+    def render(self: Self, content: Any) -> bytes:
         """
         Serialize content to JSON bytes.
 
@@ -1042,20 +958,17 @@ class JSONResponse(Response):
         if isinstance(obj, (set, frozenset)):
             return list(obj)
         # Raise error if object is not serializable
-        error_msg = (
-            f"Object of type {type(obj).__name__} is not JSON serializable"
-        )
+        error_msg = f"Object of type {type(obj).__name__} is not JSON serializable"
         raise TypeError(error_msg)
 
 class RedirectResponse(Response):
-
     __slots__ = ()
 
     # Content type advertised by this response.
     _CONTENT_TYPE: ClassVar[str] = "text/plain; charset=utf-8"
 
     def __init__(
-        self,
+        self: Self,
         url: str,
         status_code: HTTPStatus | int = 302,
         headers: Mapping[str, str] | None = None,
@@ -1107,11 +1020,10 @@ class RedirectResponse(Response):
                 self.setHeader("content-type", self._CONTENT_TYPE)
 
 class StreamingResponse(Response):
-
     __slots__ = ()
 
-    def __init__( # NOSONAR
-        self,
+    def __init__(  # NOSONAR
+        self: Self,
         content: AsyncIterable[bytes] | Iterable[bytes],
         status_code: HTTPStatus | int = 200,
         headers: Mapping[str, str] | None = None,
@@ -1183,7 +1095,7 @@ class StreamingResponse(Response):
                 )
 
     async def _wrapSyncIterable(
-        self,
+        self: Self,
         iterable: Iterable[bytes],
     ) -> AsyncIterable[bytes]:
         """
@@ -1220,7 +1132,7 @@ class EventStreamResponse(StreamingResponse):
     __slots__ = ()
 
     def __init__(
-        self,
+        self: Self,
         content: AsyncIterable[ServerSentEvent | str] | Iterable[ServerSentEvent | str],
         status_code: HTTPStatus | int = 200,
         headers: Mapping[str, str] | None = None,
@@ -1268,7 +1180,7 @@ class EventStreamResponse(StreamingResponse):
                 self.setHeader("x-accel-buffering", "no")
             self.removeHeader("content-length")
 
-    def getStream(self) -> _EventStreamIterator:
+    def getStream(self: Self) -> _EventStreamIterator:
         """
         Return the owned byte iterator without starting its event source.
 
@@ -1279,7 +1191,7 @@ class EventStreamResponse(StreamingResponse):
         """
         return cast("_EventStreamIterator", self._stream)
 
-    def getRawHeaders(self) -> list[tuple[bytes, bytes]]:
+    def getRawHeaders(self: Self) -> list[tuple[bytes, bytes]]:
         """
         Serialize headers without a fixed event-stream content length.
 
@@ -1293,7 +1205,7 @@ class EventStreamResponse(StreamingResponse):
             return [pair for pair in headers if pair[0] != b"content-length"]
         return headers
 
-    def getStringHeaders(self) -> list[tuple[str, str]]:
+    def getStringHeaders(self: Self) -> list[tuple[str, str]]:
         """
         Serialize headers without a fixed event-stream content length.
 
@@ -1308,11 +1220,10 @@ class EventStreamResponse(StreamingResponse):
         return headers
 
 class FileResponse(StreamingResponse):
-
     __slots__ = ("_chunk_size", "_file_size", "_path")
 
     def __init__(
-        self,
+        self: Self,
         path: str | Path,
         status_code: int = 200,
         headers: Mapping[str, str] | None = None,
@@ -1389,7 +1300,7 @@ class FileResponse(StreamingResponse):
                 disposition = f'attachment; filename="{filename}"'
                 self.setHeader("content-disposition", disposition)
 
-    def getPath(self) -> Path:
+    def getPath(self: Self) -> Path:
         """
         Return the file path.
 
@@ -1400,7 +1311,7 @@ class FileResponse(StreamingResponse):
         """
         return self._path
 
-    def getFileSize(self) -> int:
+    def getFileSize(self: Self) -> int:
         """
         Return the file size in bytes.
 
@@ -1411,7 +1322,7 @@ class FileResponse(StreamingResponse):
         """
         return self._file_size
 
-    async def _fileIterator(self) -> AsyncIterable[bytes]:
+    async def _fileIterator(self: Self) -> AsyncIterable[bytes]:
         """
         Yield file content in chunks asynchronously.
 

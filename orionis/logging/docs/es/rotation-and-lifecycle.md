@@ -14,7 +14,7 @@ El límite de tamaño se comprueba antes de escribir utilizando bytes ya registr
 
 `getLogger()` permite integrar handlers estándar. La siguiente recarga o cierre puede retirarlos: coordina su ownership. Para una política de rotación propia puedes construir `AdvancedRotatingFileHandler` con una implementación de `SuffixResolver` (`getSuffix`, `getNextRotationTime`); la factory integrada solo conoce los seis nombres documentados. No hay registro `extend()` de canales en `Logger`. Sustituye `ILogger` en tu provider si necesitas otra política global.
 
-Los locks son de hilo, no de proceso. Varios workers sobre el mismo patrón pueden rotar o borrar archivos mutuamente. Usa rutas separadas por worker o una infraestructura externa de agregación. La emisión, compresión y limpieza son síncronas y pueden añadir latencia al loop.
+Los locks son de hilo, no de proceso. Varios workers sobre el mismo patrón pueden rotar o borrar archivos mutuamente. Usa rutas separadas por worker o una infraestructura externa de agregación. Con `queue_capacity=0`, la emisión, compresión y limpieza son síncronas y pueden añadir latencia al loop. Una capacidad positiva las traslada al listener acotado; consulta las políticas de saturación y cierre en la introducción del módulo.
 
 
 ### Rotación
@@ -130,7 +130,7 @@ with TemporaryDirectory() as root:
 
 El hot path usa filtrado estándar y un handler. Inicialización, recarga, cambio, emisión y sufijos chunk usan locks. Los handlers cachean aproximadamente 50 rutas durante cinco minutos y rastrean bytes escritos sin `stat` por registro.
 
-Los locks son de thread, no de proceso. Evite workers apuntando al mismo archivo rotativo sin coordinación externa. Las escrituras son síncronas y pueden afectar al event loop con alto volumen; use cola/agregación a nivel de aplicación cuando el throughput sea considerable.
+Los locks son de thread, no de proceso. Evite workers apuntando al mismo archivo rotativo sin coordinación externa. Las escrituras son síncronas con la configuración predeterminada; `queue_capacity` positivo activa colas acotadas con errores de saturación explícitos y drenaje al apagar la aplicación.
 
 
 

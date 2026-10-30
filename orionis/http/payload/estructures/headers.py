@@ -1,15 +1,16 @@
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Self
 from orionis.support.patterns.final.meta import Final
 
 if TYPE_CHECKING:
     from collections.abc import Iterable, Iterator
+    from typing import Self
+    from granian.rsgi import Headers as RSGIHeaders
 
 class Headers(metaclass=Final):
-
     __slots__ = ("_has_invalid_format", "_index", "_items")
 
     def __init__(
-        self,
+        self: Self,
         raw: Iterable[tuple[str, str]] | Iterable[tuple[bytes, bytes]],
         *,
         decode: bool = False,
@@ -49,7 +50,47 @@ class Headers(metaclass=Final):
         self._items = items
         self._has_invalid_format = invalid
 
-    def hasInvalidFormat(self) -> bool:
+    @classmethod
+    def _fromRSGI(cls: type[Self], raw: RSGIHeaders) -> Self:
+        """
+        Index grouped RSGI headers while normalizing each name once.
+
+        Parameters
+        ----------
+        raw : RSGIHeaders
+            Transport collection exposing header names and ``get_all`` values.
+
+        Returns
+        -------
+        Self
+            Headers retaining duplicate order, owned lists and CRLF validation.
+        """
+        items: list[tuple[str, str]] = []
+        index: dict[str, str | list[str]] = {}
+        invalid = False
+        for raw_key in raw:
+            values = raw.get_all(raw_key)
+            if not values:
+                continue
+            key = str(raw_key).lower()
+            invalid |= "\r" in key or "\n" in key
+            for value in values:
+                items.append((key, value))
+                invalid |= "\r" in value or "\n" in value
+            bucket = index.get(key)
+            if bucket is None:
+                index[key] = values[0] if len(values) == 1 else list(values)
+            elif isinstance(bucket, list):
+                bucket.extend(values)
+            else:
+                index[key] = [bucket, *values]
+        instance = cls.__new__(cls)
+        instance._items = items  # noqa: SLF001
+        instance._index = index  # noqa: SLF001
+        instance._has_invalid_format = invalid  # noqa: SLF001
+        return instance
+
+    def hasInvalidFormat(self: Self) -> bool:
         """Report whether any header contains a carriage return or newline.
 
         Returns
@@ -59,7 +100,7 @@ class Headers(metaclass=Final):
         """
         return self._has_invalid_format
 
-    def get(self, key: str, default: str | None = None) -> str | None:
+    def get(self: Self, key: str, default: str | None = None) -> str | None:
         """
         Return the last value for the given header key.
 
@@ -78,7 +119,7 @@ class Headers(metaclass=Final):
         value = self._index.get(key.lower(), default)
         return value[-1] if isinstance(value, list) else value
 
-    def count(self, key: str) -> int:
+    def count(self: Self, key: str) -> int:
         """Return the number of occurrences of a header name.
 
         Parameters
@@ -97,7 +138,8 @@ class Headers(metaclass=Final):
         return len(value) if isinstance(value, list) else 1
 
     def getAll(
-        self, key: str | None = None,
+        self: Self,
+        key: str | None = None,
     ) -> dict[str, list[str]] | list[str]:
         """
         Return all values for a key, or a mapping of all headers.
@@ -126,7 +168,7 @@ class Headers(metaclass=Final):
             return []
         return value.copy() if isinstance(value, list) else [value]
 
-    def __contains__(self, key: str) -> bool:
+    def __contains__(self: Self, key: str) -> bool:
         """
         Check whether the given header key is present.
 
@@ -142,7 +184,7 @@ class Headers(metaclass=Final):
         """
         return key.lower() in self._index
 
-    def __getitem__(self, key: str) -> str:
+    def __getitem__(self: Self, key: str) -> str:
         """
         Return the last value for the given header key.
 
@@ -167,7 +209,7 @@ class Headers(metaclass=Final):
             raise KeyError(error_msg)
         return value
 
-    def __iter__(self) -> Iterator[tuple[str, str]]:
+    def __iter__(self: Self) -> Iterator[tuple[str, str]]:
         """
         Iterate over all header key-value pairs.
 
@@ -178,7 +220,7 @@ class Headers(metaclass=Final):
         """
         return iter(self._items)
 
-    def items(self) -> list[tuple[str, str]]:
+    def items(self: Self) -> list[tuple[str, str]]:
         """
         Return a copy of all header key-value pairs.
 
@@ -189,7 +231,7 @@ class Headers(metaclass=Final):
         """
         return list(self._items)
 
-    def byteItems(self) -> Iterator[tuple[bytes, bytes]]:
+    def byteItems(self: Self) -> Iterator[tuple[bytes, bytes]]:
         """
         Yield all header pairs as UTF-8 encoded byte strings.
 
@@ -201,7 +243,7 @@ class Headers(metaclass=Final):
         for k, v in self._items:
             yield k.encode("utf-8"), v.encode("utf-8")
 
-    def keys(self) -> set[str]:
+    def keys(self: Self) -> set[str]:
         """
         Return the set of unique header names.
 
@@ -212,7 +254,7 @@ class Headers(metaclass=Final):
         """
         return {k for k, _ in self._items}
 
-    def values(self) -> list[str]:
+    def values(self: Self) -> list[str]:
         """
         Return all header values in insertion order.
 
@@ -223,7 +265,7 @@ class Headers(metaclass=Final):
         """
         return [v for _, v in self._items]
 
-    def __len__(self) -> int:
+    def __len__(self: Self) -> int:
         """
         Return the total number of header entries.
 
@@ -234,7 +276,7 @@ class Headers(metaclass=Final):
         """
         return len(self._items)
 
-    def __repr__(self) -> str:
+    def __repr__(self: Self) -> str:
         """
         Return the canonical string representation of this instance.
 

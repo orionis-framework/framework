@@ -14,3 +14,9 @@ Declarations and builders are synchronous. Reading or writing data requires `awa
 Examples that only declare models or compose plans perform no database access. Async facade examples require bootstrap and matching tables; each chapter explains its prerequisites. Python 3.14 or later is required.
 
 The database provider installs a manager in `ConnectionResolver`; querying without that bridge raises `OrmConfigurationException`. The ORM consumes `database` configuration without a separate configuration file. `QueryBuilderProvider` registers the `DB` singleton gateway; each query call creates its own builder.
+
+## Bounded execution and performance
+
+Use `async for batch in Model.query().orderBy("id").chunks(1000): ...` for bounded hydration, or the same method on `DB.table(...)`. Each batch runs the normal `get()` path, including global scopes, retrieved events, casts and eager loading. Existing limit/offset are honored and the original query is unchanged. `get()` still materializes the full result by design.
+
+Supply a deterministic, preferably unique order. This API uses LIMIT/OFFSET pagination, so deep pages can cost more; concurrent writes can shift rows unless the surrounding transaction provides a consistent snapshot. It is not a server-side cursor. Each batch releases its query cursor/connection before yielding, except for a connection intentionally owned by the caller's transaction. Close an iterator on early exit; retained batches and relation fan-out remain the caller's memory responsibility.

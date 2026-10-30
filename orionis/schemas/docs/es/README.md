@@ -25,3 +25,7 @@ Continúa por: [http](../../../http/docs/es/README.md) · [database](../../../da
 Los ejemplos que requieren bootstrap, una solicitud o servicios externos indican su contexto. Los resultados de comprobación de esta reconstrucción se distinguen de las notas históricas; no se presupone que se haya ejecutado una integración de producción.
 
 - [Reglas de aplicación y validación con I/O](application-rules.md)
+
+## Ejecución acotada y rendimiento
+
+Los planes de reglas usan un LRU por proceso limitado a 1.024 tipos de esquema. Los tipos expulsados pueden recolectarse y sus planes se reconstruyen cuando vuelven a utilizarse. El calentamiento recursivo de planes tiene protección y la compilación concurrente se serializa. Cambia la retención, no las reglas, errores ni la serialización.

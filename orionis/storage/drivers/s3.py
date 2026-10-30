@@ -4,11 +4,10 @@ import hashlib
 import mimetypes
 import tempfile
 from datetime import UTC, datetime
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Self
 from urllib.parse import quote
+from orionis.storage.buffering import spool_stream
 from orionis.storage.contracts.driver import IStorageDriver
-from orionis.storage.entities.file_info import FileInfo
-from orionis.storage.enums.visibility import Visibility
 from orionis.storage.drivers.functions import (
     assertBinaryMode,
     deriveDirectories,
@@ -16,6 +15,8 @@ from orionis.storage.drivers.functions import (
     importDriverDependency,
     resolveDownloadTarget,
 )
+from orionis.storage.entities.file_info import FileInfo
+from orionis.storage.enums.visibility import Visibility
 from orionis.storage.exceptions import (
     StorageFileNotFoundException,
     UnsupportedStorageOperationException,
@@ -82,7 +83,7 @@ class S3StorageDriver(IStorageDriver):
         "_use_path_style",
     )
 
-    def __init__(self, config: object) -> None:
+    def __init__(self: Self, config: object) -> None:
         """
         Initialize the driver from an S3 disk configuration entity.
 
@@ -117,7 +118,7 @@ class S3StorageDriver(IStorageDriver):
 
     # ── SDK bootstrap and low-level helpers ──────────────────────────────────
 
-    def __client(self) -> Any:
+    def __client(self: Self) -> Any:
         """
         Return the boto3 S3 client, bootstrapping it on first use.
 
@@ -137,10 +138,14 @@ class S3StorageDriver(IStorageDriver):
         # Import the official SDK lazily; it is an optional dependency.
         boto3 = importDriverDependency("boto3", "boto3", "s3")
         botocore_config = importDriverDependency(
-            "botocore.config", "boto3", "s3",
+            "botocore.config",
+            "boto3",
+            "s3",
         )
         botocore_exceptions = importDriverDependency(
-            "botocore.exceptions", "boto3", "s3",
+            "botocore.exceptions",
+            "boto3",
+            "s3",
         )
 
         params: dict[str, Any] = {
@@ -161,7 +166,7 @@ class S3StorageDriver(IStorageDriver):
         self._client_error = botocore_exceptions.ClientError
         return self._client
 
-    def __isMissing(self, exc: Exception) -> bool:
+    def __isMissing(self: Self, exc: Exception) -> bool:
         """
         Check whether an SDK error denotes a missing object.
 
@@ -179,7 +184,7 @@ class S3StorageDriver(IStorageDriver):
         code = str(response.get("Error", {}).get("Code", ""))
         return code in _MISSING_CODES
 
-    def __missing(self, normalized: str) -> StorageFileNotFoundException:
+    def __missing(self: Self, normalized: str) -> StorageFileNotFoundException:
         """
         Build the framework exception for a missing object.
 
@@ -196,7 +201,7 @@ class S3StorageDriver(IStorageDriver):
         error_msg = f"File does not exist at path [{normalized}]."
         return StorageFileNotFoundException(error_msg)
 
-    def __headSync(self, normalized: str) -> dict:
+    def __headSync(self: Self, normalized: str) -> dict:
         """
         Fetch object metadata or raise when the object is absent.
 
@@ -223,7 +228,7 @@ class S3StorageDriver(IStorageDriver):
                 raise
             raise self.__missing(normalized) from exc
 
-    def __listKeysSync(self, prefix: str) -> list[str]:
+    def __listKeysSync(self: Self, prefix: str) -> list[str]:
         """
         List every object key under *prefix*.
 
@@ -241,12 +246,10 @@ class S3StorageDriver(IStorageDriver):
         keys: list[str] = []
         paginator = client.get_paginator("list_objects_v2")
         for page in paginator.paginate(Bucket=self._bucket, Prefix=prefix):
-            keys.extend(
-                entry["Key"] for entry in page.get("Contents", [])
-            )
+            keys.extend(entry["Key"] for entry in page.get("Contents", []))
         return keys
 
-    def __aclFor(self, visibility: str) -> str:
+    def __aclFor(self: Self, visibility: str) -> str:
         """
         Map a visibility level onto an S3 canned ACL.
 
@@ -272,7 +275,7 @@ class S3StorageDriver(IStorageDriver):
         return acl
 
     def __putArgs(
-        self,
+        self: Self,
         normalized: str,
         visibility: str | None,
     ) -> dict[str, str]:
@@ -299,7 +302,7 @@ class S3StorageDriver(IStorageDriver):
             args["ACL"] = self.__aclFor(visibility)
         return args
 
-    def __visibilitySync(self, normalized: str) -> str:
+    def __visibilitySync(self: Self, normalized: str) -> str:
         """
         Resolve the object visibility from its ACL grants.
 
@@ -322,7 +325,8 @@ class S3StorageDriver(IStorageDriver):
         client = self.__client()
         try:
             grants = client.get_object_acl(
-                Bucket=self._bucket, Key=normalized,
+                Bucket=self._bucket,
+                Key=normalized,
             ).get("Grants", [])
         except self._client_error as exc:
             if not self.__isMissing(exc):
@@ -336,7 +340,7 @@ class S3StorageDriver(IStorageDriver):
                 return Visibility.PUBLIC.value
         return Visibility.PRIVATE.value
 
-    def __urlFor(self, normalized: str) -> str:
+    def __urlFor(self: Self, normalized: str) -> str:
         """
         Compose the public URL of an object without SDK involvement.
 
@@ -359,35 +363,9 @@ class S3StorageDriver(IStorageDriver):
         host = f"{self._bucket}.s3.{self._region}.amazonaws.com"
         return f"https://{host}/{encoded}"
 
-    async def __spool(self, stream: AsyncIterable[bytes]) -> BinaryIO:
-        """
-        Buffer an async byte stream into a spooled temporary file.
-
-        Parameters
-        ----------
-        stream : AsyncIterable[bytes]
-            Asynchronous byte-chunk producer.
-
-        Returns
-        -------
-        BinaryIO
-            Rewound buffer holding the full payload.
-        """
-        buffer = await asyncio.to_thread(
-            tempfile.SpooledTemporaryFile, max_size=_SPOOL_THRESHOLD,
-        )
-        try:
-            async for chunk in stream:
-                await asyncio.to_thread(buffer.write, chunk)
-        except BaseException:
-            await asyncio.to_thread(buffer.close)
-            raise
-        await asyncio.to_thread(buffer.seek, 0)
-        return buffer
-
     # ── Read operations ──────────────────────────────────────────────────────
 
-    async def read(self, path: str) -> bytes:
+    async def read(self: Self, path: str) -> bytes:
         """
         Read the full contents of the object at *path*.
 
@@ -420,7 +398,8 @@ class S3StorageDriver(IStorageDriver):
             client = self.__client()
             try:
                 body = client.get_object(
-                    Bucket=self._bucket, Key=normalized,
+                    Bucket=self._bucket,
+                    Key=normalized,
                 )["Body"]
             except self._client_error as exc:
                 if not self.__isMissing(exc):
@@ -432,7 +411,7 @@ class S3StorageDriver(IStorageDriver):
         return await asyncio.to_thread(_read)
 
     async def readStream(
-        self,
+        self: Self,
         path: str,
         chunk_size: int = _CHUNK_SIZE,
     ) -> AsyncIterator[bytes]:
@@ -470,24 +449,24 @@ class S3StorageDriver(IStorageDriver):
             client = self.__client()
             try:
                 return client.get_object(
-                    Bucket=self._bucket, Key=normalized,
+                    Bucket=self._bucket,
+                    Key=normalized,
                 )["Body"]
             except self._client_error as exc:
                 if not self.__isMissing(exc):
                     raise
                 raise self.__missing(normalized) from exc
 
-        body = await asyncio.to_thread(_open)
+        from orionis.storage.buffering import read_chunks  # noqa: PLC0415
+
+        chunks = read_chunks(_open, chunk_size)
         try:
-            while True:
-                chunk = await asyncio.to_thread(body.read, chunk_size)
-                if not chunk:
-                    break
+            async for chunk in chunks:
                 yield chunk
         finally:
-            await asyncio.to_thread(body.close)
+            await chunks.aclose()
 
-    async def exists(self, path: str) -> bool:
+    async def exists(self: Self, path: str) -> bool:
         """
         Check whether an object exists at *path*.
 
@@ -523,7 +502,7 @@ class S3StorageDriver(IStorageDriver):
     # ── Write operations ─────────────────────────────────────────────────────
 
     async def write(
-        self,
+        self: Self,
         path: str,
         contents: bytes | str,
         visibility: str | None = None,
@@ -546,9 +525,7 @@ class S3StorageDriver(IStorageDriver):
         """
         normalized = normalizeFilePath(path)
         data = (
-            contents.encode("utf-8")
-            if isinstance(contents, str)
-            else bytes(contents)
+            contents.encode("utf-8") if isinstance(contents, str) else bytes(contents)
         )
 
         def _write() -> None:
@@ -571,7 +548,7 @@ class S3StorageDriver(IStorageDriver):
         await asyncio.to_thread(_write)
 
     async def writeStream(
-        self,
+        self: Self,
         path: str,
         stream: AsyncIterable[bytes],
         visibility: str | None = None,
@@ -598,7 +575,7 @@ class S3StorageDriver(IStorageDriver):
         None
         """
         normalized = normalizeFilePath(path)
-        buffer = await self.__spool(stream)
+        buffer = await spool_stream(stream, max_size=_SPOOL_THRESHOLD)
 
         def _upload() -> None:
             """
@@ -622,7 +599,7 @@ class S3StorageDriver(IStorageDriver):
         finally:
             await asyncio.to_thread(buffer.close)
 
-    async def delete(self, path: str) -> bool:
+    async def delete(self: Self, path: str) -> bool:
         """
         Delete the object at *path*.
 
@@ -652,13 +629,14 @@ class S3StorageDriver(IStorageDriver):
             except StorageFileNotFoundException:
                 return False
             self.__client().delete_object(
-                Bucket=self._bucket, Key=normalized,
+                Bucket=self._bucket,
+                Key=normalized,
             )
             return True
 
         return await asyncio.to_thread(_delete)
 
-    async def copy(self, source: str, target: str) -> None:
+    async def copy(self: Self, source: str, target: str) -> None:
         """
         Copy the object at *source* to *target* server-side.
 
@@ -704,7 +682,7 @@ class S3StorageDriver(IStorageDriver):
 
         await asyncio.to_thread(_copy)
 
-    async def move(self, source: str, target: str) -> None:
+    async def move(self: Self, source: str, target: str) -> None:
         """
         Move the object at *source* to *target*.
 
@@ -731,13 +709,14 @@ class S3StorageDriver(IStorageDriver):
         normalized = normalizeFilePath(source)
         await asyncio.to_thread(
             lambda: self.__client().delete_object(
-                Bucket=self._bucket, Key=normalized,
+                Bucket=self._bucket,
+                Key=normalized,
             ),
         )
 
     # ── Metadata operations ──────────────────────────────────────────────────
 
-    async def size(self, path: str) -> int:
+    async def size(self: Self, path: str) -> int:
         """
         Return the size in bytes of the object at *path*.
 
@@ -760,7 +739,7 @@ class S3StorageDriver(IStorageDriver):
         head = await asyncio.to_thread(self.__headSync, normalized)
         return int(head.get("ContentLength", 0))
 
-    async def mimeType(self, path: str) -> str | None:
+    async def mimeType(self: Self, path: str) -> str | None:
         """
         Return the MIME type of the object at *path*.
 
@@ -784,12 +763,9 @@ class S3StorageDriver(IStorageDriver):
         """
         normalized = normalizeFilePath(path)
         head = await asyncio.to_thread(self.__headSync, normalized)
-        return (
-            head.get("ContentType")
-            or mimetypes.guess_type(normalized)[0]
-        )
+        return head.get("ContentType") or mimetypes.guess_type(normalized)[0]
 
-    async def lastModified(self, path: str) -> datetime:
+    async def lastModified(self: Self, path: str) -> datetime:
         """
         Return the last-modification timestamp of the object at *path*.
 
@@ -813,7 +789,7 @@ class S3StorageDriver(IStorageDriver):
         stamp = head.get("LastModified")
         return stamp if stamp is not None else datetime.now(tz=UTC)
 
-    async def visibility(self, path: str) -> str:
+    async def visibility(self: Self, path: str) -> str:
         """
         Return the visibility of the object at *path*.
 
@@ -835,7 +811,7 @@ class S3StorageDriver(IStorageDriver):
         normalized = normalizeFilePath(path)
         return await asyncio.to_thread(self.__visibilitySync, normalized)
 
-    async def setVisibility(self, path: str, visibility: str) -> None:
+    async def setVisibility(self: Self, path: str, visibility: str) -> None:
         """
         Change the visibility of the object at *path*.
 
@@ -872,7 +848,9 @@ class S3StorageDriver(IStorageDriver):
             client = self.__client()
             try:
                 client.put_object_acl(
-                    Bucket=self._bucket, Key=normalized, ACL=acl,
+                    Bucket=self._bucket,
+                    Key=normalized,
+                    ACL=acl,
                 )
             except self._client_error as exc:
                 if not self.__isMissing(exc):
@@ -881,7 +859,7 @@ class S3StorageDriver(IStorageDriver):
 
         await asyncio.to_thread(_apply)
 
-    async def hash(self, path: str, algorithm: str = "sha256") -> str:
+    async def hash(self: Self, path: str, algorithm: str = "sha256") -> str:
         """
         Compute the content hash of the object at *path*.
 
@@ -927,7 +905,8 @@ class S3StorageDriver(IStorageDriver):
             client = self.__client()
             try:
                 body = client.get_object(
-                    Bucket=self._bucket, Key=normalized,
+                    Bucket=self._bucket,
+                    Key=normalized,
                 )["Body"]
             except self._client_error as exc:
                 if not self.__isMissing(exc):
@@ -940,7 +919,7 @@ class S3StorageDriver(IStorageDriver):
 
         return await asyncio.to_thread(_hash)
 
-    async def info(self, path: str) -> FileInfo:
+    async def info(self: Self, path: str) -> FileInfo:
         """
         Collect a metadata snapshot for the object at *path*.
 
@@ -989,8 +968,7 @@ class S3StorageDriver(IStorageDriver):
                 lastModified=stamp,
                 visibility=visibility,
                 mimeType=(
-                    head.get("ContentType")
-                    or mimetypes.guess_type(normalized)[0]
+                    head.get("ContentType") or mimetypes.guess_type(normalized)[0]
                 ),
                 createdAt=None,
                 etag=str(head.get("ETag", "")).strip('"') or None,
@@ -1002,7 +980,7 @@ class S3StorageDriver(IStorageDriver):
 
     # ── Directory operations ─────────────────────────────────────────────────
 
-    async def createDirectory(self, path: str) -> None:
+    async def createDirectory(self: Self, path: str) -> None:
         """
         Create a zero-byte directory marker at *path*.
 
@@ -1021,11 +999,13 @@ class S3StorageDriver(IStorageDriver):
 
         await asyncio.to_thread(
             lambda: self.__client().put_object(
-                Bucket=self._bucket, Key=f"{normalized}/", Body=b"",
+                Bucket=self._bucket,
+                Key=f"{normalized}/",
+                Body=b"",
             ),
         )
 
-    async def deleteDirectory(self, path: str) -> bool:
+    async def deleteDirectory(self: Self, path: str) -> bool:
         """
         Recursively delete every object under *path*.
 
@@ -1057,7 +1037,7 @@ class S3StorageDriver(IStorageDriver):
                 return False
             client = self.__client()
             for start in range(0, len(keys), _DELETE_BATCH):
-                batch = keys[start:start + _DELETE_BATCH]
+                batch = keys[start : start + _DELETE_BATCH]
                 client.delete_objects(
                     Bucket=self._bucket,
                     Delete={"Objects": [{"Key": key} for key in batch]},
@@ -1066,7 +1046,7 @@ class S3StorageDriver(IStorageDriver):
 
         return await asyncio.to_thread(_purge)
 
-    async def directoryExists(self, path: str) -> bool:
+    async def directoryExists(self: Self, path: str) -> bool:
         """
         Check whether any object exists under *path*.
 
@@ -1104,7 +1084,7 @@ class S3StorageDriver(IStorageDriver):
         return await asyncio.to_thread(_exists)
 
     async def files(
-        self,
+        self: Self,
         path: str = "",
         *,
         recursive: bool = False,
@@ -1130,7 +1110,7 @@ class S3StorageDriver(IStorageDriver):
         return filterFiles(keys, normalized, recursive=recursive)
 
     async def directories(
-        self,
+        self: Self,
         path: str = "",
         *,
         recursive: bool = False,
@@ -1157,7 +1137,7 @@ class S3StorageDriver(IStorageDriver):
 
     # ── URLs and transfers ───────────────────────────────────────────────────
 
-    async def url(self, path: str) -> str:
+    async def url(self: Self, path: str) -> str:
         """
         Build the public URL for the object at *path*.
 
@@ -1174,7 +1154,7 @@ class S3StorageDriver(IStorageDriver):
         """
         return self.__urlFor(normalizeFilePath(path))
 
-    async def temporaryUrl(self, path: str, expires_in: int) -> str:
+    async def temporaryUrl(self: Self, path: str, expires_in: int) -> str:
         """
         Build a presigned URL for the object at *path*.
 
@@ -1214,7 +1194,7 @@ class S3StorageDriver(IStorageDriver):
 
         return await asyncio.to_thread(_sign)
 
-    async def download(self, path: str, destination: str | Path) -> Path:
+    async def download(self: Self, path: str, destination: str | Path) -> Path:
         """
         Download the object at *path* to the local filesystem.
 
@@ -1259,7 +1239,7 @@ class S3StorageDriver(IStorageDriver):
 
         return await asyncio.to_thread(_download)
 
-    def open(self, path: str, mode: str = "rb") -> AsyncStream:
+    def open(self: Self, path: str, mode: str = "rb") -> AsyncStream:
         """
         Open an asynchronous binary stream for the object at *path*.
 
@@ -1333,7 +1313,7 @@ class S3StorageDriver(IStorageDriver):
         return AsyncStream(opener, on_close)
 
     def __seedStream(
-        self,
+        self: Self,
         buffer: BinaryIO,
         normalized: str,
         mode: str,

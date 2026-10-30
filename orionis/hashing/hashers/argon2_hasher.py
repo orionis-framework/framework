@@ -1,8 +1,11 @@
-import asyncio
-from typing import Any, Self
+from typing import TYPE_CHECKING, Any, Self
 from orionis.hashing.contracts.hasher import IHasher
 from orionis.hashing.exceptions import HashConfigurationException
+from orionis.hashing.execution import HASH_WORKERS
 from orionis.hashing.hashers.functions import import_hasher_backend
+
+if TYPE_CHECKING:
+    from orionis.support.concurrency import BoundedExecutor
 
 # ruff: noqa: ANN401
 
@@ -31,14 +34,22 @@ class Argon2Hasher(IHasher):
     backend with the new cost parameters.
     """
 
-    __slots__ = ("_backend", "_backend_class", "_memory", "_threads", "_time")
+    __slots__ = (
+        "_backend",
+        "_backend_class",
+        "_executor",
+        "_memory",
+        "_threads",
+        "_time",
+    )
 
     def __init__(
-        self,
+        self: Self,
         *,
         memory: int = DEFAULT_MEMORY,
         threads: int = DEFAULT_THREADS,
         time: int = DEFAULT_TIME,
+        executor: BoundedExecutor | None = None,
     ) -> None:
         """
         Initialize the driver with its default cost parameters.
@@ -51,6 +62,8 @@ class Argon2Hasher(IHasher):
             Degree of parallelism.
         time : int
             Number of iterations.
+        executor : BoundedExecutor | None
+            Caller-owned dedicated executor, or the shared bounded hashing pool.
 
         Returns
         -------
@@ -63,6 +76,7 @@ class Argon2Hasher(IHasher):
             If any cost parameter is not a positive integer.
         """
         self._memory = self._validate("memory", memory)
+        self._executor = HASH_WORKERS if executor is None else executor
         self._threads = self._validate("threads", threads)
         self._time = self._validate("time", time)
 
@@ -101,7 +115,7 @@ class Argon2Hasher(IHasher):
             raise HashConfigurationException(error_msg)
         return value
 
-    def _backendClass(self) -> Any:
+    def _backendClass(self: Self) -> Any:
         """
         Return the backend class, importing it on first use.
 
@@ -123,7 +137,7 @@ class Argon2Hasher(IHasher):
             )
         return self._backend_class
 
-    def _build(self, memory: int, threads: int, time: int) -> Any:
+    def _build(self: Self, memory: int, threads: int, time: int) -> Any:
         """
         Build a backend instance for the given cost parameters.
 
@@ -147,7 +161,7 @@ class Argon2Hasher(IHasher):
             parallelism=threads,
         )
 
-    def _default(self) -> Any:
+    def _default(self: Self) -> Any:
         """
         Return the cached backend built from the configured parameters.
 
@@ -161,7 +175,7 @@ class Argon2Hasher(IHasher):
         return self._backend
 
     def _make(
-        self,
+        self: Self,
         value: str,
         *,
         rounds: int | None = None,
@@ -207,7 +221,7 @@ class Argon2Hasher(IHasher):
         return backend.hash(value)
 
     async def make(
-        self,
+        self: Self,
         value: str,
         *,
         rounds: int | None = None,
@@ -238,7 +252,7 @@ class Argon2Hasher(IHasher):
         HashConfigurationException
             If any override is not a positive integer.
         """
-        return await asyncio.to_thread(
+        return await self._executor.run(
             self._make,
             value,
             rounds=rounds,
@@ -246,7 +260,7 @@ class Argon2Hasher(IHasher):
             threads=threads,
         )
 
-    def _check(self, value: str, hashed: str) -> bool:
+    def _check(self: Self, value: str, hashed: str) -> bool:
         """
         Verify a plain text value against an Argon2id hash.
 
@@ -267,7 +281,7 @@ class Argon2Hasher(IHasher):
             return False
         return self._default().verify(value, hashed)
 
-    async def check(self, value: str, hashed: str) -> bool:
+    async def check(self: Self, value: str, hashed: str) -> bool:
         """
         Verify a plain text value off the event loop.
 
@@ -283,9 +297,9 @@ class Argon2Hasher(IHasher):
         bool
             ``True`` when the value matches the hash, ``False`` otherwise.
         """
-        return await asyncio.to_thread(self._check, value, hashed)
+        return await self._executor.run(self._check, value, hashed)
 
-    def needsRehash(self, hashed: str) -> bool:
+    def needsRehash(self: Self, hashed: str) -> bool:
         """
         Determine whether the hash uses outdated Argon2id parameters.
 
@@ -304,7 +318,7 @@ class Argon2Hasher(IHasher):
             return True
         return self._default().check_needs_rehash(hashed)
 
-    def _identify(self, hashed: str) -> bool:
+    def _identify(self: Self, hashed: str) -> bool:
         """
         Check whether the hash was produced by the Argon2 family.
 
@@ -320,7 +334,7 @@ class Argon2Hasher(IHasher):
         """
         return self._backendClass().identify(hashed)
 
-    def getAlgorithm(self) -> str:
+    def getAlgorithm(self: Self) -> str:
         """
         Return the algorithm identifier of this driver.
 
@@ -331,7 +345,7 @@ class Argon2Hasher(IHasher):
         """
         return "argon2id"
 
-    def setRounds(self, rounds: int) -> Self:
+    def setRounds(self: Self, rounds: int) -> Self:
         """
         Set the default time cost used by the driver.
 
@@ -356,7 +370,7 @@ class Argon2Hasher(IHasher):
         self._backend = None
         return self
 
-    def setMemory(self, memory: int) -> Self:
+    def setMemory(self: Self, memory: int) -> Self:
         """
         Set the default memory cost used by the driver.
 
@@ -379,7 +393,7 @@ class Argon2Hasher(IHasher):
         self._backend = None
         return self
 
-    def setThreads(self, threads: int) -> Self:
+    def setThreads(self: Self, threads: int) -> Self:
         """
         Set the default parallelism used by the driver.
 

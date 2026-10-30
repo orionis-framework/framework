@@ -1,9 +1,9 @@
 from __future__ import annotations
 import inspect
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from functools import lru_cache
 from types import FunctionType, MethodDescriptorType, MethodType, WrapperDescriptorType
-from typing import TYPE_CHECKING, get_type_hints
+from typing import TYPE_CHECKING, Self, get_type_hints
 from orionis.introspection.callables.reflection import ReflectionCallable
 from orionis.introspection.concretes.reflection import ReflectionConcrete
 from orionis.introspection.dependencies.reflection import (
@@ -26,10 +26,30 @@ class InvocationPlan:
         Parameters in declaration order, excluding a bound receiver.
     is_async : bool
         Whether invocation requires awaiting the callable's result.
+
+    Attributes
+    ----------
+    has_keyword_only : bool
+        Whether resolution needs keyword arguments even for positional calls.
     """
 
     arguments: tuple[Argument, ...]
     is_async: bool
+    has_keyword_only: bool = field(init=False)
+
+    def __post_init__(self: Self) -> None:
+        """Cache argument shape without retaining resolved dependencies.
+
+        Returns
+        -------
+        None
+            The keyword-only flag is computed once per cached plan.
+        """
+        object.__setattr__(
+            self,
+            "has_keyword_only",
+            any(argument.is_keyword_only for argument in self.arguments),
+        )
 
 @lru_cache(maxsize=1024)
 def _callable_plan(target: Callable, *, bound: bool = False) -> InvocationPlan:
@@ -51,7 +71,8 @@ def _callable_plan(target: Callable, *, bound: bool = False) -> InvocationPlan:
     ReflectionCallable(target)
     signature = _cached_resolved_signature(target, bound=bound)
     return InvocationPlan(
-        tuple(signature.ordered.values()), inspect.iscoroutinefunction(target),
+        tuple(signature.ordered.values()),
+        inspect.iscoroutinefunction(target),
     )
 
 def callable_plan(target: Callable) -> InvocationPlan:
@@ -127,16 +148,20 @@ def constructor_plan(target: type, constructor: object) -> InvocationPlan:
         if parameter.name not in unresolved_names:
             parameters.append(updated)
             continue
-        probe = type("_ConstructorHint", (), {
-            "__annotations__": {"value": hint},
-        })
+        probe = type(
+            "_ConstructorHint",
+            (),
+            {
+                "__annotations__": {"value": hint},
+            },
+        )
         try:
             resolved = get_type_hints(
                 probe,
                 globalns=globalns,
                 localns=localns,
             )["value"]
-        except (AttributeError, NameError, SyntaxError, TypeError):
+        except AttributeError, NameError, SyntaxError, TypeError:
             parameters.append(updated)
             continue
         if isinstance(resolved, type):
@@ -178,7 +203,10 @@ def warm_controller_plan(target: type, method_name: str) -> None:
     elif type(constructor) is classmethod:
         constructor = MethodType(constructor.__func__, target)
     if type(constructor) in (
-        FunctionType, MethodType, MethodDescriptorType, WrapperDescriptorType,
+        FunctionType,
+        MethodType,
+        MethodDescriptorType,
+        WrapperDescriptorType,
     ):
         constructor_plan(target, constructor)
 

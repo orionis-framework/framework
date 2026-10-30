@@ -14,8 +14,8 @@ from orionis.container.enums.lifetimes import Lifetime
 from orionis.container.exceptions import CircularDependencyException
 
 if TYPE_CHECKING:
-    import msgspec
     from collections.abc import Callable
+    import msgspec
     from orionis.container.contracts.service_provider import IServiceProvider
     from orionis.http.contracts.request import IRequest
     from orionis.introspection.dependencies.entities.argument import Argument
@@ -60,7 +60,7 @@ class Container(IContainer):
     # This lock ensures that only one thread can create or access instances at a time
     _lock: ClassVar[threading.RLock] = threading.RLock()
 
-    def __new__(cls, *args: object, **kwargs: object) -> Self:
+    def __new__(cls: type[Self], *args: object, **kwargs: object) -> Self:
         """
         Create and return a singleton instance for each class in the hierarchy.
 
@@ -86,7 +86,6 @@ class Container(IContainer):
 
         # Slow path: acquire lock to ensure thread safety
         with cls._lock:
-
             # Double-check if instance was created while waiting for the lock
             instance = cls._instances.get(cls)
             if instance is not None:
@@ -101,7 +100,7 @@ class Container(IContainer):
             # Return the newly created singleton instance
             return instance
 
-    def __init__(self) -> None:
+    def __init__(self: Self) -> None:
         """
         Initialize the internal state of the container.
 
@@ -115,7 +114,6 @@ class Container(IContainer):
         """
         # Prevent multiple initializations for singleton instances
         if "_Container__initialized" not in self.__dict__:
-
             # Deferred providers for lazy loading
             self._deferred_providers: dict[str, dict[str, str]] = {}
 
@@ -136,14 +134,15 @@ class Container(IContainer):
             # Per-key locks serialising one-shot construction, paired with the
             # loop they were created on so a second loop never awaits a foreign lock.
             self.__creation_locks: dict[
-                Any, tuple[asyncio.AbstractEventLoop, asyncio.Lock],
+                Any,
+                tuple[asyncio.AbstractEventLoop, asyncio.Lock],
             ] = {}
 
             # Mark as initialized to prevent re-initialization
             self._Container__initialized = True
 
     def __creationLock(
-        self,
+        self: Self,
         key: Any,
     ) -> asyncio.Lock:
         """
@@ -190,7 +189,7 @@ class Container(IContainer):
         return concrete in _resolution_stack.get()
 
     def __aliasService(
-        self,
+        self: Self,
         alias: str | None,
     ) -> str | None:
         """
@@ -233,7 +232,7 @@ class Container(IContainer):
         return alias
 
     def __ensureCanOverrideScope(
-        self,
+        self: Self,
         override: bool,
         abstract: type[Any],
         scope: ScopeManager,
@@ -271,7 +270,7 @@ class Container(IContainer):
             raise ValueError(error_msg)
 
     def __ensureCanOverrideGlobal(
-        self,
+        self: Self,
         override: bool,
         abstract: type[Any],
         alias: str | None,
@@ -313,7 +312,7 @@ class Container(IContainer):
             raise ValueError(error_msg)
 
     def __ensureInstanceImplements(
-        self,
+        self: Self,
         abstract: type[Any],
         instance: object,
     ) -> None:
@@ -344,13 +343,11 @@ class Container(IContainer):
 
         # Ensure the instance implements the abstract class
         if not isinstance(instance, abstract):
-            error_msg = (
-                f"{type(instance).__name__} must implement {abstract.__name__}"
-            )
+            error_msg = f"{type(instance).__name__} must implement {abstract.__name__}"
             raise TypeError(error_msg)
 
     def __ensureConcreteImplements(
-        self,
+        self: Self,
         abstract: type[Any],
         concrete: type[Any],
     ) -> None:
@@ -387,13 +384,11 @@ class Container(IContainer):
 
         # Ensure concrete implements abstract
         if not issubclass(concrete, abstract):
-            error_msg = (
-                f"{concrete.__name__} must implement {abstract.__name__}"
-            )
+            error_msg = f"{concrete.__name__} must implement {abstract.__name__}"
             raise TypeError(error_msg)
 
     def __bind(
-        self,
+        self: Self,
         lifetime: Lifetime,
         abstract: type[Any] | None,
         concrete: type[Any],
@@ -462,7 +457,7 @@ class Container(IContainer):
         return True
 
     def instance(
-        self,
+        self: Self,
         abstract: type[Any] | None,
         instance: object,
         *,
@@ -521,8 +516,8 @@ class Container(IContainer):
 
         if scope is not None:
             if alias is not None:
-                msg_error = "Alias registration is only allowed globally."
-                raise ValueError(msg_error)
+                error_msg = "Alias registration is only allowed globally."
+                raise ValueError(error_msg)
             # Register instance in the current scope
             scope[abstract] = instance
         else:
@@ -542,7 +537,7 @@ class Container(IContainer):
         return True
 
     def transient(
-        self,
+        self: Self,
         abstract: type[Any] | None,
         concrete: type[Any],
         *,
@@ -578,7 +573,7 @@ class Container(IContainer):
         )
 
     def singleton(
-        self,
+        self: Self,
         abstract: type[Any] | None,
         concrete: type[Any],
         *,
@@ -614,7 +609,7 @@ class Container(IContainer):
         )
 
     def scoped(
-        self,
+        self: Self,
         abstract: type[Any] | None,
         concrete: type[Any],
         *,
@@ -650,7 +645,7 @@ class Container(IContainer):
         )
 
     def bound(
-        self,
+        self: Self,
         key: type[Any] | str,
     ) -> bool:
         """
@@ -681,12 +676,9 @@ class Container(IContainer):
             return True
 
         # Check if the abstract type is registered in the container bindings
-        return (
-            abstract in self.__bindings or
-            abstract in self.__singleton_cache
-        )
+        return abstract in self.__bindings or abstract in self.__singleton_cache
 
-    def beginScope(self) -> ScopeManager:
+    def beginScope(self: Self) -> ScopeManager:
         """
         Begin a new scope context manager for scoped services.
 
@@ -703,7 +695,7 @@ class Container(IContainer):
         # Instantiate and return a new ScopeManager for scoped service management
         return ScopeManager()
 
-    def getCurrentScope(self) -> ScopeManager | None:
+    def getCurrentScope(self: Self) -> ScopeManager | None:
         """
         Get the current active scope context for scoped services.
 
@@ -728,7 +720,7 @@ class Container(IContainer):
         return cast("ScopeManager | None", get_current_scope())
 
     async def __resolveDeferredProvider(
-        self,
+        self: Self,
         key: type[Any] | str,
     ) -> None:
         """
@@ -773,7 +765,6 @@ class Container(IContainer):
 
         # Register and boot each provider once, including multicontract providers.
         async with self.__creationLock(provider_key):
-
             # Another task may have completed the bootstrap while waiting
             if provider_key in self.__cache_resolve_deferred_providers:
                 return
@@ -783,7 +774,7 @@ class Container(IContainer):
             finally:
                 _provider_stack.reset(token)
 
-    async def __bootDeferredProvider(self, provider_key: tuple[str, str]) -> None:
+    async def __bootDeferredProvider(self: Self, provider_key: tuple[str, str]) -> None:
         """
         Register a deferred provider once and complete its boot hook.
 
@@ -821,7 +812,7 @@ class Container(IContainer):
             if self.__pending_deferred[service] == provider_key:
                 del self.__pending_deferred[service]
 
-    async def __awaitPendingProvider(self, key: type[Any] | str) -> None:
+    async def __awaitPendingProvider(self: Self, key: type[Any] | str) -> None:
         """
         Wait for a provider that has registered services but is still booting.
 
@@ -855,7 +846,7 @@ class Container(IContainer):
             await self.__resolveDeferredProvider(key)
 
     async def __resolveKey(
-        self,
+        self: Self,
         key: type[Any] | str,
     ) -> type[Any]:
         """
@@ -878,7 +869,6 @@ class Container(IContainer):
         """
         # If the key is a string.
         if isinstance(key, str):
-
             # First check if it's an alias registered in the container.
             abstract = self.__aliases.get(key)
 
@@ -899,7 +889,7 @@ class Container(IContainer):
         return key
 
     async def __resolveOrBuild(
-        self,
+        self: Self,
         abstract: type[Any],
         key: type[Any] | str,
         *args: tuple[Any, ...],
@@ -947,7 +937,7 @@ class Container(IContainer):
         return await self.__resolve(binding, *args, **kwargs)
 
     async def make(
-        self,
+        self: Self,
         key: type[Any] | str,
         *args: tuple[Any, ...],
         **kwargs: dict[str, Any],
@@ -1003,7 +993,7 @@ class Container(IContainer):
         return await self.__resolveOrBuild(abstract, key, *args, **kwargs)
 
     async def __resolve(
-        self,
+        self: Self,
         binding: Binding,
         *args: tuple[Any, ...],
         **kwargs: dict[str, Any],
@@ -1062,7 +1052,7 @@ class Container(IContainer):
         return None
 
     async def __createSingleton(
-        self,
+        self: Self,
         binding: Binding,
         *args: tuple[Any, ...],
         **kwargs: dict[str, Any],
@@ -1093,7 +1083,6 @@ class Container(IContainer):
             return await self.__autoResolveClass(concrete, *args, **kwargs)
 
         async with self.__creationLock(binding.contract):
-
             # Another task may have finished the construction while waiting
             cached = self.__singleton_cache.get(binding.contract)
             if cached is not None:
@@ -1104,7 +1093,7 @@ class Container(IContainer):
             return instance
 
     async def __createScoped(
-        self,
+        self: Self,
         binding: Binding,
         scope: ScopeManager,
         *args: tuple[Any, ...],
@@ -1138,7 +1127,6 @@ class Container(IContainer):
             return await self.__autoResolveClass(concrete, *args, **kwargs)
 
         async with scope.creationLock(binding.contract):
-
             # Another task may have finished the construction while waiting
             if binding.contract in scope:
                 return scope[binding.contract]
@@ -1148,17 +1136,17 @@ class Container(IContainer):
             return instance
 
     async def __autoResolveClass(
-        self,
+        self: Self,
         type_: Callable[..., Any],
         *args: tuple[Any, ...],
         **kwargs: dict[str, Any],
     ) -> Any:
-        r"""
+        """
         Automatically instantiate a class with injected dependencies.
 
         Parameters
         ----------
-        type\_ : Callable[..., Any]
+        type_ : Callable[..., Any]
             The class to instantiate.
         *args : tuple[Any, ...]
             Positional arguments for the constructor.
@@ -1196,9 +1184,19 @@ class Container(IContainer):
         # Push type onto the per-task stack; token allows precise rollback
         token = _resolution_stack.set(stack | {type_})
         try:
+            # Positional calls need neither a keyword mapping nor name matching.
+            if not kwargs and not plan.has_keyword_only:
+                final_args = await self.__resolvePositionalArguments(
+                    plan.arguments,
+                    args,
+                )
+                return type_(*final_args)
+
             # Resolve dependencies recursively
             final_args, final_kwargs = await self.__resolveSignature(
-                plan.arguments, *args, **kwargs,
+                plan.arguments,
+                args,
+                kwargs,
             )
 
             # Instantiate with resolved arguments
@@ -1209,17 +1207,17 @@ class Container(IContainer):
             _resolution_stack.reset(token)
 
     async def build(
-        self,
+        self: Self,
         type_: Callable[..., Any],
         *args: tuple[Any, ...],
         **kwargs: dict[str, Any],
     ) -> Any:
-        r"""
+        """
         Build and return an instance of the specified type.
 
         Parameters
         ----------
-        type\_ : Callable[..., Any]
+        type_ : Callable[..., Any]
             The class to instantiate.
         *args : tuple[Any, ...]
             Positional arguments for the constructor.
@@ -1256,7 +1254,7 @@ class Container(IContainer):
         return await self.__autoResolveClass(type_, *args, **kwargs)
 
     async def invoke(
-        self,
+        self: Self,
         fn: Callable[..., Any],
         *args: tuple[Any, ...],
         **kwargs: dict[str, Any],
@@ -1292,7 +1290,7 @@ class Container(IContainer):
         return await self.__autoResolveCallable(fn, *args, **kwargs)
 
     async def call(
-        self,
+        self: Self,
         instance: object,
         method_name: str,
         *args: object,
@@ -1347,17 +1345,17 @@ class Container(IContainer):
         return await self.__autoResolveCallable(method, *args, **kwargs)
 
     async def __autoResolveCallable(
-        self,
+        self: Self,
         type_: Callable[..., Any],
         *args: object,
         **kwargs: object,
     ) -> type[Any]:
-        r"""
+        """
         Resolve and invoke a callable, injecting dependencies.
 
         Parameters
         ----------
-        type\_ : Callable[..., Any]
+        type_ : Callable[..., Any]
             The callable to invoke.
         *args : object
             Positional arguments for the callable.
@@ -1385,9 +1383,18 @@ class Container(IContainer):
                 return await type_(*args, **kwargs)
             return type_(*args, **kwargs)
 
+        # Keep the common positional shape free of keyword dictionaries.
+        if not kwargs and not plan.has_keyword_only:
+            final_args = await self.__resolvePositionalArguments(plan.arguments, args)
+            if plan.is_async:
+                return await type_(*final_args)
+            return type_(*final_args)
+
         # Resolve dependencies recursively
         final_args, final_kwargs = await self.__resolveSignature(
-            plan.arguments, *args, **kwargs,
+            plan.arguments,
+            args,
+            kwargs,
         )
 
         # Invoke the callable with resolved arguments
@@ -1395,11 +1402,54 @@ class Container(IContainer):
             return await type_(*final_args, **final_kwargs)
         return type_(*final_args, **final_kwargs)
 
-    async def __resolveSignature(  # NOSONAR
-        self,
+    async def __resolvePositionalArguments(
+        self: Self,
         arguments: tuple[Argument, ...],
-        *args: object,
-        **kwargs: object,
+        args: tuple[object, ...],
+    ) -> list[Any] | tuple[object, ...]:
+        """
+        Resolve a positional call using the current bindings and scope.
+
+        Parameters
+        ----------
+        arguments : tuple[Argument, ...]
+            Parameters from a plan with no keyword-only arguments.
+        args : tuple[object, ...]
+            Explicit positional values, including any variadic tail.
+
+        Returns
+        -------
+        list[Any] | tuple[object, ...]
+            Explicit values followed by dependencies resolved at call time.
+        """
+        position = len(args)
+        if position >= len(arguments):
+            return args
+
+        resolved = list(args)
+        deferred = self._deferred_providers
+        bindings = self.__bindings
+        singletons = self.__singleton_cache
+        for argument in arguments[position:]:
+            if deferred and argument.full_class_path in deferred:
+                await self.__resolveDeferredProvider(argument.full_class_path)
+            if argument.is_schema:
+                resolved.append(await self.__resolveSchemaArgument(argument))
+                continue
+            arg_type = argument.type
+            if (arg_type in bindings or arg_type in singletons) and not (
+                arg_type is str and argument.module_name == "typing"
+            ):
+                resolved.append(await self.make(arg_type))
+                continue
+            resolved.append(await self.__resolveArgument(argument))
+        return resolved
+
+    async def __resolveSignature(  # NOSONAR
+        self: Self,
+        arguments: tuple[Argument, ...],
+        args: tuple[object, ...],
+        kwargs: dict[str, object],
     ) -> tuple[list[Any], dict[str, Any]]:
         """
         Resolve arguments for a callable signature using dependency injection.
@@ -1408,10 +1458,10 @@ class Container(IContainer):
         ----------
         arguments : tuple[Argument, ...]
             Parameter metadata in declaration order.
-        *args : object
+        args : tuple[object, ...]
             Positional arguments to pass to the callable.
-        **kwargs : object
-            Keyword arguments to pass to the callable.
+        kwargs : dict[str, object]
+            Invocation-owned keyword mapping, consumed during resolution.
 
         Returns
         -------
@@ -1431,8 +1481,8 @@ class Container(IContainer):
         deferred = self._deferred_providers
 
         # Read current bindings so overrides apply to previously compiled plans.
-        _bindings       = self.__bindings
-        _singleton      = self.__singleton_cache
+        _bindings = self.__bindings
+        _singleton = self.__singleton_cache
 
         # Iterate over arguments in definition order
         for argument in arguments:
@@ -1474,7 +1524,6 @@ class Container(IContainer):
                 final_args.append(resolved)
 
             else:
-
                 # Use provided keyword argument if available
                 provided = remaining_kwargs.pop(name, _MISSING)
                 if provided is not _MISSING:
@@ -1514,7 +1563,7 @@ class Container(IContainer):
         return final_args, final_kwargs
 
     async def __resolveSchemaArgument(
-        self,
+        self: Self,
         argument: Argument,
     ) -> msgspec.Struct:
         """
@@ -1548,7 +1597,7 @@ class Container(IContainer):
         return await Schema.validate(data, argument.type)
 
     async def __resolveArgument(
-        self,
+        self: Self,
         argument: Argument,
     ) -> Any:
         """
@@ -1577,7 +1626,6 @@ class Container(IContainer):
             raise TypeError(error_msg)
 
         if not argument.resolved:
-
             # Do not auto-resolve built-in or typing types
             if argument.module_name in ("builtins", "typing"):
                 error_msg = (

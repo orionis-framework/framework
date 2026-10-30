@@ -1,8 +1,7 @@
 import asyncio
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Self
 from uuid import uuid4
 import msgspec
-from orionis.database.exceptions import QueryException
 from orionis.orm.query.expressions import (
     AggregateClause,
     AggregateFunction,
@@ -14,6 +13,7 @@ from orionis.orm.query.expressions import (
     WhereClause,
     WhereType,
 )
+from orionis.queues._database import _DatabaseStorage
 from orionis.queues.contracts.driver import IQueueDriver
 from orionis.queues.entities.reserved_job import ReservedJob
 from orionis.queues.exceptions import QueueStorageError
@@ -51,18 +51,22 @@ def eligible_clauses(queue: str, now: float) -> list[WhereClause]:
             value=[
                 WhereClause("reserved_until", where_type=WhereType.NULL),
                 WhereClause(
-                    "reserved_until", operator="<=", value=now, boolean="or",
+                    "reserved_until",
+                    operator="<=",
+                    value=now,
+                    boolean="or",
                 ),
             ],
         ),
     ]
 
-class DatabaseQueueDriver(IQueueDriver):
+
+class DatabaseQueueDriver(_DatabaseStorage, IQueueDriver):
     """Persist queued jobs using atomic conditional updates and expiring leases."""
 
     __slots__ = ("_connection", "_definition", "_ready", "_ready_lock")
 
-    def __init__(self, connection: IConnection, table: str = "jobs") -> None:
+    def __init__(self: Self, connection: IConnection, table: str = "jobs") -> None:
         """
         Bind the queue driver to a framework database connection.
 
@@ -79,43 +83,17 @@ class DatabaseQueueDriver(IQueueDriver):
             Complete the documented operation without returning a value.
         """
         if not connection.supportsUniqueConstraints():
-            message = (
+            error_msg = (
                 "Database queues require enforced unique constraints "
                 "to guarantee one row per job and exclusive reservations."
             )
-            raise QueueStorageError(message)
+            raise QueueStorageError(error_msg)
         self._connection = connection
         self._definition = build_jobs_table(table)
         self._ready = False
         self._ready_lock = asyncio.Lock()
 
-    async def _ensureSchema(self) -> None:
-        """
-        Create the queue table on first use.
-
-        Returns
-        -------
-        None
-            Ensure the queue storage exists.
-        """
-        if self._ready:
-            return
-        async with self._ready_lock:
-            if not self._ready:
-                try:
-                    await self._connection.createTable(self._definition)
-                except QueryException:
-                    if self._connection.inTransaction():
-                        raise
-                    # Verify another worker created the complete table concurrently.
-                    await self._connection.select(SelectPlan(
-                        table=self._definition,
-                        columns=self._definition.columnNames(),
-                        limit_value=0,
-                    ))
-                self._ready = not self._connection.inTransaction()
-
-    async def push(self, envelope: JobEnvelope, delay: float = 0) -> str:
+    async def push(self: Self, envelope: JobEnvelope, delay: float = 0) -> str:
         """
         Store an envelope for immediate or delayed consumption.
 
@@ -134,23 +112,29 @@ class DatabaseQueueDriver(IQueueDriver):
         delay = validate_seconds(delay, "delay")
         await self._ensureSchema()
         now = current_time()
-        await self._connection.insert(InsertPlan(
-            table=self._definition,
-            values=[{
-                "id": envelope.id,
-                "queue": envelope.queue,
-                "payload": _ENCODER.encode(envelope),
-                "attempts": 0,
-                "available_at": now + delay,
-                "reserved_until": None,
-                "reservation_token": None,
-                "created_at": now,
-            }],
-        ))
+        await self._connection.insert(
+            InsertPlan(
+                table=self._definition,
+                values=[
+                    {
+                        "id": envelope.id,
+                        "queue": envelope.queue,
+                        "payload": _ENCODER.encode(envelope),
+                        "attempts": 0,
+                        "available_at": now + delay,
+                        "reserved_until": None,
+                        "reservation_token": None,
+                        "created_at": now,
+                    },
+                ],
+            ),
+        )
         return envelope.id
 
     async def reserve(
-        self, queues: tuple[str, ...], retry_after: float,
+        self: Self,
+        queues: tuple[str, ...],
+        retry_after: float,
     ) -> ReservedJob | None:
         """
         Claim one eligible job in queue priority order.
@@ -174,26 +158,28 @@ class DatabaseQueueDriver(IQueueDriver):
         """
         retry_after = validate_seconds(retry_after, "retry_after", positive=True)
         if self._connection.inTransaction():
-            message = (
+            error_msg = (
                 "Queue reservations must run outside an active database "
                 "transaction so the acquired lease is committed before execution."
             )
-            raise QueueStorageError(message)
+            raise QueueStorageError(error_msg)
         await self._ensureSchema()
         for queue in queues:
             validate_name(queue, "queue")
             for _ in range(_CLAIM_ROUNDS):
                 now = current_time()
-                rows = await self._connection.select(SelectPlan(
-                    table=self._definition,
-                    wheres=eligible_clauses(queue, now),
-                    orders=[
-                        OrderClause("available_at"),
-                        OrderClause("created_at"),
-                        OrderClause("id"),
-                    ],
-                    limit_value=1,
-                ))
+                rows = await self._connection.select(
+                    SelectPlan(
+                        table=self._definition,
+                        wheres=eligible_clauses(queue, now),
+                        orders=[
+                            OrderClause("available_at"),
+                            OrderClause("created_at"),
+                            OrderClause("id"),
+                        ],
+                        limit_value=1,
+                    ),
+                )
                 if not rows:
                     break
                 row = rows[0]
@@ -202,28 +188,33 @@ class DatabaseQueueDriver(IQueueDriver):
                 now = current_time()
                 reserved_until = now + retry_after
                 # Acquire only if the observed row remains eligible and unchanged.
-                claimed = await self._connection.update(UpdatePlan(
-                    table=self._definition,
-                    values={
-                        "attempts": attempts,
-                        "reservation_token": token,
-                        "reserved_until": reserved_until,
-                    },
-                    wheres=[
-                        WhereClause("id", value=row["id"]),
-                        WhereClause("attempts", value=row["attempts"]),
-                        *eligible_clauses(queue, now),
-                    ],
-                ))
+                claimed = await self._connection.update(
+                    UpdatePlan(
+                        table=self._definition,
+                        values={
+                            "attempts": attempts,
+                            "reservation_token": token,
+                            "reserved_until": reserved_until,
+                        },
+                        wheres=[
+                            WhereClause("id", value=row["id"]),
+                            WhereClause("attempts", value=row["attempts"]),
+                            *eligible_clauses(queue, now),
+                        ],
+                    ),
+                )
                 if claimed == 1:
                     return ReservedJob(
-                        id=row["id"], payload=bytes(row["payload"]),
-                        queue=queue, attempts=attempts, token=token,
+                        id=row["id"],
+                        payload=bytes(row["payload"]),
+                        queue=queue,
+                        attempts=attempts,
+                        token=token,
                         reserved_until=reserved_until,
                     )
         return None
 
-    def _ownershipClauses(self, reserved: ReservedJob) -> list[WhereClause]:
+    def _ownershipClauses(self: Self, reserved: ReservedJob) -> list[WhereClause]:
         """
         Require a current, unexpired reservation for a transition.
 
@@ -243,7 +234,7 @@ class DatabaseQueueDriver(IQueueDriver):
             WhereClause("reserved_until", operator=">", value=current_time()),
         ]
 
-    async def release(self, reserved: ReservedJob, delay: float = 0) -> bool:
+    async def release(self: Self, reserved: ReservedJob, delay: float = 0) -> bool:
         """
         Release an owned reservation for another attempt.
 
@@ -260,17 +251,22 @@ class DatabaseQueueDriver(IQueueDriver):
             Whether a current reservation was released.
         """
         delay = validate_seconds(delay, "delay")
-        return await self._connection.update(UpdatePlan(
-            table=self._definition,
-            values={
-                "available_at": current_time() + delay,
-                "reserved_until": None,
-                "reservation_token": None,
-            },
-            wheres=self._ownershipClauses(reserved),
-        )) == 1
+        return (
+            await self._connection.update(
+                UpdatePlan(
+                    table=self._definition,
+                    values={
+                        "available_at": current_time() + delay,
+                        "reserved_until": None,
+                        "reservation_token": None,
+                    },
+                    wheres=self._ownershipClauses(reserved),
+                ),
+            )
+            == 1
+        )
 
-    async def delete(self, reserved: ReservedJob) -> bool:
+    async def delete(self: Self, reserved: ReservedJob) -> bool:
         """
         Acknowledge an owned reservation by removing its row.
 
@@ -284,11 +280,17 @@ class DatabaseQueueDriver(IQueueDriver):
         bool
             Whether a current reservation was removed.
         """
-        return await self._connection.delete(DeletePlan(
-            table=self._definition, wheres=self._ownershipClauses(reserved),
-        )) == 1
+        return (
+            await self._connection.delete(
+                DeletePlan(
+                    table=self._definition,
+                    wheres=self._ownershipClauses(reserved),
+                ),
+            )
+            == 1
+        )
 
-    async def size(self, queue: str) -> int:
+    async def size(self: Self, queue: str) -> int:
         """
         Count ready, delayed, and reserved jobs in one queue.
 
@@ -304,13 +306,17 @@ class DatabaseQueueDriver(IQueueDriver):
         """
         validate_name(queue, "queue")
         await self._ensureSchema()
-        return int(await self._connection.scalar(SelectPlan(
-            table=self._definition,
-            wheres=[WhereClause("queue", value=queue)],
-            aggregate=AggregateClause(AggregateFunction.COUNT),
-        )))
+        return int(
+            await self._connection.scalar(
+                SelectPlan(
+                    table=self._definition,
+                    wheres=[WhereClause("queue", value=queue)],
+                    aggregate=AggregateClause(AggregateFunction.COUNT),
+                ),
+            ),
+        )
 
-    async def clear(self, queue: str) -> int:
+    async def clear(self: Self, queue: str) -> int:
         """
         Remove every job in one logical queue.
 
@@ -326,11 +332,14 @@ class DatabaseQueueDriver(IQueueDriver):
         """
         validate_name(queue, "queue")
         await self._ensureSchema()
-        return await self._connection.delete(DeletePlan(
-            table=self._definition, wheres=[WhereClause("queue", value=queue)],
-        ))
+        return await self._connection.delete(
+            DeletePlan(
+                table=self._definition,
+                wheres=[WhereClause("queue", value=queue)],
+            ),
+        )
 
-    async def close(self) -> None:
+    async def close(self: Self) -> None:
         """
         Leave the shared database connection under its manager's ownership.
 

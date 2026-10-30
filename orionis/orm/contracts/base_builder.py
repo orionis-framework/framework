@@ -3,10 +3,11 @@ from abc import ABC, abstractmethod
 from typing import TYPE_CHECKING, Any, Self
 
 if TYPE_CHECKING:
-    from collections.abc import Iterable
+    from collections.abc import AsyncIterator, Iterable
     from orionis.database.entities.result import InsertResult
     from orionis.orm.query.expressions import SelectPlan
     from orionis.orm.schema.table import TableDefinition
+    from orionis.support.types.collection import Collection
 
 class IQueryBuilderBase(ABC):
     """
@@ -24,10 +25,26 @@ class IQueryBuilderBase(ABC):
 
     __slots__ = ()
 
+    def chunks(self: Self, size: int = 1000) -> AsyncIterator[Collection]:
+        """
+        Iterate bounded, explicitly ordered result batches when supported.
+
+        Parameters
+        ----------
+        size : int
+            Maximum rows per batch.
+
+        Returns
+        -------
+        AsyncIterator[Collection]
+            Iterator of rows or hydrated models.
+        """
+        raise NotImplementedError
+
     # ── Plan access ─────────────────────────────────────────────────────────
 
     @abstractmethod
-    def toPlan(self) -> SelectPlan:
+    def toPlan(self: Self) -> SelectPlan:
         """
         Return the engine-agnostic plan assembled so far.
 
@@ -38,7 +55,7 @@ class IQueryBuilderBase(ABC):
         """
 
     @abstractmethod
-    def clone(self) -> Self:
+    def clone(self: Self) -> Self:
         """
         Return an independent copy of this builder.
 
@@ -51,7 +68,7 @@ class IQueryBuilderBase(ABC):
     # ── Projection ──────────────────────────────────────────────────────────
 
     @abstractmethod
-    def select(self, *columns: str) -> Self:
+    def select(self: Self, *columns: str) -> Self:
         """
         Restrict the query projection to the given columns.
 
@@ -67,7 +84,7 @@ class IQueryBuilderBase(ABC):
         """
 
     @abstractmethod
-    def addSelect(self, *columns: str) -> Self:
+    def addSelect(self: Self, *columns: str) -> Self:
         """
         Append columns to the current projection.
 
@@ -84,7 +101,7 @@ class IQueryBuilderBase(ABC):
 
     @abstractmethod
     def selectRaw(
-        self,
+        self: Self,
         sql: str,
         bindings: dict[str, Any] | None = None,
         alias: str | None = None,
@@ -108,7 +125,7 @@ class IQueryBuilderBase(ABC):
         """
 
     @abstractmethod
-    def selectSub(self, query: Any, alias: str) -> Self:
+    def selectSub(self: Self, query: Any, alias: str) -> Self:
         """
         Append a scalar subquery to the projection under an alias.
 
@@ -127,7 +144,7 @@ class IQueryBuilderBase(ABC):
         """
 
     @abstractmethod
-    def distinct(self) -> Self:
+    def distinct(self: Self) -> Self:
         """
         Collapse duplicate rows from the query results.
 
@@ -140,7 +157,7 @@ class IQueryBuilderBase(ABC):
     # ── Where clauses ───────────────────────────────────────────────────────
 
     @abstractmethod
-    def where(self, column: Any, *args: Any) -> Self:
+    def where(self: Self, column: Any, *args: Any) -> Self:
         """
         Add an AND-combined filtering condition.
 
@@ -160,7 +177,7 @@ class IQueryBuilderBase(ABC):
         """
 
     @abstractmethod
-    def orWhere(self, column: Any, *args: Any) -> Self:
+    def orWhere(self: Self, column: Any, *args: Any) -> Self:
         """
         Add an OR-combined filtering condition.
 
@@ -178,7 +195,7 @@ class IQueryBuilderBase(ABC):
         """
 
     @abstractmethod
-    def whereIn(self, column: str, values: Any) -> Self:
+    def whereIn(self: Self, column: str, values: Any) -> Self:
         """
         Filter rows whose column value belongs to the given set.
 
@@ -196,7 +213,7 @@ class IQueryBuilderBase(ABC):
         """
 
     @abstractmethod
-    def orWhereIn(self, column: str, values: Any) -> Self:
+    def orWhereIn(self: Self, column: str, values: Any) -> Self:
         """
         Add an OR-combined set-membership condition.
 
@@ -214,7 +231,7 @@ class IQueryBuilderBase(ABC):
         """
 
     @abstractmethod
-    def whereNotIn(self, column: str, values: Any) -> Self:
+    def whereNotIn(self: Self, column: str, values: Any) -> Self:
         """
         Filter rows whose column value is outside the given set.
 
@@ -232,7 +249,7 @@ class IQueryBuilderBase(ABC):
         """
 
     @abstractmethod
-    def orWhereNotIn(self, column: str, values: Any) -> Self:
+    def orWhereNotIn(self: Self, column: str, values: Any) -> Self:
         """
         Add an OR-combined set-exclusion condition.
 
@@ -250,7 +267,7 @@ class IQueryBuilderBase(ABC):
         """
 
     @abstractmethod
-    def whereNull(self, column: str) -> Self:
+    def whereNull(self: Self, column: str) -> Self:
         """
         Filter rows whose column value is ``NULL``.
 
@@ -266,7 +283,7 @@ class IQueryBuilderBase(ABC):
         """
 
     @abstractmethod
-    def orWhereNull(self, column: str) -> Self:
+    def orWhereNull(self: Self, column: str) -> Self:
         """
         Add an OR-combined ``IS NULL`` condition.
 
@@ -282,7 +299,7 @@ class IQueryBuilderBase(ABC):
         """
 
     @abstractmethod
-    def whereNotNull(self, column: str) -> Self:
+    def whereNotNull(self: Self, column: str) -> Self:
         """
         Filter rows whose column value is not ``NULL``.
 
@@ -298,7 +315,7 @@ class IQueryBuilderBase(ABC):
         """
 
     @abstractmethod
-    def orWhereNotNull(self, column: str) -> Self:
+    def orWhereNotNull(self: Self, column: str) -> Self:
         """
         Add an OR-combined ``IS NOT NULL`` condition.
 
@@ -314,7 +331,7 @@ class IQueryBuilderBase(ABC):
         """
 
     @abstractmethod
-    def whereBetween(self, column: str, bounds: Iterable[Any]) -> Self:
+    def whereBetween(self: Self, column: str, bounds: Iterable[Any]) -> Self:
         """
         Filter rows whose column value lies between two boundaries.
 
@@ -332,7 +349,7 @@ class IQueryBuilderBase(ABC):
         """
 
     @abstractmethod
-    def whereNotBetween(self, column: str, bounds: Iterable[Any]) -> Self:
+    def whereNotBetween(self: Self, column: str, bounds: Iterable[Any]) -> Self:
         """
         Filter rows whose column value lies outside two boundaries.
 
@@ -350,7 +367,7 @@ class IQueryBuilderBase(ABC):
         """
 
     @abstractmethod
-    def whereLike(self, column: str, pattern: str) -> Self:
+    def whereLike(self: Self, column: str, pattern: str) -> Self:
         """
         Filter rows whose column value matches an SQL LIKE pattern.
 
@@ -368,7 +385,7 @@ class IQueryBuilderBase(ABC):
         """
 
     @abstractmethod
-    def whereNotLike(self, column: str, pattern: str) -> Self:
+    def whereNotLike(self: Self, column: str, pattern: str) -> Self:
         """
         Filter rows not matching an SQL LIKE pattern.
 
@@ -386,7 +403,7 @@ class IQueryBuilderBase(ABC):
         """
 
     @abstractmethod
-    def whereILike(self, column: str, pattern: str) -> Self:
+    def whereILike(self: Self, column: str, pattern: str) -> Self:
         """
         Filter rows matching a case-insensitive SQL LIKE pattern.
 
@@ -404,7 +421,7 @@ class IQueryBuilderBase(ABC):
         """
 
     @abstractmethod
-    def whereNotILike(self, column: str, pattern: str) -> Self:
+    def whereNotILike(self: Self, column: str, pattern: str) -> Self:
         """
         Filter rows not matching a case-insensitive LIKE pattern.
 
@@ -422,7 +439,7 @@ class IQueryBuilderBase(ABC):
         """
 
     @abstractmethod
-    def whereStartsWith(self, column: str, value: str) -> Self:
+    def whereStartsWith(self: Self, column: str, value: str) -> Self:
         """
         Filter rows whose column value starts with the given text.
 
@@ -440,7 +457,7 @@ class IQueryBuilderBase(ABC):
         """
 
     @abstractmethod
-    def whereEndsWith(self, column: str, value: str) -> Self:
+    def whereEndsWith(self: Self, column: str, value: str) -> Self:
         """
         Filter rows whose column value ends with the given text.
 
@@ -458,7 +475,7 @@ class IQueryBuilderBase(ABC):
         """
 
     @abstractmethod
-    def whereContains(self, column: str, value: str) -> Self:
+    def whereContains(self: Self, column: str, value: str) -> Self:
         """
         Filter rows whose column value contains the given text.
 
@@ -476,7 +493,7 @@ class IQueryBuilderBase(ABC):
         """
 
     @abstractmethod
-    def whereRegexpMatch(self, column: str, pattern: str) -> Self:
+    def whereRegexpMatch(self: Self, column: str, pattern: str) -> Self:
         """
         Filter rows whose column value matches a regular expression.
 
@@ -494,7 +511,7 @@ class IQueryBuilderBase(ABC):
         """
 
     @abstractmethod
-    def whereColumn(self, first: str, operator: str, second: str) -> Self:
+    def whereColumn(self: Self, first: str, operator: str, second: str) -> Self:
         """
         Compare two columns of the query against each other.
 
@@ -514,7 +531,7 @@ class IQueryBuilderBase(ABC):
         """
 
     @abstractmethod
-    def orWhereColumn(self, first: str, operator: str, second: str) -> Self:
+    def orWhereColumn(self: Self, first: str, operator: str, second: str) -> Self:
         """
         Add an OR-combined comparison between two columns.
 
@@ -535,7 +552,7 @@ class IQueryBuilderBase(ABC):
 
     @abstractmethod
     def whereRaw(
-        self,
+        self: Self,
         sql: str,
         bindings: dict[str, Any] | None = None,
     ) -> Self:
@@ -557,7 +574,7 @@ class IQueryBuilderBase(ABC):
 
     @abstractmethod
     def orWhereRaw(
-        self,
+        self: Self,
         sql: str,
         bindings: dict[str, Any] | None = None,
     ) -> Self:
@@ -578,7 +595,7 @@ class IQueryBuilderBase(ABC):
         """
 
     @abstractmethod
-    def whereExists(self, query: Any) -> Self:
+    def whereExists(self: Self, query: Any) -> Self:
         """
         Keep rows for which a correlated subquery returns any row.
 
@@ -595,7 +612,7 @@ class IQueryBuilderBase(ABC):
         """
 
     @abstractmethod
-    def orWhereExists(self, query: Any) -> Self:
+    def orWhereExists(self: Self, query: Any) -> Self:
         """
         Add an OR-combined ``EXISTS`` condition.
 
@@ -611,7 +628,7 @@ class IQueryBuilderBase(ABC):
         """
 
     @abstractmethod
-    def whereNotExists(self, query: Any) -> Self:
+    def whereNotExists(self: Self, query: Any) -> Self:
         """
         Keep rows for which a correlated subquery returns no row.
 
@@ -627,7 +644,7 @@ class IQueryBuilderBase(ABC):
         """
 
     @abstractmethod
-    def orWhereNotExists(self, query: Any) -> Self:
+    def orWhereNotExists(self: Self, query: Any) -> Self:
         """
         Add an OR-combined ``NOT EXISTS`` condition.
 
@@ -646,9 +663,9 @@ class IQueryBuilderBase(ABC):
 
     @abstractmethod
     def join(
-        self,
+        self: Self,
         table: str | TableDefinition,
-        first: Any = None,
+        first: Any | None = None,
         operator: str | None = None,
         second: str | None = None,
         *,
@@ -679,9 +696,9 @@ class IQueryBuilderBase(ABC):
 
     @abstractmethod
     def leftJoin(
-        self,
+        self: Self,
         table: str | TableDefinition,
-        first: Any = None,
+        first: Any | None = None,
         operator: str | None = None,
         second: str | None = None,
         *,
@@ -711,9 +728,9 @@ class IQueryBuilderBase(ABC):
 
     @abstractmethod
     def rightJoin(
-        self,
+        self: Self,
         table: str | TableDefinition,
-        first: Any = None,
+        first: Any | None = None,
         operator: str | None = None,
         second: str | None = None,
         *,
@@ -743,9 +760,9 @@ class IQueryBuilderBase(ABC):
 
     @abstractmethod
     def fullJoin(
-        self,
+        self: Self,
         table: str | TableDefinition,
-        first: Any = None,
+        first: Any | None = None,
         operator: str | None = None,
         second: str | None = None,
         *,
@@ -775,7 +792,7 @@ class IQueryBuilderBase(ABC):
 
     @abstractmethod
     def crossJoin(
-        self,
+        self: Self,
         table: str | TableDefinition,
         *,
         alias: str | None = None,
@@ -798,10 +815,10 @@ class IQueryBuilderBase(ABC):
 
     @abstractmethod
     def joinSub(
-        self,
+        self: Self,
         query: Any,
         alias: str,
-        first: Any = None,
+        first: Any | None = None,
         operator: str | None = None,
         second: str | None = None,
     ) -> Self:
@@ -829,10 +846,10 @@ class IQueryBuilderBase(ABC):
 
     @abstractmethod
     def leftJoinSub(
-        self,
+        self: Self,
         query: Any,
         alias: str,
-        first: Any = None,
+        first: Any | None = None,
         operator: str | None = None,
         second: str | None = None,
     ) -> Self:
@@ -860,10 +877,10 @@ class IQueryBuilderBase(ABC):
 
     @abstractmethod
     def rightJoinSub(
-        self,
+        self: Self,
         query: Any,
         alias: str,
-        first: Any = None,
+        first: Any | None = None,
         operator: str | None = None,
         second: str | None = None,
     ) -> Self:
@@ -892,7 +909,7 @@ class IQueryBuilderBase(ABC):
     # ── Ordering, grouping, paging ──────────────────────────────────────────
 
     @abstractmethod
-    def orderBy(self, column: str, direction: str = "asc") -> Self:
+    def orderBy(self: Self, column: str, direction: str = "asc") -> Self:
         """
         Add an ordering rule to the query.
 
@@ -910,7 +927,7 @@ class IQueryBuilderBase(ABC):
         """
 
     @abstractmethod
-    def latest(self, column: str | None = None) -> Self:
+    def latest(self: Self, column: str | None = None) -> Self:
         """
         Order the query by a timestamp column in descending order.
 
@@ -926,7 +943,7 @@ class IQueryBuilderBase(ABC):
         """
 
     @abstractmethod
-    def oldest(self, column: str | None = None) -> Self:
+    def oldest(self: Self, column: str | None = None) -> Self:
         """
         Order the query by a timestamp column in ascending order.
 
@@ -942,7 +959,7 @@ class IQueryBuilderBase(ABC):
         """
 
     @abstractmethod
-    def groupBy(self, *columns: str) -> Self:
+    def groupBy(self: Self, *columns: str) -> Self:
         """
         Add grouping columns to the query.
 
@@ -958,7 +975,7 @@ class IQueryBuilderBase(ABC):
         """
 
     @abstractmethod
-    def having(self, column: Any, *args: Any) -> Self:
+    def having(self: Self, column: Any, *args: Any) -> Self:
         """
         Add a post-grouping condition to the query.
 
@@ -976,7 +993,7 @@ class IQueryBuilderBase(ABC):
         """
 
     @abstractmethod
-    def orHaving(self, column: Any, *args: Any) -> Self:
+    def orHaving(self: Self, column: Any, *args: Any) -> Self:
         """
         Add an OR-combined post-grouping condition to the query.
 
@@ -995,7 +1012,7 @@ class IQueryBuilderBase(ABC):
 
     @abstractmethod
     def havingRaw(
-        self,
+        self: Self,
         sql: str,
         bindings: dict[str, Any] | None = None,
     ) -> Self:
@@ -1016,7 +1033,7 @@ class IQueryBuilderBase(ABC):
         """
 
     @abstractmethod
-    def limit(self, value: int) -> Self:
+    def limit(self: Self, value: int) -> Self:
         """
         Limit the number of rows returned by the query.
 
@@ -1032,7 +1049,7 @@ class IQueryBuilderBase(ABC):
         """
 
     @abstractmethod
-    def offset(self, value: int) -> Self:
+    def offset(self: Self, value: int) -> Self:
         """
         Skip the given number of rows before returning results.
 
@@ -1048,7 +1065,7 @@ class IQueryBuilderBase(ABC):
         """
 
     @abstractmethod
-    def take(self, value: int) -> Self:
+    def take(self: Self, value: int) -> Self:
         """
         Limit the number of rows returned; alias of ``limit``.
 
@@ -1064,7 +1081,7 @@ class IQueryBuilderBase(ABC):
         """
 
     @abstractmethod
-    def skip(self, value: int) -> Self:
+    def skip(self: Self, value: int) -> Self:
         """
         Skip the given number of rows; alias of ``offset``.
 
@@ -1080,7 +1097,7 @@ class IQueryBuilderBase(ABC):
         """
 
     @abstractmethod
-    def forPage(self, page: int, per_page: int = 15) -> Self:
+    def forPage(self: Self, page: int, per_page: int = 15) -> Self:
         """
         Limit the query to a single page of results.
 
@@ -1100,7 +1117,7 @@ class IQueryBuilderBase(ABC):
     # ── Locking and compounds ───────────────────────────────────────────────
 
     @abstractmethod
-    def lockForUpdate(self) -> Self:
+    def lockForUpdate(self: Self) -> Self:
         """
         Lock the selected rows against concurrent writes.
 
@@ -1111,7 +1128,7 @@ class IQueryBuilderBase(ABC):
         """
 
     @abstractmethod
-    def sharedLock(self) -> Self:
+    def sharedLock(self: Self) -> Self:
         """
         Lock the selected rows in shared mode.
 
@@ -1122,7 +1139,7 @@ class IQueryBuilderBase(ABC):
         """
 
     @abstractmethod
-    def union(self, query: Any) -> Self:
+    def union(self: Self, query: Any) -> Self:
         """
         Append another query's rows, collapsing duplicates.
 
@@ -1138,7 +1155,7 @@ class IQueryBuilderBase(ABC):
         """
 
     @abstractmethod
-    def unionAll(self, query: Any) -> Self:
+    def unionAll(self: Self, query: Any) -> Self:
         """
         Append another query's rows, keeping duplicates.
 
@@ -1156,7 +1173,7 @@ class IQueryBuilderBase(ABC):
     # ── Aggregate terminals ─────────────────────────────────────────────────
 
     @abstractmethod
-    async def count(self, column: str = "*") -> int:
+    async def count(self: Self, column: str = "*") -> int:
         """
         Count the rows matched by the query.
 
@@ -1172,7 +1189,7 @@ class IQueryBuilderBase(ABC):
         """
 
     @abstractmethod
-    async def exists(self) -> bool:
+    async def exists(self: Self) -> bool:
         """
         Report whether the query matches at least one row.
 
@@ -1183,7 +1200,7 @@ class IQueryBuilderBase(ABC):
         """
 
     @abstractmethod
-    async def doesntExist(self) -> bool:
+    async def doesntExist(self: Self) -> bool:
         """
         Report whether the query matches no rows.
 
@@ -1194,7 +1211,7 @@ class IQueryBuilderBase(ABC):
         """
 
     @abstractmethod
-    async def max(self, column: str) -> Any:
+    async def max(self: Self, column: str) -> Any:
         """
         Return the maximum value of a column among matching rows.
 
@@ -1210,7 +1227,7 @@ class IQueryBuilderBase(ABC):
         """
 
     @abstractmethod
-    async def min(self, column: str) -> Any:
+    async def min(self: Self, column: str) -> Any:
         """
         Return the minimum value of a column among matching rows.
 
@@ -1226,7 +1243,7 @@ class IQueryBuilderBase(ABC):
         """
 
     @abstractmethod
-    async def avg(self, column: str) -> float | None:
+    async def avg(self: Self, column: str) -> float | None:
         """
         Return the average value of a column among matching rows.
 
@@ -1242,7 +1259,7 @@ class IQueryBuilderBase(ABC):
         """
 
     @abstractmethod
-    async def sum(self, column: str) -> Any:
+    async def sum(self: Self, column: str) -> Any:
         """
         Return the sum of a column among matching rows.
 
@@ -1261,7 +1278,7 @@ class IQueryBuilderBase(ABC):
 
     @abstractmethod
     async def insert(
-        self,
+        self: Self,
         values: dict[str, Any] | list[dict[str, Any]],
     ) -> InsertResult:
         """
@@ -1279,7 +1296,7 @@ class IQueryBuilderBase(ABC):
         """
 
     @abstractmethod
-    async def update(self, values: dict[str, Any]) -> int:
+    async def update(self: Self, values: dict[str, Any]) -> int:
         """
         Mass update the rows matched by the query.
 
@@ -1295,7 +1312,7 @@ class IQueryBuilderBase(ABC):
         """
 
     @abstractmethod
-    async def delete(self) -> int:
+    async def delete(self: Self) -> int:
         """
         Delete the rows matched by the query.
 

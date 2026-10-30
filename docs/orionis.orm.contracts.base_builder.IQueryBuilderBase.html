@@ -184,6 +184,16 @@
         
 
         
+            <div class="itemName"><code><a href="#chunks" class="internal-link" title="orionis.orm.contracts.base_builder.IQueryBuilderBase.chunks">chunks</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
             <div class="itemName"><code><a href="#clone" class="internal-link" title="orionis.orm.contracts.base_builder.IQueryBuilderBase.clone">clone</a></code>
             </div>
         
@@ -895,7 +905,7 @@
         
         
             <div class="itemName expandableItem">
-                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId16272"> 
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId16342"> 
                     
                 </input>
 
@@ -936,6 +946,16 @@
 
         
             <div class="itemName"><code><a href="#avg" class="internal-link" title="orionis.orm.contracts.base_builder.IQueryBuilderBase.avg">avg</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#chunks" class="internal-link" title="orionis.orm.contracts.base_builder.IQueryBuilderBase.chunks">chunks</a></code>
             </div>
         
 
@@ -1710,7 +1730,7 @@
         </div>
 
         <div class="extrasDocstring">
-          <p class="class-signature"><code><span class="py-keyword">class</span> <span class="py-defname">IQueryBuilderBase</span>(<a href="https://docs.python.org/3/library/abc.html#abc.ABC" class="intersphinx-link">ABC</a>): <a href="https://github.com/orionis-framework/framework/tree/8ae1c9cdea922c91698bddea5d5837e41068ceb3/orionis/orm/contracts/base_builder.py#L11" class="sourceLink">(source)</a></code></p><p>Known subclasses: <code><a href="orionis.orm.contracts.IModelQueryBuilder.html" class="internal-link">orionis.orm.contracts.IModelQueryBuilder</a></code>, <code><a href="orionis.orm.contracts.raw_builder.IRawQueryBuilder.html" class="internal-link">orionis.orm.contracts.raw_builder.IRawQueryBuilder</a></code></p><p><a href="classIndex.html#orionis.orm.contracts.base_builder.IQueryBuilderBase">View In Hierarchy</a></p>
+          <p class="class-signature"><code><span class="py-keyword">class</span> <span class="py-defname">IQueryBuilderBase</span>(<a href="https://docs.python.org/3/library/abc.html#abc.ABC" class="intersphinx-link">ABC</a>): <a href="https://github.com/orionis-framework/framework/tree/cddd12900b7f7907cab71102ea2d3d150fc9db33/orionis/orm/contracts/base_builder.py#L12" class="sourceLink">(source)</a></code></p><p>Known subclasses: <code><a href="orionis.orm.contracts.IModelQueryBuilder.html" class="internal-link">orionis.orm.contracts.IModelQueryBuilder</a></code>, <code><a href="orionis.orm.contracts.raw_builder.IRawQueryBuilder.html" class="internal-link">orionis.orm.contracts.raw_builder.IRawQueryBuilder</a></code></p><p><a href="classIndex.html#orionis.orm.contracts.base_builder.IQueryBuilderBase">View In Hierarchy</a></p>
         </div>
 
         <div class="moduleDocstring">
@@ -1725,7 +1745,7 @@ language.</p>
         </div>
 
         <div id="split-tables">
-          <table class="children sortable" id="id1516">
+          <table class="children sortable" id="id1529">
   
   
   <tr class="method">
@@ -1738,6 +1758,11 @@ language.</p>
     <td>Async Method</td>
     <td><code><a href="#avg" class="internal-link" title="orionis.orm.contracts.base_builder.IQueryBuilderBase.avg">avg</a></code></td>
     <td>Return the average value of a column among matching rows.</td>
+  </tr><tr class="method">
+    
+    <td>Method</td>
+    <td><code><a href="#chunks" class="internal-link" title="orionis.orm.contracts.base_builder.IQueryBuilderBase.chunks">chunks</a></code></td>
+    <td>Iterate bounded, explicitly ordered result batches when supported.</td>
   </tr><tr class="method">
     
     <td>Method</td>
@@ -2098,8 +2123,8 @@ language.</p>
   <div class="functionHeader">
     
     <div><span class="decorator">@<a href="https://docs.python.org/3/library/abc.html#abc.abstractmethod" class="intersphinx-link">abstractmethod</a><br /></span></div>
-    <span class="py-keyword">def</span>&#160;<span class="py-defname">addSelect</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">*columns: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></span>) -&gt; <code><a href="https://docs.python.org/3/library/typing.html#typing.Self" class="intersphinx-link">Self</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/8ae1c9cdea922c91698bddea5d5837e41068ceb3/orionis/orm/contracts/base_builder.py#L69">
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">addSelect</span><span class="function-signature">(<span class="rst-sig-param">self: <code><a href="https://docs.python.org/3/library/typing.html#typing.Self" class="intersphinx-link">Self</a></code>, </span><span class="rst-sig-param">*columns: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></span>) -&gt; <code><a href="https://docs.python.org/3/library/typing.html#typing.Self" class="intersphinx-link">Self</a></code>:</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/cddd12900b7f7907cab71102ea2d3d150fc9db33/orionis/orm/contracts/base_builder.py#L86">
       
       (source)
     </a>
@@ -2125,8 +2150,8 @@ language.</p>
   <div class="functionHeader">
     
     <div><span class="decorator">@<a href="https://docs.python.org/3/library/abc.html#abc.abstractmethod" class="intersphinx-link">abstractmethod</a><br /></span></div>
-    <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">avg</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">column: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/functions.html#float" class="intersphinx-link">float</a> | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/8ae1c9cdea922c91698bddea5d5837e41068ceb3/orionis/orm/contracts/base_builder.py#L1228">
+    <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">avg</span><span class="function-signature">(<span class="rst-sig-param">self: <code><a href="https://docs.python.org/3/library/typing.html#typing.Self" class="intersphinx-link">Self</a></code>, </span><span class="rst-sig-param">column: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/functions.html#float" class="intersphinx-link">float</a> | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code>:</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/cddd12900b7f7907cab71102ea2d3d150fc9db33/orionis/orm/contracts/base_builder.py#L1245">
       
       (source)
     </a>
@@ -2143,6 +2168,33 @@ language.</p>
 </div><div class="basemethod">
   
   
+  <a name="orionis.orm.contracts.base_builder.IQueryBuilderBase.chunks">
+    
+  </a>
+  <a name="chunks">
+    
+  </a>
+  <div class="functionHeader">
+    
+    
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">chunks</span><span class="function-signature">(<span class="rst-sig-param">self: <code><a href="https://docs.python.org/3/library/typing.html#typing.Self" class="intersphinx-link">Self</a></code>, </span><span class="rst-sig-param">size: <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code> = 1000</span>) -&gt; <code><a href="https://docs.python.org/3/library/collections.abc.html#collections.abc.AsyncIterator" class="intersphinx-link">AsyncIterator</a>[<wbr></wbr>Collection]</code>:</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/cddd12900b7f7907cab71102ea2d3d150fc9db33/orionis/orm/contracts/base_builder.py#L28">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#chunks" title="orionis.orm.contracts.base_builder.IQueryBuilderBase.chunks">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    
+    <div><p>Iterate bounded, explicitly ordered result batches when supported.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">size:</span><code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code></td><td class="fieldArgDesc">Maximum rows per batch.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/library/collections.abc.html#collections.abc.AsyncIterator" class="intersphinx-link">AsyncIterator</a>[<a href="orionis.support.types.Collection.html" class="internal-link" title="orionis.support.types.Collection">Collection</a>]</code></td><td class="fieldArgDesc">Iterator of rows or hydrated models.</td></tr></table></div>
+  </div>
+</div><div class="basemethod">
+  
+  
   <a name="orionis.orm.contracts.base_builder.IQueryBuilderBase.clone">
     
   </a>
@@ -2152,8 +2204,8 @@ language.</p>
   <div class="functionHeader">
     
     <div><span class="decorator">@<a href="https://docs.python.org/3/library/abc.html#abc.abstractmethod" class="intersphinx-link">abstractmethod</a><br /></span></div>
-    <span class="py-keyword">def</span>&#160;<span class="py-defname">clone</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>) -&gt; <code><a href="https://docs.python.org/3/library/typing.html#typing.Self" class="intersphinx-link">Self</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/8ae1c9cdea922c91698bddea5d5837e41068ceb3/orionis/orm/contracts/base_builder.py#L40">
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">clone</span><span class="function-signature">(<span class="rst-sig-param">self: <code><a href="https://docs.python.org/3/library/typing.html#typing.Self" class="intersphinx-link">Self</a></code></span>) -&gt; <code><a href="https://docs.python.org/3/library/typing.html#typing.Self" class="intersphinx-link">Self</a></code>:</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/cddd12900b7f7907cab71102ea2d3d150fc9db33/orionis/orm/contracts/base_builder.py#L57">
       
       (source)
     </a>
@@ -2179,8 +2231,8 @@ language.</p>
   <div class="functionHeader">
     
     <div><span class="decorator">@<a href="https://docs.python.org/3/library/abc.html#abc.abstractmethod" class="intersphinx-link">abstractmethod</a><br /></span></div>
-    <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">count</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">column: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code> = <span class="rst-variable-quote">'</span><span class="rst-variable-string">*</span><span class="rst-variable-quote">'</span></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/8ae1c9cdea922c91698bddea5d5837e41068ceb3/orionis/orm/contracts/base_builder.py#L1158">
+    <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">count</span><span class="function-signature">(<span class="rst-sig-param">self: <code><a href="https://docs.python.org/3/library/typing.html#typing.Self" class="intersphinx-link">Self</a></code>, </span><span class="rst-sig-param">column: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code> = <span class="rst-variable-quote">'</span><span class="rst-variable-string">*</span><span class="rst-variable-quote">'</span></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code>:</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/cddd12900b7f7907cab71102ea2d3d150fc9db33/orionis/orm/contracts/base_builder.py#L1175">
       
       (source)
     </a>
@@ -2206,8 +2258,8 @@ language.</p>
   <div class="functionHeader">
     
     <div><span class="decorator">@<a href="https://docs.python.org/3/library/abc.html#abc.abstractmethod" class="intersphinx-link">abstractmethod</a><br /></span></div>
-    <span class="py-keyword">def</span>&#160;<span class="py-defname">crossJoin</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">table: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a> | TableDefinition</code>, </span><span class="rst-sig-symbol">*, </span><span class="rst-sig-param">alias: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a> | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code> = <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></span>) -&gt; <code><a href="https://docs.python.org/3/library/typing.html#typing.Self" class="intersphinx-link">Self</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/8ae1c9cdea922c91698bddea5d5837e41068ceb3/orionis/orm/contracts/base_builder.py#L776">
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">crossJoin</span><span class="function-signature">(<span class="rst-sig-param">self: <code><a href="https://docs.python.org/3/library/typing.html#typing.Self" class="intersphinx-link">Self</a></code>, </span><span class="rst-sig-param">table: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a> | TableDefinition</code>, </span><span class="rst-sig-symbol">*, </span><span class="rst-sig-param">alias: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a> | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code> = <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></span>) -&gt; <code><a href="https://docs.python.org/3/library/typing.html#typing.Self" class="intersphinx-link">Self</a></code>:</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/cddd12900b7f7907cab71102ea2d3d150fc9db33/orionis/orm/contracts/base_builder.py#L793">
       
       (source)
     </a>
@@ -2233,8 +2285,8 @@ language.</p>
   <div class="functionHeader">
     
     <div><span class="decorator">@<a href="https://docs.python.org/3/library/abc.html#abc.abstractmethod" class="intersphinx-link">abstractmethod</a><br /></span></div>
-    <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">delete</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/8ae1c9cdea922c91698bddea5d5837e41068ceb3/orionis/orm/contracts/base_builder.py#L1297">
+    <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">delete</span><span class="function-signature">(<span class="rst-sig-param">self: <code><a href="https://docs.python.org/3/library/typing.html#typing.Self" class="intersphinx-link">Self</a></code></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code>:</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/cddd12900b7f7907cab71102ea2d3d150fc9db33/orionis/orm/contracts/base_builder.py#L1314">
       
       (source)
     </a>
@@ -2260,8 +2312,8 @@ language.</p>
   <div class="functionHeader">
     
     <div><span class="decorator">@<a href="https://docs.python.org/3/library/abc.html#abc.abstractmethod" class="intersphinx-link">abstractmethod</a><br /></span></div>
-    <span class="py-keyword">def</span>&#160;<span class="py-defname">distinct</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>) -&gt; <code><a href="https://docs.python.org/3/library/typing.html#typing.Self" class="intersphinx-link">Self</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/8ae1c9cdea922c91698bddea5d5837e41068ceb3/orionis/orm/contracts/base_builder.py#L129">
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">distinct</span><span class="function-signature">(<span class="rst-sig-param">self: <code><a href="https://docs.python.org/3/library/typing.html#typing.Self" class="intersphinx-link">Self</a></code></span>) -&gt; <code><a href="https://docs.python.org/3/library/typing.html#typing.Self" class="intersphinx-link">Self</a></code>:</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/cddd12900b7f7907cab71102ea2d3d150fc9db33/orionis/orm/contracts/base_builder.py#L146">
       
       (source)
     </a>
@@ -2287,8 +2339,8 @@ language.</p>
   <div class="functionHeader">
     
     <div><span class="decorator">@<a href="https://docs.python.org/3/library/abc.html#abc.abstractmethod" class="intersphinx-link">abstractmethod</a><br /></span></div>
-    <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">doesntExist</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/8ae1c9cdea922c91698bddea5d5837e41068ceb3/orionis/orm/contracts/base_builder.py#L1185">
+    <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">doesntExist</span><span class="function-signature">(<span class="rst-sig-param">self: <code><a href="https://docs.python.org/3/library/typing.html#typing.Self" class="intersphinx-link">Self</a></code></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code>:</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/cddd12900b7f7907cab71102ea2d3d150fc9db33/orionis/orm/contracts/base_builder.py#L1202">
       
       (source)
     </a>
@@ -2314,8 +2366,8 @@ language.</p>
   <div class="functionHeader">
     
     <div><span class="decorator">@<a href="https://docs.python.org/3/library/abc.html#abc.abstractmethod" class="intersphinx-link">abstractmethod</a><br /></span></div>
-    <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">exists</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/8ae1c9cdea922c91698bddea5d5837e41068ceb3/orionis/orm/contracts/base_builder.py#L1174">
+    <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">exists</span><span class="function-signature">(<span class="rst-sig-param">self: <code><a href="https://docs.python.org/3/library/typing.html#typing.Self" class="intersphinx-link">Self</a></code></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code>:</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/cddd12900b7f7907cab71102ea2d3d150fc9db33/orionis/orm/contracts/base_builder.py#L1191">
       
       (source)
     </a>
@@ -2341,8 +2393,8 @@ language.</p>
   <div class="functionHeader">
     
     <div><span class="decorator">@<a href="https://docs.python.org/3/library/abc.html#abc.abstractmethod" class="intersphinx-link">abstractmethod</a><br /></span></div>
-    <span class="py-keyword">def</span>&#160;<span class="py-defname">forPage</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">page: <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code>, </span><span class="rst-sig-param">per_page: <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code> = 15</span>) -&gt; <code><a href="https://docs.python.org/3/library/typing.html#typing.Self" class="intersphinx-link">Self</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/8ae1c9cdea922c91698bddea5d5837e41068ceb3/orionis/orm/contracts/base_builder.py#L1082">
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">forPage</span><span class="function-signature">(<span class="rst-sig-param">self: <code><a href="https://docs.python.org/3/library/typing.html#typing.Self" class="intersphinx-link">Self</a></code>, </span><span class="rst-sig-param">page: <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code>, </span><span class="rst-sig-param">per_page: <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code> = 15</span>) -&gt; <code><a href="https://docs.python.org/3/library/typing.html#typing.Self" class="intersphinx-link">Self</a></code>:</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/cddd12900b7f7907cab71102ea2d3d150fc9db33/orionis/orm/contracts/base_builder.py#L1099">
       
       (source)
     </a>
@@ -2368,8 +2420,8 @@ language.</p>
   <div class="functionHeader">
     
     <div><span class="decorator">@<a href="https://docs.python.org/3/library/abc.html#abc.abstractmethod" class="intersphinx-link">abstractmethod</a><br /></span></div>
-    <span class="py-keyword">def</span>&#160;<span class="py-defname">fullJoin</span><span class="function-signature long-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">table: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a> | TableDefinition</code>, </span><span class="rst-sig-param">first: <code><a href="https://docs.python.org/3/library/typing.html#typing.Any" class="intersphinx-link">Any</a></code> = <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a>, </span><span class="rst-sig-param">operator: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a> | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code> = <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a>, </span><span class="rst-sig-param">second: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a> | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code> = <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a>, </span><span class="rst-sig-symbol">*, </span><span class="rst-sig-param">alias: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a> | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code> = <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></span>) -&gt; <code><a href="https://docs.python.org/3/library/typing.html#typing.Self" class="intersphinx-link">Self</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/8ae1c9cdea922c91698bddea5d5837e41068ceb3/orionis/orm/contracts/base_builder.py#L744">
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">fullJoin</span><span class="function-signature long-signature">(<span class="rst-sig-param">self: <code><a href="https://docs.python.org/3/library/typing.html#typing.Self" class="intersphinx-link">Self</a></code>, </span><span class="rst-sig-param">table: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a> | TableDefinition</code>, </span><span class="rst-sig-param">first: <code><a href="https://docs.python.org/3/library/typing.html#typing.Any" class="intersphinx-link">Any</a> | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code> = <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a>, </span><span class="rst-sig-param">operator: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a> | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code> = <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a>, </span><span class="rst-sig-param">second: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a> | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code> = <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a>, </span><span class="rst-sig-symbol">*, </span><span class="rst-sig-param">alias: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a> | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code> = <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></span>) -&gt; <code><a href="https://docs.python.org/3/library/typing.html#typing.Self" class="intersphinx-link">Self</a></code>:</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/cddd12900b7f7907cab71102ea2d3d150fc9db33/orionis/orm/contracts/base_builder.py#L761">
       
       (source)
     </a>
@@ -2395,8 +2447,8 @@ language.</p>
   <div class="functionHeader">
     
     <div><span class="decorator">@<a href="https://docs.python.org/3/library/abc.html#abc.abstractmethod" class="intersphinx-link">abstractmethod</a><br /></span></div>
-    <span class="py-keyword">def</span>&#160;<span class="py-defname">groupBy</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">*columns: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></span>) -&gt; <code><a href="https://docs.python.org/3/library/typing.html#typing.Self" class="intersphinx-link">Self</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/8ae1c9cdea922c91698bddea5d5837e41068ceb3/orionis/orm/contracts/base_builder.py#L944">
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">groupBy</span><span class="function-signature">(<span class="rst-sig-param">self: <code><a href="https://docs.python.org/3/library/typing.html#typing.Self" class="intersphinx-link">Self</a></code>, </span><span class="rst-sig-param">*columns: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></span>) -&gt; <code><a href="https://docs.python.org/3/library/typing.html#typing.Self" class="intersphinx-link">Self</a></code>:</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/cddd12900b7f7907cab71102ea2d3d150fc9db33/orionis/orm/contracts/base_builder.py#L961">
       
       (source)
     </a>
@@ -2422,8 +2474,8 @@ language.</p>
   <div class="functionHeader">
     
     <div><span class="decorator">@<a href="https://docs.python.org/3/library/abc.html#abc.abstractmethod" class="intersphinx-link">abstractmethod</a><br /></span></div>
-    <span class="py-keyword">def</span>&#160;<span class="py-defname">having</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">column: <code><a href="https://docs.python.org/3/library/typing.html#typing.Any" class="intersphinx-link">Any</a></code>, </span><span class="rst-sig-param">*args: <code><a href="https://docs.python.org/3/library/typing.html#typing.Any" class="intersphinx-link">Any</a></code></span>) -&gt; <code><a href="https://docs.python.org/3/library/typing.html#typing.Self" class="intersphinx-link">Self</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/8ae1c9cdea922c91698bddea5d5837e41068ceb3/orionis/orm/contracts/base_builder.py#L960">
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">having</span><span class="function-signature">(<span class="rst-sig-param">self: <code><a href="https://docs.python.org/3/library/typing.html#typing.Self" class="intersphinx-link">Self</a></code>, </span><span class="rst-sig-param">column: <code><a href="https://docs.python.org/3/library/typing.html#typing.Any" class="intersphinx-link">Any</a></code>, </span><span class="rst-sig-param">*args: <code><a href="https://docs.python.org/3/library/typing.html#typing.Any" class="intersphinx-link">Any</a></code></span>) -&gt; <code><a href="https://docs.python.org/3/library/typing.html#typing.Self" class="intersphinx-link">Self</a></code>:</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/cddd12900b7f7907cab71102ea2d3d150fc9db33/orionis/orm/contracts/base_builder.py#L977">
       
       (source)
     </a>
@@ -2449,8 +2501,8 @@ language.</p>
   <div class="functionHeader">
     
     <div><span class="decorator">@<a href="https://docs.python.org/3/library/abc.html#abc.abstractmethod" class="intersphinx-link">abstractmethod</a><br /></span></div>
-    <span class="py-keyword">def</span>&#160;<span class="py-defname">havingRaw</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">sql: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code>, </span><span class="rst-sig-param">bindings: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#dict" class="intersphinx-link">dict</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <wbr></wbr><a href="https://docs.python.org/3/library/typing.html#typing.Any" class="intersphinx-link">Any</a>] | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code> = <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></span>) -&gt; <code><a href="https://docs.python.org/3/library/typing.html#typing.Self" class="intersphinx-link">Self</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/8ae1c9cdea922c91698bddea5d5837e41068ceb3/orionis/orm/contracts/base_builder.py#L996">
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">havingRaw</span><span class="function-signature">(<span class="rst-sig-param">self: <code><a href="https://docs.python.org/3/library/typing.html#typing.Self" class="intersphinx-link">Self</a></code>, </span><span class="rst-sig-param">sql: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code>, </span><span class="rst-sig-param">bindings: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#dict" class="intersphinx-link">dict</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <wbr></wbr><a href="https://docs.python.org/3/library/typing.html#typing.Any" class="intersphinx-link">Any</a>] | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code> = <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></span>) -&gt; <code><a href="https://docs.python.org/3/library/typing.html#typing.Self" class="intersphinx-link">Self</a></code>:</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/cddd12900b7f7907cab71102ea2d3d150fc9db33/orionis/orm/contracts/base_builder.py#L1013">
       
       (source)
     </a>
@@ -2476,8 +2528,8 @@ language.</p>
   <div class="functionHeader">
     
     <div><span class="decorator">@<a href="https://docs.python.org/3/library/abc.html#abc.abstractmethod" class="intersphinx-link">abstractmethod</a><br /></span></div>
-    <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">insert</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">values: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#dict" class="intersphinx-link">dict</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <wbr></wbr><a href="https://docs.python.org/3/library/typing.html#typing.Any" class="intersphinx-link">Any</a>] | <a href="https://docs.python.org/3/builtins/stdtypes.html#list" class="intersphinx-link">list</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#dict" class="intersphinx-link">dict</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <wbr></wbr><a href="https://docs.python.org/3/library/typing.html#typing.Any" class="intersphinx-link">Any</a>]]</code></span>) -&gt; <code>InsertResult</code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/8ae1c9cdea922c91698bddea5d5837e41068ceb3/orionis/orm/contracts/base_builder.py#L1262">
+    <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">insert</span><span class="function-signature">(<span class="rst-sig-param">self: <code><a href="https://docs.python.org/3/library/typing.html#typing.Self" class="intersphinx-link">Self</a></code>, </span><span class="rst-sig-param">values: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#dict" class="intersphinx-link">dict</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <wbr></wbr><a href="https://docs.python.org/3/library/typing.html#typing.Any" class="intersphinx-link">Any</a>] | <a href="https://docs.python.org/3/builtins/stdtypes.html#list" class="intersphinx-link">list</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#dict" class="intersphinx-link">dict</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <wbr></wbr><a href="https://docs.python.org/3/library/typing.html#typing.Any" class="intersphinx-link">Any</a>]]</code></span>) -&gt; <code>InsertResult</code>:</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/cddd12900b7f7907cab71102ea2d3d150fc9db33/orionis/orm/contracts/base_builder.py#L1279">
       
       (source)
     </a>
@@ -2503,8 +2555,8 @@ language.</p>
   <div class="functionHeader">
     
     <div><span class="decorator">@<a href="https://docs.python.org/3/library/abc.html#abc.abstractmethod" class="intersphinx-link">abstractmethod</a><br /></span></div>
-    <span class="py-keyword">def</span>&#160;<span class="py-defname">join</span><span class="function-signature long-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">table: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a> | TableDefinition</code>, </span><span class="rst-sig-param">first: <code><a href="https://docs.python.org/3/library/typing.html#typing.Any" class="intersphinx-link">Any</a></code> = <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a>, </span><span class="rst-sig-param">operator: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a> | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code> = <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a>, </span><span class="rst-sig-param">second: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a> | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code> = <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a>, </span><span class="rst-sig-symbol">*, </span><span class="rst-sig-param">alias: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a> | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code> = <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></span>) -&gt; <code><a href="https://docs.python.org/3/library/typing.html#typing.Self" class="intersphinx-link">Self</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/8ae1c9cdea922c91698bddea5d5837e41068ceb3/orionis/orm/contracts/base_builder.py#L647">
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">join</span><span class="function-signature long-signature">(<span class="rst-sig-param">self: <code><a href="https://docs.python.org/3/library/typing.html#typing.Self" class="intersphinx-link">Self</a></code>, </span><span class="rst-sig-param">table: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a> | TableDefinition</code>, </span><span class="rst-sig-param">first: <code><a href="https://docs.python.org/3/library/typing.html#typing.Any" class="intersphinx-link">Any</a> | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code> = <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a>, </span><span class="rst-sig-param">operator: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a> | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code> = <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a>, </span><span class="rst-sig-param">second: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a> | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code> = <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a>, </span><span class="rst-sig-symbol">*, </span><span class="rst-sig-param">alias: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a> | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code> = <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></span>) -&gt; <code><a href="https://docs.python.org/3/library/typing.html#typing.Self" class="intersphinx-link">Self</a></code>:</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/cddd12900b7f7907cab71102ea2d3d150fc9db33/orionis/orm/contracts/base_builder.py#L664">
       
       (source)
     </a>
@@ -2531,8 +2583,8 @@ receiving a join clause to declare several conditions.</td></tr><tr><td class="f
   <div class="functionHeader">
     
     <div><span class="decorator">@<a href="https://docs.python.org/3/library/abc.html#abc.abstractmethod" class="intersphinx-link">abstractmethod</a><br /></span></div>
-    <span class="py-keyword">def</span>&#160;<span class="py-defname">joinSub</span><span class="function-signature long-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">query: <code><a href="https://docs.python.org/3/library/typing.html#typing.Any" class="intersphinx-link">Any</a></code>, </span><span class="rst-sig-param">alias: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code>, </span><span class="rst-sig-param">first: <code><a href="https://docs.python.org/3/library/typing.html#typing.Any" class="intersphinx-link">Any</a></code> = <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a>, </span><span class="rst-sig-param">operator: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a> | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code> = <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a>, </span><span class="rst-sig-param">second: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a> | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code> = <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></span>) -&gt; <code><a href="https://docs.python.org/3/library/typing.html#typing.Self" class="intersphinx-link">Self</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/8ae1c9cdea922c91698bddea5d5837e41068ceb3/orionis/orm/contracts/base_builder.py#L799">
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">joinSub</span><span class="function-signature long-signature">(<span class="rst-sig-param">self: <code><a href="https://docs.python.org/3/library/typing.html#typing.Self" class="intersphinx-link">Self</a></code>, </span><span class="rst-sig-param">query: <code><a href="https://docs.python.org/3/library/typing.html#typing.Any" class="intersphinx-link">Any</a></code>, </span><span class="rst-sig-param">alias: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code>, </span><span class="rst-sig-param">first: <code><a href="https://docs.python.org/3/library/typing.html#typing.Any" class="intersphinx-link">Any</a> | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code> = <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a>, </span><span class="rst-sig-param">operator: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a> | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code> = <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a>, </span><span class="rst-sig-param">second: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a> | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code> = <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></span>) -&gt; <code><a href="https://docs.python.org/3/library/typing.html#typing.Self" class="intersphinx-link">Self</a></code>:</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/cddd12900b7f7907cab71102ea2d3d150fc9db33/orionis/orm/contracts/base_builder.py#L816">
       
       (source)
     </a>
@@ -2558,8 +2610,8 @@ receiving a join clause to declare several conditions.</td></tr><tr><td class="f
   <div class="functionHeader">
     
     <div><span class="decorator">@<a href="https://docs.python.org/3/library/abc.html#abc.abstractmethod" class="intersphinx-link">abstractmethod</a><br /></span></div>
-    <span class="py-keyword">def</span>&#160;<span class="py-defname">latest</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">column: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a> | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code> = <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></span>) -&gt; <code><a href="https://docs.python.org/3/library/typing.html#typing.Self" class="intersphinx-link">Self</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/8ae1c9cdea922c91698bddea5d5837e41068ceb3/orionis/orm/contracts/base_builder.py#L912">
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">latest</span><span class="function-signature">(<span class="rst-sig-param">self: <code><a href="https://docs.python.org/3/library/typing.html#typing.Self" class="intersphinx-link">Self</a></code>, </span><span class="rst-sig-param">column: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a> | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code> = <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></span>) -&gt; <code><a href="https://docs.python.org/3/library/typing.html#typing.Self" class="intersphinx-link">Self</a></code>:</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/cddd12900b7f7907cab71102ea2d3d150fc9db33/orionis/orm/contracts/base_builder.py#L929">
       
       (source)
     </a>
@@ -2585,8 +2637,8 @@ receiving a join clause to declare several conditions.</td></tr><tr><td class="f
   <div class="functionHeader">
     
     <div><span class="decorator">@<a href="https://docs.python.org/3/library/abc.html#abc.abstractmethod" class="intersphinx-link">abstractmethod</a><br /></span></div>
-    <span class="py-keyword">def</span>&#160;<span class="py-defname">leftJoin</span><span class="function-signature long-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">table: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a> | TableDefinition</code>, </span><span class="rst-sig-param">first: <code><a href="https://docs.python.org/3/library/typing.html#typing.Any" class="intersphinx-link">Any</a></code> = <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a>, </span><span class="rst-sig-param">operator: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a> | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code> = <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a>, </span><span class="rst-sig-param">second: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a> | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code> = <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a>, </span><span class="rst-sig-symbol">*, </span><span class="rst-sig-param">alias: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a> | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code> = <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></span>) -&gt; <code><a href="https://docs.python.org/3/library/typing.html#typing.Self" class="intersphinx-link">Self</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/8ae1c9cdea922c91698bddea5d5837e41068ceb3/orionis/orm/contracts/base_builder.py#L680">
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">leftJoin</span><span class="function-signature long-signature">(<span class="rst-sig-param">self: <code><a href="https://docs.python.org/3/library/typing.html#typing.Self" class="intersphinx-link">Self</a></code>, </span><span class="rst-sig-param">table: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a> | TableDefinition</code>, </span><span class="rst-sig-param">first: <code><a href="https://docs.python.org/3/library/typing.html#typing.Any" class="intersphinx-link">Any</a> | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code> = <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a>, </span><span class="rst-sig-param">operator: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a> | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code> = <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a>, </span><span class="rst-sig-param">second: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a> | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code> = <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a>, </span><span class="rst-sig-symbol">*, </span><span class="rst-sig-param">alias: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a> | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code> = <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></span>) -&gt; <code><a href="https://docs.python.org/3/library/typing.html#typing.Self" class="intersphinx-link">Self</a></code>:</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/cddd12900b7f7907cab71102ea2d3d150fc9db33/orionis/orm/contracts/base_builder.py#L697">
       
       (source)
     </a>
@@ -2612,8 +2664,8 @@ receiving a join clause to declare several conditions.</td></tr><tr><td class="f
   <div class="functionHeader">
     
     <div><span class="decorator">@<a href="https://docs.python.org/3/library/abc.html#abc.abstractmethod" class="intersphinx-link">abstractmethod</a><br /></span></div>
-    <span class="py-keyword">def</span>&#160;<span class="py-defname">leftJoinSub</span><span class="function-signature long-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">query: <code><a href="https://docs.python.org/3/library/typing.html#typing.Any" class="intersphinx-link">Any</a></code>, </span><span class="rst-sig-param">alias: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code>, </span><span class="rst-sig-param">first: <code><a href="https://docs.python.org/3/library/typing.html#typing.Any" class="intersphinx-link">Any</a></code> = <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a>, </span><span class="rst-sig-param">operator: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a> | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code> = <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a>, </span><span class="rst-sig-param">second: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a> | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code> = <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></span>) -&gt; <code><a href="https://docs.python.org/3/library/typing.html#typing.Self" class="intersphinx-link">Self</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/8ae1c9cdea922c91698bddea5d5837e41068ceb3/orionis/orm/contracts/base_builder.py#L830">
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">leftJoinSub</span><span class="function-signature long-signature">(<span class="rst-sig-param">self: <code><a href="https://docs.python.org/3/library/typing.html#typing.Self" class="intersphinx-link">Self</a></code>, </span><span class="rst-sig-param">query: <code><a href="https://docs.python.org/3/library/typing.html#typing.Any" class="intersphinx-link">Any</a></code>, </span><span class="rst-sig-param">alias: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code>, </span><span class="rst-sig-param">first: <code><a href="https://docs.python.org/3/library/typing.html#typing.Any" class="intersphinx-link">Any</a> | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code> = <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a>, </span><span class="rst-sig-param">operator: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a> | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code> = <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a>, </span><span class="rst-sig-param">second: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a> | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code> = <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></span>) -&gt; <code><a href="https://docs.python.org/3/library/typing.html#typing.Self" class="intersphinx-link">Self</a></code>:</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/cddd12900b7f7907cab71102ea2d3d150fc9db33/orionis/orm/contracts/base_builder.py#L847">
       
       (source)
     </a>
@@ -2639,8 +2691,8 @@ receiving a join clause to declare several conditions.</td></tr><tr><td class="f
   <div class="functionHeader">
     
     <div><span class="decorator">@<a href="https://docs.python.org/3/library/abc.html#abc.abstractmethod" class="intersphinx-link">abstractmethod</a><br /></span></div>
-    <span class="py-keyword">def</span>&#160;<span class="py-defname">limit</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">value: <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code></span>) -&gt; <code><a href="https://docs.python.org/3/library/typing.html#typing.Self" class="intersphinx-link">Self</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/8ae1c9cdea922c91698bddea5d5837e41068ceb3/orionis/orm/contracts/base_builder.py#L1018">
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">limit</span><span class="function-signature">(<span class="rst-sig-param">self: <code><a href="https://docs.python.org/3/library/typing.html#typing.Self" class="intersphinx-link">Self</a></code>, </span><span class="rst-sig-param">value: <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code></span>) -&gt; <code><a href="https://docs.python.org/3/library/typing.html#typing.Self" class="intersphinx-link">Self</a></code>:</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/cddd12900b7f7907cab71102ea2d3d150fc9db33/orionis/orm/contracts/base_builder.py#L1035">
       
       (source)
     </a>
@@ -2666,8 +2718,8 @@ receiving a join clause to declare several conditions.</td></tr><tr><td class="f
   <div class="functionHeader">
     
     <div><span class="decorator">@<a href="https://docs.python.org/3/library/abc.html#abc.abstractmethod" class="intersphinx-link">abstractmethod</a><br /></span></div>
-    <span class="py-keyword">def</span>&#160;<span class="py-defname">lockForUpdate</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>) -&gt; <code><a href="https://docs.python.org/3/library/typing.html#typing.Self" class="intersphinx-link">Self</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/8ae1c9cdea922c91698bddea5d5837e41068ceb3/orionis/orm/contracts/base_builder.py#L1102">
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">lockForUpdate</span><span class="function-signature">(<span class="rst-sig-param">self: <code><a href="https://docs.python.org/3/library/typing.html#typing.Self" class="intersphinx-link">Self</a></code></span>) -&gt; <code><a href="https://docs.python.org/3/library/typing.html#typing.Self" class="intersphinx-link">Self</a></code>:</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/cddd12900b7f7907cab71102ea2d3d150fc9db33/orionis/orm/contracts/base_builder.py#L1119">
       
       (source)
     </a>
@@ -2693,8 +2745,8 @@ receiving a join clause to declare several conditions.</td></tr><tr><td class="f
   <div class="functionHeader">
     
     <div><span class="decorator">@<a href="https://docs.python.org/3/library/abc.html#abc.abstractmethod" class="intersphinx-link">abstractmethod</a><br /></span></div>
-    <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">max</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">column: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></span>) -&gt; <code><a href="https://docs.python.org/3/library/typing.html#typing.Any" class="intersphinx-link">Any</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/8ae1c9cdea922c91698bddea5d5837e41068ceb3/orionis/orm/contracts/base_builder.py#L1196">
+    <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">max</span><span class="function-signature">(<span class="rst-sig-param">self: <code><a href="https://docs.python.org/3/library/typing.html#typing.Self" class="intersphinx-link">Self</a></code>, </span><span class="rst-sig-param">column: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></span>) -&gt; <code><a href="https://docs.python.org/3/library/typing.html#typing.Any" class="intersphinx-link">Any</a></code>:</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/cddd12900b7f7907cab71102ea2d3d150fc9db33/orionis/orm/contracts/base_builder.py#L1213">
       
       (source)
     </a>
@@ -2720,8 +2772,8 @@ receiving a join clause to declare several conditions.</td></tr><tr><td class="f
   <div class="functionHeader">
     
     <div><span class="decorator">@<a href="https://docs.python.org/3/library/abc.html#abc.abstractmethod" class="intersphinx-link">abstractmethod</a><br /></span></div>
-    <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">min</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">column: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></span>) -&gt; <code><a href="https://docs.python.org/3/library/typing.html#typing.Any" class="intersphinx-link">Any</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/8ae1c9cdea922c91698bddea5d5837e41068ceb3/orionis/orm/contracts/base_builder.py#L1212">
+    <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">min</span><span class="function-signature">(<span class="rst-sig-param">self: <code><a href="https://docs.python.org/3/library/typing.html#typing.Self" class="intersphinx-link">Self</a></code>, </span><span class="rst-sig-param">column: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></span>) -&gt; <code><a href="https://docs.python.org/3/library/typing.html#typing.Any" class="intersphinx-link">Any</a></code>:</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/cddd12900b7f7907cab71102ea2d3d150fc9db33/orionis/orm/contracts/base_builder.py#L1229">
       
       (source)
     </a>
@@ -2747,8 +2799,8 @@ receiving a join clause to declare several conditions.</td></tr><tr><td class="f
   <div class="functionHeader">
     
     <div><span class="decorator">@<a href="https://docs.python.org/3/library/abc.html#abc.abstractmethod" class="intersphinx-link">abstractmethod</a><br /></span></div>
-    <span class="py-keyword">def</span>&#160;<span class="py-defname">offset</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">value: <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code></span>) -&gt; <code><a href="https://docs.python.org/3/library/typing.html#typing.Self" class="intersphinx-link">Self</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/8ae1c9cdea922c91698bddea5d5837e41068ceb3/orionis/orm/contracts/base_builder.py#L1034">
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">offset</span><span class="function-signature">(<span class="rst-sig-param">self: <code><a href="https://docs.python.org/3/library/typing.html#typing.Self" class="intersphinx-link">Self</a></code>, </span><span class="rst-sig-param">value: <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code></span>) -&gt; <code><a href="https://docs.python.org/3/library/typing.html#typing.Self" class="intersphinx-link">Self</a></code>:</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/cddd12900b7f7907cab71102ea2d3d150fc9db33/orionis/orm/contracts/base_builder.py#L1051">
       
       (source)
     </a>
@@ -2774,8 +2826,8 @@ receiving a join clause to declare several conditions.</td></tr><tr><td class="f
   <div class="functionHeader">
     
     <div><span class="decorator">@<a href="https://docs.python.org/3/library/abc.html#abc.abstractmethod" class="intersphinx-link">abstractmethod</a><br /></span></div>
-    <span class="py-keyword">def</span>&#160;<span class="py-defname">oldest</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">column: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a> | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code> = <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></span>) -&gt; <code><a href="https://docs.python.org/3/library/typing.html#typing.Self" class="intersphinx-link">Self</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/8ae1c9cdea922c91698bddea5d5837e41068ceb3/orionis/orm/contracts/base_builder.py#L928">
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">oldest</span><span class="function-signature">(<span class="rst-sig-param">self: <code><a href="https://docs.python.org/3/library/typing.html#typing.Self" class="intersphinx-link">Self</a></code>, </span><span class="rst-sig-param">column: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a> | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code> = <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></span>) -&gt; <code><a href="https://docs.python.org/3/library/typing.html#typing.Self" class="intersphinx-link">Self</a></code>:</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/cddd12900b7f7907cab71102ea2d3d150fc9db33/orionis/orm/contracts/base_builder.py#L945">
       
       (source)
     </a>
@@ -2801,8 +2853,8 @@ receiving a join clause to declare several conditions.</td></tr><tr><td class="f
   <div class="functionHeader">
     
     <div><span class="decorator">@<a href="https://docs.python.org/3/library/abc.html#abc.abstractmethod" class="intersphinx-link">abstractmethod</a><br /></span></div>
-    <span class="py-keyword">def</span>&#160;<span class="py-defname">orderBy</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">column: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code>, </span><span class="rst-sig-param">direction: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code> = <span class="rst-variable-quote">'</span><span class="rst-variable-string">asc</span><span class="rst-variable-quote">'</span></span>) -&gt; <code><a href="https://docs.python.org/3/library/typing.html#typing.Self" class="intersphinx-link">Self</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/8ae1c9cdea922c91698bddea5d5837e41068ceb3/orionis/orm/contracts/base_builder.py#L894">
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">orderBy</span><span class="function-signature">(<span class="rst-sig-param">self: <code><a href="https://docs.python.org/3/library/typing.html#typing.Self" class="intersphinx-link">Self</a></code>, </span><span class="rst-sig-param">column: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code>, </span><span class="rst-sig-param">direction: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code> = <span class="rst-variable-quote">'</span><span class="rst-variable-string">asc</span><span class="rst-variable-quote">'</span></span>) -&gt; <code><a href="https://docs.python.org/3/library/typing.html#typing.Self" class="intersphinx-link">Self</a></code>:</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/cddd12900b7f7907cab71102ea2d3d150fc9db33/orionis/orm/contracts/base_builder.py#L911">
       
       (source)
     </a>
@@ -2828,8 +2880,8 @@ receiving a join clause to declare several conditions.</td></tr><tr><td class="f
   <div class="functionHeader">
     
     <div><span class="decorator">@<a href="https://docs.python.org/3/library/abc.html#abc.abstractmethod" class="intersphinx-link">abstractmethod</a><br /></span></div>
-    <span class="py-keyword">def</span>&#160;<span class="py-defname">orHaving</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">column: <code><a href="https://docs.python.org/3/library/typing.html#typing.Any" class="intersphinx-link">Any</a></code>, </span><span class="rst-sig-param">*args: <code><a href="https://docs.python.org/3/library/typing.html#typing.Any" class="intersphinx-link">Any</a></code></span>) -&gt; <code><a href="https://docs.python.org/3/library/typing.html#typing.Self" class="intersphinx-link">Self</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/8ae1c9cdea922c91698bddea5d5837e41068ceb3/orionis/orm/contracts/base_builder.py#L978">
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">orHaving</span><span class="function-signature">(<span class="rst-sig-param">self: <code><a href="https://docs.python.org/3/library/typing.html#typing.Self" class="intersphinx-link">Self</a></code>, </span><span class="rst-sig-param">column: <code><a href="https://docs.python.org/3/library/typing.html#typing.Any" class="intersphinx-link">Any</a></code>, </span><span class="rst-sig-param">*args: <code><a href="https://docs.python.org/3/library/typing.html#typing.Any" class="intersphinx-link">Any</a></code></span>) -&gt; <code><a href="https://docs.python.org/3/library/typing.html#typing.Self" class="intersphinx-link">Self</a></code>:</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/cddd12900b7f7907cab71102ea2d3d150fc9db33/orionis/orm/contracts/base_builder.py#L995">
       
       (source)
     </a>
@@ -2855,8 +2907,8 @@ receiving a join clause to declare several conditions.</td></tr><tr><td class="f
   <div class="functionHeader">
     
     <div><span class="decorator">@<a href="https://docs.python.org/3/library/abc.html#abc.abstractmethod" class="intersphinx-link">abstractmethod</a><br /></span></div>
-    <span class="py-keyword">def</span>&#160;<span class="py-defname">orWhere</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">column: <code><a href="https://docs.python.org/3/library/typing.html#typing.Any" class="intersphinx-link">Any</a></code>, </span><span class="rst-sig-param">*args: <code><a href="https://docs.python.org/3/library/typing.html#typing.Any" class="intersphinx-link">Any</a></code></span>) -&gt; <code><a href="https://docs.python.org/3/library/typing.html#typing.Self" class="intersphinx-link">Self</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/8ae1c9cdea922c91698bddea5d5837e41068ceb3/orionis/orm/contracts/base_builder.py#L162">
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">orWhere</span><span class="function-signature">(<span class="rst-sig-param">self: <code><a href="https://docs.python.org/3/library/typing.html#typing.Self" class="intersphinx-link">Self</a></code>, </span><span class="rst-sig-param">column: <code><a href="https://docs.python.org/3/library/typing.html#typing.Any" class="intersphinx-link">Any</a></code>, </span><span class="rst-sig-param">*args: <code><a href="https://docs.python.org/3/library/typing.html#typing.Any" class="intersphinx-link">Any</a></code></span>) -&gt; <code><a href="https://docs.python.org/3/library/typing.html#typing.Self" class="intersphinx-link">Self</a></code>:</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/cddd12900b7f7907cab71102ea2d3d150fc9db33/orionis/orm/contracts/base_builder.py#L179">
       
       (source)
     </a>
@@ -2882,8 +2934,8 @@ receiving a join clause to declare several conditions.</td></tr><tr><td class="f
   <div class="functionHeader">
     
     <div><span class="decorator">@<a href="https://docs.python.org/3/library/abc.html#abc.abstractmethod" class="intersphinx-link">abstractmethod</a><br /></span></div>
-    <span class="py-keyword">def</span>&#160;<span class="py-defname">orWhereColumn</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">first: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code>, </span><span class="rst-sig-param">operator: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code>, </span><span class="rst-sig-param">second: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></span>) -&gt; <code><a href="https://docs.python.org/3/library/typing.html#typing.Self" class="intersphinx-link">Self</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/8ae1c9cdea922c91698bddea5d5837e41068ceb3/orionis/orm/contracts/base_builder.py#L516">
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">orWhereColumn</span><span class="function-signature">(<span class="rst-sig-param">self: <code><a href="https://docs.python.org/3/library/typing.html#typing.Self" class="intersphinx-link">Self</a></code>, </span><span class="rst-sig-param">first: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code>, </span><span class="rst-sig-param">operator: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code>, </span><span class="rst-sig-param">second: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></span>) -&gt; <code><a href="https://docs.python.org/3/library/typing.html#typing.Self" class="intersphinx-link">Self</a></code>:</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/cddd12900b7f7907cab71102ea2d3d150fc9db33/orionis/orm/contracts/base_builder.py#L533">
       
       (source)
     </a>
@@ -2909,8 +2961,8 @@ receiving a join clause to declare several conditions.</td></tr><tr><td class="f
   <div class="functionHeader">
     
     <div><span class="decorator">@<a href="https://docs.python.org/3/library/abc.html#abc.abstractmethod" class="intersphinx-link">abstractmethod</a><br /></span></div>
-    <span class="py-keyword">def</span>&#160;<span class="py-defname">orWhereExists</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">query: <code><a href="https://docs.python.org/3/library/typing.html#typing.Any" class="intersphinx-link">Any</a></code></span>) -&gt; <code><a href="https://docs.python.org/3/library/typing.html#typing.Self" class="intersphinx-link">Self</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/8ae1c9cdea922c91698bddea5d5837e41068ceb3/orionis/orm/contracts/base_builder.py#L597">
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">orWhereExists</span><span class="function-signature">(<span class="rst-sig-param">self: <code><a href="https://docs.python.org/3/library/typing.html#typing.Self" class="intersphinx-link">Self</a></code>, </span><span class="rst-sig-param">query: <code><a href="https://docs.python.org/3/library/typing.html#typing.Any" class="intersphinx-link">Any</a></code></span>) -&gt; <code><a href="https://docs.python.org/3/library/typing.html#typing.Self" class="intersphinx-link">Self</a></code>:</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/cddd12900b7f7907cab71102ea2d3d150fc9db33/orionis/orm/contracts/base_builder.py#L614">
       
       (source)
     </a>
@@ -2936,8 +2988,8 @@ receiving a join clause to declare several conditions.</td></tr><tr><td class="f
   <div class="functionHeader">
     
     <div><span class="decorator">@<a href="https://docs.python.org/3/library/abc.html#abc.abstractmethod" class="intersphinx-link">abstractmethod</a><br /></span></div>
-    <span class="py-keyword">def</span>&#160;<span class="py-defname">orWhereIn</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">column: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code>, </span><span class="rst-sig-param">values: <code><a href="https://docs.python.org/3/library/typing.html#typing.Any" class="intersphinx-link">Any</a></code></span>) -&gt; <code><a href="https://docs.python.org/3/library/typing.html#typing.Self" class="intersphinx-link">Self</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/8ae1c9cdea922c91698bddea5d5837e41068ceb3/orionis/orm/contracts/base_builder.py#L198">
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">orWhereIn</span><span class="function-signature">(<span class="rst-sig-param">self: <code><a href="https://docs.python.org/3/library/typing.html#typing.Self" class="intersphinx-link">Self</a></code>, </span><span class="rst-sig-param">column: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code>, </span><span class="rst-sig-param">values: <code><a href="https://docs.python.org/3/library/typing.html#typing.Any" class="intersphinx-link">Any</a></code></span>) -&gt; <code><a href="https://docs.python.org/3/library/typing.html#typing.Self" class="intersphinx-link">Self</a></code>:</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/cddd12900b7f7907cab71102ea2d3d150fc9db33/orionis/orm/contracts/base_builder.py#L215">
       
       (source)
     </a>
@@ -2963,8 +3015,8 @@ receiving a join clause to declare several conditions.</td></tr><tr><td class="f
   <div class="functionHeader">
     
     <div><span class="decorator">@<a href="https://docs.python.org/3/library/abc.html#abc.abstractmethod" class="intersphinx-link">abstractmethod</a><br /></span></div>
-    <span class="py-keyword">def</span>&#160;<span class="py-defname">orWhereNotExists</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">query: <code><a href="https://docs.python.org/3/library/typing.html#typing.Any" class="intersphinx-link">Any</a></code></span>) -&gt; <code><a href="https://docs.python.org/3/library/typing.html#typing.Self" class="intersphinx-link">Self</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/8ae1c9cdea922c91698bddea5d5837e41068ceb3/orionis/orm/contracts/base_builder.py#L629">
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">orWhereNotExists</span><span class="function-signature">(<span class="rst-sig-param">self: <code><a href="https://docs.python.org/3/library/typing.html#typing.Self" class="intersphinx-link">Self</a></code>, </span><span class="rst-sig-param">query: <code><a href="https://docs.python.org/3/library/typing.html#typing.Any" class="intersphinx-link">Any</a></code></span>) -&gt; <code><a href="https://docs.python.org/3/library/typing.html#typing.Self" class="intersphinx-link">Self</a></code>:</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/cddd12900b7f7907cab71102ea2d3d150fc9db33/orionis/orm/contracts/base_builder.py#L646">
       
       (source)
     </a>
@@ -2990,8 +3042,8 @@ receiving a join clause to declare several conditions.</td></tr><tr><td class="f
   <div class="functionHeader">
     
     <div><span class="decorator">@<a href="https://docs.python.org/3/library/abc.html#abc.abstractmethod" class="intersphinx-link">abstractmethod</a><br /></span></div>
-    <span class="py-keyword">def</span>&#160;<span class="py-defname">orWhereNotIn</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">column: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code>, </span><span class="rst-sig-param">values: <code><a href="https://docs.python.org/3/library/typing.html#typing.Any" class="intersphinx-link">Any</a></code></span>) -&gt; <code><a href="https://docs.python.org/3/library/typing.html#typing.Self" class="intersphinx-link">Self</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/8ae1c9cdea922c91698bddea5d5837e41068ceb3/orionis/orm/contracts/base_builder.py#L234">
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">orWhereNotIn</span><span class="function-signature">(<span class="rst-sig-param">self: <code><a href="https://docs.python.org/3/library/typing.html#typing.Self" class="intersphinx-link">Self</a></code>, </span><span class="rst-sig-param">column: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code>, </span><span class="rst-sig-param">values: <code><a href="https://docs.python.org/3/library/typing.html#typing.Any" class="intersphinx-link">Any</a></code></span>) -&gt; <code><a href="https://docs.python.org/3/library/typing.html#typing.Self" class="intersphinx-link">Self</a></code>:</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/cddd12900b7f7907cab71102ea2d3d150fc9db33/orionis/orm/contracts/base_builder.py#L251">
       
       (source)
     </a>
@@ -3017,8 +3069,8 @@ receiving a join clause to declare several conditions.</td></tr><tr><td class="f
   <div class="functionHeader">
     
     <div><span class="decorator">@<a href="https://docs.python.org/3/library/abc.html#abc.abstractmethod" class="intersphinx-link">abstractmethod</a><br /></span></div>
-    <span class="py-keyword">def</span>&#160;<span class="py-defname">orWhereNotNull</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">column: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></span>) -&gt; <code><a href="https://docs.python.org/3/library/typing.html#typing.Self" class="intersphinx-link">Self</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/8ae1c9cdea922c91698bddea5d5837e41068ceb3/orionis/orm/contracts/base_builder.py#L300">
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">orWhereNotNull</span><span class="function-signature">(<span class="rst-sig-param">self: <code><a href="https://docs.python.org/3/library/typing.html#typing.Self" class="intersphinx-link">Self</a></code>, </span><span class="rst-sig-param">column: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></span>) -&gt; <code><a href="https://docs.python.org/3/library/typing.html#typing.Self" class="intersphinx-link">Self</a></code>:</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/cddd12900b7f7907cab71102ea2d3d150fc9db33/orionis/orm/contracts/base_builder.py#L317">
       
       (source)
     </a>
@@ -3044,8 +3096,8 @@ receiving a join clause to declare several conditions.</td></tr><tr><td class="f
   <div class="functionHeader">
     
     <div><span class="decorator">@<a href="https://docs.python.org/3/library/abc.html#abc.abstractmethod" class="intersphinx-link">abstractmethod</a><br /></span></div>
-    <span class="py-keyword">def</span>&#160;<span class="py-defname">orWhereNull</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">column: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></span>) -&gt; <code><a href="https://docs.python.org/3/library/typing.html#typing.Self" class="intersphinx-link">Self</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/8ae1c9cdea922c91698bddea5d5837e41068ceb3/orionis/orm/contracts/base_builder.py#L268">
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">orWhereNull</span><span class="function-signature">(<span class="rst-sig-param">self: <code><a href="https://docs.python.org/3/library/typing.html#typing.Self" class="intersphinx-link">Self</a></code>, </span><span class="rst-sig-param">column: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></span>) -&gt; <code><a href="https://docs.python.org/3/library/typing.html#typing.Self" class="intersphinx-link">Self</a></code>:</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/cddd12900b7f7907cab71102ea2d3d150fc9db33/orionis/orm/contracts/base_builder.py#L285">
       
       (source)
     </a>
@@ -3071,8 +3123,8 @@ receiving a join clause to declare several conditions.</td></tr><tr><td class="f
   <div class="functionHeader">
     
     <div><span class="decorator">@<a href="https://docs.python.org/3/library/abc.html#abc.abstractmethod" class="intersphinx-link">abstractmethod</a><br /></span></div>
-    <span class="py-keyword">def</span>&#160;<span class="py-defname">orWhereRaw</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">sql: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code>, </span><span class="rst-sig-param">bindings: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#dict" class="intersphinx-link">dict</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <wbr></wbr><a href="https://docs.python.org/3/library/typing.html#typing.Any" class="intersphinx-link">Any</a>] | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code> = <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></span>) -&gt; <code><a href="https://docs.python.org/3/library/typing.html#typing.Self" class="intersphinx-link">Self</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/8ae1c9cdea922c91698bddea5d5837e41068ceb3/orionis/orm/contracts/base_builder.py#L558">
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">orWhereRaw</span><span class="function-signature">(<span class="rst-sig-param">self: <code><a href="https://docs.python.org/3/library/typing.html#typing.Self" class="intersphinx-link">Self</a></code>, </span><span class="rst-sig-param">sql: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code>, </span><span class="rst-sig-param">bindings: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#dict" class="intersphinx-link">dict</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <wbr></wbr><a href="https://docs.python.org/3/library/typing.html#typing.Any" class="intersphinx-link">Any</a>] | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code> = <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></span>) -&gt; <code><a href="https://docs.python.org/3/library/typing.html#typing.Self" class="intersphinx-link">Self</a></code>:</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/cddd12900b7f7907cab71102ea2d3d150fc9db33/orionis/orm/contracts/base_builder.py#L575">
       
       (source)
     </a>
@@ -3098,8 +3150,8 @@ receiving a join clause to declare several conditions.</td></tr><tr><td class="f
   <div class="functionHeader">
     
     <div><span class="decorator">@<a href="https://docs.python.org/3/library/abc.html#abc.abstractmethod" class="intersphinx-link">abstractmethod</a><br /></span></div>
-    <span class="py-keyword">def</span>&#160;<span class="py-defname">rightJoin</span><span class="function-signature long-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">table: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a> | TableDefinition</code>, </span><span class="rst-sig-param">first: <code><a href="https://docs.python.org/3/library/typing.html#typing.Any" class="intersphinx-link">Any</a></code> = <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a>, </span><span class="rst-sig-param">operator: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a> | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code> = <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a>, </span><span class="rst-sig-param">second: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a> | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code> = <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a>, </span><span class="rst-sig-symbol">*, </span><span class="rst-sig-param">alias: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a> | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code> = <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></span>) -&gt; <code><a href="https://docs.python.org/3/library/typing.html#typing.Self" class="intersphinx-link">Self</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/8ae1c9cdea922c91698bddea5d5837e41068ceb3/orionis/orm/contracts/base_builder.py#L712">
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">rightJoin</span><span class="function-signature long-signature">(<span class="rst-sig-param">self: <code><a href="https://docs.python.org/3/library/typing.html#typing.Self" class="intersphinx-link">Self</a></code>, </span><span class="rst-sig-param">table: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a> | TableDefinition</code>, </span><span class="rst-sig-param">first: <code><a href="https://docs.python.org/3/library/typing.html#typing.Any" class="intersphinx-link">Any</a> | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code> = <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a>, </span><span class="rst-sig-param">operator: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a> | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code> = <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a>, </span><span class="rst-sig-param">second: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a> | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code> = <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a>, </span><span class="rst-sig-symbol">*, </span><span class="rst-sig-param">alias: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a> | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code> = <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></span>) -&gt; <code><a href="https://docs.python.org/3/library/typing.html#typing.Self" class="intersphinx-link">Self</a></code>:</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/cddd12900b7f7907cab71102ea2d3d150fc9db33/orionis/orm/contracts/base_builder.py#L729">
       
       (source)
     </a>
@@ -3125,8 +3177,8 @@ receiving a join clause to declare several conditions.</td></tr><tr><td class="f
   <div class="functionHeader">
     
     <div><span class="decorator">@<a href="https://docs.python.org/3/library/abc.html#abc.abstractmethod" class="intersphinx-link">abstractmethod</a><br /></span></div>
-    <span class="py-keyword">def</span>&#160;<span class="py-defname">rightJoinSub</span><span class="function-signature long-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">query: <code><a href="https://docs.python.org/3/library/typing.html#typing.Any" class="intersphinx-link">Any</a></code>, </span><span class="rst-sig-param">alias: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code>, </span><span class="rst-sig-param">first: <code><a href="https://docs.python.org/3/library/typing.html#typing.Any" class="intersphinx-link">Any</a></code> = <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a>, </span><span class="rst-sig-param">operator: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a> | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code> = <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a>, </span><span class="rst-sig-param">second: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a> | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code> = <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></span>) -&gt; <code><a href="https://docs.python.org/3/library/typing.html#typing.Self" class="intersphinx-link">Self</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/8ae1c9cdea922c91698bddea5d5837e41068ceb3/orionis/orm/contracts/base_builder.py#L861">
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">rightJoinSub</span><span class="function-signature long-signature">(<span class="rst-sig-param">self: <code><a href="https://docs.python.org/3/library/typing.html#typing.Self" class="intersphinx-link">Self</a></code>, </span><span class="rst-sig-param">query: <code><a href="https://docs.python.org/3/library/typing.html#typing.Any" class="intersphinx-link">Any</a></code>, </span><span class="rst-sig-param">alias: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code>, </span><span class="rst-sig-param">first: <code><a href="https://docs.python.org/3/library/typing.html#typing.Any" class="intersphinx-link">Any</a> | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code> = <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a>, </span><span class="rst-sig-param">operator: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a> | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code> = <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a>, </span><span class="rst-sig-param">second: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a> | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code> = <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></span>) -&gt; <code><a href="https://docs.python.org/3/library/typing.html#typing.Self" class="intersphinx-link">Self</a></code>:</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/cddd12900b7f7907cab71102ea2d3d150fc9db33/orionis/orm/contracts/base_builder.py#L878">
       
       (source)
     </a>
@@ -3152,8 +3204,8 @@ receiving a join clause to declare several conditions.</td></tr><tr><td class="f
   <div class="functionHeader">
     
     <div><span class="decorator">@<a href="https://docs.python.org/3/library/abc.html#abc.abstractmethod" class="intersphinx-link">abstractmethod</a><br /></span></div>
-    <span class="py-keyword">def</span>&#160;<span class="py-defname">select</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">*columns: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></span>) -&gt; <code><a href="https://docs.python.org/3/library/typing.html#typing.Self" class="intersphinx-link">Self</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/8ae1c9cdea922c91698bddea5d5837e41068ceb3/orionis/orm/contracts/base_builder.py#L53">
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">select</span><span class="function-signature">(<span class="rst-sig-param">self: <code><a href="https://docs.python.org/3/library/typing.html#typing.Self" class="intersphinx-link">Self</a></code>, </span><span class="rst-sig-param">*columns: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></span>) -&gt; <code><a href="https://docs.python.org/3/library/typing.html#typing.Self" class="intersphinx-link">Self</a></code>:</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/cddd12900b7f7907cab71102ea2d3d150fc9db33/orionis/orm/contracts/base_builder.py#L70">
       
       (source)
     </a>
@@ -3179,8 +3231,8 @@ receiving a join clause to declare several conditions.</td></tr><tr><td class="f
   <div class="functionHeader">
     
     <div><span class="decorator">@<a href="https://docs.python.org/3/library/abc.html#abc.abstractmethod" class="intersphinx-link">abstractmethod</a><br /></span></div>
-    <span class="py-keyword">def</span>&#160;<span class="py-defname">selectRaw</span><span class="function-signature long-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">sql: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code>, </span><span class="rst-sig-param">bindings: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#dict" class="intersphinx-link">dict</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <wbr></wbr><a href="https://docs.python.org/3/library/typing.html#typing.Any" class="intersphinx-link">Any</a>] | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code> = <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a>, </span><span class="rst-sig-param">alias: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a> | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code> = <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></span>) -&gt; <code><a href="https://docs.python.org/3/library/typing.html#typing.Self" class="intersphinx-link">Self</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/8ae1c9cdea922c91698bddea5d5837e41068ceb3/orionis/orm/contracts/base_builder.py#L85">
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">selectRaw</span><span class="function-signature long-signature">(<span class="rst-sig-param">self: <code><a href="https://docs.python.org/3/library/typing.html#typing.Self" class="intersphinx-link">Self</a></code>, </span><span class="rst-sig-param">sql: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code>, </span><span class="rst-sig-param">bindings: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#dict" class="intersphinx-link">dict</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <wbr></wbr><a href="https://docs.python.org/3/library/typing.html#typing.Any" class="intersphinx-link">Any</a>] | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code> = <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a>, </span><span class="rst-sig-param">alias: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a> | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code> = <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></span>) -&gt; <code><a href="https://docs.python.org/3/library/typing.html#typing.Self" class="intersphinx-link">Self</a></code>:</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/cddd12900b7f7907cab71102ea2d3d150fc9db33/orionis/orm/contracts/base_builder.py#L102">
       
       (source)
     </a>
@@ -3206,8 +3258,8 @@ receiving a join clause to declare several conditions.</td></tr><tr><td class="f
   <div class="functionHeader">
     
     <div><span class="decorator">@<a href="https://docs.python.org/3/library/abc.html#abc.abstractmethod" class="intersphinx-link">abstractmethod</a><br /></span></div>
-    <span class="py-keyword">def</span>&#160;<span class="py-defname">selectSub</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">query: <code><a href="https://docs.python.org/3/library/typing.html#typing.Any" class="intersphinx-link">Any</a></code>, </span><span class="rst-sig-param">alias: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></span>) -&gt; <code><a href="https://docs.python.org/3/library/typing.html#typing.Self" class="intersphinx-link">Self</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/8ae1c9cdea922c91698bddea5d5837e41068ceb3/orionis/orm/contracts/base_builder.py#L110">
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">selectSub</span><span class="function-signature">(<span class="rst-sig-param">self: <code><a href="https://docs.python.org/3/library/typing.html#typing.Self" class="intersphinx-link">Self</a></code>, </span><span class="rst-sig-param">query: <code><a href="https://docs.python.org/3/library/typing.html#typing.Any" class="intersphinx-link">Any</a></code>, </span><span class="rst-sig-param">alias: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></span>) -&gt; <code><a href="https://docs.python.org/3/library/typing.html#typing.Self" class="intersphinx-link">Self</a></code>:</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/cddd12900b7f7907cab71102ea2d3d150fc9db33/orionis/orm/contracts/base_builder.py#L127">
       
       (source)
     </a>
@@ -3234,8 +3286,8 @@ ready-made select plan.</td></tr><tr><td class="fieldArgContainer"><span class="
   <div class="functionHeader">
     
     <div><span class="decorator">@<a href="https://docs.python.org/3/library/abc.html#abc.abstractmethod" class="intersphinx-link">abstractmethod</a><br /></span></div>
-    <span class="py-keyword">def</span>&#160;<span class="py-defname">sharedLock</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>) -&gt; <code><a href="https://docs.python.org/3/library/typing.html#typing.Self" class="intersphinx-link">Self</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/8ae1c9cdea922c91698bddea5d5837e41068ceb3/orionis/orm/contracts/base_builder.py#L1113">
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">sharedLock</span><span class="function-signature">(<span class="rst-sig-param">self: <code><a href="https://docs.python.org/3/library/typing.html#typing.Self" class="intersphinx-link">Self</a></code></span>) -&gt; <code><a href="https://docs.python.org/3/library/typing.html#typing.Self" class="intersphinx-link">Self</a></code>:</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/cddd12900b7f7907cab71102ea2d3d150fc9db33/orionis/orm/contracts/base_builder.py#L1130">
       
       (source)
     </a>
@@ -3261,8 +3313,8 @@ ready-made select plan.</td></tr><tr><td class="fieldArgContainer"><span class="
   <div class="functionHeader">
     
     <div><span class="decorator">@<a href="https://docs.python.org/3/library/abc.html#abc.abstractmethod" class="intersphinx-link">abstractmethod</a><br /></span></div>
-    <span class="py-keyword">def</span>&#160;<span class="py-defname">skip</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">value: <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code></span>) -&gt; <code><a href="https://docs.python.org/3/library/typing.html#typing.Self" class="intersphinx-link">Self</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/8ae1c9cdea922c91698bddea5d5837e41068ceb3/orionis/orm/contracts/base_builder.py#L1066">
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">skip</span><span class="function-signature">(<span class="rst-sig-param">self: <code><a href="https://docs.python.org/3/library/typing.html#typing.Self" class="intersphinx-link">Self</a></code>, </span><span class="rst-sig-param">value: <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code></span>) -&gt; <code><a href="https://docs.python.org/3/library/typing.html#typing.Self" class="intersphinx-link">Self</a></code>:</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/cddd12900b7f7907cab71102ea2d3d150fc9db33/orionis/orm/contracts/base_builder.py#L1083">
       
       (source)
     </a>
@@ -3288,8 +3340,8 @@ ready-made select plan.</td></tr><tr><td class="fieldArgContainer"><span class="
   <div class="functionHeader">
     
     <div><span class="decorator">@<a href="https://docs.python.org/3/library/abc.html#abc.abstractmethod" class="intersphinx-link">abstractmethod</a><br /></span></div>
-    <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">sum</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">column: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></span>) -&gt; <code><a href="https://docs.python.org/3/library/typing.html#typing.Any" class="intersphinx-link">Any</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/8ae1c9cdea922c91698bddea5d5837e41068ceb3/orionis/orm/contracts/base_builder.py#L1244">
+    <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">sum</span><span class="function-signature">(<span class="rst-sig-param">self: <code><a href="https://docs.python.org/3/library/typing.html#typing.Self" class="intersphinx-link">Self</a></code>, </span><span class="rst-sig-param">column: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></span>) -&gt; <code><a href="https://docs.python.org/3/library/typing.html#typing.Any" class="intersphinx-link">Any</a></code>:</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/cddd12900b7f7907cab71102ea2d3d150fc9db33/orionis/orm/contracts/base_builder.py#L1261">
       
       (source)
     </a>
@@ -3315,8 +3367,8 @@ ready-made select plan.</td></tr><tr><td class="fieldArgContainer"><span class="
   <div class="functionHeader">
     
     <div><span class="decorator">@<a href="https://docs.python.org/3/library/abc.html#abc.abstractmethod" class="intersphinx-link">abstractmethod</a><br /></span></div>
-    <span class="py-keyword">def</span>&#160;<span class="py-defname">take</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">value: <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code></span>) -&gt; <code><a href="https://docs.python.org/3/library/typing.html#typing.Self" class="intersphinx-link">Self</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/8ae1c9cdea922c91698bddea5d5837e41068ceb3/orionis/orm/contracts/base_builder.py#L1050">
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">take</span><span class="function-signature">(<span class="rst-sig-param">self: <code><a href="https://docs.python.org/3/library/typing.html#typing.Self" class="intersphinx-link">Self</a></code>, </span><span class="rst-sig-param">value: <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code></span>) -&gt; <code><a href="https://docs.python.org/3/library/typing.html#typing.Self" class="intersphinx-link">Self</a></code>:</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/cddd12900b7f7907cab71102ea2d3d150fc9db33/orionis/orm/contracts/base_builder.py#L1067">
       
       (source)
     </a>
@@ -3342,8 +3394,8 @@ ready-made select plan.</td></tr><tr><td class="fieldArgContainer"><span class="
   <div class="functionHeader">
     
     <div><span class="decorator">@<a href="https://docs.python.org/3/library/abc.html#abc.abstractmethod" class="intersphinx-link">abstractmethod</a><br /></span></div>
-    <span class="py-keyword">def</span>&#160;<span class="py-defname">toPlan</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>) -&gt; <code>SelectPlan</code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/8ae1c9cdea922c91698bddea5d5837e41068ceb3/orionis/orm/contracts/base_builder.py#L29">
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">toPlan</span><span class="function-signature">(<span class="rst-sig-param">self: <code><a href="https://docs.python.org/3/library/typing.html#typing.Self" class="intersphinx-link">Self</a></code></span>) -&gt; <code>SelectPlan</code>:</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/cddd12900b7f7907cab71102ea2d3d150fc9db33/orionis/orm/contracts/base_builder.py#L46">
       
       (source)
     </a>
@@ -3369,8 +3421,8 @@ ready-made select plan.</td></tr><tr><td class="fieldArgContainer"><span class="
   <div class="functionHeader">
     
     <div><span class="decorator">@<a href="https://docs.python.org/3/library/abc.html#abc.abstractmethod" class="intersphinx-link">abstractmethod</a><br /></span></div>
-    <span class="py-keyword">def</span>&#160;<span class="py-defname">union</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">query: <code><a href="https://docs.python.org/3/library/typing.html#typing.Any" class="intersphinx-link">Any</a></code></span>) -&gt; <code><a href="https://docs.python.org/3/library/typing.html#typing.Self" class="intersphinx-link">Self</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/8ae1c9cdea922c91698bddea5d5837e41068ceb3/orionis/orm/contracts/base_builder.py#L1124">
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">union</span><span class="function-signature">(<span class="rst-sig-param">self: <code><a href="https://docs.python.org/3/library/typing.html#typing.Self" class="intersphinx-link">Self</a></code>, </span><span class="rst-sig-param">query: <code><a href="https://docs.python.org/3/library/typing.html#typing.Any" class="intersphinx-link">Any</a></code></span>) -&gt; <code><a href="https://docs.python.org/3/library/typing.html#typing.Self" class="intersphinx-link">Self</a></code>:</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/cddd12900b7f7907cab71102ea2d3d150fc9db33/orionis/orm/contracts/base_builder.py#L1141">
       
       (source)
     </a>
@@ -3396,8 +3448,8 @@ ready-made select plan.</td></tr><tr><td class="fieldArgContainer"><span class="
   <div class="functionHeader">
     
     <div><span class="decorator">@<a href="https://docs.python.org/3/library/abc.html#abc.abstractmethod" class="intersphinx-link">abstractmethod</a><br /></span></div>
-    <span class="py-keyword">def</span>&#160;<span class="py-defname">unionAll</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">query: <code><a href="https://docs.python.org/3/library/typing.html#typing.Any" class="intersphinx-link">Any</a></code></span>) -&gt; <code><a href="https://docs.python.org/3/library/typing.html#typing.Self" class="intersphinx-link">Self</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/8ae1c9cdea922c91698bddea5d5837e41068ceb3/orionis/orm/contracts/base_builder.py#L1140">
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">unionAll</span><span class="function-signature">(<span class="rst-sig-param">self: <code><a href="https://docs.python.org/3/library/typing.html#typing.Self" class="intersphinx-link">Self</a></code>, </span><span class="rst-sig-param">query: <code><a href="https://docs.python.org/3/library/typing.html#typing.Any" class="intersphinx-link">Any</a></code></span>) -&gt; <code><a href="https://docs.python.org/3/library/typing.html#typing.Self" class="intersphinx-link">Self</a></code>:</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/cddd12900b7f7907cab71102ea2d3d150fc9db33/orionis/orm/contracts/base_builder.py#L1157">
       
       (source)
     </a>
@@ -3423,8 +3475,8 @@ ready-made select plan.</td></tr><tr><td class="fieldArgContainer"><span class="
   <div class="functionHeader">
     
     <div><span class="decorator">@<a href="https://docs.python.org/3/library/abc.html#abc.abstractmethod" class="intersphinx-link">abstractmethod</a><br /></span></div>
-    <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">update</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">values: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#dict" class="intersphinx-link">dict</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <wbr></wbr><a href="https://docs.python.org/3/library/typing.html#typing.Any" class="intersphinx-link">Any</a>]</code></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/8ae1c9cdea922c91698bddea5d5837e41068ceb3/orionis/orm/contracts/base_builder.py#L1281">
+    <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">update</span><span class="function-signature">(<span class="rst-sig-param">self: <code><a href="https://docs.python.org/3/library/typing.html#typing.Self" class="intersphinx-link">Self</a></code>, </span><span class="rst-sig-param">values: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#dict" class="intersphinx-link">dict</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <wbr></wbr><a href="https://docs.python.org/3/library/typing.html#typing.Any" class="intersphinx-link">Any</a>]</code></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code>:</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/cddd12900b7f7907cab71102ea2d3d150fc9db33/orionis/orm/contracts/base_builder.py#L1298">
       
       (source)
     </a>
@@ -3450,8 +3502,8 @@ ready-made select plan.</td></tr><tr><td class="fieldArgContainer"><span class="
   <div class="functionHeader">
     
     <div><span class="decorator">@<a href="https://docs.python.org/3/library/abc.html#abc.abstractmethod" class="intersphinx-link">abstractmethod</a><br /></span></div>
-    <span class="py-keyword">def</span>&#160;<span class="py-defname">where</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">column: <code><a href="https://docs.python.org/3/library/typing.html#typing.Any" class="intersphinx-link">Any</a></code>, </span><span class="rst-sig-param">*args: <code><a href="https://docs.python.org/3/library/typing.html#typing.Any" class="intersphinx-link">Any</a></code></span>) -&gt; <code><a href="https://docs.python.org/3/library/typing.html#typing.Self" class="intersphinx-link">Self</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/8ae1c9cdea922c91698bddea5d5837e41068ceb3/orionis/orm/contracts/base_builder.py#L142">
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">where</span><span class="function-signature">(<span class="rst-sig-param">self: <code><a href="https://docs.python.org/3/library/typing.html#typing.Self" class="intersphinx-link">Self</a></code>, </span><span class="rst-sig-param">column: <code><a href="https://docs.python.org/3/library/typing.html#typing.Any" class="intersphinx-link">Any</a></code>, </span><span class="rst-sig-param">*args: <code><a href="https://docs.python.org/3/library/typing.html#typing.Any" class="intersphinx-link">Any</a></code></span>) -&gt; <code><a href="https://docs.python.org/3/library/typing.html#typing.Self" class="intersphinx-link">Self</a></code>:</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/cddd12900b7f7907cab71102ea2d3d150fc9db33/orionis/orm/contracts/base_builder.py#L159">
       
       (source)
     </a>
@@ -3479,8 +3531,8 @@ parentheses.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">*
   <div class="functionHeader">
     
     <div><span class="decorator">@<a href="https://docs.python.org/3/library/abc.html#abc.abstractmethod" class="intersphinx-link">abstractmethod</a><br /></span></div>
-    <span class="py-keyword">def</span>&#160;<span class="py-defname">whereBetween</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">column: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code>, </span><span class="rst-sig-param">bounds: <code><a href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Iterable" class="intersphinx-link">Iterable</a>[<wbr></wbr><a href="https://docs.python.org/3/library/typing.html#typing.Any" class="intersphinx-link">Any</a>]</code></span>) -&gt; <code><a href="https://docs.python.org/3/library/typing.html#typing.Self" class="intersphinx-link">Self</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/8ae1c9cdea922c91698bddea5d5837e41068ceb3/orionis/orm/contracts/base_builder.py#L316">
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">whereBetween</span><span class="function-signature">(<span class="rst-sig-param">self: <code><a href="https://docs.python.org/3/library/typing.html#typing.Self" class="intersphinx-link">Self</a></code>, </span><span class="rst-sig-param">column: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code>, </span><span class="rst-sig-param">bounds: <code><a href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Iterable" class="intersphinx-link">Iterable</a>[<wbr></wbr><a href="https://docs.python.org/3/library/typing.html#typing.Any" class="intersphinx-link">Any</a>]</code></span>) -&gt; <code><a href="https://docs.python.org/3/library/typing.html#typing.Self" class="intersphinx-link">Self</a></code>:</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/cddd12900b7f7907cab71102ea2d3d150fc9db33/orionis/orm/contracts/base_builder.py#L333">
       
       (source)
     </a>
@@ -3506,8 +3558,8 @@ parentheses.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">*
   <div class="functionHeader">
     
     <div><span class="decorator">@<a href="https://docs.python.org/3/library/abc.html#abc.abstractmethod" class="intersphinx-link">abstractmethod</a><br /></span></div>
-    <span class="py-keyword">def</span>&#160;<span class="py-defname">whereColumn</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">first: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code>, </span><span class="rst-sig-param">operator: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code>, </span><span class="rst-sig-param">second: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></span>) -&gt; <code><a href="https://docs.python.org/3/library/typing.html#typing.Self" class="intersphinx-link">Self</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/8ae1c9cdea922c91698bddea5d5837e41068ceb3/orionis/orm/contracts/base_builder.py#L496">
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">whereColumn</span><span class="function-signature">(<span class="rst-sig-param">self: <code><a href="https://docs.python.org/3/library/typing.html#typing.Self" class="intersphinx-link">Self</a></code>, </span><span class="rst-sig-param">first: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code>, </span><span class="rst-sig-param">operator: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code>, </span><span class="rst-sig-param">second: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></span>) -&gt; <code><a href="https://docs.python.org/3/library/typing.html#typing.Self" class="intersphinx-link">Self</a></code>:</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/cddd12900b7f7907cab71102ea2d3d150fc9db33/orionis/orm/contracts/base_builder.py#L513">
       
       (source)
     </a>
@@ -3533,8 +3585,8 @@ parentheses.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">*
   <div class="functionHeader">
     
     <div><span class="decorator">@<a href="https://docs.python.org/3/library/abc.html#abc.abstractmethod" class="intersphinx-link">abstractmethod</a><br /></span></div>
-    <span class="py-keyword">def</span>&#160;<span class="py-defname">whereContains</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">column: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code>, </span><span class="rst-sig-param">value: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></span>) -&gt; <code><a href="https://docs.python.org/3/library/typing.html#typing.Self" class="intersphinx-link">Self</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/8ae1c9cdea922c91698bddea5d5837e41068ceb3/orionis/orm/contracts/base_builder.py#L460">
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">whereContains</span><span class="function-signature">(<span class="rst-sig-param">self: <code><a href="https://docs.python.org/3/library/typing.html#typing.Self" class="intersphinx-link">Self</a></code>, </span><span class="rst-sig-param">column: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code>, </span><span class="rst-sig-param">value: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></span>) -&gt; <code><a href="https://docs.python.org/3/library/typing.html#typing.Self" class="intersphinx-link">Self</a></code>:</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/cddd12900b7f7907cab71102ea2d3d150fc9db33/orionis/orm/contracts/base_builder.py#L477">
       
       (source)
     </a>
@@ -3560,8 +3612,8 @@ parentheses.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">*
   <div class="functionHeader">
     
     <div><span class="decorator">@<a href="https://docs.python.org/3/library/abc.html#abc.abstractmethod" class="intersphinx-link">abstractmethod</a><br /></span></div>
-    <span class="py-keyword">def</span>&#160;<span class="py-defname">whereEndsWith</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">column: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code>, </span><span class="rst-sig-param">value: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></span>) -&gt; <code><a href="https://docs.python.org/3/library/typing.html#typing.Self" class="intersphinx-link">Self</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/8ae1c9cdea922c91698bddea5d5837e41068ceb3/orionis/orm/contracts/base_builder.py#L442">
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">whereEndsWith</span><span class="function-signature">(<span class="rst-sig-param">self: <code><a href="https://docs.python.org/3/library/typing.html#typing.Self" class="intersphinx-link">Self</a></code>, </span><span class="rst-sig-param">column: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code>, </span><span class="rst-sig-param">value: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></span>) -&gt; <code><a href="https://docs.python.org/3/library/typing.html#typing.Self" class="intersphinx-link">Self</a></code>:</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/cddd12900b7f7907cab71102ea2d3d150fc9db33/orionis/orm/contracts/base_builder.py#L459">
       
       (source)
     </a>
@@ -3587,8 +3639,8 @@ parentheses.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">*
   <div class="functionHeader">
     
     <div><span class="decorator">@<a href="https://docs.python.org/3/library/abc.html#abc.abstractmethod" class="intersphinx-link">abstractmethod</a><br /></span></div>
-    <span class="py-keyword">def</span>&#160;<span class="py-defname">whereExists</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">query: <code><a href="https://docs.python.org/3/library/typing.html#typing.Any" class="intersphinx-link">Any</a></code></span>) -&gt; <code><a href="https://docs.python.org/3/library/typing.html#typing.Self" class="intersphinx-link">Self</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/8ae1c9cdea922c91698bddea5d5837e41068ceb3/orionis/orm/contracts/base_builder.py#L580">
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">whereExists</span><span class="function-signature">(<span class="rst-sig-param">self: <code><a href="https://docs.python.org/3/library/typing.html#typing.Self" class="intersphinx-link">Self</a></code>, </span><span class="rst-sig-param">query: <code><a href="https://docs.python.org/3/library/typing.html#typing.Any" class="intersphinx-link">Any</a></code></span>) -&gt; <code><a href="https://docs.python.org/3/library/typing.html#typing.Self" class="intersphinx-link">Self</a></code>:</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/cddd12900b7f7907cab71102ea2d3d150fc9db33/orionis/orm/contracts/base_builder.py#L597">
       
       (source)
     </a>
@@ -3615,8 +3667,8 @@ ready-made select plan.</td></tr></table><table class="fieldTable"><tr class="fi
   <div class="functionHeader">
     
     <div><span class="decorator">@<a href="https://docs.python.org/3/library/abc.html#abc.abstractmethod" class="intersphinx-link">abstractmethod</a><br /></span></div>
-    <span class="py-keyword">def</span>&#160;<span class="py-defname">whereILike</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">column: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code>, </span><span class="rst-sig-param">pattern: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></span>) -&gt; <code><a href="https://docs.python.org/3/library/typing.html#typing.Self" class="intersphinx-link">Self</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/8ae1c9cdea922c91698bddea5d5837e41068ceb3/orionis/orm/contracts/base_builder.py#L388">
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">whereILike</span><span class="function-signature">(<span class="rst-sig-param">self: <code><a href="https://docs.python.org/3/library/typing.html#typing.Self" class="intersphinx-link">Self</a></code>, </span><span class="rst-sig-param">column: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code>, </span><span class="rst-sig-param">pattern: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></span>) -&gt; <code><a href="https://docs.python.org/3/library/typing.html#typing.Self" class="intersphinx-link">Self</a></code>:</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/cddd12900b7f7907cab71102ea2d3d150fc9db33/orionis/orm/contracts/base_builder.py#L405">
       
       (source)
     </a>
@@ -3642,8 +3694,8 @@ ready-made select plan.</td></tr></table><table class="fieldTable"><tr class="fi
   <div class="functionHeader">
     
     <div><span class="decorator">@<a href="https://docs.python.org/3/library/abc.html#abc.abstractmethod" class="intersphinx-link">abstractmethod</a><br /></span></div>
-    <span class="py-keyword">def</span>&#160;<span class="py-defname">whereIn</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">column: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code>, </span><span class="rst-sig-param">values: <code><a href="https://docs.python.org/3/library/typing.html#typing.Any" class="intersphinx-link">Any</a></code></span>) -&gt; <code><a href="https://docs.python.org/3/library/typing.html#typing.Self" class="intersphinx-link">Self</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/8ae1c9cdea922c91698bddea5d5837e41068ceb3/orionis/orm/contracts/base_builder.py#L180">
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">whereIn</span><span class="function-signature">(<span class="rst-sig-param">self: <code><a href="https://docs.python.org/3/library/typing.html#typing.Self" class="intersphinx-link">Self</a></code>, </span><span class="rst-sig-param">column: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code>, </span><span class="rst-sig-param">values: <code><a href="https://docs.python.org/3/library/typing.html#typing.Any" class="intersphinx-link">Any</a></code></span>) -&gt; <code><a href="https://docs.python.org/3/library/typing.html#typing.Self" class="intersphinx-link">Self</a></code>:</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/cddd12900b7f7907cab71102ea2d3d150fc9db33/orionis/orm/contracts/base_builder.py#L197">
       
       (source)
     </a>
@@ -3669,8 +3721,8 @@ ready-made select plan.</td></tr></table><table class="fieldTable"><tr class="fi
   <div class="functionHeader">
     
     <div><span class="decorator">@<a href="https://docs.python.org/3/library/abc.html#abc.abstractmethod" class="intersphinx-link">abstractmethod</a><br /></span></div>
-    <span class="py-keyword">def</span>&#160;<span class="py-defname">whereLike</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">column: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code>, </span><span class="rst-sig-param">pattern: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></span>) -&gt; <code><a href="https://docs.python.org/3/library/typing.html#typing.Self" class="intersphinx-link">Self</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/8ae1c9cdea922c91698bddea5d5837e41068ceb3/orionis/orm/contracts/base_builder.py#L352">
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">whereLike</span><span class="function-signature">(<span class="rst-sig-param">self: <code><a href="https://docs.python.org/3/library/typing.html#typing.Self" class="intersphinx-link">Self</a></code>, </span><span class="rst-sig-param">column: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code>, </span><span class="rst-sig-param">pattern: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></span>) -&gt; <code><a href="https://docs.python.org/3/library/typing.html#typing.Self" class="intersphinx-link">Self</a></code>:</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/cddd12900b7f7907cab71102ea2d3d150fc9db33/orionis/orm/contracts/base_builder.py#L369">
       
       (source)
     </a>
@@ -3696,8 +3748,8 @@ ready-made select plan.</td></tr></table><table class="fieldTable"><tr class="fi
   <div class="functionHeader">
     
     <div><span class="decorator">@<a href="https://docs.python.org/3/library/abc.html#abc.abstractmethod" class="intersphinx-link">abstractmethod</a><br /></span></div>
-    <span class="py-keyword">def</span>&#160;<span class="py-defname">whereNotBetween</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">column: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code>, </span><span class="rst-sig-param">bounds: <code><a href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Iterable" class="intersphinx-link">Iterable</a>[<wbr></wbr><a href="https://docs.python.org/3/library/typing.html#typing.Any" class="intersphinx-link">Any</a>]</code></span>) -&gt; <code><a href="https://docs.python.org/3/library/typing.html#typing.Self" class="intersphinx-link">Self</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/8ae1c9cdea922c91698bddea5d5837e41068ceb3/orionis/orm/contracts/base_builder.py#L334">
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">whereNotBetween</span><span class="function-signature">(<span class="rst-sig-param">self: <code><a href="https://docs.python.org/3/library/typing.html#typing.Self" class="intersphinx-link">Self</a></code>, </span><span class="rst-sig-param">column: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code>, </span><span class="rst-sig-param">bounds: <code><a href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Iterable" class="intersphinx-link">Iterable</a>[<wbr></wbr><a href="https://docs.python.org/3/library/typing.html#typing.Any" class="intersphinx-link">Any</a>]</code></span>) -&gt; <code><a href="https://docs.python.org/3/library/typing.html#typing.Self" class="intersphinx-link">Self</a></code>:</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/cddd12900b7f7907cab71102ea2d3d150fc9db33/orionis/orm/contracts/base_builder.py#L351">
       
       (source)
     </a>
@@ -3723,8 +3775,8 @@ ready-made select plan.</td></tr></table><table class="fieldTable"><tr class="fi
   <div class="functionHeader">
     
     <div><span class="decorator">@<a href="https://docs.python.org/3/library/abc.html#abc.abstractmethod" class="intersphinx-link">abstractmethod</a><br /></span></div>
-    <span class="py-keyword">def</span>&#160;<span class="py-defname">whereNotExists</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">query: <code><a href="https://docs.python.org/3/library/typing.html#typing.Any" class="intersphinx-link">Any</a></code></span>) -&gt; <code><a href="https://docs.python.org/3/library/typing.html#typing.Self" class="intersphinx-link">Self</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/8ae1c9cdea922c91698bddea5d5837e41068ceb3/orionis/orm/contracts/base_builder.py#L613">
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">whereNotExists</span><span class="function-signature">(<span class="rst-sig-param">self: <code><a href="https://docs.python.org/3/library/typing.html#typing.Self" class="intersphinx-link">Self</a></code>, </span><span class="rst-sig-param">query: <code><a href="https://docs.python.org/3/library/typing.html#typing.Any" class="intersphinx-link">Any</a></code></span>) -&gt; <code><a href="https://docs.python.org/3/library/typing.html#typing.Self" class="intersphinx-link">Self</a></code>:</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/cddd12900b7f7907cab71102ea2d3d150fc9db33/orionis/orm/contracts/base_builder.py#L630">
       
       (source)
     </a>
@@ -3750,8 +3802,8 @@ ready-made select plan.</td></tr></table><table class="fieldTable"><tr class="fi
   <div class="functionHeader">
     
     <div><span class="decorator">@<a href="https://docs.python.org/3/library/abc.html#abc.abstractmethod" class="intersphinx-link">abstractmethod</a><br /></span></div>
-    <span class="py-keyword">def</span>&#160;<span class="py-defname">whereNotILike</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">column: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code>, </span><span class="rst-sig-param">pattern: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></span>) -&gt; <code><a href="https://docs.python.org/3/library/typing.html#typing.Self" class="intersphinx-link">Self</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/8ae1c9cdea922c91698bddea5d5837e41068ceb3/orionis/orm/contracts/base_builder.py#L406">
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">whereNotILike</span><span class="function-signature">(<span class="rst-sig-param">self: <code><a href="https://docs.python.org/3/library/typing.html#typing.Self" class="intersphinx-link">Self</a></code>, </span><span class="rst-sig-param">column: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code>, </span><span class="rst-sig-param">pattern: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></span>) -&gt; <code><a href="https://docs.python.org/3/library/typing.html#typing.Self" class="intersphinx-link">Self</a></code>:</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/cddd12900b7f7907cab71102ea2d3d150fc9db33/orionis/orm/contracts/base_builder.py#L423">
       
       (source)
     </a>
@@ -3777,8 +3829,8 @@ ready-made select plan.</td></tr></table><table class="fieldTable"><tr class="fi
   <div class="functionHeader">
     
     <div><span class="decorator">@<a href="https://docs.python.org/3/library/abc.html#abc.abstractmethod" class="intersphinx-link">abstractmethod</a><br /></span></div>
-    <span class="py-keyword">def</span>&#160;<span class="py-defname">whereNotIn</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">column: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code>, </span><span class="rst-sig-param">values: <code><a href="https://docs.python.org/3/library/typing.html#typing.Any" class="intersphinx-link">Any</a></code></span>) -&gt; <code><a href="https://docs.python.org/3/library/typing.html#typing.Self" class="intersphinx-link">Self</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/8ae1c9cdea922c91698bddea5d5837e41068ceb3/orionis/orm/contracts/base_builder.py#L216">
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">whereNotIn</span><span class="function-signature">(<span class="rst-sig-param">self: <code><a href="https://docs.python.org/3/library/typing.html#typing.Self" class="intersphinx-link">Self</a></code>, </span><span class="rst-sig-param">column: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code>, </span><span class="rst-sig-param">values: <code><a href="https://docs.python.org/3/library/typing.html#typing.Any" class="intersphinx-link">Any</a></code></span>) -&gt; <code><a href="https://docs.python.org/3/library/typing.html#typing.Self" class="intersphinx-link">Self</a></code>:</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/cddd12900b7f7907cab71102ea2d3d150fc9db33/orionis/orm/contracts/base_builder.py#L233">
       
       (source)
     </a>
@@ -3804,8 +3856,8 @@ ready-made select plan.</td></tr></table><table class="fieldTable"><tr class="fi
   <div class="functionHeader">
     
     <div><span class="decorator">@<a href="https://docs.python.org/3/library/abc.html#abc.abstractmethod" class="intersphinx-link">abstractmethod</a><br /></span></div>
-    <span class="py-keyword">def</span>&#160;<span class="py-defname">whereNotLike</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">column: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code>, </span><span class="rst-sig-param">pattern: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></span>) -&gt; <code><a href="https://docs.python.org/3/library/typing.html#typing.Self" class="intersphinx-link">Self</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/8ae1c9cdea922c91698bddea5d5837e41068ceb3/orionis/orm/contracts/base_builder.py#L370">
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">whereNotLike</span><span class="function-signature">(<span class="rst-sig-param">self: <code><a href="https://docs.python.org/3/library/typing.html#typing.Self" class="intersphinx-link">Self</a></code>, </span><span class="rst-sig-param">column: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code>, </span><span class="rst-sig-param">pattern: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></span>) -&gt; <code><a href="https://docs.python.org/3/library/typing.html#typing.Self" class="intersphinx-link">Self</a></code>:</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/cddd12900b7f7907cab71102ea2d3d150fc9db33/orionis/orm/contracts/base_builder.py#L387">
       
       (source)
     </a>
@@ -3831,8 +3883,8 @@ ready-made select plan.</td></tr></table><table class="fieldTable"><tr class="fi
   <div class="functionHeader">
     
     <div><span class="decorator">@<a href="https://docs.python.org/3/library/abc.html#abc.abstractmethod" class="intersphinx-link">abstractmethod</a><br /></span></div>
-    <span class="py-keyword">def</span>&#160;<span class="py-defname">whereNotNull</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">column: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></span>) -&gt; <code><a href="https://docs.python.org/3/library/typing.html#typing.Self" class="intersphinx-link">Self</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/8ae1c9cdea922c91698bddea5d5837e41068ceb3/orionis/orm/contracts/base_builder.py#L284">
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">whereNotNull</span><span class="function-signature">(<span class="rst-sig-param">self: <code><a href="https://docs.python.org/3/library/typing.html#typing.Self" class="intersphinx-link">Self</a></code>, </span><span class="rst-sig-param">column: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></span>) -&gt; <code><a href="https://docs.python.org/3/library/typing.html#typing.Self" class="intersphinx-link">Self</a></code>:</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/cddd12900b7f7907cab71102ea2d3d150fc9db33/orionis/orm/contracts/base_builder.py#L301">
       
       (source)
     </a>
@@ -3858,8 +3910,8 @@ ready-made select plan.</td></tr></table><table class="fieldTable"><tr class="fi
   <div class="functionHeader">
     
     <div><span class="decorator">@<a href="https://docs.python.org/3/library/abc.html#abc.abstractmethod" class="intersphinx-link">abstractmethod</a><br /></span></div>
-    <span class="py-keyword">def</span>&#160;<span class="py-defname">whereNull</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">column: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></span>) -&gt; <code><a href="https://docs.python.org/3/library/typing.html#typing.Self" class="intersphinx-link">Self</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/8ae1c9cdea922c91698bddea5d5837e41068ceb3/orionis/orm/contracts/base_builder.py#L252">
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">whereNull</span><span class="function-signature">(<span class="rst-sig-param">self: <code><a href="https://docs.python.org/3/library/typing.html#typing.Self" class="intersphinx-link">Self</a></code>, </span><span class="rst-sig-param">column: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></span>) -&gt; <code><a href="https://docs.python.org/3/library/typing.html#typing.Self" class="intersphinx-link">Self</a></code>:</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/cddd12900b7f7907cab71102ea2d3d150fc9db33/orionis/orm/contracts/base_builder.py#L269">
       
       (source)
     </a>
@@ -3885,8 +3937,8 @@ ready-made select plan.</td></tr></table><table class="fieldTable"><tr class="fi
   <div class="functionHeader">
     
     <div><span class="decorator">@<a href="https://docs.python.org/3/library/abc.html#abc.abstractmethod" class="intersphinx-link">abstractmethod</a><br /></span></div>
-    <span class="py-keyword">def</span>&#160;<span class="py-defname">whereRaw</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">sql: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code>, </span><span class="rst-sig-param">bindings: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#dict" class="intersphinx-link">dict</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <wbr></wbr><a href="https://docs.python.org/3/library/typing.html#typing.Any" class="intersphinx-link">Any</a>] | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code> = <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></span>) -&gt; <code><a href="https://docs.python.org/3/library/typing.html#typing.Self" class="intersphinx-link">Self</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/8ae1c9cdea922c91698bddea5d5837e41068ceb3/orionis/orm/contracts/base_builder.py#L536">
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">whereRaw</span><span class="function-signature">(<span class="rst-sig-param">self: <code><a href="https://docs.python.org/3/library/typing.html#typing.Self" class="intersphinx-link">Self</a></code>, </span><span class="rst-sig-param">sql: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code>, </span><span class="rst-sig-param">bindings: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#dict" class="intersphinx-link">dict</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <wbr></wbr><a href="https://docs.python.org/3/library/typing.html#typing.Any" class="intersphinx-link">Any</a>] | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code> = <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></span>) -&gt; <code><a href="https://docs.python.org/3/library/typing.html#typing.Self" class="intersphinx-link">Self</a></code>:</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/cddd12900b7f7907cab71102ea2d3d150fc9db33/orionis/orm/contracts/base_builder.py#L553">
       
       (source)
     </a>
@@ -3912,8 +3964,8 @@ ready-made select plan.</td></tr></table><table class="fieldTable"><tr class="fi
   <div class="functionHeader">
     
     <div><span class="decorator">@<a href="https://docs.python.org/3/library/abc.html#abc.abstractmethod" class="intersphinx-link">abstractmethod</a><br /></span></div>
-    <span class="py-keyword">def</span>&#160;<span class="py-defname">whereRegexpMatch</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">column: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code>, </span><span class="rst-sig-param">pattern: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></span>) -&gt; <code><a href="https://docs.python.org/3/library/typing.html#typing.Self" class="intersphinx-link">Self</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/8ae1c9cdea922c91698bddea5d5837e41068ceb3/orionis/orm/contracts/base_builder.py#L478">
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">whereRegexpMatch</span><span class="function-signature">(<span class="rst-sig-param">self: <code><a href="https://docs.python.org/3/library/typing.html#typing.Self" class="intersphinx-link">Self</a></code>, </span><span class="rst-sig-param">column: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code>, </span><span class="rst-sig-param">pattern: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></span>) -&gt; <code><a href="https://docs.python.org/3/library/typing.html#typing.Self" class="intersphinx-link">Self</a></code>:</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/cddd12900b7f7907cab71102ea2d3d150fc9db33/orionis/orm/contracts/base_builder.py#L495">
       
       (source)
     </a>
@@ -3939,8 +3991,8 @@ ready-made select plan.</td></tr></table><table class="fieldTable"><tr class="fi
   <div class="functionHeader">
     
     <div><span class="decorator">@<a href="https://docs.python.org/3/library/abc.html#abc.abstractmethod" class="intersphinx-link">abstractmethod</a><br /></span></div>
-    <span class="py-keyword">def</span>&#160;<span class="py-defname">whereStartsWith</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">column: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code>, </span><span class="rst-sig-param">value: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></span>) -&gt; <code><a href="https://docs.python.org/3/library/typing.html#typing.Self" class="intersphinx-link">Self</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/8ae1c9cdea922c91698bddea5d5837e41068ceb3/orionis/orm/contracts/base_builder.py#L424">
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">whereStartsWith</span><span class="function-signature">(<span class="rst-sig-param">self: <code><a href="https://docs.python.org/3/library/typing.html#typing.Self" class="intersphinx-link">Self</a></code>, </span><span class="rst-sig-param">column: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code>, </span><span class="rst-sig-param">value: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></span>) -&gt; <code><a href="https://docs.python.org/3/library/typing.html#typing.Self" class="intersphinx-link">Self</a></code>:</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/cddd12900b7f7907cab71102ea2d3d150fc9db33/orionis/orm/contracts/base_builder.py#L441">
       
       (source)
     </a>
@@ -3966,7 +4018,7 @@ ready-made select plan.</td></tr></table><table class="fieldTable"><tr class="fi
   <div class="functionHeader">
     
     <span class="py-defname">__slots__</span>: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" class="intersphinx-link">tuple</a></code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/8ae1c9cdea922c91698bddea5d5837e41068ceb3/orionis/orm/contracts/base_builder.py#L25">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/cddd12900b7f7907cab71102ea2d3d150fc9db33/orionis/orm/contracts/base_builder.py#L26">
       
       (source)
     </a>
@@ -3992,7 +4044,7 @@ ready-made select plan.</td></tr></table><table class="fieldTable"><tr class="fi
   <div class="orionis-footer-inner">
     <div class="orionis-footer-copy">
       <p>API documentation for <a href="https://orionis-framework.com/" class="projecthome">Orionis</a>.</p>
-      <p class="orionis-footer-meta">Generated with <a href="https://github.com/twisted/pydoctor/">Pydoctor</a> 25.10.1.<span class="orionis-footer-build"> Built 2026-10-29 23:22:32.</span></p>
+      <p class="orionis-footer-meta">Generated with <a href="https://github.com/twisted/pydoctor/">Pydoctor</a> 25.10.1.<span class="orionis-footer-build"> Built 2026-10-30 15:04:37.</span></p>
     </div>
     <nav class="orionis-footer-links" aria-label="Additional resources">
       <a href="https://docs.orionis-framework.com">Read the guide <span aria-hidden="true">↗</span></a>

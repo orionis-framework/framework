@@ -334,6 +334,9 @@
     <loc>https://api.orionis-framework.com/orionis.auth.tokens.html</loc>
   </url>
   <url>
+    <loc>https://api.orionis-framework.com/orionis.auth.tokens.lookup.html</loc>
+  </url>
+  <url>
     <loc>https://api.orionis-framework.com/orionis.auth.tokens.repository.html</loc>
   </url>
   <url>
@@ -409,6 +412,12 @@
     <loc>https://api.orionis-framework.com/orionis.cache.html</loc>
   </url>
   <url>
+    <loc>https://api.orionis-framework.com/orionis.cache.locks.coalescing.html</loc>
+  </url>
+  <url>
+    <loc>https://api.orionis-framework.com/orionis.cache.locks.coalescing.RedisResolverLease.html</loc>
+  </url>
+  <url>
     <loc>https://api.orionis-framework.com/orionis.cache.locks.html</loc>
   </url>
   <url>
@@ -422,6 +431,9 @@
   </url>
   <url>
     <loc>https://api.orionis-framework.com/orionis.cache.provider.html</loc>
+  </url>
+  <url>
+    <loc>https://api.orionis-framework.com/orionis.cache.repository._Flight.html</loc>
   </url>
   <url>
     <loc>https://api.orionis-framework.com/orionis.cache.repository.html</loc>
@@ -2662,6 +2674,9 @@
     <loc>https://api.orionis-framework.com/orionis.hashing.exceptions.MissingHashDependencyException.html</loc>
   </url>
   <url>
+    <loc>https://api.orionis-framework.com/orionis.hashing.execution.html</loc>
+  </url>
+  <url>
     <loc>https://api.orionis-framework.com/orionis.hashing.hash_manager.html</loc>
   </url>
   <url>
@@ -3658,6 +3673,18 @@
     <loc>https://api.orionis-framework.com/orionis.logging.handlers.monthly_suffix_resolver.MonthlySuffixResolver.html</loc>
   </url>
   <url>
+    <loc>https://api.orionis-framework.com/orionis.logging.handlers.queued._Listener.html</loc>
+  </url>
+  <url>
+    <loc>https://api.orionis-framework.com/orionis.logging.handlers.queued.BoundedQueueHandler.html</loc>
+  </url>
+  <url>
+    <loc>https://api.orionis-framework.com/orionis.logging.handlers.queued.html</loc>
+  </url>
+  <url>
+    <loc>https://api.orionis-framework.com/orionis.logging.handlers.queued.LoggingDeliveryError.html</loc>
+  </url>
+  <url>
     <loc>https://api.orionis-framework.com/orionis.logging.handlers.rotating_handler_factory.html</loc>
   </url>
   <url>
@@ -3761,6 +3788,9 @@
   </url>
   <url>
     <loc>https://api.orionis-framework.com/orionis.mail.exceptions.MailAttachmentException.html</loc>
+  </url>
+  <url>
+    <loc>https://api.orionis-framework.com/orionis.mail.exceptions.MailBatchException.html</loc>
   </url>
   <url>
     <loc>https://api.orionis-framework.com/orionis.mail.exceptions.MailCompositionException.html</loc>
@@ -4885,6 +4915,12 @@
     <loc>https://api.orionis-framework.com/orionis.orm.state.StateMixin.html</loc>
   </url>
   <url>
+    <loc>https://api.orionis-framework.com/orionis.queues._database._DatabaseStorage.html</loc>
+  </url>
+  <url>
+    <loc>https://api.orionis-framework.com/orionis.queues._database.html</loc>
+  </url>
+  <url>
     <loc>https://api.orionis-framework.com/orionis.queues.BaseJob.html</loc>
   </url>
   <url>
@@ -5563,6 +5599,9 @@
     <loc>https://api.orionis-framework.com/orionis.session.exceptions.SessionStorageException.html</loc>
   </url>
   <url>
+    <loc>https://api.orionis-framework.com/orionis.session.flash._FlashData.html</loc>
+  </url>
+  <url>
     <loc>https://api.orionis-framework.com/orionis.session.flash.html</loc>
   </url>
   <url>
@@ -5612,6 +5651,9 @@
   </url>
   <url>
     <loc>https://api.orionis-framework.com/orionis.storage.AsyncStream.html</loc>
+  </url>
+  <url>
+    <loc>https://api.orionis-framework.com/orionis.storage.buffering.html</loc>
   </url>
   <url>
     <loc>https://api.orionis-framework.com/orionis.storage.contracts.directory.html</loc>
@@ -5771,6 +5813,15 @@
   </url>
   <url>
     <loc>https://api.orionis-framework.com/orionis.storage.UploadedFile.html</loc>
+  </url>
+  <url>
+    <loc>https://api.orionis-framework.com/orionis.support.concurrency.BoundedExecutor.html</loc>
+  </url>
+  <url>
+    <loc>https://api.orionis-framework.com/orionis.support.concurrency.html</loc>
+  </url>
+  <url>
+    <loc>https://api.orionis-framework.com/orionis.support.concurrency.WorkQueueFullError.html</loc>
   </url>
   <url>
     <loc>https://api.orionis-framework.com/orionis.support.entities.base.html</loc>
@@ -6017,6 +6068,9 @@
   </url>
   <url>
     <loc>https://api.orionis-framework.com/orionis.support.types.stringable.html</loc>
+  </url>
+  <url>
+    <loc>https://api.orionis-framework.com/orionis.support.types.uniqueness.html</loc>
   </url>
   <url>
     <loc>https://api.orionis-framework.com/orionis.test.cases.case.html</loc>

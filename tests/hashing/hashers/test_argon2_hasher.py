@@ -1,4 +1,5 @@
 import threading
+from typing import Self
 from orionis.hashing.contracts.hasher import IHasher
 from orionis.hashing.exceptions import HashConfigurationException
 from orionis.hashing.hashers.argon2_hasher import (
@@ -39,7 +40,7 @@ class _ThreadRecordingHasher(Argon2Hasher):
 
     __slots__ = ("thread_ids",)
 
-    def __init__(self, **options: int) -> None:
+    def __init__(self: Self, **options: int) -> None:
         """Start with an empty journal of worker threads.
 
         Parameters
@@ -56,7 +57,7 @@ class _ThreadRecordingHasher(Argon2Hasher):
         self.thread_ids: list[int] = []
 
     def _make(
-        self,
+        self: Self,
         value: str,
         *,
         rounds: int | None = None,
@@ -84,7 +85,7 @@ class _ThreadRecordingHasher(Argon2Hasher):
         self.thread_ids.append(threading.get_ident())
         return super()._make(value, rounds=rounds, memory=memory, threads=threads)
 
-    def _check(self, value: str, hashed: str) -> bool:
+    def _check(self: Self, value: str, hashed: str) -> bool:
         """Record the executing thread before verifying.
 
         Parameters
@@ -103,8 +104,7 @@ class _ThreadRecordingHasher(Argon2Hasher):
         return super()._check(value, hashed)
 
 class TestArgon2HasherLayout(TestCase):
-
-    def testImplementsTheHasherContract(self) -> None:
+    def testImplementsTheHasherContract(self: Self) -> None:
         """Register the driver as an implementation of the hashing contract.
 
         Validates that the manager can resolve it as an IHasher.
@@ -116,7 +116,7 @@ class TestArgon2HasherLayout(TestCase):
         """
         self.assertIsInstance(cheap_hasher(), IHasher)
 
-    def testDeclaresTheExpectedSlots(self) -> None:
+    def testDeclaresTheExpectedSlots(self: Self) -> None:
         """Declare the state of the driver as explicit slots.
 
         Validates the memory layout required by the framework conventions.
@@ -128,10 +128,10 @@ class TestArgon2HasherLayout(TestCase):
         """
         self.assertEqual(
             Argon2Hasher.__dict__.get("__slots__"),
-            ("_backend", "_backend_class", "_memory", "_threads", "_time"),
+            ("_backend", "_backend_class", "_executor", "_memory", "_threads", "_time"),
         )
 
-    def testDoesNotExposeAnInstanceDictionary(self) -> None:
+    def testDoesNotExposeAnInstanceDictionary(self: Self) -> None:
         """Keep instances free of an attribute dictionary.
 
         Validates that the empty slots of the contract propagate to the
@@ -144,7 +144,7 @@ class TestArgon2HasherLayout(TestCase):
         """
         self.assertFalse(hasattr(cheap_hasher(), "__dict__"))
 
-    def testReportsArgon2idAsItsAlgorithm(self) -> None:
+    def testReportsArgon2idAsItsAlgorithm(self: Self) -> None:
         """Report Argon2id as the algorithm identifier of the driver.
 
         Validates the value exposed to callers inspecting the driver.
@@ -157,8 +157,7 @@ class TestArgon2HasherLayout(TestCase):
         self.assertEqual(cheap_hasher().getAlgorithm(), "argon2id")
 
 class TestArgon2HasherDefaults(TestCase):
-
-    def testDeclaresTheRecommendedCostParameters(self) -> None:
+    def testDeclaresTheRecommendedCostParameters(self: Self) -> None:
         """Declare the cost parameters recommended for interactive logins.
 
         Validates the constants shared with the configuration entity.
@@ -172,7 +171,7 @@ class TestArgon2HasherDefaults(TestCase):
         self.assertEqual(DEFAULT_THREADS, 4)
         self.assertEqual(DEFAULT_TIME, 3)
 
-    def testAppliesTheDeclaredDefaultsWhenNoCostIsGiven(self) -> None:
+    def testAppliesTheDeclaredDefaultsWhenNoCostIsGiven(self: Self) -> None:
         """Apply the declared defaults to a driver built without arguments.
 
         Validates that the recommended costs are the ones used when the
@@ -189,8 +188,7 @@ class TestArgon2HasherDefaults(TestCase):
         self.assertEqual(hasher._time, DEFAULT_TIME)
 
 class TestArgon2HasherValidation(TestCase):
-
-    def testRejectsCostParametersBelowOne(self) -> None:
+    def testRejectsCostParametersBelowOne(self: Self) -> None:
         """Reject any cost parameter that is not strictly positive.
 
         Validates the guard protecting the backend from an unusable
@@ -208,7 +206,7 @@ class TestArgon2HasherValidation(TestCase):
         with self.assertRaises(HashConfigurationException):
             Argon2Hasher(time=-1)
 
-    def testRejectsNonIntegerCostParameters(self) -> None:
+    def testRejectsNonIntegerCostParameters(self: Self) -> None:
         """Reject cost parameters that are not integers.
 
         Validates that a textual or fractional value never reaches the
@@ -224,7 +222,7 @@ class TestArgon2HasherValidation(TestCase):
         with self.assertRaises(HashConfigurationException):
             Argon2Hasher(time=1.5)  # type: ignore[arg-type]
 
-    def testRejectsBooleanCostParameters(self) -> None:
+    def testRejectsBooleanCostParameters(self: Self) -> None:
         """Reject booleans even though they are integers in Python.
 
         Validates the explicit guard that keeps a flag from being read as
@@ -238,7 +236,7 @@ class TestArgon2HasherValidation(TestCase):
         with self.assertRaises(HashConfigurationException):
             Argon2Hasher(threads=True)
 
-    def testErrorMessageNamesTheRejectedOption(self) -> None:
+    def testErrorMessageNamesTheRejectedOption(self: Self) -> None:
         """Name the offending option and its value in the error message.
 
         Validates that the failure is actionable without a traceback.
@@ -254,7 +252,7 @@ class TestArgon2HasherValidation(TestCase):
         self.assertIn("memory", message)
         self.assertIn("0", message)
 
-    async def testRejectsInvalidOverridesAtCallTime(self) -> None:
+    async def testRejectsInvalidOverridesAtCallTime(self: Self) -> None:
         """Reject invalid per-call overrides before hashing anything.
 
         Validates that a bad override fails loudly instead of silently
@@ -273,7 +271,7 @@ class TestArgon2HasherValidation(TestCase):
         with self.assertRaises(HashConfigurationException):
             await hasher.make("secret", threads=0)
 
-    def testRejectsInvalidFluentValues(self) -> None:
+    def testRejectsInvalidFluentValues(self: Self) -> None:
         """Reject invalid values handed to the fluent setters.
 
         Validates that the configured state can never become unusable.
@@ -292,8 +290,7 @@ class TestArgon2HasherValidation(TestCase):
             hasher.setThreads(0)
 
 class TestArgon2HasherBackend(TestCase):
-
-    def testConstructionNeverTouchesTheBackend(self) -> None:
+    def testConstructionNeverTouchesTheBackend(self: Self) -> None:
         """Build the driver without importing its backend package.
 
         Validates that the driver stays constructible when the optional
@@ -308,7 +305,7 @@ class TestArgon2HasherBackend(TestCase):
         self.assertIsNone(hasher._backend_class)
         self.assertIsNone(hasher._backend)
 
-    def testImportsTheBackendClassOnlyOnce(self) -> None:
+    def testImportsTheBackendClassOnlyOnce(self: Self) -> None:
         """Cache the backend class after the first import.
 
         Validates that repeated operations do not pay the import cost
@@ -322,7 +319,7 @@ class TestArgon2HasherBackend(TestCase):
         hasher = cheap_hasher()
         self.assertIs(hasher._backendClass(), hasher._backendClass())
 
-    def testCachesTheDefaultBackendInstance(self) -> None:
+    def testCachesTheDefaultBackendInstance(self: Self) -> None:
         """Reuse a single backend instance for the configured costs.
 
         Validates the caching that keeps hashing free of redundant
@@ -336,7 +333,7 @@ class TestArgon2HasherBackend(TestCase):
         hasher = cheap_hasher()
         self.assertIs(hasher._default(), hasher._default())
 
-    async def testMakeReusesTheCachedBackend(self) -> None:
+    async def testMakeReusesTheCachedBackend(self: Self) -> None:
         """Reuse the cached backend when no override is provided.
 
         Validates the fast path taken by the vast majority of calls.
@@ -352,7 +349,7 @@ class TestArgon2HasherBackend(TestCase):
         await hasher.make("secret")
         self.assertIs(hasher._backend, cached)
 
-    async def testOverridesNeverReplaceTheCachedBackend(self) -> None:
+    async def testOverridesNeverReplaceTheCachedBackend(self: Self) -> None:
         """Keep the cached backend untouched when a call overrides a cost.
 
         Validates that a per-call override stays scoped to that call.
@@ -368,7 +365,7 @@ class TestArgon2HasherBackend(TestCase):
         await hasher.make("secret", memory=16)
         self.assertIs(hasher._backend, cached)
 
-    async def testForeignHashNeverReachesTheBackendInstance(self) -> None:
+    async def testForeignHashNeverReachesTheBackendInstance(self: Self) -> None:
         """Reject a foreign hash without building the backend instance.
 
         Validates the identify guard shared by check and needsRehash, which
@@ -384,7 +381,7 @@ class TestArgon2HasherBackend(TestCase):
         self.assertTrue(hasher.needsRehash(_FOREIGN_HASH))
         self.assertIsNone(hasher._backend)
 
-    async def testHashingRunsOutsideTheEventLoopThread(self) -> None:
+    async def testHashingRunsOutsideTheEventLoopThread(self: Self) -> None:
         """Burn the hashing cost on a worker thread instead of the loop.
 
         Validates that a login never stalls the other requests served by
@@ -402,8 +399,7 @@ class TestArgon2HasherBackend(TestCase):
         self.assertNotIn(threading.get_ident(), hasher.thread_ids)
 
 class TestArgon2HasherMake(TestCase):
-
-    async def testProducesAnArgon2idHash(self) -> None:
+    async def testProducesAnArgon2idHash(self: Self) -> None:
         """Produce a hash carrying the Argon2id identifier.
 
         Validates that the driver never falls back to another variant.
@@ -416,7 +412,7 @@ class TestArgon2HasherMake(TestCase):
         hashed = await cheap_hasher().make("secret")
         self.assertTrue(hashed.startswith("$argon2id$"))
 
-    async def testNeverReturnsThePlainValue(self) -> None:
+    async def testNeverReturnsThePlainValue(self: Self) -> None:
         """Keep the plain value out of the produced hash.
 
         Validates the most basic guarantee expected from the driver.
@@ -428,7 +424,7 @@ class TestArgon2HasherMake(TestCase):
         """
         self.assertNotIn("secret", await cheap_hasher().make("secret"))
 
-    async def testIsSaltedPerCall(self) -> None:
+    async def testIsSaltedPerCall(self: Self) -> None:
         """Produce a different hash for every call on the same value.
 
         Validates that a random salt is generated per call.
@@ -441,7 +437,7 @@ class TestArgon2HasherMake(TestCase):
         hasher = cheap_hasher()
         self.assertNotEqual(await hasher.make("secret"), await hasher.make("secret"))
 
-    async def testAppliesTheConfiguredCosts(self) -> None:
+    async def testAppliesTheConfiguredCosts(self: Self) -> None:
         """Encode the configured costs inside the produced hash.
 
         Validates that the driver configuration reaches the backend.
@@ -456,7 +452,7 @@ class TestArgon2HasherMake(TestCase):
         self.assertIn("t=1", hashed)
         self.assertIn("p=1", hashed)
 
-    async def testHonorsTheRoundsOverride(self) -> None:
+    async def testHonorsTheRoundsOverride(self: Self) -> None:
         """Map the rounds override onto the Argon2id time cost.
 
         Validates the naming bridge between the shared contract and the
@@ -469,7 +465,7 @@ class TestArgon2HasherMake(TestCase):
         """
         self.assertIn("t=2", await cheap_hasher().make("secret", rounds=2))
 
-    async def testHonorsTheMemoryOverride(self) -> None:
+    async def testHonorsTheMemoryOverride(self: Self) -> None:
         """Apply the memory override to a single call.
 
         Validates the per-call tuning of the memory cost.
@@ -481,7 +477,7 @@ class TestArgon2HasherMake(TestCase):
         """
         self.assertIn("m=16", await cheap_hasher().make("secret", memory=16))
 
-    async def testHonorsTheThreadsOverride(self) -> None:
+    async def testHonorsTheThreadsOverride(self: Self) -> None:
         """Apply the parallelism override to a single call.
 
         Validates the per-call tuning of the number of lanes.
@@ -493,7 +489,7 @@ class TestArgon2HasherMake(TestCase):
         """
         self.assertIn("p=2", await cheap_hasher().make("secret", threads=2))
 
-    async def testCombinesEveryOverrideInASingleCall(self) -> None:
+    async def testCombinesEveryOverrideInASingleCall(self: Self) -> None:
         """Apply every override provided in the same call.
 
         Validates that the overrides are independent of each other.
@@ -509,8 +505,7 @@ class TestArgon2HasherMake(TestCase):
         self.assertIn("p=2", hashed)
 
 class TestArgon2HasherCheck(TestCase):
-
-    async def testAcceptsTheOriginalValue(self) -> None:
+    async def testAcceptsTheOriginalValue(self: Self) -> None:
         """Accept the value the hash was produced from.
 
         Validates the round trip application code depends on.
@@ -523,7 +518,7 @@ class TestArgon2HasherCheck(TestCase):
         hasher = cheap_hasher()
         self.assertTrue(await hasher.check("secret", await hasher.make("secret")))
 
-    async def testRejectsADifferentValue(self) -> None:
+    async def testRejectsADifferentValue(self: Self) -> None:
         """Reject any value other than the hashed one.
 
         Validates that verification is not vulnerable to a partial match.
@@ -536,7 +531,7 @@ class TestArgon2HasherCheck(TestCase):
         hasher = cheap_hasher()
         self.assertFalse(await hasher.check("other", await hasher.make("secret")))
 
-    async def testAcceptsAHashCreatedWithOtherCosts(self) -> None:
+    async def testAcceptsAHashCreatedWithOtherCosts(self: Self) -> None:
         """Accept a hash produced with a different cost configuration.
 
         Validates that raising the costs never locks existing users out.
@@ -549,7 +544,7 @@ class TestArgon2HasherCheck(TestCase):
         legacy = await cheap_hasher(time=1).make("secret")
         self.assertTrue(await cheap_hasher(time=2).check("secret", legacy))
 
-    async def testRejectsAHashFromAnotherAlgorithm(self) -> None:
+    async def testRejectsAHashFromAnotherAlgorithm(self: Self) -> None:
         """Reject a hash produced by another algorithm.
 
         Validates the guard that keeps the backend from parsing a foreign
@@ -562,7 +557,7 @@ class TestArgon2HasherCheck(TestCase):
         """
         self.assertFalse(await cheap_hasher().check("secret", _FOREIGN_HASH))
 
-    async def testRejectsAMalformedHash(self) -> None:
+    async def testRejectsAMalformedHash(self: Self) -> None:
         """Reject an input that is not an encoded hash at all.
 
         Validates that unparsable data never raises through the driver.
@@ -574,7 +569,7 @@ class TestArgon2HasherCheck(TestCase):
         """
         self.assertFalse(await cheap_hasher().check("secret", "not-a-hash"))
 
-    async def testRejectsAnEmptyHash(self) -> None:
+    async def testRejectsAnEmptyHash(self: Self) -> None:
         """Reject an empty hash without touching the backend.
 
         Validates the guard protecting the verification path from a
@@ -588,8 +583,7 @@ class TestArgon2HasherCheck(TestCase):
         self.assertFalse(await cheap_hasher().check("secret", ""))
 
 class TestArgon2HasherNeedsRehash(TestCase):
-
-    async def testFreshHashIsUpToDate(self) -> None:
+    async def testFreshHashIsUpToDate(self: Self) -> None:
         """Report a hash created with the current costs as up to date.
 
         Validates that no needless rehash is triggered on login.
@@ -602,7 +596,7 @@ class TestArgon2HasherNeedsRehash(TestCase):
         hasher = cheap_hasher()
         self.assertFalse(hasher.needsRehash(await hasher.make("secret")))
 
-    async def testOutdatedCostRequiresARehash(self) -> None:
+    async def testOutdatedCostRequiresARehash(self: Self) -> None:
         """Report a hash created with lower costs as outdated.
 
         Validates the upgrade path after raising the configured costs.
@@ -615,7 +609,7 @@ class TestArgon2HasherNeedsRehash(TestCase):
         legacy = await cheap_hasher(time=1).make("secret")
         self.assertTrue(cheap_hasher(time=2).needsRehash(legacy))
 
-    def testForeignAlgorithmRequiresARehash(self) -> None:
+    def testForeignAlgorithmRequiresARehash(self: Self) -> None:
         """Report a hash from another algorithm as outdated.
 
         Validates the migration path from a legacy driver.
@@ -627,7 +621,7 @@ class TestArgon2HasherNeedsRehash(TestCase):
         """
         self.assertTrue(cheap_hasher().needsRehash(_FOREIGN_HASH))
 
-    def testMalformedHashRequiresARehash(self) -> None:
+    def testMalformedHashRequiresARehash(self: Self) -> None:
         """Report an unparsable hash as outdated.
 
         Validates that corrupted data is regenerated instead of raising.
@@ -639,7 +633,7 @@ class TestArgon2HasherNeedsRehash(TestCase):
         """
         self.assertTrue(cheap_hasher().needsRehash("not-a-hash"))
 
-    def testEmptyHashRequiresARehash(self) -> None:
+    def testEmptyHashRequiresARehash(self: Self) -> None:
         """Report an empty hash as outdated without touching the backend.
 
         Validates the guard covering a missing stored value.
@@ -652,8 +646,7 @@ class TestArgon2HasherNeedsRehash(TestCase):
         self.assertTrue(cheap_hasher().needsRehash(""))
 
 class TestArgon2HasherConfiguration(TestCase):
-
-    def testFluentSettersReturnTheSameInstance(self) -> None:
+    def testFluentSettersReturnTheSameInstance(self: Self) -> None:
         """Return the driver itself from every fluent setter.
 
         Validates the chaining style advertised by the contract.
@@ -668,7 +661,7 @@ class TestArgon2HasherConfiguration(TestCase):
         self.assertIs(hasher.setMemory(64), hasher)
         self.assertIs(hasher.setThreads(2), hasher)
 
-    async def testSetRoundsAppliesToLaterHashes(self) -> None:
+    async def testSetRoundsAppliesToLaterHashes(self: Self) -> None:
         """Apply the new time cost to every subsequent hash.
 
         Validates that the cached backend is rebuilt after the change.
@@ -682,7 +675,7 @@ class TestArgon2HasherConfiguration(TestCase):
         hasher.setRounds(3)
         self.assertIn("t=3", await hasher.make("secret"))
 
-    async def testSetMemoryAppliesToLaterHashes(self) -> None:
+    async def testSetMemoryAppliesToLaterHashes(self: Self) -> None:
         """Apply the new memory cost to every subsequent hash.
 
         Validates that the cached backend is rebuilt after the change.
@@ -696,7 +689,7 @@ class TestArgon2HasherConfiguration(TestCase):
         hasher.setMemory(64)
         self.assertIn("m=64", await hasher.make("secret"))
 
-    async def testSetThreadsAppliesToLaterHashes(self) -> None:
+    async def testSetThreadsAppliesToLaterHashes(self: Self) -> None:
         """Apply the new parallelism to every subsequent hash.
 
         Validates that the cached backend is rebuilt after the change.
@@ -710,7 +703,7 @@ class TestArgon2HasherConfiguration(TestCase):
         hasher.setThreads(2)
         self.assertIn("p=2", await hasher.make("secret"))
 
-    def testEveryFluentSetterDropsTheCachedBackend(self) -> None:
+    def testEveryFluentSetterDropsTheCachedBackend(self: Self) -> None:
         """Drop the cached backend whenever a cost parameter changes.
 
         Validates the invalidation that makes the new configuration
@@ -727,7 +720,7 @@ class TestArgon2HasherConfiguration(TestCase):
             getattr(hasher, setter)(value)
             self.assertIsNone(hasher._backend, msg=setter)
 
-    async def testEarlierHashesRemainVerifiable(self) -> None:
+    async def testEarlierHashesRemainVerifiable(self: Self) -> None:
         """Keep verifying hashes produced before a configuration change.
 
         Validates that reconfiguring the driver never invalidates stored

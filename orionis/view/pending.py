@@ -1,28 +1,21 @@
 from __future__ import annotations
 import re
-from typing import Any, TYPE_CHECKING
+from typing import TYPE_CHECKING, Any, Self
 from orionis.http.responses import HTMLResponse
-from orionis.session.flash import (
-    ERRORS_KEY,
-    OLD_INPUT_KEY,
-    apply_flash,
-    filter_input,
-    normalize_errors,
-    queue_bag,
-)
+from orionis.session.flash import _FlashData, apply_flash
 from orionis.support.facades.session import Session
 from orionis.view.exceptions import ViewRenderException, ViewTemplateNotFoundException
 
 if TYPE_CHECKING:
-    from collections.abc import Callable, Generator, Mapping
+    from collections.abc import Callable, Generator
     from orionis.session.contracts.session import ISession
     from orionis.view.contracts.engine import IViewEngine
 
 # Closure qualname noise (e.g. ``_global_csrf_field.<locals>.``) leaked by
 # errors raised inside template globals; irrelevant for the developer.
-_LOCALS_QUALNAME = re.compile(r"[\w.]*<locals>\.") # NOSONAR
+_LOCALS_QUALNAME = re.compile(r"[\w.]*<locals>\.")  # NOSONAR
 
-class PendingView:
+class PendingView(_FlashData):
     """
     Awaitable, chainable result of :meth:`IViewFactory.make`.
 
@@ -41,7 +34,7 @@ class PendingView:
     __slots__ = ("_context", "_engine", "_flash", "_mutations", "_template")
 
     def __init__(
-        self,
+        self: Self,
         engine: IViewEngine,
         template: str,
         context: dict[str, Any],
@@ -68,78 +61,7 @@ class PendingView:
         self._mutations: list[tuple[str, tuple, dict]] | None = None
         self._flash: dict[str, Any] | None = None
 
-    def withFlash(self, key: str, value: Any = None) -> PendingView:
-        """
-        Flash a status message into the session before rendering.
-
-        Writing happens ahead of rendering so this very view can read the
-        value back through the ``flash()`` global, and it remains
-        available for the next request.
-
-        Parameters
-        ----------
-        key : str
-            Flash data key.
-        value : Any, optional
-            Value to flash.
-
-        Returns
-        -------
-        PendingView
-            The same pending view, allowing fluent chaining.
-        """
-        flash = self._flash
-        if flash is None:
-            flash = self._flash = {}
-
-        flash[key] = value
-        return self
-
-    def withInput(self, values: Mapping[str, Any]) -> PendingView:
-        """
-        Flash the submitted payload so ``old()`` can repopulate the form.
-
-        Credential-like fields such as ``password`` are stripped.
-
-        Parameters
-        ----------
-        values : Mapping[str, Any]
-            Submitted form payload to remember.
-
-        Returns
-        -------
-        PendingView
-            The same pending view, allowing fluent chaining.
-        """
-        flash = self._flash
-        if flash is None:
-            flash = self._flash = {}
-
-        queue_bag(flash, OLD_INPUT_KEY, filter_input(values))
-        return self
-
-    def withErrors(self, errors: Mapping[str, Any] | Exception) -> PendingView:
-        """
-        Flash validation errors so the ``errors`` global can read them.
-
-        Parameters
-        ----------
-        errors : Mapping[str, Any] | Exception
-            Mapping of field to message(s), or a validation exception.
-
-        Returns
-        -------
-        PendingView
-            The same pending view, allowing fluent chaining.
-        """
-        flash = self._flash
-        if flash is None:
-            flash = self._flash = {}
-
-        queue_bag(flash, ERRORS_KEY, normalize_errors(errors))
-        return self
-
-    def __getattr__(self, name: str) -> Callable[..., PendingView]:
+    def __getattr__(self: Self, name: str) -> Callable[..., PendingView]:
         """
         Queue a :class:`HTMLResponse` call to replay after rendering.
 
@@ -159,9 +81,7 @@ class PendingView:
             If :class:`HTMLResponse` exposes no callable named *name*.
         """
         if not callable(getattr(HTMLResponse, name, None)):
-            error_msg = (
-                f"'{type(self).__name__}' object has no attribute '{name}'"
-            )
+            error_msg = f"'{type(self).__name__}' object has no attribute '{name}'"
             raise AttributeError(error_msg)  # noqa: TRY004
 
         def queue(*args: Any, **kwargs: Any) -> PendingView:
@@ -188,7 +108,7 @@ class PendingView:
 
         return queue
 
-    def __await__(self) -> Generator[Any, None, HTMLResponse]:
+    def __await__(self: Self) -> Generator[Any, None, HTMLResponse]:
         """
         Render the template and apply every queued mutation.
 
@@ -199,7 +119,7 @@ class PendingView:
         """
         return self.render().__await__()
 
-    async def render(self) -> HTMLResponse:
+    async def render(self: Self) -> HTMLResponse:
         """
         Render the template into a fully formed :class:`HTMLResponse`.
 
@@ -235,7 +155,8 @@ class PendingView:
         except Exception as e:
             detail: str = _LOCALS_QUALNAME.sub("", str(e))
             exc_msg: str = f"Failed to render view '{self._template}': {detail}"
-            raise ViewRenderException(exc_msg) from e
+            error_msg = exc_msg
+            raise ViewRenderException(error_msg) from e
 
         if self._mutations:
             for name, args, kwargs in self._mutations:
@@ -243,7 +164,7 @@ class PendingView:
 
         return response
 
-    async def __flashToSession(self) -> None:
+    async def __flashToSession(self: Self) -> None:
         """
         Write the queued flash data into the active session.
 

@@ -1,24 +1,25 @@
 {
-  "recorded_at": "2026-10-30T20:50:04.499568+00:00",
+  "recorded_at": "2026-10-30T21:33:48.540770+00:00",
   "os": "Linux-7.0.0-1017-azure-x86_64-with-glibc2.39",
   "architecture": "x86_64",
-  "cpu": "AMD EPYC 9V45 96-Core Processor",
+  "cpu": "Intel(R) Xeon(R) Platinum 8370C CPU @ 2.80GHz",
   "logical_cpus": 4,
   "physical_cpus": 2,
-  "memory_bytes": 16760348672,
+  "memory_bytes": 16759304192,
   "python": "3.14.8",
   "python_executable": "/home/runner/work/framework/framework/.venv/bin/python3",
   "versions": {
     "orionis": "1.1.0",
     "granian": "2.8.4",
+    "uvicorn": "0.54.0",
     "fastapi": "0.143.1",
     "litestar": "2.24.0",
     "starlette": "1.8.0",
     "oha": "1.16.0"
   },
-  "commit": "401db12b545f4f2bd285a7df23e1f5e078c41b3b",
+  "commit": "09e5b000fe5088b96ec989204c04d92ef052f24f",
   "dirty": false,
-  "uv_lock_sha256": "0fb58ea0ab3f98edebe3420f27db6f7767e2bce79df00618868e7398ed601202",
+  "uv_lock_sha256": "b9141f4d3ed42ccc7e223118f28037715b26c4d0b9af4720d1519a0c8d61ad03",
   "dependencies": [
     "APScheduler==3.11.3",
     "Faker==40.44.0",
@@ -82,9 +83,10 @@
     "tzdata==2026.6",
     "tzlocal==5.4.5",
     "uritemplate==4.2.0",
+    "uvicorn==0.54.0",
     "uvloop==0.23.0",
     "watchfiles==1.3.0"
   ],
-  "run_url": "https://github.com/orionis-framework/framework/actions/runs/41126272920",
-  "oha_executable": "/tmp/http-compare-oha-bzk659z1/oha-linux-amd64"
+  "run_url": "https://github.com/orionis-framework/framework/actions/runs/41131915553",
+  "oha_executable": "/tmp/http-compare-oha-wbq07iks/oha-linux-amd64"
 }

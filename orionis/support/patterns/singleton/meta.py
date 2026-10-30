@@ -6,7 +6,7 @@ class Singleton(type):
     """Create one instance per class with synchronous and asynchronous access."""
 
     def __init__(
-        cls,
+        cls: type,
         name: str,
         bases: tuple[type, ...],
         namespace: dict[str, object],
@@ -35,7 +35,7 @@ class Singleton(type):
         type.__setattr__(cls, "_singleton_lock", threading.Lock())
 
     def __call__(
-        cls,
+        cls: type,
         *args: object,
         **kwargs: object,
     ) -> object:
@@ -69,7 +69,7 @@ class Singleton(type):
         return instance
 
     async def __acall__(
-        cls,
+        cls: type,
         *args: object,
         **kwargs: object,
     ) -> object:
@@ -90,14 +90,4 @@ class Singleton(type):
         object
             The existing or newly created singleton instance.
         """
-        instance = cls._singleton_instance
-        if instance is not _MISSING:
-            return instance
-
-        with cls._singleton_lock:
-            instance = cls._singleton_instance
-            if instance is _MISSING:
-                instance = super().__call__(*args, **kwargs)
-                type.__setattr__(cls, "_singleton_instance", instance)
-
-        return instance
+        return Singleton.__call__(cls, *args, **kwargs)

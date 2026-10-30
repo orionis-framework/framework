@@ -4,8 +4,7 @@ from typing import TYPE_CHECKING, Any, Self
 from orionis.container.contracts.container import IContainer
 
 if TYPE_CHECKING:
-    from collections.abc import Awaitable, Callable
-    from collections.abc import Mapping
+    from collections.abc import Awaitable, Callable, Mapping
     from pathlib import Path
     from orionis.console.base.contracts.scheduler import IBaseScheduler
     from orionis.container.contracts.service_provider import IServiceProvider
@@ -23,7 +22,7 @@ class IApplication(IContainer, ABC):
 
     @property
     @abstractmethod
-    def isBooted(self) -> bool:
+    def isBooted(self: Self) -> bool:
         """
         Check whether configuration and provider registration have completed.
 
@@ -36,7 +35,7 @@ class IApplication(IContainer, ABC):
 
     @property
     @abstractmethod
-    def isCreated(self) -> bool:
+    def isCreated(self: Self) -> bool:
         """
         Check whether configuration and service registration are complete.
 
@@ -48,7 +47,7 @@ class IApplication(IContainer, ABC):
 
     @property
     @abstractmethod
-    def areProvidersBooted(self) -> bool:
+    def areProvidersBooted(self: Self) -> bool:
         """
         Check whether every eager provider has finished startup.
 
@@ -60,7 +59,7 @@ class IApplication(IContainer, ABC):
 
     @property
     @abstractmethod
-    def isHttpReady(self) -> bool:
+    def isHttpReady(self: Self) -> bool:
         """
         Check whether eager providers and both HTTP handlers are ready.
 
@@ -72,7 +71,7 @@ class IApplication(IContainer, ABC):
 
     @property
     @abstractmethod
-    def startAt(self) -> int:
+    def startAt(self: Self) -> int:
         """
         Return the application startup timestamp in nanoseconds.
 
@@ -85,7 +84,7 @@ class IApplication(IContainer, ABC):
 
     @property
     @abstractmethod
-    def routeHealthCheck(self) -> str:
+    def routeHealthCheck(self: Self) -> str:
         """
         Return the health check route for the application.
 
@@ -97,7 +96,7 @@ class IApplication(IContainer, ABC):
 
     @property
     @abstractmethod
-    def entryPoint(self) -> str | None:
+    def entryPoint(self: Self) -> str | None:
         """
         Return the entry point module path where the application was created.
 
@@ -110,7 +109,7 @@ class IApplication(IContainer, ABC):
 
     @property
     @abstractmethod
-    def basePath(self) -> Path:
+    def basePath(self: Self) -> Path:
         """
         Return the base path of the application.
 
@@ -122,7 +121,7 @@ class IApplication(IContainer, ABC):
 
     @property
     @abstractmethod
-    def compiled(self) -> bool:
+    def compiled(self: Self) -> bool:
         """
         Indicate whether the application is running in compiled mode.
 
@@ -135,7 +134,7 @@ class IApplication(IContainer, ABC):
 
     @property
     @abstractmethod
-    def compiledPath(self) -> Path | None:
+    def compiledPath(self: Self) -> Path | None:
         """
         Return the path where compiled cache files are stored.
 
@@ -148,7 +147,7 @@ class IApplication(IContainer, ABC):
 
     @property
     @abstractmethod
-    def compiledInvalidationPathsDirs(self) -> list[Path]:
+    def compiledInvalidationPathsDirs(self: Self) -> list[Path]:
         """
         Return the list of directory paths monitored for cache invalidation.
 
@@ -160,7 +159,7 @@ class IApplication(IContainer, ABC):
 
     @property
     @abstractmethod
-    def compiledInvalidationPathsFiles(self) -> list[Path]:
+    def compiledInvalidationPathsFiles(self: Self) -> list[Path]:
         """
         Return the list of file paths monitored for cache invalidation.
 
@@ -172,7 +171,7 @@ class IApplication(IContainer, ABC):
 
     @abstractmethod
     def compile(
-        self,
+        self: Self,
         path: str | None = None,
         invalidation_paths: list[str] | None = None,
     ) -> None:
@@ -194,7 +193,7 @@ class IApplication(IContainer, ABC):
 
     @abstractmethod
     def on(
-        self,
+        self: Self,
         lifespan: Lifespan,
         *callbacks: Callable[..., Any] | Callable[..., Awaitable[Any]],
         runtime: Runtime | None = None,
@@ -232,7 +231,7 @@ class IApplication(IContainer, ABC):
 
     @abstractmethod
     def withMiddleware(
-        self,
+        self: Self,
         *middleware: type[IBaseMiddleware],
     ) -> Self:
         """
@@ -251,7 +250,7 @@ class IApplication(IContainer, ABC):
         """
 
     @abstractmethod
-    def getMiddleware(self) -> list[type[IBaseMiddleware]]:
+    def getMiddleware(self: Self) -> list[type[IBaseMiddleware]]:
         """
         Retrieve the list of registered middleware classes.
 
@@ -263,7 +262,7 @@ class IApplication(IContainer, ABC):
 
     @abstractmethod
     def withProviders(
-        self,
+        self: Self,
         *providers: type[IServiceProvider],
     ) -> Self:
         """
@@ -289,7 +288,7 @@ class IApplication(IContainer, ABC):
 
     @abstractmethod
     def withRouting(  # noqa: PLR0913
-        self,
+        self: Self,
         api: str | list[str] | None = None,
         web: str | list[str] | None = None,
         console: str | list[str] | None = None,
@@ -332,7 +331,7 @@ class IApplication(IContainer, ABC):
 
     @abstractmethod
     def withExceptionHandler(
-        self,
+        self: Self,
         handler: type[IBaseExceptionHandler],
     ) -> Self:
         """
@@ -363,7 +362,7 @@ class IApplication(IContainer, ABC):
 
     @abstractmethod
     async def getExceptionHandler(
-        self,
+        self: Self,
     ) -> IBaseExceptionHandler:
         """
         Retrieve the registered exception handler instance.
@@ -387,7 +386,7 @@ class IApplication(IContainer, ABC):
 
     @abstractmethod
     def withScheduler(
-        self,
+        self: Self,
         scheduler: type[IBaseScheduler],
     ) -> Self:
         """
@@ -418,7 +417,7 @@ class IApplication(IContainer, ABC):
 
     @abstractmethod
     async def getScheduler(
-        self,
+        self: Self,
     ) -> IBaseScheduler:
         """
         Retrieve the currently registered scheduler instance.
@@ -436,7 +435,7 @@ class IApplication(IContainer, ABC):
 
     @abstractmethod
     def withConfigApp(
-        self,
+        self: Self,
         **app_config: object,
     ) -> Self:
         """
@@ -456,7 +455,7 @@ class IApplication(IContainer, ABC):
         """
 
     @abstractmethod
-    def withConfigMcp(self, **mcp_config: object) -> Self:
+    def withConfigMcp(self: Self, **mcp_config: object) -> Self:
         """Configure MCP protocol limits and the explicit Origin allowlist.
 
         Parameters
@@ -472,7 +471,7 @@ class IApplication(IContainer, ABC):
 
     @abstractmethod
     def withConfigAuth(
-        self,
+        self: Self,
         **auth_config: object,
     ) -> Self:
         """
@@ -493,7 +492,7 @@ class IApplication(IContainer, ABC):
 
     @abstractmethod
     def withConfigCache(
-        self,
+        self: Self,
         **cache_config: object,
     ) -> Self:
         """
@@ -514,7 +513,7 @@ class IApplication(IContainer, ABC):
 
     @abstractmethod
     def withConfigHttp(
-        self,
+        self: Self,
         **http_config: object,
     ) -> Self:
         """
@@ -535,7 +534,7 @@ class IApplication(IContainer, ABC):
 
     @abstractmethod
     def withConfigDatabase(
-        self,
+        self: Self,
         **database_config: object,
     ) -> Self:
         """
@@ -556,7 +555,7 @@ class IApplication(IContainer, ABC):
 
     @abstractmethod
     def withConfigFilesystems(
-        self,
+        self: Self,
         **filesystems_config: object,
     ) -> Self:
         """
@@ -577,7 +576,7 @@ class IApplication(IContainer, ABC):
 
     @abstractmethod
     def withConfigLogging(
-        self,
+        self: Self,
         **logging_config: object,
     ) -> Self:
         """
@@ -598,7 +597,7 @@ class IApplication(IContainer, ABC):
 
     @abstractmethod
     def withConfigMail(
-        self,
+        self: Self,
         **mail_config: object,
     ) -> Self:
         """
@@ -619,7 +618,7 @@ class IApplication(IContainer, ABC):
 
     @abstractmethod
     def withConfigQueue(
-        self,
+        self: Self,
         **queue_config: object,
     ) -> Self:
         """
@@ -640,7 +639,7 @@ class IApplication(IContainer, ABC):
 
     @abstractmethod
     def withConfigSession(
-        self,
+        self: Self,
         **session_config: object,
     ) -> Self:
         """
@@ -661,7 +660,7 @@ class IApplication(IContainer, ABC):
 
     @abstractmethod
     def withConfigTesting(
-        self,
+        self: Self,
         **testing_config: object,
     ) -> Self:
         """
@@ -682,7 +681,7 @@ class IApplication(IContainer, ABC):
 
     @abstractmethod
     def withConfigPaths(
-        self,
+        self: Self,
         **paths: str | Path | None,
     ) -> Self:
         """
@@ -703,7 +702,7 @@ class IApplication(IContainer, ABC):
         """
 
     @abstractmethod
-    def create(self) -> Self:
+    def create(self: Self) -> Self:
         """
         Bootstrap and initialize the application framework.
 
@@ -717,7 +716,7 @@ class IApplication(IContainer, ABC):
         """
 
     @abstractmethod
-    async def boot(self) -> Self:
+    async def boot(self: Self) -> Self:
         """Create the application and await eager providers for headless use.
 
         Returns
@@ -733,7 +732,7 @@ class IApplication(IContainer, ABC):
 
     @abstractmethod
     async def handleCommand(
-        self,
+        self: Self,
         args: list[str] | None = None,
     ) -> int:
         """
@@ -759,7 +758,7 @@ class IApplication(IContainer, ABC):
 
     @abstractmethod
     def config(
-        self,
+        self: Self,
         key: str | None = None,
         value: object = _SENTINEL,
     ) -> object:
@@ -789,7 +788,7 @@ class IApplication(IContainer, ABC):
         """
 
     @abstractmethod
-    def resetRuntimeConfig(self) -> bool:
+    def resetRuntimeConfig(self: Self) -> bool:
         """
         Reset the runtime configuration to a mutable copy of the bootstrap config.
 
@@ -805,7 +804,7 @@ class IApplication(IContainer, ABC):
 
     @abstractmethod
     def path(
-        self,
+        self: Self,
         key: str | None = None,
     ) -> Path | Mapping[str, Path] | None:
         """
@@ -832,7 +831,7 @@ class IApplication(IContainer, ABC):
 
     @abstractmethod
     def routingPaths(
-        self,
+        self: Self,
         key: str | None = None,
     ) -> list[Path] | dict | None:
         """
@@ -864,7 +863,7 @@ class IApplication(IContainer, ABC):
         """
 
     @abstractmethod
-    def isProduction(self) -> bool:
+    def isProduction(self: Self) -> bool:
         """
         Determine if the application is running in a production environment.
 
@@ -883,7 +882,7 @@ class IApplication(IContainer, ABC):
         """
 
     @abstractmethod
-    def isDebug(self) -> bool:
+    def isDebug(self: Self) -> bool:
         """
         Determine if the application is running in debug mode.
 
@@ -899,7 +898,7 @@ class IApplication(IContainer, ABC):
         """
 
     @abstractmethod
-    def underMaintenance(self) -> bool:
+    def underMaintenance(self: Self) -> bool:
         """
         Determine if the application is currently in maintenance mode.
 

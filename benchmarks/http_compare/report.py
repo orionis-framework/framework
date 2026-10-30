@@ -23,8 +23,8 @@ FIELDS = (
     *METRICS,
     "requests",
     "errors",
-    "reason",
 )
+FAILED_COMPARISON = "Comparison failed or incomplete; see diagnostics.json."
 FRAMEWORK_LABELS = {
     "orionis-rsgi": "Orionis RSGI",
     "orionis-asgi": "Orionis ASGI",
@@ -100,41 +100,24 @@ def write_json(path: Path, value: object) -> None:
 
 def render_summary(report: dict[str, Any]) -> str:
     """
-    Render comparative metrics, environment details, and failures as Markdown.
+    Render only comparative results and an explicit failure notice as Markdown.
 
     Parameters
     ----------
     report : dict[str, Any]
-        Settings, environment metadata, and configuration results.
+        Complete or partial comparison results.
 
     Returns
     -------
     str
-        Markdown summary with a trailing newline and explicit failure details.
+        Markdown results with a trailing newline.
     """
-    # State the measurement policy before presenting comparable rows.
-    settings = report["settings"]
     lines = [
         "# HTTP framework comparison",
         "",
         (
-            f"{settings['connections']} connections; "
-            f"{settings['warmup_seconds']}s warmup; "
-            f"{settings['repetitions']} x "
-            f"{settings['duration_seconds']}s per configuration."
-        ),
-        (
-            "HTTP/1.1 keep-alive; Granian runtime threads: 1; "
-            "asyncio; oha worker threads: 1."
-        ),
-        (
-            "Medians of individual runs; throughput counts HTTP 200 only. "
-            "Latency is in ms."
-        ),
-        "",
-        (
             "| Framework | Interface | Workers | Status | Requests/s | "
-            "Mean | p50 | p95 | p99 | Errors |"
+            "Mean (ms) | p50 (ms) | p95 (ms) | p99 (ms) | Errors |"
         ),
         "| --- | --- | ---: | --- | ---: | ---: | ---: | ---: | ---: | ---: |",
     ]
@@ -145,35 +128,8 @@ def render_summary(report: dict[str, Any]) -> str:
             f"| {row['framework']} | {row['interface']} | {row['workers']} | "
             f"{row['status']} | {' | '.join(values)} | {row.get('errors', '-')} |",
         )
-    # Keep the runtime context alongside the numbers it qualifies.
-    lines.extend(["", "## Environment", ""])
-    environment = report["environment"]
-    lines.extend(
-        f"- {key}: {environment.get(key, '')}"
-        for key in ("os", "cpu", "logical_cpus", "python", "commit", "dirty", "run_url")
-    )
-    for package, package_version in environment["versions"].items():
-        lines.append(f"- {package}: {package_version}")
-    lines.extend(
-        [
-            "",
-            (
-                "GitHub-hosted runners vary; this Hello World test "
-                "does not represent a full application."
-            ),
-        ],
-    )
-    # Retain setup and per-case failure reasons beside any successful results.
-    failures = [row for row in report["results"] if row.get("reason")]
-    if failures or report.get("error"):
-        lines.extend(["", "## Incomplete or failed measurements", ""])
-        if report.get("error"):
-            lines.append(f"- Setup: {report['error']}")
-        lines.extend(
-            f"- {row['framework']} ({row['interface']}) / "
-            f"{row['workers']} workers: {row['reason']}"
-            for row in failures
-        )
+    if "error" in report or any(row["status"] != "ok" for row in report["results"]):
+        lines.extend(["", FAILED_COMPARISON])
     return "\n".join(lines) + "\n"
 
 def render_throughput_svg(report: dict[str, Any], workers: int) -> str:
@@ -183,25 +139,24 @@ def render_throughput_svg(report: dict[str, Any], workers: int) -> str:
     Parameters
     ----------
     report : dict[str, Any]
-        Comparison report with settings, environment, and aggregated results.
+        Selected frameworks and aggregated comparison results.
     workers : int
         Worker count to display without mixing different configurations.
 
     Returns
     -------
     str
-        Standalone SVG with accessible labels and measurement context.
+        Standalone SVG with accessible framework labels and result quantities.
 
     Raises
     ------
     ValueError
         If the selected comparison is incomplete, failed, or has invalid rates.
     """
-    settings = report["settings"]
-    expected = set(settings["frameworks"])
+    expected = set(report["settings"]["frameworks"])
     rows = [row for row in report["results"] if row["workers"] == workers]
     if (
-        report.get("error")
+        "error" in report
         or not expected
         or len(rows) != len(expected)
         or {row["framework"] for row in rows} != expected
@@ -228,9 +183,9 @@ def render_throughput_svg(report: dict[str, Any], workers: int) -> str:
     precision = max(0, -math.floor(math.log10(step)))
     plot_left, plot_width, plot_top, row_height = 150, 620, 100, 60
     plot_bottom = plot_top + len(rows) * row_height - 12
-    height = plot_bottom + 108
+    height = plot_bottom + 48
     title = f"Throughput with {workers} worker{'s' if workers != 1 else ''}"
-    description = "Successful HTTP 200 requests per second. Higher is better."
+    description = "Successful HTTP 200 requests per second."
     lines = [
         (
             '<svg xmlns="http://www.w3.org/2000/svg" '
@@ -286,37 +241,12 @@ def render_throughput_svg(report: dict[str, Any], workers: int) -> str:
             ),
             "</g>",
         ])
-    environment = report["environment"]
-    measurement = (
-        f"Median of {settings['repetitions']} x "
-        f"{settings['duration_seconds']:g}s | "
-        f"{settings['connections']} connections | "
-        f"{settings['warmup_seconds']:g}s warmup"
-    )
-    context = (
-        f"Python {environment['python']} | "
-        f"Granian {environment['versions']['granian']} | "
-        f"Commit {environment.get('commit', 'unknown')[:7]} | "
-        f"{environment.get('recorded_at', 'unknown').split('T')[0]}"
-    )
-    for offset, text in (
-        (54, measurement),
-        (74, context),
-        (
-            94,
-            "Hello World microbenchmark; GitHub-hosted runner performance varies.",
-        ),
-    ):
-        lines.append(
-            f'<text class="muted" x="30" y="{plot_bottom + offset}">'
-            f"{escape(text)}</text>",
-        )
     lines.append("</svg>")
     return "\n".join(lines) + "\n"
 
 def write_reports(output: Path, report: dict[str, Any]) -> str:
     """
-    Persist consistent JSON, CSV, environment, and Markdown artifacts.
+    Persist results-only reports separately from complete diagnostics.
 
     Parameters
     ----------
@@ -330,13 +260,25 @@ def write_reports(output: Path, report: dict[str, Any]) -> str:
     str
         Markdown summary also saved as ``summary.md``.
     """
-    # Derive every artifact from the same report to prevent divergent summaries.
-    write_json(output / "summary.json", report)
+    write_json(output / "diagnostics.json", report)
+    summary: dict[str, Any] = {
+        "schema_version": 2,
+        "settings": {
+            key: report["settings"][key] for key in ("frameworks", "workers")
+        },
+        "results": [
+            {key: row[key] for key in FIELDS if key in row}
+            for row in report["results"]
+        ],
+    }
+    if "error" in report:
+        summary["error"] = FAILED_COMPARISON
+    write_json(output / "summary.json", summary)
     write_json(output / "environment.json", report["environment"])
     with (output / "summary.csv").open("w", encoding="utf-8", newline="") as stream:
-        writer = csv.DictWriter(stream, fieldnames=FIELDS, extrasaction="ignore")
+        writer = csv.DictWriter(stream, fieldnames=FIELDS)
         writer.writeheader()
-        writer.writerows(report["results"])
-    markdown = render_summary(report)
+        writer.writerows(summary["results"])
+    markdown = render_summary(summary)
     (output / "summary.md").write_text(markdown, encoding="utf-8")
     return markdown

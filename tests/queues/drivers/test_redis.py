@@ -1,7 +1,15 @@
-from typing import TYPE_CHECKING
-from redis.exceptions import RedisError
+from typing import TYPE_CHECKING, Self
+from redis.exceptions import NoScriptError, RedisError
 from orionis.foundation.config.queue import Redis as RedisConfig
-from orionis.queues.drivers.redis import RedisQueueDriver
+from orionis.queues.drivers.redis import (
+    _CLEAR,
+    _DELETE,
+    _PUSH,
+    _RELEASE,
+    _RESERVE,
+    RedisQueueDriver,
+    _script_digest,
+)
 from orionis.queues.exceptions import QueueConfigurationError, QueueStorageError
 from orionis.test import TestCase
 from tests.queues.drivers.test_database import make_envelope
@@ -9,13 +17,20 @@ from tests.queues.drivers.test_database import make_envelope
 if TYPE_CHECKING:
     from orionis.queues.entities.reserved_job import ReservedJob
 
-
 class _RedisTransport:
     """Provide explicit replies and capture atomic Redis transport calls."""
 
-    __slots__ = ("calls", "closed", "error", "replies", "size_value")
+    __slots__ = (
+        "calls",
+        "closed",
+        "error",
+        "missing",
+        "replies",
+        "sha_calls",
+        "size_value",
+    )
 
-    def __init__(self) -> None:
+    def __init__(self: Self) -> None:
         """Initialize a transport fake with explicit controllable state.
 
         Returns
@@ -28,8 +43,36 @@ class _RedisTransport:
         self.error: RedisError | None = None
         self.size_value = 0
         self.closed = False
+        self.missing = False
+        self.sha_calls = []
 
-    async def eval(self, script: str, numkeys: int, *values: object) -> object:
+    async def evalsha(self: Self, digest: str, numkeys: int, *values: object) -> object:
+        """
+        Model a warmed Redis script cache and an explicit NOSCRIPT response.
+
+        Parameters
+        ----------
+        digest : str
+            Value supplied for ``digest``.
+        numkeys : int
+            Value supplied for ``numkeys``.
+        *values : object
+            Value supplied for ``values``.
+
+        Returns
+        -------
+        object
+            Result of the wrapped operation.
+        """
+        self.sha_calls.append((digest, numkeys, values))
+        if self.missing:
+            self.missing = False
+            raise NoScriptError
+        scripts = (_PUSH, _RESERVE, _RELEASE, _DELETE, _CLEAR)
+        script = next(script for script in scripts if _script_digest(script) == digest)
+        return await self.eval(script, numkeys, *values)
+
+    async def eval(self: Self, script: str, numkeys: int, *values: object) -> object:
         """Capture one script invocation and return its explicitly queued reply.
 
         Parameters
@@ -51,7 +94,7 @@ class _RedisTransport:
             raise self.error
         return self.replies.pop(0)
 
-    async def hlen(self, key: str) -> int:
+    async def hlen(self: Self, key: str) -> int:
         """Capture a hash-size request and return its explicit count.
 
         Parameters
@@ -69,7 +112,7 @@ class _RedisTransport:
             raise self.error
         return self.size_value
 
-    async def aclose(self) -> None:
+    async def aclose(self: Self) -> None:
         """Record a request to close the transport.
 
         Returns
@@ -79,13 +122,12 @@ class _RedisTransport:
         """
         self.closed = True
 
-
 class TestRedisQueueDriverTransport(TestCase):
     """Verify driver transport and result validation without a Redis server."""
 
     __slots__ = ("_driver", "_transport")
 
-    async def asyncSetUp(self) -> None:
+    async def asyncSetUp(self: Self) -> None:
         """Create an injected transport with no network connections.
 
         Returns
@@ -95,10 +137,11 @@ class TestRedisQueueDriverTransport(TestCase):
         """
         self._transport = _RedisTransport()
         self._driver = RedisQueueDriver(
-            RedisConfig(prefix="test:queues"), client=self._transport,
+            RedisConfig(prefix="test:queues"),
+            client=self._transport,
         )
 
-    async def _reserve(self) -> ReservedJob:
+    async def _reserve(self: Self) -> ReservedJob:
         """Prepare and reserve an envelope using a valid transport reply.
 
         Returns
@@ -110,7 +153,26 @@ class TestRedisQueueDriverTransport(TestCase):
         self._transport.replies.append([envelope.id.encode(), b"envelope", 2])
         return await self._driver.reserve(("high",), 60.0)
 
-    async def testPushUsesOneAtomicScriptAndColocatedKeys(self) -> None:
+    async def testMissingScriptFallsBackWithoutRepeatingTheTransition(
+        self: Self,
+    ) -> None:
+        """
+        Load a missing script on the owning node, then use its digest again.
+
+        Returns
+        -------
+        None
+            Complete the assertions without returning a value.
+        """
+        self._transport.missing = True
+        self._transport.replies.extend([1, 1])
+        await self._driver.push(make_envelope("high"))
+        await self._driver.push(make_envelope("high"))
+        self.assertEqual(len(self._transport.sha_calls), 2)
+        self.assertEqual(len(self._transport.calls), 2)
+        self.assertTrue(all(len(call[0]) == 40 for call in self._transport.sha_calls))
+
+    async def testPushUsesOneAtomicScriptAndColocatedKeys(self: Self) -> None:
         """Submit payload and availability in one atomic script call.
 
         Returns
@@ -130,7 +192,7 @@ class TestRedisQueueDriverTransport(TestCase):
         self.assertIn("HEXISTS", script)
         self.assertEqual(len(self._transport.calls), 1)
 
-    async def testReserveRespectsPriorityAndReconstructsClaim(self) -> None:
+    async def testReserveRespectsPriorityAndReconstructsClaim(self: Self) -> None:
         """Try queues in priority order and preserve claim metadata.
 
         Returns
@@ -150,7 +212,7 @@ class TestRedisQueueDriverTransport(TestCase):
         self.assertIn("{high}", self._transport.calls[0][2][0])
         self.assertIn("{default}", self._transport.calls[1][2][0])
 
-    async def testReserveReturnsNoneWhenAllQueuesEmpty(self) -> None:
+    async def testReserveReturnsNoneWhenAllQueuesEmpty(self: Self) -> None:
         """Return no reservation when every priority queue is empty.
 
         Returns
@@ -161,7 +223,7 @@ class TestRedisQueueDriverTransport(TestCase):
         self._transport.replies.extend([[], []])
         self.assertIsNone(await self._driver.reserve(("high", "default"), 60.0))
 
-    async def testMalformedRepliesFailExplicitly(self) -> None:
+    async def testMalformedRepliesFailExplicitly(self: Self) -> None:
         """Reject malformed claim replies without silently treating them as empty.
 
         Returns
@@ -170,14 +232,18 @@ class TestRedisQueueDriverTransport(TestCase):
             Assert invalid result shape and identifiers fail explicitly.
         """
         for reply in (
-            None, [b"id"], [b"id", "payload", 1], [b"id", b"wire", 0],
-            [b"id", b"wire", "1"], [b"\xff", b"wire", 1],
+            None,
+            [b"id"],
+            [b"id", "payload", 1],
+            [b"id", b"wire", 0],
+            [b"id", b"wire", "1"],
+            [b"\xff", b"wire", 1],
         ):
             self._transport.replies.append(reply)
             with self.assertRaises(QueueStorageError):
                 await self._driver.reserve(("default",), 60.0)
 
-    async def testReleaseAndDeleteCarryFencingToken(self) -> None:
+    async def testReleaseAndDeleteCarryFencingToken(self: Self) -> None:
         """Bind reservation identifiers and tokens to ownership transitions.
 
         Returns
@@ -196,7 +262,7 @@ class TestRedisQueueDriverTransport(TestCase):
             self.assertEqual(values[key_count + 1], reserved.token)
             self.assertIn("tonumber(lease)", script)
 
-    async def testSizeAndClearReportAllPersistedJobs(self) -> None:
+    async def testSizeAndClearReportAllPersistedJobs(self: Self) -> None:
         """Count and clear complete queue state through their transport contracts.
 
         Returns
@@ -210,7 +276,7 @@ class TestRedisQueueDriverTransport(TestCase):
         self.assertEqual(await self._driver.clear("default"), 7)
         self.assertIn("unpack(KEYS)", self._transport.calls[-1][0])
 
-    async def testTranslateRedisErrorsPreservingCause(self) -> None:
+    async def testTranslateRedisErrorsPreservingCause(self: Self) -> None:
         """Translate transport failures while retaining their original cause.
 
         Returns
@@ -218,14 +284,15 @@ class TestRedisQueueDriverTransport(TestCase):
         None
             Assert Redis diagnostics remain available through exception chaining.
         """
-        self._transport.error = RedisError("transport unavailable")
+        error_msg = "transport unavailable"
+        self._transport.error = RedisError(error_msg)
         with self.assertRaises(QueueStorageError) as raised:
             await self._driver.push(make_envelope())
         self.assertIs(raised.exception.__cause__, self._transport.error)
         with self.assertRaises(QueueStorageError):
             await self._driver.size("default")
 
-    async def testRejectDuplicateIdentifier(self) -> None:
+    async def testRejectDuplicateIdentifier(self: Self) -> None:
         """Reject Redis's duplicate-id response without mutating the envelope.
 
         Returns
@@ -237,7 +304,7 @@ class TestRedisQueueDriverTransport(TestCase):
         with self.assertRaises(QueueStorageError):
             await self._driver.push(make_envelope())
 
-    async def testCloseLeavesInjectedTransportOwnedByCaller(self) -> None:
+    async def testCloseLeavesInjectedTransportOwnedByCaller(self: Self) -> None:
         """Preserve caller ownership of an explicitly injected Redis transport.
 
         Returns
@@ -248,7 +315,7 @@ class TestRedisQueueDriverTransport(TestCase):
         await self._driver.close()
         self.assertFalse(self._transport.closed)
 
-    async def testRejectInvalidQueueAndPrefix(self) -> None:
+    async def testRejectInvalidQueueAndPrefix(self: Self) -> None:
         """Reject invalid queue names and Redis key namespaces.
 
         Returns
@@ -260,6 +327,7 @@ class TestRedisQueueDriverTransport(TestCase):
             await self._driver.reserve(("bad{queue}",), 60.0)
         with self.assertRaises(QueueStorageError):
             RedisQueueDriver(
-                RedisConfig(prefix="bad{prefix}"), client=self._transport,
+                RedisConfig(prefix="bad{prefix}"),
+                client=self._transport,
             )
         self.assertEqual(self._transport.calls, [])

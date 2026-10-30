@@ -1,10 +1,9 @@
 from __future__ import annotations
 from dataclasses import dataclass, field
+from typing import Self
 from orionis.environment import Env
+from orionis.foundation.config.validation import validate_store_port
 from orionis.support.entities.base import BaseEntity
-
-# Highest valid TCP/UDP port number.
-_MAX_PORT = 65535
 
 @dataclass(frozen=True, kw_only=True)
 class Memcached(BaseEntity):
@@ -49,7 +48,7 @@ class Memcached(BaseEntity):
         },
     )
 
-    def __validateDriver(self) -> None:
+    def __validateDriver(self: Self) -> None:
         """
         Validate the ``driver`` property.
 
@@ -69,7 +68,7 @@ class Memcached(BaseEntity):
             error_msg = "The 'driver' property must be 'memcached'."
             raise ValueError(error_msg)
 
-    def __validateEndpoint(self) -> None:
+    def __validateEndpoint(self: Self) -> None:
         """
         Validate the ``endpoint`` property.
 
@@ -87,30 +86,7 @@ class Memcached(BaseEntity):
             error_msg = "The 'endpoint' property must be a string or None."
             raise TypeError(error_msg)
 
-    def __validatePort(self) -> None:
-        """
-        Validate the ``port`` property.
-
-        Returns
-        -------
-        None
-            This method performs validation and returns None.
-
-        Raises
-        ------
-        TypeError
-            If ``port`` is not an integer.
-        ValueError
-            If ``port`` is not between ``1`` and ``65535``.
-        """
-        if not isinstance(self.port, int) or isinstance(self.port, bool):
-            error_msg = "The 'port' property must be an integer."
-            raise TypeError(error_msg)
-        if not (1 <= self.port <= _MAX_PORT):
-            error_msg = f"The 'port' property must be between 1 and {_MAX_PORT}."
-            raise ValueError(error_msg)
-
-    def __post_init__(self) -> None:
+    def __post_init__(self: Self) -> None:
         """
         Validate the Memcached configuration after initialization.
 
@@ -132,4 +108,4 @@ class Memcached(BaseEntity):
         # Validate each property according to its type hint
         self.__validateDriver()
         self.__validateEndpoint()
-        self.__validatePort()
+        validate_store_port(self.port)

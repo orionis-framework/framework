@@ -1,11 +1,9 @@
 from __future__ import annotations
-import re
 from dataclasses import dataclass, field
+from typing import Self
 from orionis.environment import Env
+from orionis.foundation.config.validation import validate_store_table
 from orionis.support.entities.base import BaseEntity
-
-# Table names must start and contain only lowercase letters or underscores.
-_TABLE_NAME_PATTERN = re.compile(r"[a-z_]+")
 
 @dataclass(frozen=True, kw_only=True)
 class Database(BaseEntity):
@@ -64,7 +62,7 @@ class Database(BaseEntity):
         },
     )
 
-    def __validateDriver(self) -> None:
+    def __validateDriver(self: Self) -> None:
         """
         Validate the ``driver`` property.
 
@@ -82,10 +80,10 @@ class Database(BaseEntity):
         """
         # Ensure the driver is set to 'database' for this store.
         if self.driver != "database":
-            message = f"Invalid driver for Database store: {self.driver}"
-            raise ValueError(message)
+            error_msg = f"Invalid driver for Database store: {self.driver}"
+            raise ValueError(error_msg)
 
-    def __validateConnection(self) -> None:
+    def __validateConnection(self: Self) -> None:
         """
         Validate the ``connection`` property.
 
@@ -103,33 +101,7 @@ class Database(BaseEntity):
             error_msg = "The 'connection' property must be a string or None."
             raise TypeError(error_msg)
 
-    def __validateTable(self) -> None:
-        """
-        Validate the ``table`` property.
-
-        Returns
-        -------
-        None
-            This method performs validation and returns None.
-
-        Raises
-        ------
-        TypeError
-            If ``table`` is not a string.
-        ValueError
-            If ``table`` does not match the required pattern.
-        """
-        if not isinstance(self.table, str):
-            error_msg = "The 'table' property must be a string."
-            raise TypeError(error_msg)
-        if not _TABLE_NAME_PATTERN.fullmatch(self.table):
-            error_msg = (
-                "The 'table' property must be a valid table name: contain "
-                "only lowercase letters or underscores (no numbers allowed)."
-            )
-            raise ValueError(error_msg)
-
-    def __post_init__(self) -> None:
+    def __post_init__(self: Self) -> None:
         """
         Validate the Database job store configuration after initialization.
 
@@ -151,4 +123,4 @@ class Database(BaseEntity):
         # Validate each property according to its type hint
         self.__validateDriver()
         self.__validateConnection()
-        self.__validateTable()
+        validate_store_table(self.table)

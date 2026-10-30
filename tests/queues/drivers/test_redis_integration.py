@@ -1,18 +1,25 @@
+import asyncio
 import os
+from typing import Self
 from uuid import uuid4
 import msgspec
 from orionis.foundation.config.queue import Redis as RedisConfig
+from orionis.queues.drivers import redis as redis_module
 from orionis.queues.drivers.redis import RedisQueueDriver
 from orionis.queues.exceptions import QueueStorageError
 from orionis.test import TestCase
-from tests.queues.drivers.test_database import DurableDriverContract, make_envelope
+from tests.queues.drivers.test_database import (
+    DurableDriverContract,
+    _Clock,
+    make_envelope,
+)
 
 class TestRedisQueueIntegration(DurableDriverContract, TestCase):
     """Run the durable contract explicitly against an isolated Redis server."""
 
-    __slots__ = ("_driver", "_settings")
+    __slots__ = ("_clock", "_driver", "_settings")
 
-    async def asyncSetUp(self) -> None:
+    async def asyncSetUp(self: Self) -> None:
         """Require an explicit Redis host and isolate every test namespace.
 
         Returns
@@ -30,6 +37,16 @@ class TestRedisQueueIntegration(DurableDriverContract, TestCase):
             self.skipTest(
                 "Set ORIONIS_QUEUE_REDIS_HOST to run Redis integration tests.",
             )
+        # Lua receives the caller's timestamp. Control that timestamp just as
+        # the database contract does, without assuming network calls take <80 ms.
+        self.addCleanup(
+            setattr,
+            redis_module,
+            "current_time",
+            redis_module.current_time,
+        )
+        self._clock = _Clock()
+        redis_module.current_time = self._clock
         self._settings = RedisConfig(
             endpoint=host,
             port=int(os.environ.get("ORIONIS_QUEUE_REDIS_PORT", "6379")),
@@ -39,7 +56,23 @@ class TestRedisQueueIntegration(DurableDriverContract, TestCase):
         )
         self._driver = RedisQueueDriver(self._settings)
 
-    async def asyncTearDown(self) -> None:
+    async def _advanceTime(self: Self, seconds: float) -> None:
+        """Advance lease deadlines independently of network or debug-loop latency.
+
+        Parameters
+        ----------
+        seconds : float
+            Duration added to the timestamp passed to Lua.
+
+        Returns
+        -------
+        None
+            Yield once after advancing the controlled clock.
+        """
+        self._clock.now += seconds
+        await asyncio.sleep(0)
+
+    async def asyncTearDown(self: Self) -> None:
         """Remove isolated queue namespaces and close Redis connections.
 
         Returns
@@ -51,7 +84,7 @@ class TestRedisQueueIntegration(DurableDriverContract, TestCase):
             await self._driver.clear(queue)
         await self._driver.close()
 
-    async def testPersistenceAcrossDriverRecreation(self) -> None:
+    async def testPersistenceAcrossDriverRecreation(self: Self) -> None:
         """Retain queued state when recreating the Redis client and driver.
 
         Returns
@@ -69,7 +102,7 @@ class TestRedisQueueIntegration(DurableDriverContract, TestCase):
         self.assertEqual(next_reservation.id, envelope.id)
         self.assertEqual(next_reservation.attempts, 2)
 
-    async def testCorruptAttemptsNeverRemoveReadyJob(self) -> None:
+    async def testCorruptAttemptsNeverRemoveReadyJob(self: Self) -> None:
         """Reject corrupt counters before removing any ready queue state.
 
         Returns
@@ -91,7 +124,7 @@ class TestRedisQueueIntegration(DurableDriverContract, TestCase):
         self.assertEqual(reserved.attempts, 1)
         self.assertTrue(await self._driver.delete(reserved))
 
-    async def testMissingPayloadNeverRemovesReadyJob(self) -> None:
+    async def testMissingPayloadNeverRemovesReadyJob(self: Self) -> None:
         """Preserve ready state when a stored envelope has been corrupted.
 
         Returns
@@ -108,13 +141,16 @@ class TestRedisQueueIntegration(DurableDriverContract, TestCase):
         self.assertIsNotNone(await self._driver._client.zscore(keys[0], envelope.id))
         self.assertEqual(await self._driver._client.zcard(keys[1]), 0)
         await self._driver._client.hset(
-            keys[2], envelope.id, msgspec.json.encode(envelope),
+            keys[2],
+            envelope.id,
+            msgspec.json.encode(envelope),
         )
         self.assertEqual(
-            (await self._driver.reserve(("default",), 60.0)).id, envelope.id,
+            (await self._driver.reserve(("default",), 60.0)).id,
+            envelope.id,
         )
 
-    async def testWrongKeyTypeNeverPartiallyPushes(self) -> None:
+    async def testWrongKeyTypeNeverPartiallyPushes(self: Self) -> None:
         """Reject incorrect Redis key types before storing partial job state.
 
         Returns
@@ -130,7 +166,7 @@ class TestRedisQueueIntegration(DurableDriverContract, TestCase):
         self.assertEqual(await self._driver._client.hlen(keys[2]), 0)
         self.assertEqual(await self._driver._client.hlen(keys[3]), 0)
 
-    async def testWrongReadyTypeNeverLosesReleasedReservation(self) -> None:
+    async def testWrongReadyTypeNeverLosesReleasedReservation(self: Self) -> None:
         """Validate release destination types before removing an owned lease.
 
         Returns

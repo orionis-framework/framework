@@ -1,6 +1,7 @@
 import asyncio
 import gc
 import weakref
+from typing import Self
 from unittest.mock import patch
 from orionis.container.container import Container
 from orionis.container.context.scope import ScopedContext
@@ -18,7 +19,7 @@ class _Replacement(_Service):
 class _Controller:
     """Receive a service in an action with explicit arguments."""
 
-    async def handle(self, service: _Service, count: int = 2) -> tuple:
+    async def handle(self: Self, service: _Service, count: int = 2) -> tuple:
         """Return the resolved service and count.
 
         Parameters
@@ -43,7 +44,7 @@ class _Payload(Schema):
 class _ScopedService:
     """Suspend DI while obtaining a payload."""
 
-    def __init__(self, payload: _Payload) -> None:
+    def __init__(self: Self, payload: _Payload) -> None:
         """Store the validated payload.
 
         Parameters
@@ -61,7 +62,7 @@ class _ScopedService:
 class _Request(Request):
     """Gate body reads using events controlled by a test."""
 
-    def __init__(self, entered: asyncio.Queue, release: asyncio.Event) -> None:
+    def __init__(self: Self, entered: asyncio.Queue, release: asyncio.Event) -> None:
         """Store the shared read gate.
 
         Parameters
@@ -79,7 +80,7 @@ class _Request(Request):
         self.entered = entered
         self.release = release
 
-    async def data(self) -> dict[str, int]:
+    async def data(self: Self) -> dict[str, int]:
         """Publish a read marker and wait for the test gate.
 
         Returns
@@ -100,7 +101,7 @@ class _MultiProvider:
     registrations = 0
     boots = 0
 
-    def register(self) -> None:
+    def register(self: Self) -> None:
         """Register both services and their aliases.
 
         Returns
@@ -112,7 +113,7 @@ class _MultiProvider:
         self.container.singleton(None, _Service, alias="first")
         self.container.singleton(None, _Replacement, alias="second")
 
-    async def boot(self) -> None:
+    async def boot(self: Self) -> None:
         """Resolve an owned service and await readiness.
 
         Returns
@@ -128,7 +129,7 @@ class _MultiProvider:
 class TestDispatchPlans(TestCase):
     """Keep metadata reusable while dependencies and lifetimes stay dynamic."""
 
-    def setUp(self) -> None:
+    def setUp(self: Self) -> None:
         """Create an isolated container outside the runner's scope.
 
         Returns
@@ -140,7 +141,7 @@ class TestDispatchPlans(TestCase):
         self.container = object.__new__(Container)
         Container.__init__(self.container)
 
-    def tearDown(self) -> None:
+    def tearDown(self: Self) -> None:
         """Restore the caller's scope.
 
         Returns
@@ -150,7 +151,7 @@ class TestDispatchPlans(TestCase):
         """
         ScopedContext.reset(self.token)
 
-    async def testPlansDoNotRetainControllers(self) -> None:
+    async def testPlansDoNotRetainControllers(self: Self) -> None:
         """Release controllers after invoking a shared method plan.
 
         Returns
@@ -168,7 +169,7 @@ class TestDispatchPlans(TestCase):
         gc.collect()
         self.assertFalse(any(reference() is not None for reference in references))
 
-    async def testWarmPlansHonorBindingAndArgumentOverrides(self) -> None:
+    async def testWarmPlansHonorBindingAndArgumentOverrides(self: Self) -> None:
         """Read current bindings and explicit keyword values on each invocation.
 
         Returns
@@ -185,11 +186,12 @@ class TestDispatchPlans(TestCase):
         self.assertIsInstance(replacement, _Replacement)
         self.assertEqual(count, 9)
         arguments = {"service": first, "count": 8}
-        self.assertEqual(await self.container.call(controller, "handle", **arguments),
-                         (first, 8))
+        self.assertEqual(
+            await self.container.call(controller, "handle", **arguments), (first, 8),
+        )
         self.assertEqual(arguments, {"service": first, "count": 8})
 
-    async def testWarmPlanSkipsRepeatedCoroutineIntrospection(self) -> None:
+    async def testWarmPlanSkipsRepeatedCoroutineIntrospection(self: Self) -> None:
         """Reuse cached coroutine metadata during invocation.
 
         Returns
@@ -199,13 +201,113 @@ class TestDispatchPlans(TestCase):
         """
         controller = _Controller()
         callable_plan(controller.handle)
-        with patch("orionis.container.entities.invocation.inspect.iscoroutinefunction",
-                   side_effect=AssertionError("Unexpected introspection")):
+        error_msg = "Unexpected introspection"
+        with patch(
+            "orionis.container.entities.invocation.inspect.iscoroutinefunction",
+            side_effect=AssertionError(error_msg),
+        ):
             service, count = await self.container.call(controller, "handle")
         self.assertIsInstance(service, _Service)
         self.assertEqual(count, 2)
 
-    async def testReplacedMethodsAndConstructorsGetNewPlans(self) -> None:
+    async def testPositionalPlansObserveLifetimeChangesAndScopes(self: Self) -> None:
+        """Resolve warm positional plans against current registrations.
+
+        Returns
+        -------
+        None
+            Cached metadata retains neither service instances nor request scopes.
+        """
+        controller = _Controller()
+        original = _Service()
+        self.container.instance(_Service, original)
+        self.assertIs((await self.container.call(controller, "handle"))[0], original)
+
+        self.container.singleton(_Service, _Replacement, override=True)
+        shared = (await self.container.call(controller, "handle"))[0]
+        self.assertIsInstance(shared, _Replacement)
+        self.assertIs((await self.container.call(controller, "handle"))[0], shared)
+
+        self.container.transient(_Service, _Service, override=True)
+        first = (await self.container.call(controller, "handle"))[0]
+        second = (await self.container.call(controller, "handle"))[0]
+        self.assertIsNot(first, second)
+        self.assertIsNot(first, shared)
+
+        self.container.scoped(_Service, _Service, override=True)
+        async with self.container.beginScope():
+            scoped = (await self.container.call(controller, "handle"))[0]
+            self.assertIs((await self.container.call(controller, "handle"))[0], scoped)
+        async with self.container.beginScope():
+            self.assertIsNot(
+                (await self.container.call(controller, "handle"))[0],
+                scoped,
+            )
+
+    async def testPositionalCallsKeepDefaultsOverridesAndArgumentErrors(
+        self: Self,
+    ) -> None:
+        """Preserve partial positional input and Python's binding errors.
+
+        Returns
+        -------
+        None
+            Overrides remain per-call and invalid inputs are not discarded.
+        """
+        controller = _Controller()
+        explicit = _Service()
+        self.assertEqual(
+            await self.container.call(controller, "handle", explicit),
+            (explicit, 2),
+        )
+        self.assertEqual(
+            await self.container.call(controller, "handle", explicit, 7),
+            (explicit, 7),
+        )
+        arguments = {"service": explicit}
+        with self.assertRaises(TypeError):
+            await self.container.call(controller, "handle", explicit, **arguments)
+        self.assertEqual(arguments, {"service": explicit})
+        with self.assertRaises(TypeError):
+            await self.container.call(controller, "handle", explicit, 7, 8)
+        with self.assertRaises(TypeError):
+            await self.container.call(controller, "handle", unexpected=True)
+
+    async def testPositionalCallsForwardVariadicValues(self: Self) -> None:
+        """Pass the variadic tail after resolving ordinary parameters.
+
+        Returns
+        -------
+        None
+            Supplied values reach a positional-only callable unchanged.
+        """
+
+        def action(service: _Service, /, *extra: object) -> tuple:
+            """Return the service and variadic values.
+
+            Parameters
+            ----------
+            service : _Service
+                Explicit or injected service.
+            *extra : object
+                Additional positional values.
+
+            Returns
+            -------
+            tuple
+                Service followed by the extra values.
+            """
+            return service, extra
+
+        service = _Service()
+        self.container.instance(_Service, service)
+        self.assertEqual(await self.container.invoke(action), (service, ()))
+        self.assertEqual(
+            await self.container.invoke(action, service, "tail", 3),
+            (service, ("tail", 3)),
+        )
+
+    async def testReplacedMethodsAndConstructorsGetNewPlans(self: Self) -> None:
         """Observe callable replacements without reusing obsolete metadata.
 
         Returns
@@ -217,7 +319,7 @@ class TestDispatchPlans(TestCase):
         class MutableController:
             """Expose a controller whose callable descriptors can change."""
 
-            def action(self, value: int = 1) -> int:
+            def action(self: Self, value: int = 1) -> int:
                 """Return the action value.
 
                 Parameters
@@ -232,7 +334,9 @@ class TestDispatchPlans(TestCase):
                 """
                 return value
 
-        def replacement_action(self, value: int = 9) -> int:  # noqa: ARG001
+        def replacement_action(
+            self: MutableController, value: int = 9,  # noqa: ARG001
+        ) -> int:
             """Return the replacement action value.
 
             Parameters
@@ -249,7 +353,7 @@ class TestDispatchPlans(TestCase):
             """
             return value
 
-        def replacement_constructor(self, value: int = 4) -> None:
+        def replacement_constructor(self: MutableController, value: int = 4) -> None:
             """Store the replacement constructor value.
 
             Parameters
@@ -273,7 +377,7 @@ class TestDispatchPlans(TestCase):
         self.assertEqual(await self.container.call(controller, "action"), 9)
         self.assertEqual((await self.container.build(MutableController)).value, 4)
 
-    async def testIndependentScopesConstructConcurrently(self) -> None:
+    async def testIndependentScopesConstructConcurrently(self: Self) -> None:
         """Start construction in two scopes before either body read completes.
 
         Returns
@@ -308,7 +412,7 @@ class TestDispatchPlans(TestCase):
                 release.set()
         self.assertIsNot(first.result(), second.result())
 
-    async def testCancelledScopedConstructionCanRetry(self) -> None:
+    async def testCancelledScopedConstructionCanRetry(self: Self) -> None:
         """Release the construction lock when its owner is cancelled.
 
         Returns
@@ -330,7 +434,7 @@ class TestDispatchPlans(TestCase):
             resolved = await self.container.make(_ScopedService)
             self.assertIs(resolved, await self.container.make(_ScopedService))
 
-    def _configureProvider(self) -> None:
+    def _configureProvider(self: Self) -> None:
         """Configure the multi-service deferred provider fixture.
 
         Returns
@@ -351,7 +455,7 @@ class TestDispatchPlans(TestCase):
             f"{_Replacement.__module__}.{_Replacement.__name__}": metadata,
         }
 
-    async def testProviderContractsShareReadiness(self) -> None:
+    async def testProviderContractsShareReadiness(self: Self) -> None:
         """Wait for a provider before returning another registered contract.
 
         Returns
@@ -376,7 +480,33 @@ class TestDispatchPlans(TestCase):
         self.assertEqual(_MultiProvider.registrations, 1)
         self.assertEqual(_MultiProvider.boots, 1)
 
-    async def testCancelledProviderBootReusesRegistration(self) -> None:
+    async def testPositionalInvocationWaitsForDeferredProviderReadiness(
+        self: Self,
+    ) -> None:
+        """Keep a warm invocation blocked until its provider finishes booting.
+
+        Returns
+        -------
+        None
+            Positional specialization preserves deferred-provider coordination.
+        """
+        self._configureProvider()
+        controller = _Controller()
+        callable_plan(controller.handle)
+        async with asyncio.TaskGroup() as group:
+            first = group.create_task(self.container.make("first"))
+            await _MultiProvider.entered.wait()
+            second = group.create_task(self.container.call(controller, "handle"))
+            try:
+                await asyncio.sleep(0)
+                self.assertFalse(second.done())
+            finally:
+                _MultiProvider.release.set()
+        self.assertEqual(second.result(), (first.result(), 2))
+        self.assertEqual(_MultiProvider.registrations, 1)
+        self.assertEqual(_MultiProvider.boots, 1)
+
+    async def testCancelledProviderBootReusesRegistration(self: Self) -> None:
         """Retry cancelled boot without registering published services twice.
 
         Returns
@@ -395,7 +525,7 @@ class TestDispatchPlans(TestCase):
         self.assertEqual(_MultiProvider.registrations, 1)
         self.assertEqual(_MultiProvider.boots, 2)
 
-    async def testUndeclaredAliasStillWaitsForItsDeclaredContract(self) -> None:
+    async def testUndeclaredAliasStillWaitsForItsDeclaredContract(self: Self) -> None:
         """Coordinate aliases registered by a provider advertising only types.
 
         Returns

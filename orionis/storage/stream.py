@@ -1,10 +1,12 @@
 from __future__ import annotations
 import asyncio
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Self
+from orionis.storage.buffering import READ_BUFFER_SIZE
 from orionis.storage.contracts.stream import IStorageStream
+from orionis.support.concurrency import complete_on_cancel
 
 if TYPE_CHECKING:
-    from collections.abc import Callable
+    from collections.abc import AsyncIterator, Callable
     from types import TracebackType
     from typing import BinaryIO
 
@@ -19,10 +21,10 @@ class AsyncStream(IStorageStream):
     handle is released.
     """
 
-    __slots__ = ("_handle", "_on_close", "_opener")
+    __slots__ = ("_handle", "_lock", "_on_close", "_opener")
 
     def __init__(
-        self,
+        self: Self,
         opener: Callable[[], BinaryIO],
         on_close: Callable[[BinaryIO], None] | None = None,
     ) -> None:
@@ -45,8 +47,9 @@ class AsyncStream(IStorageStream):
         self._opener = opener
         self._on_close = on_close
         self._handle: BinaryIO | None = None
+        self._lock = asyncio.Lock()
 
-    async def __ensureHandle(self) -> BinaryIO:
+    async def __ensureHandle(self: Self) -> BinaryIO:
         """
         Open the underlying handle on first use and return it.
 
@@ -57,10 +60,28 @@ class AsyncStream(IStorageStream):
         """
         # Open lazily so building the stream object stays side-effect free.
         if self._handle is None:
-            self._handle = await asyncio.to_thread(self._opener)
+
+            def open_handle() -> None:
+                """
+                Retain the handle if cancellation races with creation.
+
+                Returns
+                -------
+                None
+                    Complete the operation without returning a value.
+                """
+                self._handle = self._opener()
+
+            try:
+                await complete_on_cancel(asyncio.to_thread(open_handle))
+            except asyncio.CancelledError:
+                handle, self._handle = self._handle, None
+                if handle is not None:
+                    await complete_on_cancel(asyncio.to_thread(handle.close))
+                raise
         return self._handle
 
-    async def read(self, size: int = -1) -> bytes:
+    async def read(self: Self, size: int = -1) -> bytes:
         """
         Read up to *size* bytes from the stream.
 
@@ -74,10 +95,49 @@ class AsyncStream(IStorageStream):
         bytes
             Bytes read from the current position; empty at EOF.
         """
-        handle = await self.__ensureHandle()
-        return await asyncio.to_thread(handle.read, size)
+        async with self._lock:
+            handle = await self.__ensureHandle()
+            return await complete_on_cancel(asyncio.to_thread(handle.read, size))
 
-    async def write(self, data: bytes) -> int:
+    async def chunks(
+        self: Self,
+        size: int = 65536,
+        *,
+        buffer_size: int = READ_BUFFER_SIZE,
+    ) -> AsyncIterator[bytes]:
+        """
+        Yield logical chunks with bounded batching of synchronous reads.
+
+        Parameters
+        ----------
+        size : int
+            Maximum yielded bytes per chunk.
+        buffer_size : int
+            Read-ahead budget, at least one logical chunk.
+
+        Yields
+        ------
+        bytes
+            Sequential content. The surrounding async context owns close;
+            callers must not mix iteration with writes, seek or other reads.
+        """
+        if (
+            isinstance(size, bool)
+            or not isinstance(size, int)
+            or size < 1
+            or isinstance(buffer_size, bool)
+            or not isinstance(buffer_size, int)
+            or buffer_size < 1
+        ):
+            error_msg = "Stream chunk and buffer sizes must be positive integers."
+            raise ValueError(error_msg)
+        read_size = size
+        while data := await self.read(read_size):
+            for offset in range(0, len(data), size):
+                yield data[offset : offset + size]
+            read_size = max(size, buffer_size // size * size)
+
+    async def write(self: Self, data: bytes) -> int:
         """
         Write *data* to the stream at the current position.
 
@@ -91,10 +151,11 @@ class AsyncStream(IStorageStream):
         int
             Number of bytes written.
         """
-        handle = await self.__ensureHandle()
-        return await asyncio.to_thread(handle.write, data)
+        async with self._lock:
+            handle = await self.__ensureHandle()
+            return await complete_on_cancel(asyncio.to_thread(handle.write, data))
 
-    async def seek(self, offset: int, whence: int = 0) -> int:
+    async def seek(self: Self, offset: int, whence: int = 0) -> int:
         """
         Move the stream position to *offset*.
 
@@ -110,10 +171,13 @@ class AsyncStream(IStorageStream):
         int
             The new absolute position within the stream.
         """
-        handle = await self.__ensureHandle()
-        return await asyncio.to_thread(handle.seek, offset, whence)
+        async with self._lock:
+            handle = await self.__ensureHandle()
+            return await complete_on_cancel(
+                asyncio.to_thread(handle.seek, offset, whence),
+            )
 
-    async def close(self) -> None:
+    async def close(self: Self) -> None:
         """
         Flush pending data and release the underlying handle.
 
@@ -125,17 +189,30 @@ class AsyncStream(IStorageStream):
         -------
         None
         """
-        handle = self._handle
-        if handle is None:
-            return
+        async with self._lock:
+            handle = self._handle
+            if handle is None:
+                return
+            self._handle = None
 
-        # Detach first so double-close attempts become harmless no-ops.
-        self._handle = None
-        if self._on_close is not None:
-            await asyncio.to_thread(self._on_close, handle)
-        await asyncio.to_thread(handle.close)
+            def close_handle() -> None:
+                """
+                Release the file even when the persistence callback fails.
 
-    async def __aenter__(self) -> IStorageStream:
+                Returns
+                -------
+                None
+                    Complete the operation without returning a value.
+                """
+                try:
+                    if self._on_close is not None:
+                        self._on_close(handle)
+                finally:
+                    handle.close()
+
+            await complete_on_cancel(asyncio.to_thread(close_handle))
+
+    async def __aenter__(self: Self) -> IStorageStream:
         """
         Open the underlying handle and return the stream.
 
@@ -144,11 +221,12 @@ class AsyncStream(IStorageStream):
         IStorageStream
             The stream itself, ready for I/O operations.
         """
-        await self.__ensureHandle()
+        async with self._lock:
+            await self.__ensureHandle()
         return self
 
     async def __aexit__(
-        self,
+        self: Self,
         exc_type: type[BaseException] | None,
         exc: BaseException | None,
         traceback: TracebackType | None,

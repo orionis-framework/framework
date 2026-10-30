@@ -6,6 +6,7 @@ import math
 import os
 import platform
 import random
+import re
 import shutil
 import signal
 import socket
@@ -21,7 +22,6 @@ from pathlib import Path
 from tempfile import TemporaryDirectory
 from typing import Any
 import psutil
-from benchmarks.http_compare.apps._ready import WORKER_PATH
 from benchmarks.http_compare.client import OHA_VERSION, install_oha, parse_measurement
 from benchmarks.http_compare.report import (
     METRICS,
@@ -39,6 +39,16 @@ GRANIAN_VERSION = "2.8.4"
 STARTUP_TIMEOUT = 60
 HTTP_1_1 = 11
 WINDOWS_LIMIT = "Granian cannot run multiple workers on Windows; use --workers 1."
+PROCESS_FLAGS = subprocess.CREATE_NO_WINDOW if sys.platform == "win32" else 0
+BENCHMARK_ERRORS = (
+    OSError,
+    ValueError,
+    KeyError,
+    TypeError,
+    RuntimeError,
+    subprocess.SubprocessError,
+    psutil.Error,
+)
 
 @dataclass(frozen=True)
 class Framework:
@@ -50,16 +60,13 @@ class Framework:
 
     @property
     def target(self) -> str:
-        """
-        Return the application factory import target passed to Granian.
-
-        Returns
-        -------
-        str
-            Fully qualified module and factory name for this framework.
-        """
-        # Resolve the target without importing optional framework dependencies.
+        """Return the factory target without importing optional frameworks."""
         return f"benchmarks.http_compare.apps.{self.module}:create_application"
+
+    @property
+    def requires_warmup(self) -> bool:
+        """Enable HTTP preparation and load warmup only for Orionis."""
+        return self.module == "orionis"
 
 FRAMEWORKS = {
     item.name: item
@@ -73,27 +80,7 @@ FRAMEWORKS = {
 }
 
 def positive_number(value: str) -> float:
-    """
-    Parse a finite positive duration in seconds.
-
-    Parameters
-    ----------
-    value : str
-        Command-line duration to convert.
-
-    Returns
-    -------
-    float
-        Finite duration greater than zero.
-
-    Raises
-    ------
-    argparse.ArgumentTypeError
-        If the parsed duration is nonfinite or nonpositive.
-    ValueError
-        If the value cannot be parsed as a float.
-    """
-    # Reject invalid durations before constructing load-generator arguments.
+    """Parse a finite positive duration in seconds."""
     number = float(value)
     if not math.isfinite(number) or number <= 0:
         error_msg = "must be finite and greater than zero"
@@ -101,27 +88,7 @@ def positive_number(value: str) -> float:
     return number
 
 def positive_integer(value: str) -> int:
-    """
-    Parse a positive connection or repetition count.
-
-    Parameters
-    ----------
-    value : str
-        Command-line count to convert.
-
-    Returns
-    -------
-    int
-        Count greater than zero.
-
-    Raises
-    ------
-    argparse.ArgumentTypeError
-        If the parsed count is nonpositive.
-    ValueError
-        If the value cannot be parsed as an integer.
-    """
-    # Exclude empty load configurations before starting any server process.
+    """Parse a positive connection or repetition count."""
     number = int(value)
     if number < 1:
         error_msg = "must be greater than zero"
@@ -129,15 +96,7 @@ def positive_integer(value: str) -> int:
     return number
 
 def build_parser() -> argparse.ArgumentParser:
-    """
-    Build the comparison command-line parser without importing applications.
-
-    Returns
-    -------
-    argparse.ArgumentParser
-        Parser for framework selection, worker counts, load, and output settings.
-    """
-    # Keep argument parsing and --help independent of optional framework imports.
+    """Build the comparison CLI without importing benchmark applications."""
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument(
         "--workers", type=int, nargs="+", choices=range(1, 5), default=[1, 2, 3, 4],
@@ -146,7 +105,10 @@ def build_parser() -> argparse.ArgumentParser:
         "--frameworks", nargs="+", choices=FRAMEWORKS, default=list(FRAMEWORKS),
     )
     parser.add_argument("--duration", type=positive_number, default=10)
-    parser.add_argument("--warmup", type=positive_number, default=2)
+    parser.add_argument(
+        "--warmup", type=positive_number, default=2,
+        help="Warmup duration in seconds for Orionis only",
+    )
     parser.add_argument("--connections", type=positive_integer, default=100)
     parser.add_argument("--repetitions", type=positive_integer, default=3)
     parser.add_argument(
@@ -167,20 +129,7 @@ def build_parser() -> argparse.ArgumentParser:
     return parser
 
 def _git(*arguments: str) -> str:
-    """
-    Read repository metadata through a bounded Git command.
-
-    Parameters
-    ----------
-    *arguments : str
-        Git subcommand and arguments to execute from the repository root.
-
-    Returns
-    -------
-    str
-        Stripped output, or ``unknown`` if Git is absent or exits unsuccessfully.
-    """
-    # Keep unavailable Git metadata distinct from an empty successful response.
+    """Read Git metadata, reporting unavailable values as unknown."""
     executable = shutil.which("git")
     if executable is None:
         return "unknown"
@@ -192,20 +141,12 @@ def _git(*arguments: str) -> str:
         encoding="utf-8",
         timeout=10,
         check=False,
-        creationflags=subprocess.CREATE_NO_WINDOW if sys.platform == "win32" else 0,
+        creationflags=PROCESS_FLAGS,
     )
     return result.stdout.strip() if result.returncode == 0 else "unknown"
 
 def collect_environment() -> dict[str, Any]:
-    """
-    Collect actual runtime, hardware, dependency, and source metadata.
-
-    Returns
-    -------
-    dict[str, Any]
-        Reproducibility metadata, including versions and the dependency lock hash.
-    """
-    # Record missing distributions without importing their benchmark applications.
+    """Collect runtime, hardware, dependencies and source provenance."""
     versions = {}
     for package in ("orionis", "granian", "fastapi", "litestar", "starlette"):
         try:
@@ -213,7 +154,6 @@ def collect_environment() -> dict[str, Any]:
         except metadata.PackageNotFoundError:
             versions[package] = "not installed"
     versions["oha"] = "not verified"
-    # Preserve unknown source state when Git metadata cannot be queried.
     try:
         commit = _git("rev-parse", "HEAD")
         dirty = bool(_git("status", "--porcelain"))
@@ -262,52 +202,23 @@ def collect_environment() -> dict[str, Any]:
     }
 
 def server_command(framework: Framework, workers: int, port: int) -> list[str]:
-    """
-    Build a Granian command with shared comparison settings.
-
-    Parameters
-    ----------
-    framework : Framework
-        Application factory and native server interface to measure.
-    workers : int
-        Number of server worker processes.
-    port : int
-        Loopback TCP port on which to listen.
-
-    Returns
-    -------
-    list[str]
-        Shell-free command arguments for the active Python interpreter.
-    """
-    # Vary only the application, native interface, worker count, and listener port.
+    """Build a Granian command using shared server settings."""
     return [
-        sys.executable,
-        "-B",
-        "-m",
-        "granian",
+        sys.executable, "-B", "-m", "granian",
         framework.target,
         "--factory",
-        "--interface",
-        framework.interface,
-        "--http",
-        "1",
-        "--host",
-        "127.0.0.1",
-        "--port",
-        str(port),
-        "--workers",
-        str(workers),
-        "--runtime-threads",
-        "1",
-        "--loop",
-        "asyncio",
-        "--task-impl",
-        "asyncio",
+        "--interface", framework.interface,
+        "--http", "1",
+        "--host", "127.0.0.1",
+        "--port", str(port),
+        "--workers", str(workers),
+        "--runtime-threads", "1",
+        "--loop", "asyncio",
+        "--task-impl", "asyncio",
         "--http1-keep-alive",
         "--no-ws",
         "--no-access-log",
-        "--log-level",
-        "warning",
+        "--log-level", "info",
         "--no-reload",
         "--no-respawn-failed-workers",
         "--no-metrics",
@@ -316,22 +227,7 @@ def server_command(framework: Framework, workers: int, port: int) -> list[str]:
 def track_children(
     process: subprocess.Popen[bytes], known: dict[int, psutil.Process],
 ) -> None:
-    """
-    Retain worker identities before their supervisor can exit.
-
-    Parameters
-    ----------
-    process : subprocess.Popen[bytes]
-        Owned Granian supervisor process.
-    known : dict[int, psutil.Process]
-        Mapping updated with observed descendants, keyed by process ID.
-
-    Returns
-    -------
-    None
-        Update the mapping with descendants that are still observable.
-    """
-    # Retain process identities so orphaned workers remain safe cleanup targets.
+    """Retain owned worker identities for cleanup even after they are orphaned."""
     with suppress(psutil.NoSuchProcess):
         for child in psutil.Process(process.pid).children(recursive=True):
             known[child.pid] = child
@@ -339,28 +235,7 @@ def track_children(
 def stop_server(
     process: subprocess.Popen[bytes], known: dict[int, psutil.Process] | None = None,
 ) -> None:
-    """
-    Stop and reap only the owned server process tree.
-
-    Parameters
-    ----------
-    process : subprocess.Popen[bytes]
-        Granian supervisor started by the comparison runner.
-    known : dict[int, psutil.Process] | None, optional
-        Previously observed descendants, including workers already orphaned.
-
-    Returns
-    -------
-    None
-        Terminate the owned process group or Windows descendant tree.
-
-    Raises
-    ------
-    RuntimeError
-        If tracked Windows processes survive cleanup.
-    subprocess.TimeoutExpired
-        If the supervisor does not exit within the final wait period.
-    """
+    """Terminate and reap only the owned server process tree."""
     if sys.platform != "win32":
         # A dedicated session also retains ownership of orphaned worker processes.
         with suppress(ProcessLookupError):
@@ -374,17 +249,13 @@ def stop_server(
                 os.killpg(process.pid, signal.SIGKILL)
             process.wait(timeout=5)
         return
-    # Preserve known descendants even when their original supervisor has exited.
     owned = dict(known or {})
     track_children(process, owned)
     with suppress(psutil.NoSuchProcess):
-        parent = psutil.Process(process.pid)
-        owned[parent.pid] = parent
-        parent.terminate()
+        owned = {process.pid: psutil.Process(process.pid), **owned}
     for child in owned.values():
         with suppress(psutil.NoSuchProcess):
             child.terminate()
-    # Escalate only for owned processes that survive graceful termination.
     _, alive = psutil.wait_procs(list(owned.values()), timeout=5)
     for child in alive:
         with suppress(psutil.NoSuchProcess):
@@ -398,139 +269,57 @@ def stop_server(
         raise RuntimeError(error_msg)
 
 def check_workers(
-    process: subprocess.Popen[bytes], ready: Path, workers: int,
+    process: subprocess.Popen[bytes], worker_pids: set[int],
     known: dict[int, psutil.Process],
 ) -> None:
-    """
-    Verify that every readiness marker belongs to an owned live worker.
-
-    Parameters
-    ----------
-    process : subprocess.Popen[bytes]
-        Owned Granian supervisor process.
-    ready : Path
-        Directory containing process-specific startup markers.
-    workers : int
-        Expected number of live worker processes.
-    known : dict[int, psutil.Process]
-        Mapping updated with owned descendants before validating markers.
-
-    Returns
-    -------
-    None
-        Confirm the supervisor and all expected workers are alive.
-
-    Raises
-    ------
-    RuntimeError
-        If the supervisor exits or markers do not match owned live workers.
-    """
-    # Files alone cannot establish readiness; verify process ownership and health.
+    """Require every worker announced by Granian to remain alive and owned."""
     track_children(process, known)
     if process.poll() is not None:
         error_msg = f"Granian exited with code {process.returncode}; see server log"
         raise RuntimeError(error_msg)
-    markers = list(ready.glob("*"))
-    if len(markers) != workers:
-        error_msg = f"Expected {workers} worker startup markers; found {len(markers)}"
+    if not worker_pids:
+        error_msg = "Granian has not announced any started workers"
         raise RuntimeError(error_msg)
-    for marker in markers:
-        worker = known.get(int(marker.name))
+    for pid in worker_pids:
+        worker = known.get(pid)
         alive = False
         if worker is not None:
             with suppress(psutil.NoSuchProcess):
                 alive = worker.is_running() and worker.status() != psutil.STATUS_ZOMBIE
         if not alive:
             error_msg = (
-                f"Worker {marker.name} exited or does not belong to this server"
+                f"Worker {pid} exited or does not belong to this server"
             )
             raise RuntimeError(error_msg)
 
 def _probe_response(
     connection: http.client.HTTPConnection,
-    path: str,
-    expected_body: bytes | None = None,
-) -> bytes:
-    """
-    Complete and validate one unmeasured keep-alive request.
-
-    Parameters
-    ----------
-    connection : http.client.HTTPConnection
-        Preparation connection shared by payload and worker probes.
-    path : str
-        Endpoint to request.
-    expected_body : bytes | None
-        Exact payload to require, or None for the worker identity response.
-
-    Returns
-    -------
-    bytes
-        Fully consumed HTTP response body.
-
-    Raises
-    ------
-    RuntimeError
-        If status, media type, payload, protocol or keep-alive is invalid.
-    OSError
-        If the connection fails.
-    http.client.HTTPException
-        If the server does not send a valid HTTP response.
-    """
-    connection.request("GET", path)
+) -> None:
+    """Validate an unmeasured Hello World response on a keep-alive connection."""
+    connection.request("GET", "/")
     response = connection.getresponse()
     body = response.read()
     content_type = response.getheader("content-type", "").split(";", 1)[0].lower()
     if (
         response.status != HTTPStatus.OK
         or content_type != "text/plain"
-        or (expected_body is not None and body != expected_body)
+        or body != b"Hello World"
     ):
         error_msg = (
-            f"Unexpected response for {path}: {response.status}, "
+            f"Unexpected response for /: {response.status}, "
             f"{content_type}, {body!r}"
         )
         raise RuntimeError(error_msg)
     if response.version != HTTP_1_1 or response.will_close:
         error_msg = "Endpoint did not preserve HTTP/1.1 keep-alive"
         raise RuntimeError(error_msg)
-    return body
 
-def wait_until_ready( # NOSONAR
-    process: subprocess.Popen[bytes], port: int, ready: Path, workers: int,
-    known: dict[int, psutil.Process],
-) -> None:
-    """
-    Complete unmeasured payload requests on every healthy worker.
-
-    Parameters
-    ----------
-    process : subprocess.Popen[bytes]
-        Owned Granian supervisor process.
-    port : int
-        Loopback TCP port to probe.
-    ready : Path
-        Directory containing worker startup markers.
-    workers : int
-        Expected number of workers to prime through real HTTP requests.
-    known : dict[int, psutil.Process]
-        Mapping updated with observed server descendants.
-
-    Returns
-    -------
-    None
-        Confirm every worker served two exact HTTP/1.1 keep-alive responses.
-
-    Raises
-    ------
-    RuntimeError
-        If a process fails or the endpoint returns an unexpected response.
-    TimeoutError
-        If any worker remains unprimed before the startup deadline.
-    """
-    # Verify worker ownership before probing HTTP to avoid false readiness.
+def wait_until_ready(  # noqa: PLR0913
+    process: subprocess.Popen[bytes], port: int, log_path: Path, workers: int,
+    known: dict[int, psutil.Process], *, warmup: bool,
+) -> set[int]:
+    """Wait for native Granian startup, probing HTTP only for Orionis."""
     deadline = time.monotonic() + STARTUP_TIMEOUT
-    primed_workers: set[bytes] = set()
     while time.monotonic() < deadline:
         track_children(process, known)
         if process.poll() is not None:
@@ -538,32 +327,40 @@ def wait_until_ready( # NOSONAR
                 f"Granian exited with code {process.returncode}; see server log"
             )
             raise RuntimeError(error_msg)
-        markers = list(ready.glob("*"))
-        if len(markers) == workers:
-            check_workers(process, ready, workers, known)
-            expected_workers = {marker.name.encode("ascii") for marker in markers}
-            connection = http.client.HTTPConnection("127.0.0.1", port, timeout=1)
-            try:
-                # Discard the cold request and verify a second on the same worker.
-                for _ in range(2):
-                    _probe_response(connection, "/", b"Hello World")
-                worker = _probe_response(connection, WORKER_PATH)
-                if worker not in expected_workers:
-                    error_msg = f"Unexpected worker identity: {worker!r}"
-                    raise RuntimeError(error_msg)
-                primed_workers.add(worker)
-                if primed_workers == expected_workers:
-                    check_workers(process, ready, workers, known)
-                    return
-            except OSError, http.client.HTTPException:
-                # Retry transient connection errors while startup completes.
-                pass
-            finally:
-                connection.close()
+        events = log_path.read_text(encoding="utf-8")
+        started = set(re.findall(r"Started worker-(\d+)\r?\n", events))
+        worker_pids = {
+            int(pid)
+            for index, pid in re.findall(
+                r"Spawning worker-(\d+) with PID: (\d+)\r?\n", events,
+            )
+            if index in started
+        }
+        if len(worker_pids) != workers:
+            time.sleep(0.1)
+            continue
+        check_workers(process, worker_pids, known)
+        try:
+            if warmup:
+                connection = http.client.HTTPConnection(
+                    "127.0.0.1", port, timeout=1,
+                )
+                try:
+                    for _ in range(2):
+                        _probe_response(connection)
+                finally:
+                    connection.close()
+            else:
+                socket.create_connection(("127.0.0.1", port), timeout=1).close()
+            check_workers(process, worker_pids, known)
+            return worker_pids
+        except OSError, http.client.HTTPException:
+            # Retry transient connection errors while startup completes.
+            pass
         time.sleep(0.1)
     error_msg = (
-        f"Not all {workers} workers completed HTTP preparation within "
-        f"{STARTUP_TIMEOUT}s ({len(primed_workers)}/{workers} primed)"
+        f"Granian did not start {workers} ready workers within "
+        f"{STARTUP_TIMEOUT}s; see server log"
     )
     raise TimeoutError(error_msg)
 
@@ -575,78 +372,34 @@ def run_load(  # noqa: PLR0913
     output: Path,
     commands: list[dict[str, Any]],
 ) -> dict[str, int | float]:
-    """
-    Run oha and preserve its command and output before parsing measurements.
-
-    Parameters
-    ----------
-    oha : Path
-        Verified load-generator executable.
-    url : str
-        HTTP endpoint to measure.
-    seconds : float
-        Nominal duration of the load run.
-    connections : int
-        Number of concurrent HTTP/1.1 connections.
-    output : Path
-        Raw JSON destination, also used to name the stderr log.
-    commands : list[dict[str, Any]]
-        Invocation log to update with the executed command.
-
-    Returns
-    -------
-    dict[str, int | float]
-        Normalized successful throughput, errors, elapsed time, and latency.
-
-    Raises
-    ------
-    subprocess.CalledProcessError
-        If oha exits unsuccessfully.
-    subprocess.TimeoutExpired
-        If execution exceeds the duration plus its shutdown allowance.
-    ValueError
-        If the output is invalid JSON or cannot define a valid measurement.
-    """
-    # Wait for in-flight requests so elapsed time includes their completion.
+    """Run oha with direct diagnostic files and return normalized measurements."""
     command = [
         str(oha),
         "--no-tui",
-        "--output-format",
-        "json",
-        "--http-version",
-        "1.1",
-        "--worker-threads",
-        "1",
+        "--output-format", "json",
+        "--http-version", "1.1",
+        "--worker-threads", "1",
         "--wait-ongoing-requests-after-deadline",
-        "-t",
-        "5s",
-        "-c",
-        str(connections),
-        "-z",
-        f"{seconds}s",
+        "-t", "5s",
+        "-c", str(connections),
+        "-z", f"{seconds}s",
         url,
     ]
     commands.append({"kind": "oha", "argv": command, "output": str(output)})
-    try:
-        result = subprocess.run(
+    with (
+        output.open("w+", encoding="utf-8") as stdout,
+        output.with_suffix(".stderr.log").open("w", encoding="utf-8") as stderr,
+    ):
+        subprocess.run(
             command,
-            capture_output=True,
-            text=True,
-            encoding="utf-8",
+            stdout=stdout,
+            stderr=stderr,
             timeout=seconds + 30,
-            check=False,
-            creationflags=subprocess.CREATE_NO_WINDOW if sys.platform == "win32" else 0,
+            check=True,
+            creationflags=PROCESS_FLAGS,
         )
-    except subprocess.TimeoutExpired as error:
-        # Preserve partial evidence before propagating a load-generator timeout.
-        output.write_bytes(error.stdout or b"")
-        output.with_suffix(".stderr.log").write_bytes(error.stderr or b"")
-        raise
-    # Save both streams before exit-status checks or parsing can raise an error.
-    output.write_text(result.stdout, encoding="utf-8")
-    output.with_suffix(".stderr.log").write_text(result.stderr, encoding="utf-8")
-    result.check_returncode()
-    return parse_measurement(json.loads(result.stdout))
+        stdout.seek(0)
+        return parse_measurement(json.load(stdout))
 
 def benchmark_case(  # noqa: PLR0913
     framework: Framework,
@@ -657,38 +410,15 @@ def benchmark_case(  # noqa: PLR0913
     commands: list[dict[str, Any]],
     row: dict[str, Any],
 ) -> None:
-    """
-    Warm up and measure one configuration while retaining failure evidence.
-
-    Parameters
-    ----------
-    framework : Framework
-        Application factory and native server interface to measure.
-    workers : int
-        Number of Granian worker processes.
-    args : argparse.Namespace
-        Parsed warmup, duration, connection, and repetition settings.
-    oha : Path
-        Verified load-generator executable.
-    output : Path
-        Report directory with existing ``raw`` and ``logs`` subdirectories.
-    commands : list[dict[str, Any]]
-        Invocation log updated with server and load-generator commands.
-    row : dict[str, Any]
-        Result row updated with warmup, samples, status, and valid metrics.
-
-    Returns
-    -------
-    None
-        Update the supplied row and always attempt server-tree cleanup.
-    """
-    # Isolate application files and readiness markers for every configuration.
+    """Measure an isolated server, warming only Orionis and always cleaning up."""
     prefix = f"{framework.name}-workers-{workers}"
     with TemporaryDirectory(prefix="http-compare-app-") as temporary:
         directory = Path(temporary)
-        ready = directory / "worker-ready"
-        ready.mkdir()
-        # Ask the OS for a listener port instead of sharing a fixed benchmark port.
+        if framework.module == "orionis":
+            shutil.copyfile(
+                REPO / "benchmarks" / "http_compare" / "apps" / "routes" / "web.py",
+                directory / "_http_compare_routes.py",
+            )
         with socket.socket() as candidate:
             candidate.bind(("127.0.0.1", 0))
             port = candidate.getsockname()[1]
@@ -701,19 +431,17 @@ def benchmark_case(  # noqa: PLR0913
             if not key.startswith("GRANIAN_")
         }
         environment.update(
-            {
-                "PYTHONPATH": str(REPO),
-                "PYTHONIOENCODING": "utf-8",
-                "PYTHONDONTWRITEBYTECODE": "1",
-                "PYTHONHASHSEED": "0",
-                "BENCHMARK_READY_DIR": str(ready),
-                "APP_KEY": "0123456789abcdef0123456789abcdef",
-                "APP_ENV": "production",
-                "APP_DEBUG": "false",
-                "NO_PROXY": "127.0.0.1,localhost",
-            },
+            PYTHONPATH=str(REPO),
+            PYTHONIOENCODING="utf-8",
+            PYTHONDONTWRITEBYTECODE="1",
+            PYTHONHASHSEED="0",
+            APP_KEY="0123456789abcdef0123456789abcdef",
+            APP_ENV="production",
+            APP_DEBUG="false",
+            NO_PROXY="127.0.0.1,localhost",
         )
-        with (output / "logs" / f"{prefix}.log").open("w", encoding="utf-8") as log:
+        log_path = output / "logs" / f"{prefix}.log"
+        with log_path.open("w", encoding="utf-8") as log:
             process = subprocess.Popen(
                 command,
                 cwd=directory,
@@ -721,73 +449,42 @@ def benchmark_case(  # noqa: PLR0913
                 stdout=log,
                 stderr=subprocess.STDOUT,
                 start_new_session=sys.platform != "win32",
-                creationflags=subprocess.CREATE_NO_WINDOW
-                if sys.platform == "win32"
-                else 0,
+                creationflags=PROCESS_FLAGS,
             )
-            known = {}
+            known: dict[int, psutil.Process] = {}
             try:
-                wait_until_ready(process, port, ready, workers, known)
-                url = f"http://127.0.0.1:{port}/"
-                # Preserve warmup separately so it cannot affect measured totals.
-                row["warmup"] = run_load(
-                    oha,
-                    url,
-                    args.warmup,
-                    args.connections,
-                    output / "raw" / f"{prefix}-warmup.json",
-                    commands,
+                worker_pids = wait_until_ready(
+                    process, port, log_path, workers, known,
+                    warmup=framework.requires_warmup,
                 )
-                if row["warmup"]["errors"]:
-                    error_msg = "Warmup returned HTTP or transport errors"
-                    raise RuntimeError(error_msg)
-                check_workers(process, ready, workers, known)
-                samples = row.setdefault("samples", [])
-                # Recheck worker health after each run before publishing medians.
-                for repetition in range(1, args.repetitions + 1):
-                    sample = run_load(
-                        oha,
-                        url,
-                        args.duration,
-                        args.connections,
-                        output / "raw" / f"{prefix}-run-{repetition}.json",
+                url = f"http://127.0.0.1:{port}/"
+                if framework.requires_warmup:
+                    row["warmup"] = run_load(
+                        oha, url, args.warmup, args.connections,
+                        output / "raw" / f"{prefix}-warmup.json",
                         commands,
                     )
-                    samples.append(sample)
-                    check_workers(process, ready, workers, known)
+                    if row["warmup"]["errors"]:
+                        error_msg = "Warmup returned HTTP or transport errors"
+                        raise RuntimeError(error_msg)
+                    check_workers(process, worker_pids, known)
+                samples = row.setdefault("samples", [])
+                for repetition in range(1, args.repetitions + 1):
+                    samples.append(run_load(
+                        oha, url, args.duration, args.connections,
+                        output / "raw" / f"{prefix}-run-{repetition}.json",
+                        commands,
+                    ))
+                    check_workers(process, worker_pids, known)
                 row.update(aggregate_samples(samples))
             finally:
-                # Clean up even when readiness, warmup, or measurement fails.
                 stop_server(process, known)
 
 def resolve_oha(explicit: Path | None, directory: Path) -> Path:
-    """
-    Locate or download oha and require the pinned version.
-
-    Parameters
-    ----------
-    explicit : Path | None
-        Explicit executable path, or ``None`` to search PATH before downloading.
-    directory : Path
-        Existing temporary directory used if a download is needed.
-
-    Returns
-    -------
-    Path
-        Executable path whose reported version matches the pinned release.
-
-    Raises
-    ------
-    RuntimeError
-        If the binary version, platform, or download verification is invalid.
-    subprocess.SubprocessError
-        If querying the executable version fails.
-    """
-    # Prefer an explicit binary, then PATH, then a verified temporary download.
-    found = shutil.which("oha") if explicit is None else None
+    """Locate or download oha and verify its pinned version."""
     if explicit is not None:
         path = explicit.resolve()
-    elif found:
+    elif found := shutil.which("oha"):
         path = Path(found)
     else:
         path = install_oha(directory)
@@ -798,35 +495,60 @@ def resolve_oha(explicit: Path | None, directory: Path) -> Path:
         encoding="utf-8",
         check=True,
         timeout=10,
-        creationflags=subprocess.CREATE_NO_WINDOW if sys.platform == "win32" else 0,
+        creationflags=PROCESS_FLAGS,
     )
     if result.stdout.strip() != f"oha {OHA_VERSION}":
         error_msg = f"Expected oha {OHA_VERSION}; found {result.stdout.strip()!r}"
         raise RuntimeError(error_msg)
     return path
 
-def main(argv: list[str] | None = None) -> int:  # noqa: C901, PLR0912, PLR0915 # NOSONAR
-    """
-    Run the requested comparison matrix and persist partial failure reports.
+def _run_matrix(
+    args: argparse.Namespace,
+    oha: Path,
+    output: Path,
+    report: dict[str, Any],
+    commands: list[dict[str, Any]],
+) -> None:
+    """Run shuffled cases sequentially, preserving failures and partial results."""
+    settings = report["settings"]
+    # Seeded benchmark ordering is reproducible and not security-sensitive.
+    generator = random.Random(args.seed)  # noqa: S311
+    for workers in settings["workers"]:
+        names = list(settings["frameworks"])
+        generator.shuffle(names)  # NOSONAR(S2245)
+        for name in names:
+            framework = FRAMEWORKS[name]
+            row = {
+                "framework": name,
+                "interface": framework.interface,
+                "workers": workers,
+                "status": "pending",
+            }
+            report["results"].append(row)
+            report["execution_order"].append({"framework": name, "workers": workers})
+            if sys.platform == "win32" and workers > 1:
+                row.update(status="unsupported", reason=WINDOWS_LIMIT)
+                continue
+            print(f"Benchmark: {name}, {workers} worker(s)", flush=True)
+            try:
+                benchmark_case(framework, workers, args, oha, output, commands, row)
+            except BENCHMARK_ERRORS as error:
+                row.update(status="failed", reason=str(error))
+                # Cleanup failures also invalidate previously computed metrics.
+                for metric in METRICS:
+                    row.pop(metric, None)
+                print(
+                    f"FAILED: {name}, {workers} workers: {error}",
+                    file=sys.stderr,
+                    flush=True,
+                )
+            write_reports(output, report)
+            write_json(output / "commands.json", commands)
 
-    Parameters
-    ----------
-    argv : list[str] | None, optional
-        Command-line arguments, or ``None`` to read the process arguments.
-
-    Returns
-    -------
-    int
-        Zero if every requested case succeeds, otherwise one.
-
-    Raises
-    ------
-    SystemExit
-        If argument parsing or output-directory validation fails.
-    """
+def main(argv: list[str] | None = None) -> int:
+    """Run the comparison CLI and persist reports, including partial failures."""
     parser = build_parser()
     args = parser.parse_args(argv)
-    # Reject stale destinations before creating any benchmark artifacts.
     output = args.output_dir.resolve()
     if output.exists() and (not output.is_dir() or any(output.iterdir())):
         parser.error(
@@ -835,15 +557,19 @@ def main(argv: list[str] | None = None) -> int:  # noqa: C901, PLR0912, PLR0915 
     output.mkdir(parents=True, exist_ok=True)
     (output / "raw").mkdir()
     (output / "logs").mkdir()
-    # Record shared settings once so every case uses the same measurement policy.
-    report = {
+    frameworks = list(dict.fromkeys(args.frameworks))
+    report: dict[str, Any] = {
         "schema_version": 1,
         "environment": collect_environment(),
         "settings": {
             "workers": list(dict.fromkeys(args.workers)),
-            "frameworks": list(dict.fromkeys(args.frameworks)),
+            "frameworks": frameworks,
             "duration_seconds": args.duration,
             "warmup_seconds": args.warmup,
+            "warmup_frameworks": [
+                name for name in frameworks
+                if FRAMEWORKS[name].requires_warmup
+            ],
             "connections": args.connections,
             "repetitions": args.repetitions,
             "http": "1.1",
@@ -852,13 +578,13 @@ def main(argv: list[str] | None = None) -> int:  # noqa: C901, PLR0912, PLR0915 
             "runtime_threads": 1,
             "oha_worker_threads": 1,
             "wait_ongoing_requests": True,
+            "readiness": "native-granian-workers-and-tcp",
             "seed": args.seed,
         },
         "execution_order": [],
         "results": [],
     }
-    commands = []
-    failed = False
+    commands: list[dict[str, Any]] = []
     try:
         if report["environment"]["versions"]["granian"] != GRANIAN_VERSION:
             error_msg = (
@@ -870,76 +596,16 @@ def main(argv: list[str] | None = None) -> int:  # noqa: C901, PLR0912, PLR0915 
             oha = resolve_oha(args.oha, Path(temporary))
             report["environment"]["versions"]["oha"] = OHA_VERSION
             report["environment"]["oha_executable"] = str(oha)
-            # Shuffle reproducibly within each worker count to reduce order bias.
-            generator = random.Random(args.seed)  # noqa: S311
-            for workers in report["settings"]["workers"]:
-                names = list(report["settings"]["frameworks"])
-                generator.shuffle(names) # NOSONAR
-                for name in names:
-                    framework = FRAMEWORKS[name]
-                    row = {
-                        "framework": name,
-                        "interface": framework.interface,
-                        "workers": workers,
-                        "status": "pending",
-                    }
-                    report["results"].append(row)
-                    report["execution_order"].append(
-                        {"framework": name, "workers": workers},
-                    )
-                    # Do not publish Windows' single-worker fallback as scaling.
-                    if sys.platform == "win32" and workers > 1:
-                        row.update(status="unsupported", reason=WINDOWS_LIMIT)
-                        failed = True
-                        continue
-                    print(f"Benchmark: {name}, {workers} worker(s)", flush=True)
-                    try:
-                        benchmark_case(
-                            framework, workers, args, oha, output, commands, row,
-                        )
-                    except (
-                        OSError,
-                        ValueError,
-                        KeyError,
-                        TypeError,
-                        RuntimeError,
-                        subprocess.SubprocessError,
-                        psutil.Error,
-                    ) as error:
-                        row.update(status="failed", reason=str(error))
-                        # Cleanup or later failures invalidate earlier medians.
-                        for metric in METRICS:
-                            row.pop(metric, None)
-                        print(
-                            f"FAILED: {name}, {workers} workers: {error}",
-                            file=sys.stderr,
-                            flush=True,
-                        )
-                    failed |= row["status"] != "ok"
-                    write_reports(output, report)
-                    write_json(output / "commands.json", commands)
-    except (
-        OSError,
-        ValueError,
-        KeyError,
-        TypeError,
-        RuntimeError,
-        subprocess.SubprocessError,
-        psutil.Error,
-    ) as error:
-        # Distinguish setup failures from failures inside individual cases.
+            _run_matrix(args, oha, output, report, commands)
+    except BENCHMARK_ERRORS as error:
         report["error"] = str(error)
-        failed = True
         print(f"Benchmark setup failed: {error}", file=sys.stderr, flush=True)
     except KeyboardInterrupt:
-        # Retain completed measurements while marking the active case as failed.
         report["error"] = "Interrupted by user"
         for row in report["results"]:
             if row["status"] == "pending":
                 row.update(status="failed", reason="Interrupted by user")
-        failed = True
     finally:
-        # Flush artifacts and the Actions summary even after setup or case errors.
         markdown = write_reports(output, report)
         write_json(output / "commands.json", commands)
         summary = os.environ.get("GITHUB_STEP_SUMMARY")
@@ -947,12 +613,15 @@ def main(argv: list[str] | None = None) -> int:  # noqa: C901, PLR0912, PLR0915 
             with Path(summary).open("a", encoding="utf-8") as stream:
                 stream.write(markdown)
         print(markdown)
-    if not failed:
-        for workers in report["settings"]["workers"]:
-            (output / f"throughput-{workers}-workers.svg").write_text(
-                render_throughput_svg(report, workers), encoding="utf-8",
-            )
-    return int(failed)
+    if "error" in report or any(
+        row["status"] != "ok" for row in report["results"]
+    ):
+        return 1
+    for workers in report["settings"]["workers"]:
+        (output / f"throughput-{workers}-workers.svg").write_text(
+            render_throughput_svg(report, workers), encoding="utf-8",
+        )
+    return 0
 
 if __name__ == "__main__":
     raise SystemExit(main())

@@ -1,8 +1,11 @@
-import asyncio
-from typing import Any, Self
+from typing import TYPE_CHECKING, Any, Self
 from orionis.hashing.contracts.hasher import IHasher
 from orionis.hashing.exceptions import HashConfigurationException
+from orionis.hashing.execution import HASH_WORKERS
 from orionis.hashing.hashers.functions import import_hasher_backend
+
+if TYPE_CHECKING:
+    from orionis.support.concurrency import BoundedExecutor
 
 # ruff: noqa: ANN401, ARG002
 
@@ -31,9 +34,14 @@ class BcryptHasher(IHasher):
     backend with the new cost factor.
     """
 
-    __slots__ = ("_backend", "_backend_class", "_rounds")
+    __slots__ = ("_backend", "_backend_class", "_executor", "_rounds")
 
-    def __init__(self, *, rounds: int = DEFAULT_ROUNDS) -> None:
+    def __init__(
+        self: Self,
+        *,
+        rounds: int = DEFAULT_ROUNDS,
+        executor: BoundedExecutor | None = None,
+    ) -> None:
         """
         Initialize the driver with its default cost factor.
 
@@ -42,6 +50,8 @@ class BcryptHasher(IHasher):
         rounds : int
             Cost factor, expressed as the base-2 logarithm of the
             iteration count.
+        executor : BoundedExecutor | None
+            Caller-owned dedicated executor, or the shared bounded hashing pool.
 
         Returns
         -------
@@ -54,6 +64,7 @@ class BcryptHasher(IHasher):
             If ``rounds`` falls outside the range supported by bcrypt.
         """
         self._rounds = self._validate(rounds)
+        self._executor = HASH_WORKERS if executor is None else executor
 
         # The backend is imported and built on first use to keep the
         # driver constructible even when the dependency is absent.
@@ -92,7 +103,7 @@ class BcryptHasher(IHasher):
             raise HashConfigurationException(error_msg)
         return rounds
 
-    def _backendClass(self) -> Any:
+    def _backendClass(self: Self) -> Any:
         """
         Return the backend class, importing it on first use.
 
@@ -114,7 +125,7 @@ class BcryptHasher(IHasher):
             )
         return self._backend_class
 
-    def _build(self, rounds: int) -> Any:
+    def _build(self: Self, rounds: int) -> Any:
         """
         Build a backend instance for the given cost factor.
 
@@ -130,7 +141,7 @@ class BcryptHasher(IHasher):
         """
         return self._backendClass()(rounds=rounds)
 
-    def _default(self) -> Any:
+    def _default(self: Self) -> Any:
         """
         Return the cached backend built from the configured cost factor.
 
@@ -144,7 +155,7 @@ class BcryptHasher(IHasher):
         return self._backend
 
     def _make(
-        self,
+        self: Self,
         value: str,
         *,
         rounds: int | None = None,
@@ -182,7 +193,7 @@ class BcryptHasher(IHasher):
         return backend.hash(value)
 
     async def make(
-        self,
+        self: Self,
         value: str,
         *,
         rounds: int | None = None,
@@ -213,7 +224,7 @@ class BcryptHasher(IHasher):
         HashConfigurationException
             If ``rounds`` falls outside the range supported by bcrypt.
         """
-        return await asyncio.to_thread(
+        return await self._executor.run(
             self._make,
             value,
             rounds=rounds,
@@ -221,7 +232,7 @@ class BcryptHasher(IHasher):
             threads=threads,
         )
 
-    def _check(self, value: str, hashed: str) -> bool:
+    def _check(self: Self, value: str, hashed: str) -> bool:
         """
         Verify a plain text value against a bcrypt hash.
 
@@ -242,7 +253,7 @@ class BcryptHasher(IHasher):
             return False
         return self._default().verify(value, hashed)
 
-    async def check(self, value: str, hashed: str) -> bool:
+    async def check(self: Self, value: str, hashed: str) -> bool:
         """
         Verify a plain text value off the event loop.
 
@@ -258,9 +269,9 @@ class BcryptHasher(IHasher):
         bool
             ``True`` when the value matches the hash, ``False`` otherwise.
         """
-        return await asyncio.to_thread(self._check, value, hashed)
+        return await self._executor.run(self._check, value, hashed)
 
-    def needsRehash(self, hashed: str) -> bool:
+    def needsRehash(self: Self, hashed: str) -> bool:
         """
         Determine whether the hash uses an outdated cost factor.
 
@@ -279,7 +290,7 @@ class BcryptHasher(IHasher):
             return True
         return self._default().check_needs_rehash(hashed)
 
-    def _identify(self, hashed: str) -> bool:
+    def _identify(self: Self, hashed: str) -> bool:
         """
         Check whether the hash was produced by bcrypt.
 
@@ -295,7 +306,7 @@ class BcryptHasher(IHasher):
         """
         return self._backendClass().identify(hashed)
 
-    def getAlgorithm(self) -> str:
+    def getAlgorithm(self: Self) -> str:
         """
         Return the algorithm identifier of this driver.
 
@@ -306,7 +317,7 @@ class BcryptHasher(IHasher):
         """
         return "bcrypt"
 
-    def setRounds(self, rounds: int) -> Self:
+    def setRounds(self: Self, rounds: int) -> Self:
         """
         Set the default cost factor used by the driver.
 

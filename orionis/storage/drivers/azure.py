@@ -4,11 +4,10 @@ import hashlib
 import mimetypes
 import tempfile
 from datetime import UTC, datetime, timedelta
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING, Any, Self
 from urllib.parse import quote
+from orionis.storage.buffering import spool_stream
 from orionis.storage.contracts.driver import IStorageDriver
-from orionis.storage.entities.file_info import FileInfo
-from orionis.storage.enums.visibility import Visibility
 from orionis.storage.drivers.functions import (
     assertBinaryMode,
     deriveDirectories,
@@ -16,6 +15,8 @@ from orionis.storage.drivers.functions import (
     importDriverDependency,
     resolveDownloadTarget,
 )
+from orionis.storage.entities.file_info import FileInfo
+from orionis.storage.enums.visibility import Visibility
 from orionis.storage.exceptions import (
     StorageFileNotFoundException,
     UnsupportedStorageOperationException,
@@ -66,7 +67,7 @@ class AzureStorageDriver(IStorageDriver):
         "_sdk",
     )
 
-    def __init__(self, config: object) -> None:
+    def __init__(self: Self, config: object) -> None:
         """
         Initialize the driver from an Azure disk configuration entity.
 
@@ -113,15 +114,17 @@ class AzureStorageDriver(IStorageDriver):
                 if separator
             }
             self._account_name = self._account_name or parts.get(
-                "AccountName", "",
+                "AccountName",
+                "",
             )
             self._account_key = self._account_key or parts.get(
-                "AccountKey", "",
+                "AccountKey",
+                "",
             )
 
     # ── SDK bootstrap and low-level helpers ──────────────────────────────────
 
-    def __containerClient(self) -> Any:
+    def __containerClient(self: Self) -> Any:
         """
         Return the container client, bootstrapping it on first use.
 
@@ -140,10 +143,14 @@ class AzureStorageDriver(IStorageDriver):
 
         # Import the official SDK lazily; it is an optional dependency.
         sdk = importDriverDependency(
-            "azure.storage.blob", "azure-storage-blob", "azure",
+            "azure.storage.blob",
+            "azure-storage-blob",
+            "azure",
         )
         errors = importDriverDependency(
-            "azure.core.exceptions", "azure-storage-blob", "azure",
+            "azure.core.exceptions",
+            "azure-storage-blob",
+            "azure",
         )
 
         if self._connection_string:
@@ -151,9 +158,7 @@ class AzureStorageDriver(IStorageDriver):
                 self._connection_string,
             )
         else:
-            account_url = (
-                f"https://{self._account_name}.blob.core.windows.net"
-            )
+            account_url = f"https://{self._account_name}.blob.core.windows.net"
             service = sdk.BlobServiceClient(
                 account_url=account_url,
                 credential=self._account_key or None,
@@ -165,7 +170,7 @@ class AzureStorageDriver(IStorageDriver):
         self._container = service.get_container_client(self._container_name)
         return self._container
 
-    def __blob(self, normalized: str) -> Any:
+    def __blob(self: Self, normalized: str) -> Any:
         """
         Return the blob client for *normalized*.
 
@@ -181,7 +186,7 @@ class AzureStorageDriver(IStorageDriver):
         """
         return self.__containerClient().get_blob_client(normalized)
 
-    def __missing(self, normalized: str) -> StorageFileNotFoundException:
+    def __missing(self: Self, normalized: str) -> StorageFileNotFoundException:
         """
         Build the framework exception for a missing blob.
 
@@ -198,7 +203,7 @@ class AzureStorageDriver(IStorageDriver):
         error_msg = f"File does not exist at path [{normalized}]."
         return StorageFileNotFoundException(error_msg)
 
-    def __propsSync(self, normalized: str) -> Any:
+    def __propsSync(self: Self, normalized: str) -> Any:
         """
         Fetch blob properties or raise when the blob is absent.
 
@@ -223,7 +228,7 @@ class AzureStorageDriver(IStorageDriver):
         except self._not_found as exc:
             raise self.__missing(normalized) from exc
 
-    def __listKeysSync(self, prefix: str) -> list[str]:
+    def __listKeysSync(self: Self, prefix: str) -> list[str]:
         """
         List every blob name under *prefix*.
 
@@ -239,11 +244,10 @@ class AzureStorageDriver(IStorageDriver):
         """
         container = self.__containerClient()
         return [
-            blob.name
-            for blob in container.list_blobs(name_starts_with=prefix or None)
+            blob.name for blob in container.list_blobs(name_starts_with=prefix or None)
         ]
 
-    def __contentSettings(self, normalized: str) -> Any:
+    def __contentSettings(self: Self, normalized: str) -> Any:
         """
         Build the content settings for an upload, when derivable.
 
@@ -263,7 +267,7 @@ class AzureStorageDriver(IStorageDriver):
             return None
         return self._sdk.ContentSettings(content_type=mime)
 
-    def __urlFor(self, normalized: str) -> str:
+    def __urlFor(self: Self, normalized: str) -> str:
         """
         Compose the public URL of a blob without SDK involvement.
 
@@ -284,35 +288,9 @@ class AzureStorageDriver(IStorageDriver):
         host = f"{self._account_name}.blob.core.windows.net"
         return f"https://{host}/{self._container_name}/{encoded}"
 
-    async def __spool(self, stream: AsyncIterable[bytes]) -> BinaryIO:
-        """
-        Buffer an async byte stream into a spooled temporary file.
-
-        Parameters
-        ----------
-        stream : AsyncIterable[bytes]
-            Asynchronous byte-chunk producer.
-
-        Returns
-        -------
-        BinaryIO
-            Rewound buffer holding the full payload.
-        """
-        buffer = await asyncio.to_thread(
-            tempfile.SpooledTemporaryFile, max_size=_SPOOL_THRESHOLD,
-        )
-        try:
-            async for chunk in stream:
-                await asyncio.to_thread(buffer.write, chunk)
-        except BaseException:
-            await asyncio.to_thread(buffer.close)
-            raise
-        await asyncio.to_thread(buffer.seek, 0)
-        return buffer
-
     # ── Read operations ──────────────────────────────────────────────────────
 
-    async def read(self, path: str) -> bytes:
+    async def read(self: Self, path: str) -> bytes:
         """
         Read the full contents of the blob at *path*.
 
@@ -351,7 +329,7 @@ class AzureStorageDriver(IStorageDriver):
         return await asyncio.to_thread(_read)
 
     async def readStream(
-        self,
+        self: Self,
         path: str,
         chunk_size: int = _CHUNK_SIZE,
     ) -> AsyncIterator[bytes]:
@@ -396,15 +374,16 @@ class AzureStorageDriver(IStorageDriver):
             except self._not_found as exc:
                 raise self.__missing(normalized) from exc
 
-        iterator = await asyncio.to_thread(_open)
-        sentinel: bytes = b""
-        while True:
-            chunk = await asyncio.to_thread(next, iterator, sentinel)
-            if not chunk:
-                break
-            yield chunk
+        from orionis.storage.buffering import iterate_chunks  # noqa: PLC0415
 
-    async def exists(self, path: str) -> bool:
+        chunks = iterate_chunks(_open)
+        try:
+            async for chunk in chunks:
+                yield chunk
+        finally:
+            await chunks.aclose()
+
+    async def exists(self: Self, path: str) -> bool:
         """
         Check whether a blob exists at *path*.
 
@@ -426,7 +405,7 @@ class AzureStorageDriver(IStorageDriver):
     # ── Write operations ─────────────────────────────────────────────────────
 
     async def write(
-        self,
+        self: Self,
         path: str,
         contents: bytes | str,
         visibility: str | None = None,
@@ -454,9 +433,7 @@ class AzureStorageDriver(IStorageDriver):
         normalized = normalizeFilePath(path)
         del visibility
         data = (
-            contents.encode("utf-8")
-            if isinstance(contents, str)
-            else bytes(contents)
+            contents.encode("utf-8") if isinstance(contents, str) else bytes(contents)
         )
 
         def _write() -> None:
@@ -479,7 +456,7 @@ class AzureStorageDriver(IStorageDriver):
         await asyncio.to_thread(_write)
 
     async def writeStream(
-        self,
+        self: Self,
         path: str,
         stream: AsyncIterable[bytes],
         visibility: str | None = None,
@@ -506,7 +483,7 @@ class AzureStorageDriver(IStorageDriver):
         """
         normalized = normalizeFilePath(path)
         del visibility
-        buffer = await self.__spool(stream)
+        buffer = await spool_stream(stream, max_size=_SPOOL_THRESHOLD)
 
         def _upload() -> None:
             """
@@ -530,7 +507,7 @@ class AzureStorageDriver(IStorageDriver):
         finally:
             await asyncio.to_thread(buffer.close)
 
-    async def delete(self, path: str) -> bool:
+    async def delete(self: Self, path: str) -> bool:
         """
         Delete the blob at *path*.
 
@@ -564,7 +541,7 @@ class AzureStorageDriver(IStorageDriver):
 
         return await asyncio.to_thread(_delete)
 
-    async def copy(self, source: str, target: str) -> None:
+    async def copy(self: Self, source: str, target: str) -> None:
         """
         Copy the blob at *source* to *target*.
 
@@ -623,7 +600,7 @@ class AzureStorageDriver(IStorageDriver):
 
         await asyncio.to_thread(_copy)
 
-    async def move(self, source: str, target: str) -> None:
+    async def move(self: Self, source: str, target: str) -> None:
         """
         Move the blob at *source* to *target*.
 
@@ -653,7 +630,7 @@ class AzureStorageDriver(IStorageDriver):
 
     # ── Metadata operations ──────────────────────────────────────────────────
 
-    async def size(self, path: str) -> int:
+    async def size(self: Self, path: str) -> int:
         """
         Return the size in bytes of the blob at *path*.
 
@@ -676,7 +653,7 @@ class AzureStorageDriver(IStorageDriver):
         props = await asyncio.to_thread(self.__propsSync, normalized)
         return int(props.size or 0)
 
-    async def mimeType(self, path: str) -> str | None:
+    async def mimeType(self: Self, path: str) -> str | None:
         """
         Return the MIME type of the blob at *path*.
 
@@ -703,7 +680,7 @@ class AzureStorageDriver(IStorageDriver):
         stored = getattr(props.content_settings, "content_type", None)
         return stored or mimetypes.guess_type(normalized)[0]
 
-    async def lastModified(self, path: str) -> datetime:
+    async def lastModified(self: Self, path: str) -> datetime:
         """
         Return the last-modification timestamp of the blob at *path*.
 
@@ -726,7 +703,7 @@ class AzureStorageDriver(IStorageDriver):
         props = await asyncio.to_thread(self.__propsSync, normalized)
         return props.last_modified or datetime.now(tz=UTC)
 
-    async def visibility(self, path: str) -> str:
+    async def visibility(self: Self, path: str) -> str:
         """
         Return the effective visibility of the blob at *path*.
 
@@ -776,7 +753,7 @@ class AzureStorageDriver(IStorageDriver):
 
         return await asyncio.to_thread(_visibility)
 
-    async def setVisibility(self, path: str, visibility: str) -> None:
+    async def setVisibility(self: Self, path: str, visibility: str) -> None:
         """
         Change the visibility of the blob at *path*.
 
@@ -809,7 +786,7 @@ class AzureStorageDriver(IStorageDriver):
         )
         raise UnsupportedStorageOperationException(error_msg)
 
-    async def hash(self, path: str, algorithm: str = "sha256") -> str:
+    async def hash(self: Self, path: str, algorithm: str = "sha256") -> str:
         """
         Compute the content hash of the blob at *path*.
 
@@ -863,7 +840,7 @@ class AzureStorageDriver(IStorageDriver):
 
         return await asyncio.to_thread(_hash)
 
-    async def info(self, path: str) -> FileInfo:
+    async def info(self: Self, path: str) -> FileInfo:
         """
         Collect a metadata snapshot for the blob at *path*.
 
@@ -907,16 +884,16 @@ class AzureStorageDriver(IStorageDriver):
 
             stored_md5 = getattr(props.content_settings, "content_md5", None)
             stored_type = getattr(
-                props.content_settings, "content_type", None,
+                props.content_settings,
+                "content_type",
+                None,
             )
             return FileInfo(
                 path=normalized,
                 size=int(props.size or 0),
                 lastModified=props.last_modified or datetime.now(tz=UTC),
                 visibility=(
-                    Visibility.PUBLIC.value
-                    if is_public
-                    else Visibility.PRIVATE.value
+                    Visibility.PUBLIC.value if is_public else Visibility.PRIVATE.value
                 ),
                 mimeType=stored_type or mimetypes.guess_type(normalized)[0],
                 createdAt=props.creation_time,
@@ -929,7 +906,7 @@ class AzureStorageDriver(IStorageDriver):
 
     # ── Directory operations ─────────────────────────────────────────────────
 
-    async def createDirectory(self, path: str) -> None:
+    async def createDirectory(self: Self, path: str) -> None:
         """
         Create a zero-byte directory marker at *path*.
 
@@ -957,12 +934,14 @@ class AzureStorageDriver(IStorageDriver):
             """
             container = self.__containerClient()
             container.upload_blob(
-                name=f"{normalized}/", data=b"", overwrite=True,
+                name=f"{normalized}/",
+                data=b"",
+                overwrite=True,
             )
 
         await asyncio.to_thread(_create)
 
-    async def deleteDirectory(self, path: str) -> bool:
+    async def deleteDirectory(self: Self, path: str) -> bool:
         """
         Recursively delete every blob under *path*.
 
@@ -997,7 +976,7 @@ class AzureStorageDriver(IStorageDriver):
 
         return await asyncio.to_thread(_purge)
 
-    async def directoryExists(self, path: str) -> bool:
+    async def directoryExists(self: Self, path: str) -> bool:
         """
         Check whether any blob exists under *path*.
 
@@ -1034,7 +1013,7 @@ class AzureStorageDriver(IStorageDriver):
         return await asyncio.to_thread(_exists)
 
     async def files(
-        self,
+        self: Self,
         path: str = "",
         *,
         recursive: bool = False,
@@ -1060,7 +1039,7 @@ class AzureStorageDriver(IStorageDriver):
         return filterFiles(keys, normalized, recursive=recursive)
 
     async def directories(
-        self,
+        self: Self,
         path: str = "",
         *,
         recursive: bool = False,
@@ -1087,7 +1066,7 @@ class AzureStorageDriver(IStorageDriver):
 
     # ── URLs and transfers ───────────────────────────────────────────────────
 
-    async def url(self, path: str) -> str:
+    async def url(self: Self, path: str) -> str:
         """
         Build the public URL for the blob at *path*.
 
@@ -1104,7 +1083,7 @@ class AzureStorageDriver(IStorageDriver):
         """
         return self.__urlFor(normalizeFilePath(path))
 
-    async def temporaryUrl(self, path: str, expires_in: int) -> str:
+    async def temporaryUrl(self: Self, path: str, expires_in: int) -> str:
         """
         Build a SAS URL for the blob at *path*.
 
@@ -1161,7 +1140,7 @@ class AzureStorageDriver(IStorageDriver):
 
         return await asyncio.to_thread(_sign)
 
-    async def download(self, path: str, destination: str | Path) -> Path:
+    async def download(self: Self, path: str, destination: str | Path) -> Path:
         """
         Download the blob at *path* to the local filesystem.
 
@@ -1206,7 +1185,7 @@ class AzureStorageDriver(IStorageDriver):
 
         return await asyncio.to_thread(_download)
 
-    def open(self, path: str, mode: str = "rb") -> AsyncStream:
+    def open(self: Self, path: str, mode: str = "rb") -> AsyncStream:
         """
         Open an asynchronous binary stream for the blob at *path*.
 

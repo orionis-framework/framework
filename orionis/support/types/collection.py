@@ -6,9 +6,10 @@ import random
 import secrets
 from functools import reduce
 from itertools import groupby
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING, Any, Self
 from dotty_dict import dotty
 from orionis.support.types.contracts.collection import ICollection
+from orionis.support.types.uniqueness import unique_items
 
 if TYPE_CHECKING:
     from collections.abc import Callable, Iterator
@@ -27,12 +28,9 @@ _OPERATORS: dict[str, Any] = {
 # value in getattr calls, eliminating the hasattr+getattr double-lookup.
 _MISSING: object = object()
 
-
 class Collection(ICollection):
 
-    # ruff: noqa: ANN401
-
-    def __hash__(self) -> int:
+    def __hash__(self: Self) -> int:
         """
         Compute the hash value of the collection.
 
@@ -45,7 +43,7 @@ class Collection(ICollection):
         return hash(tuple(self._items))
 
     def __init__(
-        self,
+        self: Self,
         items: list[Any] | None = None,
     ) -> None:
         """
@@ -65,7 +63,7 @@ class Collection(ICollection):
         self.__appends__ = []
 
     def take(
-        self,
+        self: Self,
         number: int,
     ) -> Collection:
         """
@@ -87,7 +85,7 @@ class Collection(ICollection):
         return self[:number]
 
     def first(
-        self,
+        self: Self,
         callback: Callable | None = None,
     ) -> object:
         """
@@ -114,7 +112,7 @@ class Collection(ICollection):
         return None
 
     def last(
-        self,
+        self: Self,
         callback: Callable | None = None,
     ) -> object:
         """
@@ -140,7 +138,7 @@ class Collection(ICollection):
                 result = item
         return result
 
-    def all(self) -> list[Any]:
+    def all(self: Self) -> list[Any]:
         """
         Return all items in the collection.
 
@@ -152,7 +150,7 @@ class Collection(ICollection):
         return self._items
 
     def avg(
-        self,
+        self: Self,
         key: str | None = None,
     ) -> float:
         """
@@ -185,7 +183,7 @@ class Collection(ICollection):
         return result
 
     def max(
-        self,
+        self: Self,
         key: str | None = None,
     ) -> object:
         """
@@ -206,12 +204,12 @@ class Collection(ICollection):
         items = self.__getValue(key) or self._items
         try:
             return max(items)
-        except (TypeError, ValueError):
+        except TypeError, ValueError:
             pass
         return result
 
     def min(
-        self,
+        self: Self,
         key: str | None = None,
     ) -> object:
         """
@@ -231,12 +229,12 @@ class Collection(ICollection):
         items = self.__getValue(key) or self._items
         try:
             return min(items)
-        except (TypeError, ValueError):
+        except TypeError, ValueError:
             pass
         return result
 
     def chunk(
-        self,
+        self: Self,
         size: int,
     ) -> Collection:
         """
@@ -261,7 +259,7 @@ class Collection(ICollection):
         items = [self[i : i + size] for i in range(0, len(self._items), size)]
         return self.__class__(items)
 
-    def collapse(self) -> Collection:
+    def collapse(self: Self) -> Collection:
         """
         Collapse the collection of arrays into a single, flat collection.
 
@@ -277,9 +275,9 @@ class Collection(ICollection):
         return self.__class__(items)
 
     def contains(
-        self,
+        self: Self,
         key: str | Callable,
-        value: object = None,
+        value: object | None = None,
     ) -> bool:
         """
         Check if the collection contains a given item.
@@ -307,7 +305,7 @@ class Collection(ICollection):
         # Otherwise, check if key is in the collection.
         return key in self
 
-    def count(self) -> int:
+    def count(self: Self) -> int:
         """
         Return the number of items in the collection.
 
@@ -320,7 +318,7 @@ class Collection(ICollection):
         return len(self._items)
 
     def diff(
-        self,
+        self: Self,
         items: list[Any] | Collection,
     ) -> Collection:
         """
@@ -346,7 +344,7 @@ class Collection(ICollection):
             return self.__class__([x for x in self._items if x not in items])
 
     def each(
-        self,
+        self: Self,
         callback: Callable,
     ) -> Collection:
         """
@@ -373,7 +371,7 @@ class Collection(ICollection):
         return self
 
     def every(
-        self,
+        self: Self,
         callback: Callable,
     ) -> bool:
         """
@@ -394,7 +392,7 @@ class Collection(ICollection):
         return all(callback(x) for x in self._items)
 
     def filter(
-        self,
+        self: Self,
         callback: Callable,
     ) -> Collection:
         """
@@ -414,7 +412,7 @@ class Collection(ICollection):
         self.__checkIsCallable(callback)
         return self.__class__([item for item in self._items if callback(item)])
 
-    def flatten(self) -> Collection:
+    def flatten(self: Self) -> Collection:
         """
         Flatten the collection into a single dimension.
 
@@ -423,6 +421,7 @@ class Collection(ICollection):
         Collection
             A new Collection containing all items, flattened to a single dimension.
         """
+
         def _flatten(items: object) -> Iterator[Any]:
             """
             Yield scalar values from nested lists and dictionaries.
@@ -449,7 +448,7 @@ class Collection(ICollection):
         return self.__class__(list(_flatten(self._items)))
 
     def forget(
-        self,
+        self: Self,
         *keys: int | str,
     ) -> Collection:
         """
@@ -472,7 +471,7 @@ class Collection(ICollection):
         return self
 
     def forPage(
-        self,
+        self: Self,
         page: int,
         number: int,
     ) -> Collection:
@@ -501,12 +500,12 @@ class Collection(ICollection):
 
         # Calculate start and end indices for the requested page
         start = (page - 1) * number
-        return self.__class__(self._items[start:start + number])
+        return self.__class__(self._items[start : start + number])
 
     def get(
-        self,
+        self: Self,
         key: int | str,
-        default: object = None,
+        default: object | None = None,
     ) -> object:
         """
         Retrieve an item from the collection by key.
@@ -525,12 +524,12 @@ class Collection(ICollection):
         """
         try:
             return self[key]
-        except (IndexError, KeyError):
+        except IndexError, KeyError:
             pass
         return self.__value(default)
 
     def implode(
-        self,
+        self: Self,
         glue: str = ",",
         key: str | None = None,
     ) -> str:
@@ -564,7 +563,7 @@ class Collection(ICollection):
         # Otherwise, join string representations of all items
         return glue.join([str(x) for x in self])
 
-    def isEmpty(self) -> bool:
+    def isEmpty(self: Self) -> bool:
         """
         Check if the collection is empty.
 
@@ -577,7 +576,7 @@ class Collection(ICollection):
         return not self
 
     def map(
-        self,
+        self: Self,
         callback: Callable,
     ) -> Collection:
         """
@@ -598,7 +597,7 @@ class Collection(ICollection):
         return self.__class__([callback(x) for x in self._items])
 
     def mapInto(
-        self,
+        self: Self,
         cls: type,
         method: str | None = None,
         **kwargs: object,
@@ -637,12 +636,12 @@ class Collection(ICollection):
                     results.append(mapper(item, **kwargs))
                 else:
                     results.append(cls(item))
-            except (TypeError, AttributeError, ValueError):
+            except TypeError, AttributeError, ValueError:
                 results.append(None)
         return self.__class__(results)
 
     def merge(
-        self,
+        self: Self,
         items: list[Any] | Collection,
     ) -> Collection:
         """
@@ -673,7 +672,7 @@ class Collection(ICollection):
         return self
 
     def pluck(
-        self,
+        self: Self,
         value: str,
         key: str | None = None,
     ) -> Collection:
@@ -712,7 +711,7 @@ class Collection(ICollection):
         # Return a new Collection with the plucked values
         return self.__class__(attributes)
 
-    def pop(self) -> object:
+    def pop(self: Self) -> object:
         """
         Remove and return the last item from the collection.
 
@@ -729,7 +728,7 @@ class Collection(ICollection):
         return self._items.pop()
 
     def prepend(
-        self,
+        self: Self,
         value: object,
     ) -> Collection:
         """
@@ -750,7 +749,7 @@ class Collection(ICollection):
         return self
 
     def pull(
-        self,
+        self: Self,
         key: int | str,
     ) -> object:
         """
@@ -772,7 +771,7 @@ class Collection(ICollection):
         return value
 
     def push(
-        self,
+        self: Self,
         value: object,
     ) -> Collection:
         """
@@ -793,7 +792,7 @@ class Collection(ICollection):
         return self
 
     def put(
-        self,
+        self: Self,
         key: int | str,
         value: object,
     ) -> Collection:
@@ -817,7 +816,7 @@ class Collection(ICollection):
         return self
 
     def random(
-        self,
+        self: Self,
         count: int | None = None,
     ) -> object | Collection | None:
         """
@@ -856,14 +855,14 @@ class Collection(ICollection):
         # Return random items based on count
         if count:
             # Select 'count' random items and update the collection
-            self._items = random.sample(self._items, k=count) # NOSONAR
+            self._items = random.sample(self._items, k=count)  # NOSONAR
             return self
 
         # Return a single random item
         return secrets.choice(self._items)
 
     def reduce(
-        self,
+        self: Self,
         callback: Callable,
         initial: object = 0,
     ) -> object:
@@ -886,7 +885,7 @@ class Collection(ICollection):
         return reduce(callback, self, initial)
 
     def reject(
-        self,
+        self: Self,
         callback: Callable,
     ) -> Collection:
         """
@@ -908,7 +907,7 @@ class Collection(ICollection):
         self._items = [item for item in self._items if not callback(item)]
         return self
 
-    def reverse(self) -> Collection:
+    def reverse(self: Self) -> Collection:
         """
         Reverse the order of items in the collection.
 
@@ -921,7 +920,7 @@ class Collection(ICollection):
         self._items.reverse()
         return self
 
-    def serialize(self) -> list[Any]:
+    def serialize(self: Self) -> list[Any]:
         """
         Serialize the collection items as a list.
 
@@ -930,6 +929,7 @@ class Collection(ICollection):
         list of Any
             The serialized items in the collection.
         """
+
         def _serialize(item: object) -> object:
             """
             Serialize one collection item with its declared appends.
@@ -974,7 +974,7 @@ class Collection(ICollection):
 
         return list(map(_serialize, self._items))
 
-    def shift(self) -> object:
+    def shift(self: Self) -> object:
         """
         Remove and return the first item from the collection.
 
@@ -987,7 +987,7 @@ class Collection(ICollection):
         return self.pull(0)
 
     def sort(
-        self,
+        self: Self,
         key: str | None = None,
     ) -> Collection:
         """
@@ -1013,7 +1013,7 @@ class Collection(ICollection):
         return self
 
     def sum(
-        self,
+        self: Self,
         key: str | None = None,
     ) -> float:
         """
@@ -1037,7 +1037,7 @@ class Collection(ICollection):
         return result
 
     def toJson(
-        self,
+        self: Self,
         **kwargs: object,
     ) -> str:
         """
@@ -1057,7 +1057,7 @@ class Collection(ICollection):
         return json.dumps(self.serialize(), **kwargs)
 
     def groupBy(
-        self,
+        self: Self,
         key: str,
     ) -> Collection:
         """
@@ -1086,7 +1086,7 @@ class Collection(ICollection):
         return Collection(new_dict)
 
     def transform(
-        self,
+        self: Self,
         callback: Callable,
     ) -> Collection:
         """
@@ -1108,16 +1108,18 @@ class Collection(ICollection):
         return self
 
     def unique(
-        self,
-        key: str | None = None,
+        self: Self,
+        key: str | Callable | None = None,
     ) -> Collection:
         """
         Return unique items from the collection.
 
         Parameters
         ----------
-        key : str | None, optional
-            The key to use for uniqueness comparison. If None, use items directly.
+        key : str | Callable | None, optional
+            Field name or identity selector. Hashable selector results avoid
+            quadratic comparisons for arbitrary user-defined objects. Without
+            a key, built-in value trees also use equality-compatible indexing.
 
         Returns
         -------
@@ -1135,7 +1137,7 @@ class Collection(ICollection):
         # Otherwise, get unique items based on the specified key
         return self._getUniqueItemsByKey(key)
 
-    def _getUniqueItemsWithoutKey(self) -> Collection:
+    def _getUniqueItemsWithoutKey(self: Self) -> Collection:
         """
         Return unique items from the collection without using a key.
 
@@ -1148,73 +1150,28 @@ class Collection(ICollection):
             # Attempt to use set for hashable items
             items = list(set(self._items))
         except TypeError:
-            # Fallback for unhashable items: manual uniqueness check
-            items = []
-            for item in self._items:
-                if item not in items:
-                    items.append(item)
+            items = unique_items(list(self._items), lambda item: item)
         return self.__class__(items)
 
-    def _getUniqueItemsByKey(self, key: str) -> Collection:
+    def _getUniqueItemsByKey(self: Self, key: str | Callable) -> Collection:
         """
         Get unique items from the collection based on a specified key.
 
         Parameters
         ----------
-        key : str
-            The key to determine uniqueness for each item.
+        key : str | Callable
+            Field name or identity selector used for each item.
 
         Returns
         -------
         Collection
             A new Collection containing only unique items by the given key.
         """
-        keys: set[Any] = set()
-        items: list[Any] = []
-        # Iterate and collect unique items based on the comparison key
-        for item in self:
-            comparison = self.__dataGet(item, key)
-            self._addUniqueItem(comparison, item, keys, items)
-        return self.__class__(items)
-
-    def _addUniqueItem(
-        self,
-        comparison: Any,
-        item: Any,
-        keys: set[Any],
-        items: list[Any],
-    ) -> None:
-        """
-        Add a unique item to the collection based on the comparison value.
-
-        Parameters
-        ----------
-        comparison : Any
-            The value used to determine uniqueness.
-        item : Any
-            The item to potentially add.
-        keys : set[Any]
-            The set of seen comparison values.
-        items : list[Any]
-            The list of unique items.
-
-        Returns
-        -------
-        None
-            This method does not return a value.
-        """
-        try:
-            # Add item if its comparison value is not already in keys
-            if comparison not in keys:
-                items.append(item)
-                keys.add(comparison)
-        except TypeError:
-            # Compare unhashable values against existing keys.
-            if not any(comp == comparison for comp in keys):
-                items.append(item)
+        selector = key if callable(key) else lambda item: self.__dataGet(item, key)
+        return self.__class__(unique_items(list(self), selector))
 
     def where(
-        self,
+        self: Self,
         key: str,
         *args: object,
     ) -> Collection:
@@ -1255,14 +1212,14 @@ class Collection(ICollection):
             try:
                 if self.__makeComparison(comparison, value, op):
                     attributes.append(item)
-            except (TypeError, ValueError):
+            except TypeError, ValueError:
                 # Skip items that can't be compared
                 continue
 
         return self.__class__(attributes)
 
     def whereIn(
-        self,
+        self: Self,
         key: str,
         values: list[Any] | Collection,
     ) -> Collection:
@@ -1309,7 +1266,7 @@ class Collection(ICollection):
         return self.__class__(attributes)
 
     def whereNotIn(
-        self,
+        self: Self,
         key: str,
         values: list[Any] | Collection,
     ) -> Collection:
@@ -1356,7 +1313,7 @@ class Collection(ICollection):
         return self.__class__(attributes)
 
     def zip(
-        self,
+        self: Self,
         items: list[Any] | Collection,
     ) -> Collection:
         """
@@ -1391,7 +1348,7 @@ class Collection(ICollection):
         )
 
     def setAppends(
-        self,
+        self: Self,
         appends: list[str],
     ) -> Collection:
         """
@@ -1412,7 +1369,7 @@ class Collection(ICollection):
         return self
 
     def addRelation(
-        self,
+        self: Self,
         relation_data: dict[str, Any],
     ) -> Collection:
         """
@@ -1436,7 +1393,7 @@ class Collection(ICollection):
         return self
 
     def __getValue(
-        self,
+        self: Self,
         key: str | Callable | None,
     ) -> list[Any] | None:
         """
@@ -1472,10 +1429,10 @@ class Collection(ICollection):
         return items
 
     def __dataGet(
-        self,
+        self: Self,
         item: object,
         key: str,
-        default: object = None,
+        default: object | None = None,
     ) -> object:
         """
         Retrieve a value from an item using a nested key notation.
@@ -1509,11 +1466,11 @@ class Collection(ICollection):
             if val is not _MISSING:
                 return val
             return self.__value(default)
-        except (IndexError, AttributeError, KeyError, TypeError, ValueError):
+        except IndexError, AttributeError, KeyError, TypeError, ValueError:
             return self.__value(default)
 
     def __value(
-        self,
+        self: Self,
         value: object,
     ) -> object:
         """
@@ -1532,11 +1489,11 @@ class Collection(ICollection):
         """
         # Evaluate the value if it is callable, otherwise return as is
         if callable(value):
-            return value() # NOSONAR
+            return value()  # NOSONAR
         return value
 
     def __checkIsCallable(
-        self,
+        self: Self,
         callback: object,
         *,
         raise_exception: bool = True,
@@ -1570,7 +1527,7 @@ class Collection(ICollection):
         return True
 
     def __makeComparison(
-        self,
+        self: Self,
         a: object,
         b: object,
         op: str,
@@ -1594,8 +1551,8 @@ class Collection(ICollection):
         """
         # Select the comparison implementation by operator name.
         if op not in _OPERATORS:
-            msg = "Unsupported operator: " + str(op)
-            raise ValueError(msg)
+            error_msg = "Unsupported operator: " + str(op)
+            raise ValueError(error_msg)
 
         try:
             return _OPERATORS[op](a, b)
@@ -1603,10 +1560,10 @@ class Collection(ICollection):
             # Handle incompatible types by converting to string
             try:
                 return _OPERATORS[op](str(a), str(b))
-            except (TypeError, ValueError):
+            except TypeError, ValueError:
                 return False
 
-    def __iter__(self) -> Iterator[Any]:
+    def __iter__(self: Self) -> Iterator[Any]:
         """
         Iterate over the items in the collection.
 
@@ -1619,7 +1576,7 @@ class Collection(ICollection):
         yield from self._items
 
     def __eq__(
-        self,
+        self: Self,
         other: object,
     ) -> bool:
         """
@@ -1641,7 +1598,7 @@ class Collection(ICollection):
         return other == self._items
 
     def __getitem__(
-        self,
+        self: Self,
         item: int | slice,
     ) -> object | Collection:
         """
@@ -1663,7 +1620,7 @@ class Collection(ICollection):
         return self._items[item]
 
     def __setitem__(
-        self,
+        self: Self,
         key: int | str,
         value: object,
     ) -> None:
@@ -1686,7 +1643,7 @@ class Collection(ICollection):
         self._items[key] = value
 
     def __delitem__(
-        self,
+        self: Self,
         key: int | str,
     ) -> None:
         """
@@ -1706,7 +1663,7 @@ class Collection(ICollection):
         del self._items[key]
 
     def __ne__(
-        self,
+        self: Self,
         other: object,
     ) -> bool:
         """
@@ -1727,7 +1684,7 @@ class Collection(ICollection):
         # Return True if the items are not equal, otherwise False
         return other != self._items
 
-    def __len__(self) -> int:
+    def __len__(self: Self) -> int:
         """
         Return the number of items in the collection.
 
@@ -1740,7 +1697,7 @@ class Collection(ICollection):
         return len(self._items)
 
     def __le__(
-        self,
+        self: Self,
         other: object,
     ) -> bool:
         """
@@ -1763,7 +1720,7 @@ class Collection(ICollection):
         return self._items <= other
 
     def __lt__(
-        self,
+        self: Self,
         other: object,
     ) -> bool:
         """
@@ -1786,7 +1743,7 @@ class Collection(ICollection):
         return self._items < other
 
     def __ge__(
-        self,
+        self: Self,
         other: object,
     ) -> bool:
         """
@@ -1809,7 +1766,7 @@ class Collection(ICollection):
         return self._items >= other
 
     def __gt__(
-        self,
+        self: Self,
         other: object,
     ) -> bool:
         """
@@ -1833,7 +1790,7 @@ class Collection(ICollection):
 
     @classmethod
     def __getItems(
-        cls,
+        cls: type[Self],
         items: list[Any] | Collection | object,
     ) -> list[Any] | object:
         """

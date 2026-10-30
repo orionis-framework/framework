@@ -2,27 +2,27 @@ import asyncio
 import functools
 import inspect
 import logging
-from typing import Self, TYPE_CHECKING
+from typing import TYPE_CHECKING, Self
 from orionis.console.contracts.schedule import ISchedule
+from orionis.console.contracts.store import IScheduleStore
 from orionis.console.core.contracts.reactor import IReactor
 from orionis.console.entities.scheduler_event import (
     SchedulerEvent as SchedulerEventEntity,
 )
-from orionis.console.enums.events import SchedulerEvent, TaskEvent
-from orionis.console.fluent.contracts.task import ITask
-from orionis.console.enums.states import ScheduleStates
-from orionis.console.contracts.store import IScheduleStore
-from orionis.failure.contracts.catch import ICatch
-from orionis.support.facades.logger import Log
-from orionis.support.facades.datetime import DateTime
-from orionis.support.facades.reactor import Reactor
 from orionis.console.entities.task_event import TaskEvent as TaskEventEntity
+from orionis.console.enums.events import SchedulerEvent, TaskEvent
+from orionis.console.enums.states import ScheduleStates
+from orionis.console.fluent.contracts.task import ITask
+from orionis.failure.contracts.catch import ICatch
+from orionis.support.facades.datetime import DateTime
+from orionis.support.facades.logger import Log
+from orionis.support.facades.reactor import Reactor
 
 if TYPE_CHECKING:
     from collections.abc import Callable, Coroutine
-    from apscheduler.schedulers.asyncio import AsyncIOScheduler
     from apscheduler.events import JobEvent as APJobEvent
     from apscheduler.events import SchedulerEvent as APSchedulerEvent
+    from apscheduler.schedulers.asyncio import AsyncIOScheduler
     from orionis.console.entities.task import Task as TaskEntity
     from orionis.foundation.config.scheduler.entities.scheduler import (
         Scheduler as ConfigScheduler,
@@ -64,13 +64,12 @@ async def _execute_scheduled_command(
 globals()["_executeScheduledCommand"] = _execute_scheduled_command
 
 class Schedule(ISchedule):
-
     # ruff: noqa: BLE001, PLC0415, TC001
 
     _SCHEDULER_NOT_STARTED_ERROR = "The Orionis task scheduler has not been started."
 
     def __init__(
-        self,
+        self: Self,
         reactor: IReactor,
         exception_handler: ICatch,
         stores: IScheduleStore,
@@ -111,7 +110,7 @@ class Schedule(ISchedule):
         self.__shutdown_event = asyncio.Event()
         self.__wait_to_shutdown: float = 0.5
 
-    async def __loadAvailableCommands(self) -> None:
+    async def __loadAvailableCommands(self: Self) -> None:
         """
         Retrieve and cache available command signatures from the reactor.
 
@@ -134,7 +133,7 @@ class Schedule(ISchedule):
             job.get("signature") for job in commands
         )
 
-    def __suppressApschedulerLogging(self) -> None:
+    def __suppressApschedulerLogging(self: Self) -> None:
         """
         Disable APScheduler logging to prevent log message interference.
 
@@ -157,7 +156,7 @@ class Schedule(ISchedule):
             apscheduler_logger.disabled = True
             apscheduler_logger.propagate = False
 
-    async def __validateAndLoadFluentTasks(self) -> None:
+    async def __validateAndLoadFluentTasks(self: Self) -> None:
         """
         Validate and load fluent tasks from the internal registry.
 
@@ -191,7 +190,7 @@ class Schedule(ISchedule):
                 coalesce=default_coalesce,
             )
 
-    async def info(self) -> list[dict]:
+    async def info(self: Self) -> list[dict]:
         """
         Retrieve information about all loaded fluent tasks.
 
@@ -218,46 +217,21 @@ class Schedule(ISchedule):
                 "misfire_grace_time": task.misfire_grace_time,
                 "start_date": (
                     task.start_date.strftime("%Y-%m-%d %H:%M:%S")
-                    if task.start_date else None
+                    if task.start_date
+                    else None
                 ),
                 "end_date": (
                     task.end_date.strftime("%Y-%m-%d %H:%M:%S")
-                    if task.end_date else None
+                    if task.end_date
+                    else None
                 ),
                 "details": task.details,
             }
             for signature, task in self.__tasks.items()
         ]
 
-    async def _reactorCall(
-        self,
-        signature: str,
-        args: list[str] | None = None,
-    ) -> int:
-        """
-        Execute a reactor command asynchronously.
-
-        Parameters
-        ----------
-        signature : str
-            The command signature to execute.
-        args : list of str, optional
-            Arguments to pass to the command. Defaults to an empty list.
-
-        Returns
-        -------
-        int
-            The result of the reactor call, typically an exit code or status.
-
-        Notes
-        -----
-        This method wraps the reactor call for task execution.
-        """
-        # Call the reactor asynchronously with the provided signature and arguments
-        return await self.__reactor.call(signature, args or [])
-
     def _dispatchSchedulerEventListener(
-        self,
+        self: Self,
         event: APSchedulerEvent,
     ) -> None:
         """
@@ -315,7 +289,7 @@ class Schedule(ISchedule):
         self.__createManagedTask(_async_listener_wrapper())
 
     def _dispatchTaskEventListener(
-        self,
+        self: Self,
         event: APJobEvent,
     ) -> None:
         """
@@ -399,7 +373,7 @@ class Schedule(ISchedule):
         self.__createManagedTask(_async_listener_wrapper())
 
     def __createManagedTask(
-        self,
+        self: Self,
         coroutine: Coroutine,
     ) -> None:
         """
@@ -424,7 +398,7 @@ class Schedule(ISchedule):
         task.add_done_callback(pending.discard)
 
     async def __handleListenerException(
-        self,
+        self: Self,
         exception: Exception,
     ) -> None:
         """
@@ -447,7 +421,7 @@ class Schedule(ISchedule):
             # Log errors that occur within the exception handler itself
             Log.error(f"Error in exception handler: {handler_error}")
 
-    def __addConfiguredJobStore(self) -> None:
+    def __addConfiguredJobStore(self: Self) -> None:
         """
         Add the database or redis jobstore matching the configured driver.
 
@@ -481,7 +455,7 @@ class Schedule(ISchedule):
                 alias="redis",
             )
 
-    async def boot(self) -> None:
+    async def boot(self: Self) -> None:
         """
         Initialize the scheduler and register configured tasks and listeners.
 
@@ -607,7 +581,7 @@ class Schedule(ISchedule):
         self.__scheduler.start()
 
     def on(
-        self,
+        self: Self,
         event: SchedulerEvent,
         listener: Callable,
     ) -> Self:
@@ -654,7 +628,7 @@ class Schedule(ISchedule):
         self.__scheduler_listeners[event] = listener
         return self
 
-    def state(self) -> str:
+    def state(self: Self) -> str:
         """
         Return the current scheduler state as a string.
 
@@ -666,7 +640,7 @@ class Schedule(ISchedule):
         # Return the value of the internal state enum
         return self.__state.value
 
-    def isRunning(self) -> bool:
+    def isRunning(self: Self) -> bool:
         """
         Determine if the scheduler is currently running.
 
@@ -678,7 +652,7 @@ class Schedule(ISchedule):
         # Check if the internal state is RUNNING
         return self.__state == ScheduleStates.RUNNING
 
-    def isPaused(self) -> bool:
+    def isPaused(self: Self) -> bool:
         """
         Determine if the scheduler is currently paused.
 
@@ -690,7 +664,7 @@ class Schedule(ISchedule):
         # Check if the internal state is PAUSED
         return self.__state == ScheduleStates.PAUSED
 
-    def isStopped(self) -> bool:
+    def isStopped(self: Self) -> bool:
         """
         Determine if the scheduler is currently stopped.
 
@@ -703,7 +677,7 @@ class Schedule(ISchedule):
         return self.__state == ScheduleStates.STOPPED
 
     def command(
-        self,
+        self: Self,
         signature: str,
         args: list[str] | None = None,
         purpose: str | None = None,
@@ -748,9 +722,7 @@ class Schedule(ISchedule):
         # Ensure arguments are a list of strings or None
         if args is not None:
             if not isinstance(args, list):
-                error_msg = (
-                    "Arguments must be provided as a list of strings or None."
-                )
+                error_msg = "Arguments must be provided as a list of strings or None."
                 raise TypeError(error_msg)
             for arg in args:
                 if not isinstance(arg, str):
@@ -772,7 +744,7 @@ class Schedule(ISchedule):
         return self.__fluent_tasks[signature]
 
     def pauseTask(
-        self,
+        self: Self,
         signature: str,
     ) -> bool:
         """
@@ -832,7 +804,7 @@ class Schedule(ISchedule):
             raise RuntimeError(error_msg) from e
 
     def resumeTask(
-        self,
+        self: Self,
         signature: str,
     ) -> bool:
         """
@@ -892,7 +864,7 @@ class Schedule(ISchedule):
             raise RuntimeError(error_msg) from e
 
     def removeTask(
-        self,
+        self: Self,
         signature: str,
     ) -> bool:
         """
@@ -950,7 +922,7 @@ class Schedule(ISchedule):
             Log.error(error_msg)
             raise RuntimeError(error_msg) from e
 
-    def removeAllTasks(self) -> bool:
+    def removeAllTasks(self: Self) -> bool:
         """
         Remove all tasks from the scheduler.
 
@@ -986,7 +958,7 @@ class Schedule(ISchedule):
             Log.error(error_msg)
             raise RuntimeError(error_msg) from e
 
-    def pause(self) -> bool:
+    def pause(self: Self) -> bool:
         """
         Pause the scheduler if it is running.
 
@@ -1026,7 +998,7 @@ class Schedule(ISchedule):
             Log.error(error_msg)
             raise RuntimeError(error_msg) from e
 
-    def resume(self) -> bool:
+    def resume(self: Self) -> bool:
         """
         Resume the scheduler if it is paused.
 
@@ -1066,7 +1038,7 @@ class Schedule(ISchedule):
             Log.error(error_msg)
             raise RuntimeError(error_msg) from e
 
-    def shutdown(self, wait: int | None = None) -> None:
+    def shutdown(self: Self, wait: int | None = None) -> None:
         """
         Shut down the task scheduler safely without waiting for running tasks.
 
@@ -1110,7 +1082,7 @@ class Schedule(ISchedule):
         # Create and execute the shutdown task asynchronously
         self.__createManagedTask(self.__gracefulShutdown())
 
-    async def __gracefulShutdown(self) -> None:
+    async def __gracefulShutdown(self: Self) -> None:
         """
         Execute graceful shutdown of the scheduler without blocking.
 
@@ -1153,7 +1125,7 @@ class Schedule(ISchedule):
         # Signal that shutdown is complete
         self.__shutdown_event.set()
 
-    async def wait(self) -> None:
+    async def wait(self: Self) -> None:
         """
         Wait for the scheduler shutdown to complete.
 

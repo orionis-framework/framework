@@ -3,11 +3,12 @@ import hashlib
 import secrets
 import threading
 import time
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING, Any, Self
 from zlib import crc32
-from filelock import FileLock
 import msgspec
 import msgspec.json as _msgjson
+from filelock import FileLock
+from orionis.support.concurrency import complete_on_cancel
 
 if TYPE_CHECKING:
     from pathlib import Path
@@ -22,12 +23,11 @@ _REPLACE_BACKOFF_SECONDS: float = 0.005
 _LOCK_STRIPES: int = 64
 
 class FileCacheBackend:
-
     # ruff: noqa: ANN401
 
     __slots__ = ("_counter_lock", "_locks", "_path", "_rename_lock")
 
-    def __init__(self, path: Path) -> None:
+    def __init__(self: Self, path: Path) -> None:
         """
         Initialize the backend and create the cache directory if needed.
 
@@ -54,7 +54,7 @@ class FileCacheBackend:
         )
 
     @property
-    def lockNamespace(self) -> Path:
+    def lockNamespace(self: Self) -> Path:
         """Return the canonical directory used to identify cache locks.
 
         Returns
@@ -66,7 +66,7 @@ class FileCacheBackend:
 
     # ── Internal helpers ────────────────────────────────────────────────────
 
-    def __lock(self, file: Path) -> BaseFileLock:
+    def __lock(self: Self, file: Path) -> BaseFileLock:
         """Select the stable cross-process lock stripe for a cache file.
 
         Parameters
@@ -81,7 +81,7 @@ class FileCacheBackend:
         """
         return self._locks[crc32(file.name.encode()) % _LOCK_STRIPES]
 
-    def __file(self, key: str) -> Path:
+    def __file(self: Self, key: str) -> Path:
         """
         Return the filesystem path for *key*.
 
@@ -116,7 +116,7 @@ class FileCacheBackend:
         """
         return file.with_name(f"{file.name}.{secrets.token_hex(8)}.tmp")
 
-    def __readSync(self, file: Path) -> dict | None:
+    def __readSync(self: Self, file: Path) -> dict | None:
         """
         Read and decode a cache file synchronously.
 
@@ -150,7 +150,7 @@ class FileCacheBackend:
         """
         try:
             entry = _msgjson.decode(file.read_bytes())
-        except (OSError, msgspec.DecodeError):
+        except OSError, msgspec.DecodeError:
             return None
         if not isinstance(entry, dict):
             return None
@@ -160,7 +160,7 @@ class FileCacheBackend:
             return None
         return entry
 
-    def __writeSync(self, file: Path, entry: dict) -> None:
+    def __writeSync(self: Self, file: Path, entry: dict) -> None:
         """
         Atomically write *entry* to *file* via tmp-then-rename.
 
@@ -184,7 +184,7 @@ class FileCacheBackend:
         with self.__lock(file):
             self.__writeEntryUnlocked(file, entry)
 
-    def __writeEntryUnlocked(self, file: Path, entry: dict) -> None:
+    def __writeEntryUnlocked(self: Self, file: Path, entry: dict) -> None:
         """
         Publish a cache entry while its file lock is held.
 
@@ -214,7 +214,7 @@ class FileCacheBackend:
             tmp.unlink(missing_ok=True)
             raise
 
-    def __replaceSync(self, tmp: Path, file: Path) -> None:
+    def __replaceSync(self: Self, tmp: Path, file: Path) -> None:
         """
         Publish *tmp* as *file*, retrying a transient sharing violation.
 
@@ -248,7 +248,7 @@ class FileCacheBackend:
             else:
                 return
 
-    def __createSync(self, file: Path, entry: dict) -> bool:
+    def __createSync(self: Self, file: Path, entry: dict) -> bool:
         """
         Write *entry* to *file* only when the file does not exist yet.
 
@@ -273,7 +273,7 @@ class FileCacheBackend:
                 return False
             return True
 
-    def __unlinkSync(self, file: Path) -> int:
+    def __unlinkSync(self: Self, file: Path) -> int:
         """
         Remove *file*, ignoring missing-file errors.
 
@@ -294,7 +294,7 @@ class FileCacheBackend:
                 return 0
             return 1
 
-    def __replaceIfPresent(self, file: Path, entry: dict) -> bool:
+    def __replaceIfPresent(self: Self, file: Path, entry: dict) -> bool:
         """Replace a live entry while holding its cross-process lock.
 
         Parameters
@@ -317,7 +317,7 @@ class FileCacheBackend:
 
     # ── Public async API (mirrors aiocache BaseCache interface) ─────────────
 
-    async def get(self, key: str, default: Any = None) -> Any:
+    async def get(self: Self, key: str, default: Any | None = None) -> Any:
         """
         Return the cached value for *key*, or *default* when absent/expired.
 
@@ -342,7 +342,9 @@ class FileCacheBackend:
 
         return entry.get("v")
 
-    async def replace(self, key: str, value: Any, ttl: float | None = None) -> bool:
+    async def replace(
+        self: Self, key: str, value: Any, ttl: float | None = None,
+    ) -> bool:
         """Replace an existing live key without recreating a deleted entry.
 
         Parameters
@@ -364,10 +366,12 @@ class FileCacheBackend:
             "e": time.monotonic() + ttl if ttl is not None else None,
         }
         return await asyncio.to_thread(
-            self.__replaceIfPresent, self.__file(key), entry,
+            self.__replaceIfPresent,
+            self.__file(key),
+            entry,
         )
 
-    async def set(self, key: str, value: Any, ttl: float | None = None) -> bool:
+    async def set(self: Self, key: str, value: Any, ttl: float | None = None) -> bool:
         """
         Store *value* under *key* with an optional TTL in seconds.
 
@@ -393,7 +397,7 @@ class FileCacheBackend:
         await asyncio.to_thread(self.__writeSync, file, entry)
         return True
 
-    async def exists(self, key: str) -> bool:
+    async def exists(self: Self, key: str) -> bool:
         """
         Return True if *key* exists and has not expired.
 
@@ -408,7 +412,7 @@ class FileCacheBackend:
         """
         return await self.get(key, default=_MISSING) is not _MISSING
 
-    async def delete(self, key: str) -> int:
+    async def delete(self: Self, key: str) -> int:
         """
         Remove *key* from the store.
 
@@ -425,7 +429,7 @@ class FileCacheBackend:
         file = self.__file(key)
         return await asyncio.to_thread(self.__unlinkSync, file)
 
-    async def clear(self) -> bool:
+    async def clear(self: Self) -> bool:
         """
         Remove all cache entries from the store directory.
 
@@ -434,6 +438,7 @@ class FileCacheBackend:
         bool
             Always True.
         """
+
         def _clear_all() -> None:
             """
             Remove cache entries and abandoned staging files.
@@ -457,7 +462,9 @@ class FileCacheBackend:
         await asyncio.to_thread(_clear_all)
         return True
 
-    async def multiGet(self, keys: list[str], default: Any = None) -> list[Any]:
+    async def multiGet(
+        self: Self, keys: list[str], default: Any | None = None,
+    ) -> list[Any]:
         """
         Return a list of values for *keys* in the same order.
 
@@ -472,10 +479,32 @@ class FileCacheBackend:
         -------
         list[Any]
         """
-        return [await self.get(k, default) for k in keys]
+        stopped = threading.Event()
+
+        def read_many() -> list[Any]:
+            """
+            Read the batch under the existing per-file lock stripes.
+
+            Returns
+            -------
+            list[Any]
+                Values in request order, including duplicates and missing defaults.
+            """
+            result = []
+            for key in keys:
+                if stopped.is_set():
+                    break
+                entry = self.__readSync(self.__file(key))
+                result.append(default if entry is None else entry.get("v"))
+            return result
+
+        return await complete_on_cancel(
+            asyncio.to_thread(read_many),
+            on_cancel=stopped.set,
+        )
 
     async def multiSet(
-        self,
+        self: Self,
         pairs: list[tuple[str, Any]],
         ttl: float | None = None,
     ) -> bool:
@@ -494,15 +523,37 @@ class FileCacheBackend:
         bool
             Always True.
         """
-        for key, value in pairs:
-            await self.set(key, value, ttl=ttl)
+        stopped = threading.Event()
+
+        def write_many() -> None:
+            """
+            Write in order, retaining per-key TTL and partial-error semantics.
+
+            Returns
+            -------
+            None
+                Complete the operation without returning a value.
+            """
+            for key, value in pairs:
+                if stopped.is_set():
+                    break
+                entry = {
+                    "v": value,
+                    "e": time.monotonic() + ttl if ttl is not None else None,
+                }
+                self.__writeSync(self.__file(key), entry)
+
+        await complete_on_cancel(
+            asyncio.to_thread(write_many),
+            on_cancel=stopped.set,
+        )
         return True
 
     # Expose bulk operations through aiocache's method names.
     multi_get = multiGet
     multi_set = multiSet
 
-    async def add(self, key: str, value: Any, ttl: float | None = None) -> bool:
+    async def add(self: Self, key: str, value: Any, ttl: float | None = None) -> bool:
         """
         Store *value* under *key* only if the key does not already exist.
 
@@ -541,12 +592,12 @@ class FileCacheBackend:
             created = await asyncio.to_thread(self.__createSync, file, entry)
 
         if not created:
-            msg = f"Key {key!r} already exists in the cache."
-            raise ValueError(msg)
+            error_msg = f"Key {key!r} already exists in the cache."
+            raise ValueError(error_msg)
 
         return created
 
-    async def increment(self, key: str, delta: int = 1) -> int:
+    async def increment(self: Self, key: str, delta: int = 1) -> int:
         """
         Increment the integer stored at *key* by *delta*.
 
@@ -567,10 +618,12 @@ class FileCacheBackend:
         """
         async with self._counter_lock:
             return await asyncio.to_thread(
-                self.__incrementSync, self.__file(key), delta,
+                self.__incrementSync,
+                self.__file(key),
+                delta,
             )
 
-    def __incrementSync(self, file: Path, delta: int) -> int:
+    def __incrementSync(self: Self, file: Path, delta: int) -> int:
         """
         Update a counter while holding its file lock.
 

@@ -23,3 +23,7 @@ Continue with: [http](../../../http/docs/en/README.md) · [database](../../../da
 Examples that require bootstrap, a request, or external services state that context. Verification for this reconstruction is distinct from historical notes; a production integration is not assumed to have been executed.
 
 - [Application rules and validation with I/O](application-rules.md)
+
+## Bounded execution and performance
+
+Rule plans use a process-local LRU capped at 1,024 schema types. Evicted types can be collected; their plans are rebuilt on subsequent use. Recursive child-plan warming is guarded and concurrent compilation is serialized. This changes retention, not validation rules, errors or serialization.

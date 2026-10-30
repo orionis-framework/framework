@@ -2,7 +2,7 @@ from __future__ import annotations
 import uuid
 from copy import deepcopy
 from datetime import UTC, datetime
-from typing import TYPE_CHECKING, Any, ClassVar
+from typing import TYPE_CHECKING, Any, ClassVar, Self
 from orionis.orm.attributes import AttributesMixin, serialize_for_storage
 from orionis.orm.events import EventsMixin
 from orionis.orm.metaclass import ModelMeta
@@ -21,19 +21,20 @@ from orionis.orm.state import StateMixin
 if TYPE_CHECKING:
     from collections.abc import Callable
     from orionis.database.contracts.connection import IConnection
-    from orionis.orm.collections.paginator import Paginator  # noqa: F401
     from orionis.orm.metaclass import ModelMetadata
     from orionis.orm.schema.table import TableDefinition
     from orionis.support.types.collection import Collection
 
 # Instance slots managed directly by the model machinery.
-_INTERNAL_ATTRIBUTES: frozenset[str] = frozenset({
-    "_attributes",
-    "_changes",
-    "_exists",
-    "_original",
-    "_relations",
-})
+_INTERNAL_ATTRIBUTES: frozenset[str] = frozenset(
+    {
+        "_attributes",
+        "_changes",
+        "_exists",
+        "_original",
+        "_relations",
+    },
+)
 
 class Model(
     AttributesMixin,
@@ -104,7 +105,7 @@ class Model(
     # Metadata attached by the metaclass.
     __meta__: ClassVar[ModelMetadata | None]
 
-    def __init__(self, attributes: dict[str, Any] | None = None) -> None:
+    def __init__(self: Self, attributes: dict[str, Any] | None = None) -> None:
         """
         Initialize a new, unsaved model instance.
 
@@ -133,7 +134,7 @@ class Model(
 
     # ── Attribute access ────────────────────────────────────────────────────
 
-    def __getattr__(self, key: str) -> Any:  # noqa: ANN401
+    def __getattr__(self: Self, key: str) -> Any:  # noqa: ANN401
         """
         Serve column values and accessor-backed attributes.
 
@@ -155,9 +156,7 @@ class Model(
         """
         # Internal names reaching here mean the instance is mid-construction.
         if key.startswith("_"):
-            error_msg = (
-                f"'{type(self).__name__}' object has no attribute '{key}'"
-            )
+            error_msg = f"'{type(self).__name__}' object has no attribute '{key}'"
             raise AttributeError(error_msg)
 
         meta = type(self).__meta__
@@ -171,12 +170,10 @@ class Model(
         if meta is not None and key in meta.columns:
             return None
 
-        error_msg = (
-            f"'{type(self).__name__}' object has no attribute '{key}'"
-        )
+        error_msg = f"'{type(self).__name__}' object has no attribute '{key}'"
         raise AttributeError(error_msg)
 
-    def __setattr__(self, key: str, value: Any) -> None:  # noqa: ANN401
+    def __setattr__(self: Self, key: str, value: Any) -> None:  # noqa: ANN401
         """
         Route column assignments into the attribute store.
 
@@ -203,7 +200,7 @@ class Model(
 
         object.__setattr__(self, key, value)
 
-    def __repr__(self) -> str:
+    def __repr__(self: Self) -> str:
         """
         Return a concise developer representation of the model.
 
@@ -214,14 +211,12 @@ class Model(
         """
         meta = type(self).__meta__
         key = meta.primary_key if meta is not None else "id"
-        return (
-            f"<{type(self).__name__} {key}={self._attributes.get(key)!r}>"
-        )
+        return f"<{type(self).__name__} {key}={self._attributes.get(key)!r}>"
 
     # ── Hydration ───────────────────────────────────────────────────────────
 
     @classmethod
-    def _newFromDatabase(cls, row: dict[str, Any]) -> Model:
+    def _newFromDatabase(cls: type[Self], row: dict[str, Any]) -> Model:
         """
         Hydrate a model instance from a database row.
 
@@ -249,7 +244,7 @@ class Model(
     # ── Query entry points ──────────────────────────────────────────────────
 
     @classmethod
-    def query(cls) -> ModelQueryBuilder[Any]:
+    def query(cls: type[Self]) -> ModelQueryBuilder[Any]:
         """
         Start a new query builder bound to this model.
 
@@ -261,7 +256,7 @@ class Model(
         return ModelQueryBuilder(cls)
 
     @classmethod
-    def getConnection(cls) -> IConnection:
+    def getConnection(cls: type[Self]) -> IConnection:
         """
         Resolve the connection configured for this model.
 
@@ -281,7 +276,7 @@ class Model(
 
     @classmethod
     def addGlobalScope(
-        cls,
+        cls: type[Self],
         name: str,
         scope: Callable[[ModelQueryBuilder[Any]], None],
     ) -> type[Model]:
@@ -305,7 +300,7 @@ class Model(
         return cls
 
     @classmethod
-    def removeGlobalScope(cls, name: str) -> type[Model]:
+    def removeGlobalScope(cls: type[Self], name: str) -> type[Model]:
         """
         Unregister a previously added global scope.
 
@@ -323,7 +318,7 @@ class Model(
         return cls
 
     @classmethod
-    async def all(cls) -> Collection:
+    async def all(cls: type[Self]) -> Collection:
         """
         Retrieve every row of the model table.
 
@@ -335,7 +330,7 @@ class Model(
         return await cls.query().get()
 
     @classmethod
-    async def find(cls, key: Any) -> Model | None:  # noqa: ANN401
+    async def find(cls: type[Self], key: Any) -> Model | None:  # noqa: ANN401
         """
         Retrieve a model by its primary key.
 
@@ -352,7 +347,7 @@ class Model(
         return await cls.query().find(key)
 
     @classmethod
-    async def findOrFail(cls, key: Any) -> Model:  # noqa: ANN401
+    async def findOrFail(cls: type[Self], key: Any) -> Model:  # noqa: ANN401
         """
         Retrieve a model by primary key or raise when absent.
 
@@ -374,7 +369,7 @@ class Model(
         return await cls.query().findOrFail(key)
 
     @classmethod
-    async def first(cls) -> Model | None:
+    async def first(cls: type[Self]) -> Model | None:
         """
         Retrieve the first row of the model table.
 
@@ -386,7 +381,7 @@ class Model(
         return await cls.query().first()
 
     @classmethod
-    async def firstOrFail(cls) -> Model:
+    async def firstOrFail(cls: type[Self]) -> Model:
         """
         Retrieve the first row or raise when the table is empty.
 
@@ -403,7 +398,7 @@ class Model(
         return await cls.query().firstOrFail()
 
     @classmethod
-    async def create(cls, attributes: dict[str, Any]) -> Model:
+    async def create(cls: type[Self], attributes: dict[str, Any]) -> Model:
         """
         Create, persist, and return a new model.
 
@@ -429,7 +424,7 @@ class Model(
         return instance
 
     @classmethod
-    async def destroy(cls, *keys: Any) -> int:  # noqa: ANN401
+    async def destroy(cls: type[Self], *keys: Any) -> int:  # noqa: ANN401
         """
         Delete the models matching the given primary keys.
 
@@ -449,7 +444,7 @@ class Model(
 
     # ── Persistence ─────────────────────────────────────────────────────────
 
-    async def save(self) -> bool:
+    async def save(self: Self) -> bool:
         """
         Persist the model, inserting or updating as appropriate.
 
@@ -484,7 +479,7 @@ class Model(
         await self.fireEvent("saved")
         return saved
 
-    async def update(self, attributes: dict[str, Any]) -> bool:
+    async def update(self: Self, attributes: dict[str, Any]) -> bool:
         """
         Mass assign the given attributes and persist the model.
 
@@ -508,7 +503,7 @@ class Model(
         self.fill(attributes)
         return await self.save()
 
-    async def delete(self) -> bool:
+    async def delete(self: Self) -> bool:
         """
         Delete the model row, honoring soft deletes when enabled.
 
@@ -541,7 +536,7 @@ class Model(
         await self.fireEvent("deleted")
         return deleted
 
-    async def _performForceDelete(self) -> bool:
+    async def _performForceDelete(self: Self) -> bool:
         """
         Remove the persisted row permanently.
 
@@ -572,7 +567,7 @@ class Model(
     # ── Timestamps ──────────────────────────────────────────────────────────
 
     @classmethod
-    def freshTimestamp(cls) -> datetime:
+    def freshTimestamp(cls: type[Self]) -> datetime:
         """
         Produce the current timestamp for persistence operations.
 
@@ -595,7 +590,7 @@ class Model(
         return now
 
     @classmethod
-    def newUniqueId(cls) -> Any:  # noqa: ANN401
+    def newUniqueId(cls: type[Self]) -> Any:  # noqa: ANN401
         """
         Produce a client-generated primary key value.
 
@@ -611,7 +606,7 @@ class Model(
 
     # ── Internal persistence helpers ────────────────────────────────────────
 
-    def _primaryKeyValue(self) -> Any:  # noqa: ANN401
+    def _primaryKeyValue(self: Self) -> Any:  # noqa: ANN401
         """
         Return the primary key value identifying the stored row.
 
@@ -628,7 +623,7 @@ class Model(
             return self._original[key]
         return self._attributes.get(key)
 
-    async def _performInsert(self) -> bool:
+    async def _performInsert(self: Self) -> bool:
         """
         Insert the model attributes as a new row.
 
@@ -671,7 +666,7 @@ class Model(
         self.syncOriginal()
         return True
 
-    async def _performUpdate(self) -> bool:
+    async def _performUpdate(self: Self) -> bool:
         """
         Write the dirty attributes of an existing model.
 

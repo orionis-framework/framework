@@ -16,6 +16,13 @@ Todas responden `200 OK` con el texto exacto `Hello World` (11 bytes).
 Cada configuración se ejecuta con **1, 2, 3 y 4 workers**, HTTP/1.1 con
 keep-alive y event loop `asyncio`.
 
+En Linux, el lanzador de Uvicorn activa `TCP_NODELAY` en el socket TCP antes
+de compartirlo entre workers. Así conserva la política usada por `asyncio`
+con un solo worker y evita el retardo de Nagle y ACK diferido en respuestas
+pequeñas. No modifica los handlers, el protocolo `h11` ni los parámetros de
+carga. El ajuste se registra como `uvicorn_multi_worker_tcp_nodelay` en
+`diagnostics.json`.
+
 ## Instalación y ejecución
 
 Desde la raíz del repositorio:

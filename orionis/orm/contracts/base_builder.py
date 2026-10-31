@@ -55,6 +55,33 @@ class IQueryBuilderBase(ABC):
         """
 
     @abstractmethod
+    def toSql(self: Self, *, literal_binds: bool = False) -> str:
+        """
+        Render the current SELECT query without executing or mutating it.
+
+        Parameters
+        ----------
+        literal_binds : bool, optional
+            Include values for debugging when their types support SQL literals.
+            Literal output may expose sensitive information.
+
+        Returns
+        -------
+        str
+            SQL including model filters, rendered with the selected connection's
+            dialect and table prefix. Additional retrieval queries are excluded.
+
+        Raises
+        ------
+        InvalidQueryException
+            If no target table has been selected.
+        QueryException
+            If the query or a literal value cannot be compiled.
+        MissingDatabaseDependencyException
+            If the selected connection's SQL dialect is unavailable.
+        """
+
+    @abstractmethod
     def clone(self: Self) -> Self:
         """
         Return an independent copy of this builder.

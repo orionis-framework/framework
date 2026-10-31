@@ -45,6 +45,22 @@ Run this function inside a booted application with the `articles` table. Other p
 
 Values are bound as parameters. `whereRaw`, `selectRaw`, and `havingRaw` accept trusted SQL and bindings; they do not safely interpolate arbitrary text. Allowlist column names, operators, and ordering received from requests.
 
+## Inspect SQL
+
+`toSql(*, literal_binds=False) -> str` is synchronous and uses the selected connection's dialect and table prefix. It requires a booted application or a configured `ConnectionResolver`, but does not create an engine or open database connections. The table does not need to exist to compile its SQL.
+
+```python
+query = Article.where("status", "published").whereIn("id", [1, 2]).limit(10)
+sql = query.toSql()
+debug_sql = query.toSql(literal_binds=True)
+```
+
+It also works with `DB.table(...)` and directly from a model class, such as `Article.toSql()`. By default it keeps dialect-dependent placeholders and expands `IN` parameters. Global scopes and the soft-delete filter are applied on a clone: inspecting does not modify the original builder.
+
+`literal_binds=True` includes values escaped by the dialect for debugging. **It may expose sensitive data**, and some types, such as JSON or custom values, have no literal representation and raise `QueryException`. Do not use literal output as a replacement for parameterized execution.
+
+The output describes the current plan's SELECT. It does not anticipate changes made by a later terminal or additional relationship or pagination queries, and it does not compile writes.
+
 ## Project, join, and group
 
 This application fragment produces a report over existing raw tables:

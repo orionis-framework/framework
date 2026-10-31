@@ -2,9 +2,11 @@ import csv
 import json
 import math
 import os
+import socket
 import unittest
 from argparse import Namespace
 from contextlib import chdir, closing, redirect_stderr, redirect_stdout
+from importlib import import_module
 from importlib.util import find_spec
 from inspect import iscoroutinefunction
 from io import StringIO, TextIOWrapper
@@ -31,7 +33,7 @@ def _measurement() -> dict[str, Any]:
     Returns
     -------
     dict[str, Any]
-        Mixed outcomes and timings with a deliberately inflated client rate.
+        Fixture counts and timings with an intentionally inflated client rate.
     """
     # Inflate the client rate to prove throughput is recomputed from HTTP 200.
     return {
@@ -48,7 +50,7 @@ def _successful_runs() -> list[dict[str, int | float]]:
     Returns
     -------
     list[dict[str, int | float]]
-        Successful per-run measurements for unweighted-median assertions.
+        Normalized samples that distinguish medians from pooled statistics.
     """
     # Unequal durations expose accidental pooling or weighted averages.
     samples = []
@@ -66,7 +68,14 @@ def _successful_runs() -> list[dict[str, int | float]]:
     return samples
 
 def _probe_connection() -> Mock:
-    """Mock two Hello World responses over a persistent connection."""
+    """
+    Build a connection double with two persistent Hello World responses.
+
+    Returns
+    -------
+    Mock
+        Connection yielding two successful HTTP/1.1 text responses.
+    """
     responses = []
     for _ in range(2):
         response = Mock(status=200, version=11, will_close=False)
@@ -81,7 +90,25 @@ def _startup_log(
     directory: Path, pids: list[int], *,
     server: str = "granian", started: bool = True,
 ) -> Path:
-    """Write the native server startup events used by readiness checks."""
+    """
+    Write fixture startup events for the selected server.
+
+    Parameters
+    ----------
+    directory : Path
+        Directory containing the generated server log.
+    pids : list[int]
+        Worker process identifiers to include in the log.
+    server : str, optional
+        Server whose native log format to use; default is ``granian``.
+    started : bool, optional
+        Include completed application startup events when true.
+
+    Returns
+    -------
+    Path
+        Path to the generated UTF-8 server log.
+    """
     events = []
     for index, pid in enumerate(pids, 1):
         if server == "uvicorn":
@@ -103,7 +130,7 @@ def _chart_report() -> dict[str, Any]:
     Returns
     -------
     dict[str, Any]
-        Complete chart input with fixture values, not published measurements.
+        Complete report using fixture rates rather than measured performance.
     """
     rates = {
         "fastapi": 17200,
@@ -146,7 +173,7 @@ class TestMeasurements(unittest.TestCase):
         Returns
         -------
         None
-            This test does not return a value.
+            Check successful request counts, errors, throughput, and latency units.
         """
         # Compare the complete shape so missing or additional metrics are visible.
         self.assertEqual(parse_measurement(_measurement()), {
@@ -167,7 +194,7 @@ class TestMeasurements(unittest.TestCase):
         Returns
         -------
         None
-            This test does not return a value.
+            Confirm that invalid rate denominators and success counts are rejected.
         """
         # Keep one rate component valid while invalidating the other.
         for statuses, elapsed in (
@@ -190,7 +217,7 @@ class TestMeasurements(unittest.TestCase):
         Returns
         -------
         None
-            This test does not return a value.
+            Check numeric validation across counts, durations, and percentiles.
         """
         # Cover every numeric payload field, not only successful-request counts.
         fields = (
@@ -225,7 +252,7 @@ class TestMeasurements(unittest.TestCase):
         Returns
         -------
         None
-            This test does not return a value.
+            Confirm independent sample medians and accumulated request totals.
         """
         result = aggregate_samples(_successful_runs())
 
@@ -247,7 +274,7 @@ class TestMeasurements(unittest.TestCase):
         Returns
         -------
         None
-            This test does not return a value.
+            Confirm that failed samples suppress comparative metrics.
         """
         # Mix healthy and errored samples to prevent cherry-picking valid runs.
         runs = _successful_runs()
@@ -269,7 +296,7 @@ class TestMeasurements(unittest.TestCase):
         Returns
         -------
         None
-            This test does not return a value.
+            Confirm that an empty sample sequence cannot produce a result.
         """
         # An empty run must fail rather than publish a success-shaped result.
         with self.assertRaises(ValueError):
@@ -279,7 +306,14 @@ class TestOrionisApplication(unittest.TestCase):
     """Verify the Orionis factory contains only native app configuration."""
 
     def test_factory_uses_staged_routes_without_tracking(self) -> None:
-        """Verify app creation does not copy files or register startup callbacks."""
+        """
+        Verify native app creation uses staged routes without startup hooks.
+
+        Returns
+        -------
+        None
+            Check app configuration and the absence of copied files or callbacks.
+        """
         app = Mock()
         app.withRouting.return_value = app
         app.withConfigApp.return_value = app
@@ -315,7 +349,14 @@ class TestMinimalApplications(unittest.TestCase):
     """Verify the five native servers without publishing performance results."""
 
     def test_native_asgi_routers_have_only_the_root_route(self) -> None:
-        """Verify optional frameworks register no auxiliary or documentation routes."""
+        """
+        Verify native ASGI routers register only the measured root route.
+
+        Returns
+        -------
+        None
+            Check async handlers and the absence of auxiliary routes.
+        """
         from benchmarks.http_compare.apps import fastapi, litestar, starlette
 
         for module in (fastapi, litestar, starlette):
@@ -325,7 +366,14 @@ class TestMinimalApplications(unittest.TestCase):
                 self.assertEqual([route.path for route in app.routes], ["/"])
 
     def test_native_apps_serve_only_hello_world(self) -> None:
-        """Verify payload, keep-alive, removed probes and cleanup on real servers."""
+        """
+        Verify payload, keep-alive, route isolation, and native server cleanup.
+
+        Returns
+        -------
+        None
+            Check real responses, framework preparation, and server termination.
+        """
         sample = _successful_runs()[0]
 
         def load(
@@ -336,7 +384,29 @@ class TestMinimalApplications(unittest.TestCase):
             _output: Path,
             _commands: list[dict[str, Any]],
         ) -> dict[str, int | float]:
-            """Use correctness requests instead of a benchmark load generator."""
+            """
+            Send correctness requests instead of generating benchmark load.
+
+            Parameters
+            ----------
+            _oha : Path
+                Load-generator path, unused by this double.
+            url : str
+                Root URL of the running benchmark application.
+            _seconds : float
+                Requested duration, unused by this double.
+            _connections : int
+                Requested concurrency, unused by this double.
+            _output : Path
+                Measurement output path, unused by this double.
+            _commands : list[dict[str, Any]]
+                Command log, unused by this double.
+
+            Returns
+            -------
+            dict[str, int | float]
+                Successful fixture sample after validating HTTP responses.
+            """
             with closing(compare_run.http.client.HTTPConnection(
                 urlsplit(url).netloc, timeout=5,
             )) as connection:
@@ -404,7 +474,14 @@ class TestLoadGenerator(unittest.TestCase):
     """Verify measurements and raw evidence survive subprocess failures."""
 
     def test_load_preserves_output_and_measurement_shape(self) -> None:
-        """Verify successful load retains both streams and normalized metrics."""
+        """
+        Verify successful load retains both streams and normalized metrics.
+
+        Returns
+        -------
+        None
+            Check output files, command records, timeout, and parsed measurements.
+        """
         raw = json.dumps(_measurement())
         diagnostic = "load diagnostic\n"
         script = (
@@ -416,7 +493,21 @@ class TestLoadGenerator(unittest.TestCase):
         def run(
             _command: list[str], **kwargs: Unpack[_LoadOptions],
         ) -> compare_run.subprocess.CompletedProcess[bytes]:
-            """Run a local Python stand-in without changing subprocess options."""
+            """
+            Run a Python stand-in with the original subprocess options.
+
+            Parameters
+            ----------
+            _command : list[str]
+                Original load command, unused by this double.
+            **kwargs : Unpack[_LoadOptions]
+                Stream, timeout, and execution options to forward.
+
+            Returns
+            -------
+            CompletedProcess[bytes]
+                Result of the stand-in process that emits fixture measurements.
+            """
             return execute([compare_run.sys.executable, "-B", "-c", script], **kwargs)
 
         with TemporaryDirectory() as temporary:
@@ -438,13 +529,39 @@ class TestLoadGenerator(unittest.TestCase):
             self.assertEqual(load.call_args.kwargs["timeout"], 31)
 
     def test_load_preserves_output_on_process_failure(self) -> None:
-        """Verify a nonzero exit retains diagnostics without parsing its output."""
+        """
+        Verify failed load retains diagnostics without parsing partial output.
+
+        Returns
+        -------
+        None
+            Check the native exit code and retained stdout and stderr.
+        """
         execute = compare_run.subprocess.run
 
         def run(
             _command: list[str], **kwargs: Unpack[_LoadOptions],
         ) -> compare_run.subprocess.CompletedProcess[bytes]:
-            """Emit partial output and an error through a real subprocess."""
+            """
+            Emit partial output and fail through a real subprocess.
+
+            Parameters
+            ----------
+            _command : list[str]
+                Original load command, unused by this double.
+            **kwargs : Unpack[_LoadOptions]
+                Stream, timeout, and execution options to forward.
+
+            Returns
+            -------
+            CompletedProcess[bytes]
+                Result when the caller permits a nonzero exit code.
+
+            Raises
+            ------
+            CalledProcessError
+                If the forwarded options require a successful exit.
+            """
             return execute([
                 compare_run.sys.executable, "-B", "-c",
                 (
@@ -470,13 +587,39 @@ class TestLoadGenerator(unittest.TestCase):
             )
 
     def test_load_preserves_output_on_timeout(self) -> None:
-        """Verify a timed-out subprocess retains its flushed partial streams."""
+        """
+        Verify timed-out load retains flushed partial output.
+
+        Returns
+        -------
+        None
+            Check timeout propagation and retained diagnostic streams.
+        """
         execute = compare_run.subprocess.run
 
         def run(
             _command: list[str], **kwargs: Unpack[_LoadOptions],
         ) -> compare_run.subprocess.CompletedProcess[bytes]:
-            """Limit the test duration while using real subprocess timeout handling."""
+            """
+            Run a Python subprocess with a short timeout.
+
+            Parameters
+            ----------
+            _command : list[str]
+                Original load command, unused by this double.
+            **kwargs : Unpack[_LoadOptions]
+                Execution options whose timeout is reduced for this test.
+
+            Returns
+            -------
+            CompletedProcess[bytes]
+                Process result if execution finishes before the deadline.
+
+            Raises
+            ------
+            TimeoutExpired
+                When the subprocess exceeds the shortened timeout.
+            """
             kwargs["timeout"] = 1
             return execute([
                 compare_run.sys.executable, "-B", "-c",
@@ -505,7 +648,14 @@ class TestBenchmarkRunner(unittest.TestCase):
     """Verify equal server settings, warmup isolation, and worker cleanup."""
 
     def test_help_omits_internal_options(self) -> None:
-        """Hide internal options without changing their accepted values."""
+        """
+        Verify hidden CLI options remain accepted with their defaults.
+
+        Returns
+        -------
+        None
+            Check help output and parsing of the internal warmup option.
+        """
         parser = compare_run.build_parser()
         self.assertNotIn("warmup", parser.format_help().lower())
         self.assertEqual(parser.parse_args([]).warmup, 2)
@@ -518,7 +668,7 @@ class TestBenchmarkRunner(unittest.TestCase):
         Returns
         -------
         None
-            This test does not return a value.
+            Check server assignments, launcher modules, and native CLI arguments.
         """
         servers = {
             "orionis-rsgi": "granian", "orionis-asgi": "granian",
@@ -529,6 +679,10 @@ class TestBenchmarkRunner(unittest.TestCase):
                 server = servers[framework.name]
                 command = compare_run.server_command(framework, 2, 8000)
                 self.assertEqual(framework.server, server)
+                server_module = (
+                    "benchmarks.http_compare.uvicorn_server"
+                    if server == "uvicorn" else server
+                )
                 native_options = [
                     "--interface", framework.interface,
                     "--http", "1",
@@ -541,7 +695,7 @@ class TestBenchmarkRunner(unittest.TestCase):
                     "--lifespan", "on", "--no-use-colors",
                 ]
                 self.assertEqual(command, [
-                    compare_run.sys.executable, "-B", "-m", server,
+                    compare_run.sys.executable, "-B", "-m", server_module,
                     framework.target, "--factory",
                     "--host", "127.0.0.1", "--port", "8000",
                     "--workers", "2", "--loop", "asyncio",
@@ -550,7 +704,14 @@ class TestBenchmarkRunner(unittest.TestCase):
                 ])
 
     def test_orionis_preparation_uses_only_two_root_requests(self) -> None:
-        """Verify Orionis preparation uses the measured route, not a PID probe."""
+        """
+        Verify Orionis preparation sends only two root requests.
+
+        Returns
+        -------
+        None
+            Check worker readiness, persistent requests, and connection cleanup.
+        """
         process = Mock()
         process.poll.return_value = None
         for workers in range(1, 5):
@@ -587,7 +748,7 @@ class TestBenchmarkRunner(unittest.TestCase):
         Returns
         -------
         None
-            This test does not return a value.
+            Confirm readiness uses TCP checks without sending HTTP requests.
         """
         process = Mock()
         process.poll.return_value = None
@@ -625,7 +786,7 @@ class TestBenchmarkRunner(unittest.TestCase):
         Returns
         -------
         None
-            This test does not return a value.
+            Confirm incomplete worker startup blocks measurements until timeout.
         """
         process = Mock()
         process.poll.return_value = None
@@ -653,7 +814,14 @@ class TestBenchmarkRunner(unittest.TestCase):
         pause.assert_called_once_with(0.1)
 
     def test_unstarted_worker_times_out_before_measurements(self) -> None:
-        """Verify spawning a worker is not mistaken for completed native startup."""
+        """
+        Verify spawned workers require completed application startup.
+
+        Returns
+        -------
+        None
+            Confirm incomplete startup times out without opening HTTP connections.
+        """
         process = Mock()
         process.poll.return_value = None
         with TemporaryDirectory() as temporary:
@@ -680,7 +848,14 @@ class TestBenchmarkRunner(unittest.TestCase):
         connect.assert_not_called()
 
     def test_uvicorn_waits_for_every_application_startup(self) -> None:
-        """Reject started processes until every Uvicorn app has finished startup."""
+        """
+        Verify Uvicorn waits for every worker's application startup.
+
+        Returns
+        -------
+        None
+            Check that partial startup logs cannot admit a ready server.
+        """
         process = Mock()
         process.poll.return_value = None
         for completed in (0, 1):
@@ -708,7 +883,14 @@ class TestBenchmarkRunner(unittest.TestCase):
                 tcp.assert_not_called()
 
     def test_readiness_rejects_an_unowned_native_worker(self) -> None:
-        """Verify native startup events cannot admit a foreign process."""
+        """
+        Verify readiness rejects worker processes without ownership.
+
+        Returns
+        -------
+        None
+            Confirm foreign worker identifiers block HTTP preparation.
+        """
         process = Mock()
         process.poll.return_value = None
         with TemporaryDirectory() as temporary:
@@ -734,7 +916,7 @@ class TestBenchmarkRunner(unittest.TestCase):
         Returns
         -------
         None
-            This test does not return a value.
+            Confirm invalid payloads, statuses, media types, or keep-alive fail.
         """
         for status, body, content_type, version, will_close in (
             (500, b"Hello World", "text/plain", 11, False),
@@ -765,7 +947,7 @@ class TestBenchmarkRunner(unittest.TestCase):
         Returns
         -------
         None
-            This test does not return a value.
+            Check that preparation failure blocks load and stops the server.
         """
         process = Mock()
         args = Namespace(warmup=2, duration=10, connections=100, repetitions=3)
@@ -800,7 +982,7 @@ class TestBenchmarkRunner(unittest.TestCase):
         Returns
         -------
         None
-            This test does not return a value.
+            Check measured runs, environment isolation, and cleanup without warmup.
         """
         args = Namespace(warmup=2, duration=10, connections=100, repetitions=3)
         sample = _successful_runs()[0]
@@ -854,7 +1036,7 @@ class TestBenchmarkRunner(unittest.TestCase):
         Returns
         -------
         None
-            This test does not return a value.
+            Confirm warmup precedes measured runs without affecting their metrics.
         """
         self.assertEqual(compare_run.build_parser().parse_args([]).warmup, 2)
         # Make warmup much faster than measured runs to expose contamination.
@@ -918,7 +1100,7 @@ class TestBenchmarkRunner(unittest.TestCase):
         Returns
         -------
         None
-            This test does not return a value.
+            Check owned worker termination and escalation after supervisor exit.
         """
         # Model an orphan that survives graceful termination and requires a kill.
         process = Mock(pid=1234)
@@ -944,7 +1126,14 @@ class TestBenchmarkRunner(unittest.TestCase):
         process.wait.assert_called_once_with(timeout=5)
 
     def test_cleanup_terminates_each_owned_process_once(self) -> None:
-        """Verify cleanup does not terminate the supervisor twice."""
+        """
+        Verify cleanup terminates each owned process only once.
+
+        Returns
+        -------
+        None
+            Check supervisor and worker termination without redundant kills.
+        """
         process = Mock(pid=1234)
         parent = Mock(pid=1234)
         worker = Mock(pid=5678)
@@ -963,7 +1152,14 @@ class TestBenchmarkRunner(unittest.TestCase):
         process.wait.assert_called_once_with(timeout=5)
 
     def test_native_workers_require_a_living_owned_process(self) -> None:
-        """Verify dead, foreign and zombie workers fail native health checks."""
+        """
+        Verify dead, foreign, and zombie workers fail health checks.
+
+        Returns
+        -------
+        None
+            Confirm only living owned workers satisfy native readiness checks.
+        """
         for scenario, pid in (
             ("dead", 5678), ("foreign", 9999), ("zombie", 5678),
         ):
@@ -985,7 +1181,14 @@ class TestBenchmarkRunner(unittest.TestCase):
                     compare_run.check_workers(process, {pid}, {})
 
     def test_uvicorn_single_worker_is_the_server_process(self) -> None:
-        """Accept Uvicorn's main PID as a worker only while it is alive."""
+        """
+        Verify Uvicorn's main process counts as a living single worker.
+
+        Returns
+        -------
+        None
+            Check main-process ownership and rejection of dead or zombie states.
+        """
         for status in ("running", "dead", "zombie"):
             with self.subTest(status=status):
                 process = Mock(pid=1234)
@@ -1013,7 +1216,7 @@ class TestBenchmarkRunner(unittest.TestCase):
         Returns
         -------
         None
-            This test does not return a value.
+            Check partial diagnostics, continued execution, and failure labeling.
         """
         # Keep actual CLI orchestration and artifact persistence under test.
         samples = _successful_runs()
@@ -1037,7 +1240,7 @@ class TestBenchmarkRunner(unittest.TestCase):
             Parameters
             ----------
             framework : compare_run.Framework
-                Framework whose name selects failure or success.
+                Framework selecting a failed or successful fixture result.
             _workers : int
                 Worker count, unused by this test double.
             _args : Namespace
@@ -1054,12 +1257,12 @@ class TestBenchmarkRunner(unittest.TestCase):
             Returns
             -------
             None
-                Update the result row with successful aggregate metrics.
+                Store complete aggregate metrics or a partial failed sample.
 
             Raises
             ------
             RuntimeError
-                If FastAPI is selected, after recording one partial sample.
+                When FastAPI is selected, after recording the first sample.
             """
             # Leave partial metrics behind to exercise late-failure cleanup.
             if framework.name == "fastapi":
@@ -1117,7 +1320,14 @@ class TestBenchmarkRunner(unittest.TestCase):
         self.assertIn("| starlette | asgi | 1 | ok | 100.00 |", markdown)
 
     def test_main_keeps_failure_reports_for_all_exit_paths(self) -> None:
-        """Verify setup errors, interruptions and unsupported cases remain failures."""
+        """
+        Verify failed exit paths retain diagnostic reports.
+
+        Returns
+        -------
+        None
+            Check setup failures, interruptions, unsupported cases, and chart gates.
+        """
         failure_message = "Warmup failed during preparation"
         for scenario, setup_error, benchmark_error in (
             ("setup", RuntimeError(failure_message), None),
@@ -1188,7 +1398,14 @@ class TestBenchmarkRunner(unittest.TestCase):
                         )
 
     def test_windows_preserves_single_worker_comparisons(self) -> None:
-        """Retain the Windows single-worker policy for both native servers."""
+        """
+        Verify Windows rejects unsupported multi-worker comparisons.
+
+        Returns
+        -------
+        None
+            Confirm unsupported cases skip execution and publish no metrics.
+        """
         with TemporaryDirectory() as temporary:
             output = Path(temporary) / "results"
             with (
@@ -1220,7 +1437,14 @@ class TestBenchmarkRunner(unittest.TestCase):
         ))
 
     def test_main_validates_only_selected_server_versions(self) -> None:
-        """Reject missing selected servers without requiring the unused server."""
+        """
+        Verify version checks require only the selected server.
+
+        Returns
+        -------
+        None
+            Check setup failures and independence from unused server dependencies.
+        """
         for name, selected, unused in (
             ("orionis-asgi", "granian", "uvicorn"),
             ("fastapi", "uvicorn", "granian"),
@@ -1277,7 +1501,7 @@ class TestBenchmarkRunner(unittest.TestCase):
         Returns
         -------
         None
-            This test does not return a value.
+            Check saved settings and charts against the published result data.
         """
         with TemporaryDirectory() as temporary:
             output = Path(temporary) / "results"
@@ -1321,6 +1545,7 @@ class TestBenchmarkRunner(unittest.TestCase):
         self.assertEqual(
             diagnostics["settings"]["readiness"], "native-server-workers-and-tcp",
         )
+        self.assertTrue(diagnostics["settings"]["uvicorn_multi_worker_tcp_nodelay"])
         self.assertEqual(
             diagnostics["settings"]["servers"],
             {
@@ -1358,7 +1583,7 @@ class TestThroughputCharts(unittest.TestCase):
         Returns
         -------
         None
-            This test does not return a value.
+            Check ranking, bar dimensions, labels, accessibility, and worker filters.
         """
         report = _chart_report()
         report["results"].append({
@@ -1392,7 +1617,14 @@ class TestThroughputCharts(unittest.TestCase):
         self.assertNotIn("999,999", svg)
 
     def test_chart_requires_only_result_groups_and_quantities(self) -> None:
-        """Verify public results can reproduce a chart without runtime metadata."""
+        """
+        Verify public results reproduce charts without runtime metadata.
+
+        Returns
+        -------
+        None
+            Confirm chart rendering depends only on result groups and quantities.
+        """
         report = _chart_report()
         report["settings"] = {"frameworks": report["settings"]["frameworks"]}
         report.pop("environment")
@@ -1406,7 +1638,7 @@ class TestThroughputCharts(unittest.TestCase):
         Returns
         -------
         None
-            This test does not return a value.
+            Confirm incomplete, duplicated, or failed comparisons cannot form charts.
         """
         for scenario in (
             "missing", "duplicate", "failed", "errors", "setup", "empty-setup",
@@ -1437,7 +1669,7 @@ class TestThroughputCharts(unittest.TestCase):
         Returns
         -------
         None
-            This test does not return a value.
+            Check rejection of invalid throughput values.
         """
         for rate in (0, -1, math.nan, math.inf, -math.inf, True, "100"):
             with self.subTest(rate=rate):
@@ -1453,7 +1685,7 @@ class TestThroughputCharts(unittest.TestCase):
         Returns
         -------
         None
-            This test does not return a value.
+            Check XML-safe labels and omission of environment details.
         """
         report = _chart_report()
         label = 'Framework <preview> & "quoted"'
@@ -1470,7 +1702,14 @@ class TestComparisonReports(unittest.TestCase):
     """Verify that every artifact publishes the same comparative results."""
 
     def test_public_reports_omit_preparation_details(self) -> None:
-        """Verify all public formats omit warmup and its unmeasured counts."""
+        """
+        Verify public formats omit warmup and unmeasured request counts.
+
+        Returns
+        -------
+        None
+            Check consistent omission across Markdown, JSON, CSV, and SVG.
+        """
         report = _chart_report()
         orionis = next(
             row for row in report["results"] if row["framework"] == "orionis-asgi"
@@ -1498,7 +1737,7 @@ class TestComparisonReports(unittest.TestCase):
         Returns
         -------
         None
-            This test does not return a value.
+            Check report consistency, diagnostic preservation, and failure labels.
         """
         # Pair a valid row with an errored row to expose invented failure metrics.
         good = {
@@ -1587,7 +1826,14 @@ class TestComparisonReports(unittest.TestCase):
         self.assertIn("Comparison failed or incomplete", markdown)
 
     def test_setup_failure_details_stay_in_diagnostics(self) -> None:
-        """Verify preparation failures remain explicit without exposing details."""
+        """
+        Verify setup failure details remain confined to diagnostics.
+
+        Returns
+        -------
+        None
+            Check explicit public failure labels without leaking preparation details.
+        """
         report = _chart_report()
         report["error"] = "Warmup failed during preparation"
         with TemporaryDirectory() as temporary:
@@ -1603,3 +1849,132 @@ class TestComparisonReports(unittest.TestCase):
         self.assertIn("Comparison failed or incomplete", markdown)
         self.assertIn("diagnostics.json", json.loads(public)["error"])
         self.assertEqual(diagnostics["error"], report["error"])
+
+@unittest.skipUnless(find_spec("uvicorn") is not None, "Install benchmark dependencies")
+class TestUvicornTransport(unittest.TestCase):
+    """Verify native Uvicorn launching with the multi-worker TCP correction."""
+
+    def test_real_listener_disables_nagle_before_worker_sharing(self) -> None:
+        """
+        Verify TCP_NODELAY propagates from the listener to accepted sockets.
+
+        Returns
+        -------
+        None
+            Check protocol-zero listeners, inheritable handles, and accepted options.
+        """
+        from benchmarks.http_compare.uvicorn_server import TcpNoDelayConfig
+
+        config = TcpNoDelayConfig(
+            "unused", host="127.0.0.1", port=0, workers=2, log_config=None,
+        )
+        with closing(config.bind_socket()) as listener:
+            self.assertEqual(listener.proto, 0)
+            self.assertEqual(
+                listener.getsockopt(socket.IPPROTO_TCP, socket.TCP_NODELAY), 1,
+            )
+            self.assertEqual(listener.getsockname()[0], "127.0.0.1")
+            self.assertTrue(listener.get_inheritable())
+            listener.listen(1)
+            with (
+                closing(socket.create_connection(listener.getsockname(), timeout=5)),
+                closing(listener.accept()[0]) as accepted,
+            ):
+                self.assertEqual(
+                    accepted.getsockopt(socket.IPPROTO_TCP, socket.TCP_NODELAY), 1,
+                )
+
+    def test_tcp_option_failure_closes_the_bound_listener(self) -> None:
+        """
+        Verify TCP configuration failures close the bound listener.
+
+        Returns
+        -------
+        None
+            Check option arguments, error propagation, and socket cleanup.
+        """
+        from benchmarks.http_compare.uvicorn_server import Config, TcpNoDelayConfig
+
+        listener = Mock(family=socket.AF_INET)
+        listener.setsockopt.side_effect = OSError("TCP_NODELAY unavailable")
+        config = TcpNoDelayConfig("unused", log_config=None)
+        with (
+            patch.object(Config, "bind_socket", return_value=listener),
+            self.assertRaisesRegex(OSError, "TCP_NODELAY unavailable"),
+        ):
+            config.bind_socket()
+        listener.setsockopt.assert_called_once_with(
+            socket.IPPROTO_TCP, socket.TCP_NODELAY, 1,
+        )
+        listener.close.assert_called_once_with()
+
+    def test_non_tcp_listener_is_left_unchanged(self) -> None:
+        """
+        Verify non-TCP listeners remain unchanged.
+
+        Returns
+        -------
+        None
+            Check that no TCP options or premature closure affect the listener.
+        """
+        from benchmarks.http_compare.uvicorn_server import Config, TcpNoDelayConfig
+
+        listener = Mock(family=socket.AF_UNSPEC)
+        config = TcpNoDelayConfig("unused", log_config=None)
+        with patch.object(Config, "bind_socket", return_value=listener):
+            self.assertIs(config.bind_socket(), listener)
+        listener.setsockopt.assert_not_called()
+        listener.close.assert_not_called()
+
+    def test_launcher_delegates_to_native_cli_and_restores_config(self) -> None:
+        """
+        Verify native CLI delegation uses a scoped configuration replacement.
+
+        Returns
+        -------
+        None
+            Check CLI invocation and restoration of the native configuration.
+        """
+        from benchmarks.http_compare import uvicorn_server
+
+        entrypoint = import_module("uvicorn.main")
+        native_config = entrypoint.Config
+
+        def native_main() -> None:
+            """
+            Check the active Uvicorn configuration.
+
+            Returns
+            -------
+            None
+                Confirm the CLI receives the TCP_NODELAY configuration.
+            """
+            self.assertIs(entrypoint.Config, uvicorn_server.TcpNoDelayConfig)
+
+        with patch.object(entrypoint, "main", side_effect=native_main) as main:
+            uvicorn_server.main()
+        main.assert_called_once_with()
+        self.assertIs(entrypoint.Config, native_config)
+
+    def test_launcher_preserves_cli_failures_and_exit_codes(self) -> None:
+        """
+        Verify native CLI failures and exit codes remain unchanged.
+
+        Returns
+        -------
+        None
+            Check exception identity and configuration restoration after failures.
+        """
+        from benchmarks.http_compare import uvicorn_server
+
+        entrypoint = import_module("uvicorn.main")
+        native_config = entrypoint.Config
+        for error in (SystemExit(7), RuntimeError("native CLI failed")):
+            with self.subTest(error=type(error).__name__):
+                with (
+                    patch.object(entrypoint, "main", side_effect=error),
+                    self.assertRaises(type(error)) as caught,
+                ):
+                    uvicorn_server.main()
+                self.assertIs(caught.exception, error)
+                self.assertIs(entrypoint.Config, native_config)

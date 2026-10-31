@@ -1,18 +1,24 @@
 from __future__ import annotations
 import traceback
+from importlib.util import find_spec
+from sqlalchemy import create_engine
+from sqlalchemy.ext.asyncio import create_async_engine
 from orionis.database.connection import Connection
 from orionis.database.contracts.transaction import ITransaction
 from orionis.database.exceptions import (
+    MissingDatabaseDependencyException,
     QueryException,
     TransactionException,
     UnsupportedDriverException,
 )
+from orionis.database.threaded.engine import ThreadedEngine
 from orionis.orm.query.expressions import (
     DeletePlan,
     InsertPlan,
     SelectPlan,
     UpdatePlan,
     WhereClause,
+    WhereType,
 )
 from orionis.orm.schema.table import TableDefinition
 from orionis.orm.schema.types import Integer, String
@@ -526,3 +532,192 @@ class TestConnection(TestCase):
             self.assertEqual(timeout[0]["timeout"], 2500)
         finally:
             await connection.disconnect()
+
+class TestConnectionSqlCompilation(TestCase):
+
+    def testToSqlKeepsValuesBoundAndDoesNotCreateAnEngine(self) -> None:
+        """Render placeholders and prefixes without initializing the database.
+
+        Returns
+        -------
+        None
+            Assertions verify offline compilation and parameter privacy.
+        """
+        connection = Connection(
+            "debug",
+            {"driver": "sqlite", "database": ":memory:", "prefix": "app_"},
+        )
+        plan = SelectPlan(
+            table=_make_table(),
+            columns=("name",),
+            wheres=[WhereClause(column="name", value="private-marker")],
+        )
+
+        sql = connection.toSql(plan)
+
+        self.assertIn("SELECT app_items.name", sql)
+        self.assertIn("FROM app_items", sql)
+        self.assertIn("app_items.name = ?", sql)
+        self.assertNotIn("private-marker", sql)
+        self.assertIsNone(connection._engine)
+
+    def testToSqlEscapesLiteralValues(self) -> None:
+        """Use dialect-aware escaping for explicitly requested SQL literals.
+
+        Returns
+        -------
+        None
+            Assertions verify string escaping and offline literal rendering.
+        """
+        connection = Connection(
+            "debug", {"driver": "sqlite", "database": ":memory:"},
+        )
+        plan = SelectPlan(
+            table=_make_table(),
+            wheres=[WhereClause(column="name", value="O'Reilly")],
+        )
+
+        sql = connection.toSql(plan, literal_binds=True)
+
+        self.assertIn("items.name = 'O''Reilly'", sql)
+        self.assertIsNone(connection._engine)
+
+    def testToSqlExpandsInParametersIncludingEmptyLists(self) -> None:
+        """Render executable-shaped IN clauses rather than postcompile markers.
+
+        Returns
+        -------
+        None
+            Assertions verify populated and empty expanding parameters.
+        """
+        connection = Connection(
+            "debug", {"driver": "sqlite", "database": ":memory:"},
+        )
+        for values in ([1, 2, 3], []):
+            with self.subTest(values=values):
+                plan = SelectPlan(
+                    table=_make_table(),
+                    wheres=[WhereClause(
+                        column="id", where_type=WhereType.IN, value=values,
+                    )],
+                )
+                sql = connection.toSql(plan)
+                literal_sql = connection.toSql(plan, literal_binds=True)
+                self.assertNotIn("POSTCOMPILE", sql)
+                self.assertNotIn("POSTCOMPILE", literal_sql)
+                self.assertNotIn("IN ()", sql)
+                if values:
+                    self.assertIn("items.id IN (?, ?, ?)", sql)
+                    self.assertIn("items.id IN (1, 2, 3)", literal_sql)
+        self.assertIsNone(connection._engine)
+
+    def testToSqlSanitizesUnsupportedLiteralErrors(self) -> None:
+        """Keep unsupported literal values out of compilation exception chains.
+
+        Returns
+        -------
+        None
+            Assertions verify framework errors without sensitive values.
+        """
+        connection = Connection(
+            "debug", {"driver": "sqlite", "database": ":memory:"},
+        )
+        credential = "private-value-that-must-not-be-logged"
+        plan = SelectPlan(
+            table=_make_table(),
+            wheres=[WhereClause(column="name", value={"value": credential})],
+        )
+
+        with self.assertRaises(QueryException) as caught:
+            connection.toSql(plan, literal_binds=True)
+
+        self.assertIn("CompileError", str(caught.exception))
+        self.assertNotIn(credential, "".join(
+            traceback.format_exception(caught.exception),
+        ))
+        self.assertTrue(caught.exception.__suppress_context__)
+        self.assertIsNone(connection._engine)
+
+    def testToSqlUsesEachConfiguredDialect(self) -> None:
+        """Render native identifier quoting and parameters for supported drivers.
+
+        Returns
+        -------
+        None
+            Verify five SQL dialects without database engines or connections.
+        """
+        table = TableDefinition(name="order", columns=_make_table().columns)
+        plan = SelectPlan(
+            table=table,
+            columns=("id",),
+            wheres=[WhereClause(column="name", value="private-marker")],
+        )
+        cases = (
+            ("sqlite", '"order"', "?"),
+            ("mysql", "`order`", "%s"),
+            ("pgsql", '"order"', "$1::VARCHAR"),
+            ("oracle", '"order"', ":name_1"),
+            ("sqlserver", "[order]", ":name_1"),
+        )
+        for driver, quoted_table, placeholder in cases:
+            with self.subTest(driver=driver):
+                connection = Connection("debug", {
+                    "driver": driver,
+                    "database": "debug",
+                    "dsn": "127.0.0.1:1521/debug",
+                })
+                sql = connection.toSql(plan)
+                self.assertIn("FROM " + quoted_table, sql)
+                self.assertIn(quoted_table + ".name = " + placeholder, sql)
+                self.assertNotIn("private-marker", sql)
+                self.assertIn("'private-marker'", connection.toSql(
+                    plan, literal_binds=True,
+                ))
+                self.assertIsNone(connection._engine)
+
+    def testToSqlHandlesTheOptionalRedshiftDialect(self) -> None:
+        """Render Redshift SQL or report the missing optional dialect clearly.
+
+        Returns
+        -------
+        None
+            Verify optional dependency handling without starting a SQL engine.
+        """
+        connection = Connection(
+            "debug", {"driver": "redshift", "database": "debug"},
+        )
+        plan = SelectPlan(table=TableDefinition(name="items"), columns=("name",))
+        if find_spec("sqlalchemy_redshift") is None:
+            with self.assertRaises(MissingDatabaseDependencyException):
+                connection.toSql(plan)
+        else:
+            self.assertIn("FROM items", connection.toSql(plan))
+        self.assertIsNone(connection._engine)
+
+    async def testToSqlReusesAnExistingEngineDialect(self) -> None:
+        """Honor an existing engine's settings for async and threaded engines.
+
+        Returns
+        -------
+        None
+            Verify cached dialect reuse without acquiring database connections.
+        """
+        factories = (
+            lambda: create_async_engine("sqlite+aiosqlite://", paramstyle="named"),
+            lambda: ThreadedEngine(create_engine("sqlite://", paramstyle="named")),
+        )
+        for factory in factories:
+            connection = Connection(
+                "debug", {"driver": "sqlite", "database": ":memory:"},
+            )
+            engine = factory()
+            connection._engine = engine
+            try:
+                plan = SelectPlan(
+                    table=_make_table(),
+                    wheres=[WhereClause(column="name", value="marker")],
+                )
+                self.assertIn("items.name = :name_1", connection.toSql(plan))
+                self.assertIs(connection._engine, engine)
+            finally:
+                await connection.disconnect()

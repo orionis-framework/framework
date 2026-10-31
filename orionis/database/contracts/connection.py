@@ -54,6 +54,32 @@ class IConnection(ABC):
         """
         return True
 
+    @abstractmethod
+    def toSql(self, plan: SelectPlan, *, literal_binds: bool = False) -> str:
+        """
+        Render a SELECT plan without executing it or opening a connection.
+
+        Parameters
+        ----------
+        plan : SelectPlan
+            Query plan to render with the configured connection dialect.
+        literal_binds : bool, optional
+            Include values for debugging when their types support SQL literals.
+            Literal output may expose sensitive information.
+
+        Returns
+        -------
+        str
+            SQL text with expanded placeholders or literal parameter values.
+
+        Raises
+        ------
+        QueryException
+            If the plan or a literal value cannot be compiled.
+        MissingDatabaseDependencyException
+            If the configured SQL dialect is unavailable.
+        """
+
     # ── Query execution ─────────────────────────────────────────────────────
 
     @abstractmethod

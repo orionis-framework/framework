@@ -197,6 +197,54 @@ class Connection(IConnection):
         """
         return resolve_driver(self._config) != "redshift"
 
+    def toSql(self, plan: SelectPlan, *, literal_binds: bool = False) -> str:
+        """
+        Render a SELECT plan without creating an engine or executing SQL.
+
+        Parameters
+        ----------
+        plan : SelectPlan
+            Query plan to render with the configured connection dialect.
+        literal_binds : bool, optional
+            Include bound values for debugging instead of placeholders. Values
+            may contain sensitive data; some types cannot be rendered literally.
+
+        Returns
+        -------
+        str
+            SQL text with expanded parameters and the configured table prefix.
+
+        Raises
+        ------
+        QueryException
+            If the plan or a literal value cannot be compiled.
+        MissingDatabaseDependencyException
+            If the configured SQL dialect is unavailable.
+        """
+        try:
+            statement = self._compiler.compileSelect(plan)
+            if self._engine is None:
+                if resolve_driver(self._config) == "redshift":
+                    import_module("sqlalchemy_redshift.dialect")
+                dialect = build_engine_url(self._config).get_dialect(_is_async=True)()
+            elif isinstance(self._engine, ThreadedEngine):
+                dialect = self._engine.sync_engine.dialect
+            else:
+                dialect = self._engine.dialect
+            return str(statement.compile(
+                dialect=dialect,
+                compile_kwargs={
+                    "literal_binds": literal_binds,
+                    "render_postcompile": True,
+                },
+            ))
+        except (ImportError, NoSuchModuleError) as exc:
+            raise missing_dependency_error(
+                resolve_driver(self._config), exc,
+            ) from exc
+        except SQLAlchemyError as exc:
+            raise self._queryException(exc) from None
+
     # ── Query execution ─────────────────────────────────────────────────────
 
     async def select(

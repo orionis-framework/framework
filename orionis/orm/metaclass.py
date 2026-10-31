@@ -96,6 +96,7 @@ _FORWARDED_BUILDER_METHODS: frozenset[str] = frozenset({
     "skip",
     "sum",
     "take",
+    "toSql",
     "union",
     "unionAll",
     "value",

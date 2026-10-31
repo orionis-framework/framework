@@ -6,7 +6,7 @@ import tests.orm.relations.test_mixin as relation_fixtures
 import tests.orm.test_events as feature_fixtures
 from orionis.database.compiler import SQLCompiler
 from orionis.orm.contracts.builder import IModelQueryBuilder
-from orionis.orm.exceptions import ScopeNotFoundException
+from orionis.orm.exceptions import InvalidQueryException, ScopeNotFoundException
 from orionis.orm.query.base_builder import QueryBuilderBase
 from orionis.orm.query.builder import ModelQueryBuilder
 from orionis.orm.query.raw_builder import RawQueryBuilder
@@ -338,6 +338,67 @@ class TestScopes(feature_fixtures._ModelFeatureTestCase):
         feature_fixtures.Account.removeGlobalScope("active")
         self.assertEqual(await feature_fixtures.Account.count(), 2)
 
+    async def testToSqlIncludesScopesWithoutFreezingTheOriginalQuery(self) -> None:
+        """Inspect model filters without affecting later scope selection.
+
+        Returns
+        -------
+        None
+            Verify SQL parity, detached scopes, and subsequent unscoped reads.
+        """
+        await self.seed()
+        feature_fixtures.Account.addGlobalScope(
+            "active", lambda query: query.where("active", True),
+        )
+        query = feature_fixtures.Account.query()
+        original_plan = query.toPlan()
+        original_wheres = original_plan.wheres.copy()
+
+        sql = query.toSql(literal_binds=True)
+
+        self.assertIn("accounts.active = 1", sql)
+        self.assertIn("accounts.deleted_at IS NULL", sql)
+        self.assertEqual(sql, query.toSql(literal_binds=True))
+        self.assertIs(query.toPlan(), original_plan)
+        self.assertEqual(query.toPlan().wheres, original_wheres)
+        self.assertFalse(query._scopes_applied)
+        rows = await self._manager.connection().select(sql)
+        self.assertEqual([row["first_name"] for row in rows], ["Ada"])
+
+        query.withoutGlobalScope("active").withTrashed()
+        unscoped_sql = query.toSql(literal_binds=True)
+        self.assertNotIn("accounts.active = 1", unscoped_sql)
+        self.assertNotIn("accounts.deleted_at IS NULL", unscoped_sql)
+        self.assertEqual(len(await query.get()), 2)
+
+    def testToSqlRespectsSoftDeleteModesAndLocalScopes(self) -> None:
+        """Render each soft delete mode and already-applied local scopes.
+
+        Returns
+        -------
+        None
+            Verify filter selection without modifying the original plans.
+        """
+        cases = (
+            (feature_fixtures.Account.query(), "IS NULL"),
+            (feature_fixtures.Account.onlyTrashed(), "IS NOT NULL"),
+            (feature_fixtures.Account.withTrashed(), None),
+        )
+        for query, predicate in cases:
+            with self.subTest(predicate=predicate):
+                original_wheres = query.toPlan().wheres.copy()
+                sql = query.toSql()
+                if predicate is None:
+                    self.assertNotIn("accounts.deleted_at IS", sql)
+                else:
+                    self.assertIn("accounts.deleted_at " + predicate, sql)
+                self.assertEqual(query.toPlan().wheres, original_wheres)
+                self.assertFalse(query._scopes_applied)
+        self.assertIn(
+            "accounts.active = 1",
+            feature_fixtures.Account.active().toSql(literal_binds=True),
+        )
+
 class TestModelBuilderContract(TestCase):
     def testBuilderImplementsContract(self) -> None:
         """Implement the IModelQueryBuilder contract.
@@ -468,6 +529,118 @@ class TestModelSharesTheEngine(language_fixtures._QueryLanguageTestCase):
         """
         self.assertTrue(issubclass(ModelQueryBuilder, QueryBuilderBase))
         self.assertTrue(issubclass(RawQueryBuilder, QueryBuilderBase))
+
+    def testToSqlIsSharedByModelsAndDbTable(self) -> None:
+        """Expose matching SQL through both public builder entry points.
+
+        Returns
+        -------
+        None
+            Verify class forwarding, parameter privacy, and repeatable rendering.
+        """
+        model_query = (
+            language_fixtures._User.where("name", "O'Reilly")
+            .select("name").orderBy("id").limit(3)
+        )
+        raw_query = (
+            DB.table("users").where("name", "O'Reilly")
+            .select("name").orderBy("id").limit(3)
+        )
+        for literal_binds in (False, True):
+            with self.subTest(literal_binds=literal_binds):
+                sql = model_query.toSql(literal_binds=literal_binds)
+                self.assertIsInstance(sql, str)
+                self.assertEqual(sql, raw_query.toSql(literal_binds=literal_binds))
+                self.assertEqual(sql, model_query.toSql(literal_binds=literal_binds))
+                if literal_binds:
+                    self.assertIn("'O''Reilly'", sql)
+                else:
+                    self.assertNotIn("Reilly", sql)
+        self.assertEqual(
+            language_fixtures._User.toSql(),
+            language_fixtures._User.query().toSql(),
+        )
+        self.assertEqual(model_query.toPlan().limit_value, 3)
+
+    def testToSqlUsesTheNamedConnectionAndItsPrefix(self) -> None:
+        """Use the selected connection rather than the default SQLite dialect.
+
+        Returns
+        -------
+        None
+            Verify named connection routing without creating its database engine.
+        """
+        self._manager.addConnection(
+            "debug", {"driver": "mysql", "database": "debug", "prefix": "app_"},
+        )
+        queries = (
+            DB.table("users", connection="debug").where("name", "marker"),
+            language_fixtures._User.query().adoptConnection("debug")
+            .where("name", "marker"),
+        )
+        for query in queries:
+            sql = query.toSql()
+            self.assertIn("FROM app_users", sql)
+            self.assertIn("app_users.name = %s", sql)
+            self.assertNotIn("marker", sql)
+        self.assertIsNone(self._manager.connection("debug")._engine)
+
+    def testToSqlRejectsAMissingTarget(self) -> None:
+        """Reject a builder without a selected table before compiling SQL.
+
+        Returns
+        -------
+        None
+            Verify the same target guard used by ordinary raw retrieval.
+        """
+        with self.assertRaises(InvalidQueryException):
+            RawQueryBuilder().toSql()
+
+    async def testToSqlPreservesQueryLanguageResults(self) -> None:
+        """Execute rendered literals and compare them with builder results.
+
+        Returns
+        -------
+        None
+            Verify groups, IN, joins, raw bindings, subqueries, unions, and paging.
+        """
+        await self.seedUsers()
+        await DB.table("posts").insert([
+            {"user_id": 1, "title": "first", "views": 3},
+            {"user_id": 2, "title": "second", "views": 7},
+        ])
+        queries = (
+            DB.table("users").select("name")
+            .where("active", True)
+            .where(lambda query: query.where("role", "admin").orWhere(
+                "role", "manager",
+            ))
+            .whereIn("country", ["CO", "MX"]).orderBy("name").limit(2),
+            DB.table("users", alias="u").select("u.name", "p.title")
+            .join("posts", "p.user_id", "=", "u.id", alias="p")
+            .whereRaw("p.views > :floor", {"floor": 3})
+            .whereExists(lambda query: query.table("posts").select("id")
+                         .whereColumn("posts.user_id", "=", "u.id"))
+            .orderBy("u.id"),
+            DB.table("posts").select("user_id")
+            .selectRaw("count(*)", alias="total").groupBy("user_id")
+            .havingRaw("count(*) >= :minimum", {"minimum": 1})
+            .orderBy("user_id"),
+            DB.table("users").select("name")
+            .whereRaw("role = :role", {"role": "admin"})
+            .unionAll(DB.table("users").select("name").whereRaw(
+                "role = :role", {"role": "manager"},
+            ))
+            .orderBy("name").limit(2).offset(1),
+        )
+        for index, query in enumerate(queries):
+            with self.subTest(query=index):
+                original_plan = query.toPlan()
+                sql = query.toSql(literal_binds=True)
+                self.assertNotIn("POSTCOMPILE", query.toSql())
+                self.assertIs(query.toPlan(), original_plan)
+                rendered_rows = await self._manager.connection().select(sql)
+                self.assertEqual(rendered_rows, list(await query.get()))
 
 class TestEagerLoadCloning(TestCase):
     """Check terminal guards and execution-context isolation."""

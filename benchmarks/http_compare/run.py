@@ -222,8 +222,12 @@ def check_server_versions(frameworks: list[str], versions: dict[str, str]) -> No
 
 def server_command(framework: Framework, workers: int, port: int) -> list[str]:
     """Build the assigned server command with matching HTTP and load settings."""
+    server_module = (
+        "benchmarks.http_compare.uvicorn_server"
+        if framework.server == "uvicorn" else framework.server
+    )
     command = [
-        sys.executable, "-B", "-m", framework.server,
+        sys.executable, "-B", "-m", server_module,
         framework.target,
         "--factory",
         "--host", "127.0.0.1",
@@ -621,6 +625,7 @@ def main(argv: list[str] | None = None) -> int:
             "keep_alive": True,
             "loop": "asyncio",
             "runtime_threads": 1,
+            "uvicorn_multi_worker_tcp_nodelay": True,
             "oha_worker_threads": 1,
             "wait_ongoing_requests": True,
             "readiness": "native-server-workers-and-tcp",

@@ -7,6 +7,7 @@ from orionis.test import TestCase
 BASE_METHODS = frozenset(
     [
         "toPlan",
+        "toSql",
         "clone",
         "select",
         "addSelect",

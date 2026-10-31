@@ -45,6 +45,22 @@ Ejecuta esta función en una aplicación inicializada con la tabla `articles`. T
 
 Valores se enlazan como parámetros. `whereRaw`, `selectRaw` y `havingRaw` aceptan SQL confiable y bindings; no interpolan de forma segura texto arbitrario. Controla columnas, operadores y ordenación desde una lista permitida cuando provienen de una petición.
 
+## Inspeccionar SQL
+
+`toSql(*, literal_binds=False) -> str` es síncrono y utiliza el dialecto y prefijo de la conexión seleccionada. Requiere una aplicación inicializada o un `ConnectionResolver` configurado, pero no crea un motor ni abre conexiones a la base de datos. La tabla no necesita existir para compilar el SQL.
+
+```python
+query = Article.where("status", "published").whereIn("id", [1, 2]).limit(10)
+sql = query.toSql()
+debug_sql = query.toSql(literal_binds=True)
+```
+
+También funciona con `DB.table(...)` y directamente desde la clase del modelo, como `Article.toSql()`. Por defecto conserva placeholders, cuyo formato depende del dialecto, y expande los parámetros de `IN`. Los scopes globales y el filtro de eliminación lógica se aplican sobre un clon: inspeccionar no modifica el builder original.
+
+`literal_binds=True` incluye valores con el escape del dialecto para depuración. **Puede revelar datos sensibles** y algunos tipos, como JSON o valores personalizados, no tienen representación literal y producen `QueryException`. No uses la salida literal como sustituto de la ejecución parametrizada.
+
+La salida describe el SELECT del plan actual. No anticipa cambios de un terminal posterior ni consultas adicionales de relaciones o paginación, y no compila escrituras.
+
 ## Proyectar, unir y agrupar
 
 Este fragmento de aplicación produce un informe con tablas crudas existentes:

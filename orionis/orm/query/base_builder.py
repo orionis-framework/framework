@@ -101,6 +101,42 @@ class QueryBuilderBase:
         """
         return self._plan
 
+    def toSql(self: Self, *, literal_binds: bool = False) -> str:
+        """
+        Render the current SELECT query without executing or mutating it.
+
+        Apply model scopes and soft delete filters to a detached copy. The text
+        describes this SELECT, not additional eager-loading or terminal queries.
+
+        Parameters
+        ----------
+        literal_binds : bool, optional
+            Include values for debugging instead of placeholders when their
+            types support SQL literals. Literal output may expose sensitive data.
+
+        Returns
+        -------
+        str
+            SQL rendered with the selected connection's dialect and table prefix.
+
+        Raises
+        ------
+        InvalidQueryException
+            If no target table has been selected.
+        QueryException
+            If the query or a literal value cannot be compiled.
+        MissingDatabaseDependencyException
+            If the selected connection's SQL dialect is unavailable.
+        """
+        if not self._plan.table.name:
+            error_msg = "No table selected; call table() before running the query."
+            raise InvalidQueryException(error_msg)
+        probe = self.clone()
+        probe._beforeExecute()  # noqa: SLF001
+        return probe._connection().toSql(  # noqa: SLF001
+            probe.toPlan(), literal_binds=literal_binds,
+        )
+
     def clone(self: Self) -> Self:
         """
         Return an independent copy of this builder.

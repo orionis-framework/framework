@@ -1,3 +1,5 @@
+"""List persistent failed jobs and their original exceptions."""
+
 from orionis.console.base.command import BaseCommand
 from orionis.queues.contracts.manager import IQueueManager  # noqa: TC001
 from orionis.queues.exceptions import QueueError
@@ -6,10 +8,14 @@ class QueueFailedCommand(BaseCommand):
     """List persistent failed jobs and their original exceptions."""
 
     __slots__ = ()
+    """Declare that this class introduces no additional instance slots."""
 
     timestamps: bool = False
+    """Timestamps flag used by ``QueueFailedCommand``."""
     signature: str = "queue:failed"
+    """Signature identifier: ``queue:failed``."""
     description: str = "List failed queue jobs."
+    """Description identifier: ``List failed queue jobs.``."""
 
     async def handle(self, manager: IQueueManager) -> int:
         """
@@ -17,7 +23,7 @@ class QueueFailedCommand(BaseCommand):
 
         Parameters
         ----------
-        manager : IQueueManager
+        manager : orionis.queues.contracts.manager.IQueueManager
             Queue manager providing the failure repository.
 
         Returns

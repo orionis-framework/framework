@@ -1,3 +1,5 @@
+"""Ensure a date comes strictly after a reference moment."""
+
 from orionis.schemas.rules.temporal import resolve_moment, to_datetime
 from orionis.schemas.rule import Rule
 
@@ -13,9 +15,12 @@ class After(Rule):
     # ruff: noqa: ARG002
 
     __slots__ = ("_reference",)
+    """Declare the instance attribute slots reserved by this class."""
 
     __message__ = "Value must be a date after the reference moment."
+    """Error text for message: ``Value must be a date after the reference moment.``."""
     __code__ = "after"
+    """Code identifier: ``after``."""
 
     def __init__(
         self,
@@ -41,6 +46,10 @@ class After(Rule):
         """
         super().__init__(message=message)
         self._reference: object = reference
+        """
+        Sibling field name, date string or datetime to compare against. Defaults to
+        the current moment.
+        """
 
     async def enforce(
         self,

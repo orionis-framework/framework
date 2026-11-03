@@ -1,3 +1,5 @@
+"""Normalize client IP and scheme using trusted proxy headers."""
+
 from __future__ import annotations
 from ipaddress import IPv4Network, IPv6Network, ip_address, ip_network
 from typing import TYPE_CHECKING
@@ -15,6 +17,7 @@ _PRIVATE_NETWORKS: tuple[IPv4Network, ...] = (
     ip_network("172.16.0.0/12"),  # NOSONAR
     ip_network("192.168.0.0/16"), # NOSONAR
 )
+"""Loopback and RFC-1918 networks used to expand the 'private' shorthand."""
 
 class ProxiesMiddleware:
     """
@@ -33,9 +36,12 @@ class ProxiesMiddleware:
 
     # Standard forwarding headers; not configurable by design.
     _IP_HEADER: str = "x-forwarded-for"
+    """Standard forwarding headers; not configurable by design."""
     _PROTO_HEADER: str = "x-forwarded-proto"
+    """Proto header identifier: ``x-forwarded-proto``."""
 
     __slots__ = ("__enabled", "__trusted_networks", "__trusted_peers")
+    """Declare the instance attribute slots reserved by this class."""
 
     def __init__(
         self,
@@ -52,20 +58,24 @@ class ProxiesMiddleware:
         Returns
         -------
         None
+            Initialize the middleware with the given proxy configuration.
         """
         # Validate the raw configuration through the entity dataclass.
         cfg = HTTPProxies(**config)
 
         # Pre-compile networks and index single-host peers for exact matches.
         self.__trusted_networks = self.__compile(cfg.trusted_proxies)
+        """Pre-compile networks and index single-host peers for exact matches."""
         self.__trusted_peers = frozenset(
             str(network.network_address)
             for network in self.__trusted_networks
             if network.prefixlen == network.max_prefixlen
         )
+        """Trusted peers produced by ``frozenset``."""
 
         # Requests are only rewritten when at least one proxy is trusted.
         self.__enabled = bool(self.__trusted_networks)
+        """Requests are only rewritten when at least one proxy is trusted."""
 
     def handle(self, adapter: TransportAdapter) -> TransportAdapter:
         """
@@ -73,12 +83,12 @@ class ProxiesMiddleware:
 
         Parameters
         ----------
-        adapter : TransportAdapter
+        adapter : orionis.http.adapters.request.contracts.transport.TransportAdapter
             The transport adapter to process.
 
         Returns
         -------
-        TransportAdapter
+        orionis.http.adapters.request.contracts.transport.TransportAdapter
             The same transport adapter with updated client and scheme fields.
         """
         # Bypass all proxy processing when no trusted proxies are configured.
@@ -94,7 +104,7 @@ class ProxiesMiddleware:
 
         Parameters
         ----------
-        adapter : TransportAdapter
+        adapter : orionis.http.adapters.request.contracts.transport.TransportAdapter
             Abstraction over an RSGI or ASGI scope.
 
         Returns
@@ -142,7 +152,7 @@ class ProxiesMiddleware:
 
         Parameters
         ----------
-        adapter : TransportAdapter
+        adapter : orionis.http.adapters.request.contracts.transport.TransportAdapter
             Transport abstraction providing header access.
         fallback_ip : str
             IP to return when no forwarded chain header is present.
@@ -191,7 +201,7 @@ class ProxiesMiddleware:
 
         Parameters
         ----------
-        adapter : TransportAdapter
+        adapter : orionis.http.adapters.request.contracts.transport.TransportAdapter
             Transport abstraction providing header access.
 
         Returns
@@ -222,7 +232,7 @@ class ProxiesMiddleware:
 
         Parameters
         ----------
-        addr : IPv4Address | IPv6Address
+        addr : ``ipaddress.IPv4Address`` | ``ipaddress.IPv6Address``
             The parsed IP address to evaluate.
 
         Returns
@@ -246,7 +256,7 @@ class ProxiesMiddleware:
 
         Returns
         -------
-        IPv4Address | IPv6Address | None
+        ``ipaddress.IPv4Address`` | ``ipaddress.IPv6Address`` | None
             The parsed address, or ``None`` when the string is not a
             well-formed IPv4 or IPv6 address.
         """
@@ -269,12 +279,12 @@ class ProxiesMiddleware:
 
         Parameters
         ----------
-        proxies : Iterable[str]
+        proxies : collections.abc.Iterable[str]
             An iterable of CIDR strings or the keyword ``'private'``.
 
         Returns
         -------
-        tuple[IPv4Network | IPv6Network, ...]
+        tuple[``ipaddress.IPv4Network`` | ``ipaddress.IPv6Network``, ``...``]
             Compiled network objects used for IP membership tests.
         """
         networks: list[IPv4Network | IPv6Network] = []

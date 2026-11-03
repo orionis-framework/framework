@@ -9,7 +9,7 @@ _RESOURCE = "notifications/resources/updated"
 class TestEventBus(TestCase):
     """No listener or producer task survives its request."""
 
-    async def test_filter_and_coalescing(self):
+    async def testFilterAndCoalescing(self):
         """Coalesce duplicates and ignore events outside the explicit filter.
 
         Returns
@@ -24,9 +24,9 @@ class TestEventBus(TestCase):
         await bus.publish(type(self), _RESOURCE, "docs://x")
         self.assertEqual(await anext(stream), (_TOOLS, None))
         await stream.aclose()
-        self.assertEqual(bus.listener_count, 0)
+        self.assertEqual(bus.listenerCount, 0)
 
-    async def test_overflow_closes_instead_of_losing_events(self):
+    async def testOverflowClosesInsteadOfLosingEvents(self):
         """A full buffer signals closure so clients can refresh state.
 
         Returns
@@ -43,9 +43,9 @@ class TestEventBus(TestCase):
         await bus.publish(type(self), _RESOURCE, "docs://b")
         with self.assertRaises(StopAsyncIteration):
             await anext(stream)
-        self.assertEqual(bus.listener_count, 0)
+        self.assertEqual(bus.listenerCount, 0)
 
-    async def test_cancel_releases_listener(self):
+    async def testCancelReleasesListener(self):
         """Cancellation while idle releases the request's registration.
 
         Returns
@@ -60,9 +60,9 @@ class TestEventBus(TestCase):
         task.cancel()
         with self.assertRaises(asyncio.CancelledError):
             await task
-        self.assertEqual(bus.listener_count, 0)
+        self.assertEqual(bus.listenerCount, 0)
 
-    async def test_shutdown_and_unstarted_close(self):
+    async def testShutdownAndUnstartedClose(self):
         """Even iterators never started by the transport can be cleaned up.
 
         Returns
@@ -77,4 +77,4 @@ class TestEventBus(TestCase):
         await bus.shutdown()
         with self.assertRaises(StopAsyncIteration):
             await anext(stream)
-        self.assertEqual(bus.listener_count, 0)
+        self.assertEqual(bus.listenerCount, 0)

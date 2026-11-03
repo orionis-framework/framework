@@ -6,10 +6,16 @@ import os
 import tempfile
 import tokenize
 from pathlib import Path
+from time import sleep
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
     from collections.abc import Iterator
+
+_REPLACE_ATTEMPTS = 6
+_REPLACE_BACKOFF_SECONDS = 0.005
+# Access denied, sharing violation, and lock violation.
+_WINDOWS_REPLACE_ERRORS = frozenset({5, 32, 33})
 
 class BootstrapEditError(ValueError):
     """A bootstrap cannot be updated without guessing about application flow."""
@@ -1231,6 +1237,9 @@ class BootstrapEditor:
         """
         Publish validated source atomically while preserving concurrent edits.
 
+        Retry Windows access and sharing failures with bounded backoff, checking
+        for concurrent source changes before each replacement attempt.
+
         Parameters
         ----------
         source : str | None
@@ -1262,12 +1271,24 @@ class BootstrapEditor:
                 handle.flush()
                 os.fsync(handle.fileno())
             temporary.chmod(mode)
-            if self.path.read_bytes() != self._original:
-                error_msg = (
-                    f"{self.path} changed during bootstrap; refusing to overwrite it."
-                )
-                raise BootstrapEditError(error_msg)
-            temporary.replace(self.path)
+            for attempt in range(_REPLACE_ATTEMPTS):
+                if self.path.read_bytes() != self._original:
+                    error_msg = (
+                        f"{self.path} changed during bootstrap; "
+                        "refusing to overwrite it."
+                    )
+                    raise BootstrapEditError(error_msg)
+                try:
+                    temporary.replace(self.path)
+                except PermissionError as error:
+                    if (
+                        getattr(error, "winerror", None) not in _WINDOWS_REPLACE_ERRORS
+                        or attempt == _REPLACE_ATTEMPTS - 1
+                    ):
+                        raise
+                    sleep(_REPLACE_BACKOFF_SECONDS * (1 << attempt))
+                else:
+                    break
             return True
         finally:
             if temporary is not None and temporary.exists():

@@ -1,9 +1,12 @@
+"""Attribute state tracking behavior shared by every model."""
+
 from __future__ import annotations
 from copy import deepcopy
 from typing import Any
 
 # Distinguish an absent original attribute from stored values, including None.
 _UNSET: Any = object()
+"""Distinguish an absent original attribute from stored values, including None."""
 
 class StateMixin:
     """
@@ -15,6 +18,7 @@ class StateMixin:
     """
 
     __slots__ = ()
+    """Declare that this class introduces no additional instance slots."""
 
     def getDirty(self) -> dict[str, Any]:
         """
@@ -116,12 +120,12 @@ class StateMixin:
         ----------
         key : str or None, optional
             Attribute name, or ``None`` for the whole snapshot.
-        default : Any, optional
+        default : typing.Any, optional
             Value returned when the attribute is absent.
 
         Returns
         -------
-        Any
+        typing.Any
             Original snapshot dictionary, or the original value for
             the requested key.
         """
@@ -135,7 +139,7 @@ class StateMixin:
 
         Returns
         -------
-        Model
+        orionis.orm.Model
             The same instance, enabling fluent chaining.
         """
         # Mutate the snapshot in place: the mixin declares no slots,

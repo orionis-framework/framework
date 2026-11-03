@@ -206,7 +206,7 @@ class RecordingClient:
         self._record("connect", host, port)
         return self.boundary.status, b"welcome"
 
-    def ehlo_or_helo_if_needed(self) -> None:
+    def ehloOrHeloIfNeeded(self) -> None:
         """Record capability negotiation using the standard method name.
 
         Returns
@@ -215,6 +215,9 @@ class RecordingClient:
             Completes the operation described above.
         """
         self._record("ehlo")
+
+    # Preserve the smtplib.SMTP protocol name.
+    ehlo_or_helo_if_needed = ehloOrHeloIfNeeded
 
     def starttls(self, *, context: ssl.SSLContext) -> None:
         """Record a mandatory STARTTLS upgrade or reject it.
@@ -248,7 +251,7 @@ class RecordingClient:
         """
         self._record("login", username, password)
 
-    def has_extn(self, name: str) -> bool:
+    def hasExtn(self, name: str) -> bool:
         """Expose the explicitly configured SMTP capabilities.
 
         Parameters
@@ -262,6 +265,9 @@ class RecordingClient:
             Value produced by the helper.
         """
         return name in self.boundary.extensions
+
+    # Preserve the smtplib.SMTP protocol name.
+    has_extn = hasExtn
 
     def sendmail(
         self,

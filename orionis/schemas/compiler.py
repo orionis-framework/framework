@@ -1,3 +1,5 @@
+"""Provide schemas operations through ``MetadataConflictError``, ``MetaCompiler``."""
+
 from __future__ import annotations
 from typing import TYPE_CHECKING
 import msgspec
@@ -53,6 +55,7 @@ class MetaCompiler:
     """
 
     __slots__ = ()
+    """Declare that this class introduces no additional instance slots."""
 
     @staticmethod
     def compile(metadata: list[ValidationMetadata]) -> msgspec.Meta:
@@ -61,19 +64,19 @@ class MetaCompiler:
 
         Parameters
         ----------
-        metadata : list[ValidationMetadata]
+        metadata : list[orionis.schemas.meta.validation.ValidationMetadata]
             The list of field-level metadata annotations to compile.
             Order does not matter; each concrete type may appear at most once.
 
         Returns
         -------
-        msgspec.Meta
+        ``msgspec.Meta``
             A field constraint descriptor configured with all provided
             constraints and documentation properties.
 
         Raises
         ------
-        MetadataConflictError
+        orionis.schemas.compiler.MetadataConflictError
             If any duplicate or logically conflicting metadata is detected
             before the descriptor is constructed.
         """
@@ -90,7 +93,7 @@ class MetaCompiler:
 
         Parameters
         ----------
-        metadata : list[ValidationMetadata]
+        metadata : list[orionis.schemas.meta.validation.ValidationMetadata]
             Raw annotation list from the caller.
 
         Returns
@@ -100,7 +103,7 @@ class MetaCompiler:
 
         Raises
         ------
-        MetadataConflictError
+        orionis.schemas.compiler.MetadataConflictError
             If the same concrete type appears more than once.
         """
         if not metadata:
@@ -143,7 +146,7 @@ class MetaCompiler:
 
         Raises
         ------
-        MetadataConflictError
+        orionis.schemas.compiler.MetadataConflictError
             On any detected conflict.
         """
         # Ambiguous bounds
@@ -246,7 +249,7 @@ class MetaCompiler:
 
         Returns
         -------
-        msgspec.Meta
+        ``msgspec.Meta``
             The fully configured field constraint descriptor.
         """
         # Read field constraints from the compiled metadata.

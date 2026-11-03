@@ -1,3 +1,5 @@
+"""Define the persistence operations of personal access tokens."""
+
 from abc import ABC, abstractmethod
 from typing import TYPE_CHECKING
 
@@ -17,6 +19,7 @@ class IAccessTokenRepository(ABC):
     """
 
     __slots__ = ()
+    """Declare that this class introduces no additional instance slots."""
 
     @abstractmethod
     async def create(
@@ -32,20 +35,20 @@ class IAccessTokenRepository(ABC):
 
         Parameters
         ----------
-        tokenable : IAuthorizable
+        tokenable : orionis.auth.contracts.IAuthorizable
             Identity the token belongs to.
         name : str
             Human readable label describing the token.
-        abilities : Iterable[str] | None, optional
+        abilities : collections.abc.Iterable[str] | None, optional
             Abilities the token may use. ``None`` keeps the full
             authorization of the identity.
-        expires_at : datetime | None, optional
+        expires_at : datetime.datetime | None, optional
             Moment the token stops being accepted. ``None`` falls back to
             the configured default expiration.
 
         Returns
         -------
-        NewAccessToken
+        orionis.auth.entities.NewAccessToken
             Stored token metadata plus the plain text value, which is the
             only moment the secret is available.
         """
@@ -64,7 +67,7 @@ class IAccessTokenRepository(ABC):
 
         Returns
         -------
-        AccessToken | None
+        orionis.auth.entities.AccessToken | None
             Matching token, or ``None`` when the value is unusable.
         """
 
@@ -107,7 +110,7 @@ class IAccessTokenRepository(ABC):
 
         Parameters
         ----------
-        tokenable : IAuthorizable
+        tokenable : orionis.auth.contracts.IAuthorizable
             Identity whose tokens must be revoked.
 
         Returns

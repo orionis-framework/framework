@@ -1,3 +1,9 @@
+"""Provide foundation lifespan operations.
+
+Includes ``before_startup_orionis_generator``, ``after_startup_orionis_generator``,
+``startup_orionis_generator``.
+"""
+
 from __future__ import annotations
 import asyncio
 import os
@@ -13,6 +19,7 @@ if TYPE_CHECKING:
 
 # Shared terminal output interface reused across all startup display functions
 _console = Console()
+"""Shared terminal output interface reused across all startup display functions."""
 
 # Pre-built static splash panel displayed before server initialization begins
 _BEFORE_STARTUP_PANEL: Panel = Panel(
@@ -21,6 +28,7 @@ _BEFORE_STARTUP_PANEL: Panel = Panel(
     border_style="green",
     padding=(1, 1),
 )
+"""Pre-built static splash panel displayed before server initialization begins."""
 
 # Mapping of GRANIAN_INTERFACE values to their human-readable display labels
 _INTERFACE_LABELS: dict[str, str] = {
@@ -28,6 +36,7 @@ _INTERFACE_LABELS: dict[str, str] = {
     "asgi": "⚡ ASGI: Asynchronous Server Gateway Interface",
     "default": "🔧 Auto-detected",
 }
+"""Mapping of GRANIAN_INTERFACE values to their human-readable display labels."""
 
 def before_startup_orionis_generator() -> None:
     """
@@ -113,12 +122,12 @@ def startup_orionis_generator(app: IApplication) -> Generator[None]:
 
     Parameters
     ----------
-    app : IApplication
+    app : orionis.IApplication
         Application instance used to read config values and mode flags.
 
     Returns
     -------
-    Generator[None, None, None]
+    collections.abc.Generator[None, None, None]
         Yields once; pre-startup runs before the yield, post-startup after.
     """
     # Only show panels in debug mode outside of production

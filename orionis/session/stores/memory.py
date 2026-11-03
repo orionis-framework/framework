@@ -1,3 +1,5 @@
+"""In-process session store backed by a plain dictionary."""
+
 from copy import deepcopy
 from datetime import UTC, datetime
 from typing import TYPE_CHECKING
@@ -20,6 +22,7 @@ class MemorySessionStore(ISessionStore):
     """
 
     __slots__ = ("_storage",)
+    """Declare the instance attribute slots reserved by this class."""
 
     def __init__(self) -> None:
         """
@@ -28,8 +31,10 @@ class MemorySessionStore(ISessionStore):
         Returns
         -------
         None
+            Initialise an empty in-memory session store.
         """
         self._storage: dict[str, SessionRecord] = {}
+        """Entries retained by the in-memory storage backend."""
 
     async def read(self, session_id: str) -> SessionRecord | None:
         """
@@ -42,7 +47,7 @@ class MemorySessionStore(ISessionStore):
 
         Returns
         -------
-        SessionRecord | None
+        orionis.session.entities.record.SessionRecord | None
             The stored record, or ``None`` when absent.
         """
         record = self._storage.get(session_id)
@@ -62,21 +67,23 @@ class MemorySessionStore(ISessionStore):
 
         Parameters
         ----------
-        record : SessionRecord
+        record : orionis.session.entities.record.SessionRecord
             The record to persist.
 
         Returns
         -------
         None
+            Insert or replace the record keyed by its identifier.
         """
         self._storage[record.id] = deepcopy(record)
 
     async def update(self, record: SessionRecord) -> bool:
-        """Replace a live record without yielding between checking and writing.
+        """
+        Replace a live record without yielding between checking and writing.
 
         Parameters
         ----------
-        record : SessionRecord
+        record : orionis.session.entities.record.SessionRecord
             Replacement record.
 
         Returns
@@ -116,6 +123,7 @@ class MemorySessionStore(ISessionStore):
         Returns
         -------
         None
+            Evict all records whose ``expires_at`` is in the past.
         """
         now = datetime.now(UTC)
         expired = [

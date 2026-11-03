@@ -1,3 +1,5 @@
+"""Load and cache values from a resolved dotenv file."""
+
 from __future__ import annotations
 import os
 import ast
@@ -11,35 +13,43 @@ from orionis.environment.dynamic.caster import EnvironmentCaster
 
 # Module-level constants computed once — eliminates per-call allocations
 _NULL_VALUES: frozenset[str] = frozenset({"none", "null", "nan", "nil"})
+"""Module-level constants computed once — eliminates per-call allocations."""
 _ENV_TYPE_PREFIXES: frozenset[str] = frozenset(e.value for e in EnvironmentValueType)
+"""Env type prefixes used by ``dot_env``."""
 
 class DotEnv(metaclass=Singleton):
 
     # ruff: noqa: PLR0911, FBT001
+    """Load and cache values from a resolved dotenv file."""
 
     __slots__ = ("__cache", "__resolved_path")
+    """Declare the instance attribute slots reserved by this class."""
 
     # Lock to ensure thread safety during initialization and
     # operations that modify the .env file
     _lock = threading.Lock()
+    """
+    Lock to ensure thread safety during initialization and operations that modify
+    the .env file.
+    """
 
     def __init__(
         self,
         path: str | None = None,
     ) -> None:
         """
-        Initialize the DotEnv service and prepare the `.env` file.
+        Initialize the DotEnv service and prepare the ``.env`` file.
 
         Parameters
         ----------
         path : str or None, optional
-            Path to the `.env` file. Defaults to `.env` in the current working
+            Path to the ``.env`` file. Defaults to ``.env`` in the current working
             directory.
 
         Raises
         ------
         OSError
-            If the `.env` file cannot be created or accessed.
+            If the ``.env`` file cannot be created or accessed.
         RuntimeError
             If an unexpected error occurs during initialization.
 
@@ -54,6 +64,7 @@ class DotEnv(metaclass=Singleton):
 
                 # Set the default .env file path to the current working directory.
                 self.__resolved_path = Path.cwd() / ".env"
+                """Set the default .env file path to the current working directory."""
 
                 # If a custom path is provided, resolve and use it.
                 if path:
@@ -68,6 +79,7 @@ class DotEnv(metaclass=Singleton):
 
                 # Keep parsed .env values in memory for subsequent reads.
                 self.__cache: dict[str, str] = dict(dotenv_values(self.__resolved_path))
+                """Keep parsed .env values in memory for subsequent reads."""
 
         except OSError as e:
 
@@ -95,7 +107,7 @@ class DotEnv(metaclass=Singleton):
         only_os: bool = False,
     ) -> bool:
         """
-        Set an environment variable in the `.env` file and process environment.
+        Set an environment variable in the ``.env`` file and process environment.
 
         Parameters
         ----------
@@ -106,7 +118,7 @@ class DotEnv(metaclass=Singleton):
         type_hint : str | EnvironmentValueType | None, optional
             Type hint to guide serialization of the value.
         only_os : bool, optional
-            If True, set only in the process environment, not in the `.env` file.
+            If True, set only in the process environment, not in the ``.env`` file.
 
         Returns
         -------
@@ -116,20 +128,20 @@ class DotEnv(metaclass=Singleton):
         Raises
         ------
         TypeError
-            If `key` is not a string, if `value` is not one of the supported
-            types, or if `type_hint` is neither a string nor an
-            `EnvironmentValueType`.
+            If ``key`` is not a string, if ``value`` is not one of the supported
+            types, or if ``type_hint`` is neither a string nor an
+            ``EnvironmentValueType``.
         ValueError
-            If `key` is not a valid environment variable name, or if `value`
+            If ``key`` is not a valid environment variable name, or if ``value``
             cannot be serialized for the requested type.
         RuntimeError
-            If `type_hint` is a string that does not name a member of
-            `EnvironmentValueType`.
+            If ``type_hint`` is a string that does not name a member of
+            ``EnvironmentValueType``.
 
         Notes
         -----
         Ensures thread safety, validates the key, serializes the value, writes to
-        the `.env` file, and updates the process environment.
+        the ``.env`` file, and updates the process environment.
         """
         # Ensure thread-safe operation during the set process.
         with self._lock:
@@ -173,15 +185,15 @@ class DotEnv(metaclass=Singleton):
         Returns
         -------
         object
-            Parsed value of the environment variable if found, otherwise `default`.
+            Parsed value of the environment variable if found, otherwise ``default``.
 
         Raises
         ------
         TypeError
-            If `key` is not a string, or if the stored value is incompatible
+            If ``key`` is not a string, or if the stored value is incompatible
             with its declared type.
         ValueError
-            If `key` is not a valid environment variable name, or if the stored
+            If ``key`` is not a valid environment variable name, or if the stored
             value cannot be decoded for its declared type.
         """
         # Ensure thread-safe operation while retrieving the environment variable.
@@ -204,14 +216,15 @@ class DotEnv(metaclass=Singleton):
         only_os: bool = False,
     ) -> bool:
         """
-        Remove an environment variable from the `.env` file and process environment.
+        Remove an environment variable from the ``.env`` file and process environment.
 
         Parameters
         ----------
         key : str
             Name of the environment variable to remove.
         only_os : bool, optional
-            If True, remove only from the process environment, not from the `.env` file.
+            If True, remove only from the process environment, not from the ``.env``
+            file.
 
         Returns
         -------
@@ -221,9 +234,9 @@ class DotEnv(metaclass=Singleton):
         Raises
         ------
         TypeError
-            If `key` is not a string.
+            If ``key`` is not a string.
         ValueError
-            If `key` is not a valid environment variable name.
+            If ``key`` is not a valid environment variable name.
 
         Notes
         -----
@@ -248,13 +261,13 @@ class DotEnv(metaclass=Singleton):
 
     def all(self) -> dict:
         """
-        Return all environment variables from the resolved `.env` file.
+        Return all environment variables from the resolved ``.env`` file.
 
         Returns
         -------
         dict
             Dictionary mapping environment variable names (str) to their parsed
-            Python values. Only variables present in the `.env` file are included.
+            Python values. Only variables present in the ``.env`` file are included.
         """
         # Acquire lock for thread-safe access to the .env file.
         with self._lock:
@@ -335,8 +348,8 @@ class DotEnv(metaclass=Singleton):
         Notes
         -----
         Recognizes 'none', 'null', 'nan', 'nil' (case-insensitive) as null
-        values. Attempts to use `EnvironmentCaster` for advanced type parsing.
-        Falls back to `ast.literal_eval` for literal evaluation. Returns the
+        values. Attempts to use ``EnvironmentCaster`` for advanced type parsing.
+        Falls back to ``ast.literal_eval`` for literal evaluation. Returns the
         original string if all parsing attempts fail.
         """
         # Return None if the value is None
@@ -380,9 +393,9 @@ class DotEnv(metaclass=Singleton):
 
     def reload(self) -> bool:
         """
-        Reload environment variables from the `.env` file.
+        Reload environment variables from the ``.env`` file.
 
-        Reload all environment variables from the `.env` file into the current
+        Reload all environment variables from the ``.env`` file into the current
         process environment, overriding any existing values.
 
         Returns

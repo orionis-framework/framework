@@ -1,3 +1,9 @@
+"""Provide storage drivers operations.
+
+Includes ``import_driver_dependency``, ``assert_binary_mode``,
+``resolve_download_target``, ``filter_files``.
+"""
+
 from __future__ import annotations
 import importlib
 from pathlib import Path, PurePosixPath
@@ -15,6 +21,7 @@ if TYPE_CHECKING:
 _ALLOWED_MODES: frozenset[str] = frozenset(
     {"rb", "wb", "ab", "rb+", "wb+", "ab+"},
 )
+"""Binary modes accepted by driver open() implementations."""
 
 def import_driver_dependency(module: str, package: str, extra: str) -> ModuleType:
     """
@@ -37,12 +44,12 @@ def import_driver_dependency(module: str, package: str, extra: str) -> ModuleTyp
 
     Returns
     -------
-    ModuleType
+    types.ModuleType
         The imported module.
 
     Raises
     ------
-    MissingStorageDependencyException
+    orionis.storage.exceptions.MissingStorageDependencyException
         If the package is not installed in the active environment.
     """
     try:
@@ -66,10 +73,11 @@ def assert_binary_mode(mode: str) -> None:
     Returns
     -------
     None
+        Validate a stream mode against the supported binary modes.
 
     Raises
     ------
-    UnsupportedStorageOperationException
+    orionis.storage.exceptions.UnsupportedStorageOperationException
         If *mode* is not one of ``'rb'``, ``'wb'``, ``'ab'``,
         ``'rb+'``, ``'wb+'``, or ``'ab+'``.
     """
@@ -89,12 +97,12 @@ def resolve_download_target(normalized: str, destination: str | Path) -> Path:
     ----------
     normalized : str
         Canonical root-relative path of the remote file.
-    destination : str | Path
+    destination : str | pathlib.Path
         Local target file or existing directory.
 
     Returns
     -------
-    Path
+    pathlib.Path
         Local path where the file must be written.
     """
     target = Path(destination)
@@ -119,7 +127,7 @@ def filter_files(
 
     Parameters
     ----------
-    keys : Iterable[str]
+    keys : collections.abc.Iterable[str]
         Object keys, relative to the disk root.
     base : str
         Canonical directory path acting as the listing root. The
@@ -190,7 +198,7 @@ def derive_directories(
 
     Parameters
     ----------
-    keys : Iterable[str]
+    keys : collections.abc.Iterable[str]
         Object keys, relative to the disk root.
     base : str
         Canonical directory path acting as the listing root. The
@@ -224,6 +232,7 @@ _LEGACY_EXPORTS = {
     "filterFiles": filter_files,
     "deriveDirectories": derive_directories,
 }
+"""Legacy exports definitions used by ``functions``."""
 
 def __getattr__(name: str) -> object:
     """

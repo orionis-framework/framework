@@ -1,3 +1,5 @@
+"""Hash passwords with bcrypt."""
+
 from typing import TYPE_CHECKING, Any, Self
 from orionis.hashing.contracts.hasher import IHasher
 from orionis.hashing.exceptions import HashConfigurationException
@@ -11,13 +13,19 @@ if TYPE_CHECKING:
 
 # Backend location and distribution name reported when it is missing
 _BACKEND_MODULE: str = "pwdlib.hashers.bcrypt"
+"""Backend location and distribution name reported when it is missing."""
 _BACKEND_CLASS: str = "BcryptHasher"
+"""Backend class identifier: ``BcryptHasher``."""
 _BACKEND_PACKAGE: str = "pwdlib[bcrypt]"
+"""Backend package identifier: ``pwdlib[bcrypt]``."""
 
 # Bounds imposed by the bcrypt algorithm itself
 MIN_ROUNDS: int = 4
+"""Bounds imposed by the bcrypt algorithm itself."""
 MAX_ROUNDS: int = 31
+"""Max rounds value used by ``bcrypt_hasher``."""
 DEFAULT_ROUNDS: int = 12
+"""Default rounds value used by ``bcrypt_hasher``."""
 
 class BcryptHasher(IHasher):
     """Hash passwords with bcrypt.
@@ -35,6 +43,7 @@ class BcryptHasher(IHasher):
     """
 
     __slots__ = ("_backend", "_backend_class", "_executor", "_rounds")
+    """Declare the instance attribute slots reserved by this class."""
 
     def __init__(
         self: Self,
@@ -50,7 +59,7 @@ class BcryptHasher(IHasher):
         rounds : int
             Cost factor, expressed as the base-2 logarithm of the
             iteration count.
-        executor : BoundedExecutor | None
+        executor : orionis.support.concurrency.BoundedExecutor | None
             Caller-owned dedicated executor, or the shared bounded hashing pool.
 
         Returns
@@ -60,16 +69,23 @@ class BcryptHasher(IHasher):
 
         Raises
         ------
-        HashConfigurationException
+        orionis.hashing.exceptions.HashConfigurationException
             If ``rounds`` falls outside the range supported by bcrypt.
         """
         self._rounds = self._validate(rounds)
+        """Cost factor, expressed as the base-2 logarithm of the iteration count."""
         self._executor = HASH_WORKERS if executor is None else executor
+        """Caller-owned dedicated executor, or the shared bounded hashing pool."""
 
         # The backend is imported and built on first use to keep the
         # driver constructible even when the dependency is absent.
         self._backend_class: Any = None
+        """
+        The backend is imported and built on first use to keep the driver
+        constructible even when the dependency is absent.
+        """
         self._backend: Any = None
+        """Backend implementation used to perform the configured operation."""
 
     @staticmethod
     def _validate(rounds: int) -> int:
@@ -88,7 +104,7 @@ class BcryptHasher(IHasher):
 
         Raises
         ------
-        HashConfigurationException
+        orionis.hashing.exceptions.HashConfigurationException
             If the value is not an integer within the supported range.
         """
         if (
@@ -109,12 +125,12 @@ class BcryptHasher(IHasher):
 
         Returns
         -------
-        Any
+        typing.Any
             Backend class provided by the underlying library.
 
         Raises
         ------
-        MissingHashDependencyException
+        orionis.hashing.exceptions.MissingHashDependencyException
             If the backend package is not installed.
         """
         if self._backend_class is None:
@@ -136,7 +152,7 @@ class BcryptHasher(IHasher):
 
         Returns
         -------
-        Any
+        typing.Any
             Configured backend instance.
         """
         return self._backendClass()(rounds=rounds)
@@ -147,7 +163,7 @@ class BcryptHasher(IHasher):
 
         Returns
         -------
-        Any
+        typing.Any
             Backend instance reused across calls.
         """
         if self._backend is None:
@@ -183,7 +199,7 @@ class BcryptHasher(IHasher):
 
         Raises
         ------
-        HashConfigurationException
+        orionis.hashing.exceptions.HashConfigurationException
             If ``rounds`` falls outside the range supported by bcrypt.
         """
         # Reuse the cached backend unless the call overrides the cost
@@ -221,7 +237,7 @@ class BcryptHasher(IHasher):
 
         Raises
         ------
-        HashConfigurationException
+        orionis.hashing.exceptions.HashConfigurationException
             If ``rounds`` falls outside the range supported by bcrypt.
         """
         return await self._executor.run(
@@ -328,12 +344,12 @@ class BcryptHasher(IHasher):
 
         Returns
         -------
-        Self
+        typing.Self
             The same instance, allowing fluent configuration.
 
         Raises
         ------
-        HashConfigurationException
+        orionis.hashing.exceptions.HashConfigurationException
             If the value falls outside the range supported by bcrypt.
         """
         self._rounds = self._validate(rounds)

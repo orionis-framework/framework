@@ -1,3 +1,5 @@
+"""Provide awaitable, chainable results of template rendering."""
+
 from __future__ import annotations
 import re
 from typing import TYPE_CHECKING, Any, Self
@@ -14,10 +16,16 @@ if TYPE_CHECKING:
 # Closure qualname noise (e.g. ``_global_csrf_field.<locals>.``) leaked by
 # errors raised inside template globals; irrelevant for the developer.
 _LOCALS_QUALNAME = re.compile(r"[\w.]*<locals>\.")  # NOSONAR
+"""
+Closure qualname noise (e.g. ``_global_csrf_field.<locals>.``) leaked by errors
+raised inside template globals; irrelevant for the developer.
+"""
 
 class PendingView(_FlashData):
     """
-    Awaitable, chainable result of :meth:`IViewFactory.make`.
+    Represent an awaitable, chainable template rendering result.
+
+    Created by :meth:`orionis.view.contracts.factory.IViewFactory.make`.
 
     Rendering is deferred until the object is awaited, so response
     mutators such as ``withInput()``, ``withErrors()``, ``withFlash()``
@@ -25,13 +33,14 @@ class PendingView(_FlashData):
 
         return await View.make("auth.login").withErrors(errors)
 
-    Every attribute that exists on :class:`HTMLResponse` is accepted and
+    Every attribute that exists on :class:`orionis.http.HTMLResponse` is accepted and
     replayed on the real response once the template has been rendered.
     """
 
     # ruff: noqa: ANN401, BLE001
 
     __slots__ = ("_context", "_engine", "_flash", "_mutations", "_template")
+    """Declare the instance attribute slots reserved by this class."""
 
     def __init__(
         self: Self,
@@ -44,26 +53,32 @@ class PendingView(_FlashData):
 
         Parameters
         ----------
-        engine : IViewEngine
+        engine : orionis.view.contracts.engine.IViewEngine
             Engine used to render the template once awaited.
         template : str
             Template name using dot notation or a relative path.
-        context : dict[str, Any]
+        context : dict[str, typing.Any]
             Template variables forwarded to the engine.
 
         Returns
         -------
         None
+            Store the rendering intent without performing any work.
         """
         self._engine: IViewEngine = engine
+        """Engine used to render the template once awaited."""
         self._template: str = template
+        """Template name using dot notation or a relative path."""
         self._context: dict[str, Any] = context
+        """Template variables forwarded to the engine."""
         self._mutations: list[tuple[str, tuple, dict]] | None = None
+        """Response changes queued while configuring the pending view."""
         self._flash: dict[str, Any] | None = None
+        """Session values scheduled for availability during the next request."""
 
     def __getattr__(self: Self, name: str) -> Callable[..., PendingView]:
         """
-        Queue a :class:`HTMLResponse` call to replay after rendering.
+        Queue a :class:`orionis.http.HTMLResponse` call to replay after rendering.
 
         Parameters
         ----------
@@ -72,13 +87,13 @@ class PendingView(_FlashData):
 
         Returns
         -------
-        Callable[..., PendingView]
+        collections.abc.Callable[``...``, orionis.view.pending.PendingView]
             Callable that records the invocation and returns ``self``.
 
         Raises
         ------
         AttributeError
-            If :class:`HTMLResponse` exposes no callable named *name*.
+            If :class:`orionis.http.HTMLResponse` exposes no callable named *name*.
         """
         if not callable(getattr(HTMLResponse, name, None)):
             error_msg = f"'{type(self).__name__}' object has no attribute '{name}'"
@@ -90,14 +105,14 @@ class PendingView(_FlashData):
 
             Parameters
             ----------
-            *args : Any
+            *args : typing.Any
                 Positional arguments for the response method.
-            **kwargs : Any
+            **kwargs : typing.Any
                 Keyword arguments for the response method.
 
             Returns
             -------
-            PendingView
+            orionis.view.pending.PendingView
                 The same pending view for fluent chaining.
             """
             mutations = self._mutations
@@ -114,25 +129,25 @@ class PendingView(_FlashData):
 
         Returns
         -------
-        Generator[Any, None, HTMLResponse]
+        collections.abc.Generator[typing.Any, None, orionis.http.HTMLResponse]
             Generator yielding control until the response is ready.
         """
         return self.render().__await__()
 
     async def render(self: Self) -> HTMLResponse:
         """
-        Render the template into a fully formed :class:`HTMLResponse`.
+        Render the template into a fully formed :class:`orionis.http.HTMLResponse`.
 
         Returns
         -------
-        HTMLResponse
+        orionis.http.HTMLResponse
             An HTTP response whose body is the rendered HTML content.
 
         Raises
         ------
-        ViewTemplateNotFoundException
+        orionis.view.exceptions.ViewTemplateNotFoundException
             When the view file cannot be located.
-        ViewRenderException
+        orionis.view.exceptions.ViewRenderException
             When rendering fails for any reason.
         """
         if self._flash:
@@ -174,6 +189,7 @@ class PendingView(_FlashData):
         Returns
         -------
         None
+            Write the queued flash data into the active session.
         """
         try:
             session: ISession = await Session.resolve()

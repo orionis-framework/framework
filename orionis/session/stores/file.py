@@ -1,3 +1,5 @@
+"""Session store that persists each session as a JSON file on disk."""
+
 import asyncio
 import contextlib
 import os
@@ -27,9 +29,9 @@ class _SessionPayload(msgspec.Struct, frozen=True, gc=False):
     ----------
     id : str
         Unique session identifier.
-    expires_at : datetime
+    expires_at : datetime.datetime
         Expiration timestamp in UTC.
-    data : dict[str, Any]
+    data : dict[str, typing.Any]
         Session key-value data.
     """
 
@@ -40,16 +42,26 @@ class _SessionPayload(msgspec.Struct, frozen=True, gc=False):
 # Codecs built once: msgspec resolves the struct layout at construction time
 # instead of on every encode/decode call.
 _ENCODER = _msgspec_json.Encoder()
+"""
+Codecs built once: msgspec resolves the struct layout at construction time instead
+of on every encode/decode call.
+"""
 _DECODER = _msgspec_json.Decoder(_SessionPayload)
+"""Decoder used by ``file``."""
 
 # A staging file younger than this may still belong to an in-flight write.
 _STALE_TEMP_SECONDS: float = 3600.0
+"""A staging file younger than this may still belong to an in-flight write."""
 
 # Windows refuses a rename while another process swaps the same destination.
 _REPLACE_ATTEMPTS: int = 3
+"""Windows refuses a rename while another process swaps the same destination."""
 _REPLACE_BACKOFF_SECONDS: float = 0.005
+"""Replace backoff seconds value used by ``file``."""
 _LOCK_STRIPES: int = 64
+"""Lock stripes value used by ``file``."""
 _VALID_ID = re.compile(r"[A-Za-z0-9_-]{1,255}\Z")
+"""Compiled pattern used to recognize valid id."""
 
 class FileSessionStore(ISessionStore):
     """
@@ -59,9 +71,11 @@ class FileSessionStore(ISessionStore):
     inside *directory*.  The directory is created on instantiation when
     it does not already exist.
 
-    Expired sessions are evicted lazily during :meth:`read`, keeping
+    Expired sessions are evicted lazily during
+    :meth:`orionis.session.stores.file.FileSessionStore.read`, keeping
     hot-path operations at *O(1)* complexity.  Bulk removal of stale
-    files can be triggered explicitly via :meth:`gc`.
+    files can be triggered explicitly via
+    :meth:`orionis.session.stores.file.FileSessionStore.gc`.
 
     File layout
     -----------
@@ -75,11 +89,12 @@ class FileSessionStore(ISessionStore):
 
     Parameters
     ----------
-    directory : Path
+    directory : pathlib.Path
         Path to the directory where session files are stored.
     """
 
     __slots__ = ("_directory", "_locks", "_rename_lock")
+    """Declare the instance attribute slots reserved by this class."""
 
     def __init__(self, directory: Path) -> None:
         """
@@ -87,23 +102,30 @@ class FileSessionStore(ISessionStore):
 
         Parameters
         ----------
-        directory : Path
+        directory : pathlib.Path
             Filesystem path to the session storage directory.
 
         Returns
         -------
         None
+            Initialise the store and ensure the storage directory exists.
         """
         self._directory = directory
+        """Filesystem path to the session storage directory."""
         self._directory.mkdir(parents=True, exist_ok=True)
 
         # Writes run on worker threads, so publishing two payloads for the
         # same session must not overlap inside this process.
         self._rename_lock = threading.Lock()
+        """
+        Writes run on worker threads, so publishing two payloads for the same
+        session must not overlap inside this process.
+        """
         self._locks = tuple(
             FileLock(directory / f".session-lock-{index}", timeout=10)
             for index in range(_LOCK_STRIPES)
         )
+        """Locks produced by ``tuple``."""
 
     def _lock(self, path: Path) -> BaseFileLock:
         """
@@ -111,12 +133,12 @@ class FileSessionStore(ISessionStore):
 
         Parameters
         ----------
-        path : Path
+        path : pathlib.Path
             Session file protected by the lock.
 
         Returns
         -------
-        BaseFileLock
+        ``filelock.BaseFileLock``
             Platform lock serializing validation, replacement and deletion.
         """
         return self._locks[crc32(path.name.encode()) % _LOCK_STRIPES]
@@ -136,12 +158,12 @@ class FileSessionStore(ISessionStore):
 
         Returns
         -------
-        Path
+        pathlib.Path
             Full path to ``{session_id}.json`` inside the store directory.
 
         Raises
         ------
-        SessionStorageException
+        orionis.session.exceptions.SessionStorageException
             If an identifier contains path syntax or exceeds its limit.
         """
         if not isinstance(session_id, str) or _VALID_ID.fullmatch(session_id) is None:
@@ -155,7 +177,7 @@ class FileSessionStore(ISessionStore):
 
         Parameters
         ----------
-        record : SessionRecord
+        record : orionis.session.entities.record.SessionRecord
             Record to serialise.
 
         Returns
@@ -172,19 +194,21 @@ class FileSessionStore(ISessionStore):
 
     def _deserialize(self, raw: bytes) -> SessionRecord | None:
         """
-        Decode *raw* JSON bytes into a :class:`SessionRecord`.
+        Decode JSON bytes into a session record.
 
-        Type validation is delegated entirely to ``msgspec``; any
-        structural mismatch or missing field is treated as corruption.
+        Return a :class:`orionis.session.entities.record.SessionRecord` instance.
+        Type validation is delegated entirely to ``msgspec``; any structural
+        mismatch or missing field is treated as corruption.
 
         Parameters
         ----------
         raw : bytes
-            Raw JSON bytes previously written by :meth:`_serialize`.
+            Raw JSON bytes previously written by
+            :meth:`orionis.session.stores.file.FileSessionStore._serialize`.
 
         Returns
         -------
-        SessionRecord | None
+        orionis.session.entities.record.SessionRecord | None
             Deserialised record, or ``None`` on any decode error.
         """
         try:
@@ -203,7 +227,7 @@ class FileSessionStore(ISessionStore):
 
         Parameters
         ----------
-        path : Path
+        path : pathlib.Path
             File to read.
 
         Returns
@@ -223,12 +247,12 @@ class FileSessionStore(ISessionStore):
 
         Parameters
         ----------
-        path : Path
+        path : pathlib.Path
             Final destination file.
 
         Returns
         -------
-        Path
+        pathlib.Path
             Sibling path carrying a random infix, so concurrent writers of the
             same session never share a staging file, and still ending in
             ``.tmp`` so the sweep keeps telling both apart.
@@ -245,7 +269,7 @@ class FileSessionStore(ISessionStore):
 
         Parameters
         ----------
-        path : Path
+        path : pathlib.Path
             Destination file path.
         content : bytes
             Serialised session payload.
@@ -253,6 +277,7 @@ class FileSessionStore(ISessionStore):
         Returns
         -------
         None
+            Atomically write *content* to *path*.
 
         Raises
         ------
@@ -277,14 +302,15 @@ class FileSessionStore(ISessionStore):
 
         Parameters
         ----------
-        tmp : Path
+        tmp : pathlib.Path
             Staging file holding the serialised payload.
-        path : Path
+        path : pathlib.Path
             Destination session file.
 
         Returns
         -------
         None
+            Publish *tmp* as *path*, retrying a transient sharing violation.
 
         Raises
         ------
@@ -309,7 +335,7 @@ class FileSessionStore(ISessionStore):
 
         Parameters
         ----------
-        path : Path
+        path : pathlib.Path
             Session file to remove.
 
         Returns
@@ -333,12 +359,12 @@ class FileSessionStore(ISessionStore):
 
         Parameters
         ----------
-        path : Path
+        path : pathlib.Path
             Session file to load.
 
         Returns
         -------
-        SessionRecord | None
+        orionis.session.entities.record.SessionRecord | None
             The live record, or ``None`` when absent, expired or corrupt.
         """
         with self._lock(path):
@@ -363,26 +389,28 @@ class FileSessionStore(ISessionStore):
 
         Parameters
         ----------
-        path : Path
+        path : pathlib.Path
             Destination session file.
-        record : SessionRecord
+        record : orionis.session.entities.record.SessionRecord
             The record to persist.
 
         Returns
         -------
         None
+            Serialise *record* and store it atomically at *path*.
         """
         with self._lock(path):
             self._writeFile(path, self._serialize(record))
 
     def _updateRecord(self, path: Path, record: SessionRecord) -> bool:
-        """Replace an existing live session under its cross-process lock.
+        """
+        Replace an existing live session under its cross-process lock.
 
         Parameters
         ----------
-        path : Path
+        path : pathlib.Path
             Existing session file.
-        record : SessionRecord
+        record : orionis.session.entities.record.SessionRecord
             Replacement record.
 
         Returns
@@ -400,7 +428,7 @@ class FileSessionStore(ISessionStore):
         """
         Scan the store directory and remove stale or corrupt files.
 
-        Uses :func:`os.scandir` for reduced object allocation and
+        Uses ``os.scandir`` for reduced object allocation and
         filesystem cache reuse.  A session file is removed when it is
         expired, contains invalid JSON, is structurally incomplete, or
         cannot be read due to an I/O error.  Staging files left behind by
@@ -410,6 +438,7 @@ class FileSessionStore(ISessionStore):
         Returns
         -------
         None
+            Scan the store directory and remove stale or corrupt files.
         """
         stale_before = time.time() - _STALE_TEMP_SECONDS
         with os.scandir(self._directory) as it:
@@ -447,7 +476,7 @@ class FileSessionStore(ISessionStore):
 
         Returns
         -------
-        SessionRecord | None
+        orionis.session.entities.record.SessionRecord | None
             The live record, or ``None`` when absent, expired, or corrupt.
         """
         return await asyncio.to_thread(self._readRecord, self._path(session_id))
@@ -458,21 +487,23 @@ class FileSessionStore(ISessionStore):
 
         Parameters
         ----------
-        record : SessionRecord
+        record : orionis.session.entities.record.SessionRecord
             The record to store.
 
         Returns
         -------
         None
+            Serialise and persist *record* to disk atomically.
         """
         await asyncio.to_thread(self._writeRecord, self._path(record.id), record)
 
     async def update(self, record: SessionRecord) -> bool:
-        """Update only a live session without recreating a deleted file.
+        """
+        Update only a live session without recreating a deleted file.
 
         Parameters
         ----------
-        record : SessionRecord
+        record : orionis.session.entities.record.SessionRecord
             Replacement record.
 
         Returns
@@ -507,11 +538,14 @@ class FileSessionStore(ISessionStore):
 
         The directory scan runs on a thread-pool worker so it never
         blocks the event loop.  This method must be called explicitly;
-        it is never triggered automatically by :meth:`read`,
-        :meth:`write`, or :meth:`delete`.
+        it is never triggered automatically by
+        :meth:`orionis.session.stores.file.FileSessionStore.read`,
+        :meth:`orionis.session.stores.file.FileSessionStore.write`, or
+        :meth:`orionis.session.stores.file.FileSessionStore.delete`.
 
         Returns
         -------
         None
+            Remove all expired, corrupt, or incomplete session files.
         """
         await asyncio.to_thread(self._gcSweep)

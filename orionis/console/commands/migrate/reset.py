@@ -1,3 +1,5 @@
+"""Revert every migration recorded on the connection."""
+
 from orionis.console.commands.migrate.base import MigrationCommand
 from orionis.database.migrations.migrator import Migrator
 
@@ -7,7 +9,9 @@ class MigrateResetCommand(MigrationCommand):
     # ruff: noqa: TC001
 
     signature: str = "migrate:reset"
+    """Signature identifier: ``migrate:reset``."""
     description: str = "Reverts every applied database migration."
+    """Description identifier: ``Reverts every applied database migration.``."""
 
     async def handle(self, migrator: Migrator) -> None:
         """
@@ -15,7 +19,7 @@ class MigrateResetCommand(MigrationCommand):
 
         Parameters
         ----------
-        migrator : Migrator
+        migrator : orionis.database.migrations.Migrator
             Service that discovers and reverts applied migrations.
 
         Returns

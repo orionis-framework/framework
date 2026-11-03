@@ -1,3 +1,8 @@
+"""Provide orm query operations.
+
+Includes ``WhereType``, ``LockMode``, ``SortDirection``, ``AggregateFunction``.
+"""
+
 from __future__ import annotations
 from dataclasses import dataclass, field
 from enum import StrEnum
@@ -13,30 +18,51 @@ SUPPORTED_OPERATORS: frozenset[str] = frozenset(
         "like", "not like", "ilike", "not ilike",
     },
 )
+"""Comparison operators accepted by basic where clauses."""
 
 class WhereType(StrEnum):
     """Kinds of where clauses supported by the query language."""
 
     BASIC = "basic"
+    """Basic identifier: ``basic``."""
     IN = "in"
+    """In identifier: ``in``."""
     NOT_IN = "not_in"
+    """Not in identifier: ``not_in``."""
     NULL = "null"
+    """Null identifier: ``null``."""
     NOT_NULL = "not_null"
+    """Not null identifier: ``not_null``."""
     BETWEEN = "between"
+    """Between identifier: ``between``."""
     NOT_BETWEEN = "not_between"
+    """Not between identifier: ``not_between``."""
     LIKE = "like"
+    """Like identifier: ``like``."""
     NOT_LIKE = "not_like"
+    """Not like identifier: ``not_like``."""
     ILIKE = "ilike"
+    """Ilike identifier: ``ilike``."""
     NOT_ILIKE = "not_ilike"
+    """Not ilike identifier: ``not_ilike``."""
     STARTS_WITH = "starts_with"
+    """Starts with identifier: ``starts_with``."""
     ENDS_WITH = "ends_with"
+    """Ends with identifier: ``ends_with``."""
     CONTAINS = "contains"
+    """Contains identifier: ``contains``."""
     REGEXP = "regexp"
+    """Regexp identifier: ``regexp``."""
     NESTED = "nested"
+    """Nested identifier: ``nested``."""
     COLUMN = "column"
+    """Column identifier: ``column``."""
     RAW = "raw"
+    """Raw identifier: ``raw``."""
     EXISTS = "exists"
+    """Exists identifier: ``exists``."""
     NOT_EXISTS = "not_exists"
+    """Not exists identifier: ``not_exists``."""
 
 # Clause kinds whose ``column`` field carries no column reference.
 COLUMNLESS_WHERE_TYPES: frozenset[WhereType] = frozenset({
@@ -45,36 +71,51 @@ COLUMNLESS_WHERE_TYPES: frozenset[WhereType] = frozenset({
     WhereType.EXISTS,
     WhereType.NOT_EXISTS,
 })
+"""Clause kinds whose ``column`` field carries no column reference."""
 
 class LockMode(StrEnum):
     """Row locking modes supported by select plans."""
 
     UPDATE = "update"
+    """Update identifier: ``update``."""
     SHARE = "share"
+    """Share identifier: ``share``."""
 
 class SortDirection(StrEnum):
     """Sort directions supported by order clauses."""
 
     ASC = "asc"
+    """Asc identifier: ``asc``."""
     DESC = "desc"
+    """Desc identifier: ``desc``."""
 
 class AggregateFunction(StrEnum):
     """Aggregate functions supported by the query language."""
 
     COUNT = "count"
+    """Count identifier: ``count``."""
     MAX = "max"
+    """Max identifier: ``max``."""
     MIN = "min"
+    """Min identifier: ``min``."""
     AVG = "avg"
+    """Avg identifier: ``avg``."""
     SUM = "sum"
+    """Sum identifier: ``sum``."""
 
 class JoinType(StrEnum):
     """Join kinds supported by the query language."""
 
     INNER = "inner"
+    """Inner identifier: ``inner``."""
     LEFT = "left"
+    """Left identifier: ``left``."""
     RIGHT = "right"
+    """Right identifier: ``right``."""
     FULL = "full"
+    """Full identifier: ``full``."""
     CROSS = "cross"
+    """Cross identifier: ``cross``."""
 
 @dataclass(slots=True, frozen=True)
 class RawExpression:
@@ -107,7 +148,7 @@ class SubQueryColumn:
 
     Attributes
     ----------
-    plan : SelectPlan
+    plan : orionis.orm.query.SelectPlan
         Subquery producing exactly one column and one row.
     alias : str
         Name the projected value is exposed under.
@@ -125,16 +166,18 @@ class WhereClause:
     ----------
     column : str
         Column the condition applies to; empty for clause kinds listed
-        in :data:`COLUMNLESS_WHERE_TYPES`.
-    where_type : WhereType
+        in :data:`orionis.orm.query.expressions.COLUMNLESS_WHERE_TYPES`.
+    where_type : orionis.orm.query.WhereType
         Kind of condition (basic comparison, in, null, between, like,
         nested group, column comparison, raw fragment, or exists).
     operator : str
         Comparison operator for basic and column conditions.
-    value : Any
+    value : typing.Any
         Bound value; a sequence for ``IN`` and ``BETWEEN``, a nested
-        clause list for ``NESTED``, a :class:`SelectPlan` for ``EXISTS``
-        and subquery ``IN``, or a :class:`RawExpression` for ``RAW``.
+        clause list for ``NESTED``, a :class:`orionis.orm.query.SelectPlan` for
+        ``EXISTS``
+        and subquery ``IN``, or a :class:`orionis.orm.query.expressions.RawExpression`
+        for ``RAW``.
     boolean : str
         Logical connector with the previous clause: ``"and"`` or ``"or"``.
     """
@@ -154,7 +197,7 @@ class OrderClause:
     ----------
     column : str
         Column to sort by.
-    direction : SortDirection
+    direction : orionis.orm.query.SortDirection
         Sort direction, ascending by default.
     """
 
@@ -168,7 +211,7 @@ class AggregateClause:
 
     Attributes
     ----------
-    function : AggregateFunction
+    function : orionis.orm.query.AggregateFunction
         Aggregate function to apply.
     column : str
         Target column, or ``"*"`` for ``COUNT``.
@@ -211,16 +254,16 @@ class JoinExpression:
 
     Attributes
     ----------
-    join_type : JoinType
+    join_type : orionis.orm.query.expressions.JoinType
         Kind of join to perform.
-    table : TableDefinition or SelectPlan
+    table : orionis.orm.schema.TableDefinition or orionis.orm.query.SelectPlan
         Joined table description, or a subquery joined as a derived
         table. A table definition carries its own columns so the
         compiler can resolve qualified references without guessing.
     alias : str or None
         Name the joined source is referred to by inside the query, or
         ``None`` to use its logical table name. Required for subqueries.
-    conditions : list of JoinCondition
+    conditions : list of orionis.orm.query.expressions.JoinCondition
         ON conditions combined left to right.
     """
 
@@ -236,7 +279,7 @@ class UnionClause:
 
     Attributes
     ----------
-    plan : SelectPlan
+    plan : orionis.orm.query.SelectPlan
         Query whose rows are appended to the owning query.
     all_rows : bool
         Whether duplicates are kept (``UNION ALL``) or collapsed.
@@ -252,36 +295,36 @@ class SelectPlan:
 
     Attributes
     ----------
-    table : TableDefinition
+    table : orionis.orm.schema.TableDefinition
         Table the query runs against.
     alias : str or None
         Name the main table is referred to by inside the query, or
         ``None`` to use its logical table name. Required to self-join a
         table against itself once joins are composed on top of a plan.
-    joins : list of JoinExpression
+    joins : list of orionis.orm.query.expressions.JoinExpression
         Additional table sources joined onto the main table.
     columns : tuple of str
         Projected columns; empty means all columns. Entries may be
         qualified as ``"table.column"`` once ``joins`` is non-empty.
-    wheres : list of WhereClause
+    wheres : list of orionis.orm.query.WhereClause
         Filtering conditions combined left to right.
-    orders : list of OrderClause
+    orders : list of orionis.orm.query.OrderClause
         Ordering rules.
     groups : list of str
         Grouping columns.
-    havings : list of WhereClause
+    havings : list of orionis.orm.query.WhereClause
         Conditions applied after grouping.
     limit_value : int or None
         Maximum number of rows to return.
     offset_value : int or None
         Number of rows to skip.
-    aggregate : AggregateClause or None
+    aggregate : orionis.orm.query.AggregateClause or None
         Aggregate projection replacing the column list when present.
     distinct : bool
         Whether duplicate rows are collapsed via ``SELECT DISTINCT``.
-    lock : LockMode or None
+    lock : orionis.orm.query.expressions.LockMode or None
         Row locking mode requested for the selected rows.
-    unions : list of UnionClause
+    unions : list of orionis.orm.query.expressions.UnionClause
         Queries appended to this one through ``UNION``.
     """
 
@@ -309,7 +352,7 @@ class SelectPlan:
 
         Returns
         -------
-        SelectPlan
+        orionis.orm.query.SelectPlan
             Detached copy of this plan.
         """
         return SelectPlan(
@@ -336,7 +379,7 @@ class InsertPlan:
 
     Attributes
     ----------
-    table : TableDefinition
+    table : orionis.orm.schema.TableDefinition
         Table receiving the rows.
     values : list of dict
         One dictionary of column values per row to insert.
@@ -352,11 +395,11 @@ class UpdatePlan:
 
     Attributes
     ----------
-    table : TableDefinition
+    table : orionis.orm.schema.TableDefinition
         Table to update.
     values : dict
         Column values to assign.
-    wheres : list of WhereClause
+    wheres : list of orionis.orm.query.WhereClause
         Conditions restricting the affected rows.
     """
 
@@ -371,9 +414,9 @@ class DeletePlan:
 
     Attributes
     ----------
-    table : TableDefinition
+    table : orionis.orm.schema.TableDefinition
         Table to delete from.
-    wheres : list of WhereClause
+    wheres : list of orionis.orm.query.WhereClause
         Conditions restricting the affected rows.
     """
 

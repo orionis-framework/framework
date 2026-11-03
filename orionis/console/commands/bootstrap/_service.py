@@ -135,7 +135,7 @@ class Bootstrapper:
             raise
         return ("CREATED", display_path(self.app, path))
 
-    def _routing_paths(
+    def _routingPaths(
         self, editor: BootstrapEditor, context: str,
     ) -> list[Path]:
         """
@@ -200,7 +200,7 @@ class Bootstrapper:
         return paths
 
     @staticmethod
-    def _validate_route(path: Path) -> None:
+    def _validateRoute(path: Path) -> None:
         """
         Check existing routes with the same import rules as Application.
 
@@ -261,7 +261,7 @@ class Bootstrapper:
             error_msg = f"Unknown bootstrap routing context: {context}"
             raise ValueError(error_msg)
         editor = self._editor()
-        paths = self._routing_paths(editor, context)
+        paths = self._routingPaths(editor, context)
 
         # Validate the edit before making any filesystem changes.
         source = editor.routing(
@@ -272,7 +272,7 @@ class Bootstrapper:
         content = Stub(f"bootstrap_{context}", context).render()
         compile(content, str(paths[0]), "exec")
         for path in paths:
-            self._validate_route(path)
+            self._validateRoute(path)
         # Generate resources only after the edit and existing files are validated.
         actions = [self._file(path, content) for path in paths]
         actions.extend(

@@ -1,3 +1,5 @@
+"""Translate Orionis query plans into engine-executable statements."""
+
 from __future__ import annotations
 import operator
 from typing import TYPE_CHECKING, Any, ClassVar
@@ -45,9 +47,17 @@ if TYPE_CHECKING:
     # A resolvable FROM/JOIN source: either the raw engine Table or an
     # aliased projection of it (``Table.alias(name)``).
     type SqlSource = Any
+    """
+    A resolvable FROM/JOIN source: either the raw engine Table or an aliased
+    projection of it (``Table.alias(name)``).
+    """
     # Table sources reachable by qualified column references, keyed by
     # alias when present or by logical table name otherwise.
     type SourceMap = dict[str, SqlSource]
+    """
+    Table sources reachable by qualified column references, keyed by alias when
+    present or by logical table name otherwise.
+    """
 
 # Comparison operators for basic where clauses.
 _COMPARATORS: dict[str, Callable[[Any, Any], Any]] = {
@@ -60,10 +70,13 @@ _COMPARATORS: dict[str, Callable[[Any, Any], Any]] = {
     ">": operator.gt,
     ">=": operator.ge,
 }
+"""Comparison operators for basic where clauses."""
 
 # Operators whose NULL comparison must compile to IS / IS NOT.
 _EQUALITY_OPERATORS: frozenset[str] = frozenset({"=", "=="})
+"""Operators whose NULL comparison must compile to IS / IS NOT."""
 _INEQUALITY_OPERATORS: frozenset[str] = frozenset({"!=", "<>"})
+"""Inequality operators used by ``compiler``."""
 
 # Pattern-matching operators accepted by basic where clauses.
 _PATTERN_OPERATORS: dict[str, Callable[[Any, Any], Any]] = {
@@ -72,9 +85,11 @@ _PATTERN_OPERATORS: dict[str, Callable[[Any, Any], Any]] = {
     "ilike": lambda col, val: col.ilike(val),
     "not ilike": lambda col, val: col.not_ilike(val),
 }
+"""Pattern-matching operators accepted by basic where clauses."""
 
 # Number of boundaries required by a BETWEEN condition.
 _BETWEEN_BOUNDS: int = 2
+"""Number of boundaries required by a BETWEEN condition."""
 
 # Handlers for where clause kinds with a single-expression translation.
 _SIMPLE_CLAUSES: dict[WhereType, Callable[[Any, Any], Any]] = {
@@ -91,6 +106,7 @@ _SIMPLE_CLAUSES: dict[WhereType, Callable[[Any, Any], Any]] = {
     WhereType.CONTAINS: lambda col, val: col.contains(val),
     WhereType.REGEXP: lambda col, val: col.regexp_match(val),
 }
+"""Handlers for where clause kinds with a single-expression translation."""
 
 class SQLCompiler:
     """
@@ -98,13 +114,20 @@ class SQLCompiler:
 
     This is the only component, together with the connection and the
     dialect helpers, aware of the underlying SQL toolkit. It converts
-    :class:`TableDefinition` objects into engine table metadata (cached
+    :class:`orionis.orm.schema.TableDefinition` objects into engine table metadata
+    (cached
     per compiler) and query plans into executable statements.
+
+    Attributes
+    ----------
+    _TYPE_BUILDERS : dict
+        Factories translating logical column definitions into SQLAlchemy types.
     """
 
     # ruff: noqa: ANN401, PLC0415
 
     __slots__ = ("_definitions", "_driver", "_metadata", "_prefix", "_tables")
+    """Declare the instance attribute slots reserved by this class."""
 
     # Builders translating logical column types into engine types.
     _TYPE_BUILDERS: ClassVar[
@@ -206,10 +229,15 @@ class SQLCompiler:
             Store the settings and create empty metadata and table caches.
         """
         self._prefix = prefix or ""
+        """Text prepended to logical table names; empty by default."""
         self._driver = driver
+        """Orionis backend name for native type, identity, and locking options."""
         self._metadata = MetaData()
+        """Compiled metadata used to describe and invoke the registered operation."""
         self._tables: dict[str, Table] = {}
+        """Table metadata indexed for query compilation or route lookup."""
         self._definitions: dict[str, TableDefinition] = {}
+        """Schema definitions cached for statement compilation."""
 
     # ── Statement compilation ───────────────────────────────────────────────
 
@@ -222,17 +250,17 @@ class SQLCompiler:
 
         Parameters
         ----------
-        plan : SelectPlan
+        plan : orionis.orm.query.SelectPlan
             Projection, sources, conditions, grouping, unions, paging, and locks.
 
         Returns
         -------
-        Select or CompoundSelect
+        ``sqlalchemy.sql.Select`` or ``sqlalchemy.sql.CompoundSelect``
             Executable SELECT; union branches are wrapped in a derived table.
 
         Raises
         ------
-        QueryException
+        orionis.database.QueryException
             If sources or columns are unknown, clauses are invalid, or a Redshift
             row lock is requested.
         """
@@ -277,14 +305,14 @@ class SQLCompiler:
 
         Parameters
         ----------
-        statement : Select
+        statement : ``sqlalchemy.sql.Select``
             Base SELECT without the owning plan's unions, ordering, or paging.
-        plan : SelectPlan
+        plan : orionis.orm.query.SelectPlan
             SELECT plan containing at least one union branch.
 
         Returns
         -------
-        Select
+        ``sqlalchemy.sql.Select``
             SELECT over combined rows with the owning plan's order and bounds.
         """
         branches: list[Any] = [statement]
@@ -315,19 +343,19 @@ class SQLCompiler:
 
         Parameters
         ----------
-        plan : SelectPlan
+        plan : orionis.orm.query.SelectPlan
             SELECT description whose sources and clauses are compiled.
-        outer_sources : SourceMap
+        outer_sources : orionis.database.compiler.SourceMap
             Source lookup from the enclosing query, or an empty mapping.
 
         Returns
         -------
-        Select
+        ``sqlalchemy.sql.Select``
             SELECT with projection, filters, grouping, paging, and requested locks.
 
         Raises
         ------
-        QueryException
+        orionis.database.QueryException
             If references or clauses are invalid, or a Redshift lock is requested.
         """
         self._validateSelectLock(plan)
@@ -386,7 +414,7 @@ class SQLCompiler:
 
         Parameters
         ----------
-        plan : SelectPlan
+        plan : orionis.orm.query.SelectPlan
             Current SELECT plan whose lock setting is checked.
 
         Returns
@@ -396,7 +424,7 @@ class SQLCompiler:
 
         Raises
         ------
-        QueryException
+        orionis.database.QueryException
             If ``plan.lock`` is set for the Redshift backend.
         """
         if self._driver == "redshift" and plan.lock is not None:
@@ -436,7 +464,7 @@ class SQLCompiler:
 
         Parameters
         ----------
-        clauses : Sequence of WhereClause
+        clauses : collections.abc.Sequence of orionis.orm.query.WhereClause
             WHERE or HAVING conditions to inspect recursively.
         names : set of str
             Mutable accumulator for left-hand and column-comparison references.
@@ -465,7 +493,7 @@ class SQLCompiler:
 
         Parameters
         ----------
-        plan : SelectPlan
+        plan : orionis.orm.query.SelectPlan
             SELECT plan whose direct references will be collected.
 
         Returns
@@ -502,7 +530,7 @@ class SQLCompiler:
 
         Parameters
         ----------
-        table : TableDefinition
+        table : orionis.orm.schema.TableDefinition
             Table definition; declared schemas are left unchanged.
         alias : str or None
             Query alias used to match qualified references, or ``None``.
@@ -537,7 +565,7 @@ class SQLCompiler:
 
         Parameters
         ----------
-        plan : SelectPlan
+        plan : orionis.orm.query.SelectPlan
             SELECT plan supplying source definitions and column references.
 
         Returns
@@ -569,17 +597,17 @@ class SQLCompiler:
 
         Parameters
         ----------
-        plan : SelectPlan
+        plan : orionis.orm.query.SelectPlan
             Main table, optional alias, and ordered join descriptions.
 
         Returns
         -------
-        tuple of (SqlSource, SourceMap, SqlSource)
+        tuple of (typing.Any, orionis.database.compiler.SourceMap, typing.Any)
             Main source, source lookup map, and complete FROM/JOIN expression.
 
         Raises
         ------
-        QueryException
+        orionis.database.QueryException
             If a joined source or its ON conditions cannot be compiled.
         """
         table = self._sqlTable(plan.table)
@@ -601,17 +629,17 @@ class SQLCompiler:
 
         Parameters
         ----------
-        join : JoinExpression
+        join : orionis.orm.query.expressions.JoinExpression
             Table or SELECT plan to join, with an optional source alias.
 
         Returns
         -------
-        tuple of (str, SqlSource)
+        tuple of (str, typing.Any)
             Source identifier and table, table alias, or compiled derived query.
 
         Raises
         ------
-        QueryException
+        orionis.database.QueryException
             If a subquery has no alias or its SELECT plan cannot be compiled.
         """
         if isinstance(join.table, SelectPlan):
@@ -637,21 +665,21 @@ class SQLCompiler:
 
         Parameters
         ----------
-        from_clause : SqlSource
+        from_clause : typing.Any
             FROM/JOIN expression built before this join.
-        sources : SourceMap
+        sources : orionis.database.compiler.SourceMap
             Existing sources used to resolve ON-clause column references.
-        join : JoinExpression
+        join : orionis.orm.query.expressions.JoinExpression
             Joined source, join type, and optional ON conditions.
 
         Returns
         -------
-        tuple of (SqlSource, str, SqlSource)
+        tuple of (typing.Any, str, typing.Any)
             Extended FROM clause, joined identifier, and joined source.
 
         Raises
         ------
-        QueryException
+        orionis.database.QueryException
             If a subquery alias is missing or ON conditions are absent or invalid.
         """
         joined_name, joined_source = self._joinSource(join)
@@ -685,23 +713,23 @@ class SQLCompiler:
 
         Parameters
         ----------
-        sources : SourceMap
+        sources : orionis.database.compiler.SourceMap
             Sources available before adding the joined source.
         joined_name : str
             Identifier used to qualify columns from the new source.
-        joined_source : SqlSource
+        joined_source : typing.Any
             Table or derived query introduced by this join.
-        join : JoinExpression
+        join : orionis.orm.query.expressions.JoinExpression
             Join description containing one or more ON conditions.
 
         Returns
         -------
-        ColumnElement
+        ``sqlalchemy.sql.elements.ColumnElement``
             ON expression, using the joined source for unqualified column names.
 
         Raises
         ------
-        QueryException
+        orionis.database.QueryException
             If ON conditions are absent, references are unknown, or operators are
             unsupported.
         """
@@ -730,21 +758,21 @@ class SQLCompiler:
 
         Parameters
         ----------
-        sources : SourceMap
+        sources : orionis.database.compiler.SourceMap
             Sources indexed by alias or logical table name.
-        default : SqlSource
+        default : typing.Any
             Source used to resolve unqualified column names.
-        condition : JoinCondition
+        condition : orionis.orm.query.expressions.JoinCondition
             Left reference, comparison operator, and right reference.
 
         Returns
         -------
-        ColumnElement
+        ``sqlalchemy.sql.elements.ColumnElement``
             Boolean comparison between the resolved column expressions.
 
         Raises
         ------
-        QueryException
+        orionis.database.QueryException
             If either reference is unknown or the comparison operator is unsupported.
         """
         left = self._resolveColumn(sources, default, condition.first)
@@ -766,16 +794,16 @@ class SQLCompiler:
 
         Parameters
         ----------
-        default : SqlSource
+        default : typing.Any
             Main query source and fallback for unqualified references.
-        sources : SourceMap
+        sources : orionis.database.compiler.SourceMap
             Sources indexed by alias or logical table name.
-        plan : SelectPlan
+        plan : orionis.orm.query.SelectPlan
             Aggregate, explicit projections, or default table selection.
 
         Returns
         -------
-        Select
+        ``sqlalchemy.sql.Select``
             SELECT of the requested projection; use literal ``*`` for raw tables.
         """
         # An explicit FROM is only added when the plan has no joins: with
@@ -811,12 +839,12 @@ class SQLCompiler:
 
         Parameters
         ----------
-        raw : RawExpression
+        raw : orionis.orm.query.expressions.RawExpression
             SQL fragment, named parameter values, and optional projection alias.
 
         Returns
         -------
-        ColumnElement or TextClause
+        ``sqlalchemy.sql.elements.ColumnElement`` or ``TextClause``
             Text clause or labeled expression; supplied bindings use unique
             parameters.
         """
@@ -848,16 +876,16 @@ class SQLCompiler:
 
         Parameters
         ----------
-        sources : SourceMap
+        sources : orionis.database.compiler.SourceMap
             Sources indexed by alias or logical table name.
-        default : SqlSource
+        default : typing.Any
             Fallback source for unqualified column names.
-        entry : str or SubQueryColumn or RawExpression
+        entry
             Column reference, correlated scalar subquery, or trusted SQL fragment.
 
         Returns
         -------
-        ColumnElement or TextClause
+        ``sqlalchemy.sql.elements.ColumnElement`` or ``TextClause``
             Resolved column, labeled scalar subquery, or compiled raw expression.
         """
         if isinstance(entry, SubQueryColumn):
@@ -879,23 +907,23 @@ class SQLCompiler:
 
         Parameters
         ----------
-        sources : SourceMap
+        sources : orionis.database.compiler.SourceMap
             Sources indexed by alias or logical table name.
-        default : SqlSource
+        default : typing.Any
             Fallback source for unqualified ordering columns.
-        statement : Select
+        statement : ``sqlalchemy.sql.Select``
             SELECT statement to extend without mutating it.
-        plan : SelectPlan
+        plan : orionis.orm.query.SelectPlan
             Ordering clauses and optional limit and offset values.
 
         Returns
         -------
-        Select
+        ``sqlalchemy.sql.Select``
             SELECT with all requested sorting and pagination clauses applied.
 
         Raises
         ------
-        QueryException
+        orionis.database.QueryException
             If an ordering column or its source cannot be resolved.
         """
         if len(plan.orders) == 1:
@@ -930,7 +958,7 @@ class SQLCompiler:
 
         Parameters
         ----------
-        plan : InsertPlan
+        plan : orionis.orm.query.InsertPlan
             Insert plan with row mappings and optional declared table columns.
 
         Returns
@@ -963,20 +991,20 @@ class SQLCompiler:
 
         Parameters
         ----------
-        plan : InsertPlan
+        plan : orionis.orm.query.InsertPlan
             Target table and one or more row mappings.
         parameterized : bool, optional
             Leave values to execution-time bindings. Defaults to ``False``.
 
         Returns
         -------
-        Insert
+        ``sqlalchemy.sql.Insert``
             INSERT with attached row values, or a parameterized template.
             Parameterized PostgreSQL statements include ``RETURNING 1``.
 
         Raises
         ------
-        QueryException
+        orionis.database.QueryException
             If the plan has no rows or a column type has no SQL type builder.
         """
         if not plan.values:
@@ -1008,17 +1036,17 @@ class SQLCompiler:
 
         Parameters
         ----------
-        plan : UpdatePlan
+        plan : orionis.orm.query.UpdatePlan
             Target table, nonempty assignment mapping, and WHERE conditions.
 
         Returns
         -------
-        Update
+        ``sqlalchemy.sql.Update``
             UPDATE filtered by the plan's conditions, or unrestricted without them.
 
         Raises
         ------
-        QueryException
+        orionis.database.QueryException
             If assignments are empty or columns, types, or conditions are invalid.
         """
         if not plan.values:
@@ -1044,17 +1072,17 @@ class SQLCompiler:
 
         Parameters
         ----------
-        plan : DeletePlan
+        plan : orionis.orm.query.DeletePlan
             Target table and WHERE conditions selecting rows to delete.
 
         Returns
         -------
-        Delete
+        ``sqlalchemy.sql.Delete``
             DELETE filtered by the plan's conditions, or unrestricted without them.
 
         Raises
         ------
-        QueryException
+        orionis.database.QueryException
             If column references, types, or filtering conditions cannot be compiled.
         """
         if not plan.table.columns:
@@ -1081,19 +1109,19 @@ class SQLCompiler:
 
         Parameters
         ----------
-        definition : TableDefinition
+        definition : orionis.orm.schema.TableDefinition
             Logical table name, columns, constraints, schema, and comment.
         if_not_exists : bool, optional
             Request ``IF NOT EXISTS`` in the generated DDL. Defaults to ``True``.
 
         Returns
         -------
-        Executable
+        ``sqlalchemy.sql.expression.Executable``
             CREATE TABLE object using the compiler's prefix and cached metadata.
 
         Raises
         ------
-        QueryException
+        orionis.database.QueryException
             If a declared column type has no SQL type builder.
         """
         table = self._sqlTable(definition)
@@ -1120,7 +1148,7 @@ class SQLCompiler:
 
         Returns
         -------
-        Executable
+        ``sqlalchemy.sql.expression.Executable``
             DROP TABLE object using cached metadata or a lightweight table stub.
         """
         physical = self._physicalName(name)
@@ -1175,17 +1203,17 @@ class SQLCompiler:
 
         Parameters
         ----------
-        definition : TableDefinition
+        definition : orionis.orm.schema.TableDefinition
             Logical table description, including columns, constraints, and schema.
 
         Returns
         -------
-        Table
+        ``sqlalchemy.Table``
             Prefixed table registered in this compiler's metadata and table cache.
 
         Raises
         ------
-        QueryException
+        orionis.database.QueryException
             If a column type has no registered SQL type builder.
         """
         physical = self._physicalName(definition.name)
@@ -1234,12 +1262,12 @@ class SQLCompiler:
 
         Parameters
         ----------
-        definition : TableDefinition
+        definition : orionis.orm.schema.TableDefinition
             Composite primary key, unique constraints, foreign keys, and indexes.
 
         Returns
         -------
-        list of Any
+        list of typing.Any
             SQLAlchemy schema items with prefixed foreign-key targets and generated
             names for unnamed indexes.
         """
@@ -1279,7 +1307,7 @@ class SQLCompiler:
 
         Parameters
         ----------
-        reference : ForeignReference
+        reference : orionis.orm.schema.constraints.ForeignReference
             Logical target table, optional schema qualifier, and referenced column.
 
         Returns
@@ -1302,7 +1330,7 @@ class SQLCompiler:
         ----------
         table_name : str
             Logical table name, optionally qualified as ``schema.table``.
-        columns : Sequence of str
+        columns : collections.abc.Sequence of str
             Target columns to declare as integer primary-key placeholders.
 
         Returns
@@ -1340,21 +1368,21 @@ class SQLCompiler:
 
         Parameters
         ----------
-        definition : ColumnDefinition
+        definition : orionis.orm.schema.column.ColumnDefinition
             Type options, constraints, foreign key, defaults, and identity settings.
         name : str or None, optional
             Override the definition's name; use ``definition.name`` when ``None``.
 
         Returns
         -------
-        Column
+        orionis.database.schema.Column
             Column with resolved type, constraints, defaults, and backend options.
 
         Raises
         ------
-        QueryException
+        orionis.database.QueryException
             If the logical column type has no registered SQL type builder.
-        MissingDatabaseDependencyException
+        orionis.database.MissingDatabaseDependencyException
             If Redshift column options require a missing dialect package.
         """
         args: list[Any] = [
@@ -1408,18 +1436,18 @@ class SQLCompiler:
 
         Parameters
         ----------
-        definition : ColumnDefinition
+        definition : orionis.orm.schema.column.ColumnDefinition
             Logical column type and its conversion or precision options.
 
         Returns
         -------
-        TypeEngine
+        ``sqlalchemy.types.TypeEngine``
             Configured type, with Oracle FLOAT precision or SQLite auto-increment
             variants when applicable.
 
         Raises
         ------
-        QueryException
+        orionis.database.QueryException
             If no builder is registered for the declared column type.
         """
         builder = self._TYPE_BUILDERS.get(definition.column_type)
@@ -1496,21 +1524,21 @@ class SQLCompiler:
 
         Parameters
         ----------
-        sources : SourceMap
+        sources : orionis.database.compiler.SourceMap
             Available tables or derived sources indexed by query identifier.
-        default : SqlSource
+        default : typing.Any
             Source used for unqualified column names.
         name : str
             Bare column name or dot-qualified source reference.
 
         Returns
         -------
-        ColumnElement
+        ``sqlalchemy.sql.elements.ColumnElement``
             Column exposed by the selected source's column collection.
 
         Raises
         ------
-        QueryException
+        orionis.database.QueryException
             If the source identifier or column name is unknown.
         """
         qualifier, column = self._splitQualifiedColumn(name)
@@ -1543,21 +1571,21 @@ class SQLCompiler:
 
         Parameters
         ----------
-        sources : SourceMap
+        sources : orionis.database.compiler.SourceMap
             Sources indexed by alias or logical table name.
-        default : SqlSource
+        default : typing.Any
             Fallback source for unqualified column names.
-        clauses : Sequence of WhereClause
+        clauses : collections.abc.Sequence of orionis.orm.query.WhereClause
             Ordered conditions and their boolean connectors.
 
         Returns
         -------
-        ColumnElement or TextClause or None
+        ``sqlalchemy.sql.elements.ColumnElement`` or ``TextClause`` or None
             Compiled predicate, or ``None`` when no clauses are supplied.
 
         Raises
         ------
-        QueryException
+        orionis.database.QueryException
             If a condition has unknown references or unsupported clause semantics.
         """
         if not clauses:
@@ -1583,18 +1611,18 @@ class SQLCompiler:
 
         Parameters
         ----------
-        compile_clause : Callable
+        compile_clause : collections.abc.Callable
             Callable receiving ``sources``, ``default``, and one condition.
-        sources : SourceMap
+        sources : orionis.database.compiler.SourceMap
             Source lookup supplied unchanged to each clause compiler.
-        default : SqlSource
+        default : typing.Any
             Fallback source supplied to the clause compiler.
-        clauses : Sequence of WhereClause or Sequence of JoinCondition
+        clauses
             Conditions to compile and combine in their declared order.
 
         Returns
         -------
-        ColumnElement or TextClause or None
+        ``sqlalchemy.sql.elements.ColumnElement`` or ``TextClause`` or None
             Combined predicate, or ``None`` for an empty sequence.
         """
         iterator = iter(clauses)
@@ -1630,16 +1658,16 @@ class SQLCompiler:
 
         Parameters
         ----------
-        sources : SourceMap
+        sources : orionis.database.compiler.SourceMap
             Sources available for column resolution and subquery correlation.
-        default : SqlSource
+        default : typing.Any
             Fallback source for unqualified names inside nested conditions.
-        clause : WhereClause
+        clause : orionis.orm.query.WhereClause
             Condition whose type determines whether this helper can handle it.
 
         Returns
         -------
-        ColumnElement or TextClause or None
+        ``sqlalchemy.sql.elements.ColumnElement`` or ``TextClause`` or None
             Predicate for a supported kind, or ``None`` for a column-based kind.
         """
         kind = clause.where_type
@@ -1665,21 +1693,21 @@ class SQLCompiler:
 
         Parameters
         ----------
-        sources : SourceMap
+        sources : orionis.database.compiler.SourceMap
             Sources indexed by alias or logical table name.
-        default : SqlSource
+        default : typing.Any
             Fallback source for unqualified column names.
-        clause : WhereClause
+        clause : orionis.orm.query.WhereClause
             Condition type, column reference, operator, and comparison value.
 
         Returns
         -------
-        ColumnElement or TextClause
+        ``sqlalchemy.sql.elements.ColumnElement`` or ``TextClause``
             Compiled condition, including nested, raw, and subquery predicates.
 
         Raises
         ------
-        QueryException
+        orionis.database.QueryException
             If the clause type, references, comparison operator, or range shape
             is invalid.
         """
@@ -1708,19 +1736,19 @@ class SQLCompiler:
 
         Parameters
         ----------
-        sources : SourceMap
+        sources : orionis.database.compiler.SourceMap
             Enclosing query sources available for subquery correlation.
-        value : Any
+        value : typing.Any
             Condition value, which may itself be a SELECT plan.
 
         Returns
         -------
-        Any
+        typing.Any
             Compiled SELECT for a plan value; the original object otherwise.
 
         Raises
         ------
-        QueryException
+        orionis.database.QueryException
             If a nested SELECT contains invalid clauses or unresolved references.
         """
         if isinstance(value, SelectPlan):
@@ -1737,19 +1765,19 @@ class SQLCompiler:
 
         Parameters
         ----------
-        column : ColumnElement
+        column : ``sqlalchemy.sql.elements.ColumnElement``
             Left-hand column expression tested against the range.
-        clause : WhereClause
+        clause : orionis.orm.query.WhereClause
             Range condition with lower and upper boundary values.
 
         Returns
         -------
-        ColumnElement
+        ``sqlalchemy.sql.elements.ColumnElement``
             Inclusive range predicate, negated for ``NOT BETWEEN``.
 
         Raises
         ------
-        QueryException
+        orionis.database.QueryException
             If the supplied value does not contain exactly two boundaries.
         """
         bounds = tuple(clause.value or ())
@@ -1773,23 +1801,23 @@ class SQLCompiler:
 
         Parameters
         ----------
-        sources : SourceMap
+        sources : orionis.database.compiler.SourceMap
             Sources indexed by alias or logical table name.
-        default : SqlSource
+        default : typing.Any
             Fallback source for the right-hand column reference.
-        column : ColumnElement
+        column : ``sqlalchemy.sql.elements.ColumnElement``
             Already-resolved left-hand column expression.
-        clause : WhereClause
+        clause : orionis.orm.query.WhereClause
             Comparison operator and right-hand column reference.
 
         Returns
         -------
-        ColumnElement
+        ``sqlalchemy.sql.elements.ColumnElement``
             Boolean comparison between the two column expressions.
 
         Raises
         ------
-        QueryException
+        orionis.database.QueryException
             If the right-hand column cannot be resolved or the operator is
             unsupported.
         """
@@ -1813,19 +1841,19 @@ class SQLCompiler:
 
         Parameters
         ----------
-        column : ColumnElement
+        column : ``sqlalchemy.sql.elements.ColumnElement``
             Column expression, including its SQL type for backend handling.
-        clause : WhereClause
+        clause : orionis.orm.query.WhereClause
             Comparison operator and bound value, including ``None``.
 
         Returns
         -------
-        ColumnElement
+        ``sqlalchemy.sql.elements.ColumnElement``
             NULL check, text comparison, pattern predicate, or ordinary comparison.
 
         Raises
         ------
-        QueryException
+        orionis.database.QueryException
             If the comparison operator has no supported handler.
         """
         op = clause.operator.strip().lower()
@@ -1869,21 +1897,21 @@ class SQLCompiler:
 
         Parameters
         ----------
-        sources : SourceMap
+        sources : orionis.database.compiler.SourceMap
             Sources indexed by alias or logical table name.
-        default : SqlSource
+        default : typing.Any
             Fallback source for an unqualified aggregate column.
-        aggregate : AggregateClause
+        aggregate : orionis.orm.query.AggregateClause
             Aggregate function and column reference, or ``*`` for COUNT.
 
         Returns
         -------
-        ColumnElement
+        ``sqlalchemy.sql.elements.ColumnElement``
             COUNT expression or the requested function applied to a resolved column.
 
         Raises
         ------
-        QueryException
+        orionis.database.QueryException
             If a non-COUNT aggregate targets ``*`` or a column cannot be resolved.
         """
         if aggregate.function is AggregateFunction.COUNT:

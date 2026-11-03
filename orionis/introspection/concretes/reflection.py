@@ -1,3 +1,5 @@
+"""Inspect concrete classes and their construction requirements."""
+
 from __future__ import annotations
 import inspect
 import keyword
@@ -26,6 +28,7 @@ _DUNDER_ATTR_EXCLUDE: frozenset[str] = frozenset({
     "__abstractmethods__", "__code__", "__defaults__", "__kwdefaults__",
     "__closure__",
 })
+"""Standard dunder names excluded from non-callable attribute introspection results."""
 
 class _ScanBuffers:
     """
@@ -35,6 +38,82 @@ class _ScanBuffers:
     routing helpers can run from a flat loop without passing many
     separate containers. ``__slots__`` avoids per-instance ``__dict__``
     allocations and keeps attribute access fast.
+
+    Attributes
+    ----------
+    pub_attrs
+        Initialize all mutable buckets used during class scanning. Attribute buckets
+        partitioned by visibility.
+    prot_attrs
+        Collected protected attributes.
+    priv_attrs
+        Collected private attributes.
+    dunder_attrs
+        Collected special attributes.
+    pub_m
+        Instance method buckets partitioned by visibility and sync/async.
+    pub_sync_m
+        Collected public synchronous instance methods.
+    pub_async_m
+        Collected public asynchronous instance methods.
+    prot_m
+        Collected protected instance methods.
+    prot_sync_m
+        Collected protected synchronous instance methods.
+    prot_async_m
+        Collected protected asynchronous instance methods.
+    priv_m
+        Collected private instance methods.
+    priv_sync_m
+        Collected private synchronous instance methods.
+    priv_async_m
+        Collected private asynchronous instance methods.
+    dunder_m
+        Collected special instance methods.
+    pub_cm
+        Class method buckets partitioned by visibility and sync/async.
+    pub_sync_cm
+        Collected public synchronous class methods.
+    pub_async_cm
+        Collected public asynchronous class methods.
+    prot_cm
+        Collected protected class methods.
+    prot_sync_cm
+        Collected protected synchronous class methods.
+    prot_async_cm
+        Collected protected asynchronous class methods.
+    priv_cm
+        Collected private class methods.
+    priv_sync_cm
+        Collected private synchronous class methods.
+    priv_async_cm
+        Collected private asynchronous class methods.
+    pub_sm
+        Static method buckets partitioned by visibility and sync/async.
+    pub_sync_sm
+        Collected public synchronous static methods.
+    pub_async_sm
+        Collected public asynchronous static methods.
+    prot_sm
+        Collected protected static methods.
+    prot_sync_sm
+        Collected protected synchronous static methods.
+    prot_async_sm
+        Collected protected asynchronous static methods.
+    priv_sm
+        Collected private static methods.
+    priv_sync_sm
+        Collected private synchronous static methods.
+    priv_async_sm
+        Collected private asynchronous static methods.
+    all_props
+        Property buckets partitioned by visibility.
+    pub_props
+        Collected public properties.
+    prot_props
+        Collected protected properties.
+    priv_props
+        Collected private properties.
     """
 
     __slots__ = (
@@ -75,6 +154,7 @@ class _ScanBuffers:
         "pub_sync_m",
         "pub_sync_sm",
     )
+    """Declare the instance attribute slots reserved by this class."""
 
     def __init__(self) -> None:
         """
@@ -131,6 +211,7 @@ class _ScanBuffers:
 class ReflectionConcrete(IReflectionConcrete):
 
     # ruff: noqa: ANN401
+    """Inspect concrete classes and their construction requirements."""
 
     def __init__(self, concrete: type) -> None:
         """
@@ -138,7 +219,7 @@ class ReflectionConcrete(IReflectionConcrete):
 
         Parameters
         ----------
-        concrete : Type
+        concrete : typing.Type
             The class type to reflect.
 
         Raises
@@ -164,12 +245,20 @@ class ReflectionConcrete(IReflectionConcrete):
 
         # Store the class and precompute string constants reused across methods
         self._concrete = concrete
+        """The class type to reflect."""
         self._class_name: str = concrete.__name__
+        """Class name obtained from ``concrete.__name__``."""
         # Python strips the leading underscores of the class name when it
         # mangles private members, so the prefix must be built the same way.
         self._private_prefix: str = f"_{self._class_name.lstrip('_')}"
+        """
+        Python strips the leading underscores of the class name when it mangles
+        private members, so the prefix must be built the same way.
+        """
         self._private_prefix_len: int = len(self._private_prefix)
+        """Private prefix len produced by ``len``."""
         self._cache: dict = {}
+        """Cache policy or cached state used by this component."""
 
     def __getitem__(self, key: str) -> object | None:
         """
@@ -266,7 +355,7 @@ class ReflectionConcrete(IReflectionConcrete):
             Private name-mangling prefix (e.g. ``_ClassName``).
         prefix_len : int
             Pre-computed length of ``prefix`` for efficient slicing.
-        buf : _ScanBuffers
+        buf : orionis.introspection.concretes.reflection._ScanBuffers
             Mutable accumulator that collects all classification results.
 
         Returns
@@ -316,7 +405,7 @@ class ReflectionConcrete(IReflectionConcrete):
             Private name-mangling prefix (e.g. ``_ClassName``).
         prefix_len : int
             Pre-computed length of ``prefix`` for efficient slicing.
-        buf : _ScanBuffers
+        buf : orionis.introspection.concretes.reflection._ScanBuffers
             Mutable accumulator that collects all classification results.
 
         Returns
@@ -363,7 +452,7 @@ class ReflectionConcrete(IReflectionConcrete):
             Private name-mangling prefix (e.g. ``_ClassName``).
         prefix_len : int
             Pre-computed length of ``prefix`` for efficient slicing.
-        buf : _ScanBuffers
+        buf : orionis.introspection.concretes.reflection._ScanBuffers
             Mutable accumulator that collects all classification results.
 
         Returns
@@ -409,7 +498,7 @@ class ReflectionConcrete(IReflectionConcrete):
             Private name-mangling prefix (e.g. ``_ClassName``).
         prefix_len : int
             Pre-computed length of ``prefix`` for efficient slicing.
-        buf : _ScanBuffers
+        buf : orionis.introspection.concretes.reflection._ScanBuffers
             Mutable accumulator that collects all classification results.
 
         Returns
@@ -462,7 +551,7 @@ class ReflectionConcrete(IReflectionConcrete):
             Private name-mangling prefix (e.g. ``_ClassName``).
         prefix_len : int
             Pre-computed length of ``prefix`` for efficient slicing.
-        buf : _ScanBuffers
+        buf : orionis.introspection.concretes.reflection._ScanBuffers
             Mutable accumulator that collects all classification results.
 
         Returns
@@ -579,7 +668,7 @@ class ReflectionConcrete(IReflectionConcrete):
 
         Returns
         -------
-        Type
+        typing.Type
             The class type provided during initialization.
         """
         return self._concrete
@@ -782,12 +871,12 @@ class ReflectionConcrete(IReflectionConcrete):
         ----------
         name : str
             Name of the attribute to retrieve.
-        default : Any, optional
+        default : typing.Any, optional
             Value to return if the attribute is not found. Defaults to None.
 
         Returns
         -------
-        Any
+        typing.Any
             Value of the attribute if found, otherwise the default value.
         """
         # Fetch from classified attributes, falling back to direct getattr
@@ -978,7 +1067,7 @@ class ReflectionConcrete(IReflectionConcrete):
         """
         Return all magic (dunder) class attributes.
 
-        This method is an alias for `getDunderAttributes()` and provides access
+        This method is an alias for ``getDunderAttributes()`` and provides access
         to double underscore attributes.
 
         Returns
@@ -1019,7 +1108,7 @@ class ReflectionConcrete(IReflectionConcrete):
         ----------
         name : str
             Name for the new method.
-        method : Callable
+        method : collections.abc.Callable
             Callable object to set as a method.
 
         Returns
@@ -1117,7 +1206,7 @@ class ReflectionConcrete(IReflectionConcrete):
 
         Returns
         -------
-        inspect.Signature
+        ``inspect.Signature``
             Signature object containing parameter and return information.
 
         Raises
@@ -1742,7 +1831,7 @@ class ReflectionConcrete(IReflectionConcrete):
 
         Returns
         -------
-        Any
+        typing.Any
             The current value of the property.
 
         Raises
@@ -1781,7 +1870,7 @@ class ReflectionConcrete(IReflectionConcrete):
 
         Returns
         -------
-        inspect.Signature
+        ``inspect.Signature``
             The signature object of the property's getter function.
 
         Raises
@@ -1871,7 +1960,7 @@ class ReflectionConcrete(IReflectionConcrete):
 
         Returns
         -------
-        inspect.Signature
+        ``inspect.Signature``
             Signature object for the __init__ method, containing parameter
             information.
         """
@@ -1892,7 +1981,7 @@ class ReflectionConcrete(IReflectionConcrete):
 
         Returns
         -------
-        Signature
+        orionis.introspection.dependencies.entities.signature.Signature
             Structured representation of resolved and unresolved dependencies.
         """
         # Return cached dependency analysis if available
@@ -1914,7 +2003,7 @@ class ReflectionConcrete(IReflectionConcrete):
 
         Returns
         -------
-        Signature
+        orionis.introspection.dependencies.entities.signature.Signature
             Structured representation of resolved and unresolved dependencies.
 
         Raises

@@ -1,3 +1,8 @@
+"""Provide storage operations.
+
+Includes ``read_chunks``, ``iterate_chunks``, ``spool_stream``.
+"""
+
 from __future__ import annotations
 import asyncio
 import tempfile
@@ -9,6 +14,7 @@ if TYPE_CHECKING:
     from typing import BinaryIO
 
 READ_BUFFER_SIZE = 1024 * 1024
+"""Read buffer size used by ``buffering``."""
 
 async def read_chunks(
     opener: Callable[[], BinaryIO],
@@ -21,7 +27,7 @@ async def read_chunks(
 
     Parameters
     ----------
-    opener : Callable[[], BinaryIO]
+    opener : collections.abc.Callable[[], typing.BinaryIO]
         Factory for a handle owned exclusively by this iterator.
     chunk_size : int
         Maximum bytes yielded per logical chunk.
@@ -81,7 +87,7 @@ async def iterate_chunks(
 
     Parameters
     ----------
-    opener : Callable[[], Iterator[bytes]]
+    opener : collections.abc.Callable[[], collections.abc.Iterator[bytes]]
         Synchronous factory for a request-owned SDK iterator.
 
     Yields
@@ -146,14 +152,14 @@ async def spool_stream(stream: AsyncIterable[bytes], *, max_size: int) -> Binary
 
     Parameters
     ----------
-    stream : AsyncIterable[bytes]
+    stream : collections.abc.AsyncIterable[bytes]
         Asynchronous byte-chunk producer.
     max_size : int
         Maximum in-memory bytes before the buffer spills to disk.
 
     Returns
     -------
-    BinaryIO
+    typing.BinaryIO
         Rewound temporary buffer owned and closed by the uploading driver.
     """
     buffer = await asyncio.to_thread(tempfile.SpooledTemporaryFile, max_size=max_size)

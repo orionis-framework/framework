@@ -1,3 +1,5 @@
+"""Define the contract implemented by every password hashing driver."""
+
 from __future__ import annotations
 from abc import ABC, abstractmethod
 from typing import Self
@@ -12,6 +14,7 @@ class IHasher(ABC):
     """
 
     __slots__ = ()
+    """Declare that this class introduces no additional instance slots."""
 
     @abstractmethod
     async def make(
@@ -105,11 +108,11 @@ class IHasher(ABC):
 
         Returns
         -------
-        Self
+        typing.Self
             The same instance, allowing fluent configuration.
 
         Raises
         ------
-        HashConfigurationException
+        orionis.hashing.exceptions.HashConfigurationException
             If the value is not a valid cost factor for the driver.
         """

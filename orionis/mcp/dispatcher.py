@@ -400,7 +400,7 @@ class McpDispatcher:
             Result of the operation described above.
         """
         extension, handler = self._extensions[request.method]
-        supported = request.client_capabilities.get("extensions", {})
+        supported = request.clientCapabilities.get("extensions", {})
         if not isinstance(supported, Mapping) or extension.identifier not in supported:
             raise McpProtocolException(
                 -32021,

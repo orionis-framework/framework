@@ -1,3 +1,5 @@
+"""Ensure a value differs from every value supplied to the rule."""
+
 from orionis.schemas.rule import Rule
 
 class Different(Rule):
@@ -6,9 +8,14 @@ class Different(Rule):
     # ruff: noqa: ARG002
 
     __slots__ = ("_forbidden",)
+    """Declare the instance attribute slots reserved by this class."""
 
     __message__ = "Value must be different from the forbidden values."
+    """
+    Error text for message: ``Value must be different from the forbidden values.``.
+    """
     __code__ = "different"
+    """Code identifier: ``different``."""
 
     def __init__(self, *values: object, message: str | None = None) -> None:
         """
@@ -36,6 +43,7 @@ class Different(Rule):
             error_msg = "Different requires at least one value."
             raise ValueError(error_msg)
         self._forbidden: tuple[object, ...] = values
+        """Values the field must not be equal to. At least one is required."""
 
     async def enforce(
         self,

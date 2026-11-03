@@ -2,6 +2,24 @@
 
 Las migraciones describen cambios ordenados de esquema. Los seeders insertan datos iniciales mediante clases independientes. Ambos se descubren en las rutas de aplicación `database_migrations` y `database_seeders`, normalmente `database/migrations` y `database/seeders`.
 
+## Preparar tablas internas del framework
+
+Estos comandos crean las tablas faltantes a partir del código del framework, sin descubrir ni ejecutar archivos de `database/` y sin escribir un historial en `migrations`:
+
+| Comando | Tablas configuradas | Conexión SQL |
+|---|---|---|
+| `auth:migrate` | `AUTH_TOKEN_TABLE` | Predeterminada de la aplicación. |
+| `cache:migrate` | `DB_CACHE_TABLE` y `DB_CACHE_LOCK_TABLE` | `DB_CACHE_CONNECTION`. |
+| `queue:migrate` | `QUEUE_TABLE` de cada cola SQL y `QUEUE_FAILED_TABLE` | `QUEUE_DB_CONNECTION` y `QUEUE_FAILED_DB_CONNECTION`; también respeta las conexiones de colas SQL adicionales. |
+| `schedule:migrate` | `DB_TASK_TABLE` | `DB_TASK_CONNECTION`. |
+| `session:migrate` | `SESSION_DB_TABLE` | `SESSION_DB_CONNECTION`. |
+
+Ejecuta, por ejemplo, `python reactor auth:migrate` desde la aplicación inicializada. Los comandos usan los valores de configuración derivados de esas variables; no reciben `--database`. `QUEUE_DB_CONNECTION` es una conexión, no una tabla.
+
+Se pueden ejecutar aunque el driver activo sea memoria, archivo o sync. Caché y scheduler requieren su configuración de almacenamiento `database`. Las tablas de tokens, caché, colas y sesiones respetan el prefijo de su conexión; el scheduler utiliza el nombre y los índices del job store nativo de APScheduler, sin iniciar tareas.
+
+Repetir un comando conserva los registros. No ejecuta `DROP` ni `ALTER`: una tabla existente con otro esquema necesita una migración explícita. Un fallo devuelve código 1; la creación completa devuelve 0. Las restricciones del backend siguen aplicándose, incluida la necesidad de claves únicas efectivas.
+
 ## Escribir una migración reversible
 
 Cada archivo debe contener su subclase local de `Migration`; usa prefijos secuenciales con ceros para conservar orden lexicográfico. Los generadores de [consola](../../../console/docs/es/built-in-commands.md) crean archivos siguiendo las convenciones de la aplicación.

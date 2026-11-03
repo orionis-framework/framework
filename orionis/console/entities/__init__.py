@@ -1,3 +1,5 @@
+"""Group the console entities components and public imports."""
+
 from orionis.console.entities.command import Command
 from orionis.console.entities.scheduler_event import SchedulerEvent
 from orionis.console.entities.task import Task

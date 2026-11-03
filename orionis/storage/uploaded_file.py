@@ -1,3 +1,5 @@
+"""Represent a file received through HTTP, ready to be stored."""
+
 from __future__ import annotations
 import asyncio
 import secrets
@@ -20,11 +22,12 @@ class UploadedFile(IUploadedFile):
     The object adapts the buffered multipart payload produced by the
     HTTP layer so it can be persisted onto any configured disk. It is
     fully decoupled from the request object and internally always
-    delegates persistence to :class:`~orionis.storage.file.File`
+    delegates persistence to :class:`orionis.storage.File`
     through the disk resolved by the manager.
     """
 
     __slots__ = ("_hash_name", "_manager", "_source")
+    """Declare the instance attribute slots reserved by this class."""
 
     def __init__(
         self,
@@ -36,18 +39,22 @@ class UploadedFile(IUploadedFile):
 
         Parameters
         ----------
-        source : IHttpUploadedFile
+        source : orionis.http.payload.contracts.uploaded_file.IUploadedFile
             Buffered multipart payload produced by the HTTP layer.
-        manager : IStorageManager
+        manager : orionis.storage.contracts.IStorageManager
             Manager used to resolve target disks.
 
         Returns
         -------
         None
+            Initialize the uploaded file with its payload and manager.
         """
         self._source = source
+        """Buffered multipart payload produced by the HTTP layer."""
         self._manager = manager
+        """Manager used to resolve target disks."""
         self._hash_name: str | None = None
+        """Generated filename retained for repeated storage operations."""
 
     # ── Payload metadata ─────────────────────────────────────────────────────
 
@@ -166,7 +173,7 @@ class UploadedFile(IUploadedFile):
 
         Returns
         -------
-        IFile
+        orionis.storage.contracts.IFile
             File object pointing at the stored file.
         """
         return await self.storeAs(directory, self.hashName(), disk, visibility)
@@ -194,12 +201,12 @@ class UploadedFile(IUploadedFile):
 
         Returns
         -------
-        IFile
+        orionis.storage.contracts.IFile
             File object pointing at the stored file.
 
         Raises
         ------
-        StoragePathException
+        orionis.storage.exceptions.StoragePathException
             If *name* is empty or contains a directory separator.
         """
         # The name must be a single path segment; directories go apart.
@@ -232,7 +239,7 @@ class UploadedFile(IUploadedFile):
 
         Returns
         -------
-        IFile
+        orionis.storage.contracts.IFile
             File object pointing at the stored file.
         """
         stored = await self.storeAs(directory, name or self.hashName(), disk)
@@ -262,7 +269,7 @@ class UploadedFile(IUploadedFile):
 
         Returns
         -------
-        IFile
+        orionis.storage.contracts.IFile
             File object pointing at the stored file.
         """
         return await self.storeAs(directory, name or self.hashName(), disk)

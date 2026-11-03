@@ -1,3 +1,5 @@
+"""Contract for view engine implementations."""
+
 from __future__ import annotations
 from abc import ABC, abstractmethod
 from typing import Any, Self
@@ -12,6 +14,7 @@ class IViewEngine(ABC):
     """
 
     __slots__ = ()
+    """Declare that this class introduces no additional instance slots."""
 
     async def warmup(self: Self, *templates: str) -> None: # NOSONAR
         """
@@ -39,7 +42,7 @@ class IViewEngine(ABC):
         template : str
             Template identifier.  Engines are free to interpret this string
             (e.g. dot notation ``'users.index'`` or a bare filename).
-        context : dict[str, Any]
+        context : dict[str, typing.Any]
             Mapping of variable names to values made available inside the
             template during rendering.
 
@@ -50,8 +53,8 @@ class IViewEngine(ABC):
 
         Raises
         ------
-        ViewTemplateNotFoundException
+        orionis.view.exceptions.ViewTemplateNotFoundException
             When the requested template file cannot be located.
-        ViewRenderException
+        orionis.view.exceptions.ViewRenderException
             When the template engine fails to render the template.
         """

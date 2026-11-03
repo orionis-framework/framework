@@ -1,3 +1,5 @@
+"""Cache backend that stores entries in a relational database table."""
+
 from __future__ import annotations
 import asyncio
 import time
@@ -16,12 +18,15 @@ if TYPE_CHECKING:
 
 # Sentinel object to distinguish "key not found" from a stored None value.
 _MISSING = object()
+"""Sentinel object to distinguish "key not found" from a stored None value."""
 
 # Default lock table used when the config does not declare one explicitly.
 _DEFAULT_LOCK_TABLE = "cache_locks"
+"""Default lock table used when the config does not declare one explicitly."""
 
 # Compare-and-swap rounds allowed before an increment gives up on contention.
 _INCREMENT_ATTEMPTS = 25
+"""Compare-and-swap rounds allowed before an increment gives up on contention."""
 
 def _build_entries_table(table: str) -> TableDefinition:
     """
@@ -34,7 +39,7 @@ def _build_entries_table(table: str) -> TableDefinition:
 
     Returns
     -------
-    TableDefinition
+    orionis.orm.schema.TableDefinition
         Definition with ``cache_key`` (primary key), ``cache_value``
         (JSON payload) and ``expiration`` (epoch seconds, sub-second
         precision, nullable) columns.
@@ -70,7 +75,7 @@ def _build_locks_table(table: str) -> TableDefinition:
 
     Returns
     -------
-    TableDefinition
+    orionis.orm.schema.TableDefinition
         Definition with ``cache_key`` (primary key), ``owner`` and
         ``expiration`` (epoch seconds, sub-second precision) columns.
     """
@@ -112,6 +117,7 @@ class DatabaseCacheBackend:
         "_connection", "_entry_definition", "_lock_definition", "_lock_table",
         "_ready", "_ready_lock", "_table",
     )
+    """Declare the instance attribute slots reserved by this class."""
 
     def __init__(
         self,
@@ -124,7 +130,7 @@ class DatabaseCacheBackend:
 
         Parameters
         ----------
-        connection : IConnection
+        connection : orionis.database.contracts.IConnection
             Database connection used to store cache entries and locks.
         table : str
             Table name used to store cache entries.
@@ -144,12 +150,22 @@ class DatabaseCacheBackend:
             )
             raise QueryException(message)
         self._connection = connection
+        """Database connection used to store cache entries and locks."""
         self._table = table
+        """Table name used to store cache entries."""
         self._lock_table = lock_table or _DEFAULT_LOCK_TABLE
+        """
+        Table name used to store atomic locks. Defaults to ``'cache_locks'`` when
+        not provided.
+        """
         self._entry_definition = _build_entries_table(self._table)
+        """Entry definition produced by ``_build_entries_table``."""
         self._lock_definition = _build_locks_table(self._lock_table)
+        """Lock definition produced by ``_build_locks_table``."""
         self._ready = False
+        """Ready flag used by ``DatabaseCacheBackend``."""
         self._ready_lock = asyncio.Lock()
+        """Synchronization primitive controlling access to ready lock."""
 
     # ── Schema bootstrap ─────────────────────────────────────────────────────
 
@@ -164,7 +180,7 @@ class DatabaseCacheBackend:
 
         Raises
         ------
-        QueryException
+        orionis.database.QueryException
             If the connection cannot create either table.
         """
         await self._ensureSchema()
@@ -195,7 +211,7 @@ class DatabaseCacheBackend:
 
         Parameters
         ----------
-        value : Any
+        value : typing.Any
             JSON-serializable value to encode.
 
         Returns
@@ -216,7 +232,7 @@ class DatabaseCacheBackend:
 
         Returns
         -------
-        Any
+        typing.Any
             Decoded value, or ``None`` when *raw* is missing or invalid.
         """
         if raw is None:
@@ -240,12 +256,12 @@ class DatabaseCacheBackend:
         ----------
         key : str
             Cache key.
-        default : Any
+        default : typing.Any
             Value returned when the key is not found or has expired.
 
         Returns
         -------
-        Any
+        typing.Any
             Stored value or *default*.
         """
         await self._ensureSchema()
@@ -279,7 +295,7 @@ class DatabaseCacheBackend:
         ----------
         key : str
             Cache key.
-        value : Any
+        value : typing.Any
             JSON-serializable value to cache.
         ttl : float | None
             Time-to-live in seconds. ``None`` means no expiry.
@@ -348,13 +364,14 @@ class DatabaseCacheBackend:
             )
 
     async def replace(self, key: str, value: Any, ttl: float | None = None) -> bool:
-        """Replace a live cache row with a single conditional update.
+        """
+        Replace a live cache row with a single conditional update.
 
         Parameters
         ----------
         key : str
             Existing cache key.
-        value : Any
+        value : typing.Any
             Replacement value.
         ttl : float | None
             Replacement lifetime in seconds.
@@ -398,6 +415,7 @@ class DatabaseCacheBackend:
         Returns
         -------
         bool
+            True when the cache key exists and its entry has not expired.
         """
         return await self.get(key, default=_MISSING) is not _MISSING
 
@@ -444,12 +462,13 @@ class DatabaseCacheBackend:
         ----------
         keys : list[str]
             Cache keys.
-        default : Any
+        default : typing.Any
             Returned for each missing/expired key.
 
         Returns
         -------
-        list[Any]
+        list[typing.Any]
+            Cached values in key order, with None for missing or expired entries.
         """
         return [await self.get(k, default) for k in keys]
 
@@ -463,7 +482,7 @@ class DatabaseCacheBackend:
 
         Parameters
         ----------
-        pairs : list[tuple[str, Any]]
+        pairs : list[tuple[str, typing.Any]]
             Sequence of (key, value) pairs.
         ttl : float | None
             Shared TTL applied to every pair.
@@ -493,7 +512,7 @@ class DatabaseCacheBackend:
         ----------
         key : str
             Cache key.
-        value : Any
+        value : typing.Any
             Value to store.
         ttl : float | None
             Optional TTL in seconds.
@@ -507,7 +526,7 @@ class DatabaseCacheBackend:
         ------
         ValueError
             If the key already exists and has not expired.
-        QueryException
+        orionis.database.QueryException
             If the insert fails for any reason other than the key being
             already taken.
         """
@@ -566,7 +585,7 @@ class DatabaseCacheBackend:
 
         Raises
         ------
-        QueryException
+        orionis.database.QueryException
             If contention prevents the update from landing after
             ``_INCREMENT_ATTEMPTS`` rounds.
         """
@@ -729,7 +748,7 @@ def build(
 
     Parameters
     ----------
-    connection : IConnection
+    connection : orionis.database.contracts.IConnection
         Database connection used to store cache entries and locks.
     table : str
         Table name used to store cache entries.
@@ -738,7 +757,7 @@ def build(
 
     Returns
     -------
-    DatabaseCacheBackend
+    orionis.cache.stores.database.DatabaseCacheBackend
         Configured database-backed cache backend.
     """
     return DatabaseCacheBackend(

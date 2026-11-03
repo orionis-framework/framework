@@ -1,3 +1,5 @@
+"""Represent a PostgreSQL database configuration entity."""
+
 from __future__ import annotations
 from dataclasses import dataclass, field
 from orionis.environment import Env
@@ -24,7 +26,7 @@ class PGSQL(BaseEntity):
         Database user.
     password : str
         Database password.
-    charset : str | PGSQLCharset
+    charset : str | orionis.foundation.config.database.PGSQLCharset
         Database charset.
     prefix : str
         Table prefix.
@@ -32,7 +34,7 @@ class PGSQL(BaseEntity):
         Whether to prefix indexes.
     search_path : str
         PostgreSQL schema search_path.
-    sslmode : str | PGSQLSSLMode
+    sslmode : str | orionis.foundation.config.database.PGSQLSSLMode
         Connection SSL mode.
     """
 
@@ -134,7 +136,7 @@ class PGSQL(BaseEntity):
 
         Parameters
         ----------
-        self : PGSQL
+        self : orionis.foundation.config.database.PGSQL
             Configuration entity containing the charset to normalize.
 
         Returns
@@ -159,7 +161,7 @@ class PGSQL(BaseEntity):
 
         Parameters
         ----------
-        self : PGSQL
+        self : orionis.foundation.config.database.PGSQL
             Configuration entity containing the SSL mode to normalize.
 
         Returns
@@ -187,7 +189,7 @@ class PGSQL(BaseEntity):
 
         Parameters
         ----------
-        self : PGSQL
+        self : orionis.foundation.config.database.PGSQL
             Configuration entity to validate and initialize.
 
         Returns

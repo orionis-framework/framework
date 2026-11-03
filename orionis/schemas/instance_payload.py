@@ -1,6 +1,9 @@
+"""Provide schemas operations through ``instance_payload``."""
+
 import msgspec
 
 _PLANS: dict[type, tuple] = {}
+"""Plans definitions used by ``instance_payload``."""
 
 def instance_payload(value: object) -> object:
     """

@@ -1,3 +1,5 @@
+"""Provide cache stores operations through ``build``."""
+
 from __future__ import annotations
 from aiocache.backends.memcached import MemcachedCache
 from orionis.cache.serializers.json import MsgspecSerializer
@@ -18,7 +20,7 @@ def build(
 
     Returns
     -------
-    MemcachedCache
+    ``aiocache.backends.memcached.MemcachedCache``
         Configured aiocache Memcached backend.
     """
     return MemcachedCache(

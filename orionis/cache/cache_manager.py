@@ -1,3 +1,5 @@
+"""Resolve configured cache stores and reuse their repositories."""
+
 from pathlib import Path
 from typing import TYPE_CHECKING, Any, Self
 from orionis.cache.contracts.cache_manager import ICacheManager
@@ -12,6 +14,7 @@ if TYPE_CHECKING:
 
 class CacheManager(ICacheManager):
     # ruff: noqa: ANN401, PLC0415, TC001
+    """Resolve configured cache stores and reuse their repositories."""
 
     __slots__ = (
         "_app",
@@ -21,6 +24,7 @@ class CacheManager(ICacheManager):
         "_prefix",
         "_repositories",
     )
+    """Declare the instance attribute slots reserved by this class."""
 
     def __init__(self: Self, app: IApplication) -> None:
         """
@@ -28,7 +32,7 @@ class CacheManager(ICacheManager):
 
         Parameters
         ----------
-        app : IApplication
+        app : orionis.IApplication
             Application container used to read config and the base path.
 
         Returns
@@ -37,7 +41,9 @@ class CacheManager(ICacheManager):
             Complete the documented operation without returning a value.
         """
         self._app = app
+        """Application container used to read config and the base path."""
         self._base_path: Path = app.basePath
+        """Base path obtained from ``app.basePath``."""
 
         config_data: dict = app.config("cache")
         self._config = (
@@ -45,16 +51,20 @@ class CacheManager(ICacheManager):
             if isinstance(config_data, dict)
             else config_data
         )
+        """Validated configuration used to construct and operate the service."""
 
         self._default: str = str(self._config.default)
+        """Value used when the client omits this argument."""
         self._prefix: str = str(self._config.prefix)
+        """Prefix applied when constructing names or storage keys."""
         self._repositories: dict[str, CacheRepository] = {}
+        """Cache repositories already resolved, indexed by store name."""
 
     # ── Store resolution ────────────────────────────────────────────────────
 
     def store(self: Self, name: str | None = None) -> CacheRepository:
         """
-        Return the :class:`CacheRepository` for the named (or default) store.
+        Return the named or default cache repository.
 
         The repository is created on first access and cached for reuse.
 
@@ -66,12 +76,12 @@ class CacheManager(ICacheManager):
 
         Returns
         -------
-        CacheRepository
+        orionis.cache.CacheRepository
             Repository for the selected backend.
 
         Raises
         ------
-        CacheStoreException
+        orionis.cache.exceptions.CacheStoreException
             When the requested store is not configured.
         """
         resolved: str = name or self._default
@@ -95,12 +105,12 @@ class CacheManager(ICacheManager):
 
         Returns
         -------
-        Any
+        typing.Any
             Configured backend instance.
 
         Raises
         ------
-        CacheStoreException
+        orionis.cache.exceptions.CacheStoreException
             When *name* is ``'redis'`` or ``'memcached'`` but the store
             is not configured.
         """
@@ -167,12 +177,13 @@ class CacheManager(ICacheManager):
 
         Returns
         -------
-        Any
-            Configured :class:`DatabaseCacheBackend` instance.
+        typing.Any
+            Configured :class:`orionis.cache.stores.database.DatabaseCacheBackend`
+            instance.
 
         Raises
         ------
-        CacheStoreException
+        orionis.cache.exceptions.CacheStoreException
             When the database store is not configured.
         """
         cfg = getattr(self._config.stores, "database", None)
@@ -204,7 +215,7 @@ class CacheManager(ICacheManager):
 
         Returns
         -------
-        Any
+        typing.Any
             Cached value, or ``None`` when absent.
         """
         return await self.store().get(key)
@@ -217,7 +228,7 @@ class CacheManager(ICacheManager):
         ----------
         key : str
             Cache key.
-        value : Any
+        value : typing.Any
             Value to cache.
         ttl : float | None
             Time-to-live in seconds.  ``None`` means no expiry.
@@ -283,7 +294,7 @@ class CacheManager(ICacheManager):
 
         Returns
         -------
-        dict[str, Any]
+        dict[str, typing.Any]
             Mapping of key → value; missing keys map to ``None``.
         """
         return await self.store().getMany(keys)
@@ -298,7 +309,7 @@ class CacheManager(ICacheManager):
 
         Parameters
         ----------
-        values : dict[str, Any]
+        values : dict[str, typing.Any]
             Mapping of key → value.
         ttl : float | None
             Shared TTL in seconds.
@@ -325,12 +336,12 @@ class CacheManager(ICacheManager):
             Cache key.
         ttl : float | None
             TTL applied when caching the resolved value.
-        resolver : Callable
+        resolver : collections.abc.Callable
             Zero-argument callable (sync or async) producing the value.
 
         Returns
         -------
-        Any
+        typing.Any
             Cached or freshly computed value.
         """
         return await self.store().remember(key, ttl, resolver)
@@ -353,7 +364,7 @@ class CacheManager(ICacheManager):
             Cache key.
         ttl : float | None
             Result lifetime according to the selected backend.
-        resolver : Callable
+        resolver : collections.abc.Callable
             Zero-argument synchronous or asynchronous producer.
         wait_timeout : float
             Maximum seconds waiting for the current local resolver.
@@ -362,7 +373,7 @@ class CacheManager(ICacheManager):
 
         Returns
         -------
-        Any
+        typing.Any
             Shared result, including None for overlapping calls.
         """
         return await self.store().rememberOnce(
@@ -381,12 +392,12 @@ class CacheManager(ICacheManager):
         ----------
         key : str
             Cache key.
-        resolver : Callable
+        resolver : collections.abc.Callable
             Zero-argument callable (sync or async) producing the value.
 
         Returns
         -------
-        Any
+        typing.Any
             Cached or freshly computed value.
         """
         return await self.store().rememberForever(key, resolver)
@@ -402,7 +413,7 @@ class CacheManager(ICacheManager):
 
         Returns
         -------
-        Any
+        typing.Any
             Cached value, or ``None`` when absent.
         """
         return await self.store().pull(key)
@@ -415,7 +426,7 @@ class CacheManager(ICacheManager):
         ----------
         key : str
             Cache key.
-        value : Any
+        value : typing.Any
             Value to store.
         ttl : float | None
             Optional TTL in seconds.
@@ -476,7 +487,7 @@ class CacheManager(ICacheManager):
 
         Returns
         -------
-        CacheLock
+        orionis.cache.locks.lock.CacheLock
             Async context manager.
         """
         return self.store().lock(key, timeout)

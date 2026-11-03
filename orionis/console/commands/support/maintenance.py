@@ -1,3 +1,5 @@
+"""Write a runtime-visible maintenance state for HTTP workers."""
+
 from contextlib import suppress
 from pathlib import Path
 from tempfile import NamedTemporaryFile
@@ -9,6 +11,7 @@ from orionis.console.output.console import Console
 from orionis.foundation.contracts.application import IApplication
 
 _REPLACE_ATTEMPTS = 6
+"""Replace attempts value used by ``maintenance``."""
 
 class MaintenanceModeCommand(BaseCommand):
     """Write a runtime-visible maintenance state for HTTP workers."""
@@ -16,8 +19,11 @@ class MaintenanceModeCommand(BaseCommand):
     # ruff: noqa: TC001
 
     timestamps: bool = False
+    """Timestamps flag used by ``MaintenanceModeCommand``."""
     state: ClassVar[str]
+    """State selected by the maintenance-mode command."""
     status_message: ClassVar[str]
+    """Console message describing the resulting maintenance status."""
 
     def handle(self, app: IApplication, console: Console) -> int:
         """
@@ -25,9 +31,9 @@ class MaintenanceModeCommand(BaseCommand):
 
         Parameters
         ----------
-        app : IApplication
+        app : orionis.IApplication
             Application providing the framework storage directory.
-        console : Console
+        console : orionis.console.Console
             Console used to report the state change.
 
         Returns

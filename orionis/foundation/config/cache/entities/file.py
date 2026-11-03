@@ -1,3 +1,5 @@
+"""Represent the configuration entity for a file-based cache store."""
+
 from __future__ import annotations
 from dataclasses import dataclass, field
 from orionis.environment import Env

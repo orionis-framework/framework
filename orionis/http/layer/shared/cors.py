@@ -1,3 +1,5 @@
+"""Validate cross-origin HTTP requests and attach CORS response headers."""
+
 from __future__ import annotations
 import re
 from re import Pattern
@@ -9,9 +11,11 @@ if TYPE_CHECKING:
     from orionis.http.adapters.request.contracts.transport import TransportAdapter
 
 class CORSException(Exception):
-    ...
+    """Report a request rejected by cross-origin access policy."""
+
 
 class CORSMiddleware:
+    """Validate cross-origin requests and attach the required CORS headers."""
 
     __slots__ = (
         "__allow_all_headers",
@@ -25,11 +29,13 @@ class CORSMiddleware:
         "__max_age_value",
         "__origin_regex",
     )
+    """Declare the instance attribute slots reserved by this class."""
 
     # Methods allowed in CORS preflight responses when the wildcard is used.
     ALL_METHODS: Final[str] = (
         "DELETE, GET, HEAD, OPTIONS, PATCH, POST, PUT"
     )
+    """Methods allowed in CORS preflight responses when the wildcard is used."""
 
     def __init__(
         self,
@@ -45,6 +51,7 @@ class CORSMiddleware:
         Returns
         -------
         None
+            Initialize the middleware with the given CORS configuration.
         """
         # Load cors configuration into a structured object for
         # easier access and validation.
@@ -60,18 +67,22 @@ class CORSMiddleware:
 
         # Origins
         self.__allow_all_origins = "*" in cors.allow_origins
+        """Origins."""
         self.__allow_origins = {
             origin.rstrip("/")
             for origin in cors.allow_origins
         }
+        """Origins permitted by the cross-origin request policy."""
         self.__origin_regex: Pattern[str] | None = (
             re.compile(cors.allow_origin_regex)
             if cors.allow_origin_regex
             else None
         )
+        """Compiled regular expression matching permitted request origins."""
 
         # Methods
         self.__allow_all_methods = "*" in cors.allow_methods
+        """Methods."""
         self.__allow_methods_value = (
             self.ALL_METHODS
             if self.__allow_all_methods
@@ -80,9 +91,11 @@ class CORSMiddleware:
                 for method in cors.allow_methods
             )
         )
+        """Serialized value of the Access-Control-Allow-Methods header."""
 
         # Headers
         self.__allow_all_headers = "*" in cors.allow_headers
+        """Headers."""
         self.__allow_headers_value = (
             "*"
             if self.__allow_all_headers
@@ -91,6 +104,7 @@ class CORSMiddleware:
                 for header in cors.allow_headers
             )
         )
+        """Serialized value of the Access-Control-Allow-Headers header."""
         self.__expose_headers_value = (
             ", ".join(
                 header.lower()
@@ -99,9 +113,11 @@ class CORSMiddleware:
             if cors.expose_headers
             else ""
         )
+        """Serialized value of the Access-Control-Expose-Headers header."""
 
         # Credentials / Cache
         self.__allow_credentials = cors.allow_credentials
+        """Credentials / Cache."""
 
         # Pre-render the max-age header value; None disables the header.
         self.__max_age_value: str | None = (
@@ -109,6 +125,7 @@ class CORSMiddleware:
             if isinstance(cors.max_age, int)
             else None
         )
+        """Pre-render the max-age header value; None disables the header."""
 
     def __isAllowedOrigin(
         self,
@@ -176,7 +193,7 @@ class CORSMiddleware:
 
         Parameters
         ----------
-        response : Response
+        response : orionis.http.Response
             The response object to modify.
         value : str
             The directive to add (e.g. ``"origin"``).
@@ -184,6 +201,7 @@ class CORSMiddleware:
         Returns
         -------
         None
+            Append a directive to the ``Vary`` header without overwriting it.
         """
         existing = response.getHeader("vary")
         if existing:
@@ -210,7 +228,7 @@ class CORSMiddleware:
 
         Parameters
         ----------
-        response : Response
+        response : orionis.http.Response
             The response object to modify.
         origin : str
             The ``Origin`` header value from the request.
@@ -218,6 +236,7 @@ class CORSMiddleware:
         Returns
         -------
         None
+            Write the ``Access-Control-Allow-Origin`` (and ``Vary``) headers.
         """
         if self.__allow_credentials:
             # Credentials require an explicit origin, never a wildcard.
@@ -242,12 +261,13 @@ class CORSMiddleware:
 
         Parameters
         ----------
-        response : Response
+        response : orionis.http.Response
             The response object to modify.
 
         Returns
         -------
         None
+            Write the ``Access-Control-Allow-Credentials`` header if needed.
         """
         if self.__allow_credentials:
             response.setHeader("access-control-allow-credentials", "true")
@@ -261,12 +281,12 @@ class CORSMiddleware:
 
         Parameters
         ----------
-        adapter : TransportAdapter
+        adapter : orionis.http.adapters.request.contracts.transport.TransportAdapter
             Unified transport abstraction for the current request.
 
         Returns
         -------
-        Response | None
+        orionis.http.Response | None
             A 204 No Content preflight response, or ``None`` when the
             request is not a valid CORS preflight.
         """
@@ -347,14 +367,14 @@ class CORSMiddleware:
 
         Parameters
         ----------
-        adapter : TransportAdapter
+        adapter : orionis.http.adapters.request.contracts.transport.TransportAdapter
             Unified transport abstraction for the current request.
-        response : Response
+        response : orionis.http.Response
             The response produced by the application.
 
         Returns
         -------
-        Response
+        orionis.http.Response
             The same response object, enriched with CORS headers.
         """
         # Get the request headers from the adapter, which abstracts away the

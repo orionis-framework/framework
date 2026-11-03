@@ -1,3 +1,5 @@
+"""Format Python values for structured console inspection."""
+
 from __future__ import annotations
 import copy
 import inspect
@@ -14,6 +16,7 @@ from rich.theme import Theme
 from orionis.console.output.contracts.var_dumper import IVarDumper
 
 T = TypeVar("T")
+"""Type parameter preserving the value type across var dumper operations."""
 
 # Match the diagnostic pages without changing the terminal's palette.
 _HTML_TERMINAL_THEME = TerminalTheme(
@@ -40,6 +43,7 @@ _HTML_TERMINAL_THEME = TerminalTheme(
         (24, 36, 51),
     ],
 )
+"""Match the diagnostic pages without changing the terminal's palette."""
 
 _HTML_DUMP_FORMAT = (
     '<pre class="dump-output" tabindex="0" role="region" aria-label="Dumped value" '
@@ -50,6 +54,14 @@ _HTML_DUMP_FORMAT = (
     'font-size:13px;line-height:1.75;white-space:pre;overflow-wrap:normal;'
     'scrollbar-width:thin"><code style="font:inherit">{code}</code></pre>'
 )
+"""
+Html dump format identifier: ``<pre class="dump-output" tabindex="0" role="region"
+aria-label="Dumped value"
+style="margin:0;padding:16px;overflow:auto;background-color:var(--orionis-surface,#fff);color:var(--orionis-text,#182433);font-family:var(--orionis-mono,'Fira
+Code','Cascadia
+Code',Consolas,monospace);font-size:13px;line-height:1.75;white-space:pre;overflow-wrap:normal;scrollbar-width:thin"><code
+style="font:inherit">{code}</code></pre>``.
+"""
 _HTML_DUMP_PANEL_FORMAT = (
     '<section class="code-container dump-panel" style="min-width:0;'
     "border:1px solid var(--orionis-border,#dce1e7);"
@@ -71,10 +83,26 @@ _HTML_DUMP_PANEL_FORMAT = (
     "font-family:var(--orionis-mono,'Fira Code','Cascadia Code',Consolas,monospace);"
     'overflow-wrap:anywhere">{title}</span></div>{code}</section>'
 )
+"""
+Html dump panel format identifier: ``<section class="code-container dump-panel"
+style="min-width:0;border:1px solid
+var(--orionis-border,#dce1e7);border-radius:var(--orionis-radius,6px);overflow:hidden;background-color:var(--orionis-surface,#fff);box-shadow:0
+1px 3px rgb(24 36 51 / 4%)"><div class="code-header"
+style="display:flex;align-items:center;justify-content:space-between;flex-wrap:nowrap;gap:12px;padding:12px
+16px;border-bottom:1px solid
+var(--orionis-border,#dce1e7);background-color:var(--orionis-soft,#edf3f9);font-family:var(--orionis-font,'Titillium
+Web',sans-serif);font-size:12px"><span class="code-filename"
+style="min-width:0;max-width:100%;overflow-wrap:anywhere;color:var(--orionis-primary-hover,#1a569d);font-weight:600">{source}</span><span
+class="code-header-info"
+style="display:flex;align-items:center;min-width:min-content;gap:10px;color:var(--orionis-muted,#626e7f);font-family:var(--orionis-mono,'Fira
+Code','Cascadia
+Code',Consolas,monospace);overflow-wrap:anywhere">{title}</span></div>{code}</section>``.
+"""
 
 class VarDumper(IVarDumper):
 
     # ruff: noqa: T201
+    """Format Python values for structured console inspection."""
 
     def __init__(self) -> None:
         """
@@ -90,43 +118,59 @@ class VarDumper(IVarDumper):
         """
         # Set whether to show types in output
         self.__show_types: bool = True
+        """Set whether to show types in output."""
 
         # Set whether to show index numbers in output
         self.__show_index: bool = True
+        """Set whether to show index numbers in output."""
 
         # Set whether to expand all nested structures
         self.__expand_all: bool = True
+        """Set whether to expand all nested structures."""
 
         # Set the maximum depth for nested structures; None means unlimited
         self.__max_depth: int | None = None
+        """Set the maximum depth for nested structures; None means unlimited."""
 
         # Store the module path for display in the header
         self.__module_path: str | None = None
+        """Store the module path for display in the header."""
 
         # Store the line number for display in the header
         self.__line_number: int | str | None = None
+        """Store the line number for display in the header."""
 
         # HTML capture must not replace the terminal's module header.
         self.__html_module_path: str | None = None
+        """HTML capture must not replace the terminal's module header."""
         self.__html_line_number: int | str | None = None
+        """Current line number used when rendering inspected values as HTML."""
 
         # Set whether to force program exit after dumping
         self.__force_exit: bool = False
+        """Set whether to force program exit after dumping."""
 
         # Set whether to redirect output streams during dumping
         self.__redirect_output: bool = False
+        """Set whether to redirect output streams during dumping."""
         self.__redirected_output: bool = False
+        """Redirected output flag used by ``VarDumper``."""
         self.__original_stdout: Any = None
+        """Standard-output stream restored after temporary redirection."""
         self.__original_stderr: Any = None
+        """Standard-error stream restored after temporary redirection."""
 
         # Store the arguments to be dumped
         self.__args: list = []
+        """Store the arguments to be dumped."""
 
         # Create a Console instance for output formatting
         self.__console: Console = self.__makeConsole()
+        """Create a Console instance for output formatting."""
 
         # Initialize the last index for tracking
         self.__last_index: int = 0
+        """Initialize the last index for tracking."""
 
     def __forceExit(self) -> None:
         """
@@ -208,12 +252,12 @@ class VarDumper(IVarDumper):
 
         Parameters
         ----------
-        file : TextIO or None, optional
+        file : typing.TextIO or None, optional
             Output stream; None uses the terminal's standard output.
 
         Returns
         -------
-        Console
+        orionis.console.Console
             A Console object with a custom theme for variable dumping and
             recording enabled.
         """
@@ -234,7 +278,7 @@ class VarDumper(IVarDumper):
 
         Parameters
         ----------
-        value : type[T]
+        value : type[orionis.console.output.var_dumper.T]
             Value to be cloned.
 
         Returns
@@ -294,7 +338,7 @@ class VarDumper(IVarDumper):
 
         Notes
         -----
-        Prints a blank line to the standard output if `insert_line` is True.
+        Prints a blank line to the standard output if ``insert_line`` is True.
         """
         # Print a blank line if requested
         if insert_line:
@@ -311,7 +355,7 @@ class VarDumper(IVarDumper):
 
         Returns
         -------
-        Pretty
+        ``rich.pretty.Pretty``
             Value formatted with the configured expansion and depth.
         """
         return Pretty(
@@ -332,16 +376,16 @@ class VarDumper(IVarDumper):
 
         Parameters
         ----------
-        value : type[T]
+        value : type[orionis.console.output.var_dumper.T]
             Object to be pretty-printed inside the panel.
         _type : str
             Type name of the value for display in the panel title.
-        console : Console
+        console : orionis.console.Console
             Console whose width is used to size the panel.
 
         Returns
         -------
-        Panel
+        ``rich.panel.Panel``
             Rich Panel object displaying the formatted content.
 
         Notes
@@ -386,7 +430,7 @@ class VarDumper(IVarDumper):
 
         Parameters
         ----------
-        console : Console
+        console : orionis.console.Console
             Destination for the formatted output.
         show_header : bool
             Whether to include the caller's module and line.
@@ -425,7 +469,7 @@ class VarDumper(IVarDumper):
 
         Returns
         -------
-        VarDumper
+        orionis.console.output.var_dumper.VarDumper
             The current instance with updated show types setting.
         """
         # Validate that the 'show' parameter is a boolean
@@ -450,7 +494,7 @@ class VarDumper(IVarDumper):
 
         Returns
         -------
-        VarDumper
+        orionis.console.output.var_dumper.VarDumper
             The current instance with updated show index setting.
         """
         # Validate that the 'show' parameter is a boolean
@@ -475,7 +519,7 @@ class VarDumper(IVarDumper):
 
         Returns
         -------
-        VarDumper
+        orionis.console.output.var_dumper.VarDumper
             The current instance with updated expand all setting.
         """
         # Validate that the 'expand' parameter is a boolean
@@ -498,14 +542,13 @@ class VarDumper(IVarDumper):
 
         Returns
         -------
-        VarDumper
+        orionis.console.output.var_dumper.VarDumper
             Returns self with updated max depth.
 
         Raises
         ------
         TypeError
             If 'depth' is not int or None.
-
         """
         # Check if depth is int or None
         if depth is not None and not isinstance(depth, int):
@@ -527,7 +570,7 @@ class VarDumper(IVarDumper):
 
         Returns
         -------
-        VarDumper
+        orionis.console.output.var_dumper.VarDumper
             Returns the current instance with updated module path.
 
         Raises
@@ -556,7 +599,7 @@ class VarDumper(IVarDumper):
 
         Returns
         -------
-        VarDumper
+        orionis.console.output.var_dumper.VarDumper
             Returns self with updated line number.
 
         Raises
@@ -585,7 +628,7 @@ class VarDumper(IVarDumper):
 
         Returns
         -------
-        VarDumper
+        orionis.console.output.var_dumper.VarDumper
             Returns the current instance with the updated force exit setting.
 
         Raises
@@ -616,7 +659,7 @@ class VarDumper(IVarDumper):
 
         Returns
         -------
-        VarDumper
+        orionis.console.output.var_dumper.VarDumper
             The current instance with the updated redirect output setting.
 
         Raises
@@ -646,7 +689,7 @@ class VarDumper(IVarDumper):
 
         Returns
         -------
-        VarDumper
+        orionis.console.output.var_dumper.VarDumper
             Returns the current instance for method chaining.
 
         Raises
@@ -672,12 +715,12 @@ class VarDumper(IVarDumper):
 
         Parameters
         ----------
-        value : type[T]
+        value : type[orionis.console.output.var_dumper.T]
             The value to be stored for dumping.
 
         Returns
         -------
-        VarDumper
+        orionis.console.output.var_dumper.VarDumper
             Returns the current instance for method chaining.
 
         Notes

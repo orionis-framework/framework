@@ -1,3 +1,5 @@
+"""Provide view globals operations through ``_global_encrypt``, ``_global_decrypt``."""
+
 from __future__ import annotations
 from typing import TYPE_CHECKING, Any
 from orionis.encrypter.contracts.encrypter import IEncrypter
@@ -13,12 +15,12 @@ def _global_encrypt(app: IApplication) -> Any:
 
     Parameters
     ----------
-    app : IApplication
+    app : orionis.IApplication
         Application container to expose in templates.
 
     Returns
     -------
-    Any
+    typing.Any
         Callable returning the application instance.
     """
 
@@ -47,12 +49,12 @@ def _global_decrypt(app: IApplication) -> Any:
 
     Parameters
     ----------
-    app : IApplication
+    app : orionis.IApplication
         Application container to expose in templates.
 
     Returns
     -------
-    Any
+    typing.Any
         Callable returning the application instance.
     """
 

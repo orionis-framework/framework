@@ -1,3 +1,5 @@
+"""Represent the task scheduler configuration for the application."""
+
 from __future__ import annotations
 from dataclasses import dataclass, field
 from orionis.environment import Env
@@ -8,6 +10,7 @@ from orionis.support.entities.base import BaseEntity
 
 # Define the supported scheduler driver names.
 _DRIVER_NAMES: frozenset[str] = frozenset(Drivers._member_names_)
+"""Define the supported scheduler driver names."""
 
 @dataclass(frozen=True, kw_only=True)
 class Scheduler(BaseEntity):
@@ -16,12 +19,12 @@ class Scheduler(BaseEntity):
 
     Attributes
     ----------
-    store : Drivers | str
+    store : orionis.foundation.config.scheduler.enums.Drivers | str
         The default job store used by the task scheduler. Accepts a
         ``Drivers`` enum member or a plain string (e.g. ``'memory'``,
         ``'redis'``). Resolved from the ``TASKS_STORE`` environment
         variable or ``Drivers.MEMORY.value``.
-    stores : Stores | dict
+    stores : orionis.foundation.config.scheduler.Stores | dict
         Configuration for the available scheduler job stores. Defaults to
         a ``Stores`` instance backed by the in-memory job store.
     max_instances : int

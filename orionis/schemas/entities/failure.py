@@ -1,3 +1,5 @@
+"""Represent a validation failure."""
+
 from dataclasses import dataclass
 from orionis.support.entities.base import BaseEntity
 
@@ -17,7 +19,7 @@ class ValidationFailure(BaseEntity):
 
     Returns
     -------
-    ValidationFailure
+    orionis.schemas.entities.failure.ValidationFailure
         Return a new immutable validation failure instance when instantiated.
     """
 

@@ -1,3 +1,5 @@
+"""Report which migrations are applied and which are pending."""
+
 from orionis.console.commands.migrate.base import MigrationCommand
 from orionis.database.migrations.migrator import Migrator
 
@@ -7,7 +9,9 @@ class MigrateStatusCommand(MigrationCommand):
     # ruff: noqa: TC001
 
     signature: str = "migrate:status"
+    """Signature identifier: ``migrate:status``."""
     description: str = "Shows the status of every discovered migration."
+    """Description identifier: ``Shows the status of every discovered migration.``."""
 
     async def handle(self, migrator: Migrator) -> None:
         """
@@ -15,7 +19,7 @@ class MigrateStatusCommand(MigrationCommand):
 
         Parameters
         ----------
-        migrator : Migrator
+        migrator : orionis.database.migrations.Migrator
             Service that discovers migrations and reads their history.
 
         Returns

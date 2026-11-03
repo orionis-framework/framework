@@ -1,3 +1,5 @@
+"""Create all configured queue tables without removing existing data."""
+
 from orionis.console.base.command import BaseCommand
 from orionis.database.exceptions import DatabaseException
 from orionis.queues.contracts.manager import IQueueManager  # noqa: TC001
@@ -7,10 +9,17 @@ class QueueMigrateCommand(BaseCommand):
     """Create all configured queue tables without removing existing data."""
 
     __slots__ = ()
+    """Declare that this class introduces no additional instance slots."""
 
     timestamps: bool = False
+    """Timestamps flag used by ``QueueMigrateCommand``."""
     signature: str = "queue:migrate"
+    """Signature identifier: ``queue:migrate``."""
     description: str = "Create database queue tables and failed-job storage."
+    """
+    Description identifier: ``Create database queue tables and failed-job
+    storage.``.
+    """
 
     async def handle(self, manager: IQueueManager) -> int:
         """
@@ -18,7 +27,7 @@ class QueueMigrateCommand(BaseCommand):
 
         Parameters
         ----------
-        manager : IQueueManager
+        manager : orionis.queues.contracts.manager.IQueueManager
             Queue manager providing the configured storage definitions.
 
         Returns

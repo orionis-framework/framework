@@ -1,19 +1,26 @@
+"""Ensure a string is a valid email address."""
+
 import re
 from orionis.schemas.rule import Rule
 
 # Constants for email validation
 _MAX_LENGTH = 254
+"""Constants for email validation."""
 _MAX_LOCAL_LENGTH = 64
+"""Max local length value used by ``email``."""
 
 # Local part: dot-separated atoms of RFC 5322 allowed characters.
 _LOCAL_ATOM = r"[A-Za-z0-9!#$%&'*+/=?^_`{|}~-]+"
+"""Local part: dot-separated atoms of RFC 5322 allowed characters."""
 
 # Domain label: alphanumeric edges with optional inner hyphens.
 _DOMAIN_LABEL = r"[A-Za-z0-9](?:[A-Za-z0-9-]*[A-Za-z0-9])?"
+"""Domain label: alphanumeric edges with optional inner hyphens."""
 
 _EMAIL_PATTERN = re.compile(
     rf"^{_LOCAL_ATOM}(?:\.{_LOCAL_ATOM})*@{_DOMAIN_LABEL}(?:\.{_DOMAIN_LABEL})+$",
 )
+"""Compiled pattern used to recognize email pattern."""
 
 class Email(Rule):
     """
@@ -27,9 +34,12 @@ class Email(Rule):
     # ruff: noqa: ARG002
 
     __slots__ = ()
+    """Declare that this class introduces no additional instance slots."""
 
     __message__ = "Value must be a valid email address."
+    """Error text for message: ``Value must be a valid email address.``."""
     __code__ = "email"
+    """Code identifier: ``email``."""
 
     async def enforce(
         self,

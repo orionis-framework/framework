@@ -1,3 +1,5 @@
+"""Resolve the identity of API requests from a personal access token."""
+
 from typing import TYPE_CHECKING, Self
 from orionis.auth.contracts.guard import IGuard
 from orionis.auth.contracts.identity_provider import IIdentityProvider
@@ -29,6 +31,7 @@ class TokenGuard(IGuard):
     # ruff: noqa: TC001 (Dependency Injection)
 
     __slots__ = ("__identities", "__tokens")
+    """Declare the instance attribute slots reserved by this class."""
 
     def __init__(
         self: Self,
@@ -40,9 +43,9 @@ class TokenGuard(IGuard):
 
         Parameters
         ----------
-        tokens : IAccessTokenRepository
+        tokens : orionis.auth.contracts.IAccessTokenRepository
             Store used to look tokens up and mark them as used.
-        identities : IIdentityProvider
+        identities : orionis.auth.contracts.IIdentityProvider
             Provider turning a token owner into an identity.
 
         Returns
@@ -51,7 +54,9 @@ class TokenGuard(IGuard):
             Only the collaborators are retained.
         """
         self.__tokens = tokens
+        """Store used to look tokens up and mark them as used."""
         self.__identities = identities
+        """Provider turning a token owner into an identity."""
 
     @property
     def name(self: Self) -> str:
@@ -74,12 +79,12 @@ class TokenGuard(IGuard):
 
         Parameters
         ----------
-        request : Request
+        request : orionis.http.Request
             Incoming HTTP request.
 
         Returns
         -------
-        GuardResult | None
+        orionis.auth.entities.GuardResult | None
             Resolved identity together with the abilities of the token,
             or ``None`` when the request carries no usable token.
         """

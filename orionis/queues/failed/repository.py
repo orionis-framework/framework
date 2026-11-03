@@ -1,3 +1,5 @@
+"""Retain failed envelopes and diagnostics in framework-owned DB storage."""
+
 import asyncio
 import traceback
 from typing import TYPE_CHECKING, Self
@@ -24,6 +26,7 @@ class DatabaseFailedJobRepository(_DatabaseStorage, IFailedJobRepository):
     """Retain failed envelopes and diagnostics in framework-owned DB storage."""
 
     __slots__ = ("_connection", "_definition", "_ready", "_ready_lock")
+    """Declare the instance attribute slots reserved by this class."""
 
     def __init__(
         self: Self, connection: IConnection, table: str = "failed_jobs",
@@ -33,7 +36,7 @@ class DatabaseFailedJobRepository(_DatabaseStorage, IFailedJobRepository):
 
         Parameters
         ----------
-        connection : IConnection
+        connection : orionis.database.contracts.IConnection
             Shared framework connection used for failure persistence.
         table : str, optional
             Logical table name for recorded failures.
@@ -44,9 +47,13 @@ class DatabaseFailedJobRepository(_DatabaseStorage, IFailedJobRepository):
             Complete the documented operation without returning a value.
         """
         self._connection = connection
+        """Shared framework connection used for failure persistence."""
         self._definition = build_failed_jobs_table(table)
+        """Original declaration from which runtime metadata was compiled."""
         self._ready = False
+        """Ready flag used by ``DatabaseFailedJobRepository``."""
         self._ready_lock = asyncio.Lock()
+        """Synchronization primitive controlling access to ready lock."""
 
     async def record(
         self: Self,
@@ -59,7 +66,7 @@ class DatabaseFailedJobRepository(_DatabaseStorage, IFailedJobRepository):
 
         Parameters
         ----------
-        reserved : ReservedJob
+        reserved : orionis.queues.entities.reserved_job.ReservedJob
             Reservation whose encoded envelope must remain retryable.
         connection : str
             Queue connection on which the job failed.
@@ -68,7 +75,7 @@ class DatabaseFailedJobRepository(_DatabaseStorage, IFailedJobRepository):
 
         Returns
         -------
-        FailedJob
+        orionis.queues.entities.failed_job.FailedJob
             Persisted failure or its existing idempotent record.
         """
         await self._ensureSchema()
@@ -116,7 +123,7 @@ class DatabaseFailedJobRepository(_DatabaseStorage, IFailedJobRepository):
 
         Returns
         -------
-        tuple of FailedJob
+        tuple of orionis.queues.entities.failed_job.FailedJob
             Persisted failed jobs ordered by timestamp and identifier.
         """
         await self._ensureSchema()
@@ -139,7 +146,7 @@ class DatabaseFailedJobRepository(_DatabaseStorage, IFailedJobRepository):
 
         Returns
         -------
-        FailedJob or None
+        orionis.queues.entities.failed_job.FailedJob or None
             Recorded failure or no matching record.
         """
         await self._ensureSchema()

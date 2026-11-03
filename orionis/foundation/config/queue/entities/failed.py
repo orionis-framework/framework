@@ -1,3 +1,5 @@
+"""Configure database storage for failed jobs."""
+
 from dataclasses import dataclass, field
 from orionis.environment import Env
 from orionis.foundation.config.validation import validate_name
@@ -8,7 +10,7 @@ class Failed(BaseEntity):
     """
     Configure database storage for failed jobs.
 
-    Parameters
+    Attributes
     ----------
     connection : str | None
         Framework database connection, or its default when omitted.

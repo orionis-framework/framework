@@ -1,3 +1,5 @@
+"""Enumerate the outcomes a transport can confirm for one operation."""
+
 from enum import StrEnum
 
 class MailStatus(StrEnum):

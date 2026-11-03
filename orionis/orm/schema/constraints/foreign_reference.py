@@ -1,8 +1,11 @@
+"""Immutable value object describing a foreign key reference."""
+
 from __future__ import annotations
 from dataclasses import dataclass
 
 # Number of segments expected in a qualified reference such as "companies.id".
 _REFERENCE_PARTS: int = 2
+"""Number of segments expected in a qualified reference such as "companies.id"."""
 
 @dataclass(frozen=True, slots=True)
 class ForeignReference:
@@ -32,7 +35,7 @@ class ForeignReference:
 
         Returns
         -------
-        ForeignReference
+        orionis.orm.schema.constraints.ForeignReference
             Parsed reference value object.
 
         Raises

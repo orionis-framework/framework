@@ -1,3 +1,5 @@
+"""Provide startup feedback for console commands."""
+
 from __future__ import annotations
 import os
 import sys
@@ -11,7 +13,9 @@ if TYPE_CHECKING:
     from typing import BinaryIO, Self, TextIO
 
 _FRAME = "⠋ Inicializando Orionis..."
+"""Frame identifier: ``⠋ Inicializando Orionis...``."""
 _ASCII_FRAME = "- Inicializando Orionis..."
+"""Ascii frame identifier: ``- Inicializando Orionis...``."""
 
 class _OutputProxy:
     """Delegate output while retiring a startup message before its first write."""
@@ -24,9 +28,9 @@ class _OutputProxy:
 
         Parameters
         ----------
-        stream : TextIO | BinaryIO
+        stream : typing.TextIO | typing.BinaryIO
             Wrapped stream that receives delegated operations.
-        feedback : _StartupFeedback
+        feedback : orionis.console.startup._StartupFeedback
             Controller that clears the startup message before output.
 
         Returns
@@ -35,8 +39,11 @@ class _OutputProxy:
             Store the stream and controller without creating a buffer proxy.
         """
         self._stream = stream
+        """Wrapped stream that receives delegated operations."""
         self.feedback = feedback
+        """Controller that clears the startup message before output."""
         self._buffer_proxy: _OutputProxy | None = None
+        """Binary-stream proxy corresponding to the text output wrapper."""
 
     def __getattr__(self, name: str) -> object:
         """
@@ -61,7 +68,7 @@ class _OutputProxy:
 
         Returns
         -------
-        _OutputProxy
+        orionis.console.startup._OutputProxy
             Binary buffer proxy sharing the same feedback controller.
         """
         if self._buffer_proxy is None:
@@ -94,7 +101,7 @@ class _OutputProxy:
 
         Parameters
         ----------
-        lines : Iterable[str | bytes]
+        lines : collections.abc.Iterable[str | bytes]
             Text or binary lines to forward in iteration order.
 
         Returns
@@ -111,7 +118,7 @@ class _OutputProxy:
 
         Returns
         -------
-        Self
+        typing.Self
             This proxy after entering the wrapped stream's context.
         """
         self._stream.__enter__()
@@ -142,9 +149,9 @@ class _StartupFeedback:
 
         Parameters
         ----------
-        stdout : TextIO
+        stdout : typing.TextIO
             Original standard output stream to restore after feedback.
-        stderr : TextIO
+        stderr : typing.TextIO
             Original error stream used to display and clear the message.
         frame : str
             Single-line startup message to display on ``stderr``.
@@ -155,12 +162,19 @@ class _StartupFeedback:
             Store the streams and prepare their proxies and shared lock.
         """
         self.stdout = stdout
+        """Original standard output stream to restore after feedback."""
         self.stderr = stderr
+        """Original error stream used to display and clear the message."""
         self.frame = frame
+        """Single-line startup message to display on ``stderr``."""
         self.active = False
+        """Active flag used by ``_StartupFeedback``."""
         self.lock = allocate_lock()
+        """Lock produced by ``allocate_lock``."""
         self.stdout_proxy = _OutputProxy(stdout, self)
+        """Stdout proxy produced by ``_OutputProxy``."""
         self.stderr_proxy = _OutputProxy(stderr, self)
+        """Stderr proxy produced by ``_OutputProxy``."""
 
     def start(self) -> None:
         """
@@ -223,7 +237,7 @@ def _interactive_frame(arguments: Sequence[str] | None) -> str | None: # NOSONAR
 
     Parameters
     ----------
-    arguments : Sequence[str] | None
+    arguments : collections.abc.Sequence[str] | None
         Reactor arguments, including the optional executable token.
 
     Returns
@@ -298,7 +312,7 @@ def startup_feedback(arguments: Sequence[str] | None) -> Generator[None]:
 
     Parameters
     ----------
-    arguments : Sequence[str] | None
+    arguments : collections.abc.Sequence[str] | None
         Reactor arguments, including the optional executable token.
 
     Yields

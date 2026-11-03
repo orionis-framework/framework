@@ -1,8 +1,11 @@
+"""Manage console progress tasks and their displayed state."""
+
 from __future__ import annotations
 import sys
 from orionis.console.dynamic.contracts.progress_bar import IProgressBar
 
 class ProgressBar(IProgressBar):
+    """Manage console progress tasks and their displayed state."""
 
     def __init__(self, total: int = 100, width: int = 50) -> None:
         """
@@ -22,17 +25,22 @@ class ProgressBar(IProgressBar):
         """
         # Set the total value for 100% progress
         self.total = total
+        """Maximum value representing 100% progress. Default is 100."""
 
         # Set the width of the progress bar
         self.bar_width = width
+        """Width of the progress bar in characters. Default is 50."""
 
         # Initialize progress to zero
         self.progress = 0
+        """Initialize progress to zero."""
 
         # Store output stream methods used while drawing the bar.
         _stdout = sys.stdout
         self._write = _stdout.write
+        """Callable used to append bytes to the current multipart part."""
         self._flush = _stdout.flush
+        """Flush obtained from ``_stdout.flush``."""
 
     def __updateBar(self) -> None:
         """

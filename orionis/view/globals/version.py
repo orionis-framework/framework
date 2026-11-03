@@ -1,3 +1,8 @@
+"""Provide view globals operations.
+
+Includes ``_global_python_version``, ``_global_framework_version``.
+"""
+
 from __future__ import annotations
 import sys
 from typing import Any
@@ -10,7 +15,7 @@ def _global_python_version() -> Any:
 
     Returns
     -------
-    Any
+    typing.Any
         Callable that returns the Python version.
     """
     def python_version() -> str:
@@ -36,7 +41,7 @@ def _global_framework_version() -> Any:
 
     Returns
     -------
-    Any
+    typing.Any
         Callable that returns the framework version.
     """
     def framework_version() -> str:

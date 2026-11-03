@@ -1,3 +1,5 @@
+"""Thread-safe, platform-aware asyncio event loop manager for the Orionis Framework."""
+
 from __future__ import annotations
 import asyncio
 import inspect
@@ -32,24 +34,33 @@ class Loop:
 
     # True when running on Windows; evaluated once at class definition.
     _IS_WIN32: ClassVar[bool] = sys.platform == "win32"
+    """True when running on Windows; evaluated once at class definition."""
 
     # Cached uvloop factory; ``None`` until detection completes.
     _uvloop_factory: ClassVar[Callable[[], asyncio.AbstractEventLoop] | None] = None
+    """Cached uvloop factory; ``None`` until detection completes."""
 
     # Guard: ensures uvloop detection runs at most once across all threads.
     _uvloop_checked: ClassVar[bool] = False
+    """Guard: ensures uvloop detection runs at most once across all threads."""
 
     # Serialises uvloop detection to prevent duplicate work under concurrency.
     _loop_lock: ClassVar[threading.Lock] = threading.Lock()
+    """Serialises uvloop detection to prevent duplicate work under concurrency."""
 
     # Whether the optimal loop factory has been resolved yet.
     _loop_factory_resolved: ClassVar[bool] = False
+    """Whether the optimal loop factory has been resolved yet."""
 
     # Cached optimal loop factory; ``None`` means "use asyncio default".
     # Only valid when ``_loop_factory_resolved`` is ``True``.
     _loop_factory_cached: ClassVar[
         Callable[[], asyncio.AbstractEventLoop] | None
     ] = None
+    """
+    Cached optimal loop factory; ``None`` means "use asyncio default". Only valid
+    when ``_loop_factory_resolved`` is ``True``.
+    """
 
     # ------------------------------------------------------------------
     # Internal helpers
@@ -67,6 +78,7 @@ class Loop:
         Returns
         -------
         asyncio.AbstractEventLoop or None
+            Loop running in the current thread, or None when no loop is running.
         """
         try:
             return asyncio.get_running_loop()
@@ -103,7 +115,7 @@ class Loop:
 
         Returns
         -------
-        Callable or None
+        collections.abc.Callable or None
             ``uvloop.new_event_loop`` when available on a non-Windows
             platform, otherwise ``None``.
         """
@@ -141,7 +153,8 @@ class Loop:
 
         Returns
         -------
-        Callable or None
+        collections.abc.Callable or None
+            Platform-specific loop factory, or None to use the asyncio default.
         """
         if cls._loop_factory_resolved:
             return cls._loop_factory_cached
@@ -226,13 +239,16 @@ class Loop:
         immediately. Otherwise asyncio's current registered loop is returned.
         A fresh loop is created and registered when none is open; the caller
         owns that newly created loop and must close it explicitly. A subsequent
-        :meth:`eventLoopContext` borrows the registered loop and will not close
-        it. For automatic ownership and cleanup, enter :meth:`eventLoopContext`
+        :meth:`orionis.aio.Loop.eventLoopContext` borrows the registered loop and will
+        not close
+        it. For automatic ownership and cleanup, enter
+        :meth:`orionis.aio.Loop.eventLoopContext`
         directly when no open loop is registered.
 
         Returns
         -------
         asyncio.AbstractEventLoop
+            Open event loop associated with the current thread.
         """
         running = cls._getRunningLoop()
         if running is not None:
@@ -253,12 +269,12 @@ class Loop:
 
         Parameters
         ----------
-        coro : Coroutine
+        coro : collections.abc.Coroutine
             The coroutine object to run.
 
         Returns
         -------
-        T
+        ``T``
             The value returned by the coroutine.
 
         Raises
@@ -303,16 +319,17 @@ class Loop:
 
         Parameters
         ----------
-        func : Callable
+        func : collections.abc.Callable
             The function or coroutine function to invoke.
-        *args : Any
+        *args : typing.Any
             Positional arguments forwarded to *func*.
-        **kwargs : Any
+        **kwargs : typing.Any
             Keyword arguments forwarded to *func*.
 
         Returns
         -------
-        Any
+        typing.Any
+            Callable result, or its resolved result when execution is asynchronous.
 
         Raises
         ------
@@ -338,7 +355,8 @@ class Loop:
         Borrow the current open loop, or create and own one for the block.
 
         Borrowed loops, including running loops and loops previously returned by
-        :meth:`getEventLoop`, are never closed and their tasks are not cancelled.
+        :meth:`orionis.aio.Loop.getEventLoop`, are never closed and their tasks are not
+        cancelled.
         Nested contexts borrow the outer context's loop. Ownership remains with
         the original caller or context.
 
@@ -350,6 +368,7 @@ class Loop:
         Yields
         ------
         asyncio.AbstractEventLoop
+            Loop available inside the context; an owned loop is closed on exit.
 
         Raises
         ------
@@ -372,6 +391,7 @@ class Loop:
         Returns
         -------
         bool
+            True when this thread has a running event loop, otherwise False.
         """
         return Loop._getRunningLoop() is not None
 
@@ -389,7 +409,7 @@ class Loop:
 
         Parameters
         ----------
-        coro : Coroutine
+        coro : collections.abc.Coroutine
             The coroutine to schedule.
         name : str or None, optional
             An optional descriptive name for the task.
@@ -397,6 +417,7 @@ class Loop:
         Returns
         -------
         asyncio.Task
+            Task scheduled to execute the supplied coroutine.
         """
         return asyncio.create_task(coro, name=name)
 
@@ -405,17 +426,19 @@ class Loop:
         """
         Run a coroutine synchronously from a thread without a running loop.
 
-        Delegates to :meth:`run` in the calling thread, preserving its context
+        Delegates to :meth:`orionis.aio.Loop.run` in the calling thread, preserving its
+        context
         without a shared executor. From asynchronous code, await the coroutine
         directly; blocking the loop thread is deliberately unsupported.
 
         Parameters
         ----------
-        coro : Coroutine
+        coro : collections.abc.Coroutine
+            Coroutine to execute to completion.
 
         Returns
         -------
-        T
+        ``T``
             The value returned by the coroutine.
 
         Raises

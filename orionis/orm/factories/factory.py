@@ -1,3 +1,5 @@
+"""Build and persist model instances from reusable attribute definitions."""
+
 from collections.abc import AsyncIterator, Callable, Iterator
 from copy import deepcopy
 from inspect import iscoroutinefunction
@@ -18,15 +20,19 @@ if TYPE_CHECKING:
     from orionis.orm.factories.fake import Fake
 
 type State = dict[str, Any] | Callable[[dict[str, Any]], dict[str, Any]]
+"""Type alias for ``dict[str, Any] | Callable[[dict[str, Any]], dict[str, Any]]``."""
 
 class Factory[TModel: Model]:
+    """Build and persist model instances from reusable attribute definitions."""
 
     __slots__ = (
         "_busy", "_count", "_fake", "_model", "_sequence",
         "_sequence_index", "_states",
     )
+    """Declare the instance attribute slots reserved by this class."""
 
     model: type[TModel] | None = None
+    """Model selected for generation or persistence."""
 
     def __init__(
         self,
@@ -34,7 +40,8 @@ class Factory[TModel: Model]:
         locale: str | None = None,
         seed: int | None = None,
     ) -> None:
-        """Validate the factory and initialize its independent data provider.
+        """
+        Validate the factory and initialize its independent data provider.
 
         Parameters
         ----------
@@ -46,9 +53,9 @@ class Factory[TModel: Model]:
 
         Raises
         ------
-        FactoryConfigurationException
+        orionis.orm.factories.FactoryConfigurationException
             If the model, locale or seed is invalid.
-        FactoryDefinitionException
+        orionis.orm.factories.FactoryDefinitionException
             If no synchronous definition method is implemented.
 
         Returns
@@ -84,12 +91,19 @@ class Factory[TModel: Model]:
             error_msg = "Factory seed must be an integer or None."
             raise FactoryConfigurationException(error_msg)
         self._model = model
+        """Model selected for generation or persistence."""
         self._count = 1
+        """Count value used by ``Factory``."""
         self._states: list[State] = []
+        """Attribute transformations applied when building model instances."""
         self._sequence: Sequence | None = None
+        """Sequence state used to vary attributes between generated instances."""
         self._sequence_index = 0
+        """Sequence index value used by ``Factory``."""
         self._busy = False
+        """Busy flag used by ``Factory``."""
         self._fake: Fake = create_faker(locale, seed)
+        """Fake produced by ``create_faker``."""
 
     @property
     def fake(self) -> Fake:
@@ -98,7 +112,7 @@ class Factory[TModel: Model]:
 
         Returns
         -------
-        Fake
+        orionis.orm.factories.Fake
             Orionis facade, including custom providers and ``unique``.
         """
         return self._fake
@@ -109,12 +123,12 @@ class Factory[TModel: Model]:
 
         Returns
         -------
-        dict of str to Any
+        dict of str ``to`` typing.Any
             Attributes to assign through the model constructor.
 
         Raises
         ------
-        FactoryDefinitionException
+        orionis.orm.factories.FactoryDefinitionException
             Always, unless overridden by a concrete factory.
         """
         error_msg = "A factory must implement definition()."
@@ -131,12 +145,12 @@ class Factory[TModel: Model]:
 
         Returns
         -------
-        Self
+        typing.Self
             This configured factory.
 
         Raises
         ------
-        FactoryConfigurationException
+        orionis.orm.factories.FactoryConfigurationException
             If count is not a nonnegative integer.
         """
         self._ensureIdle()
@@ -152,17 +166,17 @@ class Factory[TModel: Model]:
 
         Parameters
         ----------
-        state : dict or Callable
+        state : dict or collections.abc.Callable
             Dictionary or callback receiving detached current attributes.
 
         Returns
         -------
-        Self
+        typing.Self
             This configured factory.
 
         Raises
         ------
-        FactoryConfigurationException
+        orionis.orm.factories.FactoryConfigurationException
             If state is not a dictionary or synchronous callable.
         """
         self._ensureIdle()
@@ -189,17 +203,17 @@ class Factory[TModel: Model]:
 
         Parameters
         ----------
-        sequence : Sequence
+        sequence : collections.abc.Sequence
             Cycling mappings or callbacks of the absolute item index.
 
         Returns
         -------
-        Self
+        typing.Self
             This configured factory.
 
         Raises
         ------
-        FactoryConfigurationException
+        orionis.orm.factories.FactoryConfigurationException
             If sequence is not a Sequence instance.
         """
         self._ensureIdle()
@@ -216,7 +230,7 @@ class Factory[TModel: Model]:
 
         Returns
         -------
-        Self
+        typing.Self
             This factory, with its instance-wide unique pool cleared.
         """
         self._ensureIdle()
@@ -229,12 +243,12 @@ class Factory[TModel: Model]:
 
         Parameters
         ----------
-        **overrides : Any
+        **overrides : typing.Any
             Attributes taking precedence over defaults, states and sequence.
 
         Returns
         -------
-        TModel or Collection
+        ``TModel`` or collections.abc.Collection
             One model for count one; otherwise a Collection of models.
         """
         stream = self.iterMake(**overrides)
@@ -254,12 +268,12 @@ class Factory[TModel: Model]:
 
         Parameters
         ----------
-        **overrides : Any
+        **overrides : typing.Any
             Final attribute overrides, subject to normal mass assignment.
 
         Returns
         -------
-        TModel or Collection
+        ``TModel`` or collections.abc.Collection
             Persisted models, with the same cardinality rules as ``make``.
 
         Notes
@@ -281,12 +295,12 @@ class Factory[TModel: Model]:
 
         Parameters
         ----------
-        **overrides : Any
+        **overrides : typing.Any
             Final attribute overrides copied when iteration starts.
 
         Yields
         ------
-        TModel
+        ``TModel``
             One unsaved model per iteration.
 
         Notes
@@ -311,17 +325,17 @@ class Factory[TModel: Model]:
 
         Parameters
         ----------
-        **overrides : Any
+        **overrides : typing.Any
             Final attributes, copied before the first persistence await.
 
         Yields
         ------
-        TModel
+        ``TModel``
             One successfully persisted model per iteration.
 
         Raises
         ------
-        FactoryPersistenceException
+        orionis.orm.factories.FactoryPersistenceException
             If a model event vetoes saving.
 
         Notes
@@ -339,11 +353,12 @@ class Factory[TModel: Model]:
             stream.close()
 
     def _ensureIdle(self) -> None:
-        """Reject reconfiguration or overlapping use of an active factory.
+        """
+        Reject reconfiguration or overlapping use of an active factory.
 
         Raises
         ------
-        FactoryConcurrencyException
+        orionis.orm.factories.FactoryConcurrencyException
             If another operation owns this instance.
 
         Returns
@@ -361,12 +376,12 @@ class Factory[TModel: Model]:
 
         Parameters
         ----------
-        overrides : dict of str to Any
+        overrides : dict of str ``to`` typing.Any
             Detached explicit attributes for the current operation.
 
         Returns
         -------
-        TModel
+        ``TModel``
             New model with normal casts and mutators applied.
         """
         attributes = copy_attributes(self.definition(), "definition()")

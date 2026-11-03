@@ -1,3 +1,5 @@
+"""Load translation sources from the configured language path."""
+
 from __future__ import annotations
 from typing import TYPE_CHECKING
 import msgspec
@@ -26,11 +28,12 @@ class TranslationLoader(ITranslationLoader):
     -----
     Translation files are read as raw bytes and decoded as UTF-8 JSON.
     A source stored in any other encoding raises
-    :class:`TranslationSyntaxException`, like any other unusable
+    :class:`orionis.localization.TranslationSyntaxException`, like any other unusable
     payload.
     """
 
     __slots__ = ("_path",)
+    """Declare the instance attribute slots reserved by this class."""
 
     def __init__(self, path: Path) -> None:
         """
@@ -38,14 +41,16 @@ class TranslationLoader(ITranslationLoader):
 
         Parameters
         ----------
-        path : Path
+        path : pathlib.Path
             Absolute directory containing the translation sources.
 
         Returns
         -------
         None
+            Initialize the loader with the language directory.
         """
         self._path = path
+        """Absolute directory containing the translation sources."""
 
     def load(self, locale: str) -> TranslationMap:
         """
@@ -61,13 +66,13 @@ class TranslationLoader(ITranslationLoader):
 
         Returns
         -------
-        TranslationMap
+        orionis.localization.types.TranslationMap
             Flat mapping of translation key to translated text. An
             empty mapping is returned when no source exists.
 
         Raises
         ------
-        TranslationSyntaxException
+        orionis.localization.TranslationSyntaxException
             If a translation file is not UTF-8 encoded, contains
             invalid JSON, or its root element is not an object.
         """
@@ -96,7 +101,7 @@ class TranslationLoader(ITranslationLoader):
 
         Returns
         -------
-        tuple[str, ...]
+        tuple[str, ``...``]
             Sorted locale codes discovered from root JSON files and
             grouped directories inside the language path.
         """
@@ -119,7 +124,7 @@ class TranslationLoader(ITranslationLoader):
 
         Parameters
         ----------
-        file : Path
+        file : pathlib.Path
             Absolute path of the JSON file to decode.
 
         Returns
@@ -129,9 +134,9 @@ class TranslationLoader(ITranslationLoader):
 
         Raises
         ------
-        TranslationFileNotFoundException
+        orionis.localization.TranslationFileNotFoundException
             If the file does not exist.
-        TranslationSyntaxException
+        orionis.localization.TranslationSyntaxException
             If the payload is not UTF-8 encoded, is invalid JSON, or
             its root element is not an object.
         """
@@ -169,12 +174,13 @@ class TranslationLoader(ITranslationLoader):
             Nested translation object to flatten.
         prefix : str
             Dot-notated prefix accumulated so far.
-        target : TranslationMap
+        target : orionis.localization.types.TranslationMap
             Mutable mapping receiving the flattened entries.
 
         Returns
         -------
         None
+            Flatten a nested translation object into dot-notated keys.
         """
         for key, value in payload.items():
             compound = f"{prefix}.{key}"

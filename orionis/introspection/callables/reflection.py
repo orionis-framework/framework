@@ -1,3 +1,5 @@
+"""Inspect callable signatures, parameters and invocation metadata."""
+
 from __future__ import annotations
 import inspect
 import types
@@ -14,11 +16,18 @@ if TYPE_CHECKING:
 
 # Global sentinel: distinguishes "not yet cached" from None as a legitimate cached value
 _UNSET: object = object()
+"""
+Global sentinel: distinguishes "not yet cached" from None as a legitimate cached
+value.
+"""
 
 class ReflectionCallable(IReflectionCallable):
 
     # Explicit slots remove the per-instance __dict__ and speed up attribute access
+    """Inspect callable signatures, parameters and invocation metadata."""
+
     __slots__ = ("_cache", "_docstring", "_function", "_module", "_name")
+    """Explicit slots remove the per-instance __dict__ and speed up attribute access."""
 
     def __init__(self, fn: callable) -> None:
         """
@@ -32,7 +41,7 @@ class ReflectionCallable(IReflectionCallable):
         Raises
         ------
         TypeError
-            If `fn` is not a function, method, or lambda.
+            If ``fn`` is not a function, method, or lambda.
 
         Returns
         -------
@@ -50,11 +59,19 @@ class ReflectionCallable(IReflectionCallable):
             raise TypeError(error_msg)
         # Store the callable and pre-compute its immutable read-only properties
         self._function = fn
+        """The function, method, or lambda to be wrapped."""
         self._name: str = fn.__name__
+        """Name identifying this declaration within its containing registry."""
         self._module: str = fn.__module__
+        """Module obtained from ``fn.__module__``."""
         self._docstring: str = fn.__doc__ or ""
+        """Documentation text extracted from the inspected callable."""
         # Shared dict for deferred computation results and the external cache protocol
         self._cache: dict[str, object] = {}
+        """
+        Shared dict for deferred computation results and the external cache
+        protocol.
+        """
 
     def __getitem__(self, key: str) -> object | None:
         """
@@ -247,7 +264,7 @@ class ReflectionCallable(IReflectionCallable):
 
         Returns
         -------
-        inspect.Signature
+        ``inspect.Signature``
             The signature object representing the callable's parameters,
             default values, and type annotations.
         """
@@ -270,7 +287,7 @@ class ReflectionCallable(IReflectionCallable):
 
         Returns
         -------
-        Signature
+        orionis.introspection.dependencies.entities.signature.Signature
             A structure that holds the resolved and unresolved dependencies
             derived from the callable's parameter annotations.
         """

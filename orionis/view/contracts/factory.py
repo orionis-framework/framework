@@ -1,3 +1,5 @@
+"""Contract for the view factory."""
+
 from __future__ import annotations
 from abc import ABC, abstractmethod
 from typing import Any, TYPE_CHECKING
@@ -10,13 +12,14 @@ class IViewFactory(ABC):
     Contract for the view factory.
 
     Callers use this interface to render named templates and receive
-    fully formed :class:`HTMLResponse` objects ready to return from
+    fully formed :class:`orionis.http.HTMLResponse` objects ready to return from
     HTTP controllers.
     """
 
     # ruff: noqa: ANN401
 
     __slots__ = ()
+    """Declare that this class introduces no additional instance slots."""
 
     @abstractmethod
     def make(self, template: str, **context: Any) -> PendingView:
@@ -28,19 +31,19 @@ class IViewFactory(ABC):
         template : str
             Template name using dot notation (e.g. ``'users.index'``) or a
             direct path relative to a configured template directory.
-        **context : Any
+        **context : typing.Any
             Keyword arguments are forwarded as template variables.
 
         Returns
         -------
-        PendingView
-            Awaitable proxy that resolves to an :class:`HTMLResponse` and
+        orionis.view.pending.PendingView
+            Awaitable proxy that resolves to an :class:`orionis.http.HTMLResponse` and
             accepts chained response mutators such as ``withFlash()``.
 
         Raises
         ------
-        ViewTemplateNotFoundException
+        orionis.view.exceptions.ViewTemplateNotFoundException
             When the requested template file cannot be located.
-        ViewRenderException
+        orionis.view.exceptions.ViewRenderException
             When the template engine fails during rendering.
         """

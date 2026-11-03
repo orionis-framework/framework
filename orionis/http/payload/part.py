@@ -1,3 +1,5 @@
+"""Represent a single part within a multipart HTTP request body."""
+
 from __future__ import annotations
 import base64
 import quopri
@@ -23,6 +25,7 @@ class MultipartPart(IMultipartPart):
         "is_file",
         "name",
     )
+    """Declare the instance attribute slots reserved by this class."""
 
     def __init__(
         self,
@@ -46,6 +49,7 @@ class MultipartPart(IMultipartPart):
         """
         # Store raw headers for later CTE and charset lookups
         self.headers = headers
+        """Lowercased headers for this multipart part."""
 
         # Parse Content-Disposition to extract name, filename, and attrs.
         # _parseContentDisposition fuses RFC 5987 extended values (filename*)
@@ -56,15 +60,21 @@ class MultipartPart(IMultipartPart):
 
         # Assign field metadata extracted from the disposition attributes
         self.name: str | None = attrs.get("name")
+        """Assign field metadata extracted from the disposition attributes."""
         self.filename: str | None = attrs.get("filename")
+        """Filename used when rendering or storing the resource."""
         self.content_type: str | None = headers.get("content-type")
+        """Content type produced by ``headers.get``."""
 
         # A part is treated as a file upload when a filename is declared
         self.is_file: bool = self.filename is not None
+        """A part is treated as a file upload when a filename is declared."""
 
         # Select the file or field buffer writer for this part.
         self.data: UploadedFile | bytearray
+        """Select the file or field buffer writer for this part."""
         self._write: Callable[[bytes | bytearray | memoryview], None]
+        """Callable used to append bytes to the current multipart part."""
         if self.is_file:
             # File parts accumulate bytes via a spill-aware UploadedFile
             self.data = UploadedFile(
@@ -166,7 +176,7 @@ class MultipartPart(IMultipartPart):
 
         Returns
         -------
-        UploadedFile | str
+        orionis.http.payload.uploaded_file.UploadedFile | str
             The ``UploadedFile`` handle for file parts, or the decoded
             string for field parts.
         """

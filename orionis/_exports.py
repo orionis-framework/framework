@@ -1,3 +1,5 @@
+"""Provide framework operations through ``resolve_export``."""
+
 from importlib import import_module
 
 def resolve_export(

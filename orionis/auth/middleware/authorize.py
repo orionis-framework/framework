@@ -1,3 +1,8 @@
+"""Provide auth middleware operations.
+
+Includes ``RequirePermissionMiddleware``, ``RequireRoleMiddleware``.
+"""
+
 from typing import TYPE_CHECKING, ClassVar
 from orionis.auth.context.functions import current_auth_context
 from orionis.auth.contracts.authorizer import IAuthorizer
@@ -32,12 +37,15 @@ class RequirePermissionMiddleware(BaseMiddleware):
     # ruff: noqa: TC001 (Dependency Injection)
 
     __slots__ = ("_authorizer",)
+    """Declare the instance attribute slots reserved by this class."""
 
     # Permissions the identity must hold.
     permissions: ClassVar[tuple[str, ...]] = ()
+    """Permissions the identity must hold."""
 
     # Whether every permission is required, or just one of them.
     requires_all: ClassVar[bool] = True
+    """Whether every permission is required, or just one of them."""
 
     def __init__(self, authorizer: IAuthorizer) -> None:
         """
@@ -45,7 +53,7 @@ class RequirePermissionMiddleware(BaseMiddleware):
 
         Parameters
         ----------
-        authorizer : IAuthorizer
+        authorizer : orionis.auth.contracts.IAuthorizer
             Component evaluating the permissions of the request context.
 
         Returns
@@ -54,6 +62,7 @@ class RequirePermissionMiddleware(BaseMiddleware):
             The middleware keeps no per request state.
         """
         self._authorizer = authorizer
+        """Component evaluating the permissions of the request context."""
 
     async def handle(
         self,
@@ -65,24 +74,24 @@ class RequirePermissionMiddleware(BaseMiddleware):
 
         Parameters
         ----------
-        request : Request
+        request : orionis.http.Request
             Incoming HTTP request, unused by this middleware.
-        call_next : NextCallable
+        call_next : orionis.http.NextCallable
             Callable advancing to the next layer.
 
         Returns
         -------
-        Response
+        orionis.http.Response
             Response produced by the rest of the pipeline.
 
         Raises
         ------
-        AuthConfigurationException
+        orionis.auth.AuthConfigurationException
             When the subclass declares no permission at all.
-        AuthenticationException
+        orionis.auth.AuthenticationException
             When the request carries no authenticated identity, which the
             handler turns into a ``401`` response.
-        AuthorizationException
+        orionis.auth.AuthorizationException
             When the identity is authenticated but not authorized, which
             the handler turns into a ``403`` response.
         """
@@ -115,7 +124,8 @@ class RequireRoleMiddleware(BaseMiddleware):
     Require one or more roles before reaching the controller.
 
     Roles are a grouping of permissions, so prefer
-    :class:`RequirePermissionMiddleware` whenever the route protects a
+    :class:`orionis.auth.middleware.RequirePermissionMiddleware` whenever the route
+    protects a
     concrete capability. Declare the requirement by subclassing::
 
         class MustBeAdmin(RequireRoleMiddleware):
@@ -123,12 +133,15 @@ class RequireRoleMiddleware(BaseMiddleware):
     """
 
     __slots__ = ("_authorizer",)
+    """Declare the instance attribute slots reserved by this class."""
 
     # Roles the identity must hold.
     roles: ClassVar[tuple[str, ...]] = ()
+    """Roles the identity must hold."""
 
     # Whether every role is required, or just one of them.
     requires_all: ClassVar[bool] = False
+    """Whether every role is required, or just one of them."""
 
     def __init__(self, authorizer: IAuthorizer) -> None:
         """
@@ -136,7 +149,7 @@ class RequireRoleMiddleware(BaseMiddleware):
 
         Parameters
         ----------
-        authorizer : IAuthorizer
+        authorizer : orionis.auth.contracts.IAuthorizer
             Component evaluating the roles of the request context.
 
         Returns
@@ -145,6 +158,7 @@ class RequireRoleMiddleware(BaseMiddleware):
             The middleware keeps no per request state.
         """
         self._authorizer = authorizer
+        """Component evaluating the roles of the request context."""
 
     async def handle(
         self,
@@ -156,23 +170,23 @@ class RequireRoleMiddleware(BaseMiddleware):
 
         Parameters
         ----------
-        request : Request
+        request : orionis.http.Request
             Incoming HTTP request, unused by this middleware.
-        call_next : NextCallable
+        call_next : orionis.http.NextCallable
             Callable advancing to the next layer.
 
         Returns
         -------
-        Response
+        orionis.http.Response
             Response produced by the rest of the pipeline.
 
         Raises
         ------
-        AuthConfigurationException
+        orionis.auth.AuthConfigurationException
             When the subclass declares no role at all.
-        AuthenticationException
+        orionis.auth.AuthenticationException
             When the request carries no authenticated identity.
-        AuthorizationException
+        orionis.auth.AuthorizationException
             When the identity does not hold the required roles.
         """
         required = self.roles
@@ -211,7 +225,7 @@ class RequireRoleMiddleware(BaseMiddleware):
         ----------
         context : object
             Authentication context of the current request.
-        required : tuple[str, ...]
+        required : tuple[str, ``...``]
             Roles declared by the subclass.
 
         Returns

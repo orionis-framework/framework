@@ -1,9 +1,13 @@
+"""Define the contract for encrypter implementations."""
+
 from __future__ import annotations
 from abc import ABC, abstractmethod
 
 class IEncrypter(ABC):
+    """Define the contract for encrypter implementations."""
 
     __slots__ = ()
+    """Declare that this class introduces no additional instance slots."""
 
     @abstractmethod
     def encrypt(

@@ -1,3 +1,5 @@
+"""Configure named queue connections, failure storage, and workers."""
+
 from dataclasses import dataclass, field, fields
 from orionis.environment import Env
 from orionis.foundation.config.queue.entities.connections import Connections
@@ -10,21 +12,22 @@ from orionis.foundation.config.validation import validate_name
 from orionis.support.entities.base import BaseEntity
 
 _CONNECTION_ENTITIES = {"sync": Sync, "database": Database, "redis": Redis}
+"""Connection entities definitions used by ``queue``."""
 
 @dataclass(frozen=True, kw_only=True, slots=True)
 class Queue(BaseEntity):
     """
     Configure named queue connections, failure storage, and workers.
 
-    Parameters
+    Attributes
     ----------
     default : str
         Default connection name, read from ``QUEUE_CONNECTION``.
-    connections : Connections | dict
+    connections : orionis.foundation.config.queue.Connections | dict
         Conventional connections or named backends converted to typed entities.
-    failed : Failed | dict
+    failed : orionis.foundation.config.queue.Failed | dict
         Database connection and table used to preserve failed jobs.
-    worker : Worker | dict
+    worker : orionis.foundation.config.queue.Worker | dict
         Default concurrency, polling interval, timeout, tries, and backoff.
     """
 
@@ -92,7 +95,7 @@ class Queue(BaseEntity):
 
         Returns
         -------
-        Worker
+        orionis.foundation.config.queue.Worker
             Validated worker defaults.
 
         Raises
@@ -117,7 +120,7 @@ class Queue(BaseEntity):
 
         Returns
         -------
-        Failed
+        orionis.foundation.config.queue.Failed
             Validated failed-job storage.
 
         Raises
@@ -194,9 +197,9 @@ class Queue(BaseEntity):
         ----------
         connections : dict[str, Sync | Database | Redis]
             Validated named connection entities.
-        worker : Worker
+        worker : orionis.foundation.config.queue.Worker
             Validated execution defaults.
-        failed : Failed
+        failed : orionis.foundation.config.queue.Failed
             Validated failed-job storage.
 
         Returns

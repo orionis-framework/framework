@@ -1,3 +1,5 @@
+"""Provide foundation operations through ``get_core_config_mapping``."""
+
 from dataclasses import asdict
 from importlib import import_module
 from types import MappingProxyType
@@ -31,13 +33,15 @@ _CONFIG_ENTITIES: tuple[tuple[str, str, str], ...] = (
     ("testing", "orionis.foundation.config.testing.entities.testing", "Testing"),
     ("view", "orionis.foundation.config.view.entities.view", "View"),
 )
+"""Config entities definitions used by ``core_config``."""
 
 def get_core_config_mapping() -> MappingProxyType:
-    """Build independent configuration defaults from their declared entities.
+    """
+    Build independent configuration defaults from their declared entities.
 
     Returns
     -------
-    MappingProxyType
+    types.MappingProxyType
         Read-only outer mapping containing newly created nested configuration
         dictionaries. Entity modules are imported on the first call.
     """

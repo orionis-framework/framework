@@ -1,3 +1,5 @@
+"""Clear migration and seeder history, then rebuild the schema."""
+
 from orionis.console.commands.migrate.base import MigrationCommand
 from orionis.database.migrations.migrator import Migrator
 
@@ -7,7 +9,11 @@ class MigrateFreshCommand(MigrationCommand):
     # ruff: noqa: TC001
 
     signature: str = "migrate:fresh"
+    """Signature identifier: ``migrate:fresh``."""
     description: str = "Clears migration and seeder history, then migrates."
+    """
+    Description identifier: ``Clears migration and seeder history, then migrates.``.
+    """
 
     async def handle(self, migrator: Migrator) -> None:
         """
@@ -15,7 +21,7 @@ class MigrateFreshCommand(MigrationCommand):
 
         Parameters
         ----------
-        migrator : Migrator
+        migrator : orionis.database.migrations.Migrator
             Service that discovers, reverts, and applies migrations.
 
         Returns

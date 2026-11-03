@@ -1,3 +1,8 @@
+"""Provide logging handlers operations.
+
+Includes ``LoggingDeliveryError``, ``BoundedQueueHandler``.
+"""
+
 import logging
 import sys
 from copy import copy
@@ -14,7 +19,7 @@ def _raise_sink_error(_record: logging.LogRecord) -> None:
 
     Parameters
     ----------
-    _record : logging.LogRecord
+    _record : ``logging.LogRecord``
         Log record associated with the simulated sink failure.
 
     Returns
@@ -29,6 +34,7 @@ class _Listener(QueueListener):
     """Drain a bounded queue even after a sink reports a failure."""
 
     error: Exception | None = None
+    """First error retained while background work continues to drain."""
 
     def handle(self: Self, record: logging.LogRecord) -> None:
         """
@@ -36,7 +42,7 @@ class _Listener(QueueListener):
 
         Parameters
         ----------
-        record : logging.LogRecord
+        record : ``logging.LogRecord``
             Log record to deliver to the sink.
 
         Returns
@@ -79,7 +85,7 @@ class BoundedQueueHandler(logging.Handler):
 
         Parameters
         ----------
-        target : logging.Handler
+        target : ``logging.Handler``
             Owned sink, closed after the queue drains.
         capacity : int
             Positive number of pending records allowed.
@@ -94,10 +100,14 @@ class BoundedQueueHandler(logging.Handler):
             raise ValueError(error_msg)
         super().__init__(target.level)
         self._target = target
+        """Owned sink, closed after the queue drains."""
         target.handleError = _raise_sink_error
         self._queue: Queue = Queue(maxsize=capacity)
+        """Name of the queue receiving or storing the job."""
         self._listener = _Listener(self._queue, target)
+        """Listener produced by ``_Listener``."""
         self._stopped = False
+        """Stopped flag used by ``BoundedQueueHandler``."""
         self._listener.start()
 
     def emit(self: Self, record: logging.LogRecord) -> None:
@@ -106,7 +116,7 @@ class BoundedQueueHandler(logging.Handler):
 
         Parameters
         ----------
-        record : logging.LogRecord
+        record : ``logging.LogRecord``
             Log record to deliver to the sink.
 
         Returns

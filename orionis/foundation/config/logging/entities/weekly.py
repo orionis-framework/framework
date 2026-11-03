@@ -1,3 +1,5 @@
+"""Represent the configuration for weekly log file management."""
+
 from __future__ import annotations
 from dataclasses import dataclass, field
 from orionis.environment import Env
@@ -6,6 +8,7 @@ from orionis.foundation.config.logging.validators import IsValidLevel, IsValidPa
 from orionis.support.entities.base import BaseEntity
 
 _DEFAULT_PATH: str = "storage/logs/weekly_{suffix}.log"
+"""Default path identifier: ``storage/logs/weekly_{suffix}.log``."""
 
 @dataclass(frozen=True, kw_only=True)
 class Weekly(BaseEntity):
@@ -16,7 +19,7 @@ class Weekly(BaseEntity):
     ----------
     path : str
         The file path where the log is stored.
-    level : int | str | Level
+    level : int | str | orionis.foundation.config.logging.Level
         The logging level (e.g., 'info', 'error', 'debug').
     retention_weeks : int
         The number of weeks to retain log files before deletion.
@@ -61,7 +64,7 @@ class Weekly(BaseEntity):
 
         Parameters
         ----------
-        self : Weekly
+        self : orionis.foundation.config.logging.Weekly
             The instance of the Weekly configuration.
 
         Returns

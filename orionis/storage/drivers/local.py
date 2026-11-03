@@ -1,3 +1,5 @@
+"""Storage driver backed by the local filesystem."""
+
 from __future__ import annotations
 import asyncio
 import hashlib
@@ -26,17 +28,20 @@ if TYPE_CHECKING:
 
 # Default chunk size for streaming operations (64 KiB).
 _CHUNK_SIZE: int = 64 * 1024
+"""Default chunk size for streaming operations (64 KiB)."""
 
 # POSIX permission bits applied per visibility level.
 _FILE_MODES: dict[str, int] = {
     Visibility.PUBLIC.value: 0o644,
     Visibility.PRIVATE.value: 0o600,
 }
+"""POSIX permission bits applied per visibility level."""
 
 # Binary modes accepted by open().
 _ALLOWED_MODES: frozenset[str] = frozenset(
     {"rb", "wb", "ab", "rb+", "wb+", "ab+"},
 )
+"""Binary modes accepted by open()."""
 
 class LocalStorageDriver(IStorageDriver):
     """
@@ -51,6 +56,7 @@ class LocalStorageDriver(IStorageDriver):
     """
 
     __slots__ = ("_base_url", "_root")
+    """Declare the instance attribute slots reserved by this class."""
 
     def __init__(self: Self, root: Path, base_url: str | None = None) -> None:
         """
@@ -58,7 +64,7 @@ class LocalStorageDriver(IStorageDriver):
 
         Parameters
         ----------
-        root : Path
+        root : pathlib.Path
             Directory acting as the disk root. It is created when
             missing.
         base_url : str | None
@@ -68,9 +74,15 @@ class LocalStorageDriver(IStorageDriver):
         Returns
         -------
         None
+            Initialize the driver rooted at *root*.
         """
         self._root: Path = root.resolve()
+        """Directory acting as the disk root. It is created when missing."""
         self._base_url: str | None = base_url.rstrip("/") if base_url else None
+        """
+        Base URL used to build public file URLs, or ``None`` when the disk does not
+        expose URLs.
+        """
 
         # Guarantee the disk root exists before any operation runs.
         self._root.mkdir(parents=True, exist_ok=True)
@@ -88,7 +100,7 @@ class LocalStorageDriver(IStorageDriver):
 
         Returns
         -------
-        Path
+        pathlib.Path
             Absolute path inside the disk root.
         """
         # Normalized paths cannot escape the root, so a plain join is safe.
@@ -100,7 +112,7 @@ class LocalStorageDriver(IStorageDriver):
 
         Parameters
         ----------
-        absolute : Path
+        absolute : pathlib.Path
             Absolute path inside the disk root.
 
         Returns
@@ -126,7 +138,7 @@ class LocalStorageDriver(IStorageDriver):
 
         Raises
         ------
-        UnsupportedStorageOperationException
+        orionis.storage.exceptions.UnsupportedStorageOperationException
             If *visibility* is not a supported level.
         """
         mode = _FILE_MODES.get(str(visibility))
@@ -146,12 +158,12 @@ class LocalStorageDriver(IStorageDriver):
 
         Returns
         -------
-        tuple[Path, object]
+        tuple[pathlib.Path, object]
             The absolute path and its ``os.stat_result``.
 
         Raises
         ------
-        StorageFileNotFoundException
+        orionis.storage.exceptions.StorageFileNotFoundException
             If the path does not reference an existing file.
         """
         absolute = self.__absolute(normalized)
@@ -181,7 +193,7 @@ class LocalStorageDriver(IStorageDriver):
 
         Raises
         ------
-        StorageFileNotFoundException
+        orionis.storage.exceptions.StorageFileNotFoundException
             If the file does not exist.
         """
         absolute = self.__absolute(normalized)
@@ -204,12 +216,12 @@ class LocalStorageDriver(IStorageDriver):
 
         Returns
         -------
-        BinaryIO
+        typing.BinaryIO
             Open binary handle.
 
         Raises
         ------
-        StorageFileNotFoundException
+        orionis.storage.exceptions.StorageFileNotFoundException
             If the file does not exist.
         """
         absolute = self.__absolute(normalized)
@@ -229,12 +241,12 @@ class LocalStorageDriver(IStorageDriver):
 
         Parameters
         ----------
-        tmp : Path
+        tmp : pathlib.Path
             Absolute path of the temporary file.
 
         Returns
         -------
-        BinaryIO
+        typing.BinaryIO
             Open binary handle in write mode.
         """
         tmp.parent.mkdir(parents=True, exist_ok=True)
@@ -247,12 +259,12 @@ class LocalStorageDriver(IStorageDriver):
 
         Parameters
         ----------
-        absolute : Path
+        absolute : pathlib.Path
             Final absolute destination path.
 
         Returns
         -------
-        Path
+        pathlib.Path
             Sibling path carrying a random infix, so concurrent
             writers never share a staging file, and still ending in
             ``.tmp`` so listings keep filtering it out.
@@ -280,6 +292,7 @@ class LocalStorageDriver(IStorageDriver):
         Returns
         -------
         None
+            Atomically write *data* to *normalized* synchronously.
         """
         absolute = self.__absolute(normalized)
         absolute.parent.mkdir(parents=True, exist_ok=True)
@@ -307,9 +320,9 @@ class LocalStorageDriver(IStorageDriver):
 
         Parameters
         ----------
-        tmp : Path
+        tmp : pathlib.Path
             Fully written temporary file.
-        absolute : Path
+        absolute : pathlib.Path
             Final absolute destination path.
         visibility : str | None
             Visibility to apply, or ``None`` to keep the OS default.
@@ -317,6 +330,7 @@ class LocalStorageDriver(IStorageDriver):
         Returns
         -------
         None
+            Promote a finished temp file to its final destination.
         """
         tmp.replace(absolute)
         if visibility is not None:
@@ -336,10 +350,11 @@ class LocalStorageDriver(IStorageDriver):
         Returns
         -------
         None
+            Copy *source* to *target* synchronously.
 
         Raises
         ------
-        StorageFileNotFoundException
+        orionis.storage.exceptions.StorageFileNotFoundException
             If the source file does not exist.
         """
         origin, _ = self.__statOrFail(source)
@@ -361,10 +376,11 @@ class LocalStorageDriver(IStorageDriver):
         Returns
         -------
         None
+            Move *source* to *target* synchronously.
 
         Raises
         ------
-        StorageFileNotFoundException
+        orionis.storage.exceptions.StorageFileNotFoundException
             If the source file does not exist.
         """
         origin, _ = self.__statOrFail(source)
@@ -383,14 +399,14 @@ class LocalStorageDriver(IStorageDriver):
 
         Parameters
         ----------
-        base : Path
+        base : pathlib.Path
             Absolute directory used as the traversal root.
         want_dirs : bool
             When ``True``, yield directories; otherwise files.
 
         Yields
         ------
-        Path
+        pathlib.Path
             Absolute path of each matching entry.
         """
         # Path.walk() traverses the tree without loading it in memory.
@@ -405,14 +421,14 @@ class LocalStorageDriver(IStorageDriver):
 
         Parameters
         ----------
-        base : Path
+        base : pathlib.Path
             Absolute directory to inspect.
         want_dirs : bool
             When ``True``, yield directories; otherwise files.
 
         Yields
         ------
-        Path
+        pathlib.Path
             Absolute path of each matching entry.
         """
         for entry in base.iterdir():
@@ -467,7 +483,7 @@ class LocalStorageDriver(IStorageDriver):
         normalized : str
             Canonical root-relative file path.
         algorithm : str
-            Any algorithm name accepted by :func:`hashlib.new`.
+            Any algorithm name accepted by ``hashlib.new``.
 
         Returns
         -------
@@ -476,9 +492,9 @@ class LocalStorageDriver(IStorageDriver):
 
         Raises
         ------
-        StorageFileNotFoundException
+        orionis.storage.exceptions.StorageFileNotFoundException
             If the file does not exist.
-        UnsupportedStorageOperationException
+        orionis.storage.exceptions.UnsupportedStorageOperationException
             If *algorithm* is not available.
         """
         absolute, _ = self.__statOrFail(normalized)
@@ -522,12 +538,12 @@ class LocalStorageDriver(IStorageDriver):
 
         Returns
         -------
-        FileInfo
+        orionis.storage.entities.FileInfo
             Immutable metadata snapshot of the file.
 
         Raises
         ------
-        StorageFileNotFoundException
+        orionis.storage.exceptions.StorageFileNotFoundException
             If the file does not exist.
         """
         absolute, stats = self.__statOrFail(normalized)
@@ -584,17 +600,17 @@ class LocalStorageDriver(IStorageDriver):
         ----------
         normalized : str
             Canonical root-relative file path.
-        destination : str | Path
+        destination : str | pathlib.Path
             Local target file or existing directory.
 
         Returns
         -------
-        Path
+        pathlib.Path
             Absolute local path of the downloaded file.
 
         Raises
         ------
-        StorageFileNotFoundException
+        orionis.storage.exceptions.StorageFileNotFoundException
             If the file does not exist.
         """
         source, _ = self.__statOrFail(normalized)
@@ -625,7 +641,7 @@ class LocalStorageDriver(IStorageDriver):
 
         Raises
         ------
-        StorageFileNotFoundException
+        orionis.storage.exceptions.StorageFileNotFoundException
             If the file does not exist.
         """
         normalized = normalizeFilePath(path)
@@ -653,7 +669,7 @@ class LocalStorageDriver(IStorageDriver):
 
         Raises
         ------
-        StorageFileNotFoundException
+        orionis.storage.exceptions.StorageFileNotFoundException
             If the file does not exist.
         """
         normalized = normalizeFilePath(path)
@@ -707,6 +723,7 @@ class LocalStorageDriver(IStorageDriver):
         Returns
         -------
         None
+            Write *contents* to *path*, replacing any existing file.
         """
         normalized = normalizeFilePath(path)
         data = (
@@ -731,7 +748,7 @@ class LocalStorageDriver(IStorageDriver):
         ----------
         path : str
             Root-relative file path.
-        stream : AsyncIterable[bytes]
+        stream : collections.abc.AsyncIterable[bytes]
             Asynchronous byte-chunk producer.
         visibility : str | None
             Visibility to apply, or ``None`` to keep the OS default.
@@ -739,6 +756,7 @@ class LocalStorageDriver(IStorageDriver):
         Returns
         -------
         None
+            Write the chunks produced by *stream* to *path*.
         """
         normalized = normalizeFilePath(path)
         absolute = self.__absolute(normalized)
@@ -793,10 +811,11 @@ class LocalStorageDriver(IStorageDriver):
         Returns
         -------
         None
+            Copy the file at *source* to *target*.
 
         Raises
         ------
-        StorageFileNotFoundException
+        orionis.storage.exceptions.StorageFileNotFoundException
             If the source file does not exist.
         """
         await asyncio.to_thread(
@@ -819,10 +838,11 @@ class LocalStorageDriver(IStorageDriver):
         Returns
         -------
         None
+            Move the file at *source* to *target*.
 
         Raises
         ------
-        StorageFileNotFoundException
+        orionis.storage.exceptions.StorageFileNotFoundException
             If the source file does not exist.
         """
         await asyncio.to_thread(
@@ -849,7 +869,7 @@ class LocalStorageDriver(IStorageDriver):
 
         Raises
         ------
-        StorageFileNotFoundException
+        orionis.storage.exceptions.StorageFileNotFoundException
             If the file does not exist.
         """
         _, stats = await asyncio.to_thread(
@@ -888,12 +908,12 @@ class LocalStorageDriver(IStorageDriver):
 
         Returns
         -------
-        datetime
+        datetime.datetime
             Timezone-aware modification timestamp (UTC).
 
         Raises
         ------
-        StorageFileNotFoundException
+        orionis.storage.exceptions.StorageFileNotFoundException
             If the file does not exist.
         """
         _, stats = await asyncio.to_thread(
@@ -918,7 +938,7 @@ class LocalStorageDriver(IStorageDriver):
 
         Raises
         ------
-        StorageFileNotFoundException
+        orionis.storage.exceptions.StorageFileNotFoundException
             If the file does not exist.
         """
         _, stats = await asyncio.to_thread(
@@ -941,12 +961,13 @@ class LocalStorageDriver(IStorageDriver):
         Returns
         -------
         None
+            Change the visibility of the file at *path*.
 
         Raises
         ------
-        StorageFileNotFoundException
+        orionis.storage.exceptions.StorageFileNotFoundException
             If the file does not exist.
-        UnsupportedStorageOperationException
+        orionis.storage.exceptions.UnsupportedStorageOperationException
             If *visibility* is not a supported level.
         """
         mode = self.__fileMode(visibility)
@@ -965,7 +986,7 @@ class LocalStorageDriver(IStorageDriver):
         path : str
             Root-relative file path.
         algorithm : str
-            Any algorithm name accepted by :func:`hashlib.new`.
+            Any algorithm name accepted by ``hashlib.new``.
 
         Returns
         -------
@@ -974,9 +995,9 @@ class LocalStorageDriver(IStorageDriver):
 
         Raises
         ------
-        StorageFileNotFoundException
+        orionis.storage.exceptions.StorageFileNotFoundException
             If the file does not exist.
-        UnsupportedStorageOperationException
+        orionis.storage.exceptions.UnsupportedStorageOperationException
             If *algorithm* is not available.
         """
         return await asyncio.to_thread(
@@ -996,13 +1017,13 @@ class LocalStorageDriver(IStorageDriver):
 
         Returns
         -------
-        FileInfo
+        orionis.storage.entities.FileInfo
             Immutable entity with size, MIME type, timestamps, hashes,
             visibility, and URL when available.
 
         Raises
         ------
-        StorageFileNotFoundException
+        orionis.storage.exceptions.StorageFileNotFoundException
             If the file does not exist.
         """
         return await asyncio.to_thread(
@@ -1024,6 +1045,7 @@ class LocalStorageDriver(IStorageDriver):
         Returns
         -------
         None
+            Create the directory at *path*, including missing parents.
         """
         absolute = self.__absolute(normalizePath(path))
         await asyncio.to_thread(absolute.mkdir, parents=True, exist_ok=True)
@@ -1142,7 +1164,7 @@ class LocalStorageDriver(IStorageDriver):
 
         Raises
         ------
-        UnsupportedStorageOperationException
+        orionis.storage.exceptions.UnsupportedStorageOperationException
             If the disk has no base URL configured.
         """
         normalized = normalizeFilePath(path)
@@ -1174,7 +1196,7 @@ class LocalStorageDriver(IStorageDriver):
 
         Raises
         ------
-        UnsupportedStorageOperationException
+        orionis.storage.exceptions.UnsupportedStorageOperationException
             Always, since local disks cannot sign URLs.
         """
         error_msg = f"The local driver does not support temporary URLs for [{path}]."
@@ -1188,18 +1210,18 @@ class LocalStorageDriver(IStorageDriver):
         ----------
         path : str
             Root-relative file path on the disk.
-        destination : str | Path
+        destination : str | pathlib.Path
             Local target. When it points to an existing directory the
             file keeps its original name inside that directory.
 
         Returns
         -------
-        Path
+        pathlib.Path
             Absolute local path of the downloaded file.
 
         Raises
         ------
-        StorageFileNotFoundException
+        orionis.storage.exceptions.StorageFileNotFoundException
             If the file does not exist.
         """
         return await asyncio.to_thread(
@@ -1222,12 +1244,12 @@ class LocalStorageDriver(IStorageDriver):
 
         Returns
         -------
-        AsyncStream
+        orionis.storage.AsyncStream
             Lazily opened stream; use it as an async context manager.
 
         Raises
         ------
-        UnsupportedStorageOperationException
+        orionis.storage.exceptions.UnsupportedStorageOperationException
             If *mode* is not a supported binary mode.
         """
         normalized = normalizeFilePath(path)

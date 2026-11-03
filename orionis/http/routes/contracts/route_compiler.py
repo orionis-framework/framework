@@ -1,3 +1,5 @@
+"""Define the contract for route compiler implementations."""
+
 from __future__ import annotations
 
 from abc import ABC, abstractmethod
@@ -8,6 +10,7 @@ if TYPE_CHECKING:
     from collections.abc import Callable
 
 class IRouteCompiler(ABC):
+    """Define the contract for route compiler implementations."""
 
     @abstractmethod
     def compile(
@@ -56,7 +59,8 @@ class IRouteCompiler(ABC):
         """
         Determine whether a path is static or dynamic and compile its regex.
 
-        This method is intentionally public so that :class:`RouteCache`
+        This method is intentionally public so that
+        :class:`orionis.http.routes.route_cache.RouteCache`
         can call it during cache deserialisation to reconstruct ``regex``
         and ``converters`` without ever persisting callable objects.
 
@@ -67,7 +71,7 @@ class IRouteCompiler(ABC):
 
         Returns
         -------
-        tuple[bool, re.Pattern | None, dict[str, Callable]]
+        tuple[bool, ``re.Pattern`` | None, dict[str, collections.abc.Callable]]
             ``(is_static, regex, converters)`` — ``regex`` and
             ``converters`` are ``None`` / empty for static paths.
         """

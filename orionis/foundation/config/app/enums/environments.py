@@ -1,3 +1,5 @@
+"""Enumerate possible application environments."""
+
 from enum import Enum
 
 class Environments(Enum):
@@ -15,7 +17,7 @@ class Environments(Enum):
 
     Returns
     -------
-    Environments
+    orionis.foundation.config.app.Environments
         The enumeration member representing the environment.
     """
 

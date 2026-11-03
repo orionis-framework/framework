@@ -1,3 +1,5 @@
+"""Register mail eagerly so synchronous fluent facade entries work immediately."""
+
 from orionis.container.providers.service_provider import ServiceProvider
 from orionis.mail.composer import MailComposer
 from orionis.mail.contracts.manager import IMailManager
@@ -13,6 +15,7 @@ class MailProvider(ServiceProvider):
     """
 
     __slots__ = ()
+    """Declare that this class introduces no additional instance slots."""
 
     def register(self) -> None:
         """

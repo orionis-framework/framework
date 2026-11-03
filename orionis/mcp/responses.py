@@ -1,3 +1,5 @@
+"""Provide mcp operations through ``mime_format``, ``Progress``, ``McpResponse``."""
+
 import base64
 from dataclasses import dataclass, field, replace
 import math
@@ -21,9 +23,11 @@ if TYPE_CHECKING:
     from orionis.mcp.protocol.metadata import ContentAnnotations
 
 _JSON_MIME_TYPE = "application/json"
+"""Json mime type identifier: ``application/json``."""
 _MSGPACK_MIME_TYPES = frozenset({
     "application/msgpack", "application/x-msgpack", "application/vnd.msgpack",
 })
+"""Msgpack mime types used by ``responses``."""
 
 def mime_format(mime_type: str | None) -> Literal["json", "msgpack"] | None:
     """
@@ -36,7 +40,7 @@ def mime_format(mime_type: str | None) -> Literal["json", "msgpack"] | None:
 
     Returns
     -------
-    Literal["json", "msgpack"] | None
+    typing.Literal["``json``", "``msgpack``"] | None
         Supported codec, JSON by default, or None for another media type.
     """
     if mime_type is None:
@@ -62,7 +66,7 @@ def _encode_payload(
     ----------
     value : object
         Application data to serialize without modifying the original value.
-    payload_format : Literal["json", "msgpack"] | None
+    payload_format : typing.Literal["``json``", "``msgpack``"] | None
         Codec selected from the response MIME type.
 
     Returns
@@ -95,8 +99,11 @@ class Progress:
     """A request-scoped progress update awaiting a client-provided token."""
 
     current: float
+    """Amount of work completed so far."""
     total: float | None = None
+    """Total amount of work, when known."""
     message: str | None = None
+    """Human-readable message associated with this operation or result."""
 
 
 @dataclass(frozen=True, slots=True)
@@ -104,11 +111,16 @@ class McpResponse:
     """Compose protocol content without knowing the transport or DI container."""
 
     content: tuple[ContentBlock, ...] = ()
+    """Content blocks carried by this protocol value."""
     structured_content: object = msgspec.UNSET
     is_error: bool = False
+    """Is error flag used by ``McpResponse``."""
     role: Literal["user", "assistant"] = "user"
+    """Role identifier: ``user``."""
     progress_update: Progress | None = None
+    """Progress notification emitted independently of response content."""
     meta: dict[str, object] = field(default_factory=dict)
+    """Meta produced by ``field``."""
 
     @classmethod
     def text(cls, value: str) -> Self:
@@ -122,7 +134,7 @@ class McpResponse:
 
         Returns
         -------
-        Self
+        typing.Self
             Text content.
         """
         return cls(content=(TextContent(text=value),))
@@ -141,7 +153,7 @@ class McpResponse:
 
         Returns
         -------
-        Self
+        typing.Self
             Result of the operation described above.
         """
         return cls(
@@ -167,7 +179,7 @@ class McpResponse:
 
         Returns
         -------
-        Self
+        typing.Self
             Result of the operation described above.
         """
         return cls(
@@ -203,7 +215,7 @@ class McpResponse:
 
         Returns
         -------
-        Self
+        typing.Self
             Embedded content usable by tools, resources and prompts.
         """
         payload_format = mime_format(mime_type)
@@ -256,7 +268,7 @@ class McpResponse:
 
         Returns
         -------
-        Self
+        typing.Self
             Result of the operation described above.
         """
         return cls(
@@ -285,7 +297,7 @@ class McpResponse:
 
         Returns
         -------
-        Self
+        typing.Self
             Any JSON value and the recommended serialized text content.
         """
         encoded = _encode_payload(value, "json")
@@ -306,7 +318,7 @@ class McpResponse:
 
         Returns
         -------
-        Self
+        typing.Self
             An application-visible tool error, with an explicit safe message.
         """
         return cls(content=(TextContent(text=message),), is_error=True)
@@ -332,7 +344,7 @@ class McpResponse:
 
         Returns
         -------
-        Self
+        typing.Self
             Result of the operation described above.
         """
         if type(current) not in (int, float) or not math.isfinite(current) or (
@@ -349,7 +361,7 @@ class McpResponse:
 
         Returns
         -------
-        Self
+        typing.Self
             Result of the operation described above.
         """
         return replace(self, role="assistant")
@@ -360,7 +372,7 @@ class McpResponse:
 
         Returns
         -------
-        Self
+        typing.Self
             Result of the operation described above.
         """
         return replace(self, role="user")
@@ -376,7 +388,7 @@ class McpResponse:
 
         Returns
         -------
-        Self
+        typing.Self
             Result of the operation described above.
         """
         validate_metadata(metadata, allow_reserved=False)
@@ -394,7 +406,7 @@ class McpResponse:
 
         Returns
         -------
-        Self
+        typing.Self
             Result of the operation described above.
         """
         validate_metadata(metadata, allow_reserved=False)
@@ -419,12 +431,12 @@ class McpResponse:
 
         Parameters
         ----------
-        annotations : ContentAnnotations
+        annotations : orionis.mcp.ContentAnnotations
             Value supplied for ``annotations``.
 
         Returns
         -------
-        Self
+        typing.Self
             Result of the operation described above.
         """
         value = msgspec.convert(msgspec.to_builtins(annotations), type=Annotations)

@@ -1,3 +1,5 @@
+"""Represent a local filesystem configuration."""
+
 from __future__ import annotations
 from dataclasses import dataclass, field
 from orionis.environment import Env
@@ -9,11 +11,11 @@ class Local(BaseEntity):
     """
     Represent a local filesystem configuration.
 
-    Parameters
+    Attributes
     ----------
-    local : Local
+    local : orionis.foundation.config.filesystems.Local
         The local filesystem configuration entity.
-    path : str, default="storage/app/private"
+    path : str, default="``storage``/``app``/``private``"
         The absolute or relative path where local files are stored.
 
     Returns
@@ -29,6 +31,7 @@ class Local(BaseEntity):
             "default": "local",
         },
     )
+    """Driver produced by ``field``."""
 
     path: str = field(
         default_factory=lambda: Env.get("LOCAL_PATH", "storage/app/private"),
@@ -49,7 +52,7 @@ class Local(BaseEntity):
 
         Parameters
         ----------
-        self : Local
+        self : orionis.foundation.config.filesystems.Local
             The instance of the Local class.
 
         Returns

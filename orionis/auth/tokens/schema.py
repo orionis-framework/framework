@@ -1,3 +1,5 @@
+"""Provide auth tokens operations through ``build_tokens_table``."""
+
 from orionis.orm.schema.constraints import TableIndex
 from orionis.orm.schema.table import TableDefinition
 from orionis.orm.schema.types import BigInteger, DateTime, String, Text
@@ -13,7 +15,7 @@ def build_tokens_table(table: str) -> TableDefinition:
 
     Returns
     -------
-    TableDefinition
+    orionis.orm.schema.TableDefinition
         Token storage with a unique digest, indexed owner, and UTC timestamps.
     """
     columns = {

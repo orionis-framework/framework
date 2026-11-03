@@ -1,3 +1,5 @@
+"""Represent the configuration entity for the Argon2id hashing driver."""
+
 from __future__ import annotations
 from dataclasses import dataclass, field
 from orionis.environment import Env

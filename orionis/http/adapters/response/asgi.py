@@ -1,3 +1,5 @@
+"""Translate HTTP responses into ASGI protocol messages."""
+
 from __future__ import annotations
 import asyncio
 from typing import TYPE_CHECKING
@@ -13,11 +15,15 @@ if TYPE_CHECKING:
     from orionis.http.adapters.request.contracts.transport import TransportAdapter
 
 class ASGIResponseAdapter(ResponseAdapter):
+    """Translate HTTP responses into ASGI protocol messages."""
 
     RESPONSE_START = "http.response.start"
+    """Response start identifier: ``http.response.start``."""
     RESPONSE_BODY = "http.response.body"
+    """Response body identifier: ``http.response.body``."""
 
     __slots__ = ()
+    """Declare that this class introduces no additional instance slots."""
 
     async def send( # NOSONAR
         self,
@@ -31,15 +37,15 @@ class ASGIResponseAdapter(ResponseAdapter):
 
         Parameters
         ----------
-        adapter : TransportAdapter
+        adapter : orionis.http.adapters.request.contracts.transport.TransportAdapter
             Transport adapter containing request information.
-        response : Response
+        response : orionis.http.Response
             Response object to be sent back to the client.
-        _receive : Callable[..., Awaitable[dict]]
+        _receive : collections.abc.Callable[``...``, collections.abc.Awaitable[dict]]
             Receive callable observed for disconnects during event streams.
             Handlers must consume required request body data before returning
             an event stream, which owns receive during response delivery.
-        send : Callable[..., Awaitable[None]]
+        send : collections.abc.Callable[``...``, collections.abc.Awaitable[None]]
             Awaitable callable to send ASGI messages.
 
         Returns
@@ -142,13 +148,13 @@ class ASGIResponseAdapter(ResponseAdapter):
 
         Parameters
         ----------
-        response : Response
+        response : orionis.http.Response
             Response whose metadata is sent.
         status : int
             Response status code.
         headers : list[tuple[bytes, bytes]]
             Encoded response headers.
-        send : Callable[..., Awaitable[None]]
+        send : collections.abc.Callable[``...``, collections.abc.Awaitable[None]]
             ASGI response writer.
 
         Returns
@@ -185,7 +191,7 @@ class ASGIResponseAdapter(ResponseAdapter):
 
         Parameters
         ----------
-        receive : Callable[..., Awaitable[dict]]
+        receive : collections.abc.Callable[``...``, collections.abc.Awaitable[dict]]
             ASGI receive channel, owned by the response after handler return.
 
         Returns
@@ -218,13 +224,13 @@ class ASGIResponseAdapter(ResponseAdapter):
 
         Parameters
         ----------
-        iterator : AsyncIterator[bytes]
+        iterator : collections.abc.AsyncIterator[bytes]
             Owned iterator to close even if sending headers fails.
         status : int
             Response status code.
         headers : list[tuple[bytes, bytes]]
             Encoded response headers.
-        send : Callable[..., Awaitable[None]]
+        send : collections.abc.Callable[``...``, collections.abc.Awaitable[None]]
             ASGI response writer.
 
         Returns
@@ -262,7 +268,7 @@ class ASGIResponseAdapter(ResponseAdapter):
         ----------
         headers : list of tuple of bytes
             Mutable headers list to append content-length into.
-        response : Response
+        response : orionis.http.Response
             Response object used to compute the expected body size.
 
         Returns
@@ -291,7 +297,7 @@ class ASGIResponseAdapter(ResponseAdapter):
 
         Parameters
         ----------
-        path : Path
+        path : pathlib.Path
             Path to the file to read.
         start : int
             Byte offset to start reading from.
@@ -302,7 +308,7 @@ class ASGIResponseAdapter(ResponseAdapter):
 
         Returns
         -------
-        AsyncGenerator[bytes]
+        collections.abc.AsyncGenerator[bytes]
             Asynchronous generator yielding file chunks.
         """
         loop = asyncio.get_running_loop()

@@ -1,3 +1,5 @@
+"""Runtime representation of a single HTTP session."""
+
 from __future__ import annotations
 import secrets
 from typing import TYPE_CHECKING, Any
@@ -16,9 +18,13 @@ if TYPE_CHECKING:
 
 # Flash-bag keys defined at module level to avoid per-call string allocation.
 _FLASH_NEW: str = "_flash_new"
+"""Flash-bag keys defined at module level to avoid per-call string allocation."""
 _FLASH_OLD: str = "_flash_old"
+"""Flash old identifier: ``_flash_old``."""
 _MISSING: object = object()
+"""Sentinel distinguishing missing from ordinary values."""
 _IMMUTABLE_VALUE_TYPES = frozenset({type(None), bool, bytes, float, int, str})
+"""Immutable value types used by ``session``."""
 
 class Session(ISession):
     """
@@ -34,7 +40,7 @@ class Session(ISession):
     ----------
     _id : str | None
         Unique session identifier; ``None`` until first activation.
-    _data : dict[str, Any]
+    _data : dict[str, typing.Any]
         In-memory key-value payload.
     _started : bool
         ``True`` once the session has been activated by any write.
@@ -47,7 +53,7 @@ class Session(ISession):
         ``True`` for sessions that were not restored from a store.
     _regenerate : bool
         ``True`` when the ID must be rotated before the next save.
-    _renew_at : datetime | None
+    _renew_at : datetime.datetime | None
         Deadline for renewing an unchanged scalar payload. ``None`` requires
         persistence because no deadline is known or mutable data is present.
 
@@ -68,6 +74,7 @@ class Session(ISession):
         "_renew_at",
         "_started",
     )
+    """Declare the instance attribute slots reserved by this class."""
 
     def __init__(
         self,
@@ -85,7 +92,7 @@ class Session(ISession):
         id : str | None, optional
             Session identifier.  Pass ``None`` for a brand-new session
             (lazy activation generates the ID on the first write).
-        data : dict[str, Any] | None, optional
+        data : dict[str, typing.Any] | None, optional
             Initial session data.  Defaults to an empty dictionary.
         started : bool, optional
             ``True`` when the session was loaded from a backing store.
@@ -95,6 +102,7 @@ class Session(ISession):
         Returns
         -------
         None
+            Initialise a session instance.
         """
         self._id: str | None = id
         self._data: dict[str, Any] = data if data is not None else {}
@@ -117,6 +125,7 @@ class Session(ISession):
         Returns
         -------
         None
+            Ensure the session has an identifier and is marked active.
         """
         # token_urlsafe(32) produces 43 URL-safe characters (~192 bits).
         if self._id is None:
@@ -207,12 +216,12 @@ class Session(ISession):
         ----------
         key : str
             Session data key.
-        default : Any, optional
+        default : typing.Any, optional
             Fallback value returned when *key* is not found.
 
         Returns
         -------
-        Any
+        typing.Any
             The stored value, or *default*.
         """
         return self._data.get(key, default)
@@ -228,13 +237,14 @@ class Session(ISession):
         ----------
         key : str
             Session data key.
-        value : Any
+        value : typing.Any
             Value to store.  Must be JSON-serialisable when using the
             file backing store.
 
         Returns
         -------
         None
+            Store *value* under *key*, activating the session on the first call.
         """
         current = self._data.get(key, _MISSING)
         if current is not _MISSING and current == value:
@@ -272,6 +282,7 @@ class Session(ISession):
         Returns
         -------
         None
+            Remove *key* from session data (no-op when absent).
         """
         if self._data.pop(key, _MISSING) is not _MISSING and self._started:
             self._dirty = True
@@ -283,6 +294,7 @@ class Session(ISession):
         Returns
         -------
         None
+            Remove all data from this session.
         """
         if self._data:
             self._data.clear()
@@ -304,12 +316,13 @@ class Session(ISession):
         ----------
         key : str
             Flash data key.
-        value : Any
+        value : typing.Any
             Flash data value.  Must be JSON-serialisable.
 
         Returns
         -------
         None
+            Store *value* under *key* for exactly one subsequent request.
         """
         flash_bag = self._data.get(_FLASH_NEW)
         if flash_bag is None:
@@ -340,12 +353,12 @@ class Session(ISession):
         ----------
         key : str
             Flash data key.
-        default : Any, optional
+        default : typing.Any, optional
             Fallback value when the key is absent from both bags.
 
         Returns
         -------
-        Any
+        typing.Any
             The flash value, or *default*.
         """
         new_flash = self._data.get(_FLASH_NEW)
@@ -370,12 +383,12 @@ class Session(ISession):
         ----------
         key : str
             Reserved bag key.
-        values : dict[str, Any]
+        values : dict[str, typing.Any]
             Entries to merge into the bag.
 
         Returns
         -------
-        dict[str, Any]
+        dict[str, typing.Any]
             The resulting bag content.
         """
         new_flash = self._data.get(_FLASH_NEW)
@@ -395,12 +408,13 @@ class Session(ISession):
 
         Parameters
         ----------
-        values : Mapping[str, Any]
+        values : collections.abc.Mapping[str, typing.Any]
             Submitted payload to remember.
 
         Returns
         -------
         None
+            Flash a submitted form payload so the next request can repopulate it.
         """
         self.flash(
             OLD_INPUT_KEY,
@@ -415,12 +429,12 @@ class Session(ISession):
         ----------
         key : str
             Form field name.
-        default : Any, optional
+        default : typing.Any, optional
             Fallback value when the field was not submitted.
 
         Returns
         -------
-        Any
+        typing.Any
             The previously submitted value, or *default*.
         """
         bag = self.getFlash(OLD_INPUT_KEY)
@@ -434,12 +448,13 @@ class Session(ISession):
 
         Parameters
         ----------
-        errors : Mapping[str, Any] | Exception
+        errors : collections.abc.Mapping[str, typing.Any] | Exception
             Mapping of field to message(s), or a validation exception.
 
         Returns
         -------
         None
+            Flash validation errors for the next request.
         """
         self.flash(
             ERRORS_KEY,
@@ -470,6 +485,7 @@ class Session(ISession):
         Returns
         -------
         None
+            Remember the page the user is currently viewing.
         """
         self.put(PREVIOUS_URL_KEY, url)
 
@@ -499,6 +515,7 @@ class Session(ISession):
         Returns
         -------
         None
+            Request a session ID rotation (e.g. immediately after login).
         """
         self._regenerate = True
         self._invalidated = False
@@ -516,6 +533,7 @@ class Session(ISession):
         Returns
         -------
         None
+            Mark the session for full deletion and clear in-memory data.
         """
         self._data.clear()
         self._invalidated = True
@@ -523,11 +541,12 @@ class Session(ISession):
         self._regenerate = False
 
     def all(self) -> dict[str, Any]:
-        """Return a shallow copy of the current session data.
+        """
+        Return a shallow copy of the current session data.
 
         Returns
         -------
-        dict[str, Any]
+        dict[str, typing.Any]
             Copy of all session key-value pairs including internal flash bags.
         """
         return dict(self._data)
@@ -544,7 +563,7 @@ class Session(ISession):
 
         Parameters
         ----------
-        deadline : datetime
+        deadline : datetime.datetime
             UTC time at which an unchanged session needs renewal.
 
         Returns
@@ -564,7 +583,7 @@ class Session(ISession):
 
         Parameters
         ----------
-        now : datetime
+        now : datetime.datetime
             Current UTC time evaluated when the response is ready.
 
         Returns
@@ -592,6 +611,7 @@ class Session(ISession):
         Returns
         -------
         None
+            Advance the flash lifecycle: new → old; discard previous old.
         """
         new_flash = self._data.pop(_FLASH_NEW, None)
         had_old = self._data.pop(_FLASH_OLD, None) is not None
@@ -629,6 +649,7 @@ class Session(ISession):
         Returns
         -------
         None
+            Reset the dirty flag after a successful persistence operation.
         """
         self._dirty = False
         self._is_new = False

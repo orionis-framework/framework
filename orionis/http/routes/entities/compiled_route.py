@@ -1,3 +1,5 @@
+"""Represent a runtime-ready compiled HTTP or WebSocket route."""
+
 from __future__ import annotations
 
 from dataclasses import dataclass, field
@@ -21,9 +23,9 @@ class CompiledRoute:
         The original route path, e.g. ``'/users/{id:int}'``.
     method : str
         HTTP method in uppercase, or the reserved ``'WEBSOCKET'`` table key.
-    type : RouteType
+    type : orionis.http.routes.enums.route_types.RouteType
         How the handler will be resolved at dispatch time.
-    protocol : RouteProtocol
+    protocol : orionis.http.routes.enums.protocols.RouteProtocol
         Transport used for this route, independently of the action type.
     hub_protocol : str | None
         Realtime codec name for Hub actions; None for ordinary routes.
@@ -33,7 +35,7 @@ class CompiledRoute:
         (for controllers and invokable classes).
     name : str | None
         Optional route name used for URL generation.
-    regex : Pattern | None
+    regex : orionis.schemas.constraints.Pattern | None
         Compiled regex for dynamic routes; ``None`` for static routes.
     segment_count : int
         Number of non-empty path segments, e.g. ``2`` for
@@ -48,7 +50,7 @@ class CompiledRoute:
         Set by the loader when importing route files.
     public : bool
         Whether automatic session, CSRF, and identity context are omitted.
-    converters : dict[str, Callable]
+    converters : dict[str, collections.abc.Callable]
         Maps each path parameter name to its converter function.
         Empty for static routes.
     middleware : list

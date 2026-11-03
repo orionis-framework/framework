@@ -1,3 +1,5 @@
+"""Define the contract for fluent route implementations."""
+
 from __future__ import annotations
 from abc import ABC, abstractmethod
 from typing import TYPE_CHECKING, Self
@@ -6,6 +8,7 @@ if TYPE_CHECKING:
     from orionis.http.routes.types import MiddlewareInput
 
 class IFluentRoute(ABC):
+    """Define the contract for fluent route implementations."""
 
     @property
     @abstractmethod
@@ -33,7 +36,7 @@ class IFluentRoute(ABC):
 
         Returns
         -------
-        Self
+        typing.Self
             This instance for method chaining.
         """
 
@@ -49,13 +52,14 @@ class IFluentRoute(ABC):
 
         Returns
         -------
-        Self
+        typing.Self
             This instance for method chaining.
         """
 
     @abstractmethod
     def public(self, *, enabled: bool = True) -> Self:
-        """Select a stateless route without automatic session or identity setup.
+        """
+        Select a stateless route without automatic session or identity setup.
 
         Global security, CORS, rate limits, and explicitly attached middleware
         still run. Web session, CSRF, and automatic identity resolution do not.
@@ -69,7 +73,7 @@ class IFluentRoute(ABC):
 
         Returns
         -------
-        Self
+        typing.Self
             This route with the requested execution profile.
 
         Raises
@@ -87,14 +91,14 @@ class IFluentRoute(ABC):
 
         Parameters
         ----------
-        *middleware : MiddlewareInput
+        *middleware : orionis.http.routes.types.MiddlewareInput
             One or more middleware classes (not instances) to attach.
             Classes may be passed individually or wrapped in a
             ``list``, ``tuple`` or ``set``.
 
         Returns
         -------
-        Self
+        typing.Self
             This instance for method chaining.
         """
 
@@ -108,14 +112,14 @@ class IFluentRoute(ABC):
 
         Parameters
         ----------
-        *middleware : MiddlewareInput
+        *middleware : orionis.http.routes.types.MiddlewareInput
             One or more middleware classes to exclude from this route.
             Classes may be passed individually or wrapped in a
             ``list``, ``tuple`` or ``set``.
 
         Returns
         -------
-        Self
+        typing.Self
             This instance for method chaining.
         """
 
@@ -131,7 +135,7 @@ class IFluentRoute(ABC):
 
         Returns
         -------
-        Self
+        typing.Self
             This instance for method chaining.
         """
 

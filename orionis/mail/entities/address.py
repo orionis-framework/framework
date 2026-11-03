@@ -1,3 +1,5 @@
+"""Represent one mailbox with an optional Unicode display name."""
+
 from dataclasses import dataclass
 from email.errors import NonASCIILocalPartDefect
 from email.headerregistry import Address as HeaderAddress, HeaderRegistry
@@ -10,13 +12,14 @@ if TYPE_CHECKING:
     from orionis.mail.types import Recipients
 
 _HEADERS = HeaderRegistry()
+"""Headers used by ``address``."""
 
 @dataclass(frozen=True, slots=True)
 class Address:
     """
     Represent one mailbox with an optional Unicode display name.
 
-    Parameters
+    Attributes
     ----------
     address : str
         Single addr-spec, never a comma-separated list or a display-name form.
@@ -38,7 +41,7 @@ class Address:
 
         Raises
         ------
-        MailCompositionException
+        orionis.mail.exceptions.MailCompositionException
             If the mailbox is invalid or contains ambiguous header syntax.
         """
         value = header_value(self.address, "Address")  # NOSONAR
@@ -84,7 +87,7 @@ class Address:
 
         Returns
         -------
-        HeaderAddress
+        ``email.headerregistry.Address``
             The mailbox with its optional display name.
         """
         parsed = cast("AddressHeader", _HEADERS("To", self.address))
@@ -101,19 +104,19 @@ def one_address(value: str | Address, name: str | None = None) -> Address:
 
     Parameters
     ----------
-    value : str | Address
+    value : str | orionis.mail.entities.Address
         One mailbox.
     name : str | None
         Display name, valid only with a string mailbox.
 
     Returns
     -------
-    Address
+    orionis.mail.entities.Address
         Validated immutable address.
 
     Raises
     ------
-    MailCompositionException
+    orionis.mail.exceptions.MailCompositionException
         If the value is not one address or a name is supplied twice.
     """
     if isinstance(value, str):
@@ -129,19 +132,19 @@ def addresses(value: Recipients, name: str | None = None) -> tuple[Address, ...]
 
     Parameters
     ----------
-    value : Recipients
+    value : orionis.mail.types.Recipients
         Single mailbox or a list/tuple of mailboxes.
     name : str | None
         Optional name for a single string mailbox only.
 
     Returns
     -------
-    tuple[Address, ...]
+    tuple[orionis.mail.entities.Address, ``...``]
         Mailboxes in first-declaration order.
 
     Raises
     ------
-    MailCompositionException
+    orionis.mail.exceptions.MailCompositionException
         If a collection is combined with a display name or has invalid entries.
     """
     if isinstance(value, (str, Address)):

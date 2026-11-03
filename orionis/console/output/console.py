@@ -1,3 +1,5 @@
+"""Provide formatted console output, prompts and interactive utilities."""
+
 from __future__ import annotations
 import asyncio
 import getpass
@@ -20,6 +22,7 @@ if TYPE_CHECKING:
 class Console(IConsole):
 
     # ruff: noqa: T201, B905, PLR0913
+    """Provide formatted console output, prompts and interactive utilities."""
 
     @property
     def progressBar(self) -> IProgressBar:
@@ -28,7 +31,7 @@ class Console(IConsole):
 
         Returns
         -------
-        IProgressBar
+        orionis.console.dynamic.contracts.progress_bar.IProgressBar
             A new instance of the ProgressBar class.
         """
         return ProgressBar()
@@ -39,7 +42,7 @@ class Console(IConsole):
 
         Returns
         -------
-        datetime
+        datetime.datetime
             Current date and time as a datetime object.
         """
         # Use DateTime facade to get current datetime
@@ -71,7 +74,7 @@ class Console(IConsole):
         ----------
         label : str
             Label to display (e.g., 'SUCCESS', 'INFO').
-        bg_color : ANSIColors
+        bg_color : orionis.console.enums.ANSIColors
             Background color to use.
         message : str
             Message to print.
@@ -101,7 +104,7 @@ class Console(IConsole):
         ----------
         message : str
             Message to print.
-        text_color : ANSIColors
+        text_color : orionis.console.enums.ANSIColors
             Text color to use.
 
         Returns
@@ -559,8 +562,8 @@ class Console(IConsole):
         sep : str | None, optional
             Separator between values. Defaults to " ".
         end : str | None, optional
-            String appended after the last value..
-        file : SupportsWrite[str] | None, optional
+            String appended after the last value.
+        file : ``_typeshed.SupportsWrite[str]`` | None, optional
             Output stream. Defaults to sys.stdout.
         flush : bool, optional
             Whether to forcibly flush the stream. Defaults to False.
@@ -798,7 +801,7 @@ class Console(IConsole):
         Raises
         ------
         ValueError
-            If `choices` is empty or `default_index` is out of range.
+            If ``choices`` is empty or ``default_index`` is out of range.
 
         Notes
         -----
@@ -958,7 +961,7 @@ class Console(IConsole):
 
         Parameters
         ----------
-        *args : Any
+        *args : typing.Any
             Variables to be dumped.
         show_types : bool, optional
             Show variable types (default is True).

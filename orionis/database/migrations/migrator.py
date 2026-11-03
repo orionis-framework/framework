@@ -1,3 +1,5 @@
+"""Runner applying and reverting the application migrations."""
+
 import time
 from heapq import nlargest
 from typing import TYPE_CHECKING, Any
@@ -23,9 +25,11 @@ if TYPE_CHECKING:
 
 # Name of the table used to track already-applied migrations.
 _MIGRATIONS_TABLE: str = "migrations"
+"""Name of the table used to track already-applied migrations."""
 
 # Seeder history belongs to a schema built by the recorded migrations.
 _SEEDERS_TABLE: str = "seeders"
+"""Seeder history belongs to a schema built by the recorded migrations."""
 
 def _build_migrations_table(table: str) -> TableDefinition:
     """
@@ -38,7 +42,7 @@ def _build_migrations_table(table: str) -> TableDefinition:
 
     Returns
     -------
-    TableDefinition
+    orionis.orm.schema.TableDefinition
         Definition with ``id`` (primary key), ``migration`` (unique
         name), ``batch`` and ``migrated_at`` (epoch seconds) columns.
     """
@@ -76,6 +80,7 @@ def _build_migrations_table(table: str) -> TableDefinition:
 _MIGRATIONS_TABLE_DEFINITION: TableDefinition = _build_migrations_table(
     _MIGRATIONS_TABLE,
 )
+"""Define the columns used to track applied migrations."""
 
 class Migrator(IMigrator):
     """
@@ -92,6 +97,7 @@ class Migrator(IMigrator):
     # ruff: noqa: TC001
 
     __slots__ = ("__app", "__conn_manager", "__discovered_cache")
+    """Declare the instance attribute slots reserved by this class."""
 
     def __init__(
         self,
@@ -103,9 +109,9 @@ class Migrator(IMigrator):
 
         Parameters
         ----------
-        app : IApplication
+        app : orionis.IApplication
             Application instance used to resolve the migrations directory.
-        conn_manager : IConnectionManager
+        conn_manager : orionis.database.contracts.IConnectionManager
             Connection manager used to resolve the database connection.
 
         Returns
@@ -114,8 +120,11 @@ class Migrator(IMigrator):
             This method does not return a value.
         """
         self.__app = app
+        """Application instance used to resolve the migrations directory."""
         self.__conn_manager = conn_manager
+        """Connection manager used to resolve the database connection."""
         self.__discovered_cache: dict[str, type[Migration]] | None = None
+        """Cached results of filesystem discovery."""
 
     # ── Public operations ───────────────────────────────────────────────────
 
@@ -132,7 +141,7 @@ class Migrator(IMigrator):
         ----------
         connection : str or None, optional
             Named connection to migrate, or ``None`` for the default one.
-        events : MigrationEvents or None, optional
+        events : ``MigrationEvents`` or None, optional
             Progress callbacks reported for each migration.
 
         Returns
@@ -184,7 +193,7 @@ class Migrator(IMigrator):
             recent one. Defaults to ``1``.
         connection : str or None, optional
             Named connection to roll back, or ``None`` for the default.
-        events : MigrationEvents or None, optional
+        events : ``MigrationEvents`` or None, optional
             Progress callbacks reported for each migration.
 
         Returns
@@ -196,7 +205,7 @@ class Migrator(IMigrator):
         ------
         ValueError
             If ``steps`` is not a positive integer.
-        MigrationNotFoundException
+        orionis.database.MigrationNotFoundException
             If a recorded migration has no matching migration file.
         """
         if not isinstance(steps, int) or isinstance(steps, bool) or steps < 1:
@@ -217,7 +226,7 @@ class Migrator(IMigrator):
         ----------
         connection : str or None, optional
             Named connection to reset, or ``None`` for the default one.
-        events : MigrationEvents or None, optional
+        events : ``MigrationEvents`` or None, optional
             Progress callbacks reported for each migration.
 
         Returns
@@ -227,7 +236,7 @@ class Migrator(IMigrator):
 
         Raises
         ------
-        MigrationNotFoundException
+        orionis.database.MigrationNotFoundException
             If a recorded migration has no matching migration file.
         """
         return await self.__revert(None, connection, events)
@@ -249,7 +258,7 @@ class Migrator(IMigrator):
             every recorded migration.
         connection : str or None, optional
             Named connection to refresh, or ``None`` for the default.
-        events : MigrationEvents or None, optional
+        events : ``MigrationEvents`` or None, optional
             Progress callbacks reported for each migration.
 
         Returns
@@ -277,7 +286,8 @@ class Migrator(IMigrator):
         """
         Drop migration and seeder history, then apply every migration.
 
-        Unlike :meth:`refresh`, the tracking table itself is dropped, so
+        Unlike :meth:`orionis.database.migrations.Migrator.refresh`, the tracking table
+        itself is dropped, so
         the whole history is rebuilt as a single first batch. Seeder history
         is also removed when an older rollback left it behind.
 
@@ -285,7 +295,7 @@ class Migrator(IMigrator):
         ----------
         connection : str or None, optional
             Named connection to rebuild, or ``None`` for the default.
-        events : MigrationEvents or None, optional
+        events : ``MigrationEvents`` or None, optional
             Progress callbacks reported for each migration.
 
         Returns
@@ -351,7 +361,7 @@ class Migrator(IMigrator):
             every recorded migration.
         connection : str or None
             Named connection to roll back, or ``None`` for the default.
-        events : MigrationEvents or None
+        events : ``orionis.database.migrations.events.MigrationEvents`` or None
             Progress callbacks reported for each migration.
 
         Returns
@@ -361,7 +371,7 @@ class Migrator(IMigrator):
 
         Raises
         ------
-        MigrationNotFoundException
+        orionis.database.MigrationNotFoundException
             If a recorded migration has no matching migration file.
         """
         target = self.__connection(connection)
@@ -438,16 +448,16 @@ class Migrator(IMigrator):
 
         Parameters
         ----------
-        connection : IConnection
+        connection : orionis.database.contracts.IConnection
             Connection the migration runs against.
         name : str
             Migration name.
-        migration_cls : type of Migration
+        migration_cls : type of orionis.database.Migration
             Migration class to instantiate and run.
         batch : int or None
             Batch number to record when applying; ``None`` reverts the
             migration instead.
-        events : MigrationEvents
+        events : ``orionis.database.migrations.events.MigrationEvents``
             Progress callbacks reported for this migration.
         clear_seeders : bool, optional
             Drop seeder history when this is the last applied migration.
@@ -498,12 +508,12 @@ class Migrator(IMigrator):
 
         Returns
         -------
-        IConnection
+        orionis.database.contracts.IConnection
             Connection bound to its configuration.
 
         Raises
         ------
-        ConnectionNotFoundException
+        orionis.database.ConnectionNotFoundException
             If the connection is not declared in the configuration.
         """
         return self.__conn_manager.connection(name)
@@ -514,7 +524,7 @@ class Migrator(IMigrator):
 
         Returns
         -------
-        Path
+        pathlib.Path
             Absolute path to the ``database_migrations`` directory under
             the application base path.
         """
@@ -532,7 +542,7 @@ class Migrator(IMigrator):
 
         Returns
         -------
-        dict of str to type
+        dict of str ``to`` type
             Migration classes keyed by module file stem, ordered
             chronologically (filenames are zero-padded sequential ids).
 
@@ -585,7 +595,7 @@ class Migrator(IMigrator):
 
         Parameters
         ----------
-        connection : IConnection
+        connection : orionis.database.contracts.IConnection
             Connection used to perform the schema operation.
 
         Returns
@@ -601,7 +611,7 @@ class Migrator(IMigrator):
 
         Parameters
         ----------
-        connection : IConnection
+        connection : orionis.database.contracts.IConnection
             Connection used to run the query.
 
         Returns
@@ -648,7 +658,7 @@ class Migrator(IMigrator):
 
         Parameters
         ----------
-        connection : IConnection
+        connection : orionis.database.contracts.IConnection
             Connection used to run the statement.
         name : str
             Migration name to record.
@@ -677,7 +687,7 @@ class Migrator(IMigrator):
 
         Parameters
         ----------
-        connection : IConnection
+        connection : orionis.database.contracts.IConnection
             Connection used to run the statement.
         name : str
             Migration name to remove.

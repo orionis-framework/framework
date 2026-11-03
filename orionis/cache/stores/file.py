@@ -1,3 +1,5 @@
+"""Implement asynchronous cache operations over filesystem entries."""
+
 import asyncio
 import hashlib
 import secrets
@@ -16,16 +18,22 @@ if TYPE_CHECKING:
 
 # Sentinel object to distinguish "key not found" from a stored None value.
 _MISSING = object()
+"""Sentinel object to distinguish "key not found" from a stored None value."""
 
 # Retry budget for a rename refused because another process holds the target.
 _REPLACE_ATTEMPTS: int = 3
+"""Retry budget for a rename refused because another process holds the target."""
 _REPLACE_BACKOFF_SECONDS: float = 0.005
+"""Replace backoff seconds value used by ``file``."""
 _LOCK_STRIPES: int = 64
+"""Lock stripes value used by ``file``."""
 
 class FileCacheBackend:
     # ruff: noqa: ANN401
+    """Implement asynchronous cache operations over filesystem entries."""
 
     __slots__ = ("_counter_lock", "_locks", "_path", "_rename_lock")
+    """Declare the instance attribute slots reserved by this class."""
 
     def __init__(self: Self, path: Path) -> None:
         """
@@ -33,7 +41,7 @@ class FileCacheBackend:
 
         Parameters
         ----------
-        path : Path
+        path : pathlib.Path
             Directory where cache files will be stored.
 
         Returns
@@ -43,23 +51,28 @@ class FileCacheBackend:
         """
         path = path.resolve()
         self._path: Path = path
+        """Directory where cache files will be stored."""
         # Queue counter updates made through this backend instance.
         self._counter_lock = asyncio.Lock()
+        """Queue counter updates made through this backend instance."""
         # Writes run in worker threads, so the rename needs a thread lock.
         self._rename_lock = threading.Lock()
+        """Writes run in worker threads, so the rename needs a thread lock."""
         path.mkdir(parents=True, exist_ok=True)
         self._locks = tuple(
             FileLock(path / f".cache-lock-{index}", timeout=10)
             for index in range(_LOCK_STRIPES)
         )
+        """Locks produced by ``tuple``."""
 
     @property
     def lockNamespace(self: Self) -> Path:
-        """Return the canonical directory used to identify cache locks.
+        """
+        Return the canonical directory used to identify cache locks.
 
         Returns
         -------
-        Path
+        pathlib.Path
             Absolute directory shared by backends storing the same files.
         """
         return self._path
@@ -67,16 +80,17 @@ class FileCacheBackend:
     # ── Internal helpers ────────────────────────────────────────────────────
 
     def __lock(self: Self, file: Path) -> BaseFileLock:
-        """Select the stable cross-process lock stripe for a cache file.
+        """
+        Select the stable cross-process lock stripe for a cache file.
 
         Parameters
         ----------
-        file : Path
+        file : pathlib.Path
             Cache file protected by the lock.
 
         Returns
         -------
-        BaseFileLock
+        ``filelock.BaseFileLock``
             Platform lock shared by writes, replacement and deletion.
         """
         return self._locks[crc32(file.name.encode()) % _LOCK_STRIPES]
@@ -92,7 +106,7 @@ class FileCacheBackend:
 
         Returns
         -------
-        Path
+        pathlib.Path
             Path to the corresponding ``.json`` file.
         """
         digest = hashlib.sha256(key.encode()).hexdigest()
@@ -105,12 +119,12 @@ class FileCacheBackend:
 
         Parameters
         ----------
-        file : Path
+        file : pathlib.Path
             Target cache file.
 
         Returns
         -------
-        Path
+        pathlib.Path
             Sibling path ending in ``.tmp`` that no concurrent writer of
             the same key can collide with.
         """
@@ -122,7 +136,7 @@ class FileCacheBackend:
 
         Parameters
         ----------
-        file : Path
+        file : pathlib.Path
             Path to the cache file.
 
         Returns
@@ -140,7 +154,7 @@ class FileCacheBackend:
 
         Parameters
         ----------
-        file : Path
+        file : pathlib.Path
             Path to the cache entry.
 
         Returns
@@ -166,7 +180,7 @@ class FileCacheBackend:
 
         Parameters
         ----------
-        file : Path
+        file : pathlib.Path
             Target cache file.
         entry : dict
             Serializable cache entry.
@@ -190,7 +204,7 @@ class FileCacheBackend:
 
         Parameters
         ----------
-        file : Path
+        file : pathlib.Path
             Destination cache file.
         entry : dict
             Encodable cache entry.
@@ -220,9 +234,9 @@ class FileCacheBackend:
 
         Parameters
         ----------
-        tmp : Path
+        tmp : pathlib.Path
             Staging file holding the encoded entry.
-        file : Path
+        file : pathlib.Path
             Destination cache file.
 
         Returns
@@ -254,7 +268,7 @@ class FileCacheBackend:
 
         Parameters
         ----------
-        file : Path
+        file : pathlib.Path
             Target cache file.
         entry : dict
             Serializable cache entry.
@@ -279,7 +293,7 @@ class FileCacheBackend:
 
         Parameters
         ----------
-        file : Path
+        file : pathlib.Path
             File to remove.
 
         Returns
@@ -295,11 +309,12 @@ class FileCacheBackend:
             return 1
 
     def __replaceIfPresent(self: Self, file: Path, entry: dict) -> bool:
-        """Replace a live entry while holding its cross-process lock.
+        """
+        Replace a live entry while holding its cross-process lock.
 
         Parameters
         ----------
-        file : Path
+        file : pathlib.Path
             Target cache file.
         entry : dict
             Encoded replacement entry.
@@ -327,12 +342,12 @@ class FileCacheBackend:
         ----------
         key : str
             Cache key.
-        default : Any
+        default : typing.Any
             Value returned when the key is not found or has expired.
 
         Returns
         -------
-        Any
+        typing.Any
             Stored value or *default*.
         """
         file = self.__file(key)
@@ -345,13 +360,14 @@ class FileCacheBackend:
     async def replace(
         self: Self, key: str, value: Any, ttl: float | None = None,
     ) -> bool:
-        """Replace an existing live key without recreating a deleted entry.
+        """
+        Replace an existing live key without recreating a deleted entry.
 
         Parameters
         ----------
         key : str
             Existing cache key.
-        value : Any
+        value : typing.Any
             Replacement value.
         ttl : float | None
             Replacement lifetime in seconds.
@@ -379,7 +395,7 @@ class FileCacheBackend:
         ----------
         key : str
             Cache key.
-        value : Any
+        value : typing.Any
             JSON-serializable value to cache.
         ttl : float | None
             Time-to-live in seconds. None means no expiry.
@@ -409,6 +425,7 @@ class FileCacheBackend:
         Returns
         -------
         bool
+            True when the cache key exists and its entry has not expired.
         """
         return await self.get(key, default=_MISSING) is not _MISSING
 
@@ -472,12 +489,13 @@ class FileCacheBackend:
         ----------
         keys : list[str]
             Cache keys.
-        default : Any
+        default : typing.Any
             Returned for each missing/expired key.
 
         Returns
         -------
-        list[Any]
+        list[typing.Any]
+            Cached values in key order, with None for missing or expired entries.
         """
         stopped = threading.Event()
 
@@ -487,7 +505,7 @@ class FileCacheBackend:
 
             Returns
             -------
-            list[Any]
+            list[typing.Any]
                 Values in request order, including duplicates and missing defaults.
             """
             result = []
@@ -513,7 +531,7 @@ class FileCacheBackend:
 
         Parameters
         ----------
-        pairs : list[tuple[str, Any]]
+        pairs : list[tuple[str, typing.Any]]
             Sequence of (key, value) pairs.
         ttl : float | None
             Shared TTL applied to every pair.
@@ -565,7 +583,7 @@ class FileCacheBackend:
         ----------
         key : str
             Cache key.
-        value : Any
+        value : typing.Any
             Value to store.
         ttl : float | None
             Optional TTL in seconds.
@@ -629,7 +647,7 @@ class FileCacheBackend:
 
         Parameters
         ----------
-        file : Path
+        file : pathlib.Path
             Counter file to update.
         delta : int
             Amount to add to the current value.

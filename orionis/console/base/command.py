@@ -1,3 +1,5 @@
+"""Define the metadata and execution hooks shared by console commands."""
+
 from __future__ import annotations
 from typing import TYPE_CHECKING, Any, ClassVar
 from orionis.console.base.contracts.command import IBaseCommand
@@ -5,6 +7,7 @@ from orionis.console.output.console import Console
 
 # Sentinel object to distinguish between missing keys and keys with None values
 _MISSING = object()
+"""Sentinel object to distinguish between missing keys and keys with None values."""
 
 if TYPE_CHECKING:
     from orionis.console.args.argument import Argument
@@ -14,16 +17,22 @@ class BaseCommand(Console, IBaseCommand):
     # ruff: noqa: ANN401
 
     # Enable timestamps in console output by default
+    """Define the metadata and execution hooks shared by console commands."""
+
     timestamps: bool = True
+    """Enable timestamps in console output by default."""
 
     # Command signature string for registration and help text generation
     signature: str
+    """Command signature string for registration and help text generation."""
 
     # Human-readable description for documentation and help display
     description: str
+    """Human-readable description for documentation and help display."""
 
     # List of Argument instances defining command-line options and arguments
     arguments: ClassVar[list[Argument]] = []
+    """List of Argument instances defining command-line options and arguments."""
 
     def __init__(self) -> None:
         """
@@ -39,6 +48,7 @@ class BaseCommand(Console, IBaseCommand):
         """
         # Initialize internal argument storage for parsed CLI arguments
         self.__arguments__: dict[str, Any] = {}
+        """Initialize internal argument storage for parsed CLI arguments."""
 
     async def handle(self) -> None:
         """
@@ -68,12 +78,12 @@ class BaseCommand(Console, IBaseCommand):
         ----------
         key : str
             The name of the argument to retrieve.
-        default : Any or None, optional
+        default : typing.Any or None, optional
             The value to return if the argument is not present. Defaults to None.
 
         Returns
         -------
-        Any or None
+        typing.Any or None
             The value of the argument if present, otherwise the default value.
         """
         # Validate that the key is a string
@@ -92,7 +102,7 @@ class BaseCommand(Console, IBaseCommand):
 
         Returns
         -------
-        dict[str, Any]
+        dict[str, typing.Any]
             A copy of the dictionary containing all parsed arguments.
         """
         # Return a shallow copy to prevent external modification
@@ -104,7 +114,7 @@ class BaseCommand(Console, IBaseCommand):
 
         Parameters
         ----------
-        args : dict[str, Any]
+        args : dict[str, typing.Any]
             Dictionary containing parsed command-line arguments.
 
         Returns

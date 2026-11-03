@@ -1,3 +1,5 @@
+"""Validate the current password and its proposed replacement."""
+
 from orionis.schemas import Schema
 from orionis.schemas.constraints import (
     ConfirmPassword, MaxLength, MinLength, StrongPassword,
@@ -8,6 +10,7 @@ from orionis.schemas.metadata import Message
 class ChangePasswordSchema(Schema):
 
     # ruff: noqa: TC001 (Runtime schema metadata)
+    """Validate the current password and its proposed replacement."""
 
     current_password: Field[
         str,
@@ -15,6 +18,7 @@ class ChangePasswordSchema(Schema):
         MinLength(1, message="Enter your current password."),
         MaxLength(1024, message="Password must not exceed 1024 characters."),
     ]
+    """Current account password supplied for verification."""
 
     password: Field[
         str,
@@ -26,6 +30,7 @@ class ChangePasswordSchema(Schema):
             "a lowercase letter and a number."
         )),
     ]
+    """Account password subject to the declared validation constraints."""
 
     password_confirmation: Field[
         str,
@@ -34,3 +39,4 @@ class ChangePasswordSchema(Schema):
         MaxLength(1024, message="Password must not exceed 1024 characters."),
         ConfirmPassword(message="Password confirmation does not match."),
     ]
+    """Repeated password value that must match the password field."""

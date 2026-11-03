@@ -1,13 +1,18 @@
+"""Ensure a string is a valid lexicographically sortable identifier."""
+
 from orionis.schemas.rule import Rule
 
 # Crockford base32 alphabet, excluding I, L, O and U.
 _ALPHABET: frozenset[str] = frozenset("0123456789ABCDEFGHJKMNPQRSTVWXYZ")
+"""Crockford base32 alphabet, excluding I, L, O and U."""
 
 # Canonical length of the textual representation.
 _LENGTH = 26
+"""Canonical length of the textual representation."""
 
 # Highest first character keeping the 48-bit timestamp within range.
 _MAX_LEADING = "7"
+"""Highest first character keeping the 48-bit timestamp within range."""
 
 class Ulid(Rule):
     """Ensure a string is a valid lexicographically sortable identifier."""
@@ -15,9 +20,12 @@ class Ulid(Rule):
     # ruff: noqa: ARG002
 
     __slots__ = ()
+    """Declare that this class introduces no additional instance slots."""
 
     __message__ = "Value must be a valid ULID."
+    """Error text for message: ``Value must be a valid ULID.``."""
     __code__ = "ulid"
+    """Code identifier: ``ulid``."""
 
     async def enforce(
         self,

@@ -1,9 +1,12 @@
+"""Define the contract for route cache implementations."""
+
 from __future__ import annotations
 
 from abc import ABC, abstractmethod
 
 
 class IRouteCache(ABC):
+    """Define the contract for route cache implementations."""
 
     @abstractmethod
     def toCache(
@@ -39,7 +42,8 @@ class IRouteCache(ABC):
         Parameters
         ----------
         cached : dict
-            Dict previously produced by :meth:`toCache`.
+            Dict previously produced by
+            :meth:`orionis.http.routes.contracts.route_cache.IRouteCache.toCache`.
 
         Returns
         -------

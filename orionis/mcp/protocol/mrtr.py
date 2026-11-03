@@ -1,3 +1,8 @@
+"""Provide mcp protocol operations.
+
+Includes ``validate_input_required``, ``validate_input_responses``.
+"""
+
 from collections.abc import Mapping
 from typing import TYPE_CHECKING
 import msgspec
@@ -30,9 +35,9 @@ def validate_input_required(result: InputRequiredResult, request: McpRequest) ->
 
     Parameters
     ----------
-    result : InputRequiredResult
+    result : orionis.mcp.InputRequiredResult
         Value supplied for ``result``.
-    request : McpRequest
+    request : orionis.mcp.McpRequest
         Current request and its trusted execution context.
 
     Returns
@@ -53,9 +58,9 @@ def _input_requests(result: InputRequiredResult, request: McpRequest) -> None:
 
     Parameters
     ----------
-    result : InputRequiredResult
+    result : orionis.mcp.InputRequiredResult
         Value supplied for ``result``.
-    request : McpRequest
+    request : orionis.mcp.McpRequest
         Current request and its trusted execution context.
 
     Returns
@@ -82,7 +87,7 @@ def _input_request(item: dict[str, object], request: McpRequest) -> None:
     ----------
     item : dict[str, object]
         Embedded method and parameter object.
-    request : McpRequest
+    request : orionis.mcp.McpRequest
         Enclosing request carrying the client's capabilities.
 
     Returns
@@ -118,7 +123,7 @@ def _require(request: McpRequest, capability: str, feature: str | None = None) -
 
     Parameters
     ----------
-    request : McpRequest
+    request : orionis.mcp.McpRequest
         Current request and its trusted execution context.
     capability : str
         Value supplied for ``capability``.
@@ -152,7 +157,7 @@ def _elicitation(params: dict[str, object], request: McpRequest) -> None:
     ----------
     params : dict[str, object]
         Parameters decoded for the requested operation.
-    request : McpRequest
+    request : orionis.mcp.McpRequest
         Current request and its trusted execution context.
 
     Returns
@@ -180,7 +185,7 @@ def _form_field(field: FormField) -> None:
 
     Parameters
     ----------
-    field : FormField
+    field : orionis.mcp.protocol.input_shapes.FormField
         Qualified name of the field being processed.
 
     Returns
@@ -223,7 +228,7 @@ def _sampling(params: dict[str, object], request: McpRequest) -> None:
     ----------
     params : dict[str, object]
         Parameters decoded for the requested operation.
-    request : McpRequest
+    request : orionis.mcp.McpRequest
         Current request and its trusted execution context.
 
     Returns
@@ -254,7 +259,7 @@ def _sampling_message(message: SamplingMessage) -> None:
 
     Parameters
     ----------
-    message : SamplingMessage
+    message : orionis.mcp.protocol.input_shapes.SamplingMessage
         Value supplied for ``message``.
 
     Returns
@@ -289,7 +294,7 @@ def validate_input_responses(responses: Mapping[str, object]) -> None:
 
     Parameters
     ----------
-    responses : Mapping[str, object]
+    responses : collections.abc.Mapping[str, object]
         Value supplied for ``responses``.
 
     Returns

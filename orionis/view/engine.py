@@ -1,3 +1,5 @@
+"""Jinja2-based implementation of :class:`orionis.view.contracts.engine.IViewEngine`."""
+
 from collections import OrderedDict
 from threading import Lock, RLock
 from typing import Any, Self
@@ -10,16 +12,21 @@ from orionis.view.exceptions import ViewRenderException, ViewTemplateNotFoundExc
 
 # Template extension appended when the identifier carries no extension
 _DEFAULT_EXT: str = ".html"
+"""Template extension appended when the identifier carries no extension."""
 
 # Store recently normalized template identifiers and their loader paths.
 _PATH_CACHE: OrderedDict[str, str] = OrderedDict()
+"""Store recently normalized template identifiers and their loader paths."""
 _PATH_CACHE_MAX = 1024
+"""Path cache max value used by ``engine``."""
 _PATH_CACHE_LOCK = Lock()
+"""Synchronization primitive controlling access to path cache lock."""
 _TEMPLATE_WORKERS = BoundedExecutor(2, max_pending=64, name="orionis-template")
+"""Template workers used by ``engine``."""
 
 class Jinja2Engine(IViewEngine):
     """
-    Jinja2-based implementation of :class:`IViewEngine`.
+    Jinja2-based implementation of :class:`orionis.view.contracts.engine.IViewEngine`.
 
     Converts dot-notation template names to filesystem paths and delegates
     all rendering to Jinja2's async rendering pipeline (``render_async``).
@@ -30,6 +37,7 @@ class Jinja2Engine(IViewEngine):
     # ruff: noqa: TC001
 
     __slots__ = ("_environment", "_jinja", "_load_lock")
+    """Declare the instance attribute slots reserved by this class."""
 
     def __init__(self: Self, environment: IViewEnvironment) -> None:
         """
@@ -37,19 +45,29 @@ class Jinja2Engine(IViewEngine):
 
         Parameters
         ----------
-        environment : IViewEnvironment
+        environment : orionis.view.contracts.environment.IViewEnvironment
             View environment providing the configured Jinja2
-            :class:`Environment` instance.
+            ``Environment`` instance.
 
         Returns
         -------
         None
+            Initialise the engine with the configured view environment.
         """
         self._environment: IViewEnvironment = environment
+        """
+        View environment providing the configured Jinja2 ``Environment``
+        instance.
+        """
         # The environment instance is built once and mutated in place, so the
         # reference stays valid for the whole application lifetime.
         self._jinja: jinja2.Environment = environment.getJinjaEnvironment()
+        """
+        The environment instance is built once and mutated in place, so the
+        reference stays valid for the whole application lifetime.
+        """
         self._load_lock = RLock()
+        """Synchronization primitive controlling access to load lock."""
 
     def _load(self: Self, path: str) -> jinja2.Template:
         """
@@ -62,7 +80,7 @@ class Jinja2Engine(IViewEngine):
 
         Returns
         -------
-        jinja2.Template
+        ``jinja2.Template``
             Loaded and compiled template from the environment cache or loader.
         """
         with self._load_lock:
@@ -98,7 +116,7 @@ class Jinja2Engine(IViewEngine):
         template : str
             Template identifier using dot notation or a direct relative
             path.  A ``.html`` suffix is appended when absent.
-        context : dict[str, Any]
+        context : dict[str, typing.Any]
             Variables made available inside the template during rendering.
 
         Returns
@@ -108,10 +126,10 @@ class Jinja2Engine(IViewEngine):
 
         Raises
         ------
-        ViewTemplateNotFoundException
+        orionis.view.exceptions.ViewTemplateNotFoundException
             When the template file cannot be located by the configured
             loaders.
-        ViewRenderException
+        orionis.view.exceptions.ViewRenderException
             When Jinja2 raises any error during rendering.
         """
         # Normalise template identifier to a filesystem path
@@ -165,7 +183,7 @@ class Jinja2Engine(IViewEngine):
         -------
         str
             Normalised template path suitable for
-            :meth:`jinja2.Environment.get_template`.
+            ``jinja2.Environment.get_template``.
         """
         # Preserve direct paths (e.g. 'partials/nav.html')
         _path: str = template if "/" in template else template.replace(".", "/")

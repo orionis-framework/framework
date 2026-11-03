@@ -1,3 +1,5 @@
+"""Hold already registered routes so a parent can compose their context."""
+
 from __future__ import annotations
 
 from dataclasses import dataclass
@@ -16,3 +18,4 @@ class RouteGroup:
     """
 
     routes: tuple[FluentRoute, ...]
+    """Route definitions registered in this routing context."""

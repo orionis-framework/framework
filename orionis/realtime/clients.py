@@ -1,3 +1,9 @@
+"""Provide realtime operations.
+
+Includes ``validate_identifier``, ``validate_group``, ``ClientTarget``,
+``HubClients``.
+"""
+
 from __future__ import annotations
 from typing import TYPE_CHECKING
 from orionis.realtime.decorators import validate_remote_name
@@ -9,8 +15,11 @@ if TYPE_CHECKING:
     from orionis.realtime.hub import Hub
 
 _MAX_IDENTIFIER = 128
+"""Max identifier value used by ``clients``."""
 _MAX_GROUP = 256
+"""Max group value used by ``clients``."""
 _MAX_ARGUMENTS = 64
+"""Max arguments value used by ``clients``."""
 
 
 def validate_identifier(value: str, label: str = "Identifier") -> None:
@@ -73,7 +82,7 @@ def _validate_call(target: str, args: tuple[object, ...]) -> None:
     ----------
     target : str
         Remote client method or event name.
-    args : tuple[object, ...]
+    args : tuple[object, ``...``]
         Positional values to serialize.
 
     Returns
@@ -96,6 +105,7 @@ class ClientTarget:
     """Send to a Hub-local selection or invoke one explicitly selected client."""
 
     __slots__ = ("_excluded", "_group", "_hub", "_ids", "_manager", "_single")
+    """Declare the instance attribute slots reserved by this class."""
 
     def __init__(
         self,
@@ -111,11 +121,11 @@ class ClientTarget:
 
         Parameters
         ----------
-        manager : IConnectionManager
+        manager : orionis.realtime.contracts.IConnectionManager
             Registry owning local connections.
-        hub : type[Hub]
+        hub : type[orionis.realtime.Hub]
             Namespace limiting every selected recipient.
-        connection_ids : tuple[str, ...] | str | None, optional
+        connection_ids : tuple[str, ``...``] | str | None, optional
             A single recipient, multiple recipients, or None for all/group members.
         group : str | None, optional
             Hub-local group to select when no identifiers are supplied.
@@ -128,13 +138,19 @@ class ClientTarget:
             Store the selection without validating or resolving recipients.
         """
         self._manager = manager
+        """Registry owning local connections."""
         self._hub = hub
+        """Namespace limiting every selected recipient."""
         self._single = isinstance(connection_ids, str)
+        """Single produced by ``isinstance``."""
         self._ids: tuple[str, ...] | None = (
             (connection_ids,) if isinstance(connection_ids, str) else connection_ids
         )
+        """Connection identifiers selected as the client invocation targets."""
         self._group = group
+        """Hub-local group to select when no identifiers are supplied."""
         self._excluded = excluded
+        """Connection to omit from an all-connections or group selection."""
 
     def _recipients(self) -> tuple[str, ...]:
         """
@@ -142,7 +158,7 @@ class ClientTarget:
 
         Returns
         -------
-        tuple[str, ...]
+        tuple[str, ``...``]
             Explicit identifiers unchanged, or current ready all/group members
             with the excluded connection omitted.
 
@@ -174,7 +190,7 @@ class ClientTarget:
 
         Returns
         -------
-        BroadcastResult
+        orionis.realtime.BroadcastResult
             Counts of successful and failed deliveries; no offline persistence.
 
         Raises
@@ -225,7 +241,7 @@ class ClientTarget:
             If the target, argument count or deadline is invalid.
         TimeoutError
             If sending or receiving the completion exceeds the deadline.
-        ClientInvocationError
+        orionis.realtime.errors.ClientInvocationError
             If the client returns a completion error.
         """
         _validate_call(target, args)
@@ -243,6 +259,7 @@ class HubClients:
     """Select ready clients within one Hub in the current worker."""
 
     __slots__ = ("_caller_id", "_hub", "_manager")
+    """Declare the instance attribute slots reserved by this class."""
 
     def __init__(
         self,
@@ -255,9 +272,9 @@ class HubClients:
 
         Parameters
         ----------
-        manager : IConnectionManager
+        manager : orionis.realtime.contracts.IConnectionManager
             Registry owning the connections.
-        hub : type[Hub]
+        hub : type[orionis.realtime.Hub]
             Hub namespace selecting eligible clients.
         caller_id : str | None, optional
             Current connection identifier; absent for application services.
@@ -268,8 +285,11 @@ class HubClients:
             Store the registry, Hub namespace and optional caller identifier.
         """
         self._manager = manager
+        """Registry owning the connections."""
         self._hub = hub
+        """Hub namespace selecting eligible clients."""
         self._caller_id = caller_id
+        """Current connection identifier; absent for application services."""
 
     @property
     def all(self) -> ClientTarget:
@@ -278,7 +298,7 @@ class HubClients:
 
         Returns
         -------
-        ClientTarget
+        orionis.realtime.clients.ClientTarget
             Target resolving ready Hub connections at delivery time.
         """
         return ClientTarget(self._manager, self._hub)
@@ -290,7 +310,7 @@ class HubClients:
 
         Returns
         -------
-        ClientTarget
+        orionis.realtime.clients.ClientTarget
             Single-client target supporting event delivery and invocation.
 
         Raises
@@ -309,7 +329,7 @@ class HubClients:
 
         Returns
         -------
-        ClientTarget
+        orionis.realtime.clients.ClientTarget
             Target resolving other ready Hub connections at delivery time.
 
         Raises
@@ -349,7 +369,7 @@ class HubClients:
 
         Returns
         -------
-        ClientTarget
+        orionis.realtime.clients.ClientTarget
             Single recipient target; unavailable recipients fail on delivery.
 
         Raises
@@ -368,12 +388,12 @@ class HubClients:
 
         Parameters
         ----------
-        connection_ids : Iterable[str]
+        connection_ids : collections.abc.Iterable[str]
             Connection identifiers belonging to this Hub.
 
         Returns
         -------
-        ClientTarget
+        orionis.realtime.clients.ClientTarget
             Multi-recipient target supporting event delivery.
 
         Raises
@@ -403,7 +423,7 @@ class HubClients:
 
         Returns
         -------
-        ClientTarget
+        orionis.realtime.clients.ClientTarget
             Target resolving current group membership at delivery time.
 
         Raises

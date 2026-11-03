@@ -1,3 +1,5 @@
+"""Define the contract for the translation service."""
+
 from __future__ import annotations
 from abc import ABC, abstractmethod
 from typing import TYPE_CHECKING
@@ -15,6 +17,7 @@ class ITranslator(ABC):
     """
 
     __slots__ = ()
+    """Declare that this class introduces no additional instance slots."""
 
     @abstractmethod
     def get(
@@ -48,7 +51,7 @@ class ITranslator(ABC):
 
         Raises
         ------
-        InvalidLocaleException
+        orionis.localization.InvalidLocaleException
             If an explicit locale is malformed.
         """
 
@@ -79,7 +82,7 @@ class ITranslator(ABC):
 
         Raises
         ------
-        InvalidLocaleException
+        orionis.localization.InvalidLocaleException
             If an explicit locale is malformed.
         """
 
@@ -121,7 +124,7 @@ class ITranslator(ABC):
 
         Raises
         ------
-        InvalidLocaleException
+        orionis.localization.InvalidLocaleException
             If an explicit locale is malformed.
         """
 
@@ -138,10 +141,11 @@ class ITranslator(ABC):
         Returns
         -------
         None
+            Change the active locale at runtime.
 
         Raises
         ------
-        InvalidLocaleException
+        orionis.localization.InvalidLocaleException
             If the locale is malformed.
         """
 
@@ -163,7 +167,7 @@ class ITranslator(ABC):
 
         Returns
         -------
-        tuple[str, ...]
+        tuple[str, ``...``]
             Sorted locale codes discovered in the language path.
         """
 
@@ -180,10 +184,11 @@ class ITranslator(ABC):
         Returns
         -------
         None
+            Discard cached translations so they are re-read from disk.
 
         Raises
         ------
-        InvalidLocaleException
+        orionis.localization.InvalidLocaleException
             If an explicit locale is malformed.
         """
 
@@ -204,7 +209,7 @@ class ITranslator(ABC):
 
         Raises
         ------
-        InvalidLocaleException
+        orionis.localization.InvalidLocaleException
             If the locale is malformed.
         """
 
@@ -216,6 +221,7 @@ class ITranslator(ABC):
         Returns
         -------
         None
+            Discard every cached translation map.
         """
 
     @abstractmethod
@@ -229,11 +235,12 @@ class ITranslator(ABC):
 
         Parameters
         ----------
-        handler : MissingKeyHandler | None
+        handler : orionis.localization.types.MissingKeyHandler | None
             Callable invoked on missing keys, or ``None`` to remove the
             current handler.
 
         Returns
         -------
         None
+            Register a handler invoked when a translation key is missing.
         """

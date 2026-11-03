@@ -1,3 +1,5 @@
+"""Storage driver backed by Amazon S3 (or S3-compatible services)."""
+
 from __future__ import annotations
 import asyncio
 import hashlib
@@ -31,26 +33,36 @@ if TYPE_CHECKING:
 
 # Default chunk size for streaming operations (64 KiB).
 _CHUNK_SIZE: int = 64 * 1024
+"""Default chunk size for streaming operations (64 KiB)."""
 
 # In-memory bytes before spooled buffers spill to disk (8 MiB).
 _SPOOL_THRESHOLD: int = 8 * 1024 * 1024
+"""In-memory bytes before spooled buffers spill to disk (8 MiB)."""
 
 # Maximum number of keys per S3 batch-delete request.
 _DELETE_BATCH: int = 1000
+"""Maximum number of keys per S3 batch-delete request."""
 
 # Error codes reported by S3 for missing objects.
 _MISSING_CODES: frozenset[str] = frozenset({"404", "NoSuchKey", "NotFound"})
+"""Error codes reported by S3 for missing objects."""
 
 # Canned ACLs applied per visibility level.
 _ACL_MAP: dict[str, str] = {
     Visibility.PUBLIC.value: "public-read",
     Visibility.PRIVATE.value: "private",
 }
+"""Canned ACLs applied per visibility level."""
 
 # Grantee URI identifying anonymous users in S3 ACL grants. This is the
 # canonical identifier defined by AWS, not a network endpoint, so the
 # scheme must remain exactly as documented.
 _ALL_USERS_URI: str = "http://acs.amazonaws.com/groups/global/AllUsers"  # NOSONAR
+"""
+Grantee URI identifying anonymous users in S3 ACL grants. This is the canonical
+identifier defined by AWS, not a network endpoint, so the scheme must remain exactly
+as documented.
+"""
 
 class S3StorageDriver(IStorageDriver):
     """
@@ -82,6 +94,7 @@ class S3StorageDriver(IStorageDriver):
         "_secret",
         "_use_path_style",
     )
+    """Declare the instance attribute slots reserved by this class."""
 
     def __init__(self: Self, config: object) -> None:
         """
@@ -100,21 +113,31 @@ class S3StorageDriver(IStorageDriver):
         Returns
         -------
         None
+            Initialize the driver from an S3 disk configuration entity.
         """
         self._bucket: str = str(getattr(config, "bucket", "") or "")
+        """Cloud-storage bucket containing the driver resources."""
         self._region: str = str(getattr(config, "region", "") or "")
+        """Region produced by ``str``."""
         self._key: str = str(getattr(config, "key", "") or "")
+        """Key produced by ``str``."""
         self._secret: str = str(getattr(config, "secret", "") or "")
+        """Secret produced by ``str``."""
         self._endpoint: str | None = getattr(config, "endpoint", None) or None
+        """Configured endpoint used to contact the storage service."""
         self._use_path_style: bool = bool(
             getattr(config, "use_path_style_endpoint", False),
         )
+        """Use path style produced by ``bool``."""
 
         base_url = getattr(config, "url", None)
         self._base_url: str | None = base_url.rstrip("/") if base_url else None
+        """Base URL used when constructing public resource URLs."""
 
         self._client: Any = None
+        """Client used to communicate with the configured backend."""
         self._client_error: type[Exception] = Exception
+        """Client error supplied through ``Exception``."""
 
     # ── SDK bootstrap and low-level helpers ──────────────────────────────────
 
@@ -124,12 +147,12 @@ class S3StorageDriver(IStorageDriver):
 
         Returns
         -------
-        Any
+        typing.Any
             Configured ``boto3`` S3 client.
 
         Raises
         ------
-        MissingStorageDependencyException
+        orionis.storage.exceptions.MissingStorageDependencyException
             If ``boto3`` is not installed.
         """
         if self._client is not None:
@@ -195,7 +218,7 @@ class S3StorageDriver(IStorageDriver):
 
         Returns
         -------
-        StorageFileNotFoundException
+        orionis.storage.exceptions.StorageFileNotFoundException
             Exception instance ready to be raised.
         """
         error_msg = f"File does not exist at path [{normalized}]."
@@ -217,7 +240,7 @@ class S3StorageDriver(IStorageDriver):
 
         Raises
         ------
-        StorageFileNotFoundException
+        orionis.storage.exceptions.StorageFileNotFoundException
             If the object does not exist.
         """
         client = self.__client()
@@ -265,7 +288,7 @@ class S3StorageDriver(IStorageDriver):
 
         Raises
         ------
-        UnsupportedStorageOperationException
+        orionis.storage.exceptions.UnsupportedStorageOperationException
             If *visibility* is not a supported level.
         """
         acl = _ACL_MAP.get(str(visibility))
@@ -319,7 +342,7 @@ class S3StorageDriver(IStorageDriver):
 
         Raises
         ------
-        StorageFileNotFoundException
+        orionis.storage.exceptions.StorageFileNotFoundException
             If the object does not exist.
         """
         client = self.__client()
@@ -381,7 +404,7 @@ class S3StorageDriver(IStorageDriver):
 
         Raises
         ------
-        StorageFileNotFoundException
+        orionis.storage.exceptions.StorageFileNotFoundException
             If the object does not exist.
         """
         normalized = normalizeFilePath(path)
@@ -432,7 +455,7 @@ class S3StorageDriver(IStorageDriver):
 
         Raises
         ------
-        StorageFileNotFoundException
+        orionis.storage.exceptions.StorageFileNotFoundException
             If the object does not exist.
         """
         normalized = normalizeFilePath(path)
@@ -443,7 +466,7 @@ class S3StorageDriver(IStorageDriver):
 
             Returns
             -------
-            Any
+            typing.Any
                 Readable object stream.
             """
             client = self.__client()
@@ -522,6 +545,7 @@ class S3StorageDriver(IStorageDriver):
         Returns
         -------
         None
+            Write *contents* to *path*, replacing any existing object.
         """
         normalized = normalizeFilePath(path)
         data = (
@@ -565,7 +589,7 @@ class S3StorageDriver(IStorageDriver):
         ----------
         path : str
             Root-relative file path.
-        stream : AsyncIterable[bytes]
+        stream : collections.abc.AsyncIterable[bytes]
             Asynchronous byte-chunk producer.
         visibility : str | None
             Visibility to apply, or ``None`` for the bucket default.
@@ -573,6 +597,7 @@ class S3StorageDriver(IStorageDriver):
         Returns
         -------
         None
+            Write the chunks produced by *stream* to *path*.
         """
         normalized = normalizeFilePath(path)
         buffer = await spool_stream(stream, max_size=_SPOOL_THRESHOLD)
@@ -650,10 +675,11 @@ class S3StorageDriver(IStorageDriver):
         Returns
         -------
         None
+            Copy the object at *source* to *target* server-side.
 
         Raises
         ------
-        StorageFileNotFoundException
+        orionis.storage.exceptions.StorageFileNotFoundException
             If the source object does not exist.
         """
         origin = normalizeFilePath(source)
@@ -699,10 +725,11 @@ class S3StorageDriver(IStorageDriver):
         Returns
         -------
         None
+            Move the object at *source* to *target*.
 
         Raises
         ------
-        StorageFileNotFoundException
+        orionis.storage.exceptions.StorageFileNotFoundException
             If the source object does not exist.
         """
         await self.copy(source, target)
@@ -732,7 +759,7 @@ class S3StorageDriver(IStorageDriver):
 
         Raises
         ------
-        StorageFileNotFoundException
+        orionis.storage.exceptions.StorageFileNotFoundException
             If the object does not exist.
         """
         normalized = normalizeFilePath(path)
@@ -758,7 +785,7 @@ class S3StorageDriver(IStorageDriver):
 
         Raises
         ------
-        StorageFileNotFoundException
+        orionis.storage.exceptions.StorageFileNotFoundException
             If the object does not exist.
         """
         normalized = normalizeFilePath(path)
@@ -776,12 +803,12 @@ class S3StorageDriver(IStorageDriver):
 
         Returns
         -------
-        datetime
+        datetime.datetime
             Timezone-aware modification timestamp.
 
         Raises
         ------
-        StorageFileNotFoundException
+        orionis.storage.exceptions.StorageFileNotFoundException
             If the object does not exist.
         """
         normalized = normalizeFilePath(path)
@@ -805,7 +832,7 @@ class S3StorageDriver(IStorageDriver):
 
         Raises
         ------
-        StorageFileNotFoundException
+        orionis.storage.exceptions.StorageFileNotFoundException
             If the object does not exist.
         """
         normalized = normalizeFilePath(path)
@@ -825,12 +852,13 @@ class S3StorageDriver(IStorageDriver):
         Returns
         -------
         None
+            Change the visibility of the object at *path*.
 
         Raises
         ------
-        StorageFileNotFoundException
+        orionis.storage.exceptions.StorageFileNotFoundException
             If the object does not exist.
-        UnsupportedStorageOperationException
+        orionis.storage.exceptions.UnsupportedStorageOperationException
             If *visibility* is not a supported level.
         """
         normalized = normalizeFilePath(path)
@@ -871,7 +899,7 @@ class S3StorageDriver(IStorageDriver):
         path : str
             Root-relative file path.
         algorithm : str
-            Any algorithm name accepted by :func:`hashlib.new`.
+            Any algorithm name accepted by ``hashlib.new``.
 
         Returns
         -------
@@ -880,9 +908,9 @@ class S3StorageDriver(IStorageDriver):
 
         Raises
         ------
-        StorageFileNotFoundException
+        orionis.storage.exceptions.StorageFileNotFoundException
             If the object does not exist.
-        UnsupportedStorageOperationException
+        orionis.storage.exceptions.UnsupportedStorageOperationException
             If *algorithm* is not available.
         """
         normalized = normalizeFilePath(path)
@@ -934,13 +962,13 @@ class S3StorageDriver(IStorageDriver):
 
         Returns
         -------
-        FileInfo
+        orionis.storage.entities.FileInfo
             Immutable entity with size, MIME type, timestamps, ETag,
             visibility, and URL.
 
         Raises
         ------
-        StorageFileNotFoundException
+        orionis.storage.exceptions.StorageFileNotFoundException
             If the object does not exist.
         """
         normalized = normalizeFilePath(path)
@@ -951,7 +979,7 @@ class S3StorageDriver(IStorageDriver):
 
             Returns
             -------
-            FileInfo
+            orionis.storage.entities.FileInfo
                 Object metadata.
             """
             head = self.__headSync(normalized)
@@ -992,6 +1020,7 @@ class S3StorageDriver(IStorageDriver):
         Returns
         -------
         None
+            Create a zero-byte directory marker at *path*.
         """
         normalized = normalizePath(path)
         if not normalized:
@@ -1172,7 +1201,7 @@ class S3StorageDriver(IStorageDriver):
 
         Raises
         ------
-        MissingStorageDependencyException
+        orionis.storage.exceptions.MissingStorageDependencyException
             If ``boto3`` is not installed.
         """
         normalized = normalizeFilePath(path)
@@ -1202,18 +1231,18 @@ class S3StorageDriver(IStorageDriver):
         ----------
         path : str
             Root-relative file path on the disk.
-        destination : str | Path
+        destination : str | pathlib.Path
             Local target. When it points to an existing directory the
             file keeps its original name inside that directory.
 
         Returns
         -------
-        Path
+        pathlib.Path
             Absolute local path of the downloaded file.
 
         Raises
         ------
-        StorageFileNotFoundException
+        orionis.storage.exceptions.StorageFileNotFoundException
             If the object does not exist.
         """
         normalized = normalizeFilePath(path)
@@ -1224,7 +1253,7 @@ class S3StorageDriver(IStorageDriver):
 
             Returns
             -------
-            Path
+            pathlib.Path
                 Destination of the downloaded object.
             """
             target = resolveDownloadTarget(normalized, destination)
@@ -1257,12 +1286,12 @@ class S3StorageDriver(IStorageDriver):
 
         Returns
         -------
-        AsyncStream
+        orionis.storage.AsyncStream
             Lazily opened stream; use it as an async context manager.
 
         Raises
         ------
-        UnsupportedStorageOperationException
+        orionis.storage.exceptions.UnsupportedStorageOperationException
             If *mode* is not a supported binary mode.
         """
         normalized = normalizeFilePath(path)
@@ -1274,7 +1303,7 @@ class S3StorageDriver(IStorageDriver):
 
             Returns
             -------
-            BinaryIO
+            typing.BinaryIO
                 Stream handle for reading or writing.
             """
             buffer = tempfile.SpooledTemporaryFile(  # noqa: SIM115
@@ -1292,7 +1321,7 @@ class S3StorageDriver(IStorageDriver):
 
             Parameters
             ----------
-            handle : BinaryIO
+            handle : typing.BinaryIO
                 Buffered stream being closed.
 
             Returns
@@ -1327,7 +1356,7 @@ class S3StorageDriver(IStorageDriver):
 
         Parameters
         ----------
-        buffer : BinaryIO
+        buffer : typing.BinaryIO
             Spooled buffer backing the stream.
         normalized : str
             Canonical root-relative file path.
@@ -1337,10 +1366,11 @@ class S3StorageDriver(IStorageDriver):
         Returns
         -------
         None
+            Seed *buffer* with the current object content for a stream.
 
         Raises
         ------
-        StorageFileNotFoundException
+        orionis.storage.exceptions.StorageFileNotFoundException
             If the object does not exist and *mode* requires it.
         """
         client = self.__client()

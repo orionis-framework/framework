@@ -1,3 +1,5 @@
+"""Represent the Microsoft SQL Server database configuration."""
+
 from __future__ import annotations
 from dataclasses import dataclass, field
 from orionis.environment import Env
@@ -9,6 +11,7 @@ from orionis.support.entities.base import BaseEntity
 
 # Valid TCP port boundary for the SQL Server listener.
 _MAX_PORT: int = 65535
+"""Valid TCP port boundary for the SQL Server listener."""
 
 @dataclass(frozen=True, kw_only=True)
 class SQLServer(BaseEntity):

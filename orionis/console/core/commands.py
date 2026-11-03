@@ -1,3 +1,5 @@
+"""Provide console core operations through ``get_core_commands_mapping``."""
+
 from orionis.console.commands.auth.migrate import AuthMigrateCommand
 from orionis.console.commands.bootstrap.config import BootstrapConfigCommand
 from orionis.console.commands.bootstrap.lifespan import BootstrapLifespanCommand
@@ -80,7 +82,7 @@ def get_core_commands_mapping() -> tuple[type, ...]:
 
     Returns
     -------
-    tuple[type, ...]
+    tuple[type, ``...``]
         Immutable collection of command classes registered by the framework.
     """
     # Return the command classes registered by the framework.
@@ -160,3 +162,4 @@ def get_core_commands_mapping() -> tuple[type, ...]:
     )
 
 CORE_COMMANDS: tuple = get_core_commands_mapping()
+"""Core commands used by ``commands``."""

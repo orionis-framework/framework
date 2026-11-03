@@ -364,7 +364,7 @@ class TestDispatcher(TestCase):
         self.app = _TestContainer()
         self.client = await self.mcp(_Server, app=self.app)
 
-    async def test_async_rules_validate_inputs_and_every_output_path(self):
+    async def testAsyncRulesValidateInputsAndEveryOutputPath(self):
         """
         Await native schema rules for regular, protocol and streaming results.
 
@@ -398,7 +398,7 @@ class TestDispatcher(TestCase):
                     "Tool execution failed",
                 )
 
-    async def test_discovery_and_cache_metadata(self):
+    async def testDiscoveryAndCacheMetadata(self):
         """Discovery advertises only implemented modern capabilities.
 
         Returns
@@ -413,7 +413,7 @@ class TestDispatcher(TestCase):
         self.assertEqual((result["ttlMs"], result["cacheScope"]), (0, "private"))
         self.assertIn("completions", result["capabilities"])
 
-    async def test_dependency_override_cannot_escape_payload(self):
+    async def testDependencyOverrideCannotEscapePayload(self):
         """A client argument cannot replace a trusted container service.
 
         Returns
@@ -430,7 +430,7 @@ class TestDispatcher(TestCase):
         invalid = await self.client.tool("weather", {"location": 42})
         self.assertTrue(invalid.message["result"]["isError"])
 
-    async def test_availability_authorization_and_statelessness(self):
+    async def testAvailabilityAuthorizationAndStatelessness(self):
         """List visibility and direct invocation use the same checks every time.
 
         Returns
@@ -454,7 +454,7 @@ class TestDispatcher(TestCase):
         hidden_again = await self.client.tool("hidden", {"location": "x"})
         self.assertIn("error", hidden_again.message)
 
-    async def test_progress_requires_token(self):
+    async def testProgressRequiresToken(self):
         """Progress is request-scoped and emitted only with client opt-in.
 
         Returns
@@ -475,7 +475,7 @@ class TestDispatcher(TestCase):
         )
         response.assertTextContains("finished")
 
-    async def test_resources_templates_and_prompt_roles(self):
+    async def testResourcesTemplatesAndPromptRoles(self):
         """Exact URIs, templates and prompts normalize to distinct result schemas.
 
         Returns
@@ -499,7 +499,7 @@ class TestDispatcher(TestCase):
         missing = await self.client.request("prompts/get", {"name": "describe"})
         self.assertEqual(missing.message["error"]["code"], -32602)
 
-    async def test_output_and_sanitized_errors(self):
+    async def testOutputAndSanitizedErrors(self):
         """Validate declared structured output and hide internal exception detail.
 
         Returns
@@ -513,7 +513,7 @@ class TestDispatcher(TestCase):
         self.assertTrue(error.message["result"]["isError"])
         self.assertNotIn("secret-db", str(error.message))
 
-    async def test_pagination_is_stateless(self):
+    async def testPaginationIsStateless(self):
         """A cursor can continue on a fresh dispatcher with the same definition.
 
         Returns
@@ -532,7 +532,7 @@ class TestDispatcher(TestCase):
             following.message["result"]["tools"],
         )
 
-    async def test_completion(self):
+    async def testCompletion(self):
         """Resolve suggestions through the compiled provider.
 
         Returns
@@ -552,7 +552,7 @@ class TestDispatcher(TestCase):
             ["formal", "friendly"],
         )
 
-    async def test_mrtr_capability_and_retry(self):
+    async def testMrtrCapabilityAndRetry(self):
         """Additional input is explicit and may be retried on another instance.
 
         Returns
@@ -581,7 +581,7 @@ class TestDispatcher(TestCase):
         )
         retried.assertTextContains("received")
 
-    async def test_subscriptions_acknowledge_first_and_cleanup(self):
+    async def testSubscriptionsAcknowledgeFirstAndCleanup(self):
         """Notification correlation uses the original request ID.
 
         Returns
@@ -603,9 +603,9 @@ class TestDispatcher(TestCase):
         change = await anext(stream)
         self.assertEqual(change["method"], "notifications/tools/list_changed")
         await stream.aclose()
-        self.assertEqual(self.client.dispatcher.bus.listener_count, 0)
+        self.assertEqual(self.client.dispatcher.bus.listenerCount, 0)
 
-    async def test_catalog_access_cannot_bypass_auth(self):
+    async def testCatalogAccessCannotBypassAuth(self):
         """Synthetic tools hide entries and reuse the ordinary invoker.
 
         Returns
@@ -635,7 +635,7 @@ class TestDispatcher(TestCase):
         )
         self.assertIn("error", denied.message)
 
-    async def test_concurrent_payloads_remain_isolated(self):
+    async def testConcurrentPayloadsRemainIsolated(self):
         """Concurrent calls have independent contexts and native scopes.
 
         Returns

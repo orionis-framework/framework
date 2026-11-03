@@ -1,3 +1,5 @@
+"""Provide foundation operations through ``get_core_providers_mapping``."""
+
 from importlib import import_module
 from typing import TYPE_CHECKING
 
@@ -27,6 +29,7 @@ CORE_PROVIDER_METADATA: tuple[tuple[str, str], ...] = (
     ("orionis.test.provider", "TestingProvider"),
     ("orionis.view.provider", "ViewServiceProvider"),
 )
+"""Core provider metadata definitions used by ``core_providers``."""
 
 def get_core_providers_mapping() -> tuple[type[IServiceProvider], ...]:
     """
@@ -34,7 +37,7 @@ def get_core_providers_mapping() -> tuple[type[IServiceProvider], ...]:
 
     Returns
     -------
-    tuple[type[IServiceProvider], ...]
+    tuple[type[orionis.container.contracts.service_provider.IServiceProvider], ``...``]
         Provider classes whose modules are cached by the import system.
     """
     return tuple(

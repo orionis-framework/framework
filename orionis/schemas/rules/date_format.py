@@ -1,3 +1,5 @@
+"""Ensure a date string matches one of the accepted formats."""
+
 from orionis.support.facades.datetime import DateTime
 from orionis.schemas.rule import Rule
 
@@ -12,9 +14,14 @@ class DateFormat(Rule):
     # ruff: noqa: ARG002
 
     __slots__ = ("_formats",)
+    """Declare the instance attribute slots reserved by this class."""
 
     __message__ = "Value must match one of the accepted date formats."
+    """
+    Error text for message: ``Value must match one of the accepted date formats.``.
+    """
     __code__ = "date_format"
+    """Code identifier: ``date_format``."""
 
     def __init__(self, *formats: str, message: str | None = None) -> None:
         """
@@ -42,6 +49,7 @@ class DateFormat(Rule):
             error_msg = "DateFormat requires at least one format."
             raise ValueError(error_msg)
         self._formats: tuple[str, ...] = formats
+        """Format strings the value may match. At least one is required."""
 
     async def enforce(
         self,

@@ -1,3 +1,5 @@
+"""Provide realtime operations through ``HubContext``, ``Hub``."""
+
 from dataclasses import dataclass
 from typing import TYPE_CHECKING
 
@@ -12,18 +14,25 @@ class HubContext:
     """Expose connection identity without providing service location."""
 
     connection_id: str
+    """Identifier of the current realtime connection."""
     socket: WebSocket
+    """WebSocket associated with the current realtime invocation."""
     user: object | None = None
+    """Authenticated identity associated with the current connection."""
 
 
 class Hub:
     """Define an invocation-scoped realtime endpoint with explicit remote methods."""
 
     __slots__ = ("clients", "context", "groups")
+    """Declare the instance attribute slots reserved by this class."""
 
     context: HubContext
+    """Runtime context made available to the operation and its callbacks."""
     clients: HubClients
+    """Client-target selector available to hub handlers."""
     groups: HubGroups
+    """Realtime group membership and targeting interface."""
 
     async def onConnect(self) -> None:
         """

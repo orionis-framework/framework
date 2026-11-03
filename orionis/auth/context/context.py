@@ -1,3 +1,5 @@
+"""Hold the authenticated state of one request."""
+
 import asyncio
 from collections.abc import Iterable
 from typing import TYPE_CHECKING
@@ -41,6 +43,7 @@ class AuthenticationContext(IAuthenticationContext):
         "__scope",
         "__snapshot",
     )
+    """Declare the instance attribute slots reserved by this class."""
 
     def __init__(
         self,
@@ -55,13 +58,13 @@ class AuthenticationContext(IAuthenticationContext):
 
         Parameters
         ----------
-        identity : IAuthenticatable | None, optional
+        identity : orionis.auth.contracts.IAuthenticatable | None, optional
             Identity resolved by a guard, or ``None`` for a guest.
         guard : str | None, optional
             Name of the guard that resolved the identity.
-        abilities : Iterable[str] | None, optional
+        abilities : collections.abc.Iterable[str] | None, optional
             Abilities restricting the presented credential.
-        repository : IPermissionRepository | None, optional
+        repository : orionis.auth.contracts.IPermissionRepository | None, optional
             Source used to resolve the authorization snapshot. It is only
             required for authenticated contexts.
         credential_id : object | None, optional
@@ -74,16 +77,30 @@ class AuthenticationContext(IAuthenticationContext):
             The context starts without a resolved snapshot.
         """
         self.__identity = identity
+        """Identity resolved by a guard, or ``None`` for a guest."""
         self.__guard = guard
+        """Name of the guard that resolved the identity."""
         self.__abilities: frozenset[str] | None = (
             None if abilities is None else frozenset(abilities)
         )
+        """Abilities restricting the presented credential."""
         self.__repository = repository
+        """
+        Source used to resolve the authorization snapshot. It is only required for
+        authenticated contexts.
+        """
         self.__credential_id = credential_id
+        """
+        Identifier of the revocable credential that authenticated the request, such
+        as a personal access token.
+        """
         self.__snapshot: IAuthorizationSnapshot | None = None
+        """Authentication state captured for the current request."""
         self.__scope: ScopeManager | None = None
+        """Dependency-injection scope associated with the current operation."""
 
         self.__lock: asyncio.Lock | None = None
+        """Lock protecting concurrent access to shared state."""
 
     def _bindToScope(self, scope: ScopeManager) -> None:
         """
@@ -91,7 +108,7 @@ class AuthenticationContext(IAuthenticationContext):
 
         Parameters
         ----------
-        scope : ScopeManager
+        scope : orionis.container.context.manager.ScopeManager
             Active request scope publishing this context.
 
         Returns
@@ -101,7 +118,7 @@ class AuthenticationContext(IAuthenticationContext):
 
         Raises
         ------
-        AuthException
+        orionis.auth.AuthException
             If a context is shared between different request scopes.
         """
         if self.__scope is not None and self.__scope is not scope:
@@ -120,7 +137,7 @@ class AuthenticationContext(IAuthenticationContext):
 
         Returns
         -------
-        AuthenticationContext
+        orionis.auth.context.AuthenticationContext
             Unbound context carrying the current identity and credential limits.
         """
         return AuthenticationContext(
@@ -154,7 +171,7 @@ class AuthenticationContext(IAuthenticationContext):
 
         Returns
         -------
-        IAuthenticatable | None
+        orionis.auth.contracts.IAuthenticatable | None
             Resolved identity, or ``None`` for a guest request.
         """
         return self.__identity if self.__isCurrent() else None
@@ -240,7 +257,7 @@ class AuthenticationContext(IAuthenticationContext):
 
         Returns
         -------
-        IAuthorizationSnapshot
+        orionis.auth.contracts.IAuthorizationSnapshot
             Snapshot resolved at most once per request. Guests and
             contexts without a permission repository resolve to the
             shared empty snapshot.
@@ -299,3 +316,7 @@ class AuthenticationContext(IAuthenticationContext):
 # Shared context handed to every request nobody authenticated. It carries
 # no identity and resolves to the empty snapshot, so sharing is safe.
 GUEST_CONTEXT: AuthenticationContext = AuthenticationContext()
+"""
+Shared context handed to every request nobody authenticated. It carries no identity
+and resolves to the empty snapshot, so sharing is safe.
+"""

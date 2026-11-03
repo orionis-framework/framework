@@ -1,3 +1,5 @@
+"""Store normalized immutable headers and intended recipients."""
+
 from dataclasses import dataclass
 from typing import TYPE_CHECKING
 from orionis.mail.entities.address import Address, addresses, one_address
@@ -16,24 +18,30 @@ class Envelope:
     ----------
     subject : str
         Literal subject, including an intentionally empty subject.
-    from_address : Address | None
+    from_address : orionis.mail.entities.Address | None
         From header and transport sender.
-    to : tuple[Address, ...]
+    to : tuple[orionis.mail.entities.Address, ``...``]
         Primary visible recipients.
-    cc : tuple[Address, ...]
+    cc : tuple[orionis.mail.entities.Address, ``...``]
         Additional visible recipients.
-    bcc : tuple[Address, ...]
+    bcc : tuple[orionis.mail.entities.Address, ``...``]
         Hidden transport recipients.
-    reply_to : tuple[Address, ...]
+    reply_to : tuple[orionis.mail.entities.Address, ``...``]
         Reply destinations, which are never transport recipients.
     """
 
     subject: str
+    """Literal subject, including an empty subject."""
     from_address: Address | None
+    """From header and transport sender."""
     to: tuple[Address, ...]
+    """Primary visible recipients."""
     cc: tuple[Address, ...]
+    """Additional visible recipients."""
     bcc: tuple[Address, ...]
+    """Hidden transport recipients."""
     reply_to: tuple[Address, ...]
+    """Reply destinations, not transport recipients."""
 
     def __init__(  # noqa: PLR0913
         self,
@@ -52,15 +60,15 @@ class Envelope:
         ----------
         subject : str
             Literal subject, including an empty subject.
-        from_address : str | Address | None
+        from_address : str | orionis.mail.entities.Address | None
             From header and transport sender.
-        to : Recipients
+        to : orionis.mail.types.Recipients
             Primary visible recipients.
-        cc : Recipients
+        cc : orionis.mail.types.Recipients
             Additional visible recipients.
-        bcc : Recipients
+        bcc : orionis.mail.types.Recipients
             Hidden transport recipients.
-        reply_to : Recipients
+        reply_to : orionis.mail.types.Recipients
             Reply destinations, not transport recipients.
 
         Returns
@@ -70,7 +78,7 @@ class Envelope:
 
         Raises
         ------
-        MailCompositionException
+        orionis.mail.exceptions.MailCompositionException
             If headers are invalid or a hidden recipient is also visible.
         """
         object.__setattr__(self, "subject", header_value(subject, "Subject"))
@@ -97,7 +105,7 @@ class Envelope:
 
         Returns
         -------
-        tuple[str, ...]
+        tuple[str, ``...``]
             To, Cc, and Bcc addresses without Reply-To.
         """
         return tuple(

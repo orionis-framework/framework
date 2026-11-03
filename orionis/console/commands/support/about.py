@@ -1,3 +1,5 @@
+"""Display the installed framework and runtime version information."""
+
 from rich.console import Console
 from rich.panel import Panel
 from orionis.console.base.command import BaseCommand
@@ -8,6 +10,7 @@ from orionis.support.facades.datetime import DateTime
 _PANEL_TITLE: str = (
     f"[bold green]{framework.NAME.capitalize()} Framework | v{framework.VERSION}[/]"
 )
+"""Show the framework name and version in the panel title."""
 
 # Show framework details, author contact information, and project links.
 _PANEL_BODY: str = (
@@ -21,19 +24,25 @@ _PANEL_BODY: str = (
     f"💻 [bold]Repo:[/bold]"
     f"[underline blue]{framework.FRAMEWORK}[/underline blue]\n"
 )
+"""Show framework details, author contact information, and project links."""
 
 class VersionCommand(BaseCommand):
 
     # ruff: noqa: TC002
 
     # Control whether this command includes timestamps in its output.
+    """Display the installed framework and runtime version information."""
+
     timestamps: bool = False
+    """Control whether this command includes timestamps in its output."""
 
     # Identify the command in the CLI registry.
     signature: str = "about"
+    """Identify the command in the CLI registry."""
 
     # Describe the information displayed by this command.
     description: str = "Displays the Orionis framework version and metadata."
+    """Describe the information displayed by this command."""
 
     def handle(
         self,
@@ -46,7 +55,7 @@ class VersionCommand(BaseCommand):
 
         Parameters
         ----------
-        console : Console
+        console : orionis.console.Console
             Rich console instance for output.
 
         Returns

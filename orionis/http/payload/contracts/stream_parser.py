@@ -1,3 +1,5 @@
+"""Define the contract for parsing a multipart byte stream."""
+
 from __future__ import annotations
 from abc import ABC, abstractmethod
 from typing import TYPE_CHECKING
@@ -15,6 +17,7 @@ class IMultipartStreamParser(ABC):
     """
 
     __slots__ = ()
+    """Declare that this class introduces no additional instance slots."""
 
     @abstractmethod
     async def parse(self) -> FormData:
@@ -23,6 +26,6 @@ class IMultipartStreamParser(ABC):
 
         Returns
         -------
-        FormData
+        orionis.http.payload.form_data.FormData
             Container holding all parsed field values and uploaded files.
         """

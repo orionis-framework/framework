@@ -1,3 +1,5 @@
+"""Enumerate verbosity levels for test output."""
+
 from enum import Enum
 
 class VerbosityMode(Enum):
@@ -15,7 +17,7 @@ class VerbosityMode(Enum):
 
     Returns
     -------
-    VerbosityMode
+    orionis.foundation.config.testing.enums.VerbosityMode
         The selected verbosity level as an enumeration member.
     """
 

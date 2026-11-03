@@ -1,3 +1,5 @@
+"""Define the contract for help command implementations."""
+
 from __future__ import annotations
 from abc import ABC, abstractmethod
 from typing import Any, TYPE_CHECKING
@@ -6,6 +8,7 @@ if TYPE_CHECKING:
     import argparse
 
 class IHelpCommand(ABC):
+    """Define the contract for help command implementations."""
 
     @staticmethod
     @abstractmethod
@@ -17,12 +20,12 @@ class IHelpCommand(ABC):
 
         Parameters
         ----------
-        actions : list of argparse.Action
+        actions : list of ``argparse.Action``
             List of argparse actions to parse.
 
         Returns
         -------
-        dict[str, Any]
+        dict[str, typing.Any]
             Dictionary containing categorized actions: help, positionals,
             optionals, and subcommands.
         """
@@ -42,7 +45,7 @@ class IHelpCommand(ABC):
         ----------
         command_name : str
             Name of the command to display help for.
-        actions : list of argparse.Action
+        actions : list of ``argparse.Action``
             List of argparse actions to render in the help output.
         is_error : bool, optional
             If True, indicates this is an error output (default: False).

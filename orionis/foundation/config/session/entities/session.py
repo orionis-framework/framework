@@ -1,3 +1,5 @@
+"""Configure the session middleware."""
+
 from __future__ import annotations
 from dataclasses import dataclass, field
 from orionis.environment import Env
@@ -8,16 +10,18 @@ from orionis.support.entities.base import BaseEntity
 
 # Enumerate accepted session drivers and cookie policies.
 _SAME_SITE_VALUES: frozenset[str] = frozenset(p.value for p in SameSitePolicy)
+"""Enumerate accepted session drivers and cookie policies."""
 _DRIVER_VALUES: frozenset[str] = frozenset(d.value for d in SessionDriver)
+"""Driver values used by ``session``."""
 
 @dataclass(frozen=True, kw_only=True)
 class Session(BaseEntity):
     """
     Configure the session middleware.
 
-    Parameters
+    Attributes
     ----------
-    driver : str | SessionDriver
+    driver : str | orionis.foundation.config.session.SessionDriver
         Session driver. Defaults to SessionDriver.MEMORY.
     lifetime : int
         Session lifetime in minutes. Defaults to 120.
@@ -48,7 +52,7 @@ class Session(BaseEntity):
         Restrict cookies to HTTPS. Defaults to False.
     http_only : bool
         Prevent JavaScript from accessing the cookie. Defaults to True.
-    same_site : str | SameSitePolicy
+    same_site : str | orionis.foundation.config.session.enums.SameSitePolicy
         SameSite cookie policy. Defaults to SameSitePolicy.LAX.
     partitioned : bool
         Enable CHIPS (partitioned) cookies. Defaults to False.
@@ -202,7 +206,7 @@ class Session(BaseEntity):
 
         Parameters
         ----------
-        self : Session
+        self : orionis.foundation.config.session.Session
             The Session instance being validated.
 
         Returns
@@ -263,7 +267,7 @@ class Session(BaseEntity):
 
         Parameters
         ----------
-        self : Session
+        self : orionis.foundation.config.session.Session
             The Session instance being validated.
 
         Returns
@@ -297,7 +301,7 @@ class Session(BaseEntity):
 
         Parameters
         ----------
-        self : Session
+        self : orionis.foundation.config.session.Session
             The Session instance being validated.
 
         Returns
@@ -333,7 +337,7 @@ class Session(BaseEntity):
 
         Parameters
         ----------
-        self : Session
+        self : orionis.foundation.config.session.Session
             The Session instance being validated.
 
         Returns
@@ -377,7 +381,7 @@ class Session(BaseEntity):
 
         Parameters
         ----------
-        self : Session
+        self : orionis.foundation.config.session.Session
             The Session instance being validated.
 
         Returns
@@ -404,7 +408,7 @@ class Session(BaseEntity):
 
         Parameters
         ----------
-        self : Session
+        self : orionis.foundation.config.session.Session
             The Session instance being validated.
 
         Returns
@@ -445,7 +449,7 @@ class Session(BaseEntity):
 
         Parameters
         ----------
-        self : Session
+        self : orionis.foundation.config.session.Session
             The Session instance being validated.
 
         Returns
@@ -476,7 +480,7 @@ class Session(BaseEntity):
 
         Parameters
         ----------
-        self : Session
+        self : orionis.foundation.config.session.Session
             The Session instance being validated.
 
         Returns
@@ -507,7 +511,7 @@ class Session(BaseEntity):
 
         Parameters
         ----------
-        self : Session
+        self : orionis.foundation.config.session.Session
             The Session instance being validated.
 
         Returns
@@ -538,7 +542,7 @@ class Session(BaseEntity):
 
         Parameters
         ----------
-        self : Session
+        self : orionis.foundation.config.session.Session
             The Session instance being validated.
 
         Returns
@@ -561,7 +565,8 @@ class Session(BaseEntity):
             raise ValueError(error_msg)
 
     def __post_init__(self) -> None:
-        """Validate all fields after dataclass initialisation.
+        """
+        Validate all fields after dataclass initialisation.
 
         Called automatically by the dataclass machinery immediately
         after ``__init__``.  Delegates to individual field validators
@@ -569,7 +574,7 @@ class Session(BaseEntity):
 
         Parameters
         ----------
-        self : Session
+        self : orionis.foundation.config.session.Session
             The Session instance being validated.
 
         Returns

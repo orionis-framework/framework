@@ -1,3 +1,8 @@
+"""Provide schemas operations.
+
+Includes ``Title``, ``Description``, ``Examples``, ``ExtraJsonSchema``.
+"""
+
 from __future__ import annotations
 from dataclasses import dataclass
 from orionis.schemas.meta.document import DocumentMetadata
@@ -7,7 +12,7 @@ class Title(DocumentMetadata):
     """
     Provide a human-readable title for the field in JSON Schema / OpenAPI.
 
-    Parameters
+    Attributes
     ----------
     value : str
         The field title shown in generated schema output.
@@ -20,7 +25,7 @@ class Description(DocumentMetadata):
     """
     Provide a human-readable description for the field in JSON Schema / OpenAPI.
 
-    Parameters
+    Attributes
     ----------
     value : str
         The field description shown in generated schema output.
@@ -33,7 +38,7 @@ class Examples(DocumentMetadata):
     """
     Provide example values for the field in JSON Schema / OpenAPI.
 
-    Parameters
+    Attributes
     ----------
     values : list[object]
         A list of example values; each must be JSON-serialisable.
@@ -50,7 +55,7 @@ class ExtraJsonSchema(DocumentMetadata):
     object, allowing arbitrary schema extensions (e.g. ``readOnly``,
     ``deprecated``, vendor-specific ``x-`` properties).
 
-    Parameters
+    Attributes
     ----------
     data : dict[str, object]
         Key/value pairs to merge into the JSON Schema object.
@@ -67,7 +72,7 @@ class Extra(DocumentMetadata):
     by the schema generation pipeline. Use it for application-specific
     annotations that do not belong in the JSON Schema output.
 
-    Parameters
+    Attributes
     ----------
     data : dict[str, object]
         Arbitrary key/value pairs to attach to the field.
@@ -88,7 +93,7 @@ class Message(DocumentMetadata):
     It may also be combined with constraint metadata to cover both
     type errors and constraint errors on the same field.
 
-    Parameters
+    Attributes
     ----------
     text : str
         The custom error message shown when type validation fails.

@@ -1,3 +1,5 @@
+"""Prepare all bodies and attachments before any transport side effect."""
+
 import asyncio
 from contextlib import suppress
 from email import policy
@@ -21,8 +23,10 @@ if TYPE_CHECKING:
 
 # Attachment declaration paired with its payload and storage MIME metadata.
 type LoadedAttachment = tuple[Attachment, bytes, str | None]
+"""Attachment declaration paired with its payload and storage MIME metadata."""
 
 _DEFAULT_MEDIA_TYPE = "application/octet-stream"
+"""Default media type identifier: ``application/octet-stream``."""
 
 class MailComposer:
     """
@@ -35,6 +39,7 @@ class MailComposer:
     # ruff: noqa: TC001
 
     __slots__ = ("_storage", "_view")
+    """Declare the instance attribute slots reserved by this class."""
 
     def __init__(self, view: IViewEngine, storage: IStorageManager) -> None:
         """
@@ -42,9 +47,9 @@ class MailComposer:
 
         Parameters
         ----------
-        view : IViewEngine
+        view : orionis.view.contracts.engine.IViewEngine
             Existing text-rendering view engine.
-        storage : IStorageManager
+        storage : orionis.storage.contracts.IStorageManager
             Existing default/named disk resolver.
 
         Returns
@@ -53,7 +58,9 @@ class MailComposer:
             Store only shared services, never operation state.
         """
         self._view = view
+        """Existing text-rendering view engine."""
         self._storage = storage
+        """Existing default/named disk resolver."""
 
     async def prepare(
         self,
@@ -66,23 +73,23 @@ class MailComposer:
 
         Parameters
         ----------
-        envelope : Envelope
+        envelope : orionis.mail.entities.Envelope
             Final merged headers and intended recipients.
-        content : Content
+        content : orionis.mail.entities.Content
             Validated literals or views with explicit context.
-        attachments : tuple[Attachment, ...]
+        attachments : tuple[orionis.mail.entities.Attachment, ``...``]
             Deferred storage declarations in attachment order.
 
         Returns
         -------
-        PreparedMail
+        orionis.mail.entities.PreparedMail
             Complete MIME bytes and transport envelope.
 
         Raises
         ------
-        MailCompositionException
+        orionis.mail.exceptions.MailCompositionException
             If the envelope, view rendering, or MIME encoding fails.
-        MailAttachmentException
+        orionis.mail.exceptions.MailAttachmentException
             If any attachment cannot be read or has unsafe metadata.
         """
         if envelope.from_address is None:
@@ -125,7 +132,7 @@ class MailComposer:
             Optional view identifier.
         literal : str | None
             Unchanged literal when no view was declared.
-        content : Content
+        content : orionis.mail.entities.Content
             Owner of the isolated explicit view context.
 
         Returns
@@ -135,7 +142,7 @@ class MailComposer:
 
         Raises
         ------
-        MailCompositionException
+        orionis.mail.exceptions.MailCompositionException
             If the configured view engine fails or does not return text.
         """
         if template is None:
@@ -158,17 +165,17 @@ class MailComposer:
 
         Parameters
         ----------
-        attachment : Attachment
+        attachment : orionis.mail.entities.Attachment
             Deferred storage declaration.
 
         Returns
         -------
-        LoadedAttachment
+        orionis.mail.composer.LoadedAttachment
             Declaration, binary data, and optional storage MIME type.
 
         Raises
         ------
-        MailAttachmentException
+        orionis.mail.exceptions.MailAttachmentException
             If storage fails to open, read, inspect, or close the attachment.
         asyncio.CancelledError
             After in-progress storage work finishes and releases its stream.
@@ -191,17 +198,17 @@ class MailComposer:
 
         Parameters
         ----------
-        attachment : Attachment
+        attachment : orionis.mail.entities.Attachment
             Logical path and optional metadata.
 
         Returns
         -------
-        LoadedAttachment
+        orionis.mail.composer.LoadedAttachment
             The full payload, including a valid zero-byte payload.
 
         Raises
         ------
-        MailAttachmentException
+        orionis.mail.exceptions.MailAttachmentException
             If a driver returns a non-binary failure value.
         Exception
             Propagate storage failures to the owning task for translation.
@@ -244,23 +251,23 @@ class MailComposer:
 
         Parameters
         ----------
-        envelope : Envelope
+        envelope : orionis.mail.entities.Envelope
             Validated final envelope.
         text : str | None
             Rendered or literal plain-text body.
         html : str | None
             Rendered or literal HTML body.
-        attachments : tuple[LoadedAttachment, ...]
+        attachments : tuple[orionis.mail.composer.LoadedAttachment, ``...``]
             Fully materialized storage attachments.
 
         Returns
         -------
-        PreparedMail
+        orionis.mail.entities.PreparedMail
             Message-ID, bytes without Bcc, and a separate recipient union.
 
         Raises
         ------
-        MailCompositionException
+        orionis.mail.exceptions.MailCompositionException
             If the envelope carries no sender.
         """
         sender = envelope.from_address
@@ -334,7 +341,7 @@ async def _drain_attachment(task: asyncio.Task[LoadedAttachment]) -> None:
 
     Parameters
     ----------
-    task : asyncio.Task[LoadedAttachment]
+    task : asyncio.Task[orionis.mail.composer.LoadedAttachment]
         Shielded attachment task, possibly still opening a worker-owned stream.
 
     Returns

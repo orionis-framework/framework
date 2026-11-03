@@ -585,6 +585,16 @@
             </div>
         
 
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.mcp.dispatcher.html#TransportName" class="internal-link" title="orionis.mcp.dispatcher.TransportName"><wbr></wbr>Transport<wbr></wbr>Name</a></code>
+            </div>
+        
+
     </li>
 </ul> 
 
@@ -1340,7 +1350,7 @@
                     
                 </label>
 
-                <code><a href="orionis.mcp.server.html" class="internal-link" title="orionis.mcp.server">server</a></code>
+                <code><a href="orionis.mcp.server.package.html" class="internal-link" title="orionis.mcp.server">server</a></code>
 
                 <div class="expandableContent">
                     <div>
@@ -3804,7 +3814,7 @@
         </div>
 
         <div class="extrasDocstring">
-          <p class="class-signature"><code><span class="py-keyword">class</span> <span class="py-defname">McpExtension</span>: <a href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/mcp/server/extension.py#L11" class="sourceLink">(source)</a></code></p><p><a href="classIndex.html#orionis.mcp.McpExtension">View In Hierarchy</a></p>
+          <p class="class-signature"><code><span class="py-keyword">class</span> <span class="py-defname">McpExtension</span>: <a href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/mcp/server/extension.py#L13" class="sourceLink">(source)</a></code></p><p><a href="classIndex.html#orionis.mcp.McpExtension">View In Hierarchy</a></p>
         </div>
 
         <div class="moduleDocstring">
@@ -3812,7 +3822,7 @@
         </div>
 
         <div id="split-tables">
-          <table class="children sortable" id="id1520">
+          <table class="children sortable" id="id1524">
   
   
   <tr class="method">
@@ -3824,27 +3834,27 @@
     
     <td>Class Variable</td>
     <td><code><a href="#capabilities" class="internal-link" title="orionis.mcp.McpExtension.capabilities">capabilities</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
+    <td>Capabilities advertised by the compiled server.</td>
   </tr><tr class="classvariable">
     
     <td>Class Variable</td>
     <td><code><a href="#decoders" class="internal-link" title="orionis.mcp.McpExtension.decoders">decoders</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
+    <td>Decoders produced by <tt class="rst-docutils rst-literal">field</tt>.</td>
   </tr><tr class="classvariable">
     
     <td>Class Variable</td>
     <td><code><a href="#identifier" class="internal-link" title="orionis.mcp.McpExtension.identifier">identifier</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
+    <td>Unique identifier used to negotiate the extension.</td>
   </tr><tr class="classvariable">
     
     <td>Class Variable</td>
     <td><code><a href="#methods" class="internal-link" title="orionis.mcp.McpExtension.methods">methods</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
+    <td>Methods produced by <tt class="rst-docutils rst-literal">field</tt>.</td>
   </tr><tr class="classvariable">
     
     <td>Class Variable</td>
     <td><code><a href="#schema_hook" class="internal-link" title="orionis.mcp.McpExtension.schema_hook">schema<wbr></wbr>_hook</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
+    <td>Hook that contributes extension-specific schema definitions.</td>
   </tr>
 </table>
           
@@ -3866,7 +3876,7 @@
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">__post_init__</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>):</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/mcp/server/extension.py#L21">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/mcp/server/extension.py#L28">
       
       (source)
     </a>
@@ -3892,7 +3902,7 @@
   <div class="functionHeader">
     
     <span class="py-defname">capabilities</span>: <code>Mapping[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <wbr></wbr><a href="https://docs.python.org/3/builtins/functions.html#object" class="intersphinx-link">object</a>]</code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/mcp/server/extension.py#L16">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/mcp/server/extension.py#L19">
       
       (source)
     </a>
@@ -3904,7 +3914,7 @@
   </div>
   <div class="functionBody">
     
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p>Capabilities advertised by the compiled server.</p></div>
     
   </div>
 </div><div class="baseclassvariable">
@@ -3919,7 +3929,7 @@
   <div class="functionHeader">
     
     <span class="py-defname">decoders</span>: <code>Mapping[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <wbr></wbr>msgspec.json.Decoder]</code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/mcp/server/extension.py#L18">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/mcp/server/extension.py#L23">
       
       (source)
     </a>
@@ -3931,7 +3941,7 @@
   </div>
   <div class="functionBody">
     
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p>Decoders produced by <tt class="rst-docutils rst-literal">field</tt>.</p></div>
     
   </div>
 </div><div class="baseclassvariable">
@@ -3946,7 +3956,7 @@
   <div class="functionHeader">
     
     <span class="py-defname">identifier</span>: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/mcp/server/extension.py#L15">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/mcp/server/extension.py#L17">
       
       (source)
     </a>
@@ -3958,7 +3968,7 @@
   </div>
   <div class="functionBody">
     
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p>Unique identifier used to negotiate the extension.</p></div>
     
   </div>
 </div><div class="baseclassvariable">
@@ -3973,7 +3983,7 @@
   <div class="functionHeader">
     
     <span class="py-defname">methods</span>: <code>Mapping[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <wbr></wbr>Callable[<wbr></wbr><span class="rst-variable-ellipsis">...</span>, <wbr></wbr><a href="https://docs.python.org/3/builtins/functions.html#object" class="intersphinx-link">object</a>]]</code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/mcp/server/extension.py#L17">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/mcp/server/extension.py#L21">
       
       (source)
     </a>
@@ -3985,7 +3995,7 @@
   </div>
   <div class="functionBody">
     
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p>Methods produced by <tt class="rst-docutils rst-literal">field</tt>.</p></div>
     
   </div>
 </div><div class="baseclassvariable">
@@ -4000,7 +4010,7 @@
   <div class="functionHeader">
     
     <span class="py-defname">schema_hook</span>: <code>Callable[<wbr></wbr>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#dict" class="intersphinx-link">dict</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <wbr></wbr><a href="https://docs.python.org/3/builtins/functions.html#object" class="intersphinx-link">object</a>]], <wbr></wbr><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a>] | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/mcp/server/extension.py#L19">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/mcp/server/extension.py#L25">
       
       (source)
     </a>
@@ -4012,7 +4022,7 @@
   </div>
   <div class="functionBody">
     
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p>Hook that contributes extension-specific schema definitions.</p></div>
     
   </div>
 </div>
@@ -4026,7 +4036,7 @@
   <div class="orionis-footer-inner">
     <div class="orionis-footer-copy">
       <p>API documentation for <a href="https://orionis-framework.com/" class="projecthome">Orionis</a>.</p>
-      <p class="orionis-footer-meta">Generated with <a href="https://github.com/twisted/pydoctor/">Pydoctor</a> 25.10.1.<span class="orionis-footer-build"> Built 2026-11-03 09:36:58.</span></p>
+      <p class="orionis-footer-meta">Generated with <a href="https://github.com/twisted/pydoctor/">Pydoctor</a> 25.10.1.<span class="orionis-footer-build"> Built 2026-11-03 13:00:15.</span></p>
     </div>
     <nav class="orionis-footer-links" aria-label="Additional resources">
       <a href="https://docs.orionis-framework.com">Read the guide <span aria-hidden="true">↗</span></a>

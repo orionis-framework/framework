@@ -1996,7 +1996,7 @@
         </div>
 
         <div class="extrasDocstring">
-          <p class="class-signature"><code><span class="py-keyword">class</span> <span class="py-defname">AuthenticateMiddleware</span>(<a href="orionis.auth.middleware.ResolveIdentityMiddleware.html" class="internal-link" title="orionis.auth.middleware.ResolveIdentityMiddleware">ResolveIdentityMiddleware</a>): <a href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/auth/middleware/authenticate.py#L20" class="sourceLink">(source)</a></code></p><p>Known subclasses: <code><a href="orionis.auth.middleware.AuthenticateSessionMiddleware.html" class="internal-link">orionis.auth.middleware.AuthenticateSessionMiddleware</a></code>, <code><a href="orionis.auth.middleware.AuthenticateTokenMiddleware.html" class="internal-link">orionis.auth.middleware.AuthenticateTokenMiddleware</a></code></p><p>Constructor: <code><a href="#__init__" class="internal-link" title="orionis.auth.middleware.AuthenticateMiddleware.__init__">AuthenticateMiddleware(app, manager, permissions)</a></code></p><p><a href="classIndex.html#orionis.auth.middleware.AuthenticateMiddleware">View In Hierarchy</a></p>
+          <p class="class-signature"><code><span class="py-keyword">class</span> <span class="py-defname">AuthenticateMiddleware</span>(<a href="orionis.auth.middleware.ResolveIdentityMiddleware.html" class="internal-link" title="orionis.auth.middleware.ResolveIdentityMiddleware">ResolveIdentityMiddleware</a>): <a href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/auth/middleware/authenticate.py#L30" class="sourceLink">(source)</a></code></p><p>Known subclasses: <code><a href="orionis.auth.middleware.AuthenticateSessionMiddleware.html" class="internal-link">orionis.auth.middleware.AuthenticateSessionMiddleware</a></code>, <code><a href="orionis.auth.middleware.AuthenticateTokenMiddleware.html" class="internal-link">orionis.auth.middleware.AuthenticateTokenMiddleware</a></code></p><p>Constructor: <code><a href="#__init__" class="internal-link" title="orionis.auth.middleware.AuthenticateMiddleware.__init__">AuthenticateMiddleware(app, manager, permissions)</a></code></p><p><a href="classIndex.html#orionis.auth.middleware.AuthenticateMiddleware">View In Hierarchy</a></p>
         </div>
 
         <div class="moduleDocstring">
@@ -2035,17 +2035,17 @@ opt out by setting <tt class="rst-docutils rst-literal">cache_control</tt> to <t
     
     <td>Class Variable</td>
     <td><code><a href="#__slots__" class="internal-link" title="orionis.auth.middleware.AuthenticateMiddleware.__slots__">__slots__</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
+    <td>Declare the instance attribute slots reserved by this class.</td>
   </tr><tr class="classvariable">
     
     <td>Class Variable</td>
     <td><code><a href="#cache_control" class="internal-link" title="orionis.auth.middleware.AuthenticateMiddleware.cache_control">cache<wbr></wbr>_control</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
+    <td>Cache-Control applied to every answer of a protected route.</td>
   </tr><tr class="instancevariable">
     
     <td>Instance Variable</td>
     <td><code><a href="#_redirect_to" class="internal-link" title="orionis.auth.middleware.AuthenticateMiddleware._redirect_to">_redirect<wbr></wbr>_to</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
+    <td>Redirect to produced by <tt class="rst-docutils rst-literal">app.config</tt>.</td>
   </tr>
 </table>
           
@@ -2064,17 +2064,17 @@ opt out by setting <tt class="rst-docutils rst-literal">cache_control</tt> to <t
     
     <td>Class Variable</td>
     <td><code><a href="orionis.auth.middleware.ResolveIdentityMiddleware.html#guard" class="internal-link" title="orionis.auth.middleware.ResolveIdentityMiddleware.guard">guard</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
+    <td>An unpinned middleware reuses the request guard. Before any resolution, <tt class="rst-docutils rst-literal">None</tt> falls back to the configured default guard.</td>
   </tr><tr class="baseinstancevariable">
     
     <td>Instance Variable</td>
     <td><code><a href="orionis.auth.middleware.ResolveIdentityMiddleware.html#_manager" class="internal-link" title="orionis.auth.middleware.ResolveIdentityMiddleware._manager">_manager</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
+    <td>Manager exposing the configured guards.</td>
   </tr><tr class="baseinstancevariable">
     
     <td>Instance Variable</td>
     <td><code><a href="orionis.auth.middleware.ResolveIdentityMiddleware.html#_permissions" class="internal-link" title="orionis.auth.middleware.ResolveIdentityMiddleware._permissions">_permissions</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
+    <td>Source the authorization snapshot is built from.</td>
   </tr>
 </table>
             
@@ -2096,7 +2096,7 @@ opt out by setting <tt class="rst-docutils rst-literal">cache_control</tt> to <t
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">__init__</span><span class="function-signature long-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">app: <code>IApplication</code>, </span><span class="rst-sig-param">manager: <code>IAuthManager</code>, </span><span class="rst-sig-param">permissions: <code>IPermissionRepository</code></span>):</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/auth/middleware/authenticate.py#L43">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/auth/middleware/authenticate.py#L55">
       
       (source)
     </a>
@@ -2108,7 +2108,7 @@ opt out by setting <tt class="rst-docutils rst-literal">cache_control</tt> to <t
   </div>
   <div class="docstring functionBody">
     <div class="interfaceinfo">overrides <code><a href="orionis.auth.middleware.ResolveIdentityMiddleware.html#__init__" class="internal-link">orionis.auth.middleware.ResolveIdentityMiddleware.__init__</a></code></div>
-    <div><p>Initialise the middleware with its collaborators.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">app:</span><code><a href="orionis.IApplication.html" class="internal-link" title="orionis.IApplication">IApplication</a></code></td><td class="fieldArgDesc">Application exposing the <tt class="rst-docutils rst-literal">auth.session</tt> configuration.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">manager:</span><code><a href="orionis.auth.contracts.IAuthManager.html" class="internal-link" title="orionis.auth.contracts.IAuthManager">IAuthManager</a></code></td><td class="fieldArgDesc">Manager exposing the configured guards.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">permissions:</span><code><a href="orionis.auth.contracts.IPermissionRepository.html" class="internal-link" title="orionis.auth.contracts.IPermissionRepository">IPermissionRepository</a></code></td><td class="fieldArgDesc">Source the authorization snapshot is built from.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">The redirect target is resolved once, at boot time.</td></tr></table></div>
+    <div><p>Initialise the middleware with its collaborators.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">app:</span><code><a href="orionis.IApplication.html" class="internal-link">orionis.IApplication</a></code></td><td class="fieldArgDesc">Application exposing the <tt class="rst-docutils rst-literal">auth.session</tt> configuration.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">manager:</span><code><a href="orionis.auth.contracts.IAuthManager.html" class="internal-link">orionis.auth.contracts.IAuthManager</a></code></td><td class="fieldArgDesc">Manager exposing the configured guards.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">permissions:</span><code><a href="orionis.auth.contracts.IPermissionRepository.html" class="internal-link">orionis.auth.contracts.IPermissionRepository</a></code></td><td class="fieldArgDesc">Source the authorization snapshot is built from.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">The redirect target is resolved once, at boot time.</td></tr></table></div>
   </div>
 </div><div class="basemethod">
   
@@ -2123,7 +2123,7 @@ opt out by setting <tt class="rst-docutils rst-literal">cache_control</tt> to <t
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">_unauthenticated</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">request: <code>Request</code></span>) -&gt; <code>Response</code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/auth/middleware/authenticate.py#L107">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/auth/middleware/authenticate.py#L120">
       
       (source)
     </a>
@@ -2135,7 +2135,7 @@ opt out by setting <tt class="rst-docutils rst-literal">cache_control</tt> to <t
   </div>
   <div class="docstring functionBody">
     
-    <div><p>Build the answer given to an anonymous request.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">request:</span><code><a href="orionis.http.Request.html" class="internal-link" title="orionis.http.Request">Request</a></code></td><td class="fieldArgDesc">Incoming HTTP request.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.http.Response.html" class="internal-link" title="orionis.http.Response">Response</a></code></td><td class="fieldArgDesc">Redirect to the configured login page.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code>AuthenticationException</code></td><td>When the client expects a machine readable answer, or no
+    <div><p>Build the answer given to an anonymous request.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">request:</span><code><a href="orionis.http.Request.html" class="internal-link">orionis.http.Request</a></code></td><td class="fieldArgDesc">Incoming HTTP request.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.http.Response.html" class="internal-link">orionis.http.Response</a></code></td><td class="fieldArgDesc">Redirect to the configured login page.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.auth.AuthenticationException.html" class="internal-link">orionis.auth.AuthenticationException</a></code></td><td>When the client expects a machine readable answer, or no
 redirect target is configured. The exception is translated
 into a <tt class="rst-docutils rst-literal">401</tt> response by the framework exception handler.</td></tr></table></div>
   </div>
@@ -2152,7 +2152,7 @@ into a <tt class="rst-docutils rst-literal">401</tt> response by the framework e
     
     
     <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">handle</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">request: <code>Request</code>, </span><span class="rst-sig-param">call_next: <code>NextCallable</code></span>) -&gt; <code>Response</code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/auth/middleware/authenticate.py#L69">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/auth/middleware/authenticate.py#L82">
       
       (source)
     </a>
@@ -2164,8 +2164,8 @@ into a <tt class="rst-docutils rst-literal">401</tt> response by the framework e
   </div>
   <div class="docstring functionBody">
     <div class="interfaceinfo">overrides <code><a href="orionis.auth.middleware.ResolveIdentityMiddleware.html#handle" class="internal-link">orionis.auth.middleware.ResolveIdentityMiddleware.handle</a></code></div>
-    <div><p>Reject anonymous requests and continue authenticated ones.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">request:</span><code><a href="orionis.http.Request.html" class="internal-link" title="orionis.http.Request">Request</a></code></td><td class="fieldArgDesc">Incoming HTTP request.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">call<wbr></wbr>_next:</span><code><a href="orionis.http.html#NextCallable" class="internal-link" title="orionis.http.NextCallable">NextCallable</a></code></td><td class="fieldArgDesc">Callable advancing to the next layer.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.http.Response.html" class="internal-link" title="orionis.http.Response">Response</a></code></td><td class="fieldArgDesc">Response produced by the rest of the pipeline, or a redirect
-to the login page for anonymous browser requests.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code>AuthenticationException</code></td><td>When no identity backs the request and no redirect target is
+    <div><p>Reject anonymous requests and continue authenticated ones.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">request:</span><code><a href="orionis.http.Request.html" class="internal-link">orionis.http.Request</a></code></td><td class="fieldArgDesc">Incoming HTTP request.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">call<wbr></wbr>_next:</span><code><a href="orionis.http.html#NextCallable" class="internal-link">orionis.http.NextCallable</a></code></td><td class="fieldArgDesc">Callable advancing to the next layer.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.http.Response.html" class="internal-link">orionis.http.Response</a></code></td><td class="fieldArgDesc">Response produced by the rest of the pipeline, or a redirect
+to the login page for anonymous browser requests.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.auth.AuthenticationException.html" class="internal-link">orionis.auth.AuthenticationException</a></code></td><td>When no identity backs the request and no redirect target is
 configured for browsers.</td></tr></table></div>
   </div>
 </div><div class="baseclassvariable">
@@ -2180,7 +2180,7 @@ configured for browsers.</td></tr></table></div>
   <div class="functionHeader">
     
     <span class="py-defname">__slots__</span>: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" class="intersphinx-link">tuple</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <wbr></wbr><span class="rst-variable-ellipsis">...</span>]</code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/auth/middleware/authenticate.py#L38">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/auth/middleware/authenticate.py#L48">
       
       (source)
     </a>
@@ -2192,7 +2192,7 @@ configured for browsers.</td></tr></table></div>
   </div>
   <div class="functionBody">
     <div class="interfaceinfo">overrides <code><a href="orionis.auth.middleware.ResolveIdentityMiddleware.html#__slots__" class="internal-link">orionis.auth.middleware.ResolveIdentityMiddleware.__slots__</a></code></div><div class="interfaceinfo">overridden in <code><a href="orionis.auth.middleware.AuthenticateSessionMiddleware.html" class="internal-link">orionis.auth.middleware.AuthenticateSessionMiddleware</a></code>, <code><a href="orionis.auth.middleware.AuthenticateTokenMiddleware.html" class="internal-link">orionis.auth.middleware.AuthenticateTokenMiddleware</a></code></div>
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p>Declare the instance attribute slots reserved by this class.</p></div>
     
   </div>
 </div><div class="baseclassvariable">
@@ -2207,7 +2207,7 @@ configured for browsers.</td></tr></table></div>
   <div class="functionHeader">
     
     <span class="py-defname">cache_control</span>: <code>ClassVar[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a> | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a>]</code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/auth/middleware/authenticate.py#L41">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/auth/middleware/authenticate.py#L52">
       
       (source)
     </a>
@@ -2219,7 +2219,7 @@ configured for browsers.</td></tr></table></div>
   </div>
   <div class="functionBody">
     
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p>Cache-Control applied to every answer of a protected route.</p></div>
     
   </div>
 </div><div class="baseinstancevariable">
@@ -2234,7 +2234,7 @@ configured for browsers.</td></tr></table></div>
   <div class="functionHeader">
     
     <span class="py-defname">_redirect_to</span>: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a> | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/auth/middleware/authenticate.py#L67">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/auth/middleware/authenticate.py#L79">
       
       (source)
     </a>
@@ -2246,7 +2246,7 @@ configured for browsers.</td></tr></table></div>
   </div>
   <div class="functionBody">
     
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p>Redirect to produced by <tt class="rst-docutils rst-literal">app.config</tt>.</p></div>
     
   </div>
 </div>
@@ -2260,7 +2260,7 @@ configured for browsers.</td></tr></table></div>
   <div class="orionis-footer-inner">
     <div class="orionis-footer-copy">
       <p>API documentation for <a href="https://orionis-framework.com/" class="projecthome">Orionis</a>.</p>
-      <p class="orionis-footer-meta">Generated with <a href="https://github.com/twisted/pydoctor/">Pydoctor</a> 25.10.1.<span class="orionis-footer-build"> Built 2026-11-03 09:36:58.</span></p>
+      <p class="orionis-footer-meta">Generated with <a href="https://github.com/twisted/pydoctor/">Pydoctor</a> 25.10.1.<span class="orionis-footer-build"> Built 2026-11-03 13:00:15.</span></p>
     </div>
     <nav class="orionis-footer-links" aria-label="Additional resources">
       <a href="https://docs.orionis-framework.com">Read the guide <span aria-hidden="true">↗</span></a>

@@ -530,15 +530,15 @@
         </div>
 
         <div class="extrasDocstring">
-          <p class="class-signature"><code><span class="py-keyword">class</span> <span class="py-defname">RateLimitMiddleware</span>: <a href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/http/layer/shared/rate_limit.py#L12" class="sourceLink">(source)</a></code></p><p>Constructor: <code><a href="#__init__" class="internal-link" title="orionis.http.layer.shared.rate_limit.RateLimitMiddleware.__init__">RateLimitMiddleware(config, default_responses)</a></code></p><p><a href="classIndex.html#orionis.http.layer.shared.rate_limit.RateLimitMiddleware">View In Hierarchy</a></p>
+          <p class="class-signature"><code><span class="py-keyword">class</span> <span class="py-defname">RateLimitMiddleware</span>: <a href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/http/layer/shared/rate_limit.py#L14" class="sourceLink">(source)</a></code></p><p>Constructor: <code><a href="#__init__" class="internal-link" title="orionis.http.layer.shared.rate_limit.RateLimitMiddleware.__init__">RateLimitMiddleware(config, default_responses)</a></code></p><p><a href="classIndex.html#orionis.http.layer.shared.rate_limit.RateLimitMiddleware">View In Hierarchy</a></p>
         </div>
 
         <div class="moduleDocstring">
-          <div><p class="undocumented">Undocumented</p></div>
+          <div><p>Apply configured request-rate limits before dispatch.</p></div>
         </div>
 
         <div id="split-tables">
-          <table class="children sortable" id="id1057">
+          <table class="children sortable" id="id1058">
   
   
   <tr class="method">
@@ -565,37 +565,37 @@
     
     <td>Class Variable</td>
     <td><code><a href="#__slots__" class="internal-link" title="orionis.http.layer.shared.rate_limit.RateLimitMiddleware.__slots__">__slots__</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
+    <td>Declare the instance attribute slots reserved by this class.</td>
   </tr><tr class="instancevariable">
     
     <td>Instance Variable</td>
     <td><code><a href="#__default_responses" class="internal-link" title="orionis.http.layer.shared.rate_limit.RateLimitMiddleware.__default_responses">__default<wbr></wbr>_responses</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
+    <td>Predefined default responses for common HTTP errors.</td>
   </tr><tr class="instancevariable">
     
     <td>Instance Variable</td>
     <td><code><a href="#__rate_limit_enabled" class="internal-link" title="orionis.http.layer.shared.rate_limit.RateLimitMiddleware.__rate_limit_enabled">__rate<wbr></wbr>_limit<wbr></wbr>_enabled</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
+    <td>Rate limit enabled obtained from <tt class="rst-docutils rst-literal">cfg.rate_limit_enabled</tt>.</td>
   </tr><tr class="instancevariable">
     
     <td>Instance Variable</td>
     <td><code><a href="#__rate_limit_requests" class="internal-link" title="orionis.http.layer.shared.rate_limit.RateLimitMiddleware.__rate_limit_requests">__rate<wbr></wbr>_limit<wbr></wbr>_requests</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
+    <td>Rate limit requests obtained from <tt class="rst-docutils rst-literal">cfg.rate_limit_requests</tt>.</td>
   </tr><tr class="instancevariable">
     
     <td>Instance Variable</td>
     <td><code><a href="#__rate_limit_window_seconds" class="internal-link" title="orionis.http.layer.shared.rate_limit.RateLimitMiddleware.__rate_limit_window_seconds">__rate<wbr></wbr>_limit<wbr></wbr>_window<wbr></wbr>_seconds</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
+    <td>Rate limit window seconds obtained from <tt class="rst-docutils rst-literal">cfg.rate_limit_window_seconds</tt>.</td>
   </tr><tr class="instancevariable">
     
     <td>Instance Variable</td>
     <td><code><a href="#__retry_after_value" class="internal-link" title="orionis.http.layer.shared.rate_limit.RateLimitMiddleware.__retry_after_value">__retry<wbr></wbr>_after<wbr></wbr>_value</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
+    <td>Pre-render the Retry-After header value for rejection responses.</td>
   </tr><tr class="instancevariable">
     
     <td>Instance Variable</td>
     <td><code><a href="#__store" class="internal-link" title="orionis.http.layer.shared.rate_limit.RateLimitMiddleware.__store">__store</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
+    <td>Backend storing the state needed by this service.</td>
   </tr>
 </table>
           
@@ -617,7 +617,7 @@
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">__init__</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">config: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#dict" class="intersphinx-link">dict</a></code>, </span><span class="rst-sig-param">default_responses: <code><a href="orionis.http.default.contracts.responses.IDefaultResponses.html" class="internal-link" title="orionis.http.default.contracts.responses.IDefaultResponses">IDefaultResponses</a></code></span>):</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/http/layer/shared/rate_limit.py#L25">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/http/layer/shared/rate_limit.py#L29">
       
       (source)
     </a>
@@ -629,7 +629,7 @@
   </div>
   <div class="docstring functionBody">
     
-    <div><p>Initialize the middleware with the given rate-limit configuration.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">config:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#dict" class="intersphinx-link">dict</a></code></td><td class="fieldArgDesc">A dictionary whose keys must match <tt class="rst-docutils rst-literal">HTTPRateLimit</tt> fields.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">default<wbr></wbr>_responses:</span><code><a href="orionis.http.default.contracts.responses.IDefaultResponses.html" class="internal-link" title="orionis.http.default.contracts.responses.IDefaultResponses">IDefaultResponses</a></code></td><td class="fieldArgDesc">Predefined default responses for common HTTP errors.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">Configure the limiter and its enabled storage backend.</td></tr></table></div>
+    <div><p>Initialize the middleware with the given rate-limit configuration.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">config:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#dict" class="intersphinx-link">dict</a></code></td><td class="fieldArgDesc">A dictionary whose keys must match <tt class="rst-docutils rst-literal">HTTPRateLimit</tt> fields.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">default<wbr></wbr>_responses:</span><code><a href="orionis.http.default.contracts.responses.IDefaultResponses.html" class="internal-link">orionis.http.default.contracts.responses.IDefaultResponses</a></code></td><td class="fieldArgDesc">Predefined default responses for common HTTP errors.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">Configure the limiter and its enabled storage backend.</td></tr></table></div>
   </div>
 </div><div class="basemethod">
   
@@ -644,7 +644,7 @@
     
     
     <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">close</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>):</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/http/layer/shared/rate_limit.py#L68">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/http/layer/shared/rate_limit.py#L79">
       
       (source)
     </a>
@@ -671,7 +671,7 @@
     
     
     <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">handle</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">adapter: <code><a href="orionis.http.adapters.request.contracts.transport.TransportAdapter.html" class="internal-link" title="orionis.http.adapters.request.contracts.transport.TransportAdapter">TransportAdapter</a></code></span>) -&gt; <code>Response | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/http/layer/shared/rate_limit.py#L96">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/http/layer/shared/rate_limit.py#L107">
       
       (source)
     </a>
@@ -685,8 +685,8 @@
     
     <div><p>Enforce the sliding-window rate limit for the incoming request.</p>
 <p>Skip disabled limits and unresolved client addresses.</p>
-<table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">adapter:</span><code><a href="orionis.http.adapters.request.contracts.transport.TransportAdapter.html" class="internal-link" title="orionis.http.adapters.request.contracts.transport.TransportAdapter">TransportAdapter</a></code></td><td class="fieldArgDesc">Transport abstraction providing client IP and header
-negotiation helpers.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code>Response | None</code></td><td class="fieldArgDesc">Return 429 for exhausted quotas, 503 for Redis failures, or
+<table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">adapter:</span><code><a href="orionis.http.adapters.request.contracts.transport.TransportAdapter.html" class="internal-link">orionis.http.adapters.request.contracts.transport.TransportAdapter</a></code></td><td class="fieldArgDesc">Transport abstraction providing client IP and header
+negotiation helpers.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code>orionis.http.Response | None</code></td><td class="fieldArgDesc">Return 429 for exhausted quotas, 503 for Redis failures, or
 <tt class="rst-docutils rst-literal">None</tt> when the request is allowed to proceed.</td></tr></table></div>
   </div>
 </div><div class="basemethod">
@@ -702,7 +702,7 @@ negotiation helpers.</td></tr></table><table class="fieldTable"><tr class="field
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">isEnabled</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/http/layer/shared/rate_limit.py#L85">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/http/layer/shared/rate_limit.py#L96">
       
       (source)
     </a>
@@ -728,7 +728,7 @@ negotiation helpers.</td></tr></table><table class="fieldTable"><tr class="field
   <div class="functionHeader">
     
     <span class="py-defname">__slots__</span>: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" class="intersphinx-link">tuple</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <wbr></wbr><span class="rst-variable-ellipsis">...</span>]</code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/http/layer/shared/rate_limit.py#L16">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/http/layer/shared/rate_limit.py#L19">
       
       (source)
     </a>
@@ -740,7 +740,7 @@ negotiation helpers.</td></tr></table><table class="fieldTable"><tr class="field
   </div>
   <div class="functionBody">
     
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p>Declare the instance attribute slots reserved by this class.</p></div>
     
   </div>
 </div><div class="baseinstancevariable">
@@ -755,7 +755,7 @@ negotiation helpers.</td></tr></table><table class="fieldTable"><tr class="field
   <div class="functionHeader">
     
     <span class="py-defname">__default_responses</span> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/http/layer/shared/rate_limit.py#L66">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/http/layer/shared/rate_limit.py#L76">
       
       (source)
     </a>
@@ -767,7 +767,7 @@ negotiation helpers.</td></tr></table><table class="fieldTable"><tr class="field
   </div>
   <div class="functionBody">
     
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p>Predefined default responses for common HTTP errors.</p></div>
     
   </div>
 </div><div class="baseinstancevariable">
@@ -782,7 +782,7 @@ negotiation helpers.</td></tr></table><table class="fieldTable"><tr class="field
   <div class="functionHeader">
     
     <span class="py-defname">__rate_limit_enabled</span> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/http/layer/shared/rate_limit.py#L46">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/http/layer/shared/rate_limit.py#L51">
       
       (source)
     </a>
@@ -794,7 +794,7 @@ negotiation helpers.</td></tr></table><table class="fieldTable"><tr class="field
   </div>
   <div class="functionBody">
     
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p>Rate limit enabled obtained from <tt class="rst-docutils rst-literal">cfg.rate_limit_enabled</tt>.</p></div>
     
   </div>
 </div><div class="baseinstancevariable">
@@ -809,7 +809,7 @@ negotiation helpers.</td></tr></table><table class="fieldTable"><tr class="field
   <div class="functionHeader">
     
     <span class="py-defname">__rate_limit_requests</span> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/http/layer/shared/rate_limit.py#L47">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/http/layer/shared/rate_limit.py#L53">
       
       (source)
     </a>
@@ -821,7 +821,7 @@ negotiation helpers.</td></tr></table><table class="fieldTable"><tr class="field
   </div>
   <div class="functionBody">
     
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p>Rate limit requests obtained from <tt class="rst-docutils rst-literal">cfg.rate_limit_requests</tt>.</p></div>
     
   </div>
 </div><div class="baseinstancevariable">
@@ -836,7 +836,7 @@ negotiation helpers.</td></tr></table><table class="fieldTable"><tr class="field
   <div class="functionHeader">
     
     <span class="py-defname">__rate_limit_window_seconds</span> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/http/layer/shared/rate_limit.py#L48">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/http/layer/shared/rate_limit.py#L55">
       
       (source)
     </a>
@@ -848,7 +848,7 @@ negotiation helpers.</td></tr></table><table class="fieldTable"><tr class="field
   </div>
   <div class="functionBody">
     
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p>Rate limit window seconds obtained from <tt class="rst-docutils rst-literal">cfg.rate_limit_window_seconds</tt>.</p></div>
     
   </div>
 </div><div class="baseinstancevariable">
@@ -863,7 +863,7 @@ negotiation helpers.</td></tr></table><table class="fieldTable"><tr class="field
   <div class="functionHeader">
     
     <span class="py-defname">__retry_after_value</span> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/http/layer/shared/rate_limit.py#L51">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/http/layer/shared/rate_limit.py#L59">
       
       (source)
     </a>
@@ -875,7 +875,7 @@ negotiation helpers.</td></tr></table><table class="fieldTable"><tr class="field
   </div>
   <div class="functionBody">
     
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p>Pre-render the Retry-After header value for rejection responses.</p></div>
     
   </div>
 </div><div class="baseinstancevariable">
@@ -890,7 +890,7 @@ negotiation helpers.</td></tr></table><table class="fieldTable"><tr class="field
   <div class="functionHeader">
     
     <span class="py-defname">__store</span> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/http/layer/shared/rate_limit.py#L53">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/http/layer/shared/rate_limit.py#L62">
       
       (source)
     </a>
@@ -902,7 +902,7 @@ negotiation helpers.</td></tr></table><table class="fieldTable"><tr class="field
   </div>
   <div class="functionBody">
     
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p>Backend storing the state needed by this service.</p></div>
     
   </div>
 </div>
@@ -916,7 +916,7 @@ negotiation helpers.</td></tr></table><table class="fieldTable"><tr class="field
   <div class="orionis-footer-inner">
     <div class="orionis-footer-copy">
       <p>API documentation for <a href="https://orionis-framework.com/" class="projecthome">Orionis</a>.</p>
-      <p class="orionis-footer-meta">Generated with <a href="https://github.com/twisted/pydoctor/">Pydoctor</a> 25.10.1.<span class="orionis-footer-build"> Built 2026-11-03 09:36:58.</span></p>
+      <p class="orionis-footer-meta">Generated with <a href="https://github.com/twisted/pydoctor/">Pydoctor</a> 25.10.1.<span class="orionis-footer-build"> Built 2026-11-03 13:00:15.</span></p>
     </div>
     <nav class="orionis-footer-links" aria-label="Additional resources">
       <a href="https://docs.orionis-framework.com">Read the guide <span aria-hidden="true">↗</span></a>

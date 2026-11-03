@@ -686,7 +686,7 @@
         </div>
 
         <div class="extrasDocstring">
-          <p class="class-signature"><code><span class="py-keyword">class</span> <span class="py-defname">RedisQueueDriver</span>(<a href="orionis.queues.contracts.driver.IQueueDriver.html" class="internal-link" title="orionis.queues.contracts.driver.IQueueDriver">IQueueDriver</a>): <a href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/queues/drivers/redis.py#L123" class="sourceLink">(source)</a></code></p><p>Constructor: <code><a href="#__init__" class="internal-link" title="orionis.queues.drivers.redis.RedisQueueDriver.__init__">RedisQueueDriver(config, client)</a></code></p><p><a href="classIndex.html#orionis.queues.drivers.redis.RedisQueueDriver">View In Hierarchy</a></p>
+          <p class="class-signature"><code><span class="py-keyword">class</span> <span class="py-defname">RedisQueueDriver</span>(<a href="orionis.queues.contracts.driver.IQueueDriver.html" class="internal-link" title="orionis.queues.contracts.driver.IQueueDriver">IQueueDriver</a>): <a href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/queues/drivers/redis.py#L133" class="sourceLink">(source)</a></code></p><p>Constructor: <code><a href="#__init__" class="internal-link" title="orionis.queues.drivers.redis.RedisQueueDriver.__init__">RedisQueueDriver(config, client)</a></code></p><p><a href="classIndex.html#orionis.queues.drivers.redis.RedisQueueDriver">View In Hierarchy</a></p>
         </div>
 
         <div class="moduleDocstring">
@@ -694,7 +694,7 @@
         </div>
 
         <div id="split-tables">
-          <table class="children sortable" id="id1734">
+          <table class="children sortable" id="id1741">
   
   
   <tr class="method">
@@ -751,22 +751,22 @@
     
     <td>Class Variable</td>
     <td><code><a href="#__slots__" class="internal-link" title="orionis.queues.drivers.redis.RedisQueueDriver.__slots__">__slots__</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
+    <td>Declare the instance attribute slots reserved by this class.</td>
   </tr><tr class="instancevariable">
     
     <td>Instance Variable</td>
     <td><code><a href="#_client" class="internal-link" title="orionis.queues.drivers.redis.RedisQueueDriver._client">_client</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
+    <td>Externally owned async client, primarily for explicit test fakes.</td>
   </tr><tr class="instancevariable">
     
     <td>Instance Variable</td>
     <td><code><a href="#_owns_client" class="internal-link" title="orionis.queues.drivers.redis.RedisQueueDriver._owns_client">_owns<wbr></wbr>_client</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
+    <td>Whether this object must close the client during its own cleanup.</td>
   </tr><tr class="instancevariable">
     
     <td>Instance Variable</td>
     <td><code><a href="#_prefix" class="internal-link" title="orionis.queues.drivers.redis.RedisQueueDriver._prefix">_prefix</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
+    <td>Prefix applied when constructing names or storage keys.</td>
   </tr>
 </table>
           
@@ -788,7 +788,7 @@
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">__init__</span><span class="function-signature">(<span class="rst-sig-param">self: <code><a href="https://docs.python.org/3/library/typing.html#typing.Self" class="intersphinx-link">Self</a></code>, </span><span class="rst-sig-param">config: <code><a href="orionis.foundation.config.queue.Redis.html" class="internal-link" title="orionis.foundation.config.queue.Redis">RedisConfig</a> | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code> = <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a>, </span><span class="rst-sig-symbol">*, </span><span class="rst-sig-param">client: <code>Redis | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code> = <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></span>):</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/queues/drivers/redis.py#L128">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/queues/drivers/redis.py#L139">
       
       (source)
     </a>
@@ -800,8 +800,8 @@
   </div>
   <div class="docstring functionBody">
     
-    <div><p>Configure a lazy Redis transport and queue key namespace.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">config:</span><code>RedisConfig | None, <em>optional</em></code></td><td class="fieldArgDesc">Validated host, port, database, password, and namespace settings.
-Use the configuration entity's environment defaults when omitted.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">client:</span><code>Redis or <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a>, <em>optional</em></code></td><td class="fieldArgDesc">Externally owned async client, primarily for explicit test fakes.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">Initialize a lazy transport without opening network connections.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.queues.exceptions.QueueStorageError.html" class="internal-link" title="orionis.queues.exceptions.QueueStorageError">QueueStorageError</a></code></td><td>If the configuration type or queue namespace is invalid.</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/exceptions.html#TypeError" class="intersphinx-link">TypeError</a></code></td><td>If an environment default has an invalid type.</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/exceptions.html#ValueError" class="intersphinx-link">ValueError</a></code></td><td>If an environment default fails its configuration validation.</td></tr></table></div>
+    <div><p>Configure a lazy Redis transport and queue key namespace.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">config:</span><code>orionis.foundation.config.queue.Redis | None, <em>optional</em></code></td><td class="fieldArgDesc">Validated host, port, database, password, and namespace settings.
+Use the configuration entity's environment defaults when omitted.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">client:</span><code><tt class="rst-docutils rst-literal">redis.asyncio.Redis</tt> or <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a>, <em>optional</em></code></td><td class="fieldArgDesc">Externally owned async client, primarily for explicit test fakes.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">Initialize a lazy transport without opening network connections.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.queues.exceptions.QueueStorageError.html" class="internal-link">orionis.queues.exceptions.QueueStorageError</a></code></td><td>If the configuration type or queue namespace is invalid.</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/exceptions.html#TypeError" class="intersphinx-link">TypeError</a></code></td><td>If an environment default has an invalid type.</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/exceptions.html#ValueError" class="intersphinx-link">ValueError</a></code></td><td>If an environment default fails its configuration validation.</td></tr></table></div>
   </div>
 </div><div class="basemethod">
   
@@ -816,7 +816,7 @@ Use the configuration entity's environment defaults when omitted.</td></tr><tr><
     
     
     <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">_executeScript</span><span class="function-signature long-signature">(<span class="rst-sig-param">self: <code><a href="https://docs.python.org/3/library/typing.html#typing.Self" class="intersphinx-link">Self</a></code>, </span><span class="rst-sig-param">script: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code>, </span><span class="rst-sig-param">keys: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" class="intersphinx-link">tuple</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <wbr></wbr><span class="rst-variable-ellipsis">...</span>]</code>, </span><span class="rst-sig-param">arguments: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" class="intersphinx-link">tuple</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a> | <a href="https://docs.python.org/3/builtins/stdtypes.html#bytes" class="intersphinx-link">bytes</a> | <a href="https://docs.python.org/3/builtins/functions.html#float" class="intersphinx-link">float</a>, <wbr></wbr><span class="rst-variable-ellipsis">...</span>]</code></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/functions.html#object" class="intersphinx-link">object</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/queues/drivers/redis.py#L202">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/queues/drivers/redis.py#L216">
       
       (source)
     </a>
@@ -828,7 +828,7 @@ Use the configuration entity's environment defaults when omitted.</td></tr><tr><
   </div>
   <div class="docstring functionBody">
     
-    <div><p>Execute one atomic Redis transition and translate transport errors.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">script:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Framework-owned Lua transition source.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">keys:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" class="intersphinx-link">tuple</a> of <a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Redis keys touched by the transition.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">arguments:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" class="intersphinx-link">tuple</a></code></td><td class="fieldArgDesc">Bound transition arguments.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/functions.html#object" class="intersphinx-link">object</a></code></td><td class="fieldArgDesc">Redis reply supplied by the executed script.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.queues.exceptions.QueueStorageError.html" class="internal-link" title="orionis.queues.exceptions.QueueStorageError">QueueStorageError</a></code></td><td>If Redis cannot perform the transition.</td></tr></table></div>
+    <div><p>Execute one atomic Redis transition and translate transport errors.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">script:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Framework-owned Lua transition source.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">keys:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" class="intersphinx-link">tuple</a> of <a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Redis keys touched by the transition.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">arguments:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" class="intersphinx-link">tuple</a></code></td><td class="fieldArgDesc">Bound transition arguments.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/functions.html#object" class="intersphinx-link">object</a></code></td><td class="fieldArgDesc">Redis reply supplied by the executed script.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.queues.exceptions.QueueStorageError.html" class="internal-link">orionis.queues.exceptions.QueueStorageError</a></code></td><td>If Redis cannot perform the transition.</td></tr></table></div>
   </div>
 </div><div class="basemethod">
   
@@ -843,7 +843,7 @@ Use the configuration entity's environment defaults when omitted.</td></tr><tr><
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">_keys</span><span class="function-signature">(<span class="rst-sig-param">self: <code><a href="https://docs.python.org/3/library/typing.html#typing.Self" class="intersphinx-link">Self</a></code>, </span><span class="rst-sig-param">queue: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" class="intersphinx-link">tuple</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <wbr></wbr><span class="rst-variable-ellipsis">...</span>]</code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/queues/drivers/redis.py#L181">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/queues/drivers/redis.py#L195">
       
       (source)
     </a>
@@ -870,7 +870,7 @@ Use the configuration entity's environment defaults when omitted.</td></tr><tr><
     
     
     <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">clear</span><span class="function-signature">(<span class="rst-sig-param">self: <code><a href="https://docs.python.org/3/library/typing.html#typing.Self" class="intersphinx-link">Self</a></code>, </span><span class="rst-sig-param">queue: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/queues/drivers/redis.py#L409">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/queues/drivers/redis.py#L423">
       
       (source)
     </a>
@@ -897,7 +897,7 @@ Use the configuration entity's environment defaults when omitted.</td></tr><tr><
     
     
     <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">close</span><span class="function-signature">(<span class="rst-sig-param">self: <code><a href="https://docs.python.org/3/library/typing.html#typing.Self" class="intersphinx-link">Self</a></code></span>):</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/queues/drivers/redis.py#L429">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/queues/drivers/redis.py#L443">
       
       (source)
     </a>
@@ -924,7 +924,7 @@ Use the configuration entity's environment defaults when omitted.</td></tr><tr><
     
     
     <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">delete</span><span class="function-signature">(<span class="rst-sig-param">self: <code><a href="https://docs.python.org/3/library/typing.html#typing.Self" class="intersphinx-link">Self</a></code>, </span><span class="rst-sig-param">reserved: <code><a href="orionis.queues.entities.reserved_job.ReservedJob.html" class="internal-link" title="orionis.queues.entities.reserved_job.ReservedJob">ReservedJob</a></code></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/queues/drivers/redis.py#L366">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/queues/drivers/redis.py#L380">
       
       (source)
     </a>
@@ -936,7 +936,7 @@ Use the configuration entity's environment defaults when omitted.</td></tr><tr><
   </div>
   <div class="docstring functionBody">
     <div class="interfaceinfo">overrides <code><a href="orionis.queues.contracts.driver.IQueueDriver.html#delete" class="internal-link">orionis.queues.contracts.driver.IQueueDriver.delete</a></code></div>
-    <div><p>Acknowledge a currently owned reservation atomically.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">reserved:</span><code><a href="orionis.queues.entities.reserved_job.ReservedJob.html" class="internal-link" title="orionis.queues.entities.reserved_job.ReservedJob">ReservedJob</a></code></td><td class="fieldArgDesc">Reservation owned by the acknowledging worker.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code></td><td class="fieldArgDesc">Whether an owned, unexpired reservation was removed.</td></tr></table></div>
+    <div><p>Acknowledge a currently owned reservation atomically.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">reserved:</span><code><a href="orionis.queues.entities.reserved_job.ReservedJob.html" class="internal-link">orionis.queues.entities.reserved_job.ReservedJob</a></code></td><td class="fieldArgDesc">Reservation owned by the acknowledging worker.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code></td><td class="fieldArgDesc">Whether an owned, unexpired reservation was removed.</td></tr></table></div>
   </div>
 </div><div class="basemethod">
   
@@ -951,7 +951,7 @@ Use the configuration entity's environment defaults when omitted.</td></tr><tr><
     
     
     <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">push</span><span class="function-signature">(<span class="rst-sig-param">self: <code><a href="https://docs.python.org/3/library/typing.html#typing.Self" class="intersphinx-link">Self</a></code>, </span><span class="rst-sig-param">envelope: <code>JobEnvelope</code>, </span><span class="rst-sig-param">delay: <code><a href="https://docs.python.org/3/builtins/functions.html#float" class="intersphinx-link">float</a></code> = 0</span>) -&gt; <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/queues/drivers/redis.py#L245">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/queues/drivers/redis.py#L259">
       
       (source)
     </a>
@@ -963,7 +963,7 @@ Use the configuration entity's environment defaults when omitted.</td></tr><tr><
   </div>
   <div class="docstring functionBody">
     <div class="interfaceinfo">overrides <code><a href="orionis.queues.contracts.driver.IQueueDriver.html#push" class="internal-link">orionis.queues.contracts.driver.IQueueDriver.push</a></code></div>
-    <div><p>Store an envelope and its availability atomically.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">envelope:</span><code><a href="orionis.queues.JobEnvelope.html" class="internal-link" title="orionis.queues.JobEnvelope">JobEnvelope</a></code></td><td class="fieldArgDesc">Immutable serialized job configuration and state.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">delay:</span><code><a href="https://docs.python.org/3/builtins/functions.html#float" class="intersphinx-link">float</a>, <em>optional</em></code></td><td class="fieldArgDesc">Seconds before the job becomes available.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Persisted job identifier.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.queues.exceptions.QueueStorageError.html" class="internal-link" title="orionis.queues.exceptions.QueueStorageError">QueueStorageError</a></code></td><td>If the identifier already exists or persistence fails.</td></tr></table></div>
+    <div><p>Store an envelope and its availability atomically.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">envelope:</span><code><a href="orionis.queues.JobEnvelope.html" class="internal-link">orionis.queues.JobEnvelope</a></code></td><td class="fieldArgDesc">Immutable serialized job configuration and state.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">delay:</span><code><a href="https://docs.python.org/3/builtins/functions.html#float" class="intersphinx-link">float</a>, <em>optional</em></code></td><td class="fieldArgDesc">Seconds before the job becomes available.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Persisted job identifier.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.queues.exceptions.QueueStorageError.html" class="internal-link">orionis.queues.exceptions.QueueStorageError</a></code></td><td>If the identifier already exists or persistence fails.</td></tr></table></div>
   </div>
 </div><div class="basemethod">
   
@@ -978,7 +978,7 @@ Use the configuration entity's environment defaults when omitted.</td></tr><tr><
     
     
     <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">release</span><span class="function-signature">(<span class="rst-sig-param">self: <code><a href="https://docs.python.org/3/library/typing.html#typing.Self" class="intersphinx-link">Self</a></code>, </span><span class="rst-sig-param">reserved: <code><a href="orionis.queues.entities.reserved_job.ReservedJob.html" class="internal-link" title="orionis.queues.entities.reserved_job.ReservedJob">ReservedJob</a></code>, </span><span class="rst-sig-param">delay: <code><a href="https://docs.python.org/3/builtins/functions.html#float" class="intersphinx-link">float</a></code> = 0</span>) -&gt; <code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/queues/drivers/redis.py#L339">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/queues/drivers/redis.py#L353">
       
       (source)
     </a>
@@ -990,7 +990,7 @@ Use the configuration entity's environment defaults when omitted.</td></tr><tr><
   </div>
   <div class="docstring functionBody">
     <div class="interfaceinfo">overrides <code><a href="orionis.queues.contracts.driver.IQueueDriver.html#release" class="internal-link">orionis.queues.contracts.driver.IQueueDriver.release</a></code></div>
-    <div><p>Release a currently owned reservation with optional delay.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">reserved:</span><code><a href="orionis.queues.entities.reserved_job.ReservedJob.html" class="internal-link" title="orionis.queues.entities.reserved_job.ReservedJob">ReservedJob</a></code></td><td class="fieldArgDesc">Reservation owned by the releasing worker.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">delay:</span><code><a href="https://docs.python.org/3/builtins/functions.html#float" class="intersphinx-link">float</a>, <em>optional</em></code></td><td class="fieldArgDesc">Seconds before the job becomes available again.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code></td><td class="fieldArgDesc">Whether an owned, unexpired reservation was released.</td></tr></table></div>
+    <div><p>Release a currently owned reservation with optional delay.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">reserved:</span><code><a href="orionis.queues.entities.reserved_job.ReservedJob.html" class="internal-link">orionis.queues.entities.reserved_job.ReservedJob</a></code></td><td class="fieldArgDesc">Reservation owned by the releasing worker.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">delay:</span><code><a href="https://docs.python.org/3/builtins/functions.html#float" class="intersphinx-link">float</a>, <em>optional</em></code></td><td class="fieldArgDesc">Seconds before the job becomes available again.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code></td><td class="fieldArgDesc">Whether an owned, unexpired reservation was released.</td></tr></table></div>
   </div>
 </div><div class="basemethod">
   
@@ -1005,7 +1005,7 @@ Use the configuration entity's environment defaults when omitted.</td></tr><tr><
     
     
     <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">reserve</span><span class="function-signature">(<span class="rst-sig-param">self: <code><a href="https://docs.python.org/3/library/typing.html#typing.Self" class="intersphinx-link">Self</a></code>, </span><span class="rst-sig-param">queues: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" class="intersphinx-link">tuple</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <wbr></wbr><span class="rst-variable-ellipsis">...</span>]</code>, </span><span class="rst-sig-param">retry_after: <code><a href="https://docs.python.org/3/builtins/functions.html#float" class="intersphinx-link">float</a></code></span>) -&gt; <code><a href="orionis.queues.entities.reserved_job.ReservedJob.html" class="internal-link" title="orionis.queues.entities.reserved_job.ReservedJob">ReservedJob</a> | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/queues/drivers/redis.py#L277">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/queues/drivers/redis.py#L291">
       
       (source)
     </a>
@@ -1017,7 +1017,7 @@ Use the configuration entity's environment defaults when omitted.</td></tr><tr><
   </div>
   <div class="docstring functionBody">
     <div class="interfaceinfo">overrides <code><a href="orionis.queues.contracts.driver.IQueueDriver.html#reserve" class="internal-link">orionis.queues.contracts.driver.IQueueDriver.reserve</a></code></div>
-    <div><p>Claim one due job in queue priority order.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">queues:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" class="intersphinx-link">tuple</a> of <a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Logical queues ordered from highest to lowest priority.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">retry<wbr></wbr>_after:</span><code><a href="https://docs.python.org/3/builtins/functions.html#float" class="intersphinx-link">float</a></code></td><td class="fieldArgDesc">Lease duration in seconds.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.queues.entities.reserved_job.ReservedJob.html" class="internal-link" title="orionis.queues.entities.reserved_job.ReservedJob">ReservedJob</a> or <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">Acquired reservation, or no available job.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.queues.exceptions.QueueStorageError.html" class="internal-link" title="orionis.queues.exceptions.QueueStorageError">QueueStorageError</a></code></td><td>If Redis returns invalid reservation data.</td></tr></table></div>
+    <div><p>Claim one due job in queue priority order.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">queues:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" class="intersphinx-link">tuple</a> of <a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Logical queues ordered from highest to lowest priority.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">retry<wbr></wbr>_after:</span><code><a href="https://docs.python.org/3/builtins/functions.html#float" class="intersphinx-link">float</a></code></td><td class="fieldArgDesc">Lease duration in seconds.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.queues.entities.reserved_job.ReservedJob.html" class="internal-link">orionis.queues.entities.reserved_job.ReservedJob</a> or <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">Acquired reservation, or no available job.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.queues.exceptions.QueueStorageError.html" class="internal-link">orionis.queues.exceptions.QueueStorageError</a></code></td><td>If Redis returns invalid reservation data.</td></tr></table></div>
   </div>
 </div><div class="basemethod">
   
@@ -1032,7 +1032,7 @@ Use the configuration entity's environment defaults when omitted.</td></tr><tr><
     
     
     <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">size</span><span class="function-signature">(<span class="rst-sig-param">self: <code><a href="https://docs.python.org/3/library/typing.html#typing.Self" class="intersphinx-link">Self</a></code>, </span><span class="rst-sig-param">queue: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/queues/drivers/redis.py#L389">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/queues/drivers/redis.py#L403">
       
       (source)
     </a>
@@ -1058,7 +1058,7 @@ Use the configuration entity's environment defaults when omitted.</td></tr><tr><
   <div class="functionHeader">
     
     <span class="py-defname">__slots__</span>: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" class="intersphinx-link">tuple</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <wbr></wbr><span class="rst-variable-ellipsis">...</span>]</code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/queues/drivers/redis.py#L126">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/queues/drivers/redis.py#L136">
       
       (source)
     </a>
@@ -1070,7 +1070,7 @@ Use the configuration entity's environment defaults when omitted.</td></tr><tr><
   </div>
   <div class="functionBody">
     <div class="interfaceinfo">overrides <code><a href="orionis.queues.contracts.driver.IQueueDriver.html#__slots__" class="internal-link">orionis.queues.contracts.driver.IQueueDriver.__slots__</a></code></div>
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p>Declare the instance attribute slots reserved by this class.</p></div>
     
   </div>
 </div><div class="baseinstancevariable">
@@ -1085,7 +1085,7 @@ Use the configuration entity's environment defaults when omitted.</td></tr><tr><
   <div class="functionHeader">
     
     <span class="py-defname">_client</span> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/queues/drivers/redis.py#L169">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/queues/drivers/redis.py#L182">
       
       (source)
     </a>
@@ -1097,7 +1097,7 @@ Use the configuration entity's environment defaults when omitted.</td></tr><tr><
   </div>
   <div class="functionBody">
     
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p>Externally owned async client, primarily for explicit test fakes.</p></div>
     
   </div>
 </div><div class="baseinstancevariable">
@@ -1112,7 +1112,7 @@ Use the configuration entity's environment defaults when omitted.</td></tr><tr><
   <div class="functionHeader">
     
     <span class="py-defname">_owns_client</span> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/queues/drivers/redis.py#L168">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/queues/drivers/redis.py#L180">
       
       (source)
     </a>
@@ -1124,7 +1124,7 @@ Use the configuration entity's environment defaults when omitted.</td></tr><tr><
   </div>
   <div class="functionBody">
     
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p>Whether this object must close the client during its own cleanup.</p></div>
     
   </div>
 </div><div class="baseinstancevariable">
@@ -1139,7 +1139,7 @@ Use the configuration entity's environment defaults when omitted.</td></tr><tr><
   <div class="functionHeader">
     
     <span class="py-defname">_prefix</span> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/queues/drivers/redis.py#L167">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/queues/drivers/redis.py#L178">
       
       (source)
     </a>
@@ -1151,7 +1151,7 @@ Use the configuration entity's environment defaults when omitted.</td></tr><tr><
   </div>
   <div class="functionBody">
     
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p>Prefix applied when constructing names or storage keys.</p></div>
     
   </div>
 </div>
@@ -1165,7 +1165,7 @@ Use the configuration entity's environment defaults when omitted.</td></tr><tr><
   <div class="orionis-footer-inner">
     <div class="orionis-footer-copy">
       <p>API documentation for <a href="https://orionis-framework.com/" class="projecthome">Orionis</a>.</p>
-      <p class="orionis-footer-meta">Generated with <a href="https://github.com/twisted/pydoctor/">Pydoctor</a> 25.10.1.<span class="orionis-footer-build"> Built 2026-11-03 09:36:58.</span></p>
+      <p class="orionis-footer-meta">Generated with <a href="https://github.com/twisted/pydoctor/">Pydoctor</a> 25.10.1.<span class="orionis-footer-build"> Built 2026-11-03 13:00:15.</span></p>
     </div>
     <nav class="orionis-footer-links" aria-label="Additional resources">
       <a href="https://docs.orionis-framework.com">Read the guide <span aria-hidden="true">↗</span></a>

@@ -783,15 +783,15 @@
         </div>
 
         <div class="extrasDocstring">
-          <a href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/http/layer/web/csrf_token.py" class="sourceLink">(source)</a>
+          <a href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/http/layer/web/csrf_token.py" class="sourceLink">(source)</a>
         </div>
 
         <div class="moduleDocstring">
-          <div><p class="undocumented">Undocumented</p></div>
+          <div><p>Web-layer middleware that enforces Cross-Site Request Forgery protection.</p></div>
         </div>
 
         <div id="split-tables">
-          <table class="children sortable" id="id1067">
+          <table class="children sortable" id="id1068">
   
   
   <tr class="class">
@@ -803,37 +803,37 @@
     
     <td>Constant</td>
     <td><code><a href="#_FIELD_CSRF" class="internal-link" title="orionis.http.layer.web.csrf_token._FIELD_CSRF">_FIELD<wbr></wbr>_CSRF</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
+    <td>Form field names inspected for the submitted value, in priority order.</td>
   </tr><tr class="constant">
     
     <td>Constant</td>
     <td><code><a href="#_FIELD_CSRF_ALT" class="internal-link" title="orionis.http.layer.web.csrf_token._FIELD_CSRF_ALT">_FIELD<wbr></wbr>_CSRF<wbr></wbr>_ALT</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
+    <td><tt class="rst-docutils rst-literal">csrf_token</tt>.</td>
   </tr><tr class="constant">
     
     <td>Constant</td>
     <td><code><a href="#_FORM_MIME_MULTIPART" class="internal-link" title="orionis.http.layer.web.csrf_token._FORM_MIME_MULTIPART">_FORM<wbr></wbr>_MIME<wbr></wbr>_MULTIPART</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
+    <td><tt class="rst-docutils rst-literal"><span class="pre">multipart/form-data</span></tt>.</td>
   </tr><tr class="constant">
     
     <td>Constant</td>
     <td><code><a href="#_FORM_MIME_URLENCODED" class="internal-link" title="orionis.http.layer.web.csrf_token._FORM_MIME_URLENCODED">_FORM<wbr></wbr>_MIME<wbr></wbr>_URLENCODED</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
+    <td>Content-Types that may carry the CSRF value inside the request body.</td>
   </tr><tr class="constant">
     
     <td>Constant</td>
     <td><code><a href="#_HDR_CSRF" class="internal-link" title="orionis.http.layer.web.csrf_token._HDR_CSRF">_HDR<wbr></wbr>_CSRF</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
+    <td>Request header names inspected for the submitted value (lowercase).</td>
   </tr><tr class="constant">
     
     <td>Constant</td>
     <td><code><a href="#_HDR_XSRF" class="internal-link" title="orionis.http.layer.web.csrf_token._HDR_XSRF">_HDR<wbr></wbr>_XSRF</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
+    <td><tt class="rst-docutils rst-literal"><span class="pre">x-xsrf-token</span></tt>.</td>
   </tr><tr class="constant">
     
     <td>Constant</td>
     <td><code><a href="#_SAFE_METHODS" class="internal-link" title="orionis.http.layer.web.csrf_token._SAFE_METHODS">_SAFE<wbr></wbr>_METHODS</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
+    <td>CSRF check is skipped entirely.</td>
   </tr>
 </table>
           
@@ -854,7 +854,7 @@
   <div class="functionHeader">
     
     <span class="py-defname">_FIELD_CSRF</span>: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/http/layer/web/csrf_token.py#L29">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/http/layer/web/csrf_token.py#L36">
       
       (source)
     </a>
@@ -866,7 +866,7 @@
   </div>
   <div class="functionBody">
     
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p>Form field names inspected for the submitted value, in priority order.</p></div>
     <table class="valueTable"><tr class="fieldStart"><td class="fieldName">Value</td></tr><tr><td><pre class="constant-value"><code><span class="rst-variable-quote">'</span><span class="rst-variable-string">_csrf</span><span class="rst-variable-quote">'</span></code></pre></td></tr></table>
   </div>
 </div><div class="baseconstant">
@@ -881,7 +881,7 @@
   <div class="functionHeader">
     
     <span class="py-defname">_FIELD_CSRF_ALT</span>: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/http/layer/web/csrf_token.py#L30">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/http/layer/web/csrf_token.py#L38">
       
       (source)
     </a>
@@ -893,7 +893,7 @@
   </div>
   <div class="functionBody">
     
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p><tt class="rst-docutils rst-literal">csrf_token</tt>.</p></div>
     <table class="valueTable"><tr class="fieldStart"><td class="fieldName">Value</td></tr><tr><td><pre class="constant-value"><code><span class="rst-variable-quote">'</span><span class="rst-variable-string">csrf_token</span><span class="rst-variable-quote">'</span></code></pre></td></tr></table>
   </div>
 </div><div class="baseconstant">
@@ -908,7 +908,7 @@
   <div class="functionHeader">
     
     <span class="py-defname">_FORM_MIME_MULTIPART</span>: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/http/layer/web/csrf_token.py#L22">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/http/layer/web/csrf_token.py#L26">
       
       (source)
     </a>
@@ -920,7 +920,7 @@
   </div>
   <div class="functionBody">
     
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p><tt class="rst-docutils rst-literal"><span class="pre">multipart/form-data</span></tt>.</p></div>
     <table class="valueTable"><tr class="fieldStart"><td class="fieldName">Value</td></tr><tr><td><pre class="constant-value"><code><span class="rst-variable-quote">'</span><span class="rst-variable-string">multipart/form-data</span><span class="rst-variable-quote">'</span></code></pre></td></tr></table>
   </div>
 </div><div class="baseconstant">
@@ -935,7 +935,7 @@
   <div class="functionHeader">
     
     <span class="py-defname">_FORM_MIME_URLENCODED</span>: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/http/layer/web/csrf_token.py#L21">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/http/layer/web/csrf_token.py#L24">
       
       (source)
     </a>
@@ -947,7 +947,7 @@
   </div>
   <div class="functionBody">
     
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p>Content-Types that may carry the CSRF value inside the request body.</p></div>
     <table class="valueTable"><tr class="fieldStart"><td class="fieldName">Value</td></tr><tr><td><pre class="constant-value"><code><span class="rst-variable-quote">'</span><span class="rst-variable-string">application/x-www-form-urlencoded</span><span class="rst-variable-quote">'</span></code></pre></td></tr></table>
   </div>
 </div><div class="baseconstant">
@@ -962,7 +962,7 @@
   <div class="functionHeader">
     
     <span class="py-defname">_HDR_CSRF</span>: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/http/layer/web/csrf_token.py#L25">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/http/layer/web/csrf_token.py#L30">
       
       (source)
     </a>
@@ -974,7 +974,7 @@
   </div>
   <div class="functionBody">
     
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p>Request header names inspected for the submitted value (lowercase).</p></div>
     <table class="valueTable"><tr class="fieldStart"><td class="fieldName">Value</td></tr><tr><td><pre class="constant-value"><code><span class="rst-variable-quote">'</span><span class="rst-variable-string">x-csrf-token</span><span class="rst-variable-quote">'</span></code></pre></td></tr></table>
   </div>
 </div><div class="baseconstant">
@@ -989,7 +989,7 @@
   <div class="functionHeader">
     
     <span class="py-defname">_HDR_XSRF</span>: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/http/layer/web/csrf_token.py#L26">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/http/layer/web/csrf_token.py#L32">
       
       (source)
     </a>
@@ -1001,7 +1001,7 @@
   </div>
   <div class="functionBody">
     
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p><tt class="rst-docutils rst-literal"><span class="pre">x-xsrf-token</span></tt>.</p></div>
     <table class="valueTable"><tr class="fieldStart"><td class="fieldName">Value</td></tr><tr><td><pre class="constant-value"><code><span class="rst-variable-quote">'</span><span class="rst-variable-string">x-xsrf-token</span><span class="rst-variable-quote">'</span></code></pre></td></tr></table>
   </div>
 </div><div class="baseconstant">
@@ -1016,7 +1016,7 @@
   <div class="functionHeader">
     
     <span class="py-defname">_SAFE_METHODS</span>: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#frozenset" class="intersphinx-link">frozenset</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>]</code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/http/layer/web/csrf_token.py#L18">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/http/layer/web/csrf_token.py#L20">
       
       (source)
     </a>
@@ -1028,7 +1028,7 @@
   </div>
   <div class="functionBody">
     
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p>CSRF check is skipped entirely.</p></div>
     <table class="valueTable"><tr class="fieldStart"><td class="fieldName">Value</td></tr><tr><td><pre class="constant-value"><code><a href="https://docs.python.org/3/builtins/stdtypes.html#frozenset" class="intersphinx-link">frozenset</a>(<wbr></wbr>set([<wbr></wbr><span class="rst-variable-quote">'</span><span class="rst-variable-string">GET</span><span class="rst-variable-quote">'</span>, <wbr></wbr><span class="rst-variable-quote">'</span><span class="rst-variable-string">HEAD</span><span class="rst-variable-quote">'</span>, <wbr></wbr><span class="rst-variable-quote">'</span><span class="rst-variable-string">OPTIONS</span><span class="rst-variable-quote">'</span>, <wbr></wbr><span class="rst-variable-quote">'</span><span class="rst-variable-string">TRACE</span><span class="rst-variable-quote">'</span>]))</code></pre></td></tr></table>
   </div>
 </div>
@@ -1042,7 +1042,7 @@
   <div class="orionis-footer-inner">
     <div class="orionis-footer-copy">
       <p>API documentation for <a href="https://orionis-framework.com/" class="projecthome">Orionis</a>.</p>
-      <p class="orionis-footer-meta">Generated with <a href="https://github.com/twisted/pydoctor/">Pydoctor</a> 25.10.1.<span class="orionis-footer-build"> Built 2026-11-03 09:36:58.</span></p>
+      <p class="orionis-footer-meta">Generated with <a href="https://github.com/twisted/pydoctor/">Pydoctor</a> 25.10.1.<span class="orionis-footer-build"> Built 2026-11-03 13:00:15.</span></p>
     </div>
     <nav class="orionis-footer-links" aria-label="Additional resources">
       <a href="https://docs.orionis-framework.com">Read the guide <span aria-hidden="true">↗</span></a>

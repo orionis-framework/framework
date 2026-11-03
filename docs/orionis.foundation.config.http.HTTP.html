@@ -296,16 +296,6 @@
         
 
         
-            <div class="itemName"><code><a href="#monitor_disconnects" class="internal-link" title="orionis.foundation.config.http.HTTP.monitor_disconnects">monitor<wbr></wbr>_disconnects</a></code>
-            </div>
-        
-
-    </li><li class="">
-        
-        
-        
-
-        
             <div class="itemName"><code><a href="#proxies" class="internal-link" title="orionis.foundation.config.http.HTTP.proxies">proxies</a></code>
             </div>
         
@@ -337,6 +327,16 @@
 
         
             <div class="itemName"><code><a href="#websocket" class="internal-link" title="orionis.foundation.config.http.HTTP.websocket">websocket</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#monitor_disconnects" class="internal-link" title="orionis.foundation.config.http.HTTP.monitor_disconnects">monitor<wbr></wbr>_disconnects</a></code>
             </div>
         
 
@@ -873,16 +873,6 @@
         
 
         
-            <div class="itemName"><code><a href="#monitor_disconnects" class="internal-link" title="orionis.foundation.config.http.HTTP.monitor_disconnects">monitor<wbr></wbr>_disconnects</a></code>
-            </div>
-        
-
-    </li><li class="">
-        
-        
-        
-
-        
             <div class="itemName"><code><a href="#proxies" class="internal-link" title="orionis.foundation.config.http.HTTP.proxies">proxies</a></code>
             </div>
         
@@ -914,6 +904,16 @@
 
         
             <div class="itemName"><code><a href="#websocket" class="internal-link" title="orionis.foundation.config.http.HTTP.websocket">websocket</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#monitor_disconnects" class="internal-link" title="orionis.foundation.config.http.HTTP.monitor_disconnects">monitor<wbr></wbr>_disconnects</a></code>
             </div>
         
 
@@ -2324,18 +2324,15 @@
         </div>
 
         <div class="extrasDocstring">
-          <p class="class-signature"><code><span class="py-keyword">class</span> <span class="py-defname">HTTP</span>(<a href="orionis.support.entities.BaseEntity.html" class="internal-link" title="orionis.support.entities.BaseEntity">BaseEntity</a>): <a href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/foundation/config/http/entitites/http.py#L18" class="sourceLink">(source)</a></code></p><p><a href="classIndex.html#orionis.foundation.config.http.HTTP">View In Hierarchy</a></p>
+          <p class="class-signature"><code><span class="py-keyword">class</span> <span class="py-defname">HTTP</span>(<a href="orionis.support.entities.BaseEntity.html" class="internal-link" title="orionis.support.entities.BaseEntity">BaseEntity</a>): <a href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/foundation/config/http/entitites/http.py#L20" class="sourceLink">(source)</a></code></p><p><a href="classIndex.html#orionis.foundation.config.http.HTTP">View In Hierarchy</a></p>
         </div>
 
         <div class="moduleDocstring">
-          <div><p>Configure HTTP request handling and security.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">monitor<wbr></wbr>_disconnects</span></td><td class="fieldArgDesc">Cancel handlers proactively when a client disconnects. Defaults to
-False, executing handlers in the server task with direct body reads.
-External server cancellation still propagates in both modes. The
-application snapshots this setting during create().</td></tr></table></div>
+          <div><p>Configure HTTP request handling and security.</p></div>
         </div>
 
         <div id="split-tables">
-          <table class="children sortable" id="id783">
+          <table class="children sortable" id="id784">
   
   
   <tr class="method">
@@ -2372,49 +2369,49 @@ application snapshots this setting during create().</td></tr></table></div>
     
     <td>Class Variable</td>
     <td><code><a href="#body_limits" class="internal-link" title="orionis.foundation.config.http.HTTP.body_limits">body<wbr></wbr>_limits</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
+    <td>Body limits produced by <tt class="rst-docutils rst-literal">field</tt>.</td>
   </tr><tr class="classvariable">
     
     <td>Class Variable</td>
     <td><code><a href="#cors" class="internal-link" title="orionis.foundation.config.http.HTTP.cors">cors</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
+    <td>Cors produced by <tt class="rst-docutils rst-literal">field</tt>.</td>
   </tr><tr class="classvariable">
     
     <td>Class Variable</td>
     <td><code><a href="#csrf" class="internal-link" title="orionis.foundation.config.http.HTTP.csrf">csrf</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
-  </tr><tr class="classvariable">
-    
-    <td>Class Variable</td>
-    <td><code><a href="#monitor_disconnects" class="internal-link" title="orionis.foundation.config.http.HTTP.monitor_disconnects">monitor<wbr></wbr>_disconnects</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
+    <td>Csrf produced by <tt class="rst-docutils rst-literal">field</tt>.</td>
   </tr><tr class="classvariable">
     
     <td>Class Variable</td>
     <td><code><a href="#proxies" class="internal-link" title="orionis.foundation.config.http.HTTP.proxies">proxies</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
+    <td>Proxies produced by <tt class="rst-docutils rst-literal">field</tt>.</td>
   </tr><tr class="classvariable">
     
     <td>Class Variable</td>
     <td><code><a href="#rate_limit" class="internal-link" title="orionis.foundation.config.http.HTTP.rate_limit">rate<wbr></wbr>_limit</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
+    <td>Rate limit produced by <tt class="rst-docutils rst-literal">field</tt>.</td>
   </tr><tr class="classvariable">
     
     <td>Class Variable</td>
     <td><code><a href="#security" class="internal-link" title="orionis.foundation.config.http.HTTP.security">security</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
+    <td>Security produced by <tt class="rst-docutils rst-literal">field</tt>.</td>
   </tr><tr class="classvariable">
     
     <td>Class Variable</td>
     <td><code><a href="#websocket" class="internal-link" title="orionis.foundation.config.http.HTTP.websocket">websocket</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
+    <td>Websocket produced by <tt class="rst-docutils rst-literal">field</tt>.</td>
+  </tr><tr class="instancevariable">
+    
+    <td>Instance Variable</td>
+    <td><code><a href="#monitor_disconnects" class="internal-link" title="orionis.foundation.config.http.HTTP.monitor_disconnects">monitor<wbr></wbr>_disconnects</a></code></td>
+    <td>Cancel handlers proactively when a client disconnects. Defaults to False, executing handlers in the server task with direct body reads. External server cancellation still propagates in both modes. The application snapshots this setting during create().</td>
   </tr>
 </table>
           
             <p class="inheritedFrom">
               Inherited from <code><a href="orionis.support.entities.BaseEntity.html" class="internal-link" title="orionis.support.entities.BaseEntity">BaseEntity</a></code>:
             </p>
-            <table class="children sortable" id="id784">
+            <table class="children sortable" id="id785">
   
   
   <tr class="baseclassmethod">
@@ -2436,7 +2433,7 @@ application snapshots this setting during create().</td></tr></table></div>
     
     <td>Class Variable</td>
     <td><code><a href="orionis.support.entities.BaseEntity.html#__slots__" class="internal-link" title="orionis.support.entities.BaseEntity.__slots__">__slots__</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
+    <td>Declare that this class introduces no additional instance slots.</td>
   </tr>
 </table>
             
@@ -2458,7 +2455,7 @@ application snapshots this setting during create().</td></tr></table></div>
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">__post_init__</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>):</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/foundation/config/http/entitites/http.py#L95">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/foundation/config/http/entitites/http.py#L105">
       
       (source)
     </a>
@@ -2473,7 +2470,7 @@ application snapshots this setting during create().</td></tr></table></div>
     <div><p>Validate and coerce all composite fields.</p>
 <p>Convert dict values to their corresponding
 entity instances when provided as plain dicts.</p>
-<table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc"><span class="undocumented">Undocumented</span></td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/exceptions.html#TypeError" class="intersphinx-link">TypeError</a></code></td><td>If any field has an unexpected type.</td></tr></table></div>
+<table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">Validate and coerce all composite fields.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/exceptions.html#TypeError" class="intersphinx-link">TypeError</a></code></td><td>If any field has an unexpected type.</td></tr></table></div>
   </div>
 </div><div class="basemethod">
   
@@ -2488,7 +2485,7 @@ entity instances when provided as plain dicts.</p>
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">__validateCors</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>):</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/foundation/config/http/entitites/http.py#L230">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/foundation/config/http/entitites/http.py#L244">
       
       (source)
     </a>
@@ -2502,7 +2499,7 @@ entity instances when provided as plain dicts.</p>
     
     <div><p>Validate the <tt class="rst-docutils rst-literal">cors</tt> field.</p>
 <p>Coerce a dict to <tt class="rst-docutils rst-literal">Cors</tt> if needed.</p>
-<table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc"><span class="undocumented">Undocumented</span></td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/exceptions.html#TypeError" class="intersphinx-link">TypeError</a></code></td><td>If the value is not a <tt class="rst-docutils rst-literal">Cors</tt>
+<table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">Validate the <tt class="rst-docutils rst-literal">cors</tt> field.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/exceptions.html#TypeError" class="intersphinx-link">TypeError</a></code></td><td>If the value is not a <tt class="rst-docutils rst-literal">Cors</tt>
 or dict.</td></tr></table></div>
   </div>
 </div><div class="basemethod">
@@ -2518,7 +2515,7 @@ or dict.</td></tr></table></div>
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">__validateCsrf</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>):</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/foundation/config/http/entitites/http.py#L257">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/foundation/config/http/entitites/http.py#L272">
       
       (source)
     </a>
@@ -2532,7 +2529,7 @@ or dict.</td></tr></table></div>
     
     <div><p>Validate the <tt class="rst-docutils rst-literal">csrf</tt> field.</p>
 <p>Coerce a dict to <tt class="rst-docutils rst-literal">HTTPCsrf</tt> if needed.</p>
-<table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc"><span class="undocumented">Undocumented</span></td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/exceptions.html#TypeError" class="intersphinx-link">TypeError</a></code></td><td>If the value is not an <tt class="rst-docutils rst-literal">HTTPCsrf</tt>
+<table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">Validate the <tt class="rst-docutils rst-literal">csrf</tt> field.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/exceptions.html#TypeError" class="intersphinx-link">TypeError</a></code></td><td>If the value is not an <tt class="rst-docutils rst-literal">HTTPCsrf</tt>
 or dict.</td></tr></table></div>
   </div>
 </div><div class="basemethod">
@@ -2548,7 +2545,7 @@ or dict.</td></tr></table></div>
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">__validateProxies</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>):</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/foundation/config/http/entitites/http.py#L131">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/foundation/config/http/entitites/http.py#L142">
       
       (source)
     </a>
@@ -2562,7 +2559,7 @@ or dict.</td></tr></table></div>
     
     <div><p>Validate the <tt class="rst-docutils rst-literal">proxies</tt> field.</p>
 <p>Coerce a dict to <tt class="rst-docutils rst-literal">HTTPProxies</tt> if needed.</p>
-<table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc"><span class="undocumented">Undocumented</span></td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/exceptions.html#TypeError" class="intersphinx-link">TypeError</a></code></td><td>If the value is not an <tt class="rst-docutils rst-literal">HTTPProxies</tt>
+<table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">Validate the <tt class="rst-docutils rst-literal">proxies</tt> field.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/exceptions.html#TypeError" class="intersphinx-link">TypeError</a></code></td><td>If the value is not an <tt class="rst-docutils rst-literal">HTTPProxies</tt>
 or dict.</td></tr></table></div>
   </div>
 </div><div class="basemethod">
@@ -2578,7 +2575,7 @@ or dict.</td></tr></table></div>
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">__validateRateLimit</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>):</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/foundation/config/http/entitites/http.py#L196">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/foundation/config/http/entitites/http.py#L209">
       
       (source)
     </a>
@@ -2592,7 +2589,7 @@ or dict.</td></tr></table></div>
     
     <div><p>Validate the <tt class="rst-docutils rst-literal">rate_limit</tt> field.</p>
 <p>Coerce a dict to <tt class="rst-docutils rst-literal">HTTPRateLimit</tt> if needed.</p>
-<table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc"><span class="undocumented">Undocumented</span></td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/exceptions.html#TypeError" class="intersphinx-link">TypeError</a></code></td><td>If the value is not an <tt class="rst-docutils rst-literal">HTTPRateLimit</tt>
+<table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">Validate the <tt class="rst-docutils rst-literal">rate_limit</tt> field.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/exceptions.html#TypeError" class="intersphinx-link">TypeError</a></code></td><td>If the value is not an <tt class="rst-docutils rst-literal">HTTPRateLimit</tt>
 or dict.</td></tr></table></div>
   </div>
 </div><div class="basemethod">
@@ -2608,7 +2605,7 @@ or dict.</td></tr></table></div>
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">__validateSecurity</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>):</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/foundation/config/http/entitites/http.py#L163">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/foundation/config/http/entitites/http.py#L175">
       
       (source)
     </a>
@@ -2622,7 +2619,7 @@ or dict.</td></tr></table></div>
     
     <div><p>Validate the <tt class="rst-docutils rst-literal">security</tt> field.</p>
 <p>Coerce a dict to <tt class="rst-docutils rst-literal">HTTPSecurity</tt> if needed.</p>
-<table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc"><span class="undocumented">Undocumented</span></td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/exceptions.html#TypeError" class="intersphinx-link">TypeError</a></code></td><td>If the value is not an <tt class="rst-docutils rst-literal">HTTPSecurity</tt>
+<table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">Validate the <tt class="rst-docutils rst-literal">security</tt> field.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/exceptions.html#TypeError" class="intersphinx-link">TypeError</a></code></td><td>If the value is not an <tt class="rst-docutils rst-literal">HTTPSecurity</tt>
 or dict.</td></tr></table></div>
   </div>
 </div><div class="baseclassvariable">
@@ -2637,7 +2634,7 @@ or dict.</td></tr></table></div>
   <div class="functionHeader">
     
     <span class="py-defname">body_limits</span>: <code><a href="orionis.foundation.config.http.HTTPBodyLimits.html" class="internal-link" title="orionis.foundation.config.http.HTTPBodyLimits">HTTPBodyLimits</a> | <a href="https://docs.python.org/3/builtins/stdtypes.html#dict" class="intersphinx-link">dict</a></code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/foundation/config/http/entitites/http.py#L39">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/foundation/config/http/entitites/http.py#L42">
       
       (source)
     </a>
@@ -2649,7 +2646,7 @@ or dict.</td></tr></table></div>
   </div>
   <div class="functionBody">
     
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p>Body limits produced by <tt class="rst-docutils rst-literal">field</tt>.</p></div>
     
   </div>
 </div><div class="baseclassvariable">
@@ -2664,7 +2661,7 @@ or dict.</td></tr></table></div>
   <div class="functionHeader">
     
     <span class="py-defname">cors</span>: <code><a href="orionis.foundation.config.http.Cors.html" class="internal-link" title="orionis.foundation.config.http.Cors">Cors</a> | <a href="https://docs.python.org/3/builtins/stdtypes.html#dict" class="intersphinx-link">dict</a></code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/foundation/config/http/entitites/http.py#L79">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/foundation/config/http/entitites/http.py#L87">
       
       (source)
     </a>
@@ -2676,7 +2673,7 @@ or dict.</td></tr></table></div>
   </div>
   <div class="functionBody">
     
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p>Cors produced by <tt class="rst-docutils rst-literal">field</tt>.</p></div>
     
   </div>
 </div><div class="baseclassvariable">
@@ -2691,7 +2688,7 @@ or dict.</td></tr></table></div>
   <div class="functionHeader">
     
     <span class="py-defname">csrf</span>: <code><a href="orionis.foundation.config.http.HTTPCsrf.html" class="internal-link" title="orionis.foundation.config.http.HTTPCsrf">HTTPCsrf</a> | <a href="https://docs.python.org/3/builtins/stdtypes.html#dict" class="intersphinx-link">dict</a></code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/foundation/config/http/entitites/http.py#L87">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/foundation/config/http/entitites/http.py#L96">
       
       (source)
     </a>
@@ -2703,34 +2700,7 @@ or dict.</td></tr></table></div>
   </div>
   <div class="functionBody">
     
-    <div><p class="undocumented">Undocumented</p></div>
-    
-  </div>
-</div><div class="baseclassvariable">
-  
-  
-  <a name="orionis.foundation.config.http.HTTP.monitor_disconnects">
-    
-  </a>
-  <a name="monitor_disconnects">
-    
-  </a>
-  <div class="functionHeader">
-    
-    <span class="py-defname">monitor_disconnects</span>: <code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a>, <em>optional</em></code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/foundation/config/http/entitites/http.py#L31">
-      
-      (source)
-    </a>
-    <a class="headerLink" href="#monitor_disconnects" title="orionis.foundation.config.http.HTTP.monitor_disconnects">
-      
-      
-      ¶
-    </a>
-  </div>
-  <div class="functionBody">
-    
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p>Csrf produced by <tt class="rst-docutils rst-literal">field</tt>.</p></div>
     
   </div>
 </div><div class="baseclassvariable">
@@ -2745,7 +2715,7 @@ or dict.</td></tr></table></div>
   <div class="functionHeader">
     
     <span class="py-defname">proxies</span>: <code><a href="orionis.foundation.config.http.HTTPProxies.html" class="internal-link" title="orionis.foundation.config.http.HTTPProxies">HTTPProxies</a> | <a href="https://docs.python.org/3/builtins/stdtypes.html#dict" class="intersphinx-link">dict</a></code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/foundation/config/http/entitites/http.py#L55">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/foundation/config/http/entitites/http.py#L60">
       
       (source)
     </a>
@@ -2757,7 +2727,7 @@ or dict.</td></tr></table></div>
   </div>
   <div class="functionBody">
     
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p>Proxies produced by <tt class="rst-docutils rst-literal">field</tt>.</p></div>
     
   </div>
 </div><div class="baseclassvariable">
@@ -2772,7 +2742,7 @@ or dict.</td></tr></table></div>
   <div class="functionHeader">
     
     <span class="py-defname">rate_limit</span>: <code><a href="orionis.foundation.config.http.HTTPRateLimit.html" class="internal-link" title="orionis.foundation.config.http.HTTPRateLimit">HTTPRateLimit</a> | <a href="https://docs.python.org/3/builtins/stdtypes.html#dict" class="intersphinx-link">dict</a></code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/foundation/config/http/entitites/http.py#L71">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/foundation/config/http/entitites/http.py#L78">
       
       (source)
     </a>
@@ -2784,7 +2754,7 @@ or dict.</td></tr></table></div>
   </div>
   <div class="functionBody">
     
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p>Rate limit produced by <tt class="rst-docutils rst-literal">field</tt>.</p></div>
     
   </div>
 </div><div class="baseclassvariable">
@@ -2799,7 +2769,7 @@ or dict.</td></tr></table></div>
   <div class="functionHeader">
     
     <span class="py-defname">security</span>: <code><a href="orionis.foundation.config.http.HTTPSecurity.html" class="internal-link" title="orionis.foundation.config.http.HTTPSecurity">HTTPSecurity</a> | <a href="https://docs.python.org/3/builtins/stdtypes.html#dict" class="intersphinx-link">dict</a></code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/foundation/config/http/entitites/http.py#L63">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/foundation/config/http/entitites/http.py#L69">
       
       (source)
     </a>
@@ -2811,7 +2781,7 @@ or dict.</td></tr></table></div>
   </div>
   <div class="functionBody">
     
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p>Security produced by <tt class="rst-docutils rst-literal">field</tt>.</p></div>
     
   </div>
 </div><div class="baseclassvariable">
@@ -2826,7 +2796,7 @@ or dict.</td></tr></table></div>
   <div class="functionHeader">
     
     <span class="py-defname">websocket</span>: <code><a href="orionis.foundation.config.http.HTTPWebSocket.html" class="internal-link" title="orionis.foundation.config.http.HTTPWebSocket">HTTPWebSocket</a> | <a href="https://docs.python.org/3/builtins/stdtypes.html#dict" class="intersphinx-link">dict</a></code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/foundation/config/http/entitites/http.py#L47">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/foundation/config/http/entitites/http.py#L51">
       
       (source)
     </a>
@@ -2838,7 +2808,37 @@ or dict.</td></tr></table></div>
   </div>
   <div class="functionBody">
     
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p>Websocket produced by <tt class="rst-docutils rst-literal">field</tt>.</p></div>
+    
+  </div>
+</div><div class="baseinstancevariable">
+  
+  
+  <a name="orionis.foundation.config.http.HTTP.monitor_disconnects">
+    
+  </a>
+  <a name="monitor_disconnects">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <span class="py-defname">monitor_disconnects</span>: <code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a>, <em>optional</em></code> =
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/foundation/config/http/entitites/http.py#L34">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#monitor_disconnects" title="orionis.foundation.config.http.HTTP.monitor_disconnects">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="functionBody">
+    
+    <div><p>Cancel handlers proactively when a client disconnects. Defaults to
+False, executing handlers in the server task with direct body reads.
+External server cancellation still propagates in both modes. The
+application snapshots this setting during create().</p></div>
     
   </div>
 </div>
@@ -2852,7 +2852,7 @@ or dict.</td></tr></table></div>
   <div class="orionis-footer-inner">
     <div class="orionis-footer-copy">
       <p>API documentation for <a href="https://orionis-framework.com/" class="projecthome">Orionis</a>.</p>
-      <p class="orionis-footer-meta">Generated with <a href="https://github.com/twisted/pydoctor/">Pydoctor</a> 25.10.1.<span class="orionis-footer-build"> Built 2026-11-03 09:36:58.</span></p>
+      <p class="orionis-footer-meta">Generated with <a href="https://github.com/twisted/pydoctor/">Pydoctor</a> 25.10.1.<span class="orionis-footer-build"> Built 2026-11-03 13:00:15.</span></p>
     </div>
     <nav class="orionis-footer-links" aria-label="Additional resources">
       <a href="https://docs.orionis-framework.com">Read the guide <span aria-hidden="true">↗</span></a>

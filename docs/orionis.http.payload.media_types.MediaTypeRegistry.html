@@ -453,7 +453,7 @@
         </div>
 
         <div class="extrasDocstring">
-          <p class="class-signature"><code><span class="py-keyword">class</span> <span class="py-defname">MediaTypeRegistry</span>(<a href="orionis.http.payload.contracts.media_types.IMediaTypeRegistry.html" class="internal-link" title="orionis.http.payload.contracts.media_types.IMediaTypeRegistry">IMediaTypeRegistry</a>): <a href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/http/payload/media_types.py#L17" class="sourceLink">(source)</a></code></p><p>Constructor: <code><a href="#__init__" class="internal-link" title="orionis.http.payload.media_types.MediaTypeRegistry.__init__">MediaTypeRegistry(parsers)</a></code></p><p><a href="classIndex.html#orionis.http.payload.media_types.MediaTypeRegistry">View In Hierarchy</a></p>
+          <p class="class-signature"><code><span class="py-keyword">class</span> <span class="py-defname">MediaTypeRegistry</span>(<a href="orionis.http.payload.contracts.media_types.IMediaTypeRegistry.html" class="internal-link" title="orionis.http.payload.contracts.media_types.IMediaTypeRegistry">IMediaTypeRegistry</a>): <a href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/http/payload/media_types.py#L23" class="sourceLink">(source)</a></code></p><p>Constructor: <code><a href="#__init__" class="internal-link" title="orionis.http.payload.media_types.MediaTypeRegistry.__init__">MediaTypeRegistry(parsers)</a></code></p><p><a href="classIndex.html#orionis.http.payload.media_types.MediaTypeRegistry">View In Hierarchy</a></p>
         </div>
 
         <div class="moduleDocstring">
@@ -467,7 +467,7 @@ automatically.  Defaults to an empty mapping.</td></tr></table></div>
         </div>
 
         <div id="split-tables">
-          <table class="children sortable" id="id1098">
+          <table class="children sortable" id="id1099">
   
   
   <tr class="method">
@@ -494,12 +494,12 @@ automatically.  Defaults to an empty mapping.</td></tr></table></div>
     
     <td>Class Variable</td>
     <td><code><a href="#__slots__" class="internal-link" title="orionis.http.payload.media_types.MediaTypeRegistry.__slots__">__slots__</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
+    <td>Declare the instance attribute slots reserved by this class.</td>
   </tr><tr class="instancevariable">
     
     <td>Instance Variable</td>
     <td><code><a href="#_parsers" class="internal-link" title="orionis.http.payload.media_types.MediaTypeRegistry._parsers">_parsers</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
+    <td>Initial media-type-to-parser mapping. Keys are lowercased on ingestion. Pass <tt class="rst-docutils rst-literal">None</tt> to start with an empty registry.</td>
   </tr>
 </table>
           
@@ -521,7 +521,7 @@ automatically.  Defaults to an empty mapping.</td></tr></table></div>
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">__init__</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">parsers: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#dict" class="intersphinx-link">dict</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <wbr></wbr><a href="orionis.http.payload.media_types.html#BodyParser" class="internal-link" title="orionis.http.payload.media_types.BodyParser">BodyParser</a>] | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code> = <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></span>):</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/http/payload/media_types.py#L36">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/http/payload/media_types.py#L43">
       
       (source)
     </a>
@@ -533,8 +533,8 @@ automatically.  Defaults to an empty mapping.</td></tr></table></div>
   </div>
   <div class="docstring functionBody">
     
-    <div><p>Initialise the registry with an optional media-type mapping.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">parsers:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#dict" class="intersphinx-link">dict</a>[<a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <a href="orionis.http.payload.media_types.html#BodyParser" class="internal-link" title="orionis.http.payload.media_types.BodyParser">BodyParser</a>] | None</code></td><td class="fieldArgDesc">Initial media-type-to-parser mapping.  Keys are lowercased
-on ingestion.  Pass <tt class="rst-docutils rst-literal">None</tt> to start with an empty registry.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc"><span class="undocumented">Undocumented</span></td></tr></table></div>
+    <div><p>Initialise the registry with an optional media-type mapping.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">parsers:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#dict" class="intersphinx-link">dict</a>[<a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <a href="orionis.http.payload.media_types.html#BodyParser" class="internal-link">orionis.http.payload.media_types.BodyParser</a>] | None</code></td><td class="fieldArgDesc">Initial media-type-to-parser mapping.  Keys are lowercased
+on ingestion.  Pass <tt class="rst-docutils rst-literal">None</tt> to start with an empty registry.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">Initialise the registry with an optional media-type mapping.</td></tr></table></div>
   </div>
 </div><div class="basemethod">
   
@@ -549,7 +549,7 @@ on ingestion.  Pass <tt class="rst-docutils rst-literal">None</tt> to start with
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">extend</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">parsers: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#dict" class="intersphinx-link">dict</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <wbr></wbr><a href="orionis.http.payload.media_types.html#BodyParser" class="internal-link" title="orionis.http.payload.media_types.BodyParser">BodyParser</a>]</code></span>) -&gt; <code><a href="orionis.http.payload.media_types.MediaTypeRegistry.html" class="internal-link" title="orionis.http.payload.media_types.MediaTypeRegistry">MediaTypeRegistry</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/http/payload/media_types.py#L95">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/http/payload/media_types.py#L108">
       
       (source)
     </a>
@@ -564,7 +564,7 @@ on ingestion.  Pass <tt class="rst-docutils rst-literal">None</tt> to start with
     <div><p>Return a new registry that merges <em>parsers</em> over a copy of self.</p>
 <p>The original registry is not mutated.  Use this pattern for
 middleware or provider-level overrides.</p>
-<table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">parsers:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#dict" class="intersphinx-link">dict</a>[<a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <a href="orionis.http.payload.media_types.html#BodyParser" class="internal-link" title="orionis.http.payload.media_types.BodyParser">BodyParser</a>]</code></td><td class="fieldArgDesc">Additional or replacement media-type-to-parser entries.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.http.payload.media_types.MediaTypeRegistry.html" class="internal-link" title="orionis.http.payload.media_types.MediaTypeRegistry">MediaTypeRegistry</a></code></td><td class="fieldArgDesc">New registry containing all entries from self plus <em>parsers</em>.</td></tr></table></div>
+<table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">parsers:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#dict" class="intersphinx-link">dict</a>[<a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <a href="orionis.http.payload.media_types.html#BodyParser" class="internal-link">orionis.http.payload.media_types.BodyParser</a>]</code></td><td class="fieldArgDesc">Additional or replacement media-type-to-parser entries.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.http.payload.media_types.MediaTypeRegistry.html" class="internal-link">orionis.http.payload.media_types.MediaTypeRegistry</a></code></td><td class="fieldArgDesc">New registry containing all entries from self plus <em>parsers</em>.</td></tr></table></div>
   </div>
 </div><div class="basemethod">
   
@@ -579,7 +579,7 @@ middleware or provider-level overrides.</p>
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">get</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">media_type: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></span>) -&gt; <code><a href="orionis.http.payload.media_types.html#BodyParser" class="internal-link" title="orionis.http.payload.media_types.BodyParser">BodyParser</a> | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/http/payload/media_types.py#L76">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/http/payload/media_types.py#L89">
       
       (source)
     </a>
@@ -591,7 +591,7 @@ middleware or provider-level overrides.</p>
   </div>
   <div class="docstring functionBody">
     <div class="interfaceinfo">overrides <code><a href="orionis.http.payload.contracts.media_types.IMediaTypeRegistry.html#get" class="internal-link">orionis.http.payload.contracts.media_types.IMediaTypeRegistry.get</a></code></div>
-    <div><p>Return the parser registered for <em>media_type</em>, or <tt class="rst-docutils rst-literal">None</tt>.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">media<wbr></wbr>_type:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Case-insensitive media-type string.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code>BodyParser | None</code></td><td class="fieldArgDesc">The registered <tt class="rst-docutils rst-literal">(bytes) <span class="pre">-&gt;</span> object</tt> callable, or <tt class="rst-docutils rst-literal">None</tt>
+    <div><p>Return the parser registered for <em>media_type</em>, or <tt class="rst-docutils rst-literal">None</tt>.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">media<wbr></wbr>_type:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Case-insensitive media-type string.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code>orionis.http.payload.media_types.BodyParser | None</code></td><td class="fieldArgDesc">The registered <tt class="rst-docutils rst-literal">(bytes) <span class="pre">-&gt;</span> object</tt> callable, or <tt class="rst-docutils rst-literal">None</tt>
 when <em>media_type</em> has no registered parser.</td></tr></table></div>
   </div>
 </div><div class="basemethod">
@@ -607,7 +607,7 @@ when <em>media_type</em> has no registered parser.</td></tr></table></div>
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">register</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">media_type: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code>, </span><span class="rst-sig-param">parser: <code><a href="orionis.http.payload.media_types.html#BodyParser" class="internal-link" title="orionis.http.payload.media_types.BodyParser">BodyParser</a></code></span>):</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/http/payload/media_types.py#L56">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/http/payload/media_types.py#L68">
       
       (source)
     </a>
@@ -620,7 +620,7 @@ when <em>media_type</em> has no registered parser.</td></tr></table></div>
   <div class="docstring functionBody">
     <div class="interfaceinfo">overrides <code><a href="orionis.http.payload.contracts.media_types.IMediaTypeRegistry.html#register" class="internal-link">orionis.http.payload.contracts.media_types.IMediaTypeRegistry.register</a></code></div>
     <div><p>Add or replace the parser for <em>media_type</em> in place.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">media<wbr></wbr>_type:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Case-insensitive media-type string,
-e.g. <tt class="rst-docutils rst-literal">"application/json"</tt>.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">parser:</span><code><a href="orionis.http.payload.media_types.html#BodyParser" class="internal-link" title="orionis.http.payload.media_types.BodyParser">BodyParser</a></code></td><td class="fieldArgDesc">Synchronous callable <tt class="rst-docutils rst-literal">(bytes) <span class="pre">-&gt;</span> object</tt>.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc"><span class="undocumented">Undocumented</span></td></tr></table></div>
+e.g. <tt class="rst-docutils rst-literal">"application/json"</tt>.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">parser:</span><code><a href="orionis.http.payload.media_types.html#BodyParser" class="internal-link">orionis.http.payload.media_types.BodyParser</a></code></td><td class="fieldArgDesc">Synchronous callable <tt class="rst-docutils rst-literal">(bytes) <span class="pre">-&gt;</span> object</tt>.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">Add or replace the parser for <em>media_type</em> in place.</td></tr></table></div>
   </div>
 </div><div class="baseclassvariable">
   
@@ -634,7 +634,7 @@ e.g. <tt class="rst-docutils rst-literal">"application/json"</tt>.</td></tr><tr>
   <div class="functionHeader">
     
     <span class="py-defname">__slots__</span>: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" class="intersphinx-link">tuple</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <wbr></wbr><span class="rst-variable-ellipsis">...</span>]</code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/http/payload/media_types.py#L33">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/http/payload/media_types.py#L39">
       
       (source)
     </a>
@@ -646,7 +646,7 @@ e.g. <tt class="rst-docutils rst-literal">"application/json"</tt>.</td></tr><tr>
   </div>
   <div class="functionBody">
     <div class="interfaceinfo">overrides <code><a href="orionis.http.payload.contracts.media_types.IMediaTypeRegistry.html#__slots__" class="internal-link">orionis.http.payload.contracts.media_types.IMediaTypeRegistry.__slots__</a></code></div>
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p>Declare the instance attribute slots reserved by this class.</p></div>
     
   </div>
 </div><div class="baseinstancevariable">
@@ -661,7 +661,7 @@ e.g. <tt class="rst-docutils rst-literal">"application/json"</tt>.</td></tr><tr>
   <div class="functionHeader">
     
     <span class="py-defname">_parsers</span>: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#dict" class="intersphinx-link">dict</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <wbr></wbr><a href="orionis.http.payload.media_types.html#BodyParser" class="internal-link" title="orionis.http.payload.media_types.BodyParser">BodyParser</a>]</code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/http/payload/media_types.py#L51">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/http/payload/media_types.py#L59">
       
       (source)
     </a>
@@ -673,7 +673,8 @@ e.g. <tt class="rst-docutils rst-literal">"application/json"</tt>.</td></tr><tr>
   </div>
   <div class="functionBody">
     
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p>Initial media-type-to-parser mapping. Keys are lowercased on ingestion. Pass
+<tt class="rst-docutils rst-literal">None</tt> to start with an empty registry.</p></div>
     
   </div>
 </div>
@@ -687,7 +688,7 @@ e.g. <tt class="rst-docutils rst-literal">"application/json"</tt>.</td></tr><tr>
   <div class="orionis-footer-inner">
     <div class="orionis-footer-copy">
       <p>API documentation for <a href="https://orionis-framework.com/" class="projecthome">Orionis</a>.</p>
-      <p class="orionis-footer-meta">Generated with <a href="https://github.com/twisted/pydoctor/">Pydoctor</a> 25.10.1.<span class="orionis-footer-build"> Built 2026-11-03 09:36:58.</span></p>
+      <p class="orionis-footer-meta">Generated with <a href="https://github.com/twisted/pydoctor/">Pydoctor</a> 25.10.1.<span class="orionis-footer-build"> Built 2026-11-03 13:00:15.</span></p>
     </div>
     <nav class="orionis-footer-links" aria-label="Additional resources">
       <a href="https://docs.orionis-framework.com">Read the guide <span aria-hidden="true">↗</span></a>

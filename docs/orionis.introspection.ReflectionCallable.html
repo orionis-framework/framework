@@ -845,7 +845,7 @@
                     
                 </label>
 
-                <code><a href="orionis.introspection.reflection.html" class="internal-link" title="orionis.introspection.reflection">reflection</a></code>
+                <code><a href="orionis.introspection.reflection.module.html" class="internal-link" title="orionis.introspection.reflection">reflection</a></code>
 
                 <div class="expandableContent">
                     <div>
@@ -4860,15 +4860,15 @@
         </div>
 
         <div class="extrasDocstring">
-          <p class="class-signature"><code><span class="py-keyword">class</span> <span class="py-defname">ReflectionCallable</span>(<a href="orionis.introspection.callables.contracts.reflection.IReflectionCallable.html" class="internal-link" title="orionis.introspection.callables.contracts.reflection.IReflectionCallable">IReflectionCallable</a>): <a href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/introspection/callables/reflection.py#L18" class="sourceLink">(source)</a></code></p><p>Constructor: <code><a href="#__init__" class="internal-link" title="orionis.introspection.ReflectionCallable.__init__">ReflectionCallable(fn)</a></code></p><p><a href="classIndex.html#orionis.introspection.ReflectionCallable">View In Hierarchy</a></p>
+          <p class="class-signature"><code><span class="py-keyword">class</span> <span class="py-defname">ReflectionCallable</span>(<a href="orionis.introspection.callables.contracts.reflection.IReflectionCallable.html" class="internal-link" title="orionis.introspection.callables.contracts.reflection.IReflectionCallable">IReflectionCallable</a>): <a href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/introspection/callables/reflection.py#L24" class="sourceLink">(source)</a></code></p><p>Constructor: <code><a href="#__init__" class="internal-link" title="orionis.introspection.ReflectionCallable.__init__">ReflectionCallable(fn)</a></code></p><p><a href="classIndex.html#orionis.introspection.ReflectionCallable">View In Hierarchy</a></p>
         </div>
 
         <div class="moduleDocstring">
-          <div><p class="undocumented">Undocumented</p></div>
+          <div><p>Inspect callable signatures, parameters and invocation metadata.</p></div>
         </div>
 
         <div id="split-tables">
-          <table class="children sortable" id="id1239">
+          <table class="children sortable" id="id1241">
   
   
   <tr class="method">
@@ -4950,32 +4950,32 @@
     
     <td>Class Variable</td>
     <td><code><a href="#__slots__" class="internal-link" title="orionis.introspection.ReflectionCallable.__slots__">__slots__</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
+    <td>Explicit slots remove the per-instance __dict__ and speed up attribute access.</td>
   </tr><tr class="instancevariable">
     
     <td>Instance Variable</td>
     <td><code><a href="#_cache" class="internal-link" title="orionis.introspection.ReflectionCallable._cache">_cache</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
+    <td>Shared dict for deferred computation results and the external cache protocol.</td>
   </tr><tr class="instancevariable">
     
     <td>Instance Variable</td>
     <td><code><a href="#_docstring" class="internal-link" title="orionis.introspection.ReflectionCallable._docstring">_docstring</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
+    <td>Documentation text extracted from the inspected callable.</td>
   </tr><tr class="instancevariable">
     
     <td>Instance Variable</td>
     <td><code><a href="#_function" class="internal-link" title="orionis.introspection.ReflectionCallable._function">_function</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
+    <td>The function, method, or lambda to be wrapped.</td>
   </tr><tr class="instancevariable">
     
     <td>Instance Variable</td>
     <td><code><a href="#_module" class="internal-link" title="orionis.introspection.ReflectionCallable._module">_module</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
+    <td>Module obtained from <tt class="rst-docutils rst-literal">fn.__module__</tt>.</td>
   </tr><tr class="instancevariable">
     
     <td>Instance Variable</td>
     <td><code><a href="#_name" class="internal-link" title="orionis.introspection.ReflectionCallable._name">_name</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
+    <td>Name identifying this declaration within its containing registry.</td>
   </tr>
 </table>
           
@@ -4997,7 +4997,7 @@
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">__contains__</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">key: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/introspection/callables/reflection.py#L95">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/introspection/callables/reflection.py#L112">
       
       (source)
     </a>
@@ -5024,7 +5024,7 @@
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">__delitem__</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">key: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></span>):</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/introspection/callables/reflection.py#L112">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/introspection/callables/reflection.py#L129">
       
       (source)
     </a>
@@ -5051,7 +5051,7 @@
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">__getitem__</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">key: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/functions.html#object" class="intersphinx-link">object</a> | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/introspection/callables/reflection.py#L59">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/introspection/callables/reflection.py#L76">
       
       (source)
     </a>
@@ -5078,7 +5078,7 @@
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">__init__</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">fn: <code><a href="https://docs.python.org/3/builtins/functions.html#callable" class="intersphinx-link">callable</a></code></span>):</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/introspection/callables/reflection.py#L23">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/introspection/callables/reflection.py#L32">
       
       (source)
     </a>
@@ -5090,7 +5090,7 @@
   </div>
   <div class="docstring functionBody">
     
-    <div><p>Initialize the reflection wrapper with a callable object.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">fn:</span><code><a href="https://docs.python.org/3/builtins/functions.html#callable" class="intersphinx-link">callable</a></code></td><td class="fieldArgDesc">The function, method, or lambda to be wrapped.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">This method does not return a value.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/exceptions.html#TypeError" class="intersphinx-link">TypeError</a></code></td><td>If <code>fn</code> is not a function, method, or lambda.</td></tr></table></div>
+    <div><p>Initialize the reflection wrapper with a callable object.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">fn:</span><code><a href="https://docs.python.org/3/builtins/functions.html#callable" class="intersphinx-link">callable</a></code></td><td class="fieldArgDesc">The function, method, or lambda to be wrapped.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">This method does not return a value.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/exceptions.html#TypeError" class="intersphinx-link">TypeError</a></code></td><td>If <tt class="rst-docutils rst-literal">fn</tt> is not a function, method, or lambda.</td></tr></table></div>
   </div>
 </div><div class="basemethod">
   
@@ -5105,7 +5105,7 @@
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">__setitem__</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">key: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code>, </span><span class="rst-sig-param">value: <code><a href="https://docs.python.org/3/builtins/functions.html#object" class="intersphinx-link">object</a></code></span>):</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/introspection/callables/reflection.py#L76">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/introspection/callables/reflection.py#L93">
       
       (source)
     </a>
@@ -5132,7 +5132,7 @@
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">clearCache</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>):</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/introspection/callables/reflection.py#L286">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/introspection/callables/reflection.py#L303">
       
       (source)
     </a>
@@ -5162,7 +5162,7 @@ fresh computation on subsequent method calls.</p>
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">getCallable</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/functions.html#callable" class="intersphinx-link">callable</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/introspection/callables/reflection.py#L129">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/introspection/callables/reflection.py#L146">
       
       (source)
     </a>
@@ -5189,7 +5189,7 @@ fresh computation on subsequent method calls.</p>
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">getDependencies</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>) -&gt; <code>Signature</code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/introspection/callables/reflection.py#L263">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/introspection/callables/reflection.py#L280">
       
       (source)
     </a>
@@ -5205,7 +5205,7 @@ fresh computation on subsequent method calls.</p>
 <p>Delegates to ReflectDependencies to inspect each parameter and resolve
 its type annotation into a dependency descriptor. The result is stored
 in the shared cache so that repeated calls skip reanalysis.</p>
-<table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.introspection.dependencies.entities.signature.Signature.html" class="internal-link" title="orionis.introspection.dependencies.entities.signature.Signature">Signature</a></code></td><td class="fieldArgDesc">A structure that holds the resolved and unresolved dependencies
+<table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.introspection.dependencies.entities.signature.Signature.html" class="internal-link">orionis.introspection.dependencies.entities.signature.Signature</a></code></td><td class="fieldArgDesc">A structure that holds the resolved and unresolved dependencies
 derived from the callable's parameter annotations.</td></tr></table></div>
   </div>
 </div><div class="basemethod">
@@ -5221,7 +5221,7 @@ derived from the callable's parameter annotations.</td></tr></table></div>
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">getDocstring</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/introspection/callables/reflection.py#L178">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/introspection/callables/reflection.py#L195">
       
       (source)
     </a>
@@ -5248,7 +5248,7 @@ derived from the callable's parameter annotations.</td></tr></table></div>
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">getFile</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/introspection/callables/reflection.py#L221">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/introspection/callables/reflection.py#L238">
       
       (source)
     </a>
@@ -5275,7 +5275,7 @@ derived from the callable's parameter annotations.</td></tr></table></div>
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">getModuleName</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/introspection/callables/reflection.py#L152">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/introspection/callables/reflection.py#L169">
       
       (source)
     </a>
@@ -5302,7 +5302,7 @@ derived from the callable's parameter annotations.</td></tr></table></div>
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">getModuleWithCallableName</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/introspection/callables/reflection.py#L164">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/introspection/callables/reflection.py#L181">
       
       (source)
     </a>
@@ -5331,7 +5331,7 @@ derived from the callable's parameter annotations.</td></tr></table></div>
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">getName</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/introspection/callables/reflection.py#L140">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/introspection/callables/reflection.py#L157">
       
       (source)
     </a>
@@ -5358,7 +5358,7 @@ derived from the callable's parameter annotations.</td></tr></table></div>
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">getSignature</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>) -&gt; <code><a href="https://docs.python.org/3/library/inspect.html#inspect.Signature" class="intersphinx-link">inspect.Signature</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/introspection/callables/reflection.py#L244">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/introspection/callables/reflection.py#L261">
       
       (source)
     </a>
@@ -5370,7 +5370,7 @@ derived from the callable's parameter annotations.</td></tr></table></div>
   </div>
   <div class="docstring functionBody">
     <div class="interfaceinfo">overrides <code><a href="orionis.introspection.callables.contracts.reflection.IReflectionCallable.html#getSignature" class="internal-link">orionis.introspection.callables.contracts.reflection.IReflectionCallable.getSignature</a></code></div>
-    <div><p>Return the signature of the callable.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/library/inspect.html#inspect.Signature" class="intersphinx-link">inspect.Signature</a></code></td><td class="fieldArgDesc">The signature object representing the callable's parameters,
+    <div><p>Return the signature of the callable.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><tt class="rst-docutils rst-literal">inspect.Signature</tt></code></td><td class="fieldArgDesc">The signature object representing the callable's parameters,
 default values, and type annotations.</td></tr></table></div>
   </div>
 </div><div class="basemethod">
@@ -5386,7 +5386,7 @@ default values, and type annotations.</td></tr></table></div>
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">getSourceCode</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/introspection/callables/reflection.py#L190">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/introspection/callables/reflection.py#L207">
       
       (source)
     </a>
@@ -5416,7 +5416,7 @@ callable is built-in without accessible source.</td></tr></table></div>
   <div class="functionHeader">
     
     <span class="py-defname">__slots__</span>: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" class="intersphinx-link">tuple</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <wbr></wbr><span class="rst-variable-ellipsis">...</span>]</code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/introspection/callables/reflection.py#L21">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/introspection/callables/reflection.py#L29">
       
       (source)
     </a>
@@ -5428,7 +5428,7 @@ callable is built-in without accessible source.</td></tr></table></div>
   </div>
   <div class="functionBody">
     <div class="interfaceinfo">overrides <code><a href="orionis.introspection.callables.contracts.reflection.IReflectionCallable.html#__slots__" class="internal-link">orionis.introspection.callables.contracts.reflection.IReflectionCallable.__slots__</a></code></div>
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p>Explicit slots remove the per-instance __dict__ and speed up attribute access.</p></div>
     
   </div>
 </div><div class="baseinstancevariable">
@@ -5443,7 +5443,7 @@ callable is built-in without accessible source.</td></tr></table></div>
   <div class="functionHeader">
     
     <span class="py-defname">_cache</span>: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#dict" class="intersphinx-link">dict</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <wbr></wbr><a href="https://docs.python.org/3/builtins/functions.html#object" class="intersphinx-link">object</a>]</code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/introspection/callables/reflection.py#L57">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/introspection/callables/reflection.py#L70">
       
       (source)
     </a>
@@ -5455,7 +5455,8 @@ callable is built-in without accessible source.</td></tr></table></div>
   </div>
   <div class="functionBody">
     
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p>Shared dict for deferred computation results and the external cache
+protocol.</p></div>
     
   </div>
 </div><div class="baseinstancevariable">
@@ -5470,7 +5471,7 @@ callable is built-in without accessible source.</td></tr></table></div>
   <div class="functionHeader">
     
     <span class="py-defname">_docstring</span>: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/introspection/callables/reflection.py#L55">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/introspection/callables/reflection.py#L67">
       
       (source)
     </a>
@@ -5482,7 +5483,7 @@ callable is built-in without accessible source.</td></tr></table></div>
   </div>
   <div class="functionBody">
     
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p>Documentation text extracted from the inspected callable.</p></div>
     
   </div>
 </div><div class="baseinstancevariable">
@@ -5497,7 +5498,7 @@ callable is built-in without accessible source.</td></tr></table></div>
   <div class="functionHeader">
     
     <span class="py-defname">_function</span> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/introspection/callables/reflection.py#L52">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/introspection/callables/reflection.py#L61">
       
       (source)
     </a>
@@ -5509,7 +5510,7 @@ callable is built-in without accessible source.</td></tr></table></div>
   </div>
   <div class="functionBody">
     
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p>The function, method, or lambda to be wrapped.</p></div>
     
   </div>
 </div><div class="baseinstancevariable">
@@ -5524,7 +5525,7 @@ callable is built-in without accessible source.</td></tr></table></div>
   <div class="functionHeader">
     
     <span class="py-defname">_module</span>: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/introspection/callables/reflection.py#L54">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/introspection/callables/reflection.py#L65">
       
       (source)
     </a>
@@ -5536,7 +5537,7 @@ callable is built-in without accessible source.</td></tr></table></div>
   </div>
   <div class="functionBody">
     
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p>Module obtained from <tt class="rst-docutils rst-literal">fn.__module__</tt>.</p></div>
     
   </div>
 </div><div class="baseinstancevariable">
@@ -5551,7 +5552,7 @@ callable is built-in without accessible source.</td></tr></table></div>
   <div class="functionHeader">
     
     <span class="py-defname">_name</span>: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/introspection/callables/reflection.py#L53">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/introspection/callables/reflection.py#L63">
       
       (source)
     </a>
@@ -5563,7 +5564,7 @@ callable is built-in without accessible source.</td></tr></table></div>
   </div>
   <div class="functionBody">
     
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p>Name identifying this declaration within its containing registry.</p></div>
     
   </div>
 </div>
@@ -5577,7 +5578,7 @@ callable is built-in without accessible source.</td></tr></table></div>
   <div class="orionis-footer-inner">
     <div class="orionis-footer-copy">
       <p>API documentation for <a href="https://orionis-framework.com/" class="projecthome">Orionis</a>.</p>
-      <p class="orionis-footer-meta">Generated with <a href="https://github.com/twisted/pydoctor/">Pydoctor</a> 25.10.1.<span class="orionis-footer-build"> Built 2026-11-03 09:36:58.</span></p>
+      <p class="orionis-footer-meta">Generated with <a href="https://github.com/twisted/pydoctor/">Pydoctor</a> 25.10.1.<span class="orionis-footer-build"> Built 2026-11-03 13:00:15.</span></p>
     </div>
     <nav class="orionis-footer-links" aria-label="Additional resources">
       <a href="https://docs.orionis-framework.com">Read the guide <span aria-hidden="true">↗</span></a>

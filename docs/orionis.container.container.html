@@ -1021,7 +1021,7 @@
         
 
         
-            <div class="itemName"><code><a href="orionis.container.entities.binding.html" class="internal-link" title="orionis.container.entities.binding">binding</a></code>
+            <div class="itemName"><code><a href="orionis.container.entities.binding.module.html" class="internal-link" title="orionis.container.entities.binding">binding</a></code>
             </div>
         
 
@@ -1247,7 +1247,7 @@
         
 
         
-            <div class="itemName"><code><a href="orionis.container.facades.facade.html" class="internal-link" title="orionis.container.facades.facade">facade</a></code>
+            <div class="itemName"><code><a href="orionis.container.facades.facade.module.html" class="internal-link" title="orionis.container.facades.facade">facade</a></code>
             </div>
         
 
@@ -1463,11 +1463,11 @@
         </div>
 
         <div class="extrasDocstring">
-          <a href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/container/container.py" class="sourceLink">(source)</a>
+          <a href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/container/container.py" class="sourceLink">(source)</a>
         </div>
 
         <div class="moduleDocstring">
-          <div><p class="undocumented">Undocumented</p></div>
+          <div><p>Resolve services from contracts, aliases and constructor signatures.</p></div>
         </div>
 
         <div id="split-tables">
@@ -1483,17 +1483,17 @@
     
     <td>Constant</td>
     <td><code><a href="#_MISSING" class="internal-link" title="orionis.container.container._MISSING">_MISSING</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
+    <td>Sentinel distinguishing missing from ordinary values.</td>
   </tr><tr class="variable">
     
     <td>Variable</td>
     <td><code><a href="#_provider_stack" class="internal-link" title="orionis.container.container._provider_stack">_provider<wbr></wbr>_stack</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
+    <td>Context-local provider stack isolated between asynchronous tasks.</td>
   </tr><tr class="variable">
     
     <td>Variable</td>
     <td><code><a href="#_resolution_stack" class="internal-link" title="orionis.container.container._resolution_stack">_resolution<wbr></wbr>_stack</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
+    <td>Context variable to track the resolution stack for circular dependency detection.</td>
   </tr>
 </table>
           
@@ -1514,7 +1514,7 @@
   <div class="functionHeader">
     
     <span class="py-defname">_MISSING</span> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/container/container.py#L33">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/container/container.py#L37">
       
       (source)
     </a>
@@ -1526,7 +1526,7 @@
   </div>
   <div class="functionBody">
     
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p>Sentinel distinguishing missing from ordinary values.</p></div>
     <table class="valueTable"><tr class="fieldStart"><td class="fieldName">Value</td></tr><tr><td><pre class="constant-value"><code><a href="https://docs.python.org/3/builtins/functions.html#object" class="intersphinx-link">object</a>()</code></pre></td></tr></table>
   </div>
 </div><div class="basevariable">
@@ -1541,7 +1541,7 @@
   <div class="functionHeader">
     
     <span class="py-defname">_provider_stack</span>: <code><a href="https://docs.python.org/3/library/contextvars.html#contextvars.ContextVar" class="intersphinx-link">contextvars.ContextVar</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#frozenset" class="intersphinx-link">frozenset</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" class="intersphinx-link">tuple</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a>, <wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" class="intersphinx-link">tuple</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>]]]]</code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/container/container.py#L27">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/container/container.py#L30">
       
       (source)
     </a>
@@ -1553,7 +1553,7 @@
   </div>
   <div class="functionBody">
     
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p>Context-local provider stack isolated between asynchronous tasks.</p></div>
     
   </div>
 </div><div class="basevariable">
@@ -1568,7 +1568,7 @@
   <div class="functionHeader">
     
     <span class="py-defname">_resolution_stack</span>: <code><a href="https://docs.python.org/3/library/contextvars.html#contextvars.ContextVar" class="intersphinx-link">contextvars.ContextVar</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#frozenset" class="intersphinx-link">frozenset</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/functions.html#type" class="intersphinx-link">type</a>]]</code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/container/container.py#L24">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/container/container.py#L26">
       
       (source)
     </a>
@@ -1580,7 +1580,7 @@
   </div>
   <div class="functionBody">
     
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p>Context variable to track the resolution stack for circular dependency detection.</p></div>
     
   </div>
 </div>
@@ -1594,7 +1594,7 @@
   <div class="orionis-footer-inner">
     <div class="orionis-footer-copy">
       <p>API documentation for <a href="https://orionis-framework.com/" class="projecthome">Orionis</a>.</p>
-      <p class="orionis-footer-meta">Generated with <a href="https://github.com/twisted/pydoctor/">Pydoctor</a> 25.10.1.<span class="orionis-footer-build"> Built 2026-11-03 09:36:58.</span></p>
+      <p class="orionis-footer-meta">Generated with <a href="https://github.com/twisted/pydoctor/">Pydoctor</a> 25.10.1.<span class="orionis-footer-build"> Built 2026-11-03 13:00:15.</span></p>
     </div>
     <nav class="orionis-footer-links" aria-label="Additional resources">
       <a href="https://docs.orionis-framework.com">Read the guide <span aria-hidden="true">↗</span></a>

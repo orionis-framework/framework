@@ -430,11 +430,11 @@
         </div>
 
         <div class="extrasDocstring">
-          <p class="class-signature"><code><span class="py-keyword">class</span> <span class="py-defname">KernelCLI</span>(<a href="orionis.console.contracts.kernel.IKernelCLI.html" class="internal-link" title="orionis.console.contracts.kernel.IKernelCLI">IKernelCLI</a>): <a href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/console/kernel.py#L9" class="sourceLink">(source)</a></code></p><p><a href="classIndex.html#orionis.console.kernel.KernelCLI">View In Hierarchy</a></p>
+          <p class="class-signature"><code><span class="py-keyword">class</span> <span class="py-defname">KernelCLI</span>(<a href="orionis.console.contracts.kernel.IKernelCLI.html" class="internal-link" title="orionis.console.contracts.kernel.IKernelCLI">IKernelCLI</a>): <a href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/console/kernel.py#L11" class="sourceLink">(source)</a></code></p><p><a href="classIndex.html#orionis.console.kernel.KernelCLI">View In Hierarchy</a></p>
         </div>
 
         <div class="moduleDocstring">
-          <div><p class="undocumented">Undocumented</p></div>
+          <div><p>Bootstrap the console runtime and dispatch command invocations.</p></div>
         </div>
 
         <div id="split-tables">
@@ -455,22 +455,22 @@
     
     <td>Constant</td>
     <td><code><a href="#_HELP_FLAGS" class="internal-link" title="orionis.console.kernel.KernelCLI._HELP_FLAGS">_HELP<wbr></wbr>_FLAGS</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
+    <td>Help flags used by <tt class="rst-docutils rst-literal">KernelCLI</tt>.</td>
   </tr><tr class="constant">
     
     <td>Constant</td>
     <td><code><a href="#IGNORE_FLAGS" class="internal-link" title="orionis.console.kernel.KernelCLI.IGNORE_FLAGS">IGNORE<wbr></wbr>_FLAGS</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
+    <td>Ignore flags used by <tt class="rst-docutils rst-literal">KernelCLI</tt>.</td>
   </tr><tr class="classvariable">
     
     <td>Class Variable</td>
     <td><code><a href="#__slots__" class="internal-link" title="orionis.console.kernel.KernelCLI.__slots__">__slots__</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
+    <td>Declare the instance attribute slots reserved by this class.</td>
   </tr><tr class="instancevariable">
     
     <td>Instance Variable</td>
     <td><code><a href="#__reactor" class="internal-link" title="orionis.console.kernel.KernelCLI.__reactor">__reactor</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
+    <td>Create and assign the reactor instance using the application factory.</td>
   </tr>
 </table>
           
@@ -492,7 +492,7 @@
     
     
     <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">boot</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">application: <code>IApplication</code></span>):</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/console/kernel.py#L20">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/console/kernel.py#L26">
       
       (source)
     </a>
@@ -504,7 +504,7 @@
   </div>
   <div class="docstring functionBody">
     <div class="interfaceinfo">overrides <code><a href="orionis.console.contracts.kernel.IKernelCLI.html#boot" class="internal-link">orionis.console.contracts.kernel.IKernelCLI.boot</a></code></div>
-    <div><p>Initialize the kernel CLI and register commands with the reactor.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">application:</span><code><a href="orionis.IApplication.html" class="internal-link" title="orionis.IApplication">IApplication</a></code></td><td class="fieldArgDesc">The application instance used to create the reactor.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">This method does not return a value.</td></tr></table></div>
+    <div><p>Initialize the kernel CLI and register commands with the reactor.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">application:</span><code><a href="orionis.IApplication.html" class="internal-link">orionis.IApplication</a></code></td><td class="fieldArgDesc">The application instance used to create the reactor.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">This method does not return a value.</td></tr></table></div>
   </div>
 </div><div class="basemethod">
   
@@ -519,7 +519,7 @@
     
     
     <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">handle</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">args: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#list" class="intersphinx-link">list</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>] | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code> = <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/console/kernel.py#L40">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/console/kernel.py#L47">
       
       (source)
     </a>
@@ -545,7 +545,7 @@
   <div class="functionHeader">
     
     <span class="py-defname">_HELP_FLAGS</span>: <code><a href="https://docs.python.org/3/library/typing.html#typing.ClassVar" class="intersphinx-link">ClassVar</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#frozenset" class="intersphinx-link">frozenset</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>]]</code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/console/kernel.py#L18">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/console/kernel.py#L23">
       
       (source)
     </a>
@@ -557,7 +557,7 @@
   </div>
   <div class="functionBody">
     
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p>Help flags used by <tt class="rst-docutils rst-literal">KernelCLI</tt>.</p></div>
     <table class="valueTable"><tr class="fieldStart"><td class="fieldName">Value</td></tr><tr><td><pre class="constant-value"><code><a href="https://docs.python.org/3/builtins/stdtypes.html#frozenset" class="intersphinx-link">frozenset</a>(<wbr></wbr>set([<wbr></wbr><span class="rst-variable-quote">'</span><span class="rst-variable-string">help</span><span class="rst-variable-quote">'</span>, <wbr></wbr><span class="rst-variable-quote">'</span><span class="rst-variable-string">--help</span><span class="rst-variable-quote">'</span>, <wbr></wbr><span class="rst-variable-quote">'</span><span class="rst-variable-string">-h</span><span class="rst-variable-quote">'</span>]))</code></pre></td></tr></table>
   </div>
 </div><div class="baseconstant">
@@ -572,7 +572,7 @@
   <div class="functionHeader">
     
     <span class="py-defname">IGNORE_FLAGS</span>: <code><a href="https://docs.python.org/3/library/typing.html#typing.ClassVar" class="intersphinx-link">ClassVar</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#frozenset" class="intersphinx-link">frozenset</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>]]</code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/console/kernel.py#L13">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/console/kernel.py#L17">
       
       (source)
     </a>
@@ -584,7 +584,7 @@
   </div>
   <div class="functionBody">
     
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p>Ignore flags used by <tt class="rst-docutils rst-literal">KernelCLI</tt>.</p></div>
     <table class="valueTable"><tr class="fieldStart"><td class="fieldName">Value</td></tr><tr><td><pre class="constant-value"><code><a href="https://docs.python.org/3/builtins/stdtypes.html#frozenset" class="intersphinx-link">frozenset</a>(<wbr></wbr>set([<wbr></wbr><span class="rst-variable-quote">'</span><span class="rst-variable-string">reactor</span><span class="rst-variable-quote">'</span>,
                <wbr></wbr><span class="rst-variable-quote">'</span><span class="rst-variable-string">-c</span><span class="rst-variable-quote">'</span>,
                <wbr></wbr><span class="rst-variable-quote">'</span><span class="rst-variable-string">-m</span><span class="rst-variable-quote">'</span>,
@@ -606,7 +606,7 @@
   <div class="functionHeader">
     
     <span class="py-defname">__slots__</span>: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" class="intersphinx-link">tuple</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <wbr></wbr><span class="rst-variable-ellipsis">...</span>]</code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/console/kernel.py#L11">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/console/kernel.py#L14">
       
       (source)
     </a>
@@ -618,7 +618,7 @@
   </div>
   <div class="functionBody">
     <div class="interfaceinfo">overrides <code><a href="orionis.console.contracts.kernel.IKernelCLI.html#__slots__" class="internal-link">orionis.console.contracts.kernel.IKernelCLI.__slots__</a></code></div>
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p>Declare the instance attribute slots reserved by this class.</p></div>
     
   </div>
 </div><div class="baseinstancevariable">
@@ -633,7 +633,7 @@
   <div class="functionHeader">
     
     <span class="py-defname">__reactor</span>: <code><a href="orionis.console.core.contracts.reactor.IReactor.html" class="internal-link" title="orionis.console.core.contracts.reactor.IReactor">IReactor</a></code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/console/kernel.py#L38">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/console/kernel.py#L44">
       
       (source)
     </a>
@@ -645,7 +645,7 @@
   </div>
   <div class="functionBody">
     
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p>Create and assign the reactor instance using the application factory.</p></div>
     
   </div>
 </div>
@@ -659,7 +659,7 @@
   <div class="orionis-footer-inner">
     <div class="orionis-footer-copy">
       <p>API documentation for <a href="https://orionis-framework.com/" class="projecthome">Orionis</a>.</p>
-      <p class="orionis-footer-meta">Generated with <a href="https://github.com/twisted/pydoctor/">Pydoctor</a> 25.10.1.<span class="orionis-footer-build"> Built 2026-11-03 09:36:58.</span></p>
+      <p class="orionis-footer-meta">Generated with <a href="https://github.com/twisted/pydoctor/">Pydoctor</a> 25.10.1.<span class="orionis-footer-build"> Built 2026-11-03 13:00:15.</span></p>
     </div>
     <nav class="orionis-footer-links" aria-label="Additional resources">
       <a href="https://docs.orionis-framework.com">Read the guide <span aria-hidden="true">↗</span></a>

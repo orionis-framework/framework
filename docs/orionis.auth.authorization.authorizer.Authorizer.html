@@ -149,7 +149,7 @@
       <div>
          
           <div class="childrenKindTitle">Contents</div>
-          <ul><li><a class="rst-internal rst-reference" href="#rst-concurrency" id="rst-toc-entry-2">Concurrency</a></li>
+          <ul><li><a class="rst-internal rst-reference" href="#rst-concurrency">Concurrency</a></li>
 </ul>
         
 
@@ -324,7 +324,7 @@
                     <div>
          
           <div class="childrenKindTitle">Contents</div>
-          <ul><li><a class="rst-internal rst-reference" href="#rst-concurrency" id="rst-toc-entry-3">Concurrency</a></li>
+          <ul><li><a class="rst-internal rst-reference" href="#rst-concurrency">Concurrency</a></li>
 </ul>
         
 
@@ -538,7 +538,7 @@
         </div>
 
         <div class="extrasDocstring">
-          <p class="class-signature"><code><span class="py-keyword">class</span> <span class="py-defname">Authorizer</span>(<a href="orionis.auth.contracts.IAuthorizer.html" class="internal-link" title="orionis.auth.contracts.IAuthorizer">IAuthorizer</a>): <a href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/auth/authorization/authorizer.py#L13" class="sourceLink">(source)</a></code></p><p>Constructor: <code><a href="#__init__" class="internal-link" title="orionis.auth.authorization.authorizer.Authorizer.__init__">Authorizer(app)</a></code></p><p><a href="classIndex.html#orionis.auth.authorization.authorizer.Authorizer">View In Hierarchy</a></p>
+          <p class="class-signature"><code><span class="py-keyword">class</span> <span class="py-defname">Authorizer</span>(<a href="orionis.auth.contracts.IAuthorizer.html" class="internal-link" title="orionis.auth.contracts.IAuthorizer">IAuthorizer</a>): <a href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/auth/authorization/authorizer.py#L15" class="sourceLink">(source)</a></code></p><p>Constructor: <code><a href="#__init__" class="internal-link" title="orionis.auth.authorization.authorizer.Authorizer.__init__">Authorizer(app)</a></code></p><p><a href="classIndex.html#orionis.auth.authorization.authorizer.Authorizer">View In Hierarchy</a></p>
         </div>
 
         <div class="moduleDocstring">
@@ -548,7 +548,7 @@ the request context as its first argument. That keeps the service
 stateless and therefore safe as a container singleton shared by every
 concurrent request.</p>
 <div class="rst-section" id="rst-concurrency">
-<h2 class="heading"><a class="rst-toc-backref" href="#rst-toc-entry-1">Concurrency</a></h2>
+<h2 class="heading">Concurrency</h2>
 <p>Only policy classes are cached. Each evaluation builds a fresh policy
 in the caller's container scope, so injected request dependencies and
 mutable policy state are never retained by this singleton.</p>
@@ -604,17 +604,17 @@ mutable policy state are never retained by this singleton.</p>
     
     <td>Class Variable</td>
     <td><code><a href="#__slots__" class="internal-link" title="orionis.auth.authorization.authorizer.Authorizer.__slots__">__slots__</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
+    <td>Declare the instance attribute slots reserved by this class.</td>
   </tr><tr class="instancevariable">
     
     <td>Instance Variable</td>
     <td><code><a href="#__app" class="internal-link" title="orionis.auth.authorization.authorizer.Authorizer.__app">__app</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
+    <td>Container used to build policy instances with their own dependencies injected.</td>
   </tr><tr class="instancevariable">
     
     <td>Instance Variable</td>
     <td><code><a href="#__registry" class="internal-link" title="orionis.auth.authorization.authorizer.Authorizer.__registry">__registry</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
+    <td>Registered implementations indexed by their public identifiers.</td>
   </tr>
 </table>
           
@@ -636,7 +636,7 @@ mutable policy state are never retained by this singleton.</p>
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">__init__</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">app: <code>IApplication</code></span>):</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/auth/authorization/authorizer.py#L33">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/auth/authorization/authorizer.py#L36">
       
       (source)
     </a>
@@ -648,7 +648,7 @@ mutable policy state are never retained by this singleton.</p>
   </div>
   <div class="docstring functionBody">
     
-    <div><p>Initialise the authorizer with the application container.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">app:</span><code><a href="orionis.IApplication.html" class="internal-link" title="orionis.IApplication">IApplication</a></code></td><td class="fieldArgDesc">Container used to build policy instances with their own
+    <div><p>Initialise the authorizer with the application container.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">app:</span><code><a href="orionis.IApplication.html" class="internal-link">orionis.IApplication</a></code></td><td class="fieldArgDesc">Container used to build policy instances with their own
 dependencies injected.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">The registry starts empty and is filled during boot.</td></tr></table></div>
   </div>
 </div><div class="basemethod">
@@ -664,7 +664,7 @@ dependencies injected.</td></tr></table><table class="fieldTable"><tr class="fie
     
     
     <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">allows</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">context: <code>IAuthenticationContext</code>, </span><span class="rst-sig-param">ability: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code>, </span><span class="rst-sig-param">resource: <code><a href="https://docs.python.org/3/builtins/functions.html#object" class="intersphinx-link">object</a></code></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/auth/authorization/authorizer.py#L185">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/auth/authorization/authorizer.py#L193">
       
       (source)
     </a>
@@ -676,10 +676,10 @@ dependencies injected.</td></tr></table><table class="fieldTable"><tr class="fie
   </div>
   <div class="docstring functionBody">
     <div class="interfaceinfo">overrides <code><a href="orionis.auth.contracts.IAuthorizer.html#allows" class="internal-link">orionis.auth.contracts.IAuthorizer.allows</a></code></div>
-    <div><p>Evaluate a policy ability against a concrete resource.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">context:</span><code><a href="orionis.auth.contracts.IAuthenticationContext.html" class="internal-link" title="orionis.auth.contracts.IAuthenticationContext">IAuthenticationContext</a></code></td><td class="fieldArgDesc">Authentication context of the current request.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">ability:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Ability declared by the policy of the resource.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">resource:</span><code><a href="https://docs.python.org/3/builtins/functions.html#object" class="intersphinx-link">object</a></code></td><td class="fieldArgDesc">Resource instance, or the resource class when the ability
+    <div><p>Evaluate a policy ability against a concrete resource.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">context:</span><code><a href="orionis.auth.contracts.IAuthenticationContext.html" class="internal-link">orionis.auth.contracts.IAuthenticationContext</a></code></td><td class="fieldArgDesc">Authentication context of the current request.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">ability:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Ability declared by the policy of the resource.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">resource:</span><code><a href="https://docs.python.org/3/builtins/functions.html#object" class="intersphinx-link">object</a></code></td><td class="fieldArgDesc">Resource instance, or the resource class when the ability
 does not need an instance.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code></td><td class="fieldArgDesc">True only when the policy explicitly allows the operation
 and the credential permits the named ability. Hooks cannot
-override credential restrictions.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code>PolicyNotFoundException</code></td><td>When the resource type has no policy, or the policy does not
+override credential restrictions.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.auth.PolicyNotFoundException.html" class="internal-link">orionis.auth.PolicyNotFoundException</a></code></td><td>When the resource type has no policy, or the policy does not
 declare the requested ability.</td></tr></table></div>
   </div>
 </div><div class="basemethod">
@@ -695,7 +695,7 @@ declare the requested ability.</td></tr></table></div>
     
     
     <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">can</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">context: <code>IAuthenticationContext</code>, </span><span class="rst-sig-param">permission: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/auth/authorization/authorizer.py#L80">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/auth/authorization/authorizer.py#L88">
       
       (source)
     </a>
@@ -707,7 +707,7 @@ declare the requested ability.</td></tr></table></div>
   </div>
   <div class="docstring functionBody">
     <div class="interfaceinfo">overrides <code><a href="orionis.auth.contracts.IAuthorizer.html#can" class="internal-link">orionis.auth.contracts.IAuthorizer.can</a></code></div>
-    <div><p>Report whether the context grants a permission.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">context:</span><code><a href="orionis.auth.contracts.IAuthenticationContext.html" class="internal-link" title="orionis.auth.contracts.IAuthenticationContext">IAuthenticationContext</a></code></td><td class="fieldArgDesc">Authentication context of the current request.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">permission:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Permission name to evaluate.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code></td><td class="fieldArgDesc">True when the permission is granted.</td></tr></table></div>
+    <div><p>Report whether the context grants a permission.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">context:</span><code><a href="orionis.auth.contracts.IAuthenticationContext.html" class="internal-link">orionis.auth.contracts.IAuthenticationContext</a></code></td><td class="fieldArgDesc">Authentication context of the current request.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">permission:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Permission name to evaluate.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code></td><td class="fieldArgDesc">True when the permission is granted.</td></tr></table></div>
   </div>
 </div><div class="basemethod">
   
@@ -722,7 +722,7 @@ declare the requested ability.</td></tr></table></div>
     
     
     <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">canAll</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">context: <code>IAuthenticationContext</code>, </span><span class="rst-sig-param">permissions: <code><a href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Iterable" class="intersphinx-link">Iterable</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>]</code></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/auth/authorization/authorizer.py#L133">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/auth/authorization/authorizer.py#L141">
       
       (source)
     </a>
@@ -734,7 +734,7 @@ declare the requested ability.</td></tr></table></div>
   </div>
   <div class="docstring functionBody">
     <div class="interfaceinfo">overrides <code><a href="orionis.auth.contracts.IAuthorizer.html#canAll" class="internal-link">orionis.auth.contracts.IAuthorizer.canAll</a></code></div>
-    <div><p>Report whether the context grants every permission.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">context:</span><code><a href="orionis.auth.contracts.IAuthenticationContext.html" class="internal-link" title="orionis.auth.contracts.IAuthenticationContext">IAuthenticationContext</a></code></td><td class="fieldArgDesc">Authentication context of the current request.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">permissions:</span><code><a href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Iterable" class="intersphinx-link">Iterable</a>[<a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>]</code></td><td class="fieldArgDesc">Permission names to evaluate.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code></td><td class="fieldArgDesc">True when every permission is granted.</td></tr></table></div>
+    <div><p>Report whether the context grants every permission.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">context:</span><code><a href="orionis.auth.contracts.IAuthenticationContext.html" class="internal-link">orionis.auth.contracts.IAuthenticationContext</a></code></td><td class="fieldArgDesc">Authentication context of the current request.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">permissions:</span><code><a href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Iterable" class="intersphinx-link">collections.abc.Iterable</a>[<a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>]</code></td><td class="fieldArgDesc">Permission names to evaluate.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code></td><td class="fieldArgDesc">True when every permission is granted.</td></tr></table></div>
   </div>
 </div><div class="basemethod">
   
@@ -749,7 +749,7 @@ declare the requested ability.</td></tr></table></div>
     
     
     <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">canAny</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">context: <code>IAuthenticationContext</code>, </span><span class="rst-sig-param">permissions: <code><a href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Iterable" class="intersphinx-link">Iterable</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>]</code></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/auth/authorization/authorizer.py#L106">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/auth/authorization/authorizer.py#L114">
       
       (source)
     </a>
@@ -761,7 +761,7 @@ declare the requested ability.</td></tr></table></div>
   </div>
   <div class="docstring functionBody">
     <div class="interfaceinfo">overrides <code><a href="orionis.auth.contracts.IAuthorizer.html#canAny" class="internal-link">orionis.auth.contracts.IAuthorizer.canAny</a></code></div>
-    <div><p>Report whether the context grants at least one permission.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">context:</span><code><a href="orionis.auth.contracts.IAuthenticationContext.html" class="internal-link" title="orionis.auth.contracts.IAuthenticationContext">IAuthenticationContext</a></code></td><td class="fieldArgDesc">Authentication context of the current request.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">permissions:</span><code><a href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Iterable" class="intersphinx-link">Iterable</a>[<a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>]</code></td><td class="fieldArgDesc">Permission names to evaluate.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code></td><td class="fieldArgDesc">True when at least one permission is granted.</td></tr></table></div>
+    <div><p>Report whether the context grants at least one permission.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">context:</span><code><a href="orionis.auth.contracts.IAuthenticationContext.html" class="internal-link">orionis.auth.contracts.IAuthenticationContext</a></code></td><td class="fieldArgDesc">Authentication context of the current request.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">permissions:</span><code><a href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Iterable" class="intersphinx-link">collections.abc.Iterable</a>[<a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>]</code></td><td class="fieldArgDesc">Permission names to evaluate.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code></td><td class="fieldArgDesc">True when at least one permission is granted.</td></tr></table></div>
   </div>
 </div><div class="basemethod">
   
@@ -776,7 +776,7 @@ declare the requested ability.</td></tr></table></div>
     
     
     <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">hasRole</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">context: <code>IAuthenticationContext</code>, </span><span class="rst-sig-param">role: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/auth/authorization/authorizer.py#L160">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/auth/authorization/authorizer.py#L168">
       
       (source)
     </a>
@@ -788,7 +788,7 @@ declare the requested ability.</td></tr></table></div>
   </div>
   <div class="docstring functionBody">
     <div class="interfaceinfo">overrides <code><a href="orionis.auth.contracts.IAuthorizer.html#hasRole" class="internal-link">orionis.auth.contracts.IAuthorizer.hasRole</a></code></div>
-    <div><p>Report whether the context owns a role.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">context:</span><code><a href="orionis.auth.contracts.IAuthenticationContext.html" class="internal-link" title="orionis.auth.contracts.IAuthenticationContext">IAuthenticationContext</a></code></td><td class="fieldArgDesc">Authentication context of the current request.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">role:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Role name to evaluate.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code></td><td class="fieldArgDesc">True when the role is assigned to the identity.</td></tr></table></div>
+    <div><p>Report whether the context owns a role.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">context:</span><code><a href="orionis.auth.contracts.IAuthenticationContext.html" class="internal-link">orionis.auth.contracts.IAuthenticationContext</a></code></td><td class="fieldArgDesc">Authentication context of the current request.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">role:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Role name to evaluate.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code></td><td class="fieldArgDesc">True when the role is assigned to the identity.</td></tr></table></div>
   </div>
 </div><div class="basemethod">
   
@@ -803,7 +803,7 @@ declare the requested ability.</td></tr></table></div>
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">registerPolicy</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">resource: <code><a href="https://docs.python.org/3/builtins/functions.html#type" class="intersphinx-link">type</a></code>, </span><span class="rst-sig-param">policy: <code><a href="https://docs.python.org/3/builtins/functions.html#type" class="intersphinx-link">type</a>[<wbr></wbr>IPolicy]</code></span>):</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/auth/authorization/authorizer.py#L62">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/auth/authorization/authorizer.py#L70">
       
       (source)
     </a>
@@ -815,7 +815,7 @@ declare the requested ability.</td></tr></table></div>
   </div>
   <div class="docstring functionBody">
     <div class="interfaceinfo">overrides <code><a href="orionis.auth.contracts.IAuthorizer.html#registerPolicy" class="internal-link">orionis.auth.contracts.IAuthorizer.registerPolicy</a></code></div>
-    <div><p>Bind a policy class to a resource type.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">resource:</span><code><a href="https://docs.python.org/3/builtins/functions.html#type" class="intersphinx-link">type</a></code></td><td class="fieldArgDesc">Resource class protected by the policy.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">policy:</span><code><a href="https://docs.python.org/3/builtins/functions.html#type" class="intersphinx-link">type</a>[<a href="orionis.auth.contracts.IPolicy.html" class="internal-link" title="orionis.auth.contracts.IPolicy">IPolicy</a>]</code></td><td class="fieldArgDesc">Policy class implementing the abilities.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">The registry is updated as a side effect.</td></tr></table></div>
+    <div><p>Bind a policy class to a resource type.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">resource:</span><code><a href="https://docs.python.org/3/builtins/functions.html#type" class="intersphinx-link">type</a></code></td><td class="fieldArgDesc">Resource class protected by the policy.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">policy:</span><code><a href="https://docs.python.org/3/builtins/functions.html#type" class="intersphinx-link">type</a>[<a href="orionis.auth.contracts.IPolicy.html" class="internal-link">orionis.auth.contracts.IPolicy</a>]</code></td><td class="fieldArgDesc">Policy class implementing the abilities.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">The registry is updated as a side effect.</td></tr></table></div>
   </div>
 </div><div class="basemethod">
   
@@ -830,7 +830,7 @@ declare the requested ability.</td></tr></table></div>
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">registry</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>) -&gt; <code>PolicyRegistry</code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/auth/authorization/authorizer.py#L51">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/auth/authorization/authorizer.py#L59">
       
       (source)
     </a>
@@ -842,7 +842,7 @@ declare the requested ability.</td></tr></table></div>
   </div>
   <div class="docstring functionBody">
     
-    <div><p>Return the policy registry backing this authorizer.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.auth.authorization.PolicyRegistry.html" class="internal-link" title="orionis.auth.authorization.PolicyRegistry">PolicyRegistry</a></code></td><td class="fieldArgDesc">Registry holding the resource to policy bindings.</td></tr></table></div>
+    <div><p>Return the policy registry backing this authorizer.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.auth.authorization.PolicyRegistry.html" class="internal-link">orionis.auth.authorization.PolicyRegistry</a></code></td><td class="fieldArgDesc">Registry holding the resource to policy bindings.</td></tr></table></div>
   </div>
 </div><div class="baseclassvariable">
   
@@ -856,7 +856,7 @@ declare the requested ability.</td></tr></table></div>
   <div class="functionHeader">
     
     <span class="py-defname">__slots__</span>: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" class="intersphinx-link">tuple</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <wbr></wbr><span class="rst-variable-ellipsis">...</span>]</code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/auth/authorization/authorizer.py#L31">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/auth/authorization/authorizer.py#L33">
       
       (source)
     </a>
@@ -868,7 +868,7 @@ declare the requested ability.</td></tr></table></div>
   </div>
   <div class="functionBody">
     <div class="interfaceinfo">overrides <code><a href="orionis.auth.contracts.IAuthorizer.html#__slots__" class="internal-link">orionis.auth.contracts.IAuthorizer.__slots__</a></code></div>
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p>Declare the instance attribute slots reserved by this class.</p></div>
     
   </div>
 </div><div class="baseinstancevariable">
@@ -883,7 +883,7 @@ declare the requested ability.</td></tr></table></div>
   <div class="functionHeader">
     
     <span class="py-defname">__app</span> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/auth/authorization/authorizer.py#L48">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/auth/authorization/authorizer.py#L51">
       
       (source)
     </a>
@@ -895,7 +895,8 @@ declare the requested ability.</td></tr></table></div>
   </div>
   <div class="functionBody">
     
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p>Container used to build policy instances with their own dependencies
+injected.</p></div>
     
   </div>
 </div><div class="baseinstancevariable">
@@ -910,7 +911,7 @@ declare the requested ability.</td></tr></table></div>
   <div class="functionHeader">
     
     <span class="py-defname">__registry</span> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/auth/authorization/authorizer.py#L49">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/auth/authorization/authorizer.py#L56">
       
       (source)
     </a>
@@ -922,7 +923,7 @@ declare the requested ability.</td></tr></table></div>
   </div>
   <div class="functionBody">
     
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p>Registered implementations indexed by their public identifiers.</p></div>
     
   </div>
 </div>
@@ -936,7 +937,7 @@ declare the requested ability.</td></tr></table></div>
   <div class="orionis-footer-inner">
     <div class="orionis-footer-copy">
       <p>API documentation for <a href="https://orionis-framework.com/" class="projecthome">Orionis</a>.</p>
-      <p class="orionis-footer-meta">Generated with <a href="https://github.com/twisted/pydoctor/">Pydoctor</a> 25.10.1.<span class="orionis-footer-build"> Built 2026-11-03 09:36:58.</span></p>
+      <p class="orionis-footer-meta">Generated with <a href="https://github.com/twisted/pydoctor/">Pydoctor</a> 25.10.1.<span class="orionis-footer-build"> Built 2026-11-03 13:00:15.</span></p>
     </div>
     <nav class="orionis-footer-links" aria-label="Additional resources">
       <a href="https://docs.orionis-framework.com">Read the guide <span aria-hidden="true">↗</span></a>

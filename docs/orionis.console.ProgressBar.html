@@ -1268,7 +1268,7 @@
         
 
         
-            <div class="itemName"><code><a href="orionis.console.entities.command.html" class="internal-link" title="orionis.console.entities.command">command</a></code>
+            <div class="itemName"><code><a href="orionis.console.entities.command.module.html" class="internal-link" title="orionis.console.entities.command">command</a></code>
             </div>
         
 
@@ -1288,7 +1288,7 @@
         
 
         
-            <div class="itemName"><code><a href="orionis.console.entities.task.html" class="internal-link" title="orionis.console.entities.task">task</a></code>
+            <div class="itemName"><code><a href="orionis.console.entities.task.module.html" class="internal-link" title="orionis.console.entities.task">task</a></code>
             </div>
         
 
@@ -1542,7 +1542,7 @@
         
 
         
-            <div class="itemName"><code><a href="orionis.console.fluent.command.html" class="internal-link" title="orionis.console.fluent.command">command</a></code>
+            <div class="itemName"><code><a href="orionis.console.fluent.command.module.html" class="internal-link" title="orionis.console.fluent.command">command</a></code>
             </div>
         
 
@@ -1562,7 +1562,7 @@
         
 
         
-            <div class="itemName"><code><a href="orionis.console.fluent.task.html" class="internal-link" title="orionis.console.fluent.task">task</a></code>
+            <div class="itemName"><code><a href="orionis.console.fluent.task.module.html" class="internal-link" title="orionis.console.fluent.task">task</a></code>
             </div>
         
 
@@ -3283,11 +3283,11 @@
         </div>
 
         <div class="extrasDocstring">
-          <p class="class-signature"><code><span class="py-keyword">class</span> <span class="py-defname">ProgressBar</span>(<a href="orionis.console.dynamic.contracts.progress_bar.IProgressBar.html" class="internal-link" title="orionis.console.dynamic.contracts.progress_bar.IProgressBar">IProgressBar</a>): <a href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/console/dynamic/progress_bar.py#L5" class="sourceLink">(source)</a></code></p><p>Constructor: <code><a href="#__init__" class="internal-link" title="orionis.console.ProgressBar.__init__">ProgressBar(total, width)</a></code></p><p><a href="classIndex.html#orionis.console.ProgressBar">View In Hierarchy</a></p>
+          <p class="class-signature"><code><span class="py-keyword">class</span> <span class="py-defname">ProgressBar</span>(<a href="orionis.console.dynamic.contracts.progress_bar.IProgressBar.html" class="internal-link" title="orionis.console.dynamic.contracts.progress_bar.IProgressBar">IProgressBar</a>): <a href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/console/dynamic/progress_bar.py#L7" class="sourceLink">(source)</a></code></p><p>Constructor: <code><a href="#__init__" class="internal-link" title="orionis.console.ProgressBar.__init__">ProgressBar(total, width)</a></code></p><p><a href="classIndex.html#orionis.console.ProgressBar">View In Hierarchy</a></p>
         </div>
 
         <div class="moduleDocstring">
-          <div><p class="undocumented">Undocumented</p></div>
+          <div><p>Manage console progress tasks and their displayed state.</p></div>
         </div>
 
         <div id="split-tables">
@@ -3323,27 +3323,27 @@
     
     <td>Instance Variable</td>
     <td><code><a href="#_flush" class="internal-link" title="orionis.console.ProgressBar._flush">_flush</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
+    <td>Flush obtained from <tt class="rst-docutils rst-literal">_stdout.flush</tt>.</td>
   </tr><tr class="instancevariable">
     
     <td>Instance Variable</td>
     <td><code><a href="#_write" class="internal-link" title="orionis.console.ProgressBar._write">_write</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
+    <td>Callable used to append bytes to the current multipart part.</td>
   </tr><tr class="instancevariable">
     
     <td>Instance Variable</td>
     <td><code><a href="#bar_width" class="internal-link" title="orionis.console.ProgressBar.bar_width">bar<wbr></wbr>_width</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
+    <td>Width of the progress bar in characters. Default is 50.</td>
   </tr><tr class="instancevariable">
     
     <td>Instance Variable</td>
     <td><code><a href="#progress" class="internal-link" title="orionis.console.ProgressBar.progress">progress</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
+    <td>Initialize progress to zero.</td>
   </tr><tr class="instancevariable">
     
     <td>Instance Variable</td>
     <td><code><a href="#total" class="internal-link" title="orionis.console.ProgressBar.total">total</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
+    <td>Maximum value representing 100% progress. Default is 100.</td>
   </tr>
 </table>
           
@@ -3365,7 +3365,7 @@
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">__init__</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">total: <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code> = 100, </span><span class="rst-sig-param">width: <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code> = 50</span>):</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/console/dynamic/progress_bar.py#L7">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/console/dynamic/progress_bar.py#L10">
       
       (source)
     </a>
@@ -3392,7 +3392,7 @@
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">__updateBar</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>):</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/console/dynamic/progress_bar.py#L37">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/console/dynamic/progress_bar.py#L45">
       
       (source)
     </a>
@@ -3422,7 +3422,7 @@ in place, overwriting the previous output.</p>
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">advance</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">increment: <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code> = 1</span>):</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/console/dynamic/progress_bar.py#L79">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/console/dynamic/progress_bar.py#L87">
       
       (source)
     </a>
@@ -3454,7 +3454,7 @@ in place, overwriting the previous output.</p>
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">finish</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>):</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/console/dynamic/progress_bar.py#L104">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/console/dynamic/progress_bar.py#L112">
       
       (source)
     </a>
@@ -3484,7 +3484,7 @@ cursor to a new line for cleaner output.</p>
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">start</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>):</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/console/dynamic/progress_bar.py#L62">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/console/dynamic/progress_bar.py#L70">
       
       (source)
     </a>
@@ -3512,7 +3512,7 @@ cursor to a new line for cleaner output.</p>
   <div class="functionHeader">
     
     <span class="py-defname">_flush</span> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/console/dynamic/progress_bar.py#L35">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/console/dynamic/progress_bar.py#L42">
       
       (source)
     </a>
@@ -3524,7 +3524,7 @@ cursor to a new line for cleaner output.</p>
   </div>
   <div class="functionBody">
     
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p>Flush obtained from <tt class="rst-docutils rst-literal">_stdout.flush</tt>.</p></div>
     
   </div>
 </div><div class="baseinstancevariable">
@@ -3539,7 +3539,7 @@ cursor to a new line for cleaner output.</p>
   <div class="functionHeader">
     
     <span class="py-defname">_write</span> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/console/dynamic/progress_bar.py#L34">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/console/dynamic/progress_bar.py#L40">
       
       (source)
     </a>
@@ -3551,7 +3551,7 @@ cursor to a new line for cleaner output.</p>
   </div>
   <div class="functionBody">
     
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p>Callable used to append bytes to the current multipart part.</p></div>
     
   </div>
 </div><div class="baseinstancevariable">
@@ -3566,7 +3566,7 @@ cursor to a new line for cleaner output.</p>
   <div class="functionHeader">
     
     <span class="py-defname">bar_width</span> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/console/dynamic/progress_bar.py#L27">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/console/dynamic/progress_bar.py#L31">
       
       (source)
     </a>
@@ -3578,7 +3578,7 @@ cursor to a new line for cleaner output.</p>
   </div>
   <div class="functionBody">
     
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p>Width of the progress bar in characters. Default is 50.</p></div>
     
   </div>
 </div><div class="baseinstancevariable">
@@ -3593,7 +3593,7 @@ cursor to a new line for cleaner output.</p>
   <div class="functionHeader">
     
     <span class="py-defname">progress</span> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/console/dynamic/progress_bar.py#L30">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/console/dynamic/progress_bar.py#L35">
       
       (source)
     </a>
@@ -3605,7 +3605,7 @@ cursor to a new line for cleaner output.</p>
   </div>
   <div class="functionBody">
     
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p>Initialize progress to zero.</p></div>
     
   </div>
 </div><div class="baseinstancevariable">
@@ -3620,7 +3620,7 @@ cursor to a new line for cleaner output.</p>
   <div class="functionHeader">
     
     <span class="py-defname">total</span> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/console/dynamic/progress_bar.py#L24">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/console/dynamic/progress_bar.py#L27">
       
       (source)
     </a>
@@ -3632,7 +3632,7 @@ cursor to a new line for cleaner output.</p>
   </div>
   <div class="functionBody">
     
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p>Maximum value representing 100% progress. Default is 100.</p></div>
     
   </div>
 </div>
@@ -3646,7 +3646,7 @@ cursor to a new line for cleaner output.</p>
   <div class="orionis-footer-inner">
     <div class="orionis-footer-copy">
       <p>API documentation for <a href="https://orionis-framework.com/" class="projecthome">Orionis</a>.</p>
-      <p class="orionis-footer-meta">Generated with <a href="https://github.com/twisted/pydoctor/">Pydoctor</a> 25.10.1.<span class="orionis-footer-build"> Built 2026-11-03 09:36:58.</span></p>
+      <p class="orionis-footer-meta">Generated with <a href="https://github.com/twisted/pydoctor/">Pydoctor</a> 25.10.1.<span class="orionis-footer-build"> Built 2026-11-03 13:00:15.</span></p>
     </div>
     <nav class="orionis-footer-links" aria-label="Additional resources">
       <a href="https://docs.orionis-framework.com">Read the guide <span aria-hidden="true">↗</span></a>

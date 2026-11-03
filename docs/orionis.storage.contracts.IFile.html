@@ -2057,7 +2057,7 @@
         </div>
 
         <div class="extrasDocstring">
-          <p class="class-signature"><code><span class="py-keyword">class</span> <span class="py-defname">IFile</span>(ABC): <a href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/storage/contracts/file.py#L12" class="sourceLink">(source)</a></code></p><p>Known subclasses: <code><a href="orionis.storage.File.html" class="internal-link">orionis.storage.File</a></code></p><p><a href="classIndex.html#orionis.storage.contracts.IFile">View In Hierarchy</a></p>
+          <p class="class-signature"><code><span class="py-keyword">class</span> <span class="py-defname">IFile</span>(ABC): <a href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/storage/contracts/file.py#L14" class="sourceLink">(source)</a></code></p><p>Known subclasses: <code><a href="orionis.storage.File.html" class="internal-link">orionis.storage.File</a></code></p><p><a href="classIndex.html#orionis.storage.contracts.IFile">View In Hierarchy</a></p>
         </div>
 
         <div class="moduleDocstring">
@@ -2069,7 +2069,7 @@ which physical medium (local, memory, S3...) backs it.</p>
         </div>
 
         <div id="split-tables">
-          <table class="children sortable" id="id2008">
+          <table class="children sortable" id="id2016">
   
   
   <tr class="method">
@@ -2181,7 +2181,7 @@ which physical medium (local, memory, S3...) backs it.</p>
     
     <td>Class Variable</td>
     <td><code><a href="#__slots__" class="internal-link" title="orionis.storage.contracts.IFile.__slots__">__slots__</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
+    <td>Declare that this class introduces no additional instance slots.</td>
   </tr>
 </table>
           
@@ -2203,7 +2203,7 @@ which physical medium (local, memory, S3...) backs it.</p>
     
     <div><span class="decorator">@abstractmethod<br /></span></div>
     <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">copyTo</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">target: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></span>) -&gt; <code><a href="orionis.storage.contracts.IFile.html" class="internal-link" title="orionis.storage.contracts.IFile">IFile</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/storage/contracts/file.py#L154">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/storage/contracts/file.py#L157">
       
       (source)
     </a>
@@ -2215,7 +2215,7 @@ which physical medium (local, memory, S3...) backs it.</p>
   </div>
   <div class="docstring functionBody">
     <div class="interfaceinfo">overridden in <code><a href="orionis.storage.File.html" class="internal-link">orionis.storage.File</a></code></div>
-    <div><p>Copy the file to <em>target</em> on the same disk.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">target:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Root-relative destination path.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.storage.contracts.IFile.html" class="internal-link" title="orionis.storage.contracts.IFile">IFile</a></code></td><td class="fieldArgDesc">A new file object pointing at the copy.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code>StorageFileNotFoundException</code></td><td>If the source file does not exist.</td></tr></table></div>
+    <div><p>Copy the file to <em>target</em> on the same disk.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">target:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Root-relative destination path.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.storage.contracts.IFile.html" class="internal-link">orionis.storage.contracts.IFile</a></code></td><td class="fieldArgDesc">A new file object pointing at the copy.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.storage.exceptions.StorageFileNotFoundException.html" class="internal-link">orionis.storage.exceptions.StorageFileNotFoundException</a></code></td><td>If the source file does not exist.</td></tr></table></div>
   </div>
 </div><div class="basemethod">
   
@@ -2230,7 +2230,7 @@ which physical medium (local, memory, S3...) backs it.</p>
     
     <div><span class="decorator">@abstractmethod<br /></span></div>
     <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">delete</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/storage/contracts/file.py#L132">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/storage/contracts/file.py#L135">
       
       (source)
     </a>
@@ -2257,7 +2257,7 @@ which physical medium (local, memory, S3...) backs it.</p>
     
     <div><span class="decorator">@abstractmethod<br /></span></div>
     <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">download</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">destination: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a> | Path</code></span>) -&gt; <code>Path</code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/storage/contracts/file.py#L336">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/storage/contracts/file.py#L339">
       
       (source)
     </a>
@@ -2269,8 +2269,8 @@ which physical medium (local, memory, S3...) backs it.</p>
   </div>
   <div class="docstring functionBody">
     <div class="interfaceinfo">overridden in <code><a href="orionis.storage.File.html" class="internal-link">orionis.storage.File</a></code></div>
-    <div><p>Copy the file to a location on the local filesystem.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">destination:</span><code>str | Path</code></td><td class="fieldArgDesc">Local target. When it points to an existing directory the
-file keeps its original name inside that directory.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code>Path</code></td><td class="fieldArgDesc">Absolute local path of the downloaded file.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code>StorageFileNotFoundException</code></td><td>If the file does not exist.</td></tr></table></div>
+    <div><p>Copy the file to a location on the local filesystem.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">destination:</span><code>str | pathlib.Path</code></td><td class="fieldArgDesc">Local target. When it points to an existing directory the
+file keeps its original name inside that directory.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/library/pathlib.html#pathlib.Path" class="intersphinx-link">pathlib.Path</a></code></td><td class="fieldArgDesc">Absolute local path of the downloaded file.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.storage.exceptions.StorageFileNotFoundException.html" class="internal-link">orionis.storage.exceptions.StorageFileNotFoundException</a></code></td><td>If the file does not exist.</td></tr></table></div>
   </div>
 </div><div class="basemethod">
   
@@ -2285,7 +2285,7 @@ file keeps its original name inside that directory.</td></tr></table><table clas
     
     <div><span class="decorator">@abstractmethod<br /></span></div>
     <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">exists</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/storage/contracts/file.py#L143">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/storage/contracts/file.py#L146">
       
       (source)
     </a>
@@ -2312,7 +2312,7 @@ file keeps its original name inside that directory.</td></tr></table><table clas
     
     <div><span class="decorator">@abstractmethod<br /></span></div>
     <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">hash</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">algorithm: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code> = <span class="rst-variable-quote">'</span><span class="rst-variable-string">sha256</span><span class="rst-variable-quote">'</span></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/storage/contracts/file.py#L358">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/storage/contracts/file.py#L361">
       
       (source)
     </a>
@@ -2324,7 +2324,7 @@ file keeps its original name inside that directory.</td></tr></table><table clas
   </div>
   <div class="docstring functionBody">
     <div class="interfaceinfo">overridden in <code><a href="orionis.storage.File.html" class="internal-link">orionis.storage.File</a></code></div>
-    <div><p>Compute the content hash of the file.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">algorithm:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Any algorithm name accepted by <code><a href="https://docs.python.org/3/library/hashlib.html#hashlib.new" class="intersphinx-link">hashlib.new</a></code>.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Hexadecimal digest of the file contents.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code>StorageFileNotFoundException</code></td><td>If the file does not exist.</td></tr></table></div>
+    <div><p>Compute the content hash of the file.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">algorithm:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Any algorithm name accepted by <tt class="rst-docutils rst-literal">hashlib.new</tt>.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Hexadecimal digest of the file contents.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.storage.exceptions.StorageFileNotFoundException.html" class="internal-link">orionis.storage.exceptions.StorageFileNotFoundException</a></code></td><td>If the file does not exist.</td></tr></table></div>
   </div>
 </div><div class="basemethod">
   
@@ -2339,7 +2339,7 @@ file keeps its original name inside that directory.</td></tr></table><table clas
     
     <div><span class="decorator">@abstractmethod<br /></span></div>
     <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">info</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>) -&gt; <code>FileInfo</code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/storage/contracts/file.py#L379">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/storage/contracts/file.py#L382">
       
       (source)
     </a>
@@ -2351,8 +2351,8 @@ file keeps its original name inside that directory.</td></tr></table><table clas
   </div>
   <div class="docstring functionBody">
     <div class="interfaceinfo">overridden in <code><a href="orionis.storage.File.html" class="internal-link">orionis.storage.File</a></code></div>
-    <div><p>Collect a metadata snapshot for the file.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.storage.entities.FileInfo.html" class="internal-link" title="orionis.storage.entities.FileInfo">FileInfo</a></code></td><td class="fieldArgDesc">Immutable entity with size, MIME type, timestamps, hashes,
-visibility, and URL when available.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code>StorageFileNotFoundException</code></td><td>If the file does not exist.</td></tr></table></div>
+    <div><p>Collect a metadata snapshot for the file.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.storage.entities.FileInfo.html" class="internal-link">orionis.storage.entities.FileInfo</a></code></td><td class="fieldArgDesc">Immutable entity with size, MIME type, timestamps, hashes,
+visibility, and URL when available.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.storage.exceptions.StorageFileNotFoundException.html" class="internal-link">orionis.storage.exceptions.StorageFileNotFoundException</a></code></td><td>If the file does not exist.</td></tr></table></div>
   </div>
 </div><div class="basemethod">
   
@@ -2367,7 +2367,7 @@ visibility, and URL when available.</td></tr></table><table class="fieldTable"><
     
     <div><span class="decorator">@abstractmethod<br /></span></div>
     <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">lastModified</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>) -&gt; <code><a href="https://docs.python.org/3/library/datetime.html#module-datetime" class="intersphinx-link">datetime</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/storage/contracts/file.py#L246">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/storage/contracts/file.py#L249">
       
       (source)
     </a>
@@ -2379,7 +2379,7 @@ visibility, and URL when available.</td></tr></table><table class="fieldTable"><
   </div>
   <div class="docstring functionBody">
     <div class="interfaceinfo">overridden in <code><a href="orionis.storage.File.html" class="internal-link">orionis.storage.File</a></code></div>
-    <div><p>Return the last-modification timestamp of the file.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/library/datetime.html#module-datetime" class="intersphinx-link">datetime</a></code></td><td class="fieldArgDesc">Timezone-aware modification timestamp (UTC).</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code>StorageFileNotFoundException</code></td><td>If the file does not exist.</td></tr></table></div>
+    <div><p>Return the last-modification timestamp of the file.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/library/datetime.html#datetime.datetime" class="intersphinx-link">datetime.datetime</a></code></td><td class="fieldArgDesc">Timezone-aware modification timestamp (UTC).</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.storage.exceptions.StorageFileNotFoundException.html" class="internal-link">orionis.storage.exceptions.StorageFileNotFoundException</a></code></td><td>If the file does not exist.</td></tr></table></div>
   </div>
 </div><div class="basemethod">
   
@@ -2394,7 +2394,7 @@ visibility, and URL when available.</td></tr></table><table class="fieldTable"><
     
     <div><span class="decorator">@abstractmethod<br /></span></div>
     <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">mimeType</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a> | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/storage/contracts/file.py#L235">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/storage/contracts/file.py#L238">
       
       (source)
     </a>
@@ -2421,7 +2421,7 @@ visibility, and URL when available.</td></tr></table><table class="fieldTable"><
     
     <div><span class="decorator">@abstractmethod<br /></span></div>
     <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">moveTo</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">target: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></span>) -&gt; <code><a href="orionis.storage.contracts.IFile.html" class="internal-link" title="orionis.storage.contracts.IFile">IFile</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/storage/contracts/file.py#L175">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/storage/contracts/file.py#L178">
       
       (source)
     </a>
@@ -2433,7 +2433,7 @@ visibility, and URL when available.</td></tr></table><table class="fieldTable"><
   </div>
   <div class="docstring functionBody">
     <div class="interfaceinfo">overridden in <code><a href="orionis.storage.File.html" class="internal-link">orionis.storage.File</a></code></div>
-    <div><p>Move the file to <em>target</em> on the same disk.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">target:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Root-relative destination path.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.storage.contracts.IFile.html" class="internal-link" title="orionis.storage.contracts.IFile">IFile</a></code></td><td class="fieldArgDesc">A new file object pointing at the moved file.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code>StorageFileNotFoundException</code></td><td>If the source file does not exist.</td></tr></table></div>
+    <div><p>Move the file to <em>target</em> on the same disk.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">target:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Root-relative destination path.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.storage.contracts.IFile.html" class="internal-link">orionis.storage.contracts.IFile</a></code></td><td class="fieldArgDesc">A new file object pointing at the moved file.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.storage.exceptions.StorageFileNotFoundException.html" class="internal-link">orionis.storage.exceptions.StorageFileNotFoundException</a></code></td><td>If the source file does not exist.</td></tr></table></div>
   </div>
 </div><div class="basemethod">
   
@@ -2448,7 +2448,7 @@ visibility, and URL when available.</td></tr></table><table class="fieldTable"><
     
     <div><span class="decorator">@abstractmethod<br /></span></div>
     <span class="py-keyword">def</span>&#160;<span class="py-defname">open</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">mode: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code> = <span class="rst-variable-quote">'</span><span class="rst-variable-string">rb</span><span class="rst-variable-quote">'</span></span>) -&gt; <code><a href="orionis.storage.contracts.IStorageStream.html" class="internal-link" title="orionis.storage.contracts.IStorageStream">IStorageStream</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/storage/contracts/file.py#L115">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/storage/contracts/file.py#L118">
       
       (source)
     </a>
@@ -2461,7 +2461,7 @@ visibility, and URL when available.</td></tr></table><table class="fieldTable"><
   <div class="docstring functionBody">
     <div class="interfaceinfo">overridden in <code><a href="orionis.storage.File.html" class="internal-link">orionis.storage.File</a></code></div>
     <div><p>Open an asynchronous binary stream over the file.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">mode:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Binary mode: <tt class="rst-docutils rst-literal">'rb'</tt>, <tt class="rst-docutils rst-literal">'wb'</tt>, <tt class="rst-docutils rst-literal">'ab'</tt>, <tt class="rst-docutils rst-literal">'rb+'</tt>,
-<tt class="rst-docutils rst-literal">'wb+'</tt>, or <tt class="rst-docutils rst-literal">'ab+'</tt>.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.storage.contracts.IStorageStream.html" class="internal-link" title="orionis.storage.contracts.IStorageStream">IStorageStream</a></code></td><td class="fieldArgDesc">Lazily opened stream; use it as an async context manager.</td></tr></table></div>
+<tt class="rst-docutils rst-literal">'wb+'</tt>, or <tt class="rst-docutils rst-literal">'ab+'</tt>.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.storage.contracts.IStorageStream.html" class="internal-link">orionis.storage.contracts.IStorageStream</a></code></td><td class="fieldArgDesc">Lazily opened stream; use it as an async context manager.</td></tr></table></div>
   </div>
 </div><div class="basemethod">
   
@@ -2476,7 +2476,7 @@ visibility, and URL when available.</td></tr></table><table class="fieldTable"><
     
     <div><span class="decorator">@abstractmethod<br /></span></div>
     <span class="py-keyword">def</span>&#160;<span class="py-defname">path</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/storage/contracts/file.py#L23">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/storage/contracts/file.py#L26">
       
       (source)
     </a>
@@ -2503,7 +2503,7 @@ visibility, and URL when available.</td></tr></table><table class="fieldTable"><
     
     <div><span class="decorator">@abstractmethod<br /></span></div>
     <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">read</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/stdtypes.html#bytes" class="intersphinx-link">bytes</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/storage/contracts/file.py#L34">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/storage/contracts/file.py#L37">
       
       (source)
     </a>
@@ -2515,7 +2515,7 @@ visibility, and URL when available.</td></tr></table><table class="fieldTable"><
   </div>
   <div class="docstring functionBody">
     <div class="interfaceinfo">overridden in <code><a href="orionis.storage.File.html" class="internal-link">orionis.storage.File</a></code></div>
-    <div><p>Read the full contents of the file.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/stdtypes.html#bytes" class="intersphinx-link">bytes</a></code></td><td class="fieldArgDesc">Complete file contents.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code>StorageFileNotFoundException</code></td><td>If the file does not exist.</td></tr></table></div>
+    <div><p>Read the full contents of the file.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/stdtypes.html#bytes" class="intersphinx-link">bytes</a></code></td><td class="fieldArgDesc">Complete file contents.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.storage.exceptions.StorageFileNotFoundException.html" class="internal-link">orionis.storage.exceptions.StorageFileNotFoundException</a></code></td><td>If the file does not exist.</td></tr></table></div>
   </div>
 </div><div class="basemethod">
   
@@ -2530,7 +2530,7 @@ visibility, and URL when available.</td></tr></table><table class="fieldTable"><
     
     <div><span class="decorator">@abstractmethod<br /></span></div>
     <span class="py-keyword">def</span>&#160;<span class="py-defname">readStream</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">chunk_size: <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code> = 65536</span>) -&gt; <code>AsyncIterator[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#bytes" class="intersphinx-link">bytes</a>]</code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/storage/contracts/file.py#L50">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/storage/contracts/file.py#L53">
       
       (source)
     </a>
@@ -2542,7 +2542,7 @@ visibility, and URL when available.</td></tr></table><table class="fieldTable"><
   </div>
   <div class="docstring functionBody">
     <div class="interfaceinfo">overridden in <code><a href="orionis.storage.File.html" class="internal-link">orionis.storage.File</a></code></div>
-    <div><p>Stream the contents of the file in chunks.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">chunk<wbr></wbr>_size:</span><code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code></td><td class="fieldArgDesc">Maximum number of bytes per yielded chunk.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code>AsyncIterator[<a href="https://docs.python.org/3/builtins/stdtypes.html#bytes" class="intersphinx-link">bytes</a>]</code></td><td class="fieldArgDesc">Asynchronous iterator yielding consecutive chunks.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code>StorageFileNotFoundException</code></td><td>If the file does not exist.</td></tr></table></div>
+    <div><p>Stream the contents of the file in chunks.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">chunk<wbr></wbr>_size:</span><code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code></td><td class="fieldArgDesc">Maximum number of bytes per yielded chunk.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/library/collections.abc.html#collections.abc.AsyncIterator" class="intersphinx-link">collections.abc.AsyncIterator</a>[<a href="https://docs.python.org/3/builtins/stdtypes.html#bytes" class="intersphinx-link">bytes</a>]</code></td><td class="fieldArgDesc">Asynchronous iterator yielding consecutive chunks.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.storage.exceptions.StorageFileNotFoundException.html" class="internal-link">orionis.storage.exceptions.StorageFileNotFoundException</a></code></td><td>If the file does not exist.</td></tr></table></div>
   </div>
 </div><div class="basemethod">
   
@@ -2557,7 +2557,7 @@ visibility, and URL when available.</td></tr></table><table class="fieldTable"><
     
     <div><span class="decorator">@abstractmethod<br /></span></div>
     <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">rename</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">name: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></span>) -&gt; <code><a href="orionis.storage.contracts.IFile.html" class="internal-link" title="orionis.storage.contracts.IFile">IFile</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/storage/contracts/file.py#L196">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/storage/contracts/file.py#L199">
       
       (source)
     </a>
@@ -2569,7 +2569,7 @@ visibility, and URL when available.</td></tr></table><table class="fieldTable"><
   </div>
   <div class="docstring functionBody">
     <div class="interfaceinfo">overridden in <code><a href="orionis.storage.File.html" class="internal-link">orionis.storage.File</a></code></div>
-    <div><p>Rename the file within its current directory.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">name:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">New file name without any directory separator.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.storage.contracts.IFile.html" class="internal-link" title="orionis.storage.contracts.IFile">IFile</a></code></td><td class="fieldArgDesc">A new file object pointing at the renamed file.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code>StoragePathException</code></td><td>If <em>name</em> is empty or contains a directory separator.</td></tr><tr><td class="fieldArgContainer"><code>StorageFileNotFoundException</code></td><td>If the source file does not exist.</td></tr></table></div>
+    <div><p>Rename the file within its current directory.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">name:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">New file name without any directory separator.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.storage.contracts.IFile.html" class="internal-link">orionis.storage.contracts.IFile</a></code></td><td class="fieldArgDesc">A new file object pointing at the renamed file.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.storage.exceptions.StoragePathException.html" class="internal-link">orionis.storage.exceptions.StoragePathException</a></code></td><td>If <em>name</em> is empty or contains a directory separator.</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.storage.exceptions.StorageFileNotFoundException.html" class="internal-link">orionis.storage.exceptions.StorageFileNotFoundException</a></code></td><td>If the source file does not exist.</td></tr></table></div>
   </div>
 </div><div class="basemethod">
   
@@ -2584,7 +2584,7 @@ visibility, and URL when available.</td></tr></table><table class="fieldTable"><
     
     <div><span class="decorator">@abstractmethod<br /></span></div>
     <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">setVisibility</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">visibility: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></span>) -&gt; <code><a href="orionis.storage.contracts.IFile.html" class="internal-link" title="orionis.storage.contracts.IFile">IFile</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/storage/contracts/file.py#L315">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/storage/contracts/file.py#L318">
       
       (source)
     </a>
@@ -2596,7 +2596,7 @@ visibility, and URL when available.</td></tr></table><table class="fieldTable"><
   </div>
   <div class="docstring functionBody">
     <div class="interfaceinfo">overridden in <code><a href="orionis.storage.File.html" class="internal-link">orionis.storage.File</a></code></div>
-    <div><p>Change the visibility of the file.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">visibility:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Target visibility (<tt class="rst-docutils rst-literal">'public'</tt> or <tt class="rst-docutils rst-literal">'private'</tt>).</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.storage.contracts.IFile.html" class="internal-link" title="orionis.storage.contracts.IFile">IFile</a></code></td><td class="fieldArgDesc">The file itself, enabling fluent chaining.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code>StorageFileNotFoundException</code></td><td>If the file does not exist.</td></tr></table></div>
+    <div><p>Change the visibility of the file.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">visibility:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Target visibility (<tt class="rst-docutils rst-literal">'public'</tt> or <tt class="rst-docutils rst-literal">'private'</tt>).</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.storage.contracts.IFile.html" class="internal-link">orionis.storage.contracts.IFile</a></code></td><td class="fieldArgDesc">The file itself, enabling fluent chaining.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.storage.exceptions.StorageFileNotFoundException.html" class="internal-link">orionis.storage.exceptions.StorageFileNotFoundException</a></code></td><td>If the file does not exist.</td></tr></table></div>
   </div>
 </div><div class="basemethod">
   
@@ -2611,7 +2611,7 @@ visibility, and URL when available.</td></tr></table><table class="fieldTable"><
     
     <div><span class="decorator">@abstractmethod<br /></span></div>
     <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">size</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/storage/contracts/file.py#L219">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/storage/contracts/file.py#L222">
       
       (source)
     </a>
@@ -2623,7 +2623,7 @@ visibility, and URL when available.</td></tr></table><table class="fieldTable"><
   </div>
   <div class="docstring functionBody">
     <div class="interfaceinfo">overridden in <code><a href="orionis.storage.File.html" class="internal-link">orionis.storage.File</a></code></div>
-    <div><p>Return the size of the file in bytes.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code></td><td class="fieldArgDesc">File size in bytes.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code>StorageFileNotFoundException</code></td><td>If the file does not exist.</td></tr></table></div>
+    <div><p>Return the size of the file in bytes.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code></td><td class="fieldArgDesc">File size in bytes.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.storage.exceptions.StorageFileNotFoundException.html" class="internal-link">orionis.storage.exceptions.StorageFileNotFoundException</a></code></td><td>If the file does not exist.</td></tr></table></div>
   </div>
 </div><div class="basemethod">
   
@@ -2638,7 +2638,7 @@ visibility, and URL when available.</td></tr></table><table class="fieldTable"><
     
     <div><span class="decorator">@abstractmethod<br /></span></div>
     <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">temporaryUrl</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">expires_in: <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code> = 3600</span>) -&gt; <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/storage/contracts/file.py#L278">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/storage/contracts/file.py#L281">
       
       (source)
     </a>
@@ -2650,7 +2650,7 @@ visibility, and URL when available.</td></tr></table><table class="fieldTable"><
   </div>
   <div class="docstring functionBody">
     <div class="interfaceinfo">overridden in <code><a href="orionis.storage.File.html" class="internal-link">orionis.storage.File</a></code></div>
-    <div><p>Build a signed, time-limited URL for the file.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">expires<wbr></wbr>_in:</span><code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code></td><td class="fieldArgDesc">Lifetime of the URL in seconds.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Temporary URL valid for <em>expires_in</em> seconds.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code>UnsupportedStorageOperationException</code></td><td>If the driver does not support temporary URLs.</td></tr></table></div>
+    <div><p>Build a signed, time-limited URL for the file.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">expires<wbr></wbr>_in:</span><code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code></td><td class="fieldArgDesc">Lifetime of the URL in seconds.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Temporary URL valid for <em>expires_in</em> seconds.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.storage.exceptions.UnsupportedStorageOperationException.html" class="internal-link">orionis.storage.exceptions.UnsupportedStorageOperationException</a></code></td><td>If the driver does not support temporary URLs.</td></tr></table></div>
   </div>
 </div><div class="basemethod">
   
@@ -2665,7 +2665,7 @@ visibility, and URL when available.</td></tr></table><table class="fieldTable"><
     
     <div><span class="decorator">@abstractmethod<br /></span></div>
     <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">url</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/storage/contracts/file.py#L262">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/storage/contracts/file.py#L265">
       
       (source)
     </a>
@@ -2677,7 +2677,7 @@ visibility, and URL when available.</td></tr></table><table class="fieldTable"><
   </div>
   <div class="docstring functionBody">
     <div class="interfaceinfo">overridden in <code><a href="orionis.storage.File.html" class="internal-link">orionis.storage.File</a></code></div>
-    <div><p>Build the public URL of the file.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Publicly accessible URL.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code>UnsupportedStorageOperationException</code></td><td>If the disk does not expose public URLs.</td></tr></table></div>
+    <div><p>Build the public URL of the file.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Publicly accessible URL.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.storage.exceptions.UnsupportedStorageOperationException.html" class="internal-link">orionis.storage.exceptions.UnsupportedStorageOperationException</a></code></td><td>If the disk does not expose public URLs.</td></tr></table></div>
   </div>
 </div><div class="basemethod">
   
@@ -2692,7 +2692,7 @@ visibility, and URL when available.</td></tr></table><table class="fieldTable"><
     
     <div><span class="decorator">@abstractmethod<br /></span></div>
     <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">visibility</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/storage/contracts/file.py#L299">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/storage/contracts/file.py#L302">
       
       (source)
     </a>
@@ -2704,7 +2704,7 @@ visibility, and URL when available.</td></tr></table><table class="fieldTable"><
   </div>
   <div class="docstring functionBody">
     <div class="interfaceinfo">overridden in <code><a href="orionis.storage.File.html" class="internal-link">orionis.storage.File</a></code></div>
-    <div><p>Return the visibility of the file.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc"><tt class="rst-docutils rst-literal">'public'</tt> or <tt class="rst-docutils rst-literal">'private'</tt>.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code>StorageFileNotFoundException</code></td><td>If the file does not exist.</td></tr></table></div>
+    <div><p>Return the visibility of the file.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc"><tt class="rst-docutils rst-literal">'public'</tt> or <tt class="rst-docutils rst-literal">'private'</tt>.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.storage.exceptions.StorageFileNotFoundException.html" class="internal-link">orionis.storage.exceptions.StorageFileNotFoundException</a></code></td><td>If the file does not exist.</td></tr></table></div>
   </div>
 </div><div class="basemethod">
   
@@ -2719,7 +2719,7 @@ visibility, and URL when available.</td></tr></table><table class="fieldTable"><
     
     <div><span class="decorator">@abstractmethod<br /></span></div>
     <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">write</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">contents: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#bytes" class="intersphinx-link">bytes</a> | <a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code>, </span><span class="rst-sig-param">visibility: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a> | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code> = <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></span>) -&gt; <code><a href="orionis.storage.contracts.IFile.html" class="internal-link" title="orionis.storage.contracts.IFile">IFile</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/storage/contracts/file.py#L71">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/storage/contracts/file.py#L74">
       
       (source)
     </a>
@@ -2731,7 +2731,7 @@ visibility, and URL when available.</td></tr></table><table class="fieldTable"><
   </div>
   <div class="docstring functionBody">
     <div class="interfaceinfo">overridden in <code><a href="orionis.storage.File.html" class="internal-link">orionis.storage.File</a></code></div>
-    <div><p>Write <em>contents</em> to the file, replacing existing data.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">contents:</span><code>bytes | str</code></td><td class="fieldArgDesc">Data to persist. Strings are encoded as UTF-8.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">visibility:</span><code>str | None</code></td><td class="fieldArgDesc">Visibility to apply, or <tt class="rst-docutils rst-literal">None</tt> for the medium default.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.storage.contracts.IFile.html" class="internal-link" title="orionis.storage.contracts.IFile">IFile</a></code></td><td class="fieldArgDesc">The file itself, enabling fluent chaining.</td></tr></table></div>
+    <div><p>Write <em>contents</em> to the file, replacing existing data.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">contents:</span><code>bytes | str</code></td><td class="fieldArgDesc">Data to persist. Strings are encoded as UTF-8.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">visibility:</span><code>str | None</code></td><td class="fieldArgDesc">Visibility to apply, or <tt class="rst-docutils rst-literal">None</tt> for the medium default.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.storage.contracts.IFile.html" class="internal-link">orionis.storage.contracts.IFile</a></code></td><td class="fieldArgDesc">The file itself, enabling fluent chaining.</td></tr></table></div>
   </div>
 </div><div class="basemethod">
   
@@ -2746,7 +2746,7 @@ visibility, and URL when available.</td></tr></table><table class="fieldTable"><
     
     <div><span class="decorator">@abstractmethod<br /></span></div>
     <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">writeStream</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">stream: <code>AsyncIterable[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#bytes" class="intersphinx-link">bytes</a>]</code>, </span><span class="rst-sig-param">visibility: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a> | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code> = <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></span>) -&gt; <code><a href="orionis.storage.contracts.IFile.html" class="internal-link" title="orionis.storage.contracts.IFile">IFile</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/storage/contracts/file.py#L93">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/storage/contracts/file.py#L96">
       
       (source)
     </a>
@@ -2758,7 +2758,7 @@ visibility, and URL when available.</td></tr></table><table class="fieldTable"><
   </div>
   <div class="docstring functionBody">
     <div class="interfaceinfo">overridden in <code><a href="orionis.storage.File.html" class="internal-link">orionis.storage.File</a></code></div>
-    <div><p>Write the chunks produced by <em>stream</em> to the file.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">stream:</span><code>AsyncIterable[<a href="https://docs.python.org/3/builtins/stdtypes.html#bytes" class="intersphinx-link">bytes</a>]</code></td><td class="fieldArgDesc">Asynchronous byte-chunk producer.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">visibility:</span><code>str | None</code></td><td class="fieldArgDesc">Visibility to apply, or <tt class="rst-docutils rst-literal">None</tt> for the medium default.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.storage.contracts.IFile.html" class="internal-link" title="orionis.storage.contracts.IFile">IFile</a></code></td><td class="fieldArgDesc">The file itself, enabling fluent chaining.</td></tr></table></div>
+    <div><p>Write the chunks produced by <em>stream</em> to the file.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">stream:</span><code><a href="https://docs.python.org/3/library/collections.abc.html#collections.abc.AsyncIterable" class="intersphinx-link">collections.abc.AsyncIterable</a>[<a href="https://docs.python.org/3/builtins/stdtypes.html#bytes" class="intersphinx-link">bytes</a>]</code></td><td class="fieldArgDesc">Asynchronous byte-chunk producer.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">visibility:</span><code>str | None</code></td><td class="fieldArgDesc">Visibility to apply, or <tt class="rst-docutils rst-literal">None</tt> for the medium default.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.storage.contracts.IFile.html" class="internal-link">orionis.storage.contracts.IFile</a></code></td><td class="fieldArgDesc">The file itself, enabling fluent chaining.</td></tr></table></div>
   </div>
 </div><div class="baseclassvariable">
   
@@ -2772,7 +2772,7 @@ visibility, and URL when available.</td></tr></table><table class="fieldTable"><
   <div class="functionHeader">
     
     <span class="py-defname">__slots__</span>: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" class="intersphinx-link">tuple</a></code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/storage/contracts/file.py#L21">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/storage/contracts/file.py#L23">
       
       (source)
     </a>
@@ -2784,7 +2784,7 @@ visibility, and URL when available.</td></tr></table><table class="fieldTable"><
   </div>
   <div class="functionBody">
     <div class="interfaceinfo">overridden in <code><a href="orionis.storage.File.html" class="internal-link">orionis.storage.File</a></code></div>
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p>Declare that this class introduces no additional instance slots.</p></div>
     
   </div>
 </div>
@@ -2798,7 +2798,7 @@ visibility, and URL when available.</td></tr></table><table class="fieldTable"><
   <div class="orionis-footer-inner">
     <div class="orionis-footer-copy">
       <p>API documentation for <a href="https://orionis-framework.com/" class="projecthome">Orionis</a>.</p>
-      <p class="orionis-footer-meta">Generated with <a href="https://github.com/twisted/pydoctor/">Pydoctor</a> 25.10.1.<span class="orionis-footer-build"> Built 2026-11-03 09:36:58.</span></p>
+      <p class="orionis-footer-meta">Generated with <a href="https://github.com/twisted/pydoctor/">Pydoctor</a> 25.10.1.<span class="orionis-footer-build"> Built 2026-11-03 13:00:15.</span></p>
     </div>
     <nav class="orionis-footer-links" aria-label="Additional resources">
       <a href="https://docs.orionis-framework.com">Read the guide <span aria-hidden="true">↗</span></a>

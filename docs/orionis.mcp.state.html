@@ -667,6 +667,16 @@
             </div>
         
 
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.mcp.dispatcher.html#TransportName" class="internal-link" title="orionis.mcp.dispatcher.TransportName"><wbr></wbr>Transport<wbr></wbr>Name</a></code>
+            </div>
+        
+
     </li>
 </ul> 
 
@@ -1422,7 +1432,7 @@
                     
                 </label>
 
-                <code><a href="orionis.mcp.server.html" class="internal-link" title="orionis.mcp.server">server</a></code>
+                <code><a href="orionis.mcp.server.package.html" class="internal-link" title="orionis.mcp.server">server</a></code>
 
                 <div class="expandableContent">
                     <div>
@@ -3886,15 +3896,15 @@
         </div>
 
         <div class="extrasDocstring">
-          <a href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/mcp/state.py" class="sourceLink">(source)</a>
+          <a href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/mcp/state.py" class="sourceLink">(source)</a>
         </div>
 
         <div class="moduleDocstring">
-          <div><p class="undocumented">Undocumented</p></div>
+          <div><p>Seal state across workers sharing an application key and GCM cipher.</p></div>
         </div>
 
         <div id="split-tables">
-          <table class="children sortable" id="id1484">
+          <table class="children sortable" id="id1488">
   
   
   <tr class="class">
@@ -3916,12 +3926,12 @@
     
     <td>Constant</td>
     <td><code><a href="#_INVALID_STATE" class="internal-link" title="orionis.mcp.state._INVALID_STATE">_INVALID<wbr></wbr>_STATE</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
+    <td><tt class="rst-docutils rst-literal">Invalid request state</tt>.</td>
   </tr><tr class="constant">
     
     <td>Constant</td>
     <td><code><a href="#_STATE_DECODER" class="internal-link" title="orionis.mcp.state._STATE_DECODER">_STATE<wbr></wbr>_DECODER</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
+    <td>State decoder used by <tt class="rst-docutils rst-literal">state</tt>.</td>
   </tr>
 </table>
           
@@ -3943,7 +3953,7 @@
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">_fingerprint</span><span class="function-signature">(<span class="rst-sig-param">request: <code>McpRequest</code></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/mcp/state.py#L111">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/mcp/state.py#L122">
       
       (source)
     </a>
@@ -3955,7 +3965,7 @@
   </div>
   <div class="docstring functionBody">
     
-    <div><p>Bind state to stable request parameters, excluding retry and trace fields.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">request:</span><code><a href="orionis.mcp.McpRequest.html" class="internal-link" title="orionis.mcp.McpRequest">McpRequest</a></code></td><td class="fieldArgDesc">Current request and its trusted execution context.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Result of the operation described above.</td></tr></table></div>
+    <div><p>Bind state to stable request parameters, excluding retry and trace fields.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">request:</span><code><a href="orionis.mcp.McpRequest.html" class="internal-link">orionis.mcp.McpRequest</a></code></td><td class="fieldArgDesc">Current request and its trusted execution context.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Result of the operation described above.</td></tr></table></div>
   </div>
 </div><div class="basefunction">
   
@@ -3970,7 +3980,7 @@
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">_principal</span><span class="function-signature">(<span class="rst-sig-param">request: <code>McpRequest</code></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/mcp/state.py#L138">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/mcp/state.py#L149">
       
       (source)
     </a>
@@ -3982,7 +3992,7 @@
   </div>
   <div class="docstring functionBody">
     
-    <div><p>Bind native guard, identity type, identifier and credential without coercion.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">request:</span><code><a href="orionis.mcp.McpRequest.html" class="internal-link" title="orionis.mcp.McpRequest">McpRequest</a></code></td><td class="fieldArgDesc">Current request and its trusted execution context.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Result of the operation described above.</td></tr></table></div>
+    <div><p>Bind native guard, identity type, identifier and credential without coercion.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">request:</span><code><a href="orionis.mcp.McpRequest.html" class="internal-link">orionis.mcp.McpRequest</a></code></td><td class="fieldArgDesc">Current request and its trusted execution context.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Result of the operation described above.</td></tr></table></div>
   </div>
 </div><div class="baseconstant">
   
@@ -3996,7 +4006,7 @@
   <div class="functionHeader">
     
     <span class="py-defname">_INVALID_STATE</span>: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/mcp/state.py#L23">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/mcp/state.py#L31">
       
       (source)
     </a>
@@ -4008,7 +4018,7 @@
   </div>
   <div class="functionBody">
     
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p><tt class="rst-docutils rst-literal">Invalid request state</tt>.</p></div>
     <table class="valueTable"><tr class="fieldStart"><td class="fieldName">Value</td></tr><tr><td><pre class="constant-value"><code><span class="rst-variable-quote">'</span><span class="rst-variable-string">Invalid request state</span><span class="rst-variable-quote">'</span></code></pre></td></tr></table>
   </div>
 </div><div class="baseconstant">
@@ -4023,7 +4033,7 @@
   <div class="functionHeader">
     
     <span class="py-defname">_STATE_DECODER</span> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/mcp/state.py#L22">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/mcp/state.py#L29">
       
       (source)
     </a>
@@ -4035,7 +4045,7 @@
   </div>
   <div class="functionBody">
     
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p>State decoder used by <tt class="rst-docutils rst-literal">state</tt>.</p></div>
     <table class="valueTable"><tr class="fieldStart"><td class="fieldName">Value</td></tr><tr><td><pre class="constant-value"><code>msgspec.json.Decoder(<wbr></wbr><a href="orionis.mcp.state._State.html" class="internal-link" title="orionis.mcp.state._State">_State</a>)</code></pre></td></tr></table>
   </div>
 </div>
@@ -4049,7 +4059,7 @@
   <div class="orionis-footer-inner">
     <div class="orionis-footer-copy">
       <p>API documentation for <a href="https://orionis-framework.com/" class="projecthome">Orionis</a>.</p>
-      <p class="orionis-footer-meta">Generated with <a href="https://github.com/twisted/pydoctor/">Pydoctor</a> 25.10.1.<span class="orionis-footer-build"> Built 2026-11-03 09:36:58.</span></p>
+      <p class="orionis-footer-meta">Generated with <a href="https://github.com/twisted/pydoctor/">Pydoctor</a> 25.10.1.<span class="orionis-footer-build"> Built 2026-11-03 13:00:15.</span></p>
     </div>
     <nav class="orionis-footer-links" aria-label="Additional resources">
       <a href="https://docs.orionis-framework.com">Read the guide <span aria-hidden="true">↗</span></a>

@@ -463,7 +463,7 @@
         </div>
 
         <div class="extrasDocstring">
-          <p class="class-signature"><code><span class="py-keyword">class</span> <span class="py-defname">ScheduleWorkCommand</span>(BaseCommand): <a href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/console/commands/schedule/work.py#L23" class="sourceLink">(source)</a></code></p><p><a href="classIndex.html#orionis.console.commands.schedule.work.ScheduleWorkCommand">View In Hierarchy</a></p>
+          <p class="class-signature"><code><span class="py-keyword">class</span> <span class="py-defname">ScheduleWorkCommand</span>(BaseCommand): <a href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/console/commands/schedule/work.py#L29" class="sourceLink">(source)</a></code></p><p><a href="classIndex.html#orionis.console.commands.schedule.work.ScheduleWorkCommand">View In Hierarchy</a></p>
         </div>
 
         <div class="moduleDocstring">
@@ -498,17 +498,17 @@
     
     <td>Class Variable</td>
     <td><code><a href="#description" class="internal-link" title="orionis.console.commands.schedule.work.ScheduleWorkCommand.description">description</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
+    <td>Command description.</td>
   </tr><tr class="classvariable">
     
     <td>Class Variable</td>
     <td><code><a href="#signature" class="internal-link" title="orionis.console.commands.schedule.work.ScheduleWorkCommand.signature">signature</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
+    <td>Command signature and description.</td>
   </tr><tr class="classvariable">
     
     <td>Class Variable</td>
     <td><code><a href="#timestamps" class="internal-link" title="orionis.console.commands.schedule.work.ScheduleWorkCommand.timestamps">timestamps</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
+    <td>Indicates whether timestamps will be shown in the command output.</td>
   </tr>
 </table>
           
@@ -530,7 +530,7 @@
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">__registerListeners</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">scheduler: <code><a href="https://docs.python.org/3/builtins/functions.html#object" class="intersphinx-link">object</a></code>, </span><span class="rst-sig-param">schedule_service: <code>ISchedule</code></span>):</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/console/commands/schedule/work.py#L99">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/console/commands/schedule/work.py#L108">
       
       (source)
     </a>
@@ -542,7 +542,7 @@
   </div>
   <div class="docstring functionBody">
     
-    <div><p>Register the application's available scheduler event callbacks.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">scheduler:</span><code><a href="https://docs.python.org/3/builtins/functions.html#object" class="intersphinx-link">object</a></code></td><td class="fieldArgDesc">Application scheduler that may define event callbacks.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">schedule<wbr></wbr>_service:</span><code><a href="orionis.console.contracts.ISchedule.html" class="internal-link" title="orionis.console.contracts.ISchedule">ISchedule</a></code></td><td class="fieldArgDesc">Schedule service receiving the callbacks.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">The callbacks are registered on the schedule service.</td></tr></table></div>
+    <div><p>Register the application's available scheduler event callbacks.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">scheduler:</span><code><a href="https://docs.python.org/3/builtins/functions.html#object" class="intersphinx-link">object</a></code></td><td class="fieldArgDesc">Application scheduler that may define event callbacks.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">schedule<wbr></wbr>_service:</span><code><a href="orionis.console.contracts.ISchedule.html" class="internal-link">orionis.console.contracts.ISchedule</a></code></td><td class="fieldArgDesc">Schedule service receiving the callbacks.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">The callbacks are registered on the schedule service.</td></tr></table></div>
   </div>
 </div><div class="basemethod">
   
@@ -557,7 +557,7 @@
     
     
     <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">__shutdownSchedule</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">schedule_service: <code>ISchedule</code></span>):</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/console/commands/schedule/work.py#L82">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/console/commands/schedule/work.py#L91">
       
       (source)
     </a>
@@ -569,7 +569,7 @@
   </div>
   <div class="docstring functionBody">
     
-    <div><p>Request graceful shutdown and wait until it completes.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">schedule<wbr></wbr>_service:</span><code><a href="orionis.console.contracts.ISchedule.html" class="internal-link" title="orionis.console.contracts.ISchedule">ISchedule</a></code></td><td class="fieldArgDesc">Scheduler service to shut down.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">The scheduler service has completed its shutdown sequence.</td></tr></table></div>
+    <div><p>Request graceful shutdown and wait until it completes.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">schedule<wbr></wbr>_service:</span><code><a href="orionis.console.contracts.ISchedule.html" class="internal-link">orionis.console.contracts.ISchedule</a></code></td><td class="fieldArgDesc">Scheduler service to shut down.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">The scheduler service has completed its shutdown sequence.</td></tr></table></div>
   </div>
 </div><div class="basemethod">
   
@@ -584,7 +584,7 @@
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">__startPanel</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">console: <code>Console</code></span>):</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/console/commands/schedule/work.py#L37">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/console/commands/schedule/work.py#L46">
       
       (source)
     </a>
@@ -596,7 +596,7 @@
   </div>
   <div class="docstring functionBody">
     
-    <div><p>Display a formatted scheduler start message on the console.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">console:</span><code><a href="orionis.console.Console.html" class="internal-link" title="orionis.console.Console">Console</a></code></td><td class="fieldArgDesc">Rich console used to display the startup message.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">The startup information is printed to the console.</td></tr></table></div>
+    <div><p>Display a formatted scheduler start message on the console.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">console:</span><code><a href="orionis.console.Console.html" class="internal-link">orionis.console.Console</a></code></td><td class="fieldArgDesc">Rich console used to display the startup message.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">The startup information is printed to the console.</td></tr></table></div>
   </div>
 </div><div class="basemethod">
   
@@ -611,7 +611,7 @@
     
     
     <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">handle</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">app: <code>IApplication</code>, </span><span class="rst-sig-param">console: <code>Console</code></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a> | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/console/commands/schedule/work.py#L124">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/console/commands/schedule/work.py#L133">
       
       (source)
     </a>
@@ -623,7 +623,7 @@
   </div>
   <div class="docstring functionBody">
     
-    <div><p>Run the application's scheduled tasks worker.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">app:</span><code><a href="orionis.IApplication.html" class="internal-link" title="orionis.IApplication">IApplication</a></code></td><td class="fieldArgDesc">Application instance for configuration and service resolution.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">console:</span><code><a href="orionis.console.Console.html" class="internal-link" title="orionis.console.Console">Console</a></code></td><td class="fieldArgDesc">Rich console used to display scheduler startup information.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code>int | None</code></td><td class="fieldArgDesc">One when the configured backend is unavailable, otherwise None.</td></tr></table></div>
+    <div><p>Run the application's scheduled tasks worker.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">app:</span><code><a href="orionis.IApplication.html" class="internal-link">orionis.IApplication</a></code></td><td class="fieldArgDesc">Application instance for configuration and service resolution.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">console:</span><code><a href="orionis.console.Console.html" class="internal-link">orionis.console.Console</a></code></td><td class="fieldArgDesc">Rich console used to display scheduler startup information.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code>int | None</code></td><td class="fieldArgDesc">One when the configured backend is unavailable, otherwise None.</td></tr></table></div>
   </div>
 </div><div class="baseclassvariable">
   
@@ -637,7 +637,7 @@
   <div class="functionHeader">
     
     <span class="py-defname">description</span>: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/console/commands/schedule/work.py#L35">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/console/commands/schedule/work.py#L43">
       
       (source)
     </a>
@@ -649,7 +649,7 @@
   </div>
   <div class="functionBody">
     
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p>Command description.</p></div>
     
   </div>
 </div><div class="baseclassvariable">
@@ -664,7 +664,7 @@
   <div class="functionHeader">
     
     <span class="py-defname">signature</span>: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/console/commands/schedule/work.py#L32">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/console/commands/schedule/work.py#L39">
       
       (source)
     </a>
@@ -676,7 +676,7 @@
   </div>
   <div class="functionBody">
     
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p>Command signature and description.</p></div>
     
   </div>
 </div><div class="baseclassvariable">
@@ -691,7 +691,7 @@
   <div class="functionHeader">
     
     <span class="py-defname">timestamps</span>: <code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/console/commands/schedule/work.py#L29">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/console/commands/schedule/work.py#L35">
       
       (source)
     </a>
@@ -703,7 +703,7 @@
   </div>
   <div class="functionBody">
     
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p>Indicates whether timestamps will be shown in the command output.</p></div>
     
   </div>
 </div>
@@ -717,7 +717,7 @@
   <div class="orionis-footer-inner">
     <div class="orionis-footer-copy">
       <p>API documentation for <a href="https://orionis-framework.com/" class="projecthome">Orionis</a>.</p>
-      <p class="orionis-footer-meta">Generated with <a href="https://github.com/twisted/pydoctor/">Pydoctor</a> 25.10.1.<span class="orionis-footer-build"> Built 2026-11-03 09:36:58.</span></p>
+      <p class="orionis-footer-meta">Generated with <a href="https://github.com/twisted/pydoctor/">Pydoctor</a> 25.10.1.<span class="orionis-footer-build"> Built 2026-11-03 13:00:15.</span></p>
     </div>
     <nav class="orionis-footer-links" aria-label="Additional resources">
       <a href="https://docs.orionis-framework.com">Read the guide <span aria-hidden="true">↗</span></a>

@@ -149,7 +149,7 @@
       <div>
          
           <div class="childrenKindTitle">Contents</div>
-          <ul><li><a class="rst-internal rst-reference" href="#rst-concurrency" id="rst-toc-entry-2">Concurrency</a></li>
+          <ul><li><a class="rst-internal rst-reference" href="#rst-concurrency">Concurrency</a></li>
 </ul>
         
 
@@ -314,7 +314,7 @@
                     <div>
          
           <div class="childrenKindTitle">Contents</div>
-          <ul><li><a class="rst-internal rst-reference" href="#rst-concurrency" id="rst-toc-entry-3">Concurrency</a></li>
+          <ul><li><a class="rst-internal rst-reference" href="#rst-concurrency">Concurrency</a></li>
 </ul>
         
 
@@ -544,7 +544,7 @@
         </div>
 
         <div class="extrasDocstring">
-          <p class="class-signature"><code><span class="py-keyword">class</span> <span class="py-defname">MailManager</span>(PendingMail, IMailManager): <a href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/mail/manager.py#L26" class="sourceLink">(source)</a></code></p><p>Constructor: <code><a href="#__init__" class="internal-link" title="orionis.mail.manager.MailManager.__init__">MailManager(app, composer)</a></code></p><p><a href="classIndex.html#orionis.mail.manager.MailManager">View In Hierarchy</a></p>
+          <p class="class-signature"><code><span class="py-keyword">class</span> <span class="py-defname">MailManager</span>(PendingMail, IMailManager): <a href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/mail/manager.py#L29" class="sourceLink">(source)</a></code></p><p>Constructor: <code><a href="#__init__" class="internal-link" title="orionis.mail.manager.MailManager.__init__">MailManager(app, composer)</a></code></p><p><a href="classIndex.html#orionis.mail.manager.MailManager">View In Hierarchy</a></p>
         </div>
 
         <div class="moduleDocstring">
@@ -555,7 +555,7 @@ the manager, and factories run per send so they may resolve shared
 stateless transports through the container. A Mailable class is also built
 through the application container for each send.</p>
 <div class="rst-section" id="rst-concurrency">
-<h2 class="heading"><a class="rst-toc-backref" href="#rst-toc-entry-1">Concurrency</a></h2>
+<h2 class="heading">Concurrency</h2>
 <p>Driver registration is synchronous and rejects duplicates, so drivers must
 be registered during provider startup, before concurrent sends. Transport
 resolution and preparation keep all per-operation state in local variables.</p>
@@ -564,7 +564,7 @@ resolution and preparation keep all per-operation state in local variables.</p>
         </div>
 
         <div id="split-tables">
-          <table class="children sortable" id="id1323">
+          <table class="children sortable" id="id1326">
   
   
   <tr class="method">
@@ -601,22 +601,22 @@ resolution and preparation keep all per-operation state in local variables.</p>
     
     <td>Class Variable</td>
     <td><code><a href="#__slots__" class="internal-link" title="orionis.mail.manager.MailManager.__slots__">__slots__</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
+    <td>Declare the instance attribute slots reserved by this class.</td>
   </tr><tr class="instancevariable">
     
     <td>Instance Variable</td>
     <td><code><a href="#_app" class="internal-link" title="orionis.mail.manager.MailManager._app">_app</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
+    <td>Central configuration and dependency container.</td>
   </tr><tr class="instancevariable">
     
     <td>Instance Variable</td>
     <td><code><a href="#_composer" class="internal-link" title="orionis.mail.manager.MailManager._composer">_composer</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
+    <td>Single pipeline for views, storage, validation, and MIME.</td>
   </tr><tr class="instancevariable">
     
     <td>Instance Variable</td>
     <td><code><a href="#_factories" class="internal-link" title="orionis.mail.manager.MailManager._factories">_factories</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
+    <td>Factories registered to construct the available transport backends.</td>
   </tr>
 </table>
           
@@ -638,7 +638,7 @@ resolution and preparation keep all per-operation state in local variables.</p>
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">__init__</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">app: <code>IApplication</code>, </span><span class="rst-sig-param">composer: <code><a href="orionis.mail.composer.MailComposer.html" class="internal-link" title="orionis.mail.composer.MailComposer">MailComposer</a></code></span>):</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/mail/manager.py#L47">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/mail/manager.py#L51">
       
       (source)
     </a>
@@ -650,7 +650,7 @@ resolution and preparation keep all per-operation state in local variables.</p>
   </div>
   <div class="docstring functionBody">
     
-    <div><p>Retain shared dependencies without validating or opening transports.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">app:</span><code><a href="orionis.IApplication.html" class="internal-link" title="orionis.IApplication">IApplication</a></code></td><td class="fieldArgDesc">Central configuration and dependency container.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">composer:</span><code><a href="orionis.mail.composer.MailComposer.html" class="internal-link" title="orionis.mail.composer.MailComposer">MailComposer</a></code></td><td class="fieldArgDesc">Single pipeline for views, storage, validation, and MIME.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">Initialize an empty fluent chain and defer built-in factories.</td></tr></table></div>
+    <div><p>Retain shared dependencies without validating or opening transports.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">app:</span><code><a href="orionis.IApplication.html" class="internal-link">orionis.IApplication</a></code></td><td class="fieldArgDesc">Central configuration and dependency container.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">composer:</span><code><a href="orionis.mail.composer.MailComposer.html" class="internal-link">orionis.mail.composer.MailComposer</a></code></td><td class="fieldArgDesc">Single pipeline for views, storage, validation, and MIME.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">Initialize an empty fluent chain and defer built-in factories.</td></tr></table></div>
   </div>
 </div><div class="basemethod">
   
@@ -665,7 +665,7 @@ resolution and preparation keep all per-operation state in local variables.</p>
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">_applyGlobalSender</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">envelope: <code>Envelope</code></span>) -&gt; <code>Envelope</code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/mail/manager.py#L187">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/mail/manager.py#L194">
       
       (source)
     </a>
@@ -677,8 +677,8 @@ resolution and preparation keep all per-operation state in local variables.</p>
   </div>
   <div class="docstring functionBody">
     
-    <div><p>Overlay the configured global sender on an envelope that declares none.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">envelope:</span><code><a href="orionis.mail.entities.Envelope.html" class="internal-link" title="orionis.mail.entities.Envelope">Envelope</a></code></td><td class="fieldArgDesc">Operation-local envelope without a From header.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.mail.entities.Envelope.html" class="internal-link" title="orionis.mail.entities.Envelope">Envelope</a></code></td><td class="fieldArgDesc">The received envelope when no global sender is configured, or an
-equivalent copy carrying the configured mailbox.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.mail.exceptions.MailConfigurationException.html" class="internal-link" title="orionis.mail.exceptions.MailConfigurationException">MailConfigurationException</a></code></td><td>If the configured sender is neither a mapping nor an entity.</td></tr><tr><td class="fieldArgContainer"><code>MailCompositionException</code></td><td>If the configured mailbox or display name is invalid.</td></tr></table></div>
+    <div><p>Overlay the configured global sender on an envelope that declares none.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">envelope:</span><code><a href="orionis.mail.entities.Envelope.html" class="internal-link">orionis.mail.entities.Envelope</a></code></td><td class="fieldArgDesc">Operation-local envelope without a From header.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.mail.entities.Envelope.html" class="internal-link">orionis.mail.entities.Envelope</a></code></td><td class="fieldArgDesc">The received envelope when no global sender is configured, or an
+equivalent copy carrying the configured mailbox.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.mail.exceptions.MailConfigurationException.html" class="internal-link">orionis.mail.exceptions.MailConfigurationException</a></code></td><td>If the configured sender is neither a mapping nor an entity.</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.mail.exceptions.MailCompositionException.html" class="internal-link">orionis.mail.exceptions.MailCompositionException</a></code></td><td>If the configured mailbox or display name is invalid.</td></tr></table></div>
   </div>
 </div><div class="basemethod">
   
@@ -693,7 +693,7 @@ equivalent copy carrying the configured mailbox.</td></tr></table><table class="
     
     
     <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">_buildMailable</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">mailable: <code><a href="https://docs.python.org/3/builtins/functions.html#type" class="intersphinx-link">type</a>[<wbr></wbr>Mailable]</code></span>) -&gt; <code>Mailable</code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/mail/manager.py#L68">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/mail/manager.py#L75">
       
       (source)
     </a>
@@ -705,7 +705,7 @@ equivalent copy carrying the configured mailbox.</td></tr></table><table class="
   </div>
   <div class="docstring functionBody">
     
-    <div><p>Build one reusable mail declaration with the application container.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">mailable:</span><code><a href="https://docs.python.org/3/builtins/functions.html#type" class="intersphinx-link">type</a>[<a href="orionis.mail.Mailable.html" class="internal-link" title="orionis.mail.Mailable">Mailable</a>]</code></td><td class="fieldArgDesc">Reusable mail class requested by a send operation.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.mail.Mailable.html" class="internal-link" title="orionis.mail.Mailable">Mailable</a></code></td><td class="fieldArgDesc">A fresh declaration with constructor dependencies injected.</td></tr></table></div>
+    <div><p>Build one reusable mail declaration with the application container.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">mailable:</span><code><a href="https://docs.python.org/3/builtins/functions.html#type" class="intersphinx-link">type</a>[<a href="orionis.mail.Mailable.html" class="internal-link">orionis.mail.Mailable</a>]</code></td><td class="fieldArgDesc">Reusable mail class requested by a send operation.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.mail.Mailable.html" class="internal-link">orionis.mail.Mailable</a></code></td><td class="fieldArgDesc">A fresh declaration with constructor dependencies injected.</td></tr></table></div>
   </div>
 </div><div class="basemethod">
   
@@ -720,7 +720,7 @@ equivalent copy carrying the configured mailbox.</td></tr></table><table class="
     
     
     <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">_deliver</span><span class="function-signature long-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">name: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a> | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code>, </span><span class="rst-sig-param">envelope: <code>Envelope</code>, </span><span class="rst-sig-param">content: <code>Content</code>, </span><span class="rst-sig-param">attachments: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" class="intersphinx-link">tuple</a>[<wbr></wbr>Attachment, <wbr></wbr><span class="rst-variable-ellipsis">...</span>]</code></span>) -&gt; <code>MailResult</code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/mail/manager.py#L118">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/mail/manager.py#L125">
       
       (source)
     </a>
@@ -732,7 +732,7 @@ equivalent copy carrying the configured mailbox.</td></tr></table><table class="
   </div>
   <div class="docstring functionBody">
     
-    <div><p>Prepare a message completely before resolving and invoking its transport.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">name:</span><code>str | None</code></td><td class="fieldArgDesc">Explicit mailer name, or None for the central default.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">envelope:</span><code><a href="orionis.mail.entities.Envelope.html" class="internal-link" title="orionis.mail.entities.Envelope">Envelope</a></code></td><td class="fieldArgDesc">Final operation-local envelope.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">content:</span><code><a href="orionis.mail.entities.Content.html" class="internal-link" title="orionis.mail.entities.Content">Content</a></code></td><td class="fieldArgDesc">Normalized content declaration.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">attachments:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" class="intersphinx-link">tuple</a>[<a href="orionis.mail.entities.Attachment.html" class="internal-link" title="orionis.mail.entities.Attachment">Attachment</a>, ...]</code></td><td class="fieldArgDesc">Merged deferred attachments.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.mail.entities.MailResult.html" class="internal-link" title="orionis.mail.entities.MailResult">MailResult</a></code></td><td class="fieldArgDesc">Result reported by the selected transport.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.mail.exceptions.MailConfigurationException.html" class="internal-link" title="orionis.mail.exceptions.MailConfigurationException">MailConfigurationException</a></code></td><td>If the mailer, driver, or factory result is invalid.</td></tr><tr><td class="fieldArgContainer"><code>MailException</code></td><td>If composition, rendering, attachment resolution, or transport fails.</td></tr></table></div>
+    <div><p>Prepare a message completely before resolving and invoking its transport.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">name:</span><code>str | None</code></td><td class="fieldArgDesc">Explicit mailer name, or None for the central default.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">envelope:</span><code><a href="orionis.mail.entities.Envelope.html" class="internal-link">orionis.mail.entities.Envelope</a></code></td><td class="fieldArgDesc">Final operation-local envelope.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">content:</span><code><a href="orionis.mail.entities.Content.html" class="internal-link">orionis.mail.entities.Content</a></code></td><td class="fieldArgDesc">Normalized content declaration.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">attachments:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" class="intersphinx-link">tuple</a>[<a href="orionis.mail.entities.Attachment.html" class="internal-link">orionis.mail.entities.Attachment</a>, <tt class="rst-docutils rst-literal">...</tt>]</code></td><td class="fieldArgDesc">Merged deferred attachments.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.mail.entities.MailResult.html" class="internal-link">orionis.mail.entities.MailResult</a></code></td><td class="fieldArgDesc">Result reported by the selected transport.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.mail.exceptions.MailConfigurationException.html" class="internal-link">orionis.mail.exceptions.MailConfigurationException</a></code></td><td>If the mailer, driver, or factory result is invalid.</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.mail.exceptions.MailException.html" class="internal-link">orionis.mail.exceptions.MailException</a></code></td><td>If composition, rendering, attachment resolution, or transport fails.</td></tr></table></div>
   </div>
 </div><div class="basemethod">
   
@@ -747,7 +747,7 @@ equivalent copy carrying the configured mailbox.</td></tr></table><table class="
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">_resolveMailer</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">name: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a> | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" class="intersphinx-link">tuple</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <wbr></wbr><a href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Mapping" class="intersphinx-link">Mapping</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <wbr></wbr><a href="https://docs.python.org/3/builtins/functions.html#object" class="intersphinx-link">object</a>]]</code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/mail/manager.py#L230">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/mail/manager.py#L237">
       
       (source)
     </a>
@@ -759,7 +759,7 @@ equivalent copy carrying the configured mailbox.</td></tr></table><table class="
   </div>
   <div class="docstring functionBody">
     
-    <div><p>Normalize only the selected central mailer without environment reads.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">name:</span><code>str | None</code></td><td class="fieldArgDesc">Explicit mailer, or None for the central default.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" class="intersphinx-link">tuple</a>[<a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <a href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Mapping" class="intersphinx-link">Mapping</a>[<a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <a href="https://docs.python.org/3/builtins/functions.html#object" class="intersphinx-link">object</a>]]</code></td><td class="fieldArgDesc">Mailer name, driver name, and copied read-only configuration.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.mail.exceptions.MailConfigurationException.html" class="internal-link" title="orionis.mail.exceptions.MailConfigurationException">MailConfigurationException</a></code></td><td>If the section, name, or selected entry is invalid or missing.</td></tr></table></div>
+    <div><p>Normalize only the selected central mailer without environment reads.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">name:</span><code>str | None</code></td><td class="fieldArgDesc">Explicit mailer, or None for the central default.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" class="intersphinx-link">tuple</a>[<a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <a href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Mapping" class="intersphinx-link">collections.abc.Mapping</a>[<a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <a href="https://docs.python.org/3/builtins/functions.html#object" class="intersphinx-link">object</a>]]</code></td><td class="fieldArgDesc">Mailer name, driver name, and copied read-only configuration.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.mail.exceptions.MailConfigurationException.html" class="internal-link">orionis.mail.exceptions.MailConfigurationException</a></code></td><td>If the section, name, or selected entry is invalid or missing.</td></tr></table></div>
   </div>
 </div><div class="basemethod">
   
@@ -773,8 +773,8 @@ equivalent copy carrying the configured mailbox.</td></tr></table><table class="
   <div class="functionHeader">
     
     
-    <span class="py-keyword">def</span>&#160;<span class="py-defname">extend</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">driver: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code>, </span><span class="rst-sig-param">factory: <code>TransportFactory</code></span>):</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/mail/manager.py#L88">
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">extend</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">driver: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code>, </span><span class="rst-sig-param">factory: <code><a href="orionis.mail.types.html#TransportFactory" class="internal-link" title="orionis.mail.types.TransportFactory">TransportFactory</a></code></span>):</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/mail/manager.py#L95">
       
       (source)
     </a>
@@ -786,8 +786,8 @@ equivalent copy carrying the configured mailbox.</td></tr></table><table class="
   </div>
   <div class="docstring functionBody">
     
-    <div><p>Register a new driver without silently replacing existing registrations.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">driver:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Unique implementation name used in a mailer's driver option.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">factory:</span><code>TransportFactory</code></td><td class="fieldArgDesc">Callable receiving the application and the normalized configuration
-and returning an IMailTransport or an awaitable of one.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">Store the factory without running it or validating mailer entries.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.mail.exceptions.MailConfigurationException.html" class="internal-link" title="orionis.mail.exceptions.MailConfigurationException">MailConfigurationException</a></code></td><td>If registration is invalid or duplicates a built-in or custom driver.</td></tr></table></div>
+    <div><p>Register a new driver without silently replacing existing registrations.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">driver:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Unique implementation name used in a mailer's driver option.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">factory:</span><code><a href="orionis.mail.types.html#TransportFactory" class="internal-link">orionis.mail.types.TransportFactory</a></code></td><td class="fieldArgDesc">Callable receiving the application and the normalized configuration
+and returning an IMailTransport or an awaitable of one.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">Store the factory without running it or validating mailer entries.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.mail.exceptions.MailConfigurationException.html" class="internal-link">orionis.mail.exceptions.MailConfigurationException</a></code></td><td>If registration is invalid or duplicates a built-in or custom driver.</td></tr></table></div>
   </div>
 </div><div class="baseclassvariable">
   
@@ -801,7 +801,7 @@ and returning an IMailTransport or an awaitable of one.</td></tr></table><table 
   <div class="functionHeader">
     
     <span class="py-defname">__slots__</span>: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" class="intersphinx-link">tuple</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <wbr></wbr><span class="rst-variable-ellipsis">...</span>]</code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/mail/manager.py#L45">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/mail/manager.py#L48">
       
       (source)
     </a>
@@ -813,7 +813,7 @@ and returning an IMailTransport or an awaitable of one.</td></tr></table><table 
   </div>
   <div class="functionBody">
     
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p>Declare the instance attribute slots reserved by this class.</p></div>
     
   </div>
 </div><div class="baseinstancevariable">
@@ -828,7 +828,7 @@ and returning an IMailTransport or an awaitable of one.</td></tr></table><table 
   <div class="functionHeader">
     
     <span class="py-defname">_app</span> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/mail/manager.py#L63">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/mail/manager.py#L67">
       
       (source)
     </a>
@@ -840,7 +840,7 @@ and returning an IMailTransport or an awaitable of one.</td></tr></table><table 
   </div>
   <div class="functionBody">
     
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p>Central configuration and dependency container.</p></div>
     
   </div>
 </div><div class="baseinstancevariable">
@@ -855,7 +855,7 @@ and returning an IMailTransport or an awaitable of one.</td></tr></table><table 
   <div class="functionHeader">
     
     <span class="py-defname">_composer</span> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/mail/manager.py#L64">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/mail/manager.py#L69">
       
       (source)
     </a>
@@ -867,7 +867,7 @@ and returning an IMailTransport or an awaitable of one.</td></tr></table><table 
   </div>
   <div class="functionBody">
     
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p>Single pipeline for views, storage, validation, and MIME.</p></div>
     
   </div>
 </div><div class="baseinstancevariable">
@@ -881,8 +881,8 @@ and returning an IMailTransport or an awaitable of one.</td></tr></table><table 
   </a>
   <div class="functionHeader">
     
-    <span class="py-defname">_factories</span>: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#dict" class="intersphinx-link">dict</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <wbr></wbr>TransportFactory]</code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/mail/manager.py#L65">
+    <span class="py-defname">_factories</span>: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#dict" class="intersphinx-link">dict</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <wbr></wbr><a href="orionis.mail.types.html#TransportFactory" class="internal-link" title="orionis.mail.types.TransportFactory">TransportFactory</a>]</code> =
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/mail/manager.py#L71">
       
       (source)
     </a>
@@ -894,7 +894,7 @@ and returning an IMailTransport or an awaitable of one.</td></tr></table><table 
   </div>
   <div class="functionBody">
     
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p>Factories registered to construct the available transport backends.</p></div>
     
   </div>
 </div>
@@ -908,7 +908,7 @@ and returning an IMailTransport or an awaitable of one.</td></tr></table><table 
   <div class="orionis-footer-inner">
     <div class="orionis-footer-copy">
       <p>API documentation for <a href="https://orionis-framework.com/" class="projecthome">Orionis</a>.</p>
-      <p class="orionis-footer-meta">Generated with <a href="https://github.com/twisted/pydoctor/">Pydoctor</a> 25.10.1.<span class="orionis-footer-build"> Built 2026-11-03 09:36:58.</span></p>
+      <p class="orionis-footer-meta">Generated with <a href="https://github.com/twisted/pydoctor/">Pydoctor</a> 25.10.1.<span class="orionis-footer-build"> Built 2026-11-03 13:00:15.</span></p>
     </div>
     <nav class="orionis-footer-links" aria-label="Additional resources">
       <a href="https://docs.orionis-framework.com">Read the guide <span aria-hidden="true">↗</span></a>

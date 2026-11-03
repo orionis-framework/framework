@@ -510,15 +510,15 @@
         </div>
 
         <div class="extrasDocstring">
-          <p class="class-signature"><code><span class="py-keyword">class</span> <span class="py-defname">Argument</span>: <a href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/introspection/dependencies/entities/argument.py#L5" class="sourceLink">(source)</a></code></p><p><a href="classIndex.html#orionis.introspection.dependencies.entities.argument.Argument">View In Hierarchy</a></p>
+          <p class="class-signature"><code><span class="py-keyword">class</span> <span class="py-defname">Argument</span>: <a href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/introspection/dependencies/entities/argument.py#L7" class="sourceLink">(source)</a></code></p><p><a href="classIndex.html#orionis.introspection.dependencies.entities.argument.Argument">View In Hierarchy</a></p>
         </div>
 
         <div class="moduleDocstring">
-          <div><p>Represent a function or method argument with type and resolution metadata.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">name</span></td><td class="fieldArgDesc">The name of the argument.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">resolved</span></td><td class="fieldArgDesc">Indicates whether the argument has been resolved or processed.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">module<wbr></wbr>_name</span></td><td class="fieldArgDesc">The module where the argument's type is defined.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">class<wbr></wbr>_name</span></td><td class="fieldArgDesc">The class representing the argument's type.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">type</span></td><td class="fieldArgDesc">The Python type object for the argument's type.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">full<wbr></wbr>_class<wbr></wbr>_path</span></td><td class="fieldArgDesc">The complete dotted path to the argument's type (module.class).</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">is<wbr></wbr>_keyword<wbr></wbr>_only</span></td><td class="fieldArgDesc">Indicates if the argument is keyword-only (default is False).</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">is<wbr></wbr>_schema</span></td><td class="fieldArgDesc">Indicates if the argument is a schema (default is False).</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">default</span></td><td class="fieldArgDesc">The default value of the argument, if any (default is None).</td></tr></table></div>
+          <div><p>Represent a function or method argument with type and resolution metadata.</p></div>
         </div>
 
         <div id="split-tables">
-          <table class="children sortable" id="id1224">
+          <table class="children sortable" id="id1226">
   
   
   <tr class="method">
@@ -526,51 +526,51 @@
     <td>Method</td>
     <td><code><a href="#__post_init__" class="internal-link" title="orionis.introspection.dependencies.entities.argument.Argument.__post_init__">__post<wbr></wbr>_init__</a></code></td>
     <td>Validate field types after dataclass initialisation.</td>
-  </tr><tr class="classvariable">
+  </tr><tr class="instancevariable">
     
-    <td>Class Variable</td>
+    <td>Instance Variable</td>
     <td><code><a href="#class_name" class="internal-link" title="orionis.introspection.dependencies.entities.argument.Argument.class_name">class<wbr></wbr>_name</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
-  </tr><tr class="classvariable">
+    <td>The class representing the argument's type.</td>
+  </tr><tr class="instancevariable">
     
-    <td>Class Variable</td>
+    <td>Instance Variable</td>
     <td><code><a href="#default" class="internal-link" title="orionis.introspection.dependencies.entities.argument.Argument.default">default</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
-  </tr><tr class="classvariable">
+    <td>The default value of the argument, if any (default is None).</td>
+  </tr><tr class="instancevariable">
     
-    <td>Class Variable</td>
+    <td>Instance Variable</td>
     <td><code><a href="#full_class_path" class="internal-link" title="orionis.introspection.dependencies.entities.argument.Argument.full_class_path">full<wbr></wbr>_class<wbr></wbr>_path</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
-  </tr><tr class="classvariable">
+    <td>The complete dotted path to the argument's type (module.class).</td>
+  </tr><tr class="instancevariable">
     
-    <td>Class Variable</td>
+    <td>Instance Variable</td>
     <td><code><a href="#is_keyword_only" class="internal-link" title="orionis.introspection.dependencies.entities.argument.Argument.is_keyword_only">is<wbr></wbr>_keyword<wbr></wbr>_only</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
-  </tr><tr class="classvariable">
+    <td>Indicates if the argument is keyword-only (default is False).</td>
+  </tr><tr class="instancevariable">
     
-    <td>Class Variable</td>
+    <td>Instance Variable</td>
     <td><code><a href="#is_schema" class="internal-link" title="orionis.introspection.dependencies.entities.argument.Argument.is_schema">is<wbr></wbr>_schema</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
-  </tr><tr class="classvariable">
+    <td>Indicates if the argument is a schema (default is False).</td>
+  </tr><tr class="instancevariable">
     
-    <td>Class Variable</td>
+    <td>Instance Variable</td>
     <td><code><a href="#module_name" class="internal-link" title="orionis.introspection.dependencies.entities.argument.Argument.module_name">module<wbr></wbr>_name</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
-  </tr><tr class="classvariable">
+    <td>The module where the argument's type is defined.</td>
+  </tr><tr class="instancevariable">
     
-    <td>Class Variable</td>
+    <td>Instance Variable</td>
     <td><code><a href="#name" class="internal-link" title="orionis.introspection.dependencies.entities.argument.Argument.name">name</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
-  </tr><tr class="classvariable">
+    <td>The name of the argument.</td>
+  </tr><tr class="instancevariable">
     
-    <td>Class Variable</td>
+    <td>Instance Variable</td>
     <td><code><a href="#resolved" class="internal-link" title="orionis.introspection.dependencies.entities.argument.Argument.resolved">resolved</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
-  </tr><tr class="classvariable">
+    <td>Indicates whether the argument has been resolved or processed.</td>
+  </tr><tr class="instancevariable">
     
-    <td>Class Variable</td>
+    <td>Instance Variable</td>
     <td><code><a href="#type" class="internal-link" title="orionis.introspection.dependencies.entities.argument.Argument.type">type</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
+    <td>The Python type object for the argument's type.</td>
   </tr>
 </table>
           
@@ -592,7 +592,7 @@
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">__post_init__</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>):</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/introspection/dependencies/entities/argument.py#L45">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/introspection/dependencies/entities/argument.py#L47">
       
       (source)
     </a>
@@ -607,7 +607,7 @@
     <div><p>Validate field types after dataclass initialisation.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">Complete the documented operation without returning a value.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/exceptions.html#TypeError" class="intersphinx-link">TypeError</a></code></td><td>If <tt class="rst-docutils rst-literal">module_name</tt>, <tt class="rst-docutils rst-literal">class_name</tt>, or <tt class="rst-docutils rst-literal">full_class_path</tt> is not a
 string.</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/exceptions.html#ValueError" class="intersphinx-link">ValueError</a></code></td><td>If <tt class="rst-docutils rst-literal">type</tt> is <tt class="rst-docutils rst-literal">None</tt> and no <tt class="rst-docutils rst-literal">default</tt> value is provided.</td></tr></table></div>
   </div>
-</div><div class="baseclassvariable">
+</div><div class="baseinstancevariable">
   
   
   <a name="orionis.introspection.dependencies.entities.argument.Argument.class_name">
@@ -619,7 +619,7 @@ string.</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.p
   <div class="functionHeader">
     
     <span class="py-defname">class_name</span>: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/introspection/dependencies/entities/argument.py#L36">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/introspection/dependencies/entities/argument.py#L38">
       
       (source)
     </a>
@@ -631,10 +631,10 @@ string.</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.p
   </div>
   <div class="functionBody">
     
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p>The class representing the argument's type.</p></div>
     
   </div>
-</div><div class="baseclassvariable">
+</div><div class="baseinstancevariable">
   
   
   <a name="orionis.introspection.dependencies.entities.argument.Argument.default">
@@ -645,8 +645,8 @@ string.</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.p
   </a>
   <div class="functionHeader">
     
-    <span class="py-defname">default</span>: <code>Any | None, <em>optional</em></code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/introspection/dependencies/entities/argument.py#L43">
+    <span class="py-defname">default</span>: <code>typing.Any | None, <em>optional</em></code> =
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/introspection/dependencies/entities/argument.py#L45">
       
       (source)
     </a>
@@ -658,10 +658,10 @@ string.</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.p
   </div>
   <div class="functionBody">
     
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p>The default value of the argument, if any (default is None).</p></div>
     
   </div>
-</div><div class="baseclassvariable">
+</div><div class="baseinstancevariable">
   
   
   <a name="orionis.introspection.dependencies.entities.argument.Argument.full_class_path">
@@ -673,7 +673,7 @@ string.</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.p
   <div class="functionHeader">
     
     <span class="py-defname">full_class_path</span>: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/introspection/dependencies/entities/argument.py#L38">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/introspection/dependencies/entities/argument.py#L40">
       
       (source)
     </a>
@@ -685,10 +685,10 @@ string.</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.p
   </div>
   <div class="functionBody">
     
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p>The complete dotted path to the argument's type (module.class).</p></div>
     
   </div>
-</div><div class="baseclassvariable">
+</div><div class="baseinstancevariable">
   
   
   <a name="orionis.introspection.dependencies.entities.argument.Argument.is_keyword_only">
@@ -700,7 +700,7 @@ string.</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.p
   <div class="functionHeader">
     
     <span class="py-defname">is_keyword_only</span>: <code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a>, <em>optional</em></code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/introspection/dependencies/entities/argument.py#L41">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/introspection/dependencies/entities/argument.py#L43">
       
       (source)
     </a>
@@ -712,10 +712,10 @@ string.</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.p
   </div>
   <div class="functionBody">
     
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p>Indicates if the argument is keyword-only (default is False).</p></div>
     
   </div>
-</div><div class="baseclassvariable">
+</div><div class="baseinstancevariable">
   
   
   <a name="orionis.introspection.dependencies.entities.argument.Argument.is_schema">
@@ -727,7 +727,7 @@ string.</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.p
   <div class="functionHeader">
     
     <span class="py-defname">is_schema</span>: <code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a>, <em>optional</em></code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/introspection/dependencies/entities/argument.py#L42">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/introspection/dependencies/entities/argument.py#L44">
       
       (source)
     </a>
@@ -739,10 +739,10 @@ string.</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.p
   </div>
   <div class="functionBody">
     
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p>Indicates if the argument is a schema (default is False).</p></div>
     
   </div>
-</div><div class="baseclassvariable">
+</div><div class="baseinstancevariable">
   
   
   <a name="orionis.introspection.dependencies.entities.argument.Argument.module_name">
@@ -754,7 +754,7 @@ string.</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.p
   <div class="functionHeader">
     
     <span class="py-defname">module_name</span>: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/introspection/dependencies/entities/argument.py#L35">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/introspection/dependencies/entities/argument.py#L37">
       
       (source)
     </a>
@@ -766,10 +766,10 @@ string.</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.p
   </div>
   <div class="functionBody">
     
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p>The module where the argument's type is defined.</p></div>
     
   </div>
-</div><div class="baseclassvariable">
+</div><div class="baseinstancevariable">
   
   
   <a name="orionis.introspection.dependencies.entities.argument.Argument.name">
@@ -781,7 +781,7 @@ string.</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.p
   <div class="functionHeader">
     
     <span class="py-defname">name</span>: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/introspection/dependencies/entities/argument.py#L33">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/introspection/dependencies/entities/argument.py#L35">
       
       (source)
     </a>
@@ -793,10 +793,10 @@ string.</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.p
   </div>
   <div class="functionBody">
     
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p>The name of the argument.</p></div>
     
   </div>
-</div><div class="baseclassvariable">
+</div><div class="baseinstancevariable">
   
   
   <a name="orionis.introspection.dependencies.entities.argument.Argument.resolved">
@@ -808,7 +808,7 @@ string.</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.p
   <div class="functionHeader">
     
     <span class="py-defname">resolved</span>: <code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/introspection/dependencies/entities/argument.py#L34">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/introspection/dependencies/entities/argument.py#L36">
       
       (source)
     </a>
@@ -820,10 +820,10 @@ string.</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.p
   </div>
   <div class="functionBody">
     
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p>Indicates whether the argument has been resolved or processed.</p></div>
     
   </div>
-</div><div class="baseclassvariable">
+</div><div class="baseinstancevariable">
   
   
   <a name="orionis.introspection.dependencies.entities.argument.Argument.type">
@@ -834,8 +834,8 @@ string.</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.p
   </a>
   <div class="functionHeader">
     
-    <span class="py-defname">type</span>: <code><a href="https://docs.python.org/3/builtins/functions.html#type" class="intersphinx-link">type</a>[<a href="https://docs.python.org/3/library/typing.html#typing.Any" class="intersphinx-link">Any</a>]</code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/introspection/dependencies/entities/argument.py#L37">
+    <span class="py-defname">type</span>: <code><a href="https://docs.python.org/3/builtins/functions.html#type" class="intersphinx-link">type</a>[<a href="https://docs.python.org/3/library/typing.html#typing.Any" class="intersphinx-link">typing.Any</a>]</code> =
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/introspection/dependencies/entities/argument.py#L39">
       
       (source)
     </a>
@@ -847,7 +847,7 @@ string.</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.p
   </div>
   <div class="functionBody">
     
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p>The Python type object for the argument's type.</p></div>
     
   </div>
 </div>
@@ -861,7 +861,7 @@ string.</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.p
   <div class="orionis-footer-inner">
     <div class="orionis-footer-copy">
       <p>API documentation for <a href="https://orionis-framework.com/" class="projecthome">Orionis</a>.</p>
-      <p class="orionis-footer-meta">Generated with <a href="https://github.com/twisted/pydoctor/">Pydoctor</a> 25.10.1.<span class="orionis-footer-build"> Built 2026-11-03 09:36:58.</span></p>
+      <p class="orionis-footer-meta">Generated with <a href="https://github.com/twisted/pydoctor/">Pydoctor</a> 25.10.1.<span class="orionis-footer-build"> Built 2026-11-03 13:00:15.</span></p>
     </div>
     <nav class="orionis-footer-links" aria-label="Additional resources">
       <a href="https://docs.orionis-framework.com">Read the guide <span aria-hidden="true">↗</span></a>

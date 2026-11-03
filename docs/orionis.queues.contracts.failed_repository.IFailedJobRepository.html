@@ -430,7 +430,7 @@
         </div>
 
         <div class="extrasDocstring">
-          <p class="class-signature"><code><span class="py-keyword">class</span> <span class="py-defname">IFailedJobRepository</span>(<a href="https://docs.python.org/3/library/abc.html#abc.ABC" class="intersphinx-link">ABC</a>): <a href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/queues/contracts/failed_repository.py#L8" class="sourceLink">(source)</a></code></p><p>Known subclasses: <code><a href="orionis.queues.failed.repository.DatabaseFailedJobRepository.html" class="internal-link">orionis.queues.failed.repository.DatabaseFailedJobRepository</a></code></p><p><a href="classIndex.html#orionis.queues.contracts.failed_repository.IFailedJobRepository">View In Hierarchy</a></p>
+          <p class="class-signature"><code><span class="py-keyword">class</span> <span class="py-defname">IFailedJobRepository</span>(<a href="https://docs.python.org/3/library/abc.html#abc.ABC" class="intersphinx-link">ABC</a>): <a href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/queues/contracts/failed_repository.py#L10" class="sourceLink">(source)</a></code></p><p>Known subclasses: <code><a href="orionis.queues.failed.repository.DatabaseFailedJobRepository.html" class="internal-link">orionis.queues.failed.repository.DatabaseFailedJobRepository</a></code></p><p><a href="classIndex.html#orionis.queues.contracts.failed_repository.IFailedJobRepository">View In Hierarchy</a></p>
         </div>
 
         <div class="moduleDocstring">
@@ -438,7 +438,7 @@
         </div>
 
         <div id="split-tables">
-          <table class="children sortable" id="id1720">
+          <table class="children sortable" id="id1727">
   
   
   <tr class="method">
@@ -470,7 +470,7 @@
     
     <td>Class Variable</td>
     <td><code><a href="#__slots__" class="internal-link" title="orionis.queues.contracts.failed_repository.IFailedJobRepository.__slots__">__slots__</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
+    <td>Declare that this class introduces no additional instance slots.</td>
   </tr>
 </table>
           
@@ -492,7 +492,7 @@
     
     <div><span class="decorator">@<a href="https://docs.python.org/3/library/abc.html#abc.abstractmethod" class="intersphinx-link">abstractmethod</a><br /></span></div>
     <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">all</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" class="intersphinx-link">tuple</a>[<wbr></wbr><a href="orionis.queues.entities.failed_job.FailedJob.html" class="internal-link" title="orionis.queues.entities.failed_job.FailedJob">FailedJob</a>, <wbr></wbr><span class="rst-variable-ellipsis">...</span>]</code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/queues/contracts/failed_repository.py#L38">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/queues/contracts/failed_repository.py#L41">
       
       (source)
     </a>
@@ -504,7 +504,7 @@
   </div>
   <div class="docstring functionBody">
     <div class="interfaceinfo">overridden in <code><a href="orionis.queues.failed.repository.DatabaseFailedJobRepository.html" class="internal-link">orionis.queues.failed.repository.DatabaseFailedJobRepository</a></code></div>
-    <div><p>List persisted failures in creation order.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" class="intersphinx-link">tuple</a>[<a href="orionis.queues.entities.failed_job.FailedJob.html" class="internal-link" title="orionis.queues.entities.failed_job.FailedJob">FailedJob</a>, ...]</code></td><td class="fieldArgDesc">Failure records available for inspection.</td></tr></table></div>
+    <div><p>List persisted failures in creation order.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" class="intersphinx-link">tuple</a>[<a href="orionis.queues.entities.failed_job.FailedJob.html" class="internal-link">orionis.queues.entities.failed_job.FailedJob</a>, <tt class="rst-docutils rst-literal">...</tt>]</code></td><td class="fieldArgDesc">Failure records available for inspection.</td></tr></table></div>
   </div>
 </div><div class="basemethod">
   
@@ -519,7 +519,7 @@
     
     <div><span class="decorator">@<a href="https://docs.python.org/3/library/abc.html#abc.abstractmethod" class="intersphinx-link">abstractmethod</a><br /></span></div>
     <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">close</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>):</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/queues/contracts/failed_repository.py#L81">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/queues/contracts/failed_repository.py#L84">
       
       (source)
     </a>
@@ -546,7 +546,7 @@
     
     <div><span class="decorator">@<a href="https://docs.python.org/3/library/abc.html#abc.abstractmethod" class="intersphinx-link">abstractmethod</a><br /></span></div>
     <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">find</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">failed_id: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></span>) -&gt; <code><a href="orionis.queues.entities.failed_job.FailedJob.html" class="internal-link" title="orionis.queues.entities.failed_job.FailedJob">FailedJob</a> | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/queues/contracts/failed_repository.py#L49">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/queues/contracts/failed_repository.py#L52">
       
       (source)
     </a>
@@ -558,7 +558,7 @@
   </div>
   <div class="docstring functionBody">
     <div class="interfaceinfo">overridden in <code><a href="orionis.queues.failed.repository.DatabaseFailedJobRepository.html" class="internal-link">orionis.queues.failed.repository.DatabaseFailedJobRepository</a></code></div>
-    <div><p>Find a persisted failure by its identifier.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">failed<wbr></wbr>_id:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Failure identifier.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code>FailedJob | None</code></td><td class="fieldArgDesc">Matching failure, if present.</td></tr></table></div>
+    <div><p>Find a persisted failure by its identifier.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">failed<wbr></wbr>_id:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Failure identifier.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code>orionis.queues.entities.failed_job.FailedJob | None</code></td><td class="fieldArgDesc">Matching failure, if present.</td></tr></table></div>
   </div>
 </div><div class="basemethod">
   
@@ -573,7 +573,7 @@
     
     <div><span class="decorator">@<a href="https://docs.python.org/3/library/abc.html#abc.abstractmethod" class="intersphinx-link">abstractmethod</a><br /></span></div>
     <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">forget</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">failed_id: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/queues/contracts/failed_repository.py#L65">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/queues/contracts/failed_repository.py#L68">
       
       (source)
     </a>
@@ -600,7 +600,7 @@
     
     <div><span class="decorator">@<a href="https://docs.python.org/3/library/abc.html#abc.abstractmethod" class="intersphinx-link">abstractmethod</a><br /></span></div>
     <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">record</span><span class="function-signature long-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">reserved: <code><a href="orionis.queues.entities.reserved_job.ReservedJob.html" class="internal-link" title="orionis.queues.entities.reserved_job.ReservedJob">ReservedJob</a></code>, </span><span class="rst-sig-param">connection: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code>, </span><span class="rst-sig-param">exception: <code><a href="https://docs.python.org/3/builtins/exceptions.html#BaseException" class="intersphinx-link">BaseException</a></code></span>) -&gt; <code><a href="orionis.queues.entities.failed_job.FailedJob.html" class="internal-link" title="orionis.queues.entities.failed_job.FailedJob">FailedJob</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/queues/contracts/failed_repository.py#L13">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/queues/contracts/failed_repository.py#L16">
       
       (source)
     </a>
@@ -612,7 +612,7 @@
   </div>
   <div class="docstring functionBody">
     <div class="interfaceinfo">overridden in <code><a href="orionis.queues.failed.repository.DatabaseFailedJobRepository.html" class="internal-link">orionis.queues.failed.repository.DatabaseFailedJobRepository</a></code></div>
-    <div><p>Persist the original payload and exception before acknowledgement.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">reserved:</span><code><a href="orionis.queues.entities.reserved_job.ReservedJob.html" class="internal-link" title="orionis.queues.entities.reserved_job.ReservedJob">ReservedJob</a></code></td><td class="fieldArgDesc">Failed claim, including corrupt wire data when applicable.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">connection:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Queue connection name.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">exception:</span><code><a href="https://docs.python.org/3/builtins/exceptions.html#BaseException" class="intersphinx-link">BaseException</a></code></td><td class="fieldArgDesc">Original execution or deserialization failure.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.queues.entities.failed_job.FailedJob.html" class="internal-link" title="orionis.queues.entities.failed_job.FailedJob">FailedJob</a></code></td><td class="fieldArgDesc">Durable failure record.</td></tr></table></div>
+    <div><p>Persist the original payload and exception before acknowledgement.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">reserved:</span><code><a href="orionis.queues.entities.reserved_job.ReservedJob.html" class="internal-link">orionis.queues.entities.reserved_job.ReservedJob</a></code></td><td class="fieldArgDesc">Failed claim, including corrupt wire data when applicable.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">connection:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Queue connection name.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">exception:</span><code><a href="https://docs.python.org/3/builtins/exceptions.html#BaseException" class="intersphinx-link">BaseException</a></code></td><td class="fieldArgDesc">Original execution or deserialization failure.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.queues.entities.failed_job.FailedJob.html" class="internal-link">orionis.queues.entities.failed_job.FailedJob</a></code></td><td class="fieldArgDesc">Durable failure record.</td></tr></table></div>
   </div>
 </div><div class="baseclassvariable">
   
@@ -626,7 +626,7 @@
   <div class="functionHeader">
     
     <span class="py-defname">__slots__</span>: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" class="intersphinx-link">tuple</a></code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/queues/contracts/failed_repository.py#L11">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/queues/contracts/failed_repository.py#L13">
       
       (source)
     </a>
@@ -638,7 +638,7 @@
   </div>
   <div class="functionBody">
     <div class="interfaceinfo">overridden in <code><a href="orionis.queues.failed.repository.DatabaseFailedJobRepository.html" class="internal-link">orionis.queues.failed.repository.DatabaseFailedJobRepository</a></code></div>
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p>Declare that this class introduces no additional instance slots.</p></div>
     
   </div>
 </div>
@@ -652,7 +652,7 @@
   <div class="orionis-footer-inner">
     <div class="orionis-footer-copy">
       <p>API documentation for <a href="https://orionis-framework.com/" class="projecthome">Orionis</a>.</p>
-      <p class="orionis-footer-meta">Generated with <a href="https://github.com/twisted/pydoctor/">Pydoctor</a> 25.10.1.<span class="orionis-footer-build"> Built 2026-11-03 09:36:58.</span></p>
+      <p class="orionis-footer-meta">Generated with <a href="https://github.com/twisted/pydoctor/">Pydoctor</a> 25.10.1.<span class="orionis-footer-build"> Built 2026-11-03 13:00:15.</span></p>
     </div>
     <nav class="orionis-footer-links" aria-label="Additional resources">
       <a href="https://docs.orionis-framework.com">Read the guide <span aria-hidden="true">↗</span></a>

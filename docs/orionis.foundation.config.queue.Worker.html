@@ -441,7 +441,7 @@
         
 
         
-            <div class="itemName"><code><a href="orionis.foundation.config.queue.enums.drivers.html" class="internal-link" title="orionis.foundation.config.queue.enums.drivers">drivers</a></code>
+            <div class="itemName"><code><a href="orionis.foundation.config.queue.enums.drivers.module.html" class="internal-link" title="orionis.foundation.config.queue.enums.drivers">drivers</a></code>
             </div>
         
 
@@ -1700,15 +1700,15 @@
         </div>
 
         <div class="extrasDocstring">
-          <p class="class-signature"><code><span class="py-keyword">class</span> <span class="py-defname">Worker</span>(<a href="orionis.support.entities.BaseEntity.html" class="internal-link" title="orionis.support.entities.BaseEntity">BaseEntity</a>): <a href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/foundation/config/queue/entities/worker.py#L6" class="sourceLink">(source)</a></code></p><p><a href="classIndex.html#orionis.foundation.config.queue.Worker">View In Hierarchy</a></p>
+          <p class="class-signature"><code><span class="py-keyword">class</span> <span class="py-defname">Worker</span>(<a href="orionis.support.entities.BaseEntity.html" class="internal-link" title="orionis.support.entities.BaseEntity">BaseEntity</a>): <a href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/foundation/config/queue/entities/worker.py#L8" class="sourceLink">(source)</a></code></p><p><a href="classIndex.html#orionis.foundation.config.queue.Worker">View In Hierarchy</a></p>
         </div>
 
         <div class="moduleDocstring">
-          <div><p>Configure strictly validated queue worker defaults.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">concurrency</span></td><td class="fieldArgDesc">Maximum concurrent jobs read from <tt class="rst-docutils rst-literal">QUEUE_WORKER_CONCURRENCY</tt>.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">sleep</span></td><td class="fieldArgDesc">Positive polling seconds read from <tt class="rst-docutils rst-literal">QUEUE_WORKER_SLEEP</tt>.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">timeout</span></td><td class="fieldArgDesc">Positive execution seconds read from <tt class="rst-docutils rst-literal">QUEUE_WORKER_TIMEOUT</tt>.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">tries</span></td><td class="fieldArgDesc">Maximum attempts read from <tt class="rst-docutils rst-literal">QUEUE_WORKER_TRIES</tt>.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">backoff</span></td><td class="fieldArgDesc">Nonnegative retry delays read from <tt class="rst-docutils rst-literal">QUEUE_WORKER_BACKOFF</tt>.</td></tr></table></div>
+          <div><p>Configure strictly validated queue worker defaults.</p></div>
         </div>
 
         <div id="split-tables">
-          <table class="children sortable" id="id868">
+          <table class="children sortable" id="id869">
   
   
   <tr class="method">
@@ -1716,38 +1716,38 @@
     <td>Method</td>
     <td><code><a href="#__post_init__" class="internal-link" title="orionis.foundation.config.queue.Worker.__post_init__">__post<wbr></wbr>_init__</a></code></td>
     <td>Validate worker limits and own the immutable retry schedule.</td>
-  </tr><tr class="classvariable">
+  </tr><tr class="instancevariable">
     
-    <td>Class Variable</td>
+    <td>Instance Variable</td>
     <td><code><a href="#backoff" class="internal-link" title="orionis.foundation.config.queue.Worker.backoff">backoff</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
-  </tr><tr class="classvariable">
+    <td>Nonnegative retry delays read from <tt class="rst-docutils rst-literal">QUEUE_WORKER_BACKOFF</tt>.</td>
+  </tr><tr class="instancevariable">
     
-    <td>Class Variable</td>
+    <td>Instance Variable</td>
     <td><code><a href="#concurrency" class="internal-link" title="orionis.foundation.config.queue.Worker.concurrency">concurrency</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
-  </tr><tr class="classvariable">
+    <td>Maximum concurrent jobs read from <tt class="rst-docutils rst-literal">QUEUE_WORKER_CONCURRENCY</tt>.</td>
+  </tr><tr class="instancevariable">
     
-    <td>Class Variable</td>
+    <td>Instance Variable</td>
     <td><code><a href="#sleep" class="internal-link" title="orionis.foundation.config.queue.Worker.sleep">sleep</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
-  </tr><tr class="classvariable">
+    <td>Positive polling seconds read from <tt class="rst-docutils rst-literal">QUEUE_WORKER_SLEEP</tt>.</td>
+  </tr><tr class="instancevariable">
     
-    <td>Class Variable</td>
+    <td>Instance Variable</td>
     <td><code><a href="#timeout" class="internal-link" title="orionis.foundation.config.queue.Worker.timeout">timeout</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
-  </tr><tr class="classvariable">
+    <td>Positive execution seconds read from <tt class="rst-docutils rst-literal">QUEUE_WORKER_TIMEOUT</tt>.</td>
+  </tr><tr class="instancevariable">
     
-    <td>Class Variable</td>
+    <td>Instance Variable</td>
     <td><code><a href="#tries" class="internal-link" title="orionis.foundation.config.queue.Worker.tries">tries</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
+    <td>Maximum attempts read from <tt class="rst-docutils rst-literal">QUEUE_WORKER_TRIES</tt>.</td>
   </tr>
 </table>
           
             <p class="inheritedFrom">
               Inherited from <code><a href="orionis.support.entities.BaseEntity.html" class="internal-link" title="orionis.support.entities.BaseEntity">BaseEntity</a></code>:
             </p>
-            <table class="children sortable" id="id869">
+            <table class="children sortable" id="id870">
   
   
   <tr class="baseclassmethod">
@@ -1769,7 +1769,7 @@
     
     <td>Class Variable</td>
     <td><code><a href="orionis.support.entities.BaseEntity.html#__slots__" class="internal-link" title="orionis.support.entities.BaseEntity.__slots__">__slots__</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
+    <td>Declare that this class introduces no additional instance slots.</td>
   </tr>
 </table>
             
@@ -1791,7 +1791,7 @@
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">__post_init__</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>):</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/foundation/config/queue/entities/worker.py#L65">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/foundation/config/queue/entities/worker.py#L67">
       
       (source)
     </a>
@@ -1805,7 +1805,7 @@
     <div class="interfaceinfo">overrides <code><a href="orionis.support.entities.BaseEntity.html#__post_init__" class="internal-link">orionis.support.entities.BaseEntity.__post_init__</a></code></div>
     <div><p>Validate worker limits and own the immutable retry schedule.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">Store validated worker settings with tuple backoff values.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/exceptions.html#TypeError" class="intersphinx-link">TypeError</a></code></td><td>If limits, durations, or the retry schedule have invalid types.</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/exceptions.html#ValueError" class="intersphinx-link">ValueError</a></code></td><td>If limits or durations are outside their allowed ranges.</td></tr></table></div>
   </div>
-</div><div class="baseclassvariable">
+</div><div class="baseinstancevariable">
   
   
   <a name="orionis.foundation.config.queue.Worker.backoff">
@@ -1816,8 +1816,8 @@
   </a>
   <div class="functionHeader">
     
-    <span class="py-defname">backoff</span>: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" class="intersphinx-link">tuple</a>[<a href="https://docs.python.org/3/builtins/functions.html#float" class="intersphinx-link">float</a>, ...] | list[<a href="https://docs.python.org/3/builtins/functions.html#float" class="intersphinx-link">float</a>]</code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/foundation/config/queue/entities/worker.py#L57">
+    <span class="py-defname">backoff</span>: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" class="intersphinx-link">tuple</a>[<a href="https://docs.python.org/3/builtins/functions.html#float" class="intersphinx-link">float</a>, <tt class="rst-docutils rst-literal">...</tt>] | list[<a href="https://docs.python.org/3/builtins/functions.html#float" class="intersphinx-link">float</a>]</code> =
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/foundation/config/queue/entities/worker.py#L59">
       
       (source)
     </a>
@@ -1829,10 +1829,10 @@
   </div>
   <div class="functionBody">
     
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p>Nonnegative retry delays read from <tt class="rst-docutils rst-literal">QUEUE_WORKER_BACKOFF</tt>.</p></div>
     
   </div>
-</div><div class="baseclassvariable">
+</div><div class="baseinstancevariable">
   
   
   <a name="orionis.foundation.config.queue.Worker.concurrency">
@@ -1844,7 +1844,7 @@
   <div class="functionHeader">
     
     <span class="py-defname">concurrency</span>: <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/foundation/config/queue/entities/worker.py#L25">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/foundation/config/queue/entities/worker.py#L27">
       
       (source)
     </a>
@@ -1856,10 +1856,10 @@
   </div>
   <div class="functionBody">
     
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p>Maximum concurrent jobs read from <tt class="rst-docutils rst-literal">QUEUE_WORKER_CONCURRENCY</tt>.</p></div>
     
   </div>
-</div><div class="baseclassvariable">
+</div><div class="baseinstancevariable">
   
   
   <a name="orionis.foundation.config.queue.Worker.sleep">
@@ -1871,7 +1871,7 @@
   <div class="functionHeader">
     
     <span class="py-defname">sleep</span>: <code><a href="https://docs.python.org/3/builtins/functions.html#float" class="intersphinx-link">float</a></code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/foundation/config/queue/entities/worker.py#L33">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/foundation/config/queue/entities/worker.py#L35">
       
       (source)
     </a>
@@ -1883,10 +1883,10 @@
   </div>
   <div class="functionBody">
     
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p>Positive polling seconds read from <tt class="rst-docutils rst-literal">QUEUE_WORKER_SLEEP</tt>.</p></div>
     
   </div>
-</div><div class="baseclassvariable">
+</div><div class="baseinstancevariable">
   
   
   <a name="orionis.foundation.config.queue.Worker.timeout">
@@ -1898,7 +1898,7 @@
   <div class="functionHeader">
     
     <span class="py-defname">timeout</span>: <code><a href="https://docs.python.org/3/builtins/functions.html#float" class="intersphinx-link">float</a></code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/foundation/config/queue/entities/worker.py#L41">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/foundation/config/queue/entities/worker.py#L43">
       
       (source)
     </a>
@@ -1910,10 +1910,10 @@
   </div>
   <div class="functionBody">
     
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p>Positive execution seconds read from <tt class="rst-docutils rst-literal">QUEUE_WORKER_TIMEOUT</tt>.</p></div>
     
   </div>
-</div><div class="baseclassvariable">
+</div><div class="baseinstancevariable">
   
   
   <a name="orionis.foundation.config.queue.Worker.tries">
@@ -1925,7 +1925,7 @@
   <div class="functionHeader">
     
     <span class="py-defname">tries</span>: <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/foundation/config/queue/entities/worker.py#L49">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/foundation/config/queue/entities/worker.py#L51">
       
       (source)
     </a>
@@ -1937,7 +1937,7 @@
   </div>
   <div class="functionBody">
     
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p>Maximum attempts read from <tt class="rst-docutils rst-literal">QUEUE_WORKER_TRIES</tt>.</p></div>
     
   </div>
 </div>
@@ -1951,7 +1951,7 @@
   <div class="orionis-footer-inner">
     <div class="orionis-footer-copy">
       <p>API documentation for <a href="https://orionis-framework.com/" class="projecthome">Orionis</a>.</p>
-      <p class="orionis-footer-meta">Generated with <a href="https://github.com/twisted/pydoctor/">Pydoctor</a> 25.10.1.<span class="orionis-footer-build"> Built 2026-11-03 09:36:58.</span></p>
+      <p class="orionis-footer-meta">Generated with <a href="https://github.com/twisted/pydoctor/">Pydoctor</a> 25.10.1.<span class="orionis-footer-build"> Built 2026-11-03 13:00:15.</span></p>
     </div>
     <nav class="orionis-footer-links" aria-label="Additional resources">
       <a href="https://docs.orionis-framework.com">Read the guide <span aria-hidden="true">↗</span></a>

@@ -525,7 +525,7 @@
                     
                 </label>
 
-                <code><a href="orionis.storage.directory.html" class="internal-link" title="orionis.storage.directory">directory</a></code>
+                <code><a href="orionis.storage.directory.module.html" class="internal-link" title="orionis.storage.directory">directory</a></code>
 
                 <div class="expandableContent">
                     <div>
@@ -571,7 +571,7 @@
                     
                 </label>
 
-                <code><a href="orionis.storage.disk.html" class="internal-link" title="orionis.storage.disk">disk</a></code>
+                <code><a href="orionis.storage.disk.module.html" class="internal-link" title="orionis.storage.disk">disk</a></code>
 
                 <div class="expandableContent">
                     <div>
@@ -902,7 +902,7 @@
         
 
         
-            <div class="itemName"><code><a href="orionis.storage.enums.visibility.html" class="internal-link" title="orionis.storage.enums.visibility">visibility</a></code>
+            <div class="itemName"><code><a href="orionis.storage.enums.visibility.module.html" class="internal-link" title="orionis.storage.enums.visibility">visibility</a></code>
             </div>
         
 
@@ -1078,7 +1078,7 @@
                     
                 </label>
 
-                <code><a href="orionis.storage.file.html" class="internal-link" title="orionis.storage.file">file</a></code>
+                <code><a href="orionis.storage.file.module.html" class="internal-link" title="orionis.storage.file">file</a></code>
 
                 <div class="expandableContent">
                     <div>
@@ -2761,15 +2761,15 @@
         </div>
 
         <div class="extrasDocstring">
-          <a href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/storage/paths.py" class="sourceLink">(source)</a>
+          <a href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/storage/paths.py" class="sourceLink">(source)</a>
         </div>
 
         <div class="moduleDocstring">
-          <div><p class="undocumented">Undocumented</p></div>
+          <div><p>Provide storage operations through <tt class="rst-docutils rst-literal">normalize_path</tt>, <tt class="rst-docutils rst-literal">normalize_file_path</tt>.</p></div>
         </div>
 
         <div id="split-tables">
-          <table class="children sortable" id="id2033">
+          <table class="children sortable" id="id2041">
   
   
   <tr class="function">
@@ -2791,7 +2791,7 @@
     
     <td>Constant</td>
     <td><code><a href="#_LEGACY_EXPORTS" class="internal-link" title="orionis.storage.paths._LEGACY_EXPORTS">_LEGACY<wbr></wbr>_EXPORTS</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
+    <td>Legacy exports definitions used by <tt class="rst-docutils rst-literal">paths</tt>.</td>
   </tr>
 </table>
           
@@ -2813,7 +2813,7 @@
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">__getattr__</span><span class="function-signature">(<span class="rst-sig-param">name: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/functions.html#object" class="intersphinx-link">object</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/storage/paths.py#L97">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/storage/paths.py#L100">
       
       (source)
     </a>
@@ -2840,7 +2840,7 @@
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">normalize_file_path</span><span class="function-signature">(<span class="rst-sig-param">path: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/storage/paths.py#L60">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/storage/paths.py#L62">
       
       (source)
     </a>
@@ -2853,9 +2853,9 @@
   <div class="docstring functionBody">
     
     <div><p>Normalize a storage path and require it to reference a file.</p>
-<p>Apply <code><a href="#normalize_path" class="internal-link" title="orionis.storage.paths.normalize_path">normalize_path</a></code> and additionally reject the empty
+<p>Apply <code><a href="#normalize_path" class="internal-link">orionis.storage.paths.normalize_path</a></code> and additionally reject the empty
 result, since the disk root can never be treated as a file.</p>
-<table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">path:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Raw storage path as supplied by the caller.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Canonical, non-empty relative path using <tt class="rst-docutils rst-literal">/</tt> as separator.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.storage.exceptions.StoragePathException.html" class="internal-link" title="orionis.storage.exceptions.StoragePathException">StoragePathException</a></code></td><td>If the path is invalid or resolves to the disk root.</td></tr></table></div>
+<table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">path:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Raw storage path as supplied by the caller.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Canonical, non-empty relative path using <tt class="rst-docutils rst-literal">/</tt> as separator.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.storage.exceptions.StoragePathException.html" class="internal-link">orionis.storage.exceptions.StoragePathException</a></code></td><td>If the path is invalid or resolves to the disk root.</td></tr></table></div>
   </div>
 </div><div class="basefunction">
   
@@ -2870,7 +2870,7 @@ result, since the disk root can never be treated as a file.</p>
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">normalize_path</span><span class="function-signature">(<span class="rst-sig-param">path: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/storage/paths.py#L4">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/storage/paths.py#L6">
       
       (source)
     </a>
@@ -2889,7 +2889,7 @@ that would escape the disk root or contains forbidden characters.
 The returned path never has a leading or trailing slash; the empty
 string represents the disk root.</p>
 <table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">path:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Raw storage path as supplied by the caller.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Canonical relative path using <tt class="rst-docutils rst-literal">/</tt> as separator, or an empty
-string when the path resolves to the disk root.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.storage.exceptions.StoragePathException.html" class="internal-link" title="orionis.storage.exceptions.StoragePathException">StoragePathException</a></code></td><td>If the path contains a null byte, a <tt class="rst-docutils rst-literal">:</tt> character, or a
+string when the path resolves to the disk root.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.storage.exceptions.StoragePathException.html" class="internal-link">orionis.storage.exceptions.StoragePathException</a></code></td><td>If the path contains a null byte, a <tt class="rst-docutils rst-literal">:</tt> character, or a
 <tt class="rst-docutils rst-literal">..</tt> sequence that escapes the disk root.</td></tr></table></div>
   </div>
 </div><div class="baseconstant">
@@ -2904,7 +2904,7 @@ string when the path resolves to the disk root.</td></tr></table><table class="f
   <div class="functionHeader">
     
     <span class="py-defname">_LEGACY_EXPORTS</span> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/storage/paths.py#L92">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/storage/paths.py#L94">
       
       (source)
     </a>
@@ -2916,7 +2916,7 @@ string when the path resolves to the disk root.</td></tr></table><table class="f
   </div>
   <div class="functionBody">
     
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p>Legacy exports definitions used by <tt class="rst-docutils rst-literal">paths</tt>.</p></div>
     <table class="valueTable"><tr class="fieldStart"><td class="fieldName">Value</td></tr><tr><td><pre class="constant-value"><code>{<wbr></wbr><span class="rst-variable-quote">'</span><span class="rst-variable-string">normalizePath</span><span class="rst-variable-quote">'</span>: <a href="#normalize_path" class="internal-link" title="orionis.storage.paths.normalize_path">normalize_path</a>, <wbr></wbr><span class="rst-variable-quote">'</span><span class="rst-variable-string">normalizeFilePath</span><span class="rst-variable-quote">'</span>: <a href="#normalize_file_path" class="internal-link" title="orionis.storage.paths.normalize_file_path">normalize_file_path</a>}</code></pre></td></tr></table>
   </div>
 </div>
@@ -2930,7 +2930,7 @@ string when the path resolves to the disk root.</td></tr></table><table class="f
   <div class="orionis-footer-inner">
     <div class="orionis-footer-copy">
       <p>API documentation for <a href="https://orionis-framework.com/" class="projecthome">Orionis</a>.</p>
-      <p class="orionis-footer-meta">Generated with <a href="https://github.com/twisted/pydoctor/">Pydoctor</a> 25.10.1.<span class="orionis-footer-build"> Built 2026-11-03 09:36:58.</span></p>
+      <p class="orionis-footer-meta">Generated with <a href="https://github.com/twisted/pydoctor/">Pydoctor</a> 25.10.1.<span class="orionis-footer-build"> Built 2026-11-03 13:00:15.</span></p>
     </div>
     <nav class="orionis-footer-links" aria-label="Additional resources">
       <a href="https://docs.orionis-framework.com">Read the guide <span aria-hidden="true">↗</span></a>

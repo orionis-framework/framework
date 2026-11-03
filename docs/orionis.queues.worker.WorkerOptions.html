@@ -686,6 +686,16 @@
             </div>
         
 
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.queues.worker.html#FailedResolver" class="internal-link" title="orionis.queues.worker.FailedResolver"><wbr></wbr>Failed<wbr></wbr>Resolver</a></code>
+            </div>
+        
+
     </li>
 </ul> 
 
@@ -745,7 +755,7 @@
         </div>
 
         <div class="extrasDocstring">
-          <p class="class-signature"><code><span class="py-keyword">class</span> <span class="py-defname">WorkerOptions</span>: <a href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/queues/worker.py#L24" class="sourceLink">(source)</a></code></p><p><a href="classIndex.html#orionis.queues.worker.WorkerOptions">View In Hierarchy</a></p>
+          <p class="class-signature"><code><span class="py-keyword">class</span> <span class="py-defname">WorkerOptions</span>: <a href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/queues/worker.py#L28" class="sourceLink">(source)</a></code></p><p><a href="classIndex.html#orionis.queues.worker.WorkerOptions">View In Hierarchy</a></p>
         </div>
 
         <div class="moduleDocstring">
@@ -753,7 +763,7 @@
         </div>
 
         <div id="split-tables">
-          <table class="children sortable" id="id1765">
+          <table class="children sortable" id="id1773">
   
   
   <tr class="method">
@@ -765,27 +775,27 @@
     
     <td>Class Variable</td>
     <td><code><a href="#concurrency" class="internal-link" title="orionis.queues.worker.WorkerOptions.concurrency">concurrency</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
+    <td>Concurrency value used by <tt class="rst-docutils rst-literal">WorkerOptions</tt>.</td>
   </tr><tr class="classvariable">
     
     <td>Class Variable</td>
     <td><code><a href="#connection" class="internal-link" title="orionis.queues.worker.WorkerOptions.connection">connection</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
+    <td>Configured connection used to store or dispatch the operation.</td>
   </tr><tr class="classvariable">
     
     <td>Class Variable</td>
     <td><code><a href="#queues" class="internal-link" title="orionis.queues.worker.WorkerOptions.queues">queues</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
+    <td>Queue names selected for worker polling.</td>
   </tr><tr class="classvariable">
     
     <td>Class Variable</td>
     <td><code><a href="#retry_after" class="internal-link" title="orionis.queues.worker.WorkerOptions.retry_after">retry<wbr></wbr>_after</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
+    <td>Retry after value used by <tt class="rst-docutils rst-literal">WorkerOptions</tt>.</td>
   </tr><tr class="classvariable">
     
     <td>Class Variable</td>
     <td><code><a href="#sleep" class="internal-link" title="orionis.queues.worker.WorkerOptions.sleep">sleep</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
+    <td>Sleep value used by <tt class="rst-docutils rst-literal">WorkerOptions</tt>.</td>
   </tr>
 </table>
           
@@ -807,7 +817,7 @@
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">__post_init__</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>):</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/queues/worker.py#L34">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/queues/worker.py#L43">
       
       (source)
     </a>
@@ -819,7 +829,7 @@
   </div>
   <div class="docstring functionBody">
     
-    <div><p>Validate worker concurrency, routing names and polling durations.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">Leave valid settings unchanged.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.queues.exceptions.QueueConfigurationError.html" class="internal-link" title="orionis.queues.exceptions.QueueConfigurationError">QueueConfigurationError</a></code></td><td>If concurrency, queue selection, routing names or durations are invalid.</td></tr></table></div>
+    <div><p>Validate worker concurrency, routing names and polling durations.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">Leave valid settings unchanged.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.queues.exceptions.QueueConfigurationError.html" class="internal-link">orionis.queues.exceptions.QueueConfigurationError</a></code></td><td>If concurrency, queue selection, routing names or durations are invalid.</td></tr></table></div>
   </div>
 </div><div class="baseclassvariable">
   
@@ -833,7 +843,7 @@
   <div class="functionHeader">
     
     <span class="py-defname">concurrency</span>: <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/queues/worker.py#L30">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/queues/worker.py#L36">
       
       (source)
     </a>
@@ -845,7 +855,7 @@
   </div>
   <div class="functionBody">
     
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p>Concurrency value used by <tt class="rst-docutils rst-literal">WorkerOptions</tt>.</p></div>
     
   </div>
 </div><div class="baseclassvariable">
@@ -860,7 +870,7 @@
   <div class="functionHeader">
     
     <span class="py-defname">connection</span>: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/queues/worker.py#L28">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/queues/worker.py#L32">
       
       (source)
     </a>
@@ -872,7 +882,7 @@
   </div>
   <div class="functionBody">
     
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p>Configured connection used to store or dispatch the operation.</p></div>
     
   </div>
 </div><div class="baseclassvariable">
@@ -887,7 +897,7 @@
   <div class="functionHeader">
     
     <span class="py-defname">queues</span>: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" class="intersphinx-link">tuple</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <wbr></wbr><span class="rst-variable-ellipsis">...</span>]</code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/queues/worker.py#L29">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/queues/worker.py#L34">
       
       (source)
     </a>
@@ -899,7 +909,7 @@
   </div>
   <div class="functionBody">
     
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p>Queue names selected for worker polling.</p></div>
     
   </div>
 </div><div class="baseclassvariable">
@@ -914,7 +924,7 @@
   <div class="functionHeader">
     
     <span class="py-defname">retry_after</span>: <code><a href="https://docs.python.org/3/builtins/functions.html#float" class="intersphinx-link">float</a></code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/queues/worker.py#L31">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/queues/worker.py#L38">
       
       (source)
     </a>
@@ -926,7 +936,7 @@
   </div>
   <div class="functionBody">
     
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p>Retry after value used by <tt class="rst-docutils rst-literal">WorkerOptions</tt>.</p></div>
     
   </div>
 </div><div class="baseclassvariable">
@@ -941,7 +951,7 @@
   <div class="functionHeader">
     
     <span class="py-defname">sleep</span>: <code><a href="https://docs.python.org/3/builtins/functions.html#float" class="intersphinx-link">float</a></code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/queues/worker.py#L32">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/queues/worker.py#L40">
       
       (source)
     </a>
@@ -953,7 +963,7 @@
   </div>
   <div class="functionBody">
     
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p>Sleep value used by <tt class="rst-docutils rst-literal">WorkerOptions</tt>.</p></div>
     
   </div>
 </div>
@@ -967,7 +977,7 @@
   <div class="orionis-footer-inner">
     <div class="orionis-footer-copy">
       <p>API documentation for <a href="https://orionis-framework.com/" class="projecthome">Orionis</a>.</p>
-      <p class="orionis-footer-meta">Generated with <a href="https://github.com/twisted/pydoctor/">Pydoctor</a> 25.10.1.<span class="orionis-footer-build"> Built 2026-11-03 09:36:58.</span></p>
+      <p class="orionis-footer-meta">Generated with <a href="https://github.com/twisted/pydoctor/">Pydoctor</a> 25.10.1.<span class="orionis-footer-build"> Built 2026-11-03 13:00:15.</span></p>
     </div>
     <nav class="orionis-footer-links" aria-label="Additional resources">
       <a href="https://docs.orionis-framework.com">Read the guide <span aria-hidden="true">↗</span></a>

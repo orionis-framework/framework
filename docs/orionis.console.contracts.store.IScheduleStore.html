@@ -410,11 +410,11 @@
         </div>
 
         <div class="extrasDocstring">
-          <p class="class-signature"><code><span class="py-keyword">class</span> <span class="py-defname">IScheduleStore</span>(<a href="https://docs.python.org/3/library/abc.html#abc.ABC" class="intersphinx-link">ABC</a>): <a href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/console/contracts/store.py#L12" class="sourceLink">(source)</a></code></p><p>Known subclasses: <code><a href="orionis.console.tasks.store.ScheduleStore.html" class="internal-link">orionis.console.tasks.store.ScheduleStore</a></code></p><p><a href="classIndex.html#orionis.console.contracts.store.IScheduleStore">View In Hierarchy</a></p>
+          <p class="class-signature"><code><span class="py-keyword">class</span> <span class="py-defname">IScheduleStore</span>(<a href="https://docs.python.org/3/library/abc.html#abc.ABC" class="intersphinx-link">ABC</a>): <a href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/console/contracts/store.py#L14" class="sourceLink">(source)</a></code></p><p>Known subclasses: <code><a href="orionis.console.tasks.store.ScheduleStore.html" class="internal-link">orionis.console.tasks.store.ScheduleStore</a></code></p><p><a href="classIndex.html#orionis.console.contracts.store.IScheduleStore">View In Hierarchy</a></p>
         </div>
 
         <div class="moduleDocstring">
-          <div><p class="undocumented">Undocumented</p></div>
+          <div><p>Define the contract for schedule store implementations.</p></div>
         </div>
 
         <div id="split-tables">
@@ -467,7 +467,7 @@
     
     <div><span class="decorator">@<a href="https://docs.python.org/3/library/abc.html#abc.abstractmethod" class="intersphinx-link">abstractmethod</a><br /></span></div>
     <span class="py-keyword">def</span>&#160;<span class="py-defname">database</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>) -&gt; <code>SQLAlchemyJobStore</code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/console/contracts/store.py#L55">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/console/contracts/store.py#L58">
       
       (source)
     </a>
@@ -479,7 +479,7 @@
   </div>
   <div class="docstring functionBody">
     <div class="interfaceinfo">overridden in <code><a href="orionis.console.tasks.store.ScheduleStore.html" class="internal-link">orionis.console.tasks.store.ScheduleStore</a></code></div>
-    <div><p>Create a database job store for the scheduler.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code>SQLAlchemyJobStore</code></td><td class="fieldArgDesc">A configured SQLAlchemy job store instance.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/exceptions.html#RuntimeError" class="intersphinx-link">RuntimeError</a></code></td><td>If the database store configuration is not set.</td></tr><tr><td class="fieldArgContainer"><code>MissingDatabaseDependencyException</code></td><td>If the resolved driver package is not installed.</td></tr></table></div>
+    <div><p>Create a database job store for the scheduler.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><tt class="rst-docutils rst-literal">apscheduler.jobstores.sqlalchemy.SQLAlchemyJobStore</tt></code></td><td class="fieldArgDesc">A configured SQLAlchemy job store instance.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/exceptions.html#RuntimeError" class="intersphinx-link">RuntimeError</a></code></td><td>If the database store configuration is not set.</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.database.MissingDatabaseDependencyException.html" class="internal-link">orionis.database.MissingDatabaseDependencyException</a></code></td><td>If the resolved driver package is not installed.</td></tr></table></div>
   </div>
 </div><div class="basemethod">
   
@@ -494,7 +494,7 @@
     
     <div><span class="decorator">@<a href="https://docs.python.org/3/library/abc.html#abc.abstractmethod" class="intersphinx-link">abstractmethod</a><br /></span></div>
     <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">migrate</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>):</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/console/contracts/store.py#L73">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/console/contracts/store.py#L76">
       
       (source)
     </a>
@@ -506,7 +506,7 @@
   </div>
   <div class="docstring functionBody">
     <div class="interfaceinfo">overridden in <code><a href="orionis.console.tasks.store.ScheduleStore.html" class="internal-link">orionis.console.tasks.store.ScheduleStore</a></code></div>
-    <div><p>Create the configured database job table without starting the scheduler.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">Create missing native storage and preserve existing job data.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/exceptions.html#RuntimeError" class="intersphinx-link">RuntimeError</a></code></td><td>If database storage is absent or the backend is unsupported.</td></tr><tr><td class="fieldArgContainer"><code>DatabaseException</code></td><td>If the connection, driver, or schema creation fails.</td></tr></table></div>
+    <div><p>Create the configured database job table without starting the scheduler.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">Create missing native storage and preserve existing job data.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/exceptions.html#RuntimeError" class="intersphinx-link">RuntimeError</a></code></td><td>If database storage is absent or the backend is unsupported.</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.database.DatabaseException.html" class="internal-link">orionis.database.DatabaseException</a></code></td><td>If the connection, driver, or schema creation fails.</td></tr></table></div>
   </div>
 </div><div class="basemethod">
   
@@ -521,7 +521,7 @@
     
     <div><span class="decorator">@<a href="https://docs.python.org/3/library/abc.html#abc.abstractmethod" class="intersphinx-link">abstractmethod</a><br /></span></div>
     <span class="py-keyword">def</span>&#160;<span class="py-defname">redis</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>) -&gt; <code>RedisJobStore</code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/console/contracts/store.py#L39">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/console/contracts/store.py#L42">
       
       (source)
     </a>
@@ -533,7 +533,7 @@
   </div>
   <div class="docstring functionBody">
     <div class="interfaceinfo">overridden in <code><a href="orionis.console.tasks.store.ScheduleStore.html" class="internal-link">orionis.console.tasks.store.ScheduleStore</a></code></div>
-    <div><p>Create a Redis job store for the scheduler.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code>RedisJobStore</code></td><td class="fieldArgDesc">A configured Redis job store instance.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/exceptions.html#RuntimeError" class="intersphinx-link">RuntimeError</a></code></td><td>If the Redis store configuration is not set.</td></tr></table></div>
+    <div><p>Create a Redis job store for the scheduler.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><tt class="rst-docutils rst-literal">apscheduler.jobstores.redis.RedisJobStore</tt></code></td><td class="fieldArgDesc">A configured Redis job store instance.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/exceptions.html#RuntimeError" class="intersphinx-link">RuntimeError</a></code></td><td>If the Redis store configuration is not set.</td></tr></table></div>
   </div>
 </div><div class="baseproperty">
   
@@ -547,7 +547,7 @@
   <div class="functionHeader">
     <div><span class="decorator">@<a href="https://docs.python.org/3/builtins/functions.html#property" class="intersphinx-link">property</a><br /></span><span class="decorator">@<a href="https://docs.python.org/3/library/abc.html#abc.abstractmethod" class="intersphinx-link">abstractmethod</a><br /></span></div>
     <span class="py-defname">config</span>: <code>ConfigScheduler</code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/console/contracts/store.py#L26">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/console/contracts/store.py#L29">
       
       (source)
     </a>
@@ -559,7 +559,7 @@
   </div>
   <div class="functionBody">
     <div class="interfaceinfo">overridden in <code><a href="orionis.console.tasks.store.ScheduleStore.html" class="internal-link">orionis.console.tasks.store.ScheduleStore</a></code></div>
-    <div><p>Get the full scheduler configuration entity.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code>ConfigScheduler</code></td><td class="fieldArgDesc">The scheduler configuration (store, jitter, max_instances,
+    <div><p>Get the full scheduler configuration entity.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.foundation.config.scheduler.Scheduler.html" class="internal-link">orionis.foundation.config.scheduler.Scheduler</a></code></td><td class="fieldArgDesc">The scheduler configuration (store, jitter, max_instances,
 misfire_grace_time, coalesce, replace_existing, etc.).</td></tr></table></div>
     
   </div>
@@ -575,7 +575,7 @@ misfire_grace_time, coalesce, replace_existing, etc.).</td></tr></table></div>
   <div class="functionHeader">
     <div><span class="decorator">@<a href="https://docs.python.org/3/builtins/functions.html#property" class="intersphinx-link">property</a><br /></span><span class="decorator">@<a href="https://docs.python.org/3/library/abc.html#abc.abstractmethod" class="intersphinx-link">abstractmethod</a><br /></span></div>
     <span class="py-defname">store</span>: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/console/contracts/store.py#L14">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/console/contracts/store.py#L17">
       
       (source)
     </a>
@@ -601,7 +601,7 @@ misfire_grace_time, coalesce, replace_existing, etc.).</td></tr></table></div>
   <div class="orionis-footer-inner">
     <div class="orionis-footer-copy">
       <p>API documentation for <a href="https://orionis-framework.com/" class="projecthome">Orionis</a>.</p>
-      <p class="orionis-footer-meta">Generated with <a href="https://github.com/twisted/pydoctor/">Pydoctor</a> 25.10.1.<span class="orionis-footer-build"> Built 2026-11-03 09:36:58.</span></p>
+      <p class="orionis-footer-meta">Generated with <a href="https://github.com/twisted/pydoctor/">Pydoctor</a> 25.10.1.<span class="orionis-footer-build"> Built 2026-11-03 13:00:15.</span></p>
     </div>
     <nav class="orionis-footer-links" aria-label="Additional resources">
       <a href="https://docs.orionis-framework.com">Read the guide <span aria-hidden="true">↗</span></a>

@@ -611,7 +611,7 @@
         </div>
 
         <div class="extrasDocstring">
-          <p class="class-signature"><code><span class="py-keyword">class</span> <span class="py-defname">BoundedQueueHandler</span>(<a href="https://docs.python.org/3/library/logging.html#logging.Handler" class="intersphinx-link">logging.Handler</a>): <a href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/logging/handlers/queued.py#L67" class="sourceLink">(source)</a></code></p><p>Constructor: <code><a href="#__init__" class="internal-link" title="orionis.logging.handlers.queued.BoundedQueueHandler.__init__">BoundedQueueHandler(target, capacity)</a></code></p><p><a href="classIndex.html#orionis.logging.handlers.queued.BoundedQueueHandler">View In Hierarchy</a></p>
+          <p class="class-signature"><code><span class="py-keyword">class</span> <span class="py-defname">BoundedQueueHandler</span>(<a href="https://docs.python.org/3/library/logging.html#logging.Handler" class="intersphinx-link">logging.Handler</a>): <a href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/logging/handlers/queued.py#L73" class="sourceLink">(source)</a></code></p><p>Constructor: <code><a href="#__init__" class="internal-link" title="orionis.logging.handlers.queued.BoundedQueueHandler.__init__">BoundedQueueHandler(target, capacity)</a></code></p><p><a href="classIndex.html#orionis.logging.handlers.queued.BoundedQueueHandler">View In Hierarchy</a></p>
         </div>
 
         <div class="moduleDocstring">
@@ -623,7 +623,7 @@ Close drains accepted records and surfaces background delivery errors.</p>
         </div>
 
         <div id="split-tables">
-          <table class="children sortable" id="id1281">
+          <table class="children sortable" id="id1284">
   
   
   <tr class="method">
@@ -650,22 +650,22 @@ Close drains accepted records and surfaces background delivery errors.</p>
     
     <td>Instance Variable</td>
     <td><code><a href="#_listener" class="internal-link" title="orionis.logging.handlers.queued.BoundedQueueHandler._listener">_listener</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
+    <td>Listener produced by <tt class="rst-docutils rst-literal">_Listener</tt>.</td>
   </tr><tr class="instancevariable">
     
     <td>Instance Variable</td>
     <td><code><a href="#_queue" class="internal-link" title="orionis.logging.handlers.queued.BoundedQueueHandler._queue">_queue</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
+    <td>Name of the queue receiving or storing the job.</td>
   </tr><tr class="instancevariable">
     
     <td>Instance Variable</td>
     <td><code><a href="#_stopped" class="internal-link" title="orionis.logging.handlers.queued.BoundedQueueHandler._stopped">_stopped</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
+    <td>Stopped flag used by <tt class="rst-docutils rst-literal">BoundedQueueHandler</tt>.</td>
   </tr><tr class="instancevariable">
     
     <td>Instance Variable</td>
     <td><code><a href="#_target" class="internal-link" title="orionis.logging.handlers.queued.BoundedQueueHandler._target">_target</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
+    <td>Owned sink, closed after the queue drains.</td>
   </tr>
 </table>
           
@@ -687,7 +687,7 @@ Close drains accepted records and surfaces background delivery errors.</p>
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">__init__</span><span class="function-signature">(<span class="rst-sig-param">self: <code><a href="https://docs.python.org/3/library/typing.html#typing.Self" class="intersphinx-link">Self</a></code>, </span><span class="rst-sig-param">target: <code><a href="https://docs.python.org/3/library/logging.html#logging.Handler" class="intersphinx-link">logging.Handler</a></code>, </span><span class="rst-sig-param">capacity: <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code></span>):</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/logging/handlers/queued.py#L76">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/logging/handlers/queued.py#L82">
       
       (source)
     </a>
@@ -699,7 +699,7 @@ Close drains accepted records and surfaces background delivery errors.</p>
   </div>
   <div class="docstring functionBody">
     
-    <div><p>Start one listener for the supplied sink and bounded queue.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">target:</span><code><a href="https://docs.python.org/3/library/logging.html#logging.Handler" class="intersphinx-link">logging.Handler</a></code></td><td class="fieldArgDesc">Owned sink, closed after the queue drains.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">capacity:</span><code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code></td><td class="fieldArgDesc">Positive number of pending records allowed.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">Complete the operation without returning a value.</td></tr></table></div>
+    <div><p>Start one listener for the supplied sink and bounded queue.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">target:</span><code><tt class="rst-docutils rst-literal">logging.Handler</tt></code></td><td class="fieldArgDesc">Owned sink, closed after the queue drains.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">capacity:</span><code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code></td><td class="fieldArgDesc">Positive number of pending records allowed.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">Complete the operation without returning a value.</td></tr></table></div>
   </div>
 </div><div class="basemethod">
   
@@ -714,7 +714,7 @@ Close drains accepted records and surfaces background delivery errors.</p>
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">close</span><span class="function-signature">(<span class="rst-sig-param">self: <code><a href="https://docs.python.org/3/library/typing.html#typing.Self" class="intersphinx-link">Self</a></code></span>):</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/logging/handlers/queued.py#L147">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/logging/handlers/queued.py#L157">
       
       (source)
     </a>
@@ -741,7 +741,7 @@ Close drains accepted records and surfaces background delivery errors.</p>
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">emit</span><span class="function-signature">(<span class="rst-sig-param">self: <code><a href="https://docs.python.org/3/library/typing.html#typing.Self" class="intersphinx-link">Self</a></code>, </span><span class="rst-sig-param">record: <code><a href="https://docs.python.org/3/library/logging.html#logging.LogRecord" class="intersphinx-link">logging.LogRecord</a></code></span>):</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/logging/handlers/queued.py#L103">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/logging/handlers/queued.py#L113">
       
       (source)
     </a>
@@ -753,7 +753,7 @@ Close drains accepted records and surfaces background delivery errors.</p>
   </div>
   <div class="docstring functionBody">
     
-    <div><p>Enqueue an owned record snapshot or explicitly reject it.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">record:</span><code><a href="https://docs.python.org/3/library/logging.html#logging.LogRecord" class="intersphinx-link">logging.LogRecord</a></code></td><td class="fieldArgDesc">Log record to deliver to the sink.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">Complete the operation without returning a value.</td></tr></table></div>
+    <div><p>Enqueue an owned record snapshot or explicitly reject it.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">record:</span><code><tt class="rst-docutils rst-literal">logging.LogRecord</tt></code></td><td class="fieldArgDesc">Log record to deliver to the sink.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">Complete the operation without returning a value.</td></tr></table></div>
   </div>
 </div><div class="basemethod">
   
@@ -768,7 +768,7 @@ Close drains accepted records and surfaces background delivery errors.</p>
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">flush</span><span class="function-signature">(<span class="rst-sig-param">self: <code><a href="https://docs.python.org/3/library/typing.html#typing.Self" class="intersphinx-link">Self</a></code></span>):</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/logging/handlers/queued.py#L128">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/logging/handlers/queued.py#L138">
       
       (source)
     </a>
@@ -794,7 +794,7 @@ Close drains accepted records and surfaces background delivery errors.</p>
   <div class="functionHeader">
     
     <span class="py-defname">_listener</span> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/logging/handlers/queued.py#L99">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/logging/handlers/queued.py#L107">
       
       (source)
     </a>
@@ -806,7 +806,7 @@ Close drains accepted records and surfaces background delivery errors.</p>
   </div>
   <div class="functionBody">
     
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p>Listener produced by <tt class="rst-docutils rst-literal">_Listener</tt>.</p></div>
     
   </div>
 </div><div class="baseinstancevariable">
@@ -821,7 +821,7 @@ Close drains accepted records and surfaces background delivery errors.</p>
   <div class="functionHeader">
     
     <span class="py-defname">_queue</span>: <code><a href="https://docs.python.org/3/library/queue.html#queue.Queue" class="intersphinx-link">Queue</a></code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/logging/handlers/queued.py#L98">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/logging/handlers/queued.py#L105">
       
       (source)
     </a>
@@ -833,7 +833,7 @@ Close drains accepted records and surfaces background delivery errors.</p>
   </div>
   <div class="functionBody">
     
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p>Name of the queue receiving or storing the job.</p></div>
     
   </div>
 </div><div class="baseinstancevariable">
@@ -848,7 +848,7 @@ Close drains accepted records and surfaces background delivery errors.</p>
   <div class="functionHeader">
     
     <span class="py-defname">_stopped</span>: <code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/logging/handlers/queued.py#L100">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/logging/handlers/queued.py#L109">
       
       (source)
     </a>
@@ -860,7 +860,7 @@ Close drains accepted records and surfaces background delivery errors.</p>
   </div>
   <div class="functionBody">
     
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p>Stopped flag used by <tt class="rst-docutils rst-literal">BoundedQueueHandler</tt>.</p></div>
     
   </div>
 </div><div class="baseinstancevariable">
@@ -875,7 +875,7 @@ Close drains accepted records and surfaces background delivery errors.</p>
   <div class="functionHeader">
     
     <span class="py-defname">_target</span> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/logging/handlers/queued.py#L96">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/logging/handlers/queued.py#L102">
       
       (source)
     </a>
@@ -887,7 +887,7 @@ Close drains accepted records and surfaces background delivery errors.</p>
   </div>
   <div class="functionBody">
     
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p>Owned sink, closed after the queue drains.</p></div>
     
   </div>
 </div>
@@ -901,7 +901,7 @@ Close drains accepted records and surfaces background delivery errors.</p>
   <div class="orionis-footer-inner">
     <div class="orionis-footer-copy">
       <p>API documentation for <a href="https://orionis-framework.com/" class="projecthome">Orionis</a>.</p>
-      <p class="orionis-footer-meta">Generated with <a href="https://github.com/twisted/pydoctor/">Pydoctor</a> 25.10.1.<span class="orionis-footer-build"> Built 2026-11-03 09:36:58.</span></p>
+      <p class="orionis-footer-meta">Generated with <a href="https://github.com/twisted/pydoctor/">Pydoctor</a> 25.10.1.<span class="orionis-footer-build"> Built 2026-11-03 13:00:15.</span></p>
     </div>
     <nav class="orionis-footer-links" aria-label="Additional resources">
       <a href="https://docs.orionis-framework.com">Read the guide <span aria-hidden="true">↗</span></a>

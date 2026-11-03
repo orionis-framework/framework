@@ -723,7 +723,7 @@
         </div>
 
         <div class="extrasDocstring">
-          <p class="class-signature"><code><span class="py-keyword">class</span> <span class="py-defname">QueueManager</span>(<a href="orionis.queues.contracts.manager.IQueueManager.html" class="internal-link" title="orionis.queues.contracts.manager.IQueueManager">IQueueManager</a>): <a href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/queues/manager.py#L71" class="sourceLink">(source)</a></code></p><p>Constructor: <code><a href="#__init__" class="internal-link" title="orionis.queues.manager.QueueManager.__init__">QueueManager(app, serializer)</a></code></p><p><a href="classIndex.html#orionis.queues.manager.QueueManager">View In Hierarchy</a></p>
+          <p class="class-signature"><code><span class="py-keyword">class</span> <span class="py-defname">QueueManager</span>(<a href="orionis.queues.contracts.manager.IQueueManager.html" class="internal-link" title="orionis.queues.contracts.manager.IQueueManager">IQueueManager</a>): <a href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/queues/manager.py#L73" class="sourceLink">(source)</a></code></p><p>Constructor: <code><a href="#__init__" class="internal-link" title="orionis.queues.manager.QueueManager.__init__">QueueManager(app, serializer)</a></code></p><p><a href="classIndex.html#orionis.queues.manager.QueueManager">View In Hierarchy</a></p>
         </div>
 
         <div class="moduleDocstring">
@@ -731,7 +731,7 @@
         </div>
 
         <div id="split-tables">
-          <table class="children sortable" id="id1757">
+          <table class="children sortable" id="id1764">
   
   
   <tr class="method">
@@ -798,42 +798,42 @@
     
     <td>Class Variable</td>
     <td><code><a href="#__slots__" class="internal-link" title="orionis.queues.manager.QueueManager.__slots__">__slots__</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
+    <td>Declare the instance attribute slots reserved by this class.</td>
   </tr><tr class="instancevariable">
     
     <td>Instance Variable</td>
     <td><code><a href="#_app" class="internal-link" title="orionis.queues.manager.QueueManager._app">_app</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
+    <td>Existing application container.</td>
   </tr><tr class="instancevariable">
     
     <td>Instance Variable</td>
     <td><code><a href="#_config" class="internal-link" title="orionis.queues.manager.QueueManager._config">_config</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
+    <td>Validated configuration used to construct and operate the service.</td>
   </tr><tr class="instancevariable">
     
     <td>Instance Variable</td>
     <td><code><a href="#_driver_lock" class="internal-link" title="orionis.queues.manager.QueueManager._driver_lock">_driver<wbr></wbr>_lock</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
+    <td>Synchronization primitive controlling access to driver lock.</td>
   </tr><tr class="instancevariable">
     
     <td>Instance Variable</td>
     <td><code><a href="#_drivers" class="internal-link" title="orionis.queues.manager.QueueManager._drivers">_drivers</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
+    <td>Configured backend drivers cached by their registered names.</td>
   </tr><tr class="instancevariable">
     
     <td>Instance Variable</td>
     <td><code><a href="#_failed" class="internal-link" title="orionis.queues.manager.QueueManager._failed">_failed</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
+    <td>Backend retaining failed-job records.</td>
   </tr><tr class="instancevariable">
     
     <td>Instance Variable</td>
     <td><code><a href="#_failed_lock" class="internal-link" title="orionis.queues.manager.QueueManager._failed_lock">_failed<wbr></wbr>_lock</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
+    <td>Synchronization primitive controlling access to failed lock.</td>
   </tr><tr class="instancevariable">
     
     <td>Instance Variable</td>
     <td><code><a href="#_serializer" class="internal-link" title="orionis.queues.manager.QueueManager._serializer">_serializer</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
+    <td>Singleton registered-job serializer.</td>
   </tr>
 </table>
           
@@ -855,7 +855,7 @@
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">__init__</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">app: <code>IApplication</code>, </span><span class="rst-sig-param">serializer: <code><a href="orionis.queues.contracts.serializer.IJobSerializer.html" class="internal-link" title="orionis.queues.contracts.serializer.IJobSerializer">IJobSerializer</a></code></span>):</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/queues/manager.py#L86">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/queues/manager.py#L89">
       
       (source)
     </a>
@@ -867,7 +867,7 @@
   </div>
   <div class="docstring functionBody">
     
-    <div><p>Validate and serialize queue settings without opening backend clients.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">app:</span><code><a href="orionis.IApplication.html" class="internal-link" title="orionis.IApplication">IApplication</a></code></td><td class="fieldArgDesc">Existing application container.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">serializer:</span><code><a href="orionis.queues.contracts.serializer.IJobSerializer.html" class="internal-link" title="orionis.queues.contracts.serializer.IJobSerializer">IJobSerializer</a></code></td><td class="fieldArgDesc">Singleton registered-job serializer.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">Retain the normalized wire settings for lazy backend resolution.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/exceptions.html#TypeError" class="intersphinx-link">TypeError</a></code></td><td>If queue settings have invalid types or unsupported fields.</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/exceptions.html#ValueError" class="intersphinx-link">ValueError</a></code></td><td>If queue settings or their storage relationships are invalid.</td></tr></table></div>
+    <div><p>Validate and serialize queue settings without opening backend clients.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">app:</span><code><a href="orionis.IApplication.html" class="internal-link">orionis.IApplication</a></code></td><td class="fieldArgDesc">Existing application container.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">serializer:</span><code><a href="orionis.queues.contracts.serializer.IJobSerializer.html" class="internal-link">orionis.queues.contracts.serializer.IJobSerializer</a></code></td><td class="fieldArgDesc">Singleton registered-job serializer.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">Retain the normalized wire settings for lazy backend resolution.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/exceptions.html#TypeError" class="intersphinx-link">TypeError</a></code></td><td>If queue settings have invalid types or unsupported fields.</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/exceptions.html#ValueError" class="intersphinx-link">ValueError</a></code></td><td>If queue settings or their storage relationships are invalid.</td></tr></table></div>
   </div>
 </div><div class="basemethod">
   
@@ -882,7 +882,7 @@
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">_connectionName</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">name: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a> | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/queues/manager.py#L159">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/queues/manager.py#L169">
       
       (source)
     </a>
@@ -909,7 +909,7 @@
     
     
     <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">_createDriver</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">name: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></span>) -&gt; <code><a href="orionis.queues.contracts.driver.IQueueDriver.html" class="internal-link" title="orionis.queues.contracts.driver.IQueueDriver">IQueueDriver</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/queues/manager.py#L254">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/queues/manager.py#L264">
       
       (source)
     </a>
@@ -921,7 +921,7 @@
   </div>
   <div class="docstring functionBody">
     
-    <div><p>Construct a configured driver through framework database services.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">name:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Validated configured connection name.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.queues.contracts.driver.IQueueDriver.html" class="internal-link" title="orionis.queues.contracts.driver.IQueueDriver">IQueueDriver</a></code></td><td class="fieldArgDesc">Driver whose real I/O starts with its first operation.</td></tr></table></div>
+    <div><p>Construct a configured driver through framework database services.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">name:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Validated configured connection name.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.queues.contracts.driver.IQueueDriver.html" class="internal-link">orionis.queues.contracts.driver.IQueueDriver</a></code></td><td class="fieldArgDesc">Driver whose real I/O starts with its first operation.</td></tr></table></div>
   </div>
 </div><div class="basemethod">
   
@@ -936,7 +936,7 @@
     
     
     <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">_submit</span><span class="function-signature long-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">job: <code>BaseJob</code>, </span><span class="rst-sig-param">connection: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a> | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code>, </span><span class="rst-sig-param">queue: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a> | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code>, </span><span class="rst-sig-param">delay: <code><a href="https://docs.python.org/3/builtins/functions.html#float" class="intersphinx-link">float</a></code></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/queues/manager.py#L180">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/queues/manager.py#L190">
       
       (source)
     </a>
@@ -948,7 +948,7 @@
   </div>
   <div class="docstring functionBody">
     
-    <div><p>Serialize validated job options and submit to the selected backend.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">job:</span><code><a href="orionis.queues.BaseJob.html" class="internal-link" title="orionis.queues.BaseJob">BaseJob</a></code></td><td class="fieldArgDesc">Job containing only declared serializable state.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">connection:</span><code>str | None</code></td><td class="fieldArgDesc">Explicit backend selection.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">queue:</span><code>str | None</code></td><td class="fieldArgDesc">Explicit channel selection.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">delay:</span><code><a href="https://docs.python.org/3/builtins/functions.html#float" class="intersphinx-link">float</a></code></td><td class="fieldArgDesc">Delay in seconds before availability.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Dispatch identifier.</td></tr></table></div>
+    <div><p>Serialize validated job options and submit to the selected backend.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">job:</span><code><a href="orionis.queues.BaseJob.html" class="internal-link">orionis.queues.BaseJob</a></code></td><td class="fieldArgDesc">Job containing only declared serializable state.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">connection:</span><code>str | None</code></td><td class="fieldArgDesc">Explicit backend selection.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">queue:</span><code>str | None</code></td><td class="fieldArgDesc">Explicit channel selection.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">delay:</span><code><a href="https://docs.python.org/3/builtins/functions.html#float" class="intersphinx-link">float</a></code></td><td class="fieldArgDesc">Delay in seconds before availability.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Dispatch identifier.</td></tr></table></div>
   </div>
 </div><div class="basemethod">
   
@@ -963,7 +963,7 @@
     
     
     <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">boot</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>):</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/queues/manager.py#L118">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/queues/manager.py#L128">
       
       (source)
     </a>
@@ -975,7 +975,7 @@
   </div>
   <div class="docstring functionBody">
     
-    <div><p>Register jobs from the application's configured jobs path.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">Register discovered job classes with the shared serializer.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.queues.exceptions.QueueConfigurationError.html" class="internal-link" title="orionis.queues.exceptions.QueueConfigurationError">QueueConfigurationError</a></code></td><td>If the jobs path is invalid or a discovered module cannot be imported.</td></tr></table></div>
+    <div><p>Register jobs from the application's configured jobs path.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">Register discovered job classes with the shared serializer.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.queues.exceptions.QueueConfigurationError.html" class="internal-link">orionis.queues.exceptions.QueueConfigurationError</a></code></td><td>If the jobs path is invalid or a discovered module cannot be imported.</td></tr></table></div>
   </div>
 </div><div class="basemethod">
   
@@ -990,7 +990,7 @@
     
     
     <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">close</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>):</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/queues/manager.py#L419">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/queues/manager.py#L429">
       
       (source)
     </a>
@@ -1018,7 +1018,7 @@ then clear their cached references.</td></tr></table></div>
     
     
     <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">connection</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">name: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a> | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code> = <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></span>) -&gt; <code><a href="orionis.queues.contracts.driver.IQueueDriver.html" class="internal-link" title="orionis.queues.contracts.driver.IQueueDriver">IQueueDriver</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/queues/manager.py#L229">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/queues/manager.py#L239">
       
       (source)
     </a>
@@ -1030,7 +1030,7 @@ then clear their cached references.</td></tr></table></div>
   </div>
   <div class="docstring functionBody">
     <div class="interfaceinfo">overrides <code><a href="orionis.queues.contracts.manager.IQueueManager.html#connection" class="internal-link">orionis.queues.contracts.manager.IQueueManager.connection</a></code></div>
-    <div><p>Resolve one shared lazy driver for the selected named connection.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">name:</span><code>str | None, <em>optional</em></code></td><td class="fieldArgDesc">Explicit connection or central default.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.queues.contracts.driver.IQueueDriver.html" class="internal-link" title="orionis.queues.contracts.driver.IQueueDriver">IQueueDriver</a></code></td><td class="fieldArgDesc">Backend shared by its logical channels.</td></tr></table></div>
+    <div><p>Resolve one shared lazy driver for the selected named connection.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">name:</span><code>str | None, <em>optional</em></code></td><td class="fieldArgDesc">Explicit connection or central default.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.queues.contracts.driver.IQueueDriver.html" class="internal-link">orionis.queues.contracts.driver.IQueueDriver</a></code></td><td class="fieldArgDesc">Backend shared by its logical channels.</td></tr></table></div>
   </div>
 </div><div class="basemethod">
   
@@ -1045,7 +1045,7 @@ then clear their cached references.</td></tr></table></div>
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">dispatch</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">job: <code>BaseJob</code></span>) -&gt; <code>PendingDispatch</code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/queues/manager.py#L140">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/queues/manager.py#L150">
       
       (source)
     </a>
@@ -1057,7 +1057,7 @@ then clear their cached references.</td></tr></table></div>
   </div>
   <div class="docstring functionBody">
     <div class="interfaceinfo">overrides <code><a href="orionis.queues.contracts.manager.IQueueManager.html#dispatch" class="internal-link">orionis.queues.contracts.manager.IQueueManager.dispatch</a></code></div>
-    <div><p>Create one awaitable dispatch without serializing or persisting data.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">job:</span><code><a href="orionis.queues.BaseJob.html" class="internal-link" title="orionis.queues.BaseJob">BaseJob</a></code></td><td class="fieldArgDesc">Application job containing persistent constructor state.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.queues.PendingDispatch.html" class="internal-link" title="orionis.queues.PendingDispatch">PendingDispatch</a></code></td><td class="fieldArgDesc">Fluent operation submitted only when awaited.</td></tr></table></div>
+    <div><p>Create one awaitable dispatch without serializing or persisting data.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">job:</span><code><a href="orionis.queues.BaseJob.html" class="internal-link">orionis.queues.BaseJob</a></code></td><td class="fieldArgDesc">Application job containing persistent constructor state.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.queues.PendingDispatch.html" class="internal-link">orionis.queues.PendingDispatch</a></code></td><td class="fieldArgDesc">Fluent operation submitted only when awaited.</td></tr></table></div>
   </div>
 </div><div class="basemethod">
   
@@ -1072,7 +1072,7 @@ then clear their cached references.</td></tr></table></div>
     
     
     <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">failed</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>) -&gt; <code><a href="orionis.queues.contracts.failed_repository.IFailedJobRepository.html" class="internal-link" title="orionis.queues.contracts.failed_repository.IFailedJobRepository">IFailedJobRepository</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/queues/manager.py#L331">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/queues/manager.py#L341">
       
       (source)
     </a>
@@ -1084,7 +1084,7 @@ then clear their cached references.</td></tr></table></div>
   </div>
   <div class="docstring functionBody">
     <div class="interfaceinfo">overrides <code><a href="orionis.queues.contracts.manager.IQueueManager.html#failed" class="internal-link">orionis.queues.contracts.manager.IQueueManager.failed</a></code></div>
-    <div><p>Resolve durable failed-job storage only when first requested.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.queues.contracts.failed_repository.IFailedJobRepository.html" class="internal-link" title="orionis.queues.contracts.failed_repository.IFailedJobRepository">IFailedJobRepository</a></code></td><td class="fieldArgDesc">Repository shared by all queue connections.</td></tr></table></div>
+    <div><p>Resolve durable failed-job storage only when first requested.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.queues.contracts.failed_repository.IFailedJobRepository.html" class="internal-link">orionis.queues.contracts.failed_repository.IFailedJobRepository</a></code></td><td class="fieldArgDesc">Repository shared by all queue connections.</td></tr></table></div>
   </div>
 </div><div class="basemethod">
   
@@ -1099,7 +1099,7 @@ then clear their cached references.</td></tr></table></div>
     
     
     <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">migrate</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>):</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/queues/manager.py#L353">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/queues/manager.py#L363">
       
       (source)
     </a>
@@ -1112,7 +1112,7 @@ then clear their cached references.</td></tr></table></div>
   <div class="docstring functionBody">
     <div class="interfaceinfo">overrides <code><a href="orionis.queues.contracts.manager.IQueueManager.html#migrate" class="internal-link">orionis.queues.contracts.manager.IQueueManager.migrate</a></code></div>
     <div><p>Create every configured database queue table and failed-job storage.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">Create missing tables with their configured names and SQL connection
-prefixes, preserving existing data and lazy backend initialization.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code>DatabaseException</code></td><td>If a configured SQL connection cannot be resolved or its DDL fails.</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.queues.exceptions.QueueStorageError.html" class="internal-link" title="orionis.queues.exceptions.QueueStorageError">QueueStorageError</a></code></td><td>If a database does not enforce the required unique constraints.</td></tr></table></div>
+prefixes, preserving existing data and lazy backend initialization.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.database.DatabaseException.html" class="internal-link">orionis.database.DatabaseException</a></code></td><td>If a configured SQL connection cannot be resolved or its DDL fails.</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.queues.exceptions.QueueStorageError.html" class="internal-link">orionis.queues.exceptions.QueueStorageError</a></code></td><td>If a database does not enforce the required unique constraints.</td></tr></table></div>
   </div>
 </div><div class="basemethod">
   
@@ -1127,7 +1127,7 @@ prefixes, preserving existing data and lazy backend initialization.</td></tr></t
     
     
     <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">retryFailed</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">failed_id: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/queues/manager.py#L390">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/queues/manager.py#L400">
       
       (source)
     </a>
@@ -1154,7 +1154,7 @@ prefixes, preserving existing data and lazy backend initialization.</td></tr></t
     
     
     <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">worker</span><span class="function-signature long-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">connection: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a> | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code> = <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a>, </span><span class="rst-sig-param">queues: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" class="intersphinx-link">tuple</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <wbr></wbr><span class="rst-variable-ellipsis">...</span>] | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code> = <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a>, </span><span class="rst-sig-param">concurrency: <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a> | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code> = <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></span>) -&gt; <code><a href="orionis.queues.worker.Worker.html" class="internal-link" title="orionis.queues.worker.Worker">Worker</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/queues/manager.py#L287">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/queues/manager.py#L297">
       
       (source)
     </a>
@@ -1166,7 +1166,7 @@ prefixes, preserving existing data and lazy backend initialization.</td></tr></t
   </div>
   <div class="docstring functionBody">
     <div class="interfaceinfo">overrides <code><a href="orionis.queues.contracts.manager.IQueueManager.html#worker" class="internal-link">orionis.queues.contracts.manager.IQueueManager.worker</a></code></div>
-    <div><p>Create an independent persistent worker using validated defaults.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">connection:</span><code>str | None, <em>optional</em></code></td><td class="fieldArgDesc">Explicit backend or central default.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">queues:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" class="intersphinx-link">tuple</a>[<a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, ...] | None, <em>optional</em></code></td><td class="fieldArgDesc">Channels ordered by priority.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">concurrency:</span><code>int | None, <em>optional</em></code></td><td class="fieldArgDesc">Simultaneous job executions or configured default.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.queues.worker.Worker.html" class="internal-link" title="orionis.queues.worker.Worker">Worker</a></code></td><td class="fieldArgDesc">Consumer runtime sharing the existing application container.</td></tr></table></div>
+    <div><p>Create an independent persistent worker using validated defaults.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">connection:</span><code>str | None, <em>optional</em></code></td><td class="fieldArgDesc">Explicit backend or central default.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">queues:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" class="intersphinx-link">tuple</a>[<a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <tt class="rst-docutils rst-literal">...</tt>] | None, <em>optional</em></code></td><td class="fieldArgDesc">Channels ordered by priority.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">concurrency:</span><code>int | None, <em>optional</em></code></td><td class="fieldArgDesc">Simultaneous job executions or configured default.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.queues.worker.Worker.html" class="internal-link">orionis.queues.worker.Worker</a></code></td><td class="fieldArgDesc">Consumer runtime sharing the existing application container.</td></tr></table></div>
   </div>
 </div><div class="baseclassvariable">
   
@@ -1180,7 +1180,7 @@ prefixes, preserving existing data and lazy backend initialization.</td></tr></t
   <div class="functionHeader">
     
     <span class="py-defname">__slots__</span>: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" class="intersphinx-link">tuple</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <wbr></wbr><span class="rst-variable-ellipsis">...</span>]</code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/queues/manager.py#L76">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/queues/manager.py#L78">
       
       (source)
     </a>
@@ -1192,7 +1192,7 @@ prefixes, preserving existing data and lazy backend initialization.</td></tr></t
   </div>
   <div class="functionBody">
     <div class="interfaceinfo">overrides <code><a href="orionis.queues.contracts.manager.IQueueManager.html#__slots__" class="internal-link">orionis.queues.contracts.manager.IQueueManager.__slots__</a></code></div>
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p>Declare the instance attribute slots reserved by this class.</p></div>
     
   </div>
 </div><div class="baseinstancevariable">
@@ -1207,7 +1207,7 @@ prefixes, preserving existing data and lazy backend initialization.</td></tr></t
   <div class="functionHeader">
     
     <span class="py-defname">_app</span> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/queues/manager.py#L109">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/queues/manager.py#L112">
       
       (source)
     </a>
@@ -1219,7 +1219,7 @@ prefixes, preserving existing data and lazy backend initialization.</td></tr></t
   </div>
   <div class="functionBody">
     
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p>Existing application container.</p></div>
     
   </div>
 </div><div class="baseinstancevariable">
@@ -1234,7 +1234,7 @@ prefixes, preserving existing data and lazy backend initialization.</td></tr></t
   <div class="functionHeader">
     
     <span class="py-defname">_config</span> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/queues/manager.py#L112">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/queues/manager.py#L117">
       
       (source)
     </a>
@@ -1246,7 +1246,7 @@ prefixes, preserving existing data and lazy backend initialization.</td></tr></t
   </div>
   <div class="functionBody">
     
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p>Validated configuration used to construct and operate the service.</p></div>
     
   </div>
 </div><div class="baseinstancevariable">
@@ -1261,7 +1261,7 @@ prefixes, preserving existing data and lazy backend initialization.</td></tr></t
   <div class="functionHeader">
     
     <span class="py-defname">_driver_lock</span> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/queues/manager.py#L114">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/queues/manager.py#L121">
       
       (source)
     </a>
@@ -1273,7 +1273,7 @@ prefixes, preserving existing data and lazy backend initialization.</td></tr></t
   </div>
   <div class="functionBody">
     
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p>Synchronization primitive controlling access to driver lock.</p></div>
     
   </div>
 </div><div class="baseinstancevariable">
@@ -1288,7 +1288,7 @@ prefixes, preserving existing data and lazy backend initialization.</td></tr></t
   <div class="functionHeader">
     
     <span class="py-defname">_drivers</span>: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#dict" class="intersphinx-link">dict</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <wbr></wbr><a href="orionis.queues.contracts.driver.IQueueDriver.html" class="internal-link" title="orionis.queues.contracts.driver.IQueueDriver">IQueueDriver</a>]</code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/queues/manager.py#L113">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/queues/manager.py#L119">
       
       (source)
     </a>
@@ -1300,7 +1300,7 @@ prefixes, preserving existing data and lazy backend initialization.</td></tr></t
   </div>
   <div class="functionBody">
     
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p>Configured backend drivers cached by their registered names.</p></div>
     
   </div>
 </div><div class="baseinstancevariable">
@@ -1315,7 +1315,7 @@ prefixes, preserving existing data and lazy backend initialization.</td></tr></t
   <div class="functionHeader">
     
     <span class="py-defname">_failed</span>: <code><a href="orionis.queues.contracts.failed_repository.IFailedJobRepository.html" class="internal-link" title="orionis.queues.contracts.failed_repository.IFailedJobRepository">IFailedJobRepository</a> | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/queues/manager.py#L115">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/queues/manager.py#L123">
       
       (source)
     </a>
@@ -1327,7 +1327,7 @@ prefixes, preserving existing data and lazy backend initialization.</td></tr></t
   </div>
   <div class="functionBody">
     
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p>Backend retaining failed-job records.</p></div>
     
   </div>
 </div><div class="baseinstancevariable">
@@ -1342,7 +1342,7 @@ prefixes, preserving existing data and lazy backend initialization.</td></tr></t
   <div class="functionHeader">
     
     <span class="py-defname">_failed_lock</span> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/queues/manager.py#L116">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/queues/manager.py#L125">
       
       (source)
     </a>
@@ -1354,7 +1354,7 @@ prefixes, preserving existing data and lazy backend initialization.</td></tr></t
   </div>
   <div class="functionBody">
     
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p>Synchronization primitive controlling access to failed lock.</p></div>
     
   </div>
 </div><div class="baseinstancevariable">
@@ -1369,7 +1369,7 @@ prefixes, preserving existing data and lazy backend initialization.</td></tr></t
   <div class="functionHeader">
     
     <span class="py-defname">_serializer</span> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/queues/manager.py#L110">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/queues/manager.py#L114">
       
       (source)
     </a>
@@ -1381,7 +1381,7 @@ prefixes, preserving existing data and lazy backend initialization.</td></tr></t
   </div>
   <div class="functionBody">
     
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p>Singleton registered-job serializer.</p></div>
     
   </div>
 </div>
@@ -1395,7 +1395,7 @@ prefixes, preserving existing data and lazy backend initialization.</td></tr></t
   <div class="orionis-footer-inner">
     <div class="orionis-footer-copy">
       <p>API documentation for <a href="https://orionis-framework.com/" class="projecthome">Orionis</a>.</p>
-      <p class="orionis-footer-meta">Generated with <a href="https://github.com/twisted/pydoctor/">Pydoctor</a> 25.10.1.<span class="orionis-footer-build"> Built 2026-11-03 09:36:58.</span></p>
+      <p class="orionis-footer-meta">Generated with <a href="https://github.com/twisted/pydoctor/">Pydoctor</a> 25.10.1.<span class="orionis-footer-build"> Built 2026-11-03 13:00:15.</span></p>
     </div>
     <nav class="orionis-footer-links" aria-label="Additional resources">
       <a href="https://docs.orionis-framework.com">Read the guide <span aria-hidden="true">↗</span></a>

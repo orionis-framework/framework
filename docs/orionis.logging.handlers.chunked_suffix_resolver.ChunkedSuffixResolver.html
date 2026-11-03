@@ -450,15 +450,15 @@
         </div>
 
         <div class="extrasDocstring">
-          <p class="class-signature"><code><span class="py-keyword">class</span> <span class="py-defname">ChunkedSuffixResolver</span>(<a href="orionis.logging.contracts.suffix_resolver.SuffixResolver.html" class="internal-link" title="orionis.logging.contracts.suffix_resolver.SuffixResolver">SuffixResolver</a>): <a href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/logging/handlers/chunked_suffix_resolver.py#L7" class="sourceLink">(source)</a></code></p><p>Constructor: <code><a href="#__init__" class="internal-link" title="orionis.logging.handlers.chunked_suffix_resolver.ChunkedSuffixResolver.__init__">ChunkedSuffixResolver()</a></code></p><p><a href="classIndex.html#orionis.logging.handlers.chunked_suffix_resolver.ChunkedSuffixResolver">View In Hierarchy</a></p>
+          <p class="class-signature"><code><span class="py-keyword">class</span> <span class="py-defname">ChunkedSuffixResolver</span>(<a href="orionis.logging.contracts.suffix_resolver.SuffixResolver.html" class="internal-link" title="orionis.logging.contracts.suffix_resolver.SuffixResolver">SuffixResolver</a>): <a href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/logging/handlers/chunked_suffix_resolver.py#L9" class="sourceLink">(source)</a></code></p><p>Constructor: <code><a href="#__init__" class="internal-link" title="orionis.logging.handlers.chunked_suffix_resolver.ChunkedSuffixResolver.__init__">ChunkedSuffixResolver()</a></code></p><p><a href="classIndex.html#orionis.logging.handlers.chunked_suffix_resolver.ChunkedSuffixResolver">View In Hierarchy</a></p>
         </div>
 
         <div class="moduleDocstring">
-          <div><p class="undocumented">Undocumented</p></div>
+          <div><p>Resolve log suffixes for configured time chunks.</p></div>
         </div>
 
         <div id="split-tables">
-          <table class="children sortable" id="id1272">
+          <table class="children sortable" id="id1275">
   
   
   <tr class="method">
@@ -480,22 +480,22 @@
     
     <td>Class Variable</td>
     <td><code><a href="#__slots__" class="internal-link" title="orionis.logging.handlers.chunked_suffix_resolver.ChunkedSuffixResolver.__slots__">__slots__</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
+    <td>Declare the instance attribute slots reserved by this class.</td>
   </tr><tr class="instancevariable">
     
     <td>Instance Variable</td>
     <td><code><a href="#_counter" class="internal-link" title="orionis.logging.handlers.chunked_suffix_resolver.ChunkedSuffixResolver._counter">_counter</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
+    <td>Counter value used by <tt class="rst-docutils rst-literal">ChunkedSuffixResolver</tt>.</td>
   </tr><tr class="instancevariable">
     
     <td>Instance Variable</td>
     <td><code><a href="#_lock" class="internal-link" title="orionis.logging.handlers.chunked_suffix_resolver.ChunkedSuffixResolver._lock">_lock</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
+    <td>Lock protecting concurrent access to shared state.</td>
   </tr><tr class="instancevariable">
     
     <td>Instance Variable</td>
     <td><code><a href="#tz" class="internal-link" title="orionis.logging.handlers.chunked_suffix_resolver.ChunkedSuffixResolver.tz">tz</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
+    <td>Tz produced by <tt class="rst-docutils rst-literal">DateTime.getZoneInfo</tt>.</td>
   </tr>
 </table>
           
@@ -517,7 +517,7 @@
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">__init__</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>):</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/logging/handlers/chunked_suffix_resolver.py#L11">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/logging/handlers/chunked_suffix_resolver.py#L15">
       
       (source)
     </a>
@@ -546,7 +546,7 @@
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">getNextRotationTime</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">current_time: <code><a href="https://docs.python.org/3/library/datetime.html#datetime.datetime" class="intersphinx-link">datetime</a></code></span>) -&gt; <code><a href="https://docs.python.org/3/library/datetime.html#datetime.datetime" class="intersphinx-link">datetime</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/logging/handlers/chunked_suffix_resolver.py#L48">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/logging/handlers/chunked_suffix_resolver.py#L55">
       
       (source)
     </a>
@@ -558,7 +558,7 @@
   </div>
   <div class="docstring functionBody">
     <div class="interfaceinfo">overrides <code><a href="orionis.logging.contracts.suffix_resolver.SuffixResolver.html#getNextRotationTime" class="internal-link">orionis.logging.contracts.suffix_resolver.SuffixResolver.getNextRotationTime</a></code></div>
-    <div><p>Compute the next rotation time for the log file.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">current<wbr></wbr>_time:</span><code><a href="https://docs.python.org/3/library/datetime.html#datetime.datetime" class="intersphinx-link">datetime</a></code></td><td class="fieldArgDesc">The current datetime.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/library/datetime.html#datetime.datetime" class="intersphinx-link">datetime</a></code></td><td class="fieldArgDesc">The next rotation time. For size-based rotation, this is
+    <div><p>Compute the next rotation time for the log file.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">current<wbr></wbr>_time:</span><code><a href="https://docs.python.org/3/library/datetime.html#datetime.datetime" class="intersphinx-link">datetime.datetime</a></code></td><td class="fieldArgDesc">The current datetime.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/library/datetime.html#datetime.datetime" class="intersphinx-link">datetime.datetime</a></code></td><td class="fieldArgDesc">The next rotation time. For size-based rotation, this is
 current_time plus one hour.</td></tr></table></div>
   </div>
 </div><div class="basemethod">
@@ -574,7 +574,7 @@ current_time plus one hour.</td></tr></table></div>
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">getSuffix</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">dt: <code><a href="https://docs.python.org/3/library/datetime.html#datetime.datetime" class="intersphinx-link">datetime</a> | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code> = <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/logging/handlers/chunked_suffix_resolver.py#L26">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/logging/handlers/chunked_suffix_resolver.py#L33">
       
       (source)
     </a>
@@ -586,7 +586,7 @@ current_time plus one hour.</td></tr></table></div>
   </div>
   <div class="docstring functionBody">
     <div class="interfaceinfo">overrides <code><a href="orionis.logging.contracts.suffix_resolver.SuffixResolver.html#getSuffix" class="internal-link">orionis.logging.contracts.suffix_resolver.SuffixResolver.getSuffix</a></code></div>
-    <div><p>Generate a unique suffix for the log file.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">dt:</span><code><a href="https://docs.python.org/3/library/datetime.html#datetime.datetime" class="intersphinx-link">datetime</a> or <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a>, <em>optional</em></code></td><td class="fieldArgDesc">The datetime to use for the suffix. If None, uses current time.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">The generated suffix in the format 'YYYYMMDD_HHMMSS_counter'.</td></tr></table></div>
+    <div><p>Generate a unique suffix for the log file.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">dt:</span><code><a href="https://docs.python.org/3/library/datetime.html#datetime.datetime" class="intersphinx-link">datetime.datetime</a> or <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a>, <em>optional</em></code></td><td class="fieldArgDesc">The datetime to use for the suffix. If None, uses current time.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">The generated suffix in the format 'YYYYMMDD_HHMMSS_counter'.</td></tr></table></div>
   </div>
 </div><div class="baseclassvariable">
   
@@ -600,7 +600,7 @@ current_time plus one hour.</td></tr></table></div>
   <div class="functionHeader">
     
     <span class="py-defname">__slots__</span>: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" class="intersphinx-link">tuple</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <wbr></wbr><span class="rst-variable-ellipsis">...</span>]</code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/logging/handlers/chunked_suffix_resolver.py#L9">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/logging/handlers/chunked_suffix_resolver.py#L12">
       
       (source)
     </a>
@@ -612,7 +612,7 @@ current_time plus one hour.</td></tr></table></div>
   </div>
   <div class="functionBody">
     <div class="interfaceinfo">overrides <code><a href="orionis.logging.contracts.suffix_resolver.SuffixResolver.html#__slots__" class="internal-link">orionis.logging.contracts.suffix_resolver.SuffixResolver.__slots__</a></code></div>
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p>Declare the instance attribute slots reserved by this class.</p></div>
     
   </div>
 </div><div class="baseinstancevariable">
@@ -627,7 +627,7 @@ current_time plus one hour.</td></tr></table></div>
   <div class="functionHeader">
     
     <span class="py-defname">_counter</span>: <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/logging/handlers/chunked_suffix_resolver.py#L22">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/logging/handlers/chunked_suffix_resolver.py#L26">
       
       (source)
     </a>
@@ -639,7 +639,7 @@ current_time plus one hour.</td></tr></table></div>
   </div>
   <div class="functionBody">
     
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p>Counter value used by <tt class="rst-docutils rst-literal">ChunkedSuffixResolver</tt>.</p></div>
     
   </div>
 </div><div class="baseinstancevariable">
@@ -654,7 +654,7 @@ current_time plus one hour.</td></tr></table></div>
   <div class="functionHeader">
     
     <span class="py-defname">_lock</span> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/logging/handlers/chunked_suffix_resolver.py#L23">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/logging/handlers/chunked_suffix_resolver.py#L28">
       
       (source)
     </a>
@@ -666,7 +666,7 @@ current_time plus one hour.</td></tr></table></div>
   </div>
   <div class="functionBody">
     
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p>Lock protecting concurrent access to shared state.</p></div>
     
   </div>
 </div><div class="baseinstancevariable">
@@ -681,7 +681,7 @@ current_time plus one hour.</td></tr></table></div>
   <div class="functionHeader">
     
     <span class="py-defname">tz</span> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/logging/handlers/chunked_suffix_resolver.py#L24">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/logging/handlers/chunked_suffix_resolver.py#L30">
       
       (source)
     </a>
@@ -693,7 +693,7 @@ current_time plus one hour.</td></tr></table></div>
   </div>
   <div class="functionBody">
     
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p>Tz produced by <tt class="rst-docutils rst-literal">DateTime.getZoneInfo</tt>.</p></div>
     
   </div>
 </div>
@@ -707,7 +707,7 @@ current_time plus one hour.</td></tr></table></div>
   <div class="orionis-footer-inner">
     <div class="orionis-footer-copy">
       <p>API documentation for <a href="https://orionis-framework.com/" class="projecthome">Orionis</a>.</p>
-      <p class="orionis-footer-meta">Generated with <a href="https://github.com/twisted/pydoctor/">Pydoctor</a> 25.10.1.<span class="orionis-footer-build"> Built 2026-11-03 09:36:58.</span></p>
+      <p class="orionis-footer-meta">Generated with <a href="https://github.com/twisted/pydoctor/">Pydoctor</a> 25.10.1.<span class="orionis-footer-build"> Built 2026-11-03 13:00:15.</span></p>
     </div>
     <nav class="orionis-footer-links" aria-label="Additional resources">
       <a href="https://docs.orionis-framework.com">Read the guide <span aria-hidden="true">↗</span></a>

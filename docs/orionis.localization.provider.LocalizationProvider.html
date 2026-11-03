@@ -149,8 +149,8 @@
       <div>
          
           <div class="childrenKindTitle">Contents</div>
-          <ul><li><a class="rst-internal rst-reference" href="#rst-registration-phase" id="rst-toc-entry-3">Registration phase</a></li>
-<li><a class="rst-internal rst-reference" href="#rst-boot-phase" id="rst-toc-entry-4">Boot phase</a></li>
+          <ul><li><a class="rst-internal rst-reference" href="#rst-registration-phase">Registration phase</a></li>
+<li><a class="rst-internal rst-reference" href="#rst-boot-phase">Boot phase</a></li>
 </ul>
         
 
@@ -232,8 +232,8 @@
                     <div>
          
           <div class="childrenKindTitle">Contents</div>
-          <ul><li><a class="rst-internal rst-reference" href="#rst-registration-phase" id="rst-toc-entry-5">Registration phase</a></li>
-<li><a class="rst-internal rst-reference" href="#rst-boot-phase" id="rst-toc-entry-6">Boot phase</a></li>
+          <ul><li><a class="rst-internal rst-reference" href="#rst-registration-phase">Registration phase</a></li>
+<li><a class="rst-internal rst-reference" href="#rst-boot-phase">Boot phase</a></li>
 </ul>
         
 
@@ -354,20 +354,22 @@
         </div>
 
         <div class="extrasDocstring">
-          <p class="class-signature"><code><span class="py-keyword">class</span> <span class="py-defname">LocalizationProvider</span>(ServiceProvider): <a href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/localization/provider.py#L8" class="sourceLink">(source)</a></code></p><p><a href="classIndex.html#orionis.localization.provider.LocalizationProvider">View In Hierarchy</a></p>
+          <p class="class-signature"><code><span class="py-keyword">class</span> <span class="py-defname">LocalizationProvider</span>(ServiceProvider): <a href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/localization/provider.py#L10" class="sourceLink">(source)</a></code></p><p><a href="classIndex.html#orionis.localization.provider.LocalizationProvider">View In Hierarchy</a></p>
         </div>
 
         <div class="moduleDocstring">
           <div><p>Service provider for the Orionis localization system.</p>
 <div class="rst-section" id="rst-registration-phase">
-<h2 class="heading"><a class="rst-toc-backref" href="#rst-toc-entry-1">Registration phase</a></h2>
-<p>Binds <code><a href="orionis.localization.contracts.ILocalizationManager.html" class="internal-link" title="orionis.localization.contracts.ILocalizationManager">ILocalizationManager</a></code> to <code><a href="orionis.localization.LocalizationManager.html" class="internal-link" title="orionis.localization.LocalizationManager">LocalizationManager</a></code>
+<h2 class="heading">Registration phase</h2>
+<p>Binds <code><a href="orionis.localization.contracts.ILocalizationManager.html" class="internal-link">orionis.localization.contracts.ILocalizationManager</a></code> to
+<code><a href="orionis.localization.LocalizationManager.html" class="internal-link">orionis.localization.LocalizationManager</a></code>
 as a singleton.</p>
 </div>
 <div class="rst-section" id="rst-boot-phase">
-<h2 class="heading"><a class="rst-toc-backref" href="#rst-toc-entry-2">Boot phase</a></h2>
+<h2 class="heading">Boot phase</h2>
 <p>Builds the shared translator from the application configuration,
-binds it under <code><a href="orionis.localization.contracts.ITranslator.html" class="internal-link" title="orionis.localization.contracts.ITranslator">ITranslator</a></code>, and pins the <code><a href="orionis.support.facades.Lang.html" class="internal-link" title="orionis.support.facades.Lang">Lang</a></code>
+binds it under <code><a href="orionis.localization.contracts.ITranslator.html" class="internal-link">orionis.localization.contracts.ITranslator</a></code>, and pins the
+<code><a href="orionis.support.facades.Lang.html" class="internal-link">orionis.support.facades.Lang</a></code>
 facade so attribute access is direct without container resolution
 overhead on every call.</p>
 </div>
@@ -375,7 +377,7 @@ overhead on every call.</p>
         </div>
 
         <div id="split-tables">
-          <table class="children sortable" id="id1255">
+          <table class="children sortable" id="id1257">
   
   
   <tr class="method">
@@ -409,7 +411,7 @@ overhead on every call.</p>
     
     
     <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">boot</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>):</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/localization/provider.py#L35">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/localization/provider.py#L40">
       
       (source)
     </a>
@@ -421,7 +423,7 @@ overhead on every call.</p>
   </div>
   <div class="docstring functionBody">
     
-    <div><p>Bind the shared translator and pin the Lang facade.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc"><span class="undocumented">Undocumented</span></td></tr></table></div>
+    <div><p>Bind the shared translator and pin the Lang facade.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">Bind the shared translator and pin the Lang facade.</td></tr></table></div>
   </div>
 </div><div class="basemethod">
   
@@ -436,7 +438,7 @@ overhead on every call.</p>
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">register</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>):</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/localization/provider.py#L25">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/localization/provider.py#L29">
       
       (source)
     </a>
@@ -448,7 +450,7 @@ overhead on every call.</p>
   </div>
   <div class="docstring functionBody">
     
-    <div><p>Bind ILocalizationManager to LocalizationManager as a singleton.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc"><span class="undocumented">Undocumented</span></td></tr></table></div>
+    <div><p>Bind ILocalizationManager to LocalizationManager as a singleton.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">Bind ILocalizationManager to LocalizationManager as a singleton.</td></tr></table></div>
   </div>
 </div>
         </div>
@@ -461,7 +463,7 @@ overhead on every call.</p>
   <div class="orionis-footer-inner">
     <div class="orionis-footer-copy">
       <p>API documentation for <a href="https://orionis-framework.com/" class="projecthome">Orionis</a>.</p>
-      <p class="orionis-footer-meta">Generated with <a href="https://github.com/twisted/pydoctor/">Pydoctor</a> 25.10.1.<span class="orionis-footer-build"> Built 2026-11-03 09:36:58.</span></p>
+      <p class="orionis-footer-meta">Generated with <a href="https://github.com/twisted/pydoctor/">Pydoctor</a> 25.10.1.<span class="orionis-footer-build"> Built 2026-11-03 13:00:15.</span></p>
     </div>
     <nav class="orionis-footer-links" aria-label="Additional resources">
       <a href="https://docs.orionis-framework.com">Read the guide <span aria-hidden="true">↗</span></a>

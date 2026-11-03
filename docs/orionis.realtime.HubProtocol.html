@@ -892,7 +892,7 @@
                     
                 </label>
 
-                <code><a href="orionis.realtime.hub.html" class="internal-link" title="orionis.realtime.hub">hub</a></code>
+                <code><a href="orionis.realtime.hub.module.html" class="internal-link" title="orionis.realtime.hub">hub</a></code>
 
                 <div class="expandableContent">
                     <div>
@@ -1366,6 +1366,16 @@
 
         
             <div class="itemName"><code><a href="orionis.realtime.protocol.html#MAX_ID_LENGTH" class="internal-link" title="orionis.realtime.protocol.MAX_ID_LENGTH">MAX<wbr></wbr>_ID<wbr></wbr>_LENGTH</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.realtime.protocol.html#ClientMessage" class="internal-link" title="orionis.realtime.protocol.ClientMessage"><wbr></wbr>Client<wbr></wbr>Message</a></code>
             </div>
         
 
@@ -2562,7 +2572,7 @@
         </div>
 
         <div class="extrasDocstring">
-          <p class="class-signature"><code><span class="py-keyword">class</span> <span class="py-defname">HubProtocol</span>: <a href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/realtime/protocol.py#L148" class="sourceLink">(source)</a></code></p><p>Constructor: <code><a href="#__init__" class="internal-link" title="orionis.realtime.HubProtocol.__init__">HubProtocol(name, max_message_size)</a></code></p><p><a href="classIndex.html#orionis.realtime.HubProtocol">View In Hierarchy</a></p>
+          <p class="class-signature"><code><span class="py-keyword">class</span> <span class="py-defname">HubProtocol</span>: <a href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/realtime/protocol.py#L168" class="sourceLink">(source)</a></code></p><p>Constructor: <code><a href="#__init__" class="internal-link" title="orionis.realtime.HubProtocol.__init__">HubProtocol(name, max_message_size)</a></code></p><p><a href="classIndex.html#orionis.realtime.HubProtocol">View In Hierarchy</a></p>
         </div>
 
         <div class="moduleDocstring">
@@ -2570,7 +2580,7 @@
         </div>
 
         <div id="split-tables">
-          <table class="children sortable" id="id1812">
+          <table class="children sortable" id="id1820">
   
   
   <tr class="method">
@@ -2592,27 +2602,27 @@
     
     <td>Class Variable</td>
     <td><code><a href="#__slots__" class="internal-link" title="orionis.realtime.HubProtocol.__slots__">__slots__</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
+    <td>Declare the instance attribute slots reserved by this class.</td>
   </tr><tr class="instancevariable">
     
     <td>Instance Variable</td>
     <td><code><a href="#_decoder" class="internal-link" title="orionis.realtime.HubProtocol._decoder">_decoder</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
+    <td>Decoder produced by <tt class="rst-docutils rst-literal">codec.Decoder</tt>.</td>
   </tr><tr class="instancevariable">
     
     <td>Instance Variable</td>
     <td><code><a href="#_encoder" class="internal-link" title="orionis.realtime.HubProtocol._encoder">_encoder</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
+    <td>Encoder produced by <tt class="rst-docutils rst-literal">codec.Encoder</tt>.</td>
   </tr><tr class="instancevariable">
     
     <td>Instance Variable</td>
     <td><code><a href="#_max_message_size" class="internal-link" title="orionis.realtime.HubProtocol._max_message_size">_max<wbr></wbr>_message<wbr></wbr>_size</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
+    <td>Maximum incoming UTF-8 or binary byte length.</td>
   </tr><tr class="instancevariable">
     
     <td>Instance Variable</td>
     <td><code><a href="#name" class="internal-link" title="orionis.realtime.HubProtocol.name">name</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
+    <td><tt class="rst-docutils rst-literal">json</tt> for text frames or <tt class="rst-docutils rst-literal">msgpack</tt> for binary frames.</td>
   </tr>
 </table>
           
@@ -2634,7 +2644,7 @@
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">__init__</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">name: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code> = <span class="rst-variable-quote">'</span><span class="rst-variable-string">json</span><span class="rst-variable-quote">'</span>, </span><span class="rst-sig-symbol">*, </span><span class="rst-sig-param">max_message_size: <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code> = _DEFAULT_MESSAGE_LIMIT</span>):</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/realtime/protocol.py#L153">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/realtime/protocol.py#L174">
       
       (source)
     </a>
@@ -2662,7 +2672,7 @@ nonboolean integer.</td></tr></table></div>
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">decode</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">message: <code>WebSocketMessage</code></span>) -&gt; <code>ClientMessage</code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/realtime/protocol.py#L192">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/realtime/protocol.py#L217">
       
       (source)
     </a>
@@ -2674,7 +2684,7 @@ nonboolean integer.</td></tr></table></div>
   </div>
   <div class="docstring functionBody">
     
-    <div><p>Decode and validate one client envelope from a complete socket message.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">message:</span><code><a href="orionis.http.WebSocketMessage.html" class="internal-link" title="orionis.http.WebSocketMessage">WebSocketMessage</a></code></td><td class="fieldArgDesc">Text JSON or binary MessagePack message selected by the route.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code>ClientMessage</code></td><td class="fieldArgDesc">Strict typed request, completion, cancellation or ping/pong.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code>ProtocolError</code></td><td>If frame kind, size, fields or structural limits are invalid.</td></tr></table></div>
+    <div><p>Decode and validate one client envelope from a complete socket message.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">message:</span><code><a href="orionis.http.WebSocketMessage.html" class="internal-link">orionis.http.WebSocketMessage</a></code></td><td class="fieldArgDesc">Text JSON or binary MessagePack message selected by the route.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.realtime.protocol.html#ClientMessage" class="internal-link">orionis.realtime.protocol.ClientMessage</a></code></td><td class="fieldArgDesc">Strict typed request, completion, cancellation or ping/pong.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.realtime.errors.ProtocolError.html" class="internal-link">orionis.realtime.errors.ProtocolError</a></code></td><td>If frame kind, size, fields or structural limits are invalid.</td></tr></table></div>
   </div>
 </div><div class="basemethod">
   
@@ -2689,7 +2699,7 @@ nonboolean integer.</td></tr></table></div>
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">encode</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">message: <code><a href="https://docs.python.org/3/builtins/functions.html#object" class="intersphinx-link">object</a></code></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a> | <a href="https://docs.python.org/3/builtins/stdtypes.html#bytes" class="intersphinx-link">bytes</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/realtime/protocol.py#L242">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/realtime/protocol.py#L267">
       
       (source)
     </a>
@@ -2715,7 +2725,7 @@ nonboolean integer.</td></tr></table></div>
   <div class="functionHeader">
     
     <span class="py-defname">__slots__</span>: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" class="intersphinx-link">tuple</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <wbr></wbr><span class="rst-variable-ellipsis">...</span>]</code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/realtime/protocol.py#L151">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/realtime/protocol.py#L171">
       
       (source)
     </a>
@@ -2727,7 +2737,7 @@ nonboolean integer.</td></tr></table></div>
   </div>
   <div class="functionBody">
     
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p>Declare the instance attribute slots reserved by this class.</p></div>
     
   </div>
 </div><div class="baseinstancevariable">
@@ -2742,7 +2752,7 @@ nonboolean integer.</td></tr></table></div>
   <div class="functionHeader">
     
     <span class="py-defname">_decoder</span> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/realtime/protocol.py#L189">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/realtime/protocol.py#L212">
       
       (source)
     </a>
@@ -2754,7 +2764,7 @@ nonboolean integer.</td></tr></table></div>
   </div>
   <div class="functionBody">
     
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p>Decoder produced by <tt class="rst-docutils rst-literal">codec.Decoder</tt>.</p></div>
     
   </div>
 </div><div class="baseinstancevariable">
@@ -2769,7 +2779,7 @@ nonboolean integer.</td></tr></table></div>
   <div class="functionHeader">
     
     <span class="py-defname">_encoder</span> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/realtime/protocol.py#L190">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/realtime/protocol.py#L214">
       
       (source)
     </a>
@@ -2781,7 +2791,7 @@ nonboolean integer.</td></tr></table></div>
   </div>
   <div class="functionBody">
     
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p>Encoder produced by <tt class="rst-docutils rst-literal">codec.Encoder</tt>.</p></div>
     
   </div>
 </div><div class="baseinstancevariable">
@@ -2796,7 +2806,7 @@ nonboolean integer.</td></tr></table></div>
   <div class="functionHeader">
     
     <span class="py-defname">_max_message_size</span> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/realtime/protocol.py#L187">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/realtime/protocol.py#L209">
       
       (source)
     </a>
@@ -2808,7 +2818,7 @@ nonboolean integer.</td></tr></table></div>
   </div>
   <div class="functionBody">
     
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p>Maximum incoming UTF-8 or binary byte length.</p></div>
     
   </div>
 </div><div class="baseinstancevariable">
@@ -2823,7 +2833,7 @@ nonboolean integer.</td></tr></table></div>
   <div class="functionHeader">
     
     <span class="py-defname">name</span> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/realtime/protocol.py#L186">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/realtime/protocol.py#L207">
       
       (source)
     </a>
@@ -2835,7 +2845,7 @@ nonboolean integer.</td></tr></table></div>
   </div>
   <div class="functionBody">
     
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p><tt class="rst-docutils rst-literal">json</tt> for text frames or <tt class="rst-docutils rst-literal">msgpack</tt> for binary frames.</p></div>
     
   </div>
 </div>
@@ -2849,7 +2859,7 @@ nonboolean integer.</td></tr></table></div>
   <div class="orionis-footer-inner">
     <div class="orionis-footer-copy">
       <p>API documentation for <a href="https://orionis-framework.com/" class="projecthome">Orionis</a>.</p>
-      <p class="orionis-footer-meta">Generated with <a href="https://github.com/twisted/pydoctor/">Pydoctor</a> 25.10.1.<span class="orionis-footer-build"> Built 2026-11-03 09:36:58.</span></p>
+      <p class="orionis-footer-meta">Generated with <a href="https://github.com/twisted/pydoctor/">Pydoctor</a> 25.10.1.<span class="orionis-footer-build"> Built 2026-11-03 13:00:15.</span></p>
     </div>
     <nav class="orionis-footer-links" aria-label="Additional resources">
       <a href="https://docs.orionis-framework.com">Read the guide <span aria-hidden="true">↗</span></a>

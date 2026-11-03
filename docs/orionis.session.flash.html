@@ -1091,15 +1091,17 @@
         </div>
 
         <div class="extrasDocstring">
-          <a href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/session/flash.py" class="sourceLink">(source)</a>
+          <a href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/session/flash.py" class="sourceLink">(source)</a>
         </div>
 
         <div class="moduleDocstring">
-          <div><p class="undocumented">Undocumented</p></div>
+          <div><p>Provide session operations.</p>
+<p>Includes <tt class="rst-docutils rst-literal">filter_input</tt>, <tt class="rst-docutils rst-literal">normalize_errors</tt>, <tt class="rst-docutils rst-literal">queue_bag</tt>, <tt class="rst-docutils rst-literal">apply_flash</tt>.</p>
+</div>
         </div>
 
         <div id="split-tables">
-          <table class="children sortable" id="id1984">
+          <table class="children sortable" id="id1992">
   
   
   <tr class="class">
@@ -1131,27 +1133,27 @@
     
     <td>Constant</td>
     <td><code><a href="#_SEQUENCE_TYPES" class="internal-link" title="orionis.session.flash._SEQUENCE_TYPES">_SEQUENCE<wbr></wbr>_TYPES</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
+    <td>Hoisted so the isinstance check does not rebuild the tuple on every field.</td>
   </tr><tr class="constant">
     
     <td>Constant</td>
     <td><code><a href="#ERRORS_KEY" class="internal-link" title="orionis.session.flash.ERRORS_KEY">ERRORS<wbr></wbr>_KEY</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
+    <td>Session key containing flashed validation errors.</td>
   </tr><tr class="constant">
     
     <td>Constant</td>
     <td><code><a href="#OLD_INPUT_KEY" class="internal-link" title="orionis.session.flash.OLD_INPUT_KEY">OLD<wbr></wbr>_INPUT<wbr></wbr>_KEY</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
+    <td>Reserved flash-bag keys owned by the framework. Application code must never write them directly; use <tt class="rst-docutils rst-literal">withInput()</tt> / <tt class="rst-docutils rst-literal">withErrors()</tt> instead.</td>
   </tr><tr class="constant">
     
     <td>Constant</td>
     <td><code><a href="#PREVIOUS_URL_KEY" class="internal-link" title="orionis.session.flash.PREVIOUS_URL_KEY">PREVIOUS<wbr></wbr>_URL<wbr></wbr>_KEY</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
+    <td>Reserved session key holding the last page the user navigated to.</td>
   </tr><tr class="constant">
     
     <td>Constant</td>
     <td><code><a href="#SENSITIVE_INPUT_FIELDS" class="internal-link" title="orionis.session.flash.SENSITIVE_INPUT_FIELDS">SENSITIVE<wbr></wbr>_INPUT<wbr></wbr>_FIELDS</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
+    <td>Never carried over when repopulating a form.</td>
   </tr>
 </table>
           
@@ -1173,7 +1175,7 @@
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">apply_flash</span><span class="function-signature">(<span class="rst-sig-param">session: <code>ISession</code>, </span><span class="rst-sig-param">data: <code><a href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Mapping" class="intersphinx-link">Mapping</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <wbr></wbr><a href="https://docs.python.org/3/library/typing.html#typing.Any" class="intersphinx-link">Any</a>]</code></span>):</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/session/flash.py#L135">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/session/flash.py#L149">
       
       (source)
     </a>
@@ -1189,7 +1191,7 @@
 <p>Reserved bags are routed through their dedicated session methods so
 they merge with anything already flashed during this request instead
 of replacing it.</p>
-<table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">session:</span><code><a href="orionis.session.contracts.ISession.html" class="internal-link" title="orionis.session.contracts.ISession">ISession</a></code></td><td class="fieldArgDesc">Session receiving the flashed values.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">data:</span><code><a href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Mapping" class="intersphinx-link">Mapping</a>[<a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <a href="https://docs.python.org/3/library/typing.html#typing.Any" class="intersphinx-link">Any</a>]</code></td><td class="fieldArgDesc">Pending flash payload.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc"><span class="undocumented">Undocumented</span></td></tr></table></div>
+<table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">session:</span><code><a href="orionis.session.contracts.ISession.html" class="internal-link">orionis.session.contracts.ISession</a></code></td><td class="fieldArgDesc">Session receiving the flashed values.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">data:</span><code><a href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Mapping" class="intersphinx-link">collections.abc.Mapping</a>[<a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <a href="https://docs.python.org/3/library/typing.html#typing.Any" class="intersphinx-link">typing.Any</a>]</code></td><td class="fieldArgDesc">Pending flash payload.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">Write a pending flash payload into the session.</td></tr></table></div>
   </div>
 </div><div class="basefunction">
   
@@ -1204,7 +1206,7 @@ of replacing it.</p>
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">filter_input</span><span class="function-signature">(<span class="rst-sig-param">values: <code><a href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Mapping" class="intersphinx-link">Mapping</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <wbr></wbr><a href="https://docs.python.org/3/library/typing.html#typing.Any" class="intersphinx-link">Any</a>]</code></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/stdtypes.html#dict" class="intersphinx-link">dict</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <wbr></wbr><a href="https://docs.python.org/3/library/typing.html#typing.Any" class="intersphinx-link">Any</a>]</code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/session/flash.py#L31">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/session/flash.py#L44">
       
       (source)
     </a>
@@ -1216,8 +1218,8 @@ of replacing it.</p>
   </div>
   <div class="docstring functionBody">
     
-    <div><p>Drop credential-like fields from a form payload before flashing it.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">values:</span><code><a href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Mapping" class="intersphinx-link">Mapping</a>[<a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <a href="https://docs.python.org/3/library/typing.html#typing.Any" class="intersphinx-link">Any</a>]</code></td><td class="fieldArgDesc">Raw submitted payload.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/stdtypes.html#dict" class="intersphinx-link">dict</a>[<a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <a href="https://docs.python.org/3/library/typing.html#typing.Any" class="intersphinx-link">Any</a>]</code></td><td class="fieldArgDesc">Copy of <em>values</em> without any field listed in
-<code><a href="#SENSITIVE_INPUT_FIELDS" class="internal-link" title="orionis.session.flash.SENSITIVE_INPUT_FIELDS">SENSITIVE_INPUT_FIELDS</a></code>.</td></tr></table></div>
+    <div><p>Drop credential-like fields from a form payload before flashing it.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">values:</span><code><a href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Mapping" class="intersphinx-link">collections.abc.Mapping</a>[<a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <a href="https://docs.python.org/3/library/typing.html#typing.Any" class="intersphinx-link">typing.Any</a>]</code></td><td class="fieldArgDesc">Raw submitted payload.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/stdtypes.html#dict" class="intersphinx-link">dict</a>[<a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <a href="https://docs.python.org/3/library/typing.html#typing.Any" class="intersphinx-link">typing.Any</a>]</code></td><td class="fieldArgDesc">Copy of <em>values</em> without any field listed in
+<code><a href="#SENSITIVE_INPUT_FIELDS" class="internal-link">orionis.session.flash.SENSITIVE_INPUT_FIELDS</a></code>.</td></tr></table></div>
   </div>
 </div><div class="basefunction">
   
@@ -1232,7 +1234,7 @@ of replacing it.</p>
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">normalize_errors</span><span class="function-signature">(<span class="rst-sig-param">errors: <code><a href="https://docs.python.org/3/builtins/functions.html#object" class="intersphinx-link">object</a></code></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/stdtypes.html#dict" class="intersphinx-link">dict</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#list" class="intersphinx-link">list</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>]]</code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/session/flash.py#L54">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/session/flash.py#L67">
       
       (source)
     </a>
@@ -1260,7 +1262,7 @@ exposing <tt class="rst-docutils rst-literal">errors</tt> or <tt class="rst-docu
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">queue_bag</span><span class="function-signature">(<span class="rst-sig-param">flash: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#dict" class="intersphinx-link">dict</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <wbr></wbr><a href="https://docs.python.org/3/library/typing.html#typing.Any" class="intersphinx-link">Any</a>]</code>, </span><span class="rst-sig-param">key: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code>, </span><span class="rst-sig-param">values: <code><a href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Mapping" class="intersphinx-link">Mapping</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <wbr></wbr><a href="https://docs.python.org/3/library/typing.html#typing.Any" class="intersphinx-link">Any</a>]</code></span>):</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/session/flash.py#L108">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/session/flash.py#L121">
       
       (source)
     </a>
@@ -1272,7 +1274,7 @@ exposing <tt class="rst-docutils rst-literal">errors</tt> or <tt class="rst-docu
   </div>
   <div class="docstring functionBody">
     
-    <div><p>Merge <em>values</em> into the reserved bag <em>key</em> of a pending flash payload.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">flash:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#dict" class="intersphinx-link">dict</a>[<a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <a href="https://docs.python.org/3/library/typing.html#typing.Any" class="intersphinx-link">Any</a>]</code></td><td class="fieldArgDesc">Pending flash payload owned by a response or a pending view.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">key:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Reserved bag key.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">values:</span><code><a href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Mapping" class="intersphinx-link">Mapping</a>[<a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <a href="https://docs.python.org/3/library/typing.html#typing.Any" class="intersphinx-link">Any</a>]</code></td><td class="fieldArgDesc">Entries to merge into the bag.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc"><span class="undocumented">Undocumented</span></td></tr></table></div>
+    <div><p>Merge <em>values</em> into the reserved bag <em>key</em> of a pending flash payload.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">flash:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#dict" class="intersphinx-link">dict</a>[<a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <a href="https://docs.python.org/3/library/typing.html#typing.Any" class="intersphinx-link">typing.Any</a>]</code></td><td class="fieldArgDesc">Pending flash payload owned by a response or a pending view.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">key:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Reserved bag key.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">values:</span><code><a href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Mapping" class="intersphinx-link">collections.abc.Mapping</a>[<a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <a href="https://docs.python.org/3/library/typing.html#typing.Any" class="intersphinx-link">typing.Any</a>]</code></td><td class="fieldArgDesc">Entries to merge into the bag.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">Merge <em>values</em> into the reserved bag <em>key</em> of a pending flash payload.</td></tr></table></div>
   </div>
 </div><div class="baseconstant">
   
@@ -1286,7 +1288,7 @@ exposing <tt class="rst-docutils rst-literal">errors</tt> or <tt class="rst-docu
   <div class="functionHeader">
     
     <span class="py-defname">_SEQUENCE_TYPES</span>: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" class="intersphinx-link">tuple</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/functions.html#type" class="intersphinx-link">type</a>, <wbr></wbr><span class="rst-variable-ellipsis">...</span>]</code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/session/flash.py#L29">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/session/flash.py#L41">
       
       (source)
     </a>
@@ -1298,7 +1300,7 @@ exposing <tt class="rst-docutils rst-literal">errors</tt> or <tt class="rst-docu
   </div>
   <div class="functionBody">
     
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p>Hoisted so the isinstance check does not rebuild the tuple on every field.</p></div>
     <table class="valueTable"><tr class="fieldStart"><td class="fieldName">Value</td></tr><tr><td><pre class="constant-value"><code>(<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#list" class="intersphinx-link">list</a>, <wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" class="intersphinx-link">tuple</a>, <wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#set" class="intersphinx-link">set</a>, <wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#frozenset" class="intersphinx-link">frozenset</a>)</code></pre></td></tr></table>
   </div>
 </div><div class="baseconstant">
@@ -1313,7 +1315,7 @@ exposing <tt class="rst-docutils rst-literal">errors</tt> or <tt class="rst-docu
   <div class="functionHeader">
     
     <span class="py-defname">ERRORS_KEY</span>: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/session/flash.py#L11">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/session/flash.py#L20">
       
       (source)
     </a>
@@ -1325,7 +1327,7 @@ exposing <tt class="rst-docutils rst-literal">errors</tt> or <tt class="rst-docu
   </div>
   <div class="functionBody">
     
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p>Session key containing flashed validation errors.</p></div>
     <table class="valueTable"><tr class="fieldStart"><td class="fieldName">Value</td></tr><tr><td><pre class="constant-value"><code><span class="rst-variable-quote">'</span><span class="rst-variable-string">_errors</span><span class="rst-variable-quote">'</span></code></pre></td></tr></table>
   </div>
 </div><div class="baseconstant">
@@ -1340,7 +1342,7 @@ exposing <tt class="rst-docutils rst-literal">errors</tt> or <tt class="rst-docu
   <div class="functionHeader">
     
     <span class="py-defname">OLD_INPUT_KEY</span>: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/session/flash.py#L10">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/session/flash.py#L15">
       
       (source)
     </a>
@@ -1352,7 +1354,8 @@ exposing <tt class="rst-docutils rst-literal">errors</tt> or <tt class="rst-docu
   </div>
   <div class="functionBody">
     
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p>Reserved flash-bag keys owned by the framework. Application code must never write
+them directly; use <tt class="rst-docutils rst-literal">withInput()</tt> / <tt class="rst-docutils rst-literal">withErrors()</tt> instead.</p></div>
     <table class="valueTable"><tr class="fieldStart"><td class="fieldName">Value</td></tr><tr><td><pre class="constant-value"><code><span class="rst-variable-quote">'</span><span class="rst-variable-string">_old_input</span><span class="rst-variable-quote">'</span></code></pre></td></tr></table>
   </div>
 </div><div class="baseconstant">
@@ -1367,7 +1370,7 @@ exposing <tt class="rst-docutils rst-literal">errors</tt> or <tt class="rst-docu
   <div class="functionHeader">
     
     <span class="py-defname">PREVIOUS_URL_KEY</span>: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/session/flash.py#L14">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/session/flash.py#L24">
       
       (source)
     </a>
@@ -1379,7 +1382,7 @@ exposing <tt class="rst-docutils rst-literal">errors</tt> or <tt class="rst-docu
   </div>
   <div class="functionBody">
     
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p>Reserved session key holding the last page the user navigated to.</p></div>
     <table class="valueTable"><tr class="fieldStart"><td class="fieldName">Value</td></tr><tr><td><pre class="constant-value"><code><span class="rst-variable-quote">'</span><span class="rst-variable-string">_previous_url</span><span class="rst-variable-quote">'</span></code></pre></td></tr></table>
   </div>
 </div><div class="baseconstant">
@@ -1394,7 +1397,7 @@ exposing <tt class="rst-docutils rst-literal">errors</tt> or <tt class="rst-docu
   <div class="functionHeader">
     
     <span class="py-defname">SENSITIVE_INPUT_FIELDS</span>: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#frozenset" class="intersphinx-link">frozenset</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>]</code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/session/flash.py#L17">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/session/flash.py#L28">
       
       (source)
     </a>
@@ -1406,7 +1409,7 @@ exposing <tt class="rst-docutils rst-literal">errors</tt> or <tt class="rst-docu
   </div>
   <div class="functionBody">
     
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p>Never carried over when repopulating a form.</p></div>
     <table class="valueTable"><tr class="fieldStart"><td class="fieldName">Value</td></tr><tr><td><pre class="constant-value"><code><a href="https://docs.python.org/3/builtins/stdtypes.html#frozenset" class="intersphinx-link">frozenset</a>(<wbr></wbr>set([<wbr></wbr><span class="rst-variable-quote">'</span><span class="rst-variable-string">_csrf</span><span class="rst-variable-quote">'</span>,
                <wbr></wbr><span class="rst-variable-quote">'</span><span class="rst-variable-string">csrf_token</span><span class="rst-variable-quote">'</span>,
                <wbr></wbr><span class="rst-variable-quote">'</span><span class="rst-variable-string">current_password</span><span class="rst-variable-quote">'</span>,
@@ -1425,7 +1428,7 @@ exposing <tt class="rst-docutils rst-literal">errors</tt> or <tt class="rst-docu
   <div class="orionis-footer-inner">
     <div class="orionis-footer-copy">
       <p>API documentation for <a href="https://orionis-framework.com/" class="projecthome">Orionis</a>.</p>
-      <p class="orionis-footer-meta">Generated with <a href="https://github.com/twisted/pydoctor/">Pydoctor</a> 25.10.1.<span class="orionis-footer-build"> Built 2026-11-03 09:36:58.</span></p>
+      <p class="orionis-footer-meta">Generated with <a href="https://github.com/twisted/pydoctor/">Pydoctor</a> 25.10.1.<span class="orionis-footer-build"> Built 2026-11-03 13:00:15.</span></p>
     </div>
     <nav class="orionis-footer-links" aria-label="Additional resources">
       <a href="https://docs.orionis-framework.com">Read the guide <span aria-hidden="true">↗</span></a>

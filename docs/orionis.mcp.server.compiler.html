@@ -1246,6 +1246,16 @@
             </div>
         
 
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#_JsonObject" class="internal-link" title="orionis.mcp.server.compiler._JsonObject">_<wbr></wbr>Json<wbr></wbr>Object</a></code>
+            </div>
+        
+
     </li>
 </ul> 
 
@@ -1257,7 +1267,7 @@
 
       <div class="thingTitle">
         <span>Package</span>
-        <code><a href="orionis.mcp.server.html" class="internal-link" title="The parent of this module">server</a></code> 
+        <code><a href="orionis.mcp.server.package.html" class="internal-link" title="The parent of this module">server</a></code> 
       </div>
       
       <div>
@@ -1620,6 +1630,16 @@
 
         
             <div class="itemName"><code><a href="#_NAME" class="internal-link" title="orionis.mcp.server.compiler._NAME">_NAME</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#_JsonObject" class="internal-link" title="orionis.mcp.server.compiler._JsonObject">_<wbr></wbr>Json<wbr></wbr>Object</a></code>
             </div>
         
 
@@ -2169,7 +2189,7 @@
 </div>
 
         <div class="page-header">
-          <h1 class="module"><code><code><a href="index.html" class="internal-link">orionis</a></code><wbr></wbr>.<code><a href="orionis.mcp.html" class="internal-link" title="orionis.mcp">mcp</a></code><wbr></wbr>.<code><a href="orionis.mcp.server.html" class="internal-link" title="orionis.mcp.server">server</a></code><wbr></wbr>.<code><a href="orionis.mcp.server.compiler.html" class="internal-link" title="orionis.mcp.server.compiler">compiler</a></code></code></h1>
+          <h1 class="module"><code><code><a href="index.html" class="internal-link">orionis</a></code><wbr></wbr>.<code><a href="orionis.mcp.html" class="internal-link" title="orionis.mcp">mcp</a></code><wbr></wbr>.<code><a href="orionis.mcp.server.package.html" class="internal-link" title="orionis.mcp.server">server</a></code><wbr></wbr>.<code><a href="orionis.mcp.server.compiler.html" class="internal-link" title="orionis.mcp.server.compiler">compiler</a></code></code></h1>
           <div id="show-private">
             <button class="btn btn-link" onclick="togglePrivate()">Toggle Private API</button>
           </div>
@@ -2180,15 +2200,18 @@
         </div>
 
         <div class="extrasDocstring">
-          <a href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/mcp/server/compiler.py" class="sourceLink">(source)</a>
+          <a href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/mcp/server/compiler.py" class="sourceLink">(source)</a>
         </div>
 
         <div class="moduleDocstring">
-          <div><p class="undocumented">Undocumented</p></div>
+          <div><p>Provide mcp server operations.</p>
+<p>Includes <tt class="rst-docutils rst-literal">CompiledPrimitive</tt>, <tt class="rst-docutils rst-literal">CompiledCatalog</tt>, <tt class="rst-docutils rst-literal">CompiledMcpServer</tt>,
+<tt class="rst-docutils rst-literal">compile_server</tt>.</p>
+</div>
         </div>
 
         <div id="split-tables">
-          <table class="children sortable" id="id1471">
+          <table class="children sortable" id="id1475">
   
   
   <tr class="class">
@@ -2320,12 +2343,17 @@
     
     <td>Constant</td>
     <td><code><a href="#_CORE_METHODS" class="internal-link" title="orionis.mcp.server.compiler._CORE_METHODS">_CORE<wbr></wbr>_METHODS</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
+    <td>Core methods used by <tt class="rst-docutils rst-literal">compiler</tt>.</td>
   </tr><tr class="constant">
     
     <td>Constant</td>
     <td><code><a href="#_NAME" class="internal-link" title="orionis.mcp.server.compiler._NAME">_NAME</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
+    <td>Compiled pattern used to recognize name.</td>
+  </tr><tr class="typealias">
+    
+    <td>Type Alias</td>
+    <td><code><a href="#_JsonObject" class="internal-link" title="orionis.mcp.server.compiler._JsonObject">_<wbr></wbr>Json<wbr></wbr>Object</a></code></td>
+    <td>Type alias for <tt class="rst-docutils rst-literal">dict[str, object]</tt>.</td>
   </tr>
 </table>
           
@@ -2347,7 +2375,7 @@
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">_capabilities</span><span class="function-signature long-signature">(<span class="rst-sig-param">definition: <code><a href="https://docs.python.org/3/builtins/functions.html#type" class="intersphinx-link">type</a>[<wbr></wbr>Server]</code>, </span><span class="rst-sig-param">tools: <code><a href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Mapping" class="intersphinx-link">Mapping</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <wbr></wbr><a href="orionis.mcp.server.compiler.CompiledPrimitive.html" class="internal-link" title="orionis.mcp.server.compiler.CompiledPrimitive">CompiledPrimitive</a>]</code>, </span><span class="rst-sig-param">resources: <code><a href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Mapping" class="intersphinx-link">Mapping</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <wbr></wbr><a href="orionis.mcp.server.compiler.CompiledPrimitive.html" class="internal-link" title="orionis.mcp.server.compiler.CompiledPrimitive">CompiledPrimitive</a>]</code>, </span><span class="rst-sig-param">prompts: <code><a href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Mapping" class="intersphinx-link">Mapping</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <wbr></wbr><a href="orionis.mcp.server.compiler.CompiledPrimitive.html" class="internal-link" title="orionis.mcp.server.compiler.CompiledPrimitive">CompiledPrimitive</a>]</code>, </span><span class="rst-sig-param">templates: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" class="intersphinx-link">tuple</a>[<wbr></wbr><a href="orionis.mcp.server.compiler.CompiledPrimitive.html" class="internal-link" title="orionis.mcp.server.compiler.CompiledPrimitive">CompiledPrimitive</a>, <wbr></wbr><span class="rst-variable-ellipsis">...</span>]</code></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/stdtypes.html#dict" class="intersphinx-link">dict</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <wbr></wbr><a href="https://docs.python.org/3/builtins/functions.html#object" class="intersphinx-link">object</a>]</code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/mcp/server/compiler.py#L768">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/mcp/server/compiler.py#L823">
       
       (source)
     </a>
@@ -2359,7 +2387,7 @@
   </div>
   <div class="docstring functionBody">
     
-    <div><p>Advertise only the methods and notifications backed by this registry.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">definition:</span><code><a href="https://docs.python.org/3/builtins/functions.html#type" class="intersphinx-link">type</a>[<a href="orionis.mcp.Server.html" class="internal-link" title="orionis.mcp.Server">Server</a>]</code></td><td class="fieldArgDesc">Class declaration whose metadata is being inspected.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">tools:</span><code><a href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Mapping" class="intersphinx-link">Mapping</a>[<a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <a href="orionis.mcp.server.compiler.CompiledPrimitive.html" class="internal-link" title="orionis.mcp.server.compiler.CompiledPrimitive">CompiledPrimitive</a>]</code></td><td class="fieldArgDesc">Value supplied for <tt class="rst-docutils rst-literal">tools</tt>.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">resources:</span><code><a href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Mapping" class="intersphinx-link">Mapping</a>[<a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <a href="orionis.mcp.server.compiler.CompiledPrimitive.html" class="internal-link" title="orionis.mcp.server.compiler.CompiledPrimitive">CompiledPrimitive</a>]</code></td><td class="fieldArgDesc">Value supplied for <tt class="rst-docutils rst-literal">resources</tt>.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">prompts:</span><code><a href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Mapping" class="intersphinx-link">Mapping</a>[<a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <a href="orionis.mcp.server.compiler.CompiledPrimitive.html" class="internal-link" title="orionis.mcp.server.compiler.CompiledPrimitive">CompiledPrimitive</a>]</code></td><td class="fieldArgDesc">Value supplied for <tt class="rst-docutils rst-literal">prompts</tt>.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">templates:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" class="intersphinx-link">tuple</a>[<a href="orionis.mcp.server.compiler.CompiledPrimitive.html" class="internal-link" title="orionis.mcp.server.compiler.CompiledPrimitive">CompiledPrimitive</a>, ...]</code></td><td class="fieldArgDesc">Value supplied for <tt class="rst-docutils rst-literal">templates</tt>.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/stdtypes.html#dict" class="intersphinx-link">dict</a>[<a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <a href="https://docs.python.org/3/builtins/functions.html#object" class="intersphinx-link">object</a>]</code></td><td class="fieldArgDesc">Result of the operation described above.</td></tr></table></div>
+    <div><p>Advertise only the methods and notifications backed by this registry.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">definition:</span><code><a href="https://docs.python.org/3/builtins/functions.html#type" class="intersphinx-link">type</a>[<a href="orionis.mcp.Server.html" class="internal-link">orionis.mcp.Server</a>]</code></td><td class="fieldArgDesc">Class declaration whose metadata is being inspected.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">tools:</span><code><a href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Mapping" class="intersphinx-link">collections.abc.Mapping</a>[<a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <a href="orionis.mcp.server.compiler.CompiledPrimitive.html" class="internal-link">orionis.mcp.server.compiler.CompiledPrimitive</a>]</code></td><td class="fieldArgDesc">Value supplied for <tt class="rst-docutils rst-literal">tools</tt>.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">resources:</span><code><a href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Mapping" class="intersphinx-link">Mapping</a>[<a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <a href="orionis.mcp.server.compiler.CompiledPrimitive.html" class="internal-link" title="orionis.mcp.server.compiler.CompiledPrimitive">CompiledPrimitive</a>]</code></td><td class="fieldArgDesc">Value supplied for <tt class="rst-docutils rst-literal">resources</tt>.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">prompts:</span><code><a href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Mapping" class="intersphinx-link">Mapping</a>[<a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <a href="orionis.mcp.server.compiler.CompiledPrimitive.html" class="internal-link" title="orionis.mcp.server.compiler.CompiledPrimitive">CompiledPrimitive</a>]</code></td><td class="fieldArgDesc">Value supplied for <tt class="rst-docutils rst-literal">prompts</tt>.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">templates:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" class="intersphinx-link">tuple</a>[<a href="orionis.mcp.server.compiler.CompiledPrimitive.html" class="internal-link">orionis.mcp.server.compiler.CompiledPrimitive</a>, <tt class="rst-docutils rst-literal">...</tt>]</code></td><td class="fieldArgDesc">Value supplied for <tt class="rst-docutils rst-literal">templates</tt>.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/stdtypes.html#dict" class="intersphinx-link">dict</a>[<a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <a href="https://docs.python.org/3/builtins/functions.html#object" class="intersphinx-link">object</a>]</code></td><td class="fieldArgDesc">Result of the operation described above.</td></tr></table></div>
   </div>
 </div><div class="basefunction">
   
@@ -2374,7 +2402,7 @@
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">_extend_metadata</span><span class="function-signature long-signature">(<span class="rst-sig-param">metadata: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#dict" class="intersphinx-link">dict</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <wbr></wbr><a href="https://docs.python.org/3/builtins/functions.html#object" class="intersphinx-link">object</a>]</code>, </span><span class="rst-sig-param">extensions: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" class="intersphinx-link">tuple</a>[<wbr></wbr>McpExtension, <wbr></wbr><span class="rst-variable-ellipsis">...</span>]</code></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/stdtypes.html#dict" class="intersphinx-link">dict</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <wbr></wbr><a href="https://docs.python.org/3/builtins/functions.html#object" class="intersphinx-link">object</a>]</code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/mcp/server/compiler.py#L155">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/mcp/server/compiler.py#L206">
       
       (source)
     </a>
@@ -2386,7 +2414,7 @@
   </div>
   <div class="docstring functionBody">
     
-    <div><p>Let extensions attach data without changing compiled native contracts.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">metadata:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#dict" class="intersphinx-link">dict</a>[<a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <a href="https://docs.python.org/3/builtins/functions.html#object" class="intersphinx-link">object</a>]</code></td><td class="fieldArgDesc">Metadata associated with the current operation.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">extensions:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" class="intersphinx-link">tuple</a>[<a href="orionis.mcp.McpExtension.html" class="internal-link" title="orionis.mcp.McpExtension">McpExtension</a>, ...]</code></td><td class="fieldArgDesc">Value supplied for <tt class="rst-docutils rst-literal">extensions</tt>.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/stdtypes.html#dict" class="intersphinx-link">dict</a>[<a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <a href="https://docs.python.org/3/builtins/functions.html#object" class="intersphinx-link">object</a>]</code></td><td class="fieldArgDesc">Result of the operation described above.</td></tr></table></div>
+    <div><p>Let extensions attach data without changing compiled native contracts.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">metadata:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#dict" class="intersphinx-link">dict</a>[<a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <a href="https://docs.python.org/3/builtins/functions.html#object" class="intersphinx-link">object</a>]</code></td><td class="fieldArgDesc">Metadata associated with the current operation.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">extensions:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" class="intersphinx-link">tuple</a>[<a href="orionis.mcp.McpExtension.html" class="internal-link">orionis.mcp.McpExtension</a>, <tt class="rst-docutils rst-literal">...</tt>]</code></td><td class="fieldArgDesc">Value supplied for <tt class="rst-docutils rst-literal">extensions</tt>.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/stdtypes.html#dict" class="intersphinx-link">dict</a>[<a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <a href="https://docs.python.org/3/builtins/functions.html#object" class="intersphinx-link">object</a>]</code></td><td class="fieldArgDesc">Result of the operation described above.</td></tr></table></div>
   </div>
 </div><div class="basefunction">
   
@@ -2401,7 +2429,7 @@
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">_extensions</span><span class="function-signature">(<span class="rst-sig-param">definition: <code><a href="https://docs.python.org/3/builtins/functions.html#type" class="intersphinx-link">type</a>[<wbr></wbr>Server]</code></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" class="intersphinx-link">tuple</a>[<wbr></wbr>McpExtension, <wbr></wbr><span class="rst-variable-ellipsis">...</span>]</code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/mcp/server/compiler.py#L619">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/mcp/server/compiler.py#L674">
       
       (source)
     </a>
@@ -2413,7 +2441,7 @@
   </div>
   <div class="docstring functionBody">
     
-    <div><p>Reject extension collisions with built-in methods and other extensions.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">definition:</span><code><a href="https://docs.python.org/3/builtins/functions.html#type" class="intersphinx-link">type</a>[<a href="orionis.mcp.Server.html" class="internal-link" title="orionis.mcp.Server">Server</a>]</code></td><td class="fieldArgDesc">Class declaration whose metadata is being inspected.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" class="intersphinx-link">tuple</a>[<a href="orionis.mcp.McpExtension.html" class="internal-link" title="orionis.mcp.McpExtension">McpExtension</a>, ...]</code></td><td class="fieldArgDesc">Result of the operation described above.</td></tr></table></div>
+    <div><p>Reject extension collisions with built-in methods and other extensions.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">definition:</span><code><a href="https://docs.python.org/3/builtins/functions.html#type" class="intersphinx-link">type</a>[<a href="orionis.mcp.Server.html" class="internal-link">orionis.mcp.Server</a>]</code></td><td class="fieldArgDesc">Class declaration whose metadata is being inspected.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" class="intersphinx-link">tuple</a>[<a href="orionis.mcp.McpExtension.html" class="internal-link">orionis.mcp.McpExtension</a>, <tt class="rst-docutils rst-literal">...</tt>]</code></td><td class="fieldArgDesc">Result of the operation described above.</td></tr></table></div>
   </div>
 </div><div class="basefunction">
   
@@ -2428,7 +2456,7 @@
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">_hook</span><span class="function-signature">(<span class="rst-sig-param">definition: <code><a href="https://docs.python.org/3/builtins/functions.html#type" class="intersphinx-link">type</a></code>, </span><span class="rst-sig-param">method: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></span>) -&gt; <code><a href="orionis.mcp.invoker.McpInvoker.html" class="internal-link" title="orionis.mcp.invoker.McpInvoker">McpInvoker</a> | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/mcp/server/compiler.py#L246">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/mcp/server/compiler.py#L297">
       
       (source)
     </a>
@@ -2440,7 +2468,7 @@
   </div>
   <div class="docstring functionBody">
     
-    <div><p>Compile optional per-request checks without resolving a handler instance.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">definition:</span><code><a href="https://docs.python.org/3/builtins/functions.html#type" class="intersphinx-link">type</a></code></td><td class="fieldArgDesc">Class declaration whose metadata is being inspected.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">method:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Value supplied for <tt class="rst-docutils rst-literal">method</tt>.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code>McpInvoker | None</code></td><td class="fieldArgDesc">Result of the operation described above.</td></tr></table></div>
+    <div><p>Compile optional per-request checks without resolving a handler instance.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">definition:</span><code><a href="https://docs.python.org/3/builtins/functions.html#type" class="intersphinx-link">type</a></code></td><td class="fieldArgDesc">Class declaration whose metadata is being inspected.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">method:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Value supplied for <tt class="rst-docutils rst-literal">method</tt>.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code>orionis.mcp.invoker.McpInvoker | None</code></td><td class="fieldArgDesc">Result of the operation described above.</td></tr></table></div>
   </div>
 </div><div class="basefunction">
   
@@ -2455,7 +2483,7 @@
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">_insert</span><span class="function-signature">(<span class="rst-sig-param">registry: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#dict" class="intersphinx-link">dict</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <wbr></wbr><a href="orionis.mcp.server.compiler.CompiledPrimitive.html" class="internal-link" title="orionis.mcp.server.compiler.CompiledPrimitive">CompiledPrimitive</a>]</code>, </span><span class="rst-sig-param">key: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code>, </span><span class="rst-sig-param">primitive: <code><a href="orionis.mcp.server.compiler.CompiledPrimitive.html" class="internal-link" title="orionis.mcp.server.compiler.CompiledPrimitive">CompiledPrimitive</a></code></span>):</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/mcp/server/compiler.py#L594">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/mcp/server/compiler.py#L649">
       
       (source)
     </a>
@@ -2467,7 +2495,7 @@
   </div>
   <div class="docstring functionBody">
     
-    <div><p>Reject collisions at boot instead of changing lookup semantics silently.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">registry:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#dict" class="intersphinx-link">dict</a>[<a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <a href="orionis.mcp.server.compiler.CompiledPrimitive.html" class="internal-link" title="orionis.mcp.server.compiler.CompiledPrimitive">CompiledPrimitive</a>]</code></td><td class="fieldArgDesc">Value supplied for <tt class="rst-docutils rst-literal">registry</tt>.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">key:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Value supplied for <tt class="rst-docutils rst-literal">key</tt>.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">primitive:</span><code><a href="orionis.mcp.server.compiler.CompiledPrimitive.html" class="internal-link" title="orionis.mcp.server.compiler.CompiledPrimitive">CompiledPrimitive</a></code></td><td class="fieldArgDesc">Compiled tool, resource or prompt declaration.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">Complete the documented operation without returning a value.</td></tr></table></div>
+    <div><p>Reject collisions at boot instead of changing lookup semantics silently.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">registry:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#dict" class="intersphinx-link">dict</a>[<a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <a href="orionis.mcp.server.compiler.CompiledPrimitive.html" class="internal-link">orionis.mcp.server.compiler.CompiledPrimitive</a>]</code></td><td class="fieldArgDesc">Value supplied for <tt class="rst-docutils rst-literal">registry</tt>.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">key:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Value supplied for <tt class="rst-docutils rst-literal">key</tt>.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">primitive:</span><code><a href="orionis.mcp.server.compiler.CompiledPrimitive.html" class="internal-link">orionis.mcp.server.compiler.CompiledPrimitive</a></code></td><td class="fieldArgDesc">Compiled tool, resource or prompt declaration.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">Complete the documented operation without returning a value.</td></tr></table></div>
   </div>
 </div><div class="basefunction">
   
@@ -2482,7 +2510,7 @@
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">_metadata</span><span class="function-signature">(<span class="rst-sig-param">definition: <code><a href="https://docs.python.org/3/builtins/functions.html#type" class="intersphinx-link">type</a>[<wbr></wbr><a href="orionis.mcp.server.primitives.Primitive.html" class="internal-link" title="orionis.mcp.server.primitives.Primitive">Primitive</a>]</code>, </span><span class="rst-sig-param">name: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/stdtypes.html#dict" class="intersphinx-link">dict</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <wbr></wbr><a href="https://docs.python.org/3/builtins/functions.html#object" class="intersphinx-link">object</a>]</code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/mcp/server/compiler.py#L221">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/mcp/server/compiler.py#L272">
       
       (source)
     </a>
@@ -2494,7 +2522,7 @@
   </div>
   <div class="docstring functionBody">
     
-    <div><p>Snapshot common metadata before adding primitive-specific wire fields.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">definition:</span><code><a href="https://docs.python.org/3/builtins/functions.html#type" class="intersphinx-link">type</a>[<a href="orionis.mcp.server.primitives.Primitive.html" class="internal-link" title="orionis.mcp.server.primitives.Primitive">Primitive</a>]</code></td><td class="fieldArgDesc">Class declaration whose metadata is being inspected.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">name:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Value supplied for <tt class="rst-docutils rst-literal">name</tt>.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/stdtypes.html#dict" class="intersphinx-link">dict</a>[<a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <a href="https://docs.python.org/3/builtins/functions.html#object" class="intersphinx-link">object</a>]</code></td><td class="fieldArgDesc">Result of the operation described above.</td></tr></table></div>
+    <div><p>Snapshot common metadata before adding primitive-specific wire fields.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">definition:</span><code><a href="https://docs.python.org/3/builtins/functions.html#type" class="intersphinx-link">type</a>[<a href="orionis.mcp.server.primitives.Primitive.html" class="internal-link">orionis.mcp.server.primitives.Primitive</a>]</code></td><td class="fieldArgDesc">Class declaration whose metadata is being inspected.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">name:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Value supplied for <tt class="rst-docutils rst-literal">name</tt>.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/stdtypes.html#dict" class="intersphinx-link">dict</a>[<a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <a href="https://docs.python.org/3/builtins/functions.html#object" class="intersphinx-link">object</a>]</code></td><td class="fieldArgDesc">Result of the operation described above.</td></tr></table></div>
   </div>
 </div><div class="basefunction">
   
@@ -2509,7 +2537,7 @@
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">_name</span><span class="function-signature">(<span class="rst-sig-param">definition: <code><a href="https://docs.python.org/3/builtins/functions.html#type" class="intersphinx-link">type</a>[<wbr></wbr><a href="orionis.mcp.server.primitives.Primitive.html" class="internal-link" title="orionis.mcp.server.primitives.Primitive">Primitive</a>]</code></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/mcp/server/compiler.py#L192">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/mcp/server/compiler.py#L243">
       
       (source)
     </a>
@@ -2521,7 +2549,7 @@
   </div>
   <div class="docstring functionBody">
     
-    <div><p>Derive readable kebab names while honoring explicit protocol identifiers.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">definition:</span><code><a href="https://docs.python.org/3/builtins/functions.html#type" class="intersphinx-link">type</a>[<a href="orionis.mcp.server.primitives.Primitive.html" class="internal-link" title="orionis.mcp.server.primitives.Primitive">Primitive</a>]</code></td><td class="fieldArgDesc">Class declaration whose metadata is being inspected.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Result of the operation described above.</td></tr></table></div>
+    <div><p>Derive readable kebab names while honoring explicit protocol identifiers.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">definition:</span><code><a href="https://docs.python.org/3/builtins/functions.html#type" class="intersphinx-link">type</a>[<a href="orionis.mcp.server.primitives.Primitive.html" class="internal-link">orionis.mcp.server.primitives.Primitive</a>]</code></td><td class="fieldArgDesc">Class declaration whose metadata is being inspected.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Result of the operation described above.</td></tr></table></div>
   </div>
 </div><div class="basefunction">
   
@@ -2536,7 +2564,7 @@
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">_ordered</span><span class="function-signature">(<span class="rst-sig-param">registry: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#dict" class="intersphinx-link">dict</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <wbr></wbr><a href="orionis.mcp.server.compiler.CompiledPrimitive.html" class="internal-link" title="orionis.mcp.server.compiler.CompiledPrimitive">CompiledPrimitive</a>]</code></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/stdtypes.html#dict" class="intersphinx-link">dict</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <wbr></wbr><a href="orionis.mcp.server.compiler.CompiledPrimitive.html" class="internal-link" title="orionis.mcp.server.compiler.CompiledPrimitive">CompiledPrimitive</a>]</code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/mcp/server/compiler.py#L653">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/mcp/server/compiler.py#L708">
       
       (source)
     </a>
@@ -2548,7 +2576,7 @@
   </div>
   <div class="docstring functionBody">
     
-    <div><p>Keep deterministic name order in the compiled mapping, including URI keys.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">registry:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#dict" class="intersphinx-link">dict</a>[<a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <a href="orionis.mcp.server.compiler.CompiledPrimitive.html" class="internal-link" title="orionis.mcp.server.compiler.CompiledPrimitive">CompiledPrimitive</a>]</code></td><td class="fieldArgDesc">Value supplied for <tt class="rst-docutils rst-literal">registry</tt>.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/stdtypes.html#dict" class="intersphinx-link">dict</a>[<a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <a href="orionis.mcp.server.compiler.CompiledPrimitive.html" class="internal-link" title="orionis.mcp.server.compiler.CompiledPrimitive">CompiledPrimitive</a>]</code></td><td class="fieldArgDesc">Result of the operation described above.</td></tr></table></div>
+    <div><p>Keep deterministic name order in the compiled mapping, including URI keys.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">registry:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#dict" class="intersphinx-link">dict</a>[<a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <a href="orionis.mcp.server.compiler.CompiledPrimitive.html" class="internal-link">orionis.mcp.server.compiler.CompiledPrimitive</a>]</code></td><td class="fieldArgDesc">Value supplied for <tt class="rst-docutils rst-literal">registry</tt>.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/stdtypes.html#dict" class="intersphinx-link">dict</a>[<a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <a href="orionis.mcp.server.compiler.CompiledPrimitive.html" class="internal-link">orionis.mcp.server.compiler.CompiledPrimitive</a>]</code></td><td class="fieldArgDesc">Result of the operation described above.</td></tr></table></div>
   </div>
 </div><div class="basefunction">
   
@@ -2563,7 +2591,7 @@
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">_resource_registry</span><span class="function-signature long-signature">(<span class="rst-sig-param">compiler: <code><a href="orionis.mcp.server.compiler._Compiler.html" class="internal-link" title="orionis.mcp.server.compiler._Compiler">_Compiler</a></code>, </span><span class="rst-sig-param">entries: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" class="intersphinx-link">tuple</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/functions.html#type" class="intersphinx-link">type</a>[<wbr></wbr>Resource], <wbr></wbr><span class="rst-variable-ellipsis">...</span>]</code></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" class="intersphinx-link">tuple</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#dict" class="intersphinx-link">dict</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <wbr></wbr><a href="orionis.mcp.server.compiler.CompiledPrimitive.html" class="internal-link" title="orionis.mcp.server.compiler.CompiledPrimitive">CompiledPrimitive</a>], <wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" class="intersphinx-link">tuple</a>[<wbr></wbr><a href="orionis.mcp.server.compiler.CompiledPrimitive.html" class="internal-link" title="orionis.mcp.server.compiler.CompiledPrimitive">CompiledPrimitive</a>, <wbr></wbr><span class="rst-variable-ellipsis">...</span>]]</code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/mcp/server/compiler.py#L727">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/mcp/server/compiler.py#L782">
       
       (source)
     </a>
@@ -2575,7 +2603,7 @@
   </div>
   <div class="docstring functionBody">
     
-    <div><p>Reject identical URI/template names and automatically detectable ambiguity.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">compiler:</span><code><a href="orionis.mcp.server.compiler._Compiler.html" class="internal-link" title="orionis.mcp.server.compiler._Compiler">_Compiler</a></code></td><td class="fieldArgDesc">Value supplied for <tt class="rst-docutils rst-literal">compiler</tt>.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">entries:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" class="intersphinx-link">tuple</a>[<a href="https://docs.python.org/3/builtins/functions.html#type" class="intersphinx-link">type</a>[<a href="orionis.mcp.Resource.html" class="internal-link" title="orionis.mcp.Resource">Resource</a>], ...]</code></td><td class="fieldArgDesc">Value supplied for <tt class="rst-docutils rst-literal">entries</tt>.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" class="intersphinx-link">tuple</a>[<a href="https://docs.python.org/3/builtins/stdtypes.html#dict" class="intersphinx-link">dict</a>[<a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <a href="orionis.mcp.server.compiler.CompiledPrimitive.html" class="internal-link" title="orionis.mcp.server.compiler.CompiledPrimitive">CompiledPrimitive</a>], <a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" class="intersphinx-link">tuple</a>[<a href="orionis.mcp.server.compiler.CompiledPrimitive.html" class="internal-link" title="orionis.mcp.server.compiler.CompiledPrimitive">CompiledPrimitive</a>, ...]]</code></td><td class="fieldArgDesc">Result of the operation described above.</td></tr></table></div>
+    <div><p>Reject identical URI/template names and automatically detectable ambiguity.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">compiler:</span><code><a href="orionis.mcp.server.compiler._Compiler.html" class="internal-link">orionis.mcp.server.compiler._Compiler</a></code></td><td class="fieldArgDesc">Value supplied for <tt class="rst-docutils rst-literal">compiler</tt>.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">entries:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" class="intersphinx-link">tuple</a>[<a href="https://docs.python.org/3/builtins/functions.html#type" class="intersphinx-link">type</a>[<a href="orionis.mcp.Resource.html" class="internal-link">orionis.mcp.Resource</a>], <tt class="rst-docutils rst-literal">...</tt>]</code></td><td class="fieldArgDesc">Value supplied for <tt class="rst-docutils rst-literal">entries</tt>.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" class="intersphinx-link">tuple</a>[<a href="https://docs.python.org/3/builtins/stdtypes.html#dict" class="intersphinx-link">dict</a>[<a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <a href="orionis.mcp.server.compiler.CompiledPrimitive.html" class="internal-link" title="orionis.mcp.server.compiler.CompiledPrimitive">CompiledPrimitive</a>], <a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" class="intersphinx-link">tuple</a>[<a href="orionis.mcp.server.compiler.CompiledPrimitive.html" class="internal-link" title="orionis.mcp.server.compiler.CompiledPrimitive">CompiledPrimitive</a>, <tt class="rst-docutils rst-literal">...</tt>]]</code></td><td class="fieldArgDesc">Result of the operation described above.</td></tr></table></div>
   </div>
 </div><div class="basefunction">
   
@@ -2590,7 +2618,7 @@
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">_tool_arguments</span><span class="function-signature">(<span class="rst-sig-param">definition: <code><a href="https://docs.python.org/3/builtins/functions.html#type" class="intersphinx-link">type</a>[<wbr></wbr>Tool]</code></span>) -&gt; <code><a href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Iterator" class="intersphinx-link">Iterator</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" class="intersphinx-link">tuple</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/functions.html#object" class="intersphinx-link">object</a>, <wbr></wbr><span class="rst-variable-ellipsis">...</span>]]</code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/mcp/server/compiler.py#L266">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/mcp/server/compiler.py#L317">
       
       (source)
     </a>
@@ -2602,7 +2630,7 @@
   </div>
   <div class="docstring functionBody">
     
-    <div><p>Enumerate generic Tool arguments in method resolution order.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">definition:</span><code><a href="https://docs.python.org/3/builtins/functions.html#type" class="intersphinx-link">type</a>[<a href="orionis.mcp.Tool.html" class="internal-link" title="orionis.mcp.Tool">Tool</a>]</code></td><td class="fieldArgDesc">Tool declaration whose generic bases are inspected.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Iterator" class="intersphinx-link">Iterator</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" class="intersphinx-link">tuple</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/functions.html#object" class="intersphinx-link">object</a>, <wbr></wbr><span class="rst-variable-ellipsis">...</span>]]</code></td><td class="fieldArgDesc"><span class="undocumented">Undocumented</span></td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Yields</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" class="intersphinx-link">tuple</a>[<a href="https://docs.python.org/3/builtins/functions.html#object" class="intersphinx-link">object</a>, ...]</code></td><td class="fieldArgDesc">Input and output declarations from each Tool generic base.</td></tr></table></div>
+    <div><p>Enumerate generic Tool arguments in method resolution order.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">definition:</span><code><a href="https://docs.python.org/3/builtins/functions.html#type" class="intersphinx-link">type</a>[<a href="orionis.mcp.Tool.html" class="internal-link">orionis.mcp.Tool</a>]</code></td><td class="fieldArgDesc">Tool declaration whose generic bases are inspected.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Yields</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" class="intersphinx-link">tuple</a>[<a href="https://docs.python.org/3/builtins/functions.html#object" class="intersphinx-link">object</a>, <tt class="rst-docutils rst-literal">...</tt>]</code></td><td class="fieldArgDesc">Input and output declarations from each Tool generic base.</td></tr></table></div>
   </div>
 </div><div class="basefunction">
   
@@ -2617,7 +2645,7 @@
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">_tool_registry</span><span class="function-signature long-signature">(<span class="rst-sig-param">compiler: <code><a href="orionis.mcp.server.compiler._Compiler.html" class="internal-link" title="orionis.mcp.server.compiler._Compiler">_Compiler</a></code>, </span><span class="rst-sig-param">entries: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" class="intersphinx-link">tuple</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/functions.html#object" class="intersphinx-link">object</a>, <wbr></wbr><span class="rst-variable-ellipsis">...</span>]</code></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" class="intersphinx-link">tuple</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#dict" class="intersphinx-link">dict</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <wbr></wbr><a href="orionis.mcp.server.compiler.CompiledPrimitive.html" class="internal-link" title="orionis.mcp.server.compiler.CompiledPrimitive">CompiledPrimitive</a>], <wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#dict" class="intersphinx-link">dict</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <wbr></wbr><a href="orionis.mcp.server.compiler.CompiledPrimitive.html" class="internal-link" title="orionis.mcp.server.compiler.CompiledPrimitive">CompiledPrimitive</a>], <wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" class="intersphinx-link">tuple</a>[<wbr></wbr><a href="orionis.mcp.server.compiler.CompiledCatalog.html" class="internal-link" title="orionis.mcp.server.compiler.CompiledCatalog">CompiledCatalog</a>, <wbr></wbr><span class="rst-variable-ellipsis">...</span>]]</code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/mcp/server/compiler.py#L669">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/mcp/server/compiler.py#L724">
       
       (source)
     </a>
@@ -2629,7 +2657,7 @@
   </div>
   <div class="docstring functionBody">
     
-    <div><p>Compile visible and hidden tool namespaces with collision checks.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">compiler:</span><code><a href="orionis.mcp.server.compiler._Compiler.html" class="internal-link" title="orionis.mcp.server.compiler._Compiler">_Compiler</a></code></td><td class="fieldArgDesc">Value supplied for <tt class="rst-docutils rst-literal">compiler</tt>.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">entries:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" class="intersphinx-link">tuple</a>[<a href="https://docs.python.org/3/builtins/functions.html#object" class="intersphinx-link">object</a>, ...]</code></td><td class="fieldArgDesc">Value supplied for <tt class="rst-docutils rst-literal">entries</tt>.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" class="intersphinx-link">tuple</a></code></td><td class="fieldArgDesc">Result of the operation described above.</td></tr></table></div>
+    <div><p>Compile visible and hidden tool namespaces with collision checks.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">compiler:</span><code><a href="orionis.mcp.server.compiler._Compiler.html" class="internal-link">orionis.mcp.server.compiler._Compiler</a></code></td><td class="fieldArgDesc">Value supplied for <tt class="rst-docutils rst-literal">compiler</tt>.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">entries:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" class="intersphinx-link">tuple</a>[<a href="https://docs.python.org/3/builtins/functions.html#object" class="intersphinx-link">object</a>, <tt class="rst-docutils rst-literal">...</tt>]</code></td><td class="fieldArgDesc">Value supplied for <tt class="rst-docutils rst-literal">entries</tt>.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" class="intersphinx-link">tuple</a></code></td><td class="fieldArgDesc">Result of the operation described above.</td></tr></table></div>
   </div>
 </div><div class="basefunction">
   
@@ -2644,7 +2672,7 @@
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">_tool_types</span><span class="function-signature">(<span class="rst-sig-param">definition: <code><a href="https://docs.python.org/3/builtins/functions.html#type" class="intersphinx-link">type</a>[<wbr></wbr>Tool]</code></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" class="intersphinx-link">tuple</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/functions.html#object" class="intersphinx-link">object</a>, <wbr></wbr><a href="https://docs.python.org/3/builtins/functions.html#object" class="intersphinx-link">object</a>]</code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/mcp/server/compiler.py#L285">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/mcp/server/compiler.py#L336">
       
       (source)
     </a>
@@ -2656,7 +2684,7 @@
   </div>
   <div class="docstring functionBody">
     
-    <div><p>Resolve explicit or generic input and output declarations.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">definition:</span><code><a href="https://docs.python.org/3/builtins/functions.html#type" class="intersphinx-link">type</a>[<a href="orionis.mcp.Tool.html" class="internal-link" title="orionis.mcp.Tool">Tool</a>]</code></td><td class="fieldArgDesc">Tool class carrying explicit fields or inherited generic arguments.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" class="intersphinx-link">tuple</a>[<a href="https://docs.python.org/3/builtins/functions.html#object" class="intersphinx-link">object</a>, <a href="https://docs.python.org/3/builtins/functions.html#object" class="intersphinx-link">object</a>]</code></td><td class="fieldArgDesc">Input type and output type, with UNSET for an undeclared output.</td></tr></table></div>
+    <div><p>Resolve explicit or generic input and output declarations.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">definition:</span><code><a href="https://docs.python.org/3/builtins/functions.html#type" class="intersphinx-link">type</a>[<a href="orionis.mcp.Tool.html" class="internal-link">orionis.mcp.Tool</a>]</code></td><td class="fieldArgDesc">Tool class carrying explicit fields or inherited generic arguments.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" class="intersphinx-link">tuple</a>[<a href="https://docs.python.org/3/builtins/functions.html#object" class="intersphinx-link">object</a>, <a href="https://docs.python.org/3/builtins/functions.html#object" class="intersphinx-link">object</a>]</code></td><td class="fieldArgDesc">Input type and output type, with UNSET for an undeclared output.</td></tr></table></div>
   </div>
 </div><div class="basefunction">
   
@@ -2671,7 +2699,7 @@
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">_validate_static_metadata</span><span class="function-signature">(<span class="rst-sig-param">metadata: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#dict" class="intersphinx-link">dict</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <wbr></wbr><a href="https://docs.python.org/3/builtins/functions.html#object" class="intersphinx-link">object</a>]</code>, </span><span class="rst-sig-param">kind: <code><a href="https://docs.python.org/3/builtins/functions.html#type" class="intersphinx-link">type</a></code></span>):</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/mcp/server/compiler.py#L134">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/mcp/server/compiler.py#L185">
       
       (source)
     </a>
@@ -2698,7 +2726,7 @@
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">_wire</span><span class="function-signature">(<span class="rst-sig-param">value: <code><a href="https://docs.python.org/3/builtins/functions.html#object" class="intersphinx-link">object</a></code></span>) -&gt; <code>msgspec.Raw</code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/mcp/server/compiler.py#L118">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/mcp/server/compiler.py#L169">
       
       (source)
     </a>
@@ -2710,7 +2738,7 @@
   </div>
   <div class="docstring functionBody">
     
-    <div><p>Freeze wire metadata into immutable JSON without retaining mutable maps.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">value:</span><code><a href="https://docs.python.org/3/builtins/functions.html#object" class="intersphinx-link">object</a></code></td><td class="fieldArgDesc">Value to inspect, transform or validate.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code>msgspec.Raw</code></td><td class="fieldArgDesc">Result of the operation described above.</td></tr></table></div>
+    <div><p>Freeze wire metadata into immutable JSON without retaining mutable maps.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">value:</span><code><a href="https://docs.python.org/3/builtins/functions.html#object" class="intersphinx-link">object</a></code></td><td class="fieldArgDesc">Value to inspect, transform or validate.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><tt class="rst-docutils rst-literal">msgspec.Raw</tt></code></td><td class="fieldArgDesc">Result of the operation described above.</td></tr></table></div>
   </div>
 </div><div class="basefunction">
   
@@ -2725,7 +2753,7 @@
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">compile_server</span><span class="function-signature">(<span class="rst-sig-param">definition: <code><a href="https://docs.python.org/3/builtins/functions.html#type" class="intersphinx-link">type</a>[<wbr></wbr>Server]</code></span>) -&gt; <code><a href="orionis.mcp.server.compiler.CompiledMcpServer.html" class="internal-link" title="orionis.mcp.server.compiler.CompiledMcpServer">CompiledMcpServer</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/mcp/server/compiler.py#L819">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/mcp/server/compiler.py#L874">
       
       (source)
     </a>
@@ -2737,7 +2765,7 @@
   </div>
   <div class="docstring functionBody">
     
-    <div><p>Compile one definition without resolving services or retaining runtime state.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">definition:</span><code><a href="https://docs.python.org/3/builtins/functions.html#type" class="intersphinx-link">type</a>[<a href="orionis.mcp.Server.html" class="internal-link" title="orionis.mcp.Server">Server</a>]</code></td><td class="fieldArgDesc">Class declaration whose metadata is being inspected.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.mcp.server.compiler.CompiledMcpServer.html" class="internal-link" title="orionis.mcp.server.compiler.CompiledMcpServer">CompiledMcpServer</a></code></td><td class="fieldArgDesc">Result of the operation described above.</td></tr></table></div>
+    <div><p>Compile one definition without resolving services or retaining runtime state.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">definition:</span><code><a href="https://docs.python.org/3/builtins/functions.html#type" class="intersphinx-link">type</a>[<a href="orionis.mcp.Server.html" class="internal-link">orionis.mcp.Server</a>]</code></td><td class="fieldArgDesc">Class declaration whose metadata is being inspected.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.mcp.server.compiler.CompiledMcpServer.html" class="internal-link">orionis.mcp.server.compiler.CompiledMcpServer</a></code></td><td class="fieldArgDesc">Result of the operation described above.</td></tr></table></div>
   </div>
 </div><div class="basefunction">
   
@@ -2752,7 +2780,7 @@
     
     
     <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">validate_output</span><span class="function-signature">(<span class="rst-sig-param">primitive: <code><a href="orionis.mcp.server.compiler.CompiledPrimitive.html" class="internal-link" title="orionis.mcp.server.compiler.CompiledPrimitive">CompiledPrimitive</a></code>, </span><span class="rst-sig-param">value: <code><a href="https://docs.python.org/3/builtins/functions.html#object" class="intersphinx-link">object</a></code></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/functions.html#object" class="intersphinx-link">object</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/mcp/server/compiler.py#L905">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/mcp/server/compiler.py#L960">
       
       (source)
     </a>
@@ -2764,7 +2792,7 @@
   </div>
   <div class="docstring functionBody">
     
-    <div><p>Enforce the advertised native output type before encoding structured data.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">primitive:</span><code><a href="orionis.mcp.server.compiler.CompiledPrimitive.html" class="internal-link" title="orionis.mcp.server.compiler.CompiledPrimitive">CompiledPrimitive</a></code></td><td class="fieldArgDesc">Compiled tool, resource or prompt declaration.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">value:</span><code><a href="https://docs.python.org/3/builtins/functions.html#object" class="intersphinx-link">object</a></code></td><td class="fieldArgDesc">Value to inspect, transform or validate.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/functions.html#object" class="intersphinx-link">object</a></code></td><td class="fieldArgDesc">Result of the operation described above.</td></tr></table></div>
+    <div><p>Enforce the advertised native output type before encoding structured data.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">primitive:</span><code><a href="orionis.mcp.server.compiler.CompiledPrimitive.html" class="internal-link">orionis.mcp.server.compiler.CompiledPrimitive</a></code></td><td class="fieldArgDesc">Compiled tool, resource or prompt declaration.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">value:</span><code><a href="https://docs.python.org/3/builtins/functions.html#object" class="intersphinx-link">object</a></code></td><td class="fieldArgDesc">Value to inspect, transform or validate.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/functions.html#object" class="intersphinx-link">object</a></code></td><td class="fieldArgDesc">Result of the operation described above.</td></tr></table></div>
   </div>
 </div><div class="basefunction">
   
@@ -2779,7 +2807,7 @@
     
     
     <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">validate_payload</span><span class="function-signature">(<span class="rst-sig-param">primitive: <code><a href="orionis.mcp.server.compiler.CompiledPrimitive.html" class="internal-link" title="orionis.mcp.server.compiler.CompiledPrimitive">CompiledPrimitive</a></code>, </span><span class="rst-sig-param">arguments: <code><a href="https://docs.python.org/3/builtins/functions.html#object" class="intersphinx-link">object</a></code></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/functions.html#object" class="intersphinx-link">object</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/mcp/server/compiler.py#L878">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/mcp/server/compiler.py#L933">
       
       (source)
     </a>
@@ -2791,7 +2819,7 @@
   </div>
   <div class="docstring functionBody">
     
-    <div><p>Validate only the tool's argument object, never the HTTP JSON-RPC envelope.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">primitive:</span><code><a href="orionis.mcp.server.compiler.CompiledPrimitive.html" class="internal-link" title="orionis.mcp.server.compiler.CompiledPrimitive">CompiledPrimitive</a></code></td><td class="fieldArgDesc">Compiled tool, resource or prompt declaration.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">arguments:</span><code><a href="https://docs.python.org/3/builtins/functions.html#object" class="intersphinx-link">object</a></code></td><td class="fieldArgDesc">Arguments supplied for this operation.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/functions.html#object" class="intersphinx-link">object</a></code></td><td class="fieldArgDesc">Result of the operation described above.</td></tr></table></div>
+    <div><p>Validate only the tool's argument object, never the HTTP JSON-RPC envelope.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">primitive:</span><code><a href="orionis.mcp.server.compiler.CompiledPrimitive.html" class="internal-link">orionis.mcp.server.compiler.CompiledPrimitive</a></code></td><td class="fieldArgDesc">Compiled tool, resource or prompt declaration.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">arguments:</span><code><a href="https://docs.python.org/3/builtins/functions.html#object" class="intersphinx-link">object</a></code></td><td class="fieldArgDesc">Arguments supplied for this operation.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/functions.html#object" class="intersphinx-link">object</a></code></td><td class="fieldArgDesc">Result of the operation described above.</td></tr></table></div>
   </div>
 </div><div class="basefunction">
   
@@ -2806,7 +2834,7 @@
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">validate_prompt_arguments</span><span class="function-signature">(<span class="rst-sig-param">primitive: <code><a href="orionis.mcp.server.compiler.CompiledPrimitive.html" class="internal-link" title="orionis.mcp.server.compiler.CompiledPrimitive">CompiledPrimitive</a></code>, </span><span class="rst-sig-param">arguments: <code><a href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Mapping" class="intersphinx-link">Mapping</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <wbr></wbr><a href="https://docs.python.org/3/builtins/functions.html#object" class="intersphinx-link">object</a>]</code></span>):</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/mcp/server/compiler.py#L930">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/mcp/server/compiler.py#L985">
       
       (source)
     </a>
@@ -2818,7 +2846,7 @@
   </div>
   <div class="docstring functionBody">
     
-    <div><p>Check required/unknown argument names and the protocol's string values.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">primitive:</span><code><a href="orionis.mcp.server.compiler.CompiledPrimitive.html" class="internal-link" title="orionis.mcp.server.compiler.CompiledPrimitive">CompiledPrimitive</a></code></td><td class="fieldArgDesc">Compiled tool, resource or prompt declaration.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">arguments:</span><code><a href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Mapping" class="intersphinx-link">Mapping</a>[<a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <a href="https://docs.python.org/3/builtins/functions.html#object" class="intersphinx-link">object</a>]</code></td><td class="fieldArgDesc">Arguments supplied for this operation.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">Complete the documented operation without returning a value.</td></tr></table></div>
+    <div><p>Check required/unknown argument names and the protocol's string values.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">primitive:</span><code><a href="orionis.mcp.server.compiler.CompiledPrimitive.html" class="internal-link">orionis.mcp.server.compiler.CompiledPrimitive</a></code></td><td class="fieldArgDesc">Compiled tool, resource or prompt declaration.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">arguments:</span><code><a href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Mapping" class="intersphinx-link">collections.abc.Mapping</a>[<a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <a href="https://docs.python.org/3/builtins/functions.html#object" class="intersphinx-link">object</a>]</code></td><td class="fieldArgDesc">Arguments supplied for this operation.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">Complete the documented operation without returning a value.</td></tr></table></div>
   </div>
 </div><div class="baseconstant">
   
@@ -2832,7 +2860,7 @@
   <div class="functionHeader">
     
     <span class="py-defname">_CORE_METHODS</span> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/mcp/server/compiler.py#L31">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/mcp/server/compiler.py#L39">
       
       (source)
     </a>
@@ -2844,7 +2872,7 @@
   </div>
   <div class="functionBody">
     
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p>Core methods used by <tt class="rst-docutils rst-literal">compiler</tt>.</p></div>
     <table class="valueTable"><tr class="fieldStart"><td class="fieldName">Value</td></tr><tr><td><pre class="constant-value"><code><a href="https://docs.python.org/3/builtins/stdtypes.html#frozenset" class="intersphinx-link">frozenset</a>(<wbr></wbr>set([<wbr></wbr><span class="rst-variable-quote">'</span><span class="rst-variable-string">server/discover</span><span class="rst-variable-quote">'</span>,
                <wbr></wbr><span class="rst-variable-quote">'</span><span class="rst-variable-string">ping</span><span class="rst-variable-quote">'</span>,
                <wbr></wbr><span class="rst-variable-quote">'</span><span class="rst-variable-string">tools/list</span><span class="rst-variable-quote">'</span>,
@@ -2866,7 +2894,7 @@
   <div class="functionHeader">
     
     <span class="py-defname">_NAME</span> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/mcp/server/compiler.py#L30">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/mcp/server/compiler.py#L37">
       
       (source)
     </a>
@@ -2878,8 +2906,35 @@
   </div>
   <div class="functionBody">
     
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p>Compiled pattern used to recognize name.</p></div>
     <table class="valueTable"><tr class="fieldStart"><td class="fieldName">Value</td></tr><tr><td><pre class="constant-value"><code><a href="https://docs.python.org/3/library/re.html#re.compile" class="intersphinx-link">re.compile</a>(r<span class="rst-variable-quote">'</span><span class="rst-re-group">[</span>A<span class="rst-re-op">-</span>Za<span class="rst-re-op">-</span>z0<span class="rst-re-op">-</span>9_\.-<span class="rst-re-group">]</span><span class="rst-re-op">{1,128}</span><span class="rst-variable-quote">'</span>)</code></pre></td></tr></table>
+  </div>
+</div><div class="basetypealias">
+  
+  
+  <a name="orionis.mcp.server.compiler._JsonObject">
+    
+  </a>
+  <a name="_JsonObject">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <span class="py-defname">_JsonObject</span>: <code><a href="https://docs.python.org/3/library/typing.html#typing.TypeAlias" class="intersphinx-link">typing.TypeAlias</a></code> =
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/mcp/server/compiler.py#L34">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#_JsonObject" title="orionis.mcp.server.compiler._JsonObject">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="functionBody">
+    
+    <div><p>Type alias for <tt class="rst-docutils rst-literal">dict[str, object]</tt>.</p></div>
+    <table class="valueTable"><tr class="fieldStart"><td class="fieldName">Value</td></tr><tr><td><pre class="constant-value"><code><a href="https://docs.python.org/3/builtins/stdtypes.html#dict" class="intersphinx-link">dict</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <wbr></wbr><a href="https://docs.python.org/3/builtins/functions.html#object" class="intersphinx-link">object</a>]</code></pre></td></tr></table>
   </div>
 </div>
         </div>
@@ -2892,7 +2947,7 @@
   <div class="orionis-footer-inner">
     <div class="orionis-footer-copy">
       <p>API documentation for <a href="https://orionis-framework.com/" class="projecthome">Orionis</a>.</p>
-      <p class="orionis-footer-meta">Generated with <a href="https://github.com/twisted/pydoctor/">Pydoctor</a> 25.10.1.<span class="orionis-footer-build"> Built 2026-11-03 09:36:58.</span></p>
+      <p class="orionis-footer-meta">Generated with <a href="https://github.com/twisted/pydoctor/">Pydoctor</a> 25.10.1.<span class="orionis-footer-build"> Built 2026-11-03 13:00:15.</span></p>
     </div>
     <nav class="orionis-footer-links" aria-label="Additional resources">
       <a href="https://docs.orionis-framework.com">Read the guide <span aria-hidden="true">↗</span></a>

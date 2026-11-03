@@ -971,22 +971,22 @@
         </div>
 
         <div class="extrasDocstring">
-          <a href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/logging/handlers/rotating_handler_factory.py" class="sourceLink">(source)</a>
+          <a href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/logging/handlers/rotating_handler_factory.py" class="sourceLink">(source)</a>
         </div>
 
         <div class="moduleDocstring">
-          <div><p class="undocumented">Undocumented</p></div>
+          <div><p>Construct rotating log handlers from channel configuration.</p></div>
         </div>
 
         <div id="split-tables">
-          <table class="children sortable" id="id1282">
+          <table class="children sortable" id="id1285">
   
   
   <tr class="class">
     
     <td>Class</td>
     <td><code><a href="orionis.logging.handlers.rotating_handler_factory.RotatingHandlerFactory.html" class="internal-link" title="orionis.logging.handlers.rotating_handler_factory.RotatingHandlerFactory"><wbr></wbr>Rotating<wbr></wbr>Handler<wbr></wbr>Factory</a></code></td>
-    <td><span class="rst-undocumented">No class docstring; 1/1 static method documented</span></td>
+    <td>Construct rotating log handlers from channel configuration.</td>
   </tr><tr class="function">
     
     <td>Function</td>
@@ -1021,7 +1021,7 @@
     
     <td>Constant</td>
     <td><code><a href="#_CHANNEL_CREATORS" class="internal-link" title="orionis.logging.handlers.rotating_handler_factory._CHANNEL_CREATORS">_CHANNEL<wbr></wbr>_CREATORS</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
+    <td>Mapping of channel types to their respective handler creation functions.</td>
   </tr>
 </table>
           
@@ -1043,7 +1043,7 @@
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">_create_chunked</span><span class="function-signature long-signature">(<span class="rst-sig-param">channel_config: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#dict" class="intersphinx-link">dict</a></code>, </span><span class="rst-sig-param">app_root: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code>, </span><span class="rst-sig-param">path_template: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code>, </span><span class="rst-sig-param">level: <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code></span>) -&gt; <code><a href="https://docs.python.org/3/library/logging.html#logging.Handler" class="intersphinx-link">Handler</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/logging/handlers/rotating_handler_factory.py#L189">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/logging/handlers/rotating_handler_factory.py#L191">
       
       (source)
     </a>
@@ -1055,7 +1055,7 @@
   </div>
   <div class="docstring functionBody">
     
-    <div><p>Create a size-based rotating file handler.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">channel<wbr></wbr>_config:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#dict" class="intersphinx-link">dict</a></code></td><td class="fieldArgDesc">Channel settings containing optional <tt class="rst-docutils rst-literal">mb_size</tt> and <tt class="rst-docutils rst-literal">files</tt> values.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">app<wbr></wbr>_root:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Root path of the application.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">path<wbr></wbr>_template:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Relative or absolute log file path template.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">level:</span><code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code></td><td class="fieldArgDesc">Logging level to apply to the handler.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/library/logging.html#logging.Handler" class="intersphinx-link">Handler</a></code></td><td class="fieldArgDesc">Configured <tt class="rst-docutils rst-literal">AdvancedRotatingFileHandler</tt> instance using chunked
+    <div><p>Create a size-based rotating file handler.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">channel<wbr></wbr>_config:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#dict" class="intersphinx-link">dict</a></code></td><td class="fieldArgDesc">Channel settings containing optional <tt class="rst-docutils rst-literal">mb_size</tt> and <tt class="rst-docutils rst-literal">files</tt> values.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">app<wbr></wbr>_root:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Root path of the application.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">path<wbr></wbr>_template:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Relative or absolute log file path template.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">level:</span><code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code></td><td class="fieldArgDesc">Logging level to apply to the handler.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><tt class="rst-docutils rst-literal">logging.Handler</tt></code></td><td class="fieldArgDesc">Configured <tt class="rst-docutils rst-literal">AdvancedRotatingFileHandler</tt> instance using chunked
 rotation and compressed rotated files.</td></tr></table></div>
   </div>
 </div><div class="basefunction">
@@ -1071,7 +1071,7 @@ rotation and compressed rotated files.</td></tr></table></div>
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">_create_daily</span><span class="function-signature long-signature">(<span class="rst-sig-param">channel_config: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#dict" class="intersphinx-link">dict</a></code>, </span><span class="rst-sig-param">app_root: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code>, </span><span class="rst-sig-param">path_template: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code>, </span><span class="rst-sig-param">level: <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code></span>) -&gt; <code><a href="https://docs.python.org/3/library/logging.html#logging.Handler" class="intersphinx-link">Handler</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/logging/handlers/rotating_handler_factory.py#L81">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/logging/handlers/rotating_handler_factory.py#L83">
       
       (source)
     </a>
@@ -1084,7 +1084,7 @@ rotation and compressed rotated files.</td></tr></table></div>
   <div class="docstring functionBody">
     
     <div><p>Create a daily rotating file handler.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">channel<wbr></wbr>_config:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#dict" class="intersphinx-link">dict</a></code></td><td class="fieldArgDesc">Channel configuration dictionary. Supports <tt class="rst-docutils rst-literal">at</tt> for rotation time
-and <tt class="rst-docutils rst-literal">retention_days</tt> to control backup retention.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">app<wbr></wbr>_root:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Root path of the application.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">path<wbr></wbr>_template:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Relative or absolute log file path template.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">level:</span><code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code></td><td class="fieldArgDesc">Logging level to apply to the handler.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/library/logging.html#logging.Handler" class="intersphinx-link">Handler</a></code></td><td class="fieldArgDesc">Configured <tt class="rst-docutils rst-literal">AdvancedRotatingFileHandler</tt> instance using a daily
+and <tt class="rst-docutils rst-literal">retention_days</tt> to control backup retention.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">app<wbr></wbr>_root:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Root path of the application.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">path<wbr></wbr>_template:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Relative or absolute log file path template.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">level:</span><code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code></td><td class="fieldArgDesc">Logging level to apply to the handler.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><tt class="rst-docutils rst-literal">logging.Handler</tt></code></td><td class="fieldArgDesc">Configured <tt class="rst-docutils rst-literal">AdvancedRotatingFileHandler</tt> instance using a daily
 suffix resolver.</td></tr></table></div>
   </div>
 </div><div class="basefunction">
@@ -1100,7 +1100,7 @@ suffix resolver.</td></tr></table></div>
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">_create_hourly</span><span class="function-signature long-signature">(<span class="rst-sig-param">channel_config: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#dict" class="intersphinx-link">dict</a></code>, </span><span class="rst-sig-param">app_root: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code>, </span><span class="rst-sig-param">path_template: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code>, </span><span class="rst-sig-param">level: <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code></span>) -&gt; <code><a href="https://docs.python.org/3/library/logging.html#logging.Handler" class="intersphinx-link">Handler</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/logging/handlers/rotating_handler_factory.py#L46">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/logging/handlers/rotating_handler_factory.py#L48">
       
       (source)
     </a>
@@ -1113,7 +1113,7 @@ suffix resolver.</td></tr></table></div>
   <div class="docstring functionBody">
     
     <div><p>Create an hourly rotating file handler.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">channel<wbr></wbr>_config:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#dict" class="intersphinx-link">dict</a></code></td><td class="fieldArgDesc">Channel configuration dictionary. Supports <tt class="rst-docutils rst-literal">retention_hours</tt> to
-control backup retention.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">app<wbr></wbr>_root:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Root path of the application.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">path<wbr></wbr>_template:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Relative or absolute log file path template.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">level:</span><code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code></td><td class="fieldArgDesc">Logging level to apply to the handler.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/library/logging.html#logging.Handler" class="intersphinx-link">Handler</a></code></td><td class="fieldArgDesc">Configured <tt class="rst-docutils rst-literal">AdvancedRotatingFileHandler</tt> instance using an hourly
+control backup retention.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">app<wbr></wbr>_root:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Root path of the application.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">path<wbr></wbr>_template:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Relative or absolute log file path template.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">level:</span><code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code></td><td class="fieldArgDesc">Logging level to apply to the handler.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><tt class="rst-docutils rst-literal">logging.Handler</tt></code></td><td class="fieldArgDesc">Configured <tt class="rst-docutils rst-literal">AdvancedRotatingFileHandler</tt> instance using an hourly
 suffix resolver.</td></tr></table></div>
   </div>
 </div><div class="basefunction">
@@ -1129,7 +1129,7 @@ suffix resolver.</td></tr></table></div>
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">_create_monthly</span><span class="function-signature long-signature">(<span class="rst-sig-param">channel_config: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#dict" class="intersphinx-link">dict</a></code>, </span><span class="rst-sig-param">app_root: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code>, </span><span class="rst-sig-param">path_template: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code>, </span><span class="rst-sig-param">level: <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code></span>) -&gt; <code><a href="https://docs.python.org/3/library/logging.html#logging.Handler" class="intersphinx-link">Handler</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/logging/handlers/rotating_handler_factory.py#L153">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/logging/handlers/rotating_handler_factory.py#L155">
       
       (source)
     </a>
@@ -1142,7 +1142,7 @@ suffix resolver.</td></tr></table></div>
   <div class="docstring functionBody">
     
     <div><p>Create a monthly rotating file handler.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">channel<wbr></wbr>_config:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#dict" class="intersphinx-link">dict</a></code></td><td class="fieldArgDesc">Channel configuration dictionary. Supports <tt class="rst-docutils rst-literal">at</tt> for rotation time
-and <tt class="rst-docutils rst-literal">retention_months</tt> to control backup retention.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">app<wbr></wbr>_root:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Root path of the application.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">path<wbr></wbr>_template:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Relative or absolute log file path template.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">level:</span><code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code></td><td class="fieldArgDesc">Logging level to apply to the handler.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/library/logging.html#logging.Handler" class="intersphinx-link">Handler</a></code></td><td class="fieldArgDesc">Configured <tt class="rst-docutils rst-literal">AdvancedRotatingFileHandler</tt> instance using a monthly
+and <tt class="rst-docutils rst-literal">retention_months</tt> to control backup retention.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">app<wbr></wbr>_root:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Root path of the application.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">path<wbr></wbr>_template:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Relative or absolute log file path template.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">level:</span><code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code></td><td class="fieldArgDesc">Logging level to apply to the handler.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><tt class="rst-docutils rst-literal">logging.Handler</tt></code></td><td class="fieldArgDesc">Configured <tt class="rst-docutils rst-literal">AdvancedRotatingFileHandler</tt> instance using a monthly
 suffix resolver.</td></tr></table></div>
   </div>
 </div><div class="basefunction">
@@ -1158,7 +1158,7 @@ suffix resolver.</td></tr></table></div>
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">_create_stack</span><span class="function-signature long-signature">(<span class="rst-sig-param">_channel_config: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#dict" class="intersphinx-link">dict</a></code>, </span><span class="rst-sig-param">app_root: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code>, </span><span class="rst-sig-param">path_template: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code>, </span><span class="rst-sig-param">level: <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code></span>) -&gt; <code><a href="https://docs.python.org/3/library/logging.html#logging.Handler" class="intersphinx-link">Handler</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/logging/handlers/rotating_handler_factory.py#L18">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/logging/handlers/rotating_handler_factory.py#L20">
       
       (source)
     </a>
@@ -1170,7 +1170,7 @@ suffix resolver.</td></tr></table></div>
   </div>
   <div class="docstring functionBody">
     
-    <div><p>Create a non-rotating file handler for the stack channel.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">_channel<wbr></wbr>_config:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#dict" class="intersphinx-link">dict</a></code></td><td class="fieldArgDesc">Channel configuration dictionary (unused for this handler type).</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">app<wbr></wbr>_root:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Root path of the application.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">path<wbr></wbr>_template:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Relative or absolute log file path template.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">level:</span><code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code></td><td class="fieldArgDesc">Logging level to apply to the handler.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/library/logging.html#logging.Handler" class="intersphinx-link">Handler</a></code></td><td class="fieldArgDesc">Configured <tt class="rst-docutils rst-literal">FileHandler</tt> instance.</td></tr></table></div>
+    <div><p>Create a non-rotating file handler for the stack channel.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">_channel<wbr></wbr>_config:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#dict" class="intersphinx-link">dict</a></code></td><td class="fieldArgDesc">Channel configuration dictionary (unused for this handler type).</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">app<wbr></wbr>_root:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Root path of the application.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">path<wbr></wbr>_template:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Relative or absolute log file path template.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">level:</span><code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code></td><td class="fieldArgDesc">Logging level to apply to the handler.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><tt class="rst-docutils rst-literal">logging.Handler</tt></code></td><td class="fieldArgDesc">Configured <tt class="rst-docutils rst-literal">FileHandler</tt> instance.</td></tr></table></div>
   </div>
 </div><div class="basefunction">
   
@@ -1185,7 +1185,7 @@ suffix resolver.</td></tr></table></div>
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">_create_weekly</span><span class="function-signature long-signature">(<span class="rst-sig-param">channel_config: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#dict" class="intersphinx-link">dict</a></code>, </span><span class="rst-sig-param">app_root: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code>, </span><span class="rst-sig-param">path_template: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code>, </span><span class="rst-sig-param">level: <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code></span>) -&gt; <code><a href="https://docs.python.org/3/library/logging.html#logging.Handler" class="intersphinx-link">Handler</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/logging/handlers/rotating_handler_factory.py#L117">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/logging/handlers/rotating_handler_factory.py#L119">
       
       (source)
     </a>
@@ -1198,7 +1198,7 @@ suffix resolver.</td></tr></table></div>
   <div class="docstring functionBody">
     
     <div><p>Create a weekly rotating file handler.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">channel<wbr></wbr>_config:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#dict" class="intersphinx-link">dict</a></code></td><td class="fieldArgDesc">Channel configuration dictionary. Supports <tt class="rst-docutils rst-literal">at</tt> for rotation time
-and <tt class="rst-docutils rst-literal">retention_weeks</tt> to control backup retention.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">app<wbr></wbr>_root:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Root path of the application.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">path<wbr></wbr>_template:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Relative or absolute log file path template.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">level:</span><code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code></td><td class="fieldArgDesc">Logging level to apply to the handler.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/library/logging.html#logging.Handler" class="intersphinx-link">Handler</a></code></td><td class="fieldArgDesc">Configured <tt class="rst-docutils rst-literal">AdvancedRotatingFileHandler</tt> instance using a weekly
+and <tt class="rst-docutils rst-literal">retention_weeks</tt> to control backup retention.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">app<wbr></wbr>_root:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Root path of the application.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">path<wbr></wbr>_template:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Relative or absolute log file path template.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">level:</span><code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code></td><td class="fieldArgDesc">Logging level to apply to the handler.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><tt class="rst-docutils rst-literal">logging.Handler</tt></code></td><td class="fieldArgDesc">Configured <tt class="rst-docutils rst-literal">AdvancedRotatingFileHandler</tt> instance using a weekly
 suffix resolver.</td></tr></table></div>
   </div>
 </div><div class="baseconstant">
@@ -1213,7 +1213,7 @@ suffix resolver.</td></tr></table></div>
   <div class="functionHeader">
     
     <span class="py-defname">_CHANNEL_CREATORS</span>: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#dict" class="intersphinx-link">dict</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <wbr></wbr><a href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Callable" class="intersphinx-link">Callable</a>[<wbr></wbr>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#dict" class="intersphinx-link">dict</a>, <wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <wbr></wbr><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a>], <wbr></wbr><a href="https://docs.python.org/3/library/logging.html#logging.Handler" class="intersphinx-link">Handler</a>]]</code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/logging/handlers/rotating_handler_factory.py#L227">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/logging/handlers/rotating_handler_factory.py#L230">
       
       (source)
     </a>
@@ -1225,7 +1225,7 @@ suffix resolver.</td></tr></table></div>
   </div>
   <div class="functionBody">
     
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p>Mapping of channel types to their respective handler creation functions.</p></div>
     <table class="valueTable"><tr class="fieldStart"><td class="fieldName">Value</td></tr><tr><td><pre class="constant-value"><code>{<wbr></wbr><span class="rst-variable-quote">'</span><span class="rst-variable-string">stack</span><span class="rst-variable-quote">'</span>: <a href="#_create_stack" class="internal-link" title="orionis.logging.handlers.rotating_handler_factory._create_stack">_create_stack</a>,
  <wbr></wbr><span class="rst-variable-quote">'</span><span class="rst-variable-string">hourly</span><span class="rst-variable-quote">'</span>: <a href="#_create_hourly" class="internal-link" title="orionis.logging.handlers.rotating_handler_factory._create_hourly">_create_hourly</a>,
  <wbr></wbr><span class="rst-variable-quote">'</span><span class="rst-variable-string">daily</span><span class="rst-variable-quote">'</span>: <a href="#_create_daily" class="internal-link" title="orionis.logging.handlers.rotating_handler_factory._create_daily">_create_daily</a>,
@@ -1244,7 +1244,7 @@ suffix resolver.</td></tr></table></div>
   <div class="orionis-footer-inner">
     <div class="orionis-footer-copy">
       <p>API documentation for <a href="https://orionis-framework.com/" class="projecthome">Orionis</a>.</p>
-      <p class="orionis-footer-meta">Generated with <a href="https://github.com/twisted/pydoctor/">Pydoctor</a> 25.10.1.<span class="orionis-footer-build"> Built 2026-11-03 09:36:58.</span></p>
+      <p class="orionis-footer-meta">Generated with <a href="https://github.com/twisted/pydoctor/">Pydoctor</a> 25.10.1.<span class="orionis-footer-build"> Built 2026-11-03 13:00:15.</span></p>
     </div>
     <nav class="orionis-footer-links" aria-label="Additional resources">
       <a href="https://docs.orionis-framework.com">Read the guide <span aria-hidden="true">↗</span></a>

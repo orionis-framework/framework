@@ -719,15 +719,17 @@
         </div>
 
         <div class="extrasDocstring">
-          <a href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/http/adapters/response/files.py" class="sourceLink">(source)</a>
+          <a href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/http/adapters/response/files.py" class="sourceLink">(source)</a>
         </div>
 
         <div class="moduleDocstring">
-          <div><p class="undocumented">Undocumented</p></div>
+          <div><p>Provide http adapters response operations.</p>
+<p>Includes <tt class="rst-docutils rst-literal">open_file</tt>, <tt class="rst-docutils rst-literal">complete_file_read</tt>.</p>
+</div>
         </div>
 
         <div id="split-tables">
-          <table class="children sortable" id="id976">
+          <table class="children sortable" id="id977">
   
   
   <tr class="function">
@@ -766,7 +768,7 @@
     
     
     <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">_drain_future</span><span class="function-signature">(<span class="rst-sig-param">pending: <code><a href="https://docs.python.org/3/library/asyncio-future.html#asyncio.Future" class="intersphinx-link">Future</a>[<wbr></wbr>T]</code></span>) -&gt; <code>T</code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/http/adapters/response/files.py#L11">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/http/adapters/response/files.py#L16">
       
       (source)
     </a>
@@ -778,7 +780,7 @@
   </div>
   <div class="docstring functionBody">
     
-    <div><p>Wait through repeated cancellation until the worker operation finishes.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">pending:</span><code><a href="https://docs.python.org/3/library/asyncio-future.html#asyncio.Future" class="intersphinx-link">Future</a>[T]</code></td><td class="fieldArgDesc">Worker operation whose resources must remain owned until completion.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code>T</code></td><td class="fieldArgDesc">Completed worker result, including an opened handle awaiting cleanup.</td></tr></table></div>
+    <div><p>Wait through repeated cancellation until the worker operation finishes.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">pending:</span><code><a href="https://docs.python.org/3/library/asyncio-future.html#asyncio.Future" class="intersphinx-link">asyncio.Future</a>[<tt class="rst-docutils rst-literal">T</tt>]</code></td><td class="fieldArgDesc">Worker operation whose resources must remain owned until completion.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><tt class="rst-docutils rst-literal">T</tt></code></td><td class="fieldArgDesc">Completed worker result, including an opened handle awaiting cleanup.</td></tr></table></div>
   </div>
 </div><div class="basefunction">
   
@@ -793,7 +795,7 @@
     
     
     <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">complete_file_read</span><span class="function-signature">(<span class="rst-sig-param">pending: <code><a href="https://docs.python.org/3/library/asyncio-future.html#asyncio.Future" class="intersphinx-link">Future</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#bytes" class="intersphinx-link">bytes</a>]</code></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/stdtypes.html#bytes" class="intersphinx-link">bytes</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/http/adapters/response/files.py#L80">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/http/adapters/response/files.py#L85">
       
       (source)
     </a>
@@ -805,7 +807,7 @@
   </div>
   <div class="docstring functionBody">
     
-    <div><p>Complete a pending worker read before propagating cancellation.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">pending:</span><code><a href="https://docs.python.org/3/library/asyncio-future.html#asyncio.Future" class="intersphinx-link">Future</a>[<a href="https://docs.python.org/3/builtins/stdtypes.html#bytes" class="intersphinx-link">bytes</a>]</code></td><td class="fieldArgDesc">Future representing the pending file read.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/stdtypes.html#bytes" class="intersphinx-link">bytes</a></code></td><td class="fieldArgDesc">Bytes returned by the worker read.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/library/asyncio-exceptions.html#asyncio.CancelledError" class="intersphinx-link">asyncio.CancelledError</a></code></td><td>If the waiting task is cancelled after the read completes.</td></tr></table></div>
+    <div><p>Complete a pending worker read before propagating cancellation.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">pending:</span><code><a href="https://docs.python.org/3/library/asyncio-future.html#asyncio.Future" class="intersphinx-link">asyncio.Future</a>[<a href="https://docs.python.org/3/builtins/stdtypes.html#bytes" class="intersphinx-link">bytes</a>]</code></td><td class="fieldArgDesc">Future representing the pending file read.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/stdtypes.html#bytes" class="intersphinx-link">bytes</a></code></td><td class="fieldArgDesc">Bytes returned by the worker read.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/library/asyncio-exceptions.html#asyncio.CancelledError" class="intersphinx-link">asyncio.CancelledError</a></code></td><td>If the waiting task is cancelled after the read completes.</td></tr></table></div>
   </div>
 </div><div class="basefunction">
   
@@ -820,7 +822,7 @@
     
     
     <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">open_file</span><span class="function-signature">(<span class="rst-sig-param">path: <code><a href="https://docs.python.org/3/library/pathlib.html#pathlib.Path" class="intersphinx-link">Path</a></code>, </span><span class="rst-sig-param">start: <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code> = 0</span>) -&gt; <code><a href="https://docs.python.org/3/library/typing.html#typing.BinaryIO" class="intersphinx-link">BinaryIO</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/http/adapters/response/files.py#L30">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/http/adapters/response/files.py#L35">
       
       (source)
     </a>
@@ -832,7 +834,7 @@
   </div>
   <div class="docstring functionBody">
     
-    <div><p>Open a file in a worker thread.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">path:</span><code><a href="https://docs.python.org/3/library/pathlib.html#pathlib.Path" class="intersphinx-link">Path</a></code></td><td class="fieldArgDesc">Path of the file to open.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">start:</span><code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a>, <em>optional</em></code></td><td class="fieldArgDesc">Byte offset at which to position the file.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/library/typing.html#typing.BinaryIO" class="intersphinx-link">BinaryIO</a></code></td><td class="fieldArgDesc">The opened file positioned at <tt class="rst-docutils rst-literal">start</tt>.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/library/asyncio-exceptions.html#asyncio.CancelledError" class="intersphinx-link">asyncio.CancelledError</a></code></td><td>If the waiting task is cancelled after the file opens.</td></tr></table></div>
+    <div><p>Open a file in a worker thread.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">path:</span><code><a href="https://docs.python.org/3/library/pathlib.html#pathlib.Path" class="intersphinx-link">pathlib.Path</a></code></td><td class="fieldArgDesc">Path of the file to open.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">start:</span><code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a>, <em>optional</em></code></td><td class="fieldArgDesc">Byte offset at which to position the file.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/library/typing.html#typing.BinaryIO" class="intersphinx-link">typing.BinaryIO</a></code></td><td class="fieldArgDesc">The opened file positioned at <tt class="rst-docutils rst-literal">start</tt>.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/library/asyncio-exceptions.html#asyncio.CancelledError" class="intersphinx-link">asyncio.CancelledError</a></code></td><td>If the waiting task is cancelled after the file opens.</td></tr></table></div>
   </div>
 </div>
         </div>
@@ -845,7 +847,7 @@
   <div class="orionis-footer-inner">
     <div class="orionis-footer-copy">
       <p>API documentation for <a href="https://orionis-framework.com/" class="projecthome">Orionis</a>.</p>
-      <p class="orionis-footer-meta">Generated with <a href="https://github.com/twisted/pydoctor/">Pydoctor</a> 25.10.1.<span class="orionis-footer-build"> Built 2026-11-03 09:36:58.</span></p>
+      <p class="orionis-footer-meta">Generated with <a href="https://github.com/twisted/pydoctor/">Pydoctor</a> 25.10.1.<span class="orionis-footer-build"> Built 2026-11-03 13:00:15.</span></p>
     </div>
     <nav class="orionis-footer-links" aria-label="Additional resources">
       <a href="https://docs.orionis-framework.com">Read the guide <span aria-hidden="true">↗</span></a>

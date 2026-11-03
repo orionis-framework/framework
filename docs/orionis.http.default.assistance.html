@@ -1082,15 +1082,15 @@
         </div>
 
         <div class="extrasDocstring">
-          <a href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/http/default/assistance.py" class="sourceLink">(source)</a>
+          <a href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/http/default/assistance.py" class="sourceLink">(source)</a>
         </div>
 
         <div class="moduleDocstring">
-          <div><p class="undocumented">Undocumented</p></div>
+          <div><p>Provide http default operations through <tt class="rst-docutils rst-literal">build_chatgpt_url</tt>.</p></div>
         </div>
 
         <div id="split-tables">
-          <table class="children sortable" id="id1002">
+          <table class="children sortable" id="id1003">
   
   
   <tr class="function">
@@ -1147,47 +1147,47 @@
     
     <td>Constant</td>
     <td><code><a href="#_CHATGPT_URL_PREFIX" class="internal-link" title="orionis.http.default.assistance._CHATGPT_URL_PREFIX">_CHATGPT<wbr></wbr>_URL<wbr></wbr>_PREFIX</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
+    <td><tt class="rst-docutils rst-literal"><span class="pre">https://chatgpt.com/?prompt=</span></tt>.</td>
   </tr><tr class="constant">
     
     <td>Constant</td>
     <td><code><a href="#_ESCAPE_WIDTH" class="internal-link" title="orionis.http.default.assistance._ESCAPE_WIDTH">_ESCAPE<wbr></wbr>_WIDTH</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
+    <td>Escape width value used by <tt class="rst-docutils rst-literal">assistance</tt>.</td>
   </tr><tr class="constant">
     
     <td>Constant</td>
     <td><code><a href="#_FRAME_HEADING" class="internal-link" title="orionis.http.default.assistance._FRAME_HEADING">_FRAME<wbr></wbr>_HEADING</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
+    <td>Section heading introducing the error traceback frames.</td>
   </tr><tr class="constant">
     
     <td>Constant</td>
     <td><code><a href="#_MIN_FRAME_BUDGET" class="internal-link" title="orionis.http.default.assistance._MIN_FRAME_BUDGET">_MIN<wbr></wbr>_FRAME<wbr></wbr>_BUDGET</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
+    <td>Min frame budget value used by <tt class="rst-docutils rst-literal">assistance</tt>.</td>
   </tr><tr class="constant">
     
     <td>Constant</td>
     <td><code><a href="#_PROMPT_BUDGET" class="internal-link" title="orionis.http.default.assistance._PROMPT_BUDGET">_PROMPT<wbr></wbr>_BUDGET</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
+    <td>Prompt budget used by <tt class="rst-docutils rst-literal">assistance</tt>.</td>
   </tr><tr class="constant">
     
     <td>Constant</td>
     <td><code><a href="#_PROMPT_START" class="internal-link" title="orionis.http.default.assistance._PROMPT_START">_PROMPT<wbr></wbr>_START</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
+    <td>Opening instruction included in the bounded error-assistance prompt.</td>
   </tr><tr class="constant">
     
     <td>Constant</td>
     <td><code><a href="#_SOURCE_NOTICE" class="internal-link" title="orionis.http.default.assistance._SOURCE_NOTICE">_SOURCE<wbr></wbr>_NOTICE</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
+    <td>`` [Source snippets omitted to fit the URL limit.]``.</td>
   </tr><tr class="constant">
     
     <td>Constant</td>
     <td><code><a href="#_TRUNCATION_NOTICE" class="internal-link" title="orionis.http.default.assistance._TRUNCATION_NOTICE">_TRUNCATION<wbr></wbr>_NOTICE</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
+    <td>`` [Truncated to fit URL: source snippets omitted; {omitted} older frames omitted.]``.</td>
   </tr><tr class="constant">
     
     <td>Constant</td>
     <td><code><a href="#CHATGPT_URL_MAX_LENGTH" class="internal-link" title="orionis.http.default.assistance.CHATGPT_URL_MAX_LENGTH">CHATGPT<wbr></wbr>_URL<wbr></wbr>_MAX<wbr></wbr>_LENGTH</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
+    <td>Apply a conservative application limit to the complete outgoing URL.</td>
   </tr>
 </table>
           
@@ -1209,7 +1209,7 @@
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">_compact_frame</span><span class="function-signature">(<span class="rst-sig-param">frame: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#dict" class="intersphinx-link">dict</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <wbr></wbr><a href="https://docs.python.org/3/library/typing.html#typing.Any" class="intersphinx-link">Any</a>]</code>, </span><span class="rst-sig-param">budget: <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/http/default/assistance.py#L239">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/http/default/assistance.py#L253">
       
       (source)
     </a>
@@ -1221,7 +1221,7 @@
   </div>
   <div class="docstring functionBody">
     
-    <div><p>Build a compact representation of one traceback frame.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">frame:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#dict" class="intersphinx-link">dict</a>[<a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <a href="https://docs.python.org/3/library/typing.html#typing.Any" class="intersphinx-link">Any</a>]</code></td><td class="fieldArgDesc">Parsed traceback frame.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">budget:</span><code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code></td><td class="fieldArgDesc">Maximum encoded length assigned to the frame.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Encoded compact frame location.</td></tr></table></div>
+    <div><p>Build a compact representation of one traceback frame.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">frame:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#dict" class="intersphinx-link">dict</a>[<a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <a href="https://docs.python.org/3/library/typing.html#typing.Any" class="intersphinx-link">typing.Any</a>]</code></td><td class="fieldArgDesc">Parsed traceback frame.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">budget:</span><code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code></td><td class="fieldArgDesc">Maximum encoded length assigned to the frame.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Encoded compact frame location.</td></tr></table></div>
   </div>
 </div><div class="basefunction">
   
@@ -1236,7 +1236,7 @@
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">_compact_header</span><span class="function-signature long-signature">(<span class="rst-sig-param">traceback_data: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#dict" class="intersphinx-link">dict</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <wbr></wbr><a href="https://docs.python.org/3/library/typing.html#typing.Any" class="intersphinx-link">Any</a>]</code>, </span><span class="rst-sig-param">locale: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code>, </span><span class="rst-sig-param">request_method: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code>, </span><span class="rst-sig-param">request_path: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/http/default/assistance.py#L208">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/http/default/assistance.py#L222">
       
       (source)
     </a>
@@ -1248,7 +1248,7 @@
   </div>
   <div class="docstring functionBody">
     
-    <div><p>Build a bounded header for the diagnostic prompt.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">traceback<wbr></wbr>_data:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#dict" class="intersphinx-link">dict</a>[<a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <a href="https://docs.python.org/3/library/typing.html#typing.Any" class="intersphinx-link">Any</a>]</code></td><td class="fieldArgDesc">Parsed exception data.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">locale:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Requested response locale.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">request<wbr></wbr>_method:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">HTTP method associated with the request.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">request<wbr></wbr>_path:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">HTTP path associated with the request.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Encoded diagnostic header.</td></tr></table></div>
+    <div><p>Build a bounded header for the diagnostic prompt.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">traceback<wbr></wbr>_data:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#dict" class="intersphinx-link">dict</a>[<a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <a href="https://docs.python.org/3/library/typing.html#typing.Any" class="intersphinx-link">typing.Any</a>]</code></td><td class="fieldArgDesc">Parsed exception data.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">locale:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Requested response locale.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">request<wbr></wbr>_method:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">HTTP method associated with the request.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">request<wbr></wbr>_path:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">HTTP path associated with the request.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Encoded diagnostic header.</td></tr></table></div>
   </div>
 </div><div class="basefunction">
   
@@ -1263,7 +1263,7 @@
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">_compact_prompt</span><span class="function-signature long-signature">(<span class="rst-sig-param">traceback_data: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#dict" class="intersphinx-link">dict</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <wbr></wbr><a href="https://docs.python.org/3/library/typing.html#typing.Any" class="intersphinx-link">Any</a>]</code>, </span><span class="rst-sig-param">locale: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code>, </span><span class="rst-sig-param">request_method: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code>, </span><span class="rst-sig-param">request_path: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/http/default/assistance.py#L263">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/http/default/assistance.py#L277">
       
       (source)
     </a>
@@ -1275,7 +1275,7 @@
   </div>
   <div class="docstring functionBody">
     
-    <div><p>Build a compact prompt when the full traceback does not fit.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">traceback<wbr></wbr>_data:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#dict" class="intersphinx-link">dict</a>[<a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <a href="https://docs.python.org/3/library/typing.html#typing.Any" class="intersphinx-link">Any</a>]</code></td><td class="fieldArgDesc">Parsed exception data.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">locale:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Requested response locale.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">request<wbr></wbr>_method:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">HTTP method associated with the request.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">request<wbr></wbr>_path:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">HTTP path associated with the request.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Encoded prompt within the configured URL budget.</td></tr></table></div>
+    <div><p>Build a compact prompt when the full traceback does not fit.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">traceback<wbr></wbr>_data:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#dict" class="intersphinx-link">dict</a>[<a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <a href="https://docs.python.org/3/library/typing.html#typing.Any" class="intersphinx-link">typing.Any</a>]</code></td><td class="fieldArgDesc">Parsed exception data.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">locale:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Requested response locale.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">request<wbr></wbr>_method:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">HTTP method associated with the request.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">request<wbr></wbr>_path:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">HTTP path associated with the request.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Encoded prompt within the configured URL budget.</td></tr></table></div>
   </div>
 </div><div class="basefunction">
   
@@ -1290,7 +1290,7 @@
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">_encode_bounded</span><span class="function-signature">(<span class="rst-sig-param">value: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code>, </span><span class="rst-sig-param">limit: <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code>, </span><span class="rst-sig-symbol">*, </span><span class="rst-sig-param">tail: <code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code> = <a href="https://docs.python.org/3/builtins/constants.html#False" class="intersphinx-link">False</a></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" class="intersphinx-link">tuple</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <wbr></wbr><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a>]</code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/http/default/assistance.py#L24">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/http/default/assistance.py#L38">
       
       (source)
     </a>
@@ -1317,7 +1317,7 @@
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">_encode_field</span><span class="function-signature">(<span class="rst-sig-param">value: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code>, </span><span class="rst-sig-param">limit: <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code>, </span><span class="rst-sig-symbol">*, </span><span class="rst-sig-param">tail: <code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code> = <a href="https://docs.python.org/3/builtins/constants.html#False" class="intersphinx-link">False</a></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/http/default/assistance.py#L62">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/http/default/assistance.py#L76">
       
       (source)
     </a>
@@ -1344,7 +1344,7 @@
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">_frame_parts</span><span class="function-signature">(<span class="rst-sig-param">frames: <code><a href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Iterable" class="intersphinx-link">Iterable</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#dict" class="intersphinx-link">dict</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <wbr></wbr><a href="https://docs.python.org/3/library/typing.html#typing.Any" class="intersphinx-link">Any</a>]]</code>, </span><span class="rst-sig-symbol">*, </span><span class="rst-sig-param">sources: <code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code></span>) -&gt; <code><a href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Iterator" class="intersphinx-link">Iterator</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>]</code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/http/default/assistance.py#L145">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/http/default/assistance.py#L159">
       
       (source)
     </a>
@@ -1356,7 +1356,7 @@
   </div>
   <div class="docstring functionBody">
     
-    <div><p>Yield frame locations and optional source lines.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">frames:</span><code><a href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Iterable" class="intersphinx-link">Iterable</a>[<a href="https://docs.python.org/3/builtins/stdtypes.html#dict" class="intersphinx-link">dict</a>[<a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <a href="https://docs.python.org/3/library/typing.html#typing.Any" class="intersphinx-link">Any</a>]]</code></td><td class="fieldArgDesc">Traceback frames in most-recent-first order.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">sources:</span><code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code></td><td class="fieldArgDesc">Whether to include failing source lines.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Iterator" class="intersphinx-link">Iterator</a>[<a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>]</code></td><td class="fieldArgDesc">Unencoded frame fields.</td></tr></table></div>
+    <div><p>Yield frame locations and optional source lines.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">frames:</span><code><a href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Iterable" class="intersphinx-link">collections.abc.Iterable</a>[<a href="https://docs.python.org/3/builtins/stdtypes.html#dict" class="intersphinx-link">dict</a>[<a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <a href="https://docs.python.org/3/library/typing.html#typing.Any" class="intersphinx-link">typing.Any</a>]]</code></td><td class="fieldArgDesc">Traceback frames in most-recent-first order.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">sources:</span><code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code></td><td class="fieldArgDesc">Whether to include failing source lines.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Iterator" class="intersphinx-link">collections.abc.Iterator</a>[<a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>]</code></td><td class="fieldArgDesc">Unencoded frame fields.</td></tr></table></div>
   </div>
 </div><div class="basefunction">
   
@@ -1371,7 +1371,7 @@
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">_header_parts</span><span class="function-signature long-signature">(<span class="rst-sig-param">traceback_data: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#dict" class="intersphinx-link">dict</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <wbr></wbr><a href="https://docs.python.org/3/library/typing.html#typing.Any" class="intersphinx-link">Any</a>]</code>, </span><span class="rst-sig-param">locale: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code>, </span><span class="rst-sig-param">request_method: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code>, </span><span class="rst-sig-param">request_path: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></span>) -&gt; <code><a href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Iterator" class="intersphinx-link">Iterator</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>]</code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/http/default/assistance.py#L86">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/http/default/assistance.py#L100">
       
       (source)
     </a>
@@ -1383,7 +1383,7 @@
   </div>
   <div class="docstring functionBody">
     
-    <div><p>Yield the diagnostic request and exception fields.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">traceback<wbr></wbr>_data:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#dict" class="intersphinx-link">dict</a>[<a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <a href="https://docs.python.org/3/library/typing.html#typing.Any" class="intersphinx-link">Any</a>]</code></td><td class="fieldArgDesc">Parsed exception data.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">locale:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Requested response locale.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">request<wbr></wbr>_method:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">HTTP method associated with the request.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">request<wbr></wbr>_path:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">HTTP path associated with the request.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Iterator" class="intersphinx-link">Iterator</a>[<a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>]</code></td><td class="fieldArgDesc">Individual unencoded header fields.</td></tr></table></div>
+    <div><p>Yield the diagnostic request and exception fields.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">traceback<wbr></wbr>_data:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#dict" class="intersphinx-link">dict</a>[<a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <a href="https://docs.python.org/3/library/typing.html#typing.Any" class="intersphinx-link">typing.Any</a>]</code></td><td class="fieldArgDesc">Parsed exception data.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">locale:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Requested response locale.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">request<wbr></wbr>_method:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">HTTP method associated with the request.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">request<wbr></wbr>_path:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">HTTP path associated with the request.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Iterator" class="intersphinx-link">collections.abc.Iterator</a>[<a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>]</code></td><td class="fieldArgDesc">Individual unencoded header fields.</td></tr></table></div>
   </div>
 </div><div class="basefunction">
   
@@ -1398,7 +1398,7 @@
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">_prompt_parts</span><span class="function-signature long-signature">(<span class="rst-sig-param">traceback_data: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#dict" class="intersphinx-link">dict</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <wbr></wbr><a href="https://docs.python.org/3/library/typing.html#typing.Any" class="intersphinx-link">Any</a>]</code>, </span><span class="rst-sig-param">locale: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code>, </span><span class="rst-sig-param">request_method: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code>, </span><span class="rst-sig-param">request_path: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code>, </span><span class="rst-sig-symbol">*, </span><span class="rst-sig-param">sources: <code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code></span>) -&gt; <code><a href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Iterator" class="intersphinx-link">Iterator</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>]</code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/http/default/assistance.py#L115">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/http/default/assistance.py#L129">
       
       (source)
     </a>
@@ -1410,7 +1410,7 @@
   </div>
   <div class="docstring functionBody">
     
-    <div><p>Yield the diagnostic header and captured frames.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">traceback<wbr></wbr>_data:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#dict" class="intersphinx-link">dict</a>[<a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <a href="https://docs.python.org/3/library/typing.html#typing.Any" class="intersphinx-link">Any</a>]</code></td><td class="fieldArgDesc">Parsed exception data.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">locale:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Requested response locale.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">request<wbr></wbr>_method:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">HTTP method associated with the request.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">request<wbr></wbr>_path:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">HTTP path associated with the request.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">sources:</span><code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code></td><td class="fieldArgDesc">Whether to include failing source lines.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Iterator" class="intersphinx-link">Iterator</a>[<a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>]</code></td><td class="fieldArgDesc">Unencoded prompt fields in traceback order.</td></tr></table></div>
+    <div><p>Yield the diagnostic header and captured frames.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">traceback<wbr></wbr>_data:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#dict" class="intersphinx-link">dict</a>[<a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <a href="https://docs.python.org/3/library/typing.html#typing.Any" class="intersphinx-link">typing.Any</a>]</code></td><td class="fieldArgDesc">Parsed exception data.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">locale:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Requested response locale.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">request<wbr></wbr>_method:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">HTTP method associated with the request.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">request<wbr></wbr>_path:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">HTTP path associated with the request.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">sources:</span><code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code></td><td class="fieldArgDesc">Whether to include failing source lines.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Iterator" class="intersphinx-link">collections.abc.Iterator</a>[<a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>]</code></td><td class="fieldArgDesc">Unencoded prompt fields in traceback order.</td></tr></table></div>
   </div>
 </div><div class="basefunction">
   
@@ -1425,7 +1425,7 @@
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">_try_prompt</span><span class="function-signature long-signature">(<span class="rst-sig-param">parts: <code><a href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Iterable" class="intersphinx-link">Iterable</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>]</code>, </span><span class="rst-sig-symbol">*, </span><span class="rst-sig-param">notice: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code> = <span class="rst-variable-quote">'</span><span class="rst-variable-string"></span><span class="rst-variable-quote">'</span>, </span><span class="rst-sig-param">prefix: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code> = <span class="rst-variable-quote">'</span><span class="rst-variable-string"></span><span class="rst-variable-quote">'</span>, </span><span class="rst-sig-param">limit: <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code> = <a href="#_PROMPT_BUDGET" class="internal-link" title="orionis.http.default.assistance._PROMPT_BUDGET">_PROMPT_BUDGET</a></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a> | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/http/default/assistance.py#L173">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/http/default/assistance.py#L187">
       
       (source)
     </a>
@@ -1437,7 +1437,7 @@
   </div>
   <div class="docstring functionBody">
     
-    <div><p>Encode a prompt only when all fields fit within the limit.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">parts:</span><code><a href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Iterable" class="intersphinx-link">Iterable</a>[<a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>]</code></td><td class="fieldArgDesc">Prompt fields to encode.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">notice:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <em>optional</em></code></td><td class="fieldArgDesc">Limit notice appended to the prompt.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">prefix:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <em>optional</em></code></td><td class="fieldArgDesc">Already encoded prompt prefix.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">limit:</span><code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a>, <em>optional</em></code></td><td class="fieldArgDesc">Maximum encoded prompt length.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code>str | None</code></td><td class="fieldArgDesc">Complete encoded prompt, or <tt class="rst-docutils rst-literal">None</tt> when a field does not fit.</td></tr></table></div>
+    <div><p>Encode a prompt only when all fields fit within the limit.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">parts:</span><code><a href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Iterable" class="intersphinx-link">collections.abc.Iterable</a>[<a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>]</code></td><td class="fieldArgDesc">Prompt fields to encode.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">notice:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <em>optional</em></code></td><td class="fieldArgDesc">Limit notice appended to the prompt.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">prefix:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <em>optional</em></code></td><td class="fieldArgDesc">Already encoded prompt prefix.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">limit:</span><code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a>, <em>optional</em></code></td><td class="fieldArgDesc">Maximum encoded prompt length.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code>str | None</code></td><td class="fieldArgDesc">Complete encoded prompt, or <tt class="rst-docutils rst-literal">None</tt> when a field does not fit.</td></tr></table></div>
   </div>
 </div><div class="basefunction">
   
@@ -1452,7 +1452,7 @@
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">build_chatgpt_url</span><span class="function-signature long-signature">(<span class="rst-sig-param">traceback_data: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#dict" class="intersphinx-link">dict</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <wbr></wbr><a href="https://docs.python.org/3/library/typing.html#typing.Any" class="intersphinx-link">Any</a>]</code>, </span><span class="rst-sig-param">locale: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code>, </span><span class="rst-sig-param">request_method: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code>, </span><span class="rst-sig-param">request_path: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" class="intersphinx-link">tuple</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <wbr></wbr><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a>]</code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/http/default/assistance.py#L326">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/http/default/assistance.py#L340">
       
       (source)
     </a>
@@ -1469,7 +1469,7 @@
 Otherwise omit source snippets before shortening fields or dropping the
 oldest frames. The limit is an application compatibility policy, not a
 published ChatGPT maximum. No request data is cached or transmitted here.</p>
-<table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">traceback<wbr></wbr>_data:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#dict" class="intersphinx-link">dict</a>[<a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <a href="https://docs.python.org/3/library/typing.html#typing.Any" class="intersphinx-link">Any</a>]</code></td><td class="fieldArgDesc">ExceptionParser output, including frames in most-recent-first order.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">locale:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Locale requested for the diagnostic response.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">request<wbr></wbr>_method:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">HTTP method associated with the failed request.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">request<wbr></wbr>_path:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">HTTP path associated with the failed request.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" class="intersphinx-link">tuple</a>[<a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a>]</code></td><td class="fieldArgDesc">ASCII URL and whether source, fields, or frames were omitted.</td></tr></table></div>
+<table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">traceback<wbr></wbr>_data:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#dict" class="intersphinx-link">dict</a>[<a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <a href="https://docs.python.org/3/library/typing.html#typing.Any" class="intersphinx-link">typing.Any</a>]</code></td><td class="fieldArgDesc">ExceptionParser output, including frames in most-recent-first order.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">locale:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Locale requested for the diagnostic response.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">request<wbr></wbr>_method:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">HTTP method associated with the failed request.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">request<wbr></wbr>_path:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">HTTP path associated with the failed request.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" class="intersphinx-link">tuple</a>[<a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a>]</code></td><td class="fieldArgDesc">ASCII URL and whether source, fields, or frames were omitted.</td></tr></table></div>
   </div>
 </div><div class="baseconstant">
   
@@ -1483,7 +1483,7 @@ published ChatGPT maximum. No request data is cached or transmitted here.</p>
   <div class="functionHeader">
     
     <span class="py-defname">_CHATGPT_URL_PREFIX</span>: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/http/default/assistance.py#L9">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/http/default/assistance.py#L12">
       
       (source)
     </a>
@@ -1495,7 +1495,7 @@ published ChatGPT maximum. No request data is cached or transmitted here.</p>
   </div>
   <div class="functionBody">
     
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p><tt class="rst-docutils rst-literal"><span class="pre">https://chatgpt.com/?prompt=</span></tt>.</p></div>
     <table class="valueTable"><tr class="fieldStart"><td class="fieldName">Value</td></tr><tr><td><pre class="constant-value"><code><span class="rst-variable-quote">'</span><span class="rst-variable-string">https://chatgpt.com/?prompt=</span><span class="rst-variable-quote">'</span></code></pre></td></tr></table>
   </div>
 </div><div class="baseconstant">
@@ -1510,7 +1510,7 @@ published ChatGPT maximum. No request data is cached or transmitted here.</p>
   <div class="functionHeader">
     
     <span class="py-defname">_ESCAPE_WIDTH</span>: <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/http/default/assistance.py#L22">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/http/default/assistance.py#L35">
       
       (source)
     </a>
@@ -1522,7 +1522,7 @@ published ChatGPT maximum. No request data is cached or transmitted here.</p>
   </div>
   <div class="functionBody">
     
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p>Escape width value used by <tt class="rst-docutils rst-literal">assistance</tt>.</p></div>
     <table class="valueTable"><tr class="fieldStart"><td class="fieldName">Value</td></tr><tr><td><pre class="constant-value"><code>3</code></pre></td></tr></table>
   </div>
 </div><div class="baseconstant">
@@ -1537,7 +1537,7 @@ published ChatGPT maximum. No request data is cached or transmitted here.</p>
   <div class="functionHeader">
     
     <span class="py-defname">_FRAME_HEADING</span>: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/http/default/assistance.py#L15">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/http/default/assistance.py#L21">
       
       (source)
     </a>
@@ -1549,7 +1549,7 @@ published ChatGPT maximum. No request data is cached or transmitted here.</p>
   </div>
   <div class="functionBody">
     
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p>Section heading introducing the error traceback frames.</p></div>
     <table class="valueTable"><tr class="fieldStart"><td class="fieldName">Value</td></tr><tr><td><pre class="constant-value"><code><span class="rst-variable-quote">'''</span><span class="rst-variable-string"></span>
 <span class="rst-variable-string">Frames (most recent first):</span>
 <span class="rst-variable-string"></span><span class="rst-variable-quote">'''</span></code></pre></td></tr></table>
@@ -1566,7 +1566,7 @@ published ChatGPT maximum. No request data is cached or transmitted here.</p>
   <div class="functionHeader">
     
     <span class="py-defname">_MIN_FRAME_BUDGET</span>: <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/http/default/assistance.py#L21">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/http/default/assistance.py#L33">
       
       (source)
     </a>
@@ -1578,7 +1578,7 @@ published ChatGPT maximum. No request data is cached or transmitted here.</p>
   </div>
   <div class="functionBody">
     
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p>Min frame budget value used by <tt class="rst-docutils rst-literal">assistance</tt>.</p></div>
     <table class="valueTable"><tr class="fieldStart"><td class="fieldName">Value</td></tr><tr><td><pre class="constant-value"><code>48</code></pre></td></tr></table>
   </div>
 </div><div class="baseconstant">
@@ -1593,7 +1593,7 @@ published ChatGPT maximum. No request data is cached or transmitted here.</p>
   <div class="functionHeader">
     
     <span class="py-defname">_PROMPT_BUDGET</span>: <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/http/default/assistance.py#L10">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/http/default/assistance.py#L14">
       
       (source)
     </a>
@@ -1605,7 +1605,7 @@ published ChatGPT maximum. No request data is cached or transmitted here.</p>
   </div>
   <div class="functionBody">
     
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p>Prompt budget used by <tt class="rst-docutils rst-literal">assistance</tt>.</p></div>
     <table class="valueTable"><tr class="fieldStart"><td class="fieldName">Value</td></tr><tr><td><pre class="constant-value"><code><a href="#CHATGPT_URL_MAX_LENGTH" class="internal-link" title="orionis.http.default.assistance.CHATGPT_URL_MAX_LENGTH">CHATGPT_URL_MAX_LENGTH</a> - <a href="https://docs.python.org/3/builtins/functions.html#len" class="intersphinx-link">len</a>(<wbr></wbr><a href="#_CHATGPT_URL_PREFIX" class="internal-link" title="orionis.http.default.assistance._CHATGPT_URL_PREFIX">_CHATGPT_URL_PREFIX</a>)</code></pre></td></tr></table>
   </div>
 </div><div class="baseconstant">
@@ -1620,7 +1620,7 @@ published ChatGPT maximum. No request data is cached or transmitted here.</p>
   <div class="functionHeader">
     
     <span class="py-defname">_PROMPT_START</span>: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/http/default/assistance.py#L11">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/http/default/assistance.py#L16">
       
       (source)
     </a>
@@ -1632,7 +1632,7 @@ published ChatGPT maximum. No request data is cached or transmitted here.</p>
   </div>
   <div class="functionBody">
     
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p>Opening instruction included in the bounded error-assistance prompt.</p></div>
     <table class="valueTable"><tr class="fieldStart"><td class="fieldName">Value</td></tr><tr><td><pre class="constant-value"><code><span class="rst-variable-quote">'</span><span class="rst-variable-string">Diagnose this Orionis Framework/Python error and suggest a fix. Respond in the </span><span class="rst-variable-linewrap">↵</span>
 <span class="rst-variable-string">language of locale </span><span class="rst-variable-quote">'</span></code></pre></td></tr></table>
   </div>
@@ -1648,7 +1648,7 @@ published ChatGPT maximum. No request data is cached or transmitted here.</p>
   <div class="functionHeader">
     
     <span class="py-defname">_SOURCE_NOTICE</span>: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/http/default/assistance.py#L16">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/http/default/assistance.py#L23">
       
       (source)
     </a>
@@ -1660,7 +1660,7 @@ published ChatGPT maximum. No request data is cached or transmitted here.</p>
   </div>
   <div class="functionBody">
     
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p>`` [Source snippets omitted to fit the URL limit.]``.</p></div>
     <table class="valueTable"><tr class="fieldStart"><td class="fieldName">Value</td></tr><tr><td><pre class="constant-value"><code><span class="rst-variable-quote">'''</span><span class="rst-variable-string"></span>
 <span class="rst-variable-string">[Source snippets omitted to fit the URL limit.]</span><span class="rst-variable-quote">'''</span></code></pre></td></tr></table>
   </div>
@@ -1676,7 +1676,7 @@ published ChatGPT maximum. No request data is cached or transmitted here.</p>
   <div class="functionHeader">
     
     <span class="py-defname">_TRUNCATION_NOTICE</span>: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/http/default/assistance.py#L17">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/http/default/assistance.py#L25">
       
       (source)
     </a>
@@ -1688,7 +1688,8 @@ published ChatGPT maximum. No request data is cached or transmitted here.</p>
   </div>
   <div class="functionBody">
     
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p>`` [Truncated to fit URL: source snippets omitted;
+{omitted} older frames omitted.]``.</p></div>
     <table class="valueTable"><tr class="fieldStart"><td class="fieldName">Value</td></tr><tr><td><pre class="constant-value"><code><span class="rst-variable-quote">'''</span><span class="rst-variable-string"></span>
 <span class="rst-variable-string">[Truncated to fit URL: source snippets omitted; {omitted} older frames omitted.]</span><span class="rst-variable-quote">'''</span></code></pre></td></tr></table>
   </div>
@@ -1704,7 +1705,7 @@ published ChatGPT maximum. No request data is cached or transmitted here.</p>
   <div class="functionHeader">
     
     <span class="py-defname">CHATGPT_URL_MAX_LENGTH</span>: <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/http/default/assistance.py#L8">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/http/default/assistance.py#L10">
       
       (source)
     </a>
@@ -1716,7 +1717,7 @@ published ChatGPT maximum. No request data is cached or transmitted here.</p>
   </div>
   <div class="functionBody">
     
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p>Apply a conservative application limit to the complete outgoing URL.</p></div>
     <table class="valueTable"><tr class="fieldStart"><td class="fieldName">Value</td></tr><tr><td><pre class="constant-value"><code>2048</code></pre></td></tr></table>
   </div>
 </div>
@@ -1730,7 +1731,7 @@ published ChatGPT maximum. No request data is cached or transmitted here.</p>
   <div class="orionis-footer-inner">
     <div class="orionis-footer-copy">
       <p>API documentation for <a href="https://orionis-framework.com/" class="projecthome">Orionis</a>.</p>
-      <p class="orionis-footer-meta">Generated with <a href="https://github.com/twisted/pydoctor/">Pydoctor</a> 25.10.1.<span class="orionis-footer-build"> Built 2026-11-03 09:36:58.</span></p>
+      <p class="orionis-footer-meta">Generated with <a href="https://github.com/twisted/pydoctor/">Pydoctor</a> 25.10.1.<span class="orionis-footer-build"> Built 2026-11-03 13:00:15.</span></p>
     </div>
     <nav class="orionis-footer-links" aria-label="Additional resources">
       <a href="https://docs.orionis-framework.com">Read the guide <span aria-hidden="true">↗</span></a>

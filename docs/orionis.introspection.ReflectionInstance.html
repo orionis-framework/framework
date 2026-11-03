@@ -1465,7 +1465,7 @@
                     
                 </label>
 
-                <code><a href="orionis.introspection.reflection.html" class="internal-link" title="orionis.introspection.reflection">reflection</a></code>
+                <code><a href="orionis.introspection.reflection.module.html" class="internal-link" title="orionis.introspection.reflection">reflection</a></code>
 
                 <div class="expandableContent">
                     <div>
@@ -5480,15 +5480,15 @@
         </div>
 
         <div class="extrasDocstring">
-          <p class="class-signature"><code><span class="py-keyword">class</span> <span class="py-defname">ReflectionInstance</span>(<a href="orionis.introspection.instances.contracts.reflection.IReflectionInstance.html" class="internal-link" title="orionis.introspection.instances.contracts.reflection.IReflectionInstance">IReflectionInstance</a>): <a href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/introspection/instances/reflection.py#L17" class="sourceLink">(source)</a></code></p><p>Constructor: <code><a href="#__init__" class="internal-link" title="orionis.introspection.ReflectionInstance.__init__">ReflectionInstance(instance)</a></code></p><p><a href="classIndex.html#orionis.introspection.ReflectionInstance">View In Hierarchy</a></p>
+          <p class="class-signature"><code><span class="py-keyword">class</span> <span class="py-defname">ReflectionInstance</span>(<a href="orionis.introspection.instances.contracts.reflection.IReflectionInstance.html" class="internal-link" title="orionis.introspection.instances.contracts.reflection.IReflectionInstance">IReflectionInstance</a>): <a href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/introspection/instances/reflection.py#L19" class="sourceLink">(source)</a></code></p><p>Constructor: <code><a href="#__init__" class="internal-link" title="orionis.introspection.ReflectionInstance.__init__">ReflectionInstance(instance)</a></code></p><p><a href="classIndex.html#orionis.introspection.ReflectionInstance">View In Hierarchy</a></p>
         </div>
 
         <div class="moduleDocstring">
-          <div><p class="undocumented">Undocumented</p></div>
+          <div><p>Inspect the class and members of an existing object.</p></div>
         </div>
 
         <div id="split-tables">
-          <table class="children sortable" id="id1242">
+          <table class="children sortable" id="id1244">
   
   
   <tr class="method">
@@ -5880,32 +5880,32 @@
     
     <td>Instance Variable</td>
     <td><code><a href="#_class_name" class="internal-link" title="orionis.introspection.ReflectionInstance._class_name">_class<wbr></wbr>_name</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
+    <td>Class name obtained from <tt class="rst-docutils rst-literal">cls.__name__</tt>.</td>
   </tr><tr class="instancevariable">
     
     <td>Instance Variable</td>
     <td><code><a href="#_cls" class="internal-link" title="orionis.introspection.ReflectionInstance._cls">_cls</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
+    <td>Cls supplied through <tt class="rst-docutils rst-literal">cls</tt>.</td>
   </tr><tr class="instancevariable">
     
     <td>Instance Variable</td>
     <td><code><a href="#_instance" class="internal-link" title="orionis.introspection.ReflectionInstance._instance">_instance</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
+    <td>The object instance to reflect.</td>
   </tr><tr class="instancevariable">
     
     <td>Instance Variable</td>
     <td><code><a href="#_memory_cache" class="internal-link" title="orionis.introspection.ReflectionInstance._memory_cache">_memory<wbr></wbr>_cache</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
+    <td>Process-local cache of previously computed reflection results.</td>
   </tr><tr class="instancevariable">
     
     <td>Instance Variable</td>
     <td><code><a href="#_module_name" class="internal-link" title="orionis.introspection.ReflectionInstance._module_name">_module<wbr></wbr>_name</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
+    <td>Module name supplied through <tt class="rst-docutils rst-literal">module</tt>.</td>
   </tr><tr class="instancevariable">
     
     <td>Instance Variable</td>
     <td><code><a href="#_private_prefix" class="internal-link" title="orionis.introspection.ReflectionInstance._private_prefix">_private<wbr></wbr>_prefix</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
+    <td>Python strips the leading underscores of the class name when it mangles private members, so the prefix must be built the same way.</td>
   </tr>
 </table>
           
@@ -5927,7 +5927,7 @@
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">__contains__</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">key: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/introspection/instances/reflection.py#L112">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/introspection/instances/reflection.py#L124">
       
       (source)
     </a>
@@ -5954,7 +5954,7 @@
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">__delitem__</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">key: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></span>):</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/introspection/instances/reflection.py#L129">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/introspection/instances/reflection.py#L141">
       
       (source)
     </a>
@@ -5981,7 +5981,7 @@
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">__getitem__</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">key: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/functions.html#object" class="intersphinx-link">object</a> | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/introspection/instances/reflection.py#L76">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/introspection/instances/reflection.py#L88">
       
       (source)
     </a>
@@ -6008,7 +6008,7 @@
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">__init__</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">instance: <code>Any</code></span>):</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/introspection/instances/reflection.py#L21">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/introspection/instances/reflection.py#L24">
       
       (source)
     </a>
@@ -6020,7 +6020,7 @@
   </div>
   <div class="docstring functionBody">
     
-    <div><p>Initialize the ReflectionInstance with the given object instance.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">instance:</span><code>Any</code></td><td class="fieldArgDesc">The object instance to reflect.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">This method does not return a value.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/exceptions.html#TypeError" class="intersphinx-link">TypeError</a></code></td><td>If the provided instance is not a valid object instance or is of a
+    <div><p>Initialize the ReflectionInstance with the given object instance.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">instance:</span><code><a href="https://docs.python.org/3/library/typing.html#typing.Any" class="intersphinx-link">typing.Any</a></code></td><td class="fieldArgDesc">The object instance to reflect.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">This method does not return a value.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/exceptions.html#TypeError" class="intersphinx-link">TypeError</a></code></td><td>If the provided instance is not a valid object instance or is of a
 built-in/abstract base class.</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/exceptions.html#ValueError" class="intersphinx-link">ValueError</a></code></td><td>If the instance is from '__main__'.</td></tr></table></div>
   </div>
 </div><div class="basemethod">
@@ -6036,7 +6036,7 @@ built-in/abstract base class.</td></tr><tr><td class="fieldArgContainer"><code><
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">__setitem__</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">key: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code>, </span><span class="rst-sig-param">value: <code><a href="https://docs.python.org/3/builtins/functions.html#object" class="intersphinx-link">object</a></code></span>):</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/introspection/instances/reflection.py#L93">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/introspection/instances/reflection.py#L105">
       
       (source)
     </a>
@@ -6063,7 +6063,7 @@ built-in/abstract base class.</td></tr><tr><td class="fieldArgContainer"><code><
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">_classifyClassEntry</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">name: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code>, </span><span class="rst-sig-param">attr: <code>Any</code>, </span><span class="rst-sig-param">acc: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#dict" class="intersphinx-link">dict</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#list" class="intersphinx-link">list</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>]]</code></span>):</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/introspection/instances/reflection.py#L271">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/introspection/instances/reflection.py#L283">
       
       (source)
     </a>
@@ -6075,7 +6075,7 @@ built-in/abstract base class.</td></tr><tr><td class="fieldArgContainer"><code><
   </div>
   <div class="docstring functionBody">
     
-    <div><p>Categorize a class method by visibility and append to the accumulator.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">name:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">The member name as returned by dir().</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">attr:</span><code>Any</code></td><td class="fieldArgDesc">The classmethod descriptor.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">acc:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#dict" class="intersphinx-link">dict</a>[<a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <a href="https://docs.python.org/3/builtins/stdtypes.html#list" class="intersphinx-link">list</a>[<a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>]]</code></td><td class="fieldArgDesc">Shared accumulator dict keyed by category name.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">This method does not return a value.</td></tr></table></div>
+    <div><p>Categorize a class method by visibility and append to the accumulator.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">name:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">The member name as returned by dir().</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">attr:</span><code><a href="https://docs.python.org/3/library/typing.html#typing.Any" class="intersphinx-link">typing.Any</a></code></td><td class="fieldArgDesc">The classmethod descriptor.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">acc:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#dict" class="intersphinx-link">dict</a>[<a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <a href="https://docs.python.org/3/builtins/stdtypes.html#list" class="intersphinx-link">list</a>[<a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>]]</code></td><td class="fieldArgDesc">Shared accumulator dict keyed by category name.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">This method does not return a value.</td></tr></table></div>
   </div>
 </div><div class="basemethod">
   
@@ -6090,7 +6090,7 @@ built-in/abstract base class.</td></tr><tr><td class="fieldArgContainer"><code><
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">_classifyFunctionEntry</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">name: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code>, </span><span class="rst-sig-param">attr: <code>Any</code>, </span><span class="rst-sig-param">acc: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#dict" class="intersphinx-link">dict</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#list" class="intersphinx-link">list</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>]]</code></span>):</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/introspection/instances/reflection.py#L315">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/introspection/instances/reflection.py#L327">
       
       (source)
     </a>
@@ -6102,7 +6102,7 @@ built-in/abstract base class.</td></tr><tr><td class="fieldArgContainer"><code><
   </div>
   <div class="docstring functionBody">
     
-    <div><p>Categorize an instance method by visibility and append to the accumulator.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">name:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">The member name as returned by dir().</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">attr:</span><code>Any</code></td><td class="fieldArgDesc">The function object.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">acc:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#dict" class="intersphinx-link">dict</a>[<a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <a href="https://docs.python.org/3/builtins/stdtypes.html#list" class="intersphinx-link">list</a>[<a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>]]</code></td><td class="fieldArgDesc">Shared accumulator dict keyed by category name.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">This method does not return a value.</td></tr></table></div>
+    <div><p>Categorize an instance method by visibility and append to the accumulator.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">name:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">The member name as returned by dir().</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">attr:</span><code><a href="https://docs.python.org/3/library/typing.html#typing.Any" class="intersphinx-link">typing.Any</a></code></td><td class="fieldArgDesc">The function object.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">acc:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#dict" class="intersphinx-link">dict</a>[<a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <a href="https://docs.python.org/3/builtins/stdtypes.html#list" class="intersphinx-link">list</a>[<a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>]]</code></td><td class="fieldArgDesc">Shared accumulator dict keyed by category name.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">This method does not return a value.</td></tr></table></div>
   </div>
 </div><div class="basemethod">
   
@@ -6117,7 +6117,7 @@ built-in/abstract base class.</td></tr><tr><td class="fieldArgContainer"><code><
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">_classifyStaticEntry</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">name: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code>, </span><span class="rst-sig-param">attr: <code>Any</code>, </span><span class="rst-sig-param">acc: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#dict" class="intersphinx-link">dict</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#list" class="intersphinx-link">list</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>]]</code></span>):</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/introspection/instances/reflection.py#L227">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/introspection/instances/reflection.py#L239">
       
       (source)
     </a>
@@ -6129,7 +6129,7 @@ built-in/abstract base class.</td></tr><tr><td class="fieldArgContainer"><code><
   </div>
   <div class="docstring functionBody">
     
-    <div><p>Categorize a static method by visibility and append to the accumulator.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">name:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">The member name as returned by dir().</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">attr:</span><code>Any</code></td><td class="fieldArgDesc">The staticmethod descriptor.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">acc:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#dict" class="intersphinx-link">dict</a>[<a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <a href="https://docs.python.org/3/builtins/stdtypes.html#list" class="intersphinx-link">list</a>[<a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>]]</code></td><td class="fieldArgDesc">Shared accumulator dict keyed by category name.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">This method does not return a value.</td></tr></table></div>
+    <div><p>Categorize a static method by visibility and append to the accumulator.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">name:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">The member name as returned by dir().</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">attr:</span><code><a href="https://docs.python.org/3/library/typing.html#typing.Any" class="intersphinx-link">typing.Any</a></code></td><td class="fieldArgDesc">The staticmethod descriptor.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">acc:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#dict" class="intersphinx-link">dict</a>[<a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <a href="https://docs.python.org/3/builtins/stdtypes.html#list" class="intersphinx-link">list</a>[<a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>]]</code></td><td class="fieldArgDesc">Shared accumulator dict keyed by category name.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">This method does not return a value.</td></tr></table></div>
   </div>
 </div><div class="basemethod">
   
@@ -6144,7 +6144,7 @@ built-in/abstract base class.</td></tr><tr><td class="fieldArgContainer"><code><
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">_scanClassMembers</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>):</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/introspection/instances/reflection.py#L353">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/introspection/instances/reflection.py#L365">
       
       (source)
     </a>
@@ -6174,7 +6174,7 @@ method and property category lists and populating the cache in one pass.</p>
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">_scanInstanceVars</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>):</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/introspection/instances/reflection.py#L146">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/introspection/instances/reflection.py#L158">
       
       (source)
     </a>
@@ -6204,7 +6204,7 @@ and combined attribute dictionaries derived from the reflected instance.</p>
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">_scanPropertyEntries</span><span class="function-signature long-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">cls: <code><a href="https://docs.python.org/3/builtins/functions.html#type" class="intersphinx-link">type</a></code></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" class="intersphinx-link">tuple</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#list" class="intersphinx-link">list</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>], <wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#list" class="intersphinx-link">list</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>], <wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#list" class="intersphinx-link">list</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>], <wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#list" class="intersphinx-link">list</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>]]</code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/introspection/instances/reflection.py#L184">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/introspection/instances/reflection.py#L196">
       
       (source)
     </a>
@@ -6231,7 +6231,7 @@ and combined attribute dictionaries derived from the reflected instance.</p>
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">clearCache</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>):</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/introspection/instances/reflection.py#L1907">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/introspection/instances/reflection.py#L1899">
       
       (source)
     </a>
@@ -6261,7 +6261,7 @@ method calls will recompute and cache results.</p>
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">constructorSignature</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>) -&gt; <code>Signature</code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/introspection/instances/reflection.py#L1835">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/introspection/instances/reflection.py#L1827">
       
       (source)
     </a>
@@ -6273,7 +6273,7 @@ method calls will recompute and cache results.</p>
   </div>
   <div class="docstring functionBody">
     <div class="interfaceinfo">overrides <code><a href="orionis.introspection.instances.contracts.reflection.IReflectionInstance.html#constructorSignature" class="internal-link">orionis.introspection.instances.contracts.reflection.IReflectionInstance.constructorSignature</a></code></div>
-    <div><p>Analyze and return constructor dependencies of the instance's class.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.introspection.dependencies.entities.signature.Signature.html" class="internal-link" title="orionis.introspection.dependencies.entities.signature.Signature">Signature</a></code></td><td class="fieldArgDesc"><p>Structured representation of the constructor dependencies. Contains:</p>
+    <div><p>Analyze and return constructor dependencies of the instance's class.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.introspection.dependencies.entities.signature.Signature.html" class="internal-link">orionis.introspection.dependencies.entities.signature.Signature</a></code></td><td class="fieldArgDesc"><p>Structured representation of the constructor dependencies. Contains:</p>
 <ul class="rst-simple">
 <li><tt class="rst-docutils rst-literal">resolved</tt>: dictionary of resolved dependencies with names and values.</li>
 <li><tt class="rst-docutils rst-literal">unresolved</tt>: list of unresolved dependencies (parameter names
@@ -6294,7 +6294,7 @@ without default values or annotations).</li>
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">getAnnotations</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/stdtypes.html#dict" class="intersphinx-link">dict</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <wbr></wbr><a href="https://docs.python.org/3/builtins/functions.html#type" class="intersphinx-link">type</a>]</code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/introspection/instances/reflection.py#L600">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/introspection/instances/reflection.py#L612">
       
       (source)
     </a>
@@ -6321,7 +6321,7 @@ without default values or annotations).</li>
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">getAttribute</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">name: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code>, </span><span class="rst-sig-param">default: <code>Any</code> = <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></span>) -&gt; <code>Any</code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/introspection/instances/reflection.py#L648">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/introspection/instances/reflection.py#L660">
       
       (source)
     </a>
@@ -6338,11 +6338,11 @@ without default values or annotations).</li>
 <p class="rst-admonition-title rst-first">Notes</p>
 <p class="rst-last">This method first checks the instance's attributes dictionary for the
 given name. If not found, it attempts to retrieve the attribute directly
-from the instance using <code><a href="https://docs.python.org/3/builtins/functions.html#getattr" class="intersphinx-link">getattr</a></code>. If the attribute is still not found,
-the <code><a href="orionis.http.default.html" class="internal-link" title="orionis.http.default">default</a></code> value is returned.</p>
+from the instance using <tt class="rst-docutils rst-literal">getattr</tt>. If the attribute is still not found,
+the <tt class="rst-docutils rst-literal">default</tt> value is returned.</p>
 </div>
-<table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">name:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Name of the attribute to retrieve.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">default:</span><code>Any, <em>optional</em></code></td><td class="fieldArgDesc">Value to return if the attribute does not exist. Defaults to None.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code>Any</code></td><td class="fieldArgDesc">Value of the specified attribute if it exists, otherwise the provided
-<code><a href="orionis.http.default.html" class="internal-link" title="orionis.http.default">default</a></code> value.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/exceptions.html#AttributeError" class="intersphinx-link">AttributeError</a></code></td><td>If the attribute does not exist and no default value is provided.</td></tr></table></div>
+<table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">name:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Name of the attribute to retrieve.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">default:</span><code><a href="https://docs.python.org/3/library/typing.html#typing.Any" class="intersphinx-link">typing.Any</a>, <em>optional</em></code></td><td class="fieldArgDesc">Value to return if the attribute does not exist. Defaults to None.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/library/typing.html#typing.Any" class="intersphinx-link">typing.Any</a></code></td><td class="fieldArgDesc">Value of the specified attribute if it exists, otherwise the provided
+<tt class="rst-docutils rst-literal">default</tt> value.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/exceptions.html#AttributeError" class="intersphinx-link">AttributeError</a></code></td><td>If the attribute does not exist and no default value is provided.</td></tr></table></div>
   </div>
 </div><div class="basemethod">
   
@@ -6357,7 +6357,7 @@ the <code><a href="orionis.http.default.html" class="internal-link" title="orion
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">getAttributeDocstring</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">name: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a> | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/introspection/instances/reflection.py#L776">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/introspection/instances/reflection.py#L788">
       
       (source)
     </a>
@@ -6384,7 +6384,7 @@ the <code><a href="orionis.http.default.html" class="internal-link" title="orion
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">getAttributes</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/stdtypes.html#dict" class="intersphinx-link">dict</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <wbr></wbr>Any]</code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/introspection/instances/reflection.py#L810">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/introspection/instances/reflection.py#L822">
       
       (source)
     </a>
@@ -6400,7 +6400,7 @@ the <code><a href="orionis.http.default.html" class="internal-link" title="orion
 <p>Combines public, protected, private, and dunder attributes into a single
 dictionary. Private attribute names are unmangled. The result is cached
 for performance.</p>
-<table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/stdtypes.html#dict" class="intersphinx-link">dict</a>[<a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, Any]</code></td><td class="fieldArgDesc">Dictionary mapping attribute names to their values for all visibility
+<table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/stdtypes.html#dict" class="intersphinx-link">dict</a>[<a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <a href="https://docs.python.org/3/library/typing.html#typing.Any" class="intersphinx-link">typing.Any</a>]</code></td><td class="fieldArgDesc">Dictionary mapping attribute names to their values for all visibility
 levels.</td></tr></table></div>
   </div>
 </div><div class="basemethod">
@@ -6416,7 +6416,7 @@ levels.</td></tr></table></div>
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">getBaseClasses</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" class="intersphinx-link">tuple</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/functions.html#type" class="intersphinx-link">type</a>, <wbr></wbr><span class="rst-variable-ellipsis">...</span>]</code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/introspection/instances/reflection.py#L512">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/introspection/instances/reflection.py#L524">
       
       (source)
     </a>
@@ -6443,7 +6443,7 @@ levels.</td></tr></table></div>
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">getClass</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/functions.html#type" class="intersphinx-link">type</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/introspection/instances/reflection.py#L452">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/introspection/instances/reflection.py#L464">
       
       (source)
     </a>
@@ -6470,7 +6470,7 @@ levels.</td></tr></table></div>
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">getClassName</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/introspection/instances/reflection.py#L464">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/introspection/instances/reflection.py#L476">
       
       (source)
     </a>
@@ -6497,7 +6497,7 @@ levels.</td></tr></table></div>
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">getDocstring</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a> | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/introspection/instances/reflection.py#L500">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/introspection/instances/reflection.py#L512">
       
       (source)
     </a>
@@ -6524,7 +6524,7 @@ levels.</td></tr></table></div>
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">getDunderAttributes</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/stdtypes.html#dict" class="intersphinx-link">dict</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <wbr></wbr>Any]</code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/introspection/instances/reflection.py#L897">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/introspection/instances/reflection.py#L897">
       
       (source)
     </a>
@@ -6536,7 +6536,7 @@ levels.</td></tr></table></div>
   </div>
   <div class="docstring functionBody">
     <div class="interfaceinfo">overrides <code><a href="orionis.introspection.instances.contracts.reflection.IReflectionInstance.html#getDunderAttributes" class="internal-link">orionis.introspection.instances.contracts.reflection.IReflectionInstance.getDunderAttributes</a></code></div>
-    <div><p>Retrieve all dunder (double underscore) attributes of the instance.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">self:</span><code><a href="orionis.introspection.ReflectionInstance.html" class="internal-link" title="orionis.introspection.ReflectionInstance">ReflectionInstance</a></code></td><td class="fieldArgDesc"></td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/stdtypes.html#dict" class="intersphinx-link">dict</a>[<a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, Any]</code></td><td class="fieldArgDesc">Dictionary mapping dunder attribute names to their values.</td></tr></table></div>
+    <div><p>Retrieve all dunder (double underscore) attributes of the instance.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/stdtypes.html#dict" class="intersphinx-link">dict</a>[<a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <a href="https://docs.python.org/3/library/typing.html#typing.Any" class="intersphinx-link">typing.Any</a>]</code></td><td class="fieldArgDesc">Dictionary mapping dunder attribute names to their values.</td></tr></table></div>
   </div>
 </div><div class="basemethod">
   
@@ -6551,7 +6551,7 @@ levels.</td></tr></table></div>
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">getDunderMethods</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/stdtypes.html#list" class="intersphinx-link">list</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>]</code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/introspection/instances/reflection.py#L1627">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/introspection/instances/reflection.py#L1619">
       
       (source)
     </a>
@@ -6578,7 +6578,7 @@ levels.</td></tr></table></div>
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">getFile</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a> | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/introspection/instances/reflection.py#L578">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/introspection/instances/reflection.py#L590">
       
       (source)
     </a>
@@ -6605,7 +6605,7 @@ levels.</td></tr></table></div>
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">getInstance</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>) -&gt; <code>Any</code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/introspection/instances/reflection.py#L441">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/introspection/instances/reflection.py#L453">
       
       (source)
     </a>
@@ -6617,7 +6617,7 @@ levels.</td></tr></table></div>
   </div>
   <div class="docstring functionBody">
     <div class="interfaceinfo">overrides <code><a href="orionis.introspection.instances.contracts.reflection.IReflectionInstance.html#getInstance" class="internal-link">orionis.introspection.instances.contracts.reflection.IReflectionInstance.getInstance</a></code></div>
-    <div><p>Return the reflected object instance.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code>Any</code></td><td class="fieldArgDesc">The object instance being reflected upon.</td></tr></table></div>
+    <div><p>Return the reflected object instance.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/library/typing.html#typing.Any" class="intersphinx-link">typing.Any</a></code></td><td class="fieldArgDesc">The object instance being reflected upon.</td></tr></table></div>
   </div>
 </div><div class="basemethod">
   
@@ -6632,7 +6632,7 @@ levels.</td></tr></table></div>
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">getMagicAttributes</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/stdtypes.html#dict" class="intersphinx-link">dict</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <wbr></wbr>Any]</code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/introspection/instances/reflection.py#L917">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/introspection/instances/reflection.py#L913">
       
       (source)
     </a>
@@ -6644,7 +6644,7 @@ levels.</td></tr></table></div>
   </div>
   <div class="docstring functionBody">
     <div class="interfaceinfo">overrides <code><a href="orionis.introspection.instances.contracts.reflection.IReflectionInstance.html#getMagicAttributes" class="internal-link">orionis.introspection.instances.contracts.reflection.IReflectionInstance.getMagicAttributes</a></code></div>
-    <div><p>Return all magic attributes of the instance.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/stdtypes.html#dict" class="intersphinx-link">dict</a>[<a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, Any]</code></td><td class="fieldArgDesc">Dictionary mapping magic attribute names to their values.</td></tr></table></div>
+    <div><p>Return all magic attributes of the instance.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/stdtypes.html#dict" class="intersphinx-link">dict</a>[<a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <a href="https://docs.python.org/3/library/typing.html#typing.Any" class="intersphinx-link">typing.Any</a>]</code></td><td class="fieldArgDesc">Dictionary mapping magic attribute names to their values.</td></tr></table></div>
   </div>
 </div><div class="basemethod">
   
@@ -6659,7 +6659,7 @@ levels.</td></tr></table></div>
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">getMagicMethods</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/stdtypes.html#list" class="intersphinx-link">list</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>]</code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/introspection/instances/reflection.py#L1643">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/introspection/instances/reflection.py#L1635">
       
       (source)
     </a>
@@ -6686,7 +6686,7 @@ levels.</td></tr></table></div>
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">getMethodDocstring</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">name: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a> | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/introspection/instances/reflection.py#L1082">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/introspection/instances/reflection.py#L1078">
       
       (source)
     </a>
@@ -6713,7 +6713,7 @@ levels.</td></tr></table></div>
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">getMethods</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/stdtypes.html#list" class="intersphinx-link">list</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>]</code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/introspection/instances/reflection.py#L1124">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/introspection/instances/reflection.py#L1120">
       
       (source)
     </a>
@@ -6745,7 +6745,7 @@ instance's class, including public, protected, and private methods.</td></tr></t
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">getMethodSignature</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">name: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></span>) -&gt; <code><a href="https://docs.python.org/3/library/inspect.html#inspect.Signature" class="intersphinx-link">inspect.Signature</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/introspection/instances/reflection.py#L1040">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/introspection/instances/reflection.py#L1036">
       
       (source)
     </a>
@@ -6757,7 +6757,7 @@ instance's class, including public, protected, and private methods.</td></tr></t
   </div>
   <div class="docstring functionBody">
     <div class="interfaceinfo">overrides <code><a href="orionis.introspection.instances.contracts.reflection.IReflectionInstance.html#getMethodSignature" class="internal-link">orionis.introspection.instances.contracts.reflection.IReflectionInstance.getMethodSignature</a></code></div>
-    <div><p>Retrieve the signature of a method.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">name:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Name of the method.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/library/inspect.html#inspect.Signature" class="intersphinx-link">inspect.Signature</a></code></td><td class="fieldArgDesc">Signature object representing the method's parameters and return type.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/exceptions.html#AttributeError" class="intersphinx-link">AttributeError</a></code></td><td>If the method does not exist or is not callable.</td></tr></table></div>
+    <div><p>Retrieve the signature of a method.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">name:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Name of the method.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><tt class="rst-docutils rst-literal">inspect.Signature</tt></code></td><td class="fieldArgDesc">Signature object representing the method's parameters and return type.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/exceptions.html#AttributeError" class="intersphinx-link">AttributeError</a></code></td><td>If the method does not exist or is not callable.</td></tr></table></div>
   </div>
 </div><div class="basemethod">
   
@@ -6772,7 +6772,7 @@ instance's class, including public, protected, and private methods.</td></tr></t
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">getModuleName</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/introspection/instances/reflection.py#L476">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/introspection/instances/reflection.py#L488">
       
       (source)
     </a>
@@ -6799,7 +6799,7 @@ instance's class, including public, protected, and private methods.</td></tr></t
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">getModuleWithClassName</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/introspection/instances/reflection.py#L488">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/introspection/instances/reflection.py#L500">
       
       (source)
     </a>
@@ -6826,7 +6826,7 @@ instance's class, including public, protected, and private methods.</td></tr></t
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">getPrivateAsyncMethods</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/stdtypes.html#list" class="intersphinx-link">list</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>]</code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/introspection/instances/reflection.py#L1309">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/introspection/instances/reflection.py#L1305">
       
       (source)
     </a>
@@ -6853,7 +6853,7 @@ instance's class, including public, protected, and private methods.</td></tr></t
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">getPrivateAttributes</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/stdtypes.html#dict" class="intersphinx-link">dict</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <wbr></wbr>Any]</code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/introspection/instances/reflection.py#L877">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/introspection/instances/reflection.py#L881">
       
       (source)
     </a>
@@ -6865,7 +6865,7 @@ instance's class, including public, protected, and private methods.</td></tr></t
   </div>
   <div class="docstring functionBody">
     <div class="interfaceinfo">overrides <code><a href="orionis.introspection.instances.contracts.reflection.IReflectionInstance.html#getPrivateAttributes" class="internal-link">orionis.introspection.instances.contracts.reflection.IReflectionInstance.getPrivateAttributes</a></code></div>
-    <div><p>Retrieve all private attributes of the instance.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">self:</span><code><a href="orionis.introspection.ReflectionInstance.html" class="internal-link" title="orionis.introspection.ReflectionInstance">ReflectionInstance</a></code></td><td class="fieldArgDesc"></td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/stdtypes.html#dict" class="intersphinx-link">dict</a>[<a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, Any]</code></td><td class="fieldArgDesc">Dictionary mapping unmangled private attribute names to their values.</td></tr></table></div>
+    <div><p>Retrieve all private attributes of the instance.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/stdtypes.html#dict" class="intersphinx-link">dict</a>[<a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <a href="https://docs.python.org/3/library/typing.html#typing.Any" class="intersphinx-link">typing.Any</a>]</code></td><td class="fieldArgDesc">Dictionary mapping unmangled private attribute names to their values.</td></tr></table></div>
   </div>
 </div><div class="basemethod">
   
@@ -6880,7 +6880,7 @@ instance's class, including public, protected, and private methods.</td></tr></t
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">getPrivateClassAsyncMethods</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/stdtypes.html#list" class="intersphinx-link">list</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>]</code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/introspection/instances/reflection.py#L1458">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/introspection/instances/reflection.py#L1454">
       
       (source)
     </a>
@@ -6892,7 +6892,7 @@ instance's class, including public, protected, and private methods.</td></tr></t
   </div>
   <div class="docstring functionBody">
     <div class="interfaceinfo">overrides <code><a href="orionis.introspection.instances.contracts.reflection.IReflectionInstance.html#getPrivateClassAsyncMethods" class="internal-link">orionis.introspection.instances.contracts.reflection.IReflectionInstance.getPrivateClassAsyncMethods</a></code></div>
-    <div><p>Retrieve all private asynchronous class method names of the instance.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">self:</span><code><a href="orionis.introspection.ReflectionInstance.html" class="internal-link" title="orionis.introspection.ReflectionInstance">ReflectionInstance</a></code></td><td class="fieldArgDesc">The ReflectionInstance object.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/stdtypes.html#list" class="intersphinx-link">list</a> of <a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">List of private asynchronous class method names.</td></tr></table></div>
+    <div><p>Retrieve all private asynchronous class method names of the instance.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">self:</span><code><a href="orionis.introspection.ReflectionInstance.html" class="internal-link">orionis.introspection.ReflectionInstance</a></code></td><td class="fieldArgDesc">The ReflectionInstance object.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/stdtypes.html#list" class="intersphinx-link">list</a> of <a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">List of private asynchronous class method names.</td></tr></table></div>
   </div>
 </div><div class="basemethod">
   
@@ -6907,7 +6907,7 @@ instance's class, including public, protected, and private methods.</td></tr></t
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">getPrivateClassMethods</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/stdtypes.html#list" class="intersphinx-link">list</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>]</code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/introspection/instances/reflection.py#L1426">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/introspection/instances/reflection.py#L1422">
       
       (source)
     </a>
@@ -6934,7 +6934,7 @@ instance's class, including public, protected, and private methods.</td></tr></t
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">getPrivateClassSyncMethods</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/stdtypes.html#list" class="intersphinx-link">list</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>]</code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/introspection/instances/reflection.py#L1442">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/introspection/instances/reflection.py#L1438">
       
       (source)
     </a>
@@ -6961,7 +6961,7 @@ instance's class, including public, protected, and private methods.</td></tr></t
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">getPrivateMethods</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/stdtypes.html#list" class="intersphinx-link">list</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>]</code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/introspection/instances/reflection.py#L1274">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/introspection/instances/reflection.py#L1270">
       
       (source)
     </a>
@@ -6991,7 +6991,7 @@ instance's class, including public, protected, and private methods.</td></tr></t
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">getPrivateProperties</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/stdtypes.html#list" class="intersphinx-link">list</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/introspection/instances/reflection.py#L1703">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/introspection/instances/reflection.py#L1695">
       
       (source)
     </a>
@@ -7018,7 +7018,7 @@ instance's class, including public, protected, and private methods.</td></tr></t
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">getPrivateStaticAsyncMethods</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/stdtypes.html#list" class="intersphinx-link">list</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>]</code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/introspection/instances/reflection.py#L1611">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/introspection/instances/reflection.py#L1603">
       
       (source)
     </a>
@@ -7045,7 +7045,7 @@ instance's class, including public, protected, and private methods.</td></tr></t
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">getPrivateStaticMethods</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/stdtypes.html#list" class="intersphinx-link">list</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>]</code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/introspection/instances/reflection.py#L1579">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/introspection/instances/reflection.py#L1571">
       
       (source)
     </a>
@@ -7072,7 +7072,7 @@ instance's class, including public, protected, and private methods.</td></tr></t
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">getPrivateStaticSyncMethods</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/stdtypes.html#list" class="intersphinx-link">list</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>]</code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/introspection/instances/reflection.py#L1595">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/introspection/instances/reflection.py#L1587">
       
       (source)
     </a>
@@ -7099,7 +7099,7 @@ instance's class, including public, protected, and private methods.</td></tr></t
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">getPrivateSyncMethods</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/stdtypes.html#list" class="intersphinx-link">list</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>]</code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/introspection/instances/reflection.py#L1293">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/introspection/instances/reflection.py#L1289">
       
       (source)
     </a>
@@ -7126,7 +7126,7 @@ instance's class, including public, protected, and private methods.</td></tr></t
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">getProperties</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/stdtypes.html#list" class="intersphinx-link">list</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>]</code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/introspection/instances/reflection.py#L1655">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/introspection/instances/reflection.py#L1647">
       
       (source)
     </a>
@@ -7153,7 +7153,7 @@ instance's class, including public, protected, and private methods.</td></tr></t
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">getProperty</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">name: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></span>) -&gt; <code>Any</code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/introspection/instances/reflection.py#L1719">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/introspection/instances/reflection.py#L1711">
       
       (source)
     </a>
@@ -7165,7 +7165,7 @@ instance's class, including public, protected, and private methods.</td></tr></t
   </div>
   <div class="docstring functionBody">
     <div class="interfaceinfo">overrides <code><a href="orionis.introspection.instances.contracts.reflection.IReflectionInstance.html#getProperty" class="internal-link">orionis.introspection.instances.contracts.reflection.IReflectionInstance.getProperty</a></code></div>
-    <div><p>Retrieve the value of a property from the instance.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">name:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Name of the property to retrieve.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code>Any</code></td><td class="fieldArgDesc">Value of the specified property.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/exceptions.html#AttributeError" class="intersphinx-link">AttributeError</a></code></td><td>If the property does not exist or is not accessible.</td></tr></table></div>
+    <div><p>Retrieve the value of a property from the instance.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">name:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Name of the property to retrieve.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/library/typing.html#typing.Any" class="intersphinx-link">typing.Any</a></code></td><td class="fieldArgDesc">Value of the specified property.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/exceptions.html#AttributeError" class="intersphinx-link">AttributeError</a></code></td><td>If the property does not exist or is not accessible.</td></tr></table></div>
   </div>
 </div><div class="basemethod">
   
@@ -7180,7 +7180,7 @@ instance's class, including public, protected, and private methods.</td></tr></t
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">getPropertyDocstring</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">name: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/introspection/instances/reflection.py#L1792">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/introspection/instances/reflection.py#L1784">
       
       (source)
     </a>
@@ -7207,7 +7207,7 @@ instance's class, including public, protected, and private methods.</td></tr></t
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">getPropertySignature</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">name: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></span>) -&gt; <code><a href="https://docs.python.org/3/library/inspect.html#inspect.Signature" class="intersphinx-link">inspect.Signature</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/introspection/instances/reflection.py#L1750">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/introspection/instances/reflection.py#L1742">
       
       (source)
     </a>
@@ -7219,7 +7219,7 @@ instance's class, including public, protected, and private methods.</td></tr></t
   </div>
   <div class="docstring functionBody">
     <div class="interfaceinfo">overrides <code><a href="orionis.introspection.instances.contracts.reflection.IReflectionInstance.html#getPropertySignature" class="internal-link">orionis.introspection.instances.contracts.reflection.IReflectionInstance.getPropertySignature</a></code></div>
-    <div><p>Return the signature of a property getter.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">name:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Name of the property.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/library/inspect.html#inspect.Signature" class="intersphinx-link">inspect.Signature</a></code></td><td class="fieldArgDesc">Signature of the property's getter method.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/exceptions.html#AttributeError" class="intersphinx-link">AttributeError</a></code></td><td>If the property does not exist on the class.</td></tr></table></div>
+    <div><p>Return the signature of a property getter.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">name:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Name of the property.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><tt class="rst-docutils rst-literal">inspect.Signature</tt></code></td><td class="fieldArgDesc">Signature of the property's getter method.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/exceptions.html#AttributeError" class="intersphinx-link">AttributeError</a></code></td><td>If the property does not exist on the class.</td></tr></table></div>
   </div>
 </div><div class="basemethod">
   
@@ -7234,7 +7234,7 @@ instance's class, including public, protected, and private methods.</td></tr></t
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">getProtectedAsyncMethods</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/stdtypes.html#list" class="intersphinx-link">list</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>]</code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/introspection/instances/reflection.py#L1248">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/introspection/instances/reflection.py#L1244">
       
       (source)
     </a>
@@ -7252,7 +7252,7 @@ instance's class, including public, protected, and private methods.</td></tr></t
 <p class="rst-last">Protected asynchronous methods start with a single underscore, are not private,
 and are coroutine functions.</p>
 </div>
-<table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">self:</span><code><a href="orionis.introspection.ReflectionInstance.html" class="internal-link" title="orionis.introspection.ReflectionInstance">ReflectionInstance</a></code></td><td class="fieldArgDesc">The ReflectionInstance object.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/stdtypes.html#list" class="intersphinx-link">list</a> of <a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">List of protected asynchronous method names.</td></tr></table></div>
+<table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">self:</span><code><a href="orionis.introspection.ReflectionInstance.html" class="internal-link">orionis.introspection.ReflectionInstance</a></code></td><td class="fieldArgDesc">The ReflectionInstance object.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/stdtypes.html#list" class="intersphinx-link">list</a> of <a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">List of protected asynchronous method names.</td></tr></table></div>
   </div>
 </div><div class="basemethod">
   
@@ -7267,7 +7267,7 @@ and are coroutine functions.</p>
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">getProtectedAttributes</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/stdtypes.html#dict" class="intersphinx-link">dict</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <wbr></wbr>Any]</code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/introspection/instances/reflection.py#L855">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/introspection/instances/reflection.py#L863">
       
       (source)
     </a>
@@ -7279,7 +7279,7 @@ and are coroutine functions.</p>
   </div>
   <div class="docstring functionBody">
     <div class="interfaceinfo">overrides <code><a href="orionis.introspection.instances.contracts.reflection.IReflectionInstance.html#getProtectedAttributes" class="internal-link">orionis.introspection.instances.contracts.reflection.IReflectionInstance.getProtectedAttributes</a></code></div>
-    <div><p>Return all protected attributes of the instance.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">self:</span><code><a href="orionis.introspection.ReflectionInstance.html" class="internal-link" title="orionis.introspection.ReflectionInstance">ReflectionInstance</a></code></td><td class="fieldArgDesc"></td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/stdtypes.html#dict" class="intersphinx-link">dict</a>[<a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, Any]</code></td><td class="fieldArgDesc">Dictionary containing protected attribute names and their values.
+    <div><p>Return all protected attributes of the instance.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/stdtypes.html#dict" class="intersphinx-link">dict</a>[<a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <a href="https://docs.python.org/3/library/typing.html#typing.Any" class="intersphinx-link">typing.Any</a>]</code></td><td class="fieldArgDesc">Dictionary containing protected attribute names and their values.
 Protected attributes start with a single underscore, are not dunder,
 and are not private (do not start with the class name).</td></tr></table></div>
   </div>
@@ -7296,7 +7296,7 @@ and are not private (do not start with the class name).</td></tr></table></div>
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">getProtectedClassAsyncMethods</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/stdtypes.html#list" class="intersphinx-link">list</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>]</code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/introspection/instances/reflection.py#L1410">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/introspection/instances/reflection.py#L1406">
       
       (source)
     </a>
@@ -7323,7 +7323,7 @@ and are not private (do not start with the class name).</td></tr></table></div>
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">getProtectedClassMethods</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/stdtypes.html#list" class="intersphinx-link">list</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>]</code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/introspection/instances/reflection.py#L1373">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/introspection/instances/reflection.py#L1369">
       
       (source)
     </a>
@@ -7350,7 +7350,7 @@ and are not private (do not start with the class name).</td></tr></table></div>
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">getProtectedClassSyncMethods</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/stdtypes.html#list" class="intersphinx-link">list</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>]</code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/introspection/instances/reflection.py#L1389">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/introspection/instances/reflection.py#L1385">
       
       (source)
     </a>
@@ -7362,7 +7362,7 @@ and are not private (do not start with the class name).</td></tr></table></div>
   </div>
   <div class="docstring functionBody">
     <div class="interfaceinfo">overrides <code><a href="orionis.introspection.instances.contracts.reflection.IReflectionInstance.html#getProtectedClassSyncMethods" class="internal-link">orionis.introspection.instances.contracts.reflection.IReflectionInstance.getProtectedClassSyncMethods</a></code></div>
-    <div><p>Return all protected synchronous class method names of the instance.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">self:</span><code><a href="orionis.introspection.ReflectionInstance.html" class="internal-link" title="orionis.introspection.ReflectionInstance">ReflectionInstance</a></code></td><td class="fieldArgDesc">The ReflectionInstance object.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/stdtypes.html#list" class="intersphinx-link">list</a> of <a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">List of protected synchronous class method names.</td></tr></table></div>
+    <div><p>Return all protected synchronous class method names of the instance.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">self:</span><code><a href="orionis.introspection.ReflectionInstance.html" class="internal-link">orionis.introspection.ReflectionInstance</a></code></td><td class="fieldArgDesc">The ReflectionInstance object.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/stdtypes.html#list" class="intersphinx-link">list</a> of <a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">List of protected synchronous class method names.</td></tr></table></div>
   </div>
 </div><div class="basemethod">
   
@@ -7377,7 +7377,7 @@ and are not private (do not start with the class name).</td></tr></table></div>
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">getProtectedMethods</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/stdtypes.html#list" class="intersphinx-link">list</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>]</code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/introspection/instances/reflection.py#L1204">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/introspection/instances/reflection.py#L1200">
       
       (source)
     </a>
@@ -7389,7 +7389,7 @@ and are not private (do not start with the class name).</td></tr></table></div>
   </div>
   <div class="docstring functionBody">
     <div class="interfaceinfo">overrides <code><a href="orionis.introspection.instances.contracts.reflection.IReflectionInstance.html#getProtectedMethods" class="internal-link">orionis.introspection.instances.contracts.reflection.IReflectionInstance.getProtectedMethods</a></code></div>
-    <div><p>Return all protected method names of the instance.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">self:</span><code><a href="orionis.introspection.ReflectionInstance.html" class="internal-link" title="orionis.introspection.ReflectionInstance">ReflectionInstance</a></code></td><td class="fieldArgDesc">The ReflectionInstance object.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/stdtypes.html#list" class="intersphinx-link">list</a> of <a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">List of protected method names. Protected methods start with a single
+    <div><p>Return all protected method names of the instance.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">self:</span><code><a href="orionis.introspection.ReflectionInstance.html" class="internal-link">orionis.introspection.ReflectionInstance</a></code></td><td class="fieldArgDesc">The ReflectionInstance object.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/stdtypes.html#list" class="intersphinx-link">list</a> of <a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">List of protected method names. Protected methods start with a single
 underscore, are not private (do not start with the class name), and
 are not dunder methods.</td></tr></table></div>
   </div>
@@ -7406,7 +7406,7 @@ are not dunder methods.</td></tr></table></div>
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">getProtectedProperties</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/stdtypes.html#list" class="intersphinx-link">list</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/introspection/instances/reflection.py#L1687">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/introspection/instances/reflection.py#L1679">
       
       (source)
     </a>
@@ -7433,7 +7433,7 @@ are not dunder methods.</td></tr></table></div>
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">getProtectedStaticAsyncMethods</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/stdtypes.html#list" class="intersphinx-link">list</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>]</code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/introspection/instances/reflection.py#L1559">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/introspection/instances/reflection.py#L1555">
       
       (source)
     </a>
@@ -7445,7 +7445,7 @@ are not dunder methods.</td></tr></table></div>
   </div>
   <div class="docstring functionBody">
     <div class="interfaceinfo">overrides <code><a href="orionis.introspection.instances.contracts.reflection.IReflectionInstance.html#getProtectedStaticAsyncMethods" class="internal-link">orionis.introspection.instances.contracts.reflection.IReflectionInstance.getProtectedStaticAsyncMethods</a></code></div>
-    <div><p>Retrieve all protected asynchronous static method names.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg"><wbr></wbr>None</span></td><td class="fieldArgDesc"></td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/stdtypes.html#list" class="intersphinx-link">list</a> of <a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">List of protected asynchronous static method names defined on the class.</td></tr></table></div>
+    <div><p>Retrieve all protected asynchronous static method names.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/stdtypes.html#list" class="intersphinx-link">list</a> of <a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">List of protected asynchronous static method names defined on the class.</td></tr></table></div>
   </div>
 </div><div class="basemethod">
   
@@ -7460,7 +7460,7 @@ are not dunder methods.</td></tr></table></div>
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">getProtectedStaticMethods</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/stdtypes.html#list" class="intersphinx-link">list</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>]</code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/introspection/instances/reflection.py#L1527">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/introspection/instances/reflection.py#L1523">
       
       (source)
     </a>
@@ -7487,7 +7487,7 @@ are not dunder methods.</td></tr></table></div>
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">getProtectedStaticSyncMethods</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/stdtypes.html#list" class="intersphinx-link">list</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>]</code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/introspection/instances/reflection.py#L1543">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/introspection/instances/reflection.py#L1539">
       
       (source)
     </a>
@@ -7514,7 +7514,7 @@ are not dunder methods.</td></tr></table></div>
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">getProtectedSyncMethods</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/stdtypes.html#list" class="intersphinx-link">list</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>]</code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/introspection/instances/reflection.py#L1227">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/introspection/instances/reflection.py#L1223">
       
       (source)
     </a>
@@ -7526,7 +7526,7 @@ are not dunder methods.</td></tr></table></div>
   </div>
   <div class="docstring functionBody">
     <div class="interfaceinfo">overrides <code><a href="orionis.introspection.instances.contracts.reflection.IReflectionInstance.html#getProtectedSyncMethods" class="internal-link">orionis.introspection.instances.contracts.reflection.IReflectionInstance.getProtectedSyncMethods</a></code></div>
-    <div><p>Return all protected synchronous method names of the instance.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">self:</span><code><a href="orionis.introspection.ReflectionInstance.html" class="internal-link" title="orionis.introspection.ReflectionInstance">ReflectionInstance</a></code></td><td class="fieldArgDesc">The ReflectionInstance object.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/stdtypes.html#list" class="intersphinx-link">list</a> of <a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">List of protected synchronous method names.</td></tr></table></div>
+    <div><p>Return all protected synchronous method names of the instance.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">self:</span><code><a href="orionis.introspection.ReflectionInstance.html" class="internal-link">orionis.introspection.ReflectionInstance</a></code></td><td class="fieldArgDesc">The ReflectionInstance object.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/stdtypes.html#list" class="intersphinx-link">list</a> of <a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">List of protected synchronous method names.</td></tr></table></div>
   </div>
 </div><div class="basemethod">
   
@@ -7541,7 +7541,7 @@ are not dunder methods.</td></tr></table></div>
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">getPublicAsyncMethods</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/stdtypes.html#list" class="intersphinx-link">list</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>]</code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/introspection/instances/reflection.py#L1183">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/introspection/instances/reflection.py#L1179">
       
       (source)
     </a>
@@ -7553,7 +7553,7 @@ are not dunder methods.</td></tr></table></div>
   </div>
   <div class="docstring functionBody">
     <div class="interfaceinfo">overrides <code><a href="orionis.introspection.instances.contracts.reflection.IReflectionInstance.html#getPublicAsyncMethods" class="internal-link">orionis.introspection.instances.contracts.reflection.IReflectionInstance.getPublicAsyncMethods</a></code></div>
-    <div><p>Return all public asynchronous method names of the instance.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">self:</span><code><a href="orionis.introspection.ReflectionInstance.html" class="internal-link" title="orionis.introspection.ReflectionInstance">ReflectionInstance</a></code></td><td class="fieldArgDesc">The ReflectionInstance object.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/stdtypes.html#list" class="intersphinx-link">list</a> of <a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">List of public asynchronous method names.</td></tr></table></div>
+    <div><p>Return all public asynchronous method names of the instance.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">self:</span><code><a href="orionis.introspection.ReflectionInstance.html" class="internal-link">orionis.introspection.ReflectionInstance</a></code></td><td class="fieldArgDesc">The ReflectionInstance object.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/stdtypes.html#list" class="intersphinx-link">list</a> of <a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">List of public asynchronous method names.</td></tr></table></div>
   </div>
 </div><div class="basemethod">
   
@@ -7568,7 +7568,7 @@ are not dunder methods.</td></tr></table></div>
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">getPublicAttributes</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/stdtypes.html#dict" class="intersphinx-link">dict</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <wbr></wbr>Any]</code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/introspection/instances/reflection.py#L834">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/introspection/instances/reflection.py#L846">
       
       (source)
     </a>
@@ -7580,7 +7580,7 @@ are not dunder methods.</td></tr></table></div>
   </div>
   <div class="docstring functionBody">
     <div class="interfaceinfo">overrides <code><a href="orionis.introspection.instances.contracts.reflection.IReflectionInstance.html#getPublicAttributes" class="internal-link">orionis.introspection.instances.contracts.reflection.IReflectionInstance.getPublicAttributes</a></code></div>
-    <div><p>Return all public attributes of the instance.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">self:</span><code><a href="orionis.introspection.ReflectionInstance.html" class="internal-link" title="orionis.introspection.ReflectionInstance">ReflectionInstance</a></code></td><td class="fieldArgDesc"></td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/stdtypes.html#dict" class="intersphinx-link">dict</a>[<a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, Any]</code></td><td class="fieldArgDesc">Dictionary mapping public attribute names to their values. Excludes
+    <div><p>Return all public attributes of the instance.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/stdtypes.html#dict" class="intersphinx-link">dict</a>[<a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <a href="https://docs.python.org/3/library/typing.html#typing.Any" class="intersphinx-link">typing.Any</a>]</code></td><td class="fieldArgDesc">Dictionary mapping public attribute names to their values. Excludes
 dunder, protected, and private attributes.</td></tr></table></div>
   </div>
 </div><div class="basemethod">
@@ -7596,7 +7596,7 @@ dunder, protected, and private attributes.</td></tr></table></div>
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">getPublicClassAsyncMethods</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/stdtypes.html#list" class="intersphinx-link">list</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>]</code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/introspection/instances/reflection.py#L1357">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/introspection/instances/reflection.py#L1353">
       
       (source)
     </a>
@@ -7623,7 +7623,7 @@ dunder, protected, and private attributes.</td></tr></table></div>
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">getPublicClassMethods</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/stdtypes.html#list" class="intersphinx-link">list</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>]</code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/introspection/instances/reflection.py#L1325">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/introspection/instances/reflection.py#L1321">
       
       (source)
     </a>
@@ -7650,7 +7650,7 @@ dunder, protected, and private attributes.</td></tr></table></div>
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">getPublicClassSyncMethods</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/stdtypes.html#list" class="intersphinx-link">list</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>]</code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/introspection/instances/reflection.py#L1341">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/introspection/instances/reflection.py#L1337">
       
       (source)
     </a>
@@ -7677,7 +7677,7 @@ dunder, protected, and private attributes.</td></tr></table></div>
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">getPublicMethods</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/stdtypes.html#list" class="intersphinx-link">list</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>]</code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/introspection/instances/reflection.py#L1145">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/introspection/instances/reflection.py#L1141">
       
       (source)
     </a>
@@ -7689,7 +7689,7 @@ dunder, protected, and private attributes.</td></tr></table></div>
   </div>
   <div class="docstring functionBody">
     <div class="interfaceinfo">overrides <code><a href="orionis.introspection.instances.contracts.reflection.IReflectionInstance.html#getPublicMethods" class="internal-link">orionis.introspection.instances.contracts.reflection.IReflectionInstance.getPublicMethods</a></code></div>
-    <div><p>Return all public method names of the instance.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">self:</span><code><a href="orionis.introspection.ReflectionInstance.html" class="internal-link" title="orionis.introspection.ReflectionInstance">ReflectionInstance</a></code></td><td class="fieldArgDesc">The ReflectionInstance object.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/stdtypes.html#list" class="intersphinx-link">list</a> of <a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">List of public method names. Public methods are not static, class,
+    <div><p>Return all public method names of the instance.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">self:</span><code><a href="orionis.introspection.ReflectionInstance.html" class="internal-link">orionis.introspection.ReflectionInstance</a></code></td><td class="fieldArgDesc">The ReflectionInstance object.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/stdtypes.html#list" class="intersphinx-link">list</a> of <a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">List of public method names. Public methods are not static, class,
 private, protected, or magic methods.</td></tr></table></div>
   </div>
 </div><div class="basemethod">
@@ -7705,7 +7705,7 @@ private, protected, or magic methods.</td></tr></table></div>
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">getPublicProperties</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/stdtypes.html#list" class="intersphinx-link">list</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/introspection/instances/reflection.py#L1671">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/introspection/instances/reflection.py#L1663">
       
       (source)
     </a>
@@ -7732,7 +7732,7 @@ private, protected, or magic methods.</td></tr></table></div>
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">getPublicStaticAsyncMethods</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/stdtypes.html#list" class="intersphinx-link">list</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>]</code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/introspection/instances/reflection.py#L1511">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/introspection/instances/reflection.py#L1507">
       
       (source)
     </a>
@@ -7759,7 +7759,7 @@ private, protected, or magic methods.</td></tr></table></div>
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">getPublicStaticMethods</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/stdtypes.html#list" class="intersphinx-link">list</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>]</code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/introspection/instances/reflection.py#L1479">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/introspection/instances/reflection.py#L1475">
       
       (source)
     </a>
@@ -7786,7 +7786,7 @@ private, protected, or magic methods.</td></tr></table></div>
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">getPublicStaticSyncMethods</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/stdtypes.html#list" class="intersphinx-link">list</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>]</code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/introspection/instances/reflection.py#L1495">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/introspection/instances/reflection.py#L1491">
       
       (source)
     </a>
@@ -7813,7 +7813,7 @@ private, protected, or magic methods.</td></tr></table></div>
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">getPublicSyncMethods</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/stdtypes.html#list" class="intersphinx-link">list</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>]</code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/introspection/instances/reflection.py#L1167">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/introspection/instances/reflection.py#L1163">
       
       (source)
     </a>
@@ -7840,7 +7840,7 @@ private, protected, or magic methods.</td></tr></table></div>
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">getSourceCode</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">method: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a> | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code> = <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a> | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/introspection/instances/reflection.py#L524">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/introspection/instances/reflection.py#L536">
       
       (source)
     </a>
@@ -7875,7 +7875,7 @@ the source code of the class.</td></tr></table><table class="fieldTable"><tr cla
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">hasAttribute</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">name: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/introspection/instances/reflection.py#L631">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/introspection/instances/reflection.py#L643">
       
       (source)
     </a>
@@ -7902,7 +7902,7 @@ the source code of the class.</td></tr></table><table class="fieldTable"><tr cla
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">hasMethod</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">name: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/introspection/instances/reflection.py#L929">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/introspection/instances/reflection.py#L925">
       
       (source)
     </a>
@@ -7934,7 +7934,7 @@ the source code of the class.</td></tr></table><table class="fieldTable"><tr cla
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">methodSignature</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">method_name: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></span>) -&gt; <code>Signature</code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/introspection/instances/reflection.py#L1860">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/introspection/instances/reflection.py#L1852">
       
       (source)
     </a>
@@ -7946,7 +7946,7 @@ the source code of the class.</td></tr></table><table class="fieldTable"><tr cla
   </div>
   <div class="docstring functionBody">
     <div class="interfaceinfo">overrides <code><a href="orionis.introspection.instances.contracts.reflection.IReflectionInstance.html#methodSignature" class="internal-link">orionis.introspection.instances.contracts.reflection.IReflectionInstance.methodSignature</a></code></div>
-    <div><p>Analyze and return dependencies for a method of the instance's class.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">method<wbr></wbr>_name:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Name of the method to inspect.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.introspection.dependencies.entities.signature.Signature.html" class="internal-link" title="orionis.introspection.dependencies.entities.signature.Signature">Signature</a></code></td><td class="fieldArgDesc"><p>Structured representation of the method dependencies, including:</p>
+    <div><p>Analyze and return dependencies for a method of the instance's class.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">method<wbr></wbr>_name:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Name of the method to inspect.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.introspection.dependencies.entities.signature.Signature.html" class="internal-link">orionis.introspection.dependencies.entities.signature.Signature</a></code></td><td class="fieldArgDesc"><p>Structured representation of the method dependencies, including:</p>
 <ul class="rst-simple">
 <li><tt class="rst-docutils rst-literal">resolved</tt>: dictionary of resolved dependencies with names and values.</li>
 <li><tt class="rst-docutils rst-literal">unresolved</tt>: list of unresolved dependencies (parameter names
@@ -7967,7 +7967,7 @@ without default values or annotations).</li>
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">removeAttribute</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">name: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/introspection/instances/reflection.py#L733">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/introspection/instances/reflection.py#L745">
       
       (source)
     </a>
@@ -7999,7 +7999,7 @@ without default values or annotations).</li>
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">removeMethod</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">name: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></span>):</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/introspection/instances/reflection.py#L1008">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/introspection/instances/reflection.py#L1004">
       
       (source)
     </a>
@@ -8026,7 +8026,7 @@ without default values or annotations).</li>
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">setAttribute</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">name: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code>, </span><span class="rst-sig-param">value: <code>Any</code></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/introspection/instances/reflection.py#L680">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/introspection/instances/reflection.py#L692">
       
       (source)
     </a>
@@ -8038,7 +8038,7 @@ without default values or annotations).</li>
   </div>
   <div class="docstring functionBody">
     <div class="interfaceinfo">overrides <code><a href="orionis.introspection.instances.contracts.reflection.IReflectionInstance.html#setAttribute" class="internal-link">orionis.introspection.instances.contracts.reflection.IReflectionInstance.setAttribute</a></code></div>
-    <div><p>Set the value of an attribute on the instance.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">name:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Name of the attribute to set.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">value:</span><code>Any</code></td><td class="fieldArgDesc">Value to assign to the attribute.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code></td><td class="fieldArgDesc">True if the attribute was set successfully.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/exceptions.html#AttributeError" class="intersphinx-link">AttributeError</a></code></td><td>If the attribute name is invalid, is a keyword, or the value is callable.</td></tr></table></div>
+    <div><p>Set the value of an attribute on the instance.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">name:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Name of the attribute to set.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">value:</span><code><a href="https://docs.python.org/3/library/typing.html#typing.Any" class="intersphinx-link">typing.Any</a></code></td><td class="fieldArgDesc">Value to assign to the attribute.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code></td><td class="fieldArgDesc">True if the attribute was set successfully.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/exceptions.html#AttributeError" class="intersphinx-link">AttributeError</a></code></td><td>If the attribute name is invalid, is a keyword, or the value is callable.</td></tr></table></div>
   </div>
 </div><div class="basemethod">
   
@@ -8053,7 +8053,7 @@ without default values or annotations).</li>
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">setMethod</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">name: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code>, </span><span class="rst-sig-param">method: <code>Callable</code></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/introspection/instances/reflection.py#L956">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/introspection/instances/reflection.py#L952">
       
       (source)
     </a>
@@ -8065,7 +8065,7 @@ without default values or annotations).</li>
   </div>
   <div class="docstring functionBody">
     <div class="interfaceinfo">overrides <code><a href="orionis.introspection.instances.contracts.reflection.IReflectionInstance.html#setMethod" class="internal-link">orionis.introspection.instances.contracts.reflection.IReflectionInstance.setMethod</a></code></div>
-    <div><p>Set a callable attribute as a method.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">name:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Name of the method to set.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">method:</span><code>Callable</code></td><td class="fieldArgDesc">Callable object to assign as the method.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code></td><td class="fieldArgDesc">True if the method was set successfully.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/exceptions.html#AttributeError" class="intersphinx-link">AttributeError</a></code></td><td>If the name is not a valid identifier, is a keyword, or the method
+    <div><p>Set a callable attribute as a method.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">name:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Name of the method to set.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">method:</span><code><a href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Callable" class="intersphinx-link">collections.abc.Callable</a></code></td><td class="fieldArgDesc">Callable object to assign as the method.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code></td><td class="fieldArgDesc">True if the method was set successfully.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/exceptions.html#AttributeError" class="intersphinx-link">AttributeError</a></code></td><td>If the name is not a valid identifier, is a keyword, or the method
 is not callable.</td></tr></table></div>
   </div>
 </div><div class="baseinstancevariable">
@@ -8080,7 +8080,7 @@ is not callable.</td></tr></table></div>
   <div class="functionHeader">
     
     <span class="py-defname">_class_name</span>: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/introspection/instances/reflection.py#L69">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/introspection/instances/reflection.py#L74">
       
       (source)
     </a>
@@ -8092,7 +8092,7 @@ is not callable.</td></tr></table></div>
   </div>
   <div class="functionBody">
     
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p>Class name obtained from <tt class="rst-docutils rst-literal">cls.__name__</tt>.</p></div>
     
   </div>
 </div><div class="baseinstancevariable">
@@ -8107,7 +8107,7 @@ is not callable.</td></tr></table></div>
   <div class="functionHeader">
     
     <span class="py-defname">_cls</span>: <code><a href="https://docs.python.org/3/builtins/functions.html#type" class="intersphinx-link">type</a></code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/introspection/instances/reflection.py#L68">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/introspection/instances/reflection.py#L72">
       
       (source)
     </a>
@@ -8119,7 +8119,7 @@ is not callable.</td></tr></table></div>
   </div>
   <div class="functionBody">
     
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p>Cls supplied through <tt class="rst-docutils rst-literal">cls</tt>.</p></div>
     
   </div>
 </div><div class="baseinstancevariable">
@@ -8134,7 +8134,7 @@ is not callable.</td></tr></table></div>
   <div class="functionHeader">
     
     <span class="py-defname">_instance</span>: <code>Any</code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/introspection/instances/reflection.py#L67">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/introspection/instances/reflection.py#L70">
       
       (source)
     </a>
@@ -8146,7 +8146,7 @@ is not callable.</td></tr></table></div>
   </div>
   <div class="functionBody">
     
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p>The object instance to reflect.</p></div>
     
   </div>
 </div><div class="baseinstancevariable">
@@ -8161,7 +8161,7 @@ is not callable.</td></tr></table></div>
   <div class="functionHeader">
     
     <span class="py-defname">_memory_cache</span>: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#dict" class="intersphinx-link">dict</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <wbr></wbr>Any]</code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/introspection/instances/reflection.py#L74">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/introspection/instances/reflection.py#L85">
       
       (source)
     </a>
@@ -8173,7 +8173,7 @@ is not callable.</td></tr></table></div>
   </div>
   <div class="functionBody">
     
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p>Process-local cache of previously computed reflection results.</p></div>
     
   </div>
 </div><div class="baseinstancevariable">
@@ -8188,7 +8188,7 @@ is not callable.</td></tr></table></div>
   <div class="functionHeader">
     
     <span class="py-defname">_module_name</span>: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/introspection/instances/reflection.py#L70">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/introspection/instances/reflection.py#L76">
       
       (source)
     </a>
@@ -8200,7 +8200,7 @@ is not callable.</td></tr></table></div>
   </div>
   <div class="functionBody">
     
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p>Module name supplied through <tt class="rst-docutils rst-literal">module</tt>.</p></div>
     
   </div>
 </div><div class="baseinstancevariable">
@@ -8215,7 +8215,7 @@ is not callable.</td></tr></table></div>
   <div class="functionHeader">
     
     <span class="py-defname">_private_prefix</span>: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/introspection/instances/reflection.py#L73">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/introspection/instances/reflection.py#L80">
       
       (source)
     </a>
@@ -8227,7 +8227,8 @@ is not callable.</td></tr></table></div>
   </div>
   <div class="functionBody">
     
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p>Python strips the leading underscores of the class name when it mangles
+private members, so the prefix must be built the same way.</p></div>
     
   </div>
 </div>
@@ -8241,7 +8242,7 @@ is not callable.</td></tr></table></div>
   <div class="orionis-footer-inner">
     <div class="orionis-footer-copy">
       <p>API documentation for <a href="https://orionis-framework.com/" class="projecthome">Orionis</a>.</p>
-      <p class="orionis-footer-meta">Generated with <a href="https://github.com/twisted/pydoctor/">Pydoctor</a> 25.10.1.<span class="orionis-footer-build"> Built 2026-11-03 09:36:58.</span></p>
+      <p class="orionis-footer-meta">Generated with <a href="https://github.com/twisted/pydoctor/">Pydoctor</a> 25.10.1.<span class="orionis-footer-build"> Built 2026-11-03 13:00:15.</span></p>
     </div>
     <nav class="orionis-footer-links" aria-label="Additional resources">
       <a href="https://docs.orionis-framework.com">Read the guide <span aria-hidden="true">↗</span></a>

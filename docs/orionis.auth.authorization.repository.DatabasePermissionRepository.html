@@ -149,7 +149,7 @@
       <div>
          
           <div class="childrenKindTitle">Contents</div>
-          <ul><li><a class="rst-internal rst-reference" href="#rst-concurrency" id="rst-toc-entry-2">Concurrency</a></li>
+          <ul><li><a class="rst-internal rst-reference" href="#rst-concurrency">Concurrency</a></li>
 </ul>
         
 
@@ -284,7 +284,7 @@
                     <div>
          
           <div class="childrenKindTitle">Contents</div>
-          <ul><li><a class="rst-internal rst-reference" href="#rst-concurrency" id="rst-toc-entry-3">Concurrency</a></li>
+          <ul><li><a class="rst-internal rst-reference" href="#rst-concurrency">Concurrency</a></li>
 </ul>
         
 
@@ -551,7 +551,7 @@
         </div>
 
         <div class="extrasDocstring">
-          <p class="class-signature"><code><span class="py-keyword">class</span> <span class="py-defname">DatabasePermissionRepository</span>(<a href="orionis.auth.contracts.IPermissionRepository.html" class="internal-link" title="orionis.auth.contracts.IPermissionRepository">IPermissionRepository</a>): <a href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/auth/authorization/repository.py#L25" class="sourceLink">(source)</a></code></p><p>Constructor: <code><a href="#__init__" class="internal-link" title="orionis.auth.authorization.repository.DatabasePermissionRepository.__init__">DatabasePermissionRepository(db)</a></code></p><p><a href="classIndex.html#orionis.auth.authorization.repository.DatabasePermissionRepository">View In Hierarchy</a></p>
+          <p class="class-signature"><code><span class="py-keyword">class</span> <span class="py-defname">DatabasePermissionRepository</span>(<a href="orionis.auth.contracts.IPermissionRepository.html" class="internal-link" title="orionis.auth.contracts.IPermissionRepository">IPermissionRepository</a>): <a href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/auth/authorization/repository.py#L39" class="sourceLink">(source)</a></code></p><p>Constructor: <code><a href="#__init__" class="internal-link" title="orionis.auth.authorization.repository.DatabasePermissionRepository.__init__">DatabasePermissionRepository(db)</a></code></p><p><a href="classIndex.html#orionis.auth.authorization.repository.DatabasePermissionRepository">View In Hierarchy</a></p>
         </div>
 
         <div class="moduleDocstring">
@@ -560,7 +560,7 @@
 UNION statement, once per request. No intermediate role-ID list can
 become stale between separate reads. Later checks use the snapshot.</p>
 <div class="rst-section" id="rst-concurrency">
-<h2 class="heading"><a class="rst-toc-backref" href="#rst-toc-entry-1">Concurrency</a></h2>
+<h2 class="heading">Concurrency</h2>
 <p>The repository is stateless and safe to register as a singleton. It
 only issues read queries, so concurrent calls never interfere.</p>
 </div>
@@ -600,12 +600,12 @@ only issues read queries, so concurrent calls never interfere.</p>
     
     <td>Class Variable</td>
     <td><code><a href="#__slots__" class="internal-link" title="orionis.auth.authorization.repository.DatabasePermissionRepository.__slots__">__slots__</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
+    <td>Declare the instance attribute slots reserved by this class.</td>
   </tr><tr class="instancevariable">
     
     <td>Instance Variable</td>
     <td><code><a href="#__db" class="internal-link" title="orionis.auth.authorization.repository.DatabasePermissionRepository.__db">__db</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
+    <td>Gateway used to build queries over the authorization tables.</td>
   </tr>
 </table>
           
@@ -627,7 +627,7 @@ only issues read queries, so concurrent calls never interfere.</p>
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">__directPermissionsOf</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">model_type: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code>, </span><span class="rst-sig-param">model_id: <code><a href="https://docs.python.org/3/builtins/functions.html#object" class="intersphinx-link">object</a></code></span>) -&gt; <code><a href="orionis.orm.contracts.raw_builder.IRawQueryBuilder.html" class="internal-link" title="orionis.orm.contracts.raw_builder.IRawQueryBuilder">IRawQueryBuilder</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/auth/authorization/repository.py#L127">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/auth/authorization/repository.py#L143">
       
       (source)
     </a>
@@ -639,7 +639,7 @@ only issues read queries, so concurrent calls never interfere.</p>
   </div>
   <div class="docstring functionBody">
     
-    <div><p>Build the direct-permission arm of the authorization statement.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">model<wbr></wbr>_type:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Polymorphic type stored in the pivot table.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">model<wbr></wbr>_id:</span><code><a href="https://docs.python.org/3/builtins/functions.html#object" class="intersphinx-link">object</a></code></td><td class="fieldArgDesc">Identifier stored in the pivot table.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.orm.contracts.raw_builder.IRawQueryBuilder.html" class="internal-link" title="orionis.orm.contracts.raw_builder.IRawQueryBuilder">IRawQueryBuilder</a></code></td><td class="fieldArgDesc">Query exposing direct permission names and their kind.</td></tr></table></div>
+    <div><p>Build the direct-permission arm of the authorization statement.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">model<wbr></wbr>_type:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Polymorphic type stored in the pivot table.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">model<wbr></wbr>_id:</span><code><a href="https://docs.python.org/3/builtins/functions.html#object" class="intersphinx-link">object</a></code></td><td class="fieldArgDesc">Identifier stored in the pivot table.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.orm.contracts.raw_builder.IRawQueryBuilder.html" class="internal-link">orionis.orm.contracts.raw_builder.IRawQueryBuilder</a></code></td><td class="fieldArgDesc">Query exposing direct permission names and their kind.</td></tr></table></div>
   </div>
 </div><div class="basemethod">
   
@@ -654,7 +654,7 @@ only issues read queries, so concurrent calls never interfere.</p>
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">__init__</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">db: <code><a href="orionis.orm.contracts.query_builder.IQueryBuilder.html" class="internal-link" title="orionis.orm.contracts.query_builder.IQueryBuilder">IQueryBuilder</a></code></span>):</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/auth/authorization/repository.py#L43">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/auth/authorization/repository.py#L58">
       
       (source)
     </a>
@@ -666,7 +666,7 @@ only issues read queries, so concurrent calls never interfere.</p>
   </div>
   <div class="docstring functionBody">
     
-    <div><p>Initialise the repository with the model-less query gateway.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">db:</span><code><a href="orionis.orm.contracts.query_builder.IQueryBuilder.html" class="internal-link" title="orionis.orm.contracts.query_builder.IQueryBuilder">IQueryBuilder</a></code></td><td class="fieldArgDesc">Gateway used to build queries over the authorization tables.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">The repository keeps only the injected gateway.</td></tr></table></div>
+    <div><p>Initialise the repository with the model-less query gateway.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">db:</span><code><a href="orionis.orm.contracts.query_builder.IQueryBuilder.html" class="internal-link">orionis.orm.contracts.query_builder.IQueryBuilder</a></code></td><td class="fieldArgDesc">Gateway used to build queries over the authorization tables.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">The repository keeps only the injected gateway.</td></tr></table></div>
   </div>
 </div><div class="basemethod">
   
@@ -681,7 +681,7 @@ only issues read queries, so concurrent calls never interfere.</p>
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">__rolePermissionsOf</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">model_type: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code>, </span><span class="rst-sig-param">model_id: <code><a href="https://docs.python.org/3/builtins/functions.html#object" class="intersphinx-link">object</a></code></span>) -&gt; <code><a href="orionis.orm.contracts.raw_builder.IRawQueryBuilder.html" class="internal-link" title="orionis.orm.contracts.raw_builder.IRawQueryBuilder">IRawQueryBuilder</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/auth/authorization/repository.py#L161">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/auth/authorization/repository.py#L177">
       
       (source)
     </a>
@@ -693,7 +693,7 @@ only issues read queries, so concurrent calls never interfere.</p>
   </div>
   <div class="docstring functionBody">
     
-    <div><p>Build inherited permissions constrained to the current owner's roles.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">model<wbr></wbr>_type:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Stable polymorphic owner type.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">model<wbr></wbr>_id:</span><code><a href="https://docs.python.org/3/builtins/functions.html#object" class="intersphinx-link">object</a></code></td><td class="fieldArgDesc">Canonical identifier of the owner.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.orm.contracts.raw_builder.IRawQueryBuilder.html" class="internal-link" title="orionis.orm.contracts.raw_builder.IRawQueryBuilder">IRawQueryBuilder</a></code></td><td class="fieldArgDesc">Query exposing permissions from roles attached in this statement.</td></tr></table></div>
+    <div><p>Build inherited permissions constrained to the current owner's roles.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">model<wbr></wbr>_type:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Stable polymorphic owner type.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">model<wbr></wbr>_id:</span><code><a href="https://docs.python.org/3/builtins/functions.html#object" class="intersphinx-link">object</a></code></td><td class="fieldArgDesc">Canonical identifier of the owner.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.orm.contracts.raw_builder.IRawQueryBuilder.html" class="internal-link">orionis.orm.contracts.raw_builder.IRawQueryBuilder</a></code></td><td class="fieldArgDesc">Query exposing permissions from roles attached in this statement.</td></tr></table></div>
   </div>
 </div><div class="basemethod">
   
@@ -708,7 +708,7 @@ only issues read queries, so concurrent calls never interfere.</p>
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">__rolesOf</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">model_type: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code>, </span><span class="rst-sig-param">model_id: <code><a href="https://docs.python.org/3/builtins/functions.html#object" class="intersphinx-link">object</a></code></span>) -&gt; <code><a href="orionis.orm.contracts.raw_builder.IRawQueryBuilder.html" class="internal-link" title="orionis.orm.contracts.raw_builder.IRawQueryBuilder">IRawQueryBuilder</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/auth/authorization/repository.py#L93">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/auth/authorization/repository.py#L109">
       
       (source)
     </a>
@@ -720,7 +720,7 @@ only issues read queries, so concurrent calls never interfere.</p>
   </div>
   <div class="docstring functionBody">
     
-    <div><p>Build the role arm of the authorization statement.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">model<wbr></wbr>_type:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Polymorphic type stored in the pivot table.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">model<wbr></wbr>_id:</span><code><a href="https://docs.python.org/3/builtins/functions.html#object" class="intersphinx-link">object</a></code></td><td class="fieldArgDesc">Identifier stored in the pivot table.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.orm.contracts.raw_builder.IRawQueryBuilder.html" class="internal-link" title="orionis.orm.contracts.raw_builder.IRawQueryBuilder">IRawQueryBuilder</a></code></td><td class="fieldArgDesc">Query exposing role names tagged with their authorization kind.</td></tr></table></div>
+    <div><p>Build the role arm of the authorization statement.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">model<wbr></wbr>_type:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Polymorphic type stored in the pivot table.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">model<wbr></wbr>_id:</span><code><a href="https://docs.python.org/3/builtins/functions.html#object" class="intersphinx-link">object</a></code></td><td class="fieldArgDesc">Identifier stored in the pivot table.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.orm.contracts.raw_builder.IRawQueryBuilder.html" class="internal-link">orionis.orm.contracts.raw_builder.IRawQueryBuilder</a></code></td><td class="fieldArgDesc">Query exposing role names tagged with their authorization kind.</td></tr></table></div>
   </div>
 </div><div class="basemethod">
   
@@ -735,7 +735,7 @@ only issues read queries, so concurrent calls never interfere.</p>
     
     
     <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">loadFor</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">authorizable: <code>IAuthorizable</code></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" class="intersphinx-link">tuple</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#frozenset" class="intersphinx-link">frozenset</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>], <wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#frozenset" class="intersphinx-link">frozenset</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>]]</code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/auth/authorization/repository.py#L59">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/auth/authorization/repository.py#L75">
       
       (source)
     </a>
@@ -747,7 +747,7 @@ only issues read queries, so concurrent calls never interfere.</p>
   </div>
   <div class="docstring functionBody">
     <div class="interfaceinfo">overrides <code><a href="orionis.auth.contracts.IPermissionRepository.html#loadFor" class="internal-link">orionis.auth.contracts.IPermissionRepository.loadFor</a></code></div>
-    <div><p>Load the permissions and roles owned by an identity.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">authorizable:</span><code><a href="orionis.auth.contracts.IAuthorizable.html" class="internal-link" title="orionis.auth.contracts.IAuthorizable">IAuthorizable</a></code></td><td class="fieldArgDesc">Identity whose authorization must be resolved.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" class="intersphinx-link">tuple</a>[<a href="https://docs.python.org/3/builtins/stdtypes.html#frozenset" class="intersphinx-link">frozenset</a>[<a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>], <a href="https://docs.python.org/3/builtins/stdtypes.html#frozenset" class="intersphinx-link">frozenset</a>[<a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>]]</code></td><td class="fieldArgDesc">Effective permission names first, role names second.</td></tr></table></div>
+    <div><p>Load the permissions and roles owned by an identity.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">authorizable:</span><code><a href="orionis.auth.contracts.IAuthorizable.html" class="internal-link">orionis.auth.contracts.IAuthorizable</a></code></td><td class="fieldArgDesc">Identity whose authorization must be resolved.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" class="intersphinx-link">tuple</a>[<a href="https://docs.python.org/3/builtins/stdtypes.html#frozenset" class="intersphinx-link">frozenset</a>[<a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>], <a href="https://docs.python.org/3/builtins/stdtypes.html#frozenset" class="intersphinx-link">frozenset</a>[<a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>]]</code></td><td class="fieldArgDesc">Effective permission names first, role names second.</td></tr></table></div>
   </div>
 </div><div class="baseclassvariable">
   
@@ -761,7 +761,7 @@ only issues read queries, so concurrent calls never interfere.</p>
   <div class="functionHeader">
     
     <span class="py-defname">__slots__</span>: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" class="intersphinx-link">tuple</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <wbr></wbr><span class="rst-variable-ellipsis">...</span>]</code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/auth/authorization/repository.py#L41">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/auth/authorization/repository.py#L55">
       
       (source)
     </a>
@@ -773,7 +773,7 @@ only issues read queries, so concurrent calls never interfere.</p>
   </div>
   <div class="functionBody">
     <div class="interfaceinfo">overrides <code><a href="orionis.auth.contracts.IPermissionRepository.html#__slots__" class="internal-link">orionis.auth.contracts.IPermissionRepository.__slots__</a></code></div>
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p>Declare the instance attribute slots reserved by this class.</p></div>
     
   </div>
 </div><div class="baseinstancevariable">
@@ -788,7 +788,7 @@ only issues read queries, so concurrent calls never interfere.</p>
   <div class="functionHeader">
     
     <span class="py-defname">__db</span> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/auth/authorization/repository.py#L57">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/auth/authorization/repository.py#L72">
       
       (source)
     </a>
@@ -800,7 +800,7 @@ only issues read queries, so concurrent calls never interfere.</p>
   </div>
   <div class="functionBody">
     
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p>Gateway used to build queries over the authorization tables.</p></div>
     
   </div>
 </div>
@@ -814,7 +814,7 @@ only issues read queries, so concurrent calls never interfere.</p>
   <div class="orionis-footer-inner">
     <div class="orionis-footer-copy">
       <p>API documentation for <a href="https://orionis-framework.com/" class="projecthome">Orionis</a>.</p>
-      <p class="orionis-footer-meta">Generated with <a href="https://github.com/twisted/pydoctor/">Pydoctor</a> 25.10.1.<span class="orionis-footer-build"> Built 2026-11-03 09:36:58.</span></p>
+      <p class="orionis-footer-meta">Generated with <a href="https://github.com/twisted/pydoctor/">Pydoctor</a> 25.10.1.<span class="orionis-footer-build"> Built 2026-11-03 13:00:15.</span></p>
     </div>
     <nav class="orionis-footer-links" aria-label="Additional resources">
       <a href="https://docs.orionis-framework.com">Read the guide <span aria-hidden="true">↗</span></a>

@@ -759,15 +759,17 @@
         </div>
 
         <div class="extrasDocstring">
-          <a href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/http/adapters/response/streams.py" class="sourceLink">(source)</a>
+          <a href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/http/adapters/response/streams.py" class="sourceLink">(source)</a>
         </div>
 
         <div class="moduleDocstring">
-          <div><p class="undocumented">Undocumented</p></div>
+          <div><p>Provide http adapters response operations.</p>
+<p>Includes <tt class="rst-docutils rst-literal">close_stream</tt>, <tt class="rst-docutils rst-literal">await_cleanup</tt>, <tt class="rst-docutils rst-literal">send_until_disconnect</tt>.</p>
+</div>
         </div>
 
         <div id="split-tables">
-          <table class="children sortable" id="id980">
+          <table class="children sortable" id="id981">
   
   
   <tr class="function">
@@ -826,7 +828,7 @@
     
     
     <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">_cancel_tasks</span><span class="function-signature">(<span class="rst-sig-param">tasks: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" class="intersphinx-link">tuple</a>[<wbr></wbr><a href="https://docs.python.org/3/library/asyncio-task.html#asyncio.Task" class="intersphinx-link">Task</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a>], <wbr></wbr><a href="https://docs.python.org/3/library/asyncio-task.html#asyncio.Task" class="intersphinx-link">Task</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a>]]</code></span>):</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/http/adapters/response/streams.py#L137">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/http/adapters/response/streams.py#L142">
       
       (source)
     </a>
@@ -838,7 +840,7 @@
   </div>
   <div class="docstring functionBody">
     
-    <div><p>Cancel and join both owned tasks without abandoning asynchronous cleanup.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">tasks:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" class="intersphinx-link">tuple</a>[<a href="https://docs.python.org/3/library/asyncio-task.html#asyncio.Task" class="intersphinx-link">Task</a>[<a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a>], <a href="https://docs.python.org/3/library/asyncio-task.html#asyncio.Task" class="intersphinx-link">Task</a>[<a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a>]]</code></td><td class="fieldArgDesc">Sender and disconnect watcher owned by one response.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">Finish both tasks before propagating their errors or cancellation.</td></tr></table></div>
+    <div><p>Cancel and join both owned tasks without abandoning asynchronous cleanup.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">tasks:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" class="intersphinx-link">tuple</a>[<a href="https://docs.python.org/3/library/asyncio-task.html#asyncio.Task" class="intersphinx-link">asyncio.Task</a>[<a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a>], <a href="https://docs.python.org/3/library/asyncio-task.html#asyncio.Task" class="intersphinx-link">asyncio.Task</a>[<a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a>]]</code></td><td class="fieldArgDesc">Sender and disconnect watcher owned by one response.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">Finish both tasks before propagating their errors or cancellation.</td></tr></table></div>
   </div>
 </div><div class="basefunction">
   
@@ -853,7 +855,7 @@
     
     
     <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">_finish_cancelled_cleanup</span><span class="function-signature long-signature">(<span class="rst-sig-param">pending: <code><a href="https://docs.python.org/3/library/asyncio-future.html#asyncio.Future" class="intersphinx-link">Future</a>[<wbr></wbr>T]</code>, </span><span class="rst-sig-param">ready: <code><a href="https://docs.python.org/3/library/asyncio-future.html#asyncio.Future" class="intersphinx-link">Future</a>[<wbr></wbr><a href="https://docs.python.org/3/library/asyncio-future.html#asyncio.Future" class="intersphinx-link">Future</a>[<wbr></wbr>T]]</code>, </span><span class="rst-sig-param">cancellation: <code><a href="https://docs.python.org/3/library/asyncio-exceptions.html#asyncio.CancelledError" class="intersphinx-link">asyncio.CancelledError</a></code></span>):</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/http/adapters/response/streams.py#L38">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/http/adapters/response/streams.py#L43">
       
       (source)
     </a>
@@ -865,7 +867,7 @@
   </div>
   <div class="docstring functionBody">
     
-    <div><p>Join owned cleanup after cancellation and retain its failure cause.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">pending:</span><code><a href="https://docs.python.org/3/library/asyncio-future.html#asyncio.Future" class="intersphinx-link">Future</a>[T]</code></td><td class="fieldArgDesc">Cleanup operation which must finish before its owner returns.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">ready:</span><code><a href="https://docs.python.org/3/library/asyncio-future.html#asyncio.Future" class="intersphinx-link">Future</a>[<a href="https://docs.python.org/3/library/asyncio-future.html#asyncio.Future" class="intersphinx-link">Future</a>[T]]</code></td><td class="fieldArgDesc">Completion notification carrying no cleanup exception.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">cancellation:</span><code><a href="https://docs.python.org/3/library/asyncio-exceptions.html#asyncio.CancelledError" class="intersphinx-link">asyncio.CancelledError</a></code></td><td class="fieldArgDesc">Cancellation that the owner will re-raise after cleanup succeeds.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">Finish cleanup while deferring additional cancellation requests.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/exceptions.html#BaseException" class="intersphinx-link">BaseException</a></code></td><td>If cleanup fails, chain its error to the original cancellation.</td></tr></table></div>
+    <div><p>Join owned cleanup after cancellation and retain its failure cause.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">pending:</span><code><a href="https://docs.python.org/3/library/asyncio-future.html#asyncio.Future" class="intersphinx-link">asyncio.Future</a>[<tt class="rst-docutils rst-literal">T</tt>]</code></td><td class="fieldArgDesc">Cleanup operation which must finish before its owner returns.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">ready:</span><code><a href="https://docs.python.org/3/library/asyncio-future.html#asyncio.Future" class="intersphinx-link">asyncio.Future</a>[<a href="https://docs.python.org/3/library/asyncio-future.html#asyncio.Future" class="intersphinx-link">asyncio.Future</a>[<tt class="rst-docutils rst-literal">T</tt>]]</code></td><td class="fieldArgDesc">Completion notification carrying no cleanup exception.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">cancellation:</span><code><a href="https://docs.python.org/3/library/asyncio-exceptions.html#asyncio.CancelledError" class="intersphinx-link">asyncio.CancelledError</a></code></td><td class="fieldArgDesc">Cancellation that the owner will re-raise after cleanup succeeds.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">Finish cleanup while deferring additional cancellation requests.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/exceptions.html#BaseException" class="intersphinx-link">BaseException</a></code></td><td>If cleanup fails, chain its error to the original cancellation.</td></tr></table></div>
   </div>
 </div><div class="basefunction">
   
@@ -880,7 +882,7 @@
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">_raise_task_errors</span><span class="function-signature">(<span class="rst-sig-param">results: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#list" class="intersphinx-link">list</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/exceptions.html#BaseException" class="intersphinx-link">BaseException</a> | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a>]</code></span>):</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/http/adapters/response/streams.py#L107">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/http/adapters/response/streams.py#L112">
       
       (source)
     </a>
@@ -907,7 +909,7 @@
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">_record_completion</span><span class="function-signature">(<span class="rst-sig-param">first: <code><a href="https://docs.python.org/3/library/asyncio-future.html#asyncio.Future" class="intersphinx-link">Future</a>[<wbr></wbr><a href="https://docs.python.org/3/library/asyncio-future.html#asyncio.Future" class="intersphinx-link">Future</a>[<wbr></wbr>T]]</code>, </span><span class="rst-sig-param">completed: <code><a href="https://docs.python.org/3/library/asyncio-future.html#asyncio.Future" class="intersphinx-link">Future</a>[<wbr></wbr>T]</code></span>):</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/http/adapters/response/streams.py#L162">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/http/adapters/response/streams.py#L167">
       
       (source)
     </a>
@@ -919,7 +921,7 @@
   </div>
   <div class="docstring functionBody">
     
-    <div><p>Record the first completed future in event-loop callback order.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">first:</span><code><a href="https://docs.python.org/3/library/asyncio-future.html#asyncio.Future" class="intersphinx-link">Future</a>[<a href="https://docs.python.org/3/library/asyncio-future.html#asyncio.Future" class="intersphinx-link">Future</a>[T]]</code></td><td class="fieldArgDesc">Completion notification awaited by the stream coordinator or cleanup.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">completed:</span><code><a href="https://docs.python.org/3/library/asyncio-future.html#asyncio.Future" class="intersphinx-link">Future</a>[T]</code></td><td class="fieldArgDesc">Operation whose completion triggered this callback.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">Preserve the first completion without changing a cancelled result.</td></tr></table></div>
+    <div><p>Record the first completed future in event-loop callback order.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">first:</span><code><a href="https://docs.python.org/3/library/asyncio-future.html#asyncio.Future" class="intersphinx-link">asyncio.Future</a>[<a href="https://docs.python.org/3/library/asyncio-future.html#asyncio.Future" class="intersphinx-link">asyncio.Future</a>[<tt class="rst-docutils rst-literal">T</tt>]]</code></td><td class="fieldArgDesc">Completion notification awaited by the stream coordinator or cleanup.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">completed:</span><code><a href="https://docs.python.org/3/library/asyncio-future.html#asyncio.Future" class="intersphinx-link">asyncio.Future</a>[<tt class="rst-docutils rst-literal">T</tt>]</code></td><td class="fieldArgDesc">Operation whose completion triggered this callback.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">Preserve the first completion without changing a cancelled result.</td></tr></table></div>
   </div>
 </div><div class="basefunction">
   
@@ -934,7 +936,7 @@
     
     
     <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">await_cleanup</span><span class="function-signature">(<span class="rst-sig-param">pending: <code><a href="https://docs.python.org/3/library/asyncio-future.html#asyncio.Future" class="intersphinx-link">Future</a>[<wbr></wbr>T]</code></span>) -&gt; <code>T</code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/http/adapters/response/streams.py#L73">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/http/adapters/response/streams.py#L78">
       
       (source)
     </a>
@@ -946,7 +948,7 @@
   </div>
   <div class="docstring functionBody">
     
-    <div><p>Await owned cleanup before propagating cancellation to its caller.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">pending:</span><code><a href="https://docs.python.org/3/library/asyncio-future.html#asyncio.Future" class="intersphinx-link">Future</a>[T]</code></td><td class="fieldArgDesc">Cleanup operation protected from cancellation of its owner.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code>T</code></td><td class="fieldArgDesc">Completed cleanup result when the owner was not cancelled.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/exceptions.html#BaseException" class="intersphinx-link">BaseException</a></code></td><td>Propagate cleanup failure, or cancellation after successful cleanup.</td></tr></table></div>
+    <div><p>Await owned cleanup before propagating cancellation to its caller.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">pending:</span><code><a href="https://docs.python.org/3/library/asyncio-future.html#asyncio.Future" class="intersphinx-link">asyncio.Future</a>[<tt class="rst-docutils rst-literal">T</tt>]</code></td><td class="fieldArgDesc">Cleanup operation protected from cancellation of its owner.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><tt class="rst-docutils rst-literal">T</tt></code></td><td class="fieldArgDesc">Completed cleanup result when the owner was not cancelled.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/exceptions.html#BaseException" class="intersphinx-link">BaseException</a></code></td><td>Propagate cleanup failure, or cancellation after successful cleanup.</td></tr></table></div>
   </div>
 </div><div class="basefunction">
   
@@ -961,7 +963,7 @@
     
     
     <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">close_stream</span><span class="function-signature">(<span class="rst-sig-param">iterator: <code><a href="https://docs.python.org/3/library/collections.abc.html#collections.abc.AsyncIterable" class="intersphinx-link">AsyncIterable</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#bytes" class="intersphinx-link">bytes</a>] | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code>, </span><span class="rst-sig-param">failure: <code><a href="https://docs.python.org/3/builtins/exceptions.html#BaseException" class="intersphinx-link">BaseException</a> | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></span>):</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/http/adapters/response/streams.py#L11">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/http/adapters/response/streams.py#L16">
       
       (source)
     </a>
@@ -973,7 +975,7 @@
   </div>
   <div class="docstring functionBody">
     
-    <div><p>Close an iterator without letting sibling cancellation erase a failure.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">iterator:</span><code><a href="https://docs.python.org/3/library/collections.abc.html#collections.abc.AsyncIterable" class="intersphinx-link">AsyncIterable</a>[<a href="https://docs.python.org/3/builtins/stdtypes.html#bytes" class="intersphinx-link">bytes</a>] | None</code></td><td class="fieldArgDesc">Owned source whose optional asynchronous close must be awaited, if present.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">failure:</span><code>BaseException | None</code></td><td class="fieldArgDesc">Producer or transport failure already propagating through cleanup.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">Finish cleanup, retaining a real delivery error if cancellation races it.</td></tr></table></div>
+    <div><p>Close an iterator without letting sibling cancellation erase a failure.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">iterator:</span><code><a href="https://docs.python.org/3/library/collections.abc.html#collections.abc.AsyncIterable" class="intersphinx-link">collections.abc.AsyncIterable</a>[<a href="https://docs.python.org/3/builtins/stdtypes.html#bytes" class="intersphinx-link">bytes</a>] | None</code></td><td class="fieldArgDesc">Owned source whose optional asynchronous close must be awaited, if present.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">failure:</span><code>BaseException | None</code></td><td class="fieldArgDesc">Producer or transport failure already propagating through cleanup.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">Finish cleanup, retaining a real delivery error if cancellation races it.</td></tr></table></div>
   </div>
 </div><div class="basefunction">
   
@@ -988,7 +990,7 @@
     
     
     <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">send_until_disconnect</span><span class="function-signature long-signature">(<span class="rst-sig-param">sending: <code><a href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Coroutine" class="intersphinx-link">Coroutine</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a>, <wbr></wbr><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a>, <wbr></wbr><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a>]</code>, </span><span class="rst-sig-param">disconnected: <code><a href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Coroutine" class="intersphinx-link">Coroutine</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a>, <wbr></wbr><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a>, <wbr></wbr><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a>]</code></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/http/adapters/response/streams.py#L183">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/http/adapters/response/streams.py#L188">
       
       (source)
     </a>
@@ -1000,7 +1002,7 @@
   </div>
   <div class="docstring functionBody">
     
-    <div><p>Race a stream delivery against the transport's disconnect notification.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">sending:</span><code><a href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Coroutine" class="intersphinx-link">Coroutine</a>[<a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a>, <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a>, <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a>]</code></td><td class="fieldArgDesc">Delivery operation, including iterator cleanup and final framing.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">disconnected:</span><code><a href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Coroutine" class="intersphinx-link">Coroutine</a>[<a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a>, <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a>, <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a>]</code></td><td class="fieldArgDesc">Operation returning when the client disconnects.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code></td><td class="fieldArgDesc">Whether delivery completed before the disconnect watcher.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/exceptions.html#BaseException" class="intersphinx-link">BaseException</a></code></td><td>Propagate delivery, notification, cleanup errors or request cancellation.</td></tr></table></div>
+    <div><p>Race a stream delivery against the transport's disconnect notification.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">sending:</span><code><a href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Coroutine" class="intersphinx-link">collections.abc.Coroutine</a>[<a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a>, <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a>, <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a>]</code></td><td class="fieldArgDesc">Delivery operation, including iterator cleanup and final framing.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">disconnected:</span><code><a href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Coroutine" class="intersphinx-link">collections.abc.Coroutine</a>[<a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a>, <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a>, <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a>]</code></td><td class="fieldArgDesc">Operation returning when the client disconnects.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code></td><td class="fieldArgDesc">Whether delivery completed before the disconnect watcher.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/exceptions.html#BaseException" class="intersphinx-link">BaseException</a></code></td><td>Propagate delivery, notification, cleanup errors or request cancellation.</td></tr></table></div>
   </div>
 </div>
         </div>
@@ -1013,7 +1015,7 @@
   <div class="orionis-footer-inner">
     <div class="orionis-footer-copy">
       <p>API documentation for <a href="https://orionis-framework.com/" class="projecthome">Orionis</a>.</p>
-      <p class="orionis-footer-meta">Generated with <a href="https://github.com/twisted/pydoctor/">Pydoctor</a> 25.10.1.<span class="orionis-footer-build"> Built 2026-11-03 09:36:58.</span></p>
+      <p class="orionis-footer-meta">Generated with <a href="https://github.com/twisted/pydoctor/">Pydoctor</a> 25.10.1.<span class="orionis-footer-build"> Built 2026-11-03 13:00:15.</span></p>
     </div>
     <nav class="orionis-footer-links" aria-label="Additional resources">
       <a href="https://docs.orionis-framework.com">Read the guide <span aria-hidden="true">↗</span></a>

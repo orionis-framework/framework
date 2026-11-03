@@ -2159,11 +2159,11 @@
         </div>
 
         <div class="extrasDocstring">
-          <p class="class-signature"><code><span class="py-keyword">class</span> <span class="py-defname">FileBasedCache</span>: <a href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/cache/file_based_cache.py#L8" class="sourceLink">(source)</a></code></p><p>Constructor: <code><a href="#__init__" class="internal-link" title="orionis.cache.FileBasedCache.__init__">FileBasedCache(path, filename, monitored_dirs, monitored_files)</a></code></p><p><a href="classIndex.html#orionis.cache.FileBasedCache">View In Hierarchy</a></p>
+          <p class="class-signature"><code><span class="py-keyword">class</span> <span class="py-defname">FileBasedCache</span>: <a href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/cache/file_based_cache.py#L10" class="sourceLink">(source)</a></code></p><p>Constructor: <code><a href="#__init__" class="internal-link" title="orionis.cache.FileBasedCache.__init__">FileBasedCache(path, filename, monitored_dirs, monitored_files)</a></code></p><p><a href="classIndex.html#orionis.cache.FileBasedCache">View In Hierarchy</a></p>
         </div>
 
         <div class="moduleDocstring">
-          <div><p class="undocumented">Undocumented</p></div>
+          <div><p>Persist named cache entries in a filesystem directory.</p></div>
         </div>
 
         <div id="split-tables">
@@ -2214,52 +2214,52 @@
     
     <td>Constant</td>
     <td><code><a href="#CACHE_VERSION" class="internal-link" title="orionis.cache.FileBasedCache.CACHE_VERSION">CACHE<wbr></wbr>_VERSION</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
+    <td>Cache version value used by <tt class="rst-docutils rst-literal">FileBasedCache</tt>.</td>
   </tr><tr class="classvariable">
     
     <td>Class Variable</td>
     <td><code><a href="#__slots__" class="internal-link" title="orionis.cache.FileBasedCache.__slots__">__slots__</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
+    <td>Declare the instance attribute slots reserved by this class.</td>
   </tr><tr class="instancevariable">
     
     <td>Instance Variable</td>
     <td><code><a href="#__file" class="internal-link" title="orionis.cache.FileBasedCache.__file">__file</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
+    <td>Resolved filesystem path of the persistent cache entry.</td>
   </tr><tr class="instancevariable">
     
     <td>Instance Variable</td>
     <td><code><a href="#__file_resolved" class="internal-link" title="orionis.cache.FileBasedCache.__file_resolved">__file<wbr></wbr>_resolved</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
+    <td>Store the resolved cache file path for later access.</td>
   </tr><tr class="instancevariable">
     
     <td>Instance Variable</td>
     <td><code><a href="#__hashInterval" class="internal-link" title="orionis.cache.FileBasedCache.__hashInterval">__hash<wbr></wbr>Interval</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
+    <td>Hash interval value used by <tt class="rst-docutils rst-literal">FileBasedCache</tt>.</td>
   </tr><tr class="instancevariable">
     
     <td>Instance Variable</td>
     <td><code><a href="#__lasthashcheck" class="internal-link" title="orionis.cache.FileBasedCache.__lasthashcheck">__lasthashcheck</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
+    <td>Lasthashcheck value used by <tt class="rst-docutils rst-literal">FileBasedCache</tt>.</td>
   </tr><tr class="instancevariable">
     
     <td>Instance Variable</td>
     <td><code><a href="#__monitored_dirs" class="internal-link" title="orionis.cache.FileBasedCache.__monitored_dirs">__monitored<wbr></wbr>_dirs</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
+    <td>List of directories to monitor for changes.</td>
   </tr><tr class="instancevariable">
     
     <td>Instance Variable</td>
     <td><code><a href="#__monitored_files" class="internal-link" title="orionis.cache.FileBasedCache.__monitored_files">__monitored<wbr></wbr>_files</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
+    <td>List of files to monitor for changes.</td>
   </tr><tr class="instancevariable">
     
     <td>Instance Variable</td>
     <td><code><a href="#__path" class="internal-link" title="orionis.cache.FileBasedCache.__path">__path</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
+    <td>Directory path where the cache file will be stored.</td>
   </tr><tr class="instancevariable">
     
     <td>Instance Variable</td>
     <td><code><a href="#__sourceshashcache" class="internal-link" title="orionis.cache.FileBasedCache.__sourceshashcache">__sourceshashcache</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
+    <td>Internal cache for source hash and timing.</td>
   </tr>
 </table>
           
@@ -2281,7 +2281,7 @@
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">__collectFiles</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/stdtypes.html#list" class="intersphinx-link">list</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" class="intersphinx-link">tuple</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <wbr></wbr>Path]]</code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/cache/file_based_cache.py#L228">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/cache/file_based_cache.py#L241">
       
       (source)
     </a>
@@ -2296,7 +2296,7 @@
     <div><p>Collect monitored files for hashing and deduplicate them.</p>
 <p>Gather Python files from monitored directories and explicit monitored
 files, excluding the cache file itself.</p>
-<table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/stdtypes.html#list" class="intersphinx-link">list</a>[<a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" class="intersphinx-link">tuple</a>[<a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, Path]]</code></td><td class="fieldArgDesc">Sorted <tt class="rst-docutils rst-literal">(posix_path, resolved_path)</tt> pairs for unique monitored
+<table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/stdtypes.html#list" class="intersphinx-link">list</a>[<a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" class="intersphinx-link">tuple</a>[<a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <a href="https://docs.python.org/3/library/pathlib.html#pathlib.Path" class="intersphinx-link">pathlib.Path</a>]]</code></td><td class="fieldArgDesc">Sorted <tt class="rst-docutils rst-literal">(posix_path, resolved_path)</tt> pairs for unique monitored
 files.</td></tr></table></div>
   </div>
 </div><div class="basemethod">
@@ -2312,7 +2312,7 @@ files.</td></tr></table></div>
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">__collectFromDirs</span><span class="function-signature long-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">cache_file: <code>Path</code>, </span><span class="rst-sig-param">seen: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#set" class="intersphinx-link">set</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>]</code>, </span><span class="rst-sig-param">result: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#list" class="intersphinx-link">list</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" class="intersphinx-link">tuple</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <wbr></wbr>Path]]</code></span>):</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/cache/file_based_cache.py#L161">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/cache/file_based_cache.py#L174">
       
       (source)
     </a>
@@ -2324,7 +2324,7 @@ files.</td></tr></table></div>
   </div>
   <div class="docstring functionBody">
     
-    <div><p>Collect deduplicated Python files from monitored directories.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">cache<wbr></wbr>_file:</span><code>Path</code></td><td class="fieldArgDesc">Resolved cache file path to exclude from collection.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">seen:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#set" class="intersphinx-link">set</a>[<a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>]</code></td><td class="fieldArgDesc">Set of already collected POSIX paths used for deduplication.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">result:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#list" class="intersphinx-link">list</a>[<a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" class="intersphinx-link">tuple</a>[<a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, Path]]</code></td><td class="fieldArgDesc">Output list updated in place with <tt class="rst-docutils rst-literal">(posix_path, resolved_path)</tt> tuples.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">This method updates <tt class="rst-docutils rst-literal">result</tt> in place.</td></tr></table></div>
+    <div><p>Collect deduplicated Python files from monitored directories.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">cache<wbr></wbr>_file:</span><code><a href="https://docs.python.org/3/library/pathlib.html#pathlib.Path" class="intersphinx-link">pathlib.Path</a></code></td><td class="fieldArgDesc">Resolved cache file path to exclude from collection.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">seen:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#set" class="intersphinx-link">set</a>[<a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>]</code></td><td class="fieldArgDesc">Set of already collected POSIX paths used for deduplication.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">result:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#list" class="intersphinx-link">list</a>[<a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" class="intersphinx-link">tuple</a>[<a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <a href="https://docs.python.org/3/library/pathlib.html#pathlib.Path" class="intersphinx-link">pathlib.Path</a>]]</code></td><td class="fieldArgDesc">Output list updated in place with <tt class="rst-docutils rst-literal">(posix_path, resolved_path)</tt> tuples.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">This method updates <tt class="rst-docutils rst-literal">result</tt> in place.</td></tr></table></div>
   </div>
 </div><div class="basemethod">
   
@@ -2339,7 +2339,7 @@ files.</td></tr></table></div>
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">__collectFromFiles</span><span class="function-signature long-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">cache_file: <code>Path</code>, </span><span class="rst-sig-param">seen: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#set" class="intersphinx-link">set</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>]</code>, </span><span class="rst-sig-param">result: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#list" class="intersphinx-link">list</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" class="intersphinx-link">tuple</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <wbr></wbr>Path]]</code></span>):</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/cache/file_based_cache.py#L195">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/cache/file_based_cache.py#L208">
       
       (source)
     </a>
@@ -2351,7 +2351,7 @@ files.</td></tr></table></div>
   </div>
   <div class="docstring functionBody">
     
-    <div><p>Add deduplicated monitored files to the result list.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">cache<wbr></wbr>_file:</span><code>Path</code></td><td class="fieldArgDesc">Resolved cache file path to exclude from collection.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">seen:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#set" class="intersphinx-link">set</a>[<a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>]</code></td><td class="fieldArgDesc">Set of already collected POSIX paths used for deduplication.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">result:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#list" class="intersphinx-link">list</a>[<a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" class="intersphinx-link">tuple</a>[<a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, Path]]</code></td><td class="fieldArgDesc">Output list updated in place with <tt class="rst-docutils rst-literal">(posix_path, resolved_path)</tt> tuples.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">This method updates <tt class="rst-docutils rst-literal">result</tt> in place.</td></tr></table></div>
+    <div><p>Add deduplicated monitored files to the result list.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">cache<wbr></wbr>_file:</span><code><a href="https://docs.python.org/3/library/pathlib.html#pathlib.Path" class="intersphinx-link">pathlib.Path</a></code></td><td class="fieldArgDesc">Resolved cache file path to exclude from collection.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">seen:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#set" class="intersphinx-link">set</a>[<a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>]</code></td><td class="fieldArgDesc">Set of already collected POSIX paths used for deduplication.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">result:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#list" class="intersphinx-link">list</a>[<a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" class="intersphinx-link">tuple</a>[<a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <a href="https://docs.python.org/3/library/pathlib.html#pathlib.Path" class="intersphinx-link">pathlib.Path</a>]]</code></td><td class="fieldArgDesc">Output list updated in place with <tt class="rst-docutils rst-literal">(posix_path, resolved_path)</tt> tuples.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">This method updates <tt class="rst-docutils rst-literal">result</tt> in place.</td></tr></table></div>
   </div>
 </div><div class="basemethod">
   
@@ -2366,7 +2366,7 @@ files.</td></tr></table></div>
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">__computeSourcesHash</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/cache/file_based_cache.py#L250">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/cache/file_based_cache.py#L262">
       
       (source)
     </a>
@@ -2398,7 +2398,7 @@ redundant computation.</p>
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">__init__</span><span class="function-signature long-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">path: <code>Path</code>, </span><span class="rst-sig-param">filename: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code>, </span><span class="rst-sig-param">monitored_dirs: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#list" class="intersphinx-link">list</a>[<wbr></wbr>Path] | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code> = <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a>, </span><span class="rst-sig-param">monitored_files: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#list" class="intersphinx-link">list</a>[<wbr></wbr>Path] | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code> = <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></span>):</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/cache/file_based_cache.py#L23">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/cache/file_based_cache.py#L28">
       
       (source)
     </a>
@@ -2410,7 +2410,7 @@ redundant computation.</p>
   </div>
   <div class="docstring functionBody">
     
-    <div><p>Initialize the FileBasedCache instance.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">path:</span><code>Path</code></td><td class="fieldArgDesc">Directory path where the cache file will be stored.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">filename:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Name of the cache file.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">monitored<wbr></wbr>_dirs:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#list" class="intersphinx-link">list</a>[Path] or <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a>, <em>optional</em></code></td><td class="fieldArgDesc">List of directories to monitor for changes.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">monitored<wbr></wbr>_files:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#list" class="intersphinx-link">list</a>[Path] or <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a>, <em>optional</em></code></td><td class="fieldArgDesc">List of files to monitor for changes.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">This method does not return a value.</td></tr></table></div>
+    <div><p>Initialize the FileBasedCache instance.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">path:</span><code><a href="https://docs.python.org/3/library/pathlib.html#pathlib.Path" class="intersphinx-link">pathlib.Path</a></code></td><td class="fieldArgDesc">Directory path where the cache file will be stored.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">filename:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Name of the cache file.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">monitored<wbr></wbr>_dirs:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#list" class="intersphinx-link">list</a>[<a href="https://docs.python.org/3/library/pathlib.html#pathlib.Path" class="intersphinx-link">pathlib.Path</a>] or <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a>, <em>optional</em></code></td><td class="fieldArgDesc">List of directories to monitor for changes.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">monitored<wbr></wbr>_files:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#list" class="intersphinx-link">list</a>[<a href="https://docs.python.org/3/library/pathlib.html#pathlib.Path" class="intersphinx-link">pathlib.Path</a>] or <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a>, <em>optional</em></code></td><td class="fieldArgDesc">List of files to monitor for changes.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">This method does not return a value.</td></tr></table></div>
   </div>
 </div><div class="basemethod">
   
@@ -2425,7 +2425,7 @@ redundant computation.</p>
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">clear</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/cache/file_based_cache.py#L146">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/cache/file_based_cache.py#L159">
       
       (source)
     </a>
@@ -2452,7 +2452,7 @@ redundant computation.</p>
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">get</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/stdtypes.html#dict" class="intersphinx-link">dict</a> | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/cache/file_based_cache.py#L70">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/cache/file_based_cache.py#L83">
       
       (source)
     </a>
@@ -2479,7 +2479,7 @@ redundant computation.</p>
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">save</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">data: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#dict" class="intersphinx-link">dict</a></code></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" class="intersphinx-link">tuple</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a>, <wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>]</code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/cache/file_based_cache.py#L99">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/cache/file_based_cache.py#L112">
       
       (source)
     </a>
@@ -2505,7 +2505,7 @@ redundant computation.</p>
   <div class="functionHeader">
     
     <span class="py-defname">CACHE_VERSION</span>: <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/cache/file_based_cache.py#L21">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/cache/file_based_cache.py#L25">
       
       (source)
     </a>
@@ -2517,7 +2517,7 @@ redundant computation.</p>
   </div>
   <div class="functionBody">
     
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p>Cache version value used by <tt class="rst-docutils rst-literal">FileBasedCache</tt>.</p></div>
     <table class="valueTable"><tr class="fieldStart"><td class="fieldName">Value</td></tr><tr><td><pre class="constant-value"><code>1</code></pre></td></tr></table>
   </div>
 </div><div class="baseclassvariable">
@@ -2532,7 +2532,7 @@ redundant computation.</p>
   <div class="functionHeader">
     
     <span class="py-defname">__slots__</span>: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" class="intersphinx-link">tuple</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <wbr></wbr><span class="rst-variable-ellipsis">...</span>]</code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/cache/file_based_cache.py#L10">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/cache/file_based_cache.py#L13">
       
       (source)
     </a>
@@ -2544,7 +2544,7 @@ redundant computation.</p>
   </div>
   <div class="functionBody">
     
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p>Declare the instance attribute slots reserved by this class.</p></div>
     
   </div>
 </div><div class="baseinstancevariable">
@@ -2559,7 +2559,7 @@ redundant computation.</p>
   <div class="functionHeader">
     
     <span class="py-defname">__file</span> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/cache/file_based_cache.py#L54">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/cache/file_based_cache.py#L60">
       
       (source)
     </a>
@@ -2571,7 +2571,7 @@ redundant computation.</p>
   </div>
   <div class="functionBody">
     
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p>Resolved filesystem path of the persistent cache entry.</p></div>
     
   </div>
 </div><div class="baseinstancevariable">
@@ -2586,7 +2586,7 @@ redundant computation.</p>
   <div class="functionHeader">
     
     <span class="py-defname">__file_resolved</span> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/cache/file_based_cache.py#L56">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/cache/file_based_cache.py#L63">
       
       (source)
     </a>
@@ -2598,7 +2598,7 @@ redundant computation.</p>
   </div>
   <div class="functionBody">
     
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p>Store the resolved cache file path for later access.</p></div>
     
   </div>
 </div><div class="baseinstancevariable">
@@ -2613,7 +2613,7 @@ redundant computation.</p>
   <div class="functionHeader">
     
     <span class="py-defname">__hashInterval</span>: <code><a href="https://docs.python.org/3/builtins/functions.html#float" class="intersphinx-link">float</a></code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/cache/file_based_cache.py#L68">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/cache/file_based_cache.py#L80">
       
       (source)
     </a>
@@ -2625,7 +2625,7 @@ redundant computation.</p>
   </div>
   <div class="functionBody">
     
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p>Hash interval value used by <tt class="rst-docutils rst-literal">FileBasedCache</tt>.</p></div>
     
   </div>
 </div><div class="baseinstancevariable">
@@ -2640,7 +2640,7 @@ redundant computation.</p>
   <div class="functionHeader">
     
     <span class="py-defname">__lasthashcheck</span>: <code><a href="https://docs.python.org/3/builtins/functions.html#float" class="intersphinx-link">float</a></code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/cache/file_based_cache.py#L67">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/cache/file_based_cache.py#L78">
       
       (source)
     </a>
@@ -2652,7 +2652,7 @@ redundant computation.</p>
   </div>
   <div class="functionBody">
     
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p>Lasthashcheck value used by <tt class="rst-docutils rst-literal">FileBasedCache</tt>.</p></div>
     
   </div>
 </div><div class="baseinstancevariable">
@@ -2667,7 +2667,7 @@ redundant computation.</p>
   <div class="functionHeader">
     
     <span class="py-defname">__monitored_dirs</span> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/cache/file_based_cache.py#L59">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/cache/file_based_cache.py#L67">
       
       (source)
     </a>
@@ -2679,7 +2679,7 @@ redundant computation.</p>
   </div>
   <div class="functionBody">
     
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p>List of directories to monitor for changes.</p></div>
     
   </div>
 </div><div class="baseinstancevariable">
@@ -2694,7 +2694,7 @@ redundant computation.</p>
   <div class="functionHeader">
     
     <span class="py-defname">__monitored_files</span> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/cache/file_based_cache.py#L60">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/cache/file_based_cache.py#L69">
       
       (source)
     </a>
@@ -2706,7 +2706,7 @@ redundant computation.</p>
   </div>
   <div class="functionBody">
     
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p>List of files to monitor for changes.</p></div>
     
   </div>
 </div><div class="baseinstancevariable">
@@ -2721,7 +2721,7 @@ redundant computation.</p>
   <div class="functionHeader">
     
     <span class="py-defname">__path</span> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/cache/file_based_cache.py#L53">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/cache/file_based_cache.py#L58">
       
       (source)
     </a>
@@ -2733,7 +2733,7 @@ redundant computation.</p>
   </div>
   <div class="functionBody">
     
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p>Directory path where the cache file will be stored.</p></div>
     
   </div>
 </div><div class="baseinstancevariable">
@@ -2748,7 +2748,7 @@ redundant computation.</p>
   <div class="functionHeader">
     
     <span class="py-defname">__sourceshashcache</span>: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a> | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/cache/file_based_cache.py#L66">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/cache/file_based_cache.py#L76">
       
       (source)
     </a>
@@ -2760,7 +2760,7 @@ redundant computation.</p>
   </div>
   <div class="functionBody">
     
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p>Internal cache for source hash and timing.</p></div>
     
   </div>
 </div>
@@ -2774,7 +2774,7 @@ redundant computation.</p>
   <div class="orionis-footer-inner">
     <div class="orionis-footer-copy">
       <p>API documentation for <a href="https://orionis-framework.com/" class="projecthome">Orionis</a>.</p>
-      <p class="orionis-footer-meta">Generated with <a href="https://github.com/twisted/pydoctor/">Pydoctor</a> 25.10.1.<span class="orionis-footer-build"> Built 2026-11-03 09:36:58.</span></p>
+      <p class="orionis-footer-meta">Generated with <a href="https://github.com/twisted/pydoctor/">Pydoctor</a> 25.10.1.<span class="orionis-footer-build"> Built 2026-11-03 13:00:15.</span></p>
     </div>
     <nav class="orionis-footer-links" aria-label="Additional resources">
       <a href="https://docs.orionis-framework.com">Read the guide <span aria-hidden="true">↗</span></a>

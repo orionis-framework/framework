@@ -591,6 +591,16 @@
             </div>
         
 
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#FailedResolver" class="internal-link" title="orionis.queues.worker.FailedResolver"><wbr></wbr>Failed<wbr></wbr>Resolver</a></code>
+            </div>
+        
+
     </li>
 </ul> 
 
@@ -679,7 +689,7 @@
                     
                 </input>
 
-                <label class="lbl-toggle notExpandable" for="">
+                <label class="lbl-toggle" for="expandableItemId24999">
                     
                     
                 </label>
@@ -702,8 +712,21 @@
         
          
 
+        <div class="childrenKindTitle">Variables</div>
+        <ul>
+    
+    <li class="">
         
-         
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.queues.context.html#FailureCallback" class="internal-link" title="orionis.queues.context.FailureCallback"><wbr></wbr>Failure<wbr></wbr>Callback</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
 
         
          
@@ -1772,7 +1795,7 @@
                     
                 </input>
 
-                <label class="lbl-toggle notExpandable" for="">
+                <label class="lbl-toggle" for="expandableItemId25012">
                     
                     
                 </label>
@@ -1795,8 +1818,21 @@
         
          
 
+        <div class="childrenKindTitle">Variables</div>
+        <ul>
+    
+    <li class="">
         
-         
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.queues.types.html#DispatchCallback" class="internal-link" title="orionis.queues.types.DispatchCallback"><wbr></wbr>Dispatch<wbr></wbr>Callback</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
 
         
          
@@ -1874,6 +1910,16 @@
 
         
             <div class="itemName"><code><a href="#_LOGGER" class="internal-link" title="orionis.queues.worker._LOGGER">_LOGGER</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#FailedResolver" class="internal-link" title="orionis.queues.worker.FailedResolver"><wbr></wbr>Failed<wbr></wbr>Resolver</a></code>
             </div>
         
 
@@ -2702,15 +2748,15 @@
         </div>
 
         <div class="extrasDocstring">
-          <a href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/queues/worker.py" class="sourceLink">(source)</a>
+          <a href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/queues/worker.py" class="sourceLink">(source)</a>
         </div>
 
         <div class="moduleDocstring">
-          <div><p class="undocumented">Undocumented</p></div>
+          <div><p>Provide queues operations through <tt class="rst-docutils rst-literal">WorkerOptions</tt>, <tt class="rst-docutils rst-literal">Worker</tt>.</p></div>
         </div>
 
         <div id="split-tables">
-          <table class="children sortable" id="id1764">
+          <table class="children sortable" id="id1772">
   
   
   <tr class="class">
@@ -2727,7 +2773,12 @@
     
     <td>Constant</td>
     <td><code><a href="#_LOGGER" class="internal-link" title="orionis.queues.worker._LOGGER">_LOGGER</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
+    <td>Logger used by <tt class="rst-docutils rst-literal">worker</tt>.</td>
+  </tr><tr class="typealias">
+    
+    <td>Type Alias</td>
+    <td><code><a href="#FailedResolver" class="internal-link" title="orionis.queues.worker.FailedResolver"><wbr></wbr>Failed<wbr></wbr>Resolver</a></code></td>
+    <td>Type alias for <tt class="rst-docutils rst-literal"><span class="pre">Callable[[],</span> Awaitable[IFailedJobRepository]]</tt>.</td>
   </tr>
 </table>
           
@@ -2748,7 +2799,7 @@
   <div class="functionHeader">
     
     <span class="py-defname">_LOGGER</span> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/queues/worker.py#L21">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/queues/worker.py#L23">
       
       (source)
     </a>
@@ -2760,8 +2811,35 @@
   </div>
   <div class="functionBody">
     
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p>Logger used by <tt class="rst-docutils rst-literal">worker</tt>.</p></div>
     <table class="valueTable"><tr class="fieldStart"><td class="fieldName">Value</td></tr><tr><td><pre class="constant-value"><code><a href="https://docs.python.org/3/library/logging.html#logging.getLogger" class="intersphinx-link">logging.getLogger</a>(<wbr></wbr>__name__)</code></pre></td></tr></table>
+  </div>
+</div><div class="basetypealias">
+  
+  
+  <a name="orionis.queues.worker.FailedResolver">
+    
+  </a>
+  <a name="FailedResolver">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <span class="py-defname">FailedResolver</span>: <code><a href="https://docs.python.org/3/library/typing.html#typing.TypeAlias" class="intersphinx-link">typing.TypeAlias</a></code> =
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/queues/worker.py#L25">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#FailedResolver" title="orionis.queues.worker.FailedResolver">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="functionBody">
+    
+    <div><p>Type alias for <tt class="rst-docutils rst-literal"><span class="pre">Callable[[],</span> Awaitable[IFailedJobRepository]]</tt>.</p></div>
+    <table class="valueTable"><tr class="fieldStart"><td class="fieldName">Value</td></tr><tr><td><pre class="constant-value"><code><a href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Callable" class="intersphinx-link">Callable</a>[<wbr></wbr>[], <wbr></wbr><a href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Awaitable" class="intersphinx-link">Awaitable</a>[<wbr></wbr><a href="orionis.queues.contracts.failed_repository.IFailedJobRepository.html" class="internal-link" title="orionis.queues.contracts.failed_repository.IFailedJobRepository">IFailedJobRepository</a>]]</code></pre></td></tr></table>
   </div>
 </div>
         </div>
@@ -2774,7 +2852,7 @@
   <div class="orionis-footer-inner">
     <div class="orionis-footer-copy">
       <p>API documentation for <a href="https://orionis-framework.com/" class="projecthome">Orionis</a>.</p>
-      <p class="orionis-footer-meta">Generated with <a href="https://github.com/twisted/pydoctor/">Pydoctor</a> 25.10.1.<span class="orionis-footer-build"> Built 2026-11-03 09:36:58.</span></p>
+      <p class="orionis-footer-meta">Generated with <a href="https://github.com/twisted/pydoctor/">Pydoctor</a> 25.10.1.<span class="orionis-footer-build"> Built 2026-11-03 13:00:15.</span></p>
     </div>
     <nav class="orionis-footer-links" aria-label="Additional resources">
       <a href="https://docs.orionis-framework.com">Read the guide <span aria-hidden="true">↗</span></a>

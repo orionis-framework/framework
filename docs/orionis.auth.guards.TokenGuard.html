@@ -149,7 +149,7 @@
       <div>
          
           <div class="childrenKindTitle">Contents</div>
-          <ul><li><a class="rst-internal rst-reference" href="#rst-concurrency" id="rst-toc-entry-5">Concurrency</a></li>
+          <ul><li><a class="rst-internal rst-reference" href="#rst-concurrency">Concurrency</a></li>
 </ul>
         
 
@@ -584,7 +584,7 @@
                     <div>
          
           <div class="childrenKindTitle">Contents</div>
-          <ul><li><a class="rst-internal rst-reference" href="#rst-concurrency" id="rst-toc-entry-6">Concurrency</a></li>
+          <ul><li><a class="rst-internal rst-reference" href="#rst-concurrency">Concurrency</a></li>
 </ul>
         
 
@@ -784,7 +784,7 @@
         </div>
 
         <div class="extrasDocstring">
-          <p class="class-signature"><code><span class="py-keyword">class</span> <span class="py-defname">TokenGuard</span>(IGuard): <a href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/auth/guards/token_guard.py#L11" class="sourceLink">(source)</a></code></p><p>Constructor: <code><a href="#__init__" class="internal-link" title="orionis.auth.guards.TokenGuard.__init__">TokenGuard(tokens, identities)</a></code></p><p><a href="classIndex.html#orionis.auth.guards.TokenGuard">View In Hierarchy</a></p>
+          <p class="class-signature"><code><span class="py-keyword">class</span> <span class="py-defname">TokenGuard</span>(IGuard): <a href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/auth/guards/token_guard.py#L13" class="sourceLink">(source)</a></code></p><p>Constructor: <code><a href="#__init__" class="internal-link" title="orionis.auth.guards.TokenGuard.__init__">TokenGuard(tokens, identities)</a></code></p><p><a href="classIndex.html#orionis.auth.guards.TokenGuard">View In Hierarchy</a></p>
         </div>
 
         <div class="moduleDocstring">
@@ -796,7 +796,7 @@ Authorization: Bearer &lt;token&gt;
 <p>Tokens are opaque, revocable and optionally expiring. No signed
 payload such as a JWT is involved, so revocation is immediate.</p>
 <div class="rst-section" id="rst-concurrency">
-<h2 class="heading"><a class="rst-toc-backref" href="#rst-toc-entry-4">Concurrency</a></h2>
+<h2 class="heading">Concurrency</h2>
 <p>The guard is stateless and safe as a singleton. The only write it
 performs is the <tt class="rst-docutils rst-literal">last_used_at</tt> update, issued as a single statement
 where the last writer legitimately wins.</p>
@@ -822,17 +822,17 @@ where the last writer legitimately wins.</p>
     
     <td>Class Variable</td>
     <td><code><a href="#__slots__" class="internal-link" title="orionis.auth.guards.TokenGuard.__slots__">__slots__</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
+    <td>Declare the instance attribute slots reserved by this class.</td>
   </tr><tr class="instancevariable">
     
     <td>Instance Variable</td>
     <td><code><a href="#__identities" class="internal-link" title="orionis.auth.guards.TokenGuard.__identities">__identities</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
+    <td>Provider turning a token owner into an identity.</td>
   </tr><tr class="instancevariable">
     
     <td>Instance Variable</td>
     <td><code><a href="#__tokens" class="internal-link" title="orionis.auth.guards.TokenGuard.__tokens">__tokens</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
+    <td>Store used to look tokens up and mark them as used.</td>
   </tr><tr class="property">
     
     <td>Property</td>
@@ -859,7 +859,7 @@ where the last writer legitimately wins.</p>
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">__init__</span><span class="function-signature">(<span class="rst-sig-param">self: <code>Self</code>, </span><span class="rst-sig-param">tokens: <code>IAccessTokenRepository</code>, </span><span class="rst-sig-param">identities: <code>IIdentityProvider</code></span>):</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/auth/guards/token_guard.py#L33">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/auth/guards/token_guard.py#L36">
       
       (source)
     </a>
@@ -871,7 +871,7 @@ where the last writer legitimately wins.</p>
   </div>
   <div class="docstring functionBody">
     
-    <div><p>Initialise the guard with its collaborators.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">tokens:</span><code><a href="orionis.auth.contracts.IAccessTokenRepository.html" class="internal-link" title="orionis.auth.contracts.IAccessTokenRepository">IAccessTokenRepository</a></code></td><td class="fieldArgDesc">Store used to look tokens up and mark them as used.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">identities:</span><code><a href="orionis.auth.contracts.IIdentityProvider.html" class="internal-link" title="orionis.auth.contracts.IIdentityProvider">IIdentityProvider</a></code></td><td class="fieldArgDesc">Provider turning a token owner into an identity.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">Only the collaborators are retained.</td></tr></table></div>
+    <div><p>Initialise the guard with its collaborators.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">tokens:</span><code><a href="orionis.auth.contracts.IAccessTokenRepository.html" class="internal-link">orionis.auth.contracts.IAccessTokenRepository</a></code></td><td class="fieldArgDesc">Store used to look tokens up and mark them as used.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">identities:</span><code><a href="orionis.auth.contracts.IIdentityProvider.html" class="internal-link">orionis.auth.contracts.IIdentityProvider</a></code></td><td class="fieldArgDesc">Provider turning a token owner into an identity.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">Only the collaborators are retained.</td></tr></table></div>
   </div>
 </div><div class="basemethod">
   
@@ -886,7 +886,7 @@ where the last writer legitimately wins.</p>
     
     
     <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">resolve</span><span class="function-signature">(<span class="rst-sig-param">self: <code>Self</code>, </span><span class="rst-sig-param">request: <code>Request</code></span>) -&gt; <code>GuardResult | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/auth/guards/token_guard.py#L68">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/auth/guards/token_guard.py#L73">
       
       (source)
     </a>
@@ -898,7 +898,7 @@ where the last writer legitimately wins.</p>
   </div>
   <div class="docstring functionBody">
     
-    <div><p>Resolve the identity owning the presented access token.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">request:</span><code><a href="orionis.http.Request.html" class="internal-link" title="orionis.http.Request">Request</a></code></td><td class="fieldArgDesc">Incoming HTTP request.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code>GuardResult | None</code></td><td class="fieldArgDesc">Resolved identity together with the abilities of the token,
+    <div><p>Resolve the identity owning the presented access token.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">request:</span><code><a href="orionis.http.Request.html" class="internal-link">orionis.http.Request</a></code></td><td class="fieldArgDesc">Incoming HTTP request.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code>orionis.auth.entities.GuardResult | None</code></td><td class="fieldArgDesc">Resolved identity together with the abilities of the token,
 or <tt class="rst-docutils rst-literal">None</tt> when the request carries no usable token.</td></tr></table></div>
   </div>
 </div><div class="baseclassvariable">
@@ -913,7 +913,7 @@ or <tt class="rst-docutils rst-literal">None</tt> when the request carries no us
   <div class="functionHeader">
     
     <span class="py-defname">__slots__</span>: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" class="intersphinx-link">tuple</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <wbr></wbr><span class="rst-variable-ellipsis">...</span>]</code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/auth/guards/token_guard.py#L31">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/auth/guards/token_guard.py#L33">
       
       (source)
     </a>
@@ -925,7 +925,7 @@ or <tt class="rst-docutils rst-literal">None</tt> when the request carries no us
   </div>
   <div class="functionBody">
     
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p>Declare the instance attribute slots reserved by this class.</p></div>
     
   </div>
 </div><div class="baseinstancevariable">
@@ -940,7 +940,7 @@ or <tt class="rst-docutils rst-literal">None</tt> when the request carries no us
   <div class="functionHeader">
     
     <span class="py-defname">__identities</span> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/auth/guards/token_guard.py#L54">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/auth/guards/token_guard.py#L58">
       
       (source)
     </a>
@@ -952,7 +952,7 @@ or <tt class="rst-docutils rst-literal">None</tt> when the request carries no us
   </div>
   <div class="functionBody">
     
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p>Provider turning a token owner into an identity.</p></div>
     
   </div>
 </div><div class="baseinstancevariable">
@@ -967,7 +967,7 @@ or <tt class="rst-docutils rst-literal">None</tt> when the request carries no us
   <div class="functionHeader">
     
     <span class="py-defname">__tokens</span> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/auth/guards/token_guard.py#L53">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/auth/guards/token_guard.py#L56">
       
       (source)
     </a>
@@ -979,7 +979,7 @@ or <tt class="rst-docutils rst-literal">None</tt> when the request carries no us
   </div>
   <div class="functionBody">
     
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p>Store used to look tokens up and mark them as used.</p></div>
     
   </div>
 </div><div class="baseproperty">
@@ -994,7 +994,7 @@ or <tt class="rst-docutils rst-literal">None</tt> when the request carries no us
   <div class="functionHeader">
     <div><span class="decorator">@<a href="https://docs.python.org/3/builtins/functions.html#property" class="intersphinx-link">property</a><br /></span></div>
     <span class="py-defname">name</span>: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/auth/guards/token_guard.py#L56">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/auth/guards/token_guard.py#L61">
       
       (source)
     </a>
@@ -1020,7 +1020,7 @@ or <tt class="rst-docutils rst-literal">None</tt> when the request carries no us
   <div class="orionis-footer-inner">
     <div class="orionis-footer-copy">
       <p>API documentation for <a href="https://orionis-framework.com/" class="projecthome">Orionis</a>.</p>
-      <p class="orionis-footer-meta">Generated with <a href="https://github.com/twisted/pydoctor/">Pydoctor</a> 25.10.1.<span class="orionis-footer-build"> Built 2026-11-03 09:36:58.</span></p>
+      <p class="orionis-footer-meta">Generated with <a href="https://github.com/twisted/pydoctor/">Pydoctor</a> 25.10.1.<span class="orionis-footer-build"> Built 2026-11-03 13:00:15.</span></p>
     </div>
     <nav class="orionis-footer-links" aria-label="Additional resources">
       <a href="https://docs.orionis-framework.com">Read the guide <span aria-hidden="true">↗</span></a>

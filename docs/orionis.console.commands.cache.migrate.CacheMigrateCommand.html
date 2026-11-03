@@ -410,7 +410,7 @@
         </div>
 
         <div class="extrasDocstring">
-          <p class="class-signature"><code><span class="py-keyword">class</span> <span class="py-defname">CacheMigrateCommand</span>(BaseCommand): <a href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/console/commands/cache/migrate.py#L8" class="sourceLink">(source)</a></code></p><p><a href="classIndex.html#orionis.console.commands.cache.migrate.CacheMigrateCommand">View In Hierarchy</a></p>
+          <p class="class-signature"><code><span class="py-keyword">class</span> <span class="py-defname">CacheMigrateCommand</span>(BaseCommand): <a href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/console/commands/cache/migrate.py#L10" class="sourceLink">(source)</a></code></p><p><a href="classIndex.html#orionis.console.commands.cache.migrate.CacheMigrateCommand">View In Hierarchy</a></p>
         </div>
 
         <div class="moduleDocstring">
@@ -430,22 +430,23 @@
     
     <td>Class Variable</td>
     <td><code><a href="#__slots__" class="internal-link" title="orionis.console.commands.cache.migrate.CacheMigrateCommand.__slots__">__slots__</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
+    <td>Declare that this class introduces no additional instance slots.</td>
   </tr><tr class="classvariable">
     
     <td>Class Variable</td>
     <td><code><a href="#description" class="internal-link" title="orionis.console.commands.cache.migrate.CacheMigrateCommand.description">description</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
+    <td><tt class="rst-docutils rst-literal">Create the configured database cache and lock
+tables.</tt>.</td>
   </tr><tr class="classvariable">
     
     <td>Class Variable</td>
     <td><code><a href="#signature" class="internal-link" title="orionis.console.commands.cache.migrate.CacheMigrateCommand.signature">signature</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
+    <td><tt class="rst-docutils rst-literal">cache:migrate</tt>.</td>
   </tr><tr class="classvariable">
     
     <td>Class Variable</td>
     <td><code><a href="#timestamps" class="internal-link" title="orionis.console.commands.cache.migrate.CacheMigrateCommand.timestamps">timestamps</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
+    <td>Timestamps flag used by <tt class="rst-docutils rst-literal">CacheMigrateCommand</tt>.</td>
   </tr>
 </table>
           
@@ -467,7 +468,7 @@
     
     
     <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">handle</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">app: <code>IApplication</code>, </span><span class="rst-sig-param">manager: <code>IConnectionManager</code></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/console/commands/cache/migrate.py#L19">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/console/commands/cache/migrate.py#L28">
       
       (source)
     </a>
@@ -479,7 +480,7 @@
   </div>
   <div class="docstring functionBody">
     
-    <div><p>Create database cache storage independently of the active cache driver.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">app:</span><code><a href="orionis.IApplication.html" class="internal-link" title="orionis.IApplication">IApplication</a></code></td><td class="fieldArgDesc">Application exposing the database cache configuration.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">manager:</span><code>IConnectionManager</code></td><td class="fieldArgDesc">Manager resolving the cache store's SQL connection.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code></td><td class="fieldArgDesc">Zero on success or one for missing configuration or database errors.</td></tr></table></div>
+    <div><p>Create database cache storage independently of the active cache driver.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">app:</span><code><a href="orionis.IApplication.html" class="internal-link">orionis.IApplication</a></code></td><td class="fieldArgDesc">Application exposing the database cache configuration.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">manager:</span><code><a href="orionis.database.contracts.IConnectionManager.html" class="internal-link">orionis.database.contracts.IConnectionManager</a></code></td><td class="fieldArgDesc">Manager resolving the cache store's SQL connection.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code></td><td class="fieldArgDesc">Zero on success or one for missing configuration or database errors.</td></tr></table></div>
   </div>
 </div><div class="baseclassvariable">
   
@@ -493,7 +494,7 @@
   <div class="functionHeader">
     
     <span class="py-defname">__slots__</span>: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" class="intersphinx-link">tuple</a></code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/console/commands/cache/migrate.py#L13">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/console/commands/cache/migrate.py#L15">
       
       (source)
     </a>
@@ -505,7 +506,7 @@
   </div>
   <div class="functionBody">
     
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p>Declare that this class introduces no additional instance slots.</p></div>
     
   </div>
 </div><div class="baseclassvariable">
@@ -520,7 +521,7 @@
   <div class="functionHeader">
     
     <span class="py-defname">description</span>: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/console/commands/cache/migrate.py#L17">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/console/commands/cache/migrate.py#L22">
       
       (source)
     </a>
@@ -532,7 +533,8 @@
   </div>
   <div class="functionBody">
     
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p><tt class="rst-docutils rst-literal">Create the configured database cache and lock
+tables.</tt>.</p></div>
     
   </div>
 </div><div class="baseclassvariable">
@@ -547,7 +549,7 @@
   <div class="functionHeader">
     
     <span class="py-defname">signature</span>: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/console/commands/cache/migrate.py#L16">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/console/commands/cache/migrate.py#L20">
       
       (source)
     </a>
@@ -559,7 +561,7 @@
   </div>
   <div class="functionBody">
     
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p><tt class="rst-docutils rst-literal">cache:migrate</tt>.</p></div>
     
   </div>
 </div><div class="baseclassvariable">
@@ -574,7 +576,7 @@
   <div class="functionHeader">
     
     <span class="py-defname">timestamps</span>: <code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/console/commands/cache/migrate.py#L15">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/console/commands/cache/migrate.py#L18">
       
       (source)
     </a>
@@ -586,7 +588,7 @@
   </div>
   <div class="functionBody">
     
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p>Timestamps flag used by <tt class="rst-docutils rst-literal">CacheMigrateCommand</tt>.</p></div>
     
   </div>
 </div>
@@ -600,7 +602,7 @@
   <div class="orionis-footer-inner">
     <div class="orionis-footer-copy">
       <p>API documentation for <a href="https://orionis-framework.com/" class="projecthome">Orionis</a>.</p>
-      <p class="orionis-footer-meta">Generated with <a href="https://github.com/twisted/pydoctor/">Pydoctor</a> 25.10.1.<span class="orionis-footer-build"> Built 2026-11-03 09:36:58.</span></p>
+      <p class="orionis-footer-meta">Generated with <a href="https://github.com/twisted/pydoctor/">Pydoctor</a> 25.10.1.<span class="orionis-footer-build"> Built 2026-11-03 13:00:15.</span></p>
     </div>
     <nav class="orionis-footer-links" aria-label="Additional resources">
       <a href="https://docs.orionis-framework.com">Read the guide <span aria-hidden="true">↗</span></a>

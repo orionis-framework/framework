@@ -341,7 +341,7 @@
                     
                 </label>
 
-                <code><a href="orionis.database.schema.blueprint.html" class="internal-link" title="orionis.database.schema.blueprint">blueprint</a></code>
+                <code><a href="orionis.database.schema.blueprint.module.html" class="internal-link" title="orionis.database.schema.blueprint">blueprint</a></code>
 
                 <div class="expandableContent">
                     <div>
@@ -387,7 +387,7 @@
                     
                 </label>
 
-                <code><a href="orionis.database.schema.column.html" class="internal-link" title="orionis.database.schema.column">column</a></code>
+                <code><a href="orionis.database.schema.column.module.html" class="internal-link" title="orionis.database.schema.column">column</a></code>
 
                 <div class="expandableContent">
                     <div>
@@ -433,7 +433,7 @@
                     
                 </label>
 
-                <code><a href="orionis.database.schema.comment.html" class="internal-link" title="orionis.database.schema.comment">comment</a></code>
+                <code><a href="orionis.database.schema.comment.module.html" class="internal-link" title="orionis.database.schema.comment">comment</a></code>
 
                 <div class="expandableContent">
                     <div>
@@ -533,7 +533,7 @@
                     
                 </input>
 
-                <label class="lbl-toggle notExpandable" for="">
+                <label class="lbl-toggle" for="expandableItemId5630">
                     
                     
                 </label>
@@ -556,8 +556,21 @@
         
          
 
+        <div class="childrenKindTitle">Variables</div>
+        <ul>
+    
+    <li class="">
         
-         
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.database.schema.definitions.html#SchemaDefinition" class="internal-link" title="orionis.database.schema.definitions.SchemaDefinition"><wbr></wbr>Schema<wbr></wbr>Definition</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
 
         
          
@@ -630,7 +643,7 @@
                     
                 </label>
 
-                <code><a href="orionis.database.schema.index.html" class="internal-link" title="orionis.database.schema.index">index</a></code>
+                <code><a href="orionis.database.schema.index.module.html" class="internal-link" title="orionis.database.schema.index">index</a></code>
 
                 <div class="expandableContent">
                     <div>
@@ -886,7 +899,7 @@
                     
                 </label>
 
-                <code><a href="orionis.database.schema.unique.html" class="internal-link" title="orionis.database.schema.unique">unique</a></code>
+                <code><a href="orionis.database.schema.unique.module.html" class="internal-link" title="orionis.database.schema.unique">unique</a></code>
 
                 <div class="expandableContent">
                     <div>
@@ -2101,7 +2114,7 @@
         </div>
 
         <div class="extrasDocstring">
-          <p class="class-signature"><code><span class="py-keyword">class</span> <span class="py-defname">Blueprint</span>: <a href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/database/schema/blueprint.py#L14" class="sourceLink">(source)</a></code></p><p>Constructor: <code><a href="#__init__" class="internal-link" title="orionis.database.schema.Blueprint.__init__">Blueprint()</a></code></p><p><a href="classIndex.html#orionis.database.schema.Blueprint">View In Hierarchy</a></p>
+          <p class="class-signature"><code><span class="py-keyword">class</span> <span class="py-defname">Blueprint</span>: <a href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/database/schema/blueprint.py#L16" class="sourceLink">(source)</a></code></p><p>Constructor: <code><a href="#__init__" class="internal-link" title="orionis.database.schema.Blueprint.__init__">Blueprint()</a></code></p><p><a href="classIndex.html#orionis.database.schema.Blueprint">View In Hierarchy</a></p>
         </div>
 
         <div class="moduleDocstring">
@@ -2118,14 +2131,14 @@ same way, via <tt class="rst-docutils rst-literal"><span class="pre">table.comme
         </div>
 
         <div id="split-tables">
-          <table class="children sortable" id="id559">
+          <table class="children sortable" id="id560">
   
   
   <tr class="method">
     
     <td>Method</td>
     <td><code><a href="#__getattr__" class="internal-link" title="orionis.database.schema.Blueprint.__getattr__">__getattr__</a></code></td>
-    <td>Proxy a column-factory call to <code><a href="orionis.database.schema.Column.html" class="internal-link" title="orionis.database.schema.Column">Column</a></code>, recording it.</td>
+    <td>Proxy and record a schema column-factory call.</td>
   </tr><tr class="method">
     
     <td>Method</td>
@@ -2175,22 +2188,22 @@ same way, via <tt class="rst-docutils rst-literal"><span class="pre">table.comme
     
     <td>Class Variable</td>
     <td><code><a href="#__slots__" class="internal-link" title="orionis.database.schema.Blueprint.__slots__">__slots__</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
+    <td>Declare the instance attribute slots reserved by this class.</td>
   </tr><tr class="instancevariable">
     
     <td>Instance Variable</td>
     <td><code><a href="#__columns" class="internal-link" title="orionis.database.schema.Blueprint.__columns">__columns</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
+    <td>Column definitions included in the table schema.</td>
   </tr><tr class="instancevariable">
     
     <td>Instance Variable</td>
     <td><code><a href="#__constraints" class="internal-link" title="orionis.database.schema.Blueprint.__constraints">__constraints</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
+    <td>Constraints declared for the table schema.</td>
   </tr><tr class="instancevariable">
     
     <td>Instance Variable</td>
     <td><code><a href="#__factory_cache" class="internal-link" title="orionis.database.schema.Blueprint.__factory_cache">__factory<wbr></wbr>_cache</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
+    <td>Cached factories for constructing schema definitions.</td>
   </tr>
 </table>
           
@@ -2212,7 +2225,7 @@ same way, via <tt class="rst-docutils rst-literal"><span class="pre">table.comme
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">__getattr__</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">name: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></span>) -&gt; <code>Callable[<wbr></wbr><span class="rst-variable-ellipsis">...</span>, <wbr></wbr>ColumnDefinition]</code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/database/schema/blueprint.py#L45">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/database/schema/blueprint.py#L51">
       
       (source)
     </a>
@@ -2224,12 +2237,12 @@ same way, via <tt class="rst-docutils rst-literal"><span class="pre">table.comme
   </div>
   <div class="docstring functionBody">
     
-    <div><p>Proxy a column-factory call to <code><a href="orionis.database.schema.Column.html" class="internal-link" title="orionis.database.schema.Column">Column</a></code>, recording it.</p>
+    <div><p>Proxy and record a schema column-factory call.</p>
 <p>This is what powers calls such as <tt class="rst-docutils rst-literal"><span class="pre">table.string("username")</span></tt> or
 <tt class="rst-docutils rst-literal"><span class="pre">table.boolean("is_admin")</span></tt>: any factory exposed by
-<code><a href="orionis.database.schema.Column.html" class="internal-link" title="orionis.database.schema.Column">Column</a></code> becomes available on the blueprint, and the
-resulting column is appended to this table automatically.</p>
-<table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">name:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Name of the <tt class="rst-docutils rst-literal">Column</tt> factory method being invoked.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code>Callable[..., <a href="orionis.orm.schema.column.ColumnDefinition.html" class="internal-link" title="orionis.orm.schema.column.ColumnDefinition">ColumnDefinition</a>]</code></td><td class="fieldArgDesc">Wrapper that builds the column and appends it to this table.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/exceptions.html#AttributeError" class="intersphinx-link">AttributeError</a></code></td><td>If <tt class="rst-docutils rst-literal">name</tt> does not match a known <tt class="rst-docutils rst-literal">Column</tt> factory method.</td></tr></table></div>
+<code><a href="orionis.database.schema.Column.html" class="internal-link">orionis.database.schema.Column</a></code> becomes available on the blueprint,
+and the resulting column is appended to this table automatically.</p>
+<table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">name:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Name of the <tt class="rst-docutils rst-literal">Column</tt> factory method being invoked.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Callable" class="intersphinx-link">collections.abc.Callable</a>[<tt class="rst-docutils rst-literal">...</tt>, <a href="orionis.orm.schema.column.ColumnDefinition.html" class="internal-link">orionis.orm.schema.column.ColumnDefinition</a>]</code></td><td class="fieldArgDesc">Wrapper that builds the column and appends it to this table.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/exceptions.html#AttributeError" class="intersphinx-link">AttributeError</a></code></td><td>If <tt class="rst-docutils rst-literal">name</tt> does not match a known <tt class="rst-docutils rst-literal">Column</tt> factory method.</td></tr></table></div>
   </div>
 </div><div class="basemethod">
   
@@ -2244,7 +2257,7 @@ resulting column is appended to this table automatically.</p>
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">__init__</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>):</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/database/schema/blueprint.py#L30">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/database/schema/blueprint.py#L33">
       
       (source)
     </a>
@@ -2271,7 +2284,7 @@ resulting column is appended to this table automatically.</p>
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">columns</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" class="intersphinx-link">tuple</a>[<wbr></wbr>ColumnDefinition, <wbr></wbr><span class="rst-variable-ellipsis">...</span>]</code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/database/schema/blueprint.py#L234">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/database/schema/blueprint.py#L240">
       
       (source)
     </a>
@@ -2283,7 +2296,7 @@ resulting column is appended to this table automatically.</p>
   </div>
   <div class="docstring functionBody">
     
-    <div><p>Return the columns declared so far, in declaration order.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" class="intersphinx-link">tuple</a> of <a href="orionis.orm.schema.column.ColumnDefinition.html" class="internal-link" title="orionis.orm.schema.column.ColumnDefinition">ColumnDefinition</a></code></td><td class="fieldArgDesc">Snapshot of every column recorded on this blueprint.</td></tr></table></div>
+    <div><p>Return the columns declared so far, in declaration order.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" class="intersphinx-link">tuple</a> of <a href="orionis.orm.schema.column.ColumnDefinition.html" class="internal-link">orionis.orm.schema.column.ColumnDefinition</a></code></td><td class="fieldArgDesc">Snapshot of every column recorded on this blueprint.</td></tr></table></div>
   </div>
 </div><div class="basemethod">
   
@@ -2298,7 +2311,7 @@ resulting column is appended to this table automatically.</p>
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">comment</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">text: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></span>) -&gt; <code><a href="orionis.database.schema.Comment.html" class="internal-link" title="orionis.database.schema.Comment">Comment</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/database/schema/blueprint.py#L119">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/database/schema/blueprint.py#L125">
       
       (source)
     </a>
@@ -2310,7 +2323,7 @@ resulting column is appended to this table automatically.</p>
   </div>
   <div class="docstring functionBody">
     
-    <div><p>Attach a table-level comment.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">text:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">The comment text content.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.database.schema.Comment.html" class="internal-link" title="orionis.database.schema.Comment">Comment</a></code></td><td class="fieldArgDesc">The constraint recorded on this blueprint.</td></tr></table></div>
+    <div><p>Attach a table-level comment.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">text:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">The comment text content.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.database.schema.Comment.html" class="internal-link">orionis.database.schema.Comment</a></code></td><td class="fieldArgDesc">The constraint recorded on this blueprint.</td></tr></table></div>
   </div>
 </div><div class="basemethod">
   
@@ -2325,7 +2338,7 @@ resulting column is appended to this table automatically.</p>
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">definitions</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" class="intersphinx-link">tuple</a>[<wbr></wbr>ColumnDefinition | <a href="orionis.database.schema.Comment.html" class="internal-link" title="orionis.database.schema.Comment">Comment</a> | <a href="orionis.database.schema.ForeignKey.html" class="internal-link" title="orionis.database.schema.ForeignKey">ForeignKey</a> | <a href="orionis.database.schema.Index.html" class="internal-link" title="orionis.database.schema.Index">Index</a> | <a href="orionis.database.schema.PrimaryKey.html" class="internal-link" title="orionis.database.schema.PrimaryKey">PrimaryKey</a> | <a href="orionis.database.schema.Unique.html" class="internal-link" title="orionis.database.schema.Unique">Unique</a>, <wbr></wbr><span class="rst-variable-ellipsis">...</span>]</code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/database/schema/blueprint.py#L245">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/database/schema/blueprint.py#L251">
       
       (source)
     </a>
@@ -2353,7 +2366,7 @@ recorded on this blueprint.</td></tr></table></div>
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">foreignKey</span><span class="function-signature long-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">column: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code>, </span><span class="rst-sig-param">ref_table: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code>, </span><span class="rst-sig-param">ref_column: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code>, </span><span class="rst-sig-param">name: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a> | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code> = <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></span>) -&gt; <code><a href="orionis.database.schema.ForeignKey.html" class="internal-link" title="orionis.database.schema.ForeignKey">ForeignKey</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/database/schema/blueprint.py#L137">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/database/schema/blueprint.py#L143">
       
       (source)
     </a>
@@ -2365,7 +2378,7 @@ recorded on this blueprint.</td></tr></table></div>
   </div>
   <div class="docstring functionBody">
     
-    <div><p>Declare a foreign key constraint on this table.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">column:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">The local column name.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">ref<wbr></wbr>_table:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">The referenced table name.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">ref<wbr></wbr>_column:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">The referenced column name.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">name:</span><code>str | None, <em>optional</em></code></td><td class="fieldArgDesc">The constraint name. Defaults to None.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.database.schema.ForeignKey.html" class="internal-link" title="orionis.database.schema.ForeignKey">ForeignKey</a></code></td><td class="fieldArgDesc">The constraint recorded on this blueprint.</td></tr></table></div>
+    <div><p>Declare a foreign key constraint on this table.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">column:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">The local column name.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">ref<wbr></wbr>_table:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">The referenced table name.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">ref<wbr></wbr>_column:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">The referenced column name.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">name:</span><code>str | None, <em>optional</em></code></td><td class="fieldArgDesc">The constraint name. Defaults to None.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.database.schema.ForeignKey.html" class="internal-link">orionis.database.schema.ForeignKey</a></code></td><td class="fieldArgDesc">The constraint recorded on this blueprint.</td></tr></table></div>
   </div>
 </div><div class="basemethod">
   
@@ -2380,7 +2393,7 @@ recorded on this blueprint.</td></tr></table></div>
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">index</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">*columns: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code>, </span><span class="rst-sig-param">name: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a> | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code> = <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a>, </span><span class="rst-sig-param">unique: <code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code> = <a href="https://docs.python.org/3/builtins/constants.html#False" class="intersphinx-link">False</a></span>) -&gt; <code><a href="orionis.database.schema.Index.html" class="internal-link" title="orionis.database.schema.Index">Index</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/database/schema/blueprint.py#L167">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/database/schema/blueprint.py#L173">
       
       (source)
     </a>
@@ -2393,7 +2406,7 @@ recorded on this blueprint.</td></tr></table></div>
   <div class="docstring functionBody">
     
     <div><p>Declare an index over one or more columns.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">*columns:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Column names to include in the index.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">name:</span><code>str | None, <em>optional</em></code></td><td class="fieldArgDesc">Name of the index. If not provided, a default name will be
-generated.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">unique:</span><code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a>, <em>optional</em></code></td><td class="fieldArgDesc">Whether the index should enforce uniqueness. Default is False.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.database.schema.Index.html" class="internal-link" title="orionis.database.schema.Index">Index</a></code></td><td class="fieldArgDesc">The constraint recorded on this blueprint.</td></tr></table></div>
+generated.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">unique:</span><code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a>, <em>optional</em></code></td><td class="fieldArgDesc">Whether the index should enforce uniqueness. Default is False.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.database.schema.Index.html" class="internal-link">orionis.database.schema.Index</a></code></td><td class="fieldArgDesc">The constraint recorded on this blueprint.</td></tr></table></div>
   </div>
 </div><div class="basemethod">
   
@@ -2408,7 +2421,7 @@ generated.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">uni
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">primaryKey</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">*columns: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></span>) -&gt; <code><a href="orionis.database.schema.PrimaryKey.html" class="internal-link" title="orionis.database.schema.PrimaryKey">PrimaryKey</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/database/schema/blueprint.py#L195">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/database/schema/blueprint.py#L201">
       
       (source)
     </a>
@@ -2420,7 +2433,7 @@ generated.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">uni
   </div>
   <div class="docstring functionBody">
     
-    <div><p>Declare a (composite) primary key over one or more columns.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">*columns:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Column names that compose the primary key.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.database.schema.PrimaryKey.html" class="internal-link" title="orionis.database.schema.PrimaryKey">PrimaryKey</a></code></td><td class="fieldArgDesc">The constraint recorded on this blueprint.</td></tr></table></div>
+    <div><p>Declare a (composite) primary key over one or more columns.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">*columns:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Column names that compose the primary key.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.database.schema.PrimaryKey.html" class="internal-link">orionis.database.schema.PrimaryKey</a></code></td><td class="fieldArgDesc">The constraint recorded on this blueprint.</td></tr></table></div>
   </div>
 </div><div class="basemethod">
   
@@ -2435,7 +2448,7 @@ generated.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">uni
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">timestamps</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-symbol">*, </span><span class="rst-sig-param">timezone: <code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code> = <a href="https://docs.python.org/3/builtins/constants.html#False" class="intersphinx-link">False</a></span>):</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/database/schema/blueprint.py#L102">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/database/schema/blueprint.py#L108">
       
       (source)
     </a>
@@ -2462,7 +2475,7 @@ generated.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">uni
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">unique</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">*columns: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code>, </span><span class="rst-sig-param">name: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a> | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code> = <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></span>) -&gt; <code><a href="orionis.database.schema.Unique.html" class="internal-link" title="orionis.database.schema.Unique">Unique</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/database/schema/blueprint.py#L213">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/database/schema/blueprint.py#L219">
       
       (source)
     </a>
@@ -2475,7 +2488,7 @@ generated.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">uni
   <div class="docstring functionBody">
     
     <div><p>Declare a unique constraint over one or more columns.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">*columns:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Column names to apply the unique constraint to.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">name:</span><code>str | None, <em>optional</em></code></td><td class="fieldArgDesc">Name of the unique constraint. If not provided, a default
-name will be generated.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.database.schema.Unique.html" class="internal-link" title="orionis.database.schema.Unique">Unique</a></code></td><td class="fieldArgDesc">The constraint recorded on this blueprint.</td></tr></table></div>
+name will be generated.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.database.schema.Unique.html" class="internal-link">orionis.database.schema.Unique</a></code></td><td class="fieldArgDesc">The constraint recorded on this blueprint.</td></tr></table></div>
   </div>
 </div><div class="baseclassvariable">
   
@@ -2489,7 +2502,7 @@ name will be generated.</td></tr></table><table class="fieldTable"><tr class="fi
   <div class="functionHeader">
     
     <span class="py-defname">__slots__</span>: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" class="intersphinx-link">tuple</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <wbr></wbr><span class="rst-variable-ellipsis">...</span>]</code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/database/schema/blueprint.py#L28">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/database/schema/blueprint.py#L30">
       
       (source)
     </a>
@@ -2501,7 +2514,7 @@ name will be generated.</td></tr></table><table class="fieldTable"><tr class="fi
   </div>
   <div class="functionBody">
     
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p>Declare the instance attribute slots reserved by this class.</p></div>
     
   </div>
 </div><div class="baseinstancevariable">
@@ -2516,7 +2529,7 @@ name will be generated.</td></tr></table><table class="fieldTable"><tr class="fi
   <div class="functionHeader">
     
     <span class="py-defname">__columns</span>: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#list" class="intersphinx-link">list</a>[<wbr></wbr>ColumnDefinition]</code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/database/schema/blueprint.py#L39">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/database/schema/blueprint.py#L42">
       
       (source)
     </a>
@@ -2528,7 +2541,7 @@ name will be generated.</td></tr></table><table class="fieldTable"><tr class="fi
   </div>
   <div class="functionBody">
     
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p>Column definitions included in the table schema.</p></div>
     
   </div>
 </div><div class="baseinstancevariable">
@@ -2543,7 +2556,7 @@ name will be generated.</td></tr></table><table class="fieldTable"><tr class="fi
   <div class="functionHeader">
     
     <span class="py-defname">__constraints</span>: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#list" class="intersphinx-link">list</a>[<wbr></wbr><a href="orionis.database.schema.Comment.html" class="internal-link" title="orionis.database.schema.Comment">Comment</a> | <a href="orionis.database.schema.ForeignKey.html" class="internal-link" title="orionis.database.schema.ForeignKey">ForeignKey</a> | <a href="orionis.database.schema.Index.html" class="internal-link" title="orionis.database.schema.Index">Index</a> | <a href="orionis.database.schema.PrimaryKey.html" class="internal-link" title="orionis.database.schema.PrimaryKey">PrimaryKey</a> | <a href="orionis.database.schema.Unique.html" class="internal-link" title="orionis.database.schema.Unique">Unique</a>]</code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/database/schema/blueprint.py#L40">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/database/schema/blueprint.py#L44">
       
       (source)
     </a>
@@ -2555,7 +2568,7 @@ name will be generated.</td></tr></table><table class="fieldTable"><tr class="fi
   </div>
   <div class="functionBody">
     
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p>Constraints declared for the table schema.</p></div>
     
   </div>
 </div><div class="baseinstancevariable">
@@ -2570,7 +2583,7 @@ name will be generated.</td></tr></table><table class="fieldTable"><tr class="fi
   <div class="functionHeader">
     
     <span class="py-defname">__factory_cache</span>: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#dict" class="intersphinx-link">dict</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <wbr></wbr>Callable[<wbr></wbr><span class="rst-variable-ellipsis">...</span>, <wbr></wbr>ColumnDefinition]]</code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/database/schema/blueprint.py#L43">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/database/schema/blueprint.py#L48">
       
       (source)
     </a>
@@ -2582,7 +2595,7 @@ name will be generated.</td></tr></table><table class="fieldTable"><tr class="fi
   </div>
   <div class="functionBody">
     
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p>Cached factories for constructing schema definitions.</p></div>
     
   </div>
 </div>
@@ -2596,7 +2609,7 @@ name will be generated.</td></tr></table><table class="fieldTable"><tr class="fi
   <div class="orionis-footer-inner">
     <div class="orionis-footer-copy">
       <p>API documentation for <a href="https://orionis-framework.com/" class="projecthome">Orionis</a>.</p>
-      <p class="orionis-footer-meta">Generated with <a href="https://github.com/twisted/pydoctor/">Pydoctor</a> 25.10.1.<span class="orionis-footer-build"> Built 2026-11-03 09:36:58.</span></p>
+      <p class="orionis-footer-meta">Generated with <a href="https://github.com/twisted/pydoctor/">Pydoctor</a> 25.10.1.<span class="orionis-footer-build"> Built 2026-11-03 13:00:15.</span></p>
     </div>
     <nav class="orionis-footer-links" aria-label="Additional resources">
       <a href="https://docs.orionis-framework.com">Read the guide <span aria-hidden="true">↗</span></a>

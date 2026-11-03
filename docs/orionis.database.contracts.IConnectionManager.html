@@ -1099,11 +1099,11 @@
         </div>
 
         <div class="extrasDocstring">
-          <p class="class-signature"><code><span class="py-keyword">class</span> <span class="py-defname">IConnectionManager</span>(ABC): <a href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/database/contracts/connection_manager.py#L8" class="sourceLink">(source)</a></code></p><p>Known subclasses: <code><a href="orionis.database.ConnectionManager.html" class="internal-link">orionis.database.ConnectionManager</a></code></p><p><a href="classIndex.html#orionis.database.contracts.IConnectionManager">View In Hierarchy</a></p>
+          <p class="class-signature"><code><span class="py-keyword">class</span> <span class="py-defname">IConnectionManager</span>(ABC): <a href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/database/contracts/connection_manager.py#L10" class="sourceLink">(source)</a></code></p><p>Known subclasses: <code><a href="orionis.database.ConnectionManager.html" class="internal-link">orionis.database.ConnectionManager</a></code></p><p><a href="classIndex.html#orionis.database.contracts.IConnectionManager">View In Hierarchy</a></p>
         </div>
 
         <div class="moduleDocstring">
-          <div><p class="undocumented">Undocumented</p></div>
+          <div><p>Define the contract for connection manager implementations.</p></div>
         </div>
 
         <div id="split-tables">
@@ -1149,7 +1149,7 @@
     
     <td>Class Variable</td>
     <td><code><a href="#__slots__" class="internal-link" title="orionis.database.contracts.IConnectionManager.__slots__">__slots__</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
+    <td>Declare that this class introduces no additional instance slots.</td>
   </tr>
 </table>
           
@@ -1171,7 +1171,7 @@
     
     <div><span class="decorator">@abstractmethod<br /></span></div>
     <span class="py-keyword">def</span>&#160;<span class="py-defname">addConnection</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">name: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code>, </span><span class="rst-sig-param">config: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#dict" class="intersphinx-link">dict</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <wbr></wbr>Any]</code></span>):</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/database/contracts/connection_manager.py#L36">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/database/contracts/connection_manager.py#L40">
       
       (source)
     </a>
@@ -1185,7 +1185,8 @@
     <div class="interfaceinfo">overridden in <code><a href="orionis.database.ConnectionManager.html" class="internal-link">orionis.database.ConnectionManager</a></code></div>
     <div><p>Register or replace a named connection configuration at runtime.</p>
 <p>A live connection built from a previous configuration keeps
-serving until <code><a href="#disconnect" class="internal-link" title="orionis.database.contracts.IConnectionManager.disconnect">disconnect</a></code> is called for that name.</p>
+serving until <code><a href="#disconnect" class="internal-link">orionis.database.contracts.IConnectionManager.disconnect</a></code>
+is called for that name.</p>
 <table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">name:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Connection name to register.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">config:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#dict" class="intersphinx-link">dict</a></code></td><td class="fieldArgDesc">Driver configuration for the connection.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">This method does not return a value.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/exceptions.html#ValueError" class="intersphinx-link">ValueError</a></code></td><td>If the name is empty.</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/exceptions.html#TypeError" class="intersphinx-link">TypeError</a></code></td><td>If the configuration is not a mapping.</td></tr></table></div>
   </div>
 </div><div class="basemethod">
@@ -1201,7 +1202,7 @@ serving until <code><a href="#disconnect" class="internal-link" title="orionis.d
     
     <div><span class="decorator">@abstractmethod<br /></span></div>
     <span class="py-keyword">def</span>&#160;<span class="py-defname">configFor</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">name: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a> | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code> = <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/stdtypes.html#dict" class="intersphinx-link">dict</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <wbr></wbr>Any]</code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/database/contracts/connection_manager.py#L130">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/database/contracts/connection_manager.py#L135">
       
       (source)
     </a>
@@ -1214,7 +1215,7 @@ serving until <code><a href="#disconnect" class="internal-link" title="orionis.d
   <div class="docstring functionBody">
     <div class="interfaceinfo">overridden in <code><a href="orionis.database.ConnectionManager.html" class="internal-link">orionis.database.ConnectionManager</a></code></div>
     <div><p>Retrieve the configuration for a named connection.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">name:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a> or <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a>, <em>optional</em></code></td><td class="fieldArgDesc">Connection name as declared in the database configuration,
-or <tt class="rst-docutils rst-literal">None</tt> for the default connection.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/stdtypes.html#dict" class="intersphinx-link">dict</a></code></td><td class="fieldArgDesc">The driver configuration for the connection.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code>ConnectionNotFoundException</code></td><td>If the connection is not declared in the configuration.</td></tr></table></div>
+or <tt class="rst-docutils rst-literal">None</tt> for the default connection.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/stdtypes.html#dict" class="intersphinx-link">dict</a></code></td><td class="fieldArgDesc">The driver configuration for the connection.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.database.ConnectionNotFoundException.html" class="internal-link">orionis.database.ConnectionNotFoundException</a></code></td><td>If the connection is not declared in the configuration.</td></tr></table></div>
   </div>
 </div><div class="basemethod">
   
@@ -1229,7 +1230,7 @@ or <tt class="rst-docutils rst-literal">None</tt> for the default connection.</t
     
     <div><span class="decorator">@abstractmethod<br /></span></div>
     <span class="py-keyword">def</span>&#160;<span class="py-defname">connection</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">name: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a> | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code> = <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></span>) -&gt; <code><a href="orionis.database.contracts.IConnection.html" class="internal-link" title="orionis.database.contracts.IConnection">IConnection</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/database/contracts/connection_manager.py#L12">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/database/contracts/connection_manager.py#L16">
       
       (source)
     </a>
@@ -1244,7 +1245,7 @@ or <tt class="rst-docutils rst-literal">None</tt> for the default connection.</t
     <div><p>Resolve the connection registered under the given name.</p>
 <p>The connection is built on first access and cached for reuse.</p>
 <table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">name:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a> or <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a>, <em>optional</em></code></td><td class="fieldArgDesc">Connection name as declared in the database configuration,
-or <tt class="rst-docutils rst-literal">None</tt> for the default connection.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.database.contracts.IConnection.html" class="internal-link" title="orionis.database.contracts.IConnection">IConnection</a></code></td><td class="fieldArgDesc">Connection bound to its configuration.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code>ConnectionNotFoundException</code></td><td>If the connection is not declared in the configuration.</td></tr></table></div>
+or <tt class="rst-docutils rst-literal">None</tt> for the default connection.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.database.contracts.IConnection.html" class="internal-link">orionis.database.contracts.IConnection</a></code></td><td class="fieldArgDesc">Connection bound to its configuration.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.database.ConnectionNotFoundException.html" class="internal-link">orionis.database.ConnectionNotFoundException</a></code></td><td>If the connection is not declared in the configuration.</td></tr></table></div>
   </div>
 </div><div class="basemethod">
   
@@ -1259,7 +1260,7 @@ or <tt class="rst-docutils rst-literal">None</tt> for the default connection.</t
     
     <div><span class="decorator">@abstractmethod<br /></span></div>
     <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">disconnect</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">name: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a> | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code> = <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></span>):</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/database/contracts/connection_manager.py#L113">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/database/contracts/connection_manager.py#L118">
       
       (source)
     </a>
@@ -1287,7 +1288,7 @@ connection.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><t
     
     <div><span class="decorator">@abstractmethod<br /></span></div>
     <span class="py-keyword">def</span>&#160;<span class="py-defname">getDefaultName</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/database/contracts/connection_manager.py#L80">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/database/contracts/connection_manager.py#L85">
       
       (source)
     </a>
@@ -1314,7 +1315,7 @@ connection.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><t
     
     <div><span class="decorator">@abstractmethod<br /></span></div>
     <span class="py-keyword">def</span>&#160;<span class="py-defname">hasConnection</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">name: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/database/contracts/connection_manager.py#L64">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/database/contracts/connection_manager.py#L69">
       
       (source)
     </a>
@@ -1341,7 +1342,7 @@ connection.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><t
     
     <div><span class="decorator">@abstractmethod<br /></span></div>
     <span class="py-keyword">def</span>&#160;<span class="py-defname">setDefaultName</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">name: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></span>):</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/database/contracts/connection_manager.py#L91">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/database/contracts/connection_manager.py#L96">
       
       (source)
     </a>
@@ -1354,7 +1355,7 @@ connection.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><t
   <div class="docstring functionBody">
     <div class="interfaceinfo">overridden in <code><a href="orionis.database.ConnectionManager.html" class="internal-link">orionis.database.ConnectionManager</a></code></div>
     <div><p>Change the default connection name.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">name:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Connection name to use as the default; must already be
-declared in the configuration.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">This method does not return a value.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code>ConnectionNotFoundException</code></td><td>If the connection is not declared in the configuration.</td></tr></table></div>
+declared in the configuration.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">This method does not return a value.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.database.ConnectionNotFoundException.html" class="internal-link">orionis.database.ConnectionNotFoundException</a></code></td><td>If the connection is not declared in the configuration.</td></tr></table></div>
   </div>
 </div><div class="baseclassvariable">
   
@@ -1368,7 +1369,7 @@ declared in the configuration.</td></tr></table><table class="fieldTable"><tr cl
   <div class="functionHeader">
     
     <span class="py-defname">__slots__</span>: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" class="intersphinx-link">tuple</a></code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/database/contracts/connection_manager.py#L10">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/database/contracts/connection_manager.py#L13">
       
       (source)
     </a>
@@ -1380,7 +1381,7 @@ declared in the configuration.</td></tr></table><table class="fieldTable"><tr cl
   </div>
   <div class="functionBody">
     <div class="interfaceinfo">overridden in <code><a href="orionis.database.ConnectionManager.html" class="internal-link">orionis.database.ConnectionManager</a></code></div>
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p>Declare that this class introduces no additional instance slots.</p></div>
     
   </div>
 </div>
@@ -1394,7 +1395,7 @@ declared in the configuration.</td></tr></table><table class="fieldTable"><tr cl
   <div class="orionis-footer-inner">
     <div class="orionis-footer-copy">
       <p>API documentation for <a href="https://orionis-framework.com/" class="projecthome">Orionis</a>.</p>
-      <p class="orionis-footer-meta">Generated with <a href="https://github.com/twisted/pydoctor/">Pydoctor</a> 25.10.1.<span class="orionis-footer-build"> Built 2026-11-03 09:36:58.</span></p>
+      <p class="orionis-footer-meta">Generated with <a href="https://github.com/twisted/pydoctor/">Pydoctor</a> 25.10.1.<span class="orionis-footer-build"> Built 2026-11-03 13:00:15.</span></p>
     </div>
     <nav class="orionis-footer-links" aria-label="Additional resources">
       <a href="https://docs.orionis-framework.com">Read the guide <span aria-hidden="true">↗</span></a>

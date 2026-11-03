@@ -3755,15 +3755,17 @@
         </div>
 
         <div class="extrasDocstring">
-          <a href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/orm/query/expressions.py" class="sourceLink">(source)</a>
+          <a href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/orm/query/expressions.py" class="sourceLink">(source)</a>
         </div>
 
         <div class="moduleDocstring">
-          <div><p class="undocumented">Undocumented</p></div>
+          <div><p>Provide orm query operations.</p>
+<p>Includes <tt class="rst-docutils rst-literal">WhereType</tt>, <tt class="rst-docutils rst-literal">LockMode</tt>, <tt class="rst-docutils rst-literal">SortDirection</tt>, <tt class="rst-docutils rst-literal">AggregateFunction</tt>.</p>
+</div>
         </div>
 
         <div id="split-tables">
-          <table class="children sortable" id="id1587">
+          <table class="children sortable" id="id1593">
   
   
   <tr class="class">
@@ -3805,12 +3807,12 @@
     
     <td>Constant</td>
     <td><code><a href="#COLUMNLESS_WHERE_TYPES" class="internal-link" title="orionis.orm.query.expressions.COLUMNLESS_WHERE_TYPES">COLUMNLESS<wbr></wbr>_WHERE<wbr></wbr>_TYPES</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
+    <td>Clause kinds whose <tt class="rst-docutils rst-literal">column</tt> field carries no column reference.</td>
   </tr><tr class="constant">
     
     <td>Constant</td>
     <td><code><a href="#SUPPORTED_OPERATORS" class="internal-link" title="orionis.orm.query.expressions.SUPPORTED_OPERATORS">SUPPORTED<wbr></wbr>_OPERATORS</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
+    <td>Comparison operators accepted by basic where clauses.</td>
   </tr>
 </table>
           
@@ -3831,7 +3833,7 @@
   <div class="functionHeader">
     
     <span class="py-defname">COLUMNLESS_WHERE_TYPES</span>: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#frozenset" class="intersphinx-link">frozenset</a>[<wbr></wbr><a href="orionis.orm.query.WhereType.html" class="internal-link" title="orionis.orm.query.WhereType">WhereType</a>]</code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/orm/query/expressions.py#L42">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/orm/query/expressions.py#L68">
       
       (source)
     </a>
@@ -3843,7 +3845,7 @@
   </div>
   <div class="functionBody">
     
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p>Clause kinds whose <tt class="rst-docutils rst-literal">column</tt> field carries no column reference.</p></div>
     <table class="valueTable"><tr class="fieldStart"><td class="fieldName">Value</td></tr><tr><td><pre class="constant-value"><code><a href="https://docs.python.org/3/builtins/stdtypes.html#frozenset" class="intersphinx-link">frozenset</a>(<wbr></wbr>set([<wbr></wbr><a href="orionis.orm.query.WhereType.html#NESTED" class="internal-link" title="orionis.orm.query.WhereType.NESTED">WhereType.NESTED</a>,
                <wbr></wbr><a href="orionis.orm.query.WhereType.html#RAW" class="internal-link" title="orionis.orm.query.WhereType.RAW">WhereType.RAW</a>,
                <wbr></wbr><a href="orionis.orm.query.WhereType.html#EXISTS" class="internal-link" title="orionis.orm.query.WhereType.EXISTS">WhereType.EXISTS</a>,
@@ -3861,7 +3863,7 @@
   <div class="functionHeader">
     
     <span class="py-defname">SUPPORTED_OPERATORS</span>: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#frozenset" class="intersphinx-link">frozenset</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>]</code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/orm/query/expressions.py#L10">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/orm/query/expressions.py#L15">
       
       (source)
     </a>
@@ -3873,7 +3875,7 @@
   </div>
   <div class="functionBody">
     
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p>Comparison operators accepted by basic where clauses.</p></div>
     <table class="valueTable"><tr class="fieldStart"><td class="fieldName">Value</td></tr><tr><td><pre class="constant-value"><code><a href="https://docs.python.org/3/builtins/stdtypes.html#frozenset" class="intersphinx-link">frozenset</a>(<wbr></wbr>set([<wbr></wbr><span class="rst-variable-quote">'</span><span class="rst-variable-string">=</span><span class="rst-variable-quote">'</span>,
                <wbr></wbr><span class="rst-variable-quote">'</span><span class="rst-variable-string">==</span><span class="rst-variable-quote">'</span>,
                <wbr></wbr><span class="rst-variable-quote">'</span><span class="rst-variable-string">!=</span><span class="rst-variable-quote">'</span>,
@@ -3894,7 +3896,7 @@
   <div class="orionis-footer-inner">
     <div class="orionis-footer-copy">
       <p>API documentation for <a href="https://orionis-framework.com/" class="projecthome">Orionis</a>.</p>
-      <p class="orionis-footer-meta">Generated with <a href="https://github.com/twisted/pydoctor/">Pydoctor</a> 25.10.1.<span class="orionis-footer-build"> Built 2026-11-03 09:36:58.</span></p>
+      <p class="orionis-footer-meta">Generated with <a href="https://github.com/twisted/pydoctor/">Pydoctor</a> 25.10.1.<span class="orionis-footer-build"> Built 2026-11-03 13:00:15.</span></p>
     </div>
     <nav class="orionis-footer-links" aria-label="Additional resources">
       <a href="https://docs.orionis-framework.com">Read the guide <span aria-hidden="true">↗</span></a>

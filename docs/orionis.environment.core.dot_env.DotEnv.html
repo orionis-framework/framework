@@ -573,22 +573,22 @@
         </div>
 
         <div class="extrasDocstring">
-          <p class="class-signature"><code><span class="py-keyword">class</span> <span class="py-defname">DotEnv</span>: <a href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/environment/core/dot_env.py#L16" class="sourceLink">(source)</a></code></p><p>Constructor: <code><a href="#__init__" class="internal-link" title="orionis.environment.core.dot_env.DotEnv.__init__">DotEnv(path)</a></code></p><p><a href="classIndex.html#orionis.environment.core.dot_env.DotEnv">View In Hierarchy</a></p>
+          <p class="class-signature"><code><span class="py-keyword">class</span> <span class="py-defname">DotEnv</span>: <a href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/environment/core/dot_env.py#L20" class="sourceLink">(source)</a></code></p><p>Constructor: <code><a href="#__init__" class="internal-link" title="orionis.environment.core.dot_env.DotEnv.__init__">DotEnv(path)</a></code></p><p><a href="classIndex.html#orionis.environment.core.dot_env.DotEnv">View In Hierarchy</a></p>
         </div>
 
         <div class="moduleDocstring">
-          <div><p class="undocumented">Undocumented</p></div>
+          <div><p>Load and cache values from a resolved dotenv file.</p></div>
         </div>
 
         <div id="split-tables">
-          <table class="children sortable" id="id612">
+          <table class="children sortable" id="id613">
   
   
   <tr class="method">
     
     <td>Method</td>
     <td><code><a href="#__init__" class="internal-link" title="orionis.environment.core.dot_env.DotEnv.__init__">__init__</a></code></td>
-    <td>Initialize the DotEnv service and prepare the <code>.env</code> file.</td>
+    <td>Initialize the DotEnv service and prepare the <tt class="rst-docutils rst-literal">.env</tt> file.</td>
   </tr><tr class="method">
     
     <td>Method</td>
@@ -603,7 +603,7 @@
     
     <td>Method</td>
     <td><code><a href="#all" class="internal-link" title="orionis.environment.core.dot_env.DotEnv.all">all</a></code></td>
-    <td>Return all environment variables from the resolved <code>.env</code> file.</td>
+    <td>Return all environment variables from the resolved <tt class="rst-docutils rst-literal">.env</tt> file.</td>
   </tr><tr class="method">
     
     <td>Method</td>
@@ -613,37 +613,37 @@
     
     <td>Method</td>
     <td><code><a href="#reload" class="internal-link" title="orionis.environment.core.dot_env.DotEnv.reload">reload</a></code></td>
-    <td>Reload environment variables from the <code>.env</code> file.</td>
+    <td>Reload environment variables from the <tt class="rst-docutils rst-literal">.env</tt> file.</td>
   </tr><tr class="method">
     
     <td>Method</td>
     <td><code><a href="#set" class="internal-link" title="orionis.environment.core.dot_env.DotEnv.set">set</a></code></td>
-    <td>Set an environment variable in the <code>.env</code> file and process environment.</td>
+    <td>Set an environment variable in the <tt class="rst-docutils rst-literal">.env</tt> file and process environment.</td>
   </tr><tr class="method">
     
     <td>Method</td>
     <td><code><a href="#unset" class="internal-link" title="orionis.environment.core.dot_env.DotEnv.unset">unset</a></code></td>
-    <td>Remove an environment variable from the <code>.env</code> file and process environment.</td>
+    <td>Remove an environment variable from the <tt class="rst-docutils rst-literal">.env</tt> file and process environment.</td>
   </tr><tr class="classvariable">
     
     <td>Class Variable</td>
     <td><code><a href="#__slots__" class="internal-link" title="orionis.environment.core.dot_env.DotEnv.__slots__">__slots__</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
+    <td>Declare the instance attribute slots reserved by this class.</td>
   </tr><tr class="classvariable">
     
     <td>Class Variable</td>
     <td><code><a href="#_lock" class="internal-link" title="orionis.environment.core.dot_env.DotEnv._lock">_lock</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
+    <td>Lock to ensure thread safety during initialization and operations that modify the .env file.</td>
   </tr><tr class="instancevariable">
     
     <td>Instance Variable</td>
     <td><code><a href="#__cache" class="internal-link" title="orionis.environment.core.dot_env.DotEnv.__cache">__cache</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
+    <td>Keep parsed .env values in memory for subsequent reads.</td>
   </tr><tr class="instancevariable">
     
     <td>Instance Variable</td>
     <td><code><a href="#__resolved_path" class="internal-link" title="orionis.environment.core.dot_env.DotEnv.__resolved_path">__resolved<wbr></wbr>_path</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
+    <td>Set the default .env file path to the current working directory.</td>
   </tr>
 </table>
           
@@ -665,7 +665,7 @@
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">__init__</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">path: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a> | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code> = <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></span>):</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/environment/core/dot_env.py#L26">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/environment/core/dot_env.py#L36">
       
       (source)
     </a>
@@ -677,8 +677,8 @@
   </div>
   <div class="docstring functionBody">
     
-    <div><p>Initialize the DotEnv service and prepare the <code>.env</code> file.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">path:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a> or <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a>, <em>optional</em></code></td><td class="fieldArgDesc">Path to the <code>.env</code> file. Defaults to <code>.env</code> in the current working
-directory.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">This method does not return a value.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/exceptions.html#OSError" class="intersphinx-link">OSError</a></code></td><td>If the <code>.env</code> file cannot be created or accessed.</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/exceptions.html#RuntimeError" class="intersphinx-link">RuntimeError</a></code></td><td>If an unexpected error occurs during initialization.</td></tr></table></div>
+    <div><p>Initialize the DotEnv service and prepare the <tt class="rst-docutils rst-literal">.env</tt> file.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">path:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a> or <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a>, <em>optional</em></code></td><td class="fieldArgDesc">Path to the <tt class="rst-docutils rst-literal">.env</tt> file. Defaults to <tt class="rst-docutils rst-literal">.env</tt> in the current working
+directory.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">This method does not return a value.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/exceptions.html#OSError" class="intersphinx-link">OSError</a></code></td><td>If the <tt class="rst-docutils rst-literal">.env</tt> file cannot be created or accessed.</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/exceptions.html#RuntimeError" class="intersphinx-link">RuntimeError</a></code></td><td>If an unexpected error occurs during initialization.</td></tr></table></div>
   </div>
 </div><div class="basemethod">
   
@@ -693,7 +693,7 @@ directory.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">__parseValue</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">value: <code><a href="https://docs.python.org/3/builtins/functions.html#object" class="intersphinx-link">object</a></code></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/functions.html#object" class="intersphinx-link">object</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/environment/core/dot_env.py#L314">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/environment/core/dot_env.py#L327">
       
       (source)
     </a>
@@ -709,8 +709,8 @@ directory.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td
 <div class="rst-admonition rst-admonition-notes">
 <p class="rst-admonition-title rst-first">Notes</p>
 <p class="rst-last">Recognizes 'none', 'null', 'nan', 'nil' (case-insensitive) as null
-values. Attempts to use <code><a href="orionis.environment.dynamic.caster.EnvironmentCaster.html" class="internal-link" title="orionis.environment.dynamic.caster.EnvironmentCaster">EnvironmentCaster</a></code> for advanced type parsing.
-Falls back to <code><a href="https://docs.python.org/3/library/ast.html#ast.literal_eval" class="intersphinx-link">ast.literal_eval</a></code> for literal evaluation. Returns the
+values. Attempts to use <tt class="rst-docutils rst-literal">EnvironmentCaster</tt> for advanced type parsing.
+Falls back to <tt class="rst-docutils rst-literal">ast.literal_eval</tt> for literal evaluation. Returns the
 original string if all parsing attempts fail.</p>
 </div>
 <table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">value:</span><code><a href="https://docs.python.org/3/builtins/functions.html#object" class="intersphinx-link">object</a></code></td><td class="fieldArgDesc">The value to parse, typically a string from the .env file or a Python
@@ -732,7 +732,7 @@ if no conversion is possible.</td></tr></table></div>
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">__serializeValue</span><span class="function-signature long-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">value: <code><a href="https://docs.python.org/3/builtins/functions.html#object" class="intersphinx-link">object</a></code>, </span><span class="rst-sig-param">type_hint: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a> | <a href="orionis.environment.enums.EnvironmentValueType.html" class="internal-link" title="orionis.environment.enums.EnvironmentValueType">EnvironmentValueType</a> | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code> = <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/environment/core/dot_env.py#L265">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/environment/core/dot_env.py#L278">
       
       (source)
     </a>
@@ -761,7 +761,7 @@ storage in a .env file. Returns "null" for None values.</td></tr></table></div>
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">all</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/stdtypes.html#dict" class="intersphinx-link">dict</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/environment/core/dot_env.py#L249">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/environment/core/dot_env.py#L262">
       
       (source)
     </a>
@@ -773,8 +773,8 @@ storage in a .env file. Returns "null" for None values.</td></tr></table></div>
   </div>
   <div class="docstring functionBody">
     
-    <div><p>Return all environment variables from the resolved <code>.env</code> file.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/stdtypes.html#dict" class="intersphinx-link">dict</a></code></td><td class="fieldArgDesc">Dictionary mapping environment variable names (str) to their parsed
-Python values. Only variables present in the <code>.env</code> file are included.</td></tr></table></div>
+    <div><p>Return all environment variables from the resolved <tt class="rst-docutils rst-literal">.env</tt> file.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/stdtypes.html#dict" class="intersphinx-link">dict</a></code></td><td class="fieldArgDesc">Dictionary mapping environment variable names (str) to their parsed
+Python values. Only variables present in the <tt class="rst-docutils rst-literal">.env</tt> file are included.</td></tr></table></div>
   </div>
 </div><div class="basemethod">
   
@@ -789,7 +789,7 @@ Python values. Only variables present in the <code>.env</code> file are included
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">get</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">key: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code>, </span><span class="rst-sig-param">default: <code><a href="https://docs.python.org/3/builtins/functions.html#object" class="intersphinx-link">object</a> | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code> = <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/functions.html#object" class="intersphinx-link">object</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/environment/core/dot_env.py#L158">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/environment/core/dot_env.py#L170">
       
       (source)
     </a>
@@ -801,8 +801,8 @@ Python values. Only variables present in the <code>.env</code> file are included
   </div>
   <div class="docstring functionBody">
     
-    <div><p>Retrieve the value of an environment variable.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">key:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Name of the environment variable to retrieve.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">default:</span><code>object | None, <em>optional</em></code></td><td class="fieldArgDesc">Value to return if the key is not found. Defaults to None.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/functions.html#object" class="intersphinx-link">object</a></code></td><td class="fieldArgDesc">Parsed value of the environment variable if found, otherwise <code><a href="orionis.http.default.html" class="internal-link" title="orionis.http.default">default</a></code>.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/exceptions.html#TypeError" class="intersphinx-link">TypeError</a></code></td><td>If <code><a href="orionis.environment.key.html" class="internal-link" title="orionis.environment.key">key</a></code> is not a string, or if the stored value is incompatible
-with its declared type.</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/exceptions.html#ValueError" class="intersphinx-link">ValueError</a></code></td><td>If <code><a href="orionis.environment.key.html" class="internal-link" title="orionis.environment.key">key</a></code> is not a valid environment variable name, or if the stored
+    <div><p>Retrieve the value of an environment variable.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">key:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Name of the environment variable to retrieve.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">default:</span><code>object | None, <em>optional</em></code></td><td class="fieldArgDesc">Value to return if the key is not found. Defaults to None.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/functions.html#object" class="intersphinx-link">object</a></code></td><td class="fieldArgDesc">Parsed value of the environment variable if found, otherwise <tt class="rst-docutils rst-literal">default</tt>.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/exceptions.html#TypeError" class="intersphinx-link">TypeError</a></code></td><td>If <tt class="rst-docutils rst-literal">key</tt> is not a string, or if the stored value is incompatible
+with its declared type.</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/exceptions.html#ValueError" class="intersphinx-link">ValueError</a></code></td><td>If <tt class="rst-docutils rst-literal">key</tt> is not a valid environment variable name, or if the stored
 value cannot be decoded for its declared type.</td></tr></table></div>
   </div>
 </div><div class="basemethod">
@@ -818,7 +818,7 @@ value cannot be decoded for its declared type.</td></tr></table></div>
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">reload</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/environment/core/dot_env.py#L381">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/environment/core/dot_env.py#L394">
       
       (source)
     </a>
@@ -830,8 +830,8 @@ value cannot be decoded for its declared type.</td></tr></table></div>
   </div>
   <div class="docstring functionBody">
     
-    <div><p>Reload environment variables from the <code>.env</code> file.</p>
-<p>Reload all environment variables from the <code>.env</code> file into the current
+    <div><p>Reload environment variables from the <tt class="rst-docutils rst-literal">.env</tt> file.</p>
+<p>Reload all environment variables from the <tt class="rst-docutils rst-literal">.env</tt> file into the current
 process environment, overriding any existing values.</p>
 <table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code></td><td class="fieldArgDesc">True if environment variables were successfully reloaded.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/exceptions.html#RuntimeError" class="intersphinx-link">RuntimeError</a></code></td><td>If an error occurs during the reload operation.</td></tr></table></div>
   </div>
@@ -848,7 +848,7 @@ process environment, overriding any existing values.</p>
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">set</span><span class="function-signature long-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">key: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code>, </span><span class="rst-sig-param">value: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a> | <a href="https://docs.python.org/3/builtins/functions.html#float" class="intersphinx-link">float</a> | <a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a> | <a href="https://docs.python.org/3/builtins/stdtypes.html#list" class="intersphinx-link">list</a> | <a href="https://docs.python.org/3/builtins/stdtypes.html#dict" class="intersphinx-link">dict</a> | <a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" class="intersphinx-link">tuple</a> | <a href="#set" class="internal-link" title="orionis.environment.core.dot_env.DotEnv.set">set</a></code>, </span><span class="rst-sig-param">type_hint: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a> | <a href="orionis.environment.enums.EnvironmentValueType.html" class="internal-link" title="orionis.environment.enums.EnvironmentValueType">EnvironmentValueType</a> | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code> = <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a>, </span><span class="rst-sig-symbol">*, </span><span class="rst-sig-param">only_os: <code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code> = <a href="https://docs.python.org/3/builtins/constants.html#False" class="intersphinx-link">False</a></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/environment/core/dot_env.py#L89">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/environment/core/dot_env.py#L101">
       
       (source)
     </a>
@@ -860,17 +860,17 @@ process environment, overriding any existing values.</p>
   </div>
   <div class="docstring functionBody">
     
-    <div><p>Set an environment variable in the <code>.env</code> file and process environment.</p>
+    <div><p>Set an environment variable in the <tt class="rst-docutils rst-literal">.env</tt> file and process environment.</p>
 <div class="rst-admonition rst-admonition-notes">
 <p class="rst-admonition-title rst-first">Notes</p>
 <p class="rst-last">Ensures thread safety, validates the key, serializes the value, writes to
-the <code>.env</code> file, and updates the process environment.</p>
+the <tt class="rst-docutils rst-literal">.env</tt> file, and updates the process environment.</p>
 </div>
-<table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">key:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Name of the environment variable to set.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">value:</span><code>str | float | bool | list | dict | tuple | set</code></td><td class="fieldArgDesc">Value to assign to the environment variable.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">type<wbr></wbr>_hint:</span><code>str | EnvironmentValueType | None, <em>optional</em></code></td><td class="fieldArgDesc">Type hint to guide serialization of the value.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">only<wbr></wbr>_os:</span><code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a>, <em>optional</em></code></td><td class="fieldArgDesc">If True, set only in the process environment, not in the <code>.env</code> file.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code></td><td class="fieldArgDesc">True if the environment variable was set successfully.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/exceptions.html#TypeError" class="intersphinx-link">TypeError</a></code></td><td>If <code><a href="orionis.environment.key.html" class="internal-link" title="orionis.environment.key">key</a></code> is not a string, if <code>value</code> is not one of the supported
-types, or if <code>type_hint</code> is neither a string nor an
-<code><a href="orionis.environment.enums.EnvironmentValueType.html" class="internal-link" title="orionis.environment.enums.EnvironmentValueType">EnvironmentValueType</a></code>.</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/exceptions.html#ValueError" class="intersphinx-link">ValueError</a></code></td><td>If <code><a href="orionis.environment.key.html" class="internal-link" title="orionis.environment.key">key</a></code> is not a valid environment variable name, or if <code>value</code>
-cannot be serialized for the requested type.</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/exceptions.html#RuntimeError" class="intersphinx-link">RuntimeError</a></code></td><td>If <code>type_hint</code> is a string that does not name a member of
-<code><a href="orionis.environment.enums.EnvironmentValueType.html" class="internal-link" title="orionis.environment.enums.EnvironmentValueType">EnvironmentValueType</a></code>.</td></tr></table></div>
+<table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">key:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Name of the environment variable to set.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">value:</span><code>str | float | bool | list | dict | tuple | set</code></td><td class="fieldArgDesc">Value to assign to the environment variable.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">type<wbr></wbr>_hint:</span><code>str | EnvironmentValueType | None, <em>optional</em></code></td><td class="fieldArgDesc">Type hint to guide serialization of the value.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">only<wbr></wbr>_os:</span><code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a>, <em>optional</em></code></td><td class="fieldArgDesc">If True, set only in the process environment, not in the <tt class="rst-docutils rst-literal">.env</tt> file.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code></td><td class="fieldArgDesc">True if the environment variable was set successfully.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/exceptions.html#TypeError" class="intersphinx-link">TypeError</a></code></td><td>If <tt class="rst-docutils rst-literal">key</tt> is not a string, if <tt class="rst-docutils rst-literal">value</tt> is not one of the supported
+types, or if <tt class="rst-docutils rst-literal">type_hint</tt> is neither a string nor an
+<tt class="rst-docutils rst-literal">EnvironmentValueType</tt>.</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/exceptions.html#ValueError" class="intersphinx-link">ValueError</a></code></td><td>If <tt class="rst-docutils rst-literal">key</tt> is not a valid environment variable name, or if <tt class="rst-docutils rst-literal">value</tt>
+cannot be serialized for the requested type.</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/exceptions.html#RuntimeError" class="intersphinx-link">RuntimeError</a></code></td><td>If <tt class="rst-docutils rst-literal">type_hint</tt> is a string that does not name a member of
+<tt class="rst-docutils rst-literal">EnvironmentValueType</tt>.</td></tr></table></div>
   </div>
 </div><div class="basemethod">
   
@@ -885,7 +885,7 @@ cannot be serialized for the requested type.</td></tr><tr><td class="fieldArgCon
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">unset</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">key: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code>, </span><span class="rst-sig-symbol">*, </span><span class="rst-sig-param">only_os: <code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code> = <a href="https://docs.python.org/3/builtins/constants.html#False" class="intersphinx-link">False</a></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/environment/core/dot_env.py#L200">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/environment/core/dot_env.py#L212">
       
       (source)
     </a>
@@ -897,12 +897,13 @@ cannot be serialized for the requested type.</td></tr><tr><td class="fieldArgCon
   </div>
   <div class="docstring functionBody">
     
-    <div><p>Remove an environment variable from the <code>.env</code> file and process environment.</p>
+    <div><p>Remove an environment variable from the <tt class="rst-docutils rst-literal">.env</tt> file and process environment.</p>
 <div class="rst-admonition rst-admonition-notes">
 <p class="rst-admonition-title rst-first">Notes</p>
 <p class="rst-last">This method is thread-safe. If the variable does not exist, returns True.</p>
 </div>
-<table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">key:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Name of the environment variable to remove.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">only<wbr></wbr>_os:</span><code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a>, <em>optional</em></code></td><td class="fieldArgDesc">If True, remove only from the process environment, not from the <code>.env</code> file.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code></td><td class="fieldArgDesc">True if the environment variable was removed or did not exist.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/exceptions.html#TypeError" class="intersphinx-link">TypeError</a></code></td><td>If <code><a href="orionis.environment.key.html" class="internal-link" title="orionis.environment.key">key</a></code> is not a string.</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/exceptions.html#ValueError" class="intersphinx-link">ValueError</a></code></td><td>If <code><a href="orionis.environment.key.html" class="internal-link" title="orionis.environment.key">key</a></code> is not a valid environment variable name.</td></tr></table></div>
+<table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">key:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Name of the environment variable to remove.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">only<wbr></wbr>_os:</span><code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a>, <em>optional</em></code></td><td class="fieldArgDesc">If True, remove only from the process environment, not from the <tt class="rst-docutils rst-literal">.env</tt>
+file.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code></td><td class="fieldArgDesc">True if the environment variable was removed or did not exist.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/exceptions.html#TypeError" class="intersphinx-link">TypeError</a></code></td><td>If <tt class="rst-docutils rst-literal">key</tt> is not a string.</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/exceptions.html#ValueError" class="intersphinx-link">ValueError</a></code></td><td>If <tt class="rst-docutils rst-literal">key</tt> is not a valid environment variable name.</td></tr></table></div>
   </div>
 </div><div class="baseclassvariable">
   
@@ -916,7 +917,7 @@ cannot be serialized for the requested type.</td></tr><tr><td class="fieldArgCon
   <div class="functionHeader">
     
     <span class="py-defname">__slots__</span>: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" class="intersphinx-link">tuple</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <wbr></wbr><span class="rst-variable-ellipsis">...</span>]</code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/environment/core/dot_env.py#L20">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/environment/core/dot_env.py#L25">
       
       (source)
     </a>
@@ -928,7 +929,7 @@ cannot be serialized for the requested type.</td></tr><tr><td class="fieldArgCon
   </div>
   <div class="functionBody">
     
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p>Declare the instance attribute slots reserved by this class.</p></div>
     
   </div>
 </div><div class="baseclassvariable">
@@ -943,7 +944,7 @@ cannot be serialized for the requested type.</td></tr><tr><td class="fieldArgCon
   <div class="functionHeader">
     
     <span class="py-defname">_lock</span> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/environment/core/dot_env.py#L24">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/environment/core/dot_env.py#L30">
       
       (source)
     </a>
@@ -955,7 +956,8 @@ cannot be serialized for the requested type.</td></tr><tr><td class="fieldArgCon
   </div>
   <div class="functionBody">
     
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p>Lock to ensure thread safety during initialization and operations that modify
+the .env file.</p></div>
     
   </div>
 </div><div class="baseinstancevariable">
@@ -970,7 +972,7 @@ cannot be serialized for the requested type.</td></tr><tr><td class="fieldArgCon
   <div class="functionHeader">
     
     <span class="py-defname">__cache</span>: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#dict" class="intersphinx-link">dict</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>]</code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/environment/core/dot_env.py#L70">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/environment/core/dot_env.py#L81">
       
       (source)
     </a>
@@ -982,7 +984,7 @@ cannot be serialized for the requested type.</td></tr><tr><td class="fieldArgCon
   </div>
   <div class="functionBody">
     
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p>Keep parsed .env values in memory for subsequent reads.</p></div>
     
   </div>
 </div><div class="baseinstancevariable">
@@ -997,7 +999,7 @@ cannot be serialized for the requested type.</td></tr><tr><td class="fieldArgCon
   <div class="functionHeader">
     
     <span class="py-defname">__resolved_path</span> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/environment/core/dot_env.py#L56">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/environment/core/dot_env.py#L66">
       
       (source)
     </a>
@@ -1009,7 +1011,7 @@ cannot be serialized for the requested type.</td></tr><tr><td class="fieldArgCon
   </div>
   <div class="functionBody">
     
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p>Set the default .env file path to the current working directory.</p></div>
     
   </div>
 </div>
@@ -1023,7 +1025,7 @@ cannot be serialized for the requested type.</td></tr><tr><td class="fieldArgCon
   <div class="orionis-footer-inner">
     <div class="orionis-footer-copy">
       <p>API documentation for <a href="https://orionis-framework.com/" class="projecthome">Orionis</a>.</p>
-      <p class="orionis-footer-meta">Generated with <a href="https://github.com/twisted/pydoctor/">Pydoctor</a> 25.10.1.<span class="orionis-footer-build"> Built 2026-11-03 09:36:58.</span></p>
+      <p class="orionis-footer-meta">Generated with <a href="https://github.com/twisted/pydoctor/">Pydoctor</a> 25.10.1.<span class="orionis-footer-build"> Built 2026-11-03 13:00:15.</span></p>
     </div>
     <nav class="orionis-footer-links" aria-label="Additional resources">
       <a href="https://docs.orionis-framework.com">Read the guide <span aria-hidden="true">↗</span></a>

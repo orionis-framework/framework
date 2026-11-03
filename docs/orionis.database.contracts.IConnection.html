@@ -1209,7 +1209,7 @@
         </div>
 
         <div class="extrasDocstring">
-          <p class="class-signature"><code><span class="py-keyword">class</span> <span class="py-defname">IConnection</span>(ABC): <a href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/database/contracts/connection.py#L17" class="sourceLink">(source)</a></code></p><p>Known subclasses: <code><a href="orionis.database.Connection.html" class="internal-link">orionis.database.Connection</a></code></p><p><a href="classIndex.html#orionis.database.contracts.IConnection">View In Hierarchy</a></p>
+          <p class="class-signature"><code><span class="py-keyword">class</span> <span class="py-defname">IConnection</span>(ABC): <a href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/database/contracts/connection.py#L19" class="sourceLink">(source)</a></code></p><p>Known subclasses: <code><a href="orionis.database.Connection.html" class="internal-link">orionis.database.Connection</a></code></p><p><a href="classIndex.html#orionis.database.contracts.IConnection">View In Hierarchy</a></p>
         </div>
 
         <div class="moduleDocstring">
@@ -1319,7 +1319,7 @@ through this interface.</p>
     
     <td>Class Variable</td>
     <td><code><a href="#__slots__" class="internal-link" title="orionis.database.contracts.IConnection.__slots__">__slots__</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
+    <td>Declare that this class introduces no additional instance slots.</td>
   </tr>
 </table>
           
@@ -1341,7 +1341,7 @@ through this interface.</p>
     
     <div><span class="decorator">@abstractmethod<br /></span></div>
     <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">begin</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>):</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/database/contracts/connection.py#L318">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/database/contracts/connection.py#L321">
       
       (source)
     </a>
@@ -1353,7 +1353,7 @@ through this interface.</p>
   </div>
   <div class="docstring functionBody">
     <div class="interfaceinfo">overridden in <code><a href="orionis.database.Connection.html" class="internal-link">orionis.database.Connection</a></code></div>
-    <div><p>Begin a transaction, or a savepoint when one is already active.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">This method does not return a value.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code>TransactionException</code></td><td>If the transaction cannot be started.</td></tr></table></div>
+    <div><p>Begin a transaction, or a savepoint when one is already active.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">This method does not return a value.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.database.TransactionException.html" class="internal-link">orionis.database.TransactionException</a></code></td><td>If the transaction cannot be started.</td></tr></table></div>
   </div>
 </div><div class="basemethod">
   
@@ -1368,7 +1368,7 @@ through this interface.</p>
     
     <div><span class="decorator">@abstractmethod<br /></span></div>
     <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">commit</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>):</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/database/contracts/connection.py#L334">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/database/contracts/connection.py#L337">
       
       (source)
     </a>
@@ -1380,7 +1380,7 @@ through this interface.</p>
   </div>
   <div class="docstring functionBody">
     <div class="interfaceinfo">overridden in <code><a href="orionis.database.Connection.html" class="internal-link">orionis.database.Connection</a></code></div>
-    <div><p>Commit the innermost active transaction or savepoint.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">This method does not return a value.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code>TransactionException</code></td><td>If no transaction is active.</td></tr></table></div>
+    <div><p>Commit the innermost active transaction or savepoint.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">This method does not return a value.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.database.TransactionException.html" class="internal-link">orionis.database.TransactionException</a></code></td><td>If no transaction is active.</td></tr></table></div>
   </div>
 </div><div class="basemethod">
   
@@ -1395,7 +1395,7 @@ through this interface.</p>
     
     <div><span class="decorator">@abstractmethod<br /></span></div>
     <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">createTable</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">table: <code>TableDefinition</code>, </span><span class="rst-sig-symbol">*, </span><span class="rst-sig-param">if_not_exists: <code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code> = <a href="https://docs.python.org/3/builtins/constants.html#True" class="intersphinx-link">True</a></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/database/contracts/connection.py#L255">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/database/contracts/connection.py#L258">
       
       (source)
     </a>
@@ -1407,8 +1407,8 @@ through this interface.</p>
   </div>
   <div class="docstring functionBody">
     <div class="interfaceinfo">overridden in <code><a href="orionis.database.Connection.html" class="internal-link">orionis.database.Connection</a></code></div>
-    <div><p>Create the physical table described by the given definition.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">table:</span><code><a href="orionis.orm.schema.TableDefinition.html" class="internal-link" title="orionis.orm.schema.TableDefinition">TableDefinition</a></code></td><td class="fieldArgDesc">Table definition to materialize.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">if<wbr></wbr>_not<wbr></wbr>_exists:</span><code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a>, <em>optional</em></code></td><td class="fieldArgDesc">Whether to guard the statement with <tt class="rst-docutils rst-literal">IF NOT EXISTS</tt> so that
-an already existing table is silently kept.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code></td><td class="fieldArgDesc"><tt class="rst-docutils rst-literal">True</tt> when the statement executes without errors.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code>QueryException</code></td><td>If the DDL statement fails to execute.</td></tr></table></div>
+    <div><p>Create the physical table described by the given definition.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">table:</span><code><a href="orionis.orm.schema.TableDefinition.html" class="internal-link">orionis.orm.schema.TableDefinition</a></code></td><td class="fieldArgDesc">Table definition to materialize.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">if<wbr></wbr>_not<wbr></wbr>_exists:</span><code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a>, <em>optional</em></code></td><td class="fieldArgDesc">Whether to guard the statement with <tt class="rst-docutils rst-literal">IF NOT EXISTS</tt> so that
+an already existing table is silently kept.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code></td><td class="fieldArgDesc"><tt class="rst-docutils rst-literal">True</tt> when the statement executes without errors.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.database.QueryException.html" class="internal-link">orionis.database.QueryException</a></code></td><td>If the DDL statement fails to execute.</td></tr></table></div>
   </div>
 </div><div class="basemethod">
   
@@ -1423,7 +1423,7 @@ an already existing table is silently kept.</td></tr></table><table class="field
     
     <div><span class="decorator">@abstractmethod<br /></span></div>
     <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">delete</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">plan: <code>DeletePlan</code></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/database/contracts/connection.py#L155">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/database/contracts/connection.py#L158">
       
       (source)
     </a>
@@ -1435,7 +1435,7 @@ an already existing table is silently kept.</td></tr></table><table class="field
   </div>
   <div class="docstring functionBody">
     <div class="interfaceinfo">overridden in <code><a href="orionis.database.Connection.html" class="internal-link">orionis.database.Connection</a></code></div>
-    <div><p>Run a DELETE statement described by the given plan.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">plan:</span><code><a href="orionis.orm.query.DeletePlan.html" class="internal-link" title="orionis.orm.query.DeletePlan">DeletePlan</a></code></td><td class="fieldArgDesc">Delete plan with filtering conditions.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code></td><td class="fieldArgDesc">Number of affected rows.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code>QueryException</code></td><td>If the statement fails to compile or execute.</td></tr></table></div>
+    <div><p>Run a DELETE statement described by the given plan.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">plan:</span><code><a href="orionis.orm.query.DeletePlan.html" class="internal-link">orionis.orm.query.DeletePlan</a></code></td><td class="fieldArgDesc">Delete plan with filtering conditions.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code></td><td class="fieldArgDesc">Number of affected rows.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.database.QueryException.html" class="internal-link">orionis.database.QueryException</a></code></td><td>If the statement fails to compile or execute.</td></tr></table></div>
   </div>
 </div><div class="basemethod">
   
@@ -1450,7 +1450,7 @@ an already existing table is silently kept.</td></tr></table><table class="field
     
     <div><span class="decorator">@abstractmethod<br /></span></div>
     <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">disconnect</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>):</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/database/contracts/connection.py#L390">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/database/contracts/connection.py#L393">
       
       (source)
     </a>
@@ -1477,7 +1477,7 @@ an already existing table is silently kept.</td></tr></table><table class="field
     
     <div><span class="decorator">@abstractmethod<br /></span></div>
     <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">dropTable</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">name: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code>, </span><span class="rst-sig-param">schema: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a> | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code> = <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a>, </span><span class="rst-sig-symbol">*, </span><span class="rst-sig-param">if_exists: <code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code> = <a href="https://docs.python.org/3/builtins/constants.html#True" class="intersphinx-link">True</a></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/database/contracts/connection.py#L284">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/database/contracts/connection.py#L287">
       
       (source)
     </a>
@@ -1490,7 +1490,7 @@ an already existing table is silently kept.</td></tr></table><table class="field
   <div class="docstring functionBody">
     <div class="interfaceinfo">overridden in <code><a href="orionis.database.Connection.html" class="internal-link">orionis.database.Connection</a></code></div>
     <div><p>Drop the physical table with the given logical name.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">name:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Logical table name; the connection prefix is applied.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">schema:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a> or <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a>, <em>optional</em></code></td><td class="fieldArgDesc">Database schema owning the table, or <tt class="rst-docutils rst-literal">None</tt> for the default.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">if<wbr></wbr>_exists:</span><code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a>, <em>optional</em></code></td><td class="fieldArgDesc">Whether to guard the statement with <tt class="rst-docutils rst-literal">IF EXISTS</tt> so that a
-missing table does not raise an error.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code></td><td class="fieldArgDesc"><tt class="rst-docutils rst-literal">True</tt> when the statement executes without errors.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code>QueryException</code></td><td>If the DDL statement fails to execute.</td></tr></table></div>
+missing table does not raise an error.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code></td><td class="fieldArgDesc"><tt class="rst-docutils rst-literal">True</tt> when the statement executes without errors.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.database.QueryException.html" class="internal-link">orionis.database.QueryException</a></code></td><td>If the DDL statement fails to execute.</td></tr></table></div>
   </div>
 </div><div class="basemethod">
   
@@ -1505,7 +1505,7 @@ missing table does not raise an error.</td></tr></table><table class="fieldTable
     
     <div><span class="decorator">@abstractmethod<br /></span></div>
     <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">execute</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">sql: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code>, </span><span class="rst-sig-param">bindings: <code>Mapping[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <wbr></wbr>Any] | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code> = <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/database/contracts/connection.py#L197">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/database/contracts/connection.py#L200">
       
       (source)
     </a>
@@ -1517,7 +1517,7 @@ missing table does not raise an error.</td></tr></table><table class="fieldTable
   </div>
   <div class="docstring functionBody">
     <div class="interfaceinfo">overridden in <code><a href="orionis.database.Connection.html" class="internal-link">orionis.database.Connection</a></code></div>
-    <div><p>Run a raw data-modifying SQL statement.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">sql:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Raw SQL using named <tt class="rst-docutils rst-literal">:param</tt> placeholders.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">bindings:</span><code>Mapping of <a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a> to Any, <em>optional</em></code></td><td class="fieldArgDesc">Bound parameters for the statement.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code></td><td class="fieldArgDesc">Number of affected rows.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code>QueryException</code></td><td>If the statement fails to execute.</td></tr></table></div>
+    <div><p>Run a raw data-modifying SQL statement.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">sql:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Raw SQL using named <tt class="rst-docutils rst-literal">:param</tt> placeholders.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">bindings:</span><code><a href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Mapping" class="intersphinx-link">collections.abc.Mapping</a> of str <tt class="rst-docutils rst-literal">to</tt> typing.Any, <em>optional</em></code></td><td class="fieldArgDesc">Bound parameters for the statement.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code></td><td class="fieldArgDesc">Number of affected rows.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.database.QueryException.html" class="internal-link">orionis.database.QueryException</a></code></td><td>If the statement fails to execute.</td></tr></table></div>
   </div>
 </div><div class="basemethod">
   
@@ -1532,7 +1532,7 @@ missing table does not raise an error.</td></tr></table><table class="fieldTable
     
     <div><span class="decorator">@abstractmethod<br /></span></div>
     <span class="py-keyword">def</span>&#160;<span class="py-defname">getName</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/database/contracts/connection.py#L31">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/database/contracts/connection.py#L34">
       
       (source)
     </a>
@@ -1559,7 +1559,7 @@ missing table does not raise an error.</td></tr></table><table class="fieldTable
     
     <div><span class="decorator">@abstractmethod<br /></span></div>
     <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">insert</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">plan: <code>InsertPlan</code></span>) -&gt; <code>InsertResult</code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/database/contracts/connection.py#L113">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/database/contracts/connection.py#L116">
       
       (source)
     </a>
@@ -1571,7 +1571,7 @@ missing table does not raise an error.</td></tr></table><table class="fieldTable
   </div>
   <div class="docstring functionBody">
     <div class="interfaceinfo">overridden in <code><a href="orionis.database.Connection.html" class="internal-link">orionis.database.Connection</a></code></div>
-    <div><p>Run an INSERT statement described by the given plan.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">plan:</span><code><a href="orionis.orm.query.InsertPlan.html" class="internal-link" title="orionis.orm.query.InsertPlan">InsertPlan</a></code></td><td class="fieldArgDesc">Insert plan with the target table and row values.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.database.entities.InsertResult.html" class="internal-link" title="orionis.database.entities.InsertResult">InsertResult</a></code></td><td class="fieldArgDesc">Result carrying the generated key and affected row count.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code>QueryException</code></td><td>If the statement fails to compile or execute.</td></tr></table></div>
+    <div><p>Run an INSERT statement described by the given plan.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">plan:</span><code><a href="orionis.orm.query.InsertPlan.html" class="internal-link">orionis.orm.query.InsertPlan</a></code></td><td class="fieldArgDesc">Insert plan with the target table and row values.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.database.entities.InsertResult.html" class="internal-link">orionis.database.entities.InsertResult</a></code></td><td class="fieldArgDesc">Result carrying the generated key and affected row count.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.database.QueryException.html" class="internal-link">orionis.database.QueryException</a></code></td><td>If the statement fails to compile or execute.</td></tr></table></div>
   </div>
 </div><div class="basemethod">
   
@@ -1586,7 +1586,7 @@ missing table does not raise an error.</td></tr></table><table class="fieldTable
     
     <div><span class="decorator">@abstractmethod<br /></span></div>
     <span class="py-keyword">def</span>&#160;<span class="py-defname">inTransaction</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/database/contracts/connection.py#L377">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/database/contracts/connection.py#L380">
       
       (source)
     </a>
@@ -1613,7 +1613,7 @@ missing table does not raise an error.</td></tr></table><table class="fieldTable
     
     <div><span class="decorator">@abstractmethod<br /></span></div>
     <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">rollback</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>):</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/database/contracts/connection.py#L350">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/database/contracts/connection.py#L353">
       
       (source)
     </a>
@@ -1625,7 +1625,7 @@ missing table does not raise an error.</td></tr></table><table class="fieldTable
   </div>
   <div class="docstring functionBody">
     <div class="interfaceinfo">overridden in <code><a href="orionis.database.Connection.html" class="internal-link">orionis.database.Connection</a></code></div>
-    <div><p>Roll back the innermost active transaction or savepoint.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">This method does not return a value.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code>TransactionException</code></td><td>If no transaction is active.</td></tr></table></div>
+    <div><p>Roll back the innermost active transaction or savepoint.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">This method does not return a value.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.database.TransactionException.html" class="internal-link">orionis.database.TransactionException</a></code></td><td>If no transaction is active.</td></tr></table></div>
   </div>
 </div><div class="basemethod">
   
@@ -1640,7 +1640,7 @@ missing table does not raise an error.</td></tr></table><table class="fieldTable
     
     <div><span class="decorator">@abstractmethod<br /></span></div>
     <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">scalar</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">plan: <code>SelectPlan</code></span>) -&gt; <code>Any</code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/database/contracts/connection.py#L176">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/database/contracts/connection.py#L179">
       
       (source)
     </a>
@@ -1652,7 +1652,7 @@ missing table does not raise an error.</td></tr></table><table class="fieldTable
   </div>
   <div class="docstring functionBody">
     <div class="interfaceinfo">overridden in <code><a href="orionis.database.Connection.html" class="internal-link">orionis.database.Connection</a></code></div>
-    <div><p>Run a SELECT plan and return the first column of the first row.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">plan:</span><code><a href="orionis.orm.query.SelectPlan.html" class="internal-link" title="orionis.orm.query.SelectPlan">SelectPlan</a></code></td><td class="fieldArgDesc">Query plan, typically carrying an aggregate projection.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code>Any</code></td><td class="fieldArgDesc">Scalar value, or <tt class="rst-docutils rst-literal">None</tt> when the query yields no rows.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code>QueryException</code></td><td>If the statement fails to compile or execute.</td></tr></table></div>
+    <div><p>Run a SELECT plan and return the first column of the first row.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">plan:</span><code><a href="orionis.orm.query.SelectPlan.html" class="internal-link">orionis.orm.query.SelectPlan</a></code></td><td class="fieldArgDesc">Query plan, typically carrying an aggregate projection.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/library/typing.html#typing.Any" class="intersphinx-link">typing.Any</a></code></td><td class="fieldArgDesc">Scalar value, or <tt class="rst-docutils rst-literal">None</tt> when the query yields no rows.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.database.QueryException.html" class="internal-link">orionis.database.QueryException</a></code></td><td>If the statement fails to compile or execute.</td></tr></table></div>
   </div>
 </div><div class="basemethod">
   
@@ -1667,7 +1667,7 @@ missing table does not raise an error.</td></tr></table><table class="fieldTable
     
     <div><span class="decorator">@abstractmethod<br /></span></div>
     <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">select</span><span class="function-signature long-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">query: <code>SelectPlan | <a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code>, </span><span class="rst-sig-param">bindings: <code>Mapping[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <wbr></wbr>Any] | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code> = <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/stdtypes.html#list" class="intersphinx-link">list</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#dict" class="intersphinx-link">dict</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <wbr></wbr>Any]]</code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/database/contracts/connection.py#L85">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/database/contracts/connection.py#L88">
       
       (source)
     </a>
@@ -1679,8 +1679,8 @@ missing table does not raise an error.</td></tr></table><table class="fieldTable
   </div>
   <div class="docstring functionBody">
     <div class="interfaceinfo">overridden in <code><a href="orionis.database.Connection.html" class="internal-link">orionis.database.Connection</a></code></div>
-    <div><p>Run a SELECT query and return its rows as dictionaries.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">query:</span><code><a href="orionis.orm.query.SelectPlan.html" class="internal-link" title="orionis.orm.query.SelectPlan">SelectPlan</a> or <a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Compiled query plan, or a raw SQL string using named
-<tt class="rst-docutils rst-literal">:param</tt> placeholders.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">bindings:</span><code>Mapping of <a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a> to Any, <em>optional</em></code></td><td class="fieldArgDesc">Bound parameters for raw SQL strings.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/stdtypes.html#list" class="intersphinx-link">list</a> of <a href="https://docs.python.org/3/builtins/stdtypes.html#dict" class="intersphinx-link">dict</a></code></td><td class="fieldArgDesc">One dictionary per row keyed by column name.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code>QueryException</code></td><td>If the statement fails to compile or execute.</td></tr></table></div>
+    <div><p>Run a SELECT query and return its rows as dictionaries.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">query:</span><code><a href="orionis.orm.query.SelectPlan.html" class="internal-link">orionis.orm.query.SelectPlan</a> or <a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Compiled query plan, or a raw SQL string using named
+<tt class="rst-docutils rst-literal">:param</tt> placeholders.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">bindings:</span><code><a href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Mapping" class="intersphinx-link">collections.abc.Mapping</a> of str <tt class="rst-docutils rst-literal">to</tt> typing.Any, <em>optional</em></code></td><td class="fieldArgDesc">Bound parameters for raw SQL strings.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/stdtypes.html#list" class="intersphinx-link">list</a> of <a href="https://docs.python.org/3/builtins/stdtypes.html#dict" class="intersphinx-link">dict</a></code></td><td class="fieldArgDesc">One dictionary per row keyed by column name.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.database.QueryException.html" class="internal-link">orionis.database.QueryException</a></code></td><td>If the statement fails to compile or execute.</td></tr></table></div>
   </div>
 </div><div class="basemethod">
   
@@ -1695,7 +1695,7 @@ missing table does not raise an error.</td></tr></table><table class="fieldTable
     
     <div><span class="decorator">@abstractmethod<br /></span></div>
     <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">statement</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">sql: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code>, </span><span class="rst-sig-param">bindings: <code>Mapping[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <wbr></wbr>Any] | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code> = <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/database/contracts/connection.py#L224">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/database/contracts/connection.py#L227">
       
       (source)
     </a>
@@ -1709,7 +1709,7 @@ missing table does not raise an error.</td></tr></table><table class="fieldTable
     <div class="interfaceinfo">overridden in <code><a href="orionis.database.Connection.html" class="internal-link">orionis.database.Connection</a></code></div>
     <div><p>Run a raw SQL statement without inspecting its result.</p>
 <p>Intended for DDL and maintenance commands.</p>
-<table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">sql:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Raw SQL statement.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">bindings:</span><code>Mapping of <a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a> to Any, <em>optional</em></code></td><td class="fieldArgDesc">Bound parameters for the statement.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code></td><td class="fieldArgDesc"><tt class="rst-docutils rst-literal">True</tt> when the statement executes without errors.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code>QueryException</code></td><td>If the statement fails to execute.</td></tr></table></div>
+<table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">sql:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Raw SQL statement.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">bindings:</span><code><a href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Mapping" class="intersphinx-link">collections.abc.Mapping</a> of str <tt class="rst-docutils rst-literal">to</tt> typing.Any, <em>optional</em></code></td><td class="fieldArgDesc">Bound parameters for the statement.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code></td><td class="fieldArgDesc"><tt class="rst-docutils rst-literal">True</tt> when the statement executes without errors.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.database.QueryException.html" class="internal-link">orionis.database.QueryException</a></code></td><td>If the statement fails to execute.</td></tr></table></div>
   </div>
 </div><div class="basemethod">
   
@@ -1724,7 +1724,7 @@ missing table does not raise an error.</td></tr></table><table class="fieldTable
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">supportsUniqueConstraints</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/database/contracts/connection.py#L42">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/database/contracts/connection.py#L45">
       
       (source)
     </a>
@@ -1755,7 +1755,7 @@ reject operations that require a database-enforced unique claim.</p>
     
     <div><span class="decorator">@abstractmethod<br /></span></div>
     <span class="py-keyword">def</span>&#160;<span class="py-defname">toSql</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">plan: <code>SelectPlan</code>, </span><span class="rst-sig-symbol">*, </span><span class="rst-sig-param">literal_binds: <code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code> = <a href="https://docs.python.org/3/builtins/constants.html#False" class="intersphinx-link">False</a></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/database/contracts/connection.py#L57">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/database/contracts/connection.py#L60">
       
       (source)
     </a>
@@ -1767,8 +1767,8 @@ reject operations that require a database-enforced unique claim.</p>
   </div>
   <div class="docstring functionBody">
     <div class="interfaceinfo">overridden in <code><a href="orionis.database.Connection.html" class="internal-link">orionis.database.Connection</a></code></div>
-    <div><p>Render a SELECT plan without executing it or opening a connection.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">plan:</span><code><a href="orionis.orm.query.SelectPlan.html" class="internal-link" title="orionis.orm.query.SelectPlan">SelectPlan</a></code></td><td class="fieldArgDesc">Query plan to render with the configured connection dialect.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">literal<wbr></wbr>_binds:</span><code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a>, <em>optional</em></code></td><td class="fieldArgDesc">Include values for debugging when their types support SQL literals.
-Literal output may expose sensitive information.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">SQL text with expanded placeholders or literal parameter values.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code>QueryException</code></td><td>If the plan or a literal value cannot be compiled.</td></tr><tr><td class="fieldArgContainer"><code>MissingDatabaseDependencyException</code></td><td>If the configured SQL dialect is unavailable.</td></tr></table></div>
+    <div><p>Render a SELECT plan without executing it or opening a connection.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">plan:</span><code><a href="orionis.orm.query.SelectPlan.html" class="internal-link">orionis.orm.query.SelectPlan</a></code></td><td class="fieldArgDesc">Query plan to render with the configured connection dialect.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">literal<wbr></wbr>_binds:</span><code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a>, <em>optional</em></code></td><td class="fieldArgDesc">Include values for debugging when their types support SQL literals.
+Literal output may expose sensitive information.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">SQL text with expanded placeholders or literal parameter values.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.database.QueryException.html" class="internal-link">orionis.database.QueryException</a></code></td><td>If the plan or a literal value cannot be compiled.</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.database.MissingDatabaseDependencyException.html" class="internal-link">orionis.database.MissingDatabaseDependencyException</a></code></td><td>If the configured SQL dialect is unavailable.</td></tr></table></div>
   </div>
 </div><div class="basemethod">
   
@@ -1783,7 +1783,7 @@ Literal output may expose sensitive information.</td></tr></table><table class="
     
     <div><span class="decorator">@abstractmethod<br /></span></div>
     <span class="py-keyword">def</span>&#160;<span class="py-defname">transaction</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>) -&gt; <code><a href="orionis.database.contracts.ITransaction.html" class="internal-link" title="orionis.database.contracts.ITransaction">ITransaction</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/database/contracts/connection.py#L366">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/database/contracts/connection.py#L369">
       
       (source)
     </a>
@@ -1795,7 +1795,7 @@ Literal output may expose sensitive information.</td></tr></table><table class="
   </div>
   <div class="docstring functionBody">
     <div class="interfaceinfo">overridden in <code><a href="orionis.database.Connection.html" class="internal-link">orionis.database.Connection</a></code></div>
-    <div><p>Return a transaction usable as an async context manager.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.database.contracts.ITransaction.html" class="internal-link" title="orionis.database.contracts.ITransaction">ITransaction</a></code></td><td class="fieldArgDesc">Context manager committing on success and rolling back on error.</td></tr></table></div>
+    <div><p>Return a transaction usable as an async context manager.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.database.contracts.ITransaction.html" class="internal-link">orionis.database.contracts.ITransaction</a></code></td><td class="fieldArgDesc">Context manager committing on success and rolling back on error.</td></tr></table></div>
   </div>
 </div><div class="basemethod">
   
@@ -1810,7 +1810,7 @@ Literal output may expose sensitive information.</td></tr></table><table class="
     
     <div><span class="decorator">@abstractmethod<br /></span></div>
     <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">update</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">plan: <code>UpdatePlan</code></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/database/contracts/connection.py#L134">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/database/contracts/connection.py#L137">
       
       (source)
     </a>
@@ -1822,7 +1822,7 @@ Literal output may expose sensitive information.</td></tr></table><table class="
   </div>
   <div class="docstring functionBody">
     <div class="interfaceinfo">overridden in <code><a href="orionis.database.Connection.html" class="internal-link">orionis.database.Connection</a></code></div>
-    <div><p>Run an UPDATE statement described by the given plan.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">plan:</span><code><a href="orionis.orm.query.UpdatePlan.html" class="internal-link" title="orionis.orm.query.UpdatePlan">UpdatePlan</a></code></td><td class="fieldArgDesc">Update plan with values and filtering conditions.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code></td><td class="fieldArgDesc">Number of affected rows.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code>QueryException</code></td><td>If the statement fails to compile or execute.</td></tr></table></div>
+    <div><p>Run an UPDATE statement described by the given plan.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">plan:</span><code><a href="orionis.orm.query.UpdatePlan.html" class="internal-link">orionis.orm.query.UpdatePlan</a></code></td><td class="fieldArgDesc">Update plan with values and filtering conditions.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code></td><td class="fieldArgDesc">Number of affected rows.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.database.QueryException.html" class="internal-link">orionis.database.QueryException</a></code></td><td>If the statement fails to compile or execute.</td></tr></table></div>
   </div>
 </div><div class="baseclassvariable">
   
@@ -1836,7 +1836,7 @@ Literal output may expose sensitive information.</td></tr></table><table class="
   <div class="functionHeader">
     
     <span class="py-defname">__slots__</span>: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" class="intersphinx-link">tuple</a></code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/database/contracts/connection.py#L29">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/database/contracts/connection.py#L31">
       
       (source)
     </a>
@@ -1848,7 +1848,7 @@ Literal output may expose sensitive information.</td></tr></table><table class="
   </div>
   <div class="functionBody">
     <div class="interfaceinfo">overridden in <code><a href="orionis.database.Connection.html" class="internal-link">orionis.database.Connection</a></code></div>
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p>Declare that this class introduces no additional instance slots.</p></div>
     
   </div>
 </div>
@@ -1862,7 +1862,7 @@ Literal output may expose sensitive information.</td></tr></table><table class="
   <div class="orionis-footer-inner">
     <div class="orionis-footer-copy">
       <p>API documentation for <a href="https://orionis-framework.com/" class="projecthome">Orionis</a>.</p>
-      <p class="orionis-footer-meta">Generated with <a href="https://github.com/twisted/pydoctor/">Pydoctor</a> 25.10.1.<span class="orionis-footer-build"> Built 2026-11-03 09:36:58.</span></p>
+      <p class="orionis-footer-meta">Generated with <a href="https://github.com/twisted/pydoctor/">Pydoctor</a> 25.10.1.<span class="orionis-footer-build"> Built 2026-11-03 13:00:15.</span></p>
     </div>
     <nav class="orionis-footer-links" aria-label="Additional resources">
       <a href="https://docs.orionis-framework.com">Read the guide <span aria-hidden="true">↗</span></a>

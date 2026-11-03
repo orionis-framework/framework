@@ -417,7 +417,7 @@
                     
                 </label>
 
-                <code><a href="orionis.orm.collections.paginator.html" class="internal-link" title="orionis.orm.collections.paginator">paginator</a></code>
+                <code><a href="orionis.orm.collections.paginator.module.html" class="internal-link" title="orionis.orm.collections.paginator">paginator</a></code>
 
                 <div class="expandableContent">
                     <div>
@@ -781,19 +781,19 @@
         </div>
 
         <div class="extrasDocstring">
-          <p class="class-signature"><code><span class="py-keyword">class</span> <span class="py-defname">Paginator</span>: <a href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/orm/collections/paginator.py#L8" class="sourceLink">(source)</a></code></p><p>Constructor: <code><a href="#__init__" class="internal-link" title="orionis.orm.collections.Paginator.__init__">Paginator(items, total, page, per_page)</a></code></p><p><a href="classIndex.html#orionis.orm.collections.Paginator">View In Hierarchy</a></p>
+          <p class="class-signature"><code><span class="py-keyword">class</span> <span class="py-defname">Paginator</span>: <a href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/orm/collections/paginator.py#L10" class="sourceLink">(source)</a></code></p><p>Constructor: <code><a href="#__init__" class="internal-link" title="orionis.orm.collections.Paginator.__init__">Paginator(items, total, page, per_page)</a></code></p><p><a href="classIndex.html#orionis.orm.collections.Paginator">View In Hierarchy</a></p>
         </div>
 
         <div class="moduleDocstring">
           <div><p>Length-aware page of query results.</p>
-<p>Wraps a <code><a href="orionis.support.types.Collection.html" class="internal-link" title="orionis.support.types.Collection">Collection</a></code> of items together with the pagination
+<p>Wraps a <code><a href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Collection" class="intersphinx-link">collections.abc.Collection</a></code> of items together with the pagination
 metadata required to render page controls: total row count, current
 page, page size, and derived navigation flags.</p>
 </div>
         </div>
 
         <div id="split-tables">
-          <table class="children sortable" id="id1537">
+          <table class="children sortable" id="id1541">
   
   
   <tr class="method">
@@ -825,27 +825,27 @@ page, page size, and derived navigation flags.</p>
     
     <td>Class Variable</td>
     <td><code><a href="#__slots__" class="internal-link" title="orionis.orm.collections.Paginator.__slots__">__slots__</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
+    <td>Declare the instance attribute slots reserved by this class.</td>
   </tr><tr class="instancevariable">
     
     <td>Instance Variable</td>
     <td><code><a href="#_items" class="internal-link" title="orionis.orm.collections.Paginator._items">_items</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
+    <td>Items for the current page.</td>
   </tr><tr class="instancevariable">
     
     <td>Instance Variable</td>
     <td><code><a href="#_page" class="internal-link" title="orionis.orm.collections.Paginator._page">_page</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
+    <td>Current page number, starting at 1.</td>
   </tr><tr class="instancevariable">
     
     <td>Instance Variable</td>
     <td><code><a href="#_per_page" class="internal-link" title="orionis.orm.collections.Paginator._per_page">_per<wbr></wbr>_page</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
+    <td>Number of items per page.</td>
   </tr><tr class="instancevariable">
     
     <td>Instance Variable</td>
     <td><code><a href="#_total" class="internal-link" title="orionis.orm.collections.Paginator._total">_total</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
+    <td>Total number of rows across all pages.</td>
   </tr><tr class="property">
     
     <td>Property</td>
@@ -902,7 +902,7 @@ page, page size, and derived navigation flags.</p>
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">__init__</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">items: <code>Collection</code>, </span><span class="rst-sig-param">total: <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code>, </span><span class="rst-sig-param">page: <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code>, </span><span class="rst-sig-param">per_page: <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code></span>):</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/orm/collections/paginator.py#L19">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/orm/collections/paginator.py#L22">
       
       (source)
     </a>
@@ -914,7 +914,7 @@ page, page size, and derived navigation flags.</p>
   </div>
   <div class="docstring functionBody">
     
-    <div><p>Initialize the paginator with its items and metadata.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">items:</span><code><a href="orionis.support.types.Collection.html" class="internal-link" title="orionis.support.types.Collection">Collection</a></code></td><td class="fieldArgDesc">Items for the current page.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">total:</span><code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code></td><td class="fieldArgDesc">Total number of rows across all pages.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">page:</span><code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code></td><td class="fieldArgDesc">Current page number, starting at 1.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">per<wbr></wbr>_page:</span><code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code></td><td class="fieldArgDesc">Number of items per page.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">This method does not return a value.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/exceptions.html#ValueError" class="intersphinx-link">ValueError</a></code></td><td>If the page or page size are not positive integers.</td></tr></table></div>
+    <div><p>Initialize the paginator with its items and metadata.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">items:</span><code><a href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Collection" class="intersphinx-link">collections.abc.Collection</a></code></td><td class="fieldArgDesc">Items for the current page.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">total:</span><code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code></td><td class="fieldArgDesc">Total number of rows across all pages.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">page:</span><code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code></td><td class="fieldArgDesc">Current page number, starting at 1.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">per<wbr></wbr>_page:</span><code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code></td><td class="fieldArgDesc">Number of items per page.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">This method does not return a value.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/exceptions.html#ValueError" class="intersphinx-link">ValueError</a></code></td><td>If the page or page size are not positive integers.</td></tr></table></div>
   </div>
 </div><div class="basemethod">
   
@@ -929,7 +929,7 @@ page, page size, and derived navigation flags.</p>
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">__len__</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/orm/collections/paginator.py#L187">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/orm/collections/paginator.py#L194">
       
       (source)
     </a>
@@ -956,7 +956,7 @@ page, page size, and derived navigation flags.</p>
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">__repr__</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/orm/collections/paginator.py#L198">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/orm/collections/paginator.py#L205">
       
       (source)
     </a>
@@ -983,7 +983,7 @@ page, page size, and derived navigation flags.</p>
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">toDict</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/stdtypes.html#dict" class="intersphinx-link">dict</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <wbr></wbr>Any]</code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/orm/collections/paginator.py#L151">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/orm/collections/paginator.py#L158">
       
       (source)
     </a>
@@ -1010,7 +1010,7 @@ page, page size, and derived navigation flags.</p>
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">toJson</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">**kwargs: <code>Any</code></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/orm/collections/paginator.py#L170">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/orm/collections/paginator.py#L177">
       
       (source)
     </a>
@@ -1022,7 +1022,7 @@ page, page size, and derived navigation flags.</p>
   </div>
   <div class="docstring functionBody">
     
-    <div><p>Serialize the page and its metadata into a JSON string.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">**kwargs:</span><code>Any</code></td><td class="fieldArgDesc">Additional keyword arguments forwarded to <tt class="rst-docutils rst-literal">json.dumps</tt>.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">JSON representation of the page.</td></tr></table></div>
+    <div><p>Serialize the page and its metadata into a JSON string.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">**kwargs:</span><code><a href="https://docs.python.org/3/library/typing.html#typing.Any" class="intersphinx-link">typing.Any</a></code></td><td class="fieldArgDesc">Additional keyword arguments forwarded to <tt class="rst-docutils rst-literal">json.dumps</tt>.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">JSON representation of the page.</td></tr></table></div>
   </div>
 </div><div class="baseclassvariable">
   
@@ -1036,7 +1036,7 @@ page, page size, and derived navigation flags.</p>
   <div class="functionHeader">
     
     <span class="py-defname">__slots__</span>: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" class="intersphinx-link">tuple</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <wbr></wbr><span class="rst-variable-ellipsis">...</span>]</code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/orm/collections/paginator.py#L17">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/orm/collections/paginator.py#L19">
       
       (source)
     </a>
@@ -1048,7 +1048,7 @@ page, page size, and derived navigation flags.</p>
   </div>
   <div class="functionBody">
     
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p>Declare the instance attribute slots reserved by this class.</p></div>
     
   </div>
 </div><div class="baseinstancevariable">
@@ -1063,7 +1063,7 @@ page, page size, and derived navigation flags.</p>
   <div class="functionHeader">
     
     <span class="py-defname">_items</span> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/orm/collections/paginator.py#L58">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/orm/collections/paginator.py#L61">
       
       (source)
     </a>
@@ -1075,7 +1075,7 @@ page, page size, and derived navigation flags.</p>
   </div>
   <div class="functionBody">
     
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p>Items for the current page.</p></div>
     
   </div>
 </div><div class="baseinstancevariable">
@@ -1090,7 +1090,7 @@ page, page size, and derived navigation flags.</p>
   <div class="functionHeader">
     
     <span class="py-defname">_page</span> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/orm/collections/paginator.py#L60">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/orm/collections/paginator.py#L65">
       
       (source)
     </a>
@@ -1102,7 +1102,7 @@ page, page size, and derived navigation flags.</p>
   </div>
   <div class="functionBody">
     
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p>Current page number, starting at 1.</p></div>
     
   </div>
 </div><div class="baseinstancevariable">
@@ -1117,7 +1117,7 @@ page, page size, and derived navigation flags.</p>
   <div class="functionHeader">
     
     <span class="py-defname">_per_page</span> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/orm/collections/paginator.py#L61">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/orm/collections/paginator.py#L67">
       
       (source)
     </a>
@@ -1129,7 +1129,7 @@ page, page size, and derived navigation flags.</p>
   </div>
   <div class="functionBody">
     
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p>Number of items per page.</p></div>
     
   </div>
 </div><div class="baseinstancevariable">
@@ -1144,7 +1144,7 @@ page, page size, and derived navigation flags.</p>
   <div class="functionHeader">
     
     <span class="py-defname">_total</span> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/orm/collections/paginator.py#L59">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/orm/collections/paginator.py#L63">
       
       (source)
     </a>
@@ -1156,7 +1156,7 @@ page, page size, and derived navigation flags.</p>
   </div>
   <div class="functionBody">
     
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p>Total number of rows across all pages.</p></div>
     
   </div>
 </div><div class="baseproperty">
@@ -1171,7 +1171,7 @@ page, page size, and derived navigation flags.</p>
   <div class="functionHeader">
     <div><span class="decorator">@<a href="https://docs.python.org/3/builtins/functions.html#property" class="intersphinx-link">property</a><br /></span></div>
     <span class="py-defname">hasNext</span>: <code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/orm/collections/paginator.py#L125">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/orm/collections/paginator.py#L132">
       
       (source)
     </a>
@@ -1198,7 +1198,7 @@ page, page size, and derived navigation flags.</p>
   <div class="functionHeader">
     <div><span class="decorator">@<a href="https://docs.python.org/3/builtins/functions.html#property" class="intersphinx-link">property</a><br /></span></div>
     <span class="py-defname">hasPrevious</span>: <code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/orm/collections/paginator.py#L137">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/orm/collections/paginator.py#L144">
       
       (source)
     </a>
@@ -1225,7 +1225,7 @@ page, page size, and derived navigation flags.</p>
   <div class="functionHeader">
     <div><span class="decorator">@<a href="https://docs.python.org/3/builtins/functions.html#property" class="intersphinx-link">property</a><br /></span></div>
     <span class="py-defname">items</span>: <code>Collection</code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/orm/collections/paginator.py#L65">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/orm/collections/paginator.py#L72">
       
       (source)
     </a>
@@ -1237,7 +1237,7 @@ page, page size, and derived navigation flags.</p>
   </div>
   <div class="functionBody">
     
-    <div><p>Return the items for the current page.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.support.types.Collection.html" class="internal-link" title="orionis.support.types.Collection">Collection</a></code></td><td class="fieldArgDesc">Items of the current page.</td></tr></table></div>
+    <div><p>Return the items for the current page.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Collection" class="intersphinx-link">collections.abc.Collection</a></code></td><td class="fieldArgDesc">Items of the current page.</td></tr></table></div>
     
   </div>
 </div><div class="baseproperty">
@@ -1252,7 +1252,7 @@ page, page size, and derived navigation flags.</p>
   <div class="functionHeader">
     <div><span class="decorator">@<a href="https://docs.python.org/3/builtins/functions.html#property" class="intersphinx-link">property</a><br /></span></div>
     <span class="py-defname">lastPage</span>: <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/orm/collections/paginator.py#L113">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/orm/collections/paginator.py#L120">
       
       (source)
     </a>
@@ -1279,7 +1279,7 @@ page, page size, and derived navigation flags.</p>
   <div class="functionHeader">
     <div><span class="decorator">@<a href="https://docs.python.org/3/builtins/functions.html#property" class="intersphinx-link">property</a><br /></span></div>
     <span class="py-defname">page</span>: <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/orm/collections/paginator.py#L89">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/orm/collections/paginator.py#L96">
       
       (source)
     </a>
@@ -1306,7 +1306,7 @@ page, page size, and derived navigation flags.</p>
   <div class="functionHeader">
     <div><span class="decorator">@<a href="https://docs.python.org/3/builtins/functions.html#property" class="intersphinx-link">property</a><br /></span></div>
     <span class="py-defname">perPage</span>: <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/orm/collections/paginator.py#L101">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/orm/collections/paginator.py#L108">
       
       (source)
     </a>
@@ -1333,7 +1333,7 @@ page, page size, and derived navigation flags.</p>
   <div class="functionHeader">
     <div><span class="decorator">@<a href="https://docs.python.org/3/builtins/functions.html#property" class="intersphinx-link">property</a><br /></span></div>
     <span class="py-defname">total</span>: <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/orm/collections/paginator.py#L77">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/orm/collections/paginator.py#L84">
       
       (source)
     </a>
@@ -1359,7 +1359,7 @@ page, page size, and derived navigation flags.</p>
   <div class="orionis-footer-inner">
     <div class="orionis-footer-copy">
       <p>API documentation for <a href="https://orionis-framework.com/" class="projecthome">Orionis</a>.</p>
-      <p class="orionis-footer-meta">Generated with <a href="https://github.com/twisted/pydoctor/">Pydoctor</a> 25.10.1.<span class="orionis-footer-build"> Built 2026-11-03 09:36:58.</span></p>
+      <p class="orionis-footer-meta">Generated with <a href="https://github.com/twisted/pydoctor/">Pydoctor</a> 25.10.1.<span class="orionis-footer-build"> Built 2026-11-03 13:00:15.</span></p>
     </div>
     <nav class="orionis-footer-links" aria-label="Additional resources">
       <a href="https://docs.orionis-framework.com">Read the guide <span aria-hidden="true">↗</span></a>

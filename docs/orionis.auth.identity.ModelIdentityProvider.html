@@ -149,7 +149,7 @@
       <div>
          
           <div class="childrenKindTitle">Contents</div>
-          <ul><li><a class="rst-internal rst-reference" href="#rst-concurrency" id="rst-toc-entry-3">Concurrency</a></li>
+          <ul><li><a class="rst-internal rst-reference" href="#rst-concurrency">Concurrency</a></li>
 </ul>
         
 
@@ -446,7 +446,7 @@
                     <div>
          
           <div class="childrenKindTitle">Contents</div>
-          <ul><li><a class="rst-internal rst-reference" href="#rst-concurrency" id="rst-toc-entry-4">Concurrency</a></li>
+          <ul><li><a class="rst-internal rst-reference" href="#rst-concurrency">Concurrency</a></li>
 </ul>
         
 
@@ -706,7 +706,7 @@
         </div>
 
         <div class="extrasDocstring">
-          <p class="class-signature"><code><span class="py-keyword">class</span> <span class="py-defname">ModelIdentityProvider</span>(IIdentityProvider): <a href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/auth/identity/provider.py#L26" class="sourceLink">(source)</a></code></p><p>Constructor: <code><a href="#__init__" class="internal-link" title="orionis.auth.identity.ModelIdentityProvider.__init__">ModelIdentityProvider(app, hasher)</a></code></p><p><a href="classIndex.html#orionis.auth.identity.ModelIdentityProvider">View In Hierarchy</a></p>
+          <p class="class-signature"><code><span class="py-keyword">class</span> <span class="py-defname">ModelIdentityProvider</span>(IIdentityProvider): <a href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/auth/identity/provider.py#L34" class="sourceLink">(source)</a></code></p><p>Constructor: <code><a href="#__init__" class="internal-link" title="orionis.auth.identity.ModelIdentityProvider.__init__">ModelIdentityProvider(app, hasher)</a></code></p><p><a href="classIndex.html#orionis.auth.identity.ModelIdentityProvider">View In Hierarchy</a></p>
         </div>
 
         <div class="moduleDocstring">
@@ -716,7 +716,7 @@ path travels through <tt class="rst-docutils rst-literal">config/auth.py</tt>, w
 free of any dependency on application code and allows any model to
 play the role of the authenticatable identity.</p>
 <div class="rst-section" id="rst-concurrency">
-<h2 class="heading"><a class="rst-toc-backref" href="#rst-toc-entry-2">Concurrency</a></h2>
+<h2 class="heading">Concurrency</h2>
 <p>The provider is stateless apart from the memoised model class, which
 is a pure function of the configuration. A concurrent first import
 may resolve the same class twice with no observable difference.</p>
@@ -767,27 +767,27 @@ may resolve the same class twice with no observable difference.</p>
     
     <td>Class Variable</td>
     <td><code><a href="#__slots__" class="internal-link" title="orionis.auth.identity.ModelIdentityProvider.__slots__">__slots__</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
+    <td>Declare the instance attribute slots reserved by this class.</td>
   </tr><tr class="instancevariable">
     
     <td>Instance Variable</td>
     <td><code><a href="#__hasher" class="internal-link" title="orionis.auth.identity.ModelIdentityProvider.__hasher">__hasher</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
+    <td>Hashing service used to verify submitted passwords.</td>
   </tr><tr class="instancevariable">
     
     <td>Instance Variable</td>
     <td><code><a href="#__model" class="internal-link" title="orionis.auth.identity.ModelIdentityProvider.__model">__model</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
+    <td>Model selected for generation or persistence.</td>
   </tr><tr class="instancevariable">
     
     <td>Instance Variable</td>
     <td><code><a href="#__model_path" class="internal-link" title="orionis.auth.identity.ModelIdentityProvider.__model_path">__model<wbr></wbr>_path</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
+    <td>Import path of the configured authenticatable model.</td>
   </tr><tr class="instancevariable">
     
     <td>Instance Variable</td>
     <td><code><a href="#__username_field" class="internal-link" title="orionis.auth.identity.ModelIdentityProvider.__username_field">__username<wbr></wbr>_field</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
+    <td>Model field used to locate an identity by username.</td>
   </tr>
 </table>
           
@@ -809,7 +809,7 @@ may resolve the same class twice with no observable difference.</p>
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">__init__</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">app: <code>IApplication</code>, </span><span class="rst-sig-param">hasher: <code>IHashManager</code></span>):</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/auth/identity/provider.py#L51">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/auth/identity/provider.py#L60">
       
       (source)
     </a>
@@ -821,7 +821,7 @@ may resolve the same class twice with no observable difference.</p>
   </div>
   <div class="docstring functionBody">
     
-    <div><p>Initialise the provider from the authentication configuration.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">app:</span><code><a href="orionis.IApplication.html" class="internal-link" title="orionis.IApplication">IApplication</a></code></td><td class="fieldArgDesc">Application exposing the <tt class="rst-docutils rst-literal">auth.identity</tt> configuration.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">hasher:</span><code><a href="orionis.hashing.contracts.IHashManager.html" class="internal-link" title="orionis.hashing.contracts.IHashManager">IHashManager</a></code></td><td class="fieldArgDesc">Hashing service used to verify submitted passwords.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">The model class stays unresolved until the first lookup.</td></tr></table></div>
+    <div><p>Initialise the provider from the authentication configuration.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">app:</span><code><a href="orionis.IApplication.html" class="internal-link">orionis.IApplication</a></code></td><td class="fieldArgDesc">Application exposing the <tt class="rst-docutils rst-literal">auth.identity</tt> configuration.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">hasher:</span><code><a href="orionis.hashing.contracts.IHashManager.html" class="internal-link">orionis.hashing.contracts.IHashManager</a></code></td><td class="fieldArgDesc">Hashing service used to verify submitted passwords.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">The model class stays unresolved until the first lookup.</td></tr></table></div>
   </div>
 </div><div class="basemethod">
   
@@ -836,7 +836,7 @@ may resolve the same class twice with no observable difference.</p>
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">__normalizeIdentifier</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">identifier: <code><a href="https://docs.python.org/3/builtins/functions.html#object" class="intersphinx-link">object</a></code></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/functions.html#object" class="intersphinx-link">object</a> | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/auth/identity/provider.py#L142">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/auth/identity/provider.py#L155">
       
       (source)
     </a>
@@ -863,7 +863,7 @@ may resolve the same class twice with no observable difference.</p>
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">model</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/functions.html#type" class="intersphinx-link">type</a>[<wbr></wbr>Model]</code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/auth/identity/provider.py#L76">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/auth/identity/provider.py#L89">
       
       (source)
     </a>
@@ -875,8 +875,8 @@ may resolve the same class twice with no observable difference.</p>
   </div>
   <div class="docstring functionBody">
     
-    <div><p>Return the model class backing the authenticated identity.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/functions.html#type" class="intersphinx-link">type</a>[<a href="orionis.orm.Model.html" class="internal-link" title="orionis.orm.Model">Model</a>]</code></td><td class="fieldArgDesc">Model class resolved from the configured dotted path.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code>IdentityProviderException</code></td><td>When the path cannot be imported or the resolved class does
-not implement <code><a href="orionis.auth.contracts.IAuthenticatable.html" class="internal-link" title="orionis.auth.contracts.IAuthenticatable">IAuthenticatable</a></code>.</td></tr></table></div>
+    <div><p>Return the model class backing the authenticated identity.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/functions.html#type" class="intersphinx-link">type</a>[<a href="orionis.orm.Model.html" class="internal-link">orionis.orm.Model</a>]</code></td><td class="fieldArgDesc">Model class resolved from the configured dotted path.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.auth.IdentityProviderException.html" class="internal-link">orionis.auth.IdentityProviderException</a></code></td><td>When the path cannot be imported or the resolved class does
+not implement <code><a href="orionis.auth.contracts.IAuthenticatable.html" class="internal-link">orionis.auth.contracts.IAuthenticatable</a></code>.</td></tr></table></div>
   </div>
 </div><div class="basemethod">
   
@@ -891,7 +891,7 @@ not implement <code><a href="orionis.auth.contracts.IAuthenticatable.html" class
     
     
     <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">retrieveByCredentials</span><span class="function-signature long-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">credentials: <code>Mapping[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <wbr></wbr><a href="https://docs.python.org/3/builtins/functions.html#object" class="intersphinx-link">object</a>]</code></span>) -&gt; <code>IAuthenticatable | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/auth/identity/provider.py#L175">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/auth/identity/provider.py#L188">
       
       (source)
     </a>
@@ -903,8 +903,8 @@ not implement <code><a href="orionis.auth.contracts.IAuthenticatable.html" class
   </div>
   <div class="docstring functionBody">
     
-    <div><p>Retrieve an identity matching the public credential.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">credentials:</span><code>Mapping[<a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <a href="https://docs.python.org/3/builtins/functions.html#object" class="intersphinx-link">object</a>]</code></td><td class="fieldArgDesc">Submitted credentials. Only the configured username field is
-read; the secret is deliberately ignored here.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code>IAuthenticatable | None</code></td><td class="fieldArgDesc">Matching identity, or <tt class="rst-docutils rst-literal">None</tt> when no identity matches.</td></tr></table></div>
+    <div><p>Retrieve an identity matching the public credential.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">credentials:</span><code><a href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Mapping" class="intersphinx-link">collections.abc.Mapping</a>[<a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <a href="https://docs.python.org/3/builtins/functions.html#object" class="intersphinx-link">object</a>]</code></td><td class="fieldArgDesc">Submitted credentials. Only the configured username field is
+read; the secret is deliberately ignored here.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code>orionis.auth.contracts.IAuthenticatable | None</code></td><td class="fieldArgDesc">Matching identity, or <tt class="rst-docutils rst-literal">None</tt> when no identity matches.</td></tr></table></div>
   </div>
 </div><div class="basemethod">
   
@@ -919,7 +919,7 @@ read; the secret is deliberately ignored here.</td></tr></table><table class="fi
     
     
     <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">retrieveById</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">identifier: <code><a href="https://docs.python.org/3/builtins/functions.html#object" class="intersphinx-link">object</a></code></span>) -&gt; <code>IAuthenticatable | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/auth/identity/provider.py#L118">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/auth/identity/provider.py#L131">
       
       (source)
     </a>
@@ -931,7 +931,7 @@ read; the secret is deliberately ignored here.</td></tr></table><table class="fi
   </div>
   <div class="docstring functionBody">
     
-    <div><p>Retrieve an identity by its primary key.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">identifier:</span><code><a href="https://docs.python.org/3/builtins/functions.html#object" class="intersphinx-link">object</a></code></td><td class="fieldArgDesc">Value previously returned by <tt class="rst-docutils rst-literal">getAuthIdentifier()</tt>.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code>IAuthenticatable | None</code></td><td class="fieldArgDesc">Matching identity, or <tt class="rst-docutils rst-literal">None</tt> when it no longer exists.</td></tr></table></div>
+    <div><p>Retrieve an identity by its primary key.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">identifier:</span><code><a href="https://docs.python.org/3/builtins/functions.html#object" class="intersphinx-link">object</a></code></td><td class="fieldArgDesc">Value previously returned by <tt class="rst-docutils rst-literal">getAuthIdentifier()</tt>.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code>orionis.auth.contracts.IAuthenticatable | None</code></td><td class="fieldArgDesc">Matching identity, or <tt class="rst-docutils rst-literal">None</tt> when it no longer exists.</td></tr></table></div>
   </div>
 </div><div class="basemethod">
   
@@ -946,7 +946,7 @@ read; the secret is deliberately ignored here.</td></tr></table><table class="fi
     
     
     <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">updateRememberToken</span><span class="function-signature long-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">identity: <code>IAuthenticatable</code>, </span><span class="rst-sig-param">expected: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a> | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code>, </span><span class="rst-sig-param">token: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a> | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/auth/identity/provider.py#L200">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/auth/identity/provider.py#L213">
       
       (source)
     </a>
@@ -958,7 +958,7 @@ read; the secret is deliberately ignored here.</td></tr></table><table class="fi
   </div>
   <div class="docstring functionBody">
     
-    <div><p>Compare and replace an identity's remember token atomically.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">identity:</span><code><a href="orionis.auth.contracts.IAuthenticatable.html" class="internal-link" title="orionis.auth.contracts.IAuthenticatable">IAuthenticatable</a></code></td><td class="fieldArgDesc">Identity whose remember token should be updated.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">expected:</span><code>str | None</code></td><td class="fieldArgDesc">Current token expected in storage, or <tt class="rst-docutils rst-literal">None</tt> if it is absent.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">token:</span><code>str | None</code></td><td class="fieldArgDesc">Replacement token, or <tt class="rst-docutils rst-literal">None</tt> to revoke the current token.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code></td><td class="fieldArgDesc">True if exactly one eligible identity row was updated; otherwise,
+    <div><p>Compare and replace an identity's remember token atomically.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">identity:</span><code><a href="orionis.auth.contracts.IAuthenticatable.html" class="internal-link">orionis.auth.contracts.IAuthenticatable</a></code></td><td class="fieldArgDesc">Identity whose remember token should be updated.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">expected:</span><code>str | None</code></td><td class="fieldArgDesc">Current token expected in storage, or <tt class="rst-docutils rst-literal">None</tt> if it is absent.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">token:</span><code>str | None</code></td><td class="fieldArgDesc">Replacement token, or <tt class="rst-docutils rst-literal">None</tt> to revoke the current token.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code></td><td class="fieldArgDesc">True if exactly one eligible identity row was updated; otherwise,
 False.</td></tr></table></div>
   </div>
 </div><div class="basemethod">
@@ -974,7 +974,7 @@ False.</td></tr></table></div>
     
     
     <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">validateCredentials</span><span class="function-signature long-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">identity: <code>IAuthenticatable | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code>, </span><span class="rst-sig-param">credentials: <code>Mapping[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <wbr></wbr><a href="https://docs.python.org/3/builtins/functions.html#object" class="intersphinx-link">object</a>]</code></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/auth/identity/provider.py#L238">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/auth/identity/provider.py#L251">
       
       (source)
     </a>
@@ -992,7 +992,7 @@ loop stays free. Unknown identities still perform password hashing
 work. This reduces account enumeration signals without promising
 exact timing equality across hash algorithms or historical cost
 settings. Backend input errors are treated as invalid credentials.</p>
-<table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">identity:</span><code>IAuthenticatable | None</code></td><td class="fieldArgDesc">Identity returned by <tt class="rst-docutils rst-literal">retrieveByCredentials()</tt>.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">credentials:</span><code>Mapping[<a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <a href="https://docs.python.org/3/builtins/functions.html#object" class="intersphinx-link">object</a>]</code></td><td class="fieldArgDesc">Submitted credentials.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code></td><td class="fieldArgDesc">True only when the password matches the stored hash.</td></tr></table></div>
+<table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">identity:</span><code>orionis.auth.contracts.IAuthenticatable | None</code></td><td class="fieldArgDesc">Identity returned by <tt class="rst-docutils rst-literal">retrieveByCredentials()</tt>.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">credentials:</span><code><a href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Mapping" class="intersphinx-link">collections.abc.Mapping</a>[<a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <a href="https://docs.python.org/3/builtins/functions.html#object" class="intersphinx-link">object</a>]</code></td><td class="fieldArgDesc">Submitted credentials.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code></td><td class="fieldArgDesc">True only when the password matches the stored hash.</td></tr></table></div>
   </div>
 </div><div class="baseclassvariable">
   
@@ -1006,7 +1006,7 @@ settings. Backend input errors are treated as invalid credentials.</p>
   <div class="functionHeader">
     
     <span class="py-defname">__slots__</span>: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" class="intersphinx-link">tuple</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <wbr></wbr><span class="rst-variable-ellipsis">...</span>]</code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/auth/identity/provider.py#L44">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/auth/identity/provider.py#L52">
       
       (source)
     </a>
@@ -1018,7 +1018,7 @@ settings. Backend input errors are treated as invalid credentials.</p>
   </div>
   <div class="functionBody">
     
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p>Declare the instance attribute slots reserved by this class.</p></div>
     
   </div>
 </div><div class="baseinstancevariable">
@@ -1033,7 +1033,7 @@ settings. Backend input errors are treated as invalid credentials.</p>
   <div class="functionHeader">
     
     <span class="py-defname">__hasher</span> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/auth/identity/provider.py#L73">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/auth/identity/provider.py#L84">
       
       (source)
     </a>
@@ -1045,7 +1045,7 @@ settings. Backend input errors are treated as invalid credentials.</p>
   </div>
   <div class="functionBody">
     
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p>Hashing service used to verify submitted passwords.</p></div>
     
   </div>
 </div><div class="baseinstancevariable">
@@ -1060,7 +1060,7 @@ settings. Backend input errors are treated as invalid credentials.</p>
   <div class="functionHeader">
     
     <span class="py-defname">__model</span>: <code><a href="https://docs.python.org/3/builtins/functions.html#type" class="intersphinx-link">type</a>[<wbr></wbr>Model] | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/auth/identity/provider.py#L74">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/auth/identity/provider.py#L86">
       
       (source)
     </a>
@@ -1072,7 +1072,7 @@ settings. Backend input errors are treated as invalid credentials.</p>
   </div>
   <div class="functionBody">
     
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p>Model selected for generation or persistence.</p></div>
     
   </div>
 </div><div class="baseinstancevariable">
@@ -1087,7 +1087,7 @@ settings. Backend input errors are treated as invalid credentials.</p>
   <div class="functionHeader">
     
     <span class="py-defname">__model_path</span>: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/auth/identity/provider.py#L67">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/auth/identity/provider.py#L76">
       
       (source)
     </a>
@@ -1099,7 +1099,7 @@ settings. Backend input errors are treated as invalid credentials.</p>
   </div>
   <div class="functionBody">
     
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p>Import path of the configured authenticatable model.</p></div>
     
   </div>
 </div><div class="baseinstancevariable">
@@ -1114,7 +1114,7 @@ settings. Backend input errors are treated as invalid credentials.</p>
   <div class="functionHeader">
     
     <span class="py-defname">__username_field</span>: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/auth/identity/provider.py#L70">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/auth/identity/provider.py#L80">
       
       (source)
     </a>
@@ -1126,7 +1126,7 @@ settings. Backend input errors are treated as invalid credentials.</p>
   </div>
   <div class="functionBody">
     
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p>Model field used to locate an identity by username.</p></div>
     
   </div>
 </div>
@@ -1140,7 +1140,7 @@ settings. Backend input errors are treated as invalid credentials.</p>
   <div class="orionis-footer-inner">
     <div class="orionis-footer-copy">
       <p>API documentation for <a href="https://orionis-framework.com/" class="projecthome">Orionis</a>.</p>
-      <p class="orionis-footer-meta">Generated with <a href="https://github.com/twisted/pydoctor/">Pydoctor</a> 25.10.1.<span class="orionis-footer-build"> Built 2026-11-03 09:36:58.</span></p>
+      <p class="orionis-footer-meta">Generated with <a href="https://github.com/twisted/pydoctor/">Pydoctor</a> 25.10.1.<span class="orionis-footer-build"> Built 2026-11-03 13:00:15.</span></p>
     </div>
     <nav class="orionis-footer-links" aria-label="Additional resources">
       <a href="https://docs.orionis-framework.com">Read the guide <span aria-hidden="true">↗</span></a>

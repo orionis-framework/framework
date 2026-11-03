@@ -568,11 +568,11 @@
         </div>
 
         <div class="extrasDocstring">
-          <p class="class-signature"><code><span class="py-keyword">class</span> <span class="py-defname">FacadeMeta</span>(<a href="https://docs.python.org/3/builtins/functions.html#type" class="intersphinx-link">type</a>): <a href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/container/facades/meta.py#L136" class="sourceLink">(source)</a></code></p><p>Known subclasses: <code><a href="orionis.container.facades.meta.ScopedFacadeMeta.html" class="internal-link">orionis.container.facades.meta.ScopedFacadeMeta</a></code></p><p><a href="classIndex.html#orionis.container.facades.meta.FacadeMeta">View In Hierarchy</a></p>
+          <p class="class-signature"><code><span class="py-keyword">class</span> <span class="py-defname">FacadeMeta</span>(<a href="https://docs.python.org/3/builtins/functions.html#type" class="intersphinx-link">type</a>): <a href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/container/facades/meta.py#L145" class="sourceLink">(source)</a></code></p><p>Known subclasses: <code><a href="orionis.container.facades.meta.ScopedFacadeMeta.html" class="internal-link">orionis.container.facades.meta.ScopedFacadeMeta</a></code></p><p><a href="classIndex.html#orionis.container.facades.meta.FacadeMeta">View In Hierarchy</a></p>
         </div>
 
         <div class="moduleDocstring">
-          <div><p class="undocumented">Undocumented</p></div>
+          <div><p>Resolve the facade meta service through the application facade.</p></div>
         </div>
 
         <div id="split-tables">
@@ -605,7 +605,7 @@
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">__getattr__</span><span class="function-signature">(<span class="rst-sig-param">cls, </span><span class="rst-sig-param">name: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/functions.html#object" class="intersphinx-link">object</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/container/facades/meta.py#L138">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/container/facades/meta.py#L148">
       
       (source)
     </a>
@@ -617,7 +617,7 @@
   </div>
   <div class="docstring functionBody">
     <div class="interfaceinfo">overridden in <code><a href="orionis.container.facades.meta.ScopedFacadeMeta.html" class="internal-link">orionis.container.facades.meta.ScopedFacadeMeta</a></code></div>
-    <div><p>Return a proxy for a facade attribute.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">cls</span></td><td class="fieldArgDesc"><span class="undocumented">Undocumented</span></td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">name:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Specify the requested attribute name.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/functions.html#object" class="intersphinx-link">object</a></code></td><td class="fieldArgDesc">Return the pinned attribute when an instance is pinned;
+    <div><p>Return a proxy for a facade attribute.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">cls:</span><code><a href="https://docs.python.org/3/builtins/functions.html#type" class="intersphinx-link">type</a></code></td><td class="fieldArgDesc">Class on which the operation is performed.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">name:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Specify the requested attribute name.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/functions.html#object" class="intersphinx-link">object</a></code></td><td class="fieldArgDesc">Return the pinned attribute when an instance is pinned;
 otherwise return a dispatcher that defers resolution until
 the call is awaited or entered as an async context manager.</td></tr></table></div>
   </div>
@@ -632,7 +632,7 @@ the call is awaited or entered as an async context manager.</td></tr></table></d
   <div class="orionis-footer-inner">
     <div class="orionis-footer-copy">
       <p>API documentation for <a href="https://orionis-framework.com/" class="projecthome">Orionis</a>.</p>
-      <p class="orionis-footer-meta">Generated with <a href="https://github.com/twisted/pydoctor/">Pydoctor</a> 25.10.1.<span class="orionis-footer-build"> Built 2026-11-03 09:36:58.</span></p>
+      <p class="orionis-footer-meta">Generated with <a href="https://github.com/twisted/pydoctor/">Pydoctor</a> 25.10.1.<span class="orionis-footer-build"> Built 2026-11-03 13:00:15.</span></p>
     </div>
     <nav class="orionis-footer-links" aria-label="Additional resources">
       <a href="https://docs.orionis-framework.com">Read the guide <span aria-hidden="true">↗</span></a>

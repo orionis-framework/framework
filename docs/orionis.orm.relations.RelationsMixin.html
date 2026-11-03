@@ -557,7 +557,7 @@
                     
                 </label>
 
-                <code><a href="orionis.orm.relations.relation.html" class="internal-link" title="orionis.orm.relations.relation">relation</a></code>
+                <code><a href="orionis.orm.relations.relation.module.html" class="internal-link" title="orionis.orm.relations.relation">relation</a></code>
 
                 <div class="expandableContent">
                     <div>
@@ -584,7 +584,7 @@
         
 
         
-            <div class="itemName"><code><a href="orionis.orm.relations.relation.html#_CONSTRAINTS" class="internal-link" title="orionis.orm.relations.relation._CONSTRAINTS">_CONSTRAINTS</a></code>
+            <div class="itemName"><code><a href="orionis.orm.relations.relation.module.html#_CONSTRAINTS" class="internal-link" title="orionis.orm.relations.relation._CONSTRAINTS">_CONSTRAINTS</a></code>
             </div>
         
 
@@ -9792,7 +9792,7 @@
         </div>
 
         <div class="extrasDocstring">
-          <p class="class-signature"><code><span class="py-keyword">class</span> <span class="py-defname">RelationsMixin</span>: <a href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/orm/relations/mixin.py#L11" class="sourceLink">(source)</a></code></p><p>Known subclasses: <code><a href="orionis.orm.Model.html" class="internal-link">orionis.orm.Model</a></code></p><p><a href="classIndex.html#orionis.orm.relations.RelationsMixin">View In Hierarchy</a></p>
+          <p class="class-signature"><code><span class="py-keyword">class</span> <span class="py-defname">RelationsMixin</span>: <a href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/orm/relations/mixin.py#L13" class="sourceLink">(source)</a></code></p><p>Known subclasses: <code><a href="orionis.orm.Model.html" class="internal-link">orionis.orm.Model</a></code></p><p><a href="classIndex.html#orionis.orm.relations.RelationsMixin">View In Hierarchy</a></p>
         </div>
 
         <div class="moduleDocstring">
@@ -9816,12 +9816,12 @@ forward-reference problem regular methods sidestep entirely, since
 their body only runs once every involved class already exists.</p>
 <p>The mixin also owns the <tt class="rst-docutils rst-literal">_relations</tt> mapping every model instance
 carries, used to cache eager-loaded results
-(<code>~orionis.orm.query.builder.ModelQueryBuilder.withRelations</code>).</p>
+(<code><a href="orionis.orm.query.ModelQueryBuilder.html#withRelations" class="internal-link">orionis.orm.query.ModelQueryBuilder.withRelations</a></code>).</p>
 </div>
         </div>
 
         <div id="split-tables">
-          <table class="children sortable" id="id1639">
+          <table class="children sortable" id="id1645">
   
   
   <tr class="method">
@@ -9863,7 +9863,7 @@ carries, used to cache eager-loaded results
     
     <td>Class Variable</td>
     <td><code><a href="#__slots__" class="internal-link" title="orionis.orm.relations.RelationsMixin.__slots__">__slots__</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
+    <td>Declare that this class introduces no additional instance slots.</td>
   </tr>
 </table>
           
@@ -9885,7 +9885,7 @@ carries, used to cache eager-loaded results
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">belongsTo</span><span class="function-signature long-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">related: <code><a href="https://docs.python.org/3/builtins/functions.html#type" class="intersphinx-link">type</a>[<wbr></wbr>TRelated]</code>, </span><span class="rst-sig-param">foreign_key: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a> | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code> = <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a>, </span><span class="rst-sig-param">owner_key: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a> | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code> = <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></span>) -&gt; <code><a href="orionis.orm.relations.BelongsToRelation.html" class="internal-link" title="orionis.orm.relations.BelongsToRelation">BelongsToRelation</a>[<wbr></wbr>TRelated]</code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/orm/relations/mixin.py#L96">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/orm/relations/mixin.py#L99">
       
       (source)
     </a>
@@ -9897,9 +9897,9 @@ carries, used to cache eager-loaded results
   </div>
   <div class="docstring functionBody">
     
-    <div><p>Define the inverse of a <tt class="rst-docutils rst-literal">hasOne</tt>/<tt class="rst-docutils rst-literal">hasMany</tt> relationship.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">related:</span><code><a href="https://docs.python.org/3/builtins/functions.html#type" class="intersphinx-link">type</a> of <a href="orionis.orm.Model.html" class="internal-link" title="orionis.orm.Model">Model</a></code></td><td class="fieldArgDesc">Model class the relationship targets.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">foreign<wbr></wbr>_key:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a> or <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a>, <em>optional</em></code></td><td class="fieldArgDesc">Column on this model referencing the related row; defaults
+    <div><p>Define the inverse of a <tt class="rst-docutils rst-literal">hasOne</tt>/<tt class="rst-docutils rst-literal">hasMany</tt> relationship.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">related:</span><code><a href="https://docs.python.org/3/builtins/functions.html#type" class="intersphinx-link">type</a> of <a href="orionis.orm.Model.html" class="internal-link">orionis.orm.Model</a></code></td><td class="fieldArgDesc">Model class the relationship targets.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">foreign<wbr></wbr>_key:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a> or <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a>, <em>optional</em></code></td><td class="fieldArgDesc">Column on this model referencing the related row; defaults
 to <tt class="rst-docutils rst-literal">snake_case(RelatedClass) + "_id"</tt>.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">owner<wbr></wbr>_key:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a> or <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a>, <em>optional</em></code></td><td class="fieldArgDesc">Column on the related table identifying the owning row;
-defaults to the related model's primary key.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.orm.relations.BelongsToRelation.html" class="internal-link" title="orionis.orm.relations.BelongsToRelation">BelongsToRelation</a></code></td><td class="fieldArgDesc">Relationship query builder bound to this instance.</td></tr></table></div>
+defaults to the related model's primary key.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.orm.relations.BelongsToRelation.html" class="internal-link">orionis.orm.relations.BelongsToRelation</a></code></td><td class="fieldArgDesc">Relationship query builder bound to this instance.</td></tr></table></div>
   </div>
 </div><div class="basemethod">
   
@@ -9914,7 +9914,7 @@ defaults to the related model's primary key.</td></tr></table><table class="fiel
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">belongsToMany</span><span class="function-signature long-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">related: <code><a href="https://docs.python.org/3/builtins/functions.html#type" class="intersphinx-link">type</a>[<wbr></wbr>TRelated]</code>, </span><span class="rst-sig-param">table: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a> | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code> = <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a>, </span><span class="rst-sig-param">foreign_pivot_key: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a> | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code> = <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a>, </span><span class="rst-sig-param">related_pivot_key: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a> | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code> = <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a>, </span><span class="rst-sig-param">parent_key: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a> | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code> = <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a>, </span><span class="rst-sig-param">related_key: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a> | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code> = <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></span>) -&gt; <code><a href="orionis.orm.relations.BelongsToManyRelation.html" class="internal-link" title="orionis.orm.relations.BelongsToManyRelation">BelongsToManyRelation</a>[<wbr></wbr>TRelated]</code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/orm/relations/mixin.py#L123">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/orm/relations/mixin.py#L126">
       
       (source)
     </a>
@@ -9926,13 +9926,13 @@ defaults to the related model's primary key.</td></tr></table><table class="fiel
   </div>
   <div class="docstring functionBody">
     
-    <div><p>Define a many-to-many relationship backed by a pivot table.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">related:</span><code><a href="https://docs.python.org/3/builtins/functions.html#type" class="intersphinx-link">type</a> of <a href="orionis.orm.Model.html" class="internal-link" title="orionis.orm.Model">Model</a></code></td><td class="fieldArgDesc">Model class the relationship targets.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">table:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a> or <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a>, <em>optional</em></code></td><td class="fieldArgDesc">Pivot table name; defaults to both model names in
+    <div><p>Define a many-to-many relationship backed by a pivot table.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">related:</span><code><a href="https://docs.python.org/3/builtins/functions.html#type" class="intersphinx-link">type</a> of <a href="orionis.orm.Model.html" class="internal-link">orionis.orm.Model</a></code></td><td class="fieldArgDesc">Model class the relationship targets.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">table:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a> or <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a>, <em>optional</em></code></td><td class="fieldArgDesc">Pivot table name; defaults to both model names in
 snake_case, joined by <tt class="rst-docutils rst-literal">"_"</tt> in alphabetical order.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">foreign<wbr></wbr>_pivot<wbr></wbr>_key:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a> or <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a>, <em>optional</em></code></td><td class="fieldArgDesc">Pivot column referencing this model; defaults to
 <tt class="rst-docutils rst-literal">snake_case(ThisClass) + "_id"</tt>.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">related<wbr></wbr>_pivot<wbr></wbr>_key:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a> or <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a>, <em>optional</em></code></td><td class="fieldArgDesc">Pivot column referencing the related row; defaults to
 <tt class="rst-docutils rst-literal">snake_case(RelatedClass) + "_id"</tt>.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">parent<wbr></wbr>_key:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a> or <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a>, <em>optional</em></code></td><td class="fieldArgDesc">Column on this model matched against <tt class="rst-docutils rst-literal">foreign_pivot_key</tt>;
 defaults to this model's primary key.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">related<wbr></wbr>_key:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a> or <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a>, <em>optional</em></code></td><td class="fieldArgDesc">Column on the related table matched against
 <tt class="rst-docutils rst-literal">related_pivot_key</tt>; defaults to the related model's
-primary key.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.orm.relations.BelongsToManyRelation.html" class="internal-link" title="orionis.orm.relations.BelongsToManyRelation">BelongsToManyRelation</a></code></td><td class="fieldArgDesc">Relationship query builder bound to this instance.</td></tr></table></div>
+primary key.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.orm.relations.BelongsToManyRelation.html" class="internal-link">orionis.orm.relations.BelongsToManyRelation</a></code></td><td class="fieldArgDesc">Relationship query builder bound to this instance.</td></tr></table></div>
   </div>
 </div><div class="basemethod">
   
@@ -9947,7 +9947,7 @@ primary key.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">getRelation</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">name: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code>, </span><span class="rst-sig-param">default: <code>Any</code> = <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></span>) -&gt; <code>Any</code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/orm/relations/mixin.py#L193">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/orm/relations/mixin.py#L196">
       
       (source)
     </a>
@@ -9959,7 +9959,7 @@ primary key.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><
   </div>
   <div class="docstring functionBody">
     
-    <div><p>Return an already-resolved relationship result.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">name:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Relationship name.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">default:</span><code>Any, <em>optional</em></code></td><td class="fieldArgDesc">Value returned when the relationship was never loaded.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code>Any</code></td><td class="fieldArgDesc">Stored relationship result, or the default when unset.</td></tr></table></div>
+    <div><p>Return an already-resolved relationship result.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">name:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Relationship name.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">default:</span><code><a href="https://docs.python.org/3/library/typing.html#typing.Any" class="intersphinx-link">typing.Any</a>, <em>optional</em></code></td><td class="fieldArgDesc">Value returned when the relationship was never loaded.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/library/typing.html#typing.Any" class="intersphinx-link">typing.Any</a></code></td><td class="fieldArgDesc">Stored relationship result, or the default when unset.</td></tr></table></div>
   </div>
 </div><div class="basemethod">
   
@@ -9974,7 +9974,7 @@ primary key.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">hasMany</span><span class="function-signature long-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">related: <code><a href="https://docs.python.org/3/builtins/functions.html#type" class="intersphinx-link">type</a>[<wbr></wbr>TRelated]</code>, </span><span class="rst-sig-param">foreign_key: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a> | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code> = <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a>, </span><span class="rst-sig-param">local_key: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a> | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code> = <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></span>) -&gt; <code><a href="orionis.orm.relations.HasManyRelation.html" class="internal-link" title="orionis.orm.relations.HasManyRelation">HasManyRelation</a>[<wbr></wbr>TRelated]</code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/orm/relations/mixin.py#L69">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/orm/relations/mixin.py#L72">
       
       (source)
     </a>
@@ -9986,9 +9986,9 @@ primary key.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><
   </div>
   <div class="docstring functionBody">
     
-    <div><p>Define a one-to-many relationship owned by the related table.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">related:</span><code><a href="https://docs.python.org/3/builtins/functions.html#type" class="intersphinx-link">type</a> of <a href="orionis.orm.Model.html" class="internal-link" title="orionis.orm.Model">Model</a></code></td><td class="fieldArgDesc">Model class the relationship targets.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">foreign<wbr></wbr>_key:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a> or <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a>, <em>optional</em></code></td><td class="fieldArgDesc">Column on the related table referencing this model; defaults
+    <div><p>Define a one-to-many relationship owned by the related table.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">related:</span><code><a href="https://docs.python.org/3/builtins/functions.html#type" class="intersphinx-link">type</a> of <a href="orionis.orm.Model.html" class="internal-link">orionis.orm.Model</a></code></td><td class="fieldArgDesc">Model class the relationship targets.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">foreign<wbr></wbr>_key:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a> or <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a>, <em>optional</em></code></td><td class="fieldArgDesc">Column on the related table referencing this model; defaults
 to <tt class="rst-docutils rst-literal">snake_case(ThisClass) + "_id"</tt>.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">local<wbr></wbr>_key:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a> or <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a>, <em>optional</em></code></td><td class="fieldArgDesc">Column on this model compared against the foreign key;
-defaults to this model's primary key.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.orm.relations.HasManyRelation.html" class="internal-link" title="orionis.orm.relations.HasManyRelation">HasManyRelation</a></code></td><td class="fieldArgDesc">Relationship query builder bound to this instance.</td></tr></table></div>
+defaults to this model's primary key.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.orm.relations.HasManyRelation.html" class="internal-link">orionis.orm.relations.HasManyRelation</a></code></td><td class="fieldArgDesc">Relationship query builder bound to this instance.</td></tr></table></div>
   </div>
 </div><div class="basemethod">
   
@@ -10003,7 +10003,7 @@ defaults to this model's primary key.</td></tr></table><table class="fieldTable"
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">hasOne</span><span class="function-signature long-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">related: <code><a href="https://docs.python.org/3/builtins/functions.html#type" class="intersphinx-link">type</a>[<wbr></wbr>TRelated]</code>, </span><span class="rst-sig-param">foreign_key: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a> | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code> = <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a>, </span><span class="rst-sig-param">local_key: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a> | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code> = <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></span>) -&gt; <code><a href="orionis.orm.relations.HasOneRelation.html" class="internal-link" title="orionis.orm.relations.HasOneRelation">HasOneRelation</a>[<wbr></wbr>TRelated]</code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/orm/relations/mixin.py#L42">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/orm/relations/mixin.py#L45">
       
       (source)
     </a>
@@ -10015,9 +10015,9 @@ defaults to this model's primary key.</td></tr></table><table class="fieldTable"
   </div>
   <div class="docstring functionBody">
     
-    <div><p>Define a one-to-one relationship owned by the related table.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">related:</span><code><a href="https://docs.python.org/3/builtins/functions.html#type" class="intersphinx-link">type</a> of <a href="orionis.orm.Model.html" class="internal-link" title="orionis.orm.Model">Model</a></code></td><td class="fieldArgDesc">Model class the relationship targets.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">foreign<wbr></wbr>_key:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a> or <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a>, <em>optional</em></code></td><td class="fieldArgDesc">Column on the related table referencing this model; defaults
+    <div><p>Define a one-to-one relationship owned by the related table.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">related:</span><code><a href="https://docs.python.org/3/builtins/functions.html#type" class="intersphinx-link">type</a> of <a href="orionis.orm.Model.html" class="internal-link">orionis.orm.Model</a></code></td><td class="fieldArgDesc">Model class the relationship targets.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">foreign<wbr></wbr>_key:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a> or <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a>, <em>optional</em></code></td><td class="fieldArgDesc">Column on the related table referencing this model; defaults
 to <tt class="rst-docutils rst-literal">snake_case(ThisClass) + "_id"</tt>.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">local<wbr></wbr>_key:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a> or <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a>, <em>optional</em></code></td><td class="fieldArgDesc">Column on this model compared against the foreign key;
-defaults to this model's primary key.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.orm.relations.HasOneRelation.html" class="internal-link" title="orionis.orm.relations.HasOneRelation">HasOneRelation</a></code></td><td class="fieldArgDesc">Relationship query builder bound to this instance.</td></tr></table></div>
+defaults to this model's primary key.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.orm.relations.HasOneRelation.html" class="internal-link">orionis.orm.relations.HasOneRelation</a></code></td><td class="fieldArgDesc">Relationship query builder bound to this instance.</td></tr></table></div>
   </div>
 </div><div class="basemethod">
   
@@ -10032,7 +10032,7 @@ defaults to this model's primary key.</td></tr></table><table class="fieldTable"
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">relationLoaded</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">name: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/orm/relations/mixin.py#L211">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/orm/relations/mixin.py#L214">
       
       (source)
     </a>
@@ -10045,7 +10045,8 @@ defaults to this model's primary key.</td></tr></table><table class="fieldTable"
   <div class="docstring functionBody">
     
     <div><p>Report whether a relationship result has already been resolved.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">name:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Relationship name.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code></td><td class="fieldArgDesc"><tt class="rst-docutils rst-literal">True</tt> when the relationship was already loaded, whether
-by eager loading or a prior <code><a href="#setRelation" class="internal-link" title="orionis.orm.relations.RelationsMixin.setRelation">setRelation</a></code> call.</td></tr></table></div>
+by eager loading or a prior
+<code><a href="#setRelation" class="internal-link">orionis.orm.relations.RelationsMixin.setRelation</a></code> call.</td></tr></table></div>
   </div>
 </div><div class="basemethod">
   
@@ -10060,7 +10061,7 @@ by eager loading or a prior <code><a href="#setRelation" class="internal-link" t
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">setRelation</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">name: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code>, </span><span class="rst-sig-param">value: <code>Any</code></span>) -&gt; <code>Model</code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/orm/relations/mixin.py#L173">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/orm/relations/mixin.py#L176">
       
       (source)
     </a>
@@ -10072,8 +10073,8 @@ by eager loading or a prior <code><a href="#setRelation" class="internal-link" t
   </div>
   <div class="docstring functionBody">
     
-    <div><p>Store an already-resolved relationship result.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">name:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Relationship name.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">value:</span><code>Any</code></td><td class="fieldArgDesc">Resolved relationship result (a model, <tt class="rst-docutils rst-literal">None</tt>, or a
-Collection, depending on the relationship kind).</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.orm.Model.html" class="internal-link" title="orionis.orm.Model">Model</a></code></td><td class="fieldArgDesc">The same instance, enabling fluent chaining.</td></tr></table></div>
+    <div><p>Store an already-resolved relationship result.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">name:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Relationship name.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">value:</span><code><a href="https://docs.python.org/3/library/typing.html#typing.Any" class="intersphinx-link">typing.Any</a></code></td><td class="fieldArgDesc">Resolved relationship result (a model, <tt class="rst-docutils rst-literal">None</tt>, or a
+Collection, depending on the relationship kind).</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.orm.Model.html" class="internal-link">orionis.orm.Model</a></code></td><td class="fieldArgDesc">The same instance, enabling fluent chaining.</td></tr></table></div>
   </div>
 </div><div class="baseclassvariable">
   
@@ -10087,7 +10088,7 @@ Collection, depending on the relationship kind).</td></tr></table><table class="
   <div class="functionHeader">
     
     <span class="py-defname">__slots__</span>: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" class="intersphinx-link">tuple</a></code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/orm/relations/mixin.py#L38">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/orm/relations/mixin.py#L40">
       
       (source)
     </a>
@@ -10099,7 +10100,7 @@ Collection, depending on the relationship kind).</td></tr></table><table class="
   </div>
   <div class="functionBody">
     <div class="interfaceinfo">overridden in <code><a href="orionis.orm.Model.html" class="internal-link">orionis.orm.Model</a></code></div>
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p>Declare that this class introduces no additional instance slots.</p></div>
     
   </div>
 </div>
@@ -10113,7 +10114,7 @@ Collection, depending on the relationship kind).</td></tr></table><table class="
   <div class="orionis-footer-inner">
     <div class="orionis-footer-copy">
       <p>API documentation for <a href="https://orionis-framework.com/" class="projecthome">Orionis</a>.</p>
-      <p class="orionis-footer-meta">Generated with <a href="https://github.com/twisted/pydoctor/">Pydoctor</a> 25.10.1.<span class="orionis-footer-build"> Built 2026-11-03 09:36:58.</span></p>
+      <p class="orionis-footer-meta">Generated with <a href="https://github.com/twisted/pydoctor/">Pydoctor</a> 25.10.1.<span class="orionis-footer-build"> Built 2026-11-03 13:00:15.</span></p>
     </div>
     <nav class="orionis-footer-links" aria-label="Additional resources">
       <a href="https://docs.orionis-framework.com">Read the guide <span aria-hidden="true">↗</span></a>

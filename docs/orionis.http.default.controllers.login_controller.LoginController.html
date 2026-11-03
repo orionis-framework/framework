@@ -490,15 +490,15 @@
         </div>
 
         <div class="extrasDocstring">
-          <p class="class-signature"><code><span class="py-keyword">class</span> <span class="py-defname">LoginController</span>(<a href="orionis.http.base.BaseController.html" class="internal-link" title="orionis.http.base.BaseController">BaseController</a>): <a href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/http/default/controllers/login_controller.py#L9" class="sourceLink">(source)</a></code></p><p>Constructor: <code><a href="#__init__" class="internal-link" title="orionis.http.default.controllers.login_controller.LoginController.__init__">LoginController(application)</a></code></p><p><a href="classIndex.html#orionis.http.default.controllers.login_controller.LoginController">View In Hierarchy</a></p>
+          <p class="class-signature"><code><span class="py-keyword">class</span> <span class="py-defname">LoginController</span>(<a href="orionis.http.base.BaseController.html" class="internal-link" title="orionis.http.base.BaseController">BaseController</a>): <a href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/http/default/controllers/login_controller.py#L11" class="sourceLink">(source)</a></code></p><p>Constructor: <code><a href="#__init__" class="internal-link" title="orionis.http.default.controllers.login_controller.LoginController.__init__">LoginController(application)</a></code></p><p><a href="classIndex.html#orionis.http.default.controllers.login_controller.LoginController">View In Hierarchy</a></p>
         </div>
 
         <div class="moduleDocstring">
-          <div><p class="undocumented">Undocumented</p></div>
+          <div><p>Handle the built-in sign-in and sign-out endpoints.</p></div>
         </div>
 
         <div id="split-tables">
-          <table class="children sortable" id="id1010">
+          <table class="children sortable" id="id1011">
   
   
   <tr class="method">
@@ -525,27 +525,27 @@
     
     <td>Constant</td>
     <td><code><a href="#DEFAULT_LOGIN_PATH" class="internal-link" title="orionis.http.default.controllers.login_controller.LoginController.DEFAULT_LOGIN_PATH">DEFAULT<wbr></wbr>_LOGIN<wbr></wbr>_PATH</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
+    <td><tt class="rst-docutils rst-literal">/login</tt>.</td>
   </tr><tr class="constant">
     
     <td>Constant</td>
     <td><code><a href="#HOME_REDIRECT_PATH" class="internal-link" title="orionis.http.default.controllers.login_controller.LoginController.HOME_REDIRECT_PATH">HOME<wbr></wbr>_REDIRECT<wbr></wbr>_PATH</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
+    <td><tt class="rst-docutils rst-literal">/home</tt>.</td>
   </tr><tr class="constant">
     
     <td>Constant</td>
     <td><code><a href="#LOGIN_VIEW_NAME" class="internal-link" title="orionis.http.default.controllers.login_controller.LoginController.LOGIN_VIEW_NAME">LOGIN<wbr></wbr>_VIEW<wbr></wbr>_NAME</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
+    <td><tt class="rst-docutils rst-literal">auth.login</tt>.</td>
   </tr><tr class="constant">
     
     <td>Constant</td>
     <td><code><a href="#LOGOUT_REDIRECT_PATH" class="internal-link" title="orionis.http.default.controllers.login_controller.LoginController.LOGOUT_REDIRECT_PATH">LOGOUT<wbr></wbr>_REDIRECT<wbr></wbr>_PATH</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
+    <td><tt class="rst-docutils rst-literal">/</tt>.</td>
   </tr><tr class="instancevariable">
     
     <td>Instance Variable</td>
     <td><code><a href="#redirect_to" class="internal-link" title="orionis.http.default.controllers.login_controller.LoginController.redirect_to">redirect<wbr></wbr>_to</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
+    <td>Cache the destination used after a valid session login.</td>
   </tr>
 </table>
           
@@ -567,7 +567,7 @@
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">__init__</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">application: <code>IApplication</code></span>):</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/http/default/controllers/login_controller.py#L18">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/http/default/controllers/login_controller.py#L25">
       
       (source)
     </a>
@@ -582,7 +582,7 @@
     <div><p>Configure the controller from the session authentication settings.</p>
 <p>Web login uses the session guard through <tt class="rst-docutils rst-literal">Auth.attempt()</tt> regardless
 of the guard configured as the application's default.</p>
-<table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">application:</span><code><a href="orionis.IApplication.html" class="internal-link" title="orionis.IApplication">IApplication</a></code></td><td class="fieldArgDesc">Application instance used to read the <tt class="rst-docutils rst-literal">auth</tt> configuration.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">Complete the documented operation without returning a value.</td></tr></table></div>
+<table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">application:</span><code><a href="orionis.IApplication.html" class="internal-link">orionis.IApplication</a></code></td><td class="fieldArgDesc">Application instance used to read the <tt class="rst-docutils rst-literal">auth</tt> configuration.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">Complete the documented operation without returning a value.</td></tr></table></div>
   </div>
 </div><div class="basemethod">
   
@@ -596,8 +596,8 @@ of the guard configured as the application's default.</p>
   <div class="functionHeader">
     
     
-    <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">index</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>) -&gt; <code>HttpResponse</code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/http/default/controllers/login_controller.py#L43">
+    <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">index</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>) -&gt; <code><a href="orionis.http.html#HttpResponse" class="internal-link" title="orionis.http.HttpResponse">HttpResponse</a></code>:</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/http/default/controllers/login_controller.py#L51">
       
       (source)
     </a>
@@ -609,7 +609,7 @@ of the guard configured as the application's default.</p>
   </div>
   <div class="docstring functionBody">
     
-    <div><p>Return the login page response.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code>HttpResponse</code></td><td class="fieldArgDesc">Rendered response for the login page.</td></tr></table></div>
+    <div><p>Return the login page response.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.http.Response.html" class="internal-link">orionis.http.Response</a></code></td><td class="fieldArgDesc">Rendered response for the login page.</td></tr></table></div>
   </div>
 </div><div class="basemethod">
   
@@ -623,8 +623,8 @@ of the guard configured as the application's default.</p>
   <div class="functionHeader">
     
     
-    <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">login</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">request: <code>Request</code>, </span><span class="rst-sig-param">payload: <code><a href="orionis.http.default.schemas.login.LoginSchema.html" class="internal-link" title="orionis.http.default.schemas.login.LoginSchema">LoginSchema</a></code>, </span><span class="rst-sig-param">auth: <code>IAuthManager</code></span>) -&gt; <code>HttpResponse</code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/http/default/controllers/login_controller.py#L57">
+    <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">login</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">request: <code>Request</code>, </span><span class="rst-sig-param">payload: <code><a href="orionis.http.default.schemas.login.LoginSchema.html" class="internal-link" title="orionis.http.default.schemas.login.LoginSchema">LoginSchema</a></code>, </span><span class="rst-sig-param">auth: <code>IAuthManager</code></span>) -&gt; <code><a href="orionis.http.html#HttpResponse" class="internal-link" title="orionis.http.HttpResponse">HttpResponse</a></code>:</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/http/default/controllers/login_controller.py#L65">
       
       (source)
     </a>
@@ -636,7 +636,7 @@ of the guard configured as the application's default.</p>
   </div>
   <div class="docstring functionBody">
     
-    <div><p>Handle the login form submission.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">request:</span><code><a href="orionis.http.Request.html" class="internal-link" title="orionis.http.Request">Request</a></code></td><td class="fieldArgDesc">Incoming HTTP request, used to read the raw submitted payload.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">payload:</span><code><a href="orionis.http.default.schemas.login.LoginSchema.html" class="internal-link" title="orionis.http.default.schemas.login.LoginSchema">LoginSchema</a></code></td><td class="fieldArgDesc">Validated credentials; invalid submissions never reach this method.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">auth:</span><code><a href="orionis.auth.contracts.IAuthManager.html" class="internal-link" title="orionis.auth.contracts.IAuthManager">IAuthManager</a></code></td><td class="fieldArgDesc">Authentication service using the request's existing session.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code>HttpResponse</code></td><td class="fieldArgDesc">Redirect to the dashboard, or back with a generic credential error.</td></tr></table></div>
+    <div><p>Handle the login form submission.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">request:</span><code><a href="orionis.http.Request.html" class="internal-link">orionis.http.Request</a></code></td><td class="fieldArgDesc">Incoming HTTP request, used to read the raw submitted payload.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">payload:</span><code><a href="orionis.http.default.schemas.login.LoginSchema.html" class="internal-link">orionis.http.default.schemas.login.LoginSchema</a></code></td><td class="fieldArgDesc">Validated credentials; invalid submissions never reach this method.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">auth:</span><code><a href="orionis.auth.contracts.IAuthManager.html" class="internal-link">orionis.auth.contracts.IAuthManager</a></code></td><td class="fieldArgDesc">Authentication service using the request's existing session.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.http.Response.html" class="internal-link">orionis.http.Response</a></code></td><td class="fieldArgDesc">Redirect to the dashboard, or back with a generic credential error.</td></tr></table></div>
   </div>
 </div><div class="basemethod">
   
@@ -650,8 +650,8 @@ of the guard configured as the application's default.</p>
   <div class="functionHeader">
     
     
-    <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">logout</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">auth: <code>IAuthManager</code></span>) -&gt; <code>HttpResponse</code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/http/default/controllers/login_controller.py#L102">
+    <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">logout</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">auth: <code>IAuthManager</code></span>) -&gt; <code><a href="orionis.http.html#HttpResponse" class="internal-link" title="orionis.http.HttpResponse">HttpResponse</a></code>:</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/http/default/controllers/login_controller.py#L110">
       
       (source)
     </a>
@@ -663,7 +663,7 @@ of the guard configured as the application's default.</p>
   </div>
   <div class="docstring functionBody">
     
-    <div><p>Invalidate the current session and return to the public welcome page.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">auth:</span><code><a href="orionis.auth.contracts.IAuthManager.html" class="internal-link" title="orionis.auth.contracts.IAuthManager">IAuthManager</a></code></td><td class="fieldArgDesc">Authentication service bound to the current request.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code>HttpResponse</code></td><td class="fieldArgDesc">Redirect whose session cookie is cleared by the web middleware.</td></tr></table></div>
+    <div><p>Invalidate the current session and return to the public welcome page.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">auth:</span><code><a href="orionis.auth.contracts.IAuthManager.html" class="internal-link">orionis.auth.contracts.IAuthManager</a></code></td><td class="fieldArgDesc">Authentication service bound to the current request.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.http.Response.html" class="internal-link">orionis.http.Response</a></code></td><td class="fieldArgDesc">Redirect whose session cookie is cleared by the web middleware.</td></tr></table></div>
   </div>
 </div><div class="baseconstant">
   
@@ -677,7 +677,7 @@ of the guard configured as the application's default.</p>
   <div class="functionHeader">
     
     <span class="py-defname">DEFAULT_LOGIN_PATH</span>: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/http/default/controllers/login_controller.py#L14">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/http/default/controllers/login_controller.py#L18">
       
       (source)
     </a>
@@ -689,7 +689,7 @@ of the guard configured as the application's default.</p>
   </div>
   <div class="functionBody">
     
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p><tt class="rst-docutils rst-literal">/login</tt>.</p></div>
     <table class="valueTable"><tr class="fieldStart"><td class="fieldName">Value</td></tr><tr><td><pre class="constant-value"><code><span class="rst-variable-quote">'</span><span class="rst-variable-string">/login</span><span class="rst-variable-quote">'</span></code></pre></td></tr></table>
   </div>
 </div><div class="baseconstant">
@@ -704,7 +704,7 @@ of the guard configured as the application's default.</p>
   <div class="functionHeader">
     
     <span class="py-defname">HOME_REDIRECT_PATH</span>: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/http/default/controllers/login_controller.py#L13">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/http/default/controllers/login_controller.py#L16">
       
       (source)
     </a>
@@ -716,7 +716,7 @@ of the guard configured as the application's default.</p>
   </div>
   <div class="functionBody">
     
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p><tt class="rst-docutils rst-literal">/home</tt>.</p></div>
     <table class="valueTable"><tr class="fieldStart"><td class="fieldName">Value</td></tr><tr><td><pre class="constant-value"><code><span class="rst-variable-quote">'</span><span class="rst-variable-string">/home</span><span class="rst-variable-quote">'</span></code></pre></td></tr></table>
   </div>
 </div><div class="baseconstant">
@@ -731,7 +731,7 @@ of the guard configured as the application's default.</p>
   <div class="functionHeader">
     
     <span class="py-defname">LOGIN_VIEW_NAME</span>: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/http/default/controllers/login_controller.py#L16">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/http/default/controllers/login_controller.py#L22">
       
       (source)
     </a>
@@ -743,7 +743,7 @@ of the guard configured as the application's default.</p>
   </div>
   <div class="functionBody">
     
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p><tt class="rst-docutils rst-literal">auth.login</tt>.</p></div>
     <table class="valueTable"><tr class="fieldStart"><td class="fieldName">Value</td></tr><tr><td><pre class="constant-value"><code><span class="rst-variable-quote">'</span><span class="rst-variable-string">auth.login</span><span class="rst-variable-quote">'</span></code></pre></td></tr></table>
   </div>
 </div><div class="baseconstant">
@@ -758,7 +758,7 @@ of the guard configured as the application's default.</p>
   <div class="functionHeader">
     
     <span class="py-defname">LOGOUT_REDIRECT_PATH</span>: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/http/default/controllers/login_controller.py#L15">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/http/default/controllers/login_controller.py#L20">
       
       (source)
     </a>
@@ -770,7 +770,7 @@ of the guard configured as the application's default.</p>
   </div>
   <div class="functionBody">
     
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p><tt class="rst-docutils rst-literal">/</tt>.</p></div>
     <table class="valueTable"><tr class="fieldStart"><td class="fieldName">Value</td></tr><tr><td><pre class="constant-value"><code><span class="rst-variable-quote">'</span><span class="rst-variable-string">/</span><span class="rst-variable-quote">'</span></code></pre></td></tr></table>
   </div>
 </div><div class="baseinstancevariable">
@@ -785,7 +785,7 @@ of the guard configured as the application's default.</p>
   <div class="functionHeader">
     
     <span class="py-defname">redirect_to</span>: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/http/default/controllers/login_controller.py#L39">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/http/default/controllers/login_controller.py#L46">
       
       (source)
     </a>
@@ -797,7 +797,7 @@ of the guard configured as the application's default.</p>
   </div>
   <div class="functionBody">
     
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p>Cache the destination used after a valid session login.</p></div>
     
   </div>
 </div>
@@ -811,7 +811,7 @@ of the guard configured as the application's default.</p>
   <div class="orionis-footer-inner">
     <div class="orionis-footer-copy">
       <p>API documentation for <a href="https://orionis-framework.com/" class="projecthome">Orionis</a>.</p>
-      <p class="orionis-footer-meta">Generated with <a href="https://github.com/twisted/pydoctor/">Pydoctor</a> 25.10.1.<span class="orionis-footer-build"> Built 2026-11-03 09:36:58.</span></p>
+      <p class="orionis-footer-meta">Generated with <a href="https://github.com/twisted/pydoctor/">Pydoctor</a> 25.10.1.<span class="orionis-footer-build"> Built 2026-11-03 13:00:15.</span></p>
     </div>
     <nav class="orionis-footer-links" aria-label="Additional resources">
       <a href="https://docs.orionis-framework.com">Read the guide <span aria-hidden="true">↗</span></a>

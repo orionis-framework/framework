@@ -1277,7 +1277,7 @@
         </div>
 
         <div class="extrasDocstring">
-          <p class="class-signature"><code><span class="py-keyword">class</span> <span class="py-defname">_MiddlewarePipeline</span>: <a href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/http/kernel.py#L120" class="sourceLink">(source)</a></code></p><p>Constructor: <code><a href="#__init__" class="internal-link" title="orionis.http.kernel._MiddlewarePipeline.__init__">_MiddlewarePipeline(instances, request, terminal, terminal_args)</a></code></p><p><a href="classIndex.html#orionis.http.kernel._MiddlewarePipeline">View In Hierarchy</a></p>
+          <p class="class-signature"><code><span class="py-keyword">class</span> <span class="py-defname">_MiddlewarePipeline</span>: <a href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/http/kernel.py#L128" class="sourceLink">(source)</a></code></p><p>Constructor: <code><a href="#__init__" class="internal-link" title="orionis.http.kernel._MiddlewarePipeline.__init__">_MiddlewarePipeline(instances, request, terminal, terminal_args)</a></code></p><p><a href="classIndex.html#orionis.http.kernel._MiddlewarePipeline">View In Hierarchy</a></p>
         </div>
 
         <div class="moduleDocstring">
@@ -1289,7 +1289,7 @@ invocations cannot change the depth observed by another middleware.</p>
         </div>
 
         <div id="split-tables">
-          <table class="children sortable" id="id1043">
+          <table class="children sortable" id="id1044">
   
   
   <tr class="method">
@@ -1311,37 +1311,37 @@ invocations cannot change the depth observed by another middleware.</p>
     
     <td>Class Variable</td>
     <td><code><a href="#__slots__" class="internal-link" title="orionis.http.kernel._MiddlewarePipeline.__slots__">__slots__</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
+    <td>Declare the instance attribute slots reserved by this class.</td>
   </tr><tr class="instancevariable">
     
     <td>Instance Variable</td>
     <td><code><a href="#_called" class="internal-link" title="orionis.http.kernel._MiddlewarePipeline._called">_called</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
+    <td>Called flag used by <tt class="rst-docutils rst-literal">_MiddlewarePipeline</tt>.</td>
   </tr><tr class="instancevariable">
     
     <td>Instance Variable</td>
     <td><code><a href="#_instances" class="internal-link" title="orionis.http.kernel._MiddlewarePipeline._instances">_instances</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
+    <td>Ordered tuple of pre-built middleware instances.</td>
   </tr><tr class="instancevariable">
     
     <td>Instance Variable</td>
     <td><code><a href="#_n" class="internal-link" title="orionis.http.kernel._MiddlewarePipeline._n">_n</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
+    <td>N produced by <tt class="rst-docutils rst-literal">len</tt>.</td>
   </tr><tr class="instancevariable">
     
     <td>Instance Variable</td>
     <td><code><a href="#_request" class="internal-link" title="orionis.http.kernel._MiddlewarePipeline._request">_request</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
+    <td>Incoming HTTP request forwarded to each layer.</td>
   </tr><tr class="instancevariable">
     
     <td>Instance Variable</td>
     <td><code><a href="#_terminal" class="internal-link" title="orionis.http.kernel._MiddlewarePipeline._terminal">_terminal</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
+    <td>Async callable invoked after all middleware layers have run.</td>
   </tr><tr class="instancevariable">
     
     <td>Instance Variable</td>
     <td><code><a href="#_terminal_args" class="internal-link" title="orionis.http.kernel._MiddlewarePipeline._terminal_args">_terminal<wbr></wbr>_args</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
+    <td>Positional arguments forwarded to the terminal callable.</td>
   </tr>
 </table>
           
@@ -1363,7 +1363,7 @@ invocations cannot change the depth observed by another middleware.</p>
     
     
     <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">__advance</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">depth: <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code></span>) -&gt; <code>T</code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/http/kernel.py#L190">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/http/kernel.py#L206">
       
       (source)
     </a>
@@ -1375,7 +1375,7 @@ invocations cannot change the depth observed by another middleware.</p>
   </div>
   <div class="docstring functionBody">
     
-    <div><p>Invoke the layer at a fixed depth with its own continuation.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">depth:</span><code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code></td><td class="fieldArgDesc">Position of the middleware or terminal to execute.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code>T</code></td><td class="fieldArgDesc">Result returned by this middleware and its descendants.</td></tr></table></div>
+    <div><p>Invoke the layer at a fixed depth with its own continuation.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">depth:</span><code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code></td><td class="fieldArgDesc">Position of the middleware or terminal to execute.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><tt class="rst-docutils rst-literal">T</tt></code></td><td class="fieldArgDesc">Result returned by this middleware and its descendants.</td></tr></table></div>
   </div>
 </div><div class="basemethod">
   
@@ -1390,7 +1390,7 @@ invocations cannot change the depth observed by another middleware.</p>
     
     
     <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">__call__</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>) -&gt; <code>T</code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/http/kernel.py#L170">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/http/kernel.py#L186">
       
       (source)
     </a>
@@ -1402,7 +1402,7 @@ invocations cannot change the depth observed by another middleware.</p>
   </div>
   <div class="docstring functionBody">
     
-    <div><p>Start the middleware stack once for this request.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code>T</code></td><td class="fieldArgDesc">Result produced by the middleware stack or terminal.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/exceptions.html#RuntimeError" class="intersphinx-link">RuntimeError</a></code></td><td>If this pipeline has already started.</td></tr></table></div>
+    <div><p>Start the middleware stack once for this request.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><tt class="rst-docutils rst-literal">T</tt></code></td><td class="fieldArgDesc">Result produced by the middleware stack or terminal.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/exceptions.html#RuntimeError" class="intersphinx-link">RuntimeError</a></code></td><td>If this pipeline has already started.</td></tr></table></div>
   </div>
 </div><div class="basemethod">
   
@@ -1417,7 +1417,7 @@ invocations cannot change the depth observed by another middleware.</p>
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">__init__</span><span class="function-signature long-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">instances: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" class="intersphinx-link">tuple</a></code>, </span><span class="rst-sig-param">request: <code>Request | WebSocket</code>, </span><span class="rst-sig-param">terminal: <code><a href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Callable" class="intersphinx-link">Callable</a>[<wbr></wbr><span class="rst-variable-ellipsis">...</span>, <wbr></wbr><a href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Awaitable" class="intersphinx-link">Awaitable</a>[<wbr></wbr>T]]</code>, </span><span class="rst-sig-param">terminal_args: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" class="intersphinx-link">tuple</a></code> = ()</span>):</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/http/kernel.py#L138">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/http/kernel.py#L147">
       
       (source)
     </a>
@@ -1429,7 +1429,7 @@ invocations cannot change the depth observed by another middleware.</p>
   </div>
   <div class="docstring functionBody">
     
-    <div><p>Store the middleware stack and terminal callable for one request.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">instances:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" class="intersphinx-link">tuple</a></code></td><td class="fieldArgDesc">Ordered tuple of pre-built middleware instances.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">request:</span><code><a href="orionis.http.Request.html" class="internal-link" title="orionis.http.Request">Request</a></code></td><td class="fieldArgDesc">Incoming HTTP request forwarded to each layer.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">terminal:</span><code><a href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Callable" class="intersphinx-link">Callable</a>[..., <a href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Awaitable" class="intersphinx-link">Awaitable</a>[<a href="orionis.http.Response.html" class="internal-link" title="orionis.http.Response">Response</a>]]</code></td><td class="fieldArgDesc">Async callable invoked after all middleware layers have run.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">terminal<wbr></wbr>_args:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" class="intersphinx-link">tuple</a>, <em>optional</em></code></td><td class="fieldArgDesc">Positional arguments forwarded to the terminal callable.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc"><span class="undocumented">Undocumented</span></td></tr></table></div>
+    <div><p>Store the middleware stack and terminal callable for one request.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">instances:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" class="intersphinx-link">tuple</a></code></td><td class="fieldArgDesc">Ordered tuple of pre-built middleware instances.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">request:</span><code><a href="orionis.http.Request.html" class="internal-link">orionis.http.Request</a></code></td><td class="fieldArgDesc">Incoming HTTP request forwarded to each layer.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">terminal:</span><code><a href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Callable" class="intersphinx-link">Callable</a>[<tt class="rst-docutils rst-literal">...</tt>, <a href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Awaitable" class="intersphinx-link">Awaitable</a>[<a href="orionis.http.Response.html" class="internal-link" title="orionis.http.Response">Response</a>]]</code></td><td class="fieldArgDesc">Async callable invoked after all middleware layers have run.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">terminal<wbr></wbr>_args:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" class="intersphinx-link">tuple</a>, <em>optional</em></code></td><td class="fieldArgDesc">Positional arguments forwarded to the terminal callable.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">Store the middleware stack and terminal callable for one request.</td></tr></table></div>
   </div>
 </div><div class="baseclassvariable">
   
@@ -1443,7 +1443,7 @@ invocations cannot change the depth observed by another middleware.</p>
   <div class="functionHeader">
     
     <span class="py-defname">__slots__</span>: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" class="intersphinx-link">tuple</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <wbr></wbr><span class="rst-variable-ellipsis">...</span>]</code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/http/kernel.py#L129">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/http/kernel.py#L137">
       
       (source)
     </a>
@@ -1455,7 +1455,7 @@ invocations cannot change the depth observed by another middleware.</p>
   </div>
   <div class="functionBody">
     
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p>Declare the instance attribute slots reserved by this class.</p></div>
     
   </div>
 </div><div class="baseinstancevariable">
@@ -1470,7 +1470,7 @@ invocations cannot change the depth observed by another middleware.</p>
   <div class="functionHeader">
     
     <span class="py-defname">_called</span>: <code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/http/kernel.py#L168">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/http/kernel.py#L183">
       
       (source)
     </a>
@@ -1482,7 +1482,7 @@ invocations cannot change the depth observed by another middleware.</p>
   </div>
   <div class="functionBody">
     
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p>Called flag used by <tt class="rst-docutils rst-literal">_MiddlewarePipeline</tt>.</p></div>
     
   </div>
 </div><div class="baseinstancevariable">
@@ -1497,7 +1497,7 @@ invocations cannot change the depth observed by another middleware.</p>
   <div class="functionHeader">
     
     <span class="py-defname">_instances</span> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/http/kernel.py#L163">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/http/kernel.py#L173">
       
       (source)
     </a>
@@ -1509,7 +1509,7 @@ invocations cannot change the depth observed by another middleware.</p>
   </div>
   <div class="functionBody">
     
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p>Ordered tuple of pre-built middleware instances.</p></div>
     
   </div>
 </div><div class="baseinstancevariable">
@@ -1524,7 +1524,7 @@ invocations cannot change the depth observed by another middleware.</p>
   <div class="functionHeader">
     
     <span class="py-defname">_n</span> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/http/kernel.py#L167">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/http/kernel.py#L181">
       
       (source)
     </a>
@@ -1536,7 +1536,7 @@ invocations cannot change the depth observed by another middleware.</p>
   </div>
   <div class="functionBody">
     
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p>N produced by <tt class="rst-docutils rst-literal">len</tt>.</p></div>
     
   </div>
 </div><div class="baseinstancevariable">
@@ -1551,7 +1551,7 @@ invocations cannot change the depth observed by another middleware.</p>
   <div class="functionHeader">
     
     <span class="py-defname">_request</span> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/http/kernel.py#L164">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/http/kernel.py#L175">
       
       (source)
     </a>
@@ -1563,7 +1563,7 @@ invocations cannot change the depth observed by another middleware.</p>
   </div>
   <div class="functionBody">
     
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p>Incoming HTTP request forwarded to each layer.</p></div>
     
   </div>
 </div><div class="baseinstancevariable">
@@ -1578,7 +1578,7 @@ invocations cannot change the depth observed by another middleware.</p>
   <div class="functionHeader">
     
     <span class="py-defname">_terminal</span> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/http/kernel.py#L165">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/http/kernel.py#L177">
       
       (source)
     </a>
@@ -1590,7 +1590,7 @@ invocations cannot change the depth observed by another middleware.</p>
   </div>
   <div class="functionBody">
     
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p>Async callable invoked after all middleware layers have run.</p></div>
     
   </div>
 </div><div class="baseinstancevariable">
@@ -1605,7 +1605,7 @@ invocations cannot change the depth observed by another middleware.</p>
   <div class="functionHeader">
     
     <span class="py-defname">_terminal_args</span> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/http/kernel.py#L166">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/http/kernel.py#L179">
       
       (source)
     </a>
@@ -1617,7 +1617,7 @@ invocations cannot change the depth observed by another middleware.</p>
   </div>
   <div class="functionBody">
     
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p>Positional arguments forwarded to the terminal callable.</p></div>
     
   </div>
 </div>
@@ -1631,7 +1631,7 @@ invocations cannot change the depth observed by another middleware.</p>
   <div class="orionis-footer-inner">
     <div class="orionis-footer-copy">
       <p>API documentation for <a href="https://orionis-framework.com/" class="projecthome">Orionis</a>.</p>
-      <p class="orionis-footer-meta">Generated with <a href="https://github.com/twisted/pydoctor/">Pydoctor</a> 25.10.1.<span class="orionis-footer-build"> Built 2026-11-03 09:36:58.</span></p>
+      <p class="orionis-footer-meta">Generated with <a href="https://github.com/twisted/pydoctor/">Pydoctor</a> 25.10.1.<span class="orionis-footer-build"> Built 2026-11-03 13:00:15.</span></p>
     </div>
     <nav class="orionis-footer-links" aria-label="Additional resources">
       <a href="https://docs.orionis-framework.com">Read the guide <span aria-hidden="true">↗</span></a>

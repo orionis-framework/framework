@@ -490,15 +490,15 @@
         </div>
 
         <div class="extrasDocstring">
-          <p class="class-signature"><code><span class="py-keyword">class</span> <span class="py-defname">ExceptionParser</span>(<a href="orionis.support.formatter.exceptions.contracts.parser.IExceptionParser.html" class="internal-link" title="orionis.support.formatter.exceptions.contracts.parser.IExceptionParser">IExceptionParser</a>): <a href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/support/formatter/exceptions/parser.py#L6" class="sourceLink">(source)</a></code></p><p>Constructor: <code><a href="#__init__" class="internal-link" title="orionis.support.formatter.exceptions.parser.ExceptionParser.__init__">ExceptionParser(exception)</a></code></p><p><a href="classIndex.html#orionis.support.formatter.exceptions.parser.ExceptionParser">View In Hierarchy</a></p>
+          <p class="class-signature"><code><span class="py-keyword">class</span> <span class="py-defname">ExceptionParser</span>(<a href="orionis.support.formatter.exceptions.contracts.parser.IExceptionParser.html" class="internal-link" title="orionis.support.formatter.exceptions.contracts.parser.IExceptionParser">IExceptionParser</a>): <a href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/support/formatter/exceptions/parser.py#L8" class="sourceLink">(source)</a></code></p><p>Constructor: <code><a href="#__init__" class="internal-link" title="orionis.support.formatter.exceptions.parser.ExceptionParser.__init__">ExceptionParser(exception)</a></code></p><p><a href="classIndex.html#orionis.support.formatter.exceptions.parser.ExceptionParser">View In Hierarchy</a></p>
         </div>
 
         <div class="moduleDocstring">
-          <div><p class="undocumented">Undocumented</p></div>
+          <div><p>Extract structured details from exceptions and tracebacks.</p></div>
         </div>
 
         <div id="split-tables">
-          <table class="children sortable" id="id2088">
+          <table class="children sortable" id="id2096">
   
   
   <tr class="method">
@@ -525,27 +525,27 @@
     
     <td>Class Variable</td>
     <td><code><a href="#__slots__" class="internal-link" title="orionis.support.formatter.exceptions.parser.ExceptionParser.__slots__">__slots__</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
+    <td>Declare the instance attribute slots reserved by this class.</td>
   </tr><tr class="instancevariable">
     
     <td>Instance Variable</td>
     <td><code><a href="#_cache" class="internal-link" title="orionis.support.formatter.exceptions.parser.ExceptionParser._cache">_cache</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
+    <td>Cache policy or cached state used by this component.</td>
   </tr><tr class="instancevariable">
     
     <td>Instance Variable</td>
     <td><code><a href="#_error_code" class="internal-link" title="orionis.support.formatter.exceptions.parser.ExceptionParser._error_code">_error<wbr></wbr>_code</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
+    <td>Error code produced by <tt class="rst-docutils rst-literal">getattr</tt>.</td>
   </tr><tr class="instancevariable">
     
     <td>Instance Variable</td>
     <td><code><a href="#_exc_type" class="internal-link" title="orionis.support.formatter.exceptions.parser.ExceptionParser._exc_type">_exc<wbr></wbr>_type</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
+    <td>Type of the exception being formatted.</td>
   </tr><tr class="instancevariable">
     
     <td>Instance Variable</td>
     <td><code><a href="#_tb" class="internal-link" title="orionis.support.formatter.exceptions.parser.ExceptionParser._tb">_tb</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
+    <td>Tb supplied through <tt class="rst-docutils rst-literal">tb</tt>.</td>
   </tr>
 </table>
           
@@ -567,7 +567,7 @@
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">__init__</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">exception: <code><a href="https://docs.python.org/3/builtins/exceptions.html#Exception" class="intersphinx-link">Exception</a></code></span>):</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/support/formatter/exceptions/parser.py#L10">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/support/formatter/exceptions/parser.py#L14">
       
       (source)
     </a>
@@ -597,7 +597,7 @@ so repeated calls to toDict() pay no extra CPU cost.</p>
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">_getSourceCode</span><span class="function-signature long-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">filename: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a> | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code>, </span><span class="rst-sig-param">lineno: <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a> | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" class="intersphinx-link">tuple</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#list" class="intersphinx-link">list</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a>], <wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#list" class="intersphinx-link">list</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>]]</code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/support/formatter/exceptions/parser.py#L64">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/support/formatter/exceptions/parser.py#L72">
       
       (source)
     </a>
@@ -626,7 +626,7 @@ so repeated calls to toDict() pay no extra CPU cost.</p>
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">_parseStack</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">stack: <code><a href="https://docs.python.org/3/library/traceback.html#traceback.StackSummary" class="intersphinx-link">traceback.StackSummary</a> | <a href="https://docs.python.org/3/builtins/stdtypes.html#list" class="intersphinx-link">list</a></code></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/stdtypes.html#list" class="intersphinx-link">list</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#dict" class="intersphinx-link">dict</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <wbr></wbr><a href="https://docs.python.org/3/library/typing.html#typing.Any" class="intersphinx-link">Any</a>]]</code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/support/formatter/exceptions/parser.py#L99">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/support/formatter/exceptions/parser.py#L107">
       
       (source)
     </a>
@@ -641,7 +641,7 @@ so repeated calls to toDict() pay no extra CPU cost.</p>
     <div><p>Parse stack trace summary into frame dictionaries.</p>
 <p>Iterate over the stack in reverse to produce the most-recent-first
 order. FrameSummary attributes are provided by the traceback contract.</p>
-<table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">stack:</span><code>traceback.StackSummary | list</code></td><td class="fieldArgDesc">Stack trace summary or an empty list.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/stdtypes.html#list" class="intersphinx-link">list</a>[<a href="https://docs.python.org/3/builtins/stdtypes.html#dict" class="intersphinx-link">dict</a>[<a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <a href="https://docs.python.org/3/library/typing.html#typing.Any" class="intersphinx-link">Any</a>]]</code></td><td class="fieldArgDesc">List of frame dicts ordered most-recent first.</td></tr></table></div>
+<table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">stack:</span><code><tt class="rst-docutils rst-literal">traceback.StackSummary</tt> | list</code></td><td class="fieldArgDesc">Stack trace summary or an empty list.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/stdtypes.html#list" class="intersphinx-link">list</a>[<a href="https://docs.python.org/3/builtins/stdtypes.html#dict" class="intersphinx-link">dict</a>[<a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <a href="https://docs.python.org/3/library/typing.html#typing.Any" class="intersphinx-link">typing.Any</a>]]</code></td><td class="fieldArgDesc">List of frame dicts ordered most-recent first.</td></tr></table></div>
   </div>
 </div><div class="basemethod">
   
@@ -656,7 +656,7 @@ order. FrameSummary attributes are provided by the traceback contract.</p>
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">toDict</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/stdtypes.html#dict" class="intersphinx-link">dict</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <wbr></wbr><a href="https://docs.python.org/3/library/typing.html#typing.Any" class="intersphinx-link">Any</a>]</code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/support/formatter/exceptions/parser.py#L39">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/support/formatter/exceptions/parser.py#L47">
       
       (source)
     </a>
@@ -671,7 +671,7 @@ order. FrameSummary attributes are provided by the traceback contract.</p>
     <div><p>Serialize exception details into a dictionary.</p>
 <p>The result is cached after the first call; subsequent calls return
 the same dict with no additional computation.</p>
-<table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/stdtypes.html#dict" class="intersphinx-link">dict</a>[<a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <a href="https://docs.python.org/3/library/typing.html#typing.Any" class="intersphinx-link">Any</a>]</code></td><td class="fieldArgDesc">Dictionary with keys:
+<table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/stdtypes.html#dict" class="intersphinx-link">dict</a>[<a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <a href="https://docs.python.org/3/library/typing.html#typing.Any" class="intersphinx-link">typing.Any</a>]</code></td><td class="fieldArgDesc">Dictionary with keys:
 - 'error_type': str, type of the exception.
 - 'error_message': str, formatted traceback string.
 - 'error_code': Any, custom error code if present.
@@ -689,7 +689,7 @@ the same dict with no additional computation.</p>
   <div class="functionHeader">
     
     <span class="py-defname">__slots__</span>: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" class="intersphinx-link">tuple</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <wbr></wbr><span class="rst-variable-ellipsis">...</span>]</code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/support/formatter/exceptions/parser.py#L8">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/support/formatter/exceptions/parser.py#L11">
       
       (source)
     </a>
@@ -701,7 +701,7 @@ the same dict with no additional computation.</p>
   </div>
   <div class="functionBody">
     
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p>Declare the instance attribute slots reserved by this class.</p></div>
     
   </div>
 </div><div class="baseinstancevariable">
@@ -716,7 +716,7 @@ the same dict with no additional computation.</p>
   <div class="functionHeader">
     
     <span class="py-defname">_cache</span>: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#dict" class="intersphinx-link">dict</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <wbr></wbr><a href="https://docs.python.org/3/library/typing.html#typing.Any" class="intersphinx-link">Any</a>] | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/support/formatter/exceptions/parser.py#L37">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/support/formatter/exceptions/parser.py#L44">
       
       (source)
     </a>
@@ -728,7 +728,7 @@ the same dict with no additional computation.</p>
   </div>
   <div class="functionBody">
     
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p>Cache policy or cached state used by this component.</p></div>
     
   </div>
 </div><div class="baseinstancevariable">
@@ -743,7 +743,7 @@ the same dict with no additional computation.</p>
   <div class="functionHeader">
     
     <span class="py-defname">_error_code</span>: <code><a href="https://docs.python.org/3/library/typing.html#typing.Any" class="intersphinx-link">Any</a></code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/support/formatter/exceptions/parser.py#L36">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/support/formatter/exceptions/parser.py#L42">
       
       (source)
     </a>
@@ -755,7 +755,7 @@ the same dict with no additional computation.</p>
   </div>
   <div class="functionBody">
     
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p>Error code produced by <tt class="rst-docutils rst-literal">getattr</tt>.</p></div>
     
   </div>
 </div><div class="baseinstancevariable">
@@ -770,7 +770,7 @@ the same dict with no additional computation.</p>
   <div class="functionHeader">
     
     <span class="py-defname">_exc_type</span>: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/support/formatter/exceptions/parser.py#L31">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/support/formatter/exceptions/parser.py#L36">
       
       (source)
     </a>
@@ -782,7 +782,7 @@ the same dict with no additional computation.</p>
   </div>
   <div class="functionBody">
     
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p>Type of the exception being formatted.</p></div>
     
   </div>
 </div><div class="baseinstancevariable">
@@ -797,7 +797,7 @@ the same dict with no additional computation.</p>
   <div class="functionHeader">
     
     <span class="py-defname">_tb</span> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/support/formatter/exceptions/parser.py#L30">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/support/formatter/exceptions/parser.py#L34">
       
       (source)
     </a>
@@ -809,7 +809,7 @@ the same dict with no additional computation.</p>
   </div>
   <div class="functionBody">
     
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p>Tb supplied through <tt class="rst-docutils rst-literal">tb</tt>.</p></div>
     
   </div>
 </div>
@@ -823,7 +823,7 @@ the same dict with no additional computation.</p>
   <div class="orionis-footer-inner">
     <div class="orionis-footer-copy">
       <p>API documentation for <a href="https://orionis-framework.com/" class="projecthome">Orionis</a>.</p>
-      <p class="orionis-footer-meta">Generated with <a href="https://github.com/twisted/pydoctor/">Pydoctor</a> 25.10.1.<span class="orionis-footer-build"> Built 2026-11-03 09:36:58.</span></p>
+      <p class="orionis-footer-meta">Generated with <a href="https://github.com/twisted/pydoctor/">Pydoctor</a> 25.10.1.<span class="orionis-footer-build"> Built 2026-11-03 13:00:15.</span></p>
     </div>
     <nav class="orionis-footer-links" aria-label="Additional resources">
       <a href="https://docs.orionis-framework.com">Read the guide <span aria-hidden="true">↗</span></a>

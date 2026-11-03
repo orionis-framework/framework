@@ -421,7 +421,7 @@
         
 
         
-            <div class="itemName"><code><a href="orionis.foundation.config.queue.enums.drivers.html" class="internal-link" title="orionis.foundation.config.queue.enums.drivers">drivers</a></code>
+            <div class="itemName"><code><a href="orionis.foundation.config.queue.enums.drivers.module.html" class="internal-link" title="orionis.foundation.config.queue.enums.drivers">drivers</a></code>
             </div>
         
 
@@ -1680,15 +1680,15 @@
         </div>
 
         <div class="extrasDocstring">
-          <p class="class-signature"><code><span class="py-keyword">class</span> <span class="py-defname">Connections</span>(<a href="orionis.support.entities.BaseEntity.html" class="internal-link" title="orionis.support.entities.BaseEntity">BaseEntity</a>): <a href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/foundation/config/queue/entities/connections.py#L9" class="sourceLink">(source)</a></code></p><p><a href="classIndex.html#orionis.foundation.config.queue.Connections">View In Hierarchy</a></p>
+          <p class="class-signature"><code><span class="py-keyword">class</span> <span class="py-defname">Connections</span>(<a href="orionis.support.entities.BaseEntity.html" class="internal-link" title="orionis.support.entities.BaseEntity">BaseEntity</a>): <a href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/foundation/config/queue/entities/connections.py#L12" class="sourceLink">(source)</a></code></p><p><a href="classIndex.html#orionis.foundation.config.queue.Connections">View In Hierarchy</a></p>
         </div>
 
         <div class="moduleDocstring">
-          <div><p>Group the conventional validated queue connections.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">sync</span></td><td class="fieldArgDesc">Synchronous connection settings.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">database</span></td><td class="fieldArgDesc">Durable database connection settings.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">redis</span></td><td class="fieldArgDesc">Durable Redis connection settings.</td></tr></table></div>
+          <div><p>Group the conventional validated queue connections.</p></div>
         </div>
 
         <div id="split-tables">
-          <table class="children sortable" id="id856">
+          <table class="children sortable" id="id857">
   
   
   <tr class="method">
@@ -1696,28 +1696,28 @@
     <td>Method</td>
     <td><code><a href="#__post_init__" class="internal-link" title="orionis.foundation.config.queue.Connections.__post_init__">__post<wbr></wbr>_init__</a></code></td>
     <td>Convert connection mappings into strictly validated entities.</td>
-  </tr><tr class="classvariable">
+  </tr><tr class="instancevariable">
     
-    <td>Class Variable</td>
+    <td>Instance Variable</td>
     <td><code><a href="#database" class="internal-link" title="orionis.foundation.config.queue.Connections.database">database</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
-  </tr><tr class="classvariable">
+    <td>Durable database connection settings.</td>
+  </tr><tr class="instancevariable">
     
-    <td>Class Variable</td>
+    <td>Instance Variable</td>
     <td><code><a href="#redis" class="internal-link" title="orionis.foundation.config.queue.Connections.redis">redis</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
-  </tr><tr class="classvariable">
+    <td>Durable Redis connection settings.</td>
+  </tr><tr class="instancevariable">
     
-    <td>Class Variable</td>
+    <td>Instance Variable</td>
     <td><code><a href="#sync" class="internal-link" title="orionis.foundation.config.queue.Connections.sync">sync</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
+    <td>Synchronous connection settings.</td>
   </tr>
 </table>
           
             <p class="inheritedFrom">
               Inherited from <code><a href="orionis.support.entities.BaseEntity.html" class="internal-link" title="orionis.support.entities.BaseEntity">BaseEntity</a></code>:
             </p>
-            <table class="children sortable" id="id857">
+            <table class="children sortable" id="id858">
   
   
   <tr class="baseclassmethod">
@@ -1739,7 +1739,7 @@
     
     <td>Class Variable</td>
     <td><code><a href="orionis.support.entities.BaseEntity.html#__slots__" class="internal-link" title="orionis.support.entities.BaseEntity.__slots__">__slots__</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
+    <td>Declare that this class introduces no additional instance slots.</td>
   </tr>
 </table>
             
@@ -1761,7 +1761,7 @@
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">__post_init__</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>):</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/foundation/config/queue/entities/connections.py#L48">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/foundation/config/queue/entities/connections.py#L51">
       
       (source)
     </a>
@@ -1775,7 +1775,7 @@
     <div class="interfaceinfo">overrides <code><a href="orionis.support.entities.BaseEntity.html#__post_init__" class="internal-link">orionis.support.entities.BaseEntity.__post_init__</a></code></div>
     <div><p>Convert connection mappings into strictly validated entities.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">Store an entity for each supported connection.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/exceptions.html#TypeError" class="intersphinx-link">TypeError</a></code></td><td>If a connection has an unexpected type or unsupported fields.</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/exceptions.html#ValueError" class="intersphinx-link">ValueError</a></code></td><td>If a nested setting fails its connection's validation.</td></tr></table></div>
   </div>
-</div><div class="baseclassvariable">
+</div><div class="baseinstancevariable">
   
   
   <a name="orionis.foundation.config.queue.Connections.database">
@@ -1786,8 +1786,8 @@
   </a>
   <div class="functionHeader">
     
-    <span class="py-defname">database</span>: <code>Database | dict</code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/foundation/config/queue/entities/connections.py#L32">
+    <span class="py-defname">database</span>: <code>orionis.foundation.config.queue.Database | dict</code> =
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/foundation/config/queue/entities/connections.py#L35">
       
       (source)
     </a>
@@ -1799,10 +1799,10 @@
   </div>
   <div class="functionBody">
     
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p>Durable database connection settings.</p></div>
     
   </div>
-</div><div class="baseclassvariable">
+</div><div class="baseinstancevariable">
   
   
   <a name="orionis.foundation.config.queue.Connections.redis">
@@ -1813,8 +1813,8 @@
   </a>
   <div class="functionHeader">
     
-    <span class="py-defname">redis</span>: <code>Redis | dict</code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/foundation/config/queue/entities/connections.py#L40">
+    <span class="py-defname">redis</span>: <code>orionis.foundation.config.queue.Redis | dict</code> =
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/foundation/config/queue/entities/connections.py#L43">
       
       (source)
     </a>
@@ -1826,10 +1826,10 @@
   </div>
   <div class="functionBody">
     
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p>Durable Redis connection settings.</p></div>
     
   </div>
-</div><div class="baseclassvariable">
+</div><div class="baseinstancevariable">
   
   
   <a name="orionis.foundation.config.queue.Connections.sync">
@@ -1840,8 +1840,8 @@
   </a>
   <div class="functionHeader">
     
-    <span class="py-defname">sync</span>: <code>Sync | dict</code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/foundation/config/queue/entities/connections.py#L24">
+    <span class="py-defname">sync</span>: <code>orionis.foundation.config.queue.Sync | dict</code> =
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/foundation/config/queue/entities/connections.py#L27">
       
       (source)
     </a>
@@ -1853,7 +1853,7 @@
   </div>
   <div class="functionBody">
     
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p>Synchronous connection settings.</p></div>
     
   </div>
 </div>
@@ -1867,7 +1867,7 @@
   <div class="orionis-footer-inner">
     <div class="orionis-footer-copy">
       <p>API documentation for <a href="https://orionis-framework.com/" class="projecthome">Orionis</a>.</p>
-      <p class="orionis-footer-meta">Generated with <a href="https://github.com/twisted/pydoctor/">Pydoctor</a> 25.10.1.<span class="orionis-footer-build"> Built 2026-11-03 09:36:58.</span></p>
+      <p class="orionis-footer-meta">Generated with <a href="https://github.com/twisted/pydoctor/">Pydoctor</a> 25.10.1.<span class="orionis-footer-build"> Built 2026-11-03 13:00:15.</span></p>
     </div>
     <nav class="orionis-footer-links" aria-label="Additional resources">
       <a href="https://docs.orionis-framework.com">Read the guide <span aria-hidden="true">↗</span></a>

@@ -816,15 +816,15 @@
         </div>
 
         <div class="extrasDocstring">
-          <p class="class-signature"><code><span class="py-keyword">class</span> <span class="py-defname">Router</span>(<a href="orionis.http.routes.contracts.router.IRouter.html" class="internal-link" title="orionis.http.routes.contracts.router.IRouter">IRouter</a>): <a href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/http/routes/router.py#L23" class="sourceLink">(source)</a></code></p><p>Constructor: <code><a href="#__init__" class="internal-link" title="orionis.http.routes.router.Router.__init__">Router(app)</a></code></p><p><a href="classIndex.html#orionis.http.routes.router.Router">View In Hierarchy</a></p>
+          <p class="class-signature"><code><span class="py-keyword">class</span> <span class="py-defname">Router</span>(<a href="orionis.http.routes.contracts.router.IRouter.html" class="internal-link" title="orionis.http.routes.contracts.router.IRouter">IRouter</a>): <a href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/http/routes/router.py#L25" class="sourceLink">(source)</a></code></p><p>Constructor: <code><a href="#__init__" class="internal-link" title="orionis.http.routes.router.Router.__init__">Router(app)</a></code></p><p><a href="classIndex.html#orionis.http.routes.router.Router">View In Hierarchy</a></p>
         </div>
 
         <div class="moduleDocstring">
-          <div><p class="undocumented">Undocumented</p></div>
+          <div><p>Register application routes and configure their shared dispatch options.</p></div>
         </div>
 
         <div id="split-tables">
-          <table class="children sortable" id="id1157">
+          <table class="children sortable" id="id1158">
   
   
   <tr class="staticmethod">
@@ -921,46 +921,46 @@
     
     <td>Constant</td>
     <td><code><a href="#_DEFAULT_PATHS" class="internal-link" title="orionis.http.routes.router.Router._DEFAULT_PATHS">_DEFAULT<wbr></wbr>_PATHS</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
+    <td>Default paths used by <tt class="rst-docutils rst-literal">Router</tt>.</td>
   </tr><tr class="instancevariable">
     
     <td>Instance Variable</td>
     <td><code><a href="#__app" class="internal-link" title="orionis.http.routes.router.Router.__app">__app</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
+    <td>The application instance.</td>
   </tr><tr class="instancevariable">
     
     <td>Instance Variable</td>
     <td><code><a href="#__current_kind" class="internal-link" title="orionis.http.routes.router.Router.__current_kind">__current<wbr></wbr>_kind</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
+    <td><tt class="rst-docutils rst-literal">web</tt>.</td>
   </tr><tr class="instancevariable">
     
     <td>Instance Variable</td>
     <td><code><a href="#__fallback" class="internal-link" title="orionis.http.routes.router.Router.__fallback">__fallback</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
+    <td>Handler or route selected when no ordinary route matches.</td>
   </tr><tr class="instancevariable">
     
     <td>Instance Variable</td>
     <td><code><a href="#__replaceable_routes" class="internal-link" title="orionis.http.routes.router.Router.__replaceable_routes">__replaceable<wbr></wbr>_routes</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
+    <td>Previously registered routes eligible for replacement.</td>
   </tr><tr class="instancevariable">
     
     <td>Instance Variable</td>
     <td><code><a href="#__routes" class="internal-link" title="orionis.http.routes.router.Router.__routes">__routes</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
+    <td>Route definitions registered in this routing context.</td>
   </tr>
 </table>
           
             <p class="inheritedFrom">
               Inherited from <code><a href="orionis.http.routes.contracts.router.IRouter.html" class="internal-link" title="orionis.http.routes.contracts.router.IRouter">IRouter</a></code>:
             </p>
-            <table class="children sortable" id="id1158">
+            <table class="children sortable" id="id1159">
   
   
   <tr class="baseclassvariable">
     
     <td>Class Variable</td>
     <td><code><a href="orionis.http.routes.contracts.router.IRouter.html#__slots__" class="internal-link" title="orionis.http.routes.contracts.router.IRouter.__slots__">__slots__</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
+    <td>Declare that this class introduces no additional instance slots.</td>
   </tr>
 </table>
             
@@ -982,7 +982,7 @@
     
     <div><span class="decorator">@<a href="https://docs.python.org/3/builtins/functions.html#staticmethod" class="intersphinx-link">staticmethod</a><br /></span></div>
     <span class="py-keyword">def</span>&#160;<span class="py-defname">__groupMembers</span><span class="function-signature long-signature">(<span class="rst-sig-param">routes: <code><a href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Sequence" class="intersphinx-link">Sequence</a>[<wbr></wbr><a href="orionis.http.routes.fluent.FluentRoute.html" class="internal-link" title="orionis.http.routes.fluent.FluentRoute">FluentRoute</a> | <a href="orionis.http.routes.group.RouteGroup.html" class="internal-link" title="orionis.http.routes.group.RouteGroup">RouteGroup</a>] | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" class="intersphinx-link">tuple</a>[<wbr></wbr><a href="orionis.http.routes.fluent.FluentRoute.html" class="internal-link" title="orionis.http.routes.fluent.FluentRoute">FluentRoute</a>, <wbr></wbr><span class="rst-variable-ellipsis">...</span>]</code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/http/routes/router.py#L553">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/http/routes/router.py#L559">
       
       (source)
     </a>
@@ -994,7 +994,7 @@
   </div>
   <div class="docstring functionBody">
     
-    <div><p>Validate and flatten membership without mutating any routes.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">routes:</span><code><a href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Sequence" class="intersphinx-link">Sequence</a>[FluentRoute | RouteGroup] | None</code></td><td class="fieldArgDesc">Value supplied for <tt class="rst-docutils rst-literal">routes</tt>.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" class="intersphinx-link">tuple</a>[<a href="orionis.http.routes.fluent.FluentRoute.html" class="internal-link" title="orionis.http.routes.fluent.FluentRoute">FluentRoute</a>, ...]</code></td><td class="fieldArgDesc">Unique leaf routes in declaration order.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/exceptions.html#ValueError" class="intersphinx-link">ValueError</a></code></td><td>If membership is empty or contains duplicate routes.</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/exceptions.html#TypeError" class="intersphinx-link">TypeError</a></code></td><td>If a member is neither a route nor a group.</td></tr></table></div>
+    <div><p>Validate and flatten membership without mutating any routes.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">routes:</span><code><a href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Sequence" class="intersphinx-link">Sequence</a>[FluentRoute | RouteGroup] | None</code></td><td class="fieldArgDesc">Value supplied for <tt class="rst-docutils rst-literal">routes</tt>.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" class="intersphinx-link">tuple</a>[<a href="orionis.http.routes.fluent.FluentRoute.html" class="internal-link">orionis.http.routes.fluent.FluentRoute</a>, <tt class="rst-docutils rst-literal">...</tt>]</code></td><td class="fieldArgDesc">Unique leaf routes in declaration order.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/exceptions.html#ValueError" class="intersphinx-link">ValueError</a></code></td><td>If membership is empty or contains duplicate routes.</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/exceptions.html#TypeError" class="intersphinx-link">TypeError</a></code></td><td>If a member is neither a route nor a group.</td></tr></table></div>
   </div>
 </div><div class="basemethod">
   
@@ -1008,8 +1008,8 @@
   <div class="functionHeader">
     
     
-    <span class="py-keyword">def</span>&#160;<span class="py-defname">__addSingleRoute</span><span class="function-signature long-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">method: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code>, </span><span class="rst-sig-param">path: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code>, </span><span class="rst-sig-param">action: <code>RouteAction | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code> = <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a>, </span><span class="rst-sig-symbol">*, </span><span class="rst-sig-param">view: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a> | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code> = <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></span>) -&gt; <code><a href="orionis.http.routes.fluent.FluentRoute.html" class="internal-link" title="orionis.http.routes.fluent.FluentRoute">FluentRoute</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/http/routes/router.py#L82">
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">__addSingleRoute</span><span class="function-signature long-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">method: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code>, </span><span class="rst-sig-param">path: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code>, </span><span class="rst-sig-param">action: <code><a href="orionis.http.routes.types.html#RouteAction" class="internal-link" title="orionis.http.routes.types.RouteAction">RouteAction</a> | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code> = <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a>, </span><span class="rst-sig-symbol">*, </span><span class="rst-sig-param">view: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a> | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code> = <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></span>) -&gt; <code><a href="orionis.http.routes.fluent.FluentRoute.html" class="internal-link" title="orionis.http.routes.fluent.FluentRoute">FluentRoute</a></code>:</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/http/routes/router.py#L87">
       
       (source)
     </a>
@@ -1021,11 +1021,11 @@
   </div>
   <div class="docstring functionBody">
     
-    <div><p>Create and register a single HTTP route.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">method:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">HTTP method (e.g. <tt class="rst-docutils rst-literal">'GET'</tt>, <tt class="rst-docutils rst-literal">'POST'</tt>).</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">path:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">URL path for the route.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">action:</span><code>RouteAction | None, <em>optional</em></code></td><td class="fieldArgDesc">Callable, invokable controller class (defining <tt class="rst-docutils rst-literal">__call__</tt>),
+    <div><p>Create and register a single HTTP route.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">method:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">HTTP method (e.g. <tt class="rst-docutils rst-literal">'GET'</tt>, <tt class="rst-docutils rst-literal">'POST'</tt>).</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">path:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">URL path for the route.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">action:</span><code>orionis.http.routes.types.RouteAction | None, <em>optional</em></code></td><td class="fieldArgDesc">Callable, invokable controller class (defining <tt class="rst-docutils rst-literal">__call__</tt>),
 or <tt class="rst-docutils rst-literal">[ControllerClass, 'method_name']</tt> list.
 If omitted or None, call <tt class="rst-docutils rst-literal">action(controller, handler)</tt> on the
 returned route before exporting the router.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">view:</span><code>str | None, <em>optional</em></code></td><td class="fieldArgDesc">Template name rendered directly by the kernel, used instead of
-<em>action</em> for view-only routes.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.http.routes.fluent.FluentRoute.html" class="internal-link" title="orionis.http.routes.fluent.FluentRoute">FluentRoute</a></code></td><td class="fieldArgDesc">The registered FluentRoute instance.</td></tr></table></div>
+<em>action</em> for view-only routes.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.http.routes.fluent.FluentRoute.html" class="internal-link">orionis.http.routes.fluent.FluentRoute</a></code></td><td class="fieldArgDesc">The registered FluentRoute instance.</td></tr></table></div>
   </div>
 </div><div class="basemethod">
   
@@ -1040,7 +1040,7 @@ returned route before exporting the router.</td></tr><tr><td class="fieldArgCont
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">__defaultRoutes</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>):</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/http/routes/router.py#L60">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/http/routes/router.py#L69">
       
       (source)
     </a>
@@ -1055,7 +1055,7 @@ returned route before exporting the router.</td></tr><tr><td class="fieldArgCont
     <div><p>Register default routes for common static paths.</p>
 <p>Registers GET handlers for favicon, robots.txt, and sitemap.xml
 using the DefaultResponses class.</p>
-<table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg"><wbr></wbr>None</span></td><td class="fieldArgDesc"></td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">Default routes are registered on the instance;
+<table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">Default routes are registered on the instance;
 no value is returned.</td></tr></table></div>
   </div>
 </div><div class="basemethod">
@@ -1071,7 +1071,7 @@ no value is returned.</td></tr></table></div>
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">__init__</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">app: <code>IApplication</code></span>):</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/http/routes/router.py#L33">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/http/routes/router.py#L37">
       
       (source)
     </a>
@@ -1083,7 +1083,7 @@ no value is returned.</td></tr></table></div>
   </div>
   <div class="docstring functionBody">
     
-    <div><p>Initialise the Router and register default system routes.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">app:</span><code><a href="orionis.IApplication.html" class="internal-link" title="orionis.IApplication">IApplication</a></code></td><td class="fieldArgDesc">The application instance.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">State is stored on the instance; no value is returned.</td></tr></table></div>
+    <div><p>Initialise the Router and register default system routes.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">app:</span><code><a href="orionis.IApplication.html" class="internal-link">orionis.IApplication</a></code></td><td class="fieldArgDesc">The application instance.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">State is stored on the instance; no value is returned.</td></tr></table></div>
   </div>
 </div><div class="basemethod">
   
@@ -1098,7 +1098,7 @@ no value is returned.</td></tr></table></div>
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">_setKind</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">kind: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></span>):</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/http/routes/router.py#L125">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/http/routes/router.py#L130">
       
       (source)
     </a>
@@ -1130,7 +1130,7 @@ the routes defined in that file are tagged accordingly.</p>
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">auth</span><span class="function-signature long-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">login_controller: <code><a href="https://docs.python.org/3/builtins/functions.html#type" class="intersphinx-link">type</a> | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code> = <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a>, </span><span class="rst-sig-param">register_controller: <code><a href="https://docs.python.org/3/builtins/functions.html#type" class="intersphinx-link">type</a> | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code> = <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a>, </span><span class="rst-sig-param">forgot_password_controller: <code><a href="https://docs.python.org/3/builtins/functions.html#type" class="intersphinx-link">type</a> | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code> = <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></span>):</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/http/routes/router.py#L203">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/http/routes/router.py#L209">
       
       (source)
     </a>
@@ -1167,8 +1167,8 @@ The named routes include <tt class="rst-docutils rst-literal">login</tt>, <tt cl
   <div class="functionHeader">
     
     
-    <span class="py-keyword">def</span>&#160;<span class="py-defname">delete</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">path: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code>, </span><span class="rst-sig-param">action: <code>RouteAction | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code> = <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></span>) -&gt; <code><a href="orionis.http.routes.fluent.FluentRoute.html" class="internal-link" title="orionis.http.routes.fluent.FluentRoute">FluentRoute</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/http/routes/router.py#L388">
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">delete</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">path: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code>, </span><span class="rst-sig-param">action: <code><a href="orionis.http.routes.types.html#RouteAction" class="internal-link" title="orionis.http.routes.types.RouteAction">RouteAction</a> | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code> = <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></span>) -&gt; <code><a href="orionis.http.routes.fluent.FluentRoute.html" class="internal-link" title="orionis.http.routes.fluent.FluentRoute">FluentRoute</a></code>:</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/http/routes/router.py#L394">
       
       (source)
     </a>
@@ -1180,10 +1180,10 @@ The named routes include <tt class="rst-docutils rst-literal">login</tt>, <tt cl
   </div>
   <div class="docstring functionBody">
     <div class="interfaceinfo">overrides <code><a href="orionis.http.routes.contracts.router.IRouter.html#delete" class="internal-link">orionis.http.routes.contracts.router.IRouter.delete</a></code></div>
-    <div><p>Register a DELETE route.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">path:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">URL path for the route.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">action:</span><code>RouteAction | None, <em>optional</em></code></td><td class="fieldArgDesc">Callable, invokable controller class (defining <tt class="rst-docutils rst-literal">__call__</tt>),
+    <div><p>Register a DELETE route.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">path:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">URL path for the route.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">action:</span><code>orionis.http.routes.types.RouteAction | None, <em>optional</em></code></td><td class="fieldArgDesc">Callable, invokable controller class (defining <tt class="rst-docutils rst-literal">__call__</tt>),
 or <tt class="rst-docutils rst-literal">[ControllerClass, 'method_name']</tt> list.
 If omitted or None, call <tt class="rst-docutils rst-literal">action(controller, handler)</tt> on the
-returned route before exporting the router.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.http.routes.fluent.FluentRoute.html" class="internal-link" title="orionis.http.routes.fluent.FluentRoute">FluentRoute</a></code></td><td class="fieldArgDesc">The registered FluentRoute instance.</td></tr></table></div>
+returned route before exporting the router.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.http.routes.fluent.FluentRoute.html" class="internal-link">orionis.http.routes.fluent.FluentRoute</a></code></td><td class="fieldArgDesc">The registered FluentRoute instance.</td></tr></table></div>
   </div>
 </div><div class="basemethod">
   
@@ -1198,7 +1198,7 @@ returned route before exporting the router.</td></tr></table><table class="field
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">export</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/stdtypes.html#dict" class="intersphinx-link">dict</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/http/routes/router.py#L606">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/http/routes/router.py#L612">
       
       (source)
     </a>
@@ -1230,8 +1230,8 @@ returned route before exporting the router.</td></tr></table><table class="field
   <div class="functionHeader">
     
     
-    <span class="py-keyword">def</span>&#160;<span class="py-defname">fallback</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">action: <code>RouteAction</code></span>):</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/http/routes/router.py#L438">
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">fallback</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">action: <code><a href="orionis.http.routes.types.html#RouteAction" class="internal-link" title="orionis.http.routes.types.RouteAction">RouteAction</a></code></span>):</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/http/routes/router.py#L444">
       
       (source)
     </a>
@@ -1246,9 +1246,9 @@ returned route before exporting the router.</td></tr></table><table class="field
     <div><p>Register the fallback handler for unmatched routes (HTTP 404).</p>
 <p>Only one fallback may be registered; a second call raises
 <tt class="rst-docutils rst-literal">FallbackRouteAlreadyRegisteredException</tt>.</p>
-<table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">action:</span><code>RouteAction</code></td><td class="fieldArgDesc">Callable, invokable controller class (defining <tt class="rst-docutils rst-literal">__call__</tt>),
+<table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">action:</span><code><a href="orionis.http.routes.types.html#RouteAction" class="internal-link">orionis.http.routes.types.RouteAction</a></code></td><td class="fieldArgDesc">Callable, invokable controller class (defining <tt class="rst-docutils rst-literal">__call__</tt>),
 or <tt class="rst-docutils rst-literal">[ControllerClass, 'method_name']</tt> list. Required because
-fallback registration does not return a fluent route builder.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">The fallback is stored on the instance; no value is returned.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.http.routes.exceptions.fallback_route_already_registered.FallbackRouteAlreadyRegisteredException.html" class="internal-link" title="orionis.http.routes.exceptions.fallback_route_already_registered.FallbackRouteAlreadyRegisteredException">FallbackRouteAlreadyRegisteredException</a></code></td><td>If a fallback handler has already been registered.</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/exceptions.html#TypeError" class="intersphinx-link">TypeError</a></code></td><td>If the action is None or is not an accepted handler form.</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/exceptions.html#ValueError" class="intersphinx-link">ValueError</a></code></td><td>If a controller pair has an invalid length or names a missing
+fallback registration does not return a fluent route builder.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">The fallback is stored on the instance; no value is returned.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.http.routes.exceptions.fallback_route_already_registered.FallbackRouteAlreadyRegisteredException.html" class="internal-link">orionis.http.routes.exceptions.fallback_route_already_registered.FallbackRouteAlreadyRegisteredException</a></code></td><td>If a fallback handler has already been registered.</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/exceptions.html#TypeError" class="intersphinx-link">TypeError</a></code></td><td>If the action is None or is not an accepted handler form.</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/exceptions.html#ValueError" class="intersphinx-link">ValueError</a></code></td><td>If a controller pair has an invalid length or names a missing
 method.</td></tr></table></div>
   </div>
 </div><div class="basemethod">
@@ -1263,8 +1263,8 @@ method.</td></tr></table></div>
   <div class="functionHeader">
     
     
-    <span class="py-keyword">def</span>&#160;<span class="py-defname">get</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">path: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code>, </span><span class="rst-sig-param">action: <code>RouteAction | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code> = <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></span>) -&gt; <code><a href="orionis.http.routes.fluent.FluentRoute.html" class="internal-link" title="orionis.http.routes.fluent.FluentRoute">FluentRoute</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/http/routes/router.py#L338">
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">get</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">path: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code>, </span><span class="rst-sig-param">action: <code><a href="orionis.http.routes.types.html#RouteAction" class="internal-link" title="orionis.http.routes.types.RouteAction">RouteAction</a> | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code> = <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></span>) -&gt; <code><a href="orionis.http.routes.fluent.FluentRoute.html" class="internal-link" title="orionis.http.routes.fluent.FluentRoute">FluentRoute</a></code>:</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/http/routes/router.py#L344">
       
       (source)
     </a>
@@ -1276,10 +1276,10 @@ method.</td></tr></table></div>
   </div>
   <div class="docstring functionBody">
     <div class="interfaceinfo">overrides <code><a href="orionis.http.routes.contracts.router.IRouter.html#get" class="internal-link">orionis.http.routes.contracts.router.IRouter.get</a></code></div>
-    <div><p>Register a GET route.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">path:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">URL path for the route.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">action:</span><code>RouteAction | None, <em>optional</em></code></td><td class="fieldArgDesc">Callable, invokable controller class (defining <tt class="rst-docutils rst-literal">__call__</tt>),
+    <div><p>Register a GET route.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">path:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">URL path for the route.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">action:</span><code>orionis.http.routes.types.RouteAction | None, <em>optional</em></code></td><td class="fieldArgDesc">Callable, invokable controller class (defining <tt class="rst-docutils rst-literal">__call__</tt>),
 or <tt class="rst-docutils rst-literal">[ControllerClass, 'method_name']</tt> list.
 If omitted or None, call <tt class="rst-docutils rst-literal">action(controller, handler)</tt> on the
-returned route before exporting the router.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.http.routes.fluent.FluentRoute.html" class="internal-link" title="orionis.http.routes.fluent.FluentRoute">FluentRoute</a></code></td><td class="fieldArgDesc">The registered FluentRoute instance.</td></tr></table></div>
+returned route before exporting the router.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.http.routes.fluent.FluentRoute.html" class="internal-link">orionis.http.routes.fluent.FluentRoute</a></code></td><td class="fieldArgDesc">The registered FluentRoute instance.</td></tr></table></div>
   </div>
 </div><div class="basemethod">
   
@@ -1293,8 +1293,8 @@ returned route before exporting the router.</td></tr></table><table class="field
   <div class="functionHeader">
     
     
-    <span class="py-keyword">def</span>&#160;<span class="py-defname">group</span><span class="function-signature long-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-symbol">*, </span><span class="rst-sig-param">prefix: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a> | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code> = <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a>, </span><span class="rst-sig-param">middleware: <code>MiddlewareInput | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code> = <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a>, </span><span class="rst-sig-param">without_middleware: <code>MiddlewareInput | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code> = <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a>, </span><span class="rst-sig-param">routes: <code><a href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Sequence" class="intersphinx-link">Sequence</a>[<wbr></wbr><a href="orionis.http.routes.fluent.FluentRoute.html" class="internal-link" title="orionis.http.routes.fluent.FluentRoute">FluentRoute</a> | <a href="orionis.http.routes.group.RouteGroup.html" class="internal-link" title="orionis.http.routes.group.RouteGroup">RouteGroup</a>] | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code> = <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a>, </span><span class="rst-sig-param">public: <code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a> | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code> = <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></span>) -&gt; <code><a href="orionis.http.routes.group.RouteGroup.html" class="internal-link" title="orionis.http.routes.group.RouteGroup">RouteGroup</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/http/routes/router.py#L485">
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">group</span><span class="function-signature long-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-symbol">*, </span><span class="rst-sig-param">prefix: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a> | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code> = <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a>, </span><span class="rst-sig-param">middleware: <code><a href="orionis.http.routes.types.html#MiddlewareInput" class="internal-link" title="orionis.http.routes.types.MiddlewareInput">MiddlewareInput</a> | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code> = <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a>, </span><span class="rst-sig-param">without_middleware: <code><a href="orionis.http.routes.types.html#MiddlewareInput" class="internal-link" title="orionis.http.routes.types.MiddlewareInput">MiddlewareInput</a> | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code> = <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a>, </span><span class="rst-sig-param">routes: <code><a href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Sequence" class="intersphinx-link">Sequence</a>[<wbr></wbr><a href="orionis.http.routes.fluent.FluentRoute.html" class="internal-link" title="orionis.http.routes.fluent.FluentRoute">FluentRoute</a> | <a href="orionis.http.routes.group.RouteGroup.html" class="internal-link" title="orionis.http.routes.group.RouteGroup">RouteGroup</a>] | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code> = <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a>, </span><span class="rst-sig-param">public: <code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a> | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code> = <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></span>) -&gt; <code><a href="orionis.http.routes.group.RouteGroup.html" class="internal-link" title="orionis.http.routes.group.RouteGroup">RouteGroup</a></code>:</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/http/routes/router.py#L491">
       
       (source)
     </a>
@@ -1306,7 +1306,7 @@ returned route before exporting the router.</td></tr></table><table class="field
   </div>
   <div class="docstring functionBody">
     <div class="interfaceinfo">overrides <code><a href="orionis.http.routes.contracts.router.IRouter.html#group" class="internal-link">orionis.http.routes.contracts.router.IRouter.group</a></code></div>
-    <div><p>Compose a group and return its flattened membership for nesting.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">prefix:</span><code>str | None, <em>optional</em></code></td><td class="fieldArgDesc">Prefix prepended to every descendant path.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">middleware:</span><code>MiddlewareInput | None, <em>optional</em></code></td><td class="fieldArgDesc">Parent middleware executed before descendant middleware.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">without<wbr></wbr>_middleware:</span><code>MiddlewareInput | None, <em>optional</em></code></td><td class="fieldArgDesc">Exclusions applied to the final compiled middleware stack.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">routes:</span><code><a href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Sequence" class="intersphinx-link">Sequence</a>[FluentRoute | RouteGroup] | None, <em>optional</em></code></td><td class="fieldArgDesc">Routes or groups already registered by inner expressions.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">public:</span><code>bool | None, <em>optional</em></code></td><td class="fieldArgDesc">Inherited stateless profile; explicit child choices take precedence.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.http.routes.group.RouteGroup.html" class="internal-link" title="orionis.http.routes.group.RouteGroup">RouteGroup</a></code></td><td class="fieldArgDesc">Already registered routes, usable as members of another group.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/exceptions.html#ValueError" class="intersphinx-link">ValueError</a></code></td><td>If the group is empty, its context is invalid, or a route appears
+    <div><p>Compose a group and return its flattened membership for nesting.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">prefix:</span><code>str | None, <em>optional</em></code></td><td class="fieldArgDesc">Prefix prepended to every descendant path.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">middleware:</span><code>orionis.http.routes.types.MiddlewareInput | None, <em>optional</em></code></td><td class="fieldArgDesc">Parent middleware executed before descendant middleware.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">without<wbr></wbr>_middleware:</span><code>orionis.http.routes.types.MiddlewareInput | None, <em>optional</em></code></td><td class="fieldArgDesc">Exclusions applied to the final compiled middleware stack.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">routes:</span><code><a href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Sequence" class="intersphinx-link">Sequence</a>[FluentRoute | RouteGroup] | None, <em>optional</em></code></td><td class="fieldArgDesc">Routes or groups already registered by inner expressions.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">public:</span><code>bool | None, <em>optional</em></code></td><td class="fieldArgDesc">Inherited stateless profile; explicit child choices take precedence.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.http.routes.group.RouteGroup.html" class="internal-link">orionis.http.routes.group.RouteGroup</a></code></td><td class="fieldArgDesc">Already registered routes, usable as members of another group.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/exceptions.html#ValueError" class="intersphinx-link">ValueError</a></code></td><td>If the group is empty, its context is invalid, or a route appears
 more than once. Validation completes before any route is changed.</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/exceptions.html#TypeError" class="intersphinx-link">TypeError</a></code></td><td>If membership is not a sequence of routes and groups.</td></tr></table></div>
   </div>
 </div><div class="basemethod">
@@ -1322,7 +1322,7 @@ more than once. Validation completes before any route is changed.</td></tr><tr><
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">hub</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">path: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code>, </span><span class="rst-sig-param">hub: <code><a href="https://docs.python.org/3/builtins/functions.html#type" class="intersphinx-link">type</a>[<wbr></wbr>Hub]</code>, </span><span class="rst-sig-symbol">*, </span><span class="rst-sig-param">protocol: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code> = <span class="rst-variable-quote">'</span><span class="rst-variable-string">json</span><span class="rst-variable-quote">'</span></span>) -&gt; <code><a href="orionis.http.routes.fluent.FluentRoute.html" class="internal-link" title="orionis.http.routes.fluent.FluentRoute">FluentRoute</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/http/routes/router.py#L167">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/http/routes/router.py#L173">
       
       (source)
     </a>
@@ -1334,7 +1334,7 @@ more than once. Validation completes before any route is changed.</td></tr><tr><
   </div>
   <div class="docstring functionBody">
     <div class="interfaceinfo">overrides <code><a href="orionis.http.routes.contracts.router.IRouter.html#hub" class="internal-link">orionis.http.routes.contracts.router.IRouter.hub</a></code></div>
-    <div><p>Register a Hub endpoint using a fixed JSON or MessagePack codec.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">path:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Connection path supporting converted route parameters.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">hub:</span><code><a href="https://docs.python.org/3/builtins/functions.html#type" class="intersphinx-link">type</a>[<a href="orionis.realtime.Hub.html" class="internal-link" title="orionis.realtime.Hub">Hub</a>]</code></td><td class="fieldArgDesc">Hub class providing explicitly decorated remote methods.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">protocol:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <em>optional</em></code></td><td class="fieldArgDesc">Realtime codec, either <tt class="rst-docutils rst-literal">json</tt> (default) or <tt class="rst-docutils rst-literal">msgpack</tt>.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.http.routes.fluent.FluentRoute.html" class="internal-link" title="orionis.http.routes.fluent.FluentRoute">FluentRoute</a></code></td><td class="fieldArgDesc">Connection route supporting names, groups and socket middleware.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/exceptions.html#TypeError" class="intersphinx-link">TypeError</a></code></td><td>If hub is not a Hub subclass.</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/exceptions.html#ValueError" class="intersphinx-link">ValueError</a></code></td><td>If the protocol is unsupported.</td></tr></table></div>
+    <div><p>Register a Hub endpoint using a fixed JSON or MessagePack codec.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">path:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Connection path supporting converted route parameters.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">hub:</span><code><a href="https://docs.python.org/3/builtins/functions.html#type" class="intersphinx-link">type</a>[<a href="orionis.realtime.Hub.html" class="internal-link">orionis.realtime.Hub</a>]</code></td><td class="fieldArgDesc">Hub class providing explicitly decorated remote methods.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">protocol:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <em>optional</em></code></td><td class="fieldArgDesc">Realtime codec, either <tt class="rst-docutils rst-literal">json</tt> (default) or <tt class="rst-docutils rst-literal">msgpack</tt>.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.http.routes.fluent.FluentRoute.html" class="internal-link">orionis.http.routes.fluent.FluentRoute</a></code></td><td class="fieldArgDesc">Connection route supporting names, groups and socket middleware.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/exceptions.html#TypeError" class="intersphinx-link">TypeError</a></code></td><td>If hub is not a Hub subclass.</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/exceptions.html#ValueError" class="intersphinx-link">ValueError</a></code></td><td>If the protocol is unsupported.</td></tr></table></div>
   </div>
 </div><div class="basemethod">
   
@@ -1348,8 +1348,8 @@ more than once. Validation completes before any route is changed.</td></tr><tr><
   <div class="functionHeader">
     
     
-    <span class="py-keyword">def</span>&#160;<span class="py-defname">patch</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">path: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code>, </span><span class="rst-sig-param">action: <code>RouteAction | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code> = <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></span>) -&gt; <code><a href="orionis.http.routes.fluent.FluentRoute.html" class="internal-link" title="orionis.http.routes.fluent.FluentRoute">FluentRoute</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/http/routes/router.py#L413">
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">patch</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">path: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code>, </span><span class="rst-sig-param">action: <code><a href="orionis.http.routes.types.html#RouteAction" class="internal-link" title="orionis.http.routes.types.RouteAction">RouteAction</a> | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code> = <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></span>) -&gt; <code><a href="orionis.http.routes.fluent.FluentRoute.html" class="internal-link" title="orionis.http.routes.fluent.FluentRoute">FluentRoute</a></code>:</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/http/routes/router.py#L419">
       
       (source)
     </a>
@@ -1361,10 +1361,10 @@ more than once. Validation completes before any route is changed.</td></tr><tr><
   </div>
   <div class="docstring functionBody">
     <div class="interfaceinfo">overrides <code><a href="orionis.http.routes.contracts.router.IRouter.html#patch" class="internal-link">orionis.http.routes.contracts.router.IRouter.patch</a></code></div>
-    <div><p>Register a PATCH route.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">path:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">URL path for the route.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">action:</span><code>RouteAction | None, <em>optional</em></code></td><td class="fieldArgDesc">Callable, invokable controller class (defining <tt class="rst-docutils rst-literal">__call__</tt>),
+    <div><p>Register a PATCH route.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">path:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">URL path for the route.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">action:</span><code>orionis.http.routes.types.RouteAction | None, <em>optional</em></code></td><td class="fieldArgDesc">Callable, invokable controller class (defining <tt class="rst-docutils rst-literal">__call__</tt>),
 or <tt class="rst-docutils rst-literal">[ControllerClass, 'method_name']</tt> list.
 If omitted or None, call <tt class="rst-docutils rst-literal">action(controller, handler)</tt> on the
-returned route before exporting the router.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.http.routes.fluent.FluentRoute.html" class="internal-link" title="orionis.http.routes.fluent.FluentRoute">FluentRoute</a></code></td><td class="fieldArgDesc">The registered FluentRoute instance.</td></tr></table></div>
+returned route before exporting the router.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.http.routes.fluent.FluentRoute.html" class="internal-link">orionis.http.routes.fluent.FluentRoute</a></code></td><td class="fieldArgDesc">The registered FluentRoute instance.</td></tr></table></div>
   </div>
 </div><div class="basemethod">
   
@@ -1378,8 +1378,8 @@ returned route before exporting the router.</td></tr></table><table class="field
   <div class="functionHeader">
     
     
-    <span class="py-keyword">def</span>&#160;<span class="py-defname">post</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">path: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code>, </span><span class="rst-sig-param">action: <code>RouteAction | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code> = <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></span>) -&gt; <code><a href="orionis.http.routes.fluent.FluentRoute.html" class="internal-link" title="orionis.http.routes.fluent.FluentRoute">FluentRoute</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/http/routes/router.py#L288">
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">post</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">path: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code>, </span><span class="rst-sig-param">action: <code><a href="orionis.http.routes.types.html#RouteAction" class="internal-link" title="orionis.http.routes.types.RouteAction">RouteAction</a> | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code> = <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></span>) -&gt; <code><a href="orionis.http.routes.fluent.FluentRoute.html" class="internal-link" title="orionis.http.routes.fluent.FluentRoute">FluentRoute</a></code>:</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/http/routes/router.py#L294">
       
       (source)
     </a>
@@ -1391,10 +1391,10 @@ returned route before exporting the router.</td></tr></table><table class="field
   </div>
   <div class="docstring functionBody">
     <div class="interfaceinfo">overrides <code><a href="orionis.http.routes.contracts.router.IRouter.html#post" class="internal-link">orionis.http.routes.contracts.router.IRouter.post</a></code></div>
-    <div><p>Register a POST route.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">path:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">URL path for the route.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">action:</span><code>RouteAction | None, <em>optional</em></code></td><td class="fieldArgDesc">Callable, invokable controller class (defining <tt class="rst-docutils rst-literal">__call__</tt>),
+    <div><p>Register a POST route.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">path:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">URL path for the route.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">action:</span><code>orionis.http.routes.types.RouteAction | None, <em>optional</em></code></td><td class="fieldArgDesc">Callable, invokable controller class (defining <tt class="rst-docutils rst-literal">__call__</tt>),
 or <tt class="rst-docutils rst-literal">[ControllerClass, 'method_name']</tt> list.
 If omitted or None, call <tt class="rst-docutils rst-literal">action(controller, handler)</tt> on the
-returned route before exporting the router.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.http.routes.fluent.FluentRoute.html" class="internal-link" title="orionis.http.routes.fluent.FluentRoute">FluentRoute</a></code></td><td class="fieldArgDesc">The registered FluentRoute instance.</td></tr></table></div>
+returned route before exporting the router.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.http.routes.fluent.FluentRoute.html" class="internal-link">orionis.http.routes.fluent.FluentRoute</a></code></td><td class="fieldArgDesc">The registered FluentRoute instance.</td></tr></table></div>
   </div>
 </div><div class="basemethod">
   
@@ -1408,8 +1408,8 @@ returned route before exporting the router.</td></tr></table><table class="field
   <div class="functionHeader">
     
     
-    <span class="py-keyword">def</span>&#160;<span class="py-defname">put</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">path: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code>, </span><span class="rst-sig-param">action: <code>RouteAction | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code> = <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></span>) -&gt; <code><a href="orionis.http.routes.fluent.FluentRoute.html" class="internal-link" title="orionis.http.routes.fluent.FluentRoute">FluentRoute</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/http/routes/router.py#L363">
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">put</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">path: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code>, </span><span class="rst-sig-param">action: <code><a href="orionis.http.routes.types.html#RouteAction" class="internal-link" title="orionis.http.routes.types.RouteAction">RouteAction</a> | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code> = <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></span>) -&gt; <code><a href="orionis.http.routes.fluent.FluentRoute.html" class="internal-link" title="orionis.http.routes.fluent.FluentRoute">FluentRoute</a></code>:</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/http/routes/router.py#L369">
       
       (source)
     </a>
@@ -1421,10 +1421,10 @@ returned route before exporting the router.</td></tr></table><table class="field
   </div>
   <div class="docstring functionBody">
     <div class="interfaceinfo">overrides <code><a href="orionis.http.routes.contracts.router.IRouter.html#put" class="internal-link">orionis.http.routes.contracts.router.IRouter.put</a></code></div>
-    <div><p>Register a PUT route.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">path:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">URL path for the route.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">action:</span><code>RouteAction | None, <em>optional</em></code></td><td class="fieldArgDesc">Callable, invokable controller class (defining <tt class="rst-docutils rst-literal">__call__</tt>),
+    <div><p>Register a PUT route.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">path:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">URL path for the route.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">action:</span><code>orionis.http.routes.types.RouteAction | None, <em>optional</em></code></td><td class="fieldArgDesc">Callable, invokable controller class (defining <tt class="rst-docutils rst-literal">__call__</tt>),
 or <tt class="rst-docutils rst-literal">[ControllerClass, 'method_name']</tt> list.
 If omitted or None, call <tt class="rst-docutils rst-literal">action(controller, handler)</tt> on the
-returned route before exporting the router.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.http.routes.fluent.FluentRoute.html" class="internal-link" title="orionis.http.routes.fluent.FluentRoute">FluentRoute</a></code></td><td class="fieldArgDesc">The registered FluentRoute instance.</td></tr></table></div>
+returned route before exporting the router.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.http.routes.fluent.FluentRoute.html" class="internal-link">orionis.http.routes.fluent.FluentRoute</a></code></td><td class="fieldArgDesc">The registered FluentRoute instance.</td></tr></table></div>
   </div>
 </div><div class="basemethod">
   
@@ -1438,8 +1438,8 @@ returned route before exporting the router.</td></tr></table><table class="field
   <div class="functionHeader">
     
     
-    <span class="py-keyword">def</span>&#160;<span class="py-defname">query</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">path: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code>, </span><span class="rst-sig-param">action: <code>RouteAction | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code> = <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></span>) -&gt; <code><a href="orionis.http.routes.fluent.FluentRoute.html" class="internal-link" title="orionis.http.routes.fluent.FluentRoute">FluentRoute</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/http/routes/router.py#L313">
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">query</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">path: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code>, </span><span class="rst-sig-param">action: <code><a href="orionis.http.routes.types.html#RouteAction" class="internal-link" title="orionis.http.routes.types.RouteAction">RouteAction</a> | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code> = <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></span>) -&gt; <code><a href="orionis.http.routes.fluent.FluentRoute.html" class="internal-link" title="orionis.http.routes.fluent.FluentRoute">FluentRoute</a></code>:</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/http/routes/router.py#L319">
       
       (source)
     </a>
@@ -1451,10 +1451,10 @@ returned route before exporting the router.</td></tr></table><table class="field
   </div>
   <div class="docstring functionBody">
     <div class="interfaceinfo">overrides <code><a href="orionis.http.routes.contracts.router.IRouter.html#query" class="internal-link">orionis.http.routes.contracts.router.IRouter.query</a></code></div>
-    <div><p>Register a QUERY route.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">path:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">URL path for the route.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">action:</span><code>RouteAction | None, <em>optional</em></code></td><td class="fieldArgDesc">Callable, invokable controller class (defining <tt class="rst-docutils rst-literal">__call__</tt>),
+    <div><p>Register a QUERY route.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">path:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">URL path for the route.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">action:</span><code>orionis.http.routes.types.RouteAction | None, <em>optional</em></code></td><td class="fieldArgDesc">Callable, invokable controller class (defining <tt class="rst-docutils rst-literal">__call__</tt>),
 or <tt class="rst-docutils rst-literal">[ControllerClass, 'method_name']</tt> list.
 If omitted or None, call <tt class="rst-docutils rst-literal">action(controller, handler)</tt> on the
-returned route before exporting the router.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.http.routes.fluent.FluentRoute.html" class="internal-link" title="orionis.http.routes.fluent.FluentRoute">FluentRoute</a></code></td><td class="fieldArgDesc">The registered FluentRoute instance.</td></tr></table></div>
+returned route before exporting the router.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.http.routes.fluent.FluentRoute.html" class="internal-link">orionis.http.routes.fluent.FluentRoute</a></code></td><td class="fieldArgDesc">The registered FluentRoute instance.</td></tr></table></div>
   </div>
 </div><div class="basemethod">
   
@@ -1469,7 +1469,7 @@ returned route before exporting the router.</td></tr></table><table class="field
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">view</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">path: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code>, </span><span class="rst-sig-param">view: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></span>) -&gt; <code><a href="orionis.http.routes.fluent.FluentRoute.html" class="internal-link" title="orionis.http.routes.fluent.FluentRoute">FluentRoute</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/http/routes/router.py#L256">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/http/routes/router.py#L262">
       
       (source)
     </a>
@@ -1482,7 +1482,7 @@ returned route before exporting the router.</td></tr></table><table class="field
   <div class="docstring functionBody">
     <div class="interfaceinfo">overrides <code><a href="orionis.http.routes.contracts.router.IRouter.html#view" class="internal-link">orionis.http.routes.contracts.router.IRouter.view</a></code></div>
     <div><p>Register a GET route that renders a template with no controller.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">path:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">URL path for the route.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">view:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Template name in dot notation (e.g. <tt class="rst-docutils rst-literal">'welcome'</tt>) or a
-relative path (e.g. <tt class="rst-docutils rst-literal">'pages/welcome.html'</tt>).</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.http.routes.fluent.FluentRoute.html" class="internal-link" title="orionis.http.routes.fluent.FluentRoute">FluentRoute</a></code></td><td class="fieldArgDesc">The registered FluentRoute instance.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/exceptions.html#ValueError" class="intersphinx-link">ValueError</a></code></td><td>If <tt class="rst-docutils rst-literal">view</tt> is not a non-empty string.</td></tr></table></div>
+relative path (e.g. <tt class="rst-docutils rst-literal">'pages/welcome.html'</tt>).</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.http.routes.fluent.FluentRoute.html" class="internal-link">orionis.http.routes.fluent.FluentRoute</a></code></td><td class="fieldArgDesc">The registered FluentRoute instance.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/exceptions.html#ValueError" class="intersphinx-link">ValueError</a></code></td><td>If <tt class="rst-docutils rst-literal">view</tt> is not a non-empty string.</td></tr></table></div>
   </div>
 </div><div class="basemethod">
   
@@ -1496,8 +1496,8 @@ relative path (e.g. <tt class="rst-docutils rst-literal">'pages/welcome.html'</t
   <div class="functionHeader">
     
     
-    <span class="py-keyword">def</span>&#160;<span class="py-defname">websocket</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">path: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code>, </span><span class="rst-sig-param">action: <code>RouteAction | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code> = <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></span>) -&gt; <code><a href="orionis.http.routes.fluent.FluentRoute.html" class="internal-link" title="orionis.http.routes.fluent.FluentRoute">FluentRoute</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/http/routes/router.py#L146">
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">websocket</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">path: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code>, </span><span class="rst-sig-param">action: <code><a href="orionis.http.routes.types.html#RouteAction" class="internal-link" title="orionis.http.routes.types.RouteAction">RouteAction</a> | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code> = <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></span>) -&gt; <code><a href="orionis.http.routes.fluent.FluentRoute.html" class="internal-link" title="orionis.http.routes.fluent.FluentRoute">FluentRoute</a></code>:</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/http/routes/router.py#L151">
       
       (source)
     </a>
@@ -1509,7 +1509,7 @@ relative path (e.g. <tt class="rst-docutils rst-literal">'pages/welcome.html'</t
   </div>
   <div class="docstring functionBody">
     <div class="interfaceinfo">overrides <code><a href="orionis.http.routes.contracts.router.IRouter.html#websocket" class="internal-link">orionis.http.routes.contracts.router.IRouter.websocket</a></code></div>
-    <div><p>Register a WebSocket connection handler independently of HTTP routes.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">path:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Connection path, supporting the usual converted path parameters.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">action:</span><code>RouteAction | None, <em>optional</em></code></td><td class="fieldArgDesc">Function, controller action, or invokable controller.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.http.routes.fluent.FluentRoute.html" class="internal-link" title="orionis.http.routes.fluent.FluentRoute">FluentRoute</a></code></td><td class="fieldArgDesc">Route builder accepting WebSocketMiddleware and route groups.</td></tr></table></div>
+    <div><p>Register a WebSocket connection handler independently of HTTP routes.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">path:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Connection path, supporting the usual converted path parameters.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">action:</span><code>orionis.http.routes.types.RouteAction | None, <em>optional</em></code></td><td class="fieldArgDesc">Function, controller action, or invokable controller.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.http.routes.fluent.FluentRoute.html" class="internal-link">orionis.http.routes.fluent.FluentRoute</a></code></td><td class="fieldArgDesc">Route builder accepting WebSocketMiddleware and route groups.</td></tr></table></div>
   </div>
 </div><div class="baseconstant">
   
@@ -1523,7 +1523,7 @@ relative path (e.g. <tt class="rst-docutils rst-literal">'pages/welcome.html'</t
   <div class="functionHeader">
     
     <span class="py-defname">_DEFAULT_PATHS</span> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/http/routes/router.py#L27">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/http/routes/router.py#L30">
       
       (source)
     </a>
@@ -1535,7 +1535,7 @@ relative path (e.g. <tt class="rst-docutils rst-literal">'pages/welcome.html'</t
   </div>
   <div class="functionBody">
     
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p>Default paths used by <tt class="rst-docutils rst-literal">Router</tt>.</p></div>
     <table class="valueTable"><tr class="fieldStart"><td class="fieldName">Value</td></tr><tr><td><pre class="constant-value"><code><a href="https://docs.python.org/3/builtins/stdtypes.html#frozenset" class="intersphinx-link">frozenset</a>(<wbr></wbr>set([<wbr></wbr><span class="rst-variable-quote">'</span><span class="rst-variable-string">/favicon.ico</span><span class="rst-variable-quote">'</span>, <wbr></wbr><span class="rst-variable-quote">'</span><span class="rst-variable-string">/robots.txt</span><span class="rst-variable-quote">'</span>, <wbr></wbr><span class="rst-variable-quote">'</span><span class="rst-variable-string">/sitemap.xml</span><span class="rst-variable-quote">'</span>]))</code></pre></td></tr></table>
   </div>
 </div><div class="baseinstancevariable">
@@ -1550,7 +1550,7 @@ relative path (e.g. <tt class="rst-docutils rst-literal">'pages/welcome.html'</t
   <div class="functionHeader">
     
     <span class="py-defname">__app</span> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/http/routes/router.py#L50">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/http/routes/router.py#L54">
       
       (source)
     </a>
@@ -1562,7 +1562,7 @@ relative path (e.g. <tt class="rst-docutils rst-literal">'pages/welcome.html'</t
   </div>
   <div class="functionBody">
     
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p>The application instance.</p></div>
     
   </div>
 </div><div class="baseinstancevariable">
@@ -1577,7 +1577,7 @@ relative path (e.g. <tt class="rst-docutils rst-literal">'pages/welcome.html'</t
   <div class="functionHeader">
     
     <span class="py-defname">__current_kind</span>: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/http/routes/router.py#L57">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/http/routes/router.py#L65">
       
       (source)
     </a>
@@ -1589,7 +1589,7 @@ relative path (e.g. <tt class="rst-docutils rst-literal">'pages/welcome.html'</t
   </div>
   <div class="functionBody">
     
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p><tt class="rst-docutils rst-literal">web</tt>.</p></div>
     
   </div>
 </div><div class="baseinstancevariable">
@@ -1604,7 +1604,7 @@ relative path (e.g. <tt class="rst-docutils rst-literal">'pages/welcome.html'</t
   <div class="functionHeader">
     
     <span class="py-defname">__fallback</span>: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" class="intersphinx-link">tuple</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/functions.html#type" class="intersphinx-link">type</a> | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a>, <wbr></wbr><a href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Callable" class="intersphinx-link">Callable</a> | <a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a> | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a>]</code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/http/routes/router.py#L51">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/http/routes/router.py#L56">
       
       (source)
     </a>
@@ -1616,7 +1616,7 @@ relative path (e.g. <tt class="rst-docutils rst-literal">'pages/welcome.html'</t
   </div>
   <div class="functionBody">
     
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p>Handler or route selected when no ordinary route matches.</p></div>
     
   </div>
 </div><div class="baseinstancevariable">
@@ -1631,7 +1631,7 @@ relative path (e.g. <tt class="rst-docutils rst-literal">'pages/welcome.html'</t
   <div class="functionHeader">
     
     <span class="py-defname">__replaceable_routes</span>: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#dict" class="intersphinx-link">dict</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <wbr></wbr><a href="orionis.http.routes.fluent.FluentRoute.html" class="internal-link" title="orionis.http.routes.fluent.FluentRoute">FluentRoute</a>]</code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/http/routes/router.py#L56">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/http/routes/router.py#L63">
       
       (source)
     </a>
@@ -1643,7 +1643,7 @@ relative path (e.g. <tt class="rst-docutils rst-literal">'pages/welcome.html'</t
   </div>
   <div class="functionBody">
     
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p>Previously registered routes eligible for replacement.</p></div>
     
   </div>
 </div><div class="baseinstancevariable">
@@ -1658,7 +1658,7 @@ relative path (e.g. <tt class="rst-docutils rst-literal">'pages/welcome.html'</t
   <div class="functionHeader">
     
     <span class="py-defname">__routes</span>: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#dict" class="intersphinx-link">dict</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <wbr></wbr><a href="orionis.http.routes.fluent.FluentRoute.html" class="internal-link" title="orionis.http.routes.fluent.FluentRoute">FluentRoute</a>]</code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/http/routes/router.py#L55">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/http/routes/router.py#L61">
       
       (source)
     </a>
@@ -1670,7 +1670,7 @@ relative path (e.g. <tt class="rst-docutils rst-literal">'pages/welcome.html'</t
   </div>
   <div class="functionBody">
     
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p>Route definitions registered in this routing context.</p></div>
     
   </div>
 </div>
@@ -1684,7 +1684,7 @@ relative path (e.g. <tt class="rst-docutils rst-literal">'pages/welcome.html'</t
   <div class="orionis-footer-inner">
     <div class="orionis-footer-copy">
       <p>API documentation for <a href="https://orionis-framework.com/" class="projecthome">Orionis</a>.</p>
-      <p class="orionis-footer-meta">Generated with <a href="https://github.com/twisted/pydoctor/">Pydoctor</a> 25.10.1.<span class="orionis-footer-build"> Built 2026-11-03 09:36:58.</span></p>
+      <p class="orionis-footer-meta">Generated with <a href="https://github.com/twisted/pydoctor/">Pydoctor</a> 25.10.1.<span class="orionis-footer-build"> Built 2026-11-03 13:00:15.</span></p>
     </div>
     <nav class="orionis-footer-links" aria-label="Additional resources">
       <a href="https://docs.orionis-framework.com">Read the guide <span aria-hidden="true">↗</span></a>

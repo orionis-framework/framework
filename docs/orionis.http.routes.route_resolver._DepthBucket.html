@@ -774,6 +774,16 @@
         
 
         
+            <div class="itemName"><code><a href="orionis.http.routes.route_resolver.html#DepthTable" class="internal-link" title="orionis.http.routes.route_resolver.DepthTable"><wbr></wbr>Depth<wbr></wbr>Table</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
             <div class="itemName"><code><a href="orionis.http.routes.route_resolver.html#Extractor" class="internal-link" title="orionis.http.routes.route_resolver.Extractor"><wbr></wbr>Extractor</a></code>
             </div>
         
@@ -847,15 +857,15 @@
         </div>
 
         <div class="extrasDocstring">
-          <p class="class-signature"><code><span class="py-keyword">class</span> <span class="py-defname">_DepthBucket</span>: <a href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/http/routes/route_resolver.py#L38" class="sourceLink">(source)</a></code></p><p>Constructor: <code><a href="#__init__" class="internal-link" title="orionis.http.routes.route_resolver._DepthBucket.__init__">_DepthBucket(pattern, entries, marker_to_entry)</a></code></p><p><a href="classIndex.html#orionis.http.routes.route_resolver._DepthBucket">View In Hierarchy</a></p>
+          <p class="class-signature"><code><span class="py-keyword">class</span> <span class="py-defname">_DepthBucket</span>: <a href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/http/routes/route_resolver.py#L48" class="sourceLink">(source)</a></code></p><p>Constructor: <code><a href="#__init__" class="internal-link" title="orionis.http.routes.route_resolver._DepthBucket.__init__">_DepthBucket(pattern, entries, marker_to_entry)</a></code></p><p><a href="classIndex.html#orionis.http.routes.route_resolver._DepthBucket">View In Hierarchy</a></p>
         </div>
 
         <div class="moduleDocstring">
-          <div><p class="undocumented">Undocumented</p></div>
+          <div><p>Group compiled route candidates by their path segment structure.</p></div>
         </div>
 
         <div id="split-tables">
-          <table class="children sortable" id="id1153">
+          <table class="children sortable" id="id1154">
   
   
   <tr class="method">
@@ -867,22 +877,22 @@
     
     <td>Class Variable</td>
     <td><code><a href="#__slots__" class="internal-link" title="orionis.http.routes.route_resolver._DepthBucket.__slots__">__slots__</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
+    <td>Declare the instance attribute slots reserved by this class.</td>
   </tr><tr class="instancevariable">
     
     <td>Instance Variable</td>
     <td><code><a href="#entries" class="internal-link" title="orionis.http.routes.route_resolver._DepthBucket.entries">entries</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
+    <td>Extraction metadata and route pairs aligned with regex alternatives.</td>
   </tr><tr class="instancevariable">
     
     <td>Instance Variable</td>
     <td><code><a href="#marker_to_entry" class="internal-link" title="orionis.http.routes.route_resolver._DepthBucket.marker_to_entry">marker<wbr></wbr>_to<wbr></wbr>_entry</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
+    <td>Map of terminal capture group IDs to entry indices, or None for a single-route bucket. Defaults to None.</td>
   </tr><tr class="instancevariable">
     
     <td>Instance Variable</td>
     <td><code><a href="#pattern" class="internal-link" title="orionis.http.routes.route_resolver._DepthBucket.pattern">pattern</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
+    <td>Compiled regex for the bucket's dynamic route candidates.</td>
   </tr>
 </table>
           
@@ -904,7 +914,7 @@
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">__init__</span><span class="function-signature long-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">pattern: <code><a href="https://docs.python.org/3/library/re.html#re.Pattern" class="intersphinx-link">re.Pattern</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>]</code>, </span><span class="rst-sig-param">entries: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#list" class="intersphinx-link">list</a>[<wbr></wbr><a href="orionis.http.routes.route_resolver.html#BucketEntry" class="internal-link" title="orionis.http.routes.route_resolver.BucketEntry">BucketEntry</a>]</code>, </span><span class="rst-sig-param">marker_to_entry: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#dict" class="intersphinx-link">dict</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a>, <wbr></wbr><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a>] | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code> = <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></span>):</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/http/routes/route_resolver.py#L42">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/http/routes/route_resolver.py#L54">
       
       (source)
     </a>
@@ -916,7 +926,7 @@
   </div>
   <div class="docstring functionBody">
     
-    <div><p>Store matching and parameter extraction metadata for dynamic routes.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">pattern:</span><code><a href="https://docs.python.org/3/library/re.html#re.Pattern" class="intersphinx-link">re.Pattern</a>[<a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>]</code></td><td class="fieldArgDesc">Compiled regex for the bucket's dynamic route candidates.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">entries:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#list" class="intersphinx-link">list</a>[<a href="orionis.http.routes.route_resolver.html#BucketEntry" class="internal-link" title="orionis.http.routes.route_resolver.BucketEntry">BucketEntry</a>]</code></td><td class="fieldArgDesc">Extraction metadata and route pairs aligned with regex alternatives.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">marker<wbr></wbr>_to<wbr></wbr>_entry:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#dict" class="intersphinx-link">dict</a>[<a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a>, <a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a>] | None, <em>optional</em></code></td><td class="fieldArgDesc">Map of terminal capture group IDs to entry indices, or None for
+    <div><p>Store matching and parameter extraction metadata for dynamic routes.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">pattern:</span><code><tt class="rst-docutils rst-literal">re.Pattern[str]</tt></code></td><td class="fieldArgDesc">Compiled regex for the bucket's dynamic route candidates.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">entries:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#list" class="intersphinx-link">list</a>[<a href="orionis.http.routes.route_resolver.html#BucketEntry" class="internal-link">orionis.http.routes.route_resolver.BucketEntry</a>]</code></td><td class="fieldArgDesc">Extraction metadata and route pairs aligned with regex alternatives.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">marker<wbr></wbr>_to<wbr></wbr>_entry:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#dict" class="intersphinx-link">dict</a>[<a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a>, <a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a>] | None, <em>optional</em></code></td><td class="fieldArgDesc">Map of terminal capture group IDs to entry indices, or None for
 a single-route bucket. Defaults to None.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">Initialize the matcher, ordered entries, and optional marker lookup.</td></tr></table></div>
   </div>
 </div><div class="baseclassvariable">
@@ -931,7 +941,7 @@ a single-route bucket. Defaults to None.</td></tr></table><table class="fieldTab
   <div class="functionHeader">
     
     <span class="py-defname">__slots__</span>: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" class="intersphinx-link">tuple</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <wbr></wbr><span class="rst-variable-ellipsis">...</span>]</code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/http/routes/route_resolver.py#L40">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/http/routes/route_resolver.py#L51">
       
       (source)
     </a>
@@ -943,7 +953,7 @@ a single-route bucket. Defaults to None.</td></tr></table><table class="fieldTab
   </div>
   <div class="functionBody">
     
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p>Declare the instance attribute slots reserved by this class.</p></div>
     
   </div>
 </div><div class="baseinstancevariable">
@@ -958,7 +968,7 @@ a single-route bucket. Defaults to None.</td></tr></table><table class="fieldTab
   <div class="functionHeader">
     
     <span class="py-defname">entries</span> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/http/routes/route_resolver.py#L67">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/http/routes/route_resolver.py#L80">
       
       (source)
     </a>
@@ -970,7 +980,7 @@ a single-route bucket. Defaults to None.</td></tr></table><table class="fieldTab
   </div>
   <div class="functionBody">
     
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p>Extraction metadata and route pairs aligned with regex alternatives.</p></div>
     
   </div>
 </div><div class="baseinstancevariable">
@@ -985,7 +995,7 @@ a single-route bucket. Defaults to None.</td></tr></table><table class="fieldTab
   <div class="functionHeader">
     
     <span class="py-defname">marker_to_entry</span> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/http/routes/route_resolver.py#L68">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/http/routes/route_resolver.py#L82">
       
       (source)
     </a>
@@ -997,7 +1007,8 @@ a single-route bucket. Defaults to None.</td></tr></table><table class="fieldTab
   </div>
   <div class="functionBody">
     
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p>Map of terminal capture group IDs to entry indices, or None for a
+single-route bucket. Defaults to None.</p></div>
     
   </div>
 </div><div class="baseinstancevariable">
@@ -1012,7 +1023,7 @@ a single-route bucket. Defaults to None.</td></tr></table><table class="fieldTab
   <div class="functionHeader">
     
     <span class="py-defname">pattern</span> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/http/routes/route_resolver.py#L66">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/http/routes/route_resolver.py#L78">
       
       (source)
     </a>
@@ -1024,7 +1035,7 @@ a single-route bucket. Defaults to None.</td></tr></table><table class="fieldTab
   </div>
   <div class="functionBody">
     
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p>Compiled regex for the bucket's dynamic route candidates.</p></div>
     
   </div>
 </div>
@@ -1038,7 +1049,7 @@ a single-route bucket. Defaults to None.</td></tr></table><table class="fieldTab
   <div class="orionis-footer-inner">
     <div class="orionis-footer-copy">
       <p>API documentation for <a href="https://orionis-framework.com/" class="projecthome">Orionis</a>.</p>
-      <p class="orionis-footer-meta">Generated with <a href="https://github.com/twisted/pydoctor/">Pydoctor</a> 25.10.1.<span class="orionis-footer-build"> Built 2026-11-03 09:36:58.</span></p>
+      <p class="orionis-footer-meta">Generated with <a href="https://github.com/twisted/pydoctor/">Pydoctor</a> 25.10.1.<span class="orionis-footer-build"> Built 2026-11-03 13:00:15.</span></p>
     </div>
     <nav class="orionis-footer-links" aria-label="Additional resources">
       <a href="https://docs.orionis-framework.com">Read the guide <span aria-hidden="true">↗</span></a>

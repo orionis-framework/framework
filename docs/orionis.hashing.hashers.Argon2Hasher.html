@@ -149,7 +149,7 @@
       <div>
          
           <div class="childrenKindTitle">Contents</div>
-          <ul><li><a class="rst-internal rst-reference" href="#rst-concurrency" id="rst-toc-entry-5">Concurrency</a></li>
+          <ul><li><a class="rst-internal rst-reference" href="#rst-concurrency">Concurrency</a></li>
 </ul>
         
 
@@ -714,7 +714,7 @@
                     <div>
          
           <div class="childrenKindTitle">Contents</div>
-          <ul><li><a class="rst-internal rst-reference" href="#rst-concurrency" id="rst-toc-entry-6">Concurrency</a></li>
+          <ul><li><a class="rst-internal rst-reference" href="#rst-concurrency">Concurrency</a></li>
 </ul>
         
 
@@ -1306,7 +1306,7 @@
         </div>
 
         <div class="extrasDocstring">
-          <p class="class-signature"><code><span class="py-keyword">class</span> <span class="py-defname">Argon2Hasher</span>(<a href="orionis.hashing.contracts.IHasher.html" class="internal-link" title="orionis.hashing.contracts.IHasher">IHasher</a>): <a href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/hashing/hashers/argon2_hasher.py#L22" class="sourceLink">(source)</a></code></p><p>Constructor: <code><a href="#__init__" class="internal-link" title="orionis.hashing.hashers.Argon2Hasher.__init__">Argon2Hasher(memory, threads, time, executor)</a></code></p><p><a href="classIndex.html#orionis.hashing.hashers.Argon2Hasher">View In Hierarchy</a></p>
+          <p class="class-signature"><code><span class="py-keyword">class</span> <span class="py-defname">Argon2Hasher</span>(<a href="orionis.hashing.contracts.IHasher.html" class="internal-link" title="orionis.hashing.contracts.IHasher">IHasher</a>): <a href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/hashing/hashers/argon2_hasher.py#L30" class="sourceLink">(source)</a></code></p><p>Constructor: <code><a href="#__init__" class="internal-link" title="orionis.hashing.hashers.Argon2Hasher.__init__">Argon2Hasher(memory, threads, time, executor)</a></code></p><p><a href="classIndex.html#orionis.hashing.hashers.Argon2Hasher">View In Hierarchy</a></p>
         </div>
 
         <div class="moduleDocstring">
@@ -1314,7 +1314,7 @@
 <p>Argon2id won the Password Hashing Competition and is the recommended
 default driver of the framework.</p>
 <div class="rst-section" id="rst-concurrency">
-<h2 class="heading"><a class="rst-toc-backref" href="#rst-toc-entry-4">Concurrency</a></h2>
+<h2 class="heading">Concurrency</h2>
 <p>No locks are used. The backend class and the backend instance are
 cached on first use: a concurrent first use from several threads may
 build them twice, and the last write wins. Hashing operations only read
@@ -1325,7 +1325,7 @@ backend with the new cost parameters.</p>
         </div>
 
         <div id="split-tables">
-          <table class="children sortable" id="id954">
+          <table class="children sortable" id="id955">
   
   
   <tr class="staticmethod">
@@ -1407,37 +1407,37 @@ backend with the new cost parameters.</p>
     
     <td>Class Variable</td>
     <td><code><a href="#__slots__" class="internal-link" title="orionis.hashing.hashers.Argon2Hasher.__slots__">__slots__</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
+    <td>Declare the instance attribute slots reserved by this class.</td>
   </tr><tr class="instancevariable">
     
     <td>Instance Variable</td>
     <td><code><a href="#_backend" class="internal-link" title="orionis.hashing.hashers.Argon2Hasher._backend">_backend</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
+    <td>Backend implementation used to perform the configured operation.</td>
   </tr><tr class="instancevariable">
     
     <td>Instance Variable</td>
     <td><code><a href="#_backend_class" class="internal-link" title="orionis.hashing.hashers.Argon2Hasher._backend_class">_backend<wbr></wbr>_class</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
+    <td>The backend is imported and built on first use to keep the driver constructible even when the dependency is absent.</td>
   </tr><tr class="instancevariable">
     
     <td>Instance Variable</td>
     <td><code><a href="#_executor" class="internal-link" title="orionis.hashing.hashers.Argon2Hasher._executor">_executor</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
+    <td>Caller-owned dedicated executor, or the shared bounded hashing pool.</td>
   </tr><tr class="instancevariable">
     
     <td>Instance Variable</td>
     <td><code><a href="#_memory" class="internal-link" title="orionis.hashing.hashers.Argon2Hasher._memory">_memory</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
+    <td>Memory cost in kibibytes.</td>
   </tr><tr class="instancevariable">
     
     <td>Instance Variable</td>
     <td><code><a href="#_threads" class="internal-link" title="orionis.hashing.hashers.Argon2Hasher._threads">_threads</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
+    <td>Degree of parallelism.</td>
   </tr><tr class="instancevariable">
     
     <td>Instance Variable</td>
     <td><code><a href="#_time" class="internal-link" title="orionis.hashing.hashers.Argon2Hasher._time">_time</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
+    <td>Number of iterations.</td>
   </tr>
 </table>
           
@@ -1459,7 +1459,7 @@ backend with the new cost parameters.</p>
     
     <div><span class="decorator">@<a href="https://docs.python.org/3/builtins/functions.html#staticmethod" class="intersphinx-link">staticmethod</a><br /></span></div>
     <span class="py-keyword">def</span>&#160;<span class="py-defname">_validate</span><span class="function-signature">(<span class="rst-sig-param">name: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code>, </span><span class="rst-sig-param">value: <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/hashing/hashers/argon2_hasher.py#L88">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/hashing/hashers/argon2_hasher.py#L106">
       
       (source)
     </a>
@@ -1471,7 +1471,7 @@ backend with the new cost parameters.</p>
   </div>
   <div class="docstring functionBody">
     
-    <div><p>Ensure a cost parameter is a strictly positive integer.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">name:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Name of the parameter, used in the error message.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">value:</span><code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code></td><td class="fieldArgDesc">Value to validate.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code></td><td class="fieldArgDesc">The validated value.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code>HashConfigurationException</code></td><td>If the value is not an integer greater than zero.</td></tr></table></div>
+    <div><p>Ensure a cost parameter is a strictly positive integer.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">name:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Name of the parameter, used in the error message.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">value:</span><code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code></td><td class="fieldArgDesc">Value to validate.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code></td><td class="fieldArgDesc">The validated value.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.hashing.exceptions.HashConfigurationException.html" class="internal-link">orionis.hashing.exceptions.HashConfigurationException</a></code></td><td>If the value is not an integer greater than zero.</td></tr></table></div>
   </div>
 </div><div class="basemethod">
   
@@ -1486,7 +1486,7 @@ backend with the new cost parameters.</p>
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">__init__</span><span class="function-signature long-signature">(<span class="rst-sig-param">self: <code>Self</code>, </span><span class="rst-sig-symbol">*, </span><span class="rst-sig-param">memory: <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code> = DEFAULT_MEMORY, </span><span class="rst-sig-param">threads: <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code> = DEFAULT_THREADS, </span><span class="rst-sig-param">time: <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code> = DEFAULT_TIME, </span><span class="rst-sig-param">executor: <code>BoundedExecutor | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code> = <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></span>):</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/hashing/hashers/argon2_hasher.py#L46">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/hashing/hashers/argon2_hasher.py#L55">
       
       (source)
     </a>
@@ -1498,7 +1498,7 @@ backend with the new cost parameters.</p>
   </div>
   <div class="docstring functionBody">
     
-    <div><p>Initialize the driver with its default cost parameters.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">memory:</span><code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code></td><td class="fieldArgDesc">Memory cost in kibibytes.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">threads:</span><code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code></td><td class="fieldArgDesc">Degree of parallelism.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">time:</span><code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code></td><td class="fieldArgDesc">Number of iterations.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">executor:</span><code>BoundedExecutor | None</code></td><td class="fieldArgDesc">Caller-owned dedicated executor, or the shared bounded hashing pool.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">This method initializes the instance and returns None.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code>HashConfigurationException</code></td><td>If any cost parameter is not a positive integer.</td></tr></table></div>
+    <div><p>Initialize the driver with its default cost parameters.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">memory:</span><code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code></td><td class="fieldArgDesc">Memory cost in kibibytes.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">threads:</span><code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code></td><td class="fieldArgDesc">Degree of parallelism.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">time:</span><code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code></td><td class="fieldArgDesc">Number of iterations.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">executor:</span><code>orionis.support.concurrency.BoundedExecutor | None</code></td><td class="fieldArgDesc">Caller-owned dedicated executor, or the shared bounded hashing pool.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">This method initializes the instance and returns None.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.hashing.exceptions.HashConfigurationException.html" class="internal-link">orionis.hashing.exceptions.HashConfigurationException</a></code></td><td>If any cost parameter is not a positive integer.</td></tr></table></div>
   </div>
 </div><div class="basemethod">
   
@@ -1513,7 +1513,7 @@ backend with the new cost parameters.</p>
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">_backendClass</span><span class="function-signature">(<span class="rst-sig-param">self: <code>Self</code></span>) -&gt; <code>Any</code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/hashing/hashers/argon2_hasher.py#L118">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/hashing/hashers/argon2_hasher.py#L136">
       
       (source)
     </a>
@@ -1525,7 +1525,7 @@ backend with the new cost parameters.</p>
   </div>
   <div class="docstring functionBody">
     
-    <div><p>Return the backend class, importing it on first use.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code>Any</code></td><td class="fieldArgDesc">Backend class provided by the underlying library.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code>MissingHashDependencyException</code></td><td>If the backend package is not installed.</td></tr></table></div>
+    <div><p>Return the backend class, importing it on first use.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/library/typing.html#typing.Any" class="intersphinx-link">typing.Any</a></code></td><td class="fieldArgDesc">Backend class provided by the underlying library.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.hashing.exceptions.MissingHashDependencyException.html" class="internal-link">orionis.hashing.exceptions.MissingHashDependencyException</a></code></td><td>If the backend package is not installed.</td></tr></table></div>
   </div>
 </div><div class="basemethod">
   
@@ -1540,7 +1540,7 @@ backend with the new cost parameters.</p>
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">_build</span><span class="function-signature">(<span class="rst-sig-param">self: <code>Self</code>, </span><span class="rst-sig-param">memory: <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code>, </span><span class="rst-sig-param">threads: <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code>, </span><span class="rst-sig-param">time: <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code></span>) -&gt; <code>Any</code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/hashing/hashers/argon2_hasher.py#L140">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/hashing/hashers/argon2_hasher.py#L158">
       
       (source)
     </a>
@@ -1552,7 +1552,7 @@ backend with the new cost parameters.</p>
   </div>
   <div class="docstring functionBody">
     
-    <div><p>Build a backend instance for the given cost parameters.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">memory:</span><code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code></td><td class="fieldArgDesc">Memory cost in kibibytes.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">threads:</span><code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code></td><td class="fieldArgDesc">Degree of parallelism.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">time:</span><code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code></td><td class="fieldArgDesc">Number of iterations.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code>Any</code></td><td class="fieldArgDesc">Configured backend instance.</td></tr></table></div>
+    <div><p>Build a backend instance for the given cost parameters.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">memory:</span><code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code></td><td class="fieldArgDesc">Memory cost in kibibytes.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">threads:</span><code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code></td><td class="fieldArgDesc">Degree of parallelism.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">time:</span><code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code></td><td class="fieldArgDesc">Number of iterations.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/library/typing.html#typing.Any" class="intersphinx-link">typing.Any</a></code></td><td class="fieldArgDesc">Configured backend instance.</td></tr></table></div>
   </div>
 </div><div class="basemethod">
   
@@ -1567,7 +1567,7 @@ backend with the new cost parameters.</p>
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">_check</span><span class="function-signature">(<span class="rst-sig-param">self: <code>Self</code>, </span><span class="rst-sig-param">value: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code>, </span><span class="rst-sig-param">hashed: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/hashing/hashers/argon2_hasher.py#L263">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/hashing/hashers/argon2_hasher.py#L281">
       
       (source)
     </a>
@@ -1594,7 +1594,7 @@ backend with the new cost parameters.</p>
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">_default</span><span class="function-signature">(<span class="rst-sig-param">self: <code>Self</code></span>) -&gt; <code>Any</code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/hashing/hashers/argon2_hasher.py#L164">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/hashing/hashers/argon2_hasher.py#L182">
       
       (source)
     </a>
@@ -1606,7 +1606,7 @@ backend with the new cost parameters.</p>
   </div>
   <div class="docstring functionBody">
     
-    <div><p>Return the cached backend built from the configured parameters.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code>Any</code></td><td class="fieldArgDesc">Backend instance reused across calls.</td></tr></table></div>
+    <div><p>Return the cached backend built from the configured parameters.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/library/typing.html#typing.Any" class="intersphinx-link">typing.Any</a></code></td><td class="fieldArgDesc">Backend instance reused across calls.</td></tr></table></div>
   </div>
 </div><div class="basemethod">
   
@@ -1621,7 +1621,7 @@ backend with the new cost parameters.</p>
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">_identify</span><span class="function-signature">(<span class="rst-sig-param">self: <code>Self</code>, </span><span class="rst-sig-param">hashed: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/hashing/hashers/argon2_hasher.py#L321">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/hashing/hashers/argon2_hasher.py#L339">
       
       (source)
     </a>
@@ -1648,7 +1648,7 @@ backend with the new cost parameters.</p>
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">_make</span><span class="function-signature long-signature">(<span class="rst-sig-param">self: <code>Self</code>, </span><span class="rst-sig-param">value: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code>, </span><span class="rst-sig-symbol">*, </span><span class="rst-sig-param">rounds: <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a> | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code> = <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a>, </span><span class="rst-sig-param">memory: <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a> | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code> = <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a>, </span><span class="rst-sig-param">threads: <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a> | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code> = <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/hashing/hashers/argon2_hasher.py#L177">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/hashing/hashers/argon2_hasher.py#L195">
       
       (source)
     </a>
@@ -1660,7 +1660,7 @@ backend with the new cost parameters.</p>
   </div>
   <div class="docstring functionBody">
     
-    <div><p>Hash a plain text value with Argon2id.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">value:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Plain text value to hash.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">rounds:</span><code>int | None</code></td><td class="fieldArgDesc">Per-call time cost override.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">memory:</span><code>int | None</code></td><td class="fieldArgDesc">Per-call memory cost override, in kibibytes.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">threads:</span><code>int | None</code></td><td class="fieldArgDesc">Per-call parallelism override.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Encoded Argon2id hash.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code>HashConfigurationException</code></td><td>If any override is not a positive integer.</td></tr></table></div>
+    <div><p>Hash a plain text value with Argon2id.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">value:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Plain text value to hash.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">rounds:</span><code>int | None</code></td><td class="fieldArgDesc">Per-call time cost override.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">memory:</span><code>int | None</code></td><td class="fieldArgDesc">Per-call memory cost override, in kibibytes.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">threads:</span><code>int | None</code></td><td class="fieldArgDesc">Per-call parallelism override.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Encoded Argon2id hash.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.hashing.exceptions.HashConfigurationException.html" class="internal-link">orionis.hashing.exceptions.HashConfigurationException</a></code></td><td>If any override is not a positive integer.</td></tr></table></div>
   </div>
 </div><div class="basemethod">
   
@@ -1675,7 +1675,7 @@ backend with the new cost parameters.</p>
     
     
     <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">check</span><span class="function-signature">(<span class="rst-sig-param">self: <code>Self</code>, </span><span class="rst-sig-param">value: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code>, </span><span class="rst-sig-param">hashed: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/hashing/hashers/argon2_hasher.py#L284">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/hashing/hashers/argon2_hasher.py#L302">
       
       (source)
     </a>
@@ -1702,7 +1702,7 @@ backend with the new cost parameters.</p>
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">getAlgorithm</span><span class="function-signature">(<span class="rst-sig-param">self: <code>Self</code></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/hashing/hashers/argon2_hasher.py#L337">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/hashing/hashers/argon2_hasher.py#L355">
       
       (source)
     </a>
@@ -1729,7 +1729,7 @@ backend with the new cost parameters.</p>
     
     
     <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">make</span><span class="function-signature long-signature">(<span class="rst-sig-param">self: <code>Self</code>, </span><span class="rst-sig-param">value: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code>, </span><span class="rst-sig-symbol">*, </span><span class="rst-sig-param">rounds: <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a> | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code> = <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a>, </span><span class="rst-sig-param">memory: <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a> | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code> = <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a>, </span><span class="rst-sig-param">threads: <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a> | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code> = <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/hashing/hashers/argon2_hasher.py#L223">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/hashing/hashers/argon2_hasher.py#L241">
       
       (source)
     </a>
@@ -1741,7 +1741,7 @@ backend with the new cost parameters.</p>
   </div>
   <div class="docstring functionBody">
     <div class="interfaceinfo">overrides <code><a href="orionis.hashing.contracts.IHasher.html#make" class="internal-link">orionis.hashing.contracts.IHasher.make</a></code></div>
-    <div><p>Hash a plain text value off the event loop.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">value:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Plain text value to hash.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">rounds:</span><code>int | None</code></td><td class="fieldArgDesc">Per-call time cost override.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">memory:</span><code>int | None</code></td><td class="fieldArgDesc">Per-call memory cost override, in kibibytes.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">threads:</span><code>int | None</code></td><td class="fieldArgDesc">Per-call parallelism override.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Encoded Argon2id hash.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code>HashConfigurationException</code></td><td>If any override is not a positive integer.</td></tr></table></div>
+    <div><p>Hash a plain text value off the event loop.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">value:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Plain text value to hash.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">rounds:</span><code>int | None</code></td><td class="fieldArgDesc">Per-call time cost override.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">memory:</span><code>int | None</code></td><td class="fieldArgDesc">Per-call memory cost override, in kibibytes.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">threads:</span><code>int | None</code></td><td class="fieldArgDesc">Per-call parallelism override.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Encoded Argon2id hash.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.hashing.exceptions.HashConfigurationException.html" class="internal-link">orionis.hashing.exceptions.HashConfigurationException</a></code></td><td>If any override is not a positive integer.</td></tr></table></div>
   </div>
 </div><div class="basemethod">
   
@@ -1756,7 +1756,7 @@ backend with the new cost parameters.</p>
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">needsRehash</span><span class="function-signature">(<span class="rst-sig-param">self: <code>Self</code>, </span><span class="rst-sig-param">hashed: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/hashing/hashers/argon2_hasher.py#L302">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/hashing/hashers/argon2_hasher.py#L320">
       
       (source)
     </a>
@@ -1783,7 +1783,7 @@ backend with the new cost parameters.</p>
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">setMemory</span><span class="function-signature">(<span class="rst-sig-param">self: <code>Self</code>, </span><span class="rst-sig-param">memory: <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code></span>) -&gt; <code>Self</code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/hashing/hashers/argon2_hasher.py#L373">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/hashing/hashers/argon2_hasher.py#L391">
       
       (source)
     </a>
@@ -1795,7 +1795,7 @@ backend with the new cost parameters.</p>
   </div>
   <div class="docstring functionBody">
     
-    <div><p>Set the default memory cost used by the driver.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">memory:</span><code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code></td><td class="fieldArgDesc">New memory cost in kibibytes.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code>Self</code></td><td class="fieldArgDesc">The same instance, allowing fluent configuration.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code>HashConfigurationException</code></td><td>If the value is not a positive integer.</td></tr></table></div>
+    <div><p>Set the default memory cost used by the driver.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">memory:</span><code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code></td><td class="fieldArgDesc">New memory cost in kibibytes.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/library/typing.html#typing.Self" class="intersphinx-link">typing.Self</a></code></td><td class="fieldArgDesc">The same instance, allowing fluent configuration.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.hashing.exceptions.HashConfigurationException.html" class="internal-link">orionis.hashing.exceptions.HashConfigurationException</a></code></td><td>If the value is not a positive integer.</td></tr></table></div>
   </div>
 </div><div class="basemethod">
   
@@ -1810,7 +1810,7 @@ backend with the new cost parameters.</p>
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">setRounds</span><span class="function-signature">(<span class="rst-sig-param">self: <code>Self</code>, </span><span class="rst-sig-param">rounds: <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code></span>) -&gt; <code>Self</code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/hashing/hashers/argon2_hasher.py#L348">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/hashing/hashers/argon2_hasher.py#L366">
       
       (source)
     </a>
@@ -1822,7 +1822,7 @@ backend with the new cost parameters.</p>
   </div>
   <div class="docstring functionBody">
     <div class="interfaceinfo">overrides <code><a href="orionis.hashing.contracts.IHasher.html#setRounds" class="internal-link">orionis.hashing.contracts.IHasher.setRounds</a></code></div>
-    <div><p>Set the default time cost used by the driver.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">rounds:</span><code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code></td><td class="fieldArgDesc">New number of iterations.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code>Self</code></td><td class="fieldArgDesc">The same instance, allowing fluent configuration.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code>HashConfigurationException</code></td><td>If the value is not a positive integer.</td></tr></table></div>
+    <div><p>Set the default time cost used by the driver.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">rounds:</span><code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code></td><td class="fieldArgDesc">New number of iterations.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/library/typing.html#typing.Self" class="intersphinx-link">typing.Self</a></code></td><td class="fieldArgDesc">The same instance, allowing fluent configuration.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.hashing.exceptions.HashConfigurationException.html" class="internal-link">orionis.hashing.exceptions.HashConfigurationException</a></code></td><td>If the value is not a positive integer.</td></tr></table></div>
   </div>
 </div><div class="basemethod">
   
@@ -1837,7 +1837,7 @@ backend with the new cost parameters.</p>
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">setThreads</span><span class="function-signature">(<span class="rst-sig-param">self: <code>Self</code>, </span><span class="rst-sig-param">threads: <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code></span>) -&gt; <code>Self</code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/hashing/hashers/argon2_hasher.py#L396">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/hashing/hashers/argon2_hasher.py#L414">
       
       (source)
     </a>
@@ -1849,7 +1849,7 @@ backend with the new cost parameters.</p>
   </div>
   <div class="docstring functionBody">
     
-    <div><p>Set the default parallelism used by the driver.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">threads:</span><code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code></td><td class="fieldArgDesc">New degree of parallelism.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code>Self</code></td><td class="fieldArgDesc">The same instance, allowing fluent configuration.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code>HashConfigurationException</code></td><td>If the value is not a positive integer.</td></tr></table></div>
+    <div><p>Set the default parallelism used by the driver.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">threads:</span><code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code></td><td class="fieldArgDesc">New degree of parallelism.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/library/typing.html#typing.Self" class="intersphinx-link">typing.Self</a></code></td><td class="fieldArgDesc">The same instance, allowing fluent configuration.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.hashing.exceptions.HashConfigurationException.html" class="internal-link">orionis.hashing.exceptions.HashConfigurationException</a></code></td><td>If the value is not a positive integer.</td></tr></table></div>
   </div>
 </div><div class="baseclassvariable">
   
@@ -1863,7 +1863,7 @@ backend with the new cost parameters.</p>
   <div class="functionHeader">
     
     <span class="py-defname">__slots__</span>: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" class="intersphinx-link">tuple</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <wbr></wbr><span class="rst-variable-ellipsis">...</span>]</code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/hashing/hashers/argon2_hasher.py#L37">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/hashing/hashers/argon2_hasher.py#L45">
       
       (source)
     </a>
@@ -1875,7 +1875,7 @@ backend with the new cost parameters.</p>
   </div>
   <div class="functionBody">
     <div class="interfaceinfo">overrides <code><a href="orionis.hashing.contracts.IHasher.html#__slots__" class="internal-link">orionis.hashing.contracts.IHasher.__slots__</a></code></div>
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p>Declare the instance attribute slots reserved by this class.</p></div>
     
   </div>
 </div><div class="baseinstancevariable">
@@ -1890,7 +1890,7 @@ backend with the new cost parameters.</p>
   <div class="functionHeader">
     
     <span class="py-defname">_backend</span>: <code>Any</code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/hashing/hashers/argon2_hasher.py#L86">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/hashing/hashers/argon2_hasher.py#L103">
       
       (source)
     </a>
@@ -1902,7 +1902,7 @@ backend with the new cost parameters.</p>
   </div>
   <div class="functionBody">
     
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p>Backend implementation used to perform the configured operation.</p></div>
     
   </div>
 </div><div class="baseinstancevariable">
@@ -1917,7 +1917,7 @@ backend with the new cost parameters.</p>
   <div class="functionHeader">
     
     <span class="py-defname">_backend_class</span>: <code>Any</code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/hashing/hashers/argon2_hasher.py#L85">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/hashing/hashers/argon2_hasher.py#L98">
       
       (source)
     </a>
@@ -1929,7 +1929,8 @@ backend with the new cost parameters.</p>
   </div>
   <div class="functionBody">
     
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p>The backend is imported and built on first use to keep the driver
+constructible even when the dependency is absent.</p></div>
     
   </div>
 </div><div class="baseinstancevariable">
@@ -1944,7 +1945,7 @@ backend with the new cost parameters.</p>
   <div class="functionHeader">
     
     <span class="py-defname">_executor</span> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/hashing/hashers/argon2_hasher.py#L79">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/hashing/hashers/argon2_hasher.py#L89">
       
       (source)
     </a>
@@ -1956,7 +1957,7 @@ backend with the new cost parameters.</p>
   </div>
   <div class="functionBody">
     
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p>Caller-owned dedicated executor, or the shared bounded hashing pool.</p></div>
     
   </div>
 </div><div class="baseinstancevariable">
@@ -1971,7 +1972,7 @@ backend with the new cost parameters.</p>
   <div class="functionHeader">
     
     <span class="py-defname">_memory</span> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/hashing/hashers/argon2_hasher.py#L78">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/hashing/hashers/argon2_hasher.py#L87">
       
       (source)
     </a>
@@ -1983,7 +1984,7 @@ backend with the new cost parameters.</p>
   </div>
   <div class="functionBody">
     
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p>Memory cost in kibibytes.</p></div>
     
   </div>
 </div><div class="baseinstancevariable">
@@ -1998,7 +1999,7 @@ backend with the new cost parameters.</p>
   <div class="functionHeader">
     
     <span class="py-defname">_threads</span> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/hashing/hashers/argon2_hasher.py#L80">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/hashing/hashers/argon2_hasher.py#L91">
       
       (source)
     </a>
@@ -2010,7 +2011,7 @@ backend with the new cost parameters.</p>
   </div>
   <div class="functionBody">
     
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p>Degree of parallelism.</p></div>
     
   </div>
 </div><div class="baseinstancevariable">
@@ -2025,7 +2026,7 @@ backend with the new cost parameters.</p>
   <div class="functionHeader">
     
     <span class="py-defname">_time</span> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/hashing/hashers/argon2_hasher.py#L81">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/hashing/hashers/argon2_hasher.py#L93">
       
       (source)
     </a>
@@ -2037,7 +2038,7 @@ backend with the new cost parameters.</p>
   </div>
   <div class="functionBody">
     
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p>Number of iterations.</p></div>
     
   </div>
 </div>
@@ -2051,7 +2052,7 @@ backend with the new cost parameters.</p>
   <div class="orionis-footer-inner">
     <div class="orionis-footer-copy">
       <p>API documentation for <a href="https://orionis-framework.com/" class="projecthome">Orionis</a>.</p>
-      <p class="orionis-footer-meta">Generated with <a href="https://github.com/twisted/pydoctor/">Pydoctor</a> 25.10.1.<span class="orionis-footer-build"> Built 2026-11-03 09:36:58.</span></p>
+      <p class="orionis-footer-meta">Generated with <a href="https://github.com/twisted/pydoctor/">Pydoctor</a> 25.10.1.<span class="orionis-footer-build"> Built 2026-11-03 13:00:15.</span></p>
     </div>
     <nav class="orionis-footer-links" aria-label="Additional resources">
       <a href="https://docs.orionis-framework.com">Read the guide <span aria-hidden="true">↗</span></a>

@@ -997,11 +997,11 @@
         </div>
 
         <div class="extrasDocstring">
-          <p class="class-signature"><code><span class="py-keyword">class</span> <span class="py-defname">BaseCommand</span>(Console, <a href="orionis.console.base.contracts.command.IBaseCommand.html" class="internal-link" title="orionis.console.base.contracts.command.IBaseCommand">IBaseCommand</a>): <a href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/console/base/command.py#L12" class="sourceLink">(source)</a></code></p><p>Constructor: <code><a href="#__init__" class="internal-link" title="orionis.console.base.BaseCommand.__init__">BaseCommand()</a></code></p><p><a href="classIndex.html#orionis.console.base.BaseCommand">View In Hierarchy</a></p>
+          <p class="class-signature"><code><span class="py-keyword">class</span> <span class="py-defname">BaseCommand</span>(Console, <a href="orionis.console.base.contracts.command.IBaseCommand.html" class="internal-link" title="orionis.console.base.contracts.command.IBaseCommand">IBaseCommand</a>): <a href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/console/base/command.py#L15" class="sourceLink">(source)</a></code></p><p>Constructor: <code><a href="#__init__" class="internal-link" title="orionis.console.base.BaseCommand.__init__">BaseCommand()</a></code></p><p><a href="classIndex.html#orionis.console.base.BaseCommand">View In Hierarchy</a></p>
         </div>
 
         <div class="moduleDocstring">
-          <div><p class="undocumented">Undocumented</p></div>
+          <div><p>Define the metadata and execution hooks shared by console commands.</p></div>
         </div>
 
         <div id="split-tables">
@@ -1037,27 +1037,27 @@
     
     <td>Class Variable</td>
     <td><code><a href="#arguments" class="internal-link" title="orionis.console.base.BaseCommand.arguments">arguments</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
+    <td>List of Argument instances defining command-line options and arguments.</td>
   </tr><tr class="classvariable">
     
     <td>Class Variable</td>
     <td><code><a href="#description" class="internal-link" title="orionis.console.base.BaseCommand.description">description</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
+    <td>Human-readable description for documentation and help display.</td>
   </tr><tr class="classvariable">
     
     <td>Class Variable</td>
     <td><code><a href="#signature" class="internal-link" title="orionis.console.base.BaseCommand.signature">signature</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
+    <td>Command signature string for registration and help text generation.</td>
   </tr><tr class="classvariable">
     
     <td>Class Variable</td>
     <td><code><a href="#timestamps" class="internal-link" title="orionis.console.base.BaseCommand.timestamps">timestamps</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
+    <td>Enable timestamps in console output by default.</td>
   </tr><tr class="instancevariable">
     
     <td>Instance Variable</td>
     <td><code><a href="#__arguments__" class="internal-link" title="orionis.console.base.BaseCommand.__arguments__">__arguments__</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
+    <td>Initialize internal argument storage for parsed CLI arguments.</td>
   </tr>
 </table>
           
@@ -1079,7 +1079,7 @@
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">__init__</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>):</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/console/base/command.py#L28">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/console/base/command.py#L37">
       
       (source)
     </a>
@@ -1109,7 +1109,7 @@ storage.</p>
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">getArgument</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">key: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code>, </span><span class="rst-sig-param">default: <code>Any | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code> = <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></span>) -&gt; <code>Any | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/console/base/command.py#L63">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/console/base/command.py#L73">
       
       (source)
     </a>
@@ -1121,7 +1121,7 @@ storage.</p>
   </div>
   <div class="docstring functionBody">
     <div class="interfaceinfo">overrides <code><a href="orionis.console.base.contracts.command.IBaseCommand.html#getArgument" class="internal-link">orionis.console.base.contracts.command.IBaseCommand.getArgument</a></code></div>
-    <div><p>Retrieve the value of a command-line argument.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">key:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">The name of the argument to retrieve.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">default:</span><code>Any or <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a>, <em>optional</em></code></td><td class="fieldArgDesc">The value to return if the argument is not present. Defaults to None.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code>Any or <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">The value of the argument if present, otherwise the default value.</td></tr></table></div>
+    <div><p>Retrieve the value of a command-line argument.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">key:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">The name of the argument to retrieve.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">default:</span><code><a href="https://docs.python.org/3/library/typing.html#typing.Any" class="intersphinx-link">typing.Any</a> or <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a>, <em>optional</em></code></td><td class="fieldArgDesc">The value to return if the argument is not present. Defaults to None.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/library/typing.html#typing.Any" class="intersphinx-link">typing.Any</a> or <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">The value of the argument if present, otherwise the default value.</td></tr></table></div>
   </div>
 </div><div class="basemethod">
   
@@ -1136,7 +1136,7 @@ storage.</p>
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">getArguments</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/stdtypes.html#dict" class="intersphinx-link">dict</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <wbr></wbr>Any]</code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/console/base/command.py#L89">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/console/base/command.py#L99">
       
       (source)
     </a>
@@ -1148,7 +1148,7 @@ storage.</p>
   </div>
   <div class="docstring functionBody">
     <div class="interfaceinfo">overrides <code><a href="orionis.console.base.contracts.command.IBaseCommand.html#getArguments" class="internal-link">orionis.console.base.contracts.command.IBaseCommand.getArguments</a></code></div>
-    <div><p>Retrieve all parsed command-line arguments.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/stdtypes.html#dict" class="intersphinx-link">dict</a>[<a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, Any]</code></td><td class="fieldArgDesc">A copy of the dictionary containing all parsed arguments.</td></tr></table></div>
+    <div><p>Retrieve all parsed command-line arguments.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/stdtypes.html#dict" class="intersphinx-link">dict</a>[<a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <a href="https://docs.python.org/3/library/typing.html#typing.Any" class="intersphinx-link">typing.Any</a>]</code></td><td class="fieldArgDesc">A copy of the dictionary containing all parsed arguments.</td></tr></table></div>
   </div>
 </div><div class="basemethod">
   
@@ -1163,7 +1163,7 @@ storage.</p>
     
     
     <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">handle</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>):</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/console/base/command.py#L43">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/console/base/command.py#L53">
       
       (source)
     </a>
@@ -1193,7 +1193,7 @@ behavior. It is called after argument parsing and validation.</p>
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">setArguments</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">args: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#dict" class="intersphinx-link">dict</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <wbr></wbr>Any]</code></span>):</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/console/base/command.py#L101">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/console/base/command.py#L111">
       
       (source)
     </a>
@@ -1205,7 +1205,7 @@ behavior. It is called after argument parsing and validation.</p>
   </div>
   <div class="docstring functionBody">
     <div class="interfaceinfo">overrides <code><a href="orionis.console.base.contracts.command.IBaseCommand.html#setArguments" class="internal-link">orionis.console.base.contracts.command.IBaseCommand.setArguments</a></code></div>
-    <div><p>Set the internal arguments dictionary with the provided arguments.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">args:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#dict" class="intersphinx-link">dict</a>[<a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, Any]</code></td><td class="fieldArgDesc">Dictionary containing parsed command-line arguments.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">This method does not return a value.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/exceptions.html#TypeError" class="intersphinx-link">TypeError</a></code></td><td>If the provided arguments are not a dictionary.</td></tr></table></div>
+    <div><p>Set the internal arguments dictionary with the provided arguments.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">args:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#dict" class="intersphinx-link">dict</a>[<a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <a href="https://docs.python.org/3/library/typing.html#typing.Any" class="intersphinx-link">typing.Any</a>]</code></td><td class="fieldArgDesc">Dictionary containing parsed command-line arguments.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">This method does not return a value.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/exceptions.html#TypeError" class="intersphinx-link">TypeError</a></code></td><td>If the provided arguments are not a dictionary.</td></tr></table></div>
   </div>
 </div><div class="baseclassvariable">
   
@@ -1219,7 +1219,7 @@ behavior. It is called after argument parsing and validation.</p>
   <div class="functionHeader">
     
     <span class="py-defname">arguments</span>: <code>ClassVar[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#list" class="intersphinx-link">list</a>[<wbr></wbr>Argument]]</code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/console/base/command.py#L26">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/console/base/command.py#L34">
       
       (source)
     </a>
@@ -1231,7 +1231,7 @@ behavior. It is called after argument parsing and validation.</p>
   </div>
   <div class="functionBody">
     <div class="interfaceinfo">overrides <code><a href="orionis.console.base.contracts.command.IBaseCommand.html#arguments" class="internal-link">orionis.console.base.contracts.command.IBaseCommand.arguments</a></code></div>
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p>List of Argument instances defining command-line options and arguments.</p></div>
     
   </div>
 </div><div class="baseclassvariable">
@@ -1246,7 +1246,7 @@ behavior. It is called after argument parsing and validation.</p>
   <div class="functionHeader">
     
     <span class="py-defname">description</span>: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/console/base/command.py#L23">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/console/base/command.py#L30">
       
       (source)
     </a>
@@ -1258,7 +1258,7 @@ behavior. It is called after argument parsing and validation.</p>
   </div>
   <div class="functionBody">
     <div class="interfaceinfo">overrides <code><a href="orionis.console.base.contracts.command.IBaseCommand.html#description" class="internal-link">orionis.console.base.contracts.command.IBaseCommand.description</a></code></div>
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p>Human-readable description for documentation and help display.</p></div>
     
   </div>
 </div><div class="baseclassvariable">
@@ -1273,7 +1273,7 @@ behavior. It is called after argument parsing and validation.</p>
   <div class="functionHeader">
     
     <span class="py-defname">signature</span>: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/console/base/command.py#L20">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/console/base/command.py#L26">
       
       (source)
     </a>
@@ -1285,7 +1285,7 @@ behavior. It is called after argument parsing and validation.</p>
   </div>
   <div class="functionBody">
     <div class="interfaceinfo">overrides <code><a href="orionis.console.base.contracts.command.IBaseCommand.html#signature" class="internal-link">orionis.console.base.contracts.command.IBaseCommand.signature</a></code></div>
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p>Command signature string for registration and help text generation.</p></div>
     
   </div>
 </div><div class="baseclassvariable">
@@ -1300,7 +1300,7 @@ behavior. It is called after argument parsing and validation.</p>
   <div class="functionHeader">
     
     <span class="py-defname">timestamps</span>: <code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/console/base/command.py#L17">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/console/base/command.py#L22">
       
       (source)
     </a>
@@ -1312,7 +1312,7 @@ behavior. It is called after argument parsing and validation.</p>
   </div>
   <div class="functionBody">
     <div class="interfaceinfo">overrides <code><a href="orionis.console.base.contracts.command.IBaseCommand.html#timestamps" class="internal-link">orionis.console.base.contracts.command.IBaseCommand.timestamps</a></code></div>
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p>Enable timestamps in console output by default.</p></div>
     
   </div>
 </div><div class="baseinstancevariable">
@@ -1327,7 +1327,7 @@ behavior. It is called after argument parsing and validation.</p>
   <div class="functionHeader">
     
     <span class="py-defname">__arguments__</span>: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#dict" class="intersphinx-link">dict</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <wbr></wbr>Any]</code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/console/base/command.py#L41">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/console/base/command.py#L50">
       
       (source)
     </a>
@@ -1339,7 +1339,7 @@ behavior. It is called after argument parsing and validation.</p>
   </div>
   <div class="functionBody">
     
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p>Initialize internal argument storage for parsed CLI arguments.</p></div>
     
   </div>
 </div>
@@ -1353,7 +1353,7 @@ behavior. It is called after argument parsing and validation.</p>
   <div class="orionis-footer-inner">
     <div class="orionis-footer-copy">
       <p>API documentation for <a href="https://orionis-framework.com/" class="projecthome">Orionis</a>.</p>
-      <p class="orionis-footer-meta">Generated with <a href="https://github.com/twisted/pydoctor/">Pydoctor</a> 25.10.1.<span class="orionis-footer-build"> Built 2026-11-03 09:36:58.</span></p>
+      <p class="orionis-footer-meta">Generated with <a href="https://github.com/twisted/pydoctor/">Pydoctor</a> 25.10.1.<span class="orionis-footer-build"> Built 2026-11-03 13:00:15.</span></p>
     </div>
     <nav class="orionis-footer-links" aria-label="Additional resources">
       <a href="https://docs.orionis-framework.com">Read the guide <span aria-hidden="true">↗</span></a>

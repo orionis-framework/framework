@@ -802,7 +802,7 @@
         </div>
 
         <div class="extrasDocstring">
-          <p class="class-signature"><code><span class="py-keyword">class</span> <span class="py-defname">SmtpTransport</span>(IMailTransport): <a href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/mail/transports/smtp.py#L25" class="sourceLink">(source)</a></code></p><p>Constructor: <code><a href="#__init__" class="internal-link" title="orionis.mail.transports.SmtpTransport.__init__">SmtpTransport(settings)</a></code></p><p><a href="classIndex.html#orionis.mail.transports.SmtpTransport">View In Hierarchy</a></p>
+          <p class="class-signature"><code><span class="py-keyword">class</span> <span class="py-defname">SmtpTransport</span>(IMailTransport): <a href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/mail/transports/smtp.py#L30" class="sourceLink">(source)</a></code></p><p>Constructor: <code><a href="#__init__" class="internal-link" title="orionis.mail.transports.SmtpTransport.__init__">SmtpTransport(settings)</a></code></p><p><a href="classIndex.html#orionis.mail.transports.SmtpTransport">View In Hierarchy</a></p>
         </div>
 
         <div class="moduleDocstring">
@@ -813,7 +813,7 @@ that the server refused the message. There are no automatic retries.</p>
         </div>
 
         <div id="split-tables">
-          <table class="children sortable" id="id1332">
+          <table class="children sortable" id="id1335">
   
   
   <tr class="method">
@@ -850,12 +850,12 @@ that the server refused the message. There are no automatic retries.</p>
     
     <td>Class Variable</td>
     <td><code><a href="#__slots__" class="internal-link" title="orionis.mail.transports.SmtpTransport.__slots__">__slots__</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
+    <td>Declare the instance attribute slots reserved by this class.</td>
   </tr><tr class="instancevariable">
     
     <td>Instance Variable</td>
     <td><code><a href="#_settings" class="internal-link" title="orionis.mail.transports.SmtpTransport._settings">_settings</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
+    <td>Immutable effective connection options.</td>
   </tr>
 </table>
           
@@ -877,7 +877,7 @@ that the server refused the message. There are no automatic retries.</p>
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">__init__</span><span class="function-signature">(<span class="rst-sig-param">self: <code>Self</code>, </span><span class="rst-sig-param">settings: <code>SmtpSettings</code></span>):</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/mail/transports/smtp.py#L35">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/mail/transports/smtp.py#L41">
       
       (source)
     </a>
@@ -889,7 +889,7 @@ that the server refused the message. There are no automatic retries.</p>
   </div>
   <div class="docstring functionBody">
     
-    <div><p>Retain validated settings without opening a connection.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">settings:</span><code><a href="orionis.mail.entities.SmtpSettings.html" class="internal-link" title="orionis.mail.entities.SmtpSettings">SmtpSettings</a></code></td><td class="fieldArgDesc">Immutable effective connection options.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">Store transport configuration only.</td></tr></table></div>
+    <div><p>Retain validated settings without opening a connection.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">settings:</span><code><a href="orionis.mail.entities.SmtpSettings.html" class="internal-link">orionis.mail.entities.SmtpSettings</a></code></td><td class="fieldArgDesc">Immutable effective connection options.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">Store transport configuration only.</td></tr></table></div>
   </div>
 </div><div class="basemethod">
   
@@ -904,7 +904,7 @@ that the server refused the message. There are no automatic retries.</p>
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">_result</span><span class="function-signature long-signature">(<span class="rst-sig-param">self: <code>Self</code>, </span><span class="rst-sig-param">message: <code>PreparedMail</code>, </span><span class="rst-sig-param">mailer: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code>, </span><span class="rst-sig-param">driver: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code>, </span><span class="rst-sig-param">refused: <code>Mapping[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" class="intersphinx-link">tuple</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a>, <wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#bytes" class="intersphinx-link">bytes</a> | <a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>]]</code></span>) -&gt; <code>MailResult</code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/mail/transports/smtp.py#L238">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/mail/transports/smtp.py#L245">
       
       (source)
     </a>
@@ -916,7 +916,7 @@ that the server refused the message. There are no automatic retries.</p>
   </div>
   <div class="docstring functionBody">
     
-    <div><p>Report exactly the recipients accepted by a completed transaction.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">message:</span><code><a href="orionis.mail.entities.PreparedMail.html" class="internal-link" title="orionis.mail.entities.PreparedMail">PreparedMail</a></code></td><td class="fieldArgDesc">Intended recipient union and message identifier.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">mailer:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Selected configuration name.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">driver:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Registered driver name.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">refused:</span><code>Mapping[<a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" class="intersphinx-link">tuple</a>[<a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a>, bytes | str]]</code></td><td class="fieldArgDesc">Recipient rejections returned after the transaction succeeded.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.mail.entities.MailResult.html" class="internal-link" title="orionis.mail.entities.MailResult">MailResult</a></code></td><td class="fieldArgDesc">Accepted or partial, with sanitized immutable rejection metadata.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code>MailTransportException</code></td><td>If no recipient was accepted.</td></tr></table></div>
+    <div><p>Report exactly the recipients accepted by a completed transaction.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">message:</span><code><a href="orionis.mail.entities.PreparedMail.html" class="internal-link">orionis.mail.entities.PreparedMail</a></code></td><td class="fieldArgDesc">Intended recipient union and message identifier.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">mailer:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Selected configuration name.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">driver:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Registered driver name.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">refused:</span><code><a href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Mapping" class="intersphinx-link">collections.abc.Mapping</a>[<a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" class="intersphinx-link">tuple</a>[<a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a>, bytes | str]]</code></td><td class="fieldArgDesc">Recipient rejections returned after the transaction succeeded.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.mail.entities.MailResult.html" class="internal-link">orionis.mail.entities.MailResult</a></code></td><td class="fieldArgDesc">Accepted or partial, with sanitized immutable rejection metadata.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.mail.exceptions.MailTransportException.html" class="internal-link">orionis.mail.exceptions.MailTransportException</a></code></td><td>If no recipient was accepted.</td></tr></table></div>
   </div>
 </div><div class="basemethod">
   
@@ -931,7 +931,7 @@ that the server refused the message. There are no automatic retries.</p>
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">_sendBatchSync</span><span class="function-signature long-signature">(<span class="rst-sig-param">self: <code>Self</code>, </span><span class="rst-sig-param">messages: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" class="intersphinx-link">tuple</a>[<wbr></wbr>PreparedMail, <wbr></wbr><span class="rst-variable-ellipsis">...</span>]</code>, </span><span class="rst-sig-param">mailer: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code>, </span><span class="rst-sig-param">driver: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" class="intersphinx-link">tuple</a>[<wbr></wbr>MailResult, <wbr></wbr><span class="rst-variable-ellipsis">...</span>]</code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/mail/transports/smtp.py#L150">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/mail/transports/smtp.py#L157">
       
       (source)
     </a>
@@ -943,7 +943,7 @@ that the server refused the message. There are no automatic retries.</p>
   </div>
   <div class="docstring functionBody">
     
-    <div><p>Own one SMTP session for the complete bounded batch.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">messages:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" class="intersphinx-link">tuple</a>[<a href="orionis.mail.entities.PreparedMail.html" class="internal-link" title="orionis.mail.entities.PreparedMail">PreparedMail</a>, ...]</code></td><td class="fieldArgDesc">Prepared messages to send through one SMTP session.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">mailer:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Configured mailer name attached to delivery results.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">driver:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Transport driver name attached to delivery results.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" class="intersphinx-link">tuple</a>[<a href="orionis.mail.entities.MailResult.html" class="internal-link" title="orionis.mail.entities.MailResult">MailResult</a>, ...]</code></td><td class="fieldArgDesc">Delivery results in message order after the complete batch succeeds.</td></tr></table></div>
+    <div><p>Own one SMTP session for the complete bounded batch.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">messages:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" class="intersphinx-link">tuple</a>[<a href="orionis.mail.entities.PreparedMail.html" class="internal-link">orionis.mail.entities.PreparedMail</a>, <tt class="rst-docutils rst-literal">...</tt>]</code></td><td class="fieldArgDesc">Prepared messages to send through one SMTP session.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">mailer:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Configured mailer name attached to delivery results.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">driver:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Transport driver name attached to delivery results.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" class="intersphinx-link">tuple</a>[<a href="orionis.mail.entities.MailResult.html" class="internal-link">orionis.mail.entities.MailResult</a>, <tt class="rst-docutils rst-literal">...</tt>]</code></td><td class="fieldArgDesc">Delivery results in message order after the complete batch succeeds.</td></tr></table></div>
   </div>
 </div><div class="basemethod">
   
@@ -958,7 +958,7 @@ that the server refused the message. There are no automatic retries.</p>
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">_sendSync</span><span class="function-signature">(<span class="rst-sig-param">self: <code>Self</code>, </span><span class="rst-sig-param">message: <code>PreparedMail</code>, </span><span class="rst-sig-param">mailer: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code>, </span><span class="rst-sig-param">driver: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></span>) -&gt; <code>MailResult</code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/mail/transports/smtp.py#L116">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/mail/transports/smtp.py#L123">
       
       (source)
     </a>
@@ -970,7 +970,7 @@ that the server refused the message. There are no automatic retries.</p>
   </div>
   <div class="docstring functionBody">
     
-    <div><p>Connect, negotiate, authenticate, transmit, and always close.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">message:</span><code><a href="orionis.mail.entities.PreparedMail.html" class="internal-link" title="orionis.mail.entities.PreparedMail">PreparedMail</a></code></td><td class="fieldArgDesc">Complete operation-local message.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">mailer:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Selected configuration name.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">driver:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Registered driver name.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.mail.entities.MailResult.html" class="internal-link" title="orionis.mail.entities.MailResult">MailResult</a></code></td><td class="fieldArgDesc">Confirmed recipient acceptance after a successful transaction.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code>MailTransportException</code></td><td>Sanitized failure identifying stage, exception type, and SMTP code.</td></tr></table></div>
+    <div><p>Connect, negotiate, authenticate, transmit, and always close.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">message:</span><code><a href="orionis.mail.entities.PreparedMail.html" class="internal-link">orionis.mail.entities.PreparedMail</a></code></td><td class="fieldArgDesc">Complete operation-local message.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">mailer:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Selected configuration name.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">driver:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Registered driver name.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.mail.entities.MailResult.html" class="internal-link">orionis.mail.entities.MailResult</a></code></td><td class="fieldArgDesc">Confirmed recipient acceptance after a successful transaction.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.mail.exceptions.MailTransportException.html" class="internal-link">orionis.mail.exceptions.MailTransportException</a></code></td><td>Sanitized failure identifying stage, exception type, and SMTP code.</td></tr></table></div>
   </div>
 </div><div class="basemethod">
   
@@ -985,7 +985,7 @@ that the server refused the message. There are no automatic retries.</p>
     
     
     <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">send</span><span class="function-signature">(<span class="rst-sig-param">self: <code>Self</code>, </span><span class="rst-sig-param">message: <code>PreparedMail</code>, </span><span class="rst-sig-symbol">*, </span><span class="rst-sig-param">mailer: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code>, </span><span class="rst-sig-param">driver: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></span>) -&gt; <code>MailResult</code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/mail/transports/smtp.py#L51">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/mail/transports/smtp.py#L58">
       
       (source)
     </a>
@@ -997,7 +997,7 @@ that the server refused the message. There are no automatic retries.</p>
   </div>
   <div class="docstring functionBody">
     
-    <div><p>Run the complete blocking SMTP cycle outside the event loop.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">message:</span><code><a href="orionis.mail.entities.PreparedMail.html" class="internal-link" title="orionis.mail.entities.PreparedMail">PreparedMail</a></code></td><td class="fieldArgDesc">Already materialized MIME and a validated separate envelope.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">mailer:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Configuration name reported in the result.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">driver:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Registered transport name reported in the result.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.mail.entities.MailResult.html" class="internal-link" title="orionis.mail.entities.MailResult">MailResult</a></code></td><td class="fieldArgDesc">Total or partial acceptance confirmed by the SMTP transaction.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code>MailTransportException</code></td><td>If the transaction fails or every recipient is rejected.</td></tr></table></div>
+    <div><p>Run the complete blocking SMTP cycle outside the event loop.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">message:</span><code><a href="orionis.mail.entities.PreparedMail.html" class="internal-link">orionis.mail.entities.PreparedMail</a></code></td><td class="fieldArgDesc">Already materialized MIME and a validated separate envelope.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">mailer:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Configuration name reported in the result.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">driver:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Registered transport name reported in the result.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.mail.entities.MailResult.html" class="internal-link">orionis.mail.entities.MailResult</a></code></td><td class="fieldArgDesc">Total or partial acceptance confirmed by the SMTP transaction.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.mail.exceptions.MailTransportException.html" class="internal-link">orionis.mail.exceptions.MailTransportException</a></code></td><td>If the transaction fails or every recipient is rejected.</td></tr></table></div>
   </div>
 </div><div class="basemethod">
   
@@ -1012,7 +1012,7 @@ that the server refused the message. There are no automatic retries.</p>
     
     
     <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">sendMany</span><span class="function-signature long-signature">(<span class="rst-sig-param">self: <code>Self</code>, </span><span class="rst-sig-param">messages: <code>Iterable[<wbr></wbr>PreparedMail]</code>, </span><span class="rst-sig-symbol">*, </span><span class="rst-sig-param">mailer: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code>, </span><span class="rst-sig-param">driver: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" class="intersphinx-link">tuple</a>[<wbr></wbr>MailResult, <wbr></wbr><span class="rst-variable-ellipsis">...</span>]</code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/mail/transports/smtp.py#L82">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/mail/transports/smtp.py#L89">
       
       (source)
     </a>
@@ -1024,7 +1024,7 @@ that the server refused the message. There are no automatic retries.</p>
   </div>
   <div class="docstring functionBody">
     
-    <div><p>Send a bounded batch using one authenticated connection and no retries.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">messages:</span><code>Iterable[<a href="orionis.mail.entities.PreparedMail.html" class="internal-link" title="orionis.mail.entities.PreparedMail">PreparedMail</a>]</code></td><td class="fieldArgDesc">At most 100 already-composed messages with these transport settings.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">mailer:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Mailer identifier included in results.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">driver:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Driver identifier included in results.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" class="intersphinx-link">tuple</a>[<a href="orionis.mail.entities.MailResult.html" class="internal-link" title="orionis.mail.entities.MailResult">MailResult</a>, ...]</code></td><td class="fieldArgDesc">Ordered delivery results. MailBatchException retains completed
+    <div><p>Send a bounded batch using one authenticated connection and no retries.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">messages:</span><code><a href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Iterable" class="intersphinx-link">collections.abc.Iterable</a>[<a href="orionis.mail.entities.PreparedMail.html" class="internal-link">orionis.mail.entities.PreparedMail</a>]</code></td><td class="fieldArgDesc">At most 100 already-composed messages with these transport settings.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">mailer:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Mailer identifier included in results.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">driver:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Driver identifier included in results.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" class="intersphinx-link">tuple</a>[<a href="orionis.mail.entities.MailResult.html" class="internal-link">orionis.mail.entities.MailResult</a>, <tt class="rst-docutils rst-literal">...</tt>]</code></td><td class="fieldArgDesc">Ordered delivery results. MailBatchException retains completed
 results and the uncertain message index if the batch aborts.
 Cancellation waits for the accepted batch before closing resources.</td></tr></table></div>
   </div>
@@ -1040,7 +1040,7 @@ Cancellation waits for the accepted batch before closing resources.</td></tr></t
   <div class="functionHeader">
     
     <span class="py-defname">__slots__</span>: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" class="intersphinx-link">tuple</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <wbr></wbr><span class="rst-variable-ellipsis">...</span>]</code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/mail/transports/smtp.py#L33">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/mail/transports/smtp.py#L38">
       
       (source)
     </a>
@@ -1052,7 +1052,7 @@ Cancellation waits for the accepted batch before closing resources.</td></tr></t
   </div>
   <div class="functionBody">
     
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p>Declare the instance attribute slots reserved by this class.</p></div>
     
   </div>
 </div><div class="baseinstancevariable">
@@ -1067,7 +1067,7 @@ Cancellation waits for the accepted batch before closing resources.</td></tr></t
   <div class="functionHeader">
     
     <span class="py-defname">_settings</span> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/mail/transports/smtp.py#L49">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/mail/transports/smtp.py#L55">
       
       (source)
     </a>
@@ -1079,7 +1079,7 @@ Cancellation waits for the accepted batch before closing resources.</td></tr></t
   </div>
   <div class="functionBody">
     
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p>Immutable effective connection options.</p></div>
     
   </div>
 </div>
@@ -1093,7 +1093,7 @@ Cancellation waits for the accepted batch before closing resources.</td></tr></t
   <div class="orionis-footer-inner">
     <div class="orionis-footer-copy">
       <p>API documentation for <a href="https://orionis-framework.com/" class="projecthome">Orionis</a>.</p>
-      <p class="orionis-footer-meta">Generated with <a href="https://github.com/twisted/pydoctor/">Pydoctor</a> 25.10.1.<span class="orionis-footer-build"> Built 2026-11-03 09:36:58.</span></p>
+      <p class="orionis-footer-meta">Generated with <a href="https://github.com/twisted/pydoctor/">Pydoctor</a> 25.10.1.<span class="orionis-footer-build"> Built 2026-11-03 13:00:15.</span></p>
     </div>
     <nav class="orionis-footer-links" aria-label="Additional resources">
       <a href="https://docs.orionis-framework.com">Read the guide <span aria-hidden="true">↗</span></a>

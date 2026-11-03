@@ -522,15 +522,18 @@
         </div>
 
         <div class="extrasDocstring">
-          <a href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/foundation/lifespan/shutdown.py" class="sourceLink">(source)</a>
+          <a href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/foundation/lifespan/shutdown.py" class="sourceLink">(source)</a>
         </div>
 
         <div class="moduleDocstring">
-          <div><p class="undocumented">Undocumented</p></div>
+          <div><p>Provide foundation lifespan operations.</p>
+<p>Includes <tt class="rst-docutils rst-literal">before_shutdown_orionis_generator</tt>,
+<tt class="rst-docutils rst-literal">after_shutdown_orionis_generator</tt>, <tt class="rst-docutils rst-literal">shutdown_orionis_generator</tt>.</p>
+</div>
         </div>
 
         <div id="split-tables">
-          <table class="children sortable" id="id938">
+          <table class="children sortable" id="id939">
   
   
   <tr class="function">
@@ -552,12 +555,12 @@
     
     <td>Constant</td>
     <td><code><a href="#_BEFORE_SHUTDOWN_PANEL" class="internal-link" title="orionis.foundation.lifespan.shutdown._BEFORE_SHUTDOWN_PANEL">_BEFORE<wbr></wbr>_SHUTDOWN<wbr></wbr>_PANEL</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
+    <td>Pre-built static panel displayed while the server is stopping.</td>
   </tr><tr class="variable">
     
     <td>Variable</td>
     <td><code><a href="#_console" class="internal-link" title="orionis.foundation.lifespan.shutdown._console">_console</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
+    <td>Shared terminal output interface reused across all shutdown display functions.</td>
   </tr>
 </table>
           
@@ -579,7 +582,7 @@
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">after_shutdown_orionis_generator</span><span class="function-signature">(<span class="rst-sig-param">start_at: <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code></span>):</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/foundation/lifespan/shutdown.py#L35">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/foundation/lifespan/shutdown.py#L43">
       
       (source)
     </a>
@@ -607,7 +610,7 @@ application started, used to calculate total uptime.</td></tr></table><table cla
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">before_shutdown_orionis_generator</span><span class="function-signature">():</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/foundation/lifespan/shutdown.py#L24">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/foundation/lifespan/shutdown.py#L32">
       
       (source)
     </a>
@@ -634,7 +637,7 @@ application started, used to calculate total uptime.</td></tr></table><table cla
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">shutdown_orionis_generator</span><span class="function-signature">(<span class="rst-sig-param">app: <code>IApplication</code></span>) -&gt; <code><a href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Generator" class="intersphinx-link">Generator</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a>]</code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/foundation/lifespan/shutdown.py#L91">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/foundation/lifespan/shutdown.py#L99">
       
       (source)
     </a>
@@ -646,7 +649,7 @@ application started, used to calculate total uptime.</td></tr></table><table cla
   </div>
   <div class="docstring functionBody">
     
-    <div><p>Yield control between the pre- and post-shutdown display steps.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">app:</span><code><a href="orionis.IApplication.html" class="internal-link" title="orionis.IApplication">IApplication</a></code></td><td class="fieldArgDesc">Application instance used to read mode flags and the startup timestamp.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Generator" class="intersphinx-link">Generator</a>[<a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a>]</code></td><td class="fieldArgDesc">Yields once; pre-shutdown runs before the yield, post-shutdown after.</td></tr></table></div>
+    <div><p>Yield control between the pre- and post-shutdown display steps.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">app:</span><code><a href="orionis.IApplication.html" class="internal-link">orionis.IApplication</a></code></td><td class="fieldArgDesc">Application instance used to read mode flags and the startup timestamp.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Generator" class="intersphinx-link">collections.abc.Generator</a>[<a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a>]</code></td><td class="fieldArgDesc">Yields once; pre-shutdown runs before the yield, post-shutdown after.</td></tr></table></div>
   </div>
 </div><div class="baseconstant">
   
@@ -660,7 +663,7 @@ application started, used to calculate total uptime.</td></tr></table><table cla
   <div class="functionHeader">
     
     <span class="py-defname">_BEFORE_SHUTDOWN_PANEL</span>: <code>Panel</code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/foundation/lifespan/shutdown.py#L17">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/foundation/lifespan/shutdown.py#L24">
       
       (source)
     </a>
@@ -672,7 +675,7 @@ application started, used to calculate total uptime.</td></tr></table><table cla
   </div>
   <div class="functionBody">
     
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p>Pre-built static panel displayed while the server is stopping.</p></div>
     <table class="valueTable"><tr class="fieldStart"><td class="fieldName">Value</td></tr><tr><td><pre class="constant-value"><code>Panel(<wbr></wbr>Text(<wbr></wbr><span class="rst-variable-quote">'</span><span class="rst-variable-string">🛑 Stopping Orionis server...</span><span class="rst-variable-quote">'</span>, <wbr></wbr>style=<span class="rst-variable-quote">'</span><span class="rst-variable-string">bold red</span><span class="rst-variable-quote">'</span>),
       <wbr></wbr>title=<span class="rst-variable-quote">'</span><span class="rst-variable-string">Orionis Shutdown</span><span class="rst-variable-quote">'</span>, <wbr></wbr>border_style=<span class="rst-variable-quote">'</span><span class="rst-variable-string">red</span><span class="rst-variable-quote">'</span>, <wbr></wbr>padding=(<wbr></wbr>1, <wbr></wbr>1))</code></pre></td></tr></table>
   </div>
@@ -688,7 +691,7 @@ application started, used to calculate total uptime.</td></tr></table><table cla
   <div class="functionHeader">
     
     <span class="py-defname">_console</span> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/foundation/lifespan/shutdown.py#L14">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/foundation/lifespan/shutdown.py#L20">
       
       (source)
     </a>
@@ -700,7 +703,7 @@ application started, used to calculate total uptime.</td></tr></table><table cla
   </div>
   <div class="functionBody">
     
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p>Shared terminal output interface reused across all shutdown display functions.</p></div>
     
   </div>
 </div>
@@ -714,7 +717,7 @@ application started, used to calculate total uptime.</td></tr></table><table cla
   <div class="orionis-footer-inner">
     <div class="orionis-footer-copy">
       <p>API documentation for <a href="https://orionis-framework.com/" class="projecthome">Orionis</a>.</p>
-      <p class="orionis-footer-meta">Generated with <a href="https://github.com/twisted/pydoctor/">Pydoctor</a> 25.10.1.<span class="orionis-footer-build"> Built 2026-11-03 09:36:58.</span></p>
+      <p class="orionis-footer-meta">Generated with <a href="https://github.com/twisted/pydoctor/">Pydoctor</a> 25.10.1.<span class="orionis-footer-build"> Built 2026-11-03 13:00:15.</span></p>
     </div>
     <nav class="orionis-footer-links" aria-label="Additional resources">
       <a href="https://docs.orionis-framework.com">Read the guide <span aria-hidden="true">↗</span></a>

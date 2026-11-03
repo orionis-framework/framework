@@ -689,6 +689,16 @@
         
 
         
+            <div class="itemName"><code><a href="#DepthTable" class="internal-link" title="orionis.http.routes.route_resolver.DepthTable"><wbr></wbr>Depth<wbr></wbr>Table</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
             <div class="itemName"><code><a href="#Extractor" class="internal-link" title="orionis.http.routes.route_resolver.Extractor"><wbr></wbr>Extractor</a></code>
             </div>
         
@@ -1998,6 +2008,16 @@
         
 
         
+            <div class="itemName"><code><a href="#DepthTable" class="internal-link" title="orionis.http.routes.route_resolver.DepthTable"><wbr></wbr>Depth<wbr></wbr>Table</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
             <div class="itemName"><code><a href="#Extractor" class="internal-link" title="orionis.http.routes.route_resolver.Extractor"><wbr></wbr>Extractor</a></code>
             </div>
         
@@ -2094,7 +2114,7 @@
                     
                 </input>
 
-                <label class="lbl-toggle notExpandable" for="">
+                <label class="lbl-toggle" for="expandableItemId11223">
                     
                     
                 </label>
@@ -2117,8 +2137,31 @@
         
          
 
+        <div class="childrenKindTitle">Variables</div>
+        <ul>
+    
+    <li class="">
         
-         
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.http.routes.types.html#MiddlewareInput" class="internal-link" title="orionis.http.routes.types.MiddlewareInput"><wbr></wbr>Middleware<wbr></wbr>Input</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.http.routes.types.html#RouteAction" class="internal-link" title="orionis.http.routes.types.RouteAction"><wbr></wbr>Route<wbr></wbr>Action</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
 
         
          
@@ -2202,22 +2245,22 @@
         </div>
 
         <div class="extrasDocstring">
-          <a href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/http/routes/route_resolver.py" class="sourceLink">(source)</a>
+          <a href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/http/routes/route_resolver.py" class="sourceLink">(source)</a>
         </div>
 
         <div class="moduleDocstring">
-          <div><p class="undocumented">Undocumented</p></div>
+          <div><p>Resolve compiled routes using static maps and ordered dynamic buckets.</p></div>
         </div>
 
         <div id="split-tables">
-          <table class="children sortable" id="id1152">
+          <table class="children sortable" id="id1153">
   
   
   <tr class="class">
     
     <td>Class</td>
     <td><code><a href="orionis.http.routes.route_resolver._DepthBucket.html" class="internal-link" title="orionis.http.routes.route_resolver._DepthBucket">_<wbr></wbr>Depth<wbr></wbr>Bucket</a></code></td>
-    <td><span class="rst-undocumented">No class docstring; 0/3 instance variable, 0/1 class variable, 1/1 method documented</span></td>
+    <td>Group compiled route candidates by their path segment structure.</td>
   </tr><tr class="class">
     
     <td>Class</td>
@@ -2277,27 +2320,32 @@
     
     <td>Constant</td>
     <td><code><a href="#_GROUP_NAME_RE" class="internal-link" title="orionis.http.routes.route_resolver._GROUP_NAME_RE">_GROUP<wbr></wbr>_NAME<wbr></wbr>_RE</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
+    <td>Compiled pattern used to recognize group name re.</td>
   </tr><tr class="constant">
     
     <td>Constant</td>
     <td><code><a href="#_METHOD_MAP" class="internal-link" title="orionis.http.routes.route_resolver._METHOD_MAP">_METHOD<wbr></wbr>_MAP</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
+    <td>Canonical dispatch method per incoming method string; HEAD is served by the GET table.</td>
   </tr><tr class="typealias">
     
     <td>Type Alias</td>
     <td><code><a href="#BucketEntry" class="internal-link" title="orionis.http.routes.route_resolver.BucketEntry"><wbr></wbr>Bucket<wbr></wbr>Entry</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
+    <td>Type alias for <tt class="rst-docutils rst-literal">tuple[list[Extractor], 'CompiledRoute']</tt>.</td>
+  </tr><tr class="typealias">
+    
+    <td>Type Alias</td>
+    <td><code><a href="#DepthTable" class="internal-link" title="orionis.http.routes.route_resolver.DepthTable"><wbr></wbr>Depth<wbr></wbr>Table</a></code></td>
+    <td>Type alias for <tt class="rst-docutils rst-literal">dict[int, _DepthBucket | _PrefixIndex]</tt>.</td>
   </tr><tr class="typealias">
     
     <td>Type Alias</td>
     <td><code><a href="#Extractor" class="internal-link" title="orionis.http.routes.route_resolver.Extractor"><wbr></wbr>Extractor</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
+    <td>Type alias for <tt class="rst-docutils rst-literal">tuple[str, int, ParamConverter]</tt>.</td>
   </tr><tr class="typealias">
     
     <td>Type Alias</td>
     <td><code><a href="#ParamConverter" class="internal-link" title="orionis.http.routes.route_resolver.ParamConverter"><wbr></wbr>Param<wbr></wbr>Converter</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
+    <td>Type alias for <tt class="rst-docutils rst-literal"><span class="pre">Callable[[str],</span> object]</tt>.</td>
   </tr>
 </table>
           
@@ -2319,7 +2367,7 @@
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">_build_depth_bucket</span><span class="function-signature long-signature">(<span class="rst-sig-param">routes: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#list" class="intersphinx-link">list</a>[<wbr></wbr><a href="orionis.http.routes.entities.compiled_route.CompiledRoute.html" class="internal-link" title="orionis.http.routes.entities.compiled_route.CompiledRoute">CompiledRoute</a>]</code>, </span><span class="rst-sig-param">start: <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code> = 1</span>) -&gt; <code><a href="orionis.http.routes.route_resolver._DepthBucket.html" class="internal-link" title="orionis.http.routes.route_resolver._DepthBucket">_DepthBucket</a> | <a href="orionis.http.routes.route_resolver._PrefixIndex.html" class="internal-link" title="orionis.http.routes.route_resolver._PrefixIndex">_PrefixIndex</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/http/routes/route_resolver.py#L278">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/http/routes/route_resolver.py#L300">
       
       (source)
     </a>
@@ -2331,7 +2379,7 @@
   </div>
   <div class="docstring functionBody">
     
-    <div><p>Build a depth matcher, splitting literal prefixes when useful.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">routes:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#list" class="intersphinx-link">list</a>[<a href="orionis.http.routes.entities.compiled_route.CompiledRoute.html" class="internal-link" title="orionis.http.routes.entities.compiled_route.CompiledRoute">CompiledRoute</a>]</code></td><td class="fieldArgDesc">Dynamic candidates at one depth, sorted by compiler priority.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">start:</span><code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a>, <em>optional</em></code></td><td class="fieldArgDesc">Character offset of the next path segment to partition. Defaults to 1.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code>_DepthBucket | _PrefixIndex</code></td><td class="fieldArgDesc">Shared matcher or prefix index preserving route priority and overlap.</td></tr></table></div>
+    <div><p>Build a depth matcher, splitting literal prefixes when useful.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">routes:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#list" class="intersphinx-link">list</a>[<a href="orionis.http.routes.entities.compiled_route.CompiledRoute.html" class="internal-link">orionis.http.routes.entities.compiled_route.CompiledRoute</a>]</code></td><td class="fieldArgDesc">Dynamic candidates at one depth, sorted by compiler priority.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">start:</span><code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a>, <em>optional</em></code></td><td class="fieldArgDesc">Character offset of the next path segment to partition. Defaults to 1.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code>_DepthBucket | _PrefixIndex</code></td><td class="fieldArgDesc">Shared matcher or prefix index preserving route priority and overlap.</td></tr></table></div>
   </div>
 </div><div class="basefunction">
   
@@ -2346,7 +2394,7 @@
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">_build_extractors</span><span class="function-signature long-signature">(<span class="rst-sig-param">converters: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#dict" class="intersphinx-link">dict</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <wbr></wbr><a href="#ParamConverter" class="internal-link" title="orionis.http.routes.route_resolver.ParamConverter">ParamConverter</a>]</code>, </span><span class="rst-sig-param">prefix: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code>, </span><span class="rst-sig-param">groupindex: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#dict" class="intersphinx-link">dict</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <wbr></wbr><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a>]</code></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/stdtypes.html#list" class="intersphinx-link">list</a>[<wbr></wbr><a href="#Extractor" class="internal-link" title="orionis.http.routes.route_resolver.Extractor">Extractor</a>]</code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/http/routes/route_resolver.py#L143">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/http/routes/route_resolver.py#L165">
       
       (source)
     </a>
@@ -2358,7 +2406,7 @@
   </div>
   <div class="docstring functionBody">
     
-    <div><p>Build parameter extraction tuples from route converters.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">converters:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#dict" class="intersphinx-link">dict</a>[<a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <a href="#ParamConverter" class="internal-link" title="orionis.http.routes.route_resolver.ParamConverter">ParamConverter</a>]</code></td><td class="fieldArgDesc">Parameter names mapped to converter callables, in extraction order.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">prefix:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Prefix prepended to parameter names in the regex capture groups.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">groupindex:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#dict" class="intersphinx-link">dict</a>[<a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a>]</code></td><td class="fieldArgDesc">Named capture groups mapped to their numeric indices.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/stdtypes.html#list" class="intersphinx-link">list</a>[<a href="#Extractor" class="internal-link" title="orionis.http.routes.route_resolver.Extractor">Extractor</a>]</code></td><td class="fieldArgDesc">Ordered list of <tt class="rst-docutils rst-literal">(param_name, group_index, converter)</tt> tuples.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/exceptions.html#KeyError" class="intersphinx-link">KeyError</a></code></td><td>If a prefixed parameter name is absent from <tt class="rst-docutils rst-literal">groupindex</tt>.</td></tr></table></div>
+    <div><p>Build parameter extraction tuples from route converters.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">converters:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#dict" class="intersphinx-link">dict</a>[<a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <a href="#ParamConverter" class="internal-link">orionis.http.routes.route_resolver.ParamConverter</a>]</code></td><td class="fieldArgDesc">Parameter names mapped to converter callables, in extraction order.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">prefix:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Prefix prepended to parameter names in the regex capture groups.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">groupindex:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#dict" class="intersphinx-link">dict</a>[<a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a>]</code></td><td class="fieldArgDesc">Named capture groups mapped to their numeric indices.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/stdtypes.html#list" class="intersphinx-link">list</a>[<a href="#Extractor" class="internal-link">orionis.http.routes.route_resolver.Extractor</a>]</code></td><td class="fieldArgDesc">Ordered list of <tt class="rst-docutils rst-literal">(param_name, group_index, converter)</tt> tuples.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/exceptions.html#KeyError" class="intersphinx-link">KeyError</a></code></td><td>If a prefixed parameter name is absent from <tt class="rst-docutils rst-literal">groupindex</tt>.</td></tr></table></div>
   </div>
 </div><div class="basefunction">
   
@@ -2373,7 +2421,7 @@
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">_build_matching_bucket</span><span class="function-signature">(<span class="rst-sig-param">routes: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#list" class="intersphinx-link">list</a>[<wbr></wbr><a href="orionis.http.routes.entities.compiled_route.CompiledRoute.html" class="internal-link" title="orionis.http.routes.entities.compiled_route.CompiledRoute">CompiledRoute</a>]</code></span>) -&gt; <code><a href="orionis.http.routes.route_resolver._DepthBucket.html" class="internal-link" title="orionis.http.routes.route_resolver._DepthBucket">_DepthBucket</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/http/routes/route_resolver.py#L175">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/http/routes/route_resolver.py#L197">
       
       (source)
     </a>
@@ -2385,7 +2433,7 @@
   </div>
   <div class="docstring functionBody">
     
-    <div><p>Build an ordered matcher and extractors for dynamic routes.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">routes:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#list" class="intersphinx-link">list</a>[<a href="orionis.http.routes.entities.compiled_route.CompiledRoute.html" class="internal-link" title="orionis.http.routes.entities.compiled_route.CompiledRoute">CompiledRoute</a>]</code></td><td class="fieldArgDesc">Dynamic candidates at one depth, sorted by compiler priority.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.http.routes.route_resolver._DepthBucket.html" class="internal-link" title="orionis.http.routes.route_resolver._DepthBucket">_DepthBucket</a></code></td><td class="fieldArgDesc">Regex matcher with per-route extractors and optional alternative markers.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/library/re.html#re.PatternError" class="intersphinx-link">re.PatternError</a></code></td><td>If rewritten route patterns cannot form a valid combined regex.</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/exceptions.html#KeyError" class="intersphinx-link">KeyError</a></code></td><td>If a converter has no corresponding named capture group.</td></tr></table></div>
+    <div><p>Build an ordered matcher and extractors for dynamic routes.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">routes:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#list" class="intersphinx-link">list</a>[<a href="orionis.http.routes.entities.compiled_route.CompiledRoute.html" class="internal-link">orionis.http.routes.entities.compiled_route.CompiledRoute</a>]</code></td><td class="fieldArgDesc">Dynamic candidates at one depth, sorted by compiler priority.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.http.routes.route_resolver._DepthBucket.html" class="internal-link">orionis.http.routes.route_resolver._DepthBucket</a></code></td><td class="fieldArgDesc">Regex matcher with per-route extractors and optional alternative markers.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/library/re.html#re.PatternError" class="intersphinx-link">re.PatternError</a></code></td><td>If rewritten route patterns cannot form a valid combined regex.</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/exceptions.html#KeyError" class="intersphinx-link">KeyError</a></code></td><td>If a converter has no corresponding named capture group.</td></tr></table></div>
   </div>
 </div><div class="basefunction">
   
@@ -2400,7 +2448,7 @@
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">_build_overlapping_index</span><span class="function-signature long-signature">(<span class="rst-sig-param">routes: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#list" class="intersphinx-link">list</a>[<wbr></wbr><a href="orionis.http.routes.entities.compiled_route.CompiledRoute.html" class="internal-link" title="orionis.http.routes.entities.compiled_route.CompiledRoute">CompiledRoute</a>]</code>, </span><span class="rst-sig-param">start: <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code>, </span><span class="rst-sig-param">branches: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#dict" class="intersphinx-link">dict</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#list" class="intersphinx-link">list</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" class="intersphinx-link">tuple</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a>, <wbr></wbr><a href="orionis.http.routes.entities.compiled_route.CompiledRoute.html" class="internal-link" title="orionis.http.routes.entities.compiled_route.CompiledRoute">CompiledRoute</a>]]]</code>, </span><span class="rst-sig-param">wildcards: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#list" class="intersphinx-link">list</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" class="intersphinx-link">tuple</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a>, <wbr></wbr><a href="orionis.http.routes.entities.compiled_route.CompiledRoute.html" class="internal-link" title="orionis.http.routes.entities.compiled_route.CompiledRoute">CompiledRoute</a>]]</code></span>) -&gt; <code><a href="orionis.http.routes.route_resolver._DepthBucket.html" class="internal-link" title="orionis.http.routes.route_resolver._DepthBucket">_DepthBucket</a> | <a href="orionis.http.routes.route_resolver._PrefixIndex.html" class="internal-link" title="orionis.http.routes.route_resolver._PrefixIndex">_PrefixIndex</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/http/routes/route_resolver.py#L320">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/http/routes/route_resolver.py#L342">
       
       (source)
     </a>
@@ -2415,7 +2463,7 @@
     <div><p>Merge wildcard candidates into literal branches in route order.</p>
 <p>Reuse a shared matcher when fewer than two literal branches exist or more
 than eight wildcard candidates would be duplicated.</p>
-<table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">routes:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#list" class="intersphinx-link">list</a>[<a href="orionis.http.routes.entities.compiled_route.CompiledRoute.html" class="internal-link" title="orionis.http.routes.entities.compiled_route.CompiledRoute">CompiledRoute</a>]</code></td><td class="fieldArgDesc">Complete candidate list in priority order for the shared matcher.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">start:</span><code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code></td><td class="fieldArgDesc">Character offset of the segment used to select a literal branch.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">branches:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#dict" class="intersphinx-link">dict</a>[<a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <a href="https://docs.python.org/3/builtins/stdtypes.html#list" class="intersphinx-link">list</a>[<a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" class="intersphinx-link">tuple</a>[<a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a>, <a href="orionis.http.routes.entities.compiled_route.CompiledRoute.html" class="internal-link" title="orionis.http.routes.entities.compiled_route.CompiledRoute">CompiledRoute</a>]]]</code></td><td class="fieldArgDesc">Literal segment values mapped to sorted <tt class="rst-docutils rst-literal">(index, route)</tt> pairs.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">wildcards:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#list" class="intersphinx-link">list</a>[<a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" class="intersphinx-link">tuple</a>[<a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a>, <a href="orionis.http.routes.entities.compiled_route.CompiledRoute.html" class="internal-link" title="orionis.http.routes.entities.compiled_route.CompiledRoute">CompiledRoute</a>]]</code></td><td class="fieldArgDesc">Wildcard candidates with original indices, in priority order.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code>_DepthBucket | _PrefixIndex</code></td><td class="fieldArgDesc">Prefix index with a wildcard fallback, or the shared ordered matcher.</td></tr></table></div>
+<table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">routes:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#list" class="intersphinx-link">list</a>[<a href="orionis.http.routes.entities.compiled_route.CompiledRoute.html" class="internal-link">orionis.http.routes.entities.compiled_route.CompiledRoute</a>]</code></td><td class="fieldArgDesc">Complete candidate list in priority order for the shared matcher.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">start:</span><code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code></td><td class="fieldArgDesc">Character offset of the segment used to select a literal branch.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">branches:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#dict" class="intersphinx-link">dict</a>[<a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <a href="https://docs.python.org/3/builtins/stdtypes.html#list" class="intersphinx-link">list</a>[<a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" class="intersphinx-link">tuple</a>[<a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a>, <a href="orionis.http.routes.entities.compiled_route.CompiledRoute.html" class="internal-link" title="orionis.http.routes.entities.compiled_route.CompiledRoute">CompiledRoute</a>]]]</code></td><td class="fieldArgDesc">Literal segment values mapped to sorted <tt class="rst-docutils rst-literal">(index, route)</tt> pairs.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">wildcards:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#list" class="intersphinx-link">list</a>[<a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" class="intersphinx-link">tuple</a>[<a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a>, <a href="orionis.http.routes.entities.compiled_route.CompiledRoute.html" class="internal-link" title="orionis.http.routes.entities.compiled_route.CompiledRoute">CompiledRoute</a>]]</code></td><td class="fieldArgDesc">Wildcard candidates with original indices, in priority order.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code>_DepthBucket | _PrefixIndex</code></td><td class="fieldArgDesc">Prefix index with a wildcard fallback, or the shared ordered matcher.</td></tr></table></div>
   </div>
 </div><div class="basefunction">
   
@@ -2430,7 +2478,7 @@ than eight wildcard candidates would be duplicated.</p>
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">_extract_converter_fallback</span><span class="function-signature long-signature">(<span class="rst-sig-param">path: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code>, </span><span class="rst-sig-param">bucket: <code><a href="orionis.http.routes.route_resolver._DepthBucket.html" class="internal-link" title="orionis.http.routes.route_resolver._DepthBucket">_DepthBucket</a></code>, </span><span class="rst-sig-param">match: <code><a href="https://docs.python.org/3/library/re.html#re.Match" class="intersphinx-link">re.Match</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>]</code></span>) -&gt; <code><a href="orionis.http.routes.entities.resolved_route.ResolvedRoute.html" class="internal-link" title="orionis.http.routes.entities.resolved_route.ResolvedRoute">ResolvedRoute</a> | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/http/routes/route_resolver.py#L405">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/http/routes/route_resolver.py#L427">
       
       (source)
     </a>
@@ -2444,7 +2492,7 @@ than eight wildcard candidates would be duplicated.</p>
     
     <div><p>Try later matching routes after a parameter conversion failure.</p>
 <p>Skip candidates whose converters raise <tt class="rst-docutils rst-literal">ValueError</tt> or <tt class="rst-docutils rst-literal">OverflowError</tt>.</p>
-<table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">path:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Normalized request path to match against later routes.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">bucket:</span><code><a href="orionis.http.routes.route_resolver._DepthBucket.html" class="internal-link" title="orionis.http.routes.route_resolver._DepthBucket">_DepthBucket</a></code></td><td class="fieldArgDesc">Ordered routes in the selected dynamic bucket.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">match:</span><code><a href="https://docs.python.org/3/library/re.html#re.Match" class="intersphinx-link">re.Match</a>[<a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>]</code></td><td class="fieldArgDesc">Match whose parameter converter failed.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code>ResolvedRoute | None</code></td><td class="fieldArgDesc">First later route whose parameters convert successfully, or None.</td></tr></table></div>
+<table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">path:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Normalized request path to match against later routes.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">bucket:</span><code><a href="orionis.http.routes.route_resolver._DepthBucket.html" class="internal-link">orionis.http.routes.route_resolver._DepthBucket</a></code></td><td class="fieldArgDesc">Ordered routes in the selected dynamic bucket.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">match:</span><code><tt class="rst-docutils rst-literal">re.Match[str]</tt></code></td><td class="fieldArgDesc">Match whose parameter converter failed.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code>orionis.http.routes.entities.resolved_route.ResolvedRoute | None</code></td><td class="fieldArgDesc">First later route whose parameters convert successfully, or None.</td></tr></table></div>
   </div>
 </div><div class="basefunction">
   
@@ -2459,7 +2507,7 @@ than eight wildcard candidates would be duplicated.</p>
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">_extract_result</span><span class="function-signature">(<span class="rst-sig-param">match: <code><a href="https://docs.python.org/3/library/re.html#re.Match" class="intersphinx-link">re.Match</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>]</code>, </span><span class="rst-sig-param">bucket: <code><a href="orionis.http.routes.route_resolver._DepthBucket.html" class="internal-link" title="orionis.http.routes.route_resolver._DepthBucket">_DepthBucket</a></code></span>) -&gt; <code><a href="orionis.http.routes.entities.resolved_route.ResolvedRoute.html" class="internal-link" title="orionis.http.routes.entities.resolved_route.ResolvedRoute">ResolvedRoute</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/http/routes/route_resolver.py#L363">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/http/routes/route_resolver.py#L385">
       
       (source)
     </a>
@@ -2471,7 +2519,7 @@ than eight wildcard candidates would be duplicated.</p>
   </div>
   <div class="docstring functionBody">
     
-    <div><p>Extract a resolved route and convert its matched parameters.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">match:</span><code><a href="https://docs.python.org/3/library/re.html#re.Match" class="intersphinx-link">re.Match</a>[<a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>]</code></td><td class="fieldArgDesc">Successful match against the bucket's regex.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">bucket:</span><code><a href="orionis.http.routes.route_resolver._DepthBucket.html" class="internal-link" title="orionis.http.routes.route_resolver._DepthBucket">_DepthBucket</a></code></td><td class="fieldArgDesc">Ordered route candidates and their parameter extraction metadata.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.http.routes.entities.resolved_route.ResolvedRoute.html" class="internal-link" title="orionis.http.routes.entities.resolved_route.ResolvedRoute">ResolvedRoute</a></code></td><td class="fieldArgDesc">Compiled route with its extracted and converted parameter mapping.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.http.routes.exceptions.route_not_found.RouteNotFound.html" class="internal-link" title="orionis.http.routes.exceptions.route_not_found.RouteNotFound">RouteNotFound</a></code></td><td>If a combined match lacks its identifying route marker.</td></tr><tr><td class="fieldArgContainer"><code>ValueError, OverflowError</code></td><td>If a parameter converter rejects a captured value.</td></tr></table></div>
+    <div><p>Extract a resolved route and convert its matched parameters.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">match:</span><code><tt class="rst-docutils rst-literal">re.Match[str]</tt></code></td><td class="fieldArgDesc">Successful match against the bucket's regex.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">bucket:</span><code><a href="orionis.http.routes.route_resolver._DepthBucket.html" class="internal-link">orionis.http.routes.route_resolver._DepthBucket</a></code></td><td class="fieldArgDesc">Ordered route candidates and their parameter extraction metadata.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.http.routes.entities.resolved_route.ResolvedRoute.html" class="internal-link">orionis.http.routes.entities.resolved_route.ResolvedRoute</a></code></td><td class="fieldArgDesc">Compiled route with its extracted and converted parameter mapping.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.http.routes.exceptions.route_not_found.RouteNotFound.html" class="internal-link">orionis.http.routes.exceptions.route_not_found.RouteNotFound</a></code></td><td>If a combined match lacks its identifying route marker.</td></tr><tr><td class="fieldArgContainer"><code>ValueError, OverflowError</code></td><td>If a parameter converter rejects a captured value.</td></tr></table></div>
   </div>
 </div><div class="basefunction">
   
@@ -2486,7 +2534,7 @@ than eight wildcard candidates would be duplicated.</p>
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">_partition_route_segments</span><span class="function-signature long-signature">(<span class="rst-sig-param">routes: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#list" class="intersphinx-link">list</a>[<wbr></wbr><a href="orionis.http.routes.entities.compiled_route.CompiledRoute.html" class="internal-link" title="orionis.http.routes.entities.compiled_route.CompiledRoute">CompiledRoute</a>]</code>, </span><span class="rst-sig-param">start: <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" class="intersphinx-link">tuple</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#dict" class="intersphinx-link">dict</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#list" class="intersphinx-link">list</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" class="intersphinx-link">tuple</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a>, <wbr></wbr><a href="orionis.http.routes.entities.compiled_route.CompiledRoute.html" class="internal-link" title="orionis.http.routes.entities.compiled_route.CompiledRoute">CompiledRoute</a>]]], <wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#list" class="intersphinx-link">list</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" class="intersphinx-link">tuple</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a>, <wbr></wbr><a href="orionis.http.routes.entities.compiled_route.CompiledRoute.html" class="internal-link" title="orionis.http.routes.entities.compiled_route.CompiledRoute">CompiledRoute</a>]]] | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/http/routes/route_resolver.py#L242">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/http/routes/route_resolver.py#L264">
       
       (source)
     </a>
@@ -2498,7 +2546,7 @@ than eight wildcard candidates would be duplicated.</p>
   </div>
   <div class="docstring functionBody">
     
-    <div><p>Partition literal and wildcard path segments in candidate order.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">routes:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#list" class="intersphinx-link">list</a>[<a href="orionis.http.routes.entities.compiled_route.CompiledRoute.html" class="internal-link" title="orionis.http.routes.entities.compiled_route.CompiledRoute">CompiledRoute</a>]</code></td><td class="fieldArgDesc">Candidates sorted by compiler priority.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">start:</span><code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code></td><td class="fieldArgDesc">Character offset of the path segment to partition.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code>tuple | None</code></td><td class="fieldArgDesc">Literal branches and wildcard candidates as <tt class="rst-docutils rst-literal">(index, route)</tt> pairs,
+    <div><p>Partition literal and wildcard path segments in candidate order.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">routes:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#list" class="intersphinx-link">list</a>[<a href="orionis.http.routes.entities.compiled_route.CompiledRoute.html" class="internal-link">orionis.http.routes.entities.compiled_route.CompiledRoute</a>]</code></td><td class="fieldArgDesc">Candidates sorted by compiler priority.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">start:</span><code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code></td><td class="fieldArgDesc">Character offset of the path segment to partition.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code>tuple | None</code></td><td class="fieldArgDesc">Literal branches and wildcard candidates as <tt class="rst-docutils rst-literal">(index, route)</tt> pairs,
 or None if any selected segment is empty.</td></tr></table></div>
   </div>
 </div><div class="basefunction">
@@ -2513,8 +2561,8 @@ or None if any selected segment is empty.</td></tr></table></div>
   <div class="functionHeader">
     
     
-    <span class="py-keyword">def</span>&#160;<span class="py-defname">_path_allowed_for_method</span><span class="function-signature long-signature">(<span class="rst-sig-param">static_table: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#dict" class="intersphinx-link">dict</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <wbr></wbr><a href="orionis.http.routes.entities.resolved_route.ResolvedRoute.html" class="internal-link" title="orionis.http.routes.entities.resolved_route.ResolvedRoute">ResolvedRoute</a>]</code>, </span><span class="rst-sig-param">dynamic_table: <code>DepthTable</code>, </span><span class="rst-sig-param">path: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code>, </span><span class="rst-sig-param">depth: <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/http/routes/route_resolver.py#L111">
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">_path_allowed_for_method</span><span class="function-signature long-signature">(<span class="rst-sig-param">static_table: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#dict" class="intersphinx-link">dict</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <wbr></wbr><a href="orionis.http.routes.entities.resolved_route.ResolvedRoute.html" class="internal-link" title="orionis.http.routes.entities.resolved_route.ResolvedRoute">ResolvedRoute</a>]</code>, </span><span class="rst-sig-param">dynamic_table: <code><a href="#DepthTable" class="internal-link" title="orionis.http.routes.route_resolver.DepthTable">DepthTable</a></code>, </span><span class="rst-sig-param">path: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code>, </span><span class="rst-sig-param">depth: <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code>:</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/http/routes/route_resolver.py#L133">
       
       (source)
     </a>
@@ -2528,7 +2576,7 @@ or None if any selected segment is empty.</td></tr></table></div>
     
     <div><p>Check whether a method has a static or regex match for a path.</p>
 <p>Inspect lookup structures without extracting or converting parameters.</p>
-<table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">static<wbr></wbr>_table:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#dict" class="intersphinx-link">dict</a>[<a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <a href="orionis.http.routes.entities.resolved_route.ResolvedRoute.html" class="internal-link" title="orionis.http.routes.entities.resolved_route.ResolvedRoute">ResolvedRoute</a>]</code></td><td class="fieldArgDesc">Static paths mapped to resolved routes for one HTTP method.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">dynamic<wbr></wbr>_table:</span><code>DepthTable</code></td><td class="fieldArgDesc">Dynamic candidates grouped by depth for the same method.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">path:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Normalized request path to check.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">depth:</span><code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code></td><td class="fieldArgDesc">Number of path separators, or zero for the root path.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code></td><td class="fieldArgDesc">True if a static path or dynamic pattern matches; otherwise, False.</td></tr></table></div>
+<table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">static<wbr></wbr>_table:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#dict" class="intersphinx-link">dict</a>[<a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <a href="orionis.http.routes.entities.resolved_route.ResolvedRoute.html" class="internal-link">orionis.http.routes.entities.resolved_route.ResolvedRoute</a>]</code></td><td class="fieldArgDesc">Static paths mapped to resolved routes for one HTTP method.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">dynamic<wbr></wbr>_table:</span><code><a href="#DepthTable" class="internal-link">orionis.http.routes.route_resolver.DepthTable</a></code></td><td class="fieldArgDesc">Dynamic candidates grouped by depth for the same method.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">path:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Normalized request path to check.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">depth:</span><code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code></td><td class="fieldArgDesc">Number of path separators, or zero for the root path.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code></td><td class="fieldArgDesc">True if a static path or dynamic pattern matches; otherwise, False.</td></tr></table></div>
   </div>
 </div><div class="basefunction">
   
@@ -2542,8 +2590,8 @@ or None if any selected segment is empty.</td></tr></table></div>
   <div class="functionHeader">
     
     
-    <span class="py-keyword">def</span>&#160;<span class="py-defname">_select_bucket</span><span class="function-signature">(<span class="rst-sig-param">table: <code>DepthTable</code>, </span><span class="rst-sig-param">path: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code>, </span><span class="rst-sig-param">depth: <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code></span>) -&gt; <code><a href="orionis.http.routes.route_resolver._DepthBucket.html" class="internal-link" title="orionis.http.routes.route_resolver._DepthBucket">_DepthBucket</a> | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/http/routes/route_resolver.py#L80">
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">_select_bucket</span><span class="function-signature">(<span class="rst-sig-param">table: <code><a href="#DepthTable" class="internal-link" title="orionis.http.routes.route_resolver.DepthTable">DepthTable</a></code>, </span><span class="rst-sig-param">path: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code>, </span><span class="rst-sig-param">depth: <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code></span>) -&gt; <code><a href="orionis.http.routes.route_resolver._DepthBucket.html" class="internal-link" title="orionis.http.routes.route_resolver._DepthBucket">_DepthBucket</a> | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code>:</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/http/routes/route_resolver.py#L102">
       
       (source)
     </a>
@@ -2555,7 +2603,7 @@ or None if any selected segment is empty.</td></tr></table></div>
   </div>
   <div class="docstring functionBody">
     
-    <div><p>Select a dynamic route bucket by path depth and literal segments.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">table:</span><code>DepthTable</code></td><td class="fieldArgDesc">Dynamic candidates grouped by depth for one HTTP method.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">path:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Normalized request path used to traverse literal prefix branches.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">depth:</span><code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code></td><td class="fieldArgDesc">Number of path separators, or zero for the root path.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code>_DepthBucket | None</code></td><td class="fieldArgDesc">Bucket selected by depth and prefix, or None if no branch or fallback
+    <div><p>Select a dynamic route bucket by path depth and literal segments.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">table:</span><code><a href="#DepthTable" class="internal-link">orionis.http.routes.route_resolver.DepthTable</a></code></td><td class="fieldArgDesc">Dynamic candidates grouped by depth for one HTTP method.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">path:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Normalized request path used to traverse literal prefix branches.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">depth:</span><code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code></td><td class="fieldArgDesc">Number of path separators, or zero for the root path.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code>orionis.http.routes.route_resolver._DepthBucket | None</code></td><td class="fieldArgDesc">Bucket selected by depth and prefix, or None if no branch or fallback
 applies. The bucket's regex is not evaluated.</td></tr></table></div>
   </div>
 </div><div class="baseconstant">
@@ -2570,7 +2618,7 @@ applies. The bucket's regex is not evaluated.</td></tr></table></div>
   <div class="functionHeader">
     
     <span class="py-defname">_GROUP_NAME_RE</span>: <code><a href="https://docs.python.org/3/library/re.html#re.Pattern" class="intersphinx-link">re.Pattern</a></code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/http/routes/route_resolver.py#L18">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/http/routes/route_resolver.py#L20">
       
       (source)
     </a>
@@ -2582,7 +2630,7 @@ applies. The bucket's regex is not evaluated.</td></tr></table></div>
   </div>
   <div class="functionBody">
     
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p>Compiled pattern used to recognize group name re.</p></div>
     <table class="valueTable"><tr class="fieldStart"><td class="fieldName">Value</td></tr><tr><td><pre class="constant-value"><code><a href="https://docs.python.org/3/library/re.html#re.compile" class="intersphinx-link">re.compile</a>(r<span class="rst-variable-quote">'</span>\(\?P&lt;<span class="rst-re-group">(</span>\w<span class="rst-re-op">+</span><span class="rst-re-group">)</span>&gt;<span class="rst-variable-quote">'</span>)</code></pre></td></tr></table>
   </div>
 </div><div class="baseconstant">
@@ -2597,7 +2645,7 @@ applies. The bucket's regex is not evaluated.</td></tr></table></div>
   <div class="functionHeader">
     
     <span class="py-defname">_METHOD_MAP</span>: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#dict" class="intersphinx-link">dict</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>]</code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/http/routes/route_resolver.py#L22">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/http/routes/route_resolver.py#L25">
       
       (source)
     </a>
@@ -2609,7 +2657,8 @@ applies. The bucket's regex is not evaluated.</td></tr></table></div>
   </div>
   <div class="functionBody">
     
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p>Canonical dispatch method per incoming method string; HEAD is served by the GET
+table.</p></div>
     <table class="valueTable"><tr class="fieldStart"><td class="fieldName">Value</td></tr><tr><td><pre class="constant-value"><code>{<wbr></wbr><span class="rst-variable-quote">'</span><span class="rst-variable-string">GET</span><span class="rst-variable-quote">'</span>: <span class="rst-variable-quote">'</span><span class="rst-variable-string">GET</span><span class="rst-variable-quote">'</span>,
  <wbr></wbr><span class="rst-variable-quote">'</span><span class="rst-variable-string">HEAD</span><span class="rst-variable-quote">'</span>: <span class="rst-variable-quote">'</span><span class="rst-variable-string">GET</span><span class="rst-variable-quote">'</span>,
  <wbr></wbr><span class="rst-variable-quote">'</span><span class="rst-variable-string">POST</span><span class="rst-variable-quote">'</span>: <span class="rst-variable-quote">'</span><span class="rst-variable-string">POST</span><span class="rst-variable-quote">'</span>,
@@ -2631,7 +2680,7 @@ applies. The bucket's regex is not evaluated.</td></tr></table></div>
   <div class="functionHeader">
     
     <span class="py-defname">BucketEntry</span> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/http/routes/route_resolver.py#L36">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/http/routes/route_resolver.py#L45">
       
       (source)
     </a>
@@ -2643,8 +2692,35 @@ applies. The bucket's regex is not evaluated.</td></tr></table></div>
   </div>
   <div class="functionBody">
     
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p>Type alias for <tt class="rst-docutils rst-literal">tuple[list[Extractor], 'CompiledRoute']</tt>.</p></div>
     <table class="valueTable"><tr class="fieldStart"><td class="fieldName">Value</td></tr><tr><td><pre class="constant-value"><code><a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" class="intersphinx-link">tuple</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#list" class="intersphinx-link">list</a>[<wbr></wbr><a href="#Extractor" class="internal-link" title="orionis.http.routes.route_resolver.Extractor">Extractor</a>], <wbr></wbr><a href="orionis.http.routes.entities.compiled_route.CompiledRoute.html" class="internal-link" title="orionis.http.routes.entities.compiled_route.CompiledRoute">CompiledRoute</a>]</code></pre></td></tr></table>
+  </div>
+</div><div class="basetypealias">
+  
+  
+  <a name="orionis.http.routes.route_resolver.DepthTable">
+    
+  </a>
+  <a name="DepthTable">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <span class="py-defname">DepthTable</span>: <code><a href="https://docs.python.org/3/library/typing.html#typing.TypeAlias" class="intersphinx-link">typing.TypeAlias</a></code> =
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/http/routes/route_resolver.py#L99">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#DepthTable" title="orionis.http.routes.route_resolver.DepthTable">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="functionBody">
+    
+    <div><p>Type alias for <tt class="rst-docutils rst-literal">dict[int, _DepthBucket | _PrefixIndex]</tt>.</p></div>
+    <table class="valueTable"><tr class="fieldStart"><td class="fieldName">Value</td></tr><tr><td><pre class="constant-value"><code><a href="https://docs.python.org/3/builtins/stdtypes.html#dict" class="intersphinx-link">dict</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a>, <wbr></wbr><a href="orionis.http.routes.route_resolver._DepthBucket.html" class="internal-link" title="orionis.http.routes.route_resolver._DepthBucket">_DepthBucket</a> | <a href="orionis.http.routes.route_resolver._PrefixIndex.html" class="internal-link" title="orionis.http.routes.route_resolver._PrefixIndex">_PrefixIndex</a>]</code></pre></td></tr></table>
   </div>
 </div><div class="basetypealias">
   
@@ -2658,7 +2734,7 @@ applies. The bucket's regex is not evaluated.</td></tr></table></div>
   <div class="functionHeader">
     
     <span class="py-defname">Extractor</span> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/http/routes/route_resolver.py#L35">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/http/routes/route_resolver.py#L43">
       
       (source)
     </a>
@@ -2670,7 +2746,7 @@ applies. The bucket's regex is not evaluated.</td></tr></table></div>
   </div>
   <div class="functionBody">
     
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p>Type alias for <tt class="rst-docutils rst-literal">tuple[str, int, ParamConverter]</tt>.</p></div>
     <table class="valueTable"><tr class="fieldStart"><td class="fieldName">Value</td></tr><tr><td><pre class="constant-value"><code><a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" class="intersphinx-link">tuple</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <wbr></wbr><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a>, <wbr></wbr><a href="#ParamConverter" class="internal-link" title="orionis.http.routes.route_resolver.ParamConverter">ParamConverter</a>]</code></pre></td></tr></table>
   </div>
 </div><div class="basetypealias">
@@ -2685,7 +2761,7 @@ applies. The bucket's regex is not evaluated.</td></tr></table></div>
   <div class="functionHeader">
     
     <span class="py-defname">ParamConverter</span> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/http/routes/route_resolver.py#L34">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/http/routes/route_resolver.py#L41">
       
       (source)
     </a>
@@ -2697,7 +2773,7 @@ applies. The bucket's regex is not evaluated.</td></tr></table></div>
   </div>
   <div class="functionBody">
     
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p>Type alias for <tt class="rst-docutils rst-literal"><span class="pre">Callable[[str],</span> object]</tt>.</p></div>
     <table class="valueTable"><tr class="fieldStart"><td class="fieldName">Value</td></tr><tr><td><pre class="constant-value"><code><a href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Callable" class="intersphinx-link">Callable</a>[<wbr></wbr>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>], <wbr></wbr><a href="https://docs.python.org/3/builtins/functions.html#object" class="intersphinx-link">object</a>]</code></pre></td></tr></table>
   </div>
 </div>
@@ -2711,7 +2787,7 @@ applies. The bucket's regex is not evaluated.</td></tr></table></div>
   <div class="orionis-footer-inner">
     <div class="orionis-footer-copy">
       <p>API documentation for <a href="https://orionis-framework.com/" class="projecthome">Orionis</a>.</p>
-      <p class="orionis-footer-meta">Generated with <a href="https://github.com/twisted/pydoctor/">Pydoctor</a> 25.10.1.<span class="orionis-footer-build"> Built 2026-11-03 09:36:58.</span></p>
+      <p class="orionis-footer-meta">Generated with <a href="https://github.com/twisted/pydoctor/">Pydoctor</a> 25.10.1.<span class="orionis-footer-build"> Built 2026-11-03 13:00:15.</span></p>
     </div>
     <nav class="orionis-footer-links" aria-label="Additional resources">
       <a href="https://docs.orionis-framework.com">Read the guide <span aria-hidden="true">↗</span></a>

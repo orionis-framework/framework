@@ -523,7 +523,7 @@
         </div>
 
         <div class="extrasDocstring">
-          <p class="class-signature"><code><span class="py-keyword">class</span> <span class="py-defname">RedisResolverLease</span>: <a href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/cache/locks/coalescing.py#L14" class="sourceLink">(source)</a></code></p><p>Constructor: <code><a href="#__init__" class="internal-link" title="orionis.cache.locks.coalescing.RedisResolverLease.__init__">RedisResolverLease(backend, key, lease, wait_timeout)</a></code></p><p><a href="classIndex.html#orionis.cache.locks.coalescing.RedisResolverLease">View In Hierarchy</a></p>
+          <p class="class-signature"><code><span class="py-keyword">class</span> <span class="py-defname">RedisResolverLease</span>: <a href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/cache/locks/coalescing.py#L16" class="sourceLink">(source)</a></code></p><p>Constructor: <code><a href="#__init__" class="internal-link" title="orionis.cache.locks.coalescing.RedisResolverLease.__init__">RedisResolverLease(backend, key, lease, wait_timeout)</a></code></p><p><a href="classIndex.html#orionis.cache.locks.coalescing.RedisResolverLease">View In Hierarchy</a></p>
         </div>
 
         <div class="moduleDocstring">
@@ -563,27 +563,27 @@
     
     <td>Instance Variable</td>
     <td><code><a href="#_backend" class="internal-link" title="orionis.cache.locks.coalescing.RedisResolverLease._backend">_backend</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
+    <td>Storage backend implementing the cache operations.</td>
   </tr><tr class="instancevariable">
     
     <td>Instance Variable</td>
     <td><code><a href="#_key" class="internal-link" title="orionis.cache.locks.coalescing.RedisResolverLease._key">_key</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
+    <td>Cache or lease key to access.</td>
   </tr><tr class="instancevariable">
     
     <td>Instance Variable</td>
     <td><code><a href="#_lease" class="internal-link" title="orionis.cache.locks.coalescing.RedisResolverLease._lease">_lease</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
+    <td>Lease lifetime in seconds; use the store default when omitted.</td>
   </tr><tr class="instancevariable">
     
     <td>Instance Variable</td>
     <td><code><a href="#_owner" class="internal-link" title="orionis.cache.locks.coalescing.RedisResolverLease._owner">_owner</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
+    <td>Ownership token used to identify the current holder.</td>
   </tr><tr class="instancevariable">
     
     <td>Instance Variable</td>
     <td><code><a href="#_wait" class="internal-link" title="orionis.cache.locks.coalescing.RedisResolverLease._wait">_wait</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
+    <td>Maximum number of seconds to wait for ownership.</td>
   </tr>
 </table>
           
@@ -605,7 +605,7 @@
     
     
     <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">__aenter__</span><span class="function-signature">(<span class="rst-sig-param">self: <code><a href="https://docs.python.org/3/library/typing.html#typing.Self" class="intersphinx-link">Self</a></code></span>) -&gt; <code><a href="https://docs.python.org/3/library/typing.html#typing.Self" class="intersphinx-link">Self</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/cache/locks/coalescing.py#L77">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/cache/locks/coalescing.py#L84">
       
       (source)
     </a>
@@ -617,7 +617,7 @@
   </div>
   <div class="docstring functionBody">
     
-    <div><p>Acquire a distributed lease with a finite waiting budget.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/library/typing.html#typing.Self" class="intersphinx-link">Self</a></code></td><td class="fieldArgDesc">This lease after successful ownership acquisition.</td></tr></table></div>
+    <div><p>Acquire a distributed lease with a finite waiting budget.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/library/typing.html#typing.Self" class="intersphinx-link">typing.Self</a></code></td><td class="fieldArgDesc">This lease after successful ownership acquisition.</td></tr></table></div>
   </div>
 </div><div class="basemethod">
   
@@ -632,7 +632,7 @@
     
     
     <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">__aexit__</span><span class="function-signature long-signature">(<span class="rst-sig-param">self: <code><a href="https://docs.python.org/3/library/typing.html#typing.Self" class="intersphinx-link">Self</a></code>, </span><span class="rst-sig-param">_type: <code><a href="https://docs.python.org/3/builtins/functions.html#type" class="intersphinx-link">type</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/exceptions.html#BaseException" class="intersphinx-link">BaseException</a>] | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code>, </span><span class="rst-sig-param">_value: <code><a href="https://docs.python.org/3/builtins/exceptions.html#BaseException" class="intersphinx-link">BaseException</a> | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code>, </span><span class="rst-sig-param">_traceback: <code><a href="https://docs.python.org/3/library/types.html#types.TracebackType" class="intersphinx-link">TracebackType</a> | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></span>):</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/cache/locks/coalescing.py#L97">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/cache/locks/coalescing.py#L104">
       
       (source)
     </a>
@@ -644,7 +644,7 @@
   </div>
   <div class="docstring functionBody">
     
-    <div><p>Finish bounded ownership cleanup before propagating cancellation.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">_type:</span><code><a href="https://docs.python.org/3/builtins/functions.html#type" class="intersphinx-link">type</a>[<a href="https://docs.python.org/3/builtins/exceptions.html#BaseException" class="intersphinx-link">BaseException</a>] | None</code></td><td class="fieldArgDesc">Exception type raised by the context body, if any.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">_value:</span><code>BaseException | None</code></td><td class="fieldArgDesc">Exception raised by the context body, if any.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">_traceback:</span><code>TracebackType | None</code></td><td class="fieldArgDesc">Traceback attached to the context exception, if any.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">Complete the operation without returning a value.</td></tr></table></div>
+    <div><p>Finish bounded ownership cleanup before propagating cancellation.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">_type:</span><code><a href="https://docs.python.org/3/builtins/functions.html#type" class="intersphinx-link">type</a>[<a href="https://docs.python.org/3/builtins/exceptions.html#BaseException" class="intersphinx-link">BaseException</a>] | None</code></td><td class="fieldArgDesc">Exception type raised by the context body, if any.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">_value:</span><code>BaseException | None</code></td><td class="fieldArgDesc">Exception raised by the context body, if any.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">_traceback:</span><code>types.TracebackType | None</code></td><td class="fieldArgDesc">Traceback attached to the context exception, if any.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">Complete the operation without returning a value.</td></tr></table></div>
   </div>
 </div><div class="basemethod">
   
@@ -659,7 +659,7 @@
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">__init__</span><span class="function-signature">(<span class="rst-sig-param">self: <code><a href="https://docs.python.org/3/library/typing.html#typing.Self" class="intersphinx-link">Self</a></code>, </span><span class="rst-sig-param">backend: <code><a href="https://docs.python.org/3/library/typing.html#typing.Any" class="intersphinx-link">Any</a></code>, </span><span class="rst-sig-param">key: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code>, </span><span class="rst-sig-param">lease: <code><a href="https://docs.python.org/3/builtins/functions.html#float" class="intersphinx-link">float</a></code>, </span><span class="rst-sig-param">wait_timeout: <code><a href="https://docs.python.org/3/builtins/functions.html#float" class="intersphinx-link">float</a></code></span>):</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/cache/locks/coalescing.py#L17">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/cache/locks/coalescing.py#L19">
       
       (source)
     </a>
@@ -671,7 +671,7 @@
   </div>
   <div class="docstring functionBody">
     
-    <div><p>Retain bounded acquisition settings and a unique release token.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">backend:</span><code><a href="https://docs.python.org/3/library/typing.html#typing.Any" class="intersphinx-link">Any</a></code></td><td class="fieldArgDesc">Storage backend implementing the cache operations.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">key:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Cache or lease key to access.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">lease:</span><code><a href="https://docs.python.org/3/builtins/functions.html#float" class="intersphinx-link">float</a></code></td><td class="fieldArgDesc">Lease lifetime in seconds; use the store default when omitted.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">wait<wbr></wbr>_timeout:</span><code><a href="https://docs.python.org/3/builtins/functions.html#float" class="intersphinx-link">float</a></code></td><td class="fieldArgDesc">Maximum number of seconds to wait for ownership.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">Complete the operation without returning a value.</td></tr></table></div>
+    <div><p>Retain bounded acquisition settings and a unique release token.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">backend:</span><code><a href="https://docs.python.org/3/library/typing.html#typing.Any" class="intersphinx-link">typing.Any</a></code></td><td class="fieldArgDesc">Storage backend implementing the cache operations.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">key:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Cache or lease key to access.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">lease:</span><code><a href="https://docs.python.org/3/builtins/functions.html#float" class="intersphinx-link">float</a></code></td><td class="fieldArgDesc">Lease lifetime in seconds; use the store default when omitted.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">wait<wbr></wbr>_timeout:</span><code><a href="https://docs.python.org/3/builtins/functions.html#float" class="intersphinx-link">float</a></code></td><td class="fieldArgDesc">Maximum number of seconds to wait for ownership.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">Complete the operation without returning a value.</td></tr></table></div>
   </div>
 </div><div class="basemethod">
   
@@ -686,7 +686,7 @@
     
     
     <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">_acquire</span><span class="function-signature">(<span class="rst-sig-param">self: <code><a href="https://docs.python.org/3/library/typing.html#typing.Self" class="intersphinx-link">Self</a></code></span>):</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/cache/locks/coalescing.py#L49">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/cache/locks/coalescing.py#L56">
       
       (source)
     </a>
@@ -713,7 +713,7 @@
     
     
     <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">_release</span><span class="function-signature">(<span class="rst-sig-param">self: <code><a href="https://docs.python.org/3/library/typing.html#typing.Self" class="intersphinx-link">Self</a></code></span>):</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/cache/locks/coalescing.py#L65">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/cache/locks/coalescing.py#L72">
       
       (source)
     </a>
@@ -739,7 +739,7 @@
   <div class="functionHeader">
     
     <span class="py-defname">_backend</span> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/cache/locks/coalescing.py#L43">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/cache/locks/coalescing.py#L45">
       
       (source)
     </a>
@@ -751,7 +751,7 @@
   </div>
   <div class="functionBody">
     
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p>Storage backend implementing the cache operations.</p></div>
     
   </div>
 </div><div class="baseinstancevariable">
@@ -766,7 +766,7 @@
   <div class="functionHeader">
     
     <span class="py-defname">_key</span> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/cache/locks/coalescing.py#L44">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/cache/locks/coalescing.py#L47">
       
       (source)
     </a>
@@ -778,7 +778,7 @@
   </div>
   <div class="functionBody">
     
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p>Cache or lease key to access.</p></div>
     
   </div>
 </div><div class="baseinstancevariable">
@@ -793,7 +793,7 @@
   <div class="functionHeader">
     
     <span class="py-defname">_lease</span> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/cache/locks/coalescing.py#L45">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/cache/locks/coalescing.py#L49">
       
       (source)
     </a>
@@ -805,7 +805,7 @@
   </div>
   <div class="functionBody">
     
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p>Lease lifetime in seconds; use the store default when omitted.</p></div>
     
   </div>
 </div><div class="baseinstancevariable">
@@ -820,7 +820,7 @@
   <div class="functionHeader">
     
     <span class="py-defname">_owner</span> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/cache/locks/coalescing.py#L47">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/cache/locks/coalescing.py#L53">
       
       (source)
     </a>
@@ -832,7 +832,7 @@
   </div>
   <div class="functionBody">
     
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p>Ownership token used to identify the current holder.</p></div>
     
   </div>
 </div><div class="baseinstancevariable">
@@ -847,7 +847,7 @@
   <div class="functionHeader">
     
     <span class="py-defname">_wait</span> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/cache/locks/coalescing.py#L46">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/cache/locks/coalescing.py#L51">
       
       (source)
     </a>
@@ -859,7 +859,7 @@
   </div>
   <div class="functionBody">
     
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p>Maximum number of seconds to wait for ownership.</p></div>
     
   </div>
 </div>
@@ -873,7 +873,7 @@
   <div class="orionis-footer-inner">
     <div class="orionis-footer-copy">
       <p>API documentation for <a href="https://orionis-framework.com/" class="projecthome">Orionis</a>.</p>
-      <p class="orionis-footer-meta">Generated with <a href="https://github.com/twisted/pydoctor/">Pydoctor</a> 25.10.1.<span class="orionis-footer-build"> Built 2026-11-03 09:36:58.</span></p>
+      <p class="orionis-footer-meta">Generated with <a href="https://github.com/twisted/pydoctor/">Pydoctor</a> 25.10.1.<span class="orionis-footer-build"> Built 2026-11-03 13:00:15.</span></p>
     </div>
     <nav class="orionis-footer-links" aria-label="Additional resources">
       <a href="https://docs.orionis-framework.com">Read the guide <span aria-hidden="true">↗</span></a>

@@ -261,7 +261,7 @@
                     
                 </label>
 
-                <code><a href="orionis.mail.entities.address.html" class="internal-link" title="orionis.mail.entities.address">address</a></code>
+                <code><a href="orionis.mail.entities.address.module.html" class="internal-link" title="orionis.mail.entities.address">address</a></code>
 
                 <div class="expandableContent">
                     <div>
@@ -282,7 +282,7 @@
         
 
         
-            <div class="itemName"><code><a href="orionis.mail.entities.address.html#addresses" class="internal-link" title="orionis.mail.entities.address.addresses">addresses</a></code>
+            <div class="itemName"><code><a href="orionis.mail.entities.address.module.html#addresses" class="internal-link" title="orionis.mail.entities.address.addresses">addresses</a></code>
             </div>
         
 
@@ -292,7 +292,7 @@
         
 
         
-            <div class="itemName"><code><a href="orionis.mail.entities.address.html#one_address" class="internal-link" title="orionis.mail.entities.address.one_address">one<wbr></wbr>_address</a></code>
+            <div class="itemName"><code><a href="orionis.mail.entities.address.module.html#one_address" class="internal-link" title="orionis.mail.entities.address.one_address">one<wbr></wbr>_address</a></code>
             </div>
         
 
@@ -311,7 +311,7 @@
         
 
         
-            <div class="itemName"><code><a href="orionis.mail.entities.address.html#_HEADERS" class="internal-link" title="orionis.mail.entities.address._HEADERS">_HEADERS</a></code>
+            <div class="itemName"><code><a href="orionis.mail.entities.address.module.html#_HEADERS" class="internal-link" title="orionis.mail.entities.address._HEADERS">_HEADERS</a></code>
             </div>
         
 
@@ -343,7 +343,7 @@
                     
                 </label>
 
-                <code><a href="orionis.mail.entities.attachment.html" class="internal-link" title="orionis.mail.entities.attachment">attachment</a></code>
+                <code><a href="orionis.mail.entities.attachment.module.html" class="internal-link" title="orionis.mail.entities.attachment">attachment</a></code>
 
                 <div class="expandableContent">
                     <div>
@@ -389,7 +389,7 @@
                     
                 </label>
 
-                <code><a href="orionis.mail.entities.content.html" class="internal-link" title="orionis.mail.entities.content">content</a></code>
+                <code><a href="orionis.mail.entities.content.module.html" class="internal-link" title="orionis.mail.entities.content">content</a></code>
 
                 <div class="expandableContent">
                     <div>
@@ -435,7 +435,7 @@
                     
                 </label>
 
-                <code><a href="orionis.mail.entities.envelope.html" class="internal-link" title="orionis.mail.entities.envelope">envelope</a></code>
+                <code><a href="orionis.mail.entities.envelope.module.html" class="internal-link" title="orionis.mail.entities.envelope">envelope</a></code>
 
                 <div class="expandableContent">
                     <div>
@@ -1830,15 +1830,15 @@
         </div>
 
         <div class="extrasDocstring">
-          <p class="class-signature"><code><span class="py-keyword">class</span> <span class="py-defname">Attachment</span>: <a href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/mail/entities/attachment.py#L8" class="sourceLink">(source)</a></code></p><p><a href="classIndex.html#orionis.mail.entities.Attachment">View In Hierarchy</a></p>
+          <p class="class-signature"><code><span class="py-keyword">class</span> <span class="py-defname">Attachment</span>: <a href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/mail/entities/attachment.py#L10" class="sourceLink">(source)</a></code></p><p><a href="classIndex.html#orionis.mail.entities.Attachment">View In Hierarchy</a></p>
         </div>
 
         <div class="moduleDocstring">
-          <div><p>Describe a storage attachment without opening it or resolving a disk.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">path</span></td><td class="fieldArgDesc">Logical disk-relative path, normalized on declaration.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">disk</span></td><td class="fieldArgDesc">Configured disk name, or None for the default disk.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">name</span></td><td class="fieldArgDesc">Visible basename overriding the logical path's basename.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">mime<wbr></wbr>_type</span></td><td class="fieldArgDesc">Explicit MIME type overriding storage metadata and inference.</td></tr></table></div>
+          <div><p>Describe a storage attachment without opening it or resolving a disk.</p></div>
         </div>
 
         <div id="split-tables">
-          <table class="children sortable" id="id1302">
+          <table class="children sortable" id="id1305">
   
   
   <tr class="classmethod">
@@ -1851,26 +1851,26 @@
     <td>Method</td>
     <td><code><a href="#__post_init__" class="internal-link" title="orionis.mail.entities.Attachment.__post_init__">__post<wbr></wbr>_init__</a></code></td>
     <td>Validate logical paths and safe optional metadata without I/O.</td>
-  </tr><tr class="classvariable">
+  </tr><tr class="instancevariable">
     
-    <td>Class Variable</td>
+    <td>Instance Variable</td>
     <td><code><a href="#disk" class="internal-link" title="orionis.mail.entities.Attachment.disk">disk</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
-  </tr><tr class="classvariable">
+    <td>Configured disk name, or None for the default disk.</td>
+  </tr><tr class="instancevariable">
     
-    <td>Class Variable</td>
+    <td>Instance Variable</td>
     <td><code><a href="#mime_type" class="internal-link" title="orionis.mail.entities.Attachment.mime_type">mime<wbr></wbr>_type</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
-  </tr><tr class="classvariable">
+    <td>Explicit MIME type overriding storage metadata and inference.</td>
+  </tr><tr class="instancevariable">
     
-    <td>Class Variable</td>
+    <td>Instance Variable</td>
     <td><code><a href="#name" class="internal-link" title="orionis.mail.entities.Attachment.name">name</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
-  </tr><tr class="classvariable">
+    <td>Visible basename overriding the logical path's basename.</td>
+  </tr><tr class="instancevariable">
     
-    <td>Class Variable</td>
+    <td>Instance Variable</td>
     <td><code><a href="#path" class="internal-link" title="orionis.mail.entities.Attachment.path">path</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
+    <td>Logical disk-relative path, normalized on declaration.</td>
   </tr>
 </table>
           
@@ -1892,7 +1892,7 @@
     
     <div><span class="decorator">@<a href="https://docs.python.org/3/builtins/functions.html#classmethod" class="intersphinx-link">classmethod</a><br /></span></div>
     <span class="py-keyword">def</span>&#160;<span class="py-defname">fromStorage</span><span class="function-signature long-signature">(<span class="rst-sig-param"><span class="rst-undocumented">cls</span>, </span><span class="rst-sig-param">path: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code>, </span><span class="rst-sig-symbol">*, </span><span class="rst-sig-param">disk: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a> | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code> = <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a>, </span><span class="rst-sig-param">name: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a> | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code> = <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a>, </span><span class="rst-sig-param">mime_type: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a> | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code> = <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></span>) -&gt; <code>Self</code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/mail/entities/attachment.py#L59">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/mail/entities/attachment.py#L61">
       
       (source)
     </a>
@@ -1904,7 +1904,7 @@
   </div>
   <div class="docstring functionBody">
     
-    <div><p>Declare a file to resolve through Orionis storage when sending.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">path:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Logical disk-relative path.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">disk:</span><code>str | None</code></td><td class="fieldArgDesc">Configured disk name, or None for the default disk.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">name:</span><code>str | None</code></td><td class="fieldArgDesc">Visible basename overriding the logical path's basename.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">mime<wbr></wbr>_type:</span><code>str | None</code></td><td class="fieldArgDesc">Explicit MIME type overriding storage metadata and inference.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code>Self</code></td><td class="fieldArgDesc">An immutable attachment declaration, with no I/O performed.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code>MailAttachmentException</code></td><td>If the declaration contains unsafe paths or metadata.</td></tr></table></div>
+    <div><p>Declare a file to resolve through Orionis storage when sending.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">path:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Logical disk-relative path.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">disk:</span><code>str | None</code></td><td class="fieldArgDesc">Configured disk name, or None for the default disk.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">name:</span><code>str | None</code></td><td class="fieldArgDesc">Visible basename overriding the logical path's basename.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">mime<wbr></wbr>_type:</span><code>str | None</code></td><td class="fieldArgDesc">Explicit MIME type overriding storage metadata and inference.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/library/typing.html#typing.Self" class="intersphinx-link">typing.Self</a></code></td><td class="fieldArgDesc">An immutable attachment declaration, with no I/O performed.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.mail.exceptions.MailAttachmentException.html" class="internal-link">orionis.mail.exceptions.MailAttachmentException</a></code></td><td>If the declaration contains unsafe paths or metadata.</td></tr></table></div>
   </div>
 </div><div class="basemethod">
   
@@ -1919,7 +1919,7 @@
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">__post_init__</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>):</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/mail/entities/attachment.py#L30">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/mail/entities/attachment.py#L32">
       
       (source)
     </a>
@@ -1931,9 +1931,9 @@
   </div>
   <div class="docstring functionBody">
     
-    <div><p>Validate logical paths and safe optional metadata without I/O.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">Store canonical paths and MIME types.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code>MailAttachmentException</code></td><td>If a path, disk name, visible name, or MIME type is unsafe.</td></tr></table></div>
+    <div><p>Validate logical paths and safe optional metadata without I/O.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">Store canonical paths and MIME types.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.mail.exceptions.MailAttachmentException.html" class="internal-link">orionis.mail.exceptions.MailAttachmentException</a></code></td><td>If a path, disk name, visible name, or MIME type is unsafe.</td></tr></table></div>
   </div>
-</div><div class="baseclassvariable">
+</div><div class="baseinstancevariable">
   
   
   <a name="orionis.mail.entities.Attachment.disk">
@@ -1945,7 +1945,7 @@
   <div class="functionHeader">
     
     <span class="py-defname">disk</span>: <code>str | None</code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/mail/entities/attachment.py#L26">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/mail/entities/attachment.py#L28">
       
       (source)
     </a>
@@ -1957,10 +1957,10 @@
   </div>
   <div class="functionBody">
     
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p>Configured disk name, or None for the default disk.</p></div>
     
   </div>
-</div><div class="baseclassvariable">
+</div><div class="baseinstancevariable">
   
   
   <a name="orionis.mail.entities.Attachment.mime_type">
@@ -1972,7 +1972,7 @@
   <div class="functionHeader">
     
     <span class="py-defname">mime_type</span>: <code>str | None</code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/mail/entities/attachment.py#L28">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/mail/entities/attachment.py#L30">
       
       (source)
     </a>
@@ -1984,10 +1984,10 @@
   </div>
   <div class="functionBody">
     
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p>Explicit MIME type overriding storage metadata and inference.</p></div>
     
   </div>
-</div><div class="baseclassvariable">
+</div><div class="baseinstancevariable">
   
   
   <a name="orionis.mail.entities.Attachment.name">
@@ -1999,7 +1999,7 @@
   <div class="functionHeader">
     
     <span class="py-defname">name</span>: <code>str | None</code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/mail/entities/attachment.py#L27">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/mail/entities/attachment.py#L29">
       
       (source)
     </a>
@@ -2011,10 +2011,10 @@
   </div>
   <div class="functionBody">
     
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p>Visible basename overriding the logical path's basename.</p></div>
     
   </div>
-</div><div class="baseclassvariable">
+</div><div class="baseinstancevariable">
   
   
   <a name="orionis.mail.entities.Attachment.path">
@@ -2026,7 +2026,7 @@
   <div class="functionHeader">
     
     <span class="py-defname">path</span>: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/mail/entities/attachment.py#L25">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/mail/entities/attachment.py#L27">
       
       (source)
     </a>
@@ -2038,7 +2038,7 @@
   </div>
   <div class="functionBody">
     
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p>Logical disk-relative path, normalized on declaration.</p></div>
     
   </div>
 </div>
@@ -2052,7 +2052,7 @@
   <div class="orionis-footer-inner">
     <div class="orionis-footer-copy">
       <p>API documentation for <a href="https://orionis-framework.com/" class="projecthome">Orionis</a>.</p>
-      <p class="orionis-footer-meta">Generated with <a href="https://github.com/twisted/pydoctor/">Pydoctor</a> 25.10.1.<span class="orionis-footer-build"> Built 2026-11-03 09:36:58.</span></p>
+      <p class="orionis-footer-meta">Generated with <a href="https://github.com/twisted/pydoctor/">Pydoctor</a> 25.10.1.<span class="orionis-footer-build"> Built 2026-11-03 13:00:15.</span></p>
     </div>
     <nav class="orionis-footer-links" aria-label="Additional resources">
       <a href="https://docs.orionis-framework.com">Read the guide <span aria-hidden="true">↗</span></a>

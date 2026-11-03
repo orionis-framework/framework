@@ -396,11 +396,11 @@
         </div>
 
         <div class="extrasDocstring">
-          <p class="class-signature"><code><span class="py-keyword">class</span> <span class="py-defname">ReactorProvider</span>(<a href="orionis.container.providers.ServiceProvider.html" class="internal-link" title="orionis.container.providers.ServiceProvider">ServiceProvider</a>): <a href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/console/reactor_provider.py#L7" class="sourceLink">(source)</a></code></p><p>Constructor: <code><a href="orionis.container.providers.ServiceProvider.html#__init__" class="internal-link" title="orionis.container.providers.ServiceProvider.__init__">ReactorProvider(app)</a></code></p><p><a href="classIndex.html#orionis.console.reactor_provider.ReactorProvider">View In Hierarchy</a></p>
+          <p class="class-signature"><code><span class="py-keyword">class</span> <span class="py-defname">ReactorProvider</span>(<a href="orionis.container.providers.ServiceProvider.html" class="internal-link" title="orionis.container.providers.ServiceProvider">ServiceProvider</a>): <a href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/console/reactor_provider.py#L9" class="sourceLink">(source)</a></code></p><p>Constructor: <code><a href="orionis.container.providers.ServiceProvider.html#__init__" class="internal-link" title="orionis.container.providers.ServiceProvider.__init__">ReactorProvider(app)</a></code></p><p><a href="classIndex.html#orionis.console.reactor_provider.ReactorProvider">View In Hierarchy</a></p>
         </div>
 
         <div class="moduleDocstring">
-          <div><p class="undocumented">Undocumented</p></div>
+          <div><p>Register reactor services in the application container.</p></div>
         </div>
 
         <div id="split-tables">
@@ -435,7 +435,7 @@
     
     <td>Instance Variable</td>
     <td><code><a href="orionis.container.providers.ServiceProvider.html#app" class="internal-link" title="orionis.container.providers.ServiceProvider.app">app</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
+    <td>The application container instance to which this service provider will be attached.</td>
   </tr>
 </table>
             
@@ -457,7 +457,7 @@
     
     
     <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">boot</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>):</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/console/reactor_provider.py#L23">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/console/reactor_provider.py#L26">
       
       (source)
     </a>
@@ -488,7 +488,7 @@ setup is required at this time.</p>
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">register</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>):</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/console/reactor_provider.py#L9">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/console/reactor_provider.py#L12">
       
       (source)
     </a>
@@ -501,7 +501,7 @@ setup is required at this time.</p>
   <div class="docstring functionBody">
     <div class="interfaceinfo">overrides <code><a href="orionis.container.providers.ServiceProvider.html#register" class="internal-link">orionis.container.providers.ServiceProvider.register</a></code></div>
     <div><p>Register the reactor management service in the application container.</p>
-<p>Bind the <code><a href="orionis.console.core.contracts.reactor.IReactor.html" class="internal-link" title="orionis.console.core.contracts.reactor.IReactor">IReactor</a></code> interface as a singleton to the <code><a href="orionis.console.core.reactor.Reactor.html" class="internal-link" title="orionis.console.core.reactor.Reactor">Reactor</a></code>
+<p>Bind the <tt class="rst-docutils rst-literal">IReactor</tt> interface as a singleton to the <tt class="rst-docutils rst-literal">Reactor</tt>
 implementation in the application's dependency injection container.</p>
 <table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">No return value. Service is registered in the container.</td></tr></table></div>
   </div>
@@ -516,7 +516,7 @@ implementation in the application's dependency injection container.</p>
   <div class="orionis-footer-inner">
     <div class="orionis-footer-copy">
       <p>API documentation for <a href="https://orionis-framework.com/" class="projecthome">Orionis</a>.</p>
-      <p class="orionis-footer-meta">Generated with <a href="https://github.com/twisted/pydoctor/">Pydoctor</a> 25.10.1.<span class="orionis-footer-build"> Built 2026-11-03 09:36:58.</span></p>
+      <p class="orionis-footer-meta">Generated with <a href="https://github.com/twisted/pydoctor/">Pydoctor</a> 25.10.1.<span class="orionis-footer-build"> Built 2026-11-03 13:00:15.</span></p>
     </div>
     <nav class="orionis-footer-links" aria-label="Additional resources">
       <a href="https://docs.orionis-framework.com">Read the guide <span aria-hidden="true">↗</span></a>

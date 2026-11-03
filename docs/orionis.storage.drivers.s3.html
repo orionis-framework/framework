@@ -3317,47 +3317,47 @@
         </div>
 
         <div class="extrasDocstring">
-          <a href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/storage/drivers/s3.py" class="sourceLink">(source)</a>
+          <a href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/storage/drivers/s3.py" class="sourceLink">(source)</a>
         </div>
 
         <div class="moduleDocstring">
-          <div><p class="undocumented">Undocumented</p></div>
+          <div><p>Storage driver backed by Amazon S3 (or S3-compatible services).</p></div>
         </div>
 
         <div id="split-tables">
-          <table class="children sortable" id="id2020">
+          <table class="children sortable" id="id2028">
   
   
   <tr class="constant">
     
     <td>Constant</td>
     <td><code><a href="#_ACL_MAP" class="internal-link" title="orionis.storage.drivers.s3._ACL_MAP">_ACL<wbr></wbr>_MAP</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
+    <td>Canned ACLs applied per visibility level.</td>
   </tr><tr class="constant">
     
     <td>Constant</td>
     <td><code><a href="#_ALL_USERS_URI" class="internal-link" title="orionis.storage.drivers.s3._ALL_USERS_URI">_ALL<wbr></wbr>_USERS<wbr></wbr>_URI</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
+    <td>Grantee URI identifying anonymous users in S3 ACL grants. This is the canonical identifier defined by AWS, not a network endpoint, so the scheme must remain exactly as documented.</td>
   </tr><tr class="constant">
     
     <td>Constant</td>
     <td><code><a href="#_CHUNK_SIZE" class="internal-link" title="orionis.storage.drivers.s3._CHUNK_SIZE">_CHUNK<wbr></wbr>_SIZE</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
+    <td>Default chunk size for streaming operations (64 KiB).</td>
   </tr><tr class="constant">
     
     <td>Constant</td>
     <td><code><a href="#_DELETE_BATCH" class="internal-link" title="orionis.storage.drivers.s3._DELETE_BATCH">_DELETE<wbr></wbr>_BATCH</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
+    <td>Maximum number of keys per S3 batch-delete request.</td>
   </tr><tr class="constant">
     
     <td>Constant</td>
     <td><code><a href="#_MISSING_CODES" class="internal-link" title="orionis.storage.drivers.s3._MISSING_CODES">_MISSING<wbr></wbr>_CODES</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
+    <td>Error codes reported by S3 for missing objects.</td>
   </tr><tr class="constant">
     
     <td>Constant</td>
     <td><code><a href="#_SPOOL_THRESHOLD" class="internal-link" title="orionis.storage.drivers.s3._SPOOL_THRESHOLD">_SPOOL<wbr></wbr>_THRESHOLD</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
+    <td>In-memory bytes before spooled buffers spill to disk (8 MiB).</td>
   </tr>
 </table>
           
@@ -3378,7 +3378,7 @@
   <div class="functionHeader">
     
     <span class="py-defname">_ACL_MAP</span>: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#dict" class="intersphinx-link">dict</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>]</code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/storage/drivers/s3.py#L45">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/storage/drivers/s3.py#L51">
       
       (source)
     </a>
@@ -3390,7 +3390,7 @@
   </div>
   <div class="functionBody">
     
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p>Canned ACLs applied per visibility level.</p></div>
     <table class="valueTable"><tr class="fieldStart"><td class="fieldName">Value</td></tr><tr><td><pre class="constant-value"><code>{<wbr></wbr>Visibility.PUBLIC.value: <span class="rst-variable-quote">'</span><span class="rst-variable-string">public-read</span><span class="rst-variable-quote">'</span>, <wbr></wbr>Visibility.PRIVATE.value: <span class="rst-variable-quote">'</span><span class="rst-variable-string">private</span><span class="rst-variable-quote">'</span>}</code></pre></td></tr></table>
   </div>
 </div><div class="baseconstant">
@@ -3405,7 +3405,7 @@
   <div class="functionHeader">
     
     <span class="py-defname">_ALL_USERS_URI</span>: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/storage/drivers/s3.py#L53">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/storage/drivers/s3.py#L60">
       
       (source)
     </a>
@@ -3417,7 +3417,9 @@
   </div>
   <div class="functionBody">
     
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p>Grantee URI identifying anonymous users in S3 ACL grants. This is the canonical
+identifier defined by AWS, not a network endpoint, so the scheme must remain exactly
+as documented.</p></div>
     <table class="valueTable"><tr class="fieldStart"><td class="fieldName">Value</td></tr><tr><td><pre class="constant-value"><code><span class="rst-variable-quote">'</span><span class="rst-variable-string">http://acs.amazonaws.com/groups/global/AllUsers</span><span class="rst-variable-quote">'</span></code></pre></td></tr></table>
   </div>
 </div><div class="baseconstant">
@@ -3432,7 +3434,7 @@
   <div class="functionHeader">
     
     <span class="py-defname">_CHUNK_SIZE</span>: <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/storage/drivers/s3.py#L33">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/storage/drivers/s3.py#L35">
       
       (source)
     </a>
@@ -3444,7 +3446,7 @@
   </div>
   <div class="functionBody">
     
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p>Default chunk size for streaming operations (64 KiB).</p></div>
     <table class="valueTable"><tr class="fieldStart"><td class="fieldName">Value</td></tr><tr><td><pre class="constant-value"><code>64 * 1024</code></pre></td></tr></table>
   </div>
 </div><div class="baseconstant">
@@ -3459,7 +3461,7 @@
   <div class="functionHeader">
     
     <span class="py-defname">_DELETE_BATCH</span>: <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/storage/drivers/s3.py#L39">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/storage/drivers/s3.py#L43">
       
       (source)
     </a>
@@ -3471,7 +3473,7 @@
   </div>
   <div class="functionBody">
     
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p>Maximum number of keys per S3 batch-delete request.</p></div>
     <table class="valueTable"><tr class="fieldStart"><td class="fieldName">Value</td></tr><tr><td><pre class="constant-value"><code>1000</code></pre></td></tr></table>
   </div>
 </div><div class="baseconstant">
@@ -3486,7 +3488,7 @@
   <div class="functionHeader">
     
     <span class="py-defname">_MISSING_CODES</span>: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#frozenset" class="intersphinx-link">frozenset</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>]</code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/storage/drivers/s3.py#L42">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/storage/drivers/s3.py#L47">
       
       (source)
     </a>
@@ -3498,7 +3500,7 @@
   </div>
   <div class="functionBody">
     
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p>Error codes reported by S3 for missing objects.</p></div>
     <table class="valueTable"><tr class="fieldStart"><td class="fieldName">Value</td></tr><tr><td><pre class="constant-value"><code><a href="https://docs.python.org/3/builtins/stdtypes.html#frozenset" class="intersphinx-link">frozenset</a>(<wbr></wbr>set([<wbr></wbr><span class="rst-variable-quote">'</span><span class="rst-variable-string">404</span><span class="rst-variable-quote">'</span>, <wbr></wbr><span class="rst-variable-quote">'</span><span class="rst-variable-string">NoSuchKey</span><span class="rst-variable-quote">'</span>, <wbr></wbr><span class="rst-variable-quote">'</span><span class="rst-variable-string">NotFound</span><span class="rst-variable-quote">'</span>]))</code></pre></td></tr></table>
   </div>
 </div><div class="baseconstant">
@@ -3513,7 +3515,7 @@
   <div class="functionHeader">
     
     <span class="py-defname">_SPOOL_THRESHOLD</span>: <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/storage/drivers/s3.py#L36">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/storage/drivers/s3.py#L39">
       
       (source)
     </a>
@@ -3525,7 +3527,7 @@
   </div>
   <div class="functionBody">
     
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p>In-memory bytes before spooled buffers spill to disk (8 MiB).</p></div>
     <table class="valueTable"><tr class="fieldStart"><td class="fieldName">Value</td></tr><tr><td><pre class="constant-value"><code>8 * 1024 * 1024</code></pre></td></tr></table>
   </div>
 </div>
@@ -3539,7 +3541,7 @@
   <div class="orionis-footer-inner">
     <div class="orionis-footer-copy">
       <p>API documentation for <a href="https://orionis-framework.com/" class="projecthome">Orionis</a>.</p>
-      <p class="orionis-footer-meta">Generated with <a href="https://github.com/twisted/pydoctor/">Pydoctor</a> 25.10.1.<span class="orionis-footer-build"> Built 2026-11-03 09:36:58.</span></p>
+      <p class="orionis-footer-meta">Generated with <a href="https://github.com/twisted/pydoctor/">Pydoctor</a> 25.10.1.<span class="orionis-footer-build"> Built 2026-11-03 13:00:15.</span></p>
     </div>
     <nav class="orionis-footer-links" aria-label="Additional resources">
       <a href="https://docs.orionis-framework.com">Read the guide <span aria-hidden="true">↗</span></a>

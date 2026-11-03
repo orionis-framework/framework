@@ -706,7 +706,7 @@
                     
                 </label>
 
-                <code><a href="orionis.localization.translator.html" class="internal-link" title="orionis.localization.translator">translator</a></code>
+                <code><a href="orionis.localization.translator.module.html" class="internal-link" title="orionis.localization.translator">translator</a></code>
 
                 <div class="expandableContent">
                     <div>
@@ -733,7 +733,7 @@
         
 
         
-            <div class="itemName"><code><a href="orionis.localization.translator.html#_EXACT_PATTERN" class="internal-link" title="orionis.localization.translator._EXACT_PATTERN">_EXACT<wbr></wbr>_PATTERN</a></code>
+            <div class="itemName"><code><a href="orionis.localization.translator.module.html#_EXACT_PATTERN" class="internal-link" title="orionis.localization.translator._EXACT_PATTERN">_EXACT<wbr></wbr>_PATTERN</a></code>
             </div>
         
 
@@ -743,7 +743,7 @@
         
 
         
-            <div class="itemName"><code><a href="orionis.localization.translator.html#_LOCALE_PATTERN" class="internal-link" title="orionis.localization.translator._LOCALE_PATTERN">_LOCALE<wbr></wbr>_PATTERN</a></code>
+            <div class="itemName"><code><a href="orionis.localization.translator.module.html#_LOCALE_PATTERN" class="internal-link" title="orionis.localization.translator._LOCALE_PATTERN">_LOCALE<wbr></wbr>_PATTERN</a></code>
             </div>
         
 
@@ -753,7 +753,7 @@
         
 
         
-            <div class="itemName"><code><a href="orionis.localization.translator.html#_RANGE_PATTERN" class="internal-link" title="orionis.localization.translator._RANGE_PATTERN">_RANGE<wbr></wbr>_PATTERN</a></code>
+            <div class="itemName"><code><a href="orionis.localization.translator.module.html#_RANGE_PATTERN" class="internal-link" title="orionis.localization.translator._RANGE_PATTERN">_RANGE<wbr></wbr>_PATTERN</a></code>
             </div>
         
 
@@ -780,7 +780,7 @@
                     
                 </input>
 
-                <label class="lbl-toggle notExpandable" for="">
+                <label class="lbl-toggle" for="expandableItemId12955">
                     
                     
                 </label>
@@ -803,8 +803,41 @@
         
          
 
+        <div class="childrenKindTitle">Variables</div>
+        <ul>
+    
+    <li class="">
         
-         
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.localization.types.html#LocaleCache" class="internal-link" title="orionis.localization.types.LocaleCache"><wbr></wbr>Locale<wbr></wbr>Cache</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.localization.types.html#MissingKeyHandler" class="internal-link" title="orionis.localization.types.MissingKeyHandler"><wbr></wbr>Missing<wbr></wbr>Key<wbr></wbr>Handler</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.localization.types.html#TranslationMap" class="internal-link" title="orionis.localization.types.TranslationMap"><wbr></wbr>Translation<wbr></wbr>Map</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
 
         
          
@@ -1829,7 +1862,7 @@
         </div>
 
         <div class="extrasDocstring">
-          <p class="class-signature"><code><span class="py-keyword">class</span> <span class="py-defname">TranslationRepository</span>(<a href="orionis.localization.contracts.ITranslationRepository.html" class="internal-link" title="orionis.localization.contracts.ITranslationRepository">ITranslationRepository</a>): <a href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/localization/repository.py#L13" class="sourceLink">(source)</a></code></p><p>Constructor: <code><a href="#__init__" class="internal-link" title="orionis.localization.TranslationRepository.__init__">TranslationRepository(loader, max_locales, negative_ttl)</a></code></p><p><a href="classIndex.html#orionis.localization.TranslationRepository">View In Hierarchy</a></p>
+          <p class="class-signature"><code><span class="py-keyword">class</span> <span class="py-defname">TranslationRepository</span>(<a href="orionis.localization.contracts.ITranslationRepository.html" class="internal-link" title="orionis.localization.contracts.ITranslationRepository">ITranslationRepository</a>): <a href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/localization/repository.py#L15" class="sourceLink">(source)</a></code></p><p>Constructor: <code><a href="#__init__" class="internal-link" title="orionis.localization.TranslationRepository.__init__">TranslationRepository(loader, max_locales, negative_ttl)</a></code></p><p><a href="classIndex.html#orionis.localization.TranslationRepository">View In Hierarchy</a></p>
         </div>
 
         <div class="moduleDocstring">
@@ -1839,13 +1872,14 @@ Missing locales expire so newly created translation files can be found.</p>
 <div class="rst-admonition rst-admonition-notes">
 <p class="rst-admonition-title rst-first">Notes</p>
 <p class="rst-last">A reentrant lock protects cache and loader access across threads.
-<code><a href="#get" class="internal-link" title="orionis.localization.TranslationRepository.get">get</a></code> returns the cached mapping itself, not a copy.</p>
+<code><a href="#get" class="internal-link">orionis.localization.TranslationRepository.get</a></code> returns the cached mapping
+itself, not a copy.</p>
 </div>
 </div>
         </div>
 
         <div id="split-tables">
-          <table class="children sortable" id="id1259">
+          <table class="children sortable" id="id1262">
   
   
   <tr class="method">
@@ -1882,37 +1916,37 @@ Missing locales expire so newly created translation files can be found.</p>
     
     <td>Class Variable</td>
     <td><code><a href="#__slots__" class="internal-link" title="orionis.localization.TranslationRepository.__slots__">__slots__</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
+    <td>Declare the instance attribute slots reserved by this class.</td>
   </tr><tr class="instancevariable">
     
     <td>Instance Variable</td>
     <td><code><a href="#_cache" class="internal-link" title="orionis.localization.TranslationRepository._cache">_cache</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
+    <td>Cache policy or cached state used by this component.</td>
   </tr><tr class="instancevariable">
     
     <td>Instance Variable</td>
     <td><code><a href="#_expires" class="internal-link" title="orionis.localization.TranslationRepository._expires">_expires</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
+    <td>Expiration deadline for the cached or protected value.</td>
   </tr><tr class="instancevariable">
     
     <td>Instance Variable</td>
     <td><code><a href="#_limit" class="internal-link" title="orionis.localization.TranslationRepository._limit">_limit</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
+    <td>Maximum retained locales, including empty results.</td>
   </tr><tr class="instancevariable">
     
     <td>Instance Variable</td>
     <td><code><a href="#_loader" class="internal-link" title="orionis.localization.TranslationRepository._loader">_loader</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
+    <td>Loader used to read translation sources on cache misses.</td>
   </tr><tr class="instancevariable">
     
     <td>Instance Variable</td>
     <td><code><a href="#_lock" class="internal-link" title="orionis.localization.TranslationRepository._lock">_lock</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
+    <td>Lock protecting concurrent access to shared state.</td>
   </tr><tr class="instancevariable">
     
     <td>Instance Variable</td>
     <td><code><a href="#_negative_ttl" class="internal-link" title="orionis.localization.TranslationRepository._negative_ttl">_negative<wbr></wbr>_ttl</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
+    <td>Seconds to retain an empty result before retrying the loader.</td>
   </tr>
 </table>
           
@@ -1934,7 +1968,7 @@ Missing locales expire so newly created translation files can be found.</p>
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">__init__</span><span class="function-signature long-signature">(<span class="rst-sig-param">self: <code>Self</code>, </span><span class="rst-sig-param">loader: <code>ITranslationLoader</code>, </span><span class="rst-sig-symbol">*, </span><span class="rst-sig-param">max_locales: <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code> = 256, </span><span class="rst-sig-param">negative_ttl: <code><a href="https://docs.python.org/3/builtins/functions.html#float" class="intersphinx-link">float</a></code> = 30</span>):</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/localization/repository.py#L28">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/localization/repository.py#L32">
       
       (source)
     </a>
@@ -1946,7 +1980,7 @@ Missing locales expire so newly created translation files can be found.</p>
   </div>
   <div class="docstring functionBody">
     
-    <div><p>Initialize the repository with its translation loader.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">loader:</span><code><a href="orionis.localization.contracts.ITranslationLoader.html" class="internal-link" title="orionis.localization.contracts.ITranslationLoader">ITranslationLoader</a></code></td><td class="fieldArgDesc">Loader used to read translation sources on cache misses.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">max<wbr></wbr>_locales:</span><code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code></td><td class="fieldArgDesc">Maximum retained locales, including empty results.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">negative<wbr></wbr>_ttl:</span><code><a href="https://docs.python.org/3/builtins/functions.html#float" class="intersphinx-link">float</a></code></td><td class="fieldArgDesc">Seconds to retain an empty result before retrying the loader.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc"><span class="undocumented">Undocumented</span></td></tr></table></div>
+    <div><p>Initialize the repository with its translation loader.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">loader:</span><code><a href="orionis.localization.contracts.ITranslationLoader.html" class="internal-link">orionis.localization.contracts.ITranslationLoader</a></code></td><td class="fieldArgDesc">Loader used to read translation sources on cache misses.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">max<wbr></wbr>_locales:</span><code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code></td><td class="fieldArgDesc">Maximum retained locales, including empty results.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">negative<wbr></wbr>_ttl:</span><code><a href="https://docs.python.org/3/builtins/functions.html#float" class="intersphinx-link">float</a></code></td><td class="fieldArgDesc">Seconds to retain an empty result before retrying the loader.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">Initialize the repository with its translation loader.</td></tr></table></div>
   </div>
 </div><div class="basemethod">
   
@@ -1961,7 +1995,7 @@ Missing locales expire so newly created translation files can be found.</p>
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">flush</span><span class="function-signature">(<span class="rst-sig-param">self: <code>Self</code></span>):</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/localization/repository.py#L139">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/localization/repository.py#L150">
       
       (source)
     </a>
@@ -1973,7 +2007,7 @@ Missing locales expire so newly created translation files can be found.</p>
   </div>
   <div class="docstring functionBody">
     <div class="interfaceinfo">overrides <code><a href="orionis.localization.contracts.ITranslationRepository.html#flush" class="internal-link">orionis.localization.contracts.ITranslationRepository.flush</a></code></div>
-    <div><p>Discard every cached translation map.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc"><span class="undocumented">Undocumented</span></td></tr></table></div>
+    <div><p>Discard every cached translation map.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">Discard every cached translation map.</td></tr></table></div>
   </div>
 </div><div class="basemethod">
   
@@ -1988,7 +2022,7 @@ Missing locales expire so newly created translation files can be found.</p>
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">forget</span><span class="function-signature">(<span class="rst-sig-param">self: <code>Self</code>, </span><span class="rst-sig-param">locale: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/localization/repository.py#L121">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/localization/repository.py#L132">
       
       (source)
     </a>
@@ -2015,7 +2049,7 @@ Missing locales expire so newly created translation files can be found.</p>
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">get</span><span class="function-signature">(<span class="rst-sig-param">self: <code>Self</code>, </span><span class="rst-sig-param">locale: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></span>) -&gt; <code>TranslationMap</code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/localization/repository.py#L68">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/localization/repository.py#L79">
       
       (source)
     </a>
@@ -2027,8 +2061,8 @@ Missing locales expire so newly created translation files can be found.</p>
   </div>
   <div class="docstring functionBody">
     <div class="interfaceinfo">overrides <code><a href="orionis.localization.contracts.ITranslationRepository.html#get" class="internal-link">orionis.localization.contracts.ITranslationRepository.get</a></code></div>
-    <div><p>Return the translation map for <em>locale</em>, loading it on demand.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">locale:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Locale code whose translations are requested.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code>TranslationMap</code></td><td class="fieldArgDesc">Cached translation map for the locale. The mapping is the
-cached instance, not a copy.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.localization.TranslationSyntaxException.html" class="internal-link" title="orionis.localization.TranslationSyntaxException">TranslationSyntaxException</a></code></td><td>If a translation file contains invalid JSON.</td></tr></table></div>
+    <div><p>Return the translation map for <em>locale</em>, loading it on demand.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">locale:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Locale code whose translations are requested.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.localization.types.html#TranslationMap" class="internal-link">orionis.localization.types.TranslationMap</a></code></td><td class="fieldArgDesc">Cached translation map for the locale. The mapping is the
+cached instance, not a copy.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.localization.TranslationSyntaxException.html" class="internal-link">orionis.localization.TranslationSyntaxException</a></code></td><td>If a translation file contains invalid JSON.</td></tr></table></div>
   </div>
 </div><div class="basemethod">
   
@@ -2043,7 +2077,7 @@ cached instance, not a copy.</td></tr></table><table class="fieldTable"><tr clas
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">has</span><span class="function-signature">(<span class="rst-sig-param">self: <code>Self</code>, </span><span class="rst-sig-param">locale: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/localization/repository.py#L101">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/localization/repository.py#L112">
       
       (source)
     </a>
@@ -2070,7 +2104,7 @@ cached instance, not a copy.</td></tr></table><table class="fieldTable"><tr clas
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">loadedLocales</span><span class="function-signature">(<span class="rst-sig-param">self: <code>Self</code></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" class="intersphinx-link">tuple</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <wbr></wbr><span class="rst-variable-ellipsis">...</span>]</code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/localization/repository.py#L151">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/localization/repository.py#L163">
       
       (source)
     </a>
@@ -2082,7 +2116,7 @@ cached instance, not a copy.</td></tr></table><table class="fieldTable"><tr clas
   </div>
   <div class="docstring functionBody">
     <div class="interfaceinfo">overrides <code><a href="orionis.localization.contracts.ITranslationRepository.html#loadedLocales" class="internal-link">orionis.localization.contracts.ITranslationRepository.loadedLocales</a></code></div>
-    <div><p>Return the locales currently held in the cache.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" class="intersphinx-link">tuple</a>[<a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, ...]</code></td><td class="fieldArgDesc">Locale codes present in the in-memory cache.</td></tr></table></div>
+    <div><p>Return the locales currently held in the cache.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" class="intersphinx-link">tuple</a>[<a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <tt class="rst-docutils rst-literal">...</tt>]</code></td><td class="fieldArgDesc">Locale codes present in the in-memory cache.</td></tr></table></div>
   </div>
 </div><div class="baseclassvariable">
   
@@ -2096,7 +2130,7 @@ cached instance, not a copy.</td></tr></table><table class="fieldTable"><tr clas
   <div class="functionHeader">
     
     <span class="py-defname">__slots__</span>: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" class="intersphinx-link">tuple</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <wbr></wbr><span class="rst-variable-ellipsis">...</span>]</code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/localization/repository.py#L26">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/localization/repository.py#L29">
       
       (source)
     </a>
@@ -2108,7 +2142,7 @@ cached instance, not a copy.</td></tr></table><table class="fieldTable"><tr clas
   </div>
   <div class="functionBody">
     <div class="interfaceinfo">overrides <code><a href="orionis.localization.contracts.ITranslationRepository.html#__slots__" class="internal-link">orionis.localization.contracts.ITranslationRepository.__slots__</a></code></div>
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p>Declare the instance attribute slots reserved by this class.</p></div>
     
   </div>
 </div><div class="baseinstancevariable">
@@ -2123,7 +2157,7 @@ cached instance, not a copy.</td></tr></table><table class="fieldTable"><tr clas
   <div class="functionHeader">
     
     <span class="py-defname">_cache</span>: <code>OrderedDict[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <wbr></wbr>TranslationMap]</code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/localization/repository.py#L62">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/localization/repository.py#L68">
       
       (source)
     </a>
@@ -2135,7 +2169,7 @@ cached instance, not a copy.</td></tr></table><table class="fieldTable"><tr clas
   </div>
   <div class="functionBody">
     
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p>Cache policy or cached state used by this component.</p></div>
     
   </div>
 </div><div class="baseinstancevariable">
@@ -2150,7 +2184,7 @@ cached instance, not a copy.</td></tr></table><table class="fieldTable"><tr clas
   <div class="functionHeader">
     
     <span class="py-defname">_expires</span>: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#dict" class="intersphinx-link">dict</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <wbr></wbr><a href="https://docs.python.org/3/builtins/functions.html#float" class="intersphinx-link">float</a>]</code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/localization/repository.py#L63">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/localization/repository.py#L70">
       
       (source)
     </a>
@@ -2162,7 +2196,7 @@ cached instance, not a copy.</td></tr></table><table class="fieldTable"><tr clas
   </div>
   <div class="functionBody">
     
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p>Expiration deadline for the cached or protected value.</p></div>
     
   </div>
 </div><div class="baseinstancevariable">
@@ -2177,7 +2211,7 @@ cached instance, not a copy.</td></tr></table><table class="fieldTable"><tr clas
   <div class="functionHeader">
     
     <span class="py-defname">_limit</span> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/localization/repository.py#L64">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/localization/repository.py#L72">
       
       (source)
     </a>
@@ -2189,7 +2223,7 @@ cached instance, not a copy.</td></tr></table><table class="fieldTable"><tr clas
   </div>
   <div class="functionBody">
     
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p>Maximum retained locales, including empty results.</p></div>
     
   </div>
 </div><div class="baseinstancevariable">
@@ -2204,7 +2238,7 @@ cached instance, not a copy.</td></tr></table><table class="fieldTable"><tr clas
   <div class="functionHeader">
     
     <span class="py-defname">_loader</span> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/localization/repository.py#L51">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/localization/repository.py#L56">
       
       (source)
     </a>
@@ -2216,7 +2250,7 @@ cached instance, not a copy.</td></tr></table><table class="fieldTable"><tr clas
   </div>
   <div class="functionBody">
     
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p>Loader used to read translation sources on cache misses.</p></div>
     
   </div>
 </div><div class="baseinstancevariable">
@@ -2231,7 +2265,7 @@ cached instance, not a copy.</td></tr></table><table class="fieldTable"><tr clas
   <div class="functionHeader">
     
     <span class="py-defname">_lock</span> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/localization/repository.py#L66">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/localization/repository.py#L76">
       
       (source)
     </a>
@@ -2243,7 +2277,7 @@ cached instance, not a copy.</td></tr></table><table class="fieldTable"><tr clas
   </div>
   <div class="functionBody">
     
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p>Lock protecting concurrent access to shared state.</p></div>
     
   </div>
 </div><div class="baseinstancevariable">
@@ -2258,7 +2292,7 @@ cached instance, not a copy.</td></tr></table><table class="fieldTable"><tr clas
   <div class="functionHeader">
     
     <span class="py-defname">_negative_ttl</span> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/localization/repository.py#L65">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/localization/repository.py#L74">
       
       (source)
     </a>
@@ -2270,7 +2304,7 @@ cached instance, not a copy.</td></tr></table><table class="fieldTable"><tr clas
   </div>
   <div class="functionBody">
     
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p>Seconds to retain an empty result before retrying the loader.</p></div>
     
   </div>
 </div>
@@ -2284,7 +2318,7 @@ cached instance, not a copy.</td></tr></table><table class="fieldTable"><tr clas
   <div class="orionis-footer-inner">
     <div class="orionis-footer-copy">
       <p>API documentation for <a href="https://orionis-framework.com/" class="projecthome">Orionis</a>.</p>
-      <p class="orionis-footer-meta">Generated with <a href="https://github.com/twisted/pydoctor/">Pydoctor</a> 25.10.1.<span class="orionis-footer-build"> Built 2026-11-03 09:36:58.</span></p>
+      <p class="orionis-footer-meta">Generated with <a href="https://github.com/twisted/pydoctor/">Pydoctor</a> 25.10.1.<span class="orionis-footer-build"> Built 2026-11-03 13:00:15.</span></p>
     </div>
     <nav class="orionis-footer-links" aria-label="Additional resources">
       <a href="https://docs.orionis-framework.com">Read the guide <span aria-hidden="true">↗</span></a>

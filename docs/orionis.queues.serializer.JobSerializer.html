@@ -795,7 +795,7 @@
         </div>
 
         <div class="extrasDocstring">
-          <p class="class-signature"><code><span class="py-keyword">class</span> <span class="py-defname">JobSerializer</span>(<a href="orionis.queues.contracts.serializer.IJobSerializer.html" class="internal-link" title="orionis.queues.contracts.serializer.IJobSerializer">IJobSerializer</a>): <a href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/queues/serializer.py#L243" class="sourceLink">(source)</a></code></p><p>Constructor: <code><a href="#__init__" class="internal-link" title="orionis.queues.serializer.JobSerializer.__init__">JobSerializer()</a></code></p><p><a href="classIndex.html#orionis.queues.serializer.JobSerializer">View In Hierarchy</a></p>
+          <p class="class-signature"><code><span class="py-keyword">class</span> <span class="py-defname">JobSerializer</span>(<a href="orionis.queues.contracts.serializer.IJobSerializer.html" class="internal-link" title="orionis.queues.contracts.serializer.IJobSerializer">IJobSerializer</a>): <a href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/queues/serializer.py#L254" class="sourceLink">(source)</a></code></p><p>Constructor: <code><a href="#__init__" class="internal-link" title="orionis.queues.serializer.JobSerializer.__init__">JobSerializer()</a></code></p><p><a href="classIndex.html#orionis.queues.serializer.JobSerializer">View In Hierarchy</a></p>
         </div>
 
         <div class="moduleDocstring">
@@ -803,7 +803,7 @@
         </div>
 
         <div id="split-tables">
-          <table class="children sortable" id="id1763">
+          <table class="children sortable" id="id1770">
   
   
   <tr class="method">
@@ -850,32 +850,32 @@
     
     <td>Class Variable</td>
     <td><code><a href="#__slots__" class="internal-link" title="orionis.queues.serializer.JobSerializer.__slots__">__slots__</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
+    <td>Declare the instance attribute slots reserved by this class.</td>
   </tr><tr class="instancevariable">
     
     <td>Instance Variable</td>
     <td><code><a href="#_decoder" class="internal-link" title="orionis.queues.serializer.JobSerializer._decoder">_decoder</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
+    <td>Decoder produced by <tt class="rst-docutils rst-literal">msgspec.json.Decoder</tt>.</td>
   </tr><tr class="instancevariable">
     
     <td>Instance Variable</td>
     <td><code><a href="#_encoder" class="internal-link" title="orionis.queues.serializer.JobSerializer._encoder">_encoder</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
+    <td>Encoder produced by <tt class="rst-docutils rst-literal">msgspec.json.Encoder</tt>.</td>
   </tr><tr class="instancevariable">
     
     <td>Instance Variable</td>
     <td><code><a href="#_registry" class="internal-link" title="orionis.queues.serializer.JobSerializer._registry">_registry</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
+    <td>Registered implementations indexed by their public identifiers.</td>
   </tr><tr class="instancevariable">
     
     <td>Instance Variable</td>
     <td><code><a href="#_state_decoder" class="internal-link" title="orionis.queues.serializer.JobSerializer._state_decoder">_state<wbr></wbr>_decoder</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
+    <td>State decoder produced by <tt class="rst-docutils rst-literal">msgspec.msgpack.Decoder</tt>.</td>
   </tr><tr class="instancevariable">
     
     <td>Instance Variable</td>
     <td><code><a href="#_types" class="internal-link" title="orionis.queues.serializer.JobSerializer._types">_types</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
+    <td>Types registered for validation, serialization or schema operations.</td>
   </tr>
 </table>
           
@@ -897,7 +897,7 @@
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">__init__</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>):</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/queues/serializer.py#L248">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/queues/serializer.py#L260">
       
       (source)
     </a>
@@ -924,7 +924,7 @@
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">_checkSize</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">payload: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#bytes" class="intersphinx-link">bytes</a></code></span>):</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/queues/serializer.py#L399">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/queues/serializer.py#L416">
       
       (source)
     </a>
@@ -951,7 +951,7 @@
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">_validateFields</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">metadata: <code><a href="orionis.queues.serializer._JobMetadata.html" class="internal-link" title="orionis.queues.serializer._JobMetadata">_JobMetadata</a></code>, </span><span class="rst-sig-param">values: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#dict" class="intersphinx-link">dict</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <wbr></wbr><a href="https://docs.python.org/3/builtins/functions.html#object" class="intersphinx-link">object</a>]</code></span>):</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/queues/serializer.py#L376">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/queues/serializer.py#L393">
       
       (source)
     </a>
@@ -963,7 +963,7 @@
   </div>
   <div class="docstring functionBody">
     
-    <div><p>Validate annotated fields without accepting arbitrary application types.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">metadata:</span><code><a href="orionis.queues.serializer._JobMetadata.html" class="internal-link" title="orionis.queues.serializer._JobMetadata">_JobMetadata</a></code></td><td class="fieldArgDesc">Trusted persistent field constraints.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">values:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#dict" class="intersphinx-link">dict</a>[<a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <a href="https://docs.python.org/3/builtins/functions.html#object" class="intersphinx-link">object</a>]</code></td><td class="fieldArgDesc">Restored or declared primitive state.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">Validate field types without invoking job constructors.</td></tr></table></div>
+    <div><p>Validate annotated fields without accepting arbitrary application types.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">metadata:</span><code><a href="orionis.queues.serializer._JobMetadata.html" class="internal-link">orionis.queues.serializer._JobMetadata</a></code></td><td class="fieldArgDesc">Trusted persistent field constraints.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">values:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#dict" class="intersphinx-link">dict</a>[<a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <a href="https://docs.python.org/3/builtins/functions.html#object" class="intersphinx-link">object</a>]</code></td><td class="fieldArgDesc">Restored or declared primitive state.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">Validate field types without invoking job constructors.</td></tr></table></div>
   </div>
 </div><div class="basemethod">
   
@@ -978,7 +978,7 @@
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">decode</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">identity: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code>, </span><span class="rst-sig-param">payload: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#bytes" class="intersphinx-link">bytes</a></code></span>) -&gt; <code>BaseJob</code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/queues/serializer.py#L340">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/queues/serializer.py#L357">
       
       (source)
     </a>
@@ -990,7 +990,7 @@
   </div>
   <div class="docstring functionBody">
     <div class="interfaceinfo">overrides <code><a href="orionis.queues.contracts.serializer.IJobSerializer.html#decode" class="internal-link">orionis.queues.contracts.serializer.IJobSerializer.decode</a></code></div>
-    <div><p>Restore primitive fields for a registered identity without running init.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">identity:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Stable trusted identity, never an instruction to import a module.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">payload:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#bytes" class="intersphinx-link">bytes</a></code></td><td class="fieldArgDesc">Untrusted MessagePack state.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.queues.BaseJob.html" class="internal-link" title="orionis.queues.BaseJob">BaseJob</a></code></td><td class="fieldArgDesc">Reconstructed job awaiting scoped DI invocation.</td></tr></table></div>
+    <div><p>Restore primitive fields for a registered identity without running init.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">identity:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Stable trusted identity, never an instruction to import a module.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">payload:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#bytes" class="intersphinx-link">bytes</a></code></td><td class="fieldArgDesc">Untrusted MessagePack state.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.queues.BaseJob.html" class="internal-link">orionis.queues.BaseJob</a></code></td><td class="fieldArgDesc">Reconstructed job awaiting scoped DI invocation.</td></tr></table></div>
   </div>
 </div><div class="basemethod">
   
@@ -1005,7 +1005,7 @@
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">decodeEnvelope</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">payload: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#bytes" class="intersphinx-link">bytes</a></code></span>) -&gt; <code>JobEnvelope</code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/queues/serializer.py#L435">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/queues/serializer.py#L452">
       
       (source)
     </a>
@@ -1017,7 +1017,7 @@
   </div>
   <div class="docstring functionBody">
     <div class="interfaceinfo">overrides <code><a href="orionis.queues.contracts.serializer.IJobSerializer.html#decodeEnvelope" class="internal-link">orionis.queues.contracts.serializer.IJobSerializer.decodeEnvelope</a></code></div>
-    <div><p>Validate untrusted envelope JSON without resolving its job type.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">payload:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#bytes" class="intersphinx-link">bytes</a></code></td><td class="fieldArgDesc">Stored wire data.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.queues.JobEnvelope.html" class="internal-link" title="orionis.queues.JobEnvelope">JobEnvelope</a></code></td><td class="fieldArgDesc">Immutable options ready for registry-based state decoding.</td></tr></table></div>
+    <div><p>Validate untrusted envelope JSON without resolving its job type.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">payload:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#bytes" class="intersphinx-link">bytes</a></code></td><td class="fieldArgDesc">Stored wire data.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.queues.JobEnvelope.html" class="internal-link">orionis.queues.JobEnvelope</a></code></td><td class="fieldArgDesc">Immutable options ready for registry-based state decoding.</td></tr></table></div>
   </div>
 </div><div class="basemethod">
   
@@ -1032,7 +1032,7 @@
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">encode</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">job: <code>BaseJob</code></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" class="intersphinx-link">tuple</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#bytes" class="intersphinx-link">bytes</a>]</code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/queues/serializer.py#L301">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/queues/serializer.py#L318">
       
       (source)
     </a>
@@ -1044,7 +1044,7 @@
   </div>
   <div class="docstring functionBody">
     <div class="interfaceinfo">overrides <code><a href="orionis.queues.contracts.serializer.IJobSerializer.html#encode" class="internal-link">orionis.queues.contracts.serializer.IJobSerializer.encode</a></code></div>
-    <div><p>Serialize declared fields while rejecting service and undeclared state.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">job:</span><code><a href="orionis.queues.BaseJob.html" class="internal-link" title="orionis.queues.BaseJob">BaseJob</a></code></td><td class="fieldArgDesc">Trusted application job instance.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" class="intersphinx-link">tuple</a>[<a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <a href="https://docs.python.org/3/builtins/stdtypes.html#bytes" class="intersphinx-link">bytes</a>]</code></td><td class="fieldArgDesc">Stable identity and primitive MessagePack payload.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.queues.exceptions.QueuePayloadError.html" class="internal-link" title="orionis.queues.exceptions.QueuePayloadError">QueuePayloadError</a></code></td><td>If state is undeclared, unsupported, or exceeds the payload limit.</td></tr></table></div>
+    <div><p>Serialize declared fields while rejecting service and undeclared state.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">job:</span><code><a href="orionis.queues.BaseJob.html" class="internal-link">orionis.queues.BaseJob</a></code></td><td class="fieldArgDesc">Trusted application job instance.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" class="intersphinx-link">tuple</a>[<a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <a href="https://docs.python.org/3/builtins/stdtypes.html#bytes" class="intersphinx-link">bytes</a>]</code></td><td class="fieldArgDesc">Stable identity and primitive MessagePack payload.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.queues.exceptions.QueuePayloadError.html" class="internal-link">orionis.queues.exceptions.QueuePayloadError</a></code></td><td>If state is undeclared, unsupported, or exceeds the payload limit.</td></tr></table></div>
   </div>
 </div><div class="basemethod">
   
@@ -1059,7 +1059,7 @@
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">encodeEnvelope</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">envelope: <code>JobEnvelope</code></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/stdtypes.html#bytes" class="intersphinx-link">bytes</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/queues/serializer.py#L417">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/queues/serializer.py#L434">
       
       (source)
     </a>
@@ -1071,7 +1071,7 @@
   </div>
   <div class="docstring functionBody">
     <div class="interfaceinfo">overrides <code><a href="orionis.queues.contracts.serializer.IJobSerializer.html#encodeEnvelope" class="internal-link">orionis.queues.contracts.serializer.IJobSerializer.encodeEnvelope</a></code></div>
-    <div><p>Encode the immutable envelope as explicit versioned JSON.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">envelope:</span><code><a href="orionis.queues.JobEnvelope.html" class="internal-link" title="orionis.queues.JobEnvelope">JobEnvelope</a></code></td><td class="fieldArgDesc">Validated execution data.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/stdtypes.html#bytes" class="intersphinx-link">bytes</a></code></td><td class="fieldArgDesc">JSON suitable for native binary database or Redis storage.</td></tr></table></div>
+    <div><p>Encode the immutable envelope as explicit versioned JSON.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">envelope:</span><code><a href="orionis.queues.JobEnvelope.html" class="internal-link">orionis.queues.JobEnvelope</a></code></td><td class="fieldArgDesc">Validated execution data.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/stdtypes.html#bytes" class="intersphinx-link">bytes</a></code></td><td class="fieldArgDesc">JSON suitable for native binary database or Redis storage.</td></tr></table></div>
   </div>
 </div><div class="basemethod">
   
@@ -1086,7 +1086,7 @@
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">register</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">job_type: <code><a href="https://docs.python.org/3/builtins/functions.html#type" class="intersphinx-link">type</a>[<wbr></wbr>BaseJob]</code></span>):</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/queues/serializer.py#L263">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/queues/serializer.py#L280">
       
       (source)
     </a>
@@ -1098,7 +1098,7 @@
   </div>
   <div class="docstring functionBody">
     <div class="interfaceinfo">overrides <code><a href="orionis.queues.contracts.serializer.IJobSerializer.html#register" class="internal-link">orionis.queues.contracts.serializer.IJobSerializer.register</a></code></div>
-    <div><p>Register a concrete async job class supplied by trusted application code.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">job<wbr></wbr>_type:</span><code><a href="https://docs.python.org/3/builtins/functions.html#type" class="intersphinx-link">type</a>[<a href="orionis.queues.BaseJob.html" class="internal-link" title="orionis.queues.BaseJob">BaseJob</a>]</code></td><td class="fieldArgDesc">Class imported by application bootstrap or dispatched locally.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">Cache metadata once for the stable identity.</td></tr></table></div>
+    <div><p>Register a concrete async job class supplied by trusted application code.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">job<wbr></wbr>_type:</span><code><a href="https://docs.python.org/3/builtins/functions.html#type" class="intersphinx-link">type</a>[<a href="orionis.queues.BaseJob.html" class="internal-link">orionis.queues.BaseJob</a>]</code></td><td class="fieldArgDesc">Class imported by application bootstrap or dispatched locally.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">Cache metadata once for the stable identity.</td></tr></table></div>
   </div>
 </div><div class="baseclassvariable">
   
@@ -1112,7 +1112,7 @@
   <div class="functionHeader">
     
     <span class="py-defname">__slots__</span>: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" class="intersphinx-link">tuple</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <wbr></wbr><span class="rst-variable-ellipsis">...</span>]</code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/queues/serializer.py#L246">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/queues/serializer.py#L257">
       
       (source)
     </a>
@@ -1124,7 +1124,7 @@
   </div>
   <div class="functionBody">
     <div class="interfaceinfo">overrides <code><a href="orionis.queues.contracts.serializer.IJobSerializer.html#__slots__" class="internal-link">orionis.queues.contracts.serializer.IJobSerializer.__slots__</a></code></div>
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p>Declare the instance attribute slots reserved by this class.</p></div>
     
   </div>
 </div><div class="baseinstancevariable">
@@ -1139,7 +1139,7 @@
   <div class="functionHeader">
     
     <span class="py-defname">_decoder</span> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/queues/serializer.py#L260">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/queues/serializer.py#L275">
       
       (source)
     </a>
@@ -1151,7 +1151,7 @@
   </div>
   <div class="functionBody">
     
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p>Decoder produced by <tt class="rst-docutils rst-literal">msgspec.json.Decoder</tt>.</p></div>
     
   </div>
 </div><div class="baseinstancevariable">
@@ -1166,7 +1166,7 @@
   <div class="functionHeader">
     
     <span class="py-defname">_encoder</span> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/queues/serializer.py#L259">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/queues/serializer.py#L273">
       
       (source)
     </a>
@@ -1178,7 +1178,7 @@
   </div>
   <div class="functionBody">
     
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p>Encoder produced by <tt class="rst-docutils rst-literal">msgspec.json.Encoder</tt>.</p></div>
     
   </div>
 </div><div class="baseinstancevariable">
@@ -1193,7 +1193,7 @@
   <div class="functionHeader">
     
     <span class="py-defname">_registry</span>: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#dict" class="intersphinx-link">dict</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <wbr></wbr><a href="orionis.queues.serializer._JobMetadata.html" class="internal-link" title="orionis.queues.serializer._JobMetadata">_JobMetadata</a>]</code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/queues/serializer.py#L257">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/queues/serializer.py#L269">
       
       (source)
     </a>
@@ -1205,7 +1205,7 @@
   </div>
   <div class="functionBody">
     
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p>Registered implementations indexed by their public identifiers.</p></div>
     
   </div>
 </div><div class="baseinstancevariable">
@@ -1220,7 +1220,7 @@
   <div class="functionHeader">
     
     <span class="py-defname">_state_decoder</span> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/queues/serializer.py#L261">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/queues/serializer.py#L277">
       
       (source)
     </a>
@@ -1232,7 +1232,7 @@
   </div>
   <div class="functionBody">
     
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p>State decoder produced by <tt class="rst-docutils rst-literal">msgspec.msgpack.Decoder</tt>.</p></div>
     
   </div>
 </div><div class="baseinstancevariable">
@@ -1247,7 +1247,7 @@
   <div class="functionHeader">
     
     <span class="py-defname">_types</span>: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#dict" class="intersphinx-link">dict</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/functions.html#type" class="intersphinx-link">type</a>[<wbr></wbr>BaseJob], <wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" class="intersphinx-link">tuple</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <wbr></wbr><a href="orionis.queues.serializer._JobMetadata.html" class="internal-link" title="orionis.queues.serializer._JobMetadata">_JobMetadata</a>]]</code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/queues/serializer.py#L258">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/queues/serializer.py#L271">
       
       (source)
     </a>
@@ -1259,7 +1259,7 @@
   </div>
   <div class="functionBody">
     
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p>Types registered for validation, serialization or schema operations.</p></div>
     
   </div>
 </div>
@@ -1273,7 +1273,7 @@
   <div class="orionis-footer-inner">
     <div class="orionis-footer-copy">
       <p>API documentation for <a href="https://orionis-framework.com/" class="projecthome">Orionis</a>.</p>
-      <p class="orionis-footer-meta">Generated with <a href="https://github.com/twisted/pydoctor/">Pydoctor</a> 25.10.1.<span class="orionis-footer-build"> Built 2026-11-03 09:36:58.</span></p>
+      <p class="orionis-footer-meta">Generated with <a href="https://github.com/twisted/pydoctor/">Pydoctor</a> 25.10.1.<span class="orionis-footer-build"> Built 2026-11-03 13:00:15.</span></p>
     </div>
     <nav class="orionis-footer-links" aria-label="Additional resources">
       <a href="https://docs.orionis-framework.com">Read the guide <span aria-hidden="true">↗</span></a>

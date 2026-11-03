@@ -410,15 +410,15 @@
         </div>
 
         <div class="extrasDocstring">
-          <p class="class-signature"><code><span class="py-keyword">class</span> <span class="py-defname">IKernelHTTP</span>(<a href="https://docs.python.org/3/library/abc.html#abc.ABC" class="intersphinx-link">ABC</a>): <a href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/http/contracts/kernel.py#L8" class="sourceLink">(source)</a></code></p><p>Known subclasses: <code><a href="orionis.http.kernel.KernelHTTP.html" class="internal-link">orionis.http.kernel.KernelHTTP</a></code></p><p><a href="classIndex.html#orionis.http.contracts.kernel.IKernelHTTP">View In Hierarchy</a></p>
+          <p class="class-signature"><code><span class="py-keyword">class</span> <span class="py-defname">IKernelHTTP</span>(<a href="https://docs.python.org/3/library/abc.html#abc.ABC" class="intersphinx-link">ABC</a>): <a href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/http/contracts/kernel.py#L10" class="sourceLink">(source)</a></code></p><p>Known subclasses: <code><a href="orionis.http.kernel.KernelHTTP.html" class="internal-link">orionis.http.kernel.KernelHTTP</a></code></p><p><a href="classIndex.html#orionis.http.contracts.kernel.IKernelHTTP">View In Hierarchy</a></p>
         </div>
 
         <div class="moduleDocstring">
-          <div><p class="undocumented">Undocumented</p></div>
+          <div><p>Define the contract for kernel http implementations.</p></div>
         </div>
 
         <div id="split-tables">
-          <table class="children sortable" id="id996">
+          <table class="children sortable" id="id997">
   
   
   <tr class="method">
@@ -445,7 +445,7 @@
     
     <td>Class Variable</td>
     <td><code><a href="#__slots__" class="internal-link" title="orionis.http.contracts.kernel.IKernelHTTP.__slots__">__slots__</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
+    <td>Declare that this class introduces no additional instance slots.</td>
   </tr>
 </table>
           
@@ -467,7 +467,7 @@
     
     <div><span class="decorator">@<a href="https://docs.python.org/3/library/abc.html#abc.abstractmethod" class="intersphinx-link">abstractmethod</a><br /></span></div>
     <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">boot</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>):</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/http/contracts/kernel.py#L23">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/http/contracts/kernel.py#L27">
       
       (source)
     </a>
@@ -482,7 +482,7 @@
     <div><p>Boot the HTTP kernel by initializing core components.</p>
 <p>Resolve routes, initialize middleware stack, configure response
 adapters, and set up request printer for each protocol.</p>
-<table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc"><span class="undocumented">Undocumented</span></td></tr></table></div>
+<table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">Boot the HTTP kernel by initializing core components.</td></tr></table></div>
   </div>
 </div><div class="basemethod">
   
@@ -497,7 +497,7 @@ adapters, and set up request printer for each protocol.</p>
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">disconnectPaths</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/stdtypes.html#frozenset" class="intersphinx-link">frozenset</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>]</code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/http/contracts/kernel.py#L12">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/http/contracts/kernel.py#L16">
       
       (source)
     </a>
@@ -524,7 +524,7 @@ adapters, and set up request printer for each protocol.</p>
     
     <div><span class="decorator">@<a href="https://docs.python.org/3/library/abc.html#abc.abstractmethod" class="intersphinx-link">abstractmethod</a><br /></span></div>
     <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">handleASGI</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">scope: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#dict" class="intersphinx-link">dict</a></code>, </span><span class="rst-sig-param">receive: <code><a href="https://docs.python.org/3/builtins/functions.html#object" class="intersphinx-link">object</a></code>, </span><span class="rst-sig-param">send: <code><a href="https://docs.python.org/3/builtins/functions.html#object" class="intersphinx-link">object</a></code></span>):</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/http/contracts/kernel.py#L62">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/http/contracts/kernel.py#L67">
       
       (source)
     </a>
@@ -540,7 +540,7 @@ adapters, and set up request printer for each protocol.</p>
 <p>Open a per-request scope, run global middleware, resolve the
 route, build the request object, invoke the handler, and send
 the response.</p>
-<table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">scope:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#dict" class="intersphinx-link">dict</a></code></td><td class="fieldArgDesc">ASGI connection scope dict with request metadata.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">receive:</span><code><a href="https://docs.python.org/3/builtins/functions.html#object" class="intersphinx-link">object</a></code></td><td class="fieldArgDesc">ASGI receive callable for reading request body and events.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">send:</span><code><a href="https://docs.python.org/3/builtins/functions.html#object" class="intersphinx-link">object</a></code></td><td class="fieldArgDesc">ASGI send callable for sending response messages.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc"><span class="undocumented">Undocumented</span></td></tr></table></div>
+<table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">scope:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#dict" class="intersphinx-link">dict</a></code></td><td class="fieldArgDesc">ASGI connection scope dict with request metadata.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">receive:</span><code><a href="https://docs.python.org/3/builtins/functions.html#object" class="intersphinx-link">object</a></code></td><td class="fieldArgDesc">ASGI receive callable for reading request body and events.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">send:</span><code><a href="https://docs.python.org/3/builtins/functions.html#object" class="intersphinx-link">object</a></code></td><td class="fieldArgDesc">ASGI send callable for sending response messages.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">Handle an incoming ASGI HTTP request end-to-end.</td></tr></table></div>
   </div>
 </div><div class="basemethod">
   
@@ -555,7 +555,7 @@ the response.</p>
     
     <div><span class="decorator">@<a href="https://docs.python.org/3/library/abc.html#abc.abstractmethod" class="intersphinx-link">abstractmethod</a><br /></span></div>
     <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">handleRSGI</span><span class="function-signature long-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">scope: <code>Scope</code>, </span><span class="rst-sig-param">protocol: <code>HTTPProtocol | WebsocketProtocol</code></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/functions.html#object" class="intersphinx-link">object</a> | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/http/contracts/kernel.py#L36">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/http/contracts/kernel.py#L41">
       
       (source)
     </a>
@@ -571,7 +571,7 @@ the response.</p>
 <p>Open a per-request scope, run global middleware, resolve the
 route, build the request object, invoke the handler, and send
 the response.</p>
-<table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">scope:</span><code>Scope</code></td><td class="fieldArgDesc">Granian RSGI scope object with connection metadata.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">protocol:</span><code>HTTPProtocol</code></td><td class="fieldArgDesc">RSGI HTTP protocol object used to send the response.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code>object | None</code></td><td class="fieldArgDesc">The result of sending the RSGI response, or None on error.</td></tr></table></div>
+<table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">scope:</span><code><tt class="rst-docutils rst-literal">granian.rsgi.Scope</tt></code></td><td class="fieldArgDesc">Granian RSGI scope object with connection metadata.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">protocol:</span><code><tt class="rst-docutils rst-literal">granian.rsgi.HTTPProtocol</tt></code></td><td class="fieldArgDesc">RSGI HTTP protocol object used to send the response.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code>object | None</code></td><td class="fieldArgDesc">The result of sending the RSGI response, or None on error.</td></tr></table></div>
   </div>
 </div><div class="baseclassvariable">
   
@@ -585,7 +585,7 @@ the response.</p>
   <div class="functionHeader">
     
     <span class="py-defname">__slots__</span>: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" class="intersphinx-link">tuple</a></code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/http/contracts/kernel.py#L10">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/http/contracts/kernel.py#L13">
       
       (source)
     </a>
@@ -597,7 +597,7 @@ the response.</p>
   </div>
   <div class="functionBody">
     <div class="interfaceinfo">overridden in <code><a href="orionis.http.kernel.KernelHTTP.html" class="internal-link">orionis.http.kernel.KernelHTTP</a></code></div>
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p>Declare that this class introduces no additional instance slots.</p></div>
     
   </div>
 </div>
@@ -611,7 +611,7 @@ the response.</p>
   <div class="orionis-footer-inner">
     <div class="orionis-footer-copy">
       <p>API documentation for <a href="https://orionis-framework.com/" class="projecthome">Orionis</a>.</p>
-      <p class="orionis-footer-meta">Generated with <a href="https://github.com/twisted/pydoctor/">Pydoctor</a> 25.10.1.<span class="orionis-footer-build"> Built 2026-11-03 09:36:58.</span></p>
+      <p class="orionis-footer-meta">Generated with <a href="https://github.com/twisted/pydoctor/">Pydoctor</a> 25.10.1.<span class="orionis-footer-build"> Built 2026-11-03 13:00:15.</span></p>
     </div>
     <nav class="orionis-footer-links" aria-label="Additional resources">
       <a href="https://docs.orionis-framework.com">Read the guide <span aria-hidden="true">↗</span></a>

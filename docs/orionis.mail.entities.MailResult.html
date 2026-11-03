@@ -291,7 +291,7 @@
                     
                 </label>
 
-                <code><a href="orionis.mail.entities.address.html" class="internal-link" title="orionis.mail.entities.address">address</a></code>
+                <code><a href="orionis.mail.entities.address.module.html" class="internal-link" title="orionis.mail.entities.address">address</a></code>
 
                 <div class="expandableContent">
                     <div>
@@ -312,7 +312,7 @@
         
 
         
-            <div class="itemName"><code><a href="orionis.mail.entities.address.html#addresses" class="internal-link" title="orionis.mail.entities.address.addresses">addresses</a></code>
+            <div class="itemName"><code><a href="orionis.mail.entities.address.module.html#addresses" class="internal-link" title="orionis.mail.entities.address.addresses">addresses</a></code>
             </div>
         
 
@@ -322,7 +322,7 @@
         
 
         
-            <div class="itemName"><code><a href="orionis.mail.entities.address.html#one_address" class="internal-link" title="orionis.mail.entities.address.one_address">one<wbr></wbr>_address</a></code>
+            <div class="itemName"><code><a href="orionis.mail.entities.address.module.html#one_address" class="internal-link" title="orionis.mail.entities.address.one_address">one<wbr></wbr>_address</a></code>
             </div>
         
 
@@ -341,7 +341,7 @@
         
 
         
-            <div class="itemName"><code><a href="orionis.mail.entities.address.html#_HEADERS" class="internal-link" title="orionis.mail.entities.address._HEADERS">_HEADERS</a></code>
+            <div class="itemName"><code><a href="orionis.mail.entities.address.module.html#_HEADERS" class="internal-link" title="orionis.mail.entities.address._HEADERS">_HEADERS</a></code>
             </div>
         
 
@@ -373,7 +373,7 @@
                     
                 </label>
 
-                <code><a href="orionis.mail.entities.attachment.html" class="internal-link" title="orionis.mail.entities.attachment">attachment</a></code>
+                <code><a href="orionis.mail.entities.attachment.module.html" class="internal-link" title="orionis.mail.entities.attachment">attachment</a></code>
 
                 <div class="expandableContent">
                     <div>
@@ -419,7 +419,7 @@
                     
                 </label>
 
-                <code><a href="orionis.mail.entities.content.html" class="internal-link" title="orionis.mail.entities.content">content</a></code>
+                <code><a href="orionis.mail.entities.content.module.html" class="internal-link" title="orionis.mail.entities.content">content</a></code>
 
                 <div class="expandableContent">
                     <div>
@@ -465,7 +465,7 @@
                     
                 </label>
 
-                <code><a href="orionis.mail.entities.envelope.html" class="internal-link" title="orionis.mail.entities.envelope">envelope</a></code>
+                <code><a href="orionis.mail.entities.envelope.module.html" class="internal-link" title="orionis.mail.entities.envelope">envelope</a></code>
 
                 <div class="expandableContent">
                     <div>
@@ -1860,7 +1860,7 @@
         </div>
 
         <div class="extrasDocstring">
-          <p class="class-signature"><code><span class="py-keyword">class</span> <span class="py-defname">MailResult</span>: <a href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/mail/entities/result.py#L11" class="sourceLink">(source)</a></code></p><p><a href="classIndex.html#orionis.mail.entities.MailResult">View In Hierarchy</a></p>
+          <p class="class-signature"><code><span class="py-keyword">class</span> <span class="py-defname">MailResult</span>: <a href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/mail/entities/result.py#L13" class="sourceLink">(source)</a></code></p><p><a href="classIndex.html#orionis.mail.entities.MailResult">View In Hierarchy</a></p>
         </div>
 
         <div class="moduleDocstring">
@@ -1868,11 +1868,11 @@
 <p>All recipient collections are copied. Rejection reasons are bounded,
 single-line text; transports must redact credentials before constructing
 the result. Stored messages have no SMTP acceptance or rejection entries.</p>
-<table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">message<wbr></wbr>_id</span></td><td class="fieldArgDesc">Message-ID of the transmitted or stored message.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">mailer</span></td><td class="fieldArgDesc">Selected configuration name.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">driver</span></td><td class="fieldArgDesc">Registered transport implementation name.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">status</span></td><td class="fieldArgDesc">Confirmed outcome of the operation.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">recipients</span></td><td class="fieldArgDesc">Intended transport recipients.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">accepted<wbr></wbr>_recipients</span></td><td class="fieldArgDesc">Recipients confirmed by an SMTP transaction.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">rejected<wbr></wbr>_recipients</span></td><td class="fieldArgDesc">Rejected recipients mapped to their SMTP code and sanitized reason.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">file<wbr></wbr>_path</span></td><td class="fieldArgDesc">Published file for stored messages, or None for SMTP.</td></tr></table></div>
+</div>
         </div>
 
         <div id="split-tables">
-          <table class="children sortable" id="id1307">
+          <table class="children sortable" id="id1310">
   
   
   <tr class="method">
@@ -1880,46 +1880,46 @@ the result. Stored messages have no SMTP acceptance or rejection entries.</p>
     <td>Method</td>
     <td><code><a href="#__post_init__" class="internal-link" title="orionis.mail.entities.MailResult.__post_init__">__post<wbr></wbr>_init__</a></code></td>
     <td>Detach recipient collections and sanitize SMTP rejection reasons.</td>
-  </tr><tr class="classvariable">
+  </tr><tr class="instancevariable">
     
-    <td>Class Variable</td>
+    <td>Instance Variable</td>
     <td><code><a href="#accepted_recipients" class="internal-link" title="orionis.mail.entities.MailResult.accepted_recipients">accepted<wbr></wbr>_recipients</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
-  </tr><tr class="classvariable">
+    <td>Recipients confirmed by an SMTP transaction.</td>
+  </tr><tr class="instancevariable">
     
-    <td>Class Variable</td>
+    <td>Instance Variable</td>
     <td><code><a href="#driver" class="internal-link" title="orionis.mail.entities.MailResult.driver">driver</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
-  </tr><tr class="classvariable">
+    <td>Registered transport implementation name.</td>
+  </tr><tr class="instancevariable">
     
-    <td>Class Variable</td>
+    <td>Instance Variable</td>
     <td><code><a href="#file_path" class="internal-link" title="orionis.mail.entities.MailResult.file_path">file<wbr></wbr>_path</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
-  </tr><tr class="classvariable">
+    <td>Published file for stored messages, or None for SMTP.</td>
+  </tr><tr class="instancevariable">
     
-    <td>Class Variable</td>
+    <td>Instance Variable</td>
     <td><code><a href="#mailer" class="internal-link" title="orionis.mail.entities.MailResult.mailer">mailer</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
-  </tr><tr class="classvariable">
+    <td>Selected configuration name.</td>
+  </tr><tr class="instancevariable">
     
-    <td>Class Variable</td>
+    <td>Instance Variable</td>
     <td><code><a href="#message_id" class="internal-link" title="orionis.mail.entities.MailResult.message_id">message<wbr></wbr>_id</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
-  </tr><tr class="classvariable">
+    <td>Message-ID of the transmitted or stored message.</td>
+  </tr><tr class="instancevariable">
     
-    <td>Class Variable</td>
+    <td>Instance Variable</td>
     <td><code><a href="#recipients" class="internal-link" title="orionis.mail.entities.MailResult.recipients">recipients</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
-  </tr><tr class="classvariable">
+    <td>Intended transport recipients.</td>
+  </tr><tr class="instancevariable">
     
-    <td>Class Variable</td>
+    <td>Instance Variable</td>
     <td><code><a href="#rejected_recipients" class="internal-link" title="orionis.mail.entities.MailResult.rejected_recipients">rejected<wbr></wbr>_recipients</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
-  </tr><tr class="classvariable">
+    <td>Rejected recipients mapped to their SMTP code and sanitized reason.</td>
+  </tr><tr class="instancevariable">
     
-    <td>Class Variable</td>
+    <td>Instance Variable</td>
     <td><code><a href="#status" class="internal-link" title="orionis.mail.entities.MailResult.status">status</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
+    <td>Confirmed outcome of the operation.</td>
   </tr>
 </table>
           
@@ -1941,7 +1941,7 @@ the result. Stored messages have no SMTP acceptance or rejection entries.</p>
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">__post_init__</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>):</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/mail/entities/result.py#L49">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/mail/entities/result.py#L51">
       
       (source)
     </a>
@@ -1955,7 +1955,7 @@ the result. Stored messages have no SMTP acceptance or rejection entries.</p>
     
     <div><p>Detach recipient collections and sanitize SMTP rejection reasons.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">Store immutable snapshots owned by this result.</td></tr></table></div>
   </div>
-</div><div class="baseclassvariable">
+</div><div class="baseinstancevariable">
   
   
   <a name="orionis.mail.entities.MailResult.accepted_recipients">
@@ -1966,8 +1966,8 @@ the result. Stored messages have no SMTP acceptance or rejection entries.</p>
   </a>
   <div class="functionHeader">
     
-    <span class="py-defname">accepted_recipients</span>: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" class="intersphinx-link">tuple</a>[<a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, ...]</code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/mail/entities/result.py#L45">
+    <span class="py-defname">accepted_recipients</span>: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" class="intersphinx-link">tuple</a>[<a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <tt class="rst-docutils rst-literal">...</tt>]</code> =
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/mail/entities/result.py#L47">
       
       (source)
     </a>
@@ -1979,10 +1979,10 @@ the result. Stored messages have no SMTP acceptance or rejection entries.</p>
   </div>
   <div class="functionBody">
     
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p>Recipients confirmed by an SMTP transaction.</p></div>
     
   </div>
-</div><div class="baseclassvariable">
+</div><div class="baseinstancevariable">
   
   
   <a name="orionis.mail.entities.MailResult.driver">
@@ -1994,7 +1994,7 @@ the result. Stored messages have no SMTP acceptance or rejection entries.</p>
   <div class="functionHeader">
     
     <span class="py-defname">driver</span>: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/mail/entities/result.py#L42">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/mail/entities/result.py#L44">
       
       (source)
     </a>
@@ -2006,10 +2006,10 @@ the result. Stored messages have no SMTP acceptance or rejection entries.</p>
   </div>
   <div class="functionBody">
     
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p>Registered transport implementation name.</p></div>
     
   </div>
-</div><div class="baseclassvariable">
+</div><div class="baseinstancevariable">
   
   
   <a name="orionis.mail.entities.MailResult.file_path">
@@ -2020,8 +2020,8 @@ the result. Stored messages have no SMTP acceptance or rejection entries.</p>
   </a>
   <div class="functionHeader">
     
-    <span class="py-defname">file_path</span>: <code>Path | None</code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/mail/entities/result.py#L47">
+    <span class="py-defname">file_path</span>: <code>pathlib.Path | None</code> =
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/mail/entities/result.py#L49">
       
       (source)
     </a>
@@ -2033,10 +2033,10 @@ the result. Stored messages have no SMTP acceptance or rejection entries.</p>
   </div>
   <div class="functionBody">
     
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p>Published file for stored messages, or None for SMTP.</p></div>
     
   </div>
-</div><div class="baseclassvariable">
+</div><div class="baseinstancevariable">
   
   
   <a name="orionis.mail.entities.MailResult.mailer">
@@ -2048,7 +2048,7 @@ the result. Stored messages have no SMTP acceptance or rejection entries.</p>
   <div class="functionHeader">
     
     <span class="py-defname">mailer</span>: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/mail/entities/result.py#L41">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/mail/entities/result.py#L43">
       
       (source)
     </a>
@@ -2060,10 +2060,10 @@ the result. Stored messages have no SMTP acceptance or rejection entries.</p>
   </div>
   <div class="functionBody">
     
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p>Selected configuration name.</p></div>
     
   </div>
-</div><div class="baseclassvariable">
+</div><div class="baseinstancevariable">
   
   
   <a name="orionis.mail.entities.MailResult.message_id">
@@ -2075,7 +2075,7 @@ the result. Stored messages have no SMTP acceptance or rejection entries.</p>
   <div class="functionHeader">
     
     <span class="py-defname">message_id</span>: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/mail/entities/result.py#L40">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/mail/entities/result.py#L42">
       
       (source)
     </a>
@@ -2087,10 +2087,10 @@ the result. Stored messages have no SMTP acceptance or rejection entries.</p>
   </div>
   <div class="functionBody">
     
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p>Message-ID of the transmitted or stored message.</p></div>
     
   </div>
-</div><div class="baseclassvariable">
+</div><div class="baseinstancevariable">
   
   
   <a name="orionis.mail.entities.MailResult.recipients">
@@ -2101,8 +2101,8 @@ the result. Stored messages have no SMTP acceptance or rejection entries.</p>
   </a>
   <div class="functionHeader">
     
-    <span class="py-defname">recipients</span>: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" class="intersphinx-link">tuple</a>[<a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, ...]</code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/mail/entities/result.py#L44">
+    <span class="py-defname">recipients</span>: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" class="intersphinx-link">tuple</a>[<a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <tt class="rst-docutils rst-literal">...</tt>]</code> =
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/mail/entities/result.py#L46">
       
       (source)
     </a>
@@ -2114,10 +2114,10 @@ the result. Stored messages have no SMTP acceptance or rejection entries.</p>
   </div>
   <div class="functionBody">
     
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p>Intended transport recipients.</p></div>
     
   </div>
-</div><div class="baseclassvariable">
+</div><div class="baseinstancevariable">
   
   
   <a name="orionis.mail.entities.MailResult.rejected_recipients">
@@ -2128,8 +2128,8 @@ the result. Stored messages have no SMTP acceptance or rejection entries.</p>
   </a>
   <div class="functionHeader">
     
-    <span class="py-defname">rejected_recipients</span>: <code>Mapping[<a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" class="intersphinx-link">tuple</a>[<a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a>, <a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>]]</code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/mail/entities/result.py#L46">
+    <span class="py-defname">rejected_recipients</span>: <code><a href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Mapping" class="intersphinx-link">collections.abc.Mapping</a>[<a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" class="intersphinx-link">tuple</a>[<a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a>, <a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>]]</code> =
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/mail/entities/result.py#L48">
       
       (source)
     </a>
@@ -2141,10 +2141,10 @@ the result. Stored messages have no SMTP acceptance or rejection entries.</p>
   </div>
   <div class="functionBody">
     
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p>Rejected recipients mapped to their SMTP code and sanitized reason.</p></div>
     
   </div>
-</div><div class="baseclassvariable">
+</div><div class="baseinstancevariable">
   
   
   <a name="orionis.mail.entities.MailResult.status">
@@ -2155,8 +2155,8 @@ the result. Stored messages have no SMTP acceptance or rejection entries.</p>
   </a>
   <div class="functionHeader">
     
-    <span class="py-defname">status</span>: <code><a href="orionis.mail.enums.MailStatus.html" class="internal-link" title="orionis.mail.enums.MailStatus">MailStatus</a></code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/mail/entities/result.py#L43">
+    <span class="py-defname">status</span>: <code><a href="orionis.mail.enums.MailStatus.html" class="internal-link">orionis.mail.enums.MailStatus</a></code> =
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/mail/entities/result.py#L45">
       
       (source)
     </a>
@@ -2168,7 +2168,7 @@ the result. Stored messages have no SMTP acceptance or rejection entries.</p>
   </div>
   <div class="functionBody">
     
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p>Confirmed outcome of the operation.</p></div>
     
   </div>
 </div>
@@ -2182,7 +2182,7 @@ the result. Stored messages have no SMTP acceptance or rejection entries.</p>
   <div class="orionis-footer-inner">
     <div class="orionis-footer-copy">
       <p>API documentation for <a href="https://orionis-framework.com/" class="projecthome">Orionis</a>.</p>
-      <p class="orionis-footer-meta">Generated with <a href="https://github.com/twisted/pydoctor/">Pydoctor</a> 25.10.1.<span class="orionis-footer-build"> Built 2026-11-03 09:36:58.</span></p>
+      <p class="orionis-footer-meta">Generated with <a href="https://github.com/twisted/pydoctor/">Pydoctor</a> 25.10.1.<span class="orionis-footer-build"> Built 2026-11-03 13:00:15.</span></p>
     </div>
     <nav class="orionis-footer-links" aria-label="Additional resources">
       <a href="https://docs.orionis-framework.com">Read the guide <span aria-hidden="true">↗</span></a>

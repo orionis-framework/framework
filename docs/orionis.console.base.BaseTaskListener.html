@@ -964,11 +964,11 @@
         </div>
 
         <div class="extrasDocstring">
-          <p class="class-signature"><code><span class="py-keyword">class</span> <span class="py-defname">BaseTaskListener</span>(Console, <a href="orionis.console.base.contracts.listener.IBaseTaskListener.html" class="internal-link" title="orionis.console.base.contracts.listener.IBaseTaskListener">IBaseTaskListener</a>): <a href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/console/base/listener.py#L8" class="sourceLink">(source)</a></code></p><p><a href="classIndex.html#orionis.console.base.BaseTaskListener">View In Hierarchy</a></p>
+          <p class="class-signature"><code><span class="py-keyword">class</span> <span class="py-defname">BaseTaskListener</span>(Console, <a href="orionis.console.base.contracts.listener.IBaseTaskListener.html" class="internal-link" title="orionis.console.base.contracts.listener.IBaseTaskListener">IBaseTaskListener</a>): <a href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/console/base/listener.py#L10" class="sourceLink">(source)</a></code></p><p><a href="classIndex.html#orionis.console.base.BaseTaskListener">View In Hierarchy</a></p>
         </div>
 
         <div class="moduleDocstring">
-          <div><p class="undocumented">Undocumented</p></div>
+          <div><p>Provide lifecycle hooks for scheduled task events.</p></div>
         </div>
 
         <div id="split-tables">
@@ -1031,7 +1031,7 @@
     
     
     <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">onTaskAdded</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">event: <code>TaskEvent</code></span>):</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/console/base/listener.py#L10">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/console/base/listener.py#L13">
       
       (source)
     </a>
@@ -1043,7 +1043,7 @@
   </div>
   <div class="docstring functionBody">
     <div class="interfaceinfo">overrides <code><a href="orionis.console.base.contracts.listener.IBaseTaskListener.html#onTaskAdded" class="internal-link">orionis.console.base.contracts.listener.IBaseTaskListener.onTaskAdded</a></code></div>
-    <div><p>Handle the event when a task is added.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">event:</span><code>TaskEvent</code></td><td class="fieldArgDesc">The event object containing information about the added task.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">This method does not return a value.</td></tr></table></div>
+    <div><p>Handle the event when a task is added.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">event:</span><code><a href="orionis.console.entities.TaskEvent.html" class="internal-link">orionis.console.entities.TaskEvent</a></code></td><td class="fieldArgDesc">The event object containing information about the added task.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">This method does not return a value.</td></tr></table></div>
   </div>
 </div><div class="basemethod">
   
@@ -1058,7 +1058,7 @@
     
     
     <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">onTaskError</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">event: <code>TaskEvent</code></span>):</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/console/base/listener.py#L55">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/console/base/listener.py#L58">
       
       (source)
     </a>
@@ -1070,7 +1070,7 @@
   </div>
   <div class="docstring functionBody">
     <div class="interfaceinfo">overrides <code><a href="orionis.console.base.contracts.listener.IBaseTaskListener.html#onTaskError" class="internal-link">orionis.console.base.contracts.listener.IBaseTaskListener.onTaskError</a></code></div>
-    <div><p>Handle the event when a task encounters an error.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">event:</span><code>TaskEvent</code></td><td class="fieldArgDesc">The event object containing information about the task error.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">This method does not return a value.</td></tr></table></div>
+    <div><p>Handle the event when a task encounters an error.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">event:</span><code><a href="orionis.console.entities.TaskEvent.html" class="internal-link">orionis.console.entities.TaskEvent</a></code></td><td class="fieldArgDesc">The event object containing information about the task error.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">This method does not return a value.</td></tr></table></div>
   </div>
 </div><div class="basemethod">
   
@@ -1085,7 +1085,7 @@
     
     
     <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">onTaskExecuted</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">event: <code>TaskEvent</code></span>):</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/console/base/listener.py#L40">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/console/base/listener.py#L43">
       
       (source)
     </a>
@@ -1097,7 +1097,7 @@
   </div>
   <div class="docstring functionBody">
     <div class="interfaceinfo">overrides <code><a href="orionis.console.base.contracts.listener.IBaseTaskListener.html#onTaskExecuted" class="internal-link">orionis.console.base.contracts.listener.IBaseTaskListener.onTaskExecuted</a></code></div>
-    <div><p>Handle the event when a task is executed.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">event:</span><code>TaskEvent</code></td><td class="fieldArgDesc">The event object containing information about the executed task.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">This method does not return a value.</td></tr></table></div>
+    <div><p>Handle the event when a task is executed.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">event:</span><code><a href="orionis.console.entities.TaskEvent.html" class="internal-link">orionis.console.entities.TaskEvent</a></code></td><td class="fieldArgDesc">The event object containing information about the executed task.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">This method does not return a value.</td></tr></table></div>
   </div>
 </div><div class="basemethod">
   
@@ -1112,7 +1112,7 @@
     
     
     <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">onTaskMaxInstances</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">event: <code>TaskEvent</code></span>):</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/console/base/listener.py#L100">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/console/base/listener.py#L103">
       
       (source)
     </a>
@@ -1124,7 +1124,7 @@
   </div>
   <div class="docstring functionBody">
     <div class="interfaceinfo">overrides <code><a href="orionis.console.base.contracts.listener.IBaseTaskListener.html#onTaskMaxInstances" class="internal-link">orionis.console.base.contracts.listener.IBaseTaskListener.onTaskMaxInstances</a></code></div>
-    <div><p>Handle the event when a task reaches its maximum allowed instances.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">event:</span><code>TaskEvent</code></td><td class="fieldArgDesc">The event object containing information about the max instances event.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">This method does not return a value.</td></tr></table></div>
+    <div><p>Handle the event when a task reaches its maximum allowed instances.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">event:</span><code><a href="orionis.console.entities.TaskEvent.html" class="internal-link">orionis.console.entities.TaskEvent</a></code></td><td class="fieldArgDesc">The event object containing information about the max instances event.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">This method does not return a value.</td></tr></table></div>
   </div>
 </div><div class="basemethod">
   
@@ -1139,7 +1139,7 @@
     
     
     <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">onTaskMissed</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">event: <code>TaskEvent</code></span>):</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/console/base/listener.py#L70">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/console/base/listener.py#L73">
       
       (source)
     </a>
@@ -1151,7 +1151,7 @@
   </div>
   <div class="docstring functionBody">
     <div class="interfaceinfo">overrides <code><a href="orionis.console.base.contracts.listener.IBaseTaskListener.html#onTaskMissed" class="internal-link">orionis.console.base.contracts.listener.IBaseTaskListener.onTaskMissed</a></code></div>
-    <div><p>Handle the event when a task is missed.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">event:</span><code>TaskEvent</code></td><td class="fieldArgDesc">The event object containing information about the missed task.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">This method does not return a value.</td></tr></table></div>
+    <div><p>Handle the event when a task is missed.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">event:</span><code><a href="orionis.console.entities.TaskEvent.html" class="internal-link">orionis.console.entities.TaskEvent</a></code></td><td class="fieldArgDesc">The event object containing information about the missed task.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">This method does not return a value.</td></tr></table></div>
   </div>
 </div><div class="basemethod">
   
@@ -1166,7 +1166,7 @@
     
     
     <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">onTaskRemoved</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">event: <code>TaskEvent</code></span>):</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/console/base/listener.py#L25">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/console/base/listener.py#L28">
       
       (source)
     </a>
@@ -1178,7 +1178,7 @@
   </div>
   <div class="docstring functionBody">
     <div class="interfaceinfo">overrides <code><a href="orionis.console.base.contracts.listener.IBaseTaskListener.html#onTaskRemoved" class="internal-link">orionis.console.base.contracts.listener.IBaseTaskListener.onTaskRemoved</a></code></div>
-    <div><p>Handle the event when a task is removed.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">event:</span><code>TaskEvent</code></td><td class="fieldArgDesc">The event object containing information about the removed task.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">This method does not return a value.</td></tr></table></div>
+    <div><p>Handle the event when a task is removed.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">event:</span><code><a href="orionis.console.entities.TaskEvent.html" class="internal-link">orionis.console.entities.TaskEvent</a></code></td><td class="fieldArgDesc">The event object containing information about the removed task.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">This method does not return a value.</td></tr></table></div>
   </div>
 </div><div class="basemethod">
   
@@ -1193,7 +1193,7 @@
     
     
     <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">onTaskSubmitted</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">event: <code>TaskEvent</code></span>):</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/console/base/listener.py#L85">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/console/base/listener.py#L88">
       
       (source)
     </a>
@@ -1205,7 +1205,7 @@
   </div>
   <div class="docstring functionBody">
     <div class="interfaceinfo">overrides <code><a href="orionis.console.base.contracts.listener.IBaseTaskListener.html#onTaskSubmitted" class="internal-link">orionis.console.base.contracts.listener.IBaseTaskListener.onTaskSubmitted</a></code></div>
-    <div><p>Handle the event when a task is submitted.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">event:</span><code>TaskEvent</code></td><td class="fieldArgDesc">The event object containing information about the submitted task.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">This method does not return a value.</td></tr></table></div>
+    <div><p>Handle the event when a task is submitted.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">event:</span><code><a href="orionis.console.entities.TaskEvent.html" class="internal-link">orionis.console.entities.TaskEvent</a></code></td><td class="fieldArgDesc">The event object containing information about the submitted task.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">This method does not return a value.</td></tr></table></div>
   </div>
 </div>
         </div>
@@ -1218,7 +1218,7 @@
   <div class="orionis-footer-inner">
     <div class="orionis-footer-copy">
       <p>API documentation for <a href="https://orionis-framework.com/" class="projecthome">Orionis</a>.</p>
-      <p class="orionis-footer-meta">Generated with <a href="https://github.com/twisted/pydoctor/">Pydoctor</a> 25.10.1.<span class="orionis-footer-build"> Built 2026-11-03 09:36:58.</span></p>
+      <p class="orionis-footer-meta">Generated with <a href="https://github.com/twisted/pydoctor/">Pydoctor</a> 25.10.1.<span class="orionis-footer-build"> Built 2026-11-03 13:00:15.</span></p>
     </div>
     <nav class="orionis-footer-links" aria-label="Additional resources">
       <a href="https://docs.orionis-framework.com">Read the guide <span aria-hidden="true">↗</span></a>

@@ -968,11 +968,11 @@
         </div>
 
         <div class="extrasDocstring">
-          <a href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/auth/tokens/lookup.py" class="sourceLink">(source)</a>
+          <a href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/auth/tokens/lookup.py" class="sourceLink">(source)</a>
         </div>
 
         <div class="moduleDocstring">
-          <div><p class="undocumented">Undocumented</p></div>
+          <div><p>Provide auth tokens operations through <tt class="rst-docutils rst-literal">lookup_owner</tt>.</p></div>
         </div>
 
         <div id="split-tables">
@@ -993,22 +993,22 @@
     
     <td>Constant</td>
     <td><code><a href="#_COLUMNS" class="internal-link" title="orionis.auth.tokens.lookup._COLUMNS">_COLUMNS</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
+    <td>Columns definitions used by <tt class="rst-docutils rst-literal">lookup</tt>.</td>
   </tr><tr class="constant">
     
     <td>Constant</td>
     <td><code><a href="#_INTEGER_DIGITS" class="internal-link" title="orionis.auth.tokens.lookup._INTEGER_DIGITS">_INTEGER<wbr></wbr>_DIGITS</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
+    <td>Integer digits value used by <tt class="rst-docutils rst-literal">lookup</tt>.</td>
   </tr><tr class="constant">
     
     <td>Constant</td>
     <td><code><a href="#_INTEGERS" class="internal-link" title="orionis.auth.tokens.lookup._INTEGERS">_INTEGERS</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
+    <td>Integers used by <tt class="rst-docutils rst-literal">lookup</tt>.</td>
   </tr><tr class="constant">
     
     <td>Constant</td>
     <td><code><a href="#_STRINGS" class="internal-link" title="orionis.auth.tokens.lookup._STRINGS">_STRINGS</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
+    <td>Strings used by <tt class="rst-docutils rst-literal">lookup</tt>.</td>
   </tr>
 </table>
           
@@ -1030,7 +1030,7 @@
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">_integer_key</span><span class="function-signature">(<span class="rst-sig-param">value: <code>ColumnElement</code>, </span><span class="rst-sig-param">length: <code><a href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Callable" class="intersphinx-link">Callable</a></code></span>) -&gt; <code>ColumnElement</code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/auth/tokens/lookup.py#L51">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/auth/tokens/lookup.py#L57">
       
       (source)
     </a>
@@ -1042,7 +1042,7 @@
   </div>
   <div class="docstring functionBody">
     
-    <div><p>Cast only bounded decimal strings, including on strict SQL engines.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">value:</span><code>ColumnElement</code></td><td class="fieldArgDesc">SQL expression containing the stored string identifier.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">length:</span><code><a href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Callable" class="intersphinx-link">Callable</a></code></td><td class="fieldArgDesc">Dialect-specific SQL string-length function.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code>ColumnElement</code></td><td class="fieldArgDesc">Guarded integer cast, yielding SQL NULL for malformed keys.</td></tr></table></div>
+    <div><p>Cast only bounded decimal strings, including on strict SQL engines.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">value:</span><code><tt class="rst-docutils rst-literal">sqlalchemy.sql.elements.ColumnElement</tt></code></td><td class="fieldArgDesc">SQL expression containing the stored string identifier.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">length:</span><code><a href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Callable" class="intersphinx-link">collections.abc.Callable</a></code></td><td class="fieldArgDesc">Dialect-specific SQL string-length function.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><tt class="rst-docutils rst-literal">sqlalchemy.sql.elements.ColumnElement</tt></code></td><td class="fieldArgDesc">Guarded integer cast, yielding SQL NULL for malformed keys.</td></tr></table></div>
   </div>
 </div><div class="basefunction">
   
@@ -1057,7 +1057,7 @@
     
     
     <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">lookup_owner</span><span class="function-signature long-signature">(<span class="rst-sig-param">query: <code><a href="orionis.orm.query.raw_builder.RawQueryBuilder.html" class="internal-link" title="orionis.orm.query.raw_builder.RawQueryBuilder">RawQueryBuilder</a></code>, </span><span class="rst-sig-param">identities: <code><a href="https://docs.python.org/3/builtins/functions.html#object" class="intersphinx-link">object</a></code>, </span><span class="rst-sig-param">validate: <code><a href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Callable" class="intersphinx-link">Callable</a>[<wbr></wbr>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#dict" class="intersphinx-link">dict</a>], <wbr></wbr><a href="https://docs.python.org/3/builtins/functions.html#object" class="intersphinx-link">object</a> | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a>]</code></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" class="intersphinx-link">tuple</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/functions.html#object" class="intersphinx-link">object</a>, <wbr></wbr><a href="https://docs.python.org/3/builtins/functions.html#object" class="intersphinx-link">object</a>] | <a href="https://docs.python.org/3/library/types.html#types.NotImplementedType" class="intersphinx-link">NotImplementedType</a> | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/auth/tokens/lookup.py#L85">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/auth/tokens/lookup.py#L91">
       
       (source)
     </a>
@@ -1069,7 +1069,7 @@
   </div>
   <div class="docstring functionBody">
     
-    <div><p>Read a token and a native ORM identity in one bounded SELECT.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">query:</span><code><a href="orionis.orm.query.raw_builder.RawQueryBuilder.html" class="internal-link" title="orionis.orm.query.raw_builder.RawQueryBuilder">RawQueryBuilder</a></code></td><td class="fieldArgDesc">Token digest query, with no plaintext credential in its bindings.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">identities:</span><code><a href="https://docs.python.org/3/builtins/functions.html#object" class="intersphinx-link">object</a></code></td><td class="fieldArgDesc">Provider to optimize only when its native lookup semantics are known.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">validate:</span><code><a href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Callable" class="intersphinx-link">Callable</a></code></td><td class="fieldArgDesc">Validate token metadata before hydrating or dispatching identity events.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code>tuple | None | NotImplemented</code></td><td class="fieldArgDesc">Token row and hydrated identity, no match, or an unsupported combination.
+    <div><p>Read a token and a native ORM identity in one bounded SELECT.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">query:</span><code><a href="orionis.orm.query.raw_builder.RawQueryBuilder.html" class="internal-link">orionis.orm.query.raw_builder.RawQueryBuilder</a></code></td><td class="fieldArgDesc">Token digest query, with no plaintext credential in its bindings.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">identities:</span><code><a href="https://docs.python.org/3/builtins/functions.html#object" class="intersphinx-link">object</a></code></td><td class="fieldArgDesc">Provider to optimize only when its native lookup semantics are known.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">validate:</span><code><a href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Callable" class="intersphinx-link">collections.abc.Callable</a></code></td><td class="fieldArgDesc">Validate token metadata before hydrating or dispatching identity events.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code>tuple | None | NotImplemented</code></td><td class="fieldArgDesc">Token row and hydrated identity, no match, or an unsupported combination.
 Retrieval events still run before the guard's final conditional touch.</td></tr></table></div>
   </div>
 </div><div class="baseconstant">
@@ -1084,7 +1084,7 @@ Retrieval events still run before the guard's final conditional touch.</td></tr>
   <div class="functionHeader">
     
     <span class="py-defname">_COLUMNS</span>: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" class="intersphinx-link">tuple</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <wbr></wbr><span class="rst-variable-ellipsis">...</span>]</code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/auth/tokens/lookup.py#L39">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/auth/tokens/lookup.py#L44">
       
       (source)
     </a>
@@ -1096,7 +1096,7 @@ Retrieval events still run before the guard's final conditional touch.</td></tr>
   </div>
   <div class="functionBody">
     
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p>Columns definitions used by <tt class="rst-docutils rst-literal">lookup</tt>.</p></div>
     <table class="valueTable"><tr class="fieldStart"><td class="fieldName">Value</td></tr><tr><td><pre class="constant-value"><code>(<wbr></wbr><span class="rst-variable-quote">'</span><span class="rst-variable-string">id</span><span class="rst-variable-quote">'</span>,
  <wbr></wbr><span class="rst-variable-quote">'</span><span class="rst-variable-string">tokenable_type</span><span class="rst-variable-quote">'</span>,
  <wbr></wbr><span class="rst-variable-quote">'</span><span class="rst-variable-string">tokenable_id</span><span class="rst-variable-quote">'</span>,
@@ -1118,7 +1118,7 @@ Retrieval events still run before the guard's final conditional touch.</td></tr>
   <div class="functionHeader">
     
     <span class="py-defname">_INTEGER_DIGITS</span>: <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/auth/tokens/lookup.py#L18">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/auth/tokens/lookup.py#L20">
       
       (source)
     </a>
@@ -1130,7 +1130,7 @@ Retrieval events still run before the guard's final conditional touch.</td></tr>
   </div>
   <div class="functionBody">
     
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p>Integer digits value used by <tt class="rst-docutils rst-literal">lookup</tt>.</p></div>
     <table class="valueTable"><tr class="fieldStart"><td class="fieldName">Value</td></tr><tr><td><pre class="constant-value"><code>19</code></pre></td></tr></table>
   </div>
 </div><div class="baseconstant">
@@ -1145,7 +1145,7 @@ Retrieval events still run before the guard's final conditional touch.</td></tr>
   <div class="functionHeader">
     
     <span class="py-defname">_INTEGERS</span> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/auth/tokens/lookup.py#L19">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/auth/tokens/lookup.py#L22">
       
       (source)
     </a>
@@ -1157,7 +1157,7 @@ Retrieval events still run before the guard's final conditional touch.</td></tr>
   </div>
   <div class="functionBody">
     
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p>Integers used by <tt class="rst-docutils rst-literal">lookup</tt>.</p></div>
     <table class="valueTable"><tr class="fieldStart"><td class="fieldName">Value</td></tr><tr><td><pre class="constant-value"><code><a href="https://docs.python.org/3/builtins/stdtypes.html#frozenset" class="intersphinx-link">frozenset</a>(<wbr></wbr>set([<wbr></wbr>ColumnType.BIG_INTEGER,
                <wbr></wbr>ColumnType.INTEGER,
                <wbr></wbr>ColumnType.SMALL_INTEGER,
@@ -1177,7 +1177,7 @@ Retrieval events still run before the guard's final conditional touch.</td></tr>
   <div class="functionHeader">
     
     <span class="py-defname">_STRINGS</span> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/auth/tokens/lookup.py#L29">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/auth/tokens/lookup.py#L33">
       
       (source)
     </a>
@@ -1189,7 +1189,7 @@ Retrieval events still run before the guard's final conditional touch.</td></tr>
   </div>
   <div class="functionBody">
     
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p>Strings used by <tt class="rst-docutils rst-literal">lookup</tt>.</p></div>
     <table class="valueTable"><tr class="fieldStart"><td class="fieldName">Value</td></tr><tr><td><pre class="constant-value"><code><a href="https://docs.python.org/3/builtins/stdtypes.html#frozenset" class="intersphinx-link">frozenset</a>(<wbr></wbr>set([<wbr></wbr>ColumnType.STRING,
                <wbr></wbr>ColumnType.UNICODE,
                <wbr></wbr>ColumnType.CHAR,
@@ -1208,7 +1208,7 @@ Retrieval events still run before the guard's final conditional touch.</td></tr>
   <div class="orionis-footer-inner">
     <div class="orionis-footer-copy">
       <p>API documentation for <a href="https://orionis-framework.com/" class="projecthome">Orionis</a>.</p>
-      <p class="orionis-footer-meta">Generated with <a href="https://github.com/twisted/pydoctor/">Pydoctor</a> 25.10.1.<span class="orionis-footer-build"> Built 2026-11-03 09:36:58.</span></p>
+      <p class="orionis-footer-meta">Generated with <a href="https://github.com/twisted/pydoctor/">Pydoctor</a> 25.10.1.<span class="orionis-footer-build"> Built 2026-11-03 13:00:15.</span></p>
     </div>
     <nav class="orionis-footer-links" aria-label="Additional resources">
       <a href="https://docs.orionis-framework.com">Read the guide <span aria-hidden="true">↗</span></a>

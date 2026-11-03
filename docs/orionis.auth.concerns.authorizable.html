@@ -241,7 +241,7 @@
                     
                 </label>
 
-                <code><a href="orionis.auth.concerns.authenticatable.html" class="internal-link" title="orionis.auth.concerns.authenticatable">authenticatable</a></code>
+                <code><a href="orionis.auth.concerns.authenticatable.module.html" class="internal-link" title="orionis.auth.concerns.authenticatable">authenticatable</a></code>
 
                 <div class="expandableContent">
                     <div>
@@ -287,7 +287,7 @@
                     
                 </label>
 
-                <code><a href="orionis.auth.concerns.authorizable.html" class="internal-link" title="orionis.auth.concerns.authorizable">authorizable</a></code>
+                <code><a href="orionis.auth.concerns.authorizable.module.html" class="internal-link" title="orionis.auth.concerns.authorizable">authorizable</a></code>
 
                 <div class="expandableContent">
                     <div>
@@ -774,7 +774,7 @@
         </div>
 
         <div class="extrasDocstring">
-          <p class="class-signature"><code><span class="py-keyword">class</span> <span class="py-defname">Authorizable</span>: <a href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/auth/concerns/authorizable.py#L5" class="sourceLink">(source)</a></code></p><p><a href="classIndex.html#orionis.auth.concerns.Authorizable">View In Hierarchy</a></p>
+          <p class="class-signature"><code><span class="py-keyword">class</span> <span class="py-defname">Authorizable</span>: <a href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/auth/concerns/authorizable.py#L7" class="sourceLink">(source)</a></code></p><p><a href="classIndex.html#orionis.auth.concerns.Authorizable">View In Hierarchy</a></p>
         </div>
 
         <div class="moduleDocstring">
@@ -783,7 +783,8 @@
 next to its identifier, so users, teams or API clients can all be
 granted the very same permissions.</p>
 <p>The mixin is a plain class registered as a virtual implementation of
-<code><a href="orionis.auth.contracts.IAuthorizable.html" class="internal-link" title="orionis.auth.contracts.IAuthorizable">IAuthorizable</a></code>, because inheriting from the ABC directly would
+<code><a href="orionis.auth.contracts.IAuthorizable.html" class="internal-link">orionis.auth.contracts.IAuthorizable</a></code>, because inheriting from the ABC
+directly would
 clash with <tt class="rst-docutils rst-literal">ModelMeta</tt>, the metaclass of every Orionis model.</p>
 </div>
         </div>
@@ -806,12 +807,12 @@ clash with <tt class="rst-docutils rst-literal">ModelMeta</tt>, the metaclass of
     
     <td>Constant</td>
     <td><code><a href="#AUTHORIZABLE_TYPE" class="internal-link" title="orionis.auth.concerns.Authorizable.AUTHORIZABLE_TYPE">AUTHORIZABLE<wbr></wbr>_TYPE</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
+    <td>Value stored in the <tt class="rst-docutils rst-literal">model_type</tt> column. Leave it as <tt class="rst-docutils rst-literal">None</tt> to derive a stable dotted path from the class itself.</td>
   </tr><tr class="classvariable">
     
     <td>Class Variable</td>
     <td><code><a href="#__slots__" class="internal-link" title="orionis.auth.concerns.Authorizable.__slots__">__slots__</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
+    <td>Declare that this class introduces no additional instance slots.</td>
   </tr>
 </table>
           
@@ -833,7 +834,7 @@ clash with <tt class="rst-docutils rst-literal">ModelMeta</tt>, the metaclass of
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">getAuthorizableId</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/functions.html#object" class="intersphinx-link">object</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/auth/concerns/authorizable.py#L41">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/auth/concerns/authorizable.py#L49">
       
       (source)
     </a>
@@ -861,7 +862,7 @@ persisted.</td></tr></table></div>
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">getAuthorizableType</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/auth/concerns/authorizable.py#L24">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/auth/concerns/authorizable.py#L32">
       
       (source)
     </a>
@@ -888,7 +889,7 @@ dotted path of the class.</td></tr></table></div>
   <div class="functionHeader">
     
     <span class="py-defname">AUTHORIZABLE_TYPE</span>: <code>ClassVar[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a> | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a>]</code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/auth/concerns/authorizable.py#L22">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/auth/concerns/authorizable.py#L26">
       
       (source)
     </a>
@@ -900,7 +901,8 @@ dotted path of the class.</td></tr></table></div>
   </div>
   <div class="functionBody">
     
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p>Value stored in the <tt class="rst-docutils rst-literal">model_type</tt> column. Leave it as <tt class="rst-docutils rst-literal">None</tt> to derive a
+stable dotted path from the class itself.</p></div>
     <table class="valueTable"><tr class="fieldStart"><td class="fieldName">Value</td></tr><tr><td><pre class="constant-value"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></pre></td></tr></table>
   </div>
 </div><div class="baseclassvariable">
@@ -915,7 +917,7 @@ dotted path of the class.</td></tr></table></div>
   <div class="functionHeader">
     
     <span class="py-defname">__slots__</span>: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" class="intersphinx-link">tuple</a></code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/auth/concerns/authorizable.py#L18">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/auth/concerns/authorizable.py#L21">
       
       (source)
     </a>
@@ -927,7 +929,7 @@ dotted path of the class.</td></tr></table></div>
   </div>
   <div class="functionBody">
     
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p>Declare that this class introduces no additional instance slots.</p></div>
     
   </div>
 </div>
@@ -941,7 +943,7 @@ dotted path of the class.</td></tr></table></div>
   <div class="orionis-footer-inner">
     <div class="orionis-footer-copy">
       <p>API documentation for <a href="https://orionis-framework.com/" class="projecthome">Orionis</a>.</p>
-      <p class="orionis-footer-meta">Generated with <a href="https://github.com/twisted/pydoctor/">Pydoctor</a> 25.10.1.<span class="orionis-footer-build"> Built 2026-11-03 09:36:58.</span></p>
+      <p class="orionis-footer-meta">Generated with <a href="https://github.com/twisted/pydoctor/">Pydoctor</a> 25.10.1.<span class="orionis-footer-build"> Built 2026-11-03 13:00:15.</span></p>
     </div>
     <nav class="orionis-footer-links" aria-label="Additional resources">
       <a href="https://docs.orionis-framework.com">Read the guide <span aria-hidden="true">↗</span></a>

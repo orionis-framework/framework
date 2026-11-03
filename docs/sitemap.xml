@@ -25,7 +25,10 @@
     <loc>https://api.orionis-framework.com/orionis.aio.html</loc>
   </url>
   <url>
-    <loc>https://api.orionis-framework.com/orionis.aio.loop.html</loc>
+    <loc>https://api.orionis-framework.com/orionis.aio.Loop.html</loc>
+  </url>
+  <url>
+    <loc>https://api.orionis-framework.com/orionis.aio.loop.module.html</loc>
   </url>
   <url>
     <loc>https://api.orionis-framework.com/orionis.Application.html</loc>
@@ -52,7 +55,10 @@
     <loc>https://api.orionis-framework.com/orionis.auth.authorization.html</loc>
   </url>
   <url>
-    <loc>https://api.orionis-framework.com/orionis.auth.authorization.policy.html</loc>
+    <loc>https://api.orionis-framework.com/orionis.auth.authorization.Policy.html</loc>
+  </url>
+  <url>
+    <loc>https://api.orionis-framework.com/orionis.auth.authorization.policy.module.html</loc>
   </url>
   <url>
     <loc>https://api.orionis-framework.com/orionis.auth.authorization.PolicyRegistry.html</loc>
@@ -79,10 +85,16 @@
     <loc>https://api.orionis-framework.com/orionis.auth.AuthorizationException.html</loc>
   </url>
   <url>
-    <loc>https://api.orionis-framework.com/orionis.auth.concerns.authenticatable.html</loc>
+    <loc>https://api.orionis-framework.com/orionis.auth.concerns.Authenticatable.html</loc>
   </url>
   <url>
-    <loc>https://api.orionis-framework.com/orionis.auth.concerns.authorizable.html</loc>
+    <loc>https://api.orionis-framework.com/orionis.auth.concerns.authenticatable.module.html</loc>
+  </url>
+  <url>
+    <loc>https://api.orionis-framework.com/orionis.auth.concerns.Authorizable.html</loc>
+  </url>
+  <url>
+    <loc>https://api.orionis-framework.com/orionis.auth.concerns.authorizable.module.html</loc>
   </url>
   <url>
     <loc>https://api.orionis-framework.com/orionis.auth.concerns.functions.html</loc>
@@ -1162,7 +1174,10 @@
     <loc>https://api.orionis-framework.com/orionis.console.dynamic.progress_bar.html</loc>
   </url>
   <url>
-    <loc>https://api.orionis-framework.com/orionis.console.entities.command.html</loc>
+    <loc>https://api.orionis-framework.com/orionis.console.entities.Command.html</loc>
+  </url>
+  <url>
+    <loc>https://api.orionis-framework.com/orionis.console.entities.command.module.html</loc>
   </url>
   <url>
     <loc>https://api.orionis-framework.com/orionis.console.entities.html</loc>
@@ -1177,7 +1192,10 @@
     <loc>https://api.orionis-framework.com/orionis.console.entities.task_event.html</loc>
   </url>
   <url>
-    <loc>https://api.orionis-framework.com/orionis.console.entities.task.html</loc>
+    <loc>https://api.orionis-framework.com/orionis.console.entities.Task.html</loc>
+  </url>
+  <url>
+    <loc>https://api.orionis-framework.com/orionis.console.entities.task.module.html</loc>
   </url>
   <url>
     <loc>https://api.orionis-framework.com/orionis.console.entities.TaskEvent.html</loc>
@@ -1213,7 +1231,10 @@
     <loc>https://api.orionis-framework.com/orionis.console.enums.TaskEvent.html</loc>
   </url>
   <url>
-    <loc>https://api.orionis-framework.com/orionis.console.fluent.command.html</loc>
+    <loc>https://api.orionis-framework.com/orionis.console.fluent.Command.html</loc>
+  </url>
+  <url>
+    <loc>https://api.orionis-framework.com/orionis.console.fluent.command.module.html</loc>
   </url>
   <url>
     <loc>https://api.orionis-framework.com/orionis.console.fluent.contracts.command.html</loc>
@@ -1234,7 +1255,10 @@
     <loc>https://api.orionis-framework.com/orionis.console.fluent.html</loc>
   </url>
   <url>
-    <loc>https://api.orionis-framework.com/orionis.console.fluent.task.html</loc>
+    <loc>https://api.orionis-framework.com/orionis.console.fluent.Task.html</loc>
+  </url>
+  <url>
+    <loc>https://api.orionis-framework.com/orionis.console.fluent.task.module.html</loc>
   </url>
   <url>
     <loc>https://api.orionis-framework.com/orionis.console.html</loc>
@@ -1408,7 +1432,10 @@
     <loc>https://api.orionis-framework.com/orionis.container.contracts.service_provider.IServiceProvider.html</loc>
   </url>
   <url>
-    <loc>https://api.orionis-framework.com/orionis.container.entities.binding.html</loc>
+    <loc>https://api.orionis-framework.com/orionis.container.entities.Binding.html</loc>
+  </url>
+  <url>
+    <loc>https://api.orionis-framework.com/orionis.container.entities.binding.module.html</loc>
   </url>
   <url>
     <loc>https://api.orionis-framework.com/orionis.container.entities.html</loc>
@@ -1438,7 +1465,10 @@
     <loc>https://api.orionis-framework.com/orionis.container.exceptions.html</loc>
   </url>
   <url>
-    <loc>https://api.orionis-framework.com/orionis.container.facades.facade.html</loc>
+    <loc>https://api.orionis-framework.com/orionis.container.facades.Facade.html</loc>
+  </url>
+  <url>
+    <loc>https://api.orionis-framework.com/orionis.container.facades.facade.module.html</loc>
   </url>
   <url>
     <loc>https://api.orionis-framework.com/orionis.container.facades.facade.ScopedFacade.html</loc>
@@ -1486,7 +1516,10 @@
     <loc>https://api.orionis-framework.com/orionis.database.connection._TransactionState.html</loc>
   </url>
   <url>
-    <loc>https://api.orionis-framework.com/orionis.database.connection.html</loc>
+    <loc>https://api.orionis-framework.com/orionis.database.Connection.html</loc>
+  </url>
+  <url>
+    <loc>https://api.orionis-framework.com/orionis.database.connection.module.html</loc>
   </url>
   <url>
     <loc>https://api.orionis-framework.com/orionis.database.ConnectionManager.html</loc>
@@ -1576,7 +1609,10 @@
     <loc>https://api.orionis-framework.com/orionis.database.migrations.html</loc>
   </url>
   <url>
-    <loc>https://api.orionis-framework.com/orionis.database.migrations.migrator.html</loc>
+    <loc>https://api.orionis-framework.com/orionis.database.migrations.Migrator.html</loc>
+  </url>
+  <url>
+    <loc>https://api.orionis-framework.com/orionis.database.migrations.migrator.module.html</loc>
   </url>
   <url>
     <loc>https://api.orionis-framework.com/orionis.database.MissingDatabaseDependencyException.html</loc>
@@ -1603,13 +1639,22 @@
     <loc>https://api.orionis-framework.com/orionis.database.schema_provider.SchemaProvider.html</loc>
   </url>
   <url>
-    <loc>https://api.orionis-framework.com/orionis.database.schema.blueprint.html</loc>
+    <loc>https://api.orionis-framework.com/orionis.database.schema.Blueprint.html</loc>
   </url>
   <url>
-    <loc>https://api.orionis-framework.com/orionis.database.schema.column.html</loc>
+    <loc>https://api.orionis-framework.com/orionis.database.schema.blueprint.module.html</loc>
   </url>
   <url>
-    <loc>https://api.orionis-framework.com/orionis.database.schema.comment.html</loc>
+    <loc>https://api.orionis-framework.com/orionis.database.schema.Column.html</loc>
+  </url>
+  <url>
+    <loc>https://api.orionis-framework.com/orionis.database.schema.column.module.html</loc>
+  </url>
+  <url>
+    <loc>https://api.orionis-framework.com/orionis.database.schema.Comment.html</loc>
+  </url>
+  <url>
+    <loc>https://api.orionis-framework.com/orionis.database.schema.comment.module.html</loc>
   </url>
   <url>
     <loc>https://api.orionis-framework.com/orionis.database.schema.definition_bucket.DefinitionBucket.html</loc>
@@ -1630,7 +1675,10 @@
     <loc>https://api.orionis-framework.com/orionis.database.schema.html</loc>
   </url>
   <url>
-    <loc>https://api.orionis-framework.com/orionis.database.schema.index.html</loc>
+    <loc>https://api.orionis-framework.com/orionis.database.schema.Index.html</loc>
+  </url>
+  <url>
+    <loc>https://api.orionis-framework.com/orionis.database.schema.index.module.html</loc>
   </url>
   <url>
     <loc>https://api.orionis-framework.com/orionis.database.schema.primary.html</loc>
@@ -1657,7 +1705,10 @@
     <loc>https://api.orionis-framework.com/orionis.database.schema.Timestamps.html</loc>
   </url>
   <url>
-    <loc>https://api.orionis-framework.com/orionis.database.schema.unique.html</loc>
+    <loc>https://api.orionis-framework.com/orionis.database.schema.Unique.html</loc>
+  </url>
+  <url>
+    <loc>https://api.orionis-framework.com/orionis.database.schema.unique.module.html</loc>
   </url>
   <url>
     <loc>https://api.orionis-framework.com/orionis.database.seeders.events.html</loc>
@@ -1675,7 +1726,10 @@
     <loc>https://api.orionis-framework.com/orionis.database.seeders.runner.html</loc>
   </url>
   <url>
-    <loc>https://api.orionis-framework.com/orionis.database.seeders.seeder.html</loc>
+    <loc>https://api.orionis-framework.com/orionis.database.seeders.Seeder.html</loc>
+  </url>
+  <url>
+    <loc>https://api.orionis-framework.com/orionis.database.seeders.seeder.module.html</loc>
   </url>
   <url>
     <loc>https://api.orionis-framework.com/orionis.database.seeders.SeederRunner.html</loc>
@@ -1717,7 +1771,10 @@
     <loc>https://api.orionis-framework.com/orionis.database.threaded.worker.ThreadedWorker.html</loc>
   </url>
   <url>
-    <loc>https://api.orionis-framework.com/orionis.database.transaction.html</loc>
+    <loc>https://api.orionis-framework.com/orionis.database.Transaction.html</loc>
+  </url>
+  <url>
+    <loc>https://api.orionis-framework.com/orionis.database.transaction.module.html</loc>
   </url>
   <url>
     <loc>https://api.orionis-framework.com/orionis.database.TransactionException.html</loc>
@@ -1738,7 +1795,10 @@
     <loc>https://api.orionis-framework.com/orionis.encrypter.encrypter._Payload.html</loc>
   </url>
   <url>
-    <loc>https://api.orionis-framework.com/orionis.encrypter.encrypter.html</loc>
+    <loc>https://api.orionis-framework.com/orionis.encrypter.Encrypter.html</loc>
+  </url>
+  <url>
+    <loc>https://api.orionis-framework.com/orionis.encrypter.encrypter.module.html</loc>
   </url>
   <url>
     <loc>https://api.orionis-framework.com/orionis.encrypter.html</loc>
@@ -1834,7 +1894,10 @@
     <loc>https://api.orionis-framework.com/orionis.failure.base.html</loc>
   </url>
   <url>
-    <loc>https://api.orionis-framework.com/orionis.failure.catch.html</loc>
+    <loc>https://api.orionis-framework.com/orionis.failure.Catch.html</loc>
+  </url>
+  <url>
+    <loc>https://api.orionis-framework.com/orionis.failure.catch.module.html</loc>
   </url>
   <url>
     <loc>https://api.orionis-framework.com/orionis.failure.contracts.catch.html</loc>
@@ -1855,7 +1918,10 @@
     <loc>https://api.orionis-framework.com/orionis.failure.entities.html</loc>
   </url>
   <url>
-    <loc>https://api.orionis-framework.com/orionis.failure.entities.throwable.html</loc>
+    <loc>https://api.orionis-framework.com/orionis.failure.entities.Throwable.html</loc>
+  </url>
+  <url>
+    <loc>https://api.orionis-framework.com/orionis.failure.entities.throwable.module.html</loc>
   </url>
   <url>
     <loc>https://api.orionis-framework.com/orionis.failure.enums.html</loc>
@@ -1930,7 +1996,10 @@
     <loc>https://api.orionis-framework.com/orionis.foundation.config.auth.entities.tokens.html</loc>
   </url>
   <url>
-    <loc>https://api.orionis-framework.com/orionis.foundation.config.auth.enums.guards.html</loc>
+    <loc>https://api.orionis-framework.com/orionis.foundation.config.auth.enums.Guards.html</loc>
+  </url>
+  <url>
+    <loc>https://api.orionis-framework.com/orionis.foundation.config.auth.enums.guards.module.html</loc>
   </url>
   <url>
     <loc>https://api.orionis-framework.com/orionis.foundation.config.auth.enums.html</loc>
@@ -2467,7 +2536,10 @@
     <loc>https://api.orionis-framework.com/orionis.foundation.config.queue.entities.worker.html</loc>
   </url>
   <url>
-    <loc>https://api.orionis-framework.com/orionis.foundation.config.queue.enums.drivers.html</loc>
+    <loc>https://api.orionis-framework.com/orionis.foundation.config.queue.enums.Drivers.html</loc>
+  </url>
+  <url>
+    <loc>https://api.orionis-framework.com/orionis.foundation.config.queue.enums.drivers.module.html</loc>
   </url>
   <url>
     <loc>https://api.orionis-framework.com/orionis.foundation.config.queue.enums.html</loc>
@@ -2521,7 +2593,10 @@
     <loc>https://api.orionis-framework.com/orionis.foundation.config.scheduler.entities.stores.html</loc>
   </url>
   <url>
-    <loc>https://api.orionis-framework.com/orionis.foundation.config.scheduler.enums.drivers.html</loc>
+    <loc>https://api.orionis-framework.com/orionis.foundation.config.scheduler.enums.Drivers.html</loc>
+  </url>
+  <url>
+    <loc>https://api.orionis-framework.com/orionis.foundation.config.scheduler.enums.drivers.module.html</loc>
   </url>
   <url>
     <loc>https://api.orionis-framework.com/orionis.foundation.config.scheduler.enums.html</loc>
@@ -2659,7 +2734,10 @@
     <loc>https://api.orionis-framework.com/orionis.foundation.enums.html</loc>
   </url>
   <url>
-    <loc>https://api.orionis-framework.com/orionis.foundation.enums.lifespan.html</loc>
+    <loc>https://api.orionis-framework.com/orionis.foundation.enums.Lifespan.html</loc>
+  </url>
+  <url>
+    <loc>https://api.orionis-framework.com/orionis.foundation.enums.lifespan.module.html</loc>
   </url>
   <url>
     <loc>https://api.orionis-framework.com/orionis.foundation.enums.Runtime.html</loc>
@@ -3217,7 +3295,10 @@
     <loc>https://api.orionis-framework.com/orionis.http.RedirectResponse.html</loc>
   </url>
   <url>
-    <loc>https://api.orionis-framework.com/orionis.http.request.html</loc>
+    <loc>https://api.orionis-framework.com/orionis.http.Request.html</loc>
+  </url>
+  <url>
+    <loc>https://api.orionis-framework.com/orionis.http.request.module.html</loc>
   </url>
   <url>
     <loc>https://api.orionis-framework.com/orionis.http.request.UnsupportedMediaTypeException.html</loc>
@@ -3424,7 +3505,10 @@
     <loc>https://api.orionis-framework.com/orionis.http.websocket_middleware.html</loc>
   </url>
   <url>
-    <loc>https://api.orionis-framework.com/orionis.http.websocket.html</loc>
+    <loc>https://api.orionis-framework.com/orionis.http.WebSocket.html</loc>
+  </url>
+  <url>
+    <loc>https://api.orionis-framework.com/orionis.http.websocket.module.html</loc>
   </url>
   <url>
     <loc>https://api.orionis-framework.com/orionis.http.WebSocketDisconnected.html</loc>
@@ -3568,7 +3652,10 @@
     <loc>https://api.orionis-framework.com/orionis.introspection.ReflectDependencies.html</loc>
   </url>
   <url>
-    <loc>https://api.orionis-framework.com/orionis.introspection.reflection.html</loc>
+    <loc>https://api.orionis-framework.com/orionis.introspection.Reflection.html</loc>
+  </url>
+  <url>
+    <loc>https://api.orionis-framework.com/orionis.introspection.reflection.module.html</loc>
   </url>
   <url>
     <loc>https://api.orionis-framework.com/orionis.introspection.ReflectionAbstract.html</loc>
@@ -3655,7 +3742,10 @@
     <loc>https://api.orionis-framework.com/orionis.localization.TranslationSyntaxException.html</loc>
   </url>
   <url>
-    <loc>https://api.orionis-framework.com/orionis.localization.translator.html</loc>
+    <loc>https://api.orionis-framework.com/orionis.localization.Translator.html</loc>
+  </url>
+  <url>
+    <loc>https://api.orionis-framework.com/orionis.localization.translator.module.html</loc>
   </url>
   <url>
     <loc>https://api.orionis-framework.com/orionis.localization.types.html</loc>
@@ -3736,7 +3826,10 @@
     <loc>https://api.orionis-framework.com/orionis.logging.html</loc>
   </url>
   <url>
-    <loc>https://api.orionis-framework.com/orionis.logging.logger.html</loc>
+    <loc>https://api.orionis-framework.com/orionis.logging.Logger.html</loc>
+  </url>
+  <url>
+    <loc>https://api.orionis-framework.com/orionis.logging.logger.module.html</loc>
   </url>
   <url>
     <loc>https://api.orionis-framework.com/orionis.logging.provider.html</loc>
@@ -3766,16 +3859,28 @@
     <loc>https://api.orionis-framework.com/orionis.mail.contracts.transport.html</loc>
   </url>
   <url>
-    <loc>https://api.orionis-framework.com/orionis.mail.entities.address.html</loc>
+    <loc>https://api.orionis-framework.com/orionis.mail.entities.Address.html</loc>
   </url>
   <url>
-    <loc>https://api.orionis-framework.com/orionis.mail.entities.attachment.html</loc>
+    <loc>https://api.orionis-framework.com/orionis.mail.entities.address.module.html</loc>
   </url>
   <url>
-    <loc>https://api.orionis-framework.com/orionis.mail.entities.content.html</loc>
+    <loc>https://api.orionis-framework.com/orionis.mail.entities.Attachment.html</loc>
   </url>
   <url>
-    <loc>https://api.orionis-framework.com/orionis.mail.entities.envelope.html</loc>
+    <loc>https://api.orionis-framework.com/orionis.mail.entities.attachment.module.html</loc>
+  </url>
+  <url>
+    <loc>https://api.orionis-framework.com/orionis.mail.entities.Content.html</loc>
+  </url>
+  <url>
+    <loc>https://api.orionis-framework.com/orionis.mail.entities.content.module.html</loc>
+  </url>
+  <url>
+    <loc>https://api.orionis-framework.com/orionis.mail.entities.Envelope.html</loc>
+  </url>
+  <url>
+    <loc>https://api.orionis-framework.com/orionis.mail.entities.envelope.module.html</loc>
   </url>
   <url>
     <loc>https://api.orionis-framework.com/orionis.mail.entities.html</loc>
@@ -3847,7 +3952,10 @@
     <loc>https://api.orionis-framework.com/orionis.mail.html</loc>
   </url>
   <url>
-    <loc>https://api.orionis-framework.com/orionis.mail.mailable.html</loc>
+    <loc>https://api.orionis-framework.com/orionis.mail.Mailable.html</loc>
+  </url>
+  <url>
+    <loc>https://api.orionis-framework.com/orionis.mail.mailable.module.html</loc>
   </url>
   <url>
     <loc>https://api.orionis-framework.com/orionis.mail.manager.html</loc>
@@ -3856,7 +3964,10 @@
     <loc>https://api.orionis-framework.com/orionis.mail.manager.MailManager.html</loc>
   </url>
   <url>
-    <loc>https://api.orionis-framework.com/orionis.mail.message.html</loc>
+    <loc>https://api.orionis-framework.com/orionis.mail.Message.html</loc>
+  </url>
+  <url>
+    <loc>https://api.orionis-framework.com/orionis.mail.message.module.html</loc>
   </url>
   <url>
     <loc>https://api.orionis-framework.com/orionis.mail.pending.html</loc>
@@ -4264,7 +4375,10 @@
     <loc>https://api.orionis-framework.com/orionis.mcp.server.extension.html</loc>
   </url>
   <url>
-    <loc>https://api.orionis-framework.com/orionis.mcp.server.html</loc>
+    <loc>https://api.orionis-framework.com/orionis.mcp.Server.html</loc>
+  </url>
+  <url>
+    <loc>https://api.orionis-framework.com/orionis.mcp.server.package.html</loc>
   </url>
   <url>
     <loc>https://api.orionis-framework.com/orionis.mcp.server.primitives.html</loc>
@@ -4387,7 +4501,10 @@
     <loc>https://api.orionis-framework.com/orionis.orm.collections.html</loc>
   </url>
   <url>
-    <loc>https://api.orionis-framework.com/orionis.orm.collections.paginator.html</loc>
+    <loc>https://api.orionis-framework.com/orionis.orm.collections.Paginator.html</loc>
+  </url>
+  <url>
+    <loc>https://api.orionis-framework.com/orionis.orm.collections.paginator.module.html</loc>
   </url>
   <url>
     <loc>https://api.orionis-framework.com/orionis.orm.ConnectionResolver.html</loc>
@@ -4471,7 +4588,10 @@
     <loc>https://api.orionis-framework.com/orionis.orm.factories.exceptions.html</loc>
   </url>
   <url>
-    <loc>https://api.orionis-framework.com/orionis.orm.factories.factory.html</loc>
+    <loc>https://api.orionis-framework.com/orionis.orm.factories.Factory.html</loc>
+  </url>
+  <url>
+    <loc>https://api.orionis-framework.com/orionis.orm.factories.factory.module.html</loc>
   </url>
   <url>
     <loc>https://api.orionis-framework.com/orionis.orm.factories.FactoryConcurrencyException.html</loc>
@@ -4498,7 +4618,10 @@
     <loc>https://api.orionis-framework.com/orionis.orm.factories.fake._ProviderView.html</loc>
   </url>
   <url>
-    <loc>https://api.orionis-framework.com/orionis.orm.factories.fake.html</loc>
+    <loc>https://api.orionis-framework.com/orionis.orm.factories.Fake.html</loc>
+  </url>
+  <url>
+    <loc>https://api.orionis-framework.com/orionis.orm.factories.fake.module.html</loc>
   </url>
   <url>
     <loc>https://api.orionis-framework.com/orionis.orm.factories.html</loc>
@@ -4507,7 +4630,10 @@
     <loc>https://api.orionis-framework.com/orionis.orm.factories.OptionalFake.html</loc>
   </url>
   <url>
-    <loc>https://api.orionis-framework.com/orionis.orm.factories.sequence.html</loc>
+    <loc>https://api.orionis-framework.com/orionis.orm.factories.Sequence.html</loc>
+  </url>
+  <url>
+    <loc>https://api.orionis-framework.com/orionis.orm.factories.sequence.module.html</loc>
   </url>
   <url>
     <loc>https://api.orionis-framework.com/orionis.orm.factories.UniqueFake.html</loc>
@@ -4525,7 +4651,10 @@
     <loc>https://api.orionis-framework.com/orionis.orm.metaclass.ModelMetadata.html</loc>
   </url>
   <url>
-    <loc>https://api.orionis-framework.com/orionis.orm.model.html</loc>
+    <loc>https://api.orionis-framework.com/orionis.orm.Model.html</loc>
+  </url>
+  <url>
+    <loc>https://api.orionis-framework.com/orionis.orm.model.module.html</loc>
   </url>
   <url>
     <loc>https://api.orionis-framework.com/orionis.orm.provider.html</loc>
@@ -4657,7 +4786,10 @@
     <loc>https://api.orionis-framework.com/orionis.orm.relations.mixin.html</loc>
   </url>
   <url>
-    <loc>https://api.orionis-framework.com/orionis.orm.relations.relation.html</loc>
+    <loc>https://api.orionis-framework.com/orionis.orm.relations.Relation.html</loc>
+  </url>
+  <url>
+    <loc>https://api.orionis-framework.com/orionis.orm.relations.relation.module.html</loc>
   </url>
   <url>
     <loc>https://api.orionis-framework.com/orionis.orm.relations.RelationsMixin.html</loc>
@@ -4726,7 +4858,10 @@
     <loc>https://api.orionis-framework.com/orionis.orm.schema.types.BigInteger.html</loc>
   </url>
   <url>
-    <loc>https://api.orionis-framework.com/orionis.orm.schema.types.boolean.html</loc>
+    <loc>https://api.orionis-framework.com/orionis.orm.schema.types.Boolean.html</loc>
+  </url>
+  <url>
+    <loc>https://api.orionis-framework.com/orionis.orm.schema.types.boolean.module.html</loc>
   </url>
   <url>
     <loc>https://api.orionis-framework.com/orionis.orm.schema.types.column_type.html</loc>
@@ -4738,13 +4873,19 @@
     <loc>https://api.orionis-framework.com/orionis.orm.schema.types.date_time.html</loc>
   </url>
   <url>
-    <loc>https://api.orionis-framework.com/orionis.orm.schema.types.date.html</loc>
+    <loc>https://api.orionis-framework.com/orionis.orm.schema.types.Date.html</loc>
+  </url>
+  <url>
+    <loc>https://api.orionis-framework.com/orionis.orm.schema.types.date.module.html</loc>
   </url>
   <url>
     <loc>https://api.orionis-framework.com/orionis.orm.schema.types.DateTime.html</loc>
   </url>
   <url>
-    <loc>https://api.orionis-framework.com/orionis.orm.schema.types.double.html</loc>
+    <loc>https://api.orionis-framework.com/orionis.orm.schema.types.Double.html</loc>
+  </url>
+  <url>
+    <loc>https://api.orionis-framework.com/orionis.orm.schema.types.double.module.html</loc>
   </url>
   <url>
     <loc>https://api.orionis-framework.com/orionis.orm.schema.types.enum_type.html</loc>
@@ -4762,10 +4903,16 @@
     <loc>https://api.orionis-framework.com/orionis.orm.schema.types.html</loc>
   </url>
   <url>
-    <loc>https://api.orionis-framework.com/orionis.orm.schema.types.integer.html</loc>
+    <loc>https://api.orionis-framework.com/orionis.orm.schema.types.Integer.html</loc>
   </url>
   <url>
-    <loc>https://api.orionis-framework.com/orionis.orm.schema.types.interval.html</loc>
+    <loc>https://api.orionis-framework.com/orionis.orm.schema.types.integer.module.html</loc>
+  </url>
+  <url>
+    <loc>https://api.orionis-framework.com/orionis.orm.schema.types.Interval.html</loc>
+  </url>
+  <url>
+    <loc>https://api.orionis-framework.com/orionis.orm.schema.types.interval.module.html</loc>
   </url>
   <url>
     <loc>https://api.orionis-framework.com/orionis.orm.schema.types.large_binary.html</loc>
@@ -4783,7 +4930,10 @@
     <loc>https://api.orionis-framework.com/orionis.orm.schema.types.numeric_common.html</loc>
   </url>
   <url>
-    <loc>https://api.orionis-framework.com/orionis.orm.schema.types.numeric.html</loc>
+    <loc>https://api.orionis-framework.com/orionis.orm.schema.types.Numeric.html</loc>
+  </url>
+  <url>
+    <loc>https://api.orionis-framework.com/orionis.orm.schema.types.numeric.module.html</loc>
   </url>
   <url>
     <loc>https://api.orionis-framework.com/orionis.orm.schema.types.NumericCommon.html</loc>
@@ -4915,7 +5065,10 @@
     <loc>https://api.orionis-framework.com/orionis.orm.schema.types.String.html</loc>
   </url>
   <url>
-    <loc>https://api.orionis-framework.com/orionis.orm.schema.types.text.html</loc>
+    <loc>https://api.orionis-framework.com/orionis.orm.schema.types.Text.html</loc>
+  </url>
+  <url>
+    <loc>https://api.orionis-framework.com/orionis.orm.schema.types.text.module.html</loc>
   </url>
   <url>
     <loc>https://api.orionis-framework.com/orionis.orm.schema.types.time_type.html</loc>
@@ -4927,7 +5080,10 @@
     <loc>https://api.orionis-framework.com/orionis.orm.schema.types.unicode_text.html</loc>
   </url>
   <url>
-    <loc>https://api.orionis-framework.com/orionis.orm.schema.types.unicode.html</loc>
+    <loc>https://api.orionis-framework.com/orionis.orm.schema.types.Unicode.html</loc>
+  </url>
+  <url>
+    <loc>https://api.orionis-framework.com/orionis.orm.schema.types.unicode.module.html</loc>
   </url>
   <url>
     <loc>https://api.orionis-framework.com/orionis.orm.schema.types.UnicodeText.html</loc>
@@ -5197,7 +5353,10 @@
     <loc>https://api.orionis-framework.com/orionis.realtime.html</loc>
   </url>
   <url>
-    <loc>https://api.orionis-framework.com/orionis.realtime.hub.html</loc>
+    <loc>https://api.orionis-framework.com/orionis.realtime.Hub.html</loc>
+  </url>
+  <url>
+    <loc>https://api.orionis-framework.com/orionis.realtime.hub.module.html</loc>
   </url>
   <url>
     <loc>https://api.orionis-framework.com/orionis.realtime.HubClients.html</loc>
@@ -5410,7 +5569,10 @@
     <loc>https://api.orionis-framework.com/orionis.schemas.rules_executor.html</loc>
   </url>
   <url>
-    <loc>https://api.orionis-framework.com/orionis.schemas.rules.accepted.html</loc>
+    <loc>https://api.orionis-framework.com/orionis.schemas.rules.Accepted.html</loc>
+  </url>
+  <url>
+    <loc>https://api.orionis-framework.com/orionis.schemas.rules.accepted.module.html</loc>
   </url>
   <url>
     <loc>https://api.orionis-framework.com/orionis.schemas.rules.active_url.html</loc>
@@ -5422,28 +5584,43 @@
     <loc>https://api.orionis-framework.com/orionis.schemas.rules.after_or_equal.html</loc>
   </url>
   <url>
-    <loc>https://api.orionis-framework.com/orionis.schemas.rules.after.html</loc>
+    <loc>https://api.orionis-framework.com/orionis.schemas.rules.After.html</loc>
+  </url>
+  <url>
+    <loc>https://api.orionis-framework.com/orionis.schemas.rules.after.module.html</loc>
   </url>
   <url>
     <loc>https://api.orionis-framework.com/orionis.schemas.rules.AfterOrEqual.html</loc>
   </url>
   <url>
-    <loc>https://api.orionis-framework.com/orionis.schemas.rules.alpha.html</loc>
+    <loc>https://api.orionis-framework.com/orionis.schemas.rules.Alpha.html</loc>
   </url>
   <url>
-    <loc>https://api.orionis-framework.com/orionis.schemas.rules.ascii.html</loc>
+    <loc>https://api.orionis-framework.com/orionis.schemas.rules.alpha.module.html</loc>
+  </url>
+  <url>
+    <loc>https://api.orionis-framework.com/orionis.schemas.rules.Ascii.html</loc>
+  </url>
+  <url>
+    <loc>https://api.orionis-framework.com/orionis.schemas.rules.ascii.module.html</loc>
   </url>
   <url>
     <loc>https://api.orionis-framework.com/orionis.schemas.rules.before_or_equal.html</loc>
   </url>
   <url>
-    <loc>https://api.orionis-framework.com/orionis.schemas.rules.before.html</loc>
+    <loc>https://api.orionis-framework.com/orionis.schemas.rules.Before.html</loc>
+  </url>
+  <url>
+    <loc>https://api.orionis-framework.com/orionis.schemas.rules.before.module.html</loc>
   </url>
   <url>
     <loc>https://api.orionis-framework.com/orionis.schemas.rules.BeforeOrEqual.html</loc>
   </url>
   <url>
-    <loc>https://api.orionis-framework.com/orionis.schemas.rules.between.html</loc>
+    <loc>https://api.orionis-framework.com/orionis.schemas.rules.Between.html</loc>
+  </url>
+  <url>
+    <loc>https://api.orionis-framework.com/orionis.schemas.rules.between.module.html</loc>
   </url>
   <url>
     <loc>https://api.orionis-framework.com/orionis.schemas.rules.confirm_password.html</loc>
@@ -5464,10 +5641,16 @@
     <loc>https://api.orionis-framework.com/orionis.schemas.rules.DecimalPlaces.html</loc>
   </url>
   <url>
-    <loc>https://api.orionis-framework.com/orionis.schemas.rules.different.html</loc>
+    <loc>https://api.orionis-framework.com/orionis.schemas.rules.Different.html</loc>
   </url>
   <url>
-    <loc>https://api.orionis-framework.com/orionis.schemas.rules.dimensions.html</loc>
+    <loc>https://api.orionis-framework.com/orionis.schemas.rules.different.module.html</loc>
+  </url>
+  <url>
+    <loc>https://api.orionis-framework.com/orionis.schemas.rules.Dimensions.html</loc>
+  </url>
+  <url>
+    <loc>https://api.orionis-framework.com/orionis.schemas.rules.dimensions.module.html</loc>
   </url>
   <url>
     <loc>https://api.orionis-framework.com/orionis.schemas.rules.doesnt_end_with.html</loc>
@@ -5482,10 +5665,16 @@
     <loc>https://api.orionis-framework.com/orionis.schemas.rules.DoesntStartWith.html</loc>
   </url>
   <url>
-    <loc>https://api.orionis-framework.com/orionis.schemas.rules.email.html</loc>
+    <loc>https://api.orionis-framework.com/orionis.schemas.rules.Email.html</loc>
   </url>
   <url>
-    <loc>https://api.orionis-framework.com/orionis.schemas.rules.encoding.html</loc>
+    <loc>https://api.orionis-framework.com/orionis.schemas.rules.email.module.html</loc>
+  </url>
+  <url>
+    <loc>https://api.orionis-framework.com/orionis.schemas.rules.Encoding.html</loc>
+  </url>
+  <url>
+    <loc>https://api.orionis-framework.com/orionis.schemas.rules.encoding.module.html</loc>
   </url>
   <url>
     <loc>https://api.orionis-framework.com/orionis.schemas.rules.ends_with.html</loc>
@@ -5494,7 +5683,10 @@
     <loc>https://api.orionis-framework.com/orionis.schemas.rules.EndsWith.html</loc>
   </url>
   <url>
-    <loc>https://api.orionis-framework.com/orionis.schemas.rules.file.html</loc>
+    <loc>https://api.orionis-framework.com/orionis.schemas.rules.File.html</loc>
+  </url>
+  <url>
+    <loc>https://api.orionis-framework.com/orionis.schemas.rules.file.module.html</loc>
   </url>
   <url>
     <loc>https://api.orionis-framework.com/orionis.schemas.rules.greater_than_or_equal_field.html</loc>
@@ -5509,10 +5701,16 @@
     <loc>https://api.orionis-framework.com/orionis.schemas.rules.image_probe.html</loc>
   </url>
   <url>
-    <loc>https://api.orionis-framework.com/orionis.schemas.rules.image.html</loc>
+    <loc>https://api.orionis-framework.com/orionis.schemas.rules.Image.html</loc>
   </url>
   <url>
-    <loc>https://api.orionis-framework.com/orionis.schemas.rules.integer.html</loc>
+    <loc>https://api.orionis-framework.com/orionis.schemas.rules.image.module.html</loc>
+  </url>
+  <url>
+    <loc>https://api.orionis-framework.com/orionis.schemas.rules.Integer.html</loc>
+  </url>
+  <url>
+    <loc>https://api.orionis-framework.com/orionis.schemas.rules.integer.module.html</loc>
   </url>
   <url>
     <loc>https://api.orionis-framework.com/orionis.schemas.rules.ip_address.html</loc>
@@ -5533,7 +5731,10 @@
     <loc>https://api.orionis-framework.com/orionis.schemas.rules.LessThanOrEqualField.html</loc>
   </url>
   <url>
-    <loc>https://api.orionis-framework.com/orionis.schemas.rules.lowercase.html</loc>
+    <loc>https://api.orionis-framework.com/orionis.schemas.rules.Lowercase.html</loc>
+  </url>
+  <url>
+    <loc>https://api.orionis-framework.com/orionis.schemas.rules.lowercase.module.html</loc>
   </url>
   <url>
     <loc>https://api.orionis-framework.com/orionis.schemas.rules.mac_address.html</loc>
@@ -5557,7 +5758,10 @@
     <loc>https://api.orionis-framework.com/orionis.schemas.rules.MimeTypes.html</loc>
   </url>
   <url>
-    <loc>https://api.orionis-framework.com/orionis.schemas.rules.size.html</loc>
+    <loc>https://api.orionis-framework.com/orionis.schemas.rules.Size.html</loc>
+  </url>
+  <url>
+    <loc>https://api.orionis-framework.com/orionis.schemas.rules.size.module.html</loc>
   </url>
   <url>
     <loc>https://api.orionis-framework.com/orionis.schemas.rules.starts_with.html</loc>
@@ -5575,13 +5779,22 @@
     <loc>https://api.orionis-framework.com/orionis.schemas.rules.temporal.html</loc>
   </url>
   <url>
-    <loc>https://api.orionis-framework.com/orionis.schemas.rules.ulid.html</loc>
+    <loc>https://api.orionis-framework.com/orionis.schemas.rules.Ulid.html</loc>
   </url>
   <url>
-    <loc>https://api.orionis-framework.com/orionis.schemas.rules.unique.html</loc>
+    <loc>https://api.orionis-framework.com/orionis.schemas.rules.ulid.module.html</loc>
   </url>
   <url>
-    <loc>https://api.orionis-framework.com/orionis.schemas.rules.uppercase.html</loc>
+    <loc>https://api.orionis-framework.com/orionis.schemas.rules.Unique.html</loc>
+  </url>
+  <url>
+    <loc>https://api.orionis-framework.com/orionis.schemas.rules.unique.module.html</loc>
+  </url>
+  <url>
+    <loc>https://api.orionis-framework.com/orionis.schemas.rules.Uppercase.html</loc>
+  </url>
+  <url>
+    <loc>https://api.orionis-framework.com/orionis.schemas.rules.uppercase.module.html</loc>
   </url>
   <url>
     <loc>https://api.orionis-framework.com/orionis.schemas.rules.uuid_string.html</loc>
@@ -5590,7 +5803,10 @@
     <loc>https://api.orionis-framework.com/orionis.schemas.rules.Uuid.html</loc>
   </url>
   <url>
-    <loc>https://api.orionis-framework.com/orionis.schemas.schema.html</loc>
+    <loc>https://api.orionis-framework.com/orionis.schemas.Schema.html</loc>
+  </url>
+  <url>
+    <loc>https://api.orionis-framework.com/orionis.schemas.schema.module.html</loc>
   </url>
   <url>
     <loc>https://api.orionis-framework.com/orionis.schemas.schema.SchemaMeta.html</loc>
@@ -5737,10 +5953,16 @@
     <loc>https://api.orionis-framework.com/orionis.storage.contracts.uploaded_file.html</loc>
   </url>
   <url>
-    <loc>https://api.orionis-framework.com/orionis.storage.directory.html</loc>
+    <loc>https://api.orionis-framework.com/orionis.storage.Directory.html</loc>
   </url>
   <url>
-    <loc>https://api.orionis-framework.com/orionis.storage.disk.html</loc>
+    <loc>https://api.orionis-framework.com/orionis.storage.directory.module.html</loc>
+  </url>
+  <url>
+    <loc>https://api.orionis-framework.com/orionis.storage.Disk.html</loc>
+  </url>
+  <url>
+    <loc>https://api.orionis-framework.com/orionis.storage.disk.module.html</loc>
   </url>
   <url>
     <loc>https://api.orionis-framework.com/orionis.storage.drivers.azure.html</loc>
@@ -5794,7 +6016,10 @@
     <loc>https://api.orionis-framework.com/orionis.storage.enums.html</loc>
   </url>
   <url>
-    <loc>https://api.orionis-framework.com/orionis.storage.enums.visibility.html</loc>
+    <loc>https://api.orionis-framework.com/orionis.storage.enums.Visibility.html</loc>
+  </url>
+  <url>
+    <loc>https://api.orionis-framework.com/orionis.storage.enums.visibility.module.html</loc>
   </url>
   <url>
     <loc>https://api.orionis-framework.com/orionis.storage.exceptions.DiskNotFoundException.html</loc>
@@ -5821,7 +6046,10 @@
     <loc>https://api.orionis-framework.com/orionis.storage.exceptions.UnsupportedStorageOperationException.html</loc>
   </url>
   <url>
-    <loc>https://api.orionis-framework.com/orionis.storage.file.html</loc>
+    <loc>https://api.orionis-framework.com/orionis.storage.File.html</loc>
+  </url>
+  <url>
+    <loc>https://api.orionis-framework.com/orionis.storage.file.module.html</loc>
   </url>
   <url>
     <loc>https://api.orionis-framework.com/orionis.storage.html</loc>
@@ -5869,40 +6097,67 @@
     <loc>https://api.orionis-framework.com/orionis.support.entities.html</loc>
   </url>
   <url>
-    <loc>https://api.orionis-framework.com/orionis.support.facades.application.html</loc>
+    <loc>https://api.orionis-framework.com/orionis.support.facades.Application.html</loc>
   </url>
   <url>
-    <loc>https://api.orionis-framework.com/orionis.support.facades.auth.html</loc>
+    <loc>https://api.orionis-framework.com/orionis.support.facades.application.module.html</loc>
   </url>
   <url>
-    <loc>https://api.orionis-framework.com/orionis.support.facades.cache.html</loc>
+    <loc>https://api.orionis-framework.com/orionis.support.facades.Auth.html</loc>
   </url>
   <url>
-    <loc>https://api.orionis-framework.com/orionis.support.facades.catch.html</loc>
+    <loc>https://api.orionis-framework.com/orionis.support.facades.auth.module.html</loc>
+  </url>
+  <url>
+    <loc>https://api.orionis-framework.com/orionis.support.facades.Cache.html</loc>
+  </url>
+  <url>
+    <loc>https://api.orionis-framework.com/orionis.support.facades.cache.module.html</loc>
+  </url>
+  <url>
+    <loc>https://api.orionis-framework.com/orionis.support.facades.Catch.html</loc>
+  </url>
+  <url>
+    <loc>https://api.orionis-framework.com/orionis.support.facades.catch.module.html</loc>
   </url>
   <url>
     <loc>https://api.orionis-framework.com/orionis.support.facades.Crypt.html</loc>
   </url>
   <url>
-    <loc>https://api.orionis-framework.com/orionis.support.facades.datetime.html</loc>
+    <loc>https://api.orionis-framework.com/orionis.support.facades.DateTime.html</loc>
   </url>
   <url>
-    <loc>https://api.orionis-framework.com/orionis.support.facades.db.html</loc>
+    <loc>https://api.orionis-framework.com/orionis.support.facades.datetime.module.html</loc>
   </url>
   <url>
-    <loc>https://api.orionis-framework.com/orionis.support.facades.debug.html</loc>
+    <loc>https://api.orionis-framework.com/orionis.support.facades.DB.html</loc>
+  </url>
+  <url>
+    <loc>https://api.orionis-framework.com/orionis.support.facades.db.module.html</loc>
+  </url>
+  <url>
+    <loc>https://api.orionis-framework.com/orionis.support.facades.Debug.html</loc>
+  </url>
+  <url>
+    <loc>https://api.orionis-framework.com/orionis.support.facades.debug.module.html</loc>
   </url>
   <url>
     <loc>https://api.orionis-framework.com/orionis.support.facades.encrypter.html</loc>
   </url>
   <url>
-    <loc>https://api.orionis-framework.com/orionis.support.facades.hash.html</loc>
+    <loc>https://api.orionis-framework.com/orionis.support.facades.Hash.html</loc>
+  </url>
+  <url>
+    <loc>https://api.orionis-framework.com/orionis.support.facades.hash.module.html</loc>
   </url>
   <url>
     <loc>https://api.orionis-framework.com/orionis.support.facades.html</loc>
   </url>
   <url>
-    <loc>https://api.orionis-framework.com/orionis.support.facades.lang.html</loc>
+    <loc>https://api.orionis-framework.com/orionis.support.facades.Lang.html</loc>
+  </url>
+  <url>
+    <loc>https://api.orionis-framework.com/orionis.support.facades.lang.module.html</loc>
   </url>
   <url>
     <loc>https://api.orionis-framework.com/orionis.support.facades.Log.html</loc>
@@ -5911,19 +6166,34 @@
     <loc>https://api.orionis-framework.com/orionis.support.facades.logger.html</loc>
   </url>
   <url>
-    <loc>https://api.orionis-framework.com/orionis.support.facades.mail.html</loc>
+    <loc>https://api.orionis-framework.com/orionis.support.facades.Mail.html</loc>
   </url>
   <url>
-    <loc>https://api.orionis-framework.com/orionis.support.facades.mcp.html</loc>
+    <loc>https://api.orionis-framework.com/orionis.support.facades.mail.module.html</loc>
   </url>
   <url>
-    <loc>https://api.orionis-framework.com/orionis.support.facades.queue.html</loc>
+    <loc>https://api.orionis-framework.com/orionis.support.facades.Mcp.html</loc>
   </url>
   <url>
-    <loc>https://api.orionis-framework.com/orionis.support.facades.reactor.html</loc>
+    <loc>https://api.orionis-framework.com/orionis.support.facades.mcp.module.html</loc>
   </url>
   <url>
-    <loc>https://api.orionis-framework.com/orionis.support.facades.realtime.html</loc>
+    <loc>https://api.orionis-framework.com/orionis.support.facades.Queue.html</loc>
+  </url>
+  <url>
+    <loc>https://api.orionis-framework.com/orionis.support.facades.queue.module.html</loc>
+  </url>
+  <url>
+    <loc>https://api.orionis-framework.com/orionis.support.facades.Reactor.html</loc>
+  </url>
+  <url>
+    <loc>https://api.orionis-framework.com/orionis.support.facades.reactor.module.html</loc>
+  </url>
+  <url>
+    <loc>https://api.orionis-framework.com/orionis.support.facades.Realtime.html</loc>
+  </url>
+  <url>
+    <loc>https://api.orionis-framework.com/orionis.support.facades.realtime.module.html</loc>
   </url>
   <url>
     <loc>https://api.orionis-framework.com/orionis.support.facades.Route.html</loc>
@@ -5932,16 +6202,28 @@
     <loc>https://api.orionis-framework.com/orionis.support.facades.router.html</loc>
   </url>
   <url>
-    <loc>https://api.orionis-framework.com/orionis.support.facades.schedule.html</loc>
+    <loc>https://api.orionis-framework.com/orionis.support.facades.Schedule.html</loc>
   </url>
   <url>
-    <loc>https://api.orionis-framework.com/orionis.support.facades.schema.html</loc>
+    <loc>https://api.orionis-framework.com/orionis.support.facades.schedule.module.html</loc>
   </url>
   <url>
-    <loc>https://api.orionis-framework.com/orionis.support.facades.session.html</loc>
+    <loc>https://api.orionis-framework.com/orionis.support.facades.Schema.html</loc>
   </url>
   <url>
-    <loc>https://api.orionis-framework.com/orionis.support.facades.storage.html</loc>
+    <loc>https://api.orionis-framework.com/orionis.support.facades.schema.module.html</loc>
+  </url>
+  <url>
+    <loc>https://api.orionis-framework.com/orionis.support.facades.Session.html</loc>
+  </url>
+  <url>
+    <loc>https://api.orionis-framework.com/orionis.support.facades.session.module.html</loc>
+  </url>
+  <url>
+    <loc>https://api.orionis-framework.com/orionis.support.facades.Storage.html</loc>
+  </url>
+  <url>
+    <loc>https://api.orionis-framework.com/orionis.support.facades.storage.module.html</loc>
   </url>
   <url>
     <loc>https://api.orionis-framework.com/orionis.support.facades.Test.html</loc>
@@ -5950,7 +6232,10 @@
     <loc>https://api.orionis-framework.com/orionis.support.facades.testing.html</loc>
   </url>
   <url>
-    <loc>https://api.orionis-framework.com/orionis.support.facades.view.html</loc>
+    <loc>https://api.orionis-framework.com/orionis.support.facades.View.html</loc>
+  </url>
+  <url>
+    <loc>https://api.orionis-framework.com/orionis.support.facades.view.module.html</loc>
   </url>
   <url>
     <loc>https://api.orionis-framework.com/orionis.support.formatter.exceptions.contracts.html</loc>
@@ -5995,7 +6280,10 @@
     <loc>https://api.orionis-framework.com/orionis.support.inspirational.html</loc>
   </url>
   <url>
-    <loc>https://api.orionis-framework.com/orionis.support.inspirational.inspire.html</loc>
+    <loc>https://api.orionis-framework.com/orionis.support.inspirational.Inspire.html</loc>
+  </url>
+  <url>
+    <loc>https://api.orionis-framework.com/orionis.support.inspirational.inspire.module.html</loc>
   </url>
   <url>
     <loc>https://api.orionis-framework.com/orionis.support.inspirational.quotes.html</loc>
@@ -6061,10 +6349,16 @@
     <loc>https://api.orionis-framework.com/orionis.support.system.html</loc>
   </url>
   <url>
-    <loc>https://api.orionis-framework.com/orionis.support.system.workers.html</loc>
+    <loc>https://api.orionis-framework.com/orionis.support.system.Workers.html</loc>
   </url>
   <url>
-    <loc>https://api.orionis-framework.com/orionis.support.types.collection.html</loc>
+    <loc>https://api.orionis-framework.com/orionis.support.system.workers.module.html</loc>
+  </url>
+  <url>
+    <loc>https://api.orionis-framework.com/orionis.support.types.Collection.html</loc>
+  </url>
+  <url>
+    <loc>https://api.orionis-framework.com/orionis.support.types.collection.module.html</loc>
   </url>
   <url>
     <loc>https://api.orionis-framework.com/orionis.support.types.contracts.collection.html</loc>
@@ -6103,7 +6397,10 @@
     <loc>https://api.orionis-framework.com/orionis.support.types.StdClass.html</loc>
   </url>
   <url>
-    <loc>https://api.orionis-framework.com/orionis.support.types.stringable.html</loc>
+    <loc>https://api.orionis-framework.com/orionis.support.types.Stringable.html</loc>
+  </url>
+  <url>
+    <loc>https://api.orionis-framework.com/orionis.support.types.stringable.module.html</loc>
   </url>
   <url>
     <loc>https://api.orionis-framework.com/orionis.support.types.uniqueness.html</loc>

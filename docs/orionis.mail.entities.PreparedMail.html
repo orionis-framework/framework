@@ -248,7 +248,7 @@
                     
                 </label>
 
-                <code><a href="orionis.mail.entities.address.html" class="internal-link" title="orionis.mail.entities.address">address</a></code>
+                <code><a href="orionis.mail.entities.address.module.html" class="internal-link" title="orionis.mail.entities.address">address</a></code>
 
                 <div class="expandableContent">
                     <div>
@@ -269,7 +269,7 @@
         
 
         
-            <div class="itemName"><code><a href="orionis.mail.entities.address.html#addresses" class="internal-link" title="orionis.mail.entities.address.addresses">addresses</a></code>
+            <div class="itemName"><code><a href="orionis.mail.entities.address.module.html#addresses" class="internal-link" title="orionis.mail.entities.address.addresses">addresses</a></code>
             </div>
         
 
@@ -279,7 +279,7 @@
         
 
         
-            <div class="itemName"><code><a href="orionis.mail.entities.address.html#one_address" class="internal-link" title="orionis.mail.entities.address.one_address">one<wbr></wbr>_address</a></code>
+            <div class="itemName"><code><a href="orionis.mail.entities.address.module.html#one_address" class="internal-link" title="orionis.mail.entities.address.one_address">one<wbr></wbr>_address</a></code>
             </div>
         
 
@@ -298,7 +298,7 @@
         
 
         
-            <div class="itemName"><code><a href="orionis.mail.entities.address.html#_HEADERS" class="internal-link" title="orionis.mail.entities.address._HEADERS">_HEADERS</a></code>
+            <div class="itemName"><code><a href="orionis.mail.entities.address.module.html#_HEADERS" class="internal-link" title="orionis.mail.entities.address._HEADERS">_HEADERS</a></code>
             </div>
         
 
@@ -330,7 +330,7 @@
                     
                 </label>
 
-                <code><a href="orionis.mail.entities.attachment.html" class="internal-link" title="orionis.mail.entities.attachment">attachment</a></code>
+                <code><a href="orionis.mail.entities.attachment.module.html" class="internal-link" title="orionis.mail.entities.attachment">attachment</a></code>
 
                 <div class="expandableContent">
                     <div>
@@ -376,7 +376,7 @@
                     
                 </label>
 
-                <code><a href="orionis.mail.entities.content.html" class="internal-link" title="orionis.mail.entities.content">content</a></code>
+                <code><a href="orionis.mail.entities.content.module.html" class="internal-link" title="orionis.mail.entities.content">content</a></code>
 
                 <div class="expandableContent">
                     <div>
@@ -422,7 +422,7 @@
                     
                 </label>
 
-                <code><a href="orionis.mail.entities.envelope.html" class="internal-link" title="orionis.mail.entities.envelope">envelope</a></code>
+                <code><a href="orionis.mail.entities.envelope.module.html" class="internal-link" title="orionis.mail.entities.envelope">envelope</a></code>
 
                 <div class="expandableContent">
                     <div>
@@ -1817,45 +1817,45 @@
         </div>
 
         <div class="extrasDocstring">
-          <p class="class-signature"><code><span class="py-keyword">class</span> <span class="py-defname">PreparedMail</span>: <a href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/mail/entities/prepared.py#L3" class="sourceLink">(source)</a></code></p><p><a href="classIndex.html#orionis.mail.entities.PreparedMail">View In Hierarchy</a></p>
+          <p class="class-signature"><code><span class="py-keyword">class</span> <span class="py-defname">PreparedMail</span>: <a href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/mail/entities/prepared.py#L5" class="sourceLink">(source)</a></code></p><p><a href="classIndex.html#orionis.mail.entities.PreparedMail">View In Hierarchy</a></p>
         </div>
 
         <div class="moduleDocstring">
           <div><p>Carry immutable MIME bytes and a separate validated transport envelope.</p>
 <p>Transports consume this value without seeing templates, Mailable classes,
 storage paths, or a mutable <tt class="rst-docutils rst-literal">EmailMessage</tt>.</p>
-<table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">message<wbr></wbr>_id</span></td><td class="fieldArgDesc">Message-ID generated once for the operation.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">sender</span></td><td class="fieldArgDesc">Envelope sender used by the transport.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">recipients</span></td><td class="fieldArgDesc">Deduplicated union of To, Cc, and Bcc addresses.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">mime</span></td><td class="fieldArgDesc">Serialized message without any Bcc header.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">smtp<wbr></wbr>_utf8</span></td><td class="fieldArgDesc">Whether an envelope mailbox or a visible addr-spec needs SMTPUTF8.</td></tr></table></div>
+</div>
         </div>
 
         <div id="split-tables">
-          <table class="children sortable" id="id1306">
+          <table class="children sortable" id="id1309">
   
   
-  <tr class="classvariable">
+  <tr class="instancevariable">
     
-    <td>Class Variable</td>
+    <td>Instance Variable</td>
     <td><code><a href="#message_id" class="internal-link" title="orionis.mail.entities.PreparedMail.message_id">message<wbr></wbr>_id</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
-  </tr><tr class="classvariable">
+    <td>Message-ID generated once for the operation.</td>
+  </tr><tr class="instancevariable">
     
-    <td>Class Variable</td>
+    <td>Instance Variable</td>
     <td><code><a href="#mime" class="internal-link" title="orionis.mail.entities.PreparedMail.mime">mime</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
-  </tr><tr class="classvariable">
+    <td>Serialized message without any Bcc header.</td>
+  </tr><tr class="instancevariable">
     
-    <td>Class Variable</td>
+    <td>Instance Variable</td>
     <td><code><a href="#recipients" class="internal-link" title="orionis.mail.entities.PreparedMail.recipients">recipients</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
-  </tr><tr class="classvariable">
+    <td>Deduplicated union of To, Cc, and Bcc addresses.</td>
+  </tr><tr class="instancevariable">
     
-    <td>Class Variable</td>
+    <td>Instance Variable</td>
     <td><code><a href="#sender" class="internal-link" title="orionis.mail.entities.PreparedMail.sender">sender</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
-  </tr><tr class="classvariable">
+    <td>Envelope sender used by the transport.</td>
+  </tr><tr class="instancevariable">
     
-    <td>Class Variable</td>
+    <td>Instance Variable</td>
     <td><code><a href="#smtp_utf8" class="internal-link" title="orionis.mail.entities.PreparedMail.smtp_utf8">smtp<wbr></wbr>_utf8</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
+    <td>Whether an envelope mailbox or a visible addr-spec needs SMTPUTF8.</td>
   </tr>
 </table>
           
@@ -1864,7 +1864,7 @@ storage paths, or a mutable <tt class="rst-docutils rst-literal">EmailMessage</t
         </div>
 
         <div id="child-list">
-          <div class="baseclassvariable">
+          <div class="baseinstancevariable">
   
   
   <a name="orionis.mail.entities.PreparedMail.message_id">
@@ -1876,7 +1876,7 @@ storage paths, or a mutable <tt class="rst-docutils rst-literal">EmailMessage</t
   <div class="functionHeader">
     
     <span class="py-defname">message_id</span>: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/mail/entities/prepared.py#L25">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/mail/entities/prepared.py#L27">
       
       (source)
     </a>
@@ -1888,10 +1888,10 @@ storage paths, or a mutable <tt class="rst-docutils rst-literal">EmailMessage</t
   </div>
   <div class="functionBody">
     
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p>Message-ID generated once for the operation.</p></div>
     
   </div>
-</div><div class="baseclassvariable">
+</div><div class="baseinstancevariable">
   
   
   <a name="orionis.mail.entities.PreparedMail.mime">
@@ -1903,7 +1903,7 @@ storage paths, or a mutable <tt class="rst-docutils rst-literal">EmailMessage</t
   <div class="functionHeader">
     
     <span class="py-defname">mime</span>: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#bytes" class="intersphinx-link">bytes</a></code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/mail/entities/prepared.py#L28">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/mail/entities/prepared.py#L30">
       
       (source)
     </a>
@@ -1915,10 +1915,10 @@ storage paths, or a mutable <tt class="rst-docutils rst-literal">EmailMessage</t
   </div>
   <div class="functionBody">
     
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p>Serialized message without any Bcc header.</p></div>
     
   </div>
-</div><div class="baseclassvariable">
+</div><div class="baseinstancevariable">
   
   
   <a name="orionis.mail.entities.PreparedMail.recipients">
@@ -1929,8 +1929,8 @@ storage paths, or a mutable <tt class="rst-docutils rst-literal">EmailMessage</t
   </a>
   <div class="functionHeader">
     
-    <span class="py-defname">recipients</span>: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" class="intersphinx-link">tuple</a>[<a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, ...]</code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/mail/entities/prepared.py#L27">
+    <span class="py-defname">recipients</span>: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" class="intersphinx-link">tuple</a>[<a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <tt class="rst-docutils rst-literal">...</tt>]</code> =
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/mail/entities/prepared.py#L29">
       
       (source)
     </a>
@@ -1942,10 +1942,10 @@ storage paths, or a mutable <tt class="rst-docutils rst-literal">EmailMessage</t
   </div>
   <div class="functionBody">
     
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p>Deduplicated union of To, Cc, and Bcc addresses.</p></div>
     
   </div>
-</div><div class="baseclassvariable">
+</div><div class="baseinstancevariable">
   
   
   <a name="orionis.mail.entities.PreparedMail.sender">
@@ -1957,7 +1957,7 @@ storage paths, or a mutable <tt class="rst-docutils rst-literal">EmailMessage</t
   <div class="functionHeader">
     
     <span class="py-defname">sender</span>: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/mail/entities/prepared.py#L26">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/mail/entities/prepared.py#L28">
       
       (source)
     </a>
@@ -1969,10 +1969,10 @@ storage paths, or a mutable <tt class="rst-docutils rst-literal">EmailMessage</t
   </div>
   <div class="functionBody">
     
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p>Envelope sender used by the transport.</p></div>
     
   </div>
-</div><div class="baseclassvariable">
+</div><div class="baseinstancevariable">
   
   
   <a name="orionis.mail.entities.PreparedMail.smtp_utf8">
@@ -1984,7 +1984,7 @@ storage paths, or a mutable <tt class="rst-docutils rst-literal">EmailMessage</t
   <div class="functionHeader">
     
     <span class="py-defname">smtp_utf8</span>: <code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/mail/entities/prepared.py#L29">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/mail/entities/prepared.py#L31">
       
       (source)
     </a>
@@ -1996,7 +1996,7 @@ storage paths, or a mutable <tt class="rst-docutils rst-literal">EmailMessage</t
   </div>
   <div class="functionBody">
     
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p>Whether an envelope mailbox or a visible addr-spec needs SMTPUTF8.</p></div>
     
   </div>
 </div>
@@ -2010,7 +2010,7 @@ storage paths, or a mutable <tt class="rst-docutils rst-literal">EmailMessage</t
   <div class="orionis-footer-inner">
     <div class="orionis-footer-copy">
       <p>API documentation for <a href="https://orionis-framework.com/" class="projecthome">Orionis</a>.</p>
-      <p class="orionis-footer-meta">Generated with <a href="https://github.com/twisted/pydoctor/">Pydoctor</a> 25.10.1.<span class="orionis-footer-build"> Built 2026-11-03 09:36:58.</span></p>
+      <p class="orionis-footer-meta">Generated with <a href="https://github.com/twisted/pydoctor/">Pydoctor</a> 25.10.1.<span class="orionis-footer-build"> Built 2026-11-03 13:00:15.</span></p>
     </div>
     <nav class="orionis-footer-links" aria-label="Additional resources">
       <a href="https://docs.orionis-framework.com">Read the guide <span aria-hidden="true">↗</span></a>

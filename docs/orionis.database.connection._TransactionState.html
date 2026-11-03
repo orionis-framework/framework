@@ -248,7 +248,7 @@
 
       <div class="thingTitle">
         <span>Module</span>
-        <code><a href="orionis.database.connection.html" class="internal-link" title="The parent of this class">connection</a></code> 
+        <code><a href="orionis.database.connection.module.html" class="internal-link" title="The parent of this class">connection</a></code> 
       </div>
       
       <div>
@@ -394,7 +394,7 @@
         
 
         
-            <div class="itemName"><code><a href="orionis.database.connection.html#_text_statement" class="internal-link" title="orionis.database.connection._text_statement">_text<wbr></wbr>_statement</a></code>
+            <div class="itemName"><code><a href="orionis.database.connection.module.html#_text_statement" class="internal-link" title="orionis.database.connection._text_statement">_text<wbr></wbr>_statement</a></code>
             </div>
         
 
@@ -413,7 +413,7 @@
         
 
         
-            <div class="itemName"><code><a href="orionis.database.connection.html#_NO_ACTIVE_TRANSACTION" class="internal-link" title="orionis.database.connection._NO_ACTIVE_TRANSACTION">_NO<wbr></wbr>_ACTIVE<wbr></wbr>_TRANSACTION</a></code>
+            <div class="itemName"><code><a href="orionis.database.connection.module.html#_NO_ACTIVE_TRANSACTION" class="internal-link" title="orionis.database.connection._NO_ACTIVE_TRANSACTION">_NO<wbr></wbr>_ACTIVE<wbr></wbr>_TRANSACTION</a></code>
             </div>
         
 
@@ -465,7 +465,7 @@
 </div>
 
         <div class="page-header">
-          <h1 class="class"><code><code><a href="index.html" class="internal-link">orionis</a></code><wbr></wbr>.<code><a href="orionis.database.html" class="internal-link" title="orionis.database">database</a></code><wbr></wbr>.<code><a href="orionis.database.connection.html" class="internal-link" title="orionis.database.connection">connection</a></code><wbr></wbr>.<code><a href="orionis.database.connection._TransactionState.html" class="internal-link" title="orionis.database.connection._TransactionState">_TransactionState</a></code></code></h1>
+          <h1 class="class"><code><code><a href="index.html" class="internal-link">orionis</a></code><wbr></wbr>.<code><a href="orionis.database.html" class="internal-link" title="orionis.database">database</a></code><wbr></wbr>.<code><a href="orionis.database.connection.module.html" class="internal-link" title="orionis.database.connection">connection</a></code><wbr></wbr>.<code><a href="orionis.database.connection._TransactionState.html" class="internal-link" title="orionis.database.connection._TransactionState">_TransactionState</a></code></code></h1>
           <div id="show-private">
             <button class="btn btn-link" onclick="togglePrivate()">Toggle Private API</button>
           </div>
@@ -476,7 +476,7 @@
         </div>
 
         <div class="extrasDocstring">
-          <p class="class-signature"><code><span class="py-keyword">class</span> <span class="py-defname">_TransactionState</span>: <a href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/database/connection.py#L64" class="sourceLink">(source)</a></code></p><p>Constructor: <code><a href="#__init__" class="internal-link" title="orionis.database.connection._TransactionState.__init__">_TransactionState(connection, transaction)</a></code></p><p><a href="classIndex.html#orionis.database.connection._TransactionState">View In Hierarchy</a></p>
+          <p class="class-signature"><code><span class="py-keyword">class</span> <span class="py-defname">_TransactionState</span>: <a href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/database/connection.py#L67" class="sourceLink">(source)</a></code></p><p>Constructor: <code><a href="#__init__" class="internal-link" title="orionis.database.connection._TransactionState.__init__">_TransactionState(connection, transaction)</a></code></p><p><a href="classIndex.html#orionis.database.connection._TransactionState">View In Hierarchy</a></p>
         </div>
 
         <div class="moduleDocstring">
@@ -506,22 +506,22 @@
     
     <td>Class Variable</td>
     <td><code><a href="#__slots__" class="internal-link" title="orionis.database.connection._TransactionState.__slots__">__slots__</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
+    <td>Declare the instance attribute slots reserved by this class.</td>
   </tr><tr class="instancevariable">
     
     <td>Instance Variable</td>
     <td><code><a href="#connection" class="internal-link" title="orionis.database.connection._TransactionState.connection">connection</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
+    <td>Open connection shared by all transaction levels.</td>
   </tr><tr class="instancevariable">
     
     <td>Instance Variable</td>
     <td><code><a href="#owner" class="internal-link" title="orionis.database.connection._TransactionState.owner">owner</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
+    <td>Owner produced by <tt class="rst-docutils rst-literal">current_task</tt>.</td>
   </tr><tr class="instancevariable">
     
     <td>Instance Variable</td>
     <td><code><a href="#transactions" class="internal-link" title="orionis.database.connection._TransactionState.transactions">transactions</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
+    <td>Transaction scopes currently associated with the connection context.</td>
   </tr>
 </table>
           
@@ -543,7 +543,7 @@
     
     
     <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">__aenter__</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>) -&gt; <code>AsyncConnection | <a href="orionis.database.threaded.connection.ThreadedConnection.html" class="internal-link" title="orionis.database.threaded.connection.ThreadedConnection">ThreadedConnection</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/database/connection.py#L93">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/database/connection.py#L100">
       
       (source)
     </a>
@@ -555,7 +555,7 @@
   </div>
   <div class="docstring functionBody">
     
-    <div><p>Return the existing raw connection without acquiring another one.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code>AsyncConnection | ThreadedConnection</code></td><td class="fieldArgDesc">Open connection retained by the transaction owner.</td></tr></table></div>
+    <div><p>Return the existing raw connection without acquiring another one.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><tt class="rst-docutils rst-literal">AsyncConnection</tt> | ThreadedConnection</code></td><td class="fieldArgDesc">Open connection retained by the transaction owner.</td></tr></table></div>
   </div>
 </div><div class="basemethod">
   
@@ -570,7 +570,7 @@
     
     
     <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">__aexit__</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">*exc_info: <code><a href="https://docs.python.org/3/builtins/functions.html#object" class="intersphinx-link">object</a></code></span>):</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/database/connection.py#L104">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/database/connection.py#L111">
       
       (source)
     </a>
@@ -597,7 +597,7 @@
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">__init__</span><span class="function-signature long-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">connection: <code>AsyncConnection | <a href="orionis.database.threaded.connection.ThreadedConnection.html" class="internal-link" title="orionis.database.threaded.connection.ThreadedConnection">ThreadedConnection</a></code>, </span><span class="rst-sig-param">transaction: <code>AsyncTransaction | <a href="orionis.database.threaded.transaction.ThreadedTransaction.html" class="internal-link" title="orionis.database.threaded.transaction.ThreadedTransaction">ThreadedTransaction</a></code></span>):</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/database/connection.py#L69">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/database/connection.py#L73">
       
       (source)
     </a>
@@ -609,7 +609,7 @@
   </div>
   <div class="docstring functionBody">
     
-    <div><p>Bind a raw connection and root transaction to the current task.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">connection:</span><code>AsyncConnection | ThreadedConnection</code></td><td class="fieldArgDesc">Open connection shared by all transaction levels.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">transaction:</span><code>AsyncTransaction | ThreadedTransaction</code></td><td class="fieldArgDesc">Root transaction used to initialize the stack.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">Store the connection, owning task, and transaction stack.</td></tr></table></div>
+    <div><p>Bind a raw connection and root transaction to the current task.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">connection:</span><code><tt class="rst-docutils rst-literal">AsyncConnection</tt> | ThreadedConnection</code></td><td class="fieldArgDesc">Open connection shared by all transaction levels.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">transaction:</span><code><tt class="rst-docutils rst-literal">AsyncTransaction</tt> | ThreadedTransaction</code></td><td class="fieldArgDesc">Root transaction used to initialize the stack.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">Store the connection, owning task, and transaction stack.</td></tr></table></div>
   </div>
 </div><div class="baseclassvariable">
   
@@ -623,7 +623,7 @@
   <div class="functionHeader">
     
     <span class="py-defname">__slots__</span>: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" class="intersphinx-link">tuple</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <wbr></wbr><span class="rst-variable-ellipsis">...</span>]</code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/database/connection.py#L67">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/database/connection.py#L70">
       
       (source)
     </a>
@@ -635,7 +635,7 @@
   </div>
   <div class="functionBody">
     
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p>Declare the instance attribute slots reserved by this class.</p></div>
     
   </div>
 </div><div class="baseinstancevariable">
@@ -650,7 +650,7 @@
   <div class="functionHeader">
     
     <span class="py-defname">connection</span> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/database/connection.py#L89">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/database/connection.py#L93">
       
       (source)
     </a>
@@ -662,7 +662,7 @@
   </div>
   <div class="functionBody">
     
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p>Open connection shared by all transaction levels.</p></div>
     
   </div>
 </div><div class="baseinstancevariable">
@@ -677,7 +677,7 @@
   <div class="functionHeader">
     
     <span class="py-defname">owner</span> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/database/connection.py#L90">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/database/connection.py#L95">
       
       (source)
     </a>
@@ -689,7 +689,7 @@
   </div>
   <div class="functionBody">
     
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p>Owner produced by <tt class="rst-docutils rst-literal">current_task</tt>.</p></div>
     
   </div>
 </div><div class="baseinstancevariable">
@@ -704,7 +704,7 @@
   <div class="functionHeader">
     
     <span class="py-defname">transactions</span>: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#list" class="intersphinx-link">list</a>[<wbr></wbr>AsyncTransaction | <a href="orionis.database.threaded.transaction.ThreadedTransaction.html" class="internal-link" title="orionis.database.threaded.transaction.ThreadedTransaction">ThreadedTransaction</a>]</code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/database/connection.py#L91">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/database/connection.py#L97">
       
       (source)
     </a>
@@ -716,7 +716,7 @@
   </div>
   <div class="functionBody">
     
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p>Transaction scopes currently associated with the connection context.</p></div>
     
   </div>
 </div>
@@ -730,7 +730,7 @@
   <div class="orionis-footer-inner">
     <div class="orionis-footer-copy">
       <p>API documentation for <a href="https://orionis-framework.com/" class="projecthome">Orionis</a>.</p>
-      <p class="orionis-footer-meta">Generated with <a href="https://github.com/twisted/pydoctor/">Pydoctor</a> 25.10.1.<span class="orionis-footer-build"> Built 2026-11-03 09:36:58.</span></p>
+      <p class="orionis-footer-meta">Generated with <a href="https://github.com/twisted/pydoctor/">Pydoctor</a> 25.10.1.<span class="orionis-footer-build"> Built 2026-11-03 13:00:15.</span></p>
     </div>
     <nav class="orionis-footer-links" aria-label="Additional resources">
       <a href="https://docs.orionis-framework.com">Read the guide <span aria-hidden="true">↗</span></a>

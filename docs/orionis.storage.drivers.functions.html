@@ -3350,15 +3350,18 @@
         </div>
 
         <div class="extrasDocstring">
-          <a href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/storage/drivers/functions.py" class="sourceLink">(source)</a>
+          <a href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/storage/drivers/functions.py" class="sourceLink">(source)</a>
         </div>
 
         <div class="moduleDocstring">
-          <div><p class="undocumented">Undocumented</p></div>
+          <div><p>Provide storage drivers operations.</p>
+<p>Includes <tt class="rst-docutils rst-literal">import_driver_dependency</tt>, <tt class="rst-docutils rst-literal">assert_binary_mode</tt>,
+<tt class="rst-docutils rst-literal">resolve_download_target</tt>, <tt class="rst-docutils rst-literal">filter_files</tt>.</p>
+</div>
         </div>
 
         <div id="split-tables">
-          <table class="children sortable" id="id2015">
+          <table class="children sortable" id="id2023">
   
   
   <tr class="function">
@@ -3400,12 +3403,12 @@
     
     <td>Constant</td>
     <td><code><a href="#_ALLOWED_MODES" class="internal-link" title="orionis.storage.drivers.functions._ALLOWED_MODES">_ALLOWED<wbr></wbr>_MODES</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
+    <td>Binary modes accepted by driver open() implementations.</td>
   </tr><tr class="constant">
     
     <td>Constant</td>
     <td><code><a href="#_LEGACY_EXPORTS" class="internal-link" title="orionis.storage.drivers.functions._LEGACY_EXPORTS">_LEGACY<wbr></wbr>_EXPORTS</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
+    <td>Legacy exports definitions used by <tt class="rst-docutils rst-literal">functions</tt>.</td>
   </tr>
 </table>
           
@@ -3427,7 +3430,7 @@
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">__getattr__</span><span class="function-signature">(<span class="rst-sig-param">name: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/functions.html#object" class="intersphinx-link">object</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/storage/drivers/functions.py#L228">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/storage/drivers/functions.py#L237">
       
       (source)
     </a>
@@ -3454,7 +3457,7 @@
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">_directory_ancestors</span><span class="function-signature">(<span class="rst-sig-param">key: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code>, </span><span class="rst-sig-param">base: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></span>) -&gt; <code><a href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Iterator" class="intersphinx-link">Iterator</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>]</code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/storage/drivers/functions.py#L149">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/storage/drivers/functions.py#L157">
       
       (source)
     </a>
@@ -3469,7 +3472,7 @@
     <div><p>Yield every directory prefix implied by <em>key</em> down to <em>base</em>.</p>
 <p>Markers (keys ending with <tt class="rst-docutils rst-literal">/</tt>) name a directory directly, while
 file keys imply their parent chain.</p>
-<table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">key:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Object key, relative to the disk root.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">base:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Canonical directory path acting as the traversal floor.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Iterator" class="intersphinx-link">Iterator</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>]</code></td><td class="fieldArgDesc"><span class="undocumented">Undocumented</span></td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Yields</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Directory paths between <em>key</em> and <em>base</em>, exclusive.</td></tr></table></div>
+<table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">key:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Object key, relative to the disk root.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">base:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Canonical directory path acting as the traversal floor.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Yields</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Directory paths between <em>key</em> and <em>base</em>, exclusive.</td></tr></table></div>
   </div>
 </div><div class="basefunction">
   
@@ -3484,7 +3487,7 @@ file keys imply their parent chain.</p>
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">assert_binary_mode</span><span class="function-signature">(<span class="rst-sig-param">mode: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></span>):</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/storage/drivers/functions.py#L57">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/storage/drivers/functions.py#L64">
       
       (source)
     </a>
@@ -3496,7 +3499,7 @@ file keys imply their parent chain.</p>
   </div>
   <div class="docstring functionBody">
     
-    <div><p>Validate a stream mode against the supported binary modes.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">mode:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Mode requested by the caller.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc"><span class="undocumented">Undocumented</span></td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.storage.exceptions.UnsupportedStorageOperationException.html" class="internal-link" title="orionis.storage.exceptions.UnsupportedStorageOperationException">UnsupportedStorageOperationException</a></code></td><td>If <em>mode</em> is not one of <tt class="rst-docutils rst-literal">'rb'</tt>, <tt class="rst-docutils rst-literal">'wb'</tt>, <tt class="rst-docutils rst-literal">'ab'</tt>,
+    <div><p>Validate a stream mode against the supported binary modes.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">mode:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Mode requested by the caller.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">Validate a stream mode against the supported binary modes.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.storage.exceptions.UnsupportedStorageOperationException.html" class="internal-link">orionis.storage.exceptions.UnsupportedStorageOperationException</a></code></td><td>If <em>mode</em> is not one of <tt class="rst-docutils rst-literal">'rb'</tt>, <tt class="rst-docutils rst-literal">'wb'</tt>, <tt class="rst-docutils rst-literal">'ab'</tt>,
 <tt class="rst-docutils rst-literal">'rb+'</tt>, <tt class="rst-docutils rst-literal">'wb+'</tt>, or <tt class="rst-docutils rst-literal">'ab+'</tt>.</td></tr></table></div>
   </div>
 </div><div class="basefunction">
@@ -3512,7 +3515,7 @@ file keys imply their parent chain.</p>
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">derive_directories</span><span class="function-signature">(<span class="rst-sig-param">keys: <code><a href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Iterable" class="intersphinx-link">Iterable</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>]</code>, </span><span class="rst-sig-param">base: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code>, </span><span class="rst-sig-symbol">*, </span><span class="rst-sig-param">recursive: <code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/stdtypes.html#list" class="intersphinx-link">list</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>]</code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/storage/drivers/functions.py#L178">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/storage/drivers/functions.py#L186">
       
       (source)
     </a>
@@ -3528,7 +3531,7 @@ file keys imply their parent chain.</p>
 <p>Object stores have no physical directories: prefixes are inferred
 from the stored keys, and keys ending with <tt class="rst-docutils rst-literal">/</tt> act as explicit
 directory markers.</p>
-<table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">keys:</span><code><a href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Iterable" class="intersphinx-link">Iterable</a>[<a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>]</code></td><td class="fieldArgDesc">Object keys, relative to the disk root.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">base:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Canonical directory path acting as the listing root. The
+<table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">keys:</span><code><a href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Iterable" class="intersphinx-link">collections.abc.Iterable</a>[<a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>]</code></td><td class="fieldArgDesc">Object keys, relative to the disk root.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">base:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Canonical directory path acting as the listing root. The
 empty string denotes the disk root.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">recursive:</span><code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code></td><td class="fieldArgDesc">When <tt class="rst-docutils rst-literal">True</tt>, include all nested directories.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/stdtypes.html#list" class="intersphinx-link">list</a>[<a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>]</code></td><td class="fieldArgDesc">Sorted directory paths under <em>base</em>.</td></tr></table></div>
   </div>
 </div><div class="basefunction">
@@ -3544,7 +3547,7 @@ empty string denotes the disk root.</td></tr><tr><td class="fieldArgContainer"><
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">filter_files</span><span class="function-signature">(<span class="rst-sig-param">keys: <code><a href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Iterable" class="intersphinx-link">Iterable</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>]</code>, </span><span class="rst-sig-param">base: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code>, </span><span class="rst-sig-symbol">*, </span><span class="rst-sig-param">recursive: <code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/stdtypes.html#list" class="intersphinx-link">list</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>]</code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/storage/drivers/functions.py#L108">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/storage/drivers/functions.py#L116">
       
       (source)
     </a>
@@ -3559,7 +3562,7 @@ empty string denotes the disk root.</td></tr><tr><td class="fieldArgContainer"><
     <div><p>Select the object keys that represent files under <em>base</em>.</p>
 <p>Keys ending with <tt class="rst-docutils rst-literal">/</tt> are treated as directory markers and are
 always excluded.</p>
-<table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">keys:</span><code><a href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Iterable" class="intersphinx-link">Iterable</a>[<a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>]</code></td><td class="fieldArgDesc">Object keys, relative to the disk root.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">base:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Canonical directory path acting as the listing root. The
+<table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">keys:</span><code><a href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Iterable" class="intersphinx-link">collections.abc.Iterable</a>[<a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>]</code></td><td class="fieldArgDesc">Object keys, relative to the disk root.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">base:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Canonical directory path acting as the listing root. The
 empty string denotes the disk root.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">recursive:</span><code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code></td><td class="fieldArgDesc">When <tt class="rst-docutils rst-literal">True</tt>, include files from all nested prefixes.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/stdtypes.html#list" class="intersphinx-link">list</a>[<a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>]</code></td><td class="fieldArgDesc">Sorted file keys under <em>base</em>.</td></tr></table></div>
   </div>
 </div><div class="basefunction">
@@ -3575,7 +3578,7 @@ empty string denotes the disk root.</td></tr><tr><td class="fieldArgContainer"><
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">import_driver_dependency</span><span class="function-signature">(<span class="rst-sig-param">module: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code>, </span><span class="rst-sig-param">package: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code>, </span><span class="rst-sig-param">extra: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></span>) -&gt; <code><a href="https://docs.python.org/3/library/types.html#types.ModuleType" class="intersphinx-link">ModuleType</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/storage/drivers/functions.py#L19">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/storage/drivers/functions.py#L26">
       
       (source)
     </a>
@@ -3593,7 +3596,7 @@ empty string denotes the disk root.</td></tr><tr><td class="fieldArgContainer"><
 import lazily and converts a missing package into a descriptive
 storage exception with installation instructions.</p>
 <table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">module:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Dotted module path to import (e.g. <tt class="rst-docutils rst-literal">'boto3'</tt>).</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">package:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">PyPI package that provides the module (e.g. <tt class="rst-docutils rst-literal">'boto3'</tt>).</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">extra:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Orionis extra that pulls the package (e.g. <tt class="rst-docutils rst-literal">'s3'</tt>), used to
-suggest <tt class="rst-docutils rst-literal">uv add 'orionis[extra]'</tt>.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/library/types.html#types.ModuleType" class="intersphinx-link">ModuleType</a></code></td><td class="fieldArgDesc">The imported module.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.storage.exceptions.MissingStorageDependencyException.html" class="internal-link" title="orionis.storage.exceptions.MissingStorageDependencyException">MissingStorageDependencyException</a></code></td><td>If the package is not installed in the active environment.</td></tr></table></div>
+suggest <tt class="rst-docutils rst-literal">uv add 'orionis[extra]'</tt>.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/library/types.html#types.ModuleType" class="intersphinx-link">types.ModuleType</a></code></td><td class="fieldArgDesc">The imported module.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.storage.exceptions.MissingStorageDependencyException.html" class="internal-link">orionis.storage.exceptions.MissingStorageDependencyException</a></code></td><td>If the package is not installed in the active environment.</td></tr></table></div>
   </div>
 </div><div class="basefunction">
   
@@ -3608,7 +3611,7 @@ suggest <tt class="rst-docutils rst-literal">uv add 'orionis[extra]'</tt>.</td><
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">resolve_download_target</span><span class="function-signature">(<span class="rst-sig-param">normalized: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code>, </span><span class="rst-sig-param">destination: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a> | <a href="https://docs.python.org/3/library/pathlib.html#pathlib.Path" class="intersphinx-link">Path</a></code></span>) -&gt; <code><a href="https://docs.python.org/3/library/pathlib.html#pathlib.Path" class="intersphinx-link">Path</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/storage/drivers/functions.py#L80">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/storage/drivers/functions.py#L88">
       
       (source)
     </a>
@@ -3624,7 +3627,7 @@ suggest <tt class="rst-docutils rst-literal">uv add 'orionis[extra]'</tt>.</td><
 <p>When <em>destination</em> points to an existing directory, the file keeps
 its original name inside that directory. Missing parent
 directories are created.</p>
-<table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">normalized:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Canonical root-relative path of the remote file.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">destination:</span><code>str | Path</code></td><td class="fieldArgDesc">Local target file or existing directory.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/library/pathlib.html#pathlib.Path" class="intersphinx-link">Path</a></code></td><td class="fieldArgDesc">Local path where the file must be written.</td></tr></table></div>
+<table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">normalized:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Canonical root-relative path of the remote file.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">destination:</span><code>str | pathlib.Path</code></td><td class="fieldArgDesc">Local target file or existing directory.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/library/pathlib.html#pathlib.Path" class="intersphinx-link">pathlib.Path</a></code></td><td class="fieldArgDesc">Local path where the file must be written.</td></tr></table></div>
   </div>
 </div><div class="baseconstant">
   
@@ -3638,7 +3641,7 @@ directories are created.</p>
   <div class="functionHeader">
     
     <span class="py-defname">_ALLOWED_MODES</span>: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#frozenset" class="intersphinx-link">frozenset</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>]</code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/storage/drivers/functions.py#L15">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/storage/drivers/functions.py#L21">
       
       (source)
     </a>
@@ -3650,7 +3653,7 @@ directories are created.</p>
   </div>
   <div class="functionBody">
     
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p>Binary modes accepted by driver open() implementations.</p></div>
     <table class="valueTable"><tr class="fieldStart"><td class="fieldName">Value</td></tr><tr><td><pre class="constant-value"><code><a href="https://docs.python.org/3/builtins/stdtypes.html#frozenset" class="intersphinx-link">frozenset</a>(<wbr></wbr>set([<wbr></wbr><span class="rst-variable-quote">'</span><span class="rst-variable-string">rb</span><span class="rst-variable-quote">'</span>, <wbr></wbr><span class="rst-variable-quote">'</span><span class="rst-variable-string">wb</span><span class="rst-variable-quote">'</span>, <wbr></wbr><span class="rst-variable-quote">'</span><span class="rst-variable-string">ab</span><span class="rst-variable-quote">'</span>, <wbr></wbr><span class="rst-variable-quote">'</span><span class="rst-variable-string">rb+</span><span class="rst-variable-quote">'</span>, <wbr></wbr><span class="rst-variable-quote">'</span><span class="rst-variable-string">wb+</span><span class="rst-variable-quote">'</span>, <wbr></wbr><span class="rst-variable-quote">'</span><span class="rst-variable-string">ab+</span><span class="rst-variable-quote">'</span>]))</code></pre></td></tr></table>
   </div>
 </div><div class="baseconstant">
@@ -3665,7 +3668,7 @@ directories are created.</p>
   <div class="functionHeader">
     
     <span class="py-defname">_LEGACY_EXPORTS</span> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/storage/drivers/functions.py#L220">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/storage/drivers/functions.py#L228">
       
       (source)
     </a>
@@ -3677,7 +3680,7 @@ directories are created.</p>
   </div>
   <div class="functionBody">
     
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p>Legacy exports definitions used by <tt class="rst-docutils rst-literal">functions</tt>.</p></div>
     <table class="valueTable"><tr class="fieldStart"><td class="fieldName">Value</td></tr><tr><td><pre class="constant-value"><code>{<wbr></wbr><span class="rst-variable-quote">'</span><span class="rst-variable-string">importDriverDependency</span><span class="rst-variable-quote">'</span>: <a href="#import_driver_dependency" class="internal-link" title="orionis.storage.drivers.functions.import_driver_dependency">import_driver_dependency</a>,
  <wbr></wbr><span class="rst-variable-quote">'</span><span class="rst-variable-string">assertBinaryMode</span><span class="rst-variable-quote">'</span>: <a href="#assert_binary_mode" class="internal-link" title="orionis.storage.drivers.functions.assert_binary_mode">assert_binary_mode</a>,
  <wbr></wbr><span class="rst-variable-quote">'</span><span class="rst-variable-string">resolveDownloadTarget</span><span class="rst-variable-quote">'</span>: <a href="#resolve_download_target" class="internal-link" title="orionis.storage.drivers.functions.resolve_download_target">resolve_download_target</a>,
@@ -3695,7 +3698,7 @@ directories are created.</p>
   <div class="orionis-footer-inner">
     <div class="orionis-footer-copy">
       <p>API documentation for <a href="https://orionis-framework.com/" class="projecthome">Orionis</a>.</p>
-      <p class="orionis-footer-meta">Generated with <a href="https://github.com/twisted/pydoctor/">Pydoctor</a> 25.10.1.<span class="orionis-footer-build"> Built 2026-11-03 09:36:58.</span></p>
+      <p class="orionis-footer-meta">Generated with <a href="https://github.com/twisted/pydoctor/">Pydoctor</a> 25.10.1.<span class="orionis-footer-build"> Built 2026-11-03 13:00:15.</span></p>
     </div>
     <nav class="orionis-footer-links" aria-label="Additional resources">
       <a href="https://docs.orionis-framework.com">Read the guide <span aria-hidden="true">↗</span></a>

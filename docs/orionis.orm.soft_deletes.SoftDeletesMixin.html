@@ -410,7 +410,7 @@
         </div>
 
         <div class="extrasDocstring">
-          <p class="class-signature"><code><span class="py-keyword">class</span> <span class="py-defname">SoftDeletesMixin</span>: <a href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/orm/soft_deletes.py#L7" class="sourceLink">(source)</a></code></p><p>Known subclasses: <code><a href="orionis.orm.Model.html" class="internal-link">orionis.orm.Model</a></code></p><p><a href="classIndex.html#orionis.orm.soft_deletes.SoftDeletesMixin">View In Hierarchy</a></p>
+          <p class="class-signature"><code><span class="py-keyword">class</span> <span class="py-defname">SoftDeletesMixin</span>: <a href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/orm/soft_deletes.py#L9" class="sourceLink">(source)</a></code></p><p>Known subclasses: <code><a href="orionis.orm.Model.html" class="internal-link">orionis.orm.Model</a></code></p><p><a href="classIndex.html#orionis.orm.soft_deletes.SoftDeletesMixin">View In Hierarchy</a></p>
         </div>
 
         <div class="moduleDocstring">
@@ -418,12 +418,13 @@
 <p>A model opts in by declaring <tt class="rst-docutils rst-literal">soft_deletes = True</tt> together with a
 <tt class="rst-docutils rst-literal">deleted_at</tt> column. Deleting then stamps that column instead of
 removing the row, queries exclude stamped rows by default, and the
-row can be brought back with <code><a href="#restore" class="internal-link" title="orionis.orm.soft_deletes.SoftDeletesMixin.restore">restore</a></code>.</p>
+row can be brought back with
+<code><a href="#restore" class="internal-link">orionis.orm.soft_deletes.SoftDeletesMixin.restore</a></code>.</p>
 </div>
         </div>
 
         <div id="split-tables">
-          <table class="children sortable" id="id1702">
+          <table class="children sortable" id="id1708">
   
   
   <tr class="method">
@@ -450,7 +451,7 @@ row can be brought back with <code><a href="#restore" class="internal-link" titl
     
     <td>Class Variable</td>
     <td><code><a href="#__slots__" class="internal-link" title="orionis.orm.soft_deletes.SoftDeletesMixin.__slots__">__slots__</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
+    <td>Declare that this class introduces no additional instance slots.</td>
   </tr>
 </table>
           
@@ -472,7 +473,7 @@ row can be brought back with <code><a href="#restore" class="internal-link" titl
     
     
     <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">_performSoftDelete</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">timestamp: <code><a href="https://docs.python.org/3/library/datetime.html#datetime.datetime" class="intersphinx-link">datetime</a></code></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/orm/soft_deletes.py#L82">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/orm/soft_deletes.py#L86">
       
       (source)
     </a>
@@ -484,7 +485,7 @@ row can be brought back with <code><a href="#restore" class="internal-link" titl
   </div>
   <div class="docstring functionBody">
     
-    <div><p>Stamp the soft delete column of the persisted row.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">timestamp:</span><code><a href="https://docs.python.org/3/library/datetime.html#datetime.datetime" class="intersphinx-link">datetime</a></code></td><td class="fieldArgDesc">Value written into the soft delete column.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code></td><td class="fieldArgDesc"><tt class="rst-docutils rst-literal">True</tt> when the row was stamped.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code>QueryException</code></td><td>If the statement fails to execute.</td></tr></table></div>
+    <div><p>Stamp the soft delete column of the persisted row.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">timestamp:</span><code><a href="https://docs.python.org/3/library/datetime.html#datetime.datetime" class="intersphinx-link">datetime.datetime</a></code></td><td class="fieldArgDesc">Value written into the soft delete column.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code></td><td class="fieldArgDesc"><tt class="rst-docutils rst-literal">True</tt> when the row was stamped.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.database.QueryException.html" class="internal-link">orionis.database.QueryException</a></code></td><td>If the statement fails to execute.</td></tr></table></div>
   </div>
 </div><div class="basemethod">
   
@@ -499,7 +500,7 @@ row can be brought back with <code><a href="#restore" class="internal-link" titl
     
     
     <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">forceDelete</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/orm/soft_deletes.py#L58">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/orm/soft_deletes.py#L62">
       
       (source)
     </a>
@@ -512,7 +513,7 @@ row can be brought back with <code><a href="#restore" class="internal-link" titl
   <div class="docstring functionBody">
     
     <div><p>Delete the row permanently, ignoring soft deletes.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code></td><td class="fieldArgDesc"><tt class="rst-docutils rst-literal">True</tt> when a row was removed, <tt class="rst-docutils rst-literal">False</tt> for unsaved
-models or when a listener vetoed the operation.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code>QueryException</code></td><td>If the statement fails to execute.</td></tr></table></div>
+models or when a listener vetoed the operation.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.database.QueryException.html" class="internal-link">orionis.database.QueryException</a></code></td><td>If the statement fails to execute.</td></tr></table></div>
   </div>
 </div><div class="basemethod">
   
@@ -527,7 +528,7 @@ models or when a listener vetoed the operation.</td></tr></table><table class="f
     
     
     <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">restore</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/orm/soft_deletes.py#L31">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/orm/soft_deletes.py#L35">
       
       (source)
     </a>
@@ -541,7 +542,7 @@ models or when a listener vetoed the operation.</td></tr></table><table class="f
     
     <div><p>Bring a soft deleted row back by clearing its delete stamp.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code></td><td class="fieldArgDesc"><tt class="rst-docutils rst-literal">True</tt> when the row was restored, <tt class="rst-docutils rst-literal">False</tt> when the model
 does not soft delete, was never persisted, or a listener
-vetoed the operation.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code>QueryException</code></td><td>If the statement fails to execute.</td></tr></table></div>
+vetoed the operation.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.database.QueryException.html" class="internal-link">orionis.database.QueryException</a></code></td><td>If the statement fails to execute.</td></tr></table></div>
   </div>
 </div><div class="basemethod">
   
@@ -556,7 +557,7 @@ vetoed the operation.</td></tr></table><table class="fieldTable"><tr class="fiel
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">trashed</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/orm/soft_deletes.py#L19">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/orm/soft_deletes.py#L23">
       
       (source)
     </a>
@@ -582,7 +583,7 @@ vetoed the operation.</td></tr></table><table class="fieldTable"><tr class="fiel
   <div class="functionHeader">
     
     <span class="py-defname">__slots__</span>: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" class="intersphinx-link">tuple</a></code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/orm/soft_deletes.py#L17">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/orm/soft_deletes.py#L20">
       
       (source)
     </a>
@@ -594,7 +595,7 @@ vetoed the operation.</td></tr></table><table class="fieldTable"><tr class="fiel
   </div>
   <div class="functionBody">
     <div class="interfaceinfo">overridden in <code><a href="orionis.orm.Model.html" class="internal-link">orionis.orm.Model</a></code></div>
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p>Declare that this class introduces no additional instance slots.</p></div>
     
   </div>
 </div>
@@ -608,7 +609,7 @@ vetoed the operation.</td></tr></table><table class="fieldTable"><tr class="fiel
   <div class="orionis-footer-inner">
     <div class="orionis-footer-copy">
       <p>API documentation for <a href="https://orionis-framework.com/" class="projecthome">Orionis</a>.</p>
-      <p class="orionis-footer-meta">Generated with <a href="https://github.com/twisted/pydoctor/">Pydoctor</a> 25.10.1.<span class="orionis-footer-build"> Built 2026-11-03 09:36:58.</span></p>
+      <p class="orionis-footer-meta">Generated with <a href="https://github.com/twisted/pydoctor/">Pydoctor</a> 25.10.1.<span class="orionis-footer-build"> Built 2026-11-03 13:00:15.</span></p>
     </div>
     <nav class="orionis-footer-links" aria-label="Additional resources">
       <a href="https://docs.orionis-framework.com">Read the guide <span aria-hidden="true">↗</span></a>

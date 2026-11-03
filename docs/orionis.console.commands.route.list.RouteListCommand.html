@@ -450,7 +450,7 @@
         </div>
 
         <div class="extrasDocstring">
-          <p class="class-signature"><code><span class="py-keyword">class</span> <span class="py-defname">RouteListCommand</span>(BaseCommand): <a href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/console/commands/route/list.py#L8" class="sourceLink">(source)</a></code></p><p><a href="classIndex.html#orionis.console.commands.route.list.RouteListCommand">View In Hierarchy</a></p>
+          <p class="class-signature"><code><span class="py-keyword">class</span> <span class="py-defname">RouteListCommand</span>(BaseCommand): <a href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/console/commands/route/list.py#L10" class="sourceLink">(source)</a></code></p><p><a href="classIndex.html#orionis.console.commands.route.list.RouteListCommand">View In Hierarchy</a></p>
         </div>
 
         <div class="moduleDocstring">
@@ -485,17 +485,17 @@
     
     <td>Class Variable</td>
     <td><code><a href="#description" class="internal-link" title="orionis.console.commands.route.list.RouteListCommand.description">description</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
+    <td><tt class="rst-docutils rst-literal">List the application's registered HTTP routes.</tt>.</td>
   </tr><tr class="classvariable">
     
     <td>Class Variable</td>
     <td><code><a href="#signature" class="internal-link" title="orionis.console.commands.route.list.RouteListCommand.signature">signature</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
+    <td><tt class="rst-docutils rst-literal">route:list</tt>.</td>
   </tr><tr class="classvariable">
     
     <td>Class Variable</td>
     <td><code><a href="#timestamps" class="internal-link" title="orionis.console.commands.route.list.RouteListCommand.timestamps">timestamps</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
+    <td>Timestamps flag used by <tt class="rst-docutils rst-literal">RouteListCommand</tt>.</td>
   </tr>
 </table>
           
@@ -517,7 +517,7 @@
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">__collectRoutes</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">route_loader: <code><a href="orionis.http.routes.loader.RouteLoader.html" class="internal-link" title="orionis.http.routes.loader.RouteLoader">RouteLoader</a></code></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/stdtypes.html#list" class="intersphinx-link">list</a>[<wbr></wbr><a href="orionis.http.routes.entities.compiled_route.CompiledRoute.html" class="internal-link" title="orionis.http.routes.entities.compiled_route.CompiledRoute">CompiledRoute</a>]</code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/console/commands/route/list.py#L68">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/console/commands/route/list.py#L73">
       
       (source)
     </a>
@@ -529,7 +529,7 @@
   </div>
   <div class="docstring functionBody">
     
-    <div><p>Flatten compiled method buckets and sort routes by their URI.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">route<wbr></wbr>_loader:</span><code><a href="orionis.http.routes.loader.RouteLoader.html" class="internal-link" title="orionis.http.routes.loader.RouteLoader">RouteLoader</a></code></td><td class="fieldArgDesc">Loader that provides the application's compiled route buckets.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/stdtypes.html#list" class="intersphinx-link">list</a>[<a href="orionis.http.routes.entities.compiled_route.CompiledRoute.html" class="internal-link" title="orionis.http.routes.entities.compiled_route.CompiledRoute">CompiledRoute</a>]</code></td><td class="fieldArgDesc">All registered routes sorted by path in ascending order.</td></tr></table></div>
+    <div><p>Flatten compiled method buckets and sort routes by their URI.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">route<wbr></wbr>_loader:</span><code><a href="orionis.http.routes.loader.RouteLoader.html" class="internal-link">orionis.http.routes.loader.RouteLoader</a></code></td><td class="fieldArgDesc">Loader that provides the application's compiled route buckets.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/stdtypes.html#list" class="intersphinx-link">list</a>[<a href="orionis.http.routes.entities.compiled_route.CompiledRoute.html" class="internal-link">orionis.http.routes.entities.compiled_route.CompiledRoute</a>]</code></td><td class="fieldArgDesc">All registered routes sorted by path in ascending order.</td></tr></table></div>
   </div>
 </div><div class="basemethod">
   
@@ -544,7 +544,7 @@
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">__getAction</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">route: <code><a href="orionis.http.routes.entities.compiled_route.CompiledRoute.html" class="internal-link" title="orionis.http.routes.entities.compiled_route.CompiledRoute">CompiledRoute</a></code></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/console/commands/route/list.py#L17">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/console/commands/route/list.py#L22">
       
       (source)
     </a>
@@ -556,7 +556,7 @@
   </div>
   <div class="docstring functionBody">
     
-    <div><p>Format the route handler as an importable Python name.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">route:</span><code><a href="orionis.http.routes.entities.compiled_route.CompiledRoute.html" class="internal-link" title="orionis.http.routes.entities.compiled_route.CompiledRoute">CompiledRoute</a></code></td><td class="fieldArgDesc">Route whose action descriptor is displayed.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Qualified handler name or a dash when no action is available.</td></tr></table></div>
+    <div><p>Format the route handler as an importable Python name.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">route:</span><code><a href="orionis.http.routes.entities.compiled_route.CompiledRoute.html" class="internal-link">orionis.http.routes.entities.compiled_route.CompiledRoute</a></code></td><td class="fieldArgDesc">Route whose action descriptor is displayed.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Qualified handler name or a dash when no action is available.</td></tr></table></div>
   </div>
 </div><div class="basemethod">
   
@@ -571,7 +571,7 @@
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">__getMiddleware</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">route: <code><a href="orionis.http.routes.entities.compiled_route.CompiledRoute.html" class="internal-link" title="orionis.http.routes.entities.compiled_route.CompiledRoute">CompiledRoute</a></code></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/console/commands/route/list.py#L49">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/console/commands/route/list.py#L54">
       
       (source)
     </a>
@@ -583,7 +583,7 @@
   </div>
   <div class="docstring functionBody">
     
-    <div><p>Format the middleware stack attached to a route.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">route:</span><code><a href="orionis.http.routes.entities.compiled_route.CompiledRoute.html" class="internal-link" title="orionis.http.routes.entities.compiled_route.CompiledRoute">CompiledRoute</a></code></td><td class="fieldArgDesc">Route whose effective middleware stack is displayed.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Comma-separated middleware names or a dash when the stack is empty.</td></tr></table></div>
+    <div><p>Format the middleware stack attached to a route.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">route:</span><code><a href="orionis.http.routes.entities.compiled_route.CompiledRoute.html" class="internal-link">orionis.http.routes.entities.compiled_route.CompiledRoute</a></code></td><td class="fieldArgDesc">Route whose effective middleware stack is displayed.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Comma-separated middleware names or a dash when the stack is empty.</td></tr></table></div>
   </div>
 </div><div class="basemethod">
   
@@ -598,7 +598,7 @@
     
     
     <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">handle</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">route_loader: <code><a href="orionis.http.routes.loader.RouteLoader.html" class="internal-link" title="orionis.http.routes.loader.RouteLoader">RouteLoader</a></code>, </span><span class="rst-sig-param">console: <code>Console</code></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/console/commands/route/list.py#L90">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/console/commands/route/list.py#L95">
       
       (source)
     </a>
@@ -610,7 +610,7 @@
   </div>
   <div class="docstring functionBody">
     
-    <div><p>Print all application routes as a sorted Rich table.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">route<wbr></wbr>_loader:</span><code><a href="orionis.http.routes.loader.RouteLoader.html" class="internal-link" title="orionis.http.routes.loader.RouteLoader">RouteLoader</a></code></td><td class="fieldArgDesc">Loader that provides the application's compiled route buckets.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">console:</span><code><a href="orionis.console.Console.html" class="internal-link" title="orionis.console.Console">Console</a></code></td><td class="fieldArgDesc">Rich console used to display route information.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code></td><td class="fieldArgDesc">Zero when routes are displayed; one when no routes are registered.</td></tr></table></div>
+    <div><p>Print all application routes as a sorted Rich table.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">route<wbr></wbr>_loader:</span><code><a href="orionis.http.routes.loader.RouteLoader.html" class="internal-link">orionis.http.routes.loader.RouteLoader</a></code></td><td class="fieldArgDesc">Loader that provides the application's compiled route buckets.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">console:</span><code><a href="orionis.console.Console.html" class="internal-link">orionis.console.Console</a></code></td><td class="fieldArgDesc">Rich console used to display route information.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code></td><td class="fieldArgDesc">Zero when routes are displayed; one when no routes are registered.</td></tr></table></div>
   </div>
 </div><div class="baseclassvariable">
   
@@ -624,7 +624,7 @@
   <div class="functionHeader">
     
     <span class="py-defname">description</span>: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/console/commands/route/list.py#L15">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/console/commands/route/list.py#L19">
       
       (source)
     </a>
@@ -636,7 +636,7 @@
   </div>
   <div class="functionBody">
     
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p><tt class="rst-docutils rst-literal">List the application's registered HTTP routes.</tt>.</p></div>
     
   </div>
 </div><div class="baseclassvariable">
@@ -651,7 +651,7 @@
   <div class="functionHeader">
     
     <span class="py-defname">signature</span>: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/console/commands/route/list.py#L14">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/console/commands/route/list.py#L17">
       
       (source)
     </a>
@@ -663,7 +663,7 @@
   </div>
   <div class="functionBody">
     
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p><tt class="rst-docutils rst-literal">route:list</tt>.</p></div>
     
   </div>
 </div><div class="baseclassvariable">
@@ -678,7 +678,7 @@
   <div class="functionHeader">
     
     <span class="py-defname">timestamps</span>: <code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/console/commands/route/list.py#L13">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/console/commands/route/list.py#L15">
       
       (source)
     </a>
@@ -690,7 +690,7 @@
   </div>
   <div class="functionBody">
     
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p>Timestamps flag used by <tt class="rst-docutils rst-literal">RouteListCommand</tt>.</p></div>
     
   </div>
 </div>
@@ -704,7 +704,7 @@
   <div class="orionis-footer-inner">
     <div class="orionis-footer-copy">
       <p>API documentation for <a href="https://orionis-framework.com/" class="projecthome">Orionis</a>.</p>
-      <p class="orionis-footer-meta">Generated with <a href="https://github.com/twisted/pydoctor/">Pydoctor</a> 25.10.1.<span class="orionis-footer-build"> Built 2026-11-03 09:36:58.</span></p>
+      <p class="orionis-footer-meta">Generated with <a href="https://github.com/twisted/pydoctor/">Pydoctor</a> 25.10.1.<span class="orionis-footer-build"> Built 2026-11-03 13:00:15.</span></p>
     </div>
     <nav class="orionis-footer-links" aria-label="Additional resources">
       <a href="https://docs.orionis-framework.com">Read the guide <span aria-hidden="true">↗</span></a>

@@ -901,15 +901,15 @@
         </div>
 
         <div class="extrasDocstring">
-          <a href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/session/stores/database.py" class="sourceLink">(source)</a>
+          <a href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/session/stores/database.py" class="sourceLink">(source)</a>
         </div>
 
         <div class="moduleDocstring">
-          <div><p class="undocumented">Undocumented</p></div>
+          <div><p>Session store that persists each session as a row in a database table.</p></div>
         </div>
 
         <div id="split-tables">
-          <table class="children sortable" id="id1993">
+          <table class="children sortable" id="id2001">
   
   
   <tr class="class">
@@ -926,17 +926,17 @@
     
     <td>Constant</td>
     <td><code><a href="#_DECODER" class="internal-link" title="orionis.session.stores.database._DECODER">_DECODER</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
+    <td>Decoder used by <tt class="rst-docutils rst-literal">database</tt>.</td>
   </tr><tr class="constant">
     
     <td>Constant</td>
     <td><code><a href="#_DEFAULT_TABLE" class="internal-link" title="orionis.session.stores.database._DEFAULT_TABLE">_DEFAULT<wbr></wbr>_TABLE</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
+    <td>Default table name used when the session config does not override it.</td>
   </tr><tr class="constant">
     
     <td>Constant</td>
     <td><code><a href="#_ENCODER" class="internal-link" title="orionis.session.stores.database._ENCODER">_ENCODER</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
+    <td>msgspec resolves its internal state at construction time instead of on every encode/decode call.</td>
   </tr>
 </table>
           
@@ -958,7 +958,7 @@
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">_build_sessions_table</span><span class="function-signature">(<span class="rst-sig-param">table: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></span>) -&gt; <code>TableDefinition</code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/session/stores/database.py#L31">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/session/stores/database.py#L39">
       
       (source)
     </a>
@@ -970,7 +970,7 @@
   </div>
   <div class="docstring functionBody">
     
-    <div><p>Build the table definition for the sessions table.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">table:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Logical table name for session records.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.orm.schema.TableDefinition.html" class="internal-link" title="orionis.orm.schema.TableDefinition">TableDefinition</a></code></td><td class="fieldArgDesc">Definition with <tt class="rst-docutils rst-literal">id</tt> (primary key), <tt class="rst-docutils rst-literal">payload</tt> (JSON data)
+    <div><p>Build the table definition for the sessions table.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">table:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Logical table name for session records.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.orm.schema.TableDefinition.html" class="internal-link">orionis.orm.schema.TableDefinition</a></code></td><td class="fieldArgDesc">Definition with <tt class="rst-docutils rst-literal">id</tt> (primary key), <tt class="rst-docutils rst-literal">payload</tt> (JSON data)
 and <tt class="rst-docutils rst-literal">expires_at</tt> (epoch seconds) columns.</td></tr></table></div>
   </div>
 </div><div class="baseconstant">
@@ -985,7 +985,7 @@ and <tt class="rst-docutils rst-literal">expires_at</tt> (epoch seconds) columns
   <div class="functionHeader">
     
     <span class="py-defname">_DECODER</span> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/session/stores/database.py#L29">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/session/stores/database.py#L36">
       
       (source)
     </a>
@@ -997,7 +997,7 @@ and <tt class="rst-docutils rst-literal">expires_at</tt> (epoch seconds) columns
   </div>
   <div class="functionBody">
     
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p>Decoder used by <tt class="rst-docutils rst-literal">database</tt>.</p></div>
     <table class="valueTable"><tr class="fieldStart"><td class="fieldName">Value</td></tr><tr><td><pre class="constant-value"><code>_msgjson.Decoder()</code></pre></td></tr></table>
   </div>
 </div><div class="baseconstant">
@@ -1012,7 +1012,7 @@ and <tt class="rst-docutils rst-literal">expires_at</tt> (epoch seconds) columns
   <div class="functionHeader">
     
     <span class="py-defname">_DEFAULT_TABLE</span>: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/session/stores/database.py#L24">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/session/stores/database.py#L26">
       
       (source)
     </a>
@@ -1024,7 +1024,7 @@ and <tt class="rst-docutils rst-literal">expires_at</tt> (epoch seconds) columns
   </div>
   <div class="functionBody">
     
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p>Default table name used when the session config does not override it.</p></div>
     <table class="valueTable"><tr class="fieldStart"><td class="fieldName">Value</td></tr><tr><td><pre class="constant-value"><code><span class="rst-variable-quote">'</span><span class="rst-variable-string">sessions</span><span class="rst-variable-quote">'</span></code></pre></td></tr></table>
   </div>
 </div><div class="baseconstant">
@@ -1039,7 +1039,7 @@ and <tt class="rst-docutils rst-literal">expires_at</tt> (epoch seconds) columns
   <div class="functionHeader">
     
     <span class="py-defname">_ENCODER</span> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/session/stores/database.py#L28">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/session/stores/database.py#L31">
       
       (source)
     </a>
@@ -1051,7 +1051,8 @@ and <tt class="rst-docutils rst-literal">expires_at</tt> (epoch seconds) columns
   </div>
   <div class="functionBody">
     
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p>msgspec resolves its internal state at construction time instead
+of on every encode/decode call.</p></div>
     <table class="valueTable"><tr class="fieldStart"><td class="fieldName">Value</td></tr><tr><td><pre class="constant-value"><code>_msgjson.Encoder()</code></pre></td></tr></table>
   </div>
 </div>
@@ -1065,7 +1066,7 @@ and <tt class="rst-docutils rst-literal">expires_at</tt> (epoch seconds) columns
   <div class="orionis-footer-inner">
     <div class="orionis-footer-copy">
       <p>API documentation for <a href="https://orionis-framework.com/" class="projecthome">Orionis</a>.</p>
-      <p class="orionis-footer-meta">Generated with <a href="https://github.com/twisted/pydoctor/">Pydoctor</a> 25.10.1.<span class="orionis-footer-build"> Built 2026-11-03 09:36:58.</span></p>
+      <p class="orionis-footer-meta">Generated with <a href="https://github.com/twisted/pydoctor/">Pydoctor</a> 25.10.1.<span class="orionis-footer-build"> Built 2026-11-03 13:00:15.</span></p>
     </div>
     <nav class="orionis-footer-links" aria-label="Additional resources">
       <a href="https://docs.orionis-framework.com">Read the guide <span aria-hidden="true">↗</span></a>

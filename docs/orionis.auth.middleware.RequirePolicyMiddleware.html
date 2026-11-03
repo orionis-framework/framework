@@ -1950,7 +1950,7 @@
         </div>
 
         <div class="extrasDocstring">
-          <p class="class-signature"><code><span class="py-keyword">class</span> <span class="py-defname">RequirePolicyMiddleware</span>(<a href="orionis.http.BaseMiddleware.html" class="internal-link" title="orionis.http.BaseMiddleware">BaseMiddleware</a>): <a href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/auth/middleware/policy.py#L16" class="sourceLink">(source)</a></code></p><p>Constructor: <code><a href="#__init__" class="internal-link" title="orionis.auth.middleware.RequirePolicyMiddleware.__init__">RequirePolicyMiddleware(authorizer)</a></code></p><p><a href="classIndex.html#orionis.auth.middleware.RequirePolicyMiddleware">View In Hierarchy</a></p>
+          <p class="class-signature"><code><span class="py-keyword">class</span> <span class="py-defname">RequirePolicyMiddleware</span>(<a href="orionis.http.BaseMiddleware.html" class="internal-link" title="orionis.http.BaseMiddleware">BaseMiddleware</a>): <a href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/auth/middleware/policy.py#L18" class="sourceLink">(source)</a></code></p><p>Constructor: <code><a href="#__init__" class="internal-link" title="orionis.auth.middleware.RequirePolicyMiddleware.__init__">RequirePolicyMiddleware(authorizer)</a></code></p><p><a href="classIndex.html#orionis.auth.middleware.RequirePolicyMiddleware">View In Hierarchy</a></p>
         </div>
 
         <div class="moduleDocstring">
@@ -1989,22 +1989,22 @@ await Auth.authorizeResource("update", post)
     
     <td>Class Variable</td>
     <td><code><a href="#__slots__" class="internal-link" title="orionis.auth.middleware.RequirePolicyMiddleware.__slots__">__slots__</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
+    <td>Declare the instance attribute slots reserved by this class.</td>
   </tr><tr class="classvariable">
     
     <td>Class Variable</td>
     <td><code><a href="#ability" class="internal-link" title="orionis.auth.middleware.RequirePolicyMiddleware.ability">ability</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
+    <td>Ability declared by the policy of the resource.</td>
   </tr><tr class="classvariable">
     
     <td>Class Variable</td>
     <td><code><a href="#resource" class="internal-link" title="orionis.auth.middleware.RequirePolicyMiddleware.resource">resource</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
+    <td>Resource class protected by the policy.</td>
   </tr><tr class="instancevariable">
     
     <td>Instance Variable</td>
     <td><code><a href="#_authorizer" class="internal-link" title="orionis.auth.middleware.RequirePolicyMiddleware._authorizer">_authorizer</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
+    <td>Component resolving and running the policy.</td>
   </tr>
 </table>
           
@@ -2026,7 +2026,7 @@ await Auth.authorizeResource("update", post)
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">__init__</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">authorizer: <code>IAuthorizer</code></span>):</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/auth/middleware/policy.py#L44">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/auth/middleware/policy.py#L49">
       
       (source)
     </a>
@@ -2038,7 +2038,7 @@ await Auth.authorizeResource("update", post)
   </div>
   <div class="docstring functionBody">
     
-    <div><p>Initialise the middleware with the authorizer.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">authorizer:</span><code><a href="orionis.auth.contracts.IAuthorizer.html" class="internal-link" title="orionis.auth.contracts.IAuthorizer">IAuthorizer</a></code></td><td class="fieldArgDesc">Component resolving and running the policy.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">The middleware keeps no per request state.</td></tr></table></div>
+    <div><p>Initialise the middleware with the authorizer.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">authorizer:</span><code><a href="orionis.auth.contracts.IAuthorizer.html" class="internal-link">orionis.auth.contracts.IAuthorizer</a></code></td><td class="fieldArgDesc">Component resolving and running the policy.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">The middleware keeps no per request state.</td></tr></table></div>
   </div>
 </div><div class="basemethod">
   
@@ -2053,7 +2053,7 @@ await Auth.authorizeResource("update", post)
     
     
     <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">handle</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">request: <code>Request</code>, </span><span class="rst-sig-param">call_next: <code>NextCallable</code></span>) -&gt; <code>Response</code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/auth/middleware/policy.py#L60">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/auth/middleware/policy.py#L66">
       
       (source)
     </a>
@@ -2065,7 +2065,7 @@ await Auth.authorizeResource("update", post)
   </div>
   <div class="docstring functionBody">
     <div class="interfaceinfo">overrides <code><a href="orionis.http.BaseMiddleware.html#handle" class="internal-link">orionis.http.BaseMiddleware.handle</a></code></div>
-    <div><p>Evaluate the policy and continue when it allows the operation.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">request:</span><code><a href="orionis.http.Request.html" class="internal-link" title="orionis.http.Request">Request</a></code></td><td class="fieldArgDesc">Incoming HTTP request, unused by this middleware.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">call<wbr></wbr>_next:</span><code><a href="orionis.http.html#NextCallable" class="internal-link" title="orionis.http.NextCallable">NextCallable</a></code></td><td class="fieldArgDesc">Callable advancing to the next layer.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.http.Response.html" class="internal-link" title="orionis.http.Response">Response</a></code></td><td class="fieldArgDesc">Response produced by the rest of the pipeline.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code>AuthConfigurationException</code></td><td>When the subclass declares no ability or no resource.</td></tr><tr><td class="fieldArgContainer"><code>AuthenticationException</code></td><td>When the request carries no authenticated identity.</td></tr><tr><td class="fieldArgContainer"><code>AuthorizationException</code></td><td>When the policy denies the operation.</td></tr></table></div>
+    <div><p>Evaluate the policy and continue when it allows the operation.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">request:</span><code><a href="orionis.http.Request.html" class="internal-link">orionis.http.Request</a></code></td><td class="fieldArgDesc">Incoming HTTP request, unused by this middleware.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">call<wbr></wbr>_next:</span><code><a href="orionis.http.html#NextCallable" class="internal-link">orionis.http.NextCallable</a></code></td><td class="fieldArgDesc">Callable advancing to the next layer.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.http.Response.html" class="internal-link">orionis.http.Response</a></code></td><td class="fieldArgDesc">Response produced by the rest of the pipeline.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.auth.AuthConfigurationException.html" class="internal-link">orionis.auth.AuthConfigurationException</a></code></td><td>When the subclass declares no ability or no resource.</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.auth.AuthenticationException.html" class="internal-link">orionis.auth.AuthenticationException</a></code></td><td>When the request carries no authenticated identity.</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.auth.AuthorizationException.html" class="internal-link">orionis.auth.AuthorizationException</a></code></td><td>When the policy denies the operation.</td></tr></table></div>
   </div>
 </div><div class="baseclassvariable">
   
@@ -2079,7 +2079,7 @@ await Auth.authorizeResource("update", post)
   <div class="functionHeader">
     
     <span class="py-defname">__slots__</span>: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" class="intersphinx-link">tuple</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <wbr></wbr><span class="rst-variable-ellipsis">...</span>]</code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/auth/middleware/policy.py#L36">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/auth/middleware/policy.py#L38">
       
       (source)
     </a>
@@ -2091,7 +2091,7 @@ await Auth.authorizeResource("update", post)
   </div>
   <div class="functionBody">
     <div class="interfaceinfo">overrides <code><a href="orionis.http.BaseMiddleware.html#__slots__" class="internal-link">orionis.http.BaseMiddleware.__slots__</a></code></div>
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p>Declare the instance attribute slots reserved by this class.</p></div>
     
   </div>
 </div><div class="baseclassvariable">
@@ -2106,7 +2106,7 @@ await Auth.authorizeResource("update", post)
   <div class="functionHeader">
     
     <span class="py-defname">ability</span>: <code>ClassVar[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>]</code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/auth/middleware/policy.py#L39">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/auth/middleware/policy.py#L42">
       
       (source)
     </a>
@@ -2118,7 +2118,7 @@ await Auth.authorizeResource("update", post)
   </div>
   <div class="functionBody">
     
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p>Ability declared by the policy of the resource.</p></div>
     
   </div>
 </div><div class="baseclassvariable">
@@ -2133,7 +2133,7 @@ await Auth.authorizeResource("update", post)
   <div class="functionHeader">
     
     <span class="py-defname">resource</span>: <code>ClassVar[<wbr></wbr><a href="https://docs.python.org/3/builtins/functions.html#type" class="intersphinx-link">type</a> | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a>]</code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/auth/middleware/policy.py#L42">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/auth/middleware/policy.py#L46">
       
       (source)
     </a>
@@ -2145,7 +2145,7 @@ await Auth.authorizeResource("update", post)
   </div>
   <div class="functionBody">
     
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p>Resource class protected by the policy.</p></div>
     
   </div>
 </div><div class="baseinstancevariable">
@@ -2160,7 +2160,7 @@ await Auth.authorizeResource("update", post)
   <div class="functionHeader">
     
     <span class="py-defname">_authorizer</span> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/auth/middleware/policy.py#L58">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/auth/middleware/policy.py#L63">
       
       (source)
     </a>
@@ -2172,7 +2172,7 @@ await Auth.authorizeResource("update", post)
   </div>
   <div class="functionBody">
     
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p>Component resolving and running the policy.</p></div>
     
   </div>
 </div>
@@ -2186,7 +2186,7 @@ await Auth.authorizeResource("update", post)
   <div class="orionis-footer-inner">
     <div class="orionis-footer-copy">
       <p>API documentation for <a href="https://orionis-framework.com/" class="projecthome">Orionis</a>.</p>
-      <p class="orionis-footer-meta">Generated with <a href="https://github.com/twisted/pydoctor/">Pydoctor</a> 25.10.1.<span class="orionis-footer-build"> Built 2026-11-03 09:36:58.</span></p>
+      <p class="orionis-footer-meta">Generated with <a href="https://github.com/twisted/pydoctor/">Pydoctor</a> 25.10.1.<span class="orionis-footer-build"> Built 2026-11-03 13:00:15.</span></p>
     </div>
     <nav class="orionis-footer-links" aria-label="Additional resources">
       <a href="https://docs.orionis-framework.com">Read the guide <span aria-hidden="true">↗</span></a>

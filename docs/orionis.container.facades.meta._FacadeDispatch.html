@@ -681,7 +681,7 @@
         </div>
 
         <div class="extrasDocstring">
-          <p class="class-signature"><code><span class="py-keyword">class</span> <span class="py-defname">_FacadeDispatch</span>: <a href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/container/facades/meta.py#L11" class="sourceLink">(source)</a></code></p><p>Constructor: <code><a href="#__init__" class="internal-link" title="orionis.container.facades.meta._FacadeDispatch.__init__">_FacadeDispatch(cls, name, args, kwargs)</a></code></p><p><a href="classIndex.html#orionis.container.facades.meta._FacadeDispatch">View In Hierarchy</a></p>
+          <p class="class-signature"><code><span class="py-keyword">class</span> <span class="py-defname">_FacadeDispatch</span>: <a href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/container/facades/meta.py#L14" class="sourceLink">(source)</a></code></p><p>Constructor: <code><a href="#__init__" class="internal-link" title="orionis.container.facades.meta._FacadeDispatch.__init__">_FacadeDispatch(cls, name, args, kwargs)</a></code></p><p><a href="classIndex.html#orionis.container.facades.meta._FacadeDispatch">View In Hierarchy</a></p>
         </div>
 
         <div class="moduleDocstring">
@@ -731,32 +731,32 @@ directly (<tt class="rst-docutils rst-literal">await <span class="pre">Facade.me
     
     <td>Class Variable</td>
     <td><code><a href="#__slots__" class="internal-link" title="orionis.container.facades.meta._FacadeDispatch.__slots__">__slots__</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
+    <td>Declare the instance attribute slots reserved by this class.</td>
   </tr><tr class="instancevariable">
     
     <td>Instance Variable</td>
     <td><code><a href="#_args" class="internal-link" title="orionis.container.facades.meta._FacadeDispatch._args">_args</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
+    <td>Positional arguments to forward to the resolved attribute.</td>
   </tr><tr class="instancevariable">
     
     <td>Instance Variable</td>
     <td><code><a href="#_cls" class="internal-link" title="orionis.container.facades.meta._FacadeDispatch._cls">_cls</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
+    <td>Facade class the attribute was requested on.</td>
   </tr><tr class="instancevariable">
     
     <td>Instance Variable</td>
     <td><code><a href="#_context" class="internal-link" title="orionis.container.facades.meta._FacadeDispatch._context">_context</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
+    <td>Runtime context made available to the operation and its callbacks.</td>
   </tr><tr class="instancevariable">
     
     <td>Instance Variable</td>
     <td><code><a href="#_kwargs" class="internal-link" title="orionis.container.facades.meta._FacadeDispatch._kwargs">_kwargs</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
+    <td>Keyword arguments to forward to the resolved attribute.</td>
   </tr><tr class="instancevariable">
     
     <td>Instance Variable</td>
     <td><code><a href="#_name" class="internal-link" title="orionis.container.facades.meta._FacadeDispatch._name">_name</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
+    <td>Name of the attribute requested on the resolved service.</td>
   </tr>
 </table>
           
@@ -778,7 +778,7 @@ directly (<tt class="rst-docutils rst-literal">await <span class="pre">Facade.me
     
     
     <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">__aenter__</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/functions.html#object" class="intersphinx-link">object</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/container/facades/meta.py#L98">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/container/facades/meta.py#L107">
       
       (source)
     </a>
@@ -805,7 +805,7 @@ directly (<tt class="rst-docutils rst-literal">await <span class="pre">Facade.me
     
     
     <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">__aexit__</span><span class="function-signature long-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">exc_type: <code><a href="https://docs.python.org/3/builtins/functions.html#type" class="intersphinx-link">type</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/exceptions.html#BaseException" class="intersphinx-link">BaseException</a>] | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code>, </span><span class="rst-sig-param">exc: <code><a href="https://docs.python.org/3/builtins/exceptions.html#BaseException" class="intersphinx-link">BaseException</a> | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code>, </span><span class="rst-sig-param">traceback: <code><a href="https://docs.python.org/3/library/types.html#types.TracebackType" class="intersphinx-link">TracebackType</a> | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/container/facades/meta.py#L110">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/container/facades/meta.py#L119">
       
       (source)
     </a>
@@ -817,7 +817,7 @@ directly (<tt class="rst-docutils rst-literal">await <span class="pre">Facade.me
   </div>
   <div class="docstring functionBody">
     
-    <div><p>Exit the async context manager entered by <tt class="rst-docutils rst-literal">__aenter__</tt>.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">exc<wbr></wbr>_type:</span><code><a href="https://docs.python.org/3/builtins/functions.html#type" class="intersphinx-link">type</a>[<a href="https://docs.python.org/3/builtins/exceptions.html#BaseException" class="intersphinx-link">BaseException</a>] or <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">The exception type raised inside the block, if any.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">exc:</span><code><a href="https://docs.python.org/3/builtins/exceptions.html#BaseException" class="intersphinx-link">BaseException</a> or <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">The exception instance raised inside the block, if any.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">traceback:</span><code><a href="https://docs.python.org/3/library/types.html#types.TracebackType" class="intersphinx-link">TracebackType</a> or <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">The traceback for the raised exception, if any.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code></td><td class="fieldArgDesc">Whatever the resolved context manager returns from its own
+    <div><p>Exit the async context manager entered by <tt class="rst-docutils rst-literal">__aenter__</tt>.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">exc<wbr></wbr>_type:</span><code><a href="https://docs.python.org/3/builtins/functions.html#type" class="intersphinx-link">type</a>[<a href="https://docs.python.org/3/builtins/exceptions.html#BaseException" class="intersphinx-link">BaseException</a>] or <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">The exception type raised inside the block, if any.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">exc:</span><code><a href="https://docs.python.org/3/builtins/exceptions.html#BaseException" class="intersphinx-link">BaseException</a> or <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">The exception instance raised inside the block, if any.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">traceback:</span><code><a href="https://docs.python.org/3/library/types.html#types.TracebackType" class="intersphinx-link">types.TracebackType</a> or <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">The traceback for the raised exception, if any.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code></td><td class="fieldArgDesc">Whatever the resolved context manager returns from its own
 <tt class="rst-docutils rst-literal">__aexit__</tt>.</td></tr></table></div>
   </div>
 </div><div class="basemethod">
@@ -833,7 +833,7 @@ directly (<tt class="rst-docutils rst-literal">await <span class="pre">Facade.me
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">__await__</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>) -&gt; <code><a href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Generator" class="intersphinx-link">Generator</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/functions.html#object" class="intersphinx-link">object</a>, <wbr></wbr><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a>, <wbr></wbr><a href="https://docs.python.org/3/builtins/functions.html#object" class="intersphinx-link">object</a>]</code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/container/facades/meta.py#L72">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/container/facades/meta.py#L81">
       
       (source)
     </a>
@@ -845,7 +845,7 @@ directly (<tt class="rst-docutils rst-literal">await <span class="pre">Facade.me
   </div>
   <div class="docstring functionBody">
     
-    <div><p>Drive the deferred call to completion when awaited directly.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Generator" class="intersphinx-link">Generator</a></code></td><td class="fieldArgDesc">Iterator driving the underlying resolution coroutine.</td></tr></table></div>
+    <div><p>Drive the deferred call to completion when awaited directly.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Generator" class="intersphinx-link">collections.abc.Generator</a></code></td><td class="fieldArgDesc">Iterator driving the underlying resolution coroutine.</td></tr></table></div>
   </div>
 </div><div class="basemethod">
   
@@ -860,7 +860,7 @@ directly (<tt class="rst-docutils rst-literal">await <span class="pre">Facade.me
     
     
     <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">__awaitImpl</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/functions.html#object" class="intersphinx-link">object</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/container/facades/meta.py#L83">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/container/facades/meta.py#L92">
       
       (source)
     </a>
@@ -888,7 +888,7 @@ sync results, or the raw attribute value.</td></tr></table></div>
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">__init__</span><span class="function-signature long-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">cls: <code><a href="https://docs.python.org/3/builtins/functions.html#type" class="intersphinx-link">type</a></code>, </span><span class="rst-sig-param">name: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code>, </span><span class="rst-sig-param">args: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" class="intersphinx-link">tuple</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/functions.html#object" class="intersphinx-link">object</a>, <wbr></wbr><span class="rst-variable-ellipsis">...</span>]</code>, </span><span class="rst-sig-param">kwargs: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#dict" class="intersphinx-link">dict</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <wbr></wbr><a href="https://docs.python.org/3/builtins/functions.html#object" class="intersphinx-link">object</a>]</code></span>):</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/container/facades/meta.py#L22">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/container/facades/meta.py#L26">
       
       (source)
     </a>
@@ -900,7 +900,7 @@ sync results, or the raw attribute value.</td></tr></table></div>
   </div>
   <div class="docstring functionBody">
     
-    <div><p>Store the pending call until it is awaited or entered.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">cls:</span><code><a href="https://docs.python.org/3/builtins/functions.html#type" class="intersphinx-link">type</a></code></td><td class="fieldArgDesc">Facade class the attribute was requested on.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">name:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Name of the attribute requested on the resolved service.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">args:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" class="intersphinx-link">tuple</a> of <a href="https://docs.python.org/3/builtins/functions.html#object" class="intersphinx-link">object</a></code></td><td class="fieldArgDesc">Positional arguments to forward to the resolved attribute.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">kwargs:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#dict" class="intersphinx-link">dict</a> of <a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a> to <a href="https://docs.python.org/3/builtins/functions.html#object" class="intersphinx-link">object</a></code></td><td class="fieldArgDesc">Keyword arguments to forward to the resolved attribute.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">This method does not return a value.</td></tr></table></div>
+    <div><p>Store the pending call until it is awaited or entered.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">cls:</span><code><a href="https://docs.python.org/3/builtins/functions.html#type" class="intersphinx-link">type</a></code></td><td class="fieldArgDesc">Facade class the attribute was requested on.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">name:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Name of the attribute requested on the resolved service.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">args:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" class="intersphinx-link">tuple</a> of <a href="https://docs.python.org/3/builtins/functions.html#object" class="intersphinx-link">object</a></code></td><td class="fieldArgDesc">Positional arguments to forward to the resolved attribute.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">kwargs:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#dict" class="intersphinx-link">dict</a> of str <tt class="rst-docutils rst-literal">to</tt> object</code></td><td class="fieldArgDesc">Keyword arguments to forward to the resolved attribute.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">This method does not return a value.</td></tr></table></div>
   </div>
 </div><div class="basemethod">
   
@@ -915,7 +915,7 @@ sync results, or the raw attribute value.</td></tr></table></div>
     
     
     <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">__resolve</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/functions.html#object" class="intersphinx-link">object</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/container/facades/meta.py#L54">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/container/facades/meta.py#L63">
       
       (source)
     </a>
@@ -942,7 +942,7 @@ the plain attribute value.</td></tr></table></div>
   <div class="functionHeader">
     
     <span class="py-defname">__slots__</span>: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" class="intersphinx-link">tuple</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <wbr></wbr><span class="rst-variable-ellipsis">...</span>]</code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/container/facades/meta.py#L20">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/container/facades/meta.py#L23">
       
       (source)
     </a>
@@ -954,7 +954,7 @@ the plain attribute value.</td></tr></table></div>
   </div>
   <div class="functionBody">
     
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p>Declare the instance attribute slots reserved by this class.</p></div>
     
   </div>
 </div><div class="baseinstancevariable">
@@ -969,7 +969,7 @@ the plain attribute value.</td></tr></table></div>
   <div class="functionHeader">
     
     <span class="py-defname">_args</span> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/container/facades/meta.py#L50">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/container/facades/meta.py#L56">
       
       (source)
     </a>
@@ -981,7 +981,7 @@ the plain attribute value.</td></tr></table></div>
   </div>
   <div class="functionBody">
     
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p>Positional arguments to forward to the resolved attribute.</p></div>
     
   </div>
 </div><div class="baseinstancevariable">
@@ -996,7 +996,7 @@ the plain attribute value.</td></tr></table></div>
   <div class="functionHeader">
     
     <span class="py-defname">_cls</span> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/container/facades/meta.py#L48">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/container/facades/meta.py#L52">
       
       (source)
     </a>
@@ -1008,7 +1008,7 @@ the plain attribute value.</td></tr></table></div>
   </div>
   <div class="functionBody">
     
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p>Facade class the attribute was requested on.</p></div>
     
   </div>
 </div><div class="baseinstancevariable">
@@ -1023,7 +1023,7 @@ the plain attribute value.</td></tr></table></div>
   <div class="functionHeader">
     
     <span class="py-defname">_context</span>: <code><a href="https://docs.python.org/3/builtins/functions.html#object" class="intersphinx-link">object</a></code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/container/facades/meta.py#L52">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/container/facades/meta.py#L60">
       
       (source)
     </a>
@@ -1035,7 +1035,7 @@ the plain attribute value.</td></tr></table></div>
   </div>
   <div class="functionBody">
     
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p>Runtime context made available to the operation and its callbacks.</p></div>
     
   </div>
 </div><div class="baseinstancevariable">
@@ -1050,7 +1050,7 @@ the plain attribute value.</td></tr></table></div>
   <div class="functionHeader">
     
     <span class="py-defname">_kwargs</span> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/container/facades/meta.py#L51">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/container/facades/meta.py#L58">
       
       (source)
     </a>
@@ -1062,7 +1062,7 @@ the plain attribute value.</td></tr></table></div>
   </div>
   <div class="functionBody">
     
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p>Keyword arguments to forward to the resolved attribute.</p></div>
     
   </div>
 </div><div class="baseinstancevariable">
@@ -1077,7 +1077,7 @@ the plain attribute value.</td></tr></table></div>
   <div class="functionHeader">
     
     <span class="py-defname">_name</span> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/container/facades/meta.py#L49">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/container/facades/meta.py#L54">
       
       (source)
     </a>
@@ -1089,7 +1089,7 @@ the plain attribute value.</td></tr></table></div>
   </div>
   <div class="functionBody">
     
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p>Name of the attribute requested on the resolved service.</p></div>
     
   </div>
 </div>
@@ -1103,7 +1103,7 @@ the plain attribute value.</td></tr></table></div>
   <div class="orionis-footer-inner">
     <div class="orionis-footer-copy">
       <p>API documentation for <a href="https://orionis-framework.com/" class="projecthome">Orionis</a>.</p>
-      <p class="orionis-footer-meta">Generated with <a href="https://github.com/twisted/pydoctor/">Pydoctor</a> 25.10.1.<span class="orionis-footer-build"> Built 2026-11-03 09:36:58.</span></p>
+      <p class="orionis-footer-meta">Generated with <a href="https://github.com/twisted/pydoctor/">Pydoctor</a> 25.10.1.<span class="orionis-footer-build"> Built 2026-11-03 13:00:15.</span></p>
     </div>
     <nav class="orionis-footer-links" aria-label="Additional resources">
       <a href="https://docs.orionis-framework.com">Read the guide <span aria-hidden="true">↗</span></a>

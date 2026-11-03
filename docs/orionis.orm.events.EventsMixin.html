@@ -423,7 +423,7 @@
         </div>
 
         <div class="extrasDocstring">
-          <p class="class-signature"><code><span class="py-keyword">class</span> <span class="py-defname">EventsMixin</span>: <a href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/orm/events.py#L19" class="sourceLink">(source)</a></code></p><p>Known subclasses: <code><a href="orionis.orm.Model.html" class="internal-link">orionis.orm.Model</a></code></p><p><a href="classIndex.html#orionis.orm.events.EventsMixin">View In Hierarchy</a></p>
+          <p class="class-signature"><code><span class="py-keyword">class</span> <span class="py-defname">EventsMixin</span>: <a href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/orm/events.py#L22" class="sourceLink">(source)</a></code></p><p>Known subclasses: <code><a href="orionis.orm.Model.html" class="internal-link">orionis.orm.Model</a></code></p><p><a href="classIndex.html#orionis.orm.events.EventsMixin">View In Hierarchy</a></p>
         </div>
 
         <div class="moduleDocstring">
@@ -436,7 +436,7 @@ operation by returning <tt class="rst-docutils rst-literal">False</tt>, mirrorin
         </div>
 
         <div id="split-tables">
-          <table class="children sortable" id="id1559">
+          <table class="children sortable" id="id1563">
   
   
   <tr class="classmethod">
@@ -463,7 +463,7 @@ operation by returning <tt class="rst-docutils rst-literal">False</tt>, mirrorin
     
     <td>Class Variable</td>
     <td><code><a href="#__slots__" class="internal-link" title="orionis.orm.events.EventsMixin.__slots__">__slots__</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
+    <td>Declare that this class introduces no additional instance slots.</td>
   </tr>
 </table>
           
@@ -485,7 +485,7 @@ operation by returning <tt class="rst-docutils rst-literal">False</tt>, mirrorin
     
     <div><span class="decorator">@<a href="https://docs.python.org/3/builtins/functions.html#classmethod" class="intersphinx-link">classmethod</a><br /></span></div>
     <span class="py-keyword">def</span>&#160;<span class="py-defname">flushEvents</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">cls</span>, </span><span class="rst-sig-param">event: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a> | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code> = <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></span>):</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/orm/events.py#L93">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/orm/events.py#L97">
       
       (source)
     </a>
@@ -512,7 +512,7 @@ operation by returning <tt class="rst-docutils rst-literal">False</tt>, mirrorin
     
     <div><span class="decorator">@<a href="https://docs.python.org/3/builtins/functions.html#classmethod" class="intersphinx-link">classmethod</a><br /></span></div>
     <span class="py-keyword">def</span>&#160;<span class="py-defname">observe</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">cls</span>, </span><span class="rst-sig-param">observer: <code><a href="https://docs.python.org/3/library/typing.html#typing.Any" class="intersphinx-link">Any</a></code></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/functions.html#type" class="intersphinx-link">type</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/orm/events.py#L70">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/orm/events.py#L74">
       
       (source)
     </a>
@@ -524,7 +524,7 @@ operation by returning <tt class="rst-docutils rst-literal">False</tt>, mirrorin
   </div>
   <div class="docstring functionBody">
     
-    <div><p>Register every lifecycle method exposed by an observer.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">observer:</span><code><a href="https://docs.python.org/3/library/typing.html#typing.Any" class="intersphinx-link">Any</a></code></td><td class="fieldArgDesc">Object or class exposing methods named after the events it
+    <div><p>Register every lifecycle method exposed by an observer.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">observer:</span><code><a href="https://docs.python.org/3/library/typing.html#typing.Any" class="intersphinx-link">typing.Any</a></code></td><td class="fieldArgDesc">Object or class exposing methods named after the events it
 listens to.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/functions.html#type" class="intersphinx-link">type</a></code></td><td class="fieldArgDesc">The model class, enabling fluent chaining.</td></tr></table></div>
   </div>
 </div><div class="baseclassmethod">
@@ -540,7 +540,7 @@ listens to.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><t
     
     <div><span class="decorator">@<a href="https://docs.python.org/3/builtins/functions.html#classmethod" class="intersphinx-link">classmethod</a><br /></span></div>
     <span class="py-keyword">def</span>&#160;<span class="py-defname">registerEvent</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">cls</span>, </span><span class="rst-sig-param">event: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code>, </span><span class="rst-sig-param">listener: <code><a href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Callable" class="intersphinx-link">Callable</a>[<wbr></wbr><span class="rst-variable-ellipsis">...</span>, <wbr></wbr><a href="https://docs.python.org/3/library/typing.html#typing.Any" class="intersphinx-link">Any</a>]</code></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/functions.html#type" class="intersphinx-link">type</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/orm/events.py#L31">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/orm/events.py#L35">
       
       (source)
     </a>
@@ -552,9 +552,9 @@ listens to.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><t
   </div>
   <div class="docstring functionBody">
     
-    <div><p>Register a listener for a model lifecycle event.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">event:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Event name; one of the supported lifecycle events.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">listener:</span><code><a href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Callable" class="intersphinx-link">Callable</a></code></td><td class="fieldArgDesc">Callable receiving the model instance. It may be a
+    <div><p>Register a listener for a model lifecycle event.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">event:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Event name; one of the supported lifecycle events.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">listener:</span><code><a href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Callable" class="intersphinx-link">collections.abc.Callable</a></code></td><td class="fieldArgDesc">Callable receiving the model instance. It may be a
 coroutine function and, for "before" events, returning
-<tt class="rst-docutils rst-literal">False</tt> aborts the operation.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/functions.html#type" class="intersphinx-link">type</a></code></td><td class="fieldArgDesc">The model class, enabling fluent chaining.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.orm.exceptions.OrmException.html" class="internal-link" title="orionis.orm.exceptions.OrmException">OrmException</a></code></td><td>If the event name is not supported.</td></tr></table></div>
+<tt class="rst-docutils rst-literal">False</tt> aborts the operation.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/functions.html#type" class="intersphinx-link">type</a></code></td><td class="fieldArgDesc">The model class, enabling fluent chaining.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.orm.exceptions.OrmException.html" class="internal-link">orionis.orm.exceptions.OrmException</a></code></td><td>If the event name is not supported.</td></tr></table></div>
   </div>
 </div><div class="basemethod">
   
@@ -569,7 +569,7 @@ coroutine function and, for "before" events, returning
     
     
     <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">fireEvent</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">event: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/orm/events.py#L114">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/orm/events.py#L118">
       
       (source)
     </a>
@@ -596,7 +596,7 @@ operation, <tt class="rst-docutils rst-literal">True</tt> otherwise.</td></tr></
   <div class="functionHeader">
     
     <span class="py-defname">__slots__</span>: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" class="intersphinx-link">tuple</a></code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/orm/events.py#L29">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/orm/events.py#L32">
       
       (source)
     </a>
@@ -608,7 +608,7 @@ operation, <tt class="rst-docutils rst-literal">True</tt> otherwise.</td></tr></
   </div>
   <div class="functionBody">
     <div class="interfaceinfo">overridden in <code><a href="orionis.orm.Model.html" class="internal-link">orionis.orm.Model</a></code></div>
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p>Declare that this class introduces no additional instance slots.</p></div>
     
   </div>
 </div>
@@ -622,7 +622,7 @@ operation, <tt class="rst-docutils rst-literal">True</tt> otherwise.</td></tr></
   <div class="orionis-footer-inner">
     <div class="orionis-footer-copy">
       <p>API documentation for <a href="https://orionis-framework.com/" class="projecthome">Orionis</a>.</p>
-      <p class="orionis-footer-meta">Generated with <a href="https://github.com/twisted/pydoctor/">Pydoctor</a> 25.10.1.<span class="orionis-footer-build"> Built 2026-11-03 09:36:58.</span></p>
+      <p class="orionis-footer-meta">Generated with <a href="https://github.com/twisted/pydoctor/">Pydoctor</a> 25.10.1.<span class="orionis-footer-build"> Built 2026-11-03 13:00:15.</span></p>
     </div>
     <nav class="orionis-footer-links" aria-label="Additional resources">
       <a href="https://docs.orionis-framework.com">Read the guide <span aria-hidden="true">↗</span></a>

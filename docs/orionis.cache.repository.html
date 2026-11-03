@@ -2091,11 +2091,11 @@
         </div>
 
         <div class="extrasDocstring">
-          <a href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/cache/repository.py" class="sourceLink">(source)</a>
+          <a href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/cache/repository.py" class="sourceLink">(source)</a>
         </div>
 
         <div class="moduleDocstring">
-          <div><p class="undocumented">Undocumented</p></div>
+          <div><p>Async cache repository backed by a configurable storage backend.</p></div>
         </div>
 
         <div id="split-tables">
@@ -2111,17 +2111,17 @@
     
     <td>Constant</td>
     <td><code><a href="#_FLIGHTS" class="internal-link" title="orionis.cache.repository._FLIGHTS">_FLIGHTS</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
+    <td>Flights used by <tt class="rst-docutils rst-literal">repository</tt>.</td>
   </tr><tr class="constant">
     
     <td>Constant</td>
     <td><code><a href="#_MISSING" class="internal-link" title="orionis.cache.repository._MISSING">_MISSING</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
+    <td>Sentinel that distinguishes a missing cache key from a stored None value.</td>
   </tr><tr class="constant">
     
     <td>Constant</td>
     <td><code><a href="#_RESOLVING" class="internal-link" title="orionis.cache.repository._RESOLVING">_RESOLVING</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
+    <td>Context-local resolving isolated between asynchronous tasks.</td>
   </tr>
 </table>
           
@@ -2142,7 +2142,7 @@
   <div class="functionHeader">
     
     <span class="py-defname">_FLIGHTS</span>: <code><a href="https://docs.python.org/3/library/weakref.html#weakref.WeakValueDictionary" class="intersphinx-link">WeakValueDictionary</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" class="intersphinx-link">tuple</a>, <wbr></wbr><a href="orionis.cache.repository._Flight.html" class="internal-link" title="orionis.cache.repository._Flight">_Flight</a>]</code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/cache/repository.py#L34">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/cache/repository.py#L39">
       
       (source)
     </a>
@@ -2154,7 +2154,7 @@
   </div>
   <div class="functionBody">
     
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p>Flights used by <tt class="rst-docutils rst-literal">repository</tt>.</p></div>
     <table class="valueTable"><tr class="fieldStart"><td class="fieldName">Value</td></tr><tr><td><pre class="constant-value"><code><a href="https://docs.python.org/3/library/weakref.html#weakref.WeakValueDictionary" class="intersphinx-link">WeakValueDictionary</a>()</code></pre></td></tr></table>
   </div>
 </div><div class="baseconstant">
@@ -2169,7 +2169,7 @@
   <div class="functionHeader">
     
     <span class="py-defname">_MISSING</span> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/cache/repository.py#L17">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/cache/repository.py#L19">
       
       (source)
     </a>
@@ -2181,7 +2181,7 @@
   </div>
   <div class="functionBody">
     
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p>Sentinel that distinguishes a missing cache key from a stored None value.</p></div>
     <table class="valueTable"><tr class="fieldStart"><td class="fieldName">Value</td></tr><tr><td><pre class="constant-value"><code><a href="https://docs.python.org/3/builtins/functions.html#object" class="intersphinx-link">object</a>()</code></pre></td></tr></table>
   </div>
 </div><div class="baseconstant">
@@ -2196,7 +2196,7 @@
   <div class="functionHeader">
     
     <span class="py-defname">_RESOLVING</span>: <code><a href="https://docs.python.org/3/library/contextvars.html#contextvars.ContextVar" class="intersphinx-link">ContextVar</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#frozenset" class="intersphinx-link">frozenset</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" class="intersphinx-link">tuple</a>]]</code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/cache/repository.py#L35">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/cache/repository.py#L41">
       
       (source)
     </a>
@@ -2208,7 +2208,7 @@
   </div>
   <div class="functionBody">
     
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p>Context-local resolving isolated between asynchronous tasks.</p></div>
     <table class="valueTable"><tr class="fieldStart"><td class="fieldName">Value</td></tr><tr><td><pre class="constant-value"><code><a href="https://docs.python.org/3/library/contextvars.html#contextvars.ContextVar" class="intersphinx-link">ContextVar</a>(<wbr></wbr><span class="rst-variable-quote">'</span><span class="rst-variable-string">orionis-cache-resolving</span><span class="rst-variable-quote">'</span>,
            <wbr></wbr>default=<a href="https://docs.python.org/3/builtins/stdtypes.html#frozenset" class="intersphinx-link">frozenset</a>())</code></pre></td></tr></table>
   </div>
@@ -2223,7 +2223,7 @@
   <div class="orionis-footer-inner">
     <div class="orionis-footer-copy">
       <p>API documentation for <a href="https://orionis-framework.com/" class="projecthome">Orionis</a>.</p>
-      <p class="orionis-footer-meta">Generated with <a href="https://github.com/twisted/pydoctor/">Pydoctor</a> 25.10.1.<span class="orionis-footer-build"> Built 2026-11-03 09:36:58.</span></p>
+      <p class="orionis-footer-meta">Generated with <a href="https://github.com/twisted/pydoctor/">Pydoctor</a> 25.10.1.<span class="orionis-footer-build"> Built 2026-11-03 13:00:15.</span></p>
     </div>
     <nav class="orionis-footer-links" aria-label="Additional resources">
       <a href="https://docs.orionis-framework.com">Read the guide <span aria-hidden="true">↗</span></a>

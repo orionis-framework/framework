@@ -596,7 +596,7 @@
         </div>
 
         <div class="extrasDocstring">
-          <p class="class-signature"><code><span class="py-keyword">class</span> <span class="py-defname">ClientTarget</span>: <a href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/realtime/clients.py#L95" class="sourceLink">(source)</a></code></p><p>Constructor: <code><a href="#__init__" class="internal-link" title="orionis.realtime.clients.ClientTarget.__init__">ClientTarget(manager, hub, connection_ids, group, ...)</a></code></p><p><a href="classIndex.html#orionis.realtime.clients.ClientTarget">View In Hierarchy</a></p>
+          <p class="class-signature"><code><span class="py-keyword">class</span> <span class="py-defname">ClientTarget</span>: <a href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/realtime/clients.py#L104" class="sourceLink">(source)</a></code></p><p>Constructor: <code><a href="#__init__" class="internal-link" title="orionis.realtime.clients.ClientTarget.__init__">ClientTarget(manager, hub, connection_ids, group, ...)</a></code></p><p><a href="classIndex.html#orionis.realtime.clients.ClientTarget">View In Hierarchy</a></p>
         </div>
 
         <div class="moduleDocstring">
@@ -604,7 +604,7 @@
         </div>
 
         <div id="split-tables">
-          <table class="children sortable" id="id1775">
+          <table class="children sortable" id="id1783">
   
   
   <tr class="method">
@@ -631,37 +631,37 @@
     
     <td>Class Variable</td>
     <td><code><a href="#__slots__" class="internal-link" title="orionis.realtime.clients.ClientTarget.__slots__">__slots__</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
+    <td>Declare the instance attribute slots reserved by this class.</td>
   </tr><tr class="instancevariable">
     
     <td>Instance Variable</td>
     <td><code><a href="#_excluded" class="internal-link" title="orionis.realtime.clients.ClientTarget._excluded">_excluded</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
+    <td>Connection to omit from an all-connections or group selection.</td>
   </tr><tr class="instancevariable">
     
     <td>Instance Variable</td>
     <td><code><a href="#_group" class="internal-link" title="orionis.realtime.clients.ClientTarget._group">_group</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
+    <td>Hub-local group to select when no identifiers are supplied.</td>
   </tr><tr class="instancevariable">
     
     <td>Instance Variable</td>
     <td><code><a href="#_hub" class="internal-link" title="orionis.realtime.clients.ClientTarget._hub">_hub</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
+    <td>Namespace limiting every selected recipient.</td>
   </tr><tr class="instancevariable">
     
     <td>Instance Variable</td>
     <td><code><a href="#_ids" class="internal-link" title="orionis.realtime.clients.ClientTarget._ids">_ids</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
+    <td>Connection identifiers selected as the client invocation targets.</td>
   </tr><tr class="instancevariable">
     
     <td>Instance Variable</td>
     <td><code><a href="#_manager" class="internal-link" title="orionis.realtime.clients.ClientTarget._manager">_manager</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
+    <td>Registry owning local connections.</td>
   </tr><tr class="instancevariable">
     
     <td>Instance Variable</td>
     <td><code><a href="#_single" class="internal-link" title="orionis.realtime.clients.ClientTarget._single">_single</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
+    <td>Single produced by <tt class="rst-docutils rst-literal">isinstance</tt>.</td>
   </tr>
 </table>
           
@@ -683,7 +683,7 @@
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">__init__</span><span class="function-signature long-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">manager: <code>IConnectionManager</code>, </span><span class="rst-sig-param">hub: <code><a href="https://docs.python.org/3/builtins/functions.html#type" class="intersphinx-link">type</a>[<wbr></wbr>Hub]</code>, </span><span class="rst-sig-symbol">*, </span><span class="rst-sig-param">connection_ids: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" class="intersphinx-link">tuple</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <wbr></wbr><span class="rst-variable-ellipsis">...</span>] | <a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a> | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code> = <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a>, </span><span class="rst-sig-param">group: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a> | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code> = <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a>, </span><span class="rst-sig-param">excluded: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a> | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code> = <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></span>):</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/realtime/clients.py#L100">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/realtime/clients.py#L110">
       
       (source)
     </a>
@@ -695,7 +695,7 @@
   </div>
   <div class="docstring functionBody">
     
-    <div><p>Store a connection selection without retaining connection objects.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">manager:</span><code><a href="orionis.realtime.contracts.IConnectionManager.html" class="internal-link" title="orionis.realtime.contracts.IConnectionManager">IConnectionManager</a></code></td><td class="fieldArgDesc">Registry owning local connections.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">hub:</span><code><a href="https://docs.python.org/3/builtins/functions.html#type" class="intersphinx-link">type</a>[<a href="orionis.realtime.Hub.html" class="internal-link" title="orionis.realtime.Hub">Hub</a>]</code></td><td class="fieldArgDesc">Namespace limiting every selected recipient.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">connection<wbr></wbr>_ids:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" class="intersphinx-link">tuple</a>[<a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, ...] | str | None, <em>optional</em></code></td><td class="fieldArgDesc">A single recipient, multiple recipients, or None for all/group members.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">group:</span><code>str | None, <em>optional</em></code></td><td class="fieldArgDesc">Hub-local group to select when no identifiers are supplied.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">excluded:</span><code>str | None, <em>optional</em></code></td><td class="fieldArgDesc">Connection to omit from an all-connections or group selection.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">Store the selection without validating or resolving recipients.</td></tr></table></div>
+    <div><p>Store a connection selection without retaining connection objects.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">manager:</span><code><a href="orionis.realtime.contracts.IConnectionManager.html" class="internal-link">orionis.realtime.contracts.IConnectionManager</a></code></td><td class="fieldArgDesc">Registry owning local connections.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">hub:</span><code><a href="https://docs.python.org/3/builtins/functions.html#type" class="intersphinx-link">type</a>[<a href="orionis.realtime.Hub.html" class="internal-link">orionis.realtime.Hub</a>]</code></td><td class="fieldArgDesc">Namespace limiting every selected recipient.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">connection<wbr></wbr>_ids:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" class="intersphinx-link">tuple</a>[<a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <tt class="rst-docutils rst-literal">...</tt>] | str | None, <em>optional</em></code></td><td class="fieldArgDesc">A single recipient, multiple recipients, or None for all/group members.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">group:</span><code>str | None, <em>optional</em></code></td><td class="fieldArgDesc">Hub-local group to select when no identifiers are supplied.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">excluded:</span><code>str | None, <em>optional</em></code></td><td class="fieldArgDesc">Connection to omit from an all-connections or group selection.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">Store the selection without validating or resolving recipients.</td></tr></table></div>
   </div>
 </div><div class="basemethod">
   
@@ -710,7 +710,7 @@
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">_recipients</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" class="intersphinx-link">tuple</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <wbr></wbr><span class="rst-variable-ellipsis">...</span>]</code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/realtime/clients.py#L139">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/realtime/clients.py#L155">
       
       (source)
     </a>
@@ -722,7 +722,7 @@
   </div>
   <div class="docstring functionBody">
     
-    <div><p>Snapshot the identifiers selected for Hub-local delivery.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" class="intersphinx-link">tuple</a>[<a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, ...]</code></td><td class="fieldArgDesc">Explicit identifiers unchanged, or current ready all/group members
+    <div><p>Snapshot the identifiers selected for Hub-local delivery.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" class="intersphinx-link">tuple</a>[<a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <tt class="rst-docutils rst-literal">...</tt>]</code></td><td class="fieldArgDesc">Explicit identifiers unchanged, or current ready all/group members
 with the excluded connection omitted.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/exceptions.html#ValueError" class="intersphinx-link">ValueError</a></code></td><td>If a selected group name is invalid.</td></tr></table></div>
   </div>
 </div><div class="basemethod">
@@ -738,7 +738,7 @@ with the excluded connection omitted.</td></tr></table><table class="fieldTable"
     
     
     <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">invoke</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">target: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code>, </span><span class="rst-sig-param">*args: <code><a href="https://docs.python.org/3/builtins/functions.html#object" class="intersphinx-link">object</a></code>, </span><span class="rst-sig-param">timeout: <code><a href="https://docs.python.org/3/builtins/functions.html#float" class="intersphinx-link">float</a> | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code> = <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/functions.html#object" class="intersphinx-link">object</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/realtime/clients.py#L195">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/realtime/clients.py#L211">
       
       (source)
     </a>
@@ -752,7 +752,7 @@ with the excluded connection omitted.</td></tr></table><table class="fieldTable"
     
     <div><p>Invoke one selected client and await its correlated completion.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">target:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Public client method name.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">*args:</span><code><a href="https://docs.python.org/3/builtins/functions.html#object" class="intersphinx-link">object</a></code></td><td class="fieldArgDesc">Up to 64 positional values supplied to the client method.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">timeout:</span><code>float | None, <em>optional</em></code></td><td class="fieldArgDesc">Total send/result deadline in seconds, or None to use the
 connection's configured client-result timeout.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/functions.html#object" class="intersphinx-link">object</a></code></td><td class="fieldArgDesc">Result supplied by the selected client, including None.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/exceptions.html#RuntimeError" class="intersphinx-link">RuntimeError</a></code></td><td>If the selection is not a single-client target or the pending
-client-result budget is exhausted.</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/exceptions.html#ConnectionError" class="intersphinx-link">ConnectionError</a></code></td><td>If the client is unavailable in this Hub namespace or disconnects.</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/exceptions.html#ValueError" class="intersphinx-link">ValueError</a></code></td><td>If the target, argument count or deadline is invalid.</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/exceptions.html#TimeoutError" class="intersphinx-link">TimeoutError</a></code></td><td>If sending or receiving the completion exceeds the deadline.</td></tr><tr><td class="fieldArgContainer"><code>ClientInvocationError</code></td><td>If the client returns a completion error.</td></tr></table></div>
+client-result budget is exhausted.</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/exceptions.html#ConnectionError" class="intersphinx-link">ConnectionError</a></code></td><td>If the client is unavailable in this Hub namespace or disconnects.</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/exceptions.html#ValueError" class="intersphinx-link">ValueError</a></code></td><td>If the target, argument count or deadline is invalid.</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/exceptions.html#TimeoutError" class="intersphinx-link">TimeoutError</a></code></td><td>If sending or receiving the completion exceeds the deadline.</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.realtime.errors.ClientInvocationError.html" class="internal-link">orionis.realtime.errors.ClientInvocationError</a></code></td><td>If the client returns a completion error.</td></tr></table></div>
   </div>
 </div><div class="basemethod">
   
@@ -767,7 +767,7 @@ client-result budget is exhausted.</td></tr><tr><td class="fieldArgContainer"><c
     
     
     <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">send</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">target: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code>, </span><span class="rst-sig-param">*args: <code><a href="https://docs.python.org/3/builtins/functions.html#object" class="intersphinx-link">object</a></code></span>) -&gt; <code>BroadcastResult</code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/realtime/clients.py#L164">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/realtime/clients.py#L180">
       
       (source)
     </a>
@@ -779,7 +779,7 @@ client-result budget is exhausted.</td></tr><tr><td class="fieldArgContainer"><c
   </div>
   <div class="docstring functionBody">
     
-    <div><p>Deliver a client event and report per-recipient delivery outcomes.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">target:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Public client event or method name.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">*args:</span><code><a href="https://docs.python.org/3/builtins/functions.html#object" class="intersphinx-link">object</a></code></td><td class="fieldArgDesc">Up to 64 positional values encoded into the event envelope.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.realtime.BroadcastResult.html" class="internal-link" title="orionis.realtime.BroadcastResult">BroadcastResult</a></code></td><td class="fieldArgDesc">Counts of successful and failed deliveries; no offline persistence.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/exceptions.html#ValueError" class="intersphinx-link">ValueError</a></code></td><td>If the target, argument count, selected group name or event envelope
+    <div><p>Deliver a client event and report per-recipient delivery outcomes.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">target:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Public client event or method name.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">*args:</span><code><a href="https://docs.python.org/3/builtins/functions.html#object" class="intersphinx-link">object</a></code></td><td class="fieldArgDesc">Up to 64 positional values encoded into the event envelope.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.realtime.BroadcastResult.html" class="internal-link">orionis.realtime.BroadcastResult</a></code></td><td class="fieldArgDesc">Counts of successful and failed deliveries; no offline persistence.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/exceptions.html#ValueError" class="intersphinx-link">ValueError</a></code></td><td>If the target, argument count, selected group name or event envelope
 is invalid.</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/exceptions.html#TypeError" class="intersphinx-link">TypeError</a></code></td><td>If the event envelope contains values unsupported by the codec.</td></tr></table></div>
   </div>
 </div><div class="baseclassvariable">
@@ -794,7 +794,7 @@ is invalid.</td></tr><tr><td class="fieldArgContainer"><code><a href="https://do
   <div class="functionHeader">
     
     <span class="py-defname">__slots__</span>: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" class="intersphinx-link">tuple</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <wbr></wbr><span class="rst-variable-ellipsis">...</span>]</code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/realtime/clients.py#L98">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/realtime/clients.py#L107">
       
       (source)
     </a>
@@ -806,7 +806,7 @@ is invalid.</td></tr><tr><td class="fieldArgContainer"><code><a href="https://do
   </div>
   <div class="functionBody">
     
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p>Declare the instance attribute slots reserved by this class.</p></div>
     
   </div>
 </div><div class="baseinstancevariable">
@@ -821,7 +821,7 @@ is invalid.</td></tr><tr><td class="fieldArgContainer"><code><a href="https://do
   <div class="functionHeader">
     
     <span class="py-defname">_excluded</span> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/realtime/clients.py#L137">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/realtime/clients.py#L152">
       
       (source)
     </a>
@@ -833,7 +833,7 @@ is invalid.</td></tr><tr><td class="fieldArgContainer"><code><a href="https://do
   </div>
   <div class="functionBody">
     
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p>Connection to omit from an all-connections or group selection.</p></div>
     
   </div>
 </div><div class="baseinstancevariable">
@@ -848,7 +848,7 @@ is invalid.</td></tr><tr><td class="fieldArgContainer"><code><a href="https://do
   <div class="functionHeader">
     
     <span class="py-defname">_group</span> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/realtime/clients.py#L136">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/realtime/clients.py#L150">
       
       (source)
     </a>
@@ -860,7 +860,7 @@ is invalid.</td></tr><tr><td class="fieldArgContainer"><code><a href="https://do
   </div>
   <div class="functionBody">
     
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p>Hub-local group to select when no identifiers are supplied.</p></div>
     
   </div>
 </div><div class="baseinstancevariable">
@@ -875,7 +875,7 @@ is invalid.</td></tr><tr><td class="fieldArgContainer"><code><a href="https://do
   <div class="functionHeader">
     
     <span class="py-defname">_hub</span> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/realtime/clients.py#L131">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/realtime/clients.py#L142">
       
       (source)
     </a>
@@ -887,7 +887,7 @@ is invalid.</td></tr><tr><td class="fieldArgContainer"><code><a href="https://do
   </div>
   <div class="functionBody">
     
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p>Namespace limiting every selected recipient.</p></div>
     
   </div>
 </div><div class="baseinstancevariable">
@@ -902,7 +902,7 @@ is invalid.</td></tr><tr><td class="fieldArgContainer"><code><a href="https://do
   <div class="functionHeader">
     
     <span class="py-defname">_ids</span>: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" class="intersphinx-link">tuple</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <wbr></wbr><span class="rst-variable-ellipsis">...</span>] | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/realtime/clients.py#L133">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/realtime/clients.py#L146">
       
       (source)
     </a>
@@ -914,7 +914,7 @@ is invalid.</td></tr><tr><td class="fieldArgContainer"><code><a href="https://do
   </div>
   <div class="functionBody">
     
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p>Connection identifiers selected as the client invocation targets.</p></div>
     
   </div>
 </div><div class="baseinstancevariable">
@@ -929,7 +929,7 @@ is invalid.</td></tr><tr><td class="fieldArgContainer"><code><a href="https://do
   <div class="functionHeader">
     
     <span class="py-defname">_manager</span> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/realtime/clients.py#L130">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/realtime/clients.py#L140">
       
       (source)
     </a>
@@ -941,7 +941,7 @@ is invalid.</td></tr><tr><td class="fieldArgContainer"><code><a href="https://do
   </div>
   <div class="functionBody">
     
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p>Registry owning local connections.</p></div>
     
   </div>
 </div><div class="baseinstancevariable">
@@ -956,7 +956,7 @@ is invalid.</td></tr><tr><td class="fieldArgContainer"><code><a href="https://do
   <div class="functionHeader">
     
     <span class="py-defname">_single</span> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/realtime/clients.py#L132">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/realtime/clients.py#L144">
       
       (source)
     </a>
@@ -968,7 +968,7 @@ is invalid.</td></tr><tr><td class="fieldArgContainer"><code><a href="https://do
   </div>
   <div class="functionBody">
     
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p>Single produced by <tt class="rst-docutils rst-literal">isinstance</tt>.</p></div>
     
   </div>
 </div>
@@ -982,7 +982,7 @@ is invalid.</td></tr><tr><td class="fieldArgContainer"><code><a href="https://do
   <div class="orionis-footer-inner">
     <div class="orionis-footer-copy">
       <p>API documentation for <a href="https://orionis-framework.com/" class="projecthome">Orionis</a>.</p>
-      <p class="orionis-footer-meta">Generated with <a href="https://github.com/twisted/pydoctor/">Pydoctor</a> 25.10.1.<span class="orionis-footer-build"> Built 2026-11-03 09:36:58.</span></p>
+      <p class="orionis-footer-meta">Generated with <a href="https://github.com/twisted/pydoctor/">Pydoctor</a> 25.10.1.<span class="orionis-footer-build"> Built 2026-11-03 13:00:15.</span></p>
     </div>
     <nav class="orionis-footer-links" aria-label="Additional resources">
       <a href="https://docs.orionis-framework.com">Read the guide <span aria-hidden="true">↗</span></a>

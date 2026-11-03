@@ -663,8 +663,21 @@
         
          
 
+        <div class="childrenKindTitle">Variables</div>
+        <ul>
+    
+    <li class="">
         
-         
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.mcp.protocol.content.html#ContentBlock" class="internal-link" title="orionis.mcp.protocol.content.ContentBlock"><wbr></wbr>Content<wbr></wbr>Block</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
 
         
          
@@ -882,8 +895,51 @@
         
          
 
+        <div class="childrenKindTitle">Variables</div>
+        <ul>
+    
+    <li class="">
         
-         
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.mcp.protocol.input_shapes.html#FormValue" class="internal-link" title="orionis.mcp.protocol.input_shapes.FormValue"><wbr></wbr>Form<wbr></wbr>Value</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.mcp.protocol.input_shapes.html#Nonnegative" class="internal-link" title="orionis.mcp.protocol.input_shapes.Nonnegative"><wbr></wbr>Nonnegative</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.mcp.protocol.input_shapes.html#OptionalString" class="internal-link" title="orionis.mcp.protocol.input_shapes.OptionalString"><wbr></wbr>Optional<wbr></wbr>String</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.mcp.protocol.input_shapes.html#Priority" class="internal-link" title="orionis.mcp.protocol.input_shapes.Priority"><wbr></wbr>Priority</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
 
         
          
@@ -1551,8 +1607,41 @@
         
          
 
+        <div class="childrenKindTitle">Variables</div>
+        <ul>
+    
+    <li class="">
         
-         
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.mcp.protocol.requests.html#LoggingLevel" class="internal-link" title="orionis.mcp.protocol.requests.LoggingLevel"><wbr></wbr>Logging<wbr></wbr>Level</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.mcp.protocol.requests.html#Metadata" class="internal-link" title="orionis.mcp.protocol.requests.Metadata"><wbr></wbr>Metadata</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.mcp.protocol.requests.html#RequestId" class="internal-link" title="orionis.mcp.protocol.requests.RequestId"><wbr></wbr>Request<wbr></wbr>Id</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
 
         
          
@@ -2007,15 +2096,18 @@
         </div>
 
         <div class="extrasDocstring">
-          <a href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/mcp/protocol/validation.py" class="sourceLink">(source)</a>
+          <a href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/mcp/protocol/validation.py" class="sourceLink">(source)</a>
         </div>
 
         <div class="moduleDocstring">
-          <div><p class="undocumented">Undocumented</p></div>
+          <div><p>Provide mcp protocol operations.</p>
+<p>Includes <tt class="rst-docutils rst-literal">validate_json</tt>, <tt class="rst-docutils rst-literal">validate_result</tt>, <tt class="rst-docutils rst-literal">validate_content</tt>,
+<tt class="rst-docutils rst-literal">validate_resource</tt>.</p>
+</div>
         </div>
 
         <div id="split-tables">
-          <table class="children sortable" id="id1463">
+          <table class="children sortable" id="id1467">
   
   
   <tr class="function">
@@ -2067,17 +2159,17 @@
     
     <td>Constant</td>
     <td><code><a href="#_CONTENT_TYPES" class="internal-link" title="orionis.mcp.protocol.validation._CONTENT_TYPES">_CONTENT<wbr></wbr>_TYPES</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
+    <td>Content types definitions used by <tt class="rst-docutils rst-literal">validation</tt>.</td>
   </tr><tr class="constant">
     
     <td>Constant</td>
     <td><code><a href="#_MAX_COMPLETIONS" class="internal-link" title="orionis.mcp.protocol.validation._MAX_COMPLETIONS">_MAX<wbr></wbr>_COMPLETIONS</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
+    <td>Max completions value used by <tt class="rst-docutils rst-literal">validation</tt>.</td>
   </tr><tr class="constant">
     
     <td>Constant</td>
     <td><code><a href="#_RESULT_TYPES" class="internal-link" title="orionis.mcp.protocol.validation._RESULT_TYPES">_RESULT<wbr></wbr>_TYPES</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
+    <td>Result types definitions used by <tt class="rst-docutils rst-literal">validation</tt>.</td>
   </tr>
 </table>
           
@@ -2099,7 +2191,7 @@
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">_common</span><span class="function-signature">(<span class="rst-sig-param">value: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#dict" class="intersphinx-link">dict</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <wbr></wbr><a href="https://docs.python.org/3/builtins/functions.html#object" class="intersphinx-link">object</a>]</code></span>):</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/mcp/protocol/validation.py#L195">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/mcp/protocol/validation.py#L204">
       
       (source)
     </a>
@@ -2126,7 +2218,7 @@
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">_message</span><span class="function-signature">(<span class="rst-sig-param">message: <code><a href="https://docs.python.org/3/builtins/functions.html#object" class="intersphinx-link">object</a></code></span>):</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/mcp/protocol/validation.py#L284">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/mcp/protocol/validation.py#L293">
       
       (source)
     </a>
@@ -2153,7 +2245,7 @@
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">_object</span><span class="function-signature">(<span class="rst-sig-param">value: <code><a href="https://docs.python.org/3/builtins/functions.html#object" class="intersphinx-link">object</a></code></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/stdtypes.html#dict" class="intersphinx-link">dict</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <wbr></wbr><a href="https://docs.python.org/3/builtins/functions.html#object" class="intersphinx-link">object</a>]</code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/mcp/protocol/validation.py#L174">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/mcp/protocol/validation.py#L183">
       
       (source)
     </a>
@@ -2180,7 +2272,7 @@
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">_result_payload</span><span class="function-signature">(<span class="rst-sig-param">result: <code><a href="https://docs.python.org/3/builtins/functions.html#object" class="intersphinx-link">object</a></code></span>):</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/mcp/protocol/validation.py#L120">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/mcp/protocol/validation.py#L129">
       
       (source)
     </a>
@@ -2207,7 +2299,7 @@
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">_validate_completion</span><span class="function-signature">(<span class="rst-sig-param">result: <code><a href="orionis.mcp.protocol.results.CompleteCompletionResult.html" class="internal-link" title="orionis.mcp.protocol.results.CompleteCompletionResult">CompleteCompletionResult</a></code></span>):</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/mcp/protocol/validation.py#L148">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/mcp/protocol/validation.py#L157">
       
       (source)
     </a>
@@ -2219,7 +2311,7 @@
   </div>
   <div class="docstring functionBody">
     
-    <div><p>Check completion count and total bounds before serialization.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">result:</span><code><a href="orionis.mcp.protocol.results.CompleteCompletionResult.html" class="internal-link" title="orionis.mcp.protocol.results.CompleteCompletionResult">CompleteCompletionResult</a></code></td><td class="fieldArgDesc">Completion response supplied by the application.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">Completion values and total satisfy the protocol limits.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/exceptions.html#ValueError" class="intersphinx-link">ValueError</a></code></td><td>If the number of values or declared total is invalid.</td></tr></table></div>
+    <div><p>Check completion count and total bounds before serialization.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">result:</span><code><a href="orionis.mcp.protocol.results.CompleteCompletionResult.html" class="internal-link">orionis.mcp.protocol.results.CompleteCompletionResult</a></code></td><td class="fieldArgDesc">Completion response supplied by the application.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">Completion values and total satisfy the protocol limits.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/exceptions.html#ValueError" class="intersphinx-link">ValueError</a></code></td><td>If the number of values or declared total is invalid.</td></tr></table></div>
   </div>
 </div><div class="basefunction">
   
@@ -2234,7 +2326,7 @@
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">validate_content</span><span class="function-signature">(<span class="rst-sig-param">content: <code><a href="https://docs.python.org/3/builtins/functions.html#object" class="intersphinx-link">object</a></code></span>):</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/mcp/protocol/validation.py#L223">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/mcp/protocol/validation.py#L232">
       
       (source)
     </a>
@@ -2261,7 +2353,7 @@
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">validate_json</span><span class="function-signature">(<span class="rst-sig-param">value: <code><a href="https://docs.python.org/3/builtins/functions.html#object" class="intersphinx-link">object</a></code></span>):</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/mcp/protocol/validation.py#L54">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/mcp/protocol/validation.py#L63">
       
       (source)
     </a>
@@ -2288,7 +2380,7 @@
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">validate_resource</span><span class="function-signature">(<span class="rst-sig-param">content: <code><a href="https://docs.python.org/3/builtins/functions.html#object" class="intersphinx-link">object</a></code></span>):</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/mcp/protocol/validation.py#L258">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/mcp/protocol/validation.py#L267">
       
       (source)
     </a>
@@ -2315,7 +2407,7 @@
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">validate_result</span><span class="function-signature">(<span class="rst-sig-param">result: <code><a href="https://docs.python.org/3/builtins/functions.html#object" class="intersphinx-link">object</a></code>, </span><span class="rst-sig-param">method: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></span>):</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/mcp/protocol/validation.py#L83">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/mcp/protocol/validation.py#L92">
       
       (source)
     </a>
@@ -2341,7 +2433,7 @@
   <div class="functionHeader">
     
     <span class="py-defname">_CONTENT_TYPES</span> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/mcp/protocol/validation.py#L46">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/mcp/protocol/validation.py#L53">
       
       (source)
     </a>
@@ -2353,7 +2445,7 @@
   </div>
   <div class="functionBody">
     
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p>Content types definitions used by <tt class="rst-docutils rst-literal">validation</tt>.</p></div>
     <table class="valueTable"><tr class="fieldStart"><td class="fieldName">Value</td></tr><tr><td><pre class="constant-value"><code>{<wbr></wbr><span class="rst-variable-quote">'</span><span class="rst-variable-string">text</span><span class="rst-variable-quote">'</span>: <a href="orionis.mcp.protocol.content.TextContent.html" class="internal-link" title="orionis.mcp.protocol.content.TextContent">TextContent</a>,
  <wbr></wbr><span class="rst-variable-quote">'</span><span class="rst-variable-string">image</span><span class="rst-variable-quote">'</span>: <a href="orionis.mcp.protocol.content.ImageContent.html" class="internal-link" title="orionis.mcp.protocol.content.ImageContent">ImageContent</a>,
  <wbr></wbr><span class="rst-variable-quote">'</span><span class="rst-variable-string">audio</span><span class="rst-variable-quote">'</span>: <a href="orionis.mcp.protocol.content.AudioContent.html" class="internal-link" title="orionis.mcp.protocol.content.AudioContent">AudioContent</a>,
@@ -2371,7 +2463,7 @@
   <div class="functionHeader">
     
     <span class="py-defname">_MAX_COMPLETIONS</span>: <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/mcp/protocol/validation.py#L52">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/mcp/protocol/validation.py#L60">
       
       (source)
     </a>
@@ -2383,7 +2475,7 @@
   </div>
   <div class="functionBody">
     
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p>Max completions value used by <tt class="rst-docutils rst-literal">validation</tt>.</p></div>
     <table class="valueTable"><tr class="fieldStart"><td class="fieldName">Value</td></tr><tr><td><pre class="constant-value"><code>100</code></pre></td></tr></table>
   </div>
 </div><div class="baseconstant">
@@ -2398,7 +2490,7 @@
   <div class="functionHeader">
     
     <span class="py-defname">_RESULT_TYPES</span> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/mcp/protocol/validation.py#L34">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/mcp/protocol/validation.py#L40">
       
       (source)
     </a>
@@ -2410,7 +2502,7 @@
   </div>
   <div class="functionBody">
     
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p>Result types definitions used by <tt class="rst-docutils rst-literal">validation</tt>.</p></div>
     <table class="valueTable"><tr class="fieldStart"><td class="fieldName">Value</td></tr><tr><td><pre class="constant-value"><code>{<wbr></wbr><span class="rst-variable-quote">'</span><span class="rst-variable-string">server/discover</span><span class="rst-variable-quote">'</span>: <a href="orionis.mcp.protocol.results.DiscoverResult.html" class="internal-link" title="orionis.mcp.protocol.results.DiscoverResult">DiscoverResult</a>,
  <wbr></wbr><span class="rst-variable-quote">'</span><span class="rst-variable-string">tools/list</span><span class="rst-variable-quote">'</span>: <a href="orionis.mcp.protocol.results.ListToolsResult.html" class="internal-link" title="orionis.mcp.protocol.results.ListToolsResult">ListToolsResult</a>,
  <wbr></wbr><span class="rst-variable-quote">'</span><span class="rst-variable-string">tools/call</span><span class="rst-variable-quote">'</span>: <a href="orionis.mcp.protocol.results.CallToolResult.html" class="internal-link" title="orionis.mcp.protocol.results.CallToolResult">CallToolResult</a>,
@@ -2431,7 +2523,7 @@
   <div class="orionis-footer-inner">
     <div class="orionis-footer-copy">
       <p>API documentation for <a href="https://orionis-framework.com/" class="projecthome">Orionis</a>.</p>
-      <p class="orionis-footer-meta">Generated with <a href="https://github.com/twisted/pydoctor/">Pydoctor</a> 25.10.1.<span class="orionis-footer-build"> Built 2026-11-03 09:36:58.</span></p>
+      <p class="orionis-footer-meta">Generated with <a href="https://github.com/twisted/pydoctor/">Pydoctor</a> 25.10.1.<span class="orionis-footer-build"> Built 2026-11-03 13:00:15.</span></p>
     </div>
     <nav class="orionis-footer-links" aria-label="Additional resources">
       <a href="https://docs.orionis-framework.com">Read the guide <span aria-hidden="true">↗</span></a>

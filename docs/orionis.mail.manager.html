@@ -433,6 +433,16 @@
             </div>
         
 
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.mail.composer.html#LoadedAttachment" class="internal-link" title="orionis.mail.composer.LoadedAttachment"><wbr></wbr>Loaded<wbr></wbr>Attachment</a></code>
+            </div>
+        
+
     </li>
 </ul> 
 
@@ -568,7 +578,7 @@
         
 
         
-            <div class="itemName"><code><a href="orionis.mail.entities.address.html" class="internal-link" title="orionis.mail.entities.address">address</a></code>
+            <div class="itemName"><code><a href="orionis.mail.entities.address.module.html" class="internal-link" title="orionis.mail.entities.address">address</a></code>
             </div>
         
 
@@ -578,7 +588,7 @@
         
 
         
-            <div class="itemName"><code><a href="orionis.mail.entities.attachment.html" class="internal-link" title="orionis.mail.entities.attachment">attachment</a></code>
+            <div class="itemName"><code><a href="orionis.mail.entities.attachment.module.html" class="internal-link" title="orionis.mail.entities.attachment">attachment</a></code>
             </div>
         
 
@@ -588,7 +598,7 @@
         
 
         
-            <div class="itemName"><code><a href="orionis.mail.entities.content.html" class="internal-link" title="orionis.mail.entities.content">content</a></code>
+            <div class="itemName"><code><a href="orionis.mail.entities.content.module.html" class="internal-link" title="orionis.mail.entities.content">content</a></code>
             </div>
         
 
@@ -598,7 +608,7 @@
         
 
         
-            <div class="itemName"><code><a href="orionis.mail.entities.envelope.html" class="internal-link" title="orionis.mail.entities.envelope">envelope</a></code>
+            <div class="itemName"><code><a href="orionis.mail.entities.envelope.module.html" class="internal-link" title="orionis.mail.entities.envelope">envelope</a></code>
             </div>
         
 
@@ -1144,7 +1154,7 @@
                     
                 </label>
 
-                <code><a href="orionis.mail.mailable.html" class="internal-link" title="orionis.mail.mailable">mailable</a></code>
+                <code><a href="orionis.mail.mailable.module.html" class="internal-link" title="orionis.mail.mailable">mailable</a></code>
 
                 <div class="expandableContent">
                     <div>
@@ -1275,7 +1285,7 @@
                     
                 </label>
 
-                <code><a href="orionis.mail.message.html" class="internal-link" title="orionis.mail.message">message</a></code>
+                <code><a href="orionis.mail.message.module.html" class="internal-link" title="orionis.mail.message">message</a></code>
 
                 <div class="expandableContent">
                     <div>
@@ -1602,7 +1612,7 @@
                     
                 </input>
 
-                <label class="lbl-toggle notExpandable" for="">
+                <label class="lbl-toggle" for="expandableItemId13683">
                     
                     
                 </label>
@@ -1625,8 +1635,51 @@
         
          
 
+        <div class="childrenKindTitle">Variables</div>
+        <ul>
+    
+    <li class="">
         
-         
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.mail.types.html#Delivery" class="internal-link" title="orionis.mail.types.Delivery"><wbr></wbr>Delivery</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.mail.types.html#MessageCallback" class="internal-link" title="orionis.mail.types.MessageCallback"><wbr></wbr>Message<wbr></wbr>Callback</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.mail.types.html#Recipients" class="internal-link" title="orionis.mail.types.Recipients"><wbr></wbr>Recipients</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.mail.types.html#TransportFactory" class="internal-link" title="orionis.mail.types.TransportFactory"><wbr></wbr>Transport<wbr></wbr>Factory</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
 
         
          
@@ -2255,15 +2308,15 @@
         </div>
 
         <div class="extrasDocstring">
-          <a href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/mail/manager.py" class="sourceLink">(source)</a>
+          <a href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/mail/manager.py" class="sourceLink">(source)</a>
         </div>
 
         <div class="moduleDocstring">
-          <div><p class="undocumented">Undocumented</p></div>
+          <div><p>Resolve central mail configuration and delegate the shared fluent pipeline.</p></div>
         </div>
 
         <div id="split-tables">
-          <table class="children sortable" id="id1322">
+          <table class="children sortable" id="id1325">
   
   
   <tr class="class">
@@ -2280,7 +2333,7 @@
     
     <td>Constant</td>
     <td><code><a href="#_CONVENTIONAL_DRIVERS" class="internal-link" title="orionis.mail.manager._CONVENTIONAL_DRIVERS">_CONVENTIONAL<wbr></wbr>_DRIVERS</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
+    <td>Mailer names whose driver may be omitted in the configuration.</td>
   </tr>
 </table>
           
@@ -2302,7 +2355,7 @@
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">_configuration_mapping</span><span class="function-signature">(<span class="rst-sig-param">value: <code><a href="https://docs.python.org/3/builtins/functions.html#object" class="intersphinx-link">object</a></code></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/stdtypes.html#dict" class="intersphinx-link">dict</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <wbr></wbr><a href="https://docs.python.org/3/builtins/functions.html#object" class="intersphinx-link">object</a>]</code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/mail/manager.py#L274">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/mail/manager.py#L281">
       
       (source)
     </a>
@@ -2314,7 +2367,7 @@
   </div>
   <div class="docstring functionBody">
     
-    <div><p>Copy one configuration layer while preserving arbitrary dependency values.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">value:</span><code><a href="https://docs.python.org/3/builtins/functions.html#object" class="intersphinx-link">object</a></code></td><td class="fieldArgDesc">Central dictionary, immutable mapping, or configuration entity.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/stdtypes.html#dict" class="intersphinx-link">dict</a>[<a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <a href="https://docs.python.org/3/builtins/functions.html#object" class="intersphinx-link">object</a>]</code></td><td class="fieldArgDesc">Fresh mapping built without invoking environment-backed constructors.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.mail.exceptions.MailConfigurationException.html" class="internal-link" title="orionis.mail.exceptions.MailConfigurationException">MailConfigurationException</a></code></td><td>If the configuration is neither a mapping nor an entity.</td></tr></table></div>
+    <div><p>Copy one configuration layer while preserving arbitrary dependency values.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">value:</span><code><a href="https://docs.python.org/3/builtins/functions.html#object" class="intersphinx-link">object</a></code></td><td class="fieldArgDesc">Central dictionary, immutable mapping, or configuration entity.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/stdtypes.html#dict" class="intersphinx-link">dict</a>[<a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <a href="https://docs.python.org/3/builtins/functions.html#object" class="intersphinx-link">object</a>]</code></td><td class="fieldArgDesc">Fresh mapping built without invoking environment-backed constructors.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.mail.exceptions.MailConfigurationException.html" class="internal-link">orionis.mail.exceptions.MailConfigurationException</a></code></td><td>If the configuration is neither a mapping nor an entity.</td></tr></table></div>
   </div>
 </div><div class="baseconstant">
   
@@ -2328,7 +2381,7 @@
   <div class="functionHeader">
     
     <span class="py-defname">_CONVENTIONAL_DRIVERS</span> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/mail/manager.py#L24">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/mail/manager.py#L26">
       
       (source)
     </a>
@@ -2340,7 +2393,7 @@
   </div>
   <div class="functionBody">
     
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p>Mailer names whose driver may be omitted in the configuration.</p></div>
     <table class="valueTable"><tr class="fieldStart"><td class="fieldName">Value</td></tr><tr><td><pre class="constant-value"><code><a href="https://docs.python.org/3/builtins/stdtypes.html#frozenset" class="intersphinx-link">frozenset</a>(<wbr></wbr>set([<wbr></wbr><span class="rst-variable-quote">'</span><span class="rst-variable-string">smtp</span><span class="rst-variable-quote">'</span>, <wbr></wbr><span class="rst-variable-quote">'</span><span class="rst-variable-string">file</span><span class="rst-variable-quote">'</span>]))</code></pre></td></tr></table>
   </div>
 </div>
@@ -2354,7 +2407,7 @@
   <div class="orionis-footer-inner">
     <div class="orionis-footer-copy">
       <p>API documentation for <a href="https://orionis-framework.com/" class="projecthome">Orionis</a>.</p>
-      <p class="orionis-footer-meta">Generated with <a href="https://github.com/twisted/pydoctor/">Pydoctor</a> 25.10.1.<span class="orionis-footer-build"> Built 2026-11-03 09:36:58.</span></p>
+      <p class="orionis-footer-meta">Generated with <a href="https://github.com/twisted/pydoctor/">Pydoctor</a> 25.10.1.<span class="orionis-footer-build"> Built 2026-11-03 13:00:15.</span></p>
     </div>
     <nav class="orionis-footer-links" aria-label="Additional resources">
       <a href="https://docs.orionis-framework.com">Read the guide <span aria-hidden="true">↗</span></a>

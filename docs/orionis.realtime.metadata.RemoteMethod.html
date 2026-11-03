@@ -757,7 +757,7 @@
         </div>
 
         <div class="extrasDocstring">
-          <p class="class-signature"><code><span class="py-keyword">class</span> <span class="py-defname">RemoteMethod</span>: <a href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/realtime/metadata.py#L246" class="sourceLink">(source)</a></code></p><p><a href="classIndex.html#orionis.realtime.metadata.RemoteMethod">View In Hierarchy</a></p>
+          <p class="class-signature"><code><span class="py-keyword">class</span> <span class="py-defname">RemoteMethod</span>: <a href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/realtime/metadata.py#L260" class="sourceLink">(source)</a></code></p><p><a href="classIndex.html#orionis.realtime.metadata.RemoteMethod">View In Hierarchy</a></p>
         </div>
 
         <div class="moduleDocstring">
@@ -765,7 +765,7 @@
         </div>
 
         <div id="split-tables">
-          <table class="children sortable" id="id1796">
+          <table class="children sortable" id="id1804">
   
   
   <tr class="method">
@@ -777,32 +777,32 @@
     
     <td>Class Variable</td>
     <td><code><a href="#client_names" class="internal-link" title="orionis.realtime.metadata.RemoteMethod.client_names">client<wbr></wbr>_names</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
+    <td>Names of arguments the client is permitted to supply.</td>
   </tr><tr class="classvariable">
     
     <td>Class Variable</td>
     <td><code><a href="#dependencies" class="internal-link" title="orionis.realtime.metadata.RemoteMethod.dependencies">dependencies</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
+    <td>Service dependencies resolved for the remote invocation.</td>
   </tr><tr class="classvariable">
     
     <td>Class Variable</td>
     <td><code><a href="#is_stream" class="internal-link" title="orionis.realtime.metadata.RemoteMethod.is_stream">is<wbr></wbr>_stream</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
+    <td>Whether the remote method produces streamed results.</td>
   </tr><tr class="classvariable">
     
     <td>Class Variable</td>
     <td><code><a href="#method_name" class="internal-link" title="orionis.realtime.metadata.RemoteMethod.method_name">method<wbr></wbr>_name</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
+    <td>Python method name implementing the remote target.</td>
   </tr><tr class="classvariable">
     
     <td>Class Variable</td>
     <td><code><a href="#parameters" class="internal-link" title="orionis.realtime.metadata.RemoteMethod.parameters">parameters</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
+    <td>Client-supplied parameters accepted by the remote method.</td>
   </tr><tr class="classvariable">
     
     <td>Class Variable</td>
     <td><code><a href="#positional" class="internal-link" title="orionis.realtime.metadata.RemoteMethod.positional">positional</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
+    <td>Parameter metadata used to bind positional client arguments.</td>
   </tr>
 </table>
           
@@ -824,7 +824,7 @@
     
     
     <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">bind</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">args: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#list" class="intersphinx-link">list</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/functions.html#object" class="intersphinx-link">object</a>]</code>, </span><span class="rst-sig-param">kwargs: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#dict" class="intersphinx-link">dict</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <wbr></wbr><a href="https://docs.python.org/3/builtins/functions.html#object" class="intersphinx-link">object</a>]</code></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/stdtypes.html#dict" class="intersphinx-link">dict</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <wbr></wbr><a href="https://docs.python.org/3/builtins/functions.html#object" class="intersphinx-link">object</a>]</code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/realtime/metadata.py#L257">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/realtime/metadata.py#L277">
       
       (source)
     </a>
@@ -836,7 +836,7 @@
   </div>
   <div class="docstring functionBody">
     
-    <div><p>Bind and validate client-owned parameters, providing declared defaults.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">args:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#list" class="intersphinx-link">list</a>[<a href="https://docs.python.org/3/builtins/functions.html#object" class="intersphinx-link">object</a>]</code></td><td class="fieldArgDesc">Positional RPC values, excluding every dependency-injected parameter.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">kwargs:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#dict" class="intersphinx-link">dict</a>[<a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <a href="https://docs.python.org/3/builtins/functions.html#object" class="intersphinx-link">object</a>]</code></td><td class="fieldArgDesc">Named RPC values, restricted to the compiled client parameter set.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/stdtypes.html#dict" class="intersphinx-link">dict</a>[<a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <a href="https://docs.python.org/3/builtins/functions.html#object" class="intersphinx-link">object</a>]</code></td><td class="fieldArgDesc">Converted client arguments; container dependencies are never included.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.realtime.errors.RPCError.html" class="internal-link" title="orionis.realtime.errors.RPCError">RPCError</a></code></td><td>If an argument is missing, duplicated, unknown or invalid.</td></tr></table></div>
+    <div><p>Bind and validate client-owned parameters, providing declared defaults.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">args:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#list" class="intersphinx-link">list</a>[<a href="https://docs.python.org/3/builtins/functions.html#object" class="intersphinx-link">object</a>]</code></td><td class="fieldArgDesc">Positional RPC values, excluding every dependency-injected parameter.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">kwargs:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#dict" class="intersphinx-link">dict</a>[<a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <a href="https://docs.python.org/3/builtins/functions.html#object" class="intersphinx-link">object</a>]</code></td><td class="fieldArgDesc">Named RPC values, restricted to the compiled client parameter set.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/stdtypes.html#dict" class="intersphinx-link">dict</a>[<a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <a href="https://docs.python.org/3/builtins/functions.html#object" class="intersphinx-link">object</a>]</code></td><td class="fieldArgDesc">Converted client arguments; container dependencies are never included.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.realtime.errors.RPCError.html" class="internal-link">orionis.realtime.errors.RPCError</a></code></td><td>If an argument is missing, duplicated, unknown or invalid.</td></tr></table></div>
   </div>
 </div><div class="baseclassvariable">
   
@@ -850,7 +850,7 @@
   <div class="functionHeader">
     
     <span class="py-defname">client_names</span>: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#frozenset" class="intersphinx-link">frozenset</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>]</code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/realtime/metadata.py#L255">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/realtime/metadata.py#L274">
       
       (source)
     </a>
@@ -862,7 +862,7 @@
   </div>
   <div class="functionBody">
     
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p>Names of arguments the client is permitted to supply.</p></div>
     
   </div>
 </div><div class="baseclassvariable">
@@ -877,7 +877,7 @@
   <div class="functionHeader">
     
     <span class="py-defname">dependencies</span>: <code><a href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Mapping" class="intersphinx-link">Mapping</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <wbr></wbr><a href="https://docs.python.org/3/builtins/functions.html#type" class="intersphinx-link">type</a>]</code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/realtime/metadata.py#L252">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/realtime/metadata.py#L268">
       
       (source)
     </a>
@@ -889,7 +889,7 @@
   </div>
   <div class="functionBody">
     
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p>Service dependencies resolved for the remote invocation.</p></div>
     
   </div>
 </div><div class="baseclassvariable">
@@ -904,7 +904,7 @@
   <div class="functionHeader">
     
     <span class="py-defname">is_stream</span>: <code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/realtime/metadata.py#L251">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/realtime/metadata.py#L266">
       
       (source)
     </a>
@@ -916,7 +916,7 @@
   </div>
   <div class="functionBody">
     
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p>Whether the remote method produces streamed results.</p></div>
     
   </div>
 </div><div class="baseclassvariable">
@@ -931,7 +931,7 @@
   <div class="functionHeader">
     
     <span class="py-defname">method_name</span>: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/realtime/metadata.py#L250">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/realtime/metadata.py#L264">
       
       (source)
     </a>
@@ -943,7 +943,7 @@
   </div>
   <div class="functionBody">
     
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p>Python method name implementing the remote target.</p></div>
     
   </div>
 </div><div class="baseclassvariable">
@@ -958,7 +958,7 @@
   <div class="functionHeader">
     
     <span class="py-defname">parameters</span>: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" class="intersphinx-link">tuple</a>[<wbr></wbr><a href="orionis.realtime.metadata._ClientParameter.html" class="internal-link" title="orionis.realtime.metadata._ClientParameter">_ClientParameter</a>, <wbr></wbr><span class="rst-variable-ellipsis">...</span>]</code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/realtime/metadata.py#L253">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/realtime/metadata.py#L270">
       
       (source)
     </a>
@@ -970,7 +970,7 @@
   </div>
   <div class="functionBody">
     
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p>Client-supplied parameters accepted by the remote method.</p></div>
     
   </div>
 </div><div class="baseclassvariable">
@@ -985,7 +985,7 @@
   <div class="functionHeader">
     
     <span class="py-defname">positional</span>: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" class="intersphinx-link">tuple</a>[<wbr></wbr><a href="orionis.realtime.metadata._ClientParameter.html" class="internal-link" title="orionis.realtime.metadata._ClientParameter">_ClientParameter</a>, <wbr></wbr><span class="rst-variable-ellipsis">...</span>]</code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/realtime/metadata.py#L254">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/realtime/metadata.py#L272">
       
       (source)
     </a>
@@ -997,7 +997,7 @@
   </div>
   <div class="functionBody">
     
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p>Parameter metadata used to bind positional client arguments.</p></div>
     
   </div>
 </div>
@@ -1011,7 +1011,7 @@
   <div class="orionis-footer-inner">
     <div class="orionis-footer-copy">
       <p>API documentation for <a href="https://orionis-framework.com/" class="projecthome">Orionis</a>.</p>
-      <p class="orionis-footer-meta">Generated with <a href="https://github.com/twisted/pydoctor/">Pydoctor</a> 25.10.1.<span class="orionis-footer-build"> Built 2026-11-03 09:36:58.</span></p>
+      <p class="orionis-footer-meta">Generated with <a href="https://github.com/twisted/pydoctor/">Pydoctor</a> 25.10.1.<span class="orionis-footer-build"> Built 2026-11-03 13:00:15.</span></p>
     </div>
     <nav class="orionis-footer-links" aria-label="Additional resources">
       <a href="https://docs.orionis-framework.com">Read the guide <span aria-hidden="true">↗</span></a>

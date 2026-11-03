@@ -852,15 +852,15 @@
         </div>
 
         <div class="extrasDocstring">
-          <a href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/queues/drivers/redis.py" class="sourceLink">(source)</a>
+          <a href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/queues/drivers/redis.py" class="sourceLink">(source)</a>
         </div>
 
         <div class="moduleDocstring">
-          <div><p class="undocumented">Undocumented</p></div>
+          <div><p>Persist delayed jobs and fenced reservations through atomic Lua scripts.</p></div>
         </div>
 
         <div id="split-tables">
-          <table class="children sortable" id="id1733">
+          <table class="children sortable" id="id1740">
   
   
   <tr class="class">
@@ -877,42 +877,42 @@
     
     <td>Constant</td>
     <td><code><a href="#_CHECK_TYPES" class="internal-link" title="orionis.queues.drivers.redis._CHECK_TYPES">_CHECK<wbr></wbr>_TYPES</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
+    <td>Validate key types before any transition can remove persisted queue state.</td>
   </tr><tr class="constant">
     
     <td>Constant</td>
     <td><code><a href="#_CLEAR" class="internal-link" title="orionis.queues.drivers.redis._CLEAR">_CLEAR</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
+    <td>Remove a queue's complete state and report its previous number of jobs.</td>
   </tr><tr class="constant">
     
     <td>Constant</td>
     <td><code><a href="#_DELETE" class="internal-link" title="orionis.queues.drivers.redis._DELETE">_DELETE</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
+    <td>Remove only a token that still owns an unexpired lease.</td>
   </tr><tr class="constant">
     
     <td>Constant</td>
     <td><code><a href="#_ENCODER" class="internal-link" title="orionis.queues.drivers.redis._ENCODER">_ENCODER</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
+    <td>Encoder used by <tt class="rst-docutils rst-literal">redis</tt>.</td>
   </tr><tr class="constant">
     
     <td>Constant</td>
     <td><code><a href="#_PUSH" class="internal-link" title="orionis.queues.drivers.redis._PUSH">_PUSH</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
+    <td>Store the envelope and availability together without exposing partial state.</td>
   </tr><tr class="constant">
     
     <td>Constant</td>
     <td><code><a href="#_RELEASE" class="internal-link" title="orionis.queues.drivers.redis._RELEASE">_RELEASE</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
+    <td>Release only a token that still owns an unexpired lease.</td>
   </tr><tr class="constant">
     
     <td>Constant</td>
     <td><code><a href="#_RESERVATION_FIELDS" class="internal-link" title="orionis.queues.drivers.redis._RESERVATION_FIELDS">_RESERVATION<wbr></wbr>_FIELDS</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
+    <td>Reservation fields value used by <tt class="rst-docutils rst-literal">redis</tt>.</td>
   </tr><tr class="constant">
     
     <td>Constant</td>
     <td><code><a href="#_RESERVE" class="internal-link" title="orionis.queues.drivers.redis._RESERVE">_RESERVE</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
+    <td>Reclaim expired leases and move one due job into an owned reservation.</td>
   </tr>
 </table>
           
@@ -934,7 +934,7 @@
     
     <div><span class="decorator">@<a href="https://docs.python.org/3/library/functools.html#functools.lru_cache" class="intersphinx-link">lru_cache</a>(<wbr></wbr>maxsize=16)<br /></span></div>
     <span class="py-keyword">def</span>&#160;<span class="py-defname">_script_digest</span><span class="function-signature">(<span class="rst-sig-param">script: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/queues/drivers/redis.py#L20">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/queues/drivers/redis.py#L24">
       
       (source)
     </a>
@@ -960,7 +960,7 @@
   <div class="functionHeader">
     
     <span class="py-defname">_CHECK_TYPES</span>: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/queues/drivers/redis.py#L38">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/queues/drivers/redis.py#L42">
       
       (source)
     </a>
@@ -972,7 +972,7 @@
   </div>
   <div class="functionBody">
     
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p>Validate key types before any transition can remove persisted queue state.</p></div>
     <table class="valueTable"><tr class="fieldStart"><td class="fieldName">Value</td></tr><tr><td><pre class="constant-value"><code><span class="rst-variable-quote">'''</span><span class="rst-variable-string"></span>
 <span class="rst-variable-string">local expected = {\'zset\', \'zset\', \'hash\', \'hash\', \'hash\'}</span>
 <span class="rst-variable-string">for index, key in ipairs(KEYS) do</span>
@@ -994,7 +994,7 @@
   <div class="functionHeader">
     
     <span class="py-defname">_CLEAR</span>: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/queues/drivers/redis.py#L117">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/queues/drivers/redis.py#L126">
       
       (source)
     </a>
@@ -1006,7 +1006,7 @@
   </div>
   <div class="functionBody">
     
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p>Remove a queue's complete state and report its previous number of jobs.</p></div>
     <table class="valueTable"><tr class="fieldStart"><td class="fieldName">Value</td></tr><tr><td><pre class="constant-value"><code><span class="rst-variable-quote">'''</span><span class="rst-variable-string"></span>
 <span class="rst-variable-string">local count = redis.call(\'HLEN\', KEYS[3])</span>
 <span class="rst-variable-string">redis.call(\'DEL\', unpack(KEYS))</span>
@@ -1025,7 +1025,7 @@
   <div class="functionHeader">
     
     <span class="py-defname">_DELETE</span> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/queues/drivers/redis.py#L102">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/queues/drivers/redis.py#L110">
       
       (source)
     </a>
@@ -1037,7 +1037,7 @@
   </div>
   <div class="functionBody">
     
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p>Remove only a token that still owns an unexpired lease.</p></div>
     <table class="valueTable"><tr class="fieldStart"><td class="fieldName">Value</td></tr><tr><td><pre class="constant-value"><code><a href="#_CHECK_TYPES" class="internal-link" title="orionis.queues.drivers.redis._CHECK_TYPES">_CHECK_TYPES</a> + <span class="rst-variable-quote">'''</span><span class="rst-variable-string"></span>
 <span class="rst-variable-string">local lease = redis.call(\'ZSCORE\', KEYS[2], ARGV[1])</span>
 <span class="rst-variable-string">if redis.call(\'HGET\', KEYS[5], ARGV[1]) ~= ARGV[2]</span>
@@ -1059,7 +1059,7 @@
   <div class="functionHeader">
     
     <span class="py-defname">_ENCODER</span> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/queues/drivers/redis.py#L17">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/queues/drivers/redis.py#L19">
       
       (source)
     </a>
@@ -1071,7 +1071,7 @@
   </div>
   <div class="functionBody">
     
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p>Encoder used by <tt class="rst-docutils rst-literal">redis</tt>.</p></div>
     <table class="valueTable"><tr class="fieldStart"><td class="fieldName">Value</td></tr><tr><td><pre class="constant-value"><code>msgspec.json.Encoder()</code></pre></td></tr></table>
   </div>
 </div><div class="baseconstant">
@@ -1086,7 +1086,7 @@
   <div class="functionHeader">
     
     <span class="py-defname">_PUSH</span> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/queues/drivers/redis.py#L49">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/queues/drivers/redis.py#L54">
       
       (source)
     </a>
@@ -1098,7 +1098,7 @@
   </div>
   <div class="functionBody">
     
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p>Store the envelope and availability together without exposing partial state.</p></div>
     <table class="valueTable"><tr class="fieldStart"><td class="fieldName">Value</td></tr><tr><td><pre class="constant-value"><code><a href="#_CHECK_TYPES" class="internal-link" title="orionis.queues.drivers.redis._CHECK_TYPES">_CHECK_TYPES</a> + <span class="rst-variable-quote">'''</span><span class="rst-variable-string"></span>
 <span class="rst-variable-string">if redis.call(\'HEXISTS\', KEYS[3], ARGV[1]) == 1 then return 0 end</span>
 <span class="rst-variable-string">redis.call(\'HSET\', KEYS[3], ARGV[1], ARGV[2])</span>
@@ -1119,7 +1119,7 @@
   <div class="functionHeader">
     
     <span class="py-defname">_RELEASE</span> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/queues/drivers/redis.py#L88">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/queues/drivers/redis.py#L95">
       
       (source)
     </a>
@@ -1131,7 +1131,7 @@
   </div>
   <div class="functionBody">
     
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p>Release only a token that still owns an unexpired lease.</p></div>
     <table class="valueTable"><tr class="fieldStart"><td class="fieldName">Value</td></tr><tr><td><pre class="constant-value"><code><a href="#_CHECK_TYPES" class="internal-link" title="orionis.queues.drivers.redis._CHECK_TYPES">_CHECK_TYPES</a> + <span class="rst-variable-quote">'''</span><span class="rst-variable-string"></span>
 <span class="rst-variable-string">local lease = redis.call(\'ZSCORE\', KEYS[2], ARGV[1])</span>
 <span class="rst-variable-string">if redis.call(\'HGET\', KEYS[5], ARGV[1]) ~= ARGV[2]</span>
@@ -1153,7 +1153,7 @@
   <div class="functionHeader">
     
     <span class="py-defname">_RESERVATION_FIELDS</span>: <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/queues/drivers/redis.py#L18">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/queues/drivers/redis.py#L21">
       
       (source)
     </a>
@@ -1165,7 +1165,7 @@
   </div>
   <div class="functionBody">
     
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p>Reservation fields value used by <tt class="rst-docutils rst-literal">redis</tt>.</p></div>
     <table class="valueTable"><tr class="fieldStart"><td class="fieldName">Value</td></tr><tr><td><pre class="constant-value"><code>3</code></pre></td></tr></table>
   </div>
 </div><div class="baseconstant">
@@ -1180,7 +1180,7 @@
   <div class="functionHeader">
     
     <span class="py-defname">_RESERVE</span> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/queues/drivers/redis.py#L61">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/queues/drivers/redis.py#L67">
       
       (source)
     </a>
@@ -1192,7 +1192,7 @@
   </div>
   <div class="functionBody">
     
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p>Reclaim expired leases and move one due job into an owned reservation.</p></div>
     <table class="valueTable"><tr class="fieldStart"><td class="fieldName">Value</td></tr><tr><td><pre class="constant-value"><code><a href="#_CHECK_TYPES" class="internal-link" title="orionis.queues.drivers.redis._CHECK_TYPES">_CHECK_TYPES</a> + <span class="rst-variable-quote">'''</span><span class="rst-variable-string"></span>
 <span class="rst-variable-string">local expired = redis.call(\'ZRANGEBYSCORE\', KEYS[2], \'-inf\', ARGV[1],</span>
 <span class="rst-variable-string">                           \'LIMIT\', 0, 100)</span>
@@ -1213,7 +1213,7 @@
   <div class="orionis-footer-inner">
     <div class="orionis-footer-copy">
       <p>API documentation for <a href="https://orionis-framework.com/" class="projecthome">Orionis</a>.</p>
-      <p class="orionis-footer-meta">Generated with <a href="https://github.com/twisted/pydoctor/">Pydoctor</a> 25.10.1.<span class="orionis-footer-build"> Built 2026-11-03 09:36:58.</span></p>
+      <p class="orionis-footer-meta">Generated with <a href="https://github.com/twisted/pydoctor/">Pydoctor</a> 25.10.1.<span class="orionis-footer-build"> Built 2026-11-03 13:00:15.</span></p>
     </div>
     <nav class="orionis-footer-links" aria-label="Additional resources">
       <a href="https://docs.orionis-framework.com">Read the guide <span aria-hidden="true">↗</span></a>

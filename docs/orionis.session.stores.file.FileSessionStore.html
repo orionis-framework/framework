@@ -149,7 +149,7 @@
       <div>
          
           <div class="childrenKindTitle">Contents</div>
-          <ul><li><a class="rst-internal rst-reference" href="#rst-file-layout" id="rst-toc-entry-3">File layout</a></li>
+          <ul><li><a class="rst-internal rst-reference" href="#rst-file-layout">File layout</a></li>
 </ul>
         
 
@@ -523,7 +523,7 @@
                     <div>
          
           <div class="childrenKindTitle">Contents</div>
-          <ul><li><a class="rst-internal rst-reference" href="#rst-file-layout" id="rst-toc-entry-4">File layout</a></li>
+          <ul><li><a class="rst-internal rst-reference" href="#rst-file-layout">File layout</a></li>
 </ul>
         
 
@@ -930,7 +930,7 @@
         </div>
 
         <div class="extrasDocstring">
-          <p class="class-signature"><code><span class="py-keyword">class</span> <span class="py-defname">FileSessionStore</span>(ISessionStore): <a href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/session/stores/file.py#L54" class="sourceLink">(source)</a></code></p><p>Constructor: <code><a href="#__init__" class="internal-link" title="orionis.session.stores.file.FileSessionStore.__init__">FileSessionStore(directory)</a></code></p><p><a href="classIndex.html#orionis.session.stores.file.FileSessionStore">View In Hierarchy</a></p>
+          <p class="class-signature"><code><span class="py-keyword">class</span> <span class="py-defname">FileSessionStore</span>(ISessionStore): <a href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/session/stores/file.py#L66" class="sourceLink">(source)</a></code></p><p>Constructor: <code><a href="#__init__" class="internal-link" title="orionis.session.stores.file.FileSessionStore.__init__">FileSessionStore(directory)</a></code></p><p><a href="classIndex.html#orionis.session.stores.file.FileSessionStore">View In Hierarchy</a></p>
         </div>
 
         <div class="moduleDocstring">
@@ -938,11 +938,13 @@
 <p>One JSON file per session, named <tt class="rst-docutils rst-literal"><span class="pre">{session_id}.json</span></tt>, stored
 inside <em>directory</em>.  The directory is created on instantiation when
 it does not already exist.</p>
-<p>Expired sessions are evicted lazily during <code><a href="#read" class="internal-link" title="orionis.session.stores.file.FileSessionStore.read">read</a></code>, keeping
+<p>Expired sessions are evicted lazily during
+<code><a href="#read" class="internal-link">orionis.session.stores.file.FileSessionStore.read</a></code>, keeping
 hot-path operations at <em>O(1)</em> complexity.  Bulk removal of stale
-files can be triggered explicitly via <code><a href="https://docs.python.org/3/library/gc.html#module-gc" class="intersphinx-link">gc</a></code>.</p>
+files can be triggered explicitly via
+<code><a href="#gc" class="internal-link">orionis.session.stores.file.FileSessionStore.gc</a></code>.</p>
 <div class="rst-section" id="rst-file-layout">
-<h2 class="heading"><a class="rst-toc-backref" href="#rst-toc-entry-2">File layout</a></h2>
+<h2 class="heading">File layout</h2>
 <pre class="py-doctest">
 {
     <span class="py-string">"id"</span>: <span class="py-string">"..."</span>,
@@ -953,7 +955,7 @@ files can be triggered explicitly via <code><a href="https://docs.python.org/3/l
         </div>
 
         <div id="split-tables">
-          <table class="children sortable" id="id1997">
+          <table class="children sortable" id="id2005">
   
   
   <tr class="staticmethod">
@@ -975,7 +977,7 @@ files can be triggered explicitly via <code><a href="https://docs.python.org/3/l
     
     <td>Method</td>
     <td><code><a href="#_deserialize" class="internal-link" title="orionis.session.stores.file.FileSessionStore._deserialize">_deserialize</a></code></td>
-    <td>Decode <em>raw</em> JSON bytes into a <code><a href="orionis.session.entities.record.SessionRecord.html" class="internal-link" title="orionis.session.entities.record.SessionRecord">SessionRecord</a></code>.</td>
+    <td>Decode JSON bytes into a session record.</td>
   </tr><tr class="method">
     
     <td>Method</td>
@@ -1055,22 +1057,22 @@ files can be triggered explicitly via <code><a href="https://docs.python.org/3/l
     
     <td>Class Variable</td>
     <td><code><a href="#__slots__" class="internal-link" title="orionis.session.stores.file.FileSessionStore.__slots__">__slots__</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
+    <td>Declare the instance attribute slots reserved by this class.</td>
   </tr><tr class="instancevariable">
     
     <td>Instance Variable</td>
     <td><code><a href="#_directory" class="internal-link" title="orionis.session.stores.file.FileSessionStore._directory">_directory</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
+    <td>Filesystem path to the session storage directory.</td>
   </tr><tr class="instancevariable">
     
     <td>Instance Variable</td>
     <td><code><a href="#_locks" class="internal-link" title="orionis.session.stores.file.FileSessionStore._locks">_locks</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
+    <td>Locks produced by <tt class="rst-docutils rst-literal">tuple</tt>.</td>
   </tr><tr class="instancevariable">
     
     <td>Instance Variable</td>
     <td><code><a href="#_rename_lock" class="internal-link" title="orionis.session.stores.file.FileSessionStore._rename_lock">_rename<wbr></wbr>_lock</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
+    <td>Writes run on worker threads, so publishing two payloads for the same session must not overlap inside this process.</td>
   </tr>
 </table>
           
@@ -1092,7 +1094,7 @@ files can be triggered explicitly via <code><a href="https://docs.python.org/3/l
     
     <div><span class="decorator">@<a href="https://docs.python.org/3/builtins/functions.html#staticmethod" class="intersphinx-link">staticmethod</a><br /></span></div>
     <span class="py-keyword">def</span>&#160;<span class="py-defname">_tempPath</span><span class="function-signature">(<span class="rst-sig-param">path: <code><a href="https://docs.python.org/3/library/pathlib.html#pathlib.Path" class="intersphinx-link">Path</a></code></span>) -&gt; <code><a href="https://docs.python.org/3/library/pathlib.html#pathlib.Path" class="intersphinx-link">Path</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/session/stores/file.py#L219">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/session/stores/file.py#L243">
       
       (source)
     </a>
@@ -1104,7 +1106,7 @@ files can be triggered explicitly via <code><a href="https://docs.python.org/3/l
   </div>
   <div class="docstring functionBody">
     
-    <div><p>Build a unique staging path for an atomic write.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">path:</span><code><a href="https://docs.python.org/3/library/pathlib.html#pathlib.Path" class="intersphinx-link">Path</a></code></td><td class="fieldArgDesc">Final destination file.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/library/pathlib.html#pathlib.Path" class="intersphinx-link">Path</a></code></td><td class="fieldArgDesc">Sibling path carrying a random infix, so concurrent writers of the
+    <div><p>Build a unique staging path for an atomic write.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">path:</span><code><a href="https://docs.python.org/3/library/pathlib.html#pathlib.Path" class="intersphinx-link">pathlib.Path</a></code></td><td class="fieldArgDesc">Final destination file.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/library/pathlib.html#pathlib.Path" class="intersphinx-link">pathlib.Path</a></code></td><td class="fieldArgDesc">Sibling path carrying a random infix, so concurrent writers of the
 same session never share a staging file, and still ending in
 <tt class="rst-docutils rst-literal">.tmp</tt> so the sweep keeps telling both apart.</td></tr></table></div>
   </div>
@@ -1121,7 +1123,7 @@ same session never share a staging file, and still ending in
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">__init__</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">directory: <code><a href="https://docs.python.org/3/library/pathlib.html#pathlib.Path" class="intersphinx-link">Path</a></code></span>):</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/session/stores/file.py#L84">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/session/stores/file.py#L99">
       
       (source)
     </a>
@@ -1133,7 +1135,7 @@ same session never share a staging file, and still ending in
   </div>
   <div class="docstring functionBody">
     
-    <div><p>Initialise the store and ensure the storage directory exists.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">directory:</span><code><a href="https://docs.python.org/3/library/pathlib.html#pathlib.Path" class="intersphinx-link">Path</a></code></td><td class="fieldArgDesc">Filesystem path to the session storage directory.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc"><span class="undocumented">Undocumented</span></td></tr></table></div>
+    <div><p>Initialise the store and ensure the storage directory exists.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">directory:</span><code><a href="https://docs.python.org/3/library/pathlib.html#pathlib.Path" class="intersphinx-link">pathlib.Path</a></code></td><td class="fieldArgDesc">Filesystem path to the session storage directory.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">Initialise the store and ensure the storage directory exists.</td></tr></table></div>
   </div>
 </div><div class="basemethod">
   
@@ -1148,7 +1150,7 @@ same session never share a staging file, and still ending in
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">_deleteFile</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">path: <code><a href="https://docs.python.org/3/library/pathlib.html#pathlib.Path" class="intersphinx-link">Path</a></code></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/session/stores/file.py#L306">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/session/stores/file.py#L332">
       
       (source)
     </a>
@@ -1160,7 +1162,7 @@ same session never share a staging file, and still ending in
   </div>
   <div class="docstring functionBody">
     
-    <div><p>Unlink <em>path</em>, silently ignoring a missing-file error.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">path:</span><code><a href="https://docs.python.org/3/library/pathlib.html#pathlib.Path" class="intersphinx-link">Path</a></code></td><td class="fieldArgDesc">Session file to remove.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code></td><td class="fieldArgDesc">True when this call removed the session file.</td></tr></table></div>
+    <div><p>Unlink <em>path</em>, silently ignoring a missing-file error.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">path:</span><code><a href="https://docs.python.org/3/library/pathlib.html#pathlib.Path" class="intersphinx-link">pathlib.Path</a></code></td><td class="fieldArgDesc">Session file to remove.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code></td><td class="fieldArgDesc">True when this call removed the session file.</td></tr></table></div>
   </div>
 </div><div class="basemethod">
   
@@ -1175,7 +1177,7 @@ same session never share a staging file, and still ending in
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">_deserialize</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">raw: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#bytes" class="intersphinx-link">bytes</a></code></span>) -&gt; <code><a href="orionis.session.entities.record.SessionRecord.html" class="internal-link" title="orionis.session.entities.record.SessionRecord">SessionRecord</a> | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/session/stores/file.py#L173">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/session/stores/file.py#L195">
       
       (source)
     </a>
@@ -1187,10 +1189,12 @@ same session never share a staging file, and still ending in
   </div>
   <div class="docstring functionBody">
     
-    <div><p>Decode <em>raw</em> JSON bytes into a <code><a href="orionis.session.entities.record.SessionRecord.html" class="internal-link" title="orionis.session.entities.record.SessionRecord">SessionRecord</a></code>.</p>
-<p>Type validation is delegated entirely to <tt class="rst-docutils rst-literal">msgspec</tt>; any
-structural mismatch or missing field is treated as corruption.</p>
-<table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">raw:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#bytes" class="intersphinx-link">bytes</a></code></td><td class="fieldArgDesc">Raw JSON bytes previously written by <code><a href="#_serialize" class="internal-link" title="orionis.session.stores.file.FileSessionStore._serialize">_serialize</a></code>.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code>SessionRecord | None</code></td><td class="fieldArgDesc">Deserialised record, or <tt class="rst-docutils rst-literal">None</tt> on any decode error.</td></tr></table></div>
+    <div><p>Decode JSON bytes into a session record.</p>
+<p>Return a <code><a href="orionis.session.entities.record.SessionRecord.html" class="internal-link">orionis.session.entities.record.SessionRecord</a></code> instance.
+Type validation is delegated entirely to <tt class="rst-docutils rst-literal">msgspec</tt>; any structural
+mismatch or missing field is treated as corruption.</p>
+<table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">raw:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#bytes" class="intersphinx-link">bytes</a></code></td><td class="fieldArgDesc">Raw JSON bytes previously written by
+<code><a href="#_serialize" class="internal-link">orionis.session.stores.file.FileSessionStore._serialize</a></code>.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code>orionis.session.entities.record.SessionRecord | None</code></td><td class="fieldArgDesc">Deserialised record, or <tt class="rst-docutils rst-literal">None</tt> on any decode error.</td></tr></table></div>
   </div>
 </div><div class="basemethod">
   
@@ -1205,7 +1209,7 @@ structural mismatch or missing field is treated as corruption.</p>
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">_gcSweep</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>):</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/session/stores/file.py#L399">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/session/stores/file.py#L427">
       
       (source)
     </a>
@@ -1218,13 +1222,13 @@ structural mismatch or missing field is treated as corruption.</p>
   <div class="docstring functionBody">
     
     <div><p>Scan the store directory and remove stale or corrupt files.</p>
-<p>Uses <code><a href="https://docs.python.org/3/library/os.html#os.scandir" class="intersphinx-link">os.scandir</a></code> for reduced object allocation and
+<p>Uses <tt class="rst-docutils rst-literal">os.scandir</tt> for reduced object allocation and
 filesystem cache reuse.  A session file is removed when it is
 expired, contains invalid JSON, is structurally incomplete, or
 cannot be read due to an I/O error.  Staging files left behind by
 an interrupted write are reclaimed once they are old enough that
 no writer can still be filling them.</p>
-<table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc"><span class="undocumented">Undocumented</span></td></tr></table></div>
+<table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">Scan the store directory and remove stale or corrupt files.</td></tr></table></div>
   </div>
 </div><div class="basemethod">
   
@@ -1239,7 +1243,7 @@ no writer can still be filling them.</p>
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">_lock</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">path: <code><a href="https://docs.python.org/3/library/pathlib.html#pathlib.Path" class="intersphinx-link">Path</a></code></span>) -&gt; <code>BaseFileLock</code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/session/stores/file.py#L108">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/session/stores/file.py#L130">
       
       (source)
     </a>
@@ -1251,7 +1255,7 @@ no writer can still be filling them.</p>
   </div>
   <div class="docstring functionBody">
     
-    <div><p>Select a bounded, stable cross-process lock for a session file.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">path:</span><code><a href="https://docs.python.org/3/library/pathlib.html#pathlib.Path" class="intersphinx-link">Path</a></code></td><td class="fieldArgDesc">Session file protected by the lock.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code>BaseFileLock</code></td><td class="fieldArgDesc">Platform lock serializing validation, replacement and deletion.</td></tr></table></div>
+    <div><p>Select a bounded, stable cross-process lock for a session file.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">path:</span><code><a href="https://docs.python.org/3/library/pathlib.html#pathlib.Path" class="intersphinx-link">pathlib.Path</a></code></td><td class="fieldArgDesc">Session file protected by the lock.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><tt class="rst-docutils rst-literal">filelock.BaseFileLock</tt></code></td><td class="fieldArgDesc">Platform lock serializing validation, replacement and deletion.</td></tr></table></div>
   </div>
 </div><div class="basemethod">
   
@@ -1266,7 +1270,7 @@ no writer can still be filling them.</p>
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">_path</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">session_id: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></span>) -&gt; <code><a href="https://docs.python.org/3/library/pathlib.html#pathlib.Path" class="intersphinx-link">Path</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/session/stores/file.py#L128">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/session/stores/file.py#L150">
       
       (source)
     </a>
@@ -1278,7 +1282,7 @@ no writer can still be filling them.</p>
   </div>
   <div class="docstring functionBody">
     
-    <div><p>Return the absolute path to the JSON file for <em>session_id</em>.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">session<wbr></wbr>_id:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Unique session identifier.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/library/pathlib.html#pathlib.Path" class="intersphinx-link">Path</a></code></td><td class="fieldArgDesc">Full path to <tt class="rst-docutils rst-literal"><span class="pre">{session_id}.json</span></tt> inside the store directory.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.session.exceptions.SessionStorageException.html" class="internal-link" title="orionis.session.exceptions.SessionStorageException">SessionStorageException</a></code></td><td>If an identifier contains path syntax or exceeds its limit.</td></tr></table></div>
+    <div><p>Return the absolute path to the JSON file for <em>session_id</em>.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">session<wbr></wbr>_id:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Unique session identifier.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/library/pathlib.html#pathlib.Path" class="intersphinx-link">pathlib.Path</a></code></td><td class="fieldArgDesc">Full path to <tt class="rst-docutils rst-literal"><span class="pre">{session_id}.json</span></tt> inside the store directory.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.session.exceptions.SessionStorageException.html" class="internal-link">orionis.session.exceptions.SessionStorageException</a></code></td><td>If an identifier contains path syntax or exceeds its limit.</td></tr></table></div>
   </div>
 </div><div class="basemethod">
   
@@ -1293,7 +1297,7 @@ no writer can still be filling them.</p>
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">_readFile</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">path: <code><a href="https://docs.python.org/3/library/pathlib.html#pathlib.Path" class="intersphinx-link">Path</a></code></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/stdtypes.html#bytes" class="intersphinx-link">bytes</a> | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/session/stores/file.py#L200">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/session/stores/file.py#L224">
       
       (source)
     </a>
@@ -1305,7 +1309,7 @@ no writer can still be filling them.</p>
   </div>
   <div class="docstring functionBody">
     
-    <div><p>Read <em>path</em> as raw bytes, returning <tt class="rst-docutils rst-literal">None</tt> if absent.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">path:</span><code><a href="https://docs.python.org/3/library/pathlib.html#pathlib.Path" class="intersphinx-link">Path</a></code></td><td class="fieldArgDesc">File to read.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code>bytes | None</code></td><td class="fieldArgDesc">File contents, or <tt class="rst-docutils rst-literal">None</tt> when the file does not exist.</td></tr></table></div>
+    <div><p>Read <em>path</em> as raw bytes, returning <tt class="rst-docutils rst-literal">None</tt> if absent.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">path:</span><code><a href="https://docs.python.org/3/library/pathlib.html#pathlib.Path" class="intersphinx-link">pathlib.Path</a></code></td><td class="fieldArgDesc">File to read.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code>bytes | None</code></td><td class="fieldArgDesc">File contents, or <tt class="rst-docutils rst-literal">None</tt> when the file does not exist.</td></tr></table></div>
   </div>
 </div><div class="basemethod">
   
@@ -1320,7 +1324,7 @@ no writer can still be filling them.</p>
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">_readRecord</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">path: <code><a href="https://docs.python.org/3/library/pathlib.html#pathlib.Path" class="intersphinx-link">Path</a></code></span>) -&gt; <code><a href="orionis.session.entities.record.SessionRecord.html" class="internal-link" title="orionis.session.entities.record.SessionRecord">SessionRecord</a> | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/session/stores/file.py#L327">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/session/stores/file.py#L353">
       
       (source)
     </a>
@@ -1335,7 +1339,7 @@ no writer can still be filling them.</p>
     <div><p>Load, decode and validate the record stored at <em>path</em>.</p>
 <p>Runs entirely on a worker thread: file I/O, JSON decoding and the
 eviction of an expired or corrupt file happen in a single hop.</p>
-<table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">path:</span><code><a href="https://docs.python.org/3/library/pathlib.html#pathlib.Path" class="intersphinx-link">Path</a></code></td><td class="fieldArgDesc">Session file to load.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code>SessionRecord | None</code></td><td class="fieldArgDesc">The live record, or <tt class="rst-docutils rst-literal">None</tt> when absent, expired or corrupt.</td></tr></table></div>
+<table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">path:</span><code><a href="https://docs.python.org/3/library/pathlib.html#pathlib.Path" class="intersphinx-link">pathlib.Path</a></code></td><td class="fieldArgDesc">Session file to load.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code>orionis.session.entities.record.SessionRecord | None</code></td><td class="fieldArgDesc">The live record, or <tt class="rst-docutils rst-literal">None</tt> when absent, expired or corrupt.</td></tr></table></div>
   </div>
 </div><div class="basemethod">
   
@@ -1350,7 +1354,7 @@ eviction of an expired or corrupt file happen in a single hop.</p>
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">_replace</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">tmp: <code><a href="https://docs.python.org/3/library/pathlib.html#pathlib.Path" class="intersphinx-link">Path</a></code>, </span><span class="rst-sig-param">path: <code><a href="https://docs.python.org/3/library/pathlib.html#pathlib.Path" class="intersphinx-link">Path</a></code></span>):</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/session/stores/file.py#L270">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/session/stores/file.py#L295">
       
       (source)
     </a>
@@ -1366,7 +1370,7 @@ eviction of an expired or corrupt file happen in a single hop.</p>
 <p>The rename is serialised per store instance, and retried when the
 operating system refuses it because another process is swapping the
 same destination.  POSIX never reaches the retry branch.</p>
-<table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">tmp:</span><code><a href="https://docs.python.org/3/library/pathlib.html#pathlib.Path" class="intersphinx-link">Path</a></code></td><td class="fieldArgDesc">Staging file holding the serialised payload.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">path:</span><code><a href="https://docs.python.org/3/library/pathlib.html#pathlib.Path" class="intersphinx-link">Path</a></code></td><td class="fieldArgDesc">Destination session file.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc"><span class="undocumented">Undocumented</span></td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/exceptions.html#OSError" class="intersphinx-link">OSError</a></code></td><td>If the rename keeps failing after the last attempt.</td></tr></table></div>
+<table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">tmp:</span><code><a href="https://docs.python.org/3/library/pathlib.html#pathlib.Path" class="intersphinx-link">pathlib.Path</a></code></td><td class="fieldArgDesc">Staging file holding the serialised payload.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">path:</span><code><a href="https://docs.python.org/3/library/pathlib.html#pathlib.Path" class="intersphinx-link">pathlib.Path</a></code></td><td class="fieldArgDesc">Destination session file.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">Publish <em>tmp</em> as <em>path</em>, retrying a transient sharing violation.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/exceptions.html#OSError" class="intersphinx-link">OSError</a></code></td><td>If the rename keeps failing after the last attempt.</td></tr></table></div>
   </div>
 </div><div class="basemethod">
   
@@ -1381,7 +1385,7 @@ same destination.  POSIX never reaches the retry branch.</p>
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">_serialize</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">record: <code><a href="orionis.session.entities.record.SessionRecord.html" class="internal-link" title="orionis.session.entities.record.SessionRecord">SessionRecord</a></code></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/stdtypes.html#bytes" class="intersphinx-link">bytes</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/session/stores/file.py#L152">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/session/stores/file.py#L174">
       
       (source)
     </a>
@@ -1393,7 +1397,7 @@ same destination.  POSIX never reaches the retry branch.</p>
   </div>
   <div class="docstring functionBody">
     
-    <div><p>Encode <em>record</em> to compact JSON bytes via <tt class="rst-docutils rst-literal">msgspec</tt>.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">record:</span><code><a href="orionis.session.entities.record.SessionRecord.html" class="internal-link" title="orionis.session.entities.record.SessionRecord">SessionRecord</a></code></td><td class="fieldArgDesc">Record to serialise.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/stdtypes.html#bytes" class="intersphinx-link">bytes</a></code></td><td class="fieldArgDesc">UTF-8 encoded JSON payload.</td></tr></table></div>
+    <div><p>Encode <em>record</em> to compact JSON bytes via <tt class="rst-docutils rst-literal">msgspec</tt>.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">record:</span><code><a href="orionis.session.entities.record.SessionRecord.html" class="internal-link">orionis.session.entities.record.SessionRecord</a></code></td><td class="fieldArgDesc">Record to serialise.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/stdtypes.html#bytes" class="intersphinx-link">bytes</a></code></td><td class="fieldArgDesc">UTF-8 encoded JSON payload.</td></tr></table></div>
   </div>
 </div><div class="basemethod">
   
@@ -1408,7 +1412,7 @@ same destination.  POSIX never reaches the retry branch.</p>
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">_updateRecord</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">path: <code><a href="https://docs.python.org/3/library/pathlib.html#pathlib.Path" class="intersphinx-link">Path</a></code>, </span><span class="rst-sig-param">record: <code><a href="orionis.session.entities.record.SessionRecord.html" class="internal-link" title="orionis.session.entities.record.SessionRecord">SessionRecord</a></code></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/session/stores/file.py#L378">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/session/stores/file.py#L405">
       
       (source)
     </a>
@@ -1420,7 +1424,7 @@ same destination.  POSIX never reaches the retry branch.</p>
   </div>
   <div class="docstring functionBody">
     
-    <div><p>Replace an existing live session under its cross-process lock.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">path:</span><code><a href="https://docs.python.org/3/library/pathlib.html#pathlib.Path" class="intersphinx-link">Path</a></code></td><td class="fieldArgDesc">Existing session file.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">record:</span><code><a href="orionis.session.entities.record.SessionRecord.html" class="internal-link" title="orionis.session.entities.record.SessionRecord">SessionRecord</a></code></td><td class="fieldArgDesc">Replacement record.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code></td><td class="fieldArgDesc">False when another worker deleted or expired the record.</td></tr></table></div>
+    <div><p>Replace an existing live session under its cross-process lock.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">path:</span><code><a href="https://docs.python.org/3/library/pathlib.html#pathlib.Path" class="intersphinx-link">pathlib.Path</a></code></td><td class="fieldArgDesc">Existing session file.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">record:</span><code><a href="orionis.session.entities.record.SessionRecord.html" class="internal-link">orionis.session.entities.record.SessionRecord</a></code></td><td class="fieldArgDesc">Replacement record.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code></td><td class="fieldArgDesc">False when another worker deleted or expired the record.</td></tr></table></div>
   </div>
 </div><div class="basemethod">
   
@@ -1435,7 +1439,7 @@ same destination.  POSIX never reaches the retry branch.</p>
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">_writeFile</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">path: <code><a href="https://docs.python.org/3/library/pathlib.html#pathlib.Path" class="intersphinx-link">Path</a></code>, </span><span class="rst-sig-param">content: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#bytes" class="intersphinx-link">bytes</a></code></span>):</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/session/stores/file.py#L238">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/session/stores/file.py#L262">
       
       (source)
     </a>
@@ -1451,7 +1455,7 @@ same destination.  POSIX never reaches the retry branch.</p>
 <p>Writes to a unique <tt class="rst-docutils rst-literal">.tmp</tt> sibling first, then renames over the
 destination to prevent partial reads from concurrent processes.
 A failed write removes its own staging file before propagating.</p>
-<table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">path:</span><code><a href="https://docs.python.org/3/library/pathlib.html#pathlib.Path" class="intersphinx-link">Path</a></code></td><td class="fieldArgDesc">Destination file path.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">content:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#bytes" class="intersphinx-link">bytes</a></code></td><td class="fieldArgDesc">Serialised session payload.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc"><span class="undocumented">Undocumented</span></td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/exceptions.html#OSError" class="intersphinx-link">OSError</a></code></td><td>If the payload cannot be staged or renamed into place.</td></tr></table></div>
+<table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">path:</span><code><a href="https://docs.python.org/3/library/pathlib.html#pathlib.Path" class="intersphinx-link">pathlib.Path</a></code></td><td class="fieldArgDesc">Destination file path.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">content:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#bytes" class="intersphinx-link">bytes</a></code></td><td class="fieldArgDesc">Serialised session payload.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">Atomically write <em>content</em> to <em>path</em>.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/exceptions.html#OSError" class="intersphinx-link">OSError</a></code></td><td>If the payload cannot be staged or renamed into place.</td></tr></table></div>
   </div>
 </div><div class="basemethod">
   
@@ -1466,7 +1470,7 @@ A failed write removes its own staging file before propagating.</p>
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">_writeRecord</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">path: <code><a href="https://docs.python.org/3/library/pathlib.html#pathlib.Path" class="intersphinx-link">Path</a></code>, </span><span class="rst-sig-param">record: <code><a href="orionis.session.entities.record.SessionRecord.html" class="internal-link" title="orionis.session.entities.record.SessionRecord">SessionRecord</a></code></span>):</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/session/stores/file.py#L360">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/session/stores/file.py#L386">
       
       (source)
     </a>
@@ -1478,7 +1482,7 @@ A failed write removes its own staging file before propagating.</p>
   </div>
   <div class="docstring functionBody">
     
-    <div><p>Serialise <em>record</em> and store it atomically at <em>path</em>.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">path:</span><code><a href="https://docs.python.org/3/library/pathlib.html#pathlib.Path" class="intersphinx-link">Path</a></code></td><td class="fieldArgDesc">Destination session file.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">record:</span><code><a href="orionis.session.entities.record.SessionRecord.html" class="internal-link" title="orionis.session.entities.record.SessionRecord">SessionRecord</a></code></td><td class="fieldArgDesc">The record to persist.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc"><span class="undocumented">Undocumented</span></td></tr></table></div>
+    <div><p>Serialise <em>record</em> and store it atomically at <em>path</em>.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">path:</span><code><a href="https://docs.python.org/3/library/pathlib.html#pathlib.Path" class="intersphinx-link">pathlib.Path</a></code></td><td class="fieldArgDesc">Destination session file.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">record:</span><code><a href="orionis.session.entities.record.SessionRecord.html" class="internal-link">orionis.session.entities.record.SessionRecord</a></code></td><td class="fieldArgDesc">The record to persist.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">Serialise <em>record</em> and store it atomically at <em>path</em>.</td></tr></table></div>
   </div>
 </div><div class="basemethod">
   
@@ -1493,7 +1497,7 @@ A failed write removes its own staging file before propagating.</p>
     
     
     <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">delete</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">session_id: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/session/stores/file.py#L487">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/session/stores/file.py#L518">
       
       (source)
     </a>
@@ -1520,7 +1524,7 @@ A failed write removes its own staging file before propagating.</p>
     
     
     <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">gc</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>):</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/session/stores/file.py#L504">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/session/stores/file.py#L535">
       
       (source)
     </a>
@@ -1535,9 +1539,11 @@ A failed write removes its own staging file before propagating.</p>
     <div><p>Remove all expired, corrupt, or incomplete session files.</p>
 <p>The directory scan runs on a thread-pool worker so it never
 blocks the event loop.  This method must be called explicitly;
-it is never triggered automatically by <code><a href="#read" class="internal-link" title="orionis.session.stores.file.FileSessionStore.read">read</a></code>,
-<code><a href="#write" class="internal-link" title="orionis.session.stores.file.FileSessionStore.write">write</a></code>, or <code><a href="#delete" class="internal-link" title="orionis.session.stores.file.FileSessionStore.delete">delete</a></code>.</p>
-<table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc"><span class="undocumented">Undocumented</span></td></tr></table></div>
+it is never triggered automatically by
+<code><a href="#read" class="internal-link">orionis.session.stores.file.FileSessionStore.read</a></code>,
+<code><a href="#write" class="internal-link">orionis.session.stores.file.FileSessionStore.write</a></code>, or
+<code><a href="#delete" class="internal-link">orionis.session.stores.file.FileSessionStore.delete</a></code>.</p>
+<table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">Remove all expired, corrupt, or incomplete session files.</td></tr></table></div>
   </div>
 </div><div class="basemethod">
   
@@ -1552,7 +1558,7 @@ it is never triggered automatically by <code><a href="#read" class="internal-lin
     
     
     <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">read</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">session_id: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></span>) -&gt; <code><a href="orionis.session.entities.record.SessionRecord.html" class="internal-link" title="orionis.session.entities.record.SessionRecord">SessionRecord</a> | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/session/stores/file.py#L436">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/session/stores/file.py#L465">
       
       (source)
     </a>
@@ -1567,7 +1573,7 @@ it is never triggered automatically by <code><a href="#read" class="internal-lin
     <div><p>Load and return the live record for <em>session_id</em>, or <tt class="rst-docutils rst-literal">None</tt>.</p>
 <p>Expired or corrupt records are evicted lazily: the file is
 deleted and <tt class="rst-docutils rst-literal">None</tt> is returned without triggering a GC cycle.</p>
-<table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">session<wbr></wbr>_id:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Unique session identifier to look up.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code>SessionRecord | None</code></td><td class="fieldArgDesc">The live record, or <tt class="rst-docutils rst-literal">None</tt> when absent, expired, or corrupt.</td></tr></table></div>
+<table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">session<wbr></wbr>_id:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Unique session identifier to look up.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code>orionis.session.entities.record.SessionRecord | None</code></td><td class="fieldArgDesc">The live record, or <tt class="rst-docutils rst-literal">None</tt> when absent, expired, or corrupt.</td></tr></table></div>
   </div>
 </div><div class="basemethod">
   
@@ -1582,7 +1588,7 @@ deleted and <tt class="rst-docutils rst-literal">None</tt> is returned without t
     
     
     <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">update</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">record: <code><a href="orionis.session.entities.record.SessionRecord.html" class="internal-link" title="orionis.session.entities.record.SessionRecord">SessionRecord</a></code></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/session/stores/file.py#L470">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/session/stores/file.py#L500">
       
       (source)
     </a>
@@ -1594,7 +1600,7 @@ deleted and <tt class="rst-docutils rst-literal">None</tt> is returned without t
   </div>
   <div class="docstring functionBody">
     
-    <div><p>Update only a live session without recreating a deleted file.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">record:</span><code><a href="orionis.session.entities.record.SessionRecord.html" class="internal-link" title="orionis.session.entities.record.SessionRecord">SessionRecord</a></code></td><td class="fieldArgDesc">Replacement record.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code></td><td class="fieldArgDesc">Whether the session still existed and was updated.</td></tr></table></div>
+    <div><p>Update only a live session without recreating a deleted file.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">record:</span><code><a href="orionis.session.entities.record.SessionRecord.html" class="internal-link">orionis.session.entities.record.SessionRecord</a></code></td><td class="fieldArgDesc">Replacement record.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code></td><td class="fieldArgDesc">Whether the session still existed and was updated.</td></tr></table></div>
   </div>
 </div><div class="basemethod">
   
@@ -1609,7 +1615,7 @@ deleted and <tt class="rst-docutils rst-literal">None</tt> is returned without t
     
     
     <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">write</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">record: <code><a href="orionis.session.entities.record.SessionRecord.html" class="internal-link" title="orionis.session.entities.record.SessionRecord">SessionRecord</a></code></span>):</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/session/stores/file.py#L455">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/session/stores/file.py#L484">
       
       (source)
     </a>
@@ -1621,7 +1627,7 @@ deleted and <tt class="rst-docutils rst-literal">None</tt> is returned without t
   </div>
   <div class="docstring functionBody">
     
-    <div><p>Serialise and persist <em>record</em> to disk atomically.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">record:</span><code><a href="orionis.session.entities.record.SessionRecord.html" class="internal-link" title="orionis.session.entities.record.SessionRecord">SessionRecord</a></code></td><td class="fieldArgDesc">The record to store.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc"><span class="undocumented">Undocumented</span></td></tr></table></div>
+    <div><p>Serialise and persist <em>record</em> to disk atomically.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">record:</span><code><a href="orionis.session.entities.record.SessionRecord.html" class="internal-link">orionis.session.entities.record.SessionRecord</a></code></td><td class="fieldArgDesc">The record to store.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">Serialise and persist <em>record</em> to disk atomically.</td></tr></table></div>
   </div>
 </div><div class="baseclassvariable">
   
@@ -1635,7 +1641,7 @@ deleted and <tt class="rst-docutils rst-literal">None</tt> is returned without t
   <div class="functionHeader">
     
     <span class="py-defname">__slots__</span>: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" class="intersphinx-link">tuple</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <wbr></wbr><span class="rst-variable-ellipsis">...</span>]</code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/session/stores/file.py#L82">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/session/stores/file.py#L96">
       
       (source)
     </a>
@@ -1647,7 +1653,7 @@ deleted and <tt class="rst-docutils rst-literal">None</tt> is returned without t
   </div>
   <div class="functionBody">
     
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p>Declare the instance attribute slots reserved by this class.</p></div>
     
   </div>
 </div><div class="baseinstancevariable">
@@ -1662,7 +1668,7 @@ deleted and <tt class="rst-docutils rst-literal">None</tt> is returned without t
   <div class="functionHeader">
     
     <span class="py-defname">_directory</span> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/session/stores/file.py#L97">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/session/stores/file.py#L113">
       
       (source)
     </a>
@@ -1674,7 +1680,7 @@ deleted and <tt class="rst-docutils rst-literal">None</tt> is returned without t
   </div>
   <div class="functionBody">
     
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p>Filesystem path to the session storage directory.</p></div>
     
   </div>
 </div><div class="baseinstancevariable">
@@ -1689,7 +1695,7 @@ deleted and <tt class="rst-docutils rst-literal">None</tt> is returned without t
   <div class="functionHeader">
     
     <span class="py-defname">_locks</span> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/session/stores/file.py#L103">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/session/stores/file.py#L124">
       
       (source)
     </a>
@@ -1701,7 +1707,7 @@ deleted and <tt class="rst-docutils rst-literal">None</tt> is returned without t
   </div>
   <div class="functionBody">
     
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p>Locks produced by <tt class="rst-docutils rst-literal">tuple</tt>.</p></div>
     
   </div>
 </div><div class="baseinstancevariable">
@@ -1716,7 +1722,7 @@ deleted and <tt class="rst-docutils rst-literal">None</tt> is returned without t
   <div class="functionHeader">
     
     <span class="py-defname">_rename_lock</span> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/session/stores/file.py#L102">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/session/stores/file.py#L119">
       
       (source)
     </a>
@@ -1728,7 +1734,8 @@ deleted and <tt class="rst-docutils rst-literal">None</tt> is returned without t
   </div>
   <div class="functionBody">
     
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p>Writes run on worker threads, so publishing two payloads for the same
+session must not overlap inside this process.</p></div>
     
   </div>
 </div>
@@ -1742,7 +1749,7 @@ deleted and <tt class="rst-docutils rst-literal">None</tt> is returned without t
   <div class="orionis-footer-inner">
     <div class="orionis-footer-copy">
       <p>API documentation for <a href="https://orionis-framework.com/" class="projecthome">Orionis</a>.</p>
-      <p class="orionis-footer-meta">Generated with <a href="https://github.com/twisted/pydoctor/">Pydoctor</a> 25.10.1.<span class="orionis-footer-build"> Built 2026-11-03 09:36:58.</span></p>
+      <p class="orionis-footer-meta">Generated with <a href="https://github.com/twisted/pydoctor/">Pydoctor</a> 25.10.1.<span class="orionis-footer-build"> Built 2026-11-03 13:00:15.</span></p>
     </div>
     <nav class="orionis-footer-links" aria-label="Additional resources">
       <a href="https://docs.orionis-framework.com">Read the guide <span aria-hidden="true">↗</span></a>

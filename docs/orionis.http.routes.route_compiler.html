@@ -1634,6 +1634,16 @@
         
 
         
+            <div class="itemName"><code><a href="orionis.http.routes.route_resolver.html#DepthTable" class="internal-link" title="orionis.http.routes.route_resolver.DepthTable"><wbr></wbr>Depth<wbr></wbr>Table</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
             <div class="itemName"><code><a href="orionis.http.routes.route_resolver.html#Extractor" class="internal-link" title="orionis.http.routes.route_resolver.Extractor"><wbr></wbr>Extractor</a></code>
             </div>
         
@@ -1730,7 +1740,7 @@
                     
                 </input>
 
-                <label class="lbl-toggle notExpandable" for="">
+                <label class="lbl-toggle" for="expandableItemId11183">
                     
                     
                 </label>
@@ -1753,8 +1763,31 @@
         
          
 
+        <div class="childrenKindTitle">Variables</div>
+        <ul>
+    
+    <li class="">
         
-         
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.http.routes.types.html#MiddlewareInput" class="internal-link" title="orionis.http.routes.types.MiddlewareInput"><wbr></wbr>Middleware<wbr></wbr>Input</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.http.routes.types.html#RouteAction" class="internal-link" title="orionis.http.routes.types.RouteAction"><wbr></wbr>Route<wbr></wbr>Action</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
 
         
          
@@ -1838,22 +1871,22 @@
         </div>
 
         <div class="extrasDocstring">
-          <a href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/http/routes/route_compiler.py" class="sourceLink">(source)</a>
+          <a href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/http/routes/route_compiler.py" class="sourceLink">(source)</a>
         </div>
 
         <div class="moduleDocstring">
-          <div><p class="undocumented">Undocumented</p></div>
+          <div><p>Compile declared routes into runtime dispatch metadata.</p></div>
         </div>
 
         <div id="split-tables">
-          <table class="children sortable" id="id1148">
+          <table class="children sortable" id="id1149">
   
   
   <tr class="class">
     
     <td>Class</td>
     <td><code><a href="orionis.http.routes.route_compiler.RouteCompiler.html" class="internal-link" title="orionis.http.routes.route_compiler.RouteCompiler"><wbr></wbr>Route<wbr></wbr>Compiler</a></code></td>
-    <td><span class="rst-undocumented">No class docstring; 2/2 methods, 5/5 static methods documented</span></td>
+    <td>Compile declared routes into runtime dispatch metadata.</td>
   </tr><tr class="function">
     
     <td>Function</td>
@@ -1873,12 +1906,12 @@
     
     <td>Constant</td>
     <td><code><a href="#_NAMED_GROUP_RE" class="internal-link" title="orionis.http.routes.route_compiler._NAMED_GROUP_RE">_NAMED<wbr></wbr>_GROUP<wbr></wbr>_RE</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
+    <td>Precompiled pattern to normalise named capture groups for collision detection.</td>
   </tr><tr class="constant">
     
     <td>Constant</td>
     <td><code><a href="#_PARAM_RE" class="internal-link" title="orionis.http.routes.route_compiler._PARAM_RE">_PARAM<wbr></wbr>_RE</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
+    <td>Match path parameter placeholders, including optional converter names.</td>
   </tr>
 </table>
           
@@ -1900,7 +1933,7 @@
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">_action_name</span><span class="function-signature">(<span class="rst-sig-param">handler: <code><a href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Callable" class="intersphinx-link">Callable</a> | <a href="https://docs.python.org/3/builtins/functions.html#type" class="intersphinx-link">type</a></code></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/http/routes/route_compiler.py#L48">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/http/routes/route_compiler.py#L52">
       
       (source)
     </a>
@@ -1912,7 +1945,7 @@
   </div>
   <div class="docstring functionBody">
     
-    <div><p>Return an importable handler name for boot-time dispatch and caching.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">handler:</span><code>Callable | type</code></td><td class="fieldArgDesc">Value supplied for <tt class="rst-docutils rst-literal">handler</tt>.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">An importable handler name for boot-time dispatch and caching.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/exceptions.html#ValueError" class="intersphinx-link">ValueError</a></code></td><td>If the handler is local to a function and cannot be imported at boot.</td></tr></table></div>
+    <div><p>Return an importable handler name for boot-time dispatch and caching.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">handler:</span><code>collections.abc.Callable | type</code></td><td class="fieldArgDesc">Value supplied for <tt class="rst-docutils rst-literal">handler</tt>.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">An importable handler name for boot-time dispatch and caching.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/exceptions.html#ValueError" class="intersphinx-link">ValueError</a></code></td><td>If the handler is local to a function and cannot be imported at boot.</td></tr></table></div>
   </div>
 </div><div class="basefunction">
   
@@ -1927,7 +1960,7 @@
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">_register_name</span><span class="function-signature">(<span class="rst-sig-param">names: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#dict" class="intersphinx-link">dict</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>]</code>, </span><span class="rst-sig-param">route: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#dict" class="intersphinx-link">dict</a></code></span>):</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/http/routes/route_compiler.py#L74">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/http/routes/route_compiler.py#L78">
       
       (source)
     </a>
@@ -1954,7 +1987,7 @@
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">_validate_literal</span><span class="function-signature">(<span class="rst-sig-param">fragment: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code>, </span><span class="rst-sig-param">path: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></span>):</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/http/routes/route_compiler.py#L23">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/http/routes/route_compiler.py#L27">
       
       (source)
     </a>
@@ -1980,7 +2013,7 @@
   <div class="functionHeader">
     
     <span class="py-defname">_NAMED_GROUP_RE</span>: <code><a href="https://docs.python.org/3/library/re.html#re.Pattern" class="intersphinx-link">re.Pattern</a></code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/http/routes/route_compiler.py#L21">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/http/routes/route_compiler.py#L24">
       
       (source)
     </a>
@@ -1992,7 +2025,7 @@
   </div>
   <div class="functionBody">
     
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p>Precompiled pattern to normalise named capture groups for collision detection.</p></div>
     <table class="valueTable"><tr class="fieldStart"><td class="fieldName">Value</td></tr><tr><td><pre class="constant-value"><code><a href="https://docs.python.org/3/library/re.html#re.compile" class="intersphinx-link">re.compile</a>(r<span class="rst-variable-quote">'</span>\(\?P&lt;\w<span class="rst-re-op">+</span>&gt;<span class="rst-variable-quote">'</span>)</code></pre></td></tr></table>
   </div>
 </div><div class="baseconstant">
@@ -2007,7 +2040,7 @@
   <div class="functionHeader">
     
     <span class="py-defname">_PARAM_RE</span>: <code><a href="https://docs.python.org/3/library/re.html#re.Pattern" class="intersphinx-link">re.Pattern</a></code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/http/routes/route_compiler.py#L18">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/http/routes/route_compiler.py#L20">
       
       (source)
     </a>
@@ -2019,7 +2052,7 @@
   </div>
   <div class="functionBody">
     
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p>Match path parameter placeholders, including optional converter names.</p></div>
     <table class="valueTable"><tr class="fieldStart"><td class="fieldName">Value</td></tr><tr><td><pre class="constant-value"><code><a href="https://docs.python.org/3/library/re.html#re.compile" class="intersphinx-link">re.compile</a>(r<span class="rst-variable-quote">'</span>\{<span class="rst-re-group">(</span>\w<span class="rst-re-op">+</span><span class="rst-re-group">)</span><span class="rst-re-group">(?:</span>:<span class="rst-re-group">(</span>\w<span class="rst-re-op">+</span><span class="rst-re-group">)</span><span class="rst-re-group">)</span><span class="rst-re-op">?</span>\}<span class="rst-variable-quote">'</span>)</code></pre></td></tr></table>
   </div>
 </div>
@@ -2033,7 +2066,7 @@
   <div class="orionis-footer-inner">
     <div class="orionis-footer-copy">
       <p>API documentation for <a href="https://orionis-framework.com/" class="projecthome">Orionis</a>.</p>
-      <p class="orionis-footer-meta">Generated with <a href="https://github.com/twisted/pydoctor/">Pydoctor</a> 25.10.1.<span class="orionis-footer-build"> Built 2026-11-03 09:36:58.</span></p>
+      <p class="orionis-footer-meta">Generated with <a href="https://github.com/twisted/pydoctor/">Pydoctor</a> 25.10.1.<span class="orionis-footer-build"> Built 2026-11-03 13:00:15.</span></p>
     </div>
     <nav class="orionis-footer-links" aria-label="Additional resources">
       <a href="https://docs.orionis-framework.com">Read the guide <span aria-hidden="true">↗</span></a>

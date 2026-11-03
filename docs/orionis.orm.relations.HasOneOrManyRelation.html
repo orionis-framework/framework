@@ -1893,7 +1893,7 @@
                     
                 </label>
 
-                <code><a href="orionis.orm.relations.relation.html" class="internal-link" title="orionis.orm.relations.relation">relation</a></code>
+                <code><a href="orionis.orm.relations.relation.module.html" class="internal-link" title="orionis.orm.relations.relation">relation</a></code>
 
                 <div class="expandableContent">
                     <div>
@@ -1920,7 +1920,7 @@
         
 
         
-            <div class="itemName"><code><a href="orionis.orm.relations.relation.html#_CONSTRAINTS" class="internal-link" title="orionis.orm.relations.relation._CONSTRAINTS">_CONSTRAINTS</a></code>
+            <div class="itemName"><code><a href="orionis.orm.relations.relation.module.html#_CONSTRAINTS" class="internal-link" title="orionis.orm.relations.relation._CONSTRAINTS">_CONSTRAINTS</a></code>
             </div>
         
 
@@ -11128,21 +11128,21 @@
         </div>
 
         <div class="extrasDocstring">
-          <p class="class-signature"><code><span class="py-keyword">class</span> <span class="py-defname">HasOneOrManyRelation</span>(<a href="orionis.orm.relations.Relation.html" class="internal-link" title="orionis.orm.relations.Relation">Relation</a>[<wbr></wbr>TRelated]): <a href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/orm/relations/has_one_or_many.py#L11" class="sourceLink">(source)</a></code></p><p>Known subclasses: <code><a href="orionis.orm.relations.HasManyRelation.html" class="internal-link">orionis.orm.relations.HasManyRelation</a></code>, <code><a href="orionis.orm.relations.HasOneRelation.html" class="internal-link">orionis.orm.relations.HasOneRelation</a></code></p><p>Constructor: <code><a href="#__init__" class="internal-link" title="orionis.orm.relations.HasOneOrManyRelation.__init__">HasOneOrManyRelation(parent, related, foreign_key, local_key)</a></code></p><p><a href="classIndex.html#orionis.orm.relations.HasOneOrManyRelation">View In Hierarchy</a></p>
+          <p class="class-signature"><code><span class="py-keyword">class</span> <span class="py-defname">HasOneOrManyRelation</span>(<a href="orionis.orm.relations.Relation.html" class="internal-link" title="orionis.orm.relations.Relation">Relation</a>[<wbr></wbr>TRelated]): <a href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/orm/relations/has_one_or_many.py#L13" class="sourceLink">(source)</a></code></p><p>Known subclasses: <code><a href="orionis.orm.relations.HasManyRelation.html" class="internal-link">orionis.orm.relations.HasManyRelation</a></code>, <code><a href="orionis.orm.relations.HasOneRelation.html" class="internal-link">orionis.orm.relations.HasOneRelation</a></code></p><p>Constructor: <code><a href="#__init__" class="internal-link" title="orionis.orm.relations.HasOneOrManyRelation.__init__">HasOneOrManyRelation(parent, related, foreign_key, local_key)</a></code></p><p><a href="classIndex.html#orionis.orm.relations.HasOneOrManyRelation">View In Hierarchy</a></p>
         </div>
 
         <div class="moduleDocstring">
           <div><p>Shared machinery for the <tt class="rst-docutils rst-literal">hasOne</tt>/<tt class="rst-docutils rst-literal">hasMany</tt> relationship kinds.</p>
 <p>The related table holds the foreign key pointing back at the
 parent's local key. The two concrete kinds
-(<code>~orionis.orm.relations.has_one.HasOneRelation</code> and
-<code>~orionis.orm.relations.has_many.HasManyRelation</code>) only
+(<code><a href="orionis.orm.relations.HasOneRelation.html" class="internal-link">orionis.orm.relations.HasOneRelation</a></code> and
+<code><a href="orionis.orm.relations.HasManyRelation.html" class="internal-link">orionis.orm.relations.HasManyRelation</a></code>) only
 differ in how many rows they resolve to.</p>
 </div>
         </div>
 
         <div id="split-tables">
-          <table class="children sortable" id="id1635">
+          <table class="children sortable" id="id1641">
   
   
   <tr class="method">
@@ -11174,29 +11174,29 @@ differ in how many rows they resolve to.</p>
     
     <td>Class Variable</td>
     <td><code><a href="#__slots__" class="internal-link" title="orionis.orm.relations.HasOneOrManyRelation.__slots__">__slots__</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
+    <td>Declare the instance attribute slots reserved by this class.</td>
   </tr><tr class="instancevariable">
     
     <td>Instance Variable</td>
     <td><code><a href="#_eager_keys_empty" class="internal-link" title="orionis.orm.relations.HasOneOrManyRelation._eager_keys_empty">_eager<wbr></wbr>_keys<wbr></wbr>_empty</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
+    <td>Whether eager loading has no parent keys to query.</td>
   </tr><tr class="instancevariable">
     
     <td>Instance Variable</td>
     <td><code><a href="#_foreign_key" class="internal-link" title="orionis.orm.relations.HasOneOrManyRelation._foreign_key">_foreign<wbr></wbr>_key</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
+    <td>Column on the related table referencing the parent; defaults to <tt class="rst-docutils rst-literal">snake_case(ParentClass) + "_id"</tt>.</td>
   </tr><tr class="instancevariable">
     
     <td>Instance Variable</td>
     <td><code><a href="#_local_key" class="internal-link" title="orionis.orm.relations.HasOneOrManyRelation._local_key">_local<wbr></wbr>_key</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
+    <td>Column on the parent compared against the foreign key; defaults to the parent's primary key.</td>
   </tr>
 </table>
           
             <p class="inheritedFrom">
               Inherited from <code><a href="orionis.orm.relations.Relation.html" class="internal-link" title="orionis.orm.relations.Relation">Relation</a></code>:
             </p>
-            <table class="children sortable" id="id1636">
+            <table class="children sortable" id="id1642">
   
   
   <tr class="baseclassmethod">
@@ -11228,14 +11228,14 @@ differ in how many rows they resolve to.</p>
     
     <td>Instance Variable</td>
     <td><code><a href="orionis.orm.relations.Relation.html#_parent" class="internal-link" title="orionis.orm.relations.Relation._parent">_parent</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
+    <td>Model instance the relationship is accessed from.</td>
   </tr>
 </table>
             
             <p class="inheritedFrom">
               Inherited from <code><a href="orionis.orm.query.ModelQueryBuilder.html" class="internal-link" title="orionis.orm.query.ModelQueryBuilder">ModelQueryBuilder</a></code> (via <code><a href="orionis.orm.relations.Relation.html" class="internal-link" title="orionis.orm.relations.Relation">Relation</a></code>):
             </p>
-            <table class="children sortable" id="id1637">
+            <table class="children sortable" id="id1643">
   
   
   <tr class="basemethod">
@@ -11257,7 +11257,7 @@ differ in how many rows they resolve to.</p>
     
     <td>Method</td>
     <td><code><a href="orionis.orm.query.ModelQueryBuilder.html#_defaultTimestampColumn" class="internal-link" title="orionis.orm.query.ModelQueryBuilder._defaultTimestampColumn">_default<wbr></wbr>Timestamp<wbr></wbr>Column</a></code></td>
-    <td>Return the column <code>latest</code> and <code>oldest</code> default to.</td>
+    <td>Return the column <tt class="rst-docutils rst-literal">latest</tt> and <tt class="rst-docutils rst-literal">oldest</tt> default to.</td>
   </tr><tr class="basemethod">
     
     <td>Async Method</td>
@@ -11332,7 +11332,7 @@ differ in how many rows they resolve to.</p>
     
     <td>Method</td>
     <td><code><a href="orionis.orm.query.ModelQueryBuilder.html#load" class="internal-link" title="orionis.orm.query.ModelQueryBuilder.load">load</a></code></td>
-    <td>Eager load the given relationships; alias of <code><a href="orionis.orm.query.ModelQueryBuilder.html#withRelations" class="internal-link" title="orionis.orm.query.ModelQueryBuilder.withRelations">withRelations</a></code>.</td>
+    <td>Eager load the given relationships.</td>
   </tr><tr class="basemethod">
     
     <td>Method</td>
@@ -11392,44 +11392,44 @@ differ in how many rows they resolve to.</p>
     
     <td>Instance Variable</td>
     <td><code><a href="orionis.orm.query.ModelQueryBuilder.html#_connection_name" class="internal-link" title="orionis.orm.query.ModelQueryBuilder._connection_name">_connection<wbr></wbr>_name</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
+    <td>Name of the configured database connection to use.</td>
   </tr><tr class="baseinstancevariable">
     
     <td>Instance Variable</td>
     <td><code><a href="orionis.orm.query.ModelQueryBuilder.html#_eager_loads" class="internal-link" title="orionis.orm.query.ModelQueryBuilder._eager_loads">_eager<wbr></wbr>_loads</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
+    <td>Relations scheduled for eager loading with the query result.</td>
   </tr><tr class="baseinstancevariable">
     
     <td>Instance Variable</td>
     <td><code><a href="orionis.orm.query.ModelQueryBuilder.html#_meta" class="internal-link" title="orionis.orm.query.ModelQueryBuilder._meta">_meta</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
+    <td>Meta supplied through <tt class="rst-docutils rst-literal">meta</tt>.</td>
   </tr><tr class="baseinstancevariable">
     
     <td>Instance Variable</td>
     <td><code><a href="orionis.orm.query.ModelQueryBuilder.html#_model" class="internal-link" title="orionis.orm.query.ModelQueryBuilder._model">_model</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
+    <td>Model class the queries run against.</td>
   </tr><tr class="baseinstancevariable">
     
     <td>Instance Variable</td>
     <td><code><a href="orionis.orm.query.ModelQueryBuilder.html#_scopes_applied" class="internal-link" title="orionis.orm.query.ModelQueryBuilder._scopes_applied">_scopes<wbr></wbr>_applied</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
+    <td>Scopes applied flag used by <tt class="rst-docutils rst-literal">ModelQueryBuilder</tt>.</td>
   </tr><tr class="baseinstancevariable">
     
     <td>Instance Variable</td>
     <td><code><a href="orionis.orm.query.ModelQueryBuilder.html#_trashed_mode" class="internal-link" title="orionis.orm.query.ModelQueryBuilder._trashed_mode">_trashed<wbr></wbr>_mode</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
+    <td>Trashed mode supplied through <tt class="rst-docutils rst-literal">_TRASHED_EXCLUDE</tt>.</td>
   </tr><tr class="baseinstancevariable">
     
     <td>Instance Variable</td>
     <td><code><a href="orionis.orm.query.ModelQueryBuilder.html#_without_scopes" class="internal-link" title="orionis.orm.query.ModelQueryBuilder._without_scopes">_without<wbr></wbr>_scopes</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
+    <td>Without scopes produced by <tt class="rst-docutils rst-literal">set</tt>.</td>
   </tr>
 </table>
             
             <p class="inheritedFrom">
               Inherited from <code><a href="orionis.orm.query.base_builder.QueryBuilderBase.html" class="internal-link" title="orionis.orm.query.base_builder.QueryBuilderBase">QueryBuilderBase</a></code> (via <code><a href="orionis.orm.relations.Relation.html" class="internal-link" title="orionis.orm.relations.Relation">Relation</a></code>, <code><a href="orionis.orm.query.ModelQueryBuilder.html" class="internal-link" title="orionis.orm.query.ModelQueryBuilder">ModelQueryBuilder</a></code>):
             </p>
-            <table class="children sortable" id="id1638">
+            <table class="children sortable" id="id1644">
   
   
   <tr class="basestaticmethod">
@@ -11451,7 +11451,7 @@ differ in how many rows they resolve to.</p>
     
     <td>Static Method</td>
     <td><code><a href="orionis.orm.query.base_builder.QueryBuilderBase.html#_resolveJoinTable" class="internal-link" title="orionis.orm.query.base_builder.QueryBuilderBase._resolveJoinTable">_resolve<wbr></wbr>Join<wbr></wbr>Table</a></code></td>
-    <td>Normalize a join target into a <code><a href="orionis.orm.schema.TableDefinition.html" class="internal-link" title="orionis.orm.schema.TableDefinition">TableDefinition</a></code>.</td>
+    <td>Normalize a join target into a <code><a href="orionis.orm.schema.TableDefinition.html" class="internal-link">orionis.orm.schema.TableDefinition</a></code>.</td>
   </tr><tr class="basemethod">
     
     <td>Method</td>
@@ -11741,7 +11741,7 @@ differ in how many rows they resolve to.</p>
     
     <td>Method</td>
     <td><code><a href="orionis.orm.query.base_builder.QueryBuilderBase.html#skip" class="internal-link" title="orionis.orm.query.base_builder.QueryBuilderBase.skip">skip</a></code></td>
-    <td>Skip the given number of rows; alias of <code><a href="orionis.orm.query.base_builder.QueryBuilderBase.html#offset" class="internal-link" title="orionis.orm.query.base_builder.QueryBuilderBase.offset">offset</a></code>.</td>
+    <td>Skip the given number of rows.</td>
   </tr><tr class="basemethod">
     
     <td>Async Method</td>
@@ -11751,7 +11751,7 @@ differ in how many rows they resolve to.</p>
     
     <td>Method</td>
     <td><code><a href="orionis.orm.query.base_builder.QueryBuilderBase.html#take" class="internal-link" title="orionis.orm.query.base_builder.QueryBuilderBase.take">take</a></code></td>
-    <td>Limit the number of rows returned; alias of <code><a href="orionis.orm.query.base_builder.QueryBuilderBase.html#limit" class="internal-link" title="orionis.orm.query.base_builder.QueryBuilderBase.limit">limit</a></code>.</td>
+    <td>Limit the number of rows returned.</td>
   </tr><tr class="basemethod">
     
     <td>Method</td>
@@ -11876,7 +11876,7 @@ differ in how many rows they resolve to.</p>
     
     <td>Instance Variable</td>
     <td><code><a href="orionis.orm.query.base_builder.QueryBuilderBase.html#_plan" class="internal-link" title="orionis.orm.query.base_builder.QueryBuilderBase._plan">_plan</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
+    <td>Plan produced by <tt class="rst-docutils rst-literal">SelectPlan</tt>.</td>
   </tr>
 </table>
             
@@ -11898,7 +11898,7 @@ differ in how many rows they resolve to.</p>
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">__init__</span><span class="function-signature long-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">parent: <code>Model</code>, </span><span class="rst-sig-param">related: <code><a href="https://docs.python.org/3/builtins/functions.html#type" class="intersphinx-link">type</a>[<wbr></wbr>TRelated]</code>, </span><span class="rst-sig-param">foreign_key: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a> | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code>, </span><span class="rst-sig-param">local_key: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a> | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></span>):</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/orm/relations/has_one_or_many.py#L24">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/orm/relations/has_one_or_many.py#L27">
       
       (source)
     </a>
@@ -11910,7 +11910,7 @@ differ in how many rows they resolve to.</p>
   </div>
   <div class="docstring functionBody">
     <div class="interfaceinfo">overrides <code><a href="orionis.orm.relations.Relation.html#__init__" class="internal-link">orionis.orm.relations.Relation.__init__</a></code></div>
-    <div><p>Bind the relationship.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">parent:</span><code><a href="orionis.orm.Model.html" class="internal-link" title="orionis.orm.Model">Model</a></code></td><td class="fieldArgDesc">Model instance the relationship is accessed from.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">related:</span><code><a href="https://docs.python.org/3/builtins/functions.html#type" class="intersphinx-link">type</a> of <a href="orionis.orm.Model.html" class="internal-link" title="orionis.orm.Model">Model</a></code></td><td class="fieldArgDesc">Model class the relationship targets.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">foreign<wbr></wbr>_key:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a> or <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">Column on the related table referencing the parent; defaults
+    <div><p>Bind the relationship.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">parent:</span><code><a href="orionis.orm.Model.html" class="internal-link">orionis.orm.Model</a></code></td><td class="fieldArgDesc">Model instance the relationship is accessed from.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">related:</span><code><a href="https://docs.python.org/3/builtins/functions.html#type" class="intersphinx-link">type</a> of <a href="orionis.orm.Model.html" class="internal-link">orionis.orm.Model</a></code></td><td class="fieldArgDesc">Model class the relationship targets.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">foreign<wbr></wbr>_key:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a> or <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">Column on the related table referencing the parent; defaults
 to <tt class="rst-docutils rst-literal">snake_case(ParentClass) + "_id"</tt>.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">local<wbr></wbr>_key:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a> or <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">Column on the parent compared against the foreign key;
 defaults to the parent's primary key.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">This method does not return a value.</td></tr></table></div>
   </div>
@@ -11927,7 +11927,7 @@ defaults to the parent's primary key.</td></tr></table><table class="fieldTable"
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">_groupByForeignKey</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">results: <code>Collection</code></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/stdtypes.html#dict" class="intersphinx-link">dict</a>[<wbr></wbr>Any, <wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#list" class="intersphinx-link">list</a>[<wbr></wbr>TRelated]]</code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/orm/relations/has_one_or_many.py#L95">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/orm/relations/has_one_or_many.py#L107">
       
       (source)
     </a>
@@ -11939,7 +11939,7 @@ defaults to the parent's primary key.</td></tr></table><table class="fieldTable"
   </div>
   <div class="docstring functionBody">
     
-    <div><p>Group related rows by their foreign key value.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">results:</span><code><a href="orionis.support.types.Collection.html" class="internal-link" title="orionis.support.types.Collection">Collection</a></code></td><td class="fieldArgDesc">Related rows produced by an eager query.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/stdtypes.html#dict" class="intersphinx-link">dict</a></code></td><td class="fieldArgDesc">Related rows grouped by the parent key they belong to.</td></tr></table></div>
+    <div><p>Group related rows by their foreign key value.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">results:</span><code><a href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Collection" class="intersphinx-link">collections.abc.Collection</a></code></td><td class="fieldArgDesc">Related rows produced by an eager query.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/stdtypes.html#dict" class="intersphinx-link">dict</a></code></td><td class="fieldArgDesc">Related rows grouped by the parent key they belong to.</td></tr></table></div>
   </div>
 </div><div class="basemethod">
   
@@ -11954,7 +11954,7 @@ defaults to the parent's primary key.</td></tr></table><table class="fieldTable"
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">addConstraints</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>):</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/orm/relations/has_one_or_many.py#L56">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/orm/relations/has_one_or_many.py#L67">
       
       (source)
     </a>
@@ -11981,7 +11981,7 @@ defaults to the parent's primary key.</td></tr></table><table class="fieldTable"
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">addEagerConstraints</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">models: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#list" class="intersphinx-link">list</a>[<wbr></wbr>Model]</code></span>):</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/orm/relations/has_one_or_many.py#L73">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/orm/relations/has_one_or_many.py#L84">
       
       (source)
     </a>
@@ -11993,7 +11993,7 @@ defaults to the parent's primary key.</td></tr></table><table class="fieldTable"
   </div>
   <div class="docstring functionBody">
     <div class="interfaceinfo">overrides <code><a href="orionis.orm.relations.Relation.html#addEagerConstraints" class="internal-link">orionis.orm.relations.Relation.addEagerConstraints</a></code></div>
-    <div><p>Constrain the query to the rows owned by every parent instance.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">models:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#list" class="intersphinx-link">list</a> of <a href="orionis.orm.Model.html" class="internal-link" title="orionis.orm.Model">Model</a></code></td><td class="fieldArgDesc">Parent instances being eager loaded together.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">This method does not return a value.</td></tr></table></div>
+    <div><p>Constrain the query to the rows owned by every parent instance.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">models:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#list" class="intersphinx-link">list</a> of <a href="orionis.orm.Model.html" class="internal-link">orionis.orm.Model</a></code></td><td class="fieldArgDesc">Parent instances being eager loaded together.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">This method does not return a value.</td></tr></table></div>
   </div>
 </div><div class="basemethod">
   
@@ -12008,7 +12008,7 @@ defaults to the parent's primary key.</td></tr></table><table class="fieldTable"
     
     
     <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">create</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">attributes: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#dict" class="intersphinx-link">dict</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <wbr></wbr>Any]</code></span>) -&gt; <code>TRelated</code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/orm/relations/has_one_or_many.py#L118">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/orm/relations/has_one_or_many.py#L130">
       
       (source)
     </a>
@@ -12022,7 +12022,7 @@ defaults to the parent's primary key.</td></tr></table><table class="fieldTable"
     
     <div><p>Create and persist a new related model, auto-linking it via the foreign key.</p>
 <p>Equivalent to Eloquent's <tt class="rst-docutils rst-literal"><span class="pre">$parent-&gt;relation()-&gt;create($attrs)</span></tt>.</p>
-<table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">attributes:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#dict" class="intersphinx-link">dict</a></code></td><td class="fieldArgDesc">Attributes to mass assign on the new related model.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.orm.Model.html" class="internal-link" title="orionis.orm.Model">Model</a></code></td><td class="fieldArgDesc">Persisted related model, already linked to the parent.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code>MassAssignmentException</code></td><td>If an attribute (including the foreign key) violates the
+<table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">attributes:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#dict" class="intersphinx-link">dict</a></code></td><td class="fieldArgDesc">Attributes to mass assign on the new related model.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.orm.Model.html" class="internal-link">orionis.orm.Model</a></code></td><td class="fieldArgDesc">Persisted related model, already linked to the parent.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.orm.exceptions.MassAssignmentException.html" class="internal-link">orionis.orm.exceptions.MassAssignmentException</a></code></td><td>If an attribute (including the foreign key) violates the
 related model's fillable/guarded rules.</td></tr></table></div>
   </div>
 </div><div class="baseclassvariable">
@@ -12037,7 +12037,7 @@ related model's fillable/guarded rules.</td></tr></table></div>
   <div class="functionHeader">
     
     <span class="py-defname">__slots__</span>: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" class="intersphinx-link">tuple</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <wbr></wbr><span class="rst-variable-ellipsis">...</span>]</code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/orm/relations/has_one_or_many.py#L22">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/orm/relations/has_one_or_many.py#L24">
       
       (source)
     </a>
@@ -12049,7 +12049,7 @@ related model's fillable/guarded rules.</td></tr></table></div>
   </div>
   <div class="functionBody">
     <div class="interfaceinfo">overrides <code><a href="orionis.orm.relations.Relation.html#__slots__" class="internal-link">orionis.orm.relations.Relation.__slots__</a></code></div><div class="interfaceinfo">overridden in <code><a href="orionis.orm.relations.HasManyRelation.html" class="internal-link">orionis.orm.relations.HasManyRelation</a></code>, <code><a href="orionis.orm.relations.HasOneRelation.html" class="internal-link">orionis.orm.relations.HasOneRelation</a></code></div>
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p>Declare the instance attribute slots reserved by this class.</p></div>
     
   </div>
 </div><div class="baseinstancevariable">
@@ -12064,7 +12064,7 @@ related model's fillable/guarded rules.</td></tr></table></div>
   <div class="functionHeader">
     
     <span class="py-defname">_eager_keys_empty</span> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/orm/relations/has_one_or_many.py#L92">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/orm/relations/has_one_or_many.py#L103">
       
       (source)
     </a>
@@ -12076,7 +12076,7 @@ related model's fillable/guarded rules.</td></tr></table></div>
   </div>
   <div class="functionBody">
     <div class="interfaceinfo">overrides <code><a href="orionis.orm.relations.Relation.html#_eager_keys_empty" class="internal-link">orionis.orm.relations.Relation._eager_keys_empty</a></code></div>
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p>Whether eager loading has no parent keys to query.</p></div>
     
   </div>
 </div><div class="baseinstancevariable">
@@ -12091,7 +12091,7 @@ related model's fillable/guarded rules.</td></tr></table></div>
   <div class="functionHeader">
     
     <span class="py-defname">_foreign_key</span> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/orm/relations/has_one_or_many.py#L52">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/orm/relations/has_one_or_many.py#L55">
       
       (source)
     </a>
@@ -12103,7 +12103,8 @@ related model's fillable/guarded rules.</td></tr></table></div>
   </div>
   <div class="functionBody">
     
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p>Column on the related table referencing the parent; defaults to
+<tt class="rst-docutils rst-literal">snake_case(ParentClass) + "_id"</tt>.</p></div>
     
   </div>
 </div><div class="baseinstancevariable">
@@ -12118,7 +12119,7 @@ related model's fillable/guarded rules.</td></tr></table></div>
   <div class="functionHeader">
     
     <span class="py-defname">_local_key</span> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/orm/relations/has_one_or_many.py#L53">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/orm/relations/has_one_or_many.py#L60">
       
       (source)
     </a>
@@ -12130,7 +12131,8 @@ related model's fillable/guarded rules.</td></tr></table></div>
   </div>
   <div class="functionBody">
     
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p>Column on the parent compared against the foreign key; defaults to the
+parent's primary key.</p></div>
     
   </div>
 </div>
@@ -12144,7 +12146,7 @@ related model's fillable/guarded rules.</td></tr></table></div>
   <div class="orionis-footer-inner">
     <div class="orionis-footer-copy">
       <p>API documentation for <a href="https://orionis-framework.com/" class="projecthome">Orionis</a>.</p>
-      <p class="orionis-footer-meta">Generated with <a href="https://github.com/twisted/pydoctor/">Pydoctor</a> 25.10.1.<span class="orionis-footer-build"> Built 2026-11-03 09:36:58.</span></p>
+      <p class="orionis-footer-meta">Generated with <a href="https://github.com/twisted/pydoctor/">Pydoctor</a> 25.10.1.<span class="orionis-footer-build"> Built 2026-11-03 13:00:15.</span></p>
     </div>
     <nav class="orionis-footer-links" aria-label="Additional resources">
       <a href="https://docs.orionis-framework.com">Read the guide <span aria-hidden="true">↗</span></a>

@@ -1223,11 +1223,11 @@
         </div>
 
         <div class="extrasDocstring">
-          <p class="class-signature"><code><span class="py-keyword">class</span> <span class="py-defname">Schedule</span>(ISchedule): <a href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/console/tasks/schedule.py#L66" class="sourceLink">(source)</a></code></p><p>Constructor: <code><a href="#__init__" class="internal-link" title="orionis.console.tasks.schedule.Schedule.__init__">Schedule(reactor, exception_handler, stores)</a></code></p><p><a href="classIndex.html#orionis.console.tasks.schedule.Schedule">View In Hierarchy</a></p>
+          <p class="class-signature"><code><span class="py-keyword">class</span> <span class="py-defname">Schedule</span>(ISchedule): <a href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/console/tasks/schedule.py#L68" class="sourceLink">(source)</a></code></p><p>Constructor: <code><a href="#__init__" class="internal-link" title="orionis.console.tasks.schedule.Schedule.__init__">Schedule(reactor, exception_handler, stores)</a></code></p><p><a href="classIndex.html#orionis.console.tasks.schedule.Schedule">View In Hierarchy</a></p>
         </div>
 
         <div class="moduleDocstring">
-          <div><p class="undocumented">Undocumented</p></div>
+          <div><p>Register scheduled tasks and coordinate their scheduler integration.</p></div>
         </div>
 
         <div id="split-tables">
@@ -1368,97 +1368,98 @@
     
     <td>Constant</td>
     <td><code><a href="#_SCHEDULER_NOT_STARTED_ERROR" class="internal-link" title="orionis.console.tasks.schedule.Schedule._SCHEDULER_NOT_STARTED_ERROR">_SCHEDULER<wbr></wbr>_NOT<wbr></wbr>_STARTED<wbr></wbr>_ERROR</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
+    <td><tt class="rst-docutils rst-literal">The Orionis task scheduler has not
+been started.</tt>.</td>
   </tr><tr class="instancevariable">
     
     <td>Instance Variable</td>
     <td><code><a href="#__available_command_signatures" class="internal-link" title="orionis.console.tasks.schedule.Schedule.__available_command_signatures">__available<wbr></wbr>_command<wbr></wbr>_signatures</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
+    <td>Available command signatures produced by <tt class="rst-docutils rst-literal">set</tt>.</td>
   </tr><tr class="instancevariable">
     
     <td>Instance Variable</td>
     <td><code><a href="#__config" class="internal-link" title="orionis.console.tasks.schedule.Schedule.__config">__config</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
+    <td>Validated configuration used to construct and operate the service.</td>
   </tr><tr class="instancevariable">
     
     <td>Instance Variable</td>
     <td><code><a href="#__exception_handler" class="internal-link" title="orionis.console.tasks.schedule.Schedule.__exception_handler">__exception<wbr></wbr>_handler</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
+    <td>Exception handler for managing errors.</td>
   </tr><tr class="instancevariable">
     
     <td>Instance Variable</td>
     <td><code><a href="#__fluent_tasks" class="internal-link" title="orionis.console.tasks.schedule.Schedule.__fluent_tasks">__fluent<wbr></wbr>_tasks</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
+    <td>Task declarations awaiting conversion to scheduler jobs.</td>
   </tr><tr class="instancevariable">
     
     <td>Instance Variable</td>
     <td><code><a href="#__job_store" class="internal-link" title="orionis.console.tasks.schedule.Schedule.__job_store">__job<wbr></wbr>_store</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
+    <td>Job store obtained from <tt class="rst-docutils rst-literal">self.__config.store</tt>.</td>
   </tr><tr class="instancevariable">
     
     <td>Instance Variable</td>
     <td><code><a href="#__paused_tasks" class="internal-link" title="orionis.console.tasks.schedule.Schedule.__paused_tasks">__paused<wbr></wbr>_tasks</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
+    <td>Paused tasks produced by <tt class="rst-docutils rst-literal">set</tt>.</td>
   </tr><tr class="instancevariable">
     
     <td>Instance Variable</td>
     <td><code><a href="#__pending_listener_tasks" class="internal-link" title="orionis.console.tasks.schedule.Schedule.__pending_listener_tasks">__pending<wbr></wbr>_listener<wbr></wbr>_tasks</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
+    <td>Pending listener tasks produced by <tt class="rst-docutils rst-literal">set</tt>.</td>
   </tr><tr class="instancevariable">
     
     <td>Instance Variable</td>
     <td><code><a href="#__reactor" class="internal-link" title="orionis.console.tasks.schedule.Schedule.__reactor">__reactor</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
+    <td>Reactor instance for command execution.</td>
   </tr><tr class="instancevariable">
     
     <td>Instance Variable</td>
     <td><code><a href="#__removed_tasks" class="internal-link" title="orionis.console.tasks.schedule.Schedule.__removed_tasks">__removed<wbr></wbr>_tasks</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
+    <td>Removed tasks produced by <tt class="rst-docutils rst-literal">set</tt>.</td>
   </tr><tr class="instancevariable">
     
     <td>Instance Variable</td>
     <td><code><a href="#__running_tasks" class="internal-link" title="orionis.console.tasks.schedule.Schedule.__running_tasks">__running<wbr></wbr>_tasks</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
+    <td>Running tasks produced by <tt class="rst-docutils rst-literal">set</tt>.</td>
   </tr><tr class="instancevariable">
     
     <td>Instance Variable</td>
     <td><code><a href="#__scheduler" class="internal-link" title="orionis.console.tasks.schedule.Schedule.__scheduler">__scheduler</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
+    <td>Scheduler instance responsible for registering and running tasks.</td>
   </tr><tr class="instancevariable">
     
     <td>Instance Variable</td>
     <td><code><a href="#__scheduler_listeners" class="internal-link" title="orionis.console.tasks.schedule.Schedule.__scheduler_listeners">__scheduler<wbr></wbr>_listeners</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
+    <td>Callbacks subscribed to scheduler lifecycle events.</td>
   </tr><tr class="instancevariable">
     
     <td>Instance Variable</td>
     <td><code><a href="#__shutdown_event" class="internal-link" title="orionis.console.tasks.schedule.Schedule.__shutdown_event">__shutdown<wbr></wbr>_event</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
+    <td>Shutdown event produced by <tt class="rst-docutils rst-literal">asyncio.Event</tt>.</td>
   </tr><tr class="instancevariable">
     
     <td>Instance Variable</td>
     <td><code><a href="#__state" class="internal-link" title="orionis.console.tasks.schedule.Schedule.__state">__state</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
+    <td>State selected by the maintenance-mode command.</td>
   </tr><tr class="instancevariable">
     
     <td>Instance Variable</td>
     <td><code><a href="#__stores" class="internal-link" title="orionis.console.tasks.schedule.Schedule.__stores">__stores</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
+    <td>Schedule store for managing job stores.</td>
   </tr><tr class="instancevariable">
     
     <td>Instance Variable</td>
     <td><code><a href="#__tasks" class="internal-link" title="orionis.console.tasks.schedule.Schedule.__tasks">__tasks</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
+    <td>Tasks registered for scheduling or lifecycle management.</td>
   </tr><tr class="instancevariable">
     
     <td>Instance Variable</td>
     <td><code><a href="#__tasks_listeners" class="internal-link" title="orionis.console.tasks.schedule.Schedule.__tasks_listeners">__tasks<wbr></wbr>_listeners</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
+    <td>Callbacks subscribed to scheduled-task events.</td>
   </tr><tr class="instancevariable">
     
     <td>Instance Variable</td>
     <td><code><a href="#__wait_to_shutdown" class="internal-link" title="orionis.console.tasks.schedule.Schedule.__wait_to_shutdown">__wait<wbr></wbr>_to<wbr></wbr>_shutdown</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
+    <td>Wait to shutdown value used by <tt class="rst-docutils rst-literal">Schedule</tt>.</td>
   </tr>
 </table>
           
@@ -1480,7 +1481,7 @@
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">__addConfiguredJobStore</span><span class="function-signature">(<span class="rst-sig-param">self: <code><a href="https://docs.python.org/3/library/typing.html#typing.Self" class="intersphinx-link">Self</a></code></span>):</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/console/tasks/schedule.py#L424">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/console/tasks/schedule.py#L449">
       
       (source)
     </a>
@@ -1493,7 +1494,7 @@
   <div class="docstring functionBody">
     
     <div><p>Add the database or redis jobstore matching the configured driver.</p>
-<p><code>stores.database</code>/<code><a href="orionis.cache.stores.redis.html" class="internal-link" title="orionis.cache.stores.redis">stores.redis</a></code> default to None when not declared
+<p><tt class="rst-docutils rst-literal">stores.database</tt>/<tt class="rst-docutils rst-literal">stores.redis</tt> default to None when not declared
 in config, so this validates explicitly instead of letting an
 AttributeError leak out of the config object when the selected
 driver's dedicated section was never configured.</p>
@@ -1514,7 +1515,7 @@ dedicated configuration section is missing.</td></tr></table></div>
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">__createManagedTask</span><span class="function-signature">(<span class="rst-sig-param">self: <code><a href="https://docs.python.org/3/library/typing.html#typing.Self" class="intersphinx-link">Self</a></code>, </span><span class="rst-sig-param">coroutine: <code><a href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Coroutine" class="intersphinx-link">Coroutine</a></code></span>):</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/console/tasks/schedule.py#L375">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/console/tasks/schedule.py#L400">
       
       (source)
     </a>
@@ -1526,7 +1527,7 @@ dedicated configuration section is missing.</td></tr></table></div>
   </div>
   <div class="docstring functionBody">
     
-    <div><p>Create and manage an asyncio task with automatic cleanup.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">coroutine:</span><code><a href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Coroutine" class="intersphinx-link">Coroutine</a></code></td><td class="fieldArgDesc">The coroutine to be executed as an async task.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">This method does not return a value. It manages the lifecycle of
+    <div><p>Create and manage an asyncio task with automatic cleanup.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">coroutine:</span><code><a href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Coroutine" class="intersphinx-link">collections.abc.Coroutine</a></code></td><td class="fieldArgDesc">The coroutine to be executed as an async task.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">This method does not return a value. It manages the lifecycle of
 the created asyncio task.</td></tr></table></div>
   </div>
 </div><div class="basemethod">
@@ -1542,7 +1543,7 @@ the created asyncio task.</td></tr></table></div>
     
     
     <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">__gracefulShutdown</span><span class="function-signature">(<span class="rst-sig-param">self: <code><a href="https://docs.python.org/3/library/typing.html#typing.Self" class="intersphinx-link">Self</a></code></span>):</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/console/tasks/schedule.py#L1085">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/console/tasks/schedule.py#L1110">
       
       (source)
     </a>
@@ -1573,7 +1574,7 @@ waiting tasks that shutdown is complete.</p>
     
     
     <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">__handleListenerException</span><span class="function-signature">(<span class="rst-sig-param">self: <code><a href="https://docs.python.org/3/library/typing.html#typing.Self" class="intersphinx-link">Self</a></code>, </span><span class="rst-sig-param">exception: <code><a href="https://docs.python.org/3/builtins/exceptions.html#Exception" class="intersphinx-link">Exception</a></code></span>):</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/console/tasks/schedule.py#L400">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/console/tasks/schedule.py#L425">
       
       (source)
     </a>
@@ -1600,7 +1601,7 @@ waiting tasks that shutdown is complete.</p>
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">__init__</span><span class="function-signature long-signature">(<span class="rst-sig-param">self: <code><a href="https://docs.python.org/3/library/typing.html#typing.Self" class="intersphinx-link">Self</a></code>, </span><span class="rst-sig-param">reactor: <code><a href="orionis.console.core.contracts.reactor.IReactor.html" class="internal-link" title="orionis.console.core.contracts.reactor.IReactor">IReactor</a></code>, </span><span class="rst-sig-param">exception_handler: <code>ICatch</code>, </span><span class="rst-sig-param">stores: <code><a href="orionis.console.contracts.store.IScheduleStore.html" class="internal-link" title="orionis.console.contracts.store.IScheduleStore">IScheduleStore</a></code></span>):</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/console/tasks/schedule.py#L71">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/console/tasks/schedule.py#L78">
       
       (source)
     </a>
@@ -1612,7 +1613,7 @@ waiting tasks that shutdown is complete.</p>
   </div>
   <div class="docstring functionBody">
     
-    <div><p>Initialize the Schedule instance.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">reactor:</span><code><a href="orionis.console.core.contracts.reactor.IReactor.html" class="internal-link" title="orionis.console.core.contracts.reactor.IReactor">IReactor</a></code></td><td class="fieldArgDesc">Reactor instance for command execution.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">exception<wbr></wbr>_handler:</span><code><a href="orionis.failure.contracts.ICatch.html" class="internal-link" title="orionis.failure.contracts.ICatch">ICatch</a></code></td><td class="fieldArgDesc">Exception handler for managing errors.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">stores:</span><code><a href="orionis.console.contracts.store.IScheduleStore.html" class="internal-link" title="orionis.console.contracts.store.IScheduleStore">IScheduleStore</a></code></td><td class="fieldArgDesc">Schedule store for managing job stores.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">This constructor does not return a value.</td></tr></table></div>
+    <div><p>Initialize the Schedule instance.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">reactor:</span><code><a href="orionis.console.core.contracts.reactor.IReactor.html" class="internal-link">orionis.console.core.contracts.reactor.IReactor</a></code></td><td class="fieldArgDesc">Reactor instance for command execution.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">exception<wbr></wbr>_handler:</span><code><a href="orionis.failure.contracts.ICatch.html" class="internal-link">orionis.failure.contracts.ICatch</a></code></td><td class="fieldArgDesc">Exception handler for managing errors.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">stores:</span><code><a href="orionis.console.contracts.store.IScheduleStore.html" class="internal-link">orionis.console.contracts.store.IScheduleStore</a></code></td><td class="fieldArgDesc">Schedule store for managing job stores.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">This constructor does not return a value.</td></tr></table></div>
   </div>
 </div><div class="basemethod">
   
@@ -1627,7 +1628,7 @@ waiting tasks that shutdown is complete.</p>
     
     
     <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">__loadAvailableCommands</span><span class="function-signature">(<span class="rst-sig-param">self: <code><a href="https://docs.python.org/3/library/typing.html#typing.Self" class="intersphinx-link">Self</a></code></span>):</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/console/tasks/schedule.py#L113">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/console/tasks/schedule.py#L138">
       
       (source)
     </a>
@@ -1658,7 +1659,7 @@ of available command signatures.</td></tr></table></div>
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">__suppressApschedulerLogging</span><span class="function-signature">(<span class="rst-sig-param">self: <code><a href="https://docs.python.org/3/library/typing.html#typing.Self" class="intersphinx-link">Self</a></code></span>):</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/console/tasks/schedule.py#L136">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/console/tasks/schedule.py#L161">
       
       (source)
     </a>
@@ -1689,7 +1690,7 @@ application's logging output.</p>
     
     
     <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">__validateAndLoadFluentTasks</span><span class="function-signature">(<span class="rst-sig-param">self: <code><a href="https://docs.python.org/3/library/typing.html#typing.Self" class="intersphinx-link">Self</a></code></span>):</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/console/tasks/schedule.py#L159">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/console/tasks/schedule.py#L184">
       
       (source)
     </a>
@@ -1719,7 +1720,7 @@ Populates the internal tasks dictionary with validated task entities.</p>
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">_dispatchSchedulerEventListener</span><span class="function-signature">(<span class="rst-sig-param">self: <code><a href="https://docs.python.org/3/library/typing.html#typing.Self" class="intersphinx-link">Self</a></code>, </span><span class="rst-sig-param">event: <code>APSchedulerEvent</code></span>):</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/console/tasks/schedule.py#L233">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/console/tasks/schedule.py#L258">
       
       (source)
     </a>
@@ -1731,7 +1732,7 @@ Populates the internal tasks dictionary with validated task entities.</p>
   </div>
   <div class="docstring functionBody">
     
-    <div><p>Call the registered global event listener for a scheduler event.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">event:</span><code>APSchedulerEvent</code></td><td class="fieldArgDesc">The scheduler event that occurred.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">This method does not return a value. It triggers the appropriate
+    <div><p>Call the registered global event listener for a scheduler event.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">event:</span><code><tt class="rst-docutils rst-literal">apscheduler.events.SchedulerEvent</tt></code></td><td class="fieldArgDesc">The scheduler event that occurred.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">This method does not return a value. It triggers the appropriate
 listener for the event.</td></tr></table></div>
   </div>
 </div><div class="basemethod">
@@ -1747,7 +1748,7 @@ listener for the event.</td></tr></table></div>
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">_dispatchTaskEventListener</span><span class="function-signature">(<span class="rst-sig-param">self: <code><a href="https://docs.python.org/3/library/typing.html#typing.Self" class="intersphinx-link">Self</a></code>, </span><span class="rst-sig-param">event: <code>APJobEvent</code></span>):</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/console/tasks/schedule.py#L291">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/console/tasks/schedule.py#L316">
       
       (source)
     </a>
@@ -1759,7 +1760,7 @@ listener for the event.</td></tr></table></div>
   </div>
   <div class="docstring functionBody">
     
-    <div><p>Dispatch registered task event listener for a specific job event.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">event:</span><code>APJobEvent</code></td><td class="fieldArgDesc">The job event that occurred.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">This method does not return a value. It triggers the appropriate
+    <div><p>Dispatch registered task event listener for a specific job event.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">event:</span><code><tt class="rst-docutils rst-literal">apscheduler.events.JobEvent</tt></code></td><td class="fieldArgDesc">The job event that occurred.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">This method does not return a value. It triggers the appropriate
 listener for the event.</td></tr></table></div>
   </div>
 </div><div class="basemethod">
@@ -1775,7 +1776,7 @@ listener for the event.</td></tr></table></div>
     
     
     <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">boot</span><span class="function-signature">(<span class="rst-sig-param">self: <code><a href="https://docs.python.org/3/library/typing.html#typing.Self" class="intersphinx-link">Self</a></code></span>):</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/console/tasks/schedule.py#L458">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/console/tasks/schedule.py#L483">
       
       (source)
     </a>
@@ -1802,7 +1803,7 @@ listener for the event.</td></tr></table></div>
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">command</span><span class="function-signature long-signature">(<span class="rst-sig-param">self: <code><a href="https://docs.python.org/3/library/typing.html#typing.Self" class="intersphinx-link">Self</a></code>, </span><span class="rst-sig-param">signature: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code>, </span><span class="rst-sig-param">args: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#list" class="intersphinx-link">list</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>] | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code> = <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a>, </span><span class="rst-sig-param">purpose: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a> | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code> = <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></span>) -&gt; <code><a href="orionis.console.fluent.contracts.task.ITask.html" class="internal-link" title="orionis.console.fluent.contracts.task.ITask">ITask</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/console/tasks/schedule.py#L679">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/console/tasks/schedule.py#L704">
       
       (source)
     </a>
@@ -1814,7 +1815,7 @@ listener for the event.</td></tr></table></div>
   </div>
   <div class="docstring functionBody">
     
-    <div><p>Add a command for fluent configuration.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">signature:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Unique signature of the command to schedule.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">args:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#list" class="intersphinx-link">list</a>[<a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>] | None, <em>optional</em></code></td><td class="fieldArgDesc">Arguments for the command. Defaults to None.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">purpose:</span><code>str | None, <em>optional</em></code></td><td class="fieldArgDesc">Description of the command's purpose.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.console.fluent.contracts.task.ITask.html" class="internal-link" title="orionis.console.fluent.contracts.task.ITask">ITask</a></code></td><td class="fieldArgDesc">Task instance for further configuration.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/exceptions.html#RuntimeError" class="intersphinx-link">RuntimeError</a></code></td><td>If the scheduler has already been started.</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/exceptions.html#TypeError" class="intersphinx-link">TypeError</a></code></td><td>If the signature is not a non-empty string or arguments are invalid.</td></tr></table></div>
+    <div><p>Add a command for fluent configuration.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">signature:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Unique signature of the command to schedule.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">args:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#list" class="intersphinx-link">list</a>[<a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>] | None, <em>optional</em></code></td><td class="fieldArgDesc">Arguments for the command. Defaults to None.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">purpose:</span><code>str | None, <em>optional</em></code></td><td class="fieldArgDesc">Description of the command's purpose.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.console.fluent.contracts.task.ITask.html" class="internal-link">orionis.console.fluent.contracts.task.ITask</a></code></td><td class="fieldArgDesc">Task instance for further configuration.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/exceptions.html#RuntimeError" class="intersphinx-link">RuntimeError</a></code></td><td>If the scheduler has already been started.</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/exceptions.html#TypeError" class="intersphinx-link">TypeError</a></code></td><td>If the signature is not a non-empty string or arguments are invalid.</td></tr></table></div>
   </div>
 </div><div class="basemethod">
   
@@ -1829,7 +1830,7 @@ listener for the event.</td></tr></table></div>
     
     
     <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">info</span><span class="function-signature">(<span class="rst-sig-param">self: <code><a href="https://docs.python.org/3/library/typing.html#typing.Self" class="intersphinx-link">Self</a></code></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/stdtypes.html#list" class="intersphinx-link">list</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#dict" class="intersphinx-link">dict</a>]</code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/console/tasks/schedule.py#L193">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/console/tasks/schedule.py#L218">
       
       (source)
     </a>
@@ -1856,7 +1857,7 @@ listener for the event.</td></tr></table></div>
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">isPaused</span><span class="function-signature">(<span class="rst-sig-param">self: <code><a href="https://docs.python.org/3/library/typing.html#typing.Self" class="intersphinx-link">Self</a></code></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/console/tasks/schedule.py#L655">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/console/tasks/schedule.py#L680">
       
       (source)
     </a>
@@ -1883,7 +1884,7 @@ listener for the event.</td></tr></table></div>
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">isRunning</span><span class="function-signature">(<span class="rst-sig-param">self: <code><a href="https://docs.python.org/3/library/typing.html#typing.Self" class="intersphinx-link">Self</a></code></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/console/tasks/schedule.py#L643">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/console/tasks/schedule.py#L668">
       
       (source)
     </a>
@@ -1910,7 +1911,7 @@ listener for the event.</td></tr></table></div>
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">isStopped</span><span class="function-signature">(<span class="rst-sig-param">self: <code><a href="https://docs.python.org/3/library/typing.html#typing.Self" class="intersphinx-link">Self</a></code></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/console/tasks/schedule.py#L667">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/console/tasks/schedule.py#L692">
       
       (source)
     </a>
@@ -1937,7 +1938,7 @@ listener for the event.</td></tr></table></div>
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">on</span><span class="function-signature">(<span class="rst-sig-param">self: <code><a href="https://docs.python.org/3/library/typing.html#typing.Self" class="intersphinx-link">Self</a></code>, </span><span class="rst-sig-param">event: <code>SchedulerEvent</code>, </span><span class="rst-sig-param">listener: <code><a href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Callable" class="intersphinx-link">Callable</a></code></span>) -&gt; <code><a href="https://docs.python.org/3/library/typing.html#typing.Self" class="intersphinx-link">Self</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/console/tasks/schedule.py#L583">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/console/tasks/schedule.py#L608">
       
       (source)
     </a>
@@ -1949,7 +1950,7 @@ listener for the event.</td></tr></table></div>
   </div>
   <div class="docstring functionBody">
     
-    <div><p>Register a listener for a scheduler event.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">event:</span><code>SchedulerEvent</code></td><td class="fieldArgDesc">The scheduler event to listen for.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">listener:</span><code><a href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Callable" class="intersphinx-link">Callable</a></code></td><td class="fieldArgDesc">The callable to invoke when the event occurs.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/library/typing.html#typing.Self" class="intersphinx-link">Self</a></code></td><td class="fieldArgDesc">The Schedule instance for method chaining.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/exceptions.html#RuntimeError" class="intersphinx-link">RuntimeError</a></code></td><td>If the scheduler has already been booted.</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/exceptions.html#TypeError" class="intersphinx-link">TypeError</a></code></td><td>If event is not a SchedulerEvent or listener is not callable.</td></tr></table></div>
+    <div><p>Register a listener for a scheduler event.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">event:</span><code><a href="orionis.console.enums.SchedulerEvent.html" class="internal-link">orionis.console.enums.SchedulerEvent</a></code></td><td class="fieldArgDesc">The scheduler event to listen for.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">listener:</span><code><a href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Callable" class="intersphinx-link">collections.abc.Callable</a></code></td><td class="fieldArgDesc">The callable to invoke when the event occurs.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/library/typing.html#typing.Self" class="intersphinx-link">typing.Self</a></code></td><td class="fieldArgDesc">The Schedule instance for method chaining.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/exceptions.html#RuntimeError" class="intersphinx-link">RuntimeError</a></code></td><td>If the scheduler has already been booted.</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/exceptions.html#TypeError" class="intersphinx-link">TypeError</a></code></td><td>If event is not a SchedulerEvent or listener is not callable.</td></tr></table></div>
   </div>
 </div><div class="basemethod">
   
@@ -1964,7 +1965,7 @@ listener for the event.</td></tr></table></div>
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">pause</span><span class="function-signature">(<span class="rst-sig-param">self: <code><a href="https://docs.python.org/3/library/typing.html#typing.Self" class="intersphinx-link">Self</a></code></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/console/tasks/schedule.py#L961">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/console/tasks/schedule.py#L986">
       
       (source)
     </a>
@@ -1976,7 +1977,7 @@ listener for the event.</td></tr></table></div>
   </div>
   <div class="docstring functionBody">
     
-    <div><p>Pause the scheduler if it is running.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">self:</span><code><a href="orionis.console.tasks.schedule.Schedule.html" class="internal-link" title="orionis.console.tasks.schedule.Schedule">Schedule</a></code></td><td class="fieldArgDesc">The Schedule instance.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code></td><td class="fieldArgDesc">True if the scheduler was successfully paused.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/exceptions.html#RuntimeError" class="intersphinx-link">RuntimeError</a></code></td><td>If the scheduler is not started or not running.</td></tr></table></div>
+    <div><p>Pause the scheduler if it is running.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">self:</span><code><a href="orionis.console.tasks.schedule.Schedule.html" class="internal-link">orionis.console.tasks.schedule.Schedule</a></code></td><td class="fieldArgDesc">The Schedule instance.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code></td><td class="fieldArgDesc">True if the scheduler was successfully paused.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/exceptions.html#RuntimeError" class="intersphinx-link">RuntimeError</a></code></td><td>If the scheduler is not started or not running.</td></tr></table></div>
   </div>
 </div><div class="basemethod">
   
@@ -1991,7 +1992,7 @@ listener for the event.</td></tr></table></div>
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">pauseTask</span><span class="function-signature">(<span class="rst-sig-param">self: <code><a href="https://docs.python.org/3/library/typing.html#typing.Self" class="intersphinx-link">Self</a></code>, </span><span class="rst-sig-param">signature: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/console/tasks/schedule.py#L746">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/console/tasks/schedule.py#L771">
       
       (source)
     </a>
@@ -2023,7 +2024,7 @@ listener for the event.</td></tr></table></div>
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">removeAllTasks</span><span class="function-signature">(<span class="rst-sig-param">self: <code><a href="https://docs.python.org/3/library/typing.html#typing.Self" class="intersphinx-link">Self</a></code></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/console/tasks/schedule.py#L925">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/console/tasks/schedule.py#L950">
       
       (source)
     </a>
@@ -2055,7 +2056,7 @@ listener for the event.</td></tr></table></div>
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">removeTask</span><span class="function-signature">(<span class="rst-sig-param">self: <code><a href="https://docs.python.org/3/library/typing.html#typing.Self" class="intersphinx-link">Self</a></code>, </span><span class="rst-sig-param">signature: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/console/tasks/schedule.py#L866">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/console/tasks/schedule.py#L891">
       
       (source)
     </a>
@@ -2087,7 +2088,7 @@ listener for the event.</td></tr></table></div>
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">resume</span><span class="function-signature">(<span class="rst-sig-param">self: <code><a href="https://docs.python.org/3/library/typing.html#typing.Self" class="intersphinx-link">Self</a></code></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/console/tasks/schedule.py#L1001">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/console/tasks/schedule.py#L1026">
       
       (source)
     </a>
@@ -2099,7 +2100,7 @@ listener for the event.</td></tr></table></div>
   </div>
   <div class="docstring functionBody">
     
-    <div><p>Resume the scheduler if it is paused.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">self:</span><code><a href="orionis.console.tasks.schedule.Schedule.html" class="internal-link" title="orionis.console.tasks.schedule.Schedule">Schedule</a></code></td><td class="fieldArgDesc">The Schedule instance.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code></td><td class="fieldArgDesc">True if the scheduler was successfully resumed.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/exceptions.html#RuntimeError" class="intersphinx-link">RuntimeError</a></code></td><td>If the scheduler is not started or not paused.</td></tr></table></div>
+    <div><p>Resume the scheduler if it is paused.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">self:</span><code><a href="orionis.console.tasks.schedule.Schedule.html" class="internal-link">orionis.console.tasks.schedule.Schedule</a></code></td><td class="fieldArgDesc">The Schedule instance.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code></td><td class="fieldArgDesc">True if the scheduler was successfully resumed.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/exceptions.html#RuntimeError" class="intersphinx-link">RuntimeError</a></code></td><td>If the scheduler is not started or not paused.</td></tr></table></div>
   </div>
 </div><div class="basemethod">
   
@@ -2114,7 +2115,7 @@ listener for the event.</td></tr></table></div>
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">resumeTask</span><span class="function-signature">(<span class="rst-sig-param">self: <code><a href="https://docs.python.org/3/library/typing.html#typing.Self" class="intersphinx-link">Self</a></code>, </span><span class="rst-sig-param">signature: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/console/tasks/schedule.py#L806">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/console/tasks/schedule.py#L831">
       
       (source)
     </a>
@@ -2146,7 +2147,7 @@ listener for the event.</td></tr></table></div>
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">shutdown</span><span class="function-signature">(<span class="rst-sig-param">self: <code><a href="https://docs.python.org/3/library/typing.html#typing.Self" class="intersphinx-link">Self</a></code>, </span><span class="rst-sig-param">wait: <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a> | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code> = <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></span>):</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/console/tasks/schedule.py#L1041">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/console/tasks/schedule.py#L1066">
       
       (source)
     </a>
@@ -2166,7 +2167,7 @@ environments where the process stops immediately after calling this
 method.</p>
 <table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">wait:</span><code>int | None, <em>optional</em></code></td><td class="fieldArgDesc">Time in seconds to wait before completing shutdown. Defaults to
 None, which keeps the previously configured grace period instead
-of collapsing it to zero.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">This method does not return a value. It initiates graceful shutdown.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/exceptions.html#TypeError" class="intersphinx-link">TypeError</a></code></td><td>If <code><a href="#wait" class="internal-link" title="orionis.console.tasks.schedule.Schedule.wait">wait</a></code> is neither None nor a non-negative integer (bool is
+of collapsing it to zero.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">This method does not return a value. It initiates graceful shutdown.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/exceptions.html#TypeError" class="intersphinx-link">TypeError</a></code></td><td>If <tt class="rst-docutils rst-literal">wait</tt> is neither None nor a non-negative integer (bool is
 explicitly rejected even though it is technically an int subtype).</td></tr></table></div>
   </div>
 </div><div class="basemethod">
@@ -2182,7 +2183,7 @@ explicitly rejected even though it is technically an int subtype).</td></tr></ta
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">state</span><span class="function-signature">(<span class="rst-sig-param">self: <code><a href="https://docs.python.org/3/library/typing.html#typing.Self" class="intersphinx-link">Self</a></code></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/console/tasks/schedule.py#L631">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/console/tasks/schedule.py#L656">
       
       (source)
     </a>
@@ -2209,7 +2210,7 @@ explicitly rejected even though it is technically an int subtype).</td></tr></ta
     
     
     <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">wait</span><span class="function-signature">(<span class="rst-sig-param">self: <code><a href="https://docs.python.org/3/library/typing.html#typing.Self" class="intersphinx-link">Self</a></code></span>):</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/console/tasks/schedule.py#L1128">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/console/tasks/schedule.py#L1153">
       
       (source)
     </a>
@@ -2240,7 +2241,7 @@ completes.</td></tr></table></div>
   <div class="functionHeader">
     
     <span class="py-defname">_SCHEDULER_NOT_STARTED_ERROR</span>: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/console/tasks/schedule.py#L69">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/console/tasks/schedule.py#L72">
       
       (source)
     </a>
@@ -2252,7 +2253,8 @@ completes.</td></tr></table></div>
   </div>
   <div class="functionBody">
     
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p><tt class="rst-docutils rst-literal">The Orionis task scheduler has not
+been started.</tt>.</p></div>
     <table class="valueTable"><tr class="fieldStart"><td class="fieldName">Value</td></tr><tr><td><pre class="constant-value"><code><span class="rst-variable-quote">'</span><span class="rst-variable-string">The Orionis task scheduler has not been started.</span><span class="rst-variable-quote">'</span></code></pre></td></tr></table>
   </div>
 </div><div class="baseinstancevariable">
@@ -2267,7 +2269,7 @@ completes.</td></tr></table></div>
   <div class="functionHeader">
     
     <span class="py-defname">__available_command_signatures</span>: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#set" class="intersphinx-link">set</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>]</code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/console/tasks/schedule.py#L98">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/console/tasks/schedule.py#L109">
       
       (source)
     </a>
@@ -2279,7 +2281,7 @@ completes.</td></tr></table></div>
   </div>
   <div class="functionBody">
     
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p>Available command signatures produced by <tt class="rst-docutils rst-literal">set</tt>.</p></div>
     
   </div>
 </div><div class="baseinstancevariable">
@@ -2294,7 +2296,7 @@ completes.</td></tr></table></div>
   <div class="functionHeader">
     
     <span class="py-defname">__config</span>: <code>ConfigScheduler</code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/console/tasks/schedule.py#L97">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/console/tasks/schedule.py#L107">
       
       (source)
     </a>
@@ -2306,7 +2308,7 @@ completes.</td></tr></table></div>
   </div>
   <div class="functionBody">
     
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p>Validated configuration used to construct and operate the service.</p></div>
     
   </div>
 </div><div class="baseinstancevariable">
@@ -2321,7 +2323,7 @@ completes.</td></tr></table></div>
   <div class="functionHeader">
     
     <span class="py-defname">__exception_handler</span>: <code>ICatch</code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/console/tasks/schedule.py#L95">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/console/tasks/schedule.py#L103">
       
       (source)
     </a>
@@ -2333,7 +2335,7 @@ completes.</td></tr></table></div>
   </div>
   <div class="functionBody">
     
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p>Exception handler for managing errors.</p></div>
     
   </div>
 </div><div class="baseinstancevariable">
@@ -2348,7 +2350,7 @@ completes.</td></tr></table></div>
   <div class="functionHeader">
     
     <span class="py-defname">__fluent_tasks</span>: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#dict" class="intersphinx-link">dict</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <wbr></wbr><a href="orionis.console.fluent.contracts.task.ITask.html" class="internal-link" title="orionis.console.fluent.contracts.task.ITask">ITask</a>]</code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/console/tasks/schedule.py#L103">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/console/tasks/schedule.py#L119">
       
       (source)
     </a>
@@ -2360,7 +2362,7 @@ completes.</td></tr></table></div>
   </div>
   <div class="functionBody">
     
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p>Task declarations awaiting conversion to scheduler jobs.</p></div>
     
   </div>
 </div><div class="baseinstancevariable">
@@ -2375,7 +2377,7 @@ completes.</td></tr></table></div>
   <div class="functionHeader">
     
     <span class="py-defname">__job_store</span>: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/console/tasks/schedule.py#L99">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/console/tasks/schedule.py#L111">
       
       (source)
     </a>
@@ -2387,7 +2389,7 @@ completes.</td></tr></table></div>
   </div>
   <div class="functionBody">
     
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p>Job store obtained from <tt class="rst-docutils rst-literal">self.__config.store</tt>.</p></div>
     
   </div>
 </div><div class="baseinstancevariable">
@@ -2402,7 +2404,7 @@ completes.</td></tr></table></div>
   <div class="functionHeader">
     
     <span class="py-defname">__paused_tasks</span>: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#set" class="intersphinx-link">set</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>]</code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/console/tasks/schedule.py#L107">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/console/tasks/schedule.py#L127">
       
       (source)
     </a>
@@ -2414,7 +2416,7 @@ completes.</td></tr></table></div>
   </div>
   <div class="functionBody">
     
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p>Paused tasks produced by <tt class="rst-docutils rst-literal">set</tt>.</p></div>
     
   </div>
 </div><div class="baseinstancevariable">
@@ -2429,7 +2431,7 @@ completes.</td></tr></table></div>
   <div class="functionHeader">
     
     <span class="py-defname">__pending_listener_tasks</span>: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#set" class="intersphinx-link">set</a>[<wbr></wbr><a href="https://docs.python.org/3/library/asyncio-task.html#asyncio.Task" class="intersphinx-link">asyncio.Task</a>]</code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/console/tasks/schedule.py#L109">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/console/tasks/schedule.py#L131">
       
       (source)
     </a>
@@ -2441,7 +2443,7 @@ completes.</td></tr></table></div>
   </div>
   <div class="functionBody">
     
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p>Pending listener tasks produced by <tt class="rst-docutils rst-literal">set</tt>.</p></div>
     
   </div>
 </div><div class="baseinstancevariable">
@@ -2456,7 +2458,7 @@ completes.</td></tr></table></div>
   <div class="functionHeader">
     
     <span class="py-defname">__reactor</span>: <code><a href="orionis.console.core.contracts.reactor.IReactor.html" class="internal-link" title="orionis.console.core.contracts.reactor.IReactor">IReactor</a></code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/console/tasks/schedule.py#L94">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/console/tasks/schedule.py#L101">
       
       (source)
     </a>
@@ -2468,7 +2470,7 @@ completes.</td></tr></table></div>
   </div>
   <div class="functionBody">
     
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p>Reactor instance for command execution.</p></div>
     
   </div>
 </div><div class="baseinstancevariable">
@@ -2483,7 +2485,7 @@ completes.</td></tr></table></div>
   <div class="functionHeader">
     
     <span class="py-defname">__removed_tasks</span>: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#set" class="intersphinx-link">set</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>]</code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/console/tasks/schedule.py#L108">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/console/tasks/schedule.py#L129">
       
       (source)
     </a>
@@ -2495,7 +2497,7 @@ completes.</td></tr></table></div>
   </div>
   <div class="functionBody">
     
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p>Removed tasks produced by <tt class="rst-docutils rst-literal">set</tt>.</p></div>
     
   </div>
 </div><div class="baseinstancevariable">
@@ -2510,7 +2512,7 @@ completes.</td></tr></table></div>
   <div class="functionHeader">
     
     <span class="py-defname">__running_tasks</span>: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#set" class="intersphinx-link">set</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>]</code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/console/tasks/schedule.py#L106">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/console/tasks/schedule.py#L125">
       
       (source)
     </a>
@@ -2522,7 +2524,7 @@ completes.</td></tr></table></div>
   </div>
   <div class="functionBody">
     
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p>Running tasks produced by <tt class="rst-docutils rst-literal">set</tt>.</p></div>
     
   </div>
 </div><div class="baseinstancevariable">
@@ -2537,7 +2539,7 @@ completes.</td></tr></table></div>
   <div class="functionHeader">
     
     <span class="py-defname">__scheduler</span>: <code>AsyncIOScheduler | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/console/tasks/schedule.py#L100">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/console/tasks/schedule.py#L113">
       
       (source)
     </a>
@@ -2549,7 +2551,7 @@ completes.</td></tr></table></div>
   </div>
   <div class="functionBody">
     
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p>Scheduler instance responsible for registering and running tasks.</p></div>
     
   </div>
 </div><div class="baseinstancevariable">
@@ -2564,7 +2566,7 @@ completes.</td></tr></table></div>
   <div class="functionHeader">
     
     <span class="py-defname">__scheduler_listeners</span>: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#dict" class="intersphinx-link">dict</a>[<wbr></wbr>SchedulerEvent, <wbr></wbr><a href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Callable" class="intersphinx-link">Callable</a>]</code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/console/tasks/schedule.py#L101">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/console/tasks/schedule.py#L115">
       
       (source)
     </a>
@@ -2576,7 +2578,7 @@ completes.</td></tr></table></div>
   </div>
   <div class="functionBody">
     
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p>Callbacks subscribed to scheduler lifecycle events.</p></div>
     
   </div>
 </div><div class="baseinstancevariable">
@@ -2591,7 +2593,7 @@ completes.</td></tr></table></div>
   <div class="functionHeader">
     
     <span class="py-defname">__shutdown_event</span> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/console/tasks/schedule.py#L110">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/console/tasks/schedule.py#L133">
       
       (source)
     </a>
@@ -2603,7 +2605,7 @@ completes.</td></tr></table></div>
   </div>
   <div class="functionBody">
     
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p>Shutdown event produced by <tt class="rst-docutils rst-literal">asyncio.Event</tt>.</p></div>
     
   </div>
 </div><div class="baseinstancevariable">
@@ -2618,7 +2620,7 @@ completes.</td></tr></table></div>
   <div class="functionHeader">
     
     <span class="py-defname">__state</span>: <code>ScheduleStates</code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/console/tasks/schedule.py#L105">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/console/tasks/schedule.py#L123">
       
       (source)
     </a>
@@ -2630,7 +2632,7 @@ completes.</td></tr></table></div>
   </div>
   <div class="functionBody">
     
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p>State selected by the maintenance-mode command.</p></div>
     
   </div>
 </div><div class="baseinstancevariable">
@@ -2645,7 +2647,7 @@ completes.</td></tr></table></div>
   <div class="functionHeader">
     
     <span class="py-defname">__stores</span>: <code><a href="orionis.console.contracts.store.IScheduleStore.html" class="internal-link" title="orionis.console.contracts.store.IScheduleStore">IScheduleStore</a></code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/console/tasks/schedule.py#L96">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/console/tasks/schedule.py#L105">
       
       (source)
     </a>
@@ -2657,7 +2659,7 @@ completes.</td></tr></table></div>
   </div>
   <div class="functionBody">
     
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p>Schedule store for managing job stores.</p></div>
     
   </div>
 </div><div class="baseinstancevariable">
@@ -2672,7 +2674,7 @@ completes.</td></tr></table></div>
   <div class="functionHeader">
     
     <span class="py-defname">__tasks</span>: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#dict" class="intersphinx-link">dict</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <wbr></wbr>TaskEntity]</code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/console/tasks/schedule.py#L104">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/console/tasks/schedule.py#L121">
       
       (source)
     </a>
@@ -2684,7 +2686,7 @@ completes.</td></tr></table></div>
   </div>
   <div class="functionBody">
     
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p>Tasks registered for scheduling or lifecycle management.</p></div>
     
   </div>
 </div><div class="baseinstancevariable">
@@ -2699,7 +2701,7 @@ completes.</td></tr></table></div>
   <div class="functionHeader">
     
     <span class="py-defname">__tasks_listeners</span>: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#dict" class="intersphinx-link">dict</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#dict" class="intersphinx-link">dict</a>[<wbr></wbr>TaskEvent, <wbr></wbr><a href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Callable" class="intersphinx-link">Callable</a>]]</code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/console/tasks/schedule.py#L102">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/console/tasks/schedule.py#L117">
       
       (source)
     </a>
@@ -2711,7 +2713,7 @@ completes.</td></tr></table></div>
   </div>
   <div class="functionBody">
     
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p>Callbacks subscribed to scheduled-task events.</p></div>
     
   </div>
 </div><div class="baseinstancevariable">
@@ -2726,7 +2728,7 @@ completes.</td></tr></table></div>
   <div class="functionHeader">
     
     <span class="py-defname">__wait_to_shutdown</span>: <code><a href="https://docs.python.org/3/builtins/functions.html#float" class="intersphinx-link">float</a></code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/console/tasks/schedule.py#L111">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/console/tasks/schedule.py#L135">
       
       (source)
     </a>
@@ -2738,7 +2740,7 @@ completes.</td></tr></table></div>
   </div>
   <div class="functionBody">
     
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p>Wait to shutdown value used by <tt class="rst-docutils rst-literal">Schedule</tt>.</p></div>
     
   </div>
 </div>
@@ -2752,7 +2754,7 @@ completes.</td></tr></table></div>
   <div class="orionis-footer-inner">
     <div class="orionis-footer-copy">
       <p>API documentation for <a href="https://orionis-framework.com/" class="projecthome">Orionis</a>.</p>
-      <p class="orionis-footer-meta">Generated with <a href="https://github.com/twisted/pydoctor/">Pydoctor</a> 25.10.1.<span class="orionis-footer-build"> Built 2026-11-03 09:36:58.</span></p>
+      <p class="orionis-footer-meta">Generated with <a href="https://github.com/twisted/pydoctor/">Pydoctor</a> 25.10.1.<span class="orionis-footer-build"> Built 2026-11-03 13:00:15.</span></p>
     </div>
     <nav class="orionis-footer-links" aria-label="Additional resources">
       <a href="https://docs.orionis-framework.com">Read the guide <span aria-hidden="true">↗</span></a>

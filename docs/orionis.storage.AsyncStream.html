@@ -625,7 +625,7 @@
                     
                 </label>
 
-                <code><a href="orionis.storage.directory.html" class="internal-link" title="orionis.storage.directory">directory</a></code>
+                <code><a href="orionis.storage.directory.module.html" class="internal-link" title="orionis.storage.directory">directory</a></code>
 
                 <div class="expandableContent">
                     <div>
@@ -671,7 +671,7 @@
                     
                 </label>
 
-                <code><a href="orionis.storage.disk.html" class="internal-link" title="orionis.storage.disk">disk</a></code>
+                <code><a href="orionis.storage.disk.module.html" class="internal-link" title="orionis.storage.disk">disk</a></code>
 
                 <div class="expandableContent">
                     <div>
@@ -1002,7 +1002,7 @@
         
 
         
-            <div class="itemName"><code><a href="orionis.storage.enums.visibility.html" class="internal-link" title="orionis.storage.enums.visibility">visibility</a></code>
+            <div class="itemName"><code><a href="orionis.storage.enums.visibility.module.html" class="internal-link" title="orionis.storage.enums.visibility">visibility</a></code>
             </div>
         
 
@@ -1178,7 +1178,7 @@
                     
                 </label>
 
-                <code><a href="orionis.storage.file.html" class="internal-link" title="orionis.storage.file">file</a></code>
+                <code><a href="orionis.storage.file.module.html" class="internal-link" title="orionis.storage.file">file</a></code>
 
                 <div class="expandableContent">
                     <div>
@@ -2861,7 +2861,7 @@
         </div>
 
         <div class="extrasDocstring">
-          <p class="class-signature"><code><span class="py-keyword">class</span> <span class="py-defname">AsyncStream</span>(<a href="orionis.storage.contracts.IStorageStream.html" class="internal-link" title="orionis.storage.contracts.IStorageStream">IStorageStream</a>): <a href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/storage/stream.py#L13" class="sourceLink">(source)</a></code></p><p>Constructor: <code><a href="#__init__" class="internal-link" title="orionis.storage.AsyncStream.__init__">AsyncStream(opener, on_close)</a></code></p><p><a href="classIndex.html#orionis.storage.AsyncStream">View In Hierarchy</a></p>
+          <p class="class-signature"><code><span class="py-keyword">class</span> <span class="py-defname">AsyncStream</span>(<a href="orionis.storage.contracts.IStorageStream.html" class="internal-link" title="orionis.storage.contracts.IStorageStream">IStorageStream</a>): <a href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/storage/stream.py#L15" class="sourceLink">(source)</a></code></p><p>Constructor: <code><a href="#__init__" class="internal-link" title="orionis.storage.AsyncStream.__init__">AsyncStream(opener, on_close)</a></code></p><p><a href="classIndex.html#orionis.storage.AsyncStream">View In Hierarchy</a></p>
         </div>
 
         <div class="moduleDocstring">
@@ -2875,7 +2875,7 @@ handle is released.</p>
         </div>
 
         <div id="split-tables">
-          <table class="children sortable" id="id2040">
+          <table class="children sortable" id="id2048">
   
   
   <tr class="method">
@@ -2927,27 +2927,27 @@ handle is released.</p>
     
     <td>Class Variable</td>
     <td><code><a href="#__slots__" class="internal-link" title="orionis.storage.AsyncStream.__slots__">__slots__</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
+    <td>Declare the instance attribute slots reserved by this class.</td>
   </tr><tr class="instancevariable">
     
     <td>Instance Variable</td>
     <td><code><a href="#_handle" class="internal-link" title="orionis.storage.AsyncStream._handle">_handle</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
+    <td>Open stream handle used for asynchronous file operations.</td>
   </tr><tr class="instancevariable">
     
     <td>Instance Variable</td>
     <td><code><a href="#_lock" class="internal-link" title="orionis.storage.AsyncStream._lock">_lock</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
+    <td>Lock protecting concurrent access to shared state.</td>
   </tr><tr class="instancevariable">
     
     <td>Instance Variable</td>
     <td><code><a href="#_on_close" class="internal-link" title="orionis.storage.AsyncStream._on_close">_on<wbr></wbr>_close</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
+    <td>Optional callback executed with the open handle right before it is closed.</td>
   </tr><tr class="instancevariable">
     
     <td>Instance Variable</td>
     <td><code><a href="#_opener" class="internal-link" title="orionis.storage.AsyncStream._opener">_opener</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
+    <td>Zero-argument callable returning the binary handle. It is invoked lazily on a worker thread.</td>
   </tr>
 </table>
           
@@ -2969,7 +2969,7 @@ handle is released.</p>
     
     
     <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">__aenter__</span><span class="function-signature">(<span class="rst-sig-param">self: <code>Self</code></span>) -&gt; <code>IStorageStream</code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/storage/stream.py#L215">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/storage/stream.py#L227">
       
       (source)
     </a>
@@ -2981,7 +2981,7 @@ handle is released.</p>
   </div>
   <div class="docstring functionBody">
     <div class="interfaceinfo">overrides <code><a href="orionis.storage.contracts.IStorageStream.html#__aenter__" class="internal-link">orionis.storage.contracts.IStorageStream.__aenter__</a></code></div>
-    <div><p>Open the underlying handle and return the stream.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.storage.contracts.IStorageStream.html" class="internal-link" title="orionis.storage.contracts.IStorageStream">IStorageStream</a></code></td><td class="fieldArgDesc">The stream itself, ready for I/O operations.</td></tr></table></div>
+    <div><p>Open the underlying handle and return the stream.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.storage.contracts.IStorageStream.html" class="internal-link">orionis.storage.contracts.IStorageStream</a></code></td><td class="fieldArgDesc">The stream itself, ready for I/O operations.</td></tr></table></div>
   </div>
 </div><div class="basemethod">
   
@@ -2996,7 +2996,7 @@ handle is released.</p>
     
     
     <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">__aexit__</span><span class="function-signature long-signature">(<span class="rst-sig-param">self: <code>Self</code>, </span><span class="rst-sig-param">exc_type: <code><a href="https://docs.python.org/3/builtins/functions.html#type" class="intersphinx-link">type</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/exceptions.html#BaseException" class="intersphinx-link">BaseException</a>] | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code>, </span><span class="rst-sig-param">exc: <code><a href="https://docs.python.org/3/builtins/exceptions.html#BaseException" class="intersphinx-link">BaseException</a> | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code>, </span><span class="rst-sig-param">traceback: <code>TracebackType | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></span>):</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/storage/stream.py#L228">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/storage/stream.py#L240">
       
       (source)
     </a>
@@ -3008,7 +3008,7 @@ handle is released.</p>
   </div>
   <div class="docstring functionBody">
     <div class="interfaceinfo">overrides <code><a href="orionis.storage.contracts.IStorageStream.html#__aexit__" class="internal-link">orionis.storage.contracts.IStorageStream.__aexit__</a></code></div>
-    <div><p>Close the stream when leaving the async context.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">exc<wbr></wbr>_type:</span><code><a href="https://docs.python.org/3/builtins/functions.html#type" class="intersphinx-link">type</a>[<a href="https://docs.python.org/3/builtins/exceptions.html#BaseException" class="intersphinx-link">BaseException</a>] | None</code></td><td class="fieldArgDesc">Exception class raised inside the context, if any.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">exc:</span><code>BaseException | None</code></td><td class="fieldArgDesc">Exception instance raised inside the context, if any.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">traceback:</span><code>TracebackType | None</code></td><td class="fieldArgDesc">Traceback of the raised exception, if any.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc"><span class="undocumented">Undocumented</span></td></tr></table></div>
+    <div><p>Close the stream when leaving the async context.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">exc<wbr></wbr>_type:</span><code><a href="https://docs.python.org/3/builtins/functions.html#type" class="intersphinx-link">type</a>[<a href="https://docs.python.org/3/builtins/exceptions.html#BaseException" class="intersphinx-link">BaseException</a>] | None</code></td><td class="fieldArgDesc">Exception class raised inside the context, if any.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">exc:</span><code>BaseException | None</code></td><td class="fieldArgDesc">Exception instance raised inside the context, if any.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">traceback:</span><code>types.TracebackType | None</code></td><td class="fieldArgDesc">Traceback of the raised exception, if any.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">Close the stream when leaving the async context.</td></tr></table></div>
   </div>
 </div><div class="basemethod">
   
@@ -3023,7 +3023,7 @@ handle is released.</p>
     
     
     <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">__ensureHandle</span><span class="function-signature">(<span class="rst-sig-param">self: <code>Self</code></span>) -&gt; <code>BinaryIO</code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/storage/stream.py#L52">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/storage/stream.py#L63">
       
       (source)
     </a>
@@ -3035,7 +3035,7 @@ handle is released.</p>
   </div>
   <div class="docstring functionBody">
     
-    <div><p>Open the underlying handle on first use and return it.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code>BinaryIO</code></td><td class="fieldArgDesc">The open binary handle backing this stream.</td></tr></table></div>
+    <div><p>Open the underlying handle on first use and return it.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/library/typing.html#typing.BinaryIO" class="intersphinx-link">typing.BinaryIO</a></code></td><td class="fieldArgDesc">The open binary handle backing this stream.</td></tr></table></div>
   </div>
 </div><div class="basemethod">
   
@@ -3050,7 +3050,7 @@ handle is released.</p>
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">__init__</span><span class="function-signature long-signature">(<span class="rst-sig-param">self: <code>Self</code>, </span><span class="rst-sig-param">opener: <code>Callable[<wbr></wbr>[], <wbr></wbr>BinaryIO]</code>, </span><span class="rst-sig-param">on_close: <code>Callable[<wbr></wbr>[<wbr></wbr>BinaryIO], <wbr></wbr><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a>] | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code> = <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></span>):</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/storage/stream.py#L26">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/storage/stream.py#L29">
       
       (source)
     </a>
@@ -3062,9 +3062,9 @@ handle is released.</p>
   </div>
   <div class="docstring functionBody">
     
-    <div><p>Initialize the stream with its handle factory.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">opener:</span><code>Callable[[], BinaryIO]</code></td><td class="fieldArgDesc">Zero-argument callable returning the binary handle. It is
-invoked lazily on a worker thread.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">on<wbr></wbr>_close:</span><code>Callable[[BinaryIO], <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a>] | None</code></td><td class="fieldArgDesc">Optional callback executed with the open handle right
-before it is closed.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc"><span class="undocumented">Undocumented</span></td></tr></table></div>
+    <div><p>Initialize the stream with its handle factory.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">opener:</span><code><a href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Callable" class="intersphinx-link">collections.abc.Callable</a>[[], <a href="https://docs.python.org/3/library/typing.html#typing.BinaryIO" class="intersphinx-link">typing.BinaryIO</a>]</code></td><td class="fieldArgDesc">Zero-argument callable returning the binary handle. It is
+invoked lazily on a worker thread.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">on<wbr></wbr>_close:</span><code><a href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Callable" class="intersphinx-link">collections.abc.Callable</a>[[<a href="https://docs.python.org/3/library/typing.html#typing.BinaryIO" class="intersphinx-link">typing.BinaryIO</a>], <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a>] | None</code></td><td class="fieldArgDesc">Optional callback executed with the open handle right
+before it is closed.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">Initialize the stream with its handle factory.</td></tr></table></div>
   </div>
 </div><div class="basemethod">
   
@@ -3079,7 +3079,7 @@ before it is closed.</td></tr></table><table class="fieldTable"><tr class="field
     
     
     <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">chunks</span><span class="function-signature long-signature">(<span class="rst-sig-param">self: <code>Self</code>, </span><span class="rst-sig-param">size: <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code> = 65536, </span><span class="rst-sig-symbol">*, </span><span class="rst-sig-param">buffer_size: <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code> = READ_BUFFER_SIZE</span>) -&gt; <code>AsyncIterator[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#bytes" class="intersphinx-link">bytes</a>]</code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/storage/stream.py#L102">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/storage/stream.py#L113">
       
       (source)
     </a>
@@ -3091,7 +3091,7 @@ before it is closed.</td></tr></table><table class="fieldTable"><tr class="field
   </div>
   <div class="docstring functionBody">
     <div class="interfaceinfo">overrides <code><a href="orionis.storage.contracts.IStorageStream.html#chunks" class="internal-link">orionis.storage.contracts.IStorageStream.chunks</a></code></div>
-    <div><p>Yield logical chunks with bounded batching of synchronous reads.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">size:</span><code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code></td><td class="fieldArgDesc">Maximum yielded bytes per chunk.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">buffer<wbr></wbr>_size:</span><code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code></td><td class="fieldArgDesc">Read-ahead budget, at least one logical chunk.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code>AsyncIterator[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#bytes" class="intersphinx-link">bytes</a>]</code></td><td class="fieldArgDesc"><span class="undocumented">Undocumented</span></td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Yields</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/stdtypes.html#bytes" class="intersphinx-link">bytes</a></code></td><td class="fieldArgDesc">Sequential content. The surrounding async context owns close;
+    <div><p>Yield logical chunks with bounded batching of synchronous reads.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">size:</span><code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code></td><td class="fieldArgDesc">Maximum yielded bytes per chunk.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">buffer<wbr></wbr>_size:</span><code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code></td><td class="fieldArgDesc">Read-ahead budget, at least one logical chunk.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Yields</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/stdtypes.html#bytes" class="intersphinx-link">bytes</a></code></td><td class="fieldArgDesc">Sequential content. The surrounding async context owns close;
 callers must not mix iteration with writes, seek or other reads.</td></tr></table></div>
   </div>
 </div><div class="basemethod">
@@ -3107,7 +3107,7 @@ callers must not mix iteration with writes, seek or other reads.</td></tr></tabl
     
     
     <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">close</span><span class="function-signature">(<span class="rst-sig-param">self: <code>Self</code></span>):</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/storage/stream.py#L180">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/storage/stream.py#L191">
       
       (source)
     </a>
@@ -3123,7 +3123,7 @@ callers must not mix iteration with writes, seek or other reads.</td></tr></tabl
 <p>Invokes the <em>on_close</em> callback (when provided) before closing
 the handle. Closing an unopened or already closed stream is a
 no-op.</p>
-<table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc"><span class="undocumented">Undocumented</span></td></tr></table></div>
+<table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">Flush pending data and release the underlying handle.</td></tr></table></div>
   </div>
 </div><div class="basemethod">
   
@@ -3138,7 +3138,7 @@ no-op.</p>
     
     
     <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">read</span><span class="function-signature">(<span class="rst-sig-param">self: <code>Self</code>, </span><span class="rst-sig-param">size: <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code> = -1</span>) -&gt; <code><a href="https://docs.python.org/3/builtins/stdtypes.html#bytes" class="intersphinx-link">bytes</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/storage/stream.py#L84">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/storage/stream.py#L95">
       
       (source)
     </a>
@@ -3165,7 +3165,7 @@ no-op.</p>
     
     
     <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">seek</span><span class="function-signature">(<span class="rst-sig-param">self: <code>Self</code>, </span><span class="rst-sig-param">offset: <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code>, </span><span class="rst-sig-param">whence: <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code> = 0</span>) -&gt; <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/storage/stream.py#L158">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/storage/stream.py#L169">
       
       (source)
     </a>
@@ -3192,7 +3192,7 @@ no-op.</p>
     
     
     <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">write</span><span class="function-signature">(<span class="rst-sig-param">self: <code>Self</code>, </span><span class="rst-sig-param">data: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#bytes" class="intersphinx-link">bytes</a></code></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/storage/stream.py#L140">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/storage/stream.py#L151">
       
       (source)
     </a>
@@ -3218,7 +3218,7 @@ no-op.</p>
   <div class="functionHeader">
     
     <span class="py-defname">__slots__</span>: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" class="intersphinx-link">tuple</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <wbr></wbr><span class="rst-variable-ellipsis">...</span>]</code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/storage/stream.py#L24">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/storage/stream.py#L26">
       
       (source)
     </a>
@@ -3230,7 +3230,7 @@ no-op.</p>
   </div>
   <div class="functionBody">
     <div class="interfaceinfo">overrides <code><a href="orionis.storage.contracts.IStorageStream.html#__slots__" class="internal-link">orionis.storage.contracts.IStorageStream.__slots__</a></code></div>
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p>Declare the instance attribute slots reserved by this class.</p></div>
     
   </div>
 </div><div class="baseinstancevariable">
@@ -3245,7 +3245,7 @@ no-op.</p>
   <div class="functionHeader">
     
     <span class="py-defname">_handle</span>: <code>BinaryIO | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/storage/stream.py#L49">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/storage/stream.py#L58">
       
       (source)
     </a>
@@ -3257,7 +3257,7 @@ no-op.</p>
   </div>
   <div class="functionBody">
     
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p>Open stream handle used for asynchronous file operations.</p></div>
     
   </div>
 </div><div class="baseinstancevariable">
@@ -3272,7 +3272,7 @@ no-op.</p>
   <div class="functionHeader">
     
     <span class="py-defname">_lock</span> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/storage/stream.py#L50">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/storage/stream.py#L60">
       
       (source)
     </a>
@@ -3284,7 +3284,7 @@ no-op.</p>
   </div>
   <div class="functionBody">
     
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p>Lock protecting concurrent access to shared state.</p></div>
     
   </div>
 </div><div class="baseinstancevariable">
@@ -3299,7 +3299,7 @@ no-op.</p>
   <div class="functionHeader">
     
     <span class="py-defname">_on_close</span> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/storage/stream.py#L48">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/storage/stream.py#L56">
       
       (source)
     </a>
@@ -3311,7 +3311,7 @@ no-op.</p>
   </div>
   <div class="functionBody">
     
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p>Optional callback executed with the open handle right before it is closed.</p></div>
     
   </div>
 </div><div class="baseinstancevariable">
@@ -3326,7 +3326,7 @@ no-op.</p>
   <div class="functionHeader">
     
     <span class="py-defname">_opener</span> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/storage/stream.py#L47">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/storage/stream.py#L51">
       
       (source)
     </a>
@@ -3338,7 +3338,8 @@ no-op.</p>
   </div>
   <div class="functionBody">
     
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p>Zero-argument callable returning the binary handle. It is invoked lazily on
+a worker thread.</p></div>
     
   </div>
 </div>
@@ -3352,7 +3353,7 @@ no-op.</p>
   <div class="orionis-footer-inner">
     <div class="orionis-footer-copy">
       <p>API documentation for <a href="https://orionis-framework.com/" class="projecthome">Orionis</a>.</p>
-      <p class="orionis-footer-meta">Generated with <a href="https://github.com/twisted/pydoctor/">Pydoctor</a> 25.10.1.<span class="orionis-footer-build"> Built 2026-11-03 09:36:58.</span></p>
+      <p class="orionis-footer-meta">Generated with <a href="https://github.com/twisted/pydoctor/">Pydoctor</a> 25.10.1.<span class="orionis-footer-build"> Built 2026-11-03 13:00:15.</span></p>
     </div>
     <nav class="orionis-footer-links" aria-label="Additional resources">
       <a href="https://docs.orionis-framework.com">Read the guide <span aria-hidden="true">↗</span></a>

@@ -525,7 +525,7 @@
                     
                 </label>
 
-                <code><a href="orionis.storage.directory.html" class="internal-link" title="orionis.storage.directory">directory</a></code>
+                <code><a href="orionis.storage.directory.module.html" class="internal-link" title="orionis.storage.directory">directory</a></code>
 
                 <div class="expandableContent">
                     <div>
@@ -571,7 +571,7 @@
                     
                 </label>
 
-                <code><a href="orionis.storage.disk.html" class="internal-link" title="orionis.storage.disk">disk</a></code>
+                <code><a href="orionis.storage.disk.module.html" class="internal-link" title="orionis.storage.disk">disk</a></code>
 
                 <div class="expandableContent">
                     <div>
@@ -902,7 +902,7 @@
         
 
         
-            <div class="itemName"><code><a href="orionis.storage.enums.visibility.html" class="internal-link" title="orionis.storage.enums.visibility">visibility</a></code>
+            <div class="itemName"><code><a href="orionis.storage.enums.visibility.module.html" class="internal-link" title="orionis.storage.enums.visibility">visibility</a></code>
             </div>
         
 
@@ -1078,7 +1078,7 @@
                     
                 </label>
 
-                <code><a href="orionis.storage.file.html" class="internal-link" title="orionis.storage.file">file</a></code>
+                <code><a href="orionis.storage.file.module.html" class="internal-link" title="orionis.storage.file">file</a></code>
 
                 <div class="expandableContent">
                     <div>
@@ -2761,15 +2761,17 @@
         </div>
 
         <div class="extrasDocstring">
-          <a href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/storage/buffering.py" class="sourceLink">(source)</a>
+          <a href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/storage/buffering.py" class="sourceLink">(source)</a>
         </div>
 
         <div class="moduleDocstring">
-          <div><p class="undocumented">Undocumented</p></div>
+          <div><p>Provide storage operations.</p>
+<p>Includes <tt class="rst-docutils rst-literal">read_chunks</tt>, <tt class="rst-docutils rst-literal">iterate_chunks</tt>, <tt class="rst-docutils rst-literal">spool_stream</tt>.</p>
+</div>
         </div>
 
         <div id="split-tables">
-          <table class="children sortable" id="id2002">
+          <table class="children sortable" id="id2010">
   
   
   <tr class="function">
@@ -2791,7 +2793,7 @@
     
     <td>Constant</td>
     <td><code><a href="#READ_BUFFER_SIZE" class="internal-link" title="orionis.storage.buffering.READ_BUFFER_SIZE">READ<wbr></wbr>_BUFFER<wbr></wbr>_SIZE</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
+    <td>Read buffer size used by <tt class="rst-docutils rst-literal">buffering</tt>.</td>
   </tr>
 </table>
           
@@ -2813,7 +2815,7 @@
     
     
     <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">iterate_chunks</span><span class="function-signature">(<span class="rst-sig-param">opener: <code><a href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Callable" class="intersphinx-link">Callable</a>[<wbr></wbr>[], <wbr></wbr><a href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Iterator" class="intersphinx-link">Iterator</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#bytes" class="intersphinx-link">bytes</a>]]</code></span>) -&gt; <code><a href="https://docs.python.org/3/library/collections.abc.html#collections.abc.AsyncIterator" class="intersphinx-link">AsyncIterator</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#bytes" class="intersphinx-link">bytes</a>]</code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/storage/buffering.py#L76">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/storage/buffering.py#L82">
       
       (source)
     </a>
@@ -2825,7 +2827,7 @@
   </div>
   <div class="docstring functionBody">
     
-    <div><p>Batch SDK iterator advances with bounded read-ahead and deterministic close.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">opener:</span><code><a href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Callable" class="intersphinx-link">Callable</a>[[], <a href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Iterator" class="intersphinx-link">Iterator</a>[<a href="https://docs.python.org/3/builtins/stdtypes.html#bytes" class="intersphinx-link">bytes</a>]]</code></td><td class="fieldArgDesc">Synchronous factory for a request-owned SDK iterator.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/library/collections.abc.html#collections.abc.AsyncIterator" class="intersphinx-link">AsyncIterator</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#bytes" class="intersphinx-link">bytes</a>]</code></td><td class="fieldArgDesc"><span class="undocumented">Undocumented</span></td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Yields</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/stdtypes.html#bytes" class="intersphinx-link">bytes</a></code></td><td class="fieldArgDesc">Original SDK chunks. A batch holds at most sixteen chunks and stops
+    <div><p>Batch SDK iterator advances with bounded read-ahead and deterministic close.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">opener:</span><code><a href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Callable" class="intersphinx-link">collections.abc.Callable</a>[[], <a href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Iterator" class="intersphinx-link">collections.abc.Iterator</a>[<a href="https://docs.python.org/3/builtins/stdtypes.html#bytes" class="intersphinx-link">bytes</a>]]</code></td><td class="fieldArgDesc">Synchronous factory for a request-owned SDK iterator.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Yields</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/stdtypes.html#bytes" class="intersphinx-link">bytes</a></code></td><td class="fieldArgDesc">Original SDK chunks. A batch holds at most sixteen chunks and stops
 when it reaches 1 MiB, so memory is bounded by 1 MiB plus one SDK chunk.</td></tr></table></div>
   </div>
 </div><div class="basefunction">
@@ -2841,7 +2843,7 @@ when it reaches 1 MiB, so memory is bounded by 1 MiB plus one SDK chunk.</td></t
     
     
     <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">read_chunks</span><span class="function-signature long-signature">(<span class="rst-sig-param">opener: <code><a href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Callable" class="intersphinx-link">Callable</a>[<wbr></wbr>[], <wbr></wbr><a href="https://docs.python.org/3/library/typing.html#typing.BinaryIO" class="intersphinx-link">BinaryIO</a>]</code>, </span><span class="rst-sig-param">chunk_size: <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code>, </span><span class="rst-sig-symbol">*, </span><span class="rst-sig-param">buffer_size: <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code> = <a href="#READ_BUFFER_SIZE" class="internal-link" title="orionis.storage.buffering.READ_BUFFER_SIZE">READ_BUFFER_SIZE</a></span>) -&gt; <code><a href="https://docs.python.org/3/library/collections.abc.html#collections.abc.AsyncIterator" class="intersphinx-link">AsyncIterator</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#bytes" class="intersphinx-link">bytes</a>]</code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/storage/buffering.py#L13">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/storage/buffering.py#L19">
       
       (source)
     </a>
@@ -2853,8 +2855,8 @@ when it reaches 1 MiB, so memory is bounded by 1 MiB plus one SDK chunk.</td></t
   </div>
   <div class="docstring functionBody">
     
-    <div><p>Read bounded batches while preserving logical chunks and first-byte latency.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">opener:</span><code><a href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Callable" class="intersphinx-link">Callable</a>[[], <a href="https://docs.python.org/3/library/typing.html#typing.BinaryIO" class="intersphinx-link">BinaryIO</a>]</code></td><td class="fieldArgDesc">Factory for a handle owned exclusively by this iterator.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">chunk<wbr></wbr>_size:</span><code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code></td><td class="fieldArgDesc">Maximum bytes yielded per logical chunk.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">buffer<wbr></wbr>_size:</span><code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code></td><td class="fieldArgDesc">Read-ahead budget, rounded down to a whole number of logical chunks.
-At least one chunk is read. No producer runs while the consumer pauses.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/library/collections.abc.html#collections.abc.AsyncIterator" class="intersphinx-link">AsyncIterator</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#bytes" class="intersphinx-link">bytes</a>]</code></td><td class="fieldArgDesc"><span class="undocumented">Undocumented</span></td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Yields</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/stdtypes.html#bytes" class="intersphinx-link">bytes</a></code></td><td class="fieldArgDesc">File content in order. Cancellation drains the current read before close.</td></tr></table></div>
+    <div><p>Read bounded batches while preserving logical chunks and first-byte latency.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">opener:</span><code><a href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Callable" class="intersphinx-link">collections.abc.Callable</a>[[], <a href="https://docs.python.org/3/library/typing.html#typing.BinaryIO" class="intersphinx-link">typing.BinaryIO</a>]</code></td><td class="fieldArgDesc">Factory for a handle owned exclusively by this iterator.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">chunk<wbr></wbr>_size:</span><code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code></td><td class="fieldArgDesc">Maximum bytes yielded per logical chunk.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">buffer<wbr></wbr>_size:</span><code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code></td><td class="fieldArgDesc">Read-ahead budget, rounded down to a whole number of logical chunks.
+At least one chunk is read. No producer runs while the consumer pauses.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Yields</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/stdtypes.html#bytes" class="intersphinx-link">bytes</a></code></td><td class="fieldArgDesc">File content in order. Cancellation drains the current read before close.</td></tr></table></div>
   </div>
 </div><div class="basefunction">
   
@@ -2869,7 +2871,7 @@ At least one chunk is read. No producer runs while the consumer pauses.</td></tr
     
     
     <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">spool_stream</span><span class="function-signature">(<span class="rst-sig-param">stream: <code><a href="https://docs.python.org/3/library/collections.abc.html#collections.abc.AsyncIterable" class="intersphinx-link">AsyncIterable</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#bytes" class="intersphinx-link">bytes</a>]</code>, </span><span class="rst-sig-symbol">*, </span><span class="rst-sig-param">max_size: <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code></span>) -&gt; <code><a href="https://docs.python.org/3/library/typing.html#typing.BinaryIO" class="intersphinx-link">BinaryIO</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/storage/buffering.py#L143">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/storage/buffering.py#L149">
       
       (source)
     </a>
@@ -2881,7 +2883,7 @@ At least one chunk is read. No producer runs while the consumer pauses.</td></tr
   </div>
   <div class="docstring functionBody">
     
-    <div><p>Buffer an async upload once for the cloud drivers.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">stream:</span><code><a href="https://docs.python.org/3/library/collections.abc.html#collections.abc.AsyncIterable" class="intersphinx-link">AsyncIterable</a>[<a href="https://docs.python.org/3/builtins/stdtypes.html#bytes" class="intersphinx-link">bytes</a>]</code></td><td class="fieldArgDesc">Asynchronous byte-chunk producer.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">max<wbr></wbr>_size:</span><code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code></td><td class="fieldArgDesc">Maximum in-memory bytes before the buffer spills to disk.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/library/typing.html#typing.BinaryIO" class="intersphinx-link">BinaryIO</a></code></td><td class="fieldArgDesc">Rewound temporary buffer owned and closed by the uploading driver.</td></tr></table></div>
+    <div><p>Buffer an async upload once for the cloud drivers.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">stream:</span><code><a href="https://docs.python.org/3/library/collections.abc.html#collections.abc.AsyncIterable" class="intersphinx-link">collections.abc.AsyncIterable</a>[<a href="https://docs.python.org/3/builtins/stdtypes.html#bytes" class="intersphinx-link">bytes</a>]</code></td><td class="fieldArgDesc">Asynchronous byte-chunk producer.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">max<wbr></wbr>_size:</span><code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code></td><td class="fieldArgDesc">Maximum in-memory bytes before the buffer spills to disk.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/library/typing.html#typing.BinaryIO" class="intersphinx-link">typing.BinaryIO</a></code></td><td class="fieldArgDesc">Rewound temporary buffer owned and closed by the uploading driver.</td></tr></table></div>
   </div>
 </div><div class="baseconstant">
   
@@ -2895,7 +2897,7 @@ At least one chunk is read. No producer runs while the consumer pauses.</td></tr
   <div class="functionHeader">
     
     <span class="py-defname">READ_BUFFER_SIZE</span> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/storage/buffering.py#L11">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/storage/buffering.py#L16">
       
       (source)
     </a>
@@ -2907,7 +2909,7 @@ At least one chunk is read. No producer runs while the consumer pauses.</td></tr
   </div>
   <div class="functionBody">
     
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p>Read buffer size used by <tt class="rst-docutils rst-literal">buffering</tt>.</p></div>
     <table class="valueTable"><tr class="fieldStart"><td class="fieldName">Value</td></tr><tr><td><pre class="constant-value"><code>1024 * 1024</code></pre></td></tr></table>
   </div>
 </div>
@@ -2921,7 +2923,7 @@ At least one chunk is read. No producer runs while the consumer pauses.</td></tr
   <div class="orionis-footer-inner">
     <div class="orionis-footer-copy">
       <p>API documentation for <a href="https://orionis-framework.com/" class="projecthome">Orionis</a>.</p>
-      <p class="orionis-footer-meta">Generated with <a href="https://github.com/twisted/pydoctor/">Pydoctor</a> 25.10.1.<span class="orionis-footer-build"> Built 2026-11-03 09:36:58.</span></p>
+      <p class="orionis-footer-meta">Generated with <a href="https://github.com/twisted/pydoctor/">Pydoctor</a> 25.10.1.<span class="orionis-footer-build"> Built 2026-11-03 13:00:15.</span></p>
     </div>
     <nav class="orionis-footer-links" aria-label="Additional resources">
       <a href="https://docs.orionis-framework.com">Read the guide <span aria-hidden="true">↗</span></a>

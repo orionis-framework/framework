@@ -785,6 +785,16 @@
             </div>
         
 
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.mcp.transport.headers.html#HeaderKind" class="internal-link" title="orionis.mcp.transport.headers.HeaderKind"><wbr></wbr>Header<wbr></wbr>Kind</a></code>
+            </div>
+        
+
     </li>
 </ul> 
 
@@ -1321,15 +1331,17 @@
         </div>
 
         <div class="extrasDocstring">
-          <a href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/mcp/transport/policy.py" class="sourceLink">(source)</a>
+          <a href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/mcp/transport/policy.py" class="sourceLink">(source)</a>
         </div>
 
         <div class="moduleDocstring">
-          <div><p class="undocumented">Undocumented</p></div>
+          <div><p>Provide mcp transport operations.</p>
+<p>Includes <tt class="rst-docutils rst-literal">McpProtocolResponse</tt>, <tt class="rst-docutils rst-literal">origin_allowed</tt>, <tt class="rst-docutils rst-literal">McpHttpPolicy</tt>.</p>
+</div>
         </div>
 
         <div id="split-tables">
-          <table class="children sortable" id="id1500">
+          <table class="children sortable" id="id1504">
   
   
   <tr class="class">
@@ -1356,42 +1368,42 @@
     
     <td>Constant</td>
     <td><code><a href="#_AUTHENTICATION_HEADERS" class="internal-link" title="orionis.mcp.transport.policy._AUTHENTICATION_HEADERS">_AUTHENTICATION<wbr></wbr>_HEADERS</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
+    <td>Authentication headers used by <tt class="rst-docutils rst-literal">policy</tt>.</td>
   </tr><tr class="constant">
     
     <td>Constant</td>
     <td><code><a href="#_CLIENT_ERROR_START" class="internal-link" title="orionis.mcp.transport.policy._CLIENT_ERROR_START">_CLIENT<wbr></wbr>_ERROR<wbr></wbr>_START</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
+    <td>Client error start value used by <tt class="rst-docutils rst-literal">policy</tt>.</td>
   </tr><tr class="constant">
     
     <td>Constant</td>
     <td><code><a href="#_EXCEPTION_STATUS" class="internal-link" title="orionis.mcp.transport.policy._EXCEPTION_STATUS">_EXCEPTION<wbr></wbr>_STATUS</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
+    <td>Exception status definitions used by <tt class="rst-docutils rst-literal">policy</tt>.</td>
   </tr><tr class="constant">
     
     <td>Constant</td>
     <td><code><a href="#_JSON_MEDIA_TYPE" class="internal-link" title="orionis.mcp.transport.policy._JSON_MEDIA_TYPE">_JSON<wbr></wbr>_MEDIA<wbr></wbr>_TYPE</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
+    <td><tt class="rst-docutils rst-literal">application/json</tt>.</td>
   </tr><tr class="constant">
     
     <td>Constant</td>
     <td><code><a href="#_LOGGER" class="internal-link" title="orionis.mcp.transport.policy._LOGGER">_LOGGER</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
+    <td>Logger used by <tt class="rst-docutils rst-literal">policy</tt>.</td>
   </tr><tr class="constant">
     
     <td>Constant</td>
     <td><code><a href="#_REDIRECTION_START" class="internal-link" title="orionis.mcp.transport.policy._REDIRECTION_START">_REDIRECTION<wbr></wbr>_START</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
+    <td>Redirection start value used by <tt class="rst-docutils rst-literal">policy</tt>.</td>
   </tr><tr class="constant">
     
     <td>Constant</td>
     <td><code><a href="#_REPLACED_HEADERS" class="internal-link" title="orionis.mcp.transport.policy._REPLACED_HEADERS">_REPLACED<wbr></wbr>_HEADERS</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
+    <td>Replaced headers used by <tt class="rst-docutils rst-literal">policy</tt>.</td>
   </tr><tr class="constant">
     
     <td>Constant</td>
     <td><code><a href="#_SERVER_ERROR_START" class="internal-link" title="orionis.mcp.transport.policy._SERVER_ERROR_START">_SERVER<wbr></wbr>_ERROR<wbr></wbr>_START</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
+    <td>Server error start value used by <tt class="rst-docutils rst-literal">policy</tt>.</td>
   </tr>
 </table>
           
@@ -1413,7 +1425,7 @@
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">_error</span><span class="function-signature">(<span class="rst-sig-param">status: <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code></span>) -&gt; <code><a href="orionis.mcp.transport.policy.McpProtocolResponse.html" class="internal-link" title="orionis.mcp.transport.policy.McpProtocolResponse">McpProtocolResponse</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/mcp/transport/policy.py#L97">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/mcp/transport/policy.py#L111">
       
       (source)
     </a>
@@ -1425,7 +1437,7 @@
   </div>
   <div class="docstring functionBody">
     
-    <div><p>Use public status names rather than exception messages or middleware bodies.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">status:</span><code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code></td><td class="fieldArgDesc">Value supplied for <tt class="rst-docutils rst-literal">status</tt>.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.mcp.transport.policy.McpProtocolResponse.html" class="internal-link" title="orionis.mcp.transport.policy.McpProtocolResponse">McpProtocolResponse</a></code></td><td class="fieldArgDesc">Result of the operation described above.</td></tr></table></div>
+    <div><p>Use public status names rather than exception messages or middleware bodies.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">status:</span><code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code></td><td class="fieldArgDesc">Value supplied for <tt class="rst-docutils rst-literal">status</tt>.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.mcp.transport.policy.McpProtocolResponse.html" class="internal-link">orionis.mcp.transport.policy.McpProtocolResponse</a></code></td><td class="fieldArgDesc">Result of the operation described above.</td></tr></table></div>
   </div>
 </div><div class="basefunction">
   
@@ -1440,7 +1452,7 @@
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">origin_allowed</span><span class="function-signature">(<span class="rst-sig-param">headers: <code><a href="orionis.http.payload.estructures.headers.Headers.html" class="internal-link" title="orionis.http.payload.estructures.headers.Headers">Headers</a></code>, </span><span class="rst-sig-param">origins: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#frozenset" class="intersphinx-link">frozenset</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>]</code></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/mcp/transport/policy.py#L78">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/mcp/transport/policy.py#L92">
       
       (source)
     </a>
@@ -1452,7 +1464,7 @@
   </div>
   <div class="docstring functionBody">
     
-    <div><p>Accept absent origins and one explicitly configured serialized origin.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">headers:</span><code><a href="orionis.http.payload.estructures.headers.Headers.html" class="internal-link" title="orionis.http.payload.estructures.headers.Headers">Headers</a></code></td><td class="fieldArgDesc">Value supplied for <tt class="rst-docutils rst-literal">headers</tt>.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">origins:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#frozenset" class="intersphinx-link">frozenset</a>[<a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>]</code></td><td class="fieldArgDesc">Value supplied for <tt class="rst-docutils rst-literal">origins</tt>.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code></td><td class="fieldArgDesc">Result of the operation described above.</td></tr></table></div>
+    <div><p>Accept absent origins and one explicitly configured serialized origin.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">headers:</span><code><a href="orionis.http.payload.estructures.headers.Headers.html" class="internal-link">orionis.http.payload.estructures.headers.Headers</a></code></td><td class="fieldArgDesc">Value supplied for <tt class="rst-docutils rst-literal">headers</tt>.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">origins:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#frozenset" class="intersphinx-link">frozenset</a>[<a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>]</code></td><td class="fieldArgDesc">Value supplied for <tt class="rst-docutils rst-literal">origins</tt>.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code></td><td class="fieldArgDesc">Result of the operation described above.</td></tr></table></div>
   </div>
 </div><div class="baseconstant">
   
@@ -1466,7 +1478,7 @@
   <div class="functionHeader">
     
     <span class="py-defname">_AUTHENTICATION_HEADERS</span> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/mcp/transport/policy.py#L30">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/mcp/transport/policy.py#L40">
       
       (source)
     </a>
@@ -1478,7 +1490,7 @@
   </div>
   <div class="functionBody">
     
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p>Authentication headers used by <tt class="rst-docutils rst-literal">policy</tt>.</p></div>
     <table class="valueTable"><tr class="fieldStart"><td class="fieldName">Value</td></tr><tr><td><pre class="constant-value"><code><a href="https://docs.python.org/3/builtins/stdtypes.html#frozenset" class="intersphinx-link">frozenset</a>(<wbr></wbr>set([<wbr></wbr><span class="rst-variable-quote">'</span><span class="rst-variable-string">www-authenticate</span><span class="rst-variable-quote">'</span>, <wbr></wbr><span class="rst-variable-quote">'</span><span class="rst-variable-string">allow</span><span class="rst-variable-quote">'</span>]))</code></pre></td></tr></table>
   </div>
 </div><div class="baseconstant">
@@ -1493,7 +1505,7 @@
   <div class="functionHeader">
     
     <span class="py-defname">_CLIENT_ERROR_START</span>: <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/mcp/transport/policy.py#L26">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/mcp/transport/policy.py#L32">
       
       (source)
     </a>
@@ -1505,7 +1517,7 @@
   </div>
   <div class="functionBody">
     
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p>Client error start value used by <tt class="rst-docutils rst-literal">policy</tt>.</p></div>
     <table class="valueTable"><tr class="fieldStart"><td class="fieldName">Value</td></tr><tr><td><pre class="constant-value"><code>400</code></pre></td></tr></table>
   </div>
 </div><div class="baseconstant">
@@ -1520,7 +1532,7 @@
   <div class="functionHeader">
     
     <span class="py-defname">_EXCEPTION_STATUS</span> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/mcp/transport/policy.py#L32">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/mcp/transport/policy.py#L44">
       
       (source)
     </a>
@@ -1532,7 +1544,7 @@
   </div>
   <div class="functionBody">
     
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p>Exception status definitions used by <tt class="rst-docutils rst-literal">policy</tt>.</p></div>
     <table class="valueTable"><tr class="fieldStart"><td class="fieldName">Value</td></tr><tr><td><pre class="constant-value"><code>{<wbr></wbr>AuthenticationException: HTTPStatus.UNAUTHORIZED,
  <wbr></wbr>AuthorizationException: HTTPStatus.FORBIDDEN,
  <wbr></wbr><a href="orionis.http.routes.exceptions.route_not_found.RouteNotFound.html" class="internal-link" title="orionis.http.routes.exceptions.route_not_found.RouteNotFound">RouteNotFound</a>: HTTPStatus.NOT_FOUND,
@@ -1554,7 +1566,7 @@
   <div class="functionHeader">
     
     <span class="py-defname">_JSON_MEDIA_TYPE</span>: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/mcp/transport/policy.py#L28">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/mcp/transport/policy.py#L36">
       
       (source)
     </a>
@@ -1566,7 +1578,7 @@
   </div>
   <div class="functionBody">
     
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p><tt class="rst-docutils rst-literal">application/json</tt>.</p></div>
     <table class="valueTable"><tr class="fieldStart"><td class="fieldName">Value</td></tr><tr><td><pre class="constant-value"><code><span class="rst-variable-quote">'</span><span class="rst-variable-string">application/json</span><span class="rst-variable-quote">'</span></code></pre></td></tr></table>
   </div>
 </div><div class="baseconstant">
@@ -1581,7 +1593,7 @@
   <div class="functionHeader">
     
     <span class="py-defname">_LOGGER</span> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/mcp/transport/policy.py#L31">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/mcp/transport/policy.py#L42">
       
       (source)
     </a>
@@ -1593,7 +1605,7 @@
   </div>
   <div class="functionBody">
     
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p>Logger used by <tt class="rst-docutils rst-literal">policy</tt>.</p></div>
     <table class="valueTable"><tr class="fieldStart"><td class="fieldName">Value</td></tr><tr><td><pre class="constant-value"><code><a href="https://docs.python.org/3/library/logging.html#logging.getLogger" class="intersphinx-link">logging.getLogger</a>(<wbr></wbr>__name__)</code></pre></td></tr></table>
   </div>
 </div><div class="baseconstant">
@@ -1608,7 +1620,7 @@
   <div class="functionHeader">
     
     <span class="py-defname">_REDIRECTION_START</span>: <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/mcp/transport/policy.py#L25">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/mcp/transport/policy.py#L30">
       
       (source)
     </a>
@@ -1620,7 +1632,7 @@
   </div>
   <div class="functionBody">
     
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p>Redirection start value used by <tt class="rst-docutils rst-literal">policy</tt>.</p></div>
     <table class="valueTable"><tr class="fieldStart"><td class="fieldName">Value</td></tr><tr><td><pre class="constant-value"><code>300</code></pre></td></tr></table>
   </div>
 </div><div class="baseconstant">
@@ -1635,7 +1647,7 @@
   <div class="functionHeader">
     
     <span class="py-defname">_REPLACED_HEADERS</span> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/mcp/transport/policy.py#L29">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/mcp/transport/policy.py#L38">
       
       (source)
     </a>
@@ -1647,7 +1659,7 @@
   </div>
   <div class="functionBody">
     
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p>Replaced headers used by <tt class="rst-docutils rst-literal">policy</tt>.</p></div>
     <table class="valueTable"><tr class="fieldStart"><td class="fieldName">Value</td></tr><tr><td><pre class="constant-value"><code><a href="https://docs.python.org/3/builtins/stdtypes.html#frozenset" class="intersphinx-link">frozenset</a>(<wbr></wbr>set([<wbr></wbr><span class="rst-variable-quote">'</span><span class="rst-variable-string">content-type</span><span class="rst-variable-quote">'</span>, <wbr></wbr><span class="rst-variable-quote">'</span><span class="rst-variable-string">content-length</span><span class="rst-variable-quote">'</span>, <wbr></wbr><span class="rst-variable-quote">'</span><span class="rst-variable-string">location</span><span class="rst-variable-quote">'</span>]))</code></pre></td></tr></table>
   </div>
 </div><div class="baseconstant">
@@ -1662,7 +1674,7 @@
   <div class="functionHeader">
     
     <span class="py-defname">_SERVER_ERROR_START</span>: <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/mcp/transport/policy.py#L27">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/mcp/transport/policy.py#L34">
       
       (source)
     </a>
@@ -1674,7 +1686,7 @@
   </div>
   <div class="functionBody">
     
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p>Server error start value used by <tt class="rst-docutils rst-literal">policy</tt>.</p></div>
     <table class="valueTable"><tr class="fieldStart"><td class="fieldName">Value</td></tr><tr><td><pre class="constant-value"><code>500</code></pre></td></tr></table>
   </div>
 </div>
@@ -1688,7 +1700,7 @@
   <div class="orionis-footer-inner">
     <div class="orionis-footer-copy">
       <p>API documentation for <a href="https://orionis-framework.com/" class="projecthome">Orionis</a>.</p>
-      <p class="orionis-footer-meta">Generated with <a href="https://github.com/twisted/pydoctor/">Pydoctor</a> 25.10.1.<span class="orionis-footer-build"> Built 2026-11-03 09:36:58.</span></p>
+      <p class="orionis-footer-meta">Generated with <a href="https://github.com/twisted/pydoctor/">Pydoctor</a> 25.10.1.<span class="orionis-footer-build"> Built 2026-11-03 13:00:15.</span></p>
     </div>
     <nav class="orionis-footer-links" aria-label="Additional resources">
       <a href="https://docs.orionis-framework.com">Read the guide <span aria-hidden="true">↗</span></a>

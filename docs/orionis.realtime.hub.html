@@ -872,7 +872,7 @@
                     
                 </label>
 
-                <code><a href="orionis.realtime.hub.html" class="internal-link" title="orionis.realtime.hub">hub</a></code>
+                <code><a href="orionis.realtime.hub.module.html" class="internal-link" title="orionis.realtime.hub">hub</a></code>
 
                 <div class="expandableContent">
                     <div>
@@ -1346,6 +1346,16 @@
 
         
             <div class="itemName"><code><a href="orionis.realtime.protocol.html#MAX_ID_LENGTH" class="internal-link" title="orionis.realtime.protocol.MAX_ID_LENGTH">MAX<wbr></wbr>_ID<wbr></wbr>_LENGTH</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.realtime.protocol.html#ClientMessage" class="internal-link" title="orionis.realtime.protocol.ClientMessage"><wbr></wbr>Client<wbr></wbr>Message</a></code>
             </div>
         
 
@@ -2542,7 +2552,7 @@
         </div>
 
         <div class="extrasDocstring">
-          <p class="class-signature"><code><span class="py-keyword">class</span> <span class="py-defname">Hub</span>: <a href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/realtime/hub.py#L19" class="sourceLink">(source)</a></code></p><p><a href="classIndex.html#orionis.realtime.Hub">View In Hierarchy</a></p>
+          <p class="class-signature"><code><span class="py-keyword">class</span> <span class="py-defname">Hub</span>: <a href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/realtime/hub.py#L24" class="sourceLink">(source)</a></code></p><p><a href="classIndex.html#orionis.realtime.Hub">View In Hierarchy</a></p>
         </div>
 
         <div class="moduleDocstring">
@@ -2550,7 +2560,7 @@
         </div>
 
         <div id="split-tables">
-          <table class="children sortable" id="id1809">
+          <table class="children sortable" id="id1817">
   
   
   <tr class="method">
@@ -2567,22 +2577,22 @@
     
     <td>Class Variable</td>
     <td><code><a href="#__slots__" class="internal-link" title="orionis.realtime.Hub.__slots__">__slots__</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
+    <td>Declare the instance attribute slots reserved by this class.</td>
   </tr><tr class="classvariable">
     
     <td>Class Variable</td>
     <td><code><a href="#clients" class="internal-link" title="orionis.realtime.Hub.clients">clients</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
+    <td>Client-target selector available to hub handlers.</td>
   </tr><tr class="classvariable">
     
     <td>Class Variable</td>
     <td><code><a href="#context" class="internal-link" title="orionis.realtime.Hub.context">context</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
+    <td>Runtime context made available to the operation and its callbacks.</td>
   </tr><tr class="classvariable">
     
     <td>Class Variable</td>
     <td><code><a href="#groups" class="internal-link" title="orionis.realtime.Hub.groups">groups</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
+    <td>Realtime group membership and targeting interface.</td>
   </tr>
 </table>
           
@@ -2604,7 +2614,7 @@
     
     
     <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">onConnect</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>):</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/realtime/hub.py#L28">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/realtime/hub.py#L37">
       
       (source)
     </a>
@@ -2631,7 +2641,7 @@
     
     
     <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">onDisconnect</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">code: <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code>, </span><span class="rst-sig-param">reason: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a> | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code> = <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></span>):</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/realtime/hub.py#L38">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/realtime/hub.py#L47">
       
       (source)
     </a>
@@ -2657,7 +2667,7 @@
   <div class="functionHeader">
     
     <span class="py-defname">__slots__</span>: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" class="intersphinx-link">tuple</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <wbr></wbr><span class="rst-variable-ellipsis">...</span>]</code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/realtime/hub.py#L22">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/realtime/hub.py#L27">
       
       (source)
     </a>
@@ -2669,7 +2679,7 @@
   </div>
   <div class="functionBody">
     
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p>Declare the instance attribute slots reserved by this class.</p></div>
     
   </div>
 </div><div class="baseclassvariable">
@@ -2684,7 +2694,7 @@
   <div class="functionHeader">
     
     <span class="py-defname">clients</span>: <code><a href="orionis.realtime.HubClients.html" class="internal-link" title="orionis.realtime.HubClients">HubClients</a></code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/realtime/hub.py#L25">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/realtime/hub.py#L32">
       
       (source)
     </a>
@@ -2696,7 +2706,7 @@
   </div>
   <div class="functionBody">
     
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p>Client-target selector available to hub handlers.</p></div>
     
   </div>
 </div><div class="baseclassvariable">
@@ -2711,7 +2721,7 @@
   <div class="functionHeader">
     
     <span class="py-defname">context</span>: <code><a href="orionis.realtime.HubContext.html" class="internal-link" title="orionis.realtime.HubContext">HubContext</a></code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/realtime/hub.py#L24">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/realtime/hub.py#L30">
       
       (source)
     </a>
@@ -2723,7 +2733,7 @@
   </div>
   <div class="functionBody">
     
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p>Runtime context made available to the operation and its callbacks.</p></div>
     
   </div>
 </div><div class="baseclassvariable">
@@ -2738,7 +2748,7 @@
   <div class="functionHeader">
     
     <span class="py-defname">groups</span>: <code><a href="orionis.realtime.HubGroups.html" class="internal-link" title="orionis.realtime.HubGroups">HubGroups</a></code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/realtime/hub.py#L26">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/realtime/hub.py#L34">
       
       (source)
     </a>
@@ -2750,7 +2760,7 @@
   </div>
   <div class="functionBody">
     
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p>Realtime group membership and targeting interface.</p></div>
     
   </div>
 </div>
@@ -2764,7 +2774,7 @@
   <div class="orionis-footer-inner">
     <div class="orionis-footer-copy">
       <p>API documentation for <a href="https://orionis-framework.com/" class="projecthome">Orionis</a>.</p>
-      <p class="orionis-footer-meta">Generated with <a href="https://github.com/twisted/pydoctor/">Pydoctor</a> 25.10.1.<span class="orionis-footer-build"> Built 2026-11-03 09:36:58.</span></p>
+      <p class="orionis-footer-meta">Generated with <a href="https://github.com/twisted/pydoctor/">Pydoctor</a> 25.10.1.<span class="orionis-footer-build"> Built 2026-11-03 13:00:15.</span></p>
     </div>
     <nav class="orionis-footer-links" aria-label="Additional resources">
       <a href="https://docs.orionis-framework.com">Read the guide <span aria-hidden="true">↗</span></a>

@@ -2231,11 +2231,11 @@
         </div>
 
         <div class="extrasDocstring">
-          <a href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/cache/serializer.py" class="sourceLink">(source)</a>
+          <a href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/cache/serializer.py" class="sourceLink">(source)</a>
         </div>
 
         <div class="moduleDocstring">
-          <div><p class="undocumented">Undocumented</p></div>
+          <div><p>Encode and decode cache values with the configured serialization format.</p></div>
         </div>
 
         <div id="split-tables">
@@ -2246,7 +2246,7 @@
     
     <td>Class</td>
     <td><code><a href="orionis.cache.serializer.Serializer.html" class="internal-link" title="orionis.cache.serializer.Serializer"><wbr></wbr>Serializer</a></code></td>
-    <td><span class="rst-undocumented">No class docstring; 4/4 static methods documented</span></td>
+    <td>Encode and decode cache values with the configured serialization format.</td>
   </tr><tr class="function">
     
     <td>Function</td>
@@ -2311,22 +2311,22 @@
     
     <td>Constant</td>
     <td><code><a href="#_DECODE_DISPATCH" class="internal-link" title="orionis.cache.serializer._DECODE_DISPATCH">_DECODE<wbr></wbr>_DISPATCH</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
+    <td>keyed by the type string written by the encoder.</td>
   </tr><tr class="constant">
     
     <td>Constant</td>
     <td><code><a href="#_ENCODE_EXACT" class="internal-link" title="orionis.cache.serializer._ENCODE_EXACT">_ENCODE<wbr></wbr>_EXACT</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
+    <td>Map supported types to their encoder functions.</td>
   </tr><tr class="constant">
     
     <td>Constant</td>
     <td><code><a href="#_TK" class="internal-link" title="orionis.cache.serializer._TK">_TK</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
+    <td>Keys for type-discriminated payloads in the encoder output.</td>
   </tr><tr class="constant">
     
     <td>Constant</td>
     <td><code><a href="#_VK" class="internal-link" title="orionis.cache.serializer._VK">_VK</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
+    <td><tt class="rst-docutils rst-literal">__value__</tt>.</td>
   </tr>
 </table>
           
@@ -2348,7 +2348,7 @@
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">_dec_complex</span><span class="function-signature">(<span class="rst-sig-param">v: <code><a href="https://docs.python.org/3/library/typing.html#typing.Any" class="intersphinx-link">Any</a></code></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/functions.html#complex" class="intersphinx-link">complex</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/cache/serializer.py#L326">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/cache/serializer.py#L331">
       
       (source)
     </a>
@@ -2360,7 +2360,7 @@
   </div>
   <div class="docstring functionBody">
     
-    <div><p>Decode a mapping payload into a complex number.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">v:</span><code><a href="https://docs.python.org/3/library/typing.html#typing.Any" class="intersphinx-link">Any</a></code></td><td class="fieldArgDesc">Mapping with <tt class="rst-docutils rst-literal">real</tt> and <tt class="rst-docutils rst-literal">imag</tt> components.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/functions.html#complex" class="intersphinx-link">complex</a></code></td><td class="fieldArgDesc">Decoded complex value.</td></tr></table></div>
+    <div><p>Decode a mapping payload into a complex number.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">v:</span><code><a href="https://docs.python.org/3/library/typing.html#typing.Any" class="intersphinx-link">typing.Any</a></code></td><td class="fieldArgDesc">Mapping with <tt class="rst-docutils rst-literal">real</tt> and <tt class="rst-docutils rst-literal">imag</tt> components.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/functions.html#complex" class="intersphinx-link">complex</a></code></td><td class="fieldArgDesc">Decoded complex value.</td></tr></table></div>
   </div>
 </div><div class="basefunction">
   
@@ -2375,7 +2375,7 @@
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">_dec_enum</span><span class="function-signature">(<span class="rst-sig-param">val: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#dict" class="intersphinx-link">dict</a></code></span>) -&gt; <code><a href="https://docs.python.org/3/library/typing.html#typing.Any" class="intersphinx-link">Any</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/cache/serializer.py#L244">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/cache/serializer.py#L249">
       
       (source)
     </a>
@@ -2387,7 +2387,7 @@
   </div>
   <div class="docstring functionBody">
     
-    <div><p>Reconstruct an enum member from its serialized class path and value.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">val:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#dict" class="intersphinx-link">dict</a></code></td><td class="fieldArgDesc">Mapping with <tt class="rst-docutils rst-literal">"class"</tt> (dotted class path) and <tt class="rst-docutils rst-literal">"value"</tt> keys.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/library/typing.html#typing.Any" class="intersphinx-link">Any</a></code></td><td class="fieldArgDesc">The enum member corresponding to the encoded value.</td></tr></table></div>
+    <div><p>Reconstruct an enum member from its serialized class path and value.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">val:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#dict" class="intersphinx-link">dict</a></code></td><td class="fieldArgDesc">Mapping with <tt class="rst-docutils rst-literal">"class"</tt> (dotted class path) and <tt class="rst-docutils rst-literal">"value"</tt> keys.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/library/typing.html#typing.Any" class="intersphinx-link">typing.Any</a></code></td><td class="fieldArgDesc">The enum member corresponding to the encoded value.</td></tr></table></div>
   </div>
 </div><div class="basefunction">
   
@@ -2402,7 +2402,7 @@
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">_dec_frozenset</span><span class="function-signature">(<span class="rst-sig-param">v: <code><a href="https://docs.python.org/3/library/typing.html#typing.Any" class="intersphinx-link">Any</a></code></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/stdtypes.html#frozenset" class="intersphinx-link">frozenset</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/cache/serializer.py#L310">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/cache/serializer.py#L315">
       
       (source)
     </a>
@@ -2414,7 +2414,7 @@
   </div>
   <div class="docstring functionBody">
     
-    <div><p>Decode an iterable payload into a frozenset.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">v:</span><code><a href="https://docs.python.org/3/library/typing.html#typing.Any" class="intersphinx-link">Any</a></code></td><td class="fieldArgDesc">Encoded iterable of frozenset elements.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/stdtypes.html#frozenset" class="intersphinx-link">frozenset</a></code></td><td class="fieldArgDesc">Frozen set with recursively decoded elements.</td></tr></table></div>
+    <div><p>Decode an iterable payload into a frozenset.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">v:</span><code><a href="https://docs.python.org/3/library/typing.html#typing.Any" class="intersphinx-link">typing.Any</a></code></td><td class="fieldArgDesc">Encoded iterable of frozenset elements.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/stdtypes.html#frozenset" class="intersphinx-link">frozenset</a></code></td><td class="fieldArgDesc">Frozen set with recursively decoded elements.</td></tr></table></div>
   </div>
 </div><div class="basefunction">
   
@@ -2429,7 +2429,7 @@
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">_dec_missing</span><span class="function-signature">(<span class="rst-sig-param">_: <code><a href="https://docs.python.org/3/library/typing.html#typing.Any" class="intersphinx-link">Any</a></code></span>) -&gt; <code><a href="https://docs.python.org/3/library/typing.html#typing.Any" class="intersphinx-link">Any</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/cache/serializer.py#L210">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/cache/serializer.py#L215">
       
       (source)
     </a>
@@ -2441,7 +2441,7 @@
   </div>
   <div class="docstring functionBody">
     
-    <div><p>Return the singleton marker for missing values.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">_:</span><code><a href="https://docs.python.org/3/library/typing.html#typing.Any" class="intersphinx-link">Any</a></code></td><td class="fieldArgDesc">Ignored encoded payload.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/library/typing.html#typing.Any" class="intersphinx-link">Any</a></code></td><td class="fieldArgDesc">The <tt class="rst-docutils rst-literal">MISSING</tt> sentinel.</td></tr></table></div>
+    <div><p>Return the singleton marker for missing values.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">_:</span><code><a href="https://docs.python.org/3/library/typing.html#typing.Any" class="intersphinx-link">typing.Any</a></code></td><td class="fieldArgDesc">Ignored encoded payload.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/library/typing.html#typing.Any" class="intersphinx-link">typing.Any</a></code></td><td class="fieldArgDesc">The <tt class="rst-docutils rst-literal">MISSING</tt> sentinel.</td></tr></table></div>
   </div>
 </div><div class="basefunction">
   
@@ -2456,7 +2456,7 @@
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">_dec_set</span><span class="function-signature">(<span class="rst-sig-param">v: <code><a href="https://docs.python.org/3/library/typing.html#typing.Any" class="intersphinx-link">Any</a></code></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/stdtypes.html#set" class="intersphinx-link">set</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/cache/serializer.py#L294">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/cache/serializer.py#L299">
       
       (source)
     </a>
@@ -2468,7 +2468,7 @@
   </div>
   <div class="docstring functionBody">
     
-    <div><p>Decode an iterable payload into a set.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">v:</span><code><a href="https://docs.python.org/3/library/typing.html#typing.Any" class="intersphinx-link">Any</a></code></td><td class="fieldArgDesc">Encoded iterable of set elements.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/stdtypes.html#set" class="intersphinx-link">set</a></code></td><td class="fieldArgDesc">Set with recursively decoded elements.</td></tr></table></div>
+    <div><p>Decode an iterable payload into a set.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">v:</span><code><a href="https://docs.python.org/3/library/typing.html#typing.Any" class="intersphinx-link">typing.Any</a></code></td><td class="fieldArgDesc">Encoded iterable of set elements.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/stdtypes.html#set" class="intersphinx-link">set</a></code></td><td class="fieldArgDesc">Set with recursively decoded elements.</td></tr></table></div>
   </div>
 </div><div class="basefunction">
   
@@ -2483,7 +2483,7 @@
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">_dec_timedelta</span><span class="function-signature">(<span class="rst-sig-param">v: <code><a href="https://docs.python.org/3/library/typing.html#typing.Any" class="intersphinx-link">Any</a></code></span>) -&gt; <code><a href="https://docs.python.org/3/library/datetime.html#datetime.timedelta" class="intersphinx-link">dt.timedelta</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/cache/serializer.py#L262">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/cache/serializer.py#L267">
       
       (source)
     </a>
@@ -2495,7 +2495,7 @@
   </div>
   <div class="docstring functionBody">
     
-    <div><p>Decode a mapping into a <tt class="rst-docutils rst-literal">datetime.timedelta</tt>.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">v:</span><code><a href="https://docs.python.org/3/library/typing.html#typing.Any" class="intersphinx-link">Any</a></code></td><td class="fieldArgDesc">Mapping of timedelta constructor fields.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/library/datetime.html#datetime.timedelta" class="intersphinx-link">datetime.timedelta</a></code></td><td class="fieldArgDesc">Decoded time delta value.</td></tr></table></div>
+    <div><p>Decode a mapping into a <tt class="rst-docutils rst-literal">datetime.timedelta</tt>.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">v:</span><code><a href="https://docs.python.org/3/library/typing.html#typing.Any" class="intersphinx-link">typing.Any</a></code></td><td class="fieldArgDesc">Mapping of timedelta constructor fields.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/library/datetime.html#datetime.timedelta" class="intersphinx-link">datetime.timedelta</a></code></td><td class="fieldArgDesc">Decoded time delta value.</td></tr></table></div>
   </div>
 </div><div class="basefunction">
   
@@ -2510,7 +2510,7 @@
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">_dec_tuple</span><span class="function-signature">(<span class="rst-sig-param">v: <code><a href="https://docs.python.org/3/library/typing.html#typing.Any" class="intersphinx-link">Any</a></code></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" class="intersphinx-link">tuple</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/cache/serializer.py#L278">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/cache/serializer.py#L283">
       
       (source)
     </a>
@@ -2522,7 +2522,7 @@
   </div>
   <div class="docstring functionBody">
     
-    <div><p>Decode an iterable payload into a tuple.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">v:</span><code><a href="https://docs.python.org/3/library/typing.html#typing.Any" class="intersphinx-link">Any</a></code></td><td class="fieldArgDesc">Encoded iterable of tuple elements.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" class="intersphinx-link">tuple</a></code></td><td class="fieldArgDesc">Tuple with recursively decoded elements.</td></tr></table></div>
+    <div><p>Decode an iterable payload into a tuple.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">v:</span><code><a href="https://docs.python.org/3/library/typing.html#typing.Any" class="intersphinx-link">typing.Any</a></code></td><td class="fieldArgDesc">Encoded iterable of tuple elements.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" class="intersphinx-link">tuple</a></code></td><td class="fieldArgDesc">Tuple with recursively decoded elements.</td></tr></table></div>
   </div>
 </div><div class="basefunction">
   
@@ -2537,7 +2537,7 @@
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">_dec_type</span><span class="function-signature">(<span class="rst-sig-param">val: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></span>) -&gt; <code><a href="https://docs.python.org/3/library/typing.html#typing.Any" class="intersphinx-link">Any</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/cache/serializer.py#L226">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/cache/serializer.py#L231">
       
       (source)
     </a>
@@ -2549,7 +2549,7 @@
   </div>
   <div class="docstring functionBody">
     
-    <div><p>Resolve a dotted class path to the corresponding type object.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">val:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Fully qualified class name, e.g. <tt class="rst-docutils rst-literal">"module.submodule.ClassName"</tt>.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/library/typing.html#typing.Any" class="intersphinx-link">Any</a></code></td><td class="fieldArgDesc">The class object referenced by <em>val</em>.</td></tr></table></div>
+    <div><p>Resolve a dotted class path to the corresponding type object.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">val:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Fully qualified class name, e.g. <tt class="rst-docutils rst-literal">"module.submodule.ClassName"</tt>.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/library/typing.html#typing.Any" class="intersphinx-link">typing.Any</a></code></td><td class="fieldArgDesc">The class object referenced by <em>val</em>.</td></tr></table></div>
   </div>
 </div><div class="basefunction">
   
@@ -2564,7 +2564,7 @@
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">_decode</span><span class="function-signature">(<span class="rst-sig-param">obj: <code><a href="https://docs.python.org/3/library/typing.html#typing.Any" class="intersphinx-link">Any</a></code></span>) -&gt; <code><a href="https://docs.python.org/3/library/typing.html#typing.Any" class="intersphinx-link">Any</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/cache/serializer.py#L361">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/cache/serializer.py#L367">
       
       (source)
     </a>
@@ -2576,7 +2576,7 @@
   </div>
   <div class="docstring functionBody">
     
-    <div><p>Decode recursively serialized cache payloads into Python objects.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">obj:</span><code><a href="https://docs.python.org/3/library/typing.html#typing.Any" class="intersphinx-link">Any</a></code></td><td class="fieldArgDesc">Value produced by the serializer, including nested lists and mappings.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/library/typing.html#typing.Any" class="intersphinx-link">Any</a></code></td><td class="fieldArgDesc">Decoded Python object, with typed payload wrappers resolved via
+    <div><p>Decode recursively serialized cache payloads into Python objects.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">obj:</span><code><a href="https://docs.python.org/3/library/typing.html#typing.Any" class="intersphinx-link">typing.Any</a></code></td><td class="fieldArgDesc">Value produced by the serializer, including nested lists and mappings.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/library/typing.html#typing.Any" class="intersphinx-link">typing.Any</a></code></td><td class="fieldArgDesc">Decoded Python object, with typed payload wrappers resolved via
 <tt class="rst-docutils rst-literal">_DECODE_DISPATCH</tt>.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/exceptions.html#ValueError" class="intersphinx-link">ValueError</a></code></td><td>If a serialized type key is present but has no registered decoder.</td></tr></table></div>
   </div>
 </div><div class="basefunction">
@@ -2592,7 +2592,7 @@
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">_encode</span><span class="function-signature">(<span class="rst-sig-param">obj: <code><a href="https://docs.python.org/3/library/typing.html#typing.Any" class="intersphinx-link">Any</a></code></span>) -&gt; <code><a href="https://docs.python.org/3/library/typing.html#typing.Any" class="intersphinx-link">Any</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/cache/serializer.py#L175">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/cache/serializer.py#L180">
       
       (source)
     </a>
@@ -2608,7 +2608,7 @@
 <p>Dispatch to <tt class="rst-docutils rst-literal">_ENCODE_EXACT</tt> for known types via O(1) hash lookup;
 fall back to fast-path dict/list handling, then <tt class="rst-docutils rst-literal">_encode_subclass</tt>
 for all remaining cases.</p>
-<table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">obj:</span><code><a href="https://docs.python.org/3/library/typing.html#typing.Any" class="intersphinx-link">Any</a></code></td><td class="fieldArgDesc">The Python object to encode.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/library/typing.html#typing.Any" class="intersphinx-link">Any</a></code></td><td class="fieldArgDesc">A JSON-serialisable representation of <em>obj</em>.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/exceptions.html#TypeError" class="intersphinx-link">TypeError</a></code></td><td>If <em>obj</em> is of an unsupported type.</td></tr></table></div>
+<table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">obj:</span><code><a href="https://docs.python.org/3/library/typing.html#typing.Any" class="intersphinx-link">typing.Any</a></code></td><td class="fieldArgDesc">The Python object to encode.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/library/typing.html#typing.Any" class="intersphinx-link">typing.Any</a></code></td><td class="fieldArgDesc">A JSON-serialisable representation of <em>obj</em>.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/exceptions.html#TypeError" class="intersphinx-link">TypeError</a></code></td><td>If <em>obj</em> is of an unsupported type.</td></tr></table></div>
   </div>
 </div><div class="basefunction">
   
@@ -2623,7 +2623,7 @@ for all remaining cases.</p>
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">_encode_subclass</span><span class="function-signature">(<span class="rst-sig-param">obj: <code><a href="https://docs.python.org/3/library/typing.html#typing.Any" class="intersphinx-link">Any</a></code>, </span><span class="rst-sig-param">t: <code><a href="https://docs.python.org/3/builtins/functions.html#type" class="intersphinx-link">type</a></code></span>) -&gt; <code><a href="https://docs.python.org/3/library/typing.html#typing.Any" class="intersphinx-link">Any</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/cache/serializer.py#L42">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/cache/serializer.py#L46">
       
       (source)
     </a>
@@ -2639,7 +2639,7 @@ for all remaining cases.</p>
 <p>Walk a priority-ordered chain of <tt class="rst-docutils rst-literal">isinstance</tt> checks to handle Path
 subclasses, datetime hierarchy, collection subclasses, and sentinel
 values. Raises <tt class="rst-docutils rst-literal">TypeError</tt> for unsupported types.</p>
-<table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">obj:</span><code><a href="https://docs.python.org/3/library/typing.html#typing.Any" class="intersphinx-link">Any</a></code></td><td class="fieldArgDesc">Object whose type is not present in <tt class="rst-docutils rst-literal">_ENCODE_EXACT</tt>.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">t:</span><code><a href="https://docs.python.org/3/builtins/functions.html#type" class="intersphinx-link">type</a></code></td><td class="fieldArgDesc"><tt class="rst-docutils rst-literal">type(obj)</tt>, passed by the caller to avoid recomputing it.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/library/typing.html#typing.Any" class="intersphinx-link">Any</a></code></td><td class="fieldArgDesc">JSON-compatible representation of <em>obj</em>.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/exceptions.html#TypeError" class="intersphinx-link">TypeError</a></code></td><td>If <em>obj</em> does not match any supported subclass or singleton.</td></tr></table></div>
+<table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">obj:</span><code><a href="https://docs.python.org/3/library/typing.html#typing.Any" class="intersphinx-link">typing.Any</a></code></td><td class="fieldArgDesc">Object whose type is not present in <tt class="rst-docutils rst-literal">_ENCODE_EXACT</tt>.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">t:</span><code><a href="https://docs.python.org/3/builtins/functions.html#type" class="intersphinx-link">type</a></code></td><td class="fieldArgDesc"><tt class="rst-docutils rst-literal">type(obj)</tt>, passed by the caller to avoid recomputing it.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/library/typing.html#typing.Any" class="intersphinx-link">typing.Any</a></code></td><td class="fieldArgDesc">JSON-compatible representation of <em>obj</em>.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/exceptions.html#TypeError" class="intersphinx-link">TypeError</a></code></td><td>If <em>obj</em> does not match any supported subclass or singleton.</td></tr></table></div>
   </div>
 </div><div class="basefunction">
   
@@ -2654,7 +2654,7 @@ values. Raises <tt class="rst-docutils rst-literal">TypeError</tt> for unsupport
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">_identity</span><span class="function-signature">(<span class="rst-sig-param">o: <code><a href="https://docs.python.org/3/library/typing.html#typing.Any" class="intersphinx-link">Any</a></code></span>) -&gt; <code><a href="https://docs.python.org/3/library/typing.html#typing.Any" class="intersphinx-link">Any</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/cache/serializer.py#L23">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/cache/serializer.py#L27">
       
       (source)
     </a>
@@ -2669,7 +2669,7 @@ values. Raises <tt class="rst-docutils rst-literal">TypeError</tt> for unsupport
     <div><p>Return <em>o</em> unchanged.</p>
 <p>Used as the encoder for primitive types (<tt class="rst-docutils rst-literal">str</tt>, <tt class="rst-docutils rst-literal">int</tt>, <tt class="rst-docutils rst-literal">float</tt>,
 <tt class="rst-docutils rst-literal">bool</tt>, <tt class="rst-docutils rst-literal">None</tt>) that need no transformation before JSON serialisation.</p>
-<table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">o:</span><code><a href="https://docs.python.org/3/library/typing.html#typing.Any" class="intersphinx-link">Any</a></code></td><td class="fieldArgDesc">Value to pass through.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/library/typing.html#typing.Any" class="intersphinx-link">Any</a></code></td><td class="fieldArgDesc">The same object <em>o</em>, unmodified.</td></tr></table></div>
+<table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">o:</span><code><a href="https://docs.python.org/3/library/typing.html#typing.Any" class="intersphinx-link">typing.Any</a></code></td><td class="fieldArgDesc">Value to pass through.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/library/typing.html#typing.Any" class="intersphinx-link">typing.Any</a></code></td><td class="fieldArgDesc">The same object <em>o</em>, unmodified.</td></tr></table></div>
   </div>
 </div><div class="baseconstant">
   
@@ -2683,7 +2683,7 @@ values. Raises <tt class="rst-docutils rst-literal">TypeError</tt> for unsupport
   <div class="functionHeader">
     
     <span class="py-defname">_DECODE_DISPATCH</span>: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#dict" class="intersphinx-link">dict</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <wbr></wbr><a href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Callable" class="intersphinx-link">Callable</a>[<wbr></wbr>[<wbr></wbr><a href="https://docs.python.org/3/library/typing.html#typing.Any" class="intersphinx-link">Any</a>], <wbr></wbr><a href="https://docs.python.org/3/library/typing.html#typing.Any" class="intersphinx-link">Any</a>]]</code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/cache/serializer.py#L343">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/cache/serializer.py#L348">
       
       (source)
     </a>
@@ -2695,7 +2695,7 @@ values. Raises <tt class="rst-docutils rst-literal">TypeError</tt> for unsupport
   </div>
   <div class="functionBody">
     
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p>keyed by the type string written by the encoder.</p></div>
     <table class="valueTable"><tr class="fieldStart"><td class="fieldName">Value</td></tr><tr><td><pre class="constant-value"><code>{<wbr></wbr><span class="rst-variable-quote">'</span><span class="rst-variable-string">missing</span><span class="rst-variable-quote">'</span>: <a href="#_dec_missing" class="internal-link" title="orionis.cache.serializer._dec_missing">_dec_missing</a>,
  <wbr></wbr><span class="rst-variable-quote">'</span><span class="rst-variable-string">path</span><span class="rst-variable-quote">'</span>: <a href="https://docs.python.org/3/library/pathlib.html#pathlib.Path" class="intersphinx-link">Path</a>,
  <wbr></wbr><span class="rst-variable-quote">'</span><span class="rst-variable-string">bytes</span><span class="rst-variable-quote">'</span>: <a href="https://docs.python.org/3/library/base64.html#base64.b64decode" class="intersphinx-link">base64.b64decode</a>,
@@ -2717,7 +2717,7 @@ values. Raises <tt class="rst-docutils rst-literal">TypeError</tt> for unsupport
   <div class="functionHeader">
     
     <span class="py-defname">_ENCODE_EXACT</span>: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#dict" class="intersphinx-link">dict</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/functions.html#type" class="intersphinx-link">type</a>, <wbr></wbr><a href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Callable" class="intersphinx-link">Callable</a>[<wbr></wbr>[<wbr></wbr><a href="https://docs.python.org/3/library/typing.html#typing.Any" class="intersphinx-link">Any</a>], <wbr></wbr><a href="https://docs.python.org/3/library/typing.html#typing.Any" class="intersphinx-link">Any</a>]]</code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/cache/serializer.py#L131">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/cache/serializer.py#L135">
       
       (source)
     </a>
@@ -2729,7 +2729,7 @@ values. Raises <tt class="rst-docutils rst-literal">TypeError</tt> for unsupport
   </div>
   <div class="functionBody">
     
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p>Map supported types to their encoder functions.</p></div>
     <table class="valueTable"><tr class="fieldStart"><td class="fieldName">Value</td></tr><tr><td><pre class="constant-value"><code>{<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>: <a href="#_identity" class="internal-link" title="orionis.cache.serializer._identity">_identity</a>,
  <wbr></wbr><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a>: <a href="#_identity" class="internal-link" title="orionis.cache.serializer._identity">_identity</a>,
  <wbr></wbr><a href="https://docs.python.org/3/builtins/functions.html#float" class="intersphinx-link">float</a>: <a href="#_identity" class="internal-link" title="orionis.cache.serializer._identity">_identity</a>,
@@ -2751,7 +2751,7 @@ values. Raises <tt class="rst-docutils rst-literal">TypeError</tt> for unsupport
   <div class="functionHeader">
     
     <span class="py-defname">_TK</span>: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/cache/serializer.py#L20">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/cache/serializer.py#L22">
       
       (source)
     </a>
@@ -2763,7 +2763,7 @@ values. Raises <tt class="rst-docutils rst-literal">TypeError</tt> for unsupport
   </div>
   <div class="functionBody">
     
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p>Keys for type-discriminated payloads in the encoder output.</p></div>
     <table class="valueTable"><tr class="fieldStart"><td class="fieldName">Value</td></tr><tr><td><pre class="constant-value"><code><span class="rst-variable-quote">'</span><span class="rst-variable-string">__type__</span><span class="rst-variable-quote">'</span></code></pre></td></tr></table>
   </div>
 </div><div class="baseconstant">
@@ -2778,7 +2778,7 @@ values. Raises <tt class="rst-docutils rst-literal">TypeError</tt> for unsupport
   <div class="functionHeader">
     
     <span class="py-defname">_VK</span>: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/cache/serializer.py#L21">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/cache/serializer.py#L24">
       
       (source)
     </a>
@@ -2790,7 +2790,7 @@ values. Raises <tt class="rst-docutils rst-literal">TypeError</tt> for unsupport
   </div>
   <div class="functionBody">
     
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p><tt class="rst-docutils rst-literal">__value__</tt>.</p></div>
     <table class="valueTable"><tr class="fieldStart"><td class="fieldName">Value</td></tr><tr><td><pre class="constant-value"><code><span class="rst-variable-quote">'</span><span class="rst-variable-string">__value__</span><span class="rst-variable-quote">'</span></code></pre></td></tr></table>
   </div>
 </div>
@@ -2804,7 +2804,7 @@ values. Raises <tt class="rst-docutils rst-literal">TypeError</tt> for unsupport
   <div class="orionis-footer-inner">
     <div class="orionis-footer-copy">
       <p>API documentation for <a href="https://orionis-framework.com/" class="projecthome">Orionis</a>.</p>
-      <p class="orionis-footer-meta">Generated with <a href="https://github.com/twisted/pydoctor/">Pydoctor</a> 25.10.1.<span class="orionis-footer-build"> Built 2026-11-03 09:36:58.</span></p>
+      <p class="orionis-footer-meta">Generated with <a href="https://github.com/twisted/pydoctor/">Pydoctor</a> 25.10.1.<span class="orionis-footer-build"> Built 2026-11-03 13:00:15.</span></p>
     </div>
     <nav class="orionis-footer-links" aria-label="Additional resources">
       <a href="https://docs.orionis-framework.com">Read the guide <span aria-hidden="true">↗</span></a>

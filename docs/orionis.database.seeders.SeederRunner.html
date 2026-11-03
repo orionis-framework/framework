@@ -478,7 +478,7 @@
                     
                 </label>
 
-                <code><a href="orionis.database.seeders.seeder.html" class="internal-link" title="orionis.database.seeders.seeder">seeder</a></code>
+                <code><a href="orionis.database.seeders.seeder.module.html" class="internal-link" title="orionis.database.seeders.seeder">seeder</a></code>
 
                 <div class="expandableContent">
                     <div>
@@ -864,7 +864,7 @@
         </div>
 
         <div class="extrasDocstring">
-          <p class="class-signature"><code><span class="py-keyword">class</span> <span class="py-defname">SeederRunner</span>: <a href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/database/seeders/runner.py#L83" class="sourceLink">(source)</a></code></p><p>Constructor: <code><a href="#__init__" class="internal-link" title="orionis.database.seeders.SeederRunner.__init__">SeederRunner(app, conn_manager)</a></code></p><p><a href="classIndex.html#orionis.database.seeders.SeederRunner">View In Hierarchy</a></p>
+          <p class="class-signature"><code><span class="py-keyword">class</span> <span class="py-defname">SeederRunner</span>: <a href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/database/seeders/runner.py#L88" class="sourceLink">(source)</a></code></p><p>Constructor: <code><a href="#__init__" class="internal-link" title="orionis.database.seeders.SeederRunner.__init__">SeederRunner(app, conn_manager)</a></code></p><p><a href="classIndex.html#orionis.database.seeders.SeederRunner">View In Hierarchy</a></p>
         </div>
 
         <div class="moduleDocstring">
@@ -878,7 +878,7 @@ runs overlap.</p>
         </div>
 
         <div id="split-tables">
-          <table class="children sortable" id="id575">
+          <table class="children sortable" id="id576">
   
   
   <tr class="method">
@@ -925,22 +925,22 @@ runs overlap.</p>
     
     <td>Class Variable</td>
     <td><code><a href="#__slots__" class="internal-link" title="orionis.database.seeders.SeederRunner.__slots__">__slots__</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
+    <td>Declare the instance attribute slots reserved by this class.</td>
   </tr><tr class="instancevariable">
     
     <td>Instance Variable</td>
     <td><code><a href="#__app" class="internal-link" title="orionis.database.seeders.SeederRunner.__app">__app</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
+    <td>Application providing the seeder directory.</td>
   </tr><tr class="instancevariable">
     
     <td>Instance Variable</td>
     <td><code><a href="#__conn_manager" class="internal-link" title="orionis.database.seeders.SeederRunner.__conn_manager">__conn<wbr></wbr>_manager</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
+    <td>Manager resolving configured database connections.</td>
   </tr><tr class="instancevariable">
     
     <td>Instance Variable</td>
     <td><code><a href="#__discovered_cache" class="internal-link" title="orionis.database.seeders.SeederRunner.__discovered_cache">__discovered<wbr></wbr>_cache</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
+    <td>Cached results of filesystem discovery.</td>
   </tr>
 </table>
           
@@ -962,7 +962,7 @@ runs overlap.</p>
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">__discover</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/stdtypes.html#dict" class="intersphinx-link">dict</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <wbr></wbr><a href="https://docs.python.org/3/builtins/functions.html#type" class="intersphinx-link">type</a>[<wbr></wbr><a href="orionis.database.seeders.Seeder.html" class="internal-link" title="orionis.database.seeders.Seeder">Seeder</a>]]</code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/database/seeders/runner.py#L206">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/database/seeders/runner.py#L215">
       
       (source)
     </a>
@@ -974,7 +974,7 @@ runs overlap.</p>
   </div>
   <div class="docstring functionBody">
     
-    <div><p>Find local Seeder subclasses in deterministic filename order.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/stdtypes.html#dict" class="intersphinx-link">dict</a> of <a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a> to <a href="https://docs.python.org/3/builtins/functions.html#type" class="intersphinx-link">type</a> of <a href="orionis.database.seeders.Seeder.html" class="internal-link" title="orionis.database.seeders.Seeder">Seeder</a></code></td><td class="fieldArgDesc">Seeder classes keyed by persisted filename stem.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/exceptions.html#ValueError" class="intersphinx-link">ValueError</a></code></td><td>If more than one class resolves to the same persisted name.</td></tr></table></div>
+    <div><p>Find local Seeder subclasses in deterministic filename order.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/stdtypes.html#dict" class="intersphinx-link">dict</a> of str <tt class="rst-docutils rst-literal">to</tt> type of <a href="orionis.database.seeders.Seeder.html" class="internal-link">orionis.database.seeders.Seeder</a></code></td><td class="fieldArgDesc">Seeder classes keyed by persisted filename stem.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/exceptions.html#ValueError" class="intersphinx-link">ValueError</a></code></td><td>If more than one class resolves to the same persisted name.</td></tr></table></div>
   </div>
 </div><div class="basemethod">
   
@@ -989,7 +989,7 @@ runs overlap.</p>
     
     
     <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">__ensureTrackingTable</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">connection: <code>IConnection</code></span>):</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/database/seeders/runner.py#L171">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/database/seeders/runner.py#L180">
       
       (source)
     </a>
@@ -1001,7 +1001,7 @@ runs overlap.</p>
   </div>
   <div class="docstring functionBody">
     
-    <div><p>Create the tracking table, tolerating a concurrent creator.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">connection:</span><code><a href="orionis.database.contracts.IConnection.html" class="internal-link" title="orionis.database.contracts.IConnection">IConnection</a></code></td><td class="fieldArgDesc">Selected database connection.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">The table is available for tracking operations.</td></tr></table></div>
+    <div><p>Create the tracking table, tolerating a concurrent creator.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">connection:</span><code><a href="orionis.database.contracts.IConnection.html" class="internal-link">orionis.database.contracts.IConnection</a></code></td><td class="fieldArgDesc">Selected database connection.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">The table is available for tracking operations.</td></tr></table></div>
   </div>
 </div><div class="basemethod">
   
@@ -1016,7 +1016,7 @@ runs overlap.</p>
     
     
     <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">__getRan</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">connection: <code>IConnection</code></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/stdtypes.html#list" class="intersphinx-link">list</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#dict" class="intersphinx-link">dict</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <wbr></wbr>Any]]</code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/database/seeders/runner.py#L254">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/database/seeders/runner.py#L263">
       
       (source)
     </a>
@@ -1028,7 +1028,7 @@ runs overlap.</p>
   </div>
   <div class="docstring functionBody">
     
-    <div><p>Read committed tracking rows in insertion order.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">connection:</span><code><a href="orionis.database.contracts.IConnection.html" class="internal-link" title="orionis.database.contracts.IConnection">IConnection</a></code></td><td class="fieldArgDesc">Connection holding the tracking table.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/stdtypes.html#list" class="intersphinx-link">list</a> of <a href="https://docs.python.org/3/builtins/stdtypes.html#dict" class="intersphinx-link">dict</a></code></td><td class="fieldArgDesc">Tracking rows ordered by primary key.</td></tr></table></div>
+    <div><p>Read committed tracking rows in insertion order.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">connection:</span><code><a href="orionis.database.contracts.IConnection.html" class="internal-link">orionis.database.contracts.IConnection</a></code></td><td class="fieldArgDesc">Connection holding the tracking table.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/stdtypes.html#list" class="intersphinx-link">list</a> of <a href="https://docs.python.org/3/builtins/stdtypes.html#dict" class="intersphinx-link">dict</a></code></td><td class="fieldArgDesc">Tracking rows ordered by primary key.</td></tr></table></div>
   </div>
 </div><div class="basemethod">
   
@@ -1043,7 +1043,7 @@ runs overlap.</p>
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">__init__</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">app: <code>IApplication</code>, </span><span class="rst-sig-param">conn_manager: <code>IConnectionManager</code></span>):</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/database/seeders/runner.py#L99">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/database/seeders/runner.py#L105">
       
       (source)
     </a>
@@ -1055,7 +1055,7 @@ runs overlap.</p>
   </div>
   <div class="docstring functionBody">
     
-    <div><p>Initialize the runner with the application and connection manager.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">app:</span><code><a href="orionis.IApplication.html" class="internal-link" title="orionis.IApplication">IApplication</a></code></td><td class="fieldArgDesc">Application providing the seeder directory.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">conn<wbr></wbr>_manager:</span><code><a href="orionis.database.contracts.IConnectionManager.html" class="internal-link" title="orionis.database.contracts.IConnectionManager">IConnectionManager</a></code></td><td class="fieldArgDesc">Manager resolving configured database connections.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">Complete the documented operation without returning a value.</td></tr></table></div>
+    <div><p>Initialize the runner with the application and connection manager.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">app:</span><code><a href="orionis.IApplication.html" class="internal-link">orionis.IApplication</a></code></td><td class="fieldArgDesc">Application providing the seeder directory.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">conn<wbr></wbr>_manager:</span><code><a href="orionis.database.contracts.IConnectionManager.html" class="internal-link">orionis.database.contracts.IConnectionManager</a></code></td><td class="fieldArgDesc">Manager resolving configured database connections.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">Complete the documented operation without returning a value.</td></tr></table></div>
   </div>
 </div><div class="basemethod">
   
@@ -1070,7 +1070,7 @@ runs overlap.</p>
     
     
     <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">__isRecorded</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">connection: <code>IConnection</code>, </span><span class="rst-sig-param">name: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/database/seeders/runner.py#L276">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/database/seeders/runner.py#L285">
       
       (source)
     </a>
@@ -1082,7 +1082,7 @@ runs overlap.</p>
   </div>
   <div class="docstring functionBody">
     
-    <div><p>Check whether another transaction committed this seeder.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">connection:</span><code><a href="orionis.database.contracts.IConnection.html" class="internal-link" title="orionis.database.contracts.IConnection">IConnection</a></code></td><td class="fieldArgDesc">Connection holding the tracking table.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">name:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Seeder filename stem.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code></td><td class="fieldArgDesc">Whether the tracking row is committed.</td></tr></table></div>
+    <div><p>Check whether another transaction committed this seeder.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">connection:</span><code><a href="orionis.database.contracts.IConnection.html" class="internal-link">orionis.database.contracts.IConnection</a></code></td><td class="fieldArgDesc">Connection holding the tracking table.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">name:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Seeder filename stem.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code></td><td class="fieldArgDesc">Whether the tracking row is committed.</td></tr></table></div>
   </div>
 </div><div class="basemethod">
   
@@ -1097,7 +1097,7 @@ runs overlap.</p>
     
     
     <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">__runStep</span><span class="function-signature long-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">connection: <code>IConnection</code>, </span><span class="rst-sig-param">name: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code>, </span><span class="rst-sig-param">seeder_cls: <code><a href="https://docs.python.org/3/builtins/functions.html#type" class="intersphinx-link">type</a>[<wbr></wbr><a href="orionis.database.seeders.Seeder.html" class="internal-link" title="orionis.database.seeders.Seeder">Seeder</a>]</code>, </span><span class="rst-sig-param">batch: <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code>, </span><span class="rst-sig-param">events: <code><a href="orionis.database.seeders.events.SeederEvents.html" class="internal-link" title="orionis.database.seeders.events.SeederEvents">SeederEvents</a></code></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/database/seeders/runner.py#L302">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/database/seeders/runner.py#L311">
       
       (source)
     </a>
@@ -1109,7 +1109,7 @@ runs overlap.</p>
   </div>
   <div class="docstring functionBody">
     
-    <div><p>Claim, run and commit one seeder and its tracking row.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">connection:</span><code><a href="orionis.database.contracts.IConnection.html" class="internal-link" title="orionis.database.contracts.IConnection">IConnection</a></code></td><td class="fieldArgDesc">Connection shared by the seeder and tracking transaction.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">name:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Persisted seeder filename stem.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">seeder<wbr></wbr>_cls:</span><code><a href="https://docs.python.org/3/builtins/functions.html#type" class="intersphinx-link">type</a> of <a href="orionis.database.seeders.Seeder.html" class="internal-link" title="orionis.database.seeders.Seeder">Seeder</a></code></td><td class="fieldArgDesc">Class to instantiate and execute.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">batch:</span><code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code></td><td class="fieldArgDesc">Batch assigned to this invocation.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">events:</span><code><a href="orionis.database.seeders.events.SeederEvents.html" class="internal-link" title="orionis.database.seeders.events.SeederEvents">SeederEvents</a></code></td><td class="fieldArgDesc">Progress callbacks.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code></td><td class="fieldArgDesc">Whether this call executed the seeder.</td></tr></table></div>
+    <div><p>Claim, run and commit one seeder and its tracking row.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">connection:</span><code><a href="orionis.database.contracts.IConnection.html" class="internal-link">orionis.database.contracts.IConnection</a></code></td><td class="fieldArgDesc">Connection shared by the seeder and tracking transaction.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">name:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Persisted seeder filename stem.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">seeder<wbr></wbr>_cls:</span><code><a href="https://docs.python.org/3/builtins/functions.html#type" class="intersphinx-link">type</a> of <a href="orionis.database.seeders.Seeder.html" class="internal-link">orionis.database.seeders.Seeder</a></code></td><td class="fieldArgDesc">Class to instantiate and execute.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">batch:</span><code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code></td><td class="fieldArgDesc">Batch assigned to this invocation.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">events:</span><code><a href="orionis.database.seeders.events.SeederEvents.html" class="internal-link">orionis.database.seeders.events.SeederEvents</a></code></td><td class="fieldArgDesc">Progress callbacks.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code></td><td class="fieldArgDesc">Whether this call executed the seeder.</td></tr></table></div>
   </div>
 </div><div class="basemethod">
   
@@ -1124,7 +1124,7 @@ runs overlap.</p>
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">__seedersPath</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>) -&gt; <code>Path</code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/database/seeders/runner.py#L195">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/database/seeders/runner.py#L204">
       
       (source)
     </a>
@@ -1136,7 +1136,7 @@ runs overlap.</p>
   </div>
   <div class="docstring functionBody">
     
-    <div><p>Return the application's configured seeder directory.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code>Path</code></td><td class="fieldArgDesc">Absolute path under <tt class="rst-docutils rst-literal">database/seeders</tt>.</td></tr></table></div>
+    <div><p>Return the application's configured seeder directory.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/library/pathlib.html#pathlib.Path" class="intersphinx-link">pathlib.Path</a></code></td><td class="fieldArgDesc">Absolute path under <tt class="rst-docutils rst-literal">database/seeders</tt>.</td></tr></table></div>
   </div>
 </div><div class="basemethod">
   
@@ -1151,7 +1151,7 @@ runs overlap.</p>
     
     
     <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">seed</span><span class="function-signature long-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-symbol">*, </span><span class="rst-sig-param">connection: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a> | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code> = <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a>, </span><span class="rst-sig-param">events: <code><a href="orionis.database.seeders.events.SeederEvents.html" class="internal-link" title="orionis.database.seeders.events.SeederEvents">SeederEvents</a> | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code> = <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/stdtypes.html#list" class="intersphinx-link">list</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>]</code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/database/seeders/runner.py#L123">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/database/seeders/runner.py#L132">
       
       (source)
     </a>
@@ -1163,7 +1163,7 @@ runs overlap.</p>
   </div>
   <div class="docstring functionBody">
     
-    <div><p>Run every discovered seeder that has no committed tracking row.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">connection:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a> or <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a>, <em>optional</em></code></td><td class="fieldArgDesc">Named database connection, or the configured default.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">events:</span><code><a href="orionis.database.seeders.events.SeederEvents.html" class="internal-link" title="orionis.database.seeders.events.SeederEvents">SeederEvents</a> or <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a>, <em>optional</em></code></td><td class="fieldArgDesc">Progress callbacks for executed seeders.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/stdtypes.html#list" class="intersphinx-link">list</a> of <a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Seeder names completed by this call, in execution order.</td></tr></table></div>
+    <div><p>Run every discovered seeder that has no committed tracking row.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">connection:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a> or <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a>, <em>optional</em></code></td><td class="fieldArgDesc">Named database connection, or the configured default.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">events:</span><code><a href="orionis.database.seeders.events.SeederEvents.html" class="internal-link">orionis.database.seeders.events.SeederEvents</a> or <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a>, <em>optional</em></code></td><td class="fieldArgDesc">Progress callbacks for executed seeders.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/stdtypes.html#list" class="intersphinx-link">list</a> of <a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Seeder names completed by this call, in execution order.</td></tr></table></div>
   </div>
 </div><div class="baseclassvariable">
   
@@ -1177,7 +1177,7 @@ runs overlap.</p>
   <div class="functionHeader">
     
     <span class="py-defname">__slots__</span>: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" class="intersphinx-link">tuple</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <wbr></wbr><span class="rst-variable-ellipsis">...</span>]</code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/database/seeders/runner.py#L97">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/database/seeders/runner.py#L102">
       
       (source)
     </a>
@@ -1189,7 +1189,7 @@ runs overlap.</p>
   </div>
   <div class="functionBody">
     
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p>Declare the instance attribute slots reserved by this class.</p></div>
     
   </div>
 </div><div class="baseinstancevariable">
@@ -1204,7 +1204,7 @@ runs overlap.</p>
   <div class="functionHeader">
     
     <span class="py-defname">__app</span> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/database/seeders/runner.py#L119">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/database/seeders/runner.py#L125">
       
       (source)
     </a>
@@ -1216,7 +1216,7 @@ runs overlap.</p>
   </div>
   <div class="functionBody">
     
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p>Application providing the seeder directory.</p></div>
     
   </div>
 </div><div class="baseinstancevariable">
@@ -1231,7 +1231,7 @@ runs overlap.</p>
   <div class="functionHeader">
     
     <span class="py-defname">__conn_manager</span> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/database/seeders/runner.py#L120">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/database/seeders/runner.py#L127">
       
       (source)
     </a>
@@ -1243,7 +1243,7 @@ runs overlap.</p>
   </div>
   <div class="functionBody">
     
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p>Manager resolving configured database connections.</p></div>
     
   </div>
 </div><div class="baseinstancevariable">
@@ -1258,7 +1258,7 @@ runs overlap.</p>
   <div class="functionHeader">
     
     <span class="py-defname">__discovered_cache</span>: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#dict" class="intersphinx-link">dict</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <wbr></wbr><a href="https://docs.python.org/3/builtins/functions.html#type" class="intersphinx-link">type</a>[<wbr></wbr><a href="orionis.database.seeders.Seeder.html" class="internal-link" title="orionis.database.seeders.Seeder">Seeder</a>]] | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/database/seeders/runner.py#L121">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/database/seeders/runner.py#L129">
       
       (source)
     </a>
@@ -1270,7 +1270,7 @@ runs overlap.</p>
   </div>
   <div class="functionBody">
     
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p>Cached results of filesystem discovery.</p></div>
     
   </div>
 </div>
@@ -1284,7 +1284,7 @@ runs overlap.</p>
   <div class="orionis-footer-inner">
     <div class="orionis-footer-copy">
       <p>API documentation for <a href="https://orionis-framework.com/" class="projecthome">Orionis</a>.</p>
-      <p class="orionis-footer-meta">Generated with <a href="https://github.com/twisted/pydoctor/">Pydoctor</a> 25.10.1.<span class="orionis-footer-build"> Built 2026-11-03 09:36:58.</span></p>
+      <p class="orionis-footer-meta">Generated with <a href="https://github.com/twisted/pydoctor/">Pydoctor</a> 25.10.1.<span class="orionis-footer-build"> Built 2026-11-03 13:00:15.</span></p>
     </div>
     <nav class="orionis-footer-links" aria-label="Additional resources">
       <a href="https://docs.orionis-framework.com">Read the guide <span aria-hidden="true">↗</span></a>

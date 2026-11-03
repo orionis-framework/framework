@@ -396,11 +396,11 @@
         </div>
 
         <div class="extrasDocstring">
-          <p class="class-signature"><code><span class="py-keyword">class</span> <span class="py-defname">ScheduleProvider</span>(<a href="orionis.container.providers.ServiceProvider.html" class="internal-link" title="orionis.container.providers.ServiceProvider">ServiceProvider</a>): <a href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/console/scheduler_provider.py#L8" class="sourceLink">(source)</a></code></p><p>Constructor: <code><a href="orionis.container.providers.ServiceProvider.html#__init__" class="internal-link" title="orionis.container.providers.ServiceProvider.__init__">ScheduleProvider(app)</a></code></p><p><a href="classIndex.html#orionis.console.scheduler_provider.ScheduleProvider">View In Hierarchy</a></p>
+          <p class="class-signature"><code><span class="py-keyword">class</span> <span class="py-defname">ScheduleProvider</span>(<a href="orionis.container.providers.ServiceProvider.html" class="internal-link" title="orionis.container.providers.ServiceProvider">ServiceProvider</a>): <a href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/console/scheduler_provider.py#L10" class="sourceLink">(source)</a></code></p><p>Constructor: <code><a href="orionis.container.providers.ServiceProvider.html#__init__" class="internal-link" title="orionis.container.providers.ServiceProvider.__init__">ScheduleProvider(app)</a></code></p><p><a href="classIndex.html#orionis.console.scheduler_provider.ScheduleProvider">View In Hierarchy</a></p>
         </div>
 
         <div class="moduleDocstring">
-          <div><p class="undocumented">Undocumented</p></div>
+          <div><p>Register schedule services in the application container.</p></div>
         </div>
 
         <div id="split-tables">
@@ -435,7 +435,7 @@
     
     <td>Instance Variable</td>
     <td><code><a href="orionis.container.providers.ServiceProvider.html#app" class="internal-link" title="orionis.container.providers.ServiceProvider.app">app</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
+    <td>The application container instance to which this service provider will be attached.</td>
   </tr>
 </table>
             
@@ -457,7 +457,7 @@
     
     
     <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">boot</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>):</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/console/scheduler_provider.py#L31">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/console/scheduler_provider.py#L30">
       
       (source)
     </a>
@@ -487,7 +487,7 @@ handling requests.</p>
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">register</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>):</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/console/scheduler_provider.py#L10">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/console/scheduler_provider.py#L13">
       
       (source)
     </a>
@@ -500,11 +500,11 @@ handling requests.</p>
   <div class="docstring functionBody">
     <div class="interfaceinfo">overrides <code><a href="orionis.container.providers.ServiceProvider.html#register" class="internal-link">orionis.container.providers.ServiceProvider.register</a></code></div>
     <div><p>Register the Scheduler as a singleton service in the application container.</p>
-<p>Binds the <code><a href="orionis.console.contracts.ISchedule.html" class="internal-link" title="orionis.console.contracts.ISchedule">ISchedule</a></code> interface to the <code><a href="orionis.console.tasks.schedule.Schedule.html" class="internal-link" title="orionis.console.tasks.schedule.Schedule">Schedule</a></code> implementation, ensuring a
+<p>Binds the <tt class="rst-docutils rst-literal">ISchedule</tt> interface to the <tt class="rst-docutils rst-literal">Schedule</tt> implementation, ensuring a
 single instance throughout the application's lifecycle. Also binds
-<code><a href="orionis.console.contracts.store.IScheduleStore.html" class="internal-link" title="orionis.console.contracts.store.IScheduleStore">IScheduleStore</a></code> to <code><a href="orionis.console.tasks.store.ScheduleStore.html" class="internal-link" title="orionis.console.tasks.store.ScheduleStore">ScheduleStore</a></code> so it can be auto-resolved as a
-constructor dependency of <code><a href="orionis.console.tasks.schedule.Schedule.html" class="internal-link" title="orionis.console.tasks.schedule.Schedule">Schedule</a></code>.</p>
-<table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg"><wbr></wbr>None</span></td><td class="fieldArgDesc"></td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">This method performs registration as a side effect and returns None.</td></tr></table></div>
+<tt class="rst-docutils rst-literal">IScheduleStore</tt> to <tt class="rst-docutils rst-literal">ScheduleStore</tt> so it can be auto-resolved as a
+constructor dependency of <tt class="rst-docutils rst-literal">Schedule</tt>.</p>
+<table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">This method performs registration as a side effect and returns None.</td></tr></table></div>
   </div>
 </div>
         </div>
@@ -517,7 +517,7 @@ constructor dependency of <code><a href="orionis.console.tasks.schedule.Schedule
   <div class="orionis-footer-inner">
     <div class="orionis-footer-copy">
       <p>API documentation for <a href="https://orionis-framework.com/" class="projecthome">Orionis</a>.</p>
-      <p class="orionis-footer-meta">Generated with <a href="https://github.com/twisted/pydoctor/">Pydoctor</a> 25.10.1.<span class="orionis-footer-build"> Built 2026-11-03 09:36:58.</span></p>
+      <p class="orionis-footer-meta">Generated with <a href="https://github.com/twisted/pydoctor/">Pydoctor</a> 25.10.1.<span class="orionis-footer-build"> Built 2026-11-03 13:00:15.</span></p>
     </div>
     <nav class="orionis-footer-links" aria-label="Additional resources">
       <a href="https://docs.orionis-framework.com">Read the guide <span aria-hidden="true">↗</span></a>

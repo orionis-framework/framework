@@ -506,7 +506,7 @@
         </div>
 
         <div class="extrasDocstring">
-          <p class="class-signature"><code><span class="py-keyword">class</span> <span class="py-defname">_FlashData</span>: <a href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/session/flash.py#L162" class="sourceLink">(source)</a></code></p><p>Known subclasses: <code><a href="orionis.http.Response.html" class="internal-link">orionis.http.Response</a></code>, <code><a href="orionis.view.pending.PendingView.html" class="internal-link">orionis.view.pending.PendingView</a></code></p><p><a href="classIndex.html#orionis.session.flash._FlashData">View In Hierarchy</a></p>
+          <p class="class-signature"><code><span class="py-keyword">class</span> <span class="py-defname">_FlashData</span>: <a href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/session/flash.py#L177" class="sourceLink">(source)</a></code></p><p>Known subclasses: <code><a href="orionis.http.Response.html" class="internal-link">orionis.http.Response</a></code>, <code><a href="orionis.view.pending.PendingView.html" class="internal-link">orionis.view.pending.PendingView</a></code></p><p><a href="classIndex.html#orionis.session.flash._FlashData">View In Hierarchy</a></p>
         </div>
 
         <div class="moduleDocstring">
@@ -517,7 +517,7 @@ Pending views apply it before rendering; responses apply it during dispatch.</p>
         </div>
 
         <div id="split-tables">
-          <table class="children sortable" id="id1985">
+          <table class="children sortable" id="id1993">
   
   
   <tr class="method">
@@ -539,12 +539,12 @@ Pending views apply it before rendering; responses apply it during dispatch.</p>
     
     <td>Class Variable</td>
     <td><code><a href="#__slots__" class="internal-link" title="orionis.session.flash._FlashData.__slots__">__slots__</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
+    <td>Declare the instance attribute slots reserved by this class.</td>
   </tr><tr class="instancevariable">
     
     <td>Instance Variable</td>
     <td><code><a href="#_flash" class="internal-link" title="orionis.session.flash._FlashData._flash">_flash</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
+    <td>Session values scheduled for availability during the next request.</td>
   </tr>
 </table>
           
@@ -566,7 +566,7 @@ Pending views apply it before rendering; responses apply it during dispatch.</p>
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">withErrors</span><span class="function-signature">(<span class="rst-sig-param">self: <code><a href="https://docs.python.org/3/library/typing.html#typing.Self" class="intersphinx-link">Self</a></code>, </span><span class="rst-sig-param">errors: <code><a href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Mapping" class="intersphinx-link">Mapping</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <wbr></wbr><a href="https://docs.python.org/3/library/typing.html#typing.Any" class="intersphinx-link">Any</a>] | <a href="https://docs.python.org/3/builtins/exceptions.html#Exception" class="intersphinx-link">Exception</a></code></span>) -&gt; <code><a href="https://docs.python.org/3/library/typing.html#typing.Self" class="intersphinx-link">Self</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/session/flash.py#L224">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/session/flash.py#L241">
       
       (source)
     </a>
@@ -580,7 +580,7 @@ Pending views apply it before rendering; responses apply it during dispatch.</p>
     
     <div><p>Flash validation errors for the next request.</p>
 <p>Errors are read back in templates through the <tt class="rst-docutils rst-literal">errors</tt> global.</p>
-<table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">errors:</span><code><a href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Mapping" class="intersphinx-link">Mapping</a>[<a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <a href="https://docs.python.org/3/library/typing.html#typing.Any" class="intersphinx-link">Any</a>] | Exception</code></td><td class="fieldArgDesc">Mapping of field to message(s), or a validation exception.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/library/typing.html#typing.Self" class="intersphinx-link">Self</a></code></td><td class="fieldArgDesc">The same owner, allowing fluent chaining.</td></tr></table></div>
+<table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">errors:</span><code><a href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Mapping" class="intersphinx-link">collections.abc.Mapping</a>[<a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <a href="https://docs.python.org/3/library/typing.html#typing.Any" class="intersphinx-link">typing.Any</a>] | Exception</code></td><td class="fieldArgDesc">Mapping of field to message(s), or a validation exception.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/library/typing.html#typing.Self" class="intersphinx-link">typing.Self</a></code></td><td class="fieldArgDesc">The same owner, allowing fluent chaining.</td></tr></table></div>
   </div>
 </div><div class="basemethod">
   
@@ -595,7 +595,7 @@ Pending views apply it before rendering; responses apply it during dispatch.</p>
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">withFlash</span><span class="function-signature">(<span class="rst-sig-param">self: <code><a href="https://docs.python.org/3/library/typing.html#typing.Self" class="intersphinx-link">Self</a></code>, </span><span class="rst-sig-param">key: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code>, </span><span class="rst-sig-param">value: <code><a href="https://docs.python.org/3/library/typing.html#typing.Any" class="intersphinx-link">Any</a> | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code> = <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></span>) -&gt; <code><a href="https://docs.python.org/3/library/typing.html#typing.Self" class="intersphinx-link">Self</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/session/flash.py#L174">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/session/flash.py#L191">
       
       (source)
     </a>
@@ -610,7 +610,7 @@ Pending views apply it before rendering; responses apply it during dispatch.</p>
     <div><p>Queue a status message for the owning response or pending view.</p>
 <p>The value survives for exactly one subsequent request and is read
 back in templates through the <tt class="rst-docutils rst-literal">flash()</tt> global.</p>
-<table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">key:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Flash data key.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">value:</span><code><a href="https://docs.python.org/3/library/typing.html#typing.Any" class="intersphinx-link">Any</a>, <em>optional</em></code></td><td class="fieldArgDesc">Value to flash.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/library/typing.html#typing.Self" class="intersphinx-link">Self</a></code></td><td class="fieldArgDesc">The same owner, allowing fluent chaining.</td></tr></table></div>
+<table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">key:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Flash data key.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">value:</span><code><a href="https://docs.python.org/3/library/typing.html#typing.Any" class="intersphinx-link">typing.Any</a>, <em>optional</em></code></td><td class="fieldArgDesc">Value to flash.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/library/typing.html#typing.Self" class="intersphinx-link">typing.Self</a></code></td><td class="fieldArgDesc">The same owner, allowing fluent chaining.</td></tr></table></div>
   </div>
 </div><div class="basemethod">
   
@@ -625,7 +625,7 @@ back in templates through the <tt class="rst-docutils rst-literal">flash()</tt> 
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">withInput</span><span class="function-signature">(<span class="rst-sig-param">self: <code><a href="https://docs.python.org/3/library/typing.html#typing.Self" class="intersphinx-link">Self</a></code>, </span><span class="rst-sig-param">values: <code><a href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Mapping" class="intersphinx-link">Mapping</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <wbr></wbr><a href="https://docs.python.org/3/library/typing.html#typing.Any" class="intersphinx-link">Any</a>]</code></span>) -&gt; <code><a href="https://docs.python.org/3/library/typing.html#typing.Self" class="intersphinx-link">Self</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/session/flash.py#L200">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/session/flash.py#L217">
       
       (source)
     </a>
@@ -640,7 +640,7 @@ back in templates through the <tt class="rst-docutils rst-literal">flash()</tt> 
     <div><p>Flash the submitted payload so the next request can repopulate it.</p>
 <p>Values are read back in templates through the <tt class="rst-docutils rst-literal">old()</tt> global.
 Credential-like fields such as <tt class="rst-docutils rst-literal">password</tt> are stripped.</p>
-<table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">values:</span><code><a href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Mapping" class="intersphinx-link">Mapping</a>[<a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <a href="https://docs.python.org/3/library/typing.html#typing.Any" class="intersphinx-link">Any</a>]</code></td><td class="fieldArgDesc">Submitted form payload to remember.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/library/typing.html#typing.Self" class="intersphinx-link">Self</a></code></td><td class="fieldArgDesc">The same owner, allowing fluent chaining.</td></tr></table></div>
+<table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">values:</span><code><a href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Mapping" class="intersphinx-link">collections.abc.Mapping</a>[<a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <a href="https://docs.python.org/3/library/typing.html#typing.Any" class="intersphinx-link">typing.Any</a>]</code></td><td class="fieldArgDesc">Submitted form payload to remember.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/library/typing.html#typing.Self" class="intersphinx-link">typing.Self</a></code></td><td class="fieldArgDesc">The same owner, allowing fluent chaining.</td></tr></table></div>
   </div>
 </div><div class="baseclassvariable">
   
@@ -654,7 +654,7 @@ Credential-like fields such as <tt class="rst-docutils rst-literal">password</tt
   <div class="functionHeader">
     
     <span class="py-defname">__slots__</span>: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" class="intersphinx-link">tuple</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <wbr></wbr><span class="rst-variable-ellipsis">...</span>]</code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/session/flash.py#L169">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/session/flash.py#L184">
       
       (source)
     </a>
@@ -666,7 +666,7 @@ Credential-like fields such as <tt class="rst-docutils rst-literal">password</tt
   </div>
   <div class="functionBody">
     <div class="interfaceinfo">overridden in <code><a href="orionis.http.Response.html" class="internal-link">orionis.http.Response</a></code>, <code><a href="orionis.view.pending.PendingView.html" class="internal-link">orionis.view.pending.PendingView</a></code></div>
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p>Declare the instance attribute slots reserved by this class.</p></div>
     
   </div>
 </div><div class="baseinstancevariable">
@@ -681,7 +681,7 @@ Credential-like fields such as <tt class="rst-docutils rst-literal">password</tt
   <div class="functionHeader">
     
     <span class="py-defname">_flash</span>: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#dict" class="intersphinx-link">dict</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <wbr></wbr><a href="https://docs.python.org/3/library/typing.html#typing.Any" class="intersphinx-link">Any</a>] | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/session/flash.py#L170">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/session/flash.py#L186">
       
       (source)
     </a>
@@ -693,7 +693,7 @@ Credential-like fields such as <tt class="rst-docutils rst-literal">password</tt
   </div>
   <div class="functionBody">
     <div class="interfaceinfo">overridden in <code><a href="orionis.http.Response.html" class="internal-link">orionis.http.Response</a></code>, <code><a href="orionis.view.pending.PendingView.html" class="internal-link">orionis.view.pending.PendingView</a></code></div>
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p>Session values scheduled for availability during the next request.</p></div>
     
   </div>
 </div>
@@ -707,7 +707,7 @@ Credential-like fields such as <tt class="rst-docutils rst-literal">password</tt
   <div class="orionis-footer-inner">
     <div class="orionis-footer-copy">
       <p>API documentation for <a href="https://orionis-framework.com/" class="projecthome">Orionis</a>.</p>
-      <p class="orionis-footer-meta">Generated with <a href="https://github.com/twisted/pydoctor/">Pydoctor</a> 25.10.1.<span class="orionis-footer-build"> Built 2026-11-03 09:36:58.</span></p>
+      <p class="orionis-footer-meta">Generated with <a href="https://github.com/twisted/pydoctor/">Pydoctor</a> 25.10.1.<span class="orionis-footer-build"> Built 2026-11-03 13:00:15.</span></p>
     </div>
     <nav class="orionis-footer-links" aria-label="Additional resources">
       <a href="https://docs.orionis-framework.com">Read the guide <span aria-hidden="true">↗</span></a>

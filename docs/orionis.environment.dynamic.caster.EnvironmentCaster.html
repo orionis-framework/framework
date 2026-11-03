@@ -890,15 +890,15 @@
         </div>
 
         <div class="extrasDocstring">
-          <p class="class-signature"><code><span class="py-keyword">class</span> <span class="py-defname">EnvironmentCaster</span>(<a href="orionis.environment.contracts.caster.IEnvironmentCaster.html" class="internal-link" title="orionis.environment.contracts.caster.IEnvironmentCaster">IEnvironmentCaster</a>): <a href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/environment/dynamic/caster.py#L9" class="sourceLink">(source)</a></code></p><p>Constructor: <code><a href="#__init__" class="internal-link" title="orionis.environment.dynamic.caster.EnvironmentCaster.__init__">EnvironmentCaster(raw)</a></code></p><p><a href="classIndex.html#orionis.environment.dynamic.caster.EnvironmentCaster">View In Hierarchy</a></p>
+          <p class="class-signature"><code><span class="py-keyword">class</span> <span class="py-defname">EnvironmentCaster</span>(<a href="orionis.environment.contracts.caster.IEnvironmentCaster.html" class="internal-link" title="orionis.environment.contracts.caster.IEnvironmentCaster">IEnvironmentCaster</a>): <a href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/environment/dynamic/caster.py#L11" class="sourceLink">(source)</a></code></p><p>Constructor: <code><a href="#__init__" class="internal-link" title="orionis.environment.dynamic.caster.EnvironmentCaster.__init__">EnvironmentCaster(raw)</a></code></p><p><a href="classIndex.html#orionis.environment.dynamic.caster.EnvironmentCaster">View In Hierarchy</a></p>
         </div>
 
         <div class="moduleDocstring">
-          <div><p class="undocumented">Undocumented</p></div>
+          <div><p>Convert raw environment strings to the requested Python value type.</p></div>
         </div>
 
         <div id="split-tables">
-          <table class="children sortable" id="id615">
+          <table class="children sortable" id="id616">
   
   
   <tr class="staticmethod">
@@ -1030,22 +1030,22 @@
     
     <td>Constant</td>
     <td><code><a href="#OPTIONS" class="internal-link" title="orionis.environment.dynamic.caster.EnvironmentCaster.OPTIONS">OPTIONS</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
+    <td>Precompute the set of valid type hints from the EnvironmentValueType enum for fast membership checks.</td>
   </tr><tr class="classvariable">
     
     <td>Class Variable</td>
     <td><code><a href="#__slots__" class="internal-link" title="orionis.environment.dynamic.caster.EnvironmentCaster.__slots__">__slots__</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
+    <td>Restrict instances to the declared attributes.</td>
   </tr><tr class="instancevariable">
     
     <td>Instance Variable</td>
     <td><code><a href="#__type_hint" class="internal-link" title="orionis.environment.dynamic.caster.EnvironmentCaster.__type_hint">__type<wbr></wbr>_hint</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
+    <td>Initialize type hint and value to default None.</td>
   </tr><tr class="instancevariable">
     
     <td>Instance Variable</td>
     <td><code><a href="#__value_raw" class="internal-link" title="orionis.environment.dynamic.caster.EnvironmentCaster.__value_raw">__value<wbr></wbr>_raw</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
+    <td>Raw environment value before conversion to the requested type.</td>
   </tr>
 </table>
           
@@ -1067,7 +1067,7 @@
     
     <div><span class="decorator">@<a href="https://docs.python.org/3/builtins/functions.html#staticmethod" class="intersphinx-link">staticmethod</a><br /></span></div>
     <span class="py-keyword">def</span>&#160;<span class="py-defname">parseTyped</span><span class="function-signature">(<span class="rst-sig-param">value_str: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/functions.html#object" class="intersphinx-link">object</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/environment/dynamic/caster.py#L31">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/environment/dynamic/caster.py#L40">
       
       (source)
     </a>
@@ -1100,7 +1100,7 @@ instantiation only when necessary.</p>
     
     <div><span class="decorator">@<a href="https://docs.python.org/3/builtins/functions.html#staticmethod" class="intersphinx-link">staticmethod</a><br /></span></div>
     <span class="py-keyword">def</span>&#160;<span class="py-defname">supportedTypes</span><span class="function-signature">() -&gt; <code><a href="https://docs.python.org/3/builtins/stdtypes.html#frozenset" class="intersphinx-link">frozenset</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>]</code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/environment/dynamic/caster.py#L18">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/environment/dynamic/caster.py#L27">
       
       (source)
     </a>
@@ -1128,7 +1128,7 @@ value casting.</td></tr></table></div>
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">__init__</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">raw: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a> | <a href="https://docs.python.org/3/builtins/functions.html#object" class="intersphinx-link">object</a></code></span>):</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/environment/dynamic/caster.py#L89">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/environment/dynamic/caster.py#L98">
       
       (source)
     </a>
@@ -1158,7 +1158,7 @@ hint. Non-string inputs are treated as values with no type hint.</td></tr></tabl
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">__parseBase64</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a> | <a href="https://docs.python.org/3/builtins/stdtypes.html#bytes" class="intersphinx-link">bytes</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/environment/dynamic/caster.py#L343">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/environment/dynamic/caster.py#L354">
       
       (source)
     </a>
@@ -1186,7 +1186,7 @@ represent valid UTF-8 text, otherwise returns the raw bytes.</td></tr></table><t
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">__parseBool</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/environment/dynamic/caster.py#L674">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/environment/dynamic/caster.py#L685">
       
       (source)
     </a>
@@ -1218,7 +1218,7 @@ Raises ValueError if the value does not match any valid representation.</p>
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">__parseDict</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/stdtypes.html#dict" class="intersphinx-link">dict</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/environment/dynamic/caster.py#L833">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/environment/dynamic/caster.py#L844">
       
       (source)
     </a>
@@ -1233,7 +1233,7 @@ Raises ValueError if the value does not match any valid representation.</p>
     <div><p>Parse the internal raw value and convert it to a Python dictionary.</p>
 <p>Strips leading and trailing whitespace from the internal raw value,
 then safely evaluates the string as a Python dictionary using
-<code><a href="https://docs.python.org/3/library/ast.html#ast.literal_eval" class="intersphinx-link">ast.literal_eval</a></code>. Raises an error if the conversion fails or the
+<tt class="rst-docutils rst-literal">ast.literal_eval</tt>. Raises an error if the conversion fails or the
 result is not a dictionary.</p>
 <table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/stdtypes.html#dict" class="intersphinx-link">dict</a></code></td><td class="fieldArgDesc">The internal value converted to a dictionary.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/exceptions.html#ValueError" class="intersphinx-link">ValueError</a></code></td><td>If the value cannot be converted to a dictionary due to invalid
 format or type.</td></tr></table></div>
@@ -1251,7 +1251,7 @@ format or type.</td></tr></table></div>
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">__parseFloat</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/functions.html#float" class="intersphinx-link">float</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/environment/dynamic/caster.py#L589">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/environment/dynamic/caster.py#L600">
       
       (source)
     </a>
@@ -1266,7 +1266,7 @@ format or type.</td></tr></table></div>
     <div><p>Convert the internal raw value to a float.</p>
 <p>Strips leading and trailing whitespace from the internal raw value and
 attempts to convert it to a float.</p>
-<table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">self:</span><code><a href="orionis.environment.dynamic.caster.EnvironmentCaster.html" class="internal-link" title="orionis.environment.dynamic.caster.EnvironmentCaster">EnvironmentCaster</a></code></td><td class="fieldArgDesc">Instance of the EnvironmentCaster class.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/functions.html#float" class="intersphinx-link">float</a></code></td><td class="fieldArgDesc">The internal value converted to a float.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/exceptions.html#ValueError" class="intersphinx-link">ValueError</a></code></td><td>If the value cannot be converted to a float due to invalid format or type.</td></tr></table></div>
+<table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">self:</span><code><a href="orionis.environment.dynamic.caster.EnvironmentCaster.html" class="internal-link">orionis.environment.dynamic.caster.EnvironmentCaster</a></code></td><td class="fieldArgDesc">Instance of the EnvironmentCaster class.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/functions.html#float" class="intersphinx-link">float</a></code></td><td class="fieldArgDesc">The internal value converted to a float.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/exceptions.html#ValueError" class="intersphinx-link">ValueError</a></code></td><td>If the value cannot be converted to a float due to invalid format or type.</td></tr></table></div>
   </div>
 </div><div class="basemethod">
   
@@ -1281,7 +1281,7 @@ attempts to convert it to a float.</p>
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">__parseInt</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/environment/dynamic/caster.py#L513">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/environment/dynamic/caster.py#L524">
       
       (source)
     </a>
@@ -1312,7 +1312,7 @@ or type.</td></tr></table></div>
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">__parseList</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/stdtypes.html#list" class="intersphinx-link">list</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/environment/dynamic/caster.py#L767">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/environment/dynamic/caster.py#L778">
       
       (source)
     </a>
@@ -1326,7 +1326,7 @@ or type.</td></tr></table></div>
     
     <div><p>Parse the internal raw value and convert it to a Python list.</p>
 <p>Strips leading and trailing whitespace from the internal raw value,
-then safely evaluates the string as a Python list using <code><a href="https://docs.python.org/3/library/ast.html#ast.literal_eval" class="intersphinx-link">ast.literal_eval</a></code>.
+then safely evaluates the string as a Python list using <tt class="rst-docutils rst-literal">ast.literal_eval</tt>.
 Raises an exception if the conversion fails or the result is not a list.</p>
 <table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/stdtypes.html#list" class="intersphinx-link">list</a></code></td><td class="fieldArgDesc">The internal value converted to a list.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/exceptions.html#ValueError" class="intersphinx-link">ValueError</a></code></td><td>If the value cannot be converted to a list due to invalid format.</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/exceptions.html#SyntaxError" class="intersphinx-link">SyntaxError</a></code></td><td>If the value contains invalid Python syntax.</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/exceptions.html#TypeError" class="intersphinx-link">TypeError</a></code></td><td>If the evaluated value is not a list.</td></tr></table></div>
   </div>
@@ -1343,7 +1343,7 @@ Raises an exception if the conversion fails or the result is not a list.</p>
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">__parsePath</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/environment/dynamic/caster.py#L379">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/environment/dynamic/caster.py#L390">
       
       (source)
     </a>
@@ -1357,7 +1357,7 @@ Raises an exception if the conversion fails or the result is not a list.</p>
     
     <div><p>Convert the internal raw value to a normalized POSIX path string.</p>
 <p>Process the internal value as a file system path. If the value is already
-a <code><a href="https://docs.python.org/3/library/pathlib.html#pathlib.Path" class="intersphinx-link">Path</a></code> object, return its POSIX representation. If the value is a string,
+a <tt class="rst-docutils rst-literal">Path</tt> object, return its POSIX representation. If the value is a string,
 replace backslashes with forward slashes for normalization and return the
 POSIX path string.</p>
 <table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">The normalized POSIX path string representing the file system path.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/exceptions.html#ValueError" class="intersphinx-link">ValueError</a></code></td><td>If the value cannot be processed as a valid path.</td></tr></table></div>
@@ -1375,7 +1375,7 @@ POSIX path string.</p>
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">__parseSet</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/stdtypes.html#set" class="intersphinx-link">set</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/environment/dynamic/caster.py#L971">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/environment/dynamic/caster.py#L982">
       
       (source)
     </a>
@@ -1389,7 +1389,7 @@ POSIX path string.</p>
     
     <div><p>Parse the internal raw value and convert it to a Python set.</p>
 <p>Remove leading and trailing whitespace from the internal raw value,
-then safely evaluate the string as a Python set using <code><a href="https://docs.python.org/3/library/ast.html#ast.literal_eval" class="intersphinx-link">ast.literal_eval</a></code>.
+then safely evaluate the string as a Python set using <tt class="rst-docutils rst-literal">ast.literal_eval</tt>.
 Raise a TypeError if the result is not a set, or a ValueError if the
 conversion fails.</p>
 <table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/stdtypes.html#set" class="intersphinx-link">set</a></code></td><td class="fieldArgDesc">The internal value converted to a set.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/exceptions.html#TypeError" class="intersphinx-link">TypeError</a></code></td><td>If the evaluated value is not a set.</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/exceptions.html#ValueError" class="intersphinx-link">ValueError</a></code></td><td>If the value cannot be converted to a set due to invalid format or type.</td></tr></table></div>
@@ -1407,7 +1407,7 @@ conversion fails.</p>
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">__parseStr</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/environment/dynamic/caster.py#L466">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/environment/dynamic/caster.py#L477">
       
       (source)
     </a>
@@ -1434,7 +1434,7 @@ conversion fails.</p>
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">__parseTuple</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" class="intersphinx-link">tuple</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/environment/dynamic/caster.py#L902">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/environment/dynamic/caster.py#L913">
       
       (source)
     </a>
@@ -1448,7 +1448,7 @@ conversion fails.</p>
     
     <div><p>Parse the internal raw value and convert it to a Python tuple.</p>
 <p>Remove leading and trailing whitespace from the internal raw value,
-then safely evaluate the string as a Python tuple using <code><a href="https://docs.python.org/3/library/ast.html#ast.literal_eval" class="intersphinx-link">ast.literal_eval</a></code>.
+then safely evaluate the string as a Python tuple using <tt class="rst-docutils rst-literal">ast.literal_eval</tt>.
 Raise a ValueError if conversion fails or the result is not a tuple.</p>
 <table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" class="intersphinx-link">tuple</a></code></td><td class="fieldArgDesc">The internal value converted to a tuple.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/exceptions.html#ValueError" class="intersphinx-link">ValueError</a></code></td><td>If the value cannot be converted to a tuple due to invalid format or type.</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/exceptions.html#TypeError" class="intersphinx-link">TypeError</a></code></td><td>If the evaluated value is not a tuple.</td></tr></table></div>
   </div>
@@ -1465,7 +1465,7 @@ Raise a ValueError if conversion fails or the result is not a tuple.</p>
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">__toBase64</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/environment/dynamic/caster.py#L282">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/environment/dynamic/caster.py#L293">
       
       (source)
     </a>
@@ -1496,7 +1496,7 @@ is the Base64 encoded representation.</td></tr></table><table class="fieldTable"
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">__toBool</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/environment/dynamic/caster.py#L710">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/environment/dynamic/caster.py#L721">
       
       (source)
     </a>
@@ -1512,7 +1512,7 @@ is the Base64 encoded representation.</td></tr></table><table class="fieldTable"
 <p>Converts the internal value to a string representation of a boolean,
 prefixed by the type hint. Accepts common boolean representations for
 string inputs.</p>
-<table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">self:</span><code><a href="orionis.environment.dynamic.caster.EnvironmentCaster.html" class="internal-link" title="orionis.environment.dynamic.caster.EnvironmentCaster">EnvironmentCaster</a></code></td><td class="fieldArgDesc">Instance of the EnvironmentCaster class.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">String in the format "&lt;type_hint&gt;:&lt;value&gt;", where &lt;value&gt; is
+<table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">self:</span><code><a href="orionis.environment.dynamic.caster.EnvironmentCaster.html" class="internal-link">orionis.environment.dynamic.caster.EnvironmentCaster</a></code></td><td class="fieldArgDesc">Instance of the EnvironmentCaster class.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">String in the format "&lt;type_hint&gt;:&lt;value&gt;", where &lt;value&gt; is
 'true' or 'false' in lowercase.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/exceptions.html#ValueError" class="intersphinx-link">ValueError</a></code></td><td>If the internal value cannot be converted to a boolean.</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/exceptions.html#TypeError" class="intersphinx-link">TypeError</a></code></td><td>If the value type is not convertible to boolean.</td></tr></table></div>
   </div>
 </div><div class="basemethod">
@@ -1528,7 +1528,7 @@ string inputs.</p>
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">__toDict</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/environment/dynamic/caster.py#L869">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/environment/dynamic/caster.py#L880">
       
       (source)
     </a>
@@ -1540,7 +1540,7 @@ string inputs.</p>
   </div>
   <div class="docstring functionBody">
     
-    <div><p>Convert the internal value to a string with dictionary type hint prefix.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">self:</span><code><a href="orionis.environment.dynamic.caster.EnvironmentCaster.html" class="internal-link" title="orionis.environment.dynamic.caster.EnvironmentCaster">EnvironmentCaster</a></code></td><td class="fieldArgDesc">Instance of the EnvironmentCaster class.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">String in the format "&lt;type_hint&gt;:&lt;value&gt;", where &lt;type_hint&gt; is the
+    <div><p>Convert the internal value to a string with dictionary type hint prefix.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">self:</span><code><a href="orionis.environment.dynamic.caster.EnvironmentCaster.html" class="internal-link">orionis.environment.dynamic.caster.EnvironmentCaster</a></code></td><td class="fieldArgDesc">Instance of the EnvironmentCaster class.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">String in the format "&lt;type_hint&gt;:&lt;value&gt;", where &lt;type_hint&gt; is the
 current type hint and &lt;value&gt; is the string representation of the dict.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/exceptions.html#TypeError" class="intersphinx-link">TypeError</a></code></td><td>If the internal value is not a dictionary.</td></tr></table></div>
   </div>
 </div><div class="basemethod">
@@ -1556,7 +1556,7 @@ current type hint and &lt;value&gt; is the string representation of the dict.</t
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">__toFloat</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/environment/dynamic/caster.py#L623">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/environment/dynamic/caster.py#L634">
       
       (source)
     </a>
@@ -1568,7 +1568,7 @@ current type hint and &lt;value&gt; is the string representation of the dict.</t
   </div>
   <div class="docstring functionBody">
     
-    <div><p>Convert the internal value to a string with the float type hint prefix.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">self:</span><code><a href="orionis.environment.dynamic.caster.EnvironmentCaster.html" class="internal-link" title="orionis.environment.dynamic.caster.EnvironmentCaster">EnvironmentCaster</a></code></td><td class="fieldArgDesc">Instance of the EnvironmentCaster class.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">String in the format "&lt;type_hint&gt;:&lt;value&gt;", where &lt;type_hint&gt; is the
+    <div><p>Convert the internal value to a string with the float type hint prefix.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">self:</span><code><a href="orionis.environment.dynamic.caster.EnvironmentCaster.html" class="internal-link">orionis.environment.dynamic.caster.EnvironmentCaster</a></code></td><td class="fieldArgDesc">Instance of the EnvironmentCaster class.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">String in the format "&lt;type_hint&gt;:&lt;value&gt;", where &lt;type_hint&gt; is the
 current type hint and &lt;value&gt; is the float value.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/exceptions.html#TypeError" class="intersphinx-link">TypeError</a></code></td><td>If the internal value cannot be converted to a float.</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/exceptions.html#ValueError" class="intersphinx-link">ValueError</a></code></td><td>If the internal value cannot be converted to a float due to invalid format.</td></tr></table></div>
   </div>
 </div><div class="basemethod">
@@ -1584,7 +1584,7 @@ current type hint and &lt;value&gt; is the float value.</td></tr></table><table 
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">__toInt</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/environment/dynamic/caster.py#L543">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/environment/dynamic/caster.py#L554">
       
       (source)
     </a>
@@ -1614,7 +1614,7 @@ current type hint and &lt;value&gt; is the integer value.</td></tr></table><tabl
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">__toList</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/environment/dynamic/caster.py#L805">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/environment/dynamic/caster.py#L816">
       
       (source)
     </a>
@@ -1642,7 +1642,7 @@ current type hint and &lt;value&gt; is the string representation of the list.</t
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">__toPath</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/environment/dynamic/caster.py#L416">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/environment/dynamic/caster.py#L427">
       
       (source)
     </a>
@@ -1654,7 +1654,7 @@ current type hint and &lt;value&gt; is the string representation of the list.</t
   </div>
   <div class="docstring functionBody">
     
-    <div><p>Convert internal value to absolute POSIX path string with type hint prefix.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">self:</span><code><a href="orionis.environment.dynamic.caster.EnvironmentCaster.html" class="internal-link" title="orionis.environment.dynamic.caster.EnvironmentCaster">EnvironmentCaster</a></code></td><td class="fieldArgDesc">Instance of the EnvironmentCaster class.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">String in format "&lt;type_hint&gt;:&lt;absolute_path&gt;" where absolute_path
+    <div><p>Convert internal value to absolute POSIX path string with type hint prefix.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">self:</span><code><a href="orionis.environment.dynamic.caster.EnvironmentCaster.html" class="internal-link">orionis.environment.dynamic.caster.EnvironmentCaster</a></code></td><td class="fieldArgDesc">Instance of the EnvironmentCaster class.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">String in format "&lt;type_hint&gt;:&lt;absolute_path&gt;" where absolute_path
 is the normalized, absolute POSIX path representation.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/exceptions.html#TypeError" class="intersphinx-link">TypeError</a></code></td><td>If the internal value is not a string or pathlib.Path object.</td></tr></table></div>
   </div>
 </div><div class="basemethod">
@@ -1670,7 +1670,7 @@ is the normalized, absolute POSIX path representation.</td></tr></table><table c
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">__toSet</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/environment/dynamic/caster.py#L1008">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/environment/dynamic/caster.py#L1019">
       
       (source)
     </a>
@@ -1682,7 +1682,7 @@ is the normalized, absolute POSIX path representation.</td></tr></table><table c
   </div>
   <div class="docstring functionBody">
     
-    <div><p>Convert the internal value to a string with the set type hint prefix.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">self:</span><code><a href="orionis.environment.dynamic.caster.EnvironmentCaster.html" class="internal-link" title="orionis.environment.dynamic.caster.EnvironmentCaster">EnvironmentCaster</a></code></td><td class="fieldArgDesc">Instance of the EnvironmentCaster class.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">String in the format "&lt;type_hint&gt;:&lt;value&gt;", where &lt;type_hint&gt; is the
+    <div><p>Convert the internal value to a string with the set type hint prefix.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">self:</span><code><a href="orionis.environment.dynamic.caster.EnvironmentCaster.html" class="internal-link">orionis.environment.dynamic.caster.EnvironmentCaster</a></code></td><td class="fieldArgDesc">Instance of the EnvironmentCaster class.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">String in the format "&lt;type_hint&gt;:&lt;value&gt;", where &lt;type_hint&gt; is the
 current type hint and &lt;value&gt; is the string representation of the set.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/exceptions.html#TypeError" class="intersphinx-link">TypeError</a></code></td><td>If the internal value is not a set.</td></tr></table></div>
   </div>
 </div><div class="basemethod">
@@ -1698,7 +1698,7 @@ current type hint and &lt;value&gt; is the string representation of the set.</td
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">__toStr</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/environment/dynamic/caster.py#L480">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/environment/dynamic/caster.py#L491">
       
       (source)
     </a>
@@ -1710,7 +1710,7 @@ current type hint and &lt;value&gt; is the string representation of the set.</td
   </div>
   <div class="docstring functionBody">
     
-    <div><p>Return the internal value as a string prefixed by the type hint.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">self:</span><code><a href="orionis.environment.dynamic.caster.EnvironmentCaster.html" class="internal-link" title="orionis.environment.dynamic.caster.EnvironmentCaster">EnvironmentCaster</a></code></td><td class="fieldArgDesc">Instance of the EnvironmentCaster class.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">String in the format "&lt;type_hint&gt;:&lt;value&gt;", where &lt;type_hint&gt; is the
+    <div><p>Return the internal value as a string prefixed by the type hint.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">self:</span><code><a href="orionis.environment.dynamic.caster.EnvironmentCaster.html" class="internal-link">orionis.environment.dynamic.caster.EnvironmentCaster</a></code></td><td class="fieldArgDesc">Instance of the EnvironmentCaster class.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">String in the format "&lt;type_hint&gt;:&lt;value&gt;", where &lt;type_hint&gt; is the
 current type hint and &lt;value&gt; is the string value.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/exceptions.html#TypeError" class="intersphinx-link">TypeError</a></code></td><td>If the internal value is not a string.</td></tr></table></div>
   </div>
 </div><div class="basemethod">
@@ -1726,7 +1726,7 @@ current type hint and &lt;value&gt; is the string value.</td></tr></table><table
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">__toTuple</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/environment/dynamic/caster.py#L938">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/environment/dynamic/caster.py#L949">
       
       (source)
     </a>
@@ -1738,7 +1738,7 @@ current type hint and &lt;value&gt; is the string value.</td></tr></table><table
   </div>
   <div class="docstring functionBody">
     
-    <div><p>Convert the internal value to a string with the tuple type hint prefix.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">self:</span><code><a href="orionis.environment.dynamic.caster.EnvironmentCaster.html" class="internal-link" title="orionis.environment.dynamic.caster.EnvironmentCaster">EnvironmentCaster</a></code></td><td class="fieldArgDesc">Instance of the EnvironmentCaster class.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">String in the format "&lt;type_hint&gt;:&lt;value&gt;", where &lt;type_hint&gt; is the
+    <div><p>Convert the internal value to a string with the tuple type hint prefix.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">self:</span><code><a href="orionis.environment.dynamic.caster.EnvironmentCaster.html" class="internal-link">orionis.environment.dynamic.caster.EnvironmentCaster</a></code></td><td class="fieldArgDesc">Instance of the EnvironmentCaster class.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">String in the format "&lt;type_hint&gt;:&lt;value&gt;", where &lt;type_hint&gt; is the
 current type hint and &lt;value&gt; is the string representation of the tuple.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/exceptions.html#TypeError" class="intersphinx-link">TypeError</a></code></td><td>If the internal value is not a tuple.</td></tr></table></div>
   </div>
 </div><div class="basemethod">
@@ -1754,7 +1754,7 @@ current type hint and &lt;value&gt; is the string representation of the tuple.</
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">get</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/functions.html#object" class="intersphinx-link">object</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/environment/dynamic/caster.py#L136">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/environment/dynamic/caster.py#L147">
       
       (source)
     </a>
@@ -1771,7 +1771,7 @@ current type hint and &lt;value&gt; is the string representation of the tuple.</
 parsing method for that type. Supported type hints include: 'path', 'str',
 'int', 'float', 'bool', 'list', 'dict', 'tuple', 'set', and 'base64'.
 If no type hint is set, return the raw value.</p>
-<table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">self:</span><code><a href="orionis.environment.dynamic.caster.EnvironmentCaster.html" class="internal-link" title="orionis.environment.dynamic.caster.EnvironmentCaster">EnvironmentCaster</a></code></td><td class="fieldArgDesc">Instance of the EnvironmentCaster class.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/functions.html#object" class="intersphinx-link">object</a></code></td><td class="fieldArgDesc">The value converted or processed according to the specified type hint.
+<table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">self:</span><code><a href="orionis.environment.dynamic.caster.EnvironmentCaster.html" class="internal-link">orionis.environment.dynamic.caster.EnvironmentCaster</a></code></td><td class="fieldArgDesc">Instance of the EnvironmentCaster class.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/functions.html#object" class="intersphinx-link">object</a></code></td><td class="fieldArgDesc">The value converted or processed according to the specified type hint.
 If no type hint is set, returns the raw value.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/exceptions.html#ValueError" class="intersphinx-link">ValueError</a></code></td><td>If an error occurs during type conversion or processing.</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/exceptions.html#TypeError" class="intersphinx-link">TypeError</a></code></td><td>If an error occurs during type conversion or processing.</td></tr></table></div>
   </div>
 </div><div class="basemethod">
@@ -1787,7 +1787,7 @@ If no type hint is set, returns the raw value.</td></tr></table><table class="fi
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">to</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">type_hint: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a> | EnvironmentValueType</code></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/environment/dynamic/caster.py#L209">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/environment/dynamic/caster.py#L220">
       
       (source)
     </a>
@@ -1799,8 +1799,8 @@ If no type hint is set, returns the raw value.</td></tr></table><table class="fi
   </div>
   <div class="docstring functionBody">
     <div class="interfaceinfo">overrides <code><a href="orionis.environment.contracts.caster.IEnvironmentCaster.html#to" class="internal-link">orionis.environment.contracts.caster.IEnvironmentCaster.to</a></code></div>
-    <div><p>Convert the internal value to the specified type and return as a string.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">type<wbr></wbr>_hint:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a> or <a href="orionis.environment.enums.EnvironmentValueType.html" class="internal-link" title="orionis.environment.enums.EnvironmentValueType">EnvironmentValueType</a></code></td><td class="fieldArgDesc">The type to which the internal value should be converted. Must be a
-valid option in <code><a href="#OPTIONS" class="internal-link" title="orionis.environment.dynamic.caster.EnvironmentCaster.OPTIONS">OPTIONS</a></code>.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">String representation of the value with the type hint prefix, e.g.,
+    <div><p>Convert the internal value to the specified type and return as a string.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">type<wbr></wbr>_hint:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a> or <a href="orionis.environment.enums.EnvironmentValueType.html" class="internal-link">orionis.environment.enums.EnvironmentValueType</a></code></td><td class="fieldArgDesc">The type to which the internal value should be converted. Must be a
+valid option in <tt class="rst-docutils rst-literal">OPTIONS</tt>.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">String representation of the value with the type hint prefix, e.g.,
 int:42, list:[1, 2, 3], etc.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/exceptions.html#ValueError" class="intersphinx-link">ValueError</a></code></td><td>If the provided type hint is invalid or conversion fails.</td></tr></table></div>
   </div>
 </div><div class="baseconstant">
@@ -1815,7 +1815,7 @@ int:42, list:[1, 2, 3], etc.</td></tr></table><table class="fieldTable"><tr clas
   <div class="functionHeader">
     
     <span class="py-defname">OPTIONS</span>: <code><a href="https://docs.python.org/3/library/typing.html#typing.ClassVar" class="intersphinx-link">ClassVar</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#frozenset" class="intersphinx-link">frozenset</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>]]</code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/environment/dynamic/caster.py#L13">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/environment/dynamic/caster.py#L17">
       
       (source)
     </a>
@@ -1827,7 +1827,8 @@ int:42, list:[1, 2, 3], etc.</td></tr></table><table class="fieldTable"><tr clas
   </div>
   <div class="functionBody">
     
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p>Precompute the set of valid type hints from the EnvironmentValueType enum for
+fast membership checks.</p></div>
     <table class="valueTable"><tr class="fieldStart"><td class="fieldName">Value</td></tr><tr><td><pre class="constant-value"><code><a href="https://docs.python.org/3/builtins/stdtypes.html#frozenset" class="intersphinx-link">frozenset</a>(<wbr></wbr>(e.value for e in EnvironmentValueType))</code></pre></td></tr></table>
   </div>
 </div><div class="baseclassvariable">
@@ -1842,7 +1843,7 @@ int:42, list:[1, 2, 3], etc.</td></tr></table><table class="fieldTable"><tr clas
   <div class="functionHeader">
     
     <span class="py-defname">__slots__</span>: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" class="intersphinx-link">tuple</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <wbr></wbr><span class="rst-variable-ellipsis">...</span>]</code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/environment/dynamic/caster.py#L16">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/environment/dynamic/caster.py#L24">
       
       (source)
     </a>
@@ -1854,7 +1855,7 @@ int:42, list:[1, 2, 3], etc.</td></tr></table><table class="fieldTable"><tr clas
   </div>
   <div class="functionBody">
     <div class="interfaceinfo">overrides <code><a href="orionis.environment.contracts.caster.IEnvironmentCaster.html#__slots__" class="internal-link">orionis.environment.contracts.caster.IEnvironmentCaster.__slots__</a></code></div>
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p>Restrict instances to the declared attributes.</p></div>
     
   </div>
 </div><div class="baseinstancevariable">
@@ -1869,7 +1870,7 @@ int:42, list:[1, 2, 3], etc.</td></tr></table><table class="fieldTable"><tr clas
   <div class="functionHeader">
     
     <span class="py-defname">__type_hint</span>: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a> | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/environment/dynamic/caster.py#L110">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/environment/dynamic/caster.py#L119">
       
       (source)
     </a>
@@ -1881,7 +1882,7 @@ int:42, list:[1, 2, 3], etc.</td></tr></table><table class="fieldTable"><tr clas
   </div>
   <div class="functionBody">
     
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p>Initialize type hint and value to default None.</p></div>
     
   </div>
 </div><div class="baseinstancevariable">
@@ -1896,7 +1897,7 @@ int:42, list:[1, 2, 3], etc.</td></tr></table><table class="fieldTable"><tr clas
   <div class="functionHeader">
     
     <span class="py-defname">__value_raw</span>: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a> | <a href="https://docs.python.org/3/library/typing.html#typing.Any" class="intersphinx-link">Any</a></code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/environment/dynamic/caster.py#L111">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/environment/dynamic/caster.py#L121">
       
       (source)
     </a>
@@ -1908,7 +1909,7 @@ int:42, list:[1, 2, 3], etc.</td></tr></table><table class="fieldTable"><tr clas
   </div>
   <div class="functionBody">
     
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p>Raw environment value before conversion to the requested type.</p></div>
     
   </div>
 </div>
@@ -1922,7 +1923,7 @@ int:42, list:[1, 2, 3], etc.</td></tr></table><table class="fieldTable"><tr clas
   <div class="orionis-footer-inner">
     <div class="orionis-footer-copy">
       <p>API documentation for <a href="https://orionis-framework.com/" class="projecthome">Orionis</a>.</p>
-      <p class="orionis-footer-meta">Generated with <a href="https://github.com/twisted/pydoctor/">Pydoctor</a> 25.10.1.<span class="orionis-footer-build"> Built 2026-11-03 09:36:58.</span></p>
+      <p class="orionis-footer-meta">Generated with <a href="https://github.com/twisted/pydoctor/">Pydoctor</a> 25.10.1.<span class="orionis-footer-build"> Built 2026-11-03 13:00:15.</span></p>
     </div>
     <nav class="orionis-footer-links" aria-label="Additional resources">
       <a href="https://docs.orionis-framework.com">Read the guide <span aria-hidden="true">↗</span></a>

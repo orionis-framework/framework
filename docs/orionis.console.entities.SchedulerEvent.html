@@ -287,7 +287,7 @@
                     
                 </label>
 
-                <code><a href="orionis.console.entities.command.html" class="internal-link" title="orionis.console.entities.command">command</a></code>
+                <code><a href="orionis.console.entities.command.module.html" class="internal-link" title="orionis.console.entities.command">command</a></code>
 
                 <div class="expandableContent">
                     <div>
@@ -379,7 +379,7 @@
                     
                 </label>
 
-                <code><a href="orionis.console.entities.task.html" class="internal-link" title="orionis.console.entities.task">task</a></code>
+                <code><a href="orionis.console.entities.task.module.html" class="internal-link" title="orionis.console.entities.task">task</a></code>
 
                 <div class="expandableContent">
                     <div>
@@ -1088,7 +1088,7 @@
         
 
         
-            <div class="itemName"><code><a href="orionis.console.entities.TaskEvent.html#code" class="internal-link" title="orionis.console.entities.TaskEvent.code">code</a></code>
+            <div class="itemName"><code><a href="orionis.console.entities.TaskEvent.html#description" class="internal-link" title="orionis.console.entities.TaskEvent.description">description</a></code>
             </div>
         
 
@@ -1098,7 +1098,7 @@
         
 
         
-            <div class="itemName"><code><a href="orionis.console.entities.TaskEvent.html#description" class="internal-link" title="orionis.console.entities.TaskEvent.description">description</a></code>
+            <div class="itemName"><code><a href="orionis.console.entities.TaskEvent.html#code" class="internal-link" title="orionis.console.entities.TaskEvent.code">code</a></code>
             </div>
         
 
@@ -1267,11 +1267,11 @@
         </div>
 
         <div class="extrasDocstring">
-          <p class="class-signature"><code><span class="py-keyword">class</span> <span class="py-defname">SchedulerEvent</span>(<a href="orionis.support.entities.BaseEntity.html" class="internal-link" title="orionis.support.entities.BaseEntity">BaseEntity</a>): <a href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/console/entities/scheduler_event.py#L6" class="sourceLink">(source)</a></code></p><p><a href="classIndex.html#orionis.console.entities.SchedulerEvent">View In Hierarchy</a></p>
+          <p class="class-signature"><code><span class="py-keyword">class</span> <span class="py-defname">SchedulerEvent</span>(<a href="orionis.support.entities.BaseEntity.html" class="internal-link" title="orionis.support.entities.BaseEntity">BaseEntity</a>): <a href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/console/entities/scheduler_event.py#L8" class="sourceLink">(source)</a></code></p><p><a href="classIndex.html#orionis.console.entities.SchedulerEvent">View In Hierarchy</a></p>
         </div>
 
         <div class="moduleDocstring">
-          <div><p>Represent a scheduler event entity.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">code</span></td><td class="fieldArgDesc">Unique identifier code for the scheduler event.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">description</span></td><td class="fieldArgDesc">Description of the scheduler event. Defaults to an empty string.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">jobstore</span></td><td class="fieldArgDesc">Storage backend for the scheduler job. Defaults to "memory".</td></tr></table></div>
+          <div><p>Represent a scheduler event entity.</p></div>
         </div>
 
         <div id="split-tables">
@@ -1283,21 +1283,21 @@
     <td>Method</td>
     <td><code><a href="#__post_init__" class="internal-link" title="orionis.console.entities.SchedulerEvent.__post_init__">__post<wbr></wbr>_init__</a></code></td>
     <td>Initialize the SchedulerEvent instance after dataclass construction.</td>
-  </tr><tr class="classvariable">
+  </tr><tr class="instancevariable">
     
-    <td>Class Variable</td>
+    <td>Instance Variable</td>
     <td><code><a href="#code" class="internal-link" title="orionis.console.entities.SchedulerEvent.code">code</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
-  </tr><tr class="classvariable">
+    <td>Unique identifier code for the scheduler event.</td>
+  </tr><tr class="instancevariable">
     
-    <td>Class Variable</td>
+    <td>Instance Variable</td>
     <td><code><a href="#description" class="internal-link" title="orionis.console.entities.SchedulerEvent.description">description</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
-  </tr><tr class="classvariable">
+    <td>Description of the scheduler event. Defaults to an empty string.</td>
+  </tr><tr class="instancevariable">
     
-    <td>Class Variable</td>
+    <td>Instance Variable</td>
     <td><code><a href="#jobstore" class="internal-link" title="orionis.console.entities.SchedulerEvent.jobstore">jobstore</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
+    <td>Storage backend for the scheduler job. Defaults to "memory".</td>
   </tr>
 </table>
           
@@ -1326,7 +1326,7 @@
     
     <td>Class Variable</td>
     <td><code><a href="orionis.support.entities.BaseEntity.html#__slots__" class="internal-link" title="orionis.support.entities.BaseEntity.__slots__">__slots__</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
+    <td>Declare that this class introduces no additional instance slots.</td>
   </tr>
 </table>
             
@@ -1348,7 +1348,7 @@
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">__post_init__</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>):</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/console/entities/scheduler_event.py#L25">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/console/entities/scheduler_event.py#L27">
       
       (source)
     </a>
@@ -1365,7 +1365,7 @@
 attribute accordingly. Calls the parent class's __post_init__ method.</p>
 <table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">This method modifies the instance in place and returns None.</td></tr></table></div>
   </div>
-</div><div class="baseclassvariable">
+</div><div class="baseinstancevariable">
   
   
   <a name="orionis.console.entities.SchedulerEvent.code">
@@ -1377,7 +1377,7 @@ attribute accordingly. Calls the parent class's __post_init__ method.</p>
   <div class="functionHeader">
     
     <span class="py-defname">code</span>: <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/console/entities/scheduler_event.py#L21">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/console/entities/scheduler_event.py#L23">
       
       (source)
     </a>
@@ -1389,10 +1389,10 @@ attribute accordingly. Calls the parent class's __post_init__ method.</p>
   </div>
   <div class="functionBody">
     
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p>Unique identifier code for the scheduler event.</p></div>
     
   </div>
-</div><div class="baseclassvariable">
+</div><div class="baseinstancevariable">
   
   
   <a name="orionis.console.entities.SchedulerEvent.description">
@@ -1404,7 +1404,7 @@ attribute accordingly. Calls the parent class's __post_init__ method.</p>
   <div class="functionHeader">
     
     <span class="py-defname">description</span>: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <em>optional</em></code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/console/entities/scheduler_event.py#L22">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/console/entities/scheduler_event.py#L24">
       
       (source)
     </a>
@@ -1416,10 +1416,10 @@ attribute accordingly. Calls the parent class's __post_init__ method.</p>
   </div>
   <div class="functionBody">
     
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p>Description of the scheduler event. Defaults to an empty string.</p></div>
     
   </div>
-</div><div class="baseclassvariable">
+</div><div class="baseinstancevariable">
   
   
   <a name="orionis.console.entities.SchedulerEvent.jobstore">
@@ -1431,7 +1431,7 @@ attribute accordingly. Calls the parent class's __post_init__ method.</p>
   <div class="functionHeader">
     
     <span class="py-defname">jobstore</span>: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <em>optional</em></code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/console/entities/scheduler_event.py#L23">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/console/entities/scheduler_event.py#L25">
       
       (source)
     </a>
@@ -1443,7 +1443,7 @@ attribute accordingly. Calls the parent class's __post_init__ method.</p>
   </div>
   <div class="functionBody">
     
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p>Storage backend for the scheduler job. Defaults to "memory".</p></div>
     
   </div>
 </div>
@@ -1457,7 +1457,7 @@ attribute accordingly. Calls the parent class's __post_init__ method.</p>
   <div class="orionis-footer-inner">
     <div class="orionis-footer-copy">
       <p>API documentation for <a href="https://orionis-framework.com/" class="projecthome">Orionis</a>.</p>
-      <p class="orionis-footer-meta">Generated with <a href="https://github.com/twisted/pydoctor/">Pydoctor</a> 25.10.1.<span class="orionis-footer-build"> Built 2026-11-03 09:36:58.</span></p>
+      <p class="orionis-footer-meta">Generated with <a href="https://github.com/twisted/pydoctor/">Pydoctor</a> 25.10.1.<span class="orionis-footer-build"> Built 2026-11-03 13:00:15.</span></p>
     </div>
     <nav class="orionis-footer-links" aria-label="Additional resources">
       <a href="https://docs.orionis-framework.com">Read the guide <span aria-hidden="true">↗</span></a>

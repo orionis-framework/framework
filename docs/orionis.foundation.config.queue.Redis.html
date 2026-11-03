@@ -471,7 +471,7 @@
         
 
         
-            <div class="itemName"><code><a href="orionis.foundation.config.queue.enums.drivers.html" class="internal-link" title="orionis.foundation.config.queue.enums.drivers">drivers</a></code>
+            <div class="itemName"><code><a href="orionis.foundation.config.queue.enums.drivers.module.html" class="internal-link" title="orionis.foundation.config.queue.enums.drivers">drivers</a></code>
             </div>
         
 
@@ -1730,15 +1730,15 @@
         </div>
 
         <div class="extrasDocstring">
-          <p class="class-signature"><code><span class="py-keyword">class</span> <span class="py-defname">Redis</span>(<a href="orionis.support.entities.BaseEntity.html" class="internal-link" title="orionis.support.entities.BaseEntity">BaseEntity</a>): <a href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/foundation/config/queue/entities/redis.py#L15" class="sourceLink">(source)</a></code></p><p><a href="classIndex.html#orionis.foundation.config.queue.Redis">View In Hierarchy</a></p>
+          <p class="class-signature"><code><span class="py-keyword">class</span> <span class="py-defname">Redis</span>(<a href="orionis.support.entities.BaseEntity.html" class="internal-link" title="orionis.support.entities.BaseEntity">BaseEntity</a>): <a href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/foundation/config/queue/entities/redis.py#L18" class="sourceLink">(source)</a></code></p><p><a href="classIndex.html#orionis.foundation.config.queue.Redis">View In Hierarchy</a></p>
         </div>
 
         <div class="moduleDocstring">
-          <div><p>Configure a durable Redis queue connection.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">driver</span></td><td class="fieldArgDesc">Redis driver identifier.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">endpoint</span></td><td class="fieldArgDesc">Redis host read from <tt class="rst-docutils rst-literal">REDIS_HOST</tt>.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">port</span></td><td class="fieldArgDesc">TCP port read from <tt class="rst-docutils rst-literal">REDIS_PORT</tt>, between 1 and 65535.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">db</span></td><td class="fieldArgDesc">Nonnegative database index read from <tt class="rst-docutils rst-literal">REDIS_DB</tt>.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">password</span></td><td class="fieldArgDesc">Optional authentication password read from <tt class="rst-docutils rst-literal">REDIS_PASSWORD</tt>.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">prefix</span></td><td class="fieldArgDesc">Namespace read from <tt class="rst-docutils rst-literal">QUEUE_REDIS_PREFIX</tt> to isolate persisted jobs.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">queue</span></td><td class="fieldArgDesc">Default logical queue name read from <tt class="rst-docutils rst-literal">QUEUE_REDIS_QUEUE</tt>.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">retry<wbr></wbr>_after</span></td><td class="fieldArgDesc">Reservation duration read from <tt class="rst-docutils rst-literal">QUEUE_REDIS_RETRY_AFTER</tt> in seconds.</td></tr></table></div>
+          <div><p>Configure a durable Redis queue connection.</p></div>
         </div>
 
         <div id="split-tables">
-          <table class="children sortable" id="id864">
+          <table class="children sortable" id="id865">
   
   
   <tr class="method">
@@ -1746,53 +1746,53 @@
     <td>Method</td>
     <td><code><a href="#__post_init__" class="internal-link" title="orionis.foundation.config.queue.Redis.__post_init__">__post<wbr></wbr>_init__</a></code></td>
     <td>Validate Redis connection fields, namespace, and reservation duration.</td>
-  </tr><tr class="classvariable">
+  </tr><tr class="instancevariable">
     
-    <td>Class Variable</td>
+    <td>Instance Variable</td>
     <td><code><a href="#db" class="internal-link" title="orionis.foundation.config.queue.Redis.db">db</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
-  </tr><tr class="classvariable">
+    <td>Nonnegative database index read from <tt class="rst-docutils rst-literal">REDIS_DB</tt>.</td>
+  </tr><tr class="instancevariable">
     
-    <td>Class Variable</td>
+    <td>Instance Variable</td>
     <td><code><a href="#driver" class="internal-link" title="orionis.foundation.config.queue.Redis.driver">driver</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
-  </tr><tr class="classvariable">
+    <td>Redis driver identifier.</td>
+  </tr><tr class="instancevariable">
     
-    <td>Class Variable</td>
+    <td>Instance Variable</td>
     <td><code><a href="#endpoint" class="internal-link" title="orionis.foundation.config.queue.Redis.endpoint">endpoint</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
-  </tr><tr class="classvariable">
+    <td>Redis host read from <tt class="rst-docutils rst-literal">REDIS_HOST</tt>.</td>
+  </tr><tr class="instancevariable">
     
-    <td>Class Variable</td>
+    <td>Instance Variable</td>
     <td><code><a href="#password" class="internal-link" title="orionis.foundation.config.queue.Redis.password">password</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
-  </tr><tr class="classvariable">
+    <td>Optional authentication password read from <tt class="rst-docutils rst-literal">REDIS_PASSWORD</tt>.</td>
+  </tr><tr class="instancevariable">
     
-    <td>Class Variable</td>
+    <td>Instance Variable</td>
     <td><code><a href="#port" class="internal-link" title="orionis.foundation.config.queue.Redis.port">port</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
-  </tr><tr class="classvariable">
+    <td>TCP port read from <tt class="rst-docutils rst-literal">REDIS_PORT</tt>, between 1 and 65535.</td>
+  </tr><tr class="instancevariable">
     
-    <td>Class Variable</td>
+    <td>Instance Variable</td>
     <td><code><a href="#prefix" class="internal-link" title="orionis.foundation.config.queue.Redis.prefix">prefix</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
-  </tr><tr class="classvariable">
+    <td>Namespace read from <tt class="rst-docutils rst-literal">QUEUE_REDIS_PREFIX</tt> to isolate persisted jobs.</td>
+  </tr><tr class="instancevariable">
     
-    <td>Class Variable</td>
+    <td>Instance Variable</td>
     <td><code><a href="#queue" class="internal-link" title="orionis.foundation.config.queue.Redis.queue">queue</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
-  </tr><tr class="classvariable">
+    <td>Default logical queue name read from <tt class="rst-docutils rst-literal">QUEUE_REDIS_QUEUE</tt>.</td>
+  </tr><tr class="instancevariable">
     
-    <td>Class Variable</td>
+    <td>Instance Variable</td>
     <td><code><a href="#retry_after" class="internal-link" title="orionis.foundation.config.queue.Redis.retry_after">retry<wbr></wbr>_after</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
+    <td>Reservation duration read from <tt class="rst-docutils rst-literal">QUEUE_REDIS_RETRY_AFTER</tt> in seconds.</td>
   </tr>
 </table>
           
             <p class="inheritedFrom">
               Inherited from <code><a href="orionis.support.entities.BaseEntity.html" class="internal-link" title="orionis.support.entities.BaseEntity">BaseEntity</a></code>:
             </p>
-            <table class="children sortable" id="id865">
+            <table class="children sortable" id="id866">
   
   
   <tr class="baseclassmethod">
@@ -1814,7 +1814,7 @@
     
     <td>Class Variable</td>
     <td><code><a href="orionis.support.entities.BaseEntity.html#__slots__" class="internal-link" title="orionis.support.entities.BaseEntity.__slots__">__slots__</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
+    <td>Declare that this class introduces no additional instance slots.</td>
   </tr>
 </table>
             
@@ -1836,7 +1836,7 @@
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">__post_init__</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>):</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/foundation/config/queue/entities/redis.py#L93">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/foundation/config/queue/entities/redis.py#L96">
       
       (source)
     </a>
@@ -1850,7 +1850,7 @@
     <div class="interfaceinfo">overrides <code><a href="orionis.support.entities.BaseEntity.html#__post_init__" class="internal-link">orionis.support.entities.BaseEntity.__post_init__</a></code></div>
     <div><p>Validate Redis connection fields, namespace, and reservation duration.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">Keep validated connection settings unchanged.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/exceptions.html#TypeError" class="intersphinx-link">TypeError</a></code></td><td>If a setting has an invalid type.</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/exceptions.html#ValueError" class="intersphinx-link">ValueError</a></code></td><td>If a driver, identifier, numeric range, or duration is invalid.</td></tr></table></div>
   </div>
-</div><div class="baseclassvariable">
+</div><div class="baseinstancevariable">
   
   
   <a name="orionis.foundation.config.queue.Redis.db">
@@ -1862,7 +1862,7 @@
   <div class="functionHeader">
     
     <span class="py-defname">db</span>: <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/foundation/config/queue/entities/redis.py#L57">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/foundation/config/queue/entities/redis.py#L60">
       
       (source)
     </a>
@@ -1874,10 +1874,10 @@
   </div>
   <div class="functionBody">
     
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p>Nonnegative database index read from <tt class="rst-docutils rst-literal">REDIS_DB</tt>.</p></div>
     
   </div>
-</div><div class="baseclassvariable">
+</div><div class="baseinstancevariable">
   
   
   <a name="orionis.foundation.config.queue.Redis.driver">
@@ -1888,8 +1888,8 @@
   </a>
   <div class="functionHeader">
     
-    <span class="py-defname">driver</span>: <code>Drivers | str</code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/foundation/config/queue/entities/redis.py#L40">
+    <span class="py-defname">driver</span>: <code>orionis.foundation.config.queue.enums.Drivers | str</code> =
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/foundation/config/queue/entities/redis.py#L43">
       
       (source)
     </a>
@@ -1901,10 +1901,10 @@
   </div>
   <div class="functionBody">
     
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p>Redis driver identifier.</p></div>
     
   </div>
-</div><div class="baseclassvariable">
+</div><div class="baseinstancevariable">
   
   
   <a name="orionis.foundation.config.queue.Redis.endpoint">
@@ -1916,7 +1916,7 @@
   <div class="functionHeader">
     
     <span class="py-defname">endpoint</span>: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/foundation/config/queue/entities/redis.py#L42">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/foundation/config/queue/entities/redis.py#L45">
       
       (source)
     </a>
@@ -1928,10 +1928,10 @@
   </div>
   <div class="functionBody">
     
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p>Redis host read from <tt class="rst-docutils rst-literal">REDIS_HOST</tt>.</p></div>
     
   </div>
-</div><div class="baseclassvariable">
+</div><div class="baseinstancevariable">
   
   
   <a name="orionis.foundation.config.queue.Redis.password">
@@ -1943,7 +1943,7 @@
   <div class="functionHeader">
     
     <span class="py-defname">password</span>: <code>str | None</code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/foundation/config/queue/entities/redis.py#L64">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/foundation/config/queue/entities/redis.py#L67">
       
       (source)
     </a>
@@ -1955,10 +1955,10 @@
   </div>
   <div class="functionBody">
     
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p>Optional authentication password read from <tt class="rst-docutils rst-literal">REDIS_PASSWORD</tt>.</p></div>
     
   </div>
-</div><div class="baseclassvariable">
+</div><div class="baseinstancevariable">
   
   
   <a name="orionis.foundation.config.queue.Redis.port">
@@ -1970,7 +1970,7 @@
   <div class="functionHeader">
     
     <span class="py-defname">port</span>: <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/foundation/config/queue/entities/redis.py#L49">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/foundation/config/queue/entities/redis.py#L52">
       
       (source)
     </a>
@@ -1982,10 +1982,10 @@
   </div>
   <div class="functionBody">
     
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p>TCP port read from <tt class="rst-docutils rst-literal">REDIS_PORT</tt>, between 1 and 65535.</p></div>
     
   </div>
-</div><div class="baseclassvariable">
+</div><div class="baseinstancevariable">
   
   
   <a name="orionis.foundation.config.queue.Redis.prefix">
@@ -1997,7 +1997,7 @@
   <div class="functionHeader">
     
     <span class="py-defname">prefix</span>: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/foundation/config/queue/entities/redis.py#L71">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/foundation/config/queue/entities/redis.py#L74">
       
       (source)
     </a>
@@ -2009,10 +2009,10 @@
   </div>
   <div class="functionBody">
     
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p>Namespace read from <tt class="rst-docutils rst-literal">QUEUE_REDIS_PREFIX</tt> to isolate persisted jobs.</p></div>
     
   </div>
-</div><div class="baseclassvariable">
+</div><div class="baseinstancevariable">
   
   
   <a name="orionis.foundation.config.queue.Redis.queue">
@@ -2024,7 +2024,7 @@
   <div class="functionHeader">
     
     <span class="py-defname">queue</span>: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/foundation/config/queue/entities/redis.py#L78">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/foundation/config/queue/entities/redis.py#L81">
       
       (source)
     </a>
@@ -2036,10 +2036,10 @@
   </div>
   <div class="functionBody">
     
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p>Default logical queue name read from <tt class="rst-docutils rst-literal">QUEUE_REDIS_QUEUE</tt>.</p></div>
     
   </div>
-</div><div class="baseclassvariable">
+</div><div class="baseinstancevariable">
   
   
   <a name="orionis.foundation.config.queue.Redis.retry_after">
@@ -2051,7 +2051,7 @@
   <div class="functionHeader">
     
     <span class="py-defname">retry_after</span>: <code><a href="https://docs.python.org/3/builtins/functions.html#float" class="intersphinx-link">float</a></code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/foundation/config/queue/entities/redis.py#L85">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/foundation/config/queue/entities/redis.py#L88">
       
       (source)
     </a>
@@ -2063,7 +2063,7 @@
   </div>
   <div class="functionBody">
     
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p>Reservation duration read from <tt class="rst-docutils rst-literal">QUEUE_REDIS_RETRY_AFTER</tt> in seconds.</p></div>
     
   </div>
 </div>
@@ -2077,7 +2077,7 @@
   <div class="orionis-footer-inner">
     <div class="orionis-footer-copy">
       <p>API documentation for <a href="https://orionis-framework.com/" class="projecthome">Orionis</a>.</p>
-      <p class="orionis-footer-meta">Generated with <a href="https://github.com/twisted/pydoctor/">Pydoctor</a> 25.10.1.<span class="orionis-footer-build"> Built 2026-11-03 09:36:58.</span></p>
+      <p class="orionis-footer-meta">Generated with <a href="https://github.com/twisted/pydoctor/">Pydoctor</a> 25.10.1.<span class="orionis-footer-build"> Built 2026-11-03 13:00:15.</span></p>
     </div>
     <nav class="orionis-footer-links" aria-label="Additional resources">
       <a href="https://docs.orionis-framework.com">Read the guide <span aria-hidden="true">↗</span></a>

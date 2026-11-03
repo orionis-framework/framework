@@ -705,6 +705,16 @@
             </div>
         
 
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.mcp.dispatcher.html#TransportName" class="internal-link" title="orionis.mcp.dispatcher.TransportName"><wbr></wbr>Transport<wbr></wbr>Name</a></code>
+            </div>
+        
+
     </li>
 </ul> 
 
@@ -1460,7 +1470,7 @@
                     
                 </label>
 
-                <code><a href="orionis.mcp.server.html" class="internal-link" title="orionis.mcp.server">server</a></code>
+                <code><a href="orionis.mcp.server.package.html" class="internal-link" title="orionis.mcp.server">server</a></code>
 
                 <div class="expandableContent">
                     <div>
@@ -3924,7 +3934,7 @@
         </div>
 
         <div class="extrasDocstring">
-          <p class="class-signature"><code><span class="py-keyword">class</span> <span class="py-defname">McpResponse</span>: <a href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/mcp/responses.py#L102" class="sourceLink">(source)</a></code></p><p><a href="classIndex.html#orionis.mcp.McpResponse">View In Hierarchy</a></p>
+          <p class="class-signature"><code><span class="py-keyword">class</span> <span class="py-defname">McpResponse</span>: <a href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/mcp/responses.py#L109" class="sourceLink">(source)</a></code></p><p><a href="classIndex.html#orionis.mcp.McpResponse">View In Hierarchy</a></p>
         </div>
 
         <div class="moduleDocstring">
@@ -3932,7 +3942,7 @@
         </div>
 
         <div id="split-tables">
-          <table class="children sortable" id="id1518">
+          <table class="children sortable" id="id1522">
   
   
   <tr class="classmethod">
@@ -4004,27 +4014,27 @@
     
     <td>Class Variable</td>
     <td><code><a href="#content" class="internal-link" title="orionis.mcp.McpResponse.content">content</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
+    <td>Content blocks carried by this protocol value.</td>
   </tr><tr class="classvariable">
     
     <td>Class Variable</td>
     <td><code><a href="#is_error" class="internal-link" title="orionis.mcp.McpResponse.is_error">is<wbr></wbr>_error</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
+    <td>Is error flag used by <tt class="rst-docutils rst-literal">McpResponse</tt>.</td>
   </tr><tr class="classvariable">
     
     <td>Class Variable</td>
     <td><code><a href="#meta" class="internal-link" title="orionis.mcp.McpResponse.meta">meta</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
+    <td>Meta produced by <tt class="rst-docutils rst-literal">field</tt>.</td>
   </tr><tr class="classvariable">
     
     <td>Class Variable</td>
     <td><code><a href="#progress_update" class="internal-link" title="orionis.mcp.McpResponse.progress_update">progress<wbr></wbr>_update</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
+    <td>Progress notification emitted independently of response content.</td>
   </tr><tr class="classvariable">
     
     <td>Class Variable</td>
     <td><code><a href="#role" class="internal-link" title="orionis.mcp.McpResponse.role">role</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
+    <td><tt class="rst-docutils rst-literal">user</tt>.</td>
   </tr>
 </table>
           
@@ -4046,7 +4056,7 @@
     
     <div><span class="decorator">@<a href="https://docs.python.org/3/builtins/functions.html#classmethod" class="intersphinx-link">classmethod</a><br /></span></div>
     <span class="py-keyword">def</span>&#160;<span class="py-defname">audio</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">cls</span>, </span><span class="rst-sig-param">value: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#bytes" class="intersphinx-link">bytes</a></code>, </span><span class="rst-sig-param">mime_type: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></span>) -&gt; <code>Self</code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/mcp/responses.py#L156">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/mcp/responses.py#L168">
       
       (source)
     </a>
@@ -4058,7 +4068,7 @@
   </div>
   <div class="docstring functionBody">
     
-    <div><p>Encode raw audio bytes once.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">value:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#bytes" class="intersphinx-link">bytes</a></code></td><td class="fieldArgDesc">Value to inspect, transform or validate.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">mime<wbr></wbr>_type:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Value supplied for <tt class="rst-docutils rst-literal">mime_type</tt>.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code>Self</code></td><td class="fieldArgDesc">Result of the operation described above.</td></tr></table></div>
+    <div><p>Encode raw audio bytes once.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">value:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#bytes" class="intersphinx-link">bytes</a></code></td><td class="fieldArgDesc">Value to inspect, transform or validate.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">mime<wbr></wbr>_type:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Value supplied for <tt class="rst-docutils rst-literal">mime_type</tt>.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/library/typing.html#typing.Self" class="intersphinx-link">typing.Self</a></code></td><td class="fieldArgDesc">Result of the operation described above.</td></tr></table></div>
   </div>
 </div><div class="baseclassmethod">
   
@@ -4073,7 +4083,7 @@
     
     <div><span class="decorator">@<a href="https://docs.python.org/3/builtins/functions.html#classmethod" class="intersphinx-link">classmethod</a><br /></span></div>
     <span class="py-keyword">def</span>&#160;<span class="py-defname">error</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">cls</span>, </span><span class="rst-sig-param">message: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></span>) -&gt; <code>Self</code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/mcp/responses.py#L297">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/mcp/responses.py#L309">
       
       (source)
     </a>
@@ -4085,7 +4095,7 @@
   </div>
   <div class="docstring functionBody">
     
-    <div><p>Return an application-visible tool error, with an explicit safe message.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">message:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Value supplied for <tt class="rst-docutils rst-literal">message</tt>.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code>Self</code></td><td class="fieldArgDesc">An application-visible tool error, with an explicit safe message.</td></tr></table></div>
+    <div><p>Return an application-visible tool error, with an explicit safe message.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">message:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Value supplied for <tt class="rst-docutils rst-literal">message</tt>.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/library/typing.html#typing.Self" class="intersphinx-link">typing.Self</a></code></td><td class="fieldArgDesc">An application-visible tool error, with an explicit safe message.</td></tr></table></div>
   </div>
 </div><div class="baseclassmethod">
   
@@ -4100,7 +4110,7 @@
     
     <div><span class="decorator">@<a href="https://docs.python.org/3/builtins/functions.html#classmethod" class="intersphinx-link">classmethod</a><br /></span></div>
     <span class="py-keyword">def</span>&#160;<span class="py-defname">image</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">cls</span>, </span><span class="rst-sig-param">value: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#bytes" class="intersphinx-link">bytes</a></code>, </span><span class="rst-sig-param">mime_type: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></span>) -&gt; <code>Self</code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/mcp/responses.py#L130">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/mcp/responses.py#L142">
       
       (source)
     </a>
@@ -4112,7 +4122,7 @@
   </div>
   <div class="docstring functionBody">
     
-    <div><p>Encode raw image bytes once.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">value:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#bytes" class="intersphinx-link">bytes</a></code></td><td class="fieldArgDesc">Value to inspect, transform or validate.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">mime<wbr></wbr>_type:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Value supplied for <tt class="rst-docutils rst-literal">mime_type</tt>.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code>Self</code></td><td class="fieldArgDesc">Result of the operation described above.</td></tr></table></div>
+    <div><p>Encode raw image bytes once.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">value:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#bytes" class="intersphinx-link">bytes</a></code></td><td class="fieldArgDesc">Value to inspect, transform or validate.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">mime<wbr></wbr>_type:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Value supplied for <tt class="rst-docutils rst-literal">mime_type</tt>.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/library/typing.html#typing.Self" class="intersphinx-link">typing.Self</a></code></td><td class="fieldArgDesc">Result of the operation described above.</td></tr></table></div>
   </div>
 </div><div class="baseclassmethod">
   
@@ -4127,7 +4137,7 @@
     
     <div><span class="decorator">@<a href="https://docs.python.org/3/builtins/functions.html#classmethod" class="intersphinx-link">classmethod</a><br /></span></div>
     <span class="py-keyword">def</span>&#160;<span class="py-defname">progress</span><span class="function-signature long-signature">(<span class="rst-sig-param"><span class="rst-undocumented">cls</span>, </span><span class="rst-sig-param">current: <code><a href="https://docs.python.org/3/builtins/functions.html#float" class="intersphinx-link">float</a></code>, </span><span class="rst-sig-param">total: <code><a href="https://docs.python.org/3/builtins/functions.html#float" class="intersphinx-link">float</a> | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code> = <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a>, </span><span class="rst-sig-param">message: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a> | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code> = <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></span>) -&gt; <code>Self</code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/mcp/responses.py#L314">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/mcp/responses.py#L326">
       
       (source)
     </a>
@@ -4139,7 +4149,7 @@
   </div>
   <div class="docstring functionBody">
     
-    <div><p>Yield progress; the dispatcher suppresses it without client opt-in.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">current:</span><code><a href="https://docs.python.org/3/builtins/functions.html#float" class="intersphinx-link">float</a></code></td><td class="fieldArgDesc">Value supplied for <tt class="rst-docutils rst-literal">current</tt>.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">total:</span><code>float | None</code></td><td class="fieldArgDesc">Value supplied for <tt class="rst-docutils rst-literal">total</tt>.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">message:</span><code>str | None</code></td><td class="fieldArgDesc">Value supplied for <tt class="rst-docutils rst-literal">message</tt>.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code>Self</code></td><td class="fieldArgDesc">Result of the operation described above.</td></tr></table></div>
+    <div><p>Yield progress; the dispatcher suppresses it without client opt-in.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">current:</span><code><a href="https://docs.python.org/3/builtins/functions.html#float" class="intersphinx-link">float</a></code></td><td class="fieldArgDesc">Value supplied for <tt class="rst-docutils rst-literal">current</tt>.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">total:</span><code>float | None</code></td><td class="fieldArgDesc">Value supplied for <tt class="rst-docutils rst-literal">total</tt>.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">message:</span><code>str | None</code></td><td class="fieldArgDesc">Value supplied for <tt class="rst-docutils rst-literal">message</tt>.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/library/typing.html#typing.Self" class="intersphinx-link">typing.Self</a></code></td><td class="fieldArgDesc">Result of the operation described above.</td></tr></table></div>
   </div>
 </div><div class="baseclassmethod">
   
@@ -4154,7 +4164,7 @@
     
     <div><span class="decorator">@<a href="https://docs.python.org/3/builtins/functions.html#classmethod" class="intersphinx-link">classmethod</a><br /></span></div>
     <span class="py-keyword">def</span>&#160;<span class="py-defname">resource</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">cls</span>, </span><span class="rst-sig-param">uri: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code>, </span><span class="rst-sig-param">value: <code><a href="https://docs.python.org/3/builtins/functions.html#object" class="intersphinx-link">object</a></code>, </span><span class="rst-sig-param">mime_type: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a> | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code> = <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></span>) -&gt; <code>Self</code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/mcp/responses.py#L182">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/mcp/responses.py#L194">
       
       (source)
     </a>
@@ -4169,7 +4179,7 @@
     <div><p>Serialize and embed resource content according to its MIME type.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">uri:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Value supplied for <tt class="rst-docutils rst-literal">uri</tt>.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">value:</span><code><a href="https://docs.python.org/3/builtins/functions.html#object" class="intersphinx-link">object</a></code></td><td class="fieldArgDesc">Native msgspec-compatible data, or already encoded content.
 JSON data is normalized to builtins before strict validation.
 JSON strings and binary buffers are retained without re-encoding.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">mime<wbr></wbr>_type:</span><code>str | None</code></td><td class="fieldArgDesc">Declared media type. Structured data defaults to application/json;
-MessagePack is emitted as Base64 binary resource content.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code>Self</code></td><td class="fieldArgDesc">Embedded content usable by tools, resources and prompts.</td></tr></table></div>
+MessagePack is emitted as Base64 binary resource content.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/library/typing.html#typing.Self" class="intersphinx-link">typing.Self</a></code></td><td class="fieldArgDesc">Embedded content usable by tools, resources and prompts.</td></tr></table></div>
   </div>
 </div><div class="baseclassmethod">
   
@@ -4184,7 +4194,7 @@ MessagePack is emitted as Base64 binary resource content.</td></tr></table><tabl
     
     <div><span class="decorator">@<a href="https://docs.python.org/3/builtins/functions.html#classmethod" class="intersphinx-link">classmethod</a><br /></span></div>
     <span class="py-keyword">def</span>&#160;<span class="py-defname">resourceLink</span><span class="function-signature long-signature">(<span class="rst-sig-param"><span class="rst-undocumented">cls</span>, </span><span class="rst-sig-param">uri: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code>, </span><span class="rst-sig-param">name: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code>, </span><span class="rst-sig-symbol">*, </span><span class="rst-sig-param">title: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a> | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code> = <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a>, </span><span class="rst-sig-param">description: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a> | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code> = <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a>, </span><span class="rst-sig-param">mime_type: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a> | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code> = <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></span>) -&gt; <code>Self</code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/mcp/responses.py#L231">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/mcp/responses.py#L243">
       
       (source)
     </a>
@@ -4196,7 +4206,7 @@ MessagePack is emitted as Base64 binary resource content.</td></tr></table><tabl
   </div>
   <div class="docstring functionBody">
     
-    <div><p>Link to a resource without loading it.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">uri:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Value supplied for <tt class="rst-docutils rst-literal">uri</tt>.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">name:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Value supplied for <tt class="rst-docutils rst-literal">name</tt>.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">title:</span><code>str | None</code></td><td class="fieldArgDesc">Value supplied for <tt class="rst-docutils rst-literal">title</tt>.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">description:</span><code>str | None</code></td><td class="fieldArgDesc">Value supplied for <tt class="rst-docutils rst-literal">description</tt>.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">mime<wbr></wbr>_type:</span><code>str | None</code></td><td class="fieldArgDesc">Value supplied for <tt class="rst-docutils rst-literal">mime_type</tt>.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code>Self</code></td><td class="fieldArgDesc">Result of the operation described above.</td></tr></table></div>
+    <div><p>Link to a resource without loading it.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">uri:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Value supplied for <tt class="rst-docutils rst-literal">uri</tt>.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">name:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Value supplied for <tt class="rst-docutils rst-literal">name</tt>.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">title:</span><code>str | None</code></td><td class="fieldArgDesc">Value supplied for <tt class="rst-docutils rst-literal">title</tt>.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">description:</span><code>str | None</code></td><td class="fieldArgDesc">Value supplied for <tt class="rst-docutils rst-literal">description</tt>.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">mime<wbr></wbr>_type:</span><code>str | None</code></td><td class="fieldArgDesc">Value supplied for <tt class="rst-docutils rst-literal">mime_type</tt>.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/library/typing.html#typing.Self" class="intersphinx-link">typing.Self</a></code></td><td class="fieldArgDesc">Result of the operation described above.</td></tr></table></div>
   </div>
 </div><div class="baseclassmethod">
   
@@ -4211,7 +4221,7 @@ MessagePack is emitted as Base64 binary resource content.</td></tr></table><tabl
     
     <div><span class="decorator">@<a href="https://docs.python.org/3/builtins/functions.html#classmethod" class="intersphinx-link">classmethod</a><br /></span></div>
     <span class="py-keyword">def</span>&#160;<span class="py-defname">structured</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">cls</span>, </span><span class="rst-sig-param">value: <code><a href="https://docs.python.org/3/builtins/functions.html#object" class="intersphinx-link">object</a></code></span>) -&gt; <code>Self</code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/mcp/responses.py#L276">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/mcp/responses.py#L288">
       
       (source)
     </a>
@@ -4223,7 +4233,7 @@ MessagePack is emitted as Base64 binary resource content.</td></tr></table><tabl
   </div>
   <div class="docstring functionBody">
     
-    <div><p>Return any JSON value and the recommended serialized text content.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">value:</span><code><a href="https://docs.python.org/3/builtins/functions.html#object" class="intersphinx-link">object</a></code></td><td class="fieldArgDesc">Native msgspec-compatible data normalized to a finite JSON value.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code>Self</code></td><td class="fieldArgDesc">Any JSON value and the recommended serialized text content.</td></tr></table></div>
+    <div><p>Return any JSON value and the recommended serialized text content.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">value:</span><code><a href="https://docs.python.org/3/builtins/functions.html#object" class="intersphinx-link">object</a></code></td><td class="fieldArgDesc">Native msgspec-compatible data normalized to a finite JSON value.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/library/typing.html#typing.Self" class="intersphinx-link">typing.Self</a></code></td><td class="fieldArgDesc">Any JSON value and the recommended serialized text content.</td></tr></table></div>
   </div>
 </div><div class="baseclassmethod">
   
@@ -4238,7 +4248,7 @@ MessagePack is emitted as Base64 binary resource content.</td></tr></table><tabl
     
     <div><span class="decorator">@<a href="https://docs.python.org/3/builtins/functions.html#classmethod" class="intersphinx-link">classmethod</a><br /></span></div>
     <span class="py-keyword">def</span>&#160;<span class="py-defname">text</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">cls</span>, </span><span class="rst-sig-param">value: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></span>) -&gt; <code>Self</code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/mcp/responses.py#L113">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/mcp/responses.py#L125">
       
       (source)
     </a>
@@ -4250,7 +4260,7 @@ MessagePack is emitted as Base64 binary resource content.</td></tr></table><tabl
   </div>
   <div class="docstring functionBody">
     
-    <div><p>Return text content.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">value:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Value to inspect, transform or validate.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code>Self</code></td><td class="fieldArgDesc">Text content.</td></tr></table></div>
+    <div><p>Return text content.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">value:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Value to inspect, transform or validate.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/library/typing.html#typing.Self" class="intersphinx-link">typing.Self</a></code></td><td class="fieldArgDesc">Text content.</td></tr></table></div>
   </div>
 </div><div class="basemethod">
   
@@ -4265,7 +4275,7 @@ MessagePack is emitted as Base64 binary resource content.</td></tr></table><tabl
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">asAssistant</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>) -&gt; <code>Self</code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/mcp/responses.py#L346">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/mcp/responses.py#L358">
       
       (source)
     </a>
@@ -4277,7 +4287,7 @@ MessagePack is emitted as Base64 binary resource content.</td></tr></table><tabl
   </div>
   <div class="docstring functionBody">
     
-    <div><p>Assign the assistant role for a prompt response.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code>Self</code></td><td class="fieldArgDesc">Result of the operation described above.</td></tr></table></div>
+    <div><p>Assign the assistant role for a prompt response.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/library/typing.html#typing.Self" class="intersphinx-link">typing.Self</a></code></td><td class="fieldArgDesc">Result of the operation described above.</td></tr></table></div>
   </div>
 </div><div class="basemethod">
   
@@ -4292,7 +4302,7 @@ MessagePack is emitted as Base64 binary resource content.</td></tr></table><tabl
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">asUser</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>) -&gt; <code>Self</code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/mcp/responses.py#L357">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/mcp/responses.py#L369">
       
       (source)
     </a>
@@ -4304,7 +4314,7 @@ MessagePack is emitted as Base64 binary resource content.</td></tr></table><tabl
   </div>
   <div class="docstring functionBody">
     
-    <div><p>Assign the user role for a prompt response.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code>Self</code></td><td class="fieldArgDesc">Result of the operation described above.</td></tr></table></div>
+    <div><p>Assign the user role for a prompt response.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/library/typing.html#typing.Self" class="intersphinx-link">typing.Self</a></code></td><td class="fieldArgDesc">Result of the operation described above.</td></tr></table></div>
   </div>
 </div><div class="basemethod">
   
@@ -4319,7 +4329,7 @@ MessagePack is emitted as Base64 binary resource content.</td></tr></table><tabl
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">withAnnotations</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">annotations: <code><a href="orionis.mcp.ContentAnnotations.html" class="internal-link" title="orionis.mcp.ContentAnnotations">ContentAnnotations</a></code></span>) -&gt; <code>Self</code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/mcp/responses.py#L416">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/mcp/responses.py#L428">
       
       (source)
     </a>
@@ -4331,7 +4341,7 @@ MessagePack is emitted as Base64 binary resource content.</td></tr></table><tabl
   </div>
   <div class="docstring functionBody">
     
-    <div><p>Set audience, priority and modification hints on content blocks.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">annotations:</span><code><a href="orionis.mcp.ContentAnnotations.html" class="internal-link" title="orionis.mcp.ContentAnnotations">ContentAnnotations</a></code></td><td class="fieldArgDesc">Value supplied for <tt class="rst-docutils rst-literal">annotations</tt>.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code>Self</code></td><td class="fieldArgDesc">Result of the operation described above.</td></tr></table></div>
+    <div><p>Set audience, priority and modification hints on content blocks.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">annotations:</span><code><a href="orionis.mcp.ContentAnnotations.html" class="internal-link">orionis.mcp.ContentAnnotations</a></code></td><td class="fieldArgDesc">Value supplied for <tt class="rst-docutils rst-literal">annotations</tt>.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/library/typing.html#typing.Self" class="intersphinx-link">typing.Self</a></code></td><td class="fieldArgDesc">Result of the operation described above.</td></tr></table></div>
   </div>
 </div><div class="basemethod">
   
@@ -4346,7 +4356,7 @@ MessagePack is emitted as Base64 binary resource content.</td></tr></table><tabl
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">withContentMeta</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">metadata: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#dict" class="intersphinx-link">dict</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <wbr></wbr><a href="https://docs.python.org/3/builtins/functions.html#object" class="intersphinx-link">object</a>]</code></span>) -&gt; <code>Self</code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/mcp/responses.py#L386">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/mcp/responses.py#L398">
       
       (source)
     </a>
@@ -4358,7 +4368,7 @@ MessagePack is emitted as Base64 binary resource content.</td></tr></table><tabl
   </div>
   <div class="docstring functionBody">
     
-    <div><p>Attach application metadata to each content block.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">metadata:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#dict" class="intersphinx-link">dict</a>[<a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <a href="https://docs.python.org/3/builtins/functions.html#object" class="intersphinx-link">object</a>]</code></td><td class="fieldArgDesc">Metadata associated with the current operation.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code>Self</code></td><td class="fieldArgDesc">Result of the operation described above.</td></tr></table></div>
+    <div><p>Attach application metadata to each content block.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">metadata:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#dict" class="intersphinx-link">dict</a>[<a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <a href="https://docs.python.org/3/builtins/functions.html#object" class="intersphinx-link">object</a>]</code></td><td class="fieldArgDesc">Metadata associated with the current operation.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/library/typing.html#typing.Self" class="intersphinx-link">typing.Self</a></code></td><td class="fieldArgDesc">Result of the operation described above.</td></tr></table></div>
   </div>
 </div><div class="basemethod">
   
@@ -4373,7 +4383,7 @@ MessagePack is emitted as Base64 binary resource content.</td></tr></table><tabl
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">withMeta</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">metadata: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#dict" class="intersphinx-link">dict</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <wbr></wbr><a href="https://docs.python.org/3/builtins/functions.html#object" class="intersphinx-link">object</a>]</code></span>) -&gt; <code>Self</code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/mcp/responses.py#L368">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/mcp/responses.py#L380">
       
       (source)
     </a>
@@ -4385,7 +4395,7 @@ MessagePack is emitted as Base64 binary resource content.</td></tr></table><tabl
   </div>
   <div class="docstring functionBody">
     
-    <div><p>Attach result metadata without allowing reserved protocol keys.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">metadata:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#dict" class="intersphinx-link">dict</a>[<a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <a href="https://docs.python.org/3/builtins/functions.html#object" class="intersphinx-link">object</a>]</code></td><td class="fieldArgDesc">Metadata associated with the current operation.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code>Self</code></td><td class="fieldArgDesc">Result of the operation described above.</td></tr></table></div>
+    <div><p>Attach result metadata without allowing reserved protocol keys.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">metadata:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#dict" class="intersphinx-link">dict</a>[<a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <a href="https://docs.python.org/3/builtins/functions.html#object" class="intersphinx-link">object</a>]</code></td><td class="fieldArgDesc">Metadata associated with the current operation.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/library/typing.html#typing.Self" class="intersphinx-link">typing.Self</a></code></td><td class="fieldArgDesc">Result of the operation described above.</td></tr></table></div>
   </div>
 </div><div class="baseclassvariable">
   
@@ -4399,7 +4409,7 @@ MessagePack is emitted as Base64 binary resource content.</td></tr></table><tabl
   <div class="functionHeader">
     
     <span class="py-defname">content</span>: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" class="intersphinx-link">tuple</a>[<wbr></wbr>ContentBlock, <wbr></wbr><span class="rst-variable-ellipsis">...</span>]</code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/mcp/responses.py#L106">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/mcp/responses.py#L113">
       
       (source)
     </a>
@@ -4411,7 +4421,7 @@ MessagePack is emitted as Base64 binary resource content.</td></tr></table><tabl
   </div>
   <div class="functionBody">
     
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p>Content blocks carried by this protocol value.</p></div>
     
   </div>
 </div><div class="baseclassvariable">
@@ -4426,7 +4436,7 @@ MessagePack is emitted as Base64 binary resource content.</td></tr></table><tabl
   <div class="functionHeader">
     
     <span class="py-defname">is_error</span>: <code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/mcp/responses.py#L108">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/mcp/responses.py#L116">
       
       (source)
     </a>
@@ -4438,7 +4448,7 @@ MessagePack is emitted as Base64 binary resource content.</td></tr></table><tabl
   </div>
   <div class="functionBody">
     
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p>Is error flag used by <tt class="rst-docutils rst-literal">McpResponse</tt>.</p></div>
     
   </div>
 </div><div class="baseclassvariable">
@@ -4453,7 +4463,7 @@ MessagePack is emitted as Base64 binary resource content.</td></tr></table><tabl
   <div class="functionHeader">
     
     <span class="py-defname">meta</span>: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#dict" class="intersphinx-link">dict</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <wbr></wbr><a href="https://docs.python.org/3/builtins/functions.html#object" class="intersphinx-link">object</a>]</code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/mcp/responses.py#L111">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/mcp/responses.py#L122">
       
       (source)
     </a>
@@ -4465,7 +4475,7 @@ MessagePack is emitted as Base64 binary resource content.</td></tr></table><tabl
   </div>
   <div class="functionBody">
     
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p>Meta produced by <tt class="rst-docutils rst-literal">field</tt>.</p></div>
     
   </div>
 </div><div class="baseclassvariable">
@@ -4480,7 +4490,7 @@ MessagePack is emitted as Base64 binary resource content.</td></tr></table><tabl
   <div class="functionHeader">
     
     <span class="py-defname">progress_update</span>: <code>Progress | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/mcp/responses.py#L110">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/mcp/responses.py#L120">
       
       (source)
     </a>
@@ -4492,7 +4502,7 @@ MessagePack is emitted as Base64 binary resource content.</td></tr></table><tabl
   </div>
   <div class="functionBody">
     
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p>Progress notification emitted independently of response content.</p></div>
     
   </div>
 </div><div class="baseclassvariable">
@@ -4507,7 +4517,7 @@ MessagePack is emitted as Base64 binary resource content.</td></tr></table><tabl
   <div class="functionHeader">
     
     <span class="py-defname">role</span>: <code>Literal[<wbr></wbr><span class="rst-variable-quote">'</span><span class="rst-variable-string">user</span><span class="rst-variable-quote">'</span>, <wbr></wbr><span class="rst-variable-quote">'</span><span class="rst-variable-string">assistant</span><span class="rst-variable-quote">'</span>]</code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/mcp/responses.py#L109">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/mcp/responses.py#L118">
       
       (source)
     </a>
@@ -4519,7 +4529,7 @@ MessagePack is emitted as Base64 binary resource content.</td></tr></table><tabl
   </div>
   <div class="functionBody">
     
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p><tt class="rst-docutils rst-literal">user</tt>.</p></div>
     
   </div>
 </div>
@@ -4533,7 +4543,7 @@ MessagePack is emitted as Base64 binary resource content.</td></tr></table><tabl
   <div class="orionis-footer-inner">
     <div class="orionis-footer-copy">
       <p>API documentation for <a href="https://orionis-framework.com/" class="projecthome">Orionis</a>.</p>
-      <p class="orionis-footer-meta">Generated with <a href="https://github.com/twisted/pydoctor/">Pydoctor</a> 25.10.1.<span class="orionis-footer-build"> Built 2026-11-03 09:36:58.</span></p>
+      <p class="orionis-footer-meta">Generated with <a href="https://github.com/twisted/pydoctor/">Pydoctor</a> 25.10.1.<span class="orionis-footer-build"> Built 2026-11-03 13:00:15.</span></p>
     </div>
     <nav class="orionis-footer-links" aria-label="Additional resources">
       <a href="https://docs.orionis-framework.com">Read the guide <span aria-hidden="true">↗</span></a>

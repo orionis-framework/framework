@@ -510,22 +510,22 @@
         </div>
 
         <div class="extrasDocstring">
-          <a href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/environment/validators/types.py" class="sourceLink">(source)</a>
+          <a href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/environment/validators/types.py" class="sourceLink">(source)</a>
         </div>
 
         <div class="moduleDocstring">
-          <div><p class="undocumented">Undocumented</p></div>
+          <div><p>Validate supported environment type hints before values are cast.</p></div>
         </div>
 
         <div id="split-tables">
-          <table class="children sortable" id="id625">
+          <table class="children sortable" id="id626">
   
   
   <tr class="class">
     
     <td>Class</td>
     <td><code><a href="orionis.environment.validators.types.__ValidateTypes.html" class="internal-link" title="orionis.environment.validators.types.__ValidateTypes">__<wbr></wbr>Validate<wbr></wbr>Types</a></code></td>
-    <td><span class="rst-undocumented">No class docstring; 1/1 method documented</span></td>
+    <td>Validate supported environment type hints before values are cast.</td>
   </tr><tr class="function">
     
     <td>Function</td>
@@ -535,7 +535,7 @@
     
     <td>Constant</td>
     <td><code><a href="#_ALLOWED_TYPE_HINT_VALUES" class="internal-link" title="orionis.environment.validators.types._ALLOWED_TYPE_HINT_VALUES">_ALLOWED<wbr></wbr>_TYPE<wbr></wbr>_HINT<wbr></wbr>_VALUES</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
+    <td>Pre-build allowed types list once — avoids repeated list comprehension in error paths.</td>
   </tr>
 </table>
           
@@ -557,7 +557,7 @@
     
     <div><span class="decorator">@<a href="https://docs.python.org/3/library/functools.html#functools.lru_cache" class="intersphinx-link">functools.lru_cache</a>(<wbr></wbr>maxsize=64)<br /></span></div>
     <span class="py-keyword">def</span>&#160;<span class="py-defname">_normalize_type_hint</span><span class="function-signature">(<span class="rst-sig-param">type_hint: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a> | EnvironmentValueType</code></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/environment/validators/types.py#L8">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/environment/validators/types.py#L14">
       
       (source)
     </a>
@@ -572,7 +572,7 @@
     <div><p>Normalize and validate a type hint, returning its canonical string value.</p>
 <p>Cached with lru_cache — type hints are a finite, known set so repeated
 calls with the same hint become O(1) dict lookups after the first call.</p>
-<table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">type<wbr></wbr>_hint:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a> or <a href="orionis.environment.enums.EnvironmentValueType.html" class="internal-link" title="orionis.environment.enums.EnvironmentValueType">EnvironmentValueType</a></code></td><td class="fieldArgDesc">The type hint to normalize.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">The canonical string value of the type hint.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/exceptions.html#RuntimeError" class="intersphinx-link">RuntimeError</a></code></td><td>If the type hint string is not a valid EnvironmentValueType name.</td></tr></table></div>
+<table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">type<wbr></wbr>_hint:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a> or <a href="orionis.environment.enums.EnvironmentValueType.html" class="internal-link">orionis.environment.enums.EnvironmentValueType</a></code></td><td class="fieldArgDesc">The type hint to normalize.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">The canonical string value of the type hint.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/exceptions.html#RuntimeError" class="intersphinx-link">RuntimeError</a></code></td><td>If the type hint string is not a valid EnvironmentValueType name.</td></tr></table></div>
   </div>
 </div><div class="baseconstant">
   
@@ -586,7 +586,7 @@ calls with the same hint become O(1) dict lookups after the first call.</p>
   <div class="functionHeader">
     
     <span class="py-defname">_ALLOWED_TYPE_HINT_VALUES</span>: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#list" class="intersphinx-link">list</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>]</code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/environment/validators/types.py#L6">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/environment/validators/types.py#L8">
       
       (source)
     </a>
@@ -598,7 +598,8 @@ calls with the same hint become O(1) dict lookups after the first call.</p>
   </div>
   <div class="functionBody">
     
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p>Pre-build allowed types list once — avoids repeated list comprehension in error
+paths.</p></div>
     <table class="valueTable"><tr class="fieldStart"><td class="fieldName">Value</td></tr><tr><td><pre class="constant-value"><code>[e.value for e in EnvironmentValueType]</code></pre></td></tr></table>
   </div>
 </div>
@@ -612,7 +613,7 @@ calls with the same hint become O(1) dict lookups after the first call.</p>
   <div class="orionis-footer-inner">
     <div class="orionis-footer-copy">
       <p>API documentation for <a href="https://orionis-framework.com/" class="projecthome">Orionis</a>.</p>
-      <p class="orionis-footer-meta">Generated with <a href="https://github.com/twisted/pydoctor/">Pydoctor</a> 25.10.1.<span class="orionis-footer-build"> Built 2026-11-03 09:36:58.</span></p>
+      <p class="orionis-footer-meta">Generated with <a href="https://github.com/twisted/pydoctor/">Pydoctor</a> 25.10.1.<span class="orionis-footer-build"> Built 2026-11-03 13:00:15.</span></p>
     </div>
     <nav class="orionis-footer-links" aria-label="Additional resources">
       <a href="https://docs.orionis-framework.com">Read the guide <span aria-hidden="true">↗</span></a>

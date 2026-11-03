@@ -450,7 +450,7 @@
         </div>
 
         <div class="extrasDocstring">
-          <p class="class-signature"><code><span class="py-keyword">class</span> <span class="py-defname">ThreadedEngine</span>: <a href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/database/threaded/engine.py#L13" class="sourceLink">(source)</a></code></p><p>Constructor: <code><a href="#__init__" class="internal-link" title="orionis.database.threaded.engine.ThreadedEngine.__init__">ThreadedEngine(engine, name)</a></code></p><p><a href="classIndex.html#orionis.database.threaded.engine.ThreadedEngine">View In Hierarchy</a></p>
+          <p class="class-signature"><code><span class="py-keyword">class</span> <span class="py-defname">ThreadedEngine</span>: <a href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/database/threaded/engine.py#L15" class="sourceLink">(source)</a></code></p><p>Constructor: <code><a href="#__init__" class="internal-link" title="orionis.database.threaded.engine.ThreadedEngine.__init__">ThreadedEngine(engine, name)</a></code></p><p><a href="classIndex.html#orionis.database.threaded.engine.ThreadedEngine">View In Hierarchy</a></p>
         </div>
 
         <div class="moduleDocstring">
@@ -458,7 +458,7 @@
         </div>
 
         <div id="split-tables">
-          <table class="children sortable" id="id581">
+          <table class="children sortable" id="id582">
   
   
   <tr class="method">
@@ -485,17 +485,17 @@
     
     <td>Class Variable</td>
     <td><code><a href="#__slots__" class="internal-link" title="orionis.database.threaded.engine.ThreadedEngine.__slots__">__slots__</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
+    <td>Declare the instance attribute slots reserved by this class.</td>
   </tr><tr class="instancevariable">
     
     <td>Instance Variable</td>
     <td><code><a href="#_name" class="internal-link" title="orionis.database.threaded.engine.ThreadedEngine._name">_name</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
+    <td>Connection name used in sanitized opening errors.</td>
   </tr><tr class="instancevariable">
     
     <td>Instance Variable</td>
     <td><code><a href="#sync_engine" class="internal-link" title="orionis.database.threaded.engine.ThreadedEngine.sync_engine">sync<wbr></wbr>_engine</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
+    <td>Blocking Core engine backed by the official connector dialect.</td>
   </tr>
 </table>
           
@@ -517,7 +517,7 @@
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">__init__</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">engine: <code>Engine</code>, </span><span class="rst-sig-param">name: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code> = <span class="rst-variable-quote">'</span><span class="rst-variable-string">redshift</span><span class="rst-variable-quote">'</span></span>):</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/database/threaded/engine.py#L18">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/database/threaded/engine.py#L21">
       
       (source)
     </a>
@@ -529,7 +529,7 @@
   </div>
   <div class="docstring functionBody">
     
-    <div><p>Retain a lazy blocking engine without opening any connections.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">engine:</span><code>Engine</code></td><td class="fieldArgDesc">Blocking Core engine backed by the official connector dialect.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">name:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <em>optional</em></code></td><td class="fieldArgDesc">Connection name used in sanitized opening errors.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">Initialize the adapter without starting worker threads.</td></tr></table></div>
+    <div><p>Retain a lazy blocking engine without opening any connections.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">engine:</span><code><tt class="rst-docutils rst-literal">sqlalchemy.engine.Engine</tt></code></td><td class="fieldArgDesc">Blocking Core engine backed by the official connector dialect.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">name:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <em>optional</em></code></td><td class="fieldArgDesc">Connection name used in sanitized opening errors.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">Initialize the adapter without starting worker threads.</td></tr></table></div>
   </div>
 </div><div class="basemethod">
   
@@ -544,7 +544,7 @@
     
     <div><span class="decorator">@<a href="https://docs.python.org/3/library/contextlib.html#contextlib.asynccontextmanager" class="intersphinx-link">asynccontextmanager</a><br /></span></div>
     <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">begin</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>) -&gt; <code><a href="https://docs.python.org/3/library/collections.abc.html#collections.abc.AsyncIterator" class="intersphinx-link">AsyncIterator</a>[<wbr></wbr><a href="orionis.database.threaded.connection.ThreadedConnection.html" class="internal-link" title="orionis.database.threaded.connection.ThreadedConnection">ThreadedConnection</a>]</code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/database/threaded/engine.py#L60">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/database/threaded/engine.py#L65">
       
       (source)
     </a>
@@ -556,7 +556,7 @@
   </div>
   <div class="docstring functionBody">
     
-    <div><p>Own a checkout and commit or roll back before returning it to the pool.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Yields</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.database.threaded.connection.ThreadedConnection.html" class="internal-link" title="orionis.database.threaded.connection.ThreadedConnection">ThreadedConnection</a></code></td><td class="fieldArgDesc">Checkout with an active root transaction.</td></tr></table></div>
+    <div><p>Own a checkout and commit or roll back before returning it to the pool.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Yields</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.database.threaded.connection.ThreadedConnection.html" class="internal-link">orionis.database.threaded.connection.ThreadedConnection</a></code></td><td class="fieldArgDesc">Checkout with an active root transaction.</td></tr></table></div>
   </div>
 </div><div class="basemethod">
   
@@ -571,7 +571,7 @@
     
     
     <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">connect</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>) -&gt; <code><a href="orionis.database.threaded.connection.ThreadedConnection.html" class="internal-link" title="orionis.database.threaded.connection.ThreadedConnection">ThreadedConnection</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/database/threaded/engine.py#L37">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/database/threaded/engine.py#L42">
       
       (source)
     </a>
@@ -583,7 +583,7 @@
   </div>
   <div class="docstring functionBody">
     
-    <div><p>Open one checkout without blocking the event loop.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.database.threaded.connection.ThreadedConnection.html" class="internal-link" title="orionis.database.threaded.connection.ThreadedConnection">ThreadedConnection</a></code></td><td class="fieldArgDesc">Connection owning a worker until it closes.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code>QueryException</code></td><td>If the connector cannot open the connection; driver details are omitted.</td></tr></table></div>
+    <div><p>Open one checkout without blocking the event loop.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.database.threaded.connection.ThreadedConnection.html" class="internal-link">orionis.database.threaded.connection.ThreadedConnection</a></code></td><td class="fieldArgDesc">Connection owning a worker until it closes.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.database.QueryException.html" class="internal-link">orionis.database.QueryException</a></code></td><td>If the connector cannot open the connection; driver details are omitted.</td></tr></table></div>
   </div>
 </div><div class="basemethod">
   
@@ -598,7 +598,7 @@
     
     
     <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">dispose</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>):</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/database/threaded/engine.py#L93">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/database/threaded/engine.py#L98">
       
       (source)
     </a>
@@ -624,7 +624,7 @@
   <div class="functionHeader">
     
     <span class="py-defname">__slots__</span>: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" class="intersphinx-link">tuple</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <wbr></wbr><span class="rst-variable-ellipsis">...</span>]</code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/database/threaded/engine.py#L16">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/database/threaded/engine.py#L18">
       
       (source)
     </a>
@@ -636,7 +636,7 @@
   </div>
   <div class="functionBody">
     
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p>Declare the instance attribute slots reserved by this class.</p></div>
     
   </div>
 </div><div class="baseinstancevariable">
@@ -651,7 +651,7 @@
   <div class="functionHeader">
     
     <span class="py-defname">_name</span> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/database/threaded/engine.py#L35">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/database/threaded/engine.py#L39">
       
       (source)
     </a>
@@ -663,7 +663,7 @@
   </div>
   <div class="functionBody">
     
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p>Connection name used in sanitized opening errors.</p></div>
     
   </div>
 </div><div class="baseinstancevariable">
@@ -678,7 +678,7 @@
   <div class="functionHeader">
     
     <span class="py-defname">sync_engine</span> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/database/threaded/engine.py#L34">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/database/threaded/engine.py#L37">
       
       (source)
     </a>
@@ -690,7 +690,7 @@
   </div>
   <div class="functionBody">
     
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p>Blocking Core engine backed by the official connector dialect.</p></div>
     
   </div>
 </div>
@@ -704,7 +704,7 @@
   <div class="orionis-footer-inner">
     <div class="orionis-footer-copy">
       <p>API documentation for <a href="https://orionis-framework.com/" class="projecthome">Orionis</a>.</p>
-      <p class="orionis-footer-meta">Generated with <a href="https://github.com/twisted/pydoctor/">Pydoctor</a> 25.10.1.<span class="orionis-footer-build"> Built 2026-11-03 09:36:58.</span></p>
+      <p class="orionis-footer-meta">Generated with <a href="https://github.com/twisted/pydoctor/">Pydoctor</a> 25.10.1.<span class="orionis-footer-build"> Built 2026-11-03 13:00:15.</span></p>
     </div>
     <nav class="orionis-footer-links" aria-label="Additional resources">
       <a href="https://docs.orionis-framework.com">Read the guide <span aria-hidden="true">↗</span></a>

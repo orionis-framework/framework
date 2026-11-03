@@ -281,7 +281,7 @@
                     
                 </label>
 
-                <code><a href="orionis.mail.entities.address.html" class="internal-link" title="orionis.mail.entities.address">address</a></code>
+                <code><a href="orionis.mail.entities.address.module.html" class="internal-link" title="orionis.mail.entities.address">address</a></code>
 
                 <div class="expandableContent">
                     <div>
@@ -302,7 +302,7 @@
         
 
         
-            <div class="itemName"><code><a href="orionis.mail.entities.address.html#addresses" class="internal-link" title="orionis.mail.entities.address.addresses">addresses</a></code>
+            <div class="itemName"><code><a href="orionis.mail.entities.address.module.html#addresses" class="internal-link" title="orionis.mail.entities.address.addresses">addresses</a></code>
             </div>
         
 
@@ -312,7 +312,7 @@
         
 
         
-            <div class="itemName"><code><a href="orionis.mail.entities.address.html#one_address" class="internal-link" title="orionis.mail.entities.address.one_address">one<wbr></wbr>_address</a></code>
+            <div class="itemName"><code><a href="orionis.mail.entities.address.module.html#one_address" class="internal-link" title="orionis.mail.entities.address.one_address">one<wbr></wbr>_address</a></code>
             </div>
         
 
@@ -331,7 +331,7 @@
         
 
         
-            <div class="itemName"><code><a href="orionis.mail.entities.address.html#_HEADERS" class="internal-link" title="orionis.mail.entities.address._HEADERS">_HEADERS</a></code>
+            <div class="itemName"><code><a href="orionis.mail.entities.address.module.html#_HEADERS" class="internal-link" title="orionis.mail.entities.address._HEADERS">_HEADERS</a></code>
             </div>
         
 
@@ -363,7 +363,7 @@
                     
                 </label>
 
-                <code><a href="orionis.mail.entities.attachment.html" class="internal-link" title="orionis.mail.entities.attachment">attachment</a></code>
+                <code><a href="orionis.mail.entities.attachment.module.html" class="internal-link" title="orionis.mail.entities.attachment">attachment</a></code>
 
                 <div class="expandableContent">
                     <div>
@@ -409,7 +409,7 @@
                     
                 </label>
 
-                <code><a href="orionis.mail.entities.content.html" class="internal-link" title="orionis.mail.entities.content">content</a></code>
+                <code><a href="orionis.mail.entities.content.module.html" class="internal-link" title="orionis.mail.entities.content">content</a></code>
 
                 <div class="expandableContent">
                     <div>
@@ -455,7 +455,7 @@
                     
                 </label>
 
-                <code><a href="orionis.mail.entities.envelope.html" class="internal-link" title="orionis.mail.entities.envelope">envelope</a></code>
+                <code><a href="orionis.mail.entities.envelope.module.html" class="internal-link" title="orionis.mail.entities.envelope">envelope</a></code>
 
                 <div class="expandableContent">
                     <div>
@@ -1850,15 +1850,15 @@
         </div>
 
         <div class="extrasDocstring">
-          <p class="class-signature"><code><span class="py-keyword">class</span> <span class="py-defname">SmtpSettings</span>: <a href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/mail/entities/smtp_settings.py#L24" class="sourceLink">(source)</a></code></p><p><a href="classIndex.html#orionis.mail.entities.SmtpSettings">View In Hierarchy</a></p>
+          <p class="class-signature"><code><span class="py-keyword">class</span> <span class="py-defname">SmtpSettings</span>: <a href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/mail/entities/smtp_settings.py#L34" class="sourceLink">(source)</a></code></p><p><a href="classIndex.html#orionis.mail.entities.SmtpSettings">View In Hierarchy</a></p>
         </div>
 
         <div class="moduleDocstring">
-          <div><p>Store effective SMTP settings without exposing credentials in repr.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">host</span></td><td class="fieldArgDesc">Effective SMTP hostname.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">port</span></td><td class="fieldArgDesc">Effective TCP port between 1 and 65535.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">encryption</span></td><td class="fieldArgDesc">Negotiated transport security mode.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">username</span></td><td class="fieldArgDesc">Authentication user, empty when authentication is disabled.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">password</span></td><td class="fieldArgDesc">Authentication secret, empty when authentication is disabled.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">timeout</span></td><td class="fieldArgDesc">Positive socket timeout in seconds, or None for an unbounded wait.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">sensitive</span></td><td class="fieldArgDesc">Values redacted from transport diagnostics.</td></tr></table></div>
+          <div><p>Store effective SMTP settings without exposing credentials in repr.</p></div>
         </div>
 
         <div id="split-tables">
-          <table class="children sortable" id="id1308">
+          <table class="children sortable" id="id1311">
   
   
   <tr class="classmethod">
@@ -1866,41 +1866,41 @@
     <td>Class Method</td>
     <td><code><a href="#fromConfig" class="internal-link" title="orionis.mail.entities.SmtpSettings.fromConfig">from<wbr></wbr>Config</a></code></td>
     <td>Resolve URL precedence and validate the effective SMTP settings.</td>
-  </tr><tr class="classvariable">
+  </tr><tr class="instancevariable">
     
-    <td>Class Variable</td>
+    <td>Instance Variable</td>
     <td><code><a href="#encryption" class="internal-link" title="orionis.mail.entities.SmtpSettings.encryption">encryption</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
-  </tr><tr class="classvariable">
+    <td>Negotiated transport security mode.</td>
+  </tr><tr class="instancevariable">
     
-    <td>Class Variable</td>
+    <td>Instance Variable</td>
     <td><code><a href="#host" class="internal-link" title="orionis.mail.entities.SmtpSettings.host">host</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
-  </tr><tr class="classvariable">
+    <td>Effective SMTP hostname.</td>
+  </tr><tr class="instancevariable">
     
-    <td>Class Variable</td>
+    <td>Instance Variable</td>
     <td><code><a href="#password" class="internal-link" title="orionis.mail.entities.SmtpSettings.password">password</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
-  </tr><tr class="classvariable">
+    <td>Authentication secret, empty when authentication is disabled.</td>
+  </tr><tr class="instancevariable">
     
-    <td>Class Variable</td>
+    <td>Instance Variable</td>
     <td><code><a href="#port" class="internal-link" title="orionis.mail.entities.SmtpSettings.port">port</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
-  </tr><tr class="classvariable">
+    <td>Effective TCP port between 1 and 65535.</td>
+  </tr><tr class="instancevariable">
     
-    <td>Class Variable</td>
+    <td>Instance Variable</td>
     <td><code><a href="#sensitive" class="internal-link" title="orionis.mail.entities.SmtpSettings.sensitive">sensitive</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
-  </tr><tr class="classvariable">
+    <td>Values redacted from transport diagnostics.</td>
+  </tr><tr class="instancevariable">
     
-    <td>Class Variable</td>
+    <td>Instance Variable</td>
     <td><code><a href="#timeout" class="internal-link" title="orionis.mail.entities.SmtpSettings.timeout">timeout</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
-  </tr><tr class="classvariable">
+    <td>Positive socket timeout in seconds, or None for an unbounded wait.</td>
+  </tr><tr class="instancevariable">
     
-    <td>Class Variable</td>
+    <td>Instance Variable</td>
     <td><code><a href="#username" class="internal-link" title="orionis.mail.entities.SmtpSettings.username">username</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
+    <td>Authentication user, empty when authentication is disabled.</td>
   </tr>
 </table>
           
@@ -1922,7 +1922,7 @@
     
     <div><span class="decorator">@<a href="https://docs.python.org/3/builtins/functions.html#classmethod" class="intersphinx-link">classmethod</a><br /></span></div>
     <span class="py-keyword">def</span>&#160;<span class="py-defname">fromConfig</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">cls</span>, </span><span class="rst-sig-param">config: <code>Mapping[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <wbr></wbr><a href="https://docs.python.org/3/builtins/functions.html#object" class="intersphinx-link">object</a>]</code></span>) -&gt; <code>Self</code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/mail/entities/smtp_settings.py#L55">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/mail/entities/smtp_settings.py#L65">
       
       (source)
     </a>
@@ -1934,9 +1934,9 @@
   </div>
   <div class="docstring functionBody">
     
-    <div><p>Resolve URL precedence and validate the effective SMTP settings.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">config:</span><code>Mapping[<a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <a href="https://docs.python.org/3/builtins/functions.html#object" class="intersphinx-link">object</a>]</code></td><td class="fieldArgDesc">One normalized mailer, without environment lookups.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code>Self</code></td><td class="fieldArgDesc">Validated immutable connection options.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code>MailConfigurationException</code></td><td>If endpoint, encryption, credentials, timeout, or URL is invalid.</td></tr></table></div>
+    <div><p>Resolve URL precedence and validate the effective SMTP settings.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">config:</span><code><a href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Mapping" class="intersphinx-link">collections.abc.Mapping</a>[<a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <a href="https://docs.python.org/3/builtins/functions.html#object" class="intersphinx-link">object</a>]</code></td><td class="fieldArgDesc">One normalized mailer, without environment lookups.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/library/typing.html#typing.Self" class="intersphinx-link">typing.Self</a></code></td><td class="fieldArgDesc">Validated immutable connection options.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.mail.exceptions.MailConfigurationException.html" class="internal-link">orionis.mail.exceptions.MailConfigurationException</a></code></td><td>If endpoint, encryption, credentials, timeout, or URL is invalid.</td></tr></table></div>
   </div>
-</div><div class="baseclassvariable">
+</div><div class="baseinstancevariable">
   
   
   <a name="orionis.mail.entities.SmtpSettings.encryption">
@@ -1947,8 +1947,8 @@
   </a>
   <div class="functionHeader">
     
-    <span class="py-defname">encryption</span>: <code><a href="orionis.mail.enums.MailEncryption.html" class="internal-link" title="orionis.mail.enums.MailEncryption">MailEncryption</a></code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/mail/entities/smtp_settings.py#L49">
+    <span class="py-defname">encryption</span>: <code><a href="orionis.mail.enums.MailEncryption.html" class="internal-link">orionis.mail.enums.MailEncryption</a></code> =
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/mail/entities/smtp_settings.py#L59">
       
       (source)
     </a>
@@ -1960,10 +1960,10 @@
   </div>
   <div class="functionBody">
     
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p>Negotiated transport security mode.</p></div>
     
   </div>
-</div><div class="baseclassvariable">
+</div><div class="baseinstancevariable">
   
   
   <a name="orionis.mail.entities.SmtpSettings.host">
@@ -1975,7 +1975,7 @@
   <div class="functionHeader">
     
     <span class="py-defname">host</span>: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/mail/entities/smtp_settings.py#L47">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/mail/entities/smtp_settings.py#L57">
       
       (source)
     </a>
@@ -1987,10 +1987,10 @@
   </div>
   <div class="functionBody">
     
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p>Effective SMTP hostname.</p></div>
     
   </div>
-</div><div class="baseclassvariable">
+</div><div class="baseinstancevariable">
   
   
   <a name="orionis.mail.entities.SmtpSettings.password">
@@ -2002,7 +2002,7 @@
   <div class="functionHeader">
     
     <span class="py-defname">password</span>: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/mail/entities/smtp_settings.py#L51">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/mail/entities/smtp_settings.py#L61">
       
       (source)
     </a>
@@ -2014,10 +2014,10 @@
   </div>
   <div class="functionBody">
     
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p>Authentication secret, empty when authentication is disabled.</p></div>
     
   </div>
-</div><div class="baseclassvariable">
+</div><div class="baseinstancevariable">
   
   
   <a name="orionis.mail.entities.SmtpSettings.port">
@@ -2029,7 +2029,7 @@
   <div class="functionHeader">
     
     <span class="py-defname">port</span>: <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/mail/entities/smtp_settings.py#L48">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/mail/entities/smtp_settings.py#L58">
       
       (source)
     </a>
@@ -2041,10 +2041,10 @@
   </div>
   <div class="functionBody">
     
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p>Effective TCP port between 1 and 65535.</p></div>
     
   </div>
-</div><div class="baseclassvariable">
+</div><div class="baseinstancevariable">
   
   
   <a name="orionis.mail.entities.SmtpSettings.sensitive">
@@ -2055,8 +2055,8 @@
   </a>
   <div class="functionHeader">
     
-    <span class="py-defname">sensitive</span>: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" class="intersphinx-link">tuple</a>[<a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, ...]</code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/mail/entities/smtp_settings.py#L53">
+    <span class="py-defname">sensitive</span>: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" class="intersphinx-link">tuple</a>[<a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <tt class="rst-docutils rst-literal">...</tt>]</code> =
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/mail/entities/smtp_settings.py#L63">
       
       (source)
     </a>
@@ -2068,10 +2068,10 @@
   </div>
   <div class="functionBody">
     
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p>Values redacted from transport diagnostics.</p></div>
     
   </div>
-</div><div class="baseclassvariable">
+</div><div class="baseinstancevariable">
   
   
   <a name="orionis.mail.entities.SmtpSettings.timeout">
@@ -2083,7 +2083,7 @@
   <div class="functionHeader">
     
     <span class="py-defname">timeout</span>: <code>int | None</code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/mail/entities/smtp_settings.py#L52">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/mail/entities/smtp_settings.py#L62">
       
       (source)
     </a>
@@ -2095,10 +2095,10 @@
   </div>
   <div class="functionBody">
     
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p>Positive socket timeout in seconds, or None for an unbounded wait.</p></div>
     
   </div>
-</div><div class="baseclassvariable">
+</div><div class="baseinstancevariable">
   
   
   <a name="orionis.mail.entities.SmtpSettings.username">
@@ -2110,7 +2110,7 @@
   <div class="functionHeader">
     
     <span class="py-defname">username</span>: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/mail/entities/smtp_settings.py#L50">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/mail/entities/smtp_settings.py#L60">
       
       (source)
     </a>
@@ -2122,7 +2122,7 @@
   </div>
   <div class="functionBody">
     
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p>Authentication user, empty when authentication is disabled.</p></div>
     
   </div>
 </div>
@@ -2136,7 +2136,7 @@
   <div class="orionis-footer-inner">
     <div class="orionis-footer-copy">
       <p>API documentation for <a href="https://orionis-framework.com/" class="projecthome">Orionis</a>.</p>
-      <p class="orionis-footer-meta">Generated with <a href="https://github.com/twisted/pydoctor/">Pydoctor</a> 25.10.1.<span class="orionis-footer-build"> Built 2026-11-03 09:36:58.</span></p>
+      <p class="orionis-footer-meta">Generated with <a href="https://github.com/twisted/pydoctor/">Pydoctor</a> 25.10.1.<span class="orionis-footer-build"> Built 2026-11-03 13:00:15.</span></p>
     </div>
     <nav class="orionis-footer-links" aria-label="Additional resources">
       <a href="https://docs.orionis-framework.com">Read the guide <span aria-hidden="true">↗</span></a>

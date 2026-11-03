@@ -883,7 +883,7 @@
         </div>
 
         <div class="extrasDocstring">
-          <p class="class-signature"><code><span class="py-keyword">class</span> <span class="py-defname">SessionManager</span>: <a href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/session/manager.py#L20" class="sourceLink">(source)</a></code></p><p>Constructor: <code><a href="#__init__" class="internal-link" title="orionis.session.manager.SessionManager.__init__">SessionManager(app, cache)</a></code></p><p><a href="classIndex.html#orionis.session.manager.SessionManager">View In Hierarchy</a></p>
+          <p class="class-signature"><code><span class="py-keyword">class</span> <span class="py-defname">SessionManager</span>: <a href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/session/manager.py#L23" class="sourceLink">(source)</a></code></p><p>Constructor: <code><a href="#__init__" class="internal-link" title="orionis.session.manager.SessionManager.__init__">SessionManager(app, cache)</a></code></p><p><a href="classIndex.html#orionis.session.manager.SessionManager">View In Hierarchy</a></p>
         </div>
 
         <div class="moduleDocstring">
@@ -891,11 +891,11 @@
 <p>This class is a <strong>coordinator only</strong>.  It never stores session data,
 never interprets the session payload, and never duplicates logic that
 belongs to <tt class="rst-docutils rst-literal">Session</tt> or to the backing store.</p>
-<table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">config</span></td><td class="fieldArgDesc">Resolved session configuration entity.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">store</span></td><td class="fieldArgDesc">Pre-built backing-store instance.</td></tr></table></div>
+<table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">app</span></td><td class="fieldArgDesc">Application providing session configuration and filesystem paths.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">cache</span></td><td class="fieldArgDesc">Cache manager used when the configured session store is cache-backed.</td></tr></table></div>
         </div>
 
         <div id="split-tables">
-          <table class="children sortable" id="id1987">
+          <table class="children sortable" id="id1995">
   
   
   <tr class="method">
@@ -962,77 +962,77 @@ belongs to <tt class="rst-docutils rst-literal">Session</tt> or to the backing s
     
     <td>Class Variable</td>
     <td><code><a href="#__slots__" class="internal-link" title="orionis.session.manager.SessionManager.__slots__">__slots__</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
+    <td>Declare the instance attribute slots reserved by this class.</td>
   </tr><tr class="instancevariable">
     
     <td>Instance Variable</td>
     <td><code><a href="#_app" class="internal-link" title="orionis.session.manager.SessionManager._app">_app</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
+    <td>The application instance.</td>
   </tr><tr class="instancevariable">
     
     <td>Instance Variable</td>
     <td><code><a href="#_cookie_domain" class="internal-link" title="orionis.session.manager.SessionManager._cookie_domain">_cookie<wbr></wbr>_domain</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
+    <td>Cookie domain obtained from <tt class="rst-docutils rst-literal">config.domain</tt>.</td>
   </tr><tr class="instancevariable">
     
     <td>Instance Variable</td>
     <td><code><a href="#_cookie_http_only" class="internal-link" title="orionis.session.manager.SessionManager._cookie_http_only">_cookie<wbr></wbr>_http<wbr></wbr>_only</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
+    <td>Cookie http only obtained from <tt class="rst-docutils rst-literal">config.http_only</tt>.</td>
   </tr><tr class="instancevariable">
     
     <td>Instance Variable</td>
     <td><code><a href="#_cookie_max_age" class="internal-link" title="orionis.session.manager.SessionManager._cookie_max_age">_cookie<wbr></wbr>_max<wbr></wbr>_age</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
+    <td>Lifetime applied to the session cookie.</td>
   </tr><tr class="instancevariable">
     
     <td>Instance Variable</td>
     <td><code><a href="#_cookie_name" class="internal-link" title="orionis.session.manager.SessionManager._cookie_name">_cookie<wbr></wbr>_name</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
+    <td>Cookie name obtained from <tt class="rst-docutils rst-literal">config.cookie</tt>.</td>
   </tr><tr class="instancevariable">
     
     <td>Instance Variable</td>
     <td><code><a href="#_cookie_partitioned" class="internal-link" title="orionis.session.manager.SessionManager._cookie_partitioned">_cookie<wbr></wbr>_partitioned</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
+    <td>Cookie partitioned obtained from <tt class="rst-docutils rst-literal">config.partitioned</tt>.</td>
   </tr><tr class="instancevariable">
     
     <td>Instance Variable</td>
     <td><code><a href="#_cookie_path" class="internal-link" title="orionis.session.manager.SessionManager._cookie_path">_cookie<wbr></wbr>_path</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
+    <td>Cookie path obtained from <tt class="rst-docutils rst-literal">config.path</tt>.</td>
   </tr><tr class="instancevariable">
     
     <td>Instance Variable</td>
     <td><code><a href="#_cookie_same_site" class="internal-link" title="orionis.session.manager.SessionManager._cookie_same_site">_cookie<wbr></wbr>_same<wbr></wbr>_site</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
+    <td>Cookie same site produced by <tt class="rst-docutils rst-literal">getattr</tt>.</td>
   </tr><tr class="instancevariable">
     
     <td>Instance Variable</td>
     <td><code><a href="#_cookie_secure" class="internal-link" title="orionis.session.manager.SessionManager._cookie_secure">_cookie<wbr></wbr>_secure</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
+    <td>Cookie secure obtained from <tt class="rst-docutils rst-literal">config.secure</tt>.</td>
   </tr><tr class="instancevariable">
     
     <td>Instance Variable</td>
     <td><code><a href="#_lifetime_delta" class="internal-link" title="orionis.session.manager.SessionManager._lifetime_delta">_lifetime<wbr></wbr>_delta</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
+    <td>Lifetime delta produced by <tt class="rst-docutils rst-literal">timedelta</tt>.</td>
   </tr><tr class="instancevariable">
     
     <td>Instance Variable</td>
     <td><code><a href="#_renewal_delta" class="internal-link" title="orionis.session.manager.SessionManager._renewal_delta">_renewal<wbr></wbr>_delta</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
+    <td>Interval used to calculate the next session renewal deadline.</td>
   </tr><tr class="instancevariable">
     
     <td>Instance Variable</td>
     <td><code><a href="#_renewal_window" class="internal-link" title="orionis.session.manager.SessionManager._renewal_window">_renewal<wbr></wbr>_window</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
+    <td>Window during which a session becomes eligible for renewal.</td>
   </tr><tr class="instancevariable">
     
     <td>Instance Variable</td>
     <td><code><a href="#_store" class="internal-link" title="orionis.session.manager.SessionManager._store">_store</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
+    <td>Pre-built backing-store instance.</td>
   </tr><tr class="instancevariable">
     
     <td>Instance Variable</td>
     <td><code><a href="#_track_previous_url" class="internal-link" title="orionis.session.manager.SessionManager._track_previous_url">_track<wbr></wbr>_previous<wbr></wbr>_url</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
+    <td>Track previous url obtained from <tt class="rst-docutils rst-literal">config.track_previous_url</tt>.</td>
   </tr><tr class="property">
     
     <td>Property</td>
@@ -1059,7 +1059,7 @@ belongs to <tt class="rst-docutils rst-literal">Session</tt> or to the backing s
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">__deleteCookie</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">response: <code>Response</code></span>):</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/session/manager.py#L413">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/session/manager.py#L437">
       
       (source)
     </a>
@@ -1071,7 +1071,7 @@ belongs to <tt class="rst-docutils rst-literal">Session</tt> or to the backing s
   </div>
   <div class="docstring functionBody">
     
-    <div><p>Set an expired cookie to instruct the browser to clear it.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">response:</span><code><a href="orionis.http.Response.html" class="internal-link" title="orionis.http.Response">Response</a></code></td><td class="fieldArgDesc">The outgoing response.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc"><span class="undocumented">Undocumented</span></td></tr></table></div>
+    <div><p>Set an expired cookie to instruct the browser to clear it.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">response:</span><code><a href="orionis.http.Response.html" class="internal-link">orionis.http.Response</a></code></td><td class="fieldArgDesc">The outgoing response.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">Set an expired cookie to instruct the browser to clear it.</td></tr></table></div>
   </div>
 </div><div class="basemethod">
   
@@ -1086,7 +1086,7 @@ belongs to <tt class="rst-docutils rst-literal">Session</tt> or to the backing s
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">__init__</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">app: <code>IApplication</code>, </span><span class="rst-sig-param">cache: <code>ICacheManager</code></span>):</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/session/manager.py#L55">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/session/manager.py#L59">
       
       (source)
     </a>
@@ -1098,9 +1098,9 @@ belongs to <tt class="rst-docutils rst-literal">Session</tt> or to the backing s
   </div>
   <div class="docstring functionBody">
     
-    <div><p>Initialise the manager, pre-computing all request-invariant values.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">app:</span><code><a href="orionis.IApplication.html" class="internal-link" title="orionis.IApplication">IApplication</a></code></td><td class="fieldArgDesc">The application instance.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">cache:</span><code><a href="orionis.cache.contracts.ICacheManager.html" class="internal-link" title="orionis.cache.contracts.ICacheManager">ICacheManager</a></code></td><td class="fieldArgDesc">The application's cache manager, injected so the cache-backed
+    <div><p>Initialise the manager, pre-computing all request-invariant values.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">app:</span><code><a href="orionis.IApplication.html" class="internal-link">orionis.IApplication</a></code></td><td class="fieldArgDesc">The application instance.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">cache:</span><code><a href="orionis.cache.contracts.ICacheManager.html" class="internal-link">orionis.cache.contracts.ICacheManager</a></code></td><td class="fieldArgDesc">The application's cache manager, injected so the cache-backed
 store can be built without depending on the <tt class="rst-docutils rst-literal">Cache</tt> facade's
-pin state.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc"><span class="undocumented">Undocumented</span></td></tr></table></div>
+pin state.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">Initialise the manager, pre-computing all request-invariant values.</td></tr></table></div>
   </div>
 </div><div class="basemethod">
   
@@ -1115,7 +1115,7 @@ pin state.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td
     
     
     <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">__invalidateSession</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">response: <code>Response</code>, </span><span class="rst-sig-param">session: <code><a href="orionis.session.session.Session.html" class="internal-link" title="orionis.session.session.Session">Session</a></code></span>):</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/session/manager.py#L363">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/session/manager.py#L385">
       
       (source)
     </a>
@@ -1127,7 +1127,7 @@ pin state.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td
   </div>
   <div class="docstring functionBody">
     
-    <div><p>Remove the session record and expire the cookie on <em>response</em>.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">response:</span><code><a href="orionis.http.Response.html" class="internal-link" title="orionis.http.Response">Response</a></code></td><td class="fieldArgDesc">Response on which the expired cookie is set.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">session:</span><code><a href="orionis.session.session.Session.html" class="internal-link" title="orionis.session.session.Session">Session</a></code></td><td class="fieldArgDesc">The session to remove.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc"><span class="undocumented">Undocumented</span></td></tr></table></div>
+    <div><p>Remove the session record and expire the cookie on <em>response</em>.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">response:</span><code><a href="orionis.http.Response.html" class="internal-link">orionis.http.Response</a></code></td><td class="fieldArgDesc">Response on which the expired cookie is set.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">session:</span><code><a href="orionis.session.session.Session.html" class="internal-link">orionis.session.session.Session</a></code></td><td class="fieldArgDesc">The session to remove.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">Remove the session record and expire the cookie on <em>response</em>.</td></tr></table></div>
   </div>
 </div><div class="basemethod">
   
@@ -1142,7 +1142,7 @@ pin state.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td
     
     
     <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">__persist</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">session: <code><a href="orionis.session.session.Session.html" class="internal-link" title="orionis.session.session.Session">Session</a></code></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/session/manager.py#L310">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/session/manager.py#L332">
       
       (source)
     </a>
@@ -1154,7 +1154,7 @@ pin state.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td
   </div>
   <div class="docstring functionBody">
     
-    <div><p>Write the current session state to the backing store.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">session:</span><code><a href="orionis.session.session.Session.html" class="internal-link" title="orionis.session.session.Session">Session</a></code></td><td class="fieldArgDesc">The session to persist.  <tt class="rst-docutils rst-literal">session.id</tt> must not be <tt class="rst-docutils rst-literal">None</tt>.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code></td><td class="fieldArgDesc">False if a restored session has already been revoked or expired.</td></tr></table></div>
+    <div><p>Write the current session state to the backing store.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">session:</span><code><a href="orionis.session.session.Session.html" class="internal-link">orionis.session.session.Session</a></code></td><td class="fieldArgDesc">The session to persist.  <tt class="rst-docutils rst-literal">session.id</tt> must not be <tt class="rst-docutils rst-literal">None</tt>.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code></td><td class="fieldArgDesc">False if a restored session has already been revoked or expired.</td></tr></table></div>
   </div>
 </div><div class="basemethod">
   
@@ -1169,7 +1169,7 @@ pin state.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">__register</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">session: <code><a href="orionis.session.session.Session.html" class="internal-link" title="orionis.session.session.Session">Session</a></code></span>):</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/session/manager.py#L212">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/session/manager.py#L233">
       
       (source)
     </a>
@@ -1181,7 +1181,7 @@ pin state.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td
   </div>
   <div class="docstring functionBody">
     
-    <div><p>Register the session in the application container.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">session:</span><code><a href="orionis.session.session.Session.html" class="internal-link" title="orionis.session.session.Session">Session</a></code></td><td class="fieldArgDesc">The session to register.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc"><span class="undocumented">Undocumented</span></td></tr></table></div>
+    <div><p>Register the session in the application container.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">session:</span><code><a href="orionis.session.session.Session.html" class="internal-link">orionis.session.session.Session</a></code></td><td class="fieldArgDesc">The session to register.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">Register the session in the application container.</td></tr></table></div>
   </div>
 </div><div class="basemethod">
   
@@ -1196,7 +1196,7 @@ pin state.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">__resolveStore</span><span class="function-signature long-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">base_path: <code><a href="https://docs.python.org/3/library/pathlib.html#pathlib.Path" class="intersphinx-link">Path</a></code>, </span><span class="rst-sig-param">config: <code>SessionConfig</code>, </span><span class="rst-sig-param">cache: <code>ICacheManager</code></span>) -&gt; <code>ISessionStore</code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/session/manager.py#L229">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/session/manager.py#L251">
       
       (source)
     </a>
@@ -1208,7 +1208,7 @@ pin state.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td
   </div>
   <div class="docstring functionBody">
     
-    <div><p>Resolve and return the configured session store implementation.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">base<wbr></wbr>_path:</span><code><a href="https://docs.python.org/3/library/pathlib.html#pathlib.Path" class="intersphinx-link">Path</a></code></td><td class="fieldArgDesc">Base project path used to resolve file-store directories.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">config:</span><code>SessionConfig</code></td><td class="fieldArgDesc">Session configuration containing the selected driver.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">cache:</span><code><a href="orionis.cache.contracts.ICacheManager.html" class="internal-link" title="orionis.cache.contracts.ICacheManager">ICacheManager</a></code></td><td class="fieldArgDesc">The application's cache manager, used by the cache driver.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.session.contracts.ISessionStore.html" class="internal-link" title="orionis.session.contracts.ISessionStore">ISessionStore</a></code></td><td class="fieldArgDesc">Store implementing the selected file, cache, database or memory driver.</td></tr></table></div>
+    <div><p>Resolve and return the configured session store implementation.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">base<wbr></wbr>_path:</span><code><a href="https://docs.python.org/3/library/pathlib.html#pathlib.Path" class="intersphinx-link">pathlib.Path</a></code></td><td class="fieldArgDesc">Base project path used to resolve file-store directories.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">config:</span><code><a href="orionis.foundation.config.session.Session.html" class="internal-link">orionis.foundation.config.session.Session</a></code></td><td class="fieldArgDesc">Session configuration containing the selected driver.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">cache:</span><code><a href="orionis.cache.contracts.ICacheManager.html" class="internal-link">orionis.cache.contracts.ICacheManager</a></code></td><td class="fieldArgDesc">The application's cache manager, used by the cache driver.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.session.contracts.ISessionStore.html" class="internal-link">orionis.session.contracts.ISessionStore</a></code></td><td class="fieldArgDesc">Store implementing the selected file, cache, database or memory driver.</td></tr></table></div>
   </div>
 </div><div class="basemethod">
   
@@ -1223,7 +1223,7 @@ pin state.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td
     
     
     <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">__restore</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">session_id: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></span>) -&gt; <code><a href="orionis.session.session.Session.html" class="internal-link" title="orionis.session.session.Session">Session</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/session/manager.py#L276">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/session/manager.py#L298">
       
       (source)
     </a>
@@ -1238,7 +1238,7 @@ pin state.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td
     <div><p>Load a session from the store, or return a blank lazy session.</p>
 <p>The store is trusted to handle expiry: a <tt class="rst-docutils rst-literal">None</tt> return means
 the record was absent or already expired.</p>
-<table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">session<wbr></wbr>_id:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">The identifier read from the session cookie.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.session.session.Session.html" class="internal-link" title="orionis.session.session.Session">Session</a></code></td><td class="fieldArgDesc">Restored session, or a blank lazy session on cache miss.</td></tr></table></div>
+<table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">session<wbr></wbr>_id:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">The identifier read from the session cookie.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.session.session.Session.html" class="internal-link">orionis.session.session.Session</a></code></td><td class="fieldArgDesc">Restored session, or a blank lazy session on cache miss.</td></tr></table></div>
   </div>
 </div><div class="basemethod">
   
@@ -1253,7 +1253,7 @@ the record was absent or already expired.</p>
     
     
     <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">__rotateId</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">session: <code><a href="orionis.session.session.Session.html" class="internal-link" title="orionis.session.session.Session">Session</a></code></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/session/manager.py#L340">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/session/manager.py#L362">
       
       (source)
     </a>
@@ -1265,7 +1265,7 @@ the record was absent or already expired.</p>
   </div>
   <div class="docstring functionBody">
     
-    <div><p>Replace the session ID, deleting the old record from the store.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">session:</span><code><a href="orionis.session.session.Session.html" class="internal-link" title="orionis.session.session.Session">Session</a></code></td><td class="fieldArgDesc">The session whose ID is to be rotated.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code></td><td class="fieldArgDesc">False if another request has already invalidated the old ID.</td></tr></table></div>
+    <div><p>Replace the session ID, deleting the old record from the store.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">session:</span><code><a href="orionis.session.session.Session.html" class="internal-link">orionis.session.session.Session</a></code></td><td class="fieldArgDesc">The session whose ID is to be rotated.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code></td><td class="fieldArgDesc">False if another request has already invalidated the old ID.</td></tr></table></div>
   </div>
 </div><div class="basemethod">
   
@@ -1280,7 +1280,7 @@ the record was absent or already expired.</p>
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">__setCookie</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">response: <code>Response</code>, </span><span class="rst-sig-param">session_id: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></span>):</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/session/manager.py#L386">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/session/manager.py#L409">
       
       (source)
     </a>
@@ -1292,7 +1292,7 @@ the record was absent or already expired.</p>
   </div>
   <div class="docstring functionBody">
     
-    <div><p>Attach the session identifier cookie to <em>response</em>.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">response:</span><code><a href="orionis.http.Response.html" class="internal-link" title="orionis.http.Response">Response</a></code></td><td class="fieldArgDesc">The outgoing response.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">session<wbr></wbr>_id:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">The session identifier to embed in the cookie value.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc"><span class="undocumented">Undocumented</span></td></tr></table></div>
+    <div><p>Attach the session identifier cookie to <em>response</em>.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">response:</span><code><a href="orionis.http.Response.html" class="internal-link">orionis.http.Response</a></code></td><td class="fieldArgDesc">The outgoing response.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">session<wbr></wbr>_id:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">The session identifier to embed in the cookie value.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">Attach the session identifier cookie to <em>response</em>.</td></tr></table></div>
   </div>
 </div><div class="basemethod">
   
@@ -1307,7 +1307,7 @@ the record was absent or already expired.</p>
     
     
     <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">abort</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">session: <code><a href="orionis.session.session.Session.html" class="internal-link" title="orionis.session.session.Session">Session</a></code></span>):</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/session/manager.py#L194">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/session/manager.py#L214">
       
       (source)
     </a>
@@ -1319,7 +1319,7 @@ the record was absent or already expired.</p>
   </div>
   <div class="docstring functionBody">
     
-    <div><p>Persist pending revocation when a request cannot produce a response.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">session:</span><code><a href="orionis.session.session.Session.html" class="internal-link" title="orionis.session.session.Session">Session</a></code></td><td class="fieldArgDesc">Session belonging to a failed or cancelled request.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">Invalidated or superseded IDs are deleted; no new session is issued.</td></tr></table></div>
+    <div><p>Persist pending revocation when a request cannot produce a response.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">session:</span><code><a href="orionis.session.session.Session.html" class="internal-link">orionis.session.session.Session</a></code></td><td class="fieldArgDesc">Session belonging to a failed or cancelled request.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">Invalidated or superseded IDs are deleted; no new session is issued.</td></tr></table></div>
   </div>
 </div><div class="basemethod">
   
@@ -1334,7 +1334,7 @@ the record was absent or already expired.</p>
     
     
     <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">save</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">response: <code>Response</code>, </span><span class="rst-sig-param">session: <code><a href="orionis.session.session.Session.html" class="internal-link" title="orionis.session.session.Session">Session</a></code></span>):</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/session/manager.py#L151">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/session/manager.py#L170">
       
       (source)
     </a>
@@ -1351,7 +1351,7 @@ the record was absent or already expired.</p>
 unchanged scalar payloads retain their existing store and cookie expiry
 until the deadline; mutable payloads are always persisted. Browser
 session cookies still omit Max-Age when expire_on_close is enabled.</p>
-<table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">response:</span><code><a href="orionis.http.Response.html" class="internal-link" title="orionis.http.Response">Response</a></code></td><td class="fieldArgDesc">Outgoing HTTP response.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">session:</span><code><a href="orionis.session.session.Session.html" class="internal-link" title="orionis.session.session.Session">Session</a></code></td><td class="fieldArgDesc">The session returned by <tt class="rst-docutils rst-literal">start()</tt>.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc"><span class="undocumented">Undocumented</span></td></tr></table></div>
+<table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">response:</span><code><a href="orionis.http.Response.html" class="internal-link">orionis.http.Response</a></code></td><td class="fieldArgDesc">Outgoing HTTP response.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">session:</span><code><a href="orionis.session.session.Session.html" class="internal-link">orionis.session.session.Session</a></code></td><td class="fieldArgDesc">The session returned by <tt class="rst-docutils rst-literal">start()</tt>.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">Persist the session and set the cookie on <em>response</em>.</td></tr></table></div>
   </div>
 </div><div class="basemethod">
   
@@ -1366,7 +1366,7 @@ session cookies still omit Max-Age when expire_on_close is enabled.</p>
     
     
     <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">start</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">request: <code>Request</code></span>) -&gt; <code><a href="orionis.session.session.Session.html" class="internal-link" title="orionis.session.session.Session">Session</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/session/manager.py#L122">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/session/manager.py#L141">
       
       (source)
     </a>
@@ -1378,7 +1378,7 @@ session cookies still omit Max-Age when expire_on_close is enabled.</p>
   </div>
   <div class="docstring functionBody">
     
-    <div><p>Restore or create a session for the incoming request.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">request:</span><code><a href="orionis.http.Request.html" class="internal-link" title="orionis.http.Request">Request</a></code></td><td class="fieldArgDesc">The incoming HTTP request.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.session.session.Session.html" class="internal-link" title="orionis.session.session.Session">Session</a></code></td><td class="fieldArgDesc">An active or blank lazy session, with flash data aged.</td></tr></table></div>
+    <div><p>Restore or create a session for the incoming request.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">request:</span><code><a href="orionis.http.Request.html" class="internal-link">orionis.http.Request</a></code></td><td class="fieldArgDesc">The incoming HTTP request.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.session.session.Session.html" class="internal-link">orionis.session.session.Session</a></code></td><td class="fieldArgDesc">An active or blank lazy session, with flash data aged.</td></tr></table></div>
   </div>
 </div><div class="baseclassvariable">
   
@@ -1392,7 +1392,7 @@ session cookies still omit Max-Age when expire_on_close is enabled.</p>
   <div class="functionHeader">
     
     <span class="py-defname">__slots__</span>: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" class="intersphinx-link">tuple</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <wbr></wbr><span class="rst-variable-ellipsis">...</span>]</code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/session/manager.py#L38">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/session/manager.py#L41">
       
       (source)
     </a>
@@ -1404,7 +1404,7 @@ session cookies still omit Max-Age when expire_on_close is enabled.</p>
   </div>
   <div class="functionBody">
     
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p>Declare the instance attribute slots reserved by this class.</p></div>
     
   </div>
 </div><div class="baseinstancevariable">
@@ -1419,7 +1419,7 @@ session cookies still omit Max-Age when expire_on_close is enabled.</p>
   <div class="functionHeader">
     
     <span class="py-defname">_app</span> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/session/manager.py#L76">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/session/manager.py#L81">
       
       (source)
     </a>
@@ -1431,7 +1431,7 @@ session cookies still omit Max-Age when expire_on_close is enabled.</p>
   </div>
   <div class="functionBody">
     
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p>The application instance.</p></div>
     
   </div>
 </div><div class="baseinstancevariable">
@@ -1446,7 +1446,7 @@ session cookies still omit Max-Age when expire_on_close is enabled.</p>
   <div class="functionHeader">
     
     <span class="py-defname">_cookie_domain</span>: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a> | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/session/manager.py#L97">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/session/manager.py#L110">
       
       (source)
     </a>
@@ -1458,7 +1458,7 @@ session cookies still omit Max-Age when expire_on_close is enabled.</p>
   </div>
   <div class="functionBody">
     
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p>Cookie domain obtained from <tt class="rst-docutils rst-literal">config.domain</tt>.</p></div>
     
   </div>
 </div><div class="baseinstancevariable">
@@ -1473,7 +1473,7 @@ session cookies still omit Max-Age when expire_on_close is enabled.</p>
   <div class="functionHeader">
     
     <span class="py-defname">_cookie_http_only</span>: <code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/session/manager.py#L102">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/session/manager.py#L118">
       
       (source)
     </a>
@@ -1485,7 +1485,7 @@ session cookies still omit Max-Age when expire_on_close is enabled.</p>
   </div>
   <div class="functionBody">
     
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p>Cookie http only obtained from <tt class="rst-docutils rst-literal">config.http_only</tt>.</p></div>
     
   </div>
 </div><div class="baseinstancevariable">
@@ -1500,7 +1500,7 @@ session cookies still omit Max-Age when expire_on_close is enabled.</p>
   <div class="functionHeader">
     
     <span class="py-defname">_cookie_max_age</span>: <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a> | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/session/manager.py#L98">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/session/manager.py#L112">
       
       (source)
     </a>
@@ -1512,7 +1512,7 @@ session cookies still omit Max-Age when expire_on_close is enabled.</p>
   </div>
   <div class="functionBody">
     
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p>Lifetime applied to the session cookie.</p></div>
     
   </div>
 </div><div class="baseinstancevariable">
@@ -1527,7 +1527,7 @@ session cookies still omit Max-Age when expire_on_close is enabled.</p>
   <div class="functionHeader">
     
     <span class="py-defname">_cookie_name</span>: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/session/manager.py#L95">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/session/manager.py#L106">
       
       (source)
     </a>
@@ -1539,7 +1539,7 @@ session cookies still omit Max-Age when expire_on_close is enabled.</p>
   </div>
   <div class="functionBody">
     
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p>Cookie name obtained from <tt class="rst-docutils rst-literal">config.cookie</tt>.</p></div>
     
   </div>
 </div><div class="baseinstancevariable">
@@ -1554,7 +1554,7 @@ session cookies still omit Max-Age when expire_on_close is enabled.</p>
   <div class="functionHeader">
     
     <span class="py-defname">_cookie_partitioned</span>: <code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/session/manager.py#L106">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/session/manager.py#L124">
       
       (source)
     </a>
@@ -1566,7 +1566,7 @@ session cookies still omit Max-Age when expire_on_close is enabled.</p>
   </div>
   <div class="functionBody">
     
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p>Cookie partitioned obtained from <tt class="rst-docutils rst-literal">config.partitioned</tt>.</p></div>
     
   </div>
 </div><div class="baseinstancevariable">
@@ -1581,7 +1581,7 @@ session cookies still omit Max-Age when expire_on_close is enabled.</p>
   <div class="functionHeader">
     
     <span class="py-defname">_cookie_path</span>: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/session/manager.py#L96">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/session/manager.py#L108">
       
       (source)
     </a>
@@ -1593,7 +1593,7 @@ session cookies still omit Max-Age when expire_on_close is enabled.</p>
   </div>
   <div class="functionBody">
     
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p>Cookie path obtained from <tt class="rst-docutils rst-literal">config.path</tt>.</p></div>
     
   </div>
 </div><div class="baseinstancevariable">
@@ -1608,7 +1608,7 @@ session cookies still omit Max-Age when expire_on_close is enabled.</p>
   <div class="functionHeader">
     
     <span class="py-defname">_cookie_same_site</span>: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/session/manager.py#L103">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/session/manager.py#L120">
       
       (source)
     </a>
@@ -1620,7 +1620,7 @@ session cookies still omit Max-Age when expire_on_close is enabled.</p>
   </div>
   <div class="functionBody">
     
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p>Cookie same site produced by <tt class="rst-docutils rst-literal">getattr</tt>.</p></div>
     
   </div>
 </div><div class="baseinstancevariable">
@@ -1635,7 +1635,7 @@ session cookies still omit Max-Age when expire_on_close is enabled.</p>
   <div class="functionHeader">
     
     <span class="py-defname">_cookie_secure</span>: <code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/session/manager.py#L101">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/session/manager.py#L116">
       
       (source)
     </a>
@@ -1647,7 +1647,7 @@ session cookies still omit Max-Age when expire_on_close is enabled.</p>
   </div>
   <div class="functionBody">
     
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p>Cookie secure obtained from <tt class="rst-docutils rst-literal">config.secure</tt>.</p></div>
     
   </div>
 </div><div class="baseinstancevariable">
@@ -1662,7 +1662,7 @@ session cookies still omit Max-Age when expire_on_close is enabled.</p>
   <div class="functionHeader">
     
     <span class="py-defname">_lifetime_delta</span>: <code><a href="https://docs.python.org/3/library/datetime.html#datetime.timedelta" class="intersphinx-link">timedelta</a></code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/session/manager.py#L85">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/session/manager.py#L92">
       
       (source)
     </a>
@@ -1674,7 +1674,7 @@ session cookies still omit Max-Age when expire_on_close is enabled.</p>
   </div>
   <div class="functionBody">
     
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p>Lifetime delta produced by <tt class="rst-docutils rst-literal">timedelta</tt>.</p></div>
     
   </div>
 </div><div class="baseinstancevariable">
@@ -1689,7 +1689,7 @@ session cookies still omit Max-Age when expire_on_close is enabled.</p>
   <div class="functionHeader">
     
     <span class="py-defname">_renewal_delta</span> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/session/manager.py#L86">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/session/manager.py#L94">
       
       (source)
     </a>
@@ -1701,7 +1701,7 @@ session cookies still omit Max-Age when expire_on_close is enabled.</p>
   </div>
   <div class="functionBody">
     
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p>Interval used to calculate the next session renewal deadline.</p></div>
     
   </div>
 </div><div class="baseinstancevariable">
@@ -1716,7 +1716,7 @@ session cookies still omit Max-Age when expire_on_close is enabled.</p>
   <div class="functionHeader">
     
     <span class="py-defname">_renewal_window</span> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/session/manager.py#L90">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/session/manager.py#L99">
       
       (source)
     </a>
@@ -1728,7 +1728,7 @@ session cookies still omit Max-Age when expire_on_close is enabled.</p>
   </div>
   <div class="functionBody">
     
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p>Window during which a session becomes eligible for renewal.</p></div>
     
   </div>
 </div><div class="baseinstancevariable">
@@ -1743,7 +1743,7 @@ session cookies still omit Max-Age when expire_on_close is enabled.</p>
   <div class="functionHeader">
     
     <span class="py-defname">_store</span>: <code>ISessionStore</code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/session/manager.py#L80">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/session/manager.py#L86">
       
       (source)
     </a>
@@ -1755,7 +1755,7 @@ session cookies still omit Max-Age when expire_on_close is enabled.</p>
   </div>
   <div class="functionBody">
     
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p>Pre-built backing-store instance.</p></div>
     
   </div>
 </div><div class="baseinstancevariable">
@@ -1770,7 +1770,7 @@ session cookies still omit Max-Age when expire_on_close is enabled.</p>
   <div class="functionHeader">
     
     <span class="py-defname">_track_previous_url</span> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/session/manager.py#L94">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/session/manager.py#L104">
       
       (source)
     </a>
@@ -1782,7 +1782,7 @@ session cookies still omit Max-Age when expire_on_close is enabled.</p>
   </div>
   <div class="functionBody">
     
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p>Track previous url obtained from <tt class="rst-docutils rst-literal">config.track_previous_url</tt>.</p></div>
     
   </div>
 </div><div class="baseproperty">
@@ -1797,7 +1797,7 @@ session cookies still omit Max-Age when expire_on_close is enabled.</p>
   <div class="functionHeader">
     <div><span class="decorator">@<a href="https://docs.python.org/3/builtins/functions.html#property" class="intersphinx-link">property</a><br /></span></div>
     <span class="py-defname">tracksPreviousUrl</span>: <code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/session/manager.py#L110">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/session/manager.py#L129">
       
       (source)
     </a>
@@ -1823,7 +1823,7 @@ session cookies still omit Max-Age when expire_on_close is enabled.</p>
   <div class="orionis-footer-inner">
     <div class="orionis-footer-copy">
       <p>API documentation for <a href="https://orionis-framework.com/" class="projecthome">Orionis</a>.</p>
-      <p class="orionis-footer-meta">Generated with <a href="https://github.com/twisted/pydoctor/">Pydoctor</a> 25.10.1.<span class="orionis-footer-build"> Built 2026-11-03 09:36:58.</span></p>
+      <p class="orionis-footer-meta">Generated with <a href="https://github.com/twisted/pydoctor/">Pydoctor</a> 25.10.1.<span class="orionis-footer-build"> Built 2026-11-03 13:00:15.</span></p>
     </div>
     <nav class="orionis-footer-links" aria-label="Additional resources">
       <a href="https://docs.orionis-framework.com">Read the guide <span aria-hidden="true">↗</span></a>

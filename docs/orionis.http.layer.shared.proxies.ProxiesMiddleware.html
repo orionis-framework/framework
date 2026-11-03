@@ -603,7 +603,7 @@
         </div>
 
         <div class="extrasDocstring">
-          <p class="class-signature"><code><span class="py-keyword">class</span> <span class="py-defname">ProxiesMiddleware</span>: <a href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/http/layer/shared/proxies.py#L19" class="sourceLink">(source)</a></code></p><p>Constructor: <code><a href="#__init__" class="internal-link" title="orionis.http.layer.shared.proxies.ProxiesMiddleware.__init__">ProxiesMiddleware(config)</a></code></p><p><a href="classIndex.html#orionis.http.layer.shared.proxies.ProxiesMiddleware">View In Hierarchy</a></p>
+          <p class="class-signature"><code><span class="py-keyword">class</span> <span class="py-defname">ProxiesMiddleware</span>: <a href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/http/layer/shared/proxies.py#L22" class="sourceLink">(source)</a></code></p><p>Constructor: <code><a href="#__init__" class="internal-link" title="orionis.http.layer.shared.proxies.ProxiesMiddleware.__init__">ProxiesMiddleware(config)</a></code></p><p><a href="classIndex.html#orionis.http.layer.shared.proxies.ProxiesMiddleware">View In Hierarchy</a></p>
         </div>
 
         <div class="moduleDocstring">
@@ -622,7 +622,7 @@ used.  Applications only declare which proxies are trusted via
         </div>
 
         <div id="split-tables">
-          <table class="children sortable" id="id1055">
+          <table class="children sortable" id="id1056">
   
   
   <tr class="staticmethod">
@@ -669,32 +669,32 @@ used.  Applications only declare which proxies are trusted via
     
     <td>Constant</td>
     <td><code><a href="#_IP_HEADER" class="internal-link" title="orionis.http.layer.shared.proxies.ProxiesMiddleware._IP_HEADER">_IP<wbr></wbr>_HEADER</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
+    <td>Standard forwarding headers; not configurable by design.</td>
   </tr><tr class="constant">
     
     <td>Constant</td>
     <td><code><a href="#_PROTO_HEADER" class="internal-link" title="orionis.http.layer.shared.proxies.ProxiesMiddleware._PROTO_HEADER">_PROTO<wbr></wbr>_HEADER</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
+    <td><tt class="rst-docutils rst-literal"><span class="pre">x-forwarded-proto</span></tt>.</td>
   </tr><tr class="classvariable">
     
     <td>Class Variable</td>
     <td><code><a href="#__slots__" class="internal-link" title="orionis.http.layer.shared.proxies.ProxiesMiddleware.__slots__">__slots__</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
+    <td>Declare the instance attribute slots reserved by this class.</td>
   </tr><tr class="instancevariable">
     
     <td>Instance Variable</td>
     <td><code><a href="#__enabled" class="internal-link" title="orionis.http.layer.shared.proxies.ProxiesMiddleware.__enabled">__enabled</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
+    <td>Requests are only rewritten when at least one proxy is trusted.</td>
   </tr><tr class="instancevariable">
     
     <td>Instance Variable</td>
     <td><code><a href="#__trusted_networks" class="internal-link" title="orionis.http.layer.shared.proxies.ProxiesMiddleware.__trusted_networks">__trusted<wbr></wbr>_networks</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
+    <td>Pre-compile networks and index single-host peers for exact matches.</td>
   </tr><tr class="instancevariable">
     
     <td>Instance Variable</td>
     <td><code><a href="#__trusted_peers" class="internal-link" title="orionis.http.layer.shared.proxies.ProxiesMiddleware.__trusted_peers">__trusted<wbr></wbr>_peers</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
+    <td>Trusted peers produced by <tt class="rst-docutils rst-literal">frozenset</tt>.</td>
   </tr>
 </table>
           
@@ -716,7 +716,7 @@ used.  Applications only declare which proxies are trusted via
     
     <div><span class="decorator">@<a href="https://docs.python.org/3/builtins/functions.html#staticmethod" class="intersphinx-link">staticmethod</a><br /></span></div>
     <span class="py-keyword">def</span>&#160;<span class="py-defname">__compile</span><span class="function-signature">(<span class="rst-sig-param">proxies: <code><a href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Iterable" class="intersphinx-link">Iterable</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>]</code></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" class="intersphinx-link">tuple</a>[<wbr></wbr><a href="https://docs.python.org/3/library/ipaddress.html#ipaddress.IPv4Network" class="intersphinx-link">IPv4Network</a> | <a href="https://docs.python.org/3/library/ipaddress.html#ipaddress.IPv6Network" class="intersphinx-link">IPv6Network</a>, <wbr></wbr><span class="rst-variable-ellipsis">...</span>]</code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/http/layer/shared/proxies.py#L260">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/http/layer/shared/proxies.py#L270">
       
       (source)
     </a>
@@ -731,7 +731,7 @@ used.  Applications only declare which proxies are trusted via
     <div><p>Compile proxy identifiers into network objects.</p>
 <p>The special token <tt class="rst-docutils rst-literal">'private'</tt> expands into the standard
 RFC-1918 and loopback address ranges.</p>
-<table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">proxies:</span><code><a href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Iterable" class="intersphinx-link">Iterable</a>[<a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>]</code></td><td class="fieldArgDesc">An iterable of CIDR strings or the keyword <tt class="rst-docutils rst-literal">'private'</tt>.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" class="intersphinx-link">tuple</a>[IPv4Network | IPv6Network, ...]</code></td><td class="fieldArgDesc">Compiled network objects used for IP membership tests.</td></tr></table></div>
+<table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">proxies:</span><code><a href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Iterable" class="intersphinx-link">collections.abc.Iterable</a>[<a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>]</code></td><td class="fieldArgDesc">An iterable of CIDR strings or the keyword <tt class="rst-docutils rst-literal">'private'</tt>.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" class="intersphinx-link">tuple</a>[<tt class="rst-docutils rst-literal">ipaddress.IPv4Network</tt> | <tt class="rst-docutils rst-literal">ipaddress.IPv6Network</tt>, <tt class="rst-docutils rst-literal">...</tt>]</code></td><td class="fieldArgDesc">Compiled network objects used for IP membership tests.</td></tr></table></div>
   </div>
 </div><div class="basestaticmethod">
   
@@ -746,7 +746,7 @@ RFC-1918 and loopback address ranges.</p>
     
     <div><span class="decorator">@<a href="https://docs.python.org/3/builtins/functions.html#staticmethod" class="intersphinx-link">staticmethod</a><br /></span></div>
     <span class="py-keyword">def</span>&#160;<span class="py-defname">__parseIp</span><span class="function-signature">(<span class="rst-sig-param">value: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></span>) -&gt; <code><a href="https://docs.python.org/3/library/ipaddress.html#ipaddress.IPv4Address" class="intersphinx-link">IPv4Address</a> | <a href="https://docs.python.org/3/library/ipaddress.html#ipaddress.IPv6Address" class="intersphinx-link">IPv6Address</a> | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/http/layer/shared/proxies.py#L237">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/http/layer/shared/proxies.py#L247">
       
       (source)
     </a>
@@ -758,7 +758,7 @@ RFC-1918 and loopback address ranges.</p>
   </div>
   <div class="docstring functionBody">
     
-    <div><p>Parse a string into an IP address object.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">value:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">The string to parse.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code>IPv4Address | IPv6Address | None</code></td><td class="fieldArgDesc">The parsed address, or <tt class="rst-docutils rst-literal">None</tt> when the string is not a
+    <div><p>Parse a string into an IP address object.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">value:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">The string to parse.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><tt class="rst-docutils rst-literal">ipaddress.IPv4Address</tt> | <tt class="rst-docutils rst-literal">ipaddress.IPv6Address</tt> | None</code></td><td class="fieldArgDesc">The parsed address, or <tt class="rst-docutils rst-literal">None</tt> when the string is not a
 well-formed IPv4 or IPv6 address.</td></tr></table></div>
   </div>
 </div><div class="basemethod">
@@ -774,7 +774,7 @@ well-formed IPv4 or IPv6 address.</td></tr></table></div>
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">__init__</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">config: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#dict" class="intersphinx-link">dict</a></code></span>):</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/http/layer/shared/proxies.py#L40">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/http/layer/shared/proxies.py#L46">
       
       (source)
     </a>
@@ -786,7 +786,7 @@ well-formed IPv4 or IPv6 address.</td></tr></table></div>
   </div>
   <div class="docstring functionBody">
     
-    <div><p>Initialize the middleware with the given proxy configuration.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">config:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#dict" class="intersphinx-link">dict</a></code></td><td class="fieldArgDesc">A dictionary whose keys must match <tt class="rst-docutils rst-literal">HTTPProxies</tt> fields.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc"><span class="undocumented">Undocumented</span></td></tr></table></div>
+    <div><p>Initialize the middleware with the given proxy configuration.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">config:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#dict" class="intersphinx-link">dict</a></code></td><td class="fieldArgDesc">A dictionary whose keys must match <tt class="rst-docutils rst-literal">HTTPProxies</tt> fields.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">Initialize the middleware with the given proxy configuration.</td></tr></table></div>
   </div>
 </div><div class="basemethod">
   
@@ -801,7 +801,7 @@ well-formed IPv4 or IPv6 address.</td></tr></table></div>
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">__isTrustedAddress</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">addr: <code><a href="https://docs.python.org/3/library/ipaddress.html#ipaddress.IPv4Address" class="intersphinx-link">IPv4Address</a> | <a href="https://docs.python.org/3/library/ipaddress.html#ipaddress.IPv6Address" class="intersphinx-link">IPv6Address</a></code></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/http/layer/shared/proxies.py#L216">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/http/layer/shared/proxies.py#L226">
       
       (source)
     </a>
@@ -813,7 +813,7 @@ well-formed IPv4 or IPv6 address.</td></tr></table></div>
   </div>
   <div class="docstring functionBody">
     
-    <div><p>Determine whether a parsed address belongs to a trusted network.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">addr:</span><code>IPv4Address | IPv6Address</code></td><td class="fieldArgDesc">The parsed IP address to evaluate.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code></td><td class="fieldArgDesc"><tt class="rst-docutils rst-literal">True</tt> if the address is within a trusted network;
+    <div><p>Determine whether a parsed address belongs to a trusted network.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">addr:</span><code><tt class="rst-docutils rst-literal">ipaddress.IPv4Address</tt> | <tt class="rst-docutils rst-literal">ipaddress.IPv6Address</tt></code></td><td class="fieldArgDesc">The parsed IP address to evaluate.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code></td><td class="fieldArgDesc"><tt class="rst-docutils rst-literal">True</tt> if the address is within a trusted network;
 <tt class="rst-docutils rst-literal">False</tt> otherwise.</td></tr></table></div>
   </div>
 </div><div class="basemethod">
@@ -829,7 +829,7 @@ well-formed IPv4 or IPv6 address.</td></tr></table></div>
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">__process</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">adapter: <code><a href="orionis.http.adapters.request.contracts.transport.TransportAdapter.html" class="internal-link" title="orionis.http.adapters.request.contracts.transport.TransportAdapter">TransportAdapter</a></code></span>):</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/http/layer/shared/proxies.py#L91">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/http/layer/shared/proxies.py#L101">
       
       (source)
     </a>
@@ -841,7 +841,7 @@ well-formed IPv4 or IPv6 address.</td></tr></table></div>
   </div>
   <div class="docstring functionBody">
     
-    <div><p>Apply trusted-proxy normalization to the transport adapter.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">adapter:</span><code><a href="orionis.http.adapters.request.contracts.transport.TransportAdapter.html" class="internal-link" title="orionis.http.adapters.request.contracts.transport.TransportAdapter">TransportAdapter</a></code></td><td class="fieldArgDesc">Abstraction over an RSGI or ASGI scope.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">Mutates <tt class="rst-docutils rst-literal">adapter</tt> in place; no value is returned.</td></tr></table></div>
+    <div><p>Apply trusted-proxy normalization to the transport adapter.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">adapter:</span><code><a href="orionis.http.adapters.request.contracts.transport.TransportAdapter.html" class="internal-link">orionis.http.adapters.request.contracts.transport.TransportAdapter</a></code></td><td class="fieldArgDesc">Abstraction over an RSGI or ASGI scope.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">Mutates <tt class="rst-docutils rst-literal">adapter</tt> in place; no value is returned.</td></tr></table></div>
   </div>
 </div><div class="basemethod">
   
@@ -856,7 +856,7 @@ well-formed IPv4 or IPv6 address.</td></tr></table></div>
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">__resolveForwardedChain</span><span class="function-signature long-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">adapter: <code><a href="orionis.http.adapters.request.contracts.transport.TransportAdapter.html" class="internal-link" title="orionis.http.adapters.request.contracts.transport.TransportAdapter">TransportAdapter</a></code>, </span><span class="rst-sig-param">fallback_ip: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" class="intersphinx-link">tuple</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#list" class="intersphinx-link">list</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>], <wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#list" class="intersphinx-link">list</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>]]</code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/http/layer/shared/proxies.py#L132">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/http/layer/shared/proxies.py#L142">
       
       (source)
     </a>
@@ -871,7 +871,7 @@ well-formed IPv4 or IPv6 address.</td></tr></table></div>
     <div><p>Resolve the real client IP from the forwarded header chain.</p>
 <p>Walks the chain right-to-left to skip trusted intermediaries
 and find the first untrusted address.</p>
-<table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">adapter:</span><code><a href="orionis.http.adapters.request.contracts.transport.TransportAdapter.html" class="internal-link" title="orionis.http.adapters.request.contracts.transport.TransportAdapter">TransportAdapter</a></code></td><td class="fieldArgDesc">Transport abstraction providing header access.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">fallback<wbr></wbr>_ip:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">IP to return when no forwarded chain header is present.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" class="intersphinx-link">tuple</a>[<a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <a href="https://docs.python.org/3/builtins/stdtypes.html#list" class="intersphinx-link">list</a>[<a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>], <a href="https://docs.python.org/3/builtins/stdtypes.html#list" class="intersphinx-link">list</a>[<a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>]]</code></td><td class="fieldArgDesc">A three-element tuple of <tt class="rst-docutils rst-literal">(real_ip, proxies, full_chain)</tt>.</td></tr></table></div>
+<table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">adapter:</span><code><a href="orionis.http.adapters.request.contracts.transport.TransportAdapter.html" class="internal-link">orionis.http.adapters.request.contracts.transport.TransportAdapter</a></code></td><td class="fieldArgDesc">Transport abstraction providing header access.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">fallback<wbr></wbr>_ip:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">IP to return when no forwarded chain header is present.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" class="intersphinx-link">tuple</a>[<a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <a href="https://docs.python.org/3/builtins/stdtypes.html#list" class="intersphinx-link">list</a>[<a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>], <a href="https://docs.python.org/3/builtins/stdtypes.html#list" class="intersphinx-link">list</a>[<a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>]]</code></td><td class="fieldArgDesc">A three-element tuple of <tt class="rst-docutils rst-literal">(real_ip, proxies, full_chain)</tt>.</td></tr></table></div>
   </div>
 </div><div class="basemethod">
   
@@ -886,7 +886,7 @@ and find the first untrusted address.</p>
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">__resolveScheme</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">adapter: <code><a href="orionis.http.adapters.request.contracts.transport.TransportAdapter.html" class="internal-link" title="orionis.http.adapters.request.contracts.transport.TransportAdapter">TransportAdapter</a></code></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a> | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/http/layer/shared/proxies.py#L188">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/http/layer/shared/proxies.py#L198">
       
       (source)
     </a>
@@ -898,7 +898,7 @@ and find the first untrusted address.</p>
   </div>
   <div class="docstring functionBody">
     
-    <div><p>Determine the original request scheme from forwarded headers.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">adapter:</span><code><a href="orionis.http.adapters.request.contracts.transport.TransportAdapter.html" class="internal-link" title="orionis.http.adapters.request.contracts.transport.TransportAdapter">TransportAdapter</a></code></td><td class="fieldArgDesc">Transport abstraction providing header access.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a> or <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc"><tt class="rst-docutils rst-literal">'http'</tt> or <tt class="rst-docutils rst-literal">'https'</tt> when the header is valid;
+    <div><p>Determine the original request scheme from forwarded headers.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">adapter:</span><code><a href="orionis.http.adapters.request.contracts.transport.TransportAdapter.html" class="internal-link">orionis.http.adapters.request.contracts.transport.TransportAdapter</a></code></td><td class="fieldArgDesc">Transport abstraction providing header access.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a> or <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc"><tt class="rst-docutils rst-literal">'http'</tt> or <tt class="rst-docutils rst-literal">'https'</tt> when the header is valid;
 <tt class="rst-docutils rst-literal">None</tt> otherwise.</td></tr></table></div>
   </div>
 </div><div class="basemethod">
@@ -914,7 +914,7 @@ and find the first untrusted address.</p>
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">handle</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">adapter: <code><a href="orionis.http.adapters.request.contracts.transport.TransportAdapter.html" class="internal-link" title="orionis.http.adapters.request.contracts.transport.TransportAdapter">TransportAdapter</a></code></span>) -&gt; <code><a href="orionis.http.adapters.request.contracts.transport.TransportAdapter.html" class="internal-link" title="orionis.http.adapters.request.contracts.transport.TransportAdapter">TransportAdapter</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/http/layer/shared/proxies.py#L70">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/http/layer/shared/proxies.py#L80">
       
       (source)
     </a>
@@ -926,7 +926,7 @@ and find the first untrusted address.</p>
   </div>
   <div class="docstring functionBody">
     
-    <div><p>Process an ASGI/RSGI scope and normalize its client IP and scheme.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">adapter:</span><code><a href="orionis.http.adapters.request.contracts.transport.TransportAdapter.html" class="internal-link" title="orionis.http.adapters.request.contracts.transport.TransportAdapter">TransportAdapter</a></code></td><td class="fieldArgDesc">The transport adapter to process.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.http.adapters.request.contracts.transport.TransportAdapter.html" class="internal-link" title="orionis.http.adapters.request.contracts.transport.TransportAdapter">TransportAdapter</a></code></td><td class="fieldArgDesc">The same transport adapter with updated client and scheme fields.</td></tr></table></div>
+    <div><p>Process an ASGI/RSGI scope and normalize its client IP and scheme.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">adapter:</span><code><a href="orionis.http.adapters.request.contracts.transport.TransportAdapter.html" class="internal-link">orionis.http.adapters.request.contracts.transport.TransportAdapter</a></code></td><td class="fieldArgDesc">The transport adapter to process.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.http.adapters.request.contracts.transport.TransportAdapter.html" class="internal-link">orionis.http.adapters.request.contracts.transport.TransportAdapter</a></code></td><td class="fieldArgDesc">The same transport adapter with updated client and scheme fields.</td></tr></table></div>
   </div>
 </div><div class="baseconstant">
   
@@ -940,7 +940,7 @@ and find the first untrusted address.</p>
   <div class="functionHeader">
     
     <span class="py-defname">_IP_HEADER</span>: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/http/layer/shared/proxies.py#L35">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/http/layer/shared/proxies.py#L38">
       
       (source)
     </a>
@@ -952,7 +952,7 @@ and find the first untrusted address.</p>
   </div>
   <div class="functionBody">
     
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p>Standard forwarding headers; not configurable by design.</p></div>
     <table class="valueTable"><tr class="fieldStart"><td class="fieldName">Value</td></tr><tr><td><pre class="constant-value"><code><span class="rst-variable-quote">'</span><span class="rst-variable-string">x-forwarded-for</span><span class="rst-variable-quote">'</span></code></pre></td></tr></table>
   </div>
 </div><div class="baseconstant">
@@ -967,7 +967,7 @@ and find the first untrusted address.</p>
   <div class="functionHeader">
     
     <span class="py-defname">_PROTO_HEADER</span>: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/http/layer/shared/proxies.py#L36">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/http/layer/shared/proxies.py#L40">
       
       (source)
     </a>
@@ -979,7 +979,7 @@ and find the first untrusted address.</p>
   </div>
   <div class="functionBody">
     
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p><tt class="rst-docutils rst-literal"><span class="pre">x-forwarded-proto</span></tt>.</p></div>
     <table class="valueTable"><tr class="fieldStart"><td class="fieldName">Value</td></tr><tr><td><pre class="constant-value"><code><span class="rst-variable-quote">'</span><span class="rst-variable-string">x-forwarded-proto</span><span class="rst-variable-quote">'</span></code></pre></td></tr></table>
   </div>
 </div><div class="baseclassvariable">
@@ -994,7 +994,7 @@ and find the first untrusted address.</p>
   <div class="functionHeader">
     
     <span class="py-defname">__slots__</span>: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" class="intersphinx-link">tuple</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <wbr></wbr><span class="rst-variable-ellipsis">...</span>]</code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/http/layer/shared/proxies.py#L38">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/http/layer/shared/proxies.py#L43">
       
       (source)
     </a>
@@ -1006,7 +1006,7 @@ and find the first untrusted address.</p>
   </div>
   <div class="functionBody">
     
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p>Declare the instance attribute slots reserved by this class.</p></div>
     
   </div>
 </div><div class="baseinstancevariable">
@@ -1021,7 +1021,7 @@ and find the first untrusted address.</p>
   <div class="functionHeader">
     
     <span class="py-defname">__enabled</span> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/http/layer/shared/proxies.py#L68">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/http/layer/shared/proxies.py#L77">
       
       (source)
     </a>
@@ -1033,7 +1033,7 @@ and find the first untrusted address.</p>
   </div>
   <div class="functionBody">
     
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p>Requests are only rewritten when at least one proxy is trusted.</p></div>
     
   </div>
 </div><div class="baseinstancevariable">
@@ -1048,7 +1048,7 @@ and find the first untrusted address.</p>
   <div class="functionHeader">
     
     <span class="py-defname">__trusted_networks</span> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/http/layer/shared/proxies.py#L60">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/http/layer/shared/proxies.py#L67">
       
       (source)
     </a>
@@ -1060,7 +1060,7 @@ and find the first untrusted address.</p>
   </div>
   <div class="functionBody">
     
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p>Pre-compile networks and index single-host peers for exact matches.</p></div>
     
   </div>
 </div><div class="baseinstancevariable">
@@ -1075,7 +1075,7 @@ and find the first untrusted address.</p>
   <div class="functionHeader">
     
     <span class="py-defname">__trusted_peers</span> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/http/layer/shared/proxies.py#L61">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/http/layer/shared/proxies.py#L69">
       
       (source)
     </a>
@@ -1087,7 +1087,7 @@ and find the first untrusted address.</p>
   </div>
   <div class="functionBody">
     
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p>Trusted peers produced by <tt class="rst-docutils rst-literal">frozenset</tt>.</p></div>
     
   </div>
 </div>
@@ -1101,7 +1101,7 @@ and find the first untrusted address.</p>
   <div class="orionis-footer-inner">
     <div class="orionis-footer-copy">
       <p>API documentation for <a href="https://orionis-framework.com/" class="projecthome">Orionis</a>.</p>
-      <p class="orionis-footer-meta">Generated with <a href="https://github.com/twisted/pydoctor/">Pydoctor</a> 25.10.1.<span class="orionis-footer-build"> Built 2026-11-03 09:36:58.</span></p>
+      <p class="orionis-footer-meta">Generated with <a href="https://github.com/twisted/pydoctor/">Pydoctor</a> 25.10.1.<span class="orionis-footer-build"> Built 2026-11-03 13:00:15.</span></p>
     </div>
     <nav class="orionis-footer-links" aria-label="Additional resources">
       <a href="https://docs.orionis-framework.com">Read the guide <span aria-hidden="true">↗</span></a>

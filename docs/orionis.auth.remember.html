@@ -431,7 +431,7 @@
         
 
         
-            <div class="itemName"><code><a href="orionis.auth.authorization.policy.html" class="internal-link" title="orionis.auth.authorization.policy">policy</a></code>
+            <div class="itemName"><code><a href="orionis.auth.authorization.policy.module.html" class="internal-link" title="orionis.auth.authorization.policy">policy</a></code>
             </div>
         
 
@@ -576,7 +576,7 @@
         
 
         
-            <div class="itemName"><code><a href="orionis.auth.concerns.authenticatable.html" class="internal-link" title="orionis.auth.concerns.authenticatable">authenticatable</a></code>
+            <div class="itemName"><code><a href="orionis.auth.concerns.authenticatable.module.html" class="internal-link" title="orionis.auth.concerns.authenticatable">authenticatable</a></code>
             </div>
         
 
@@ -586,7 +586,7 @@
         
 
         
-            <div class="itemName"><code><a href="orionis.auth.concerns.authorizable.html" class="internal-link" title="orionis.auth.concerns.authorizable">authorizable</a></code>
+            <div class="itemName"><code><a href="orionis.auth.concerns.authorizable.module.html" class="internal-link" title="orionis.auth.concerns.authorizable">authorizable</a></code>
             </div>
         
 
@@ -2672,11 +2672,11 @@
         </div>
 
         <div class="extrasDocstring">
-          <a href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/auth/remember.py" class="sourceLink">(source)</a>
+          <a href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/auth/remember.py" class="sourceLink">(source)</a>
         </div>
 
         <div class="moduleDocstring">
-          <div><p class="undocumented">Undocumented</p></div>
+          <div><p>Store expiring token digests and rotate them on persistent login.</p></div>
         </div>
 
         <div id="split-tables">
@@ -2697,17 +2697,17 @@
     
     <td>Constant</td>
     <td><code><a href="#_COOKIE_PATTERN" class="internal-link" title="orionis.auth.remember._COOKIE_PATTERN">_COOKIE<wbr></wbr>_PATTERN</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
+    <td>Compiled pattern used to recognize cookie pattern.</td>
   </tr><tr class="constant">
     
     <td>Constant</td>
     <td><code><a href="#_COOKIE_STATE" class="internal-link" title="orionis.auth.remember._COOKIE_STATE">_COOKIE<wbr></wbr>_STATE</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
+    <td><tt class="rst-docutils rst-literal">_auth_remember_cookie</tt>.</td>
   </tr><tr class="constant">
     
     <td>Constant</td>
     <td><code><a href="#_MAX_COOKIE_LENGTH" class="internal-link" title="orionis.auth.remember._MAX_COOKIE_LENGTH">_MAX<wbr></wbr>_COOKIE<wbr></wbr>_LENGTH</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
+    <td>Max cookie length value used by <tt class="rst-docutils rst-literal">remember</tt>.</td>
   </tr>
 </table>
           
@@ -2729,7 +2729,7 @@
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">apply_remember_cookie</span><span class="function-signature">(<span class="rst-sig-param">request: <code>Request</code>, </span><span class="rst-sig-param">response: <code>Response</code></span>):</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/auth/remember.py#L287">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/auth/remember.py#L294">
       
       (source)
     </a>
@@ -2741,7 +2741,7 @@
   </div>
   <div class="docstring functionBody">
     
-    <div><p>Apply a queued remember-cookie change to the outgoing response.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">request:</span><code><a href="orionis.http.Request.html" class="internal-link" title="orionis.http.Request">Request</a></code></td><td class="fieldArgDesc">Request containing a pending cookie change, if any.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">response:</span><code><a href="orionis.http.Response.html" class="internal-link" title="orionis.http.Response">Response</a></code></td><td class="fieldArgDesc">Response that will receive the cookie and cache-control headers.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">The response is updated only when a cookie change is pending.</td></tr></table></div>
+    <div><p>Apply a queued remember-cookie change to the outgoing response.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">request:</span><code><a href="orionis.http.Request.html" class="internal-link">orionis.http.Request</a></code></td><td class="fieldArgDesc">Request containing a pending cookie change, if any.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">response:</span><code><a href="orionis.http.Response.html" class="internal-link">orionis.http.Response</a></code></td><td class="fieldArgDesc">Response that will receive the cookie and cache-control headers.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">The response is updated only when a cookie change is pending.</td></tr></table></div>
   </div>
 </div><div class="baseconstant">
   
@@ -2755,7 +2755,7 @@
   <div class="functionHeader">
     
     <span class="py-defname">_COOKIE_PATTERN</span> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/auth/remember.py#L18">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/auth/remember.py#L22">
       
       (source)
     </a>
@@ -2767,7 +2767,7 @@
   </div>
   <div class="functionBody">
     
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p>Compiled pattern used to recognize cookie pattern.</p></div>
     <table class="valueTable"><tr class="fieldStart"><td class="fieldName">Value</td></tr><tr><td><pre class="constant-value"><code><a href="https://docs.python.org/3/library/re.html#re.compile" class="intersphinx-link">re.compile</a>(r<span class="rst-variable-quote">'</span><span class="rst-re-group">(</span>.<span class="rst-re-op">{1,255}</span><span class="rst-re-group">)</span>\|<span class="rst-re-group">(</span>\d<span class="rst-re-op">{1,12}</span><span class="rst-re-group">)</span>\|<span class="rst-re-group">(</span><span class="rst-re-group">[</span>A<span class="rst-re-op">-</span>Za<span class="rst-re-op">-</span>z0<span class="rst-re-op">-</span>9_-<span class="rst-re-group">]</span><span class="rst-re-op">{43}</span><span class="rst-re-group">)</span><span class="rst-variable-quote">'</span>)</code></pre></td></tr></table>
   </div>
 </div><div class="baseconstant">
@@ -2782,7 +2782,7 @@
   <div class="functionHeader">
     
     <span class="py-defname">_COOKIE_STATE</span>: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/auth/remember.py#L17">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/auth/remember.py#L20">
       
       (source)
     </a>
@@ -2794,7 +2794,7 @@
   </div>
   <div class="functionBody">
     
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p><tt class="rst-docutils rst-literal">_auth_remember_cookie</tt>.</p></div>
     <table class="valueTable"><tr class="fieldStart"><td class="fieldName">Value</td></tr><tr><td><pre class="constant-value"><code><span class="rst-variable-quote">'</span><span class="rst-variable-string">_auth_remember_cookie</span><span class="rst-variable-quote">'</span></code></pre></td></tr></table>
   </div>
 </div><div class="baseconstant">
@@ -2809,7 +2809,7 @@
   <div class="functionHeader">
     
     <span class="py-defname">_MAX_COOKIE_LENGTH</span>: <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/auth/remember.py#L16">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/auth/remember.py#L18">
       
       (source)
     </a>
@@ -2821,7 +2821,7 @@
   </div>
   <div class="functionBody">
     
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p>Max cookie length value used by <tt class="rst-docutils rst-literal">remember</tt>.</p></div>
     <table class="valueTable"><tr class="fieldStart"><td class="fieldName">Value</td></tr><tr><td><pre class="constant-value"><code>512</code></pre></td></tr></table>
   </div>
 </div>
@@ -2835,7 +2835,7 @@
   <div class="orionis-footer-inner">
     <div class="orionis-footer-copy">
       <p>API documentation for <a href="https://orionis-framework.com/" class="projecthome">Orionis</a>.</p>
-      <p class="orionis-footer-meta">Generated with <a href="https://github.com/twisted/pydoctor/">Pydoctor</a> 25.10.1.<span class="orionis-footer-build"> Built 2026-11-03 09:36:58.</span></p>
+      <p class="orionis-footer-meta">Generated with <a href="https://github.com/twisted/pydoctor/">Pydoctor</a> 25.10.1.<span class="orionis-footer-build"> Built 2026-11-03 13:00:15.</span></p>
     </div>
     <nav class="orionis-footer-links" aria-label="Additional resources">
       <a href="https://docs.orionis-framework.com">Read the guide <span aria-hidden="true">↗</span></a>

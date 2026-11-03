@@ -193,7 +193,7 @@
         
 
         
-            <div class="itemName"><code><a href="#is_async" class="internal-link" title="orionis.container.entities.invocation.InvocationPlan.is_async">is<wbr></wbr>_async</a></code>
+            <div class="itemName"><code><a href="#has_keyword_only" class="internal-link" title="orionis.container.entities.invocation.InvocationPlan.has_keyword_only">has<wbr></wbr>_keyword<wbr></wbr>_only</a></code>
             </div>
         
 
@@ -203,7 +203,7 @@
         
 
         
-            <div class="itemName"><code><a href="#has_keyword_only" class="internal-link" title="orionis.container.entities.invocation.InvocationPlan.has_keyword_only">has<wbr></wbr>_keyword<wbr></wbr>_only</a></code>
+            <div class="itemName"><code><a href="#is_async" class="internal-link" title="orionis.container.entities.invocation.InvocationPlan.is_async">is<wbr></wbr>_async</a></code>
             </div>
         
 
@@ -294,7 +294,7 @@
         
 
         
-            <div class="itemName"><code><a href="#is_async" class="internal-link" title="orionis.container.entities.invocation.InvocationPlan.is_async">is<wbr></wbr>_async</a></code>
+            <div class="itemName"><code><a href="#has_keyword_only" class="internal-link" title="orionis.container.entities.invocation.InvocationPlan.has_keyword_only">has<wbr></wbr>_keyword<wbr></wbr>_only</a></code>
             </div>
         
 
@@ -304,7 +304,7 @@
         
 
         
-            <div class="itemName"><code><a href="#has_keyword_only" class="internal-link" title="orionis.container.entities.invocation.InvocationPlan.has_keyword_only">has<wbr></wbr>_keyword<wbr></wbr>_only</a></code>
+            <div class="itemName"><code><a href="#is_async" class="internal-link" title="orionis.container.entities.invocation.InvocationPlan.is_async">is<wbr></wbr>_async</a></code>
             </div>
         
 
@@ -433,11 +433,11 @@
         </div>
 
         <div class="extrasDocstring">
-          <p class="class-signature"><code><span class="py-keyword">class</span> <span class="py-defname">InvocationPlan</span>: <a href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/container/entities/invocation.py#L18" class="sourceLink">(source)</a></code></p><p><a href="classIndex.html#orionis.container.entities.invocation.InvocationPlan">View In Hierarchy</a></p>
+          <p class="class-signature"><code><span class="py-keyword">class</span> <span class="py-defname">InvocationPlan</span>: <a href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/container/entities/invocation.py#L20" class="sourceLink">(source)</a></code></p><p><a href="classIndex.html#orionis.container.entities.invocation.InvocationPlan">View In Hierarchy</a></p>
         </div>
 
         <div class="moduleDocstring">
-          <div><p>Describe the immutable metadata needed to invoke one callable.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">arguments</span></td><td class="fieldArgDesc">Parameters in declaration order, excluding a bound receiver.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">is<wbr></wbr>_async</span></td><td class="fieldArgDesc">Whether invocation requires awaiting the callable's result.</td></tr></table></div>
+          <div><p>Describe the immutable metadata needed to invoke one callable.</p></div>
         </div>
 
         <div id="split-tables">
@@ -449,21 +449,21 @@
     <td>Method</td>
     <td><code><a href="#__post_init__" class="internal-link" title="orionis.container.entities.invocation.InvocationPlan.__post_init__">__post<wbr></wbr>_init__</a></code></td>
     <td>Cache argument shape without retaining resolved dependencies.</td>
-  </tr><tr class="classvariable">
+  </tr><tr class="instancevariable">
     
-    <td>Class Variable</td>
+    <td>Instance Variable</td>
     <td><code><a href="#arguments" class="internal-link" title="orionis.container.entities.invocation.InvocationPlan.arguments">arguments</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
-  </tr><tr class="classvariable">
-    
-    <td>Class Variable</td>
-    <td><code><a href="#is_async" class="internal-link" title="orionis.container.entities.invocation.InvocationPlan.is_async">is<wbr></wbr>_async</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
+    <td>Parameters in declaration order, excluding a bound receiver.</td>
   </tr><tr class="instancevariable">
     
     <td>Instance Variable</td>
     <td><code><a href="#has_keyword_only" class="internal-link" title="orionis.container.entities.invocation.InvocationPlan.has_keyword_only">has<wbr></wbr>_keyword<wbr></wbr>_only</a></code></td>
     <td>Whether resolution needs keyword arguments even for positional calls.</td>
+  </tr><tr class="instancevariable">
+    
+    <td>Instance Variable</td>
+    <td><code><a href="#is_async" class="internal-link" title="orionis.container.entities.invocation.InvocationPlan.is_async">is<wbr></wbr>_async</a></code></td>
+    <td>Whether invocation requires awaiting the callable's result.</td>
   </tr>
 </table>
           
@@ -485,7 +485,7 @@
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">__post_init__</span><span class="function-signature">(<span class="rst-sig-param">self: <code><a href="https://docs.python.org/3/library/typing.html#typing.Self" class="intersphinx-link">Self</a></code></span>):</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/container/entities/invocation.py#L40">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/container/entities/invocation.py#L42">
       
       (source)
     </a>
@@ -499,7 +499,7 @@
     
     <div><p>Cache argument shape without retaining resolved dependencies.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">The keyword-only flag is computed once per cached plan.</td></tr></table></div>
   </div>
-</div><div class="baseclassvariable">
+</div><div class="baseinstancevariable">
   
   
   <a name="orionis.container.entities.invocation.InvocationPlan.arguments">
@@ -510,8 +510,8 @@
   </a>
   <div class="functionHeader">
     
-    <span class="py-defname">arguments</span>: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" class="intersphinx-link">tuple</a>[<a href="orionis.introspection.dependencies.entities.argument.Argument.html" class="internal-link" title="orionis.introspection.dependencies.entities.argument.Argument">Argument</a>, ...]</code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/container/entities/invocation.py#L36">
+    <span class="py-defname">arguments</span>: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" class="intersphinx-link">tuple</a>[<a href="orionis.introspection.dependencies.entities.argument.Argument.html" class="internal-link" title="orionis.introspection.dependencies.entities.argument.Argument">Argument</a>, <tt class="rst-docutils rst-literal">...</tt>]</code> =
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/container/entities/invocation.py#L38">
       
       (source)
     </a>
@@ -523,34 +523,7 @@
   </div>
   <div class="functionBody">
     
-    <div><p class="undocumented">Undocumented</p></div>
-    
-  </div>
-</div><div class="baseclassvariable">
-  
-  
-  <a name="orionis.container.entities.invocation.InvocationPlan.is_async">
-    
-  </a>
-  <a name="is_async">
-    
-  </a>
-  <div class="functionHeader">
-    
-    <span class="py-defname">is_async</span>: <code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/container/entities/invocation.py#L37">
-      
-      (source)
-    </a>
-    <a class="headerLink" href="#is_async" title="orionis.container.entities.invocation.InvocationPlan.is_async">
-      
-      
-      ¶
-    </a>
-  </div>
-  <div class="functionBody">
-    
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p>Parameters in declaration order, excluding a bound receiver.</p></div>
     
   </div>
 </div><div class="baseinstancevariable">
@@ -565,7 +538,7 @@
   <div class="functionHeader">
     
     <span class="py-defname">has_keyword_only</span>: <code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/container/entities/invocation.py#L38">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/container/entities/invocation.py#L40">
       
       (source)
     </a>
@@ -580,6 +553,33 @@
     <div><p>Whether resolution needs keyword arguments even for positional calls.</p></div>
     
   </div>
+</div><div class="baseinstancevariable">
+  
+  
+  <a name="orionis.container.entities.invocation.InvocationPlan.is_async">
+    
+  </a>
+  <a name="is_async">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <span class="py-defname">is_async</span>: <code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code> =
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/container/entities/invocation.py#L39">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#is_async" title="orionis.container.entities.invocation.InvocationPlan.is_async">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="functionBody">
+    
+    <div><p>Whether invocation requires awaiting the callable's result.</p></div>
+    
+  </div>
 </div>
         </div>
       
@@ -591,7 +591,7 @@
   <div class="orionis-footer-inner">
     <div class="orionis-footer-copy">
       <p>API documentation for <a href="https://orionis-framework.com/" class="projecthome">Orionis</a>.</p>
-      <p class="orionis-footer-meta">Generated with <a href="https://github.com/twisted/pydoctor/">Pydoctor</a> 25.10.1.<span class="orionis-footer-build"> Built 2026-11-03 09:36:58.</span></p>
+      <p class="orionis-footer-meta">Generated with <a href="https://github.com/twisted/pydoctor/">Pydoctor</a> 25.10.1.<span class="orionis-footer-build"> Built 2026-11-03 13:00:15.</span></p>
     </div>
     <nav class="orionis-footer-links" aria-label="Additional resources">
       <a href="https://docs.orionis-framework.com">Read the guide <span aria-hidden="true">↗</span></a>

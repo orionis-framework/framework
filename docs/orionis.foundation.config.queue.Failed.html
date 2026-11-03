@@ -411,7 +411,7 @@
         
 
         
-            <div class="itemName"><code><a href="orionis.foundation.config.queue.enums.drivers.html" class="internal-link" title="orionis.foundation.config.queue.enums.drivers">drivers</a></code>
+            <div class="itemName"><code><a href="orionis.foundation.config.queue.enums.drivers.module.html" class="internal-link" title="orionis.foundation.config.queue.enums.drivers">drivers</a></code>
             </div>
         
 
@@ -1670,15 +1670,15 @@
         </div>
 
         <div class="extrasDocstring">
-          <p class="class-signature"><code><span class="py-keyword">class</span> <span class="py-defname">Failed</span>(<a href="orionis.support.entities.BaseEntity.html" class="internal-link" title="orionis.support.entities.BaseEntity">BaseEntity</a>): <a href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/foundation/config/queue/entities/failed.py#L6" class="sourceLink">(source)</a></code></p><p><a href="classIndex.html#orionis.foundation.config.queue.Failed">View In Hierarchy</a></p>
+          <p class="class-signature"><code><span class="py-keyword">class</span> <span class="py-defname">Failed</span>(<a href="orionis.support.entities.BaseEntity.html" class="internal-link" title="orionis.support.entities.BaseEntity">BaseEntity</a>): <a href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/foundation/config/queue/entities/failed.py#L8" class="sourceLink">(source)</a></code></p><p><a href="classIndex.html#orionis.foundation.config.queue.Failed">View In Hierarchy</a></p>
         </div>
 
         <div class="moduleDocstring">
-          <div><p>Configure database storage for failed jobs.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">connection</span></td><td class="fieldArgDesc">Framework database connection, or its default when omitted.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">table</span></td><td class="fieldArgDesc">Unqualified SQL table used to preserve failed jobs.</td></tr></table></div>
+          <div><p>Configure database storage for failed jobs.</p></div>
         </div>
 
         <div id="split-tables">
-          <table class="children sortable" id="id860">
+          <table class="children sortable" id="id861">
   
   
   <tr class="method">
@@ -1686,23 +1686,23 @@
     <td>Method</td>
     <td><code><a href="#__post_init__" class="internal-link" title="orionis.foundation.config.queue.Failed.__post_init__">__post<wbr></wbr>_init__</a></code></td>
     <td>Validate the failed-job database connection and table.</td>
-  </tr><tr class="classvariable">
+  </tr><tr class="instancevariable">
     
-    <td>Class Variable</td>
+    <td>Instance Variable</td>
     <td><code><a href="#connection" class="internal-link" title="orionis.foundation.config.queue.Failed.connection">connection</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
-  </tr><tr class="classvariable">
+    <td>Framework database connection, or its default when omitted.</td>
+  </tr><tr class="instancevariable">
     
-    <td>Class Variable</td>
+    <td>Instance Variable</td>
     <td><code><a href="#table" class="internal-link" title="orionis.foundation.config.queue.Failed.table">table</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
+    <td>Unqualified SQL table used to preserve failed jobs.</td>
   </tr>
 </table>
           
             <p class="inheritedFrom">
               Inherited from <code><a href="orionis.support.entities.BaseEntity.html" class="internal-link" title="orionis.support.entities.BaseEntity">BaseEntity</a></code>:
             </p>
-            <table class="children sortable" id="id861">
+            <table class="children sortable" id="id862">
   
   
   <tr class="baseclassmethod">
@@ -1724,7 +1724,7 @@
     
     <td>Class Variable</td>
     <td><code><a href="orionis.support.entities.BaseEntity.html#__slots__" class="internal-link" title="orionis.support.entities.BaseEntity.__slots__">__slots__</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
+    <td>Declare that this class introduces no additional instance slots.</td>
   </tr>
 </table>
             
@@ -1746,7 +1746,7 @@
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">__post_init__</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>):</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/foundation/config/queue/entities/failed.py#L26">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/foundation/config/queue/entities/failed.py#L28">
       
       (source)
     </a>
@@ -1760,7 +1760,7 @@
     <div class="interfaceinfo">overrides <code><a href="orionis.support.entities.BaseEntity.html#__post_init__" class="internal-link">orionis.support.entities.BaseEntity.__post_init__</a></code></div>
     <div><p>Validate the failed-job database connection and table.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">Keep validated failure storage settings unchanged.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/exceptions.html#TypeError" class="intersphinx-link">TypeError</a></code></td><td>If an identifier has an invalid type.</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/exceptions.html#ValueError" class="intersphinx-link">ValueError</a></code></td><td>If an identifier is empty or unsafe.</td></tr></table></div>
   </div>
-</div><div class="baseclassvariable">
+</div><div class="baseinstancevariable">
   
   
   <a name="orionis.foundation.config.queue.Failed.connection">
@@ -1772,7 +1772,7 @@
   <div class="functionHeader">
     
     <span class="py-defname">connection</span>: <code>str | None</code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/foundation/config/queue/entities/failed.py#L19">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/foundation/config/queue/entities/failed.py#L21">
       
       (source)
     </a>
@@ -1784,10 +1784,10 @@
   </div>
   <div class="functionBody">
     
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p>Framework database connection, or its default when omitted.</p></div>
     
   </div>
-</div><div class="baseclassvariable">
+</div><div class="baseinstancevariable">
   
   
   <a name="orionis.foundation.config.queue.Failed.table">
@@ -1799,7 +1799,7 @@
   <div class="functionHeader">
     
     <span class="py-defname">table</span>: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/foundation/config/queue/entities/failed.py#L22">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/foundation/config/queue/entities/failed.py#L24">
       
       (source)
     </a>
@@ -1811,7 +1811,7 @@
   </div>
   <div class="functionBody">
     
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p>Unqualified SQL table used to preserve failed jobs.</p></div>
     
   </div>
 </div>
@@ -1825,7 +1825,7 @@
   <div class="orionis-footer-inner">
     <div class="orionis-footer-copy">
       <p>API documentation for <a href="https://orionis-framework.com/" class="projecthome">Orionis</a>.</p>
-      <p class="orionis-footer-meta">Generated with <a href="https://github.com/twisted/pydoctor/">Pydoctor</a> 25.10.1.<span class="orionis-footer-build"> Built 2026-11-03 09:36:58.</span></p>
+      <p class="orionis-footer-meta">Generated with <a href="https://github.com/twisted/pydoctor/">Pydoctor</a> 25.10.1.<span class="orionis-footer-build"> Built 2026-11-03 13:00:15.</span></p>
     </div>
     <nav class="orionis-footer-links" aria-label="Additional resources">
       <a href="https://docs.orionis-framework.com">Read the guide <span aria-hidden="true">↗</span></a>

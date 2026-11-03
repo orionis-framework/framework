@@ -737,7 +737,7 @@
         </div>
 
         <div class="extrasDocstring">
-          <p class="class-signature"><code><span class="py-keyword">class</span> <span class="py-defname">RealtimeConnectionLike</span>(Protocol): <a href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/realtime/contracts/connection.py#L9" class="sourceLink">(source)</a></code></p><p><a href="classIndex.html#orionis.realtime.contracts.RealtimeConnectionLike">View In Hierarchy</a></p>
+          <p class="class-signature"><code><span class="py-keyword">class</span> <span class="py-defname">RealtimeConnectionLike</span>(Protocol): <a href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/realtime/contracts/connection.py#L11" class="sourceLink">(source)</a></code></p><p><a href="classIndex.html#orionis.realtime.contracts.RealtimeConnectionLike">View In Hierarchy</a></p>
         </div>
 
         <div class="moduleDocstring">
@@ -745,7 +745,7 @@
         </div>
 
         <div id="split-tables">
-          <table class="children sortable" id="id1783">
+          <table class="children sortable" id="id1791">
   
   
   <tr class="method">
@@ -762,7 +762,7 @@
     
     <td>Class Variable</td>
     <td><code><a href="#__slots__" class="internal-link" title="orionis.realtime.contracts.RealtimeConnectionLike.__slots__">__slots__</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
+    <td>Declare that this class introduces no additional instance slots.</td>
   </tr><tr class="property">
     
     <td>Property</td>
@@ -809,7 +809,7 @@
     
     
     <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">invoke</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">target: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code>, </span><span class="rst-sig-param">*args: <code><a href="https://docs.python.org/3/builtins/functions.html#object" class="intersphinx-link">object</a></code>, </span><span class="rst-sig-param">timeout: <code><a href="https://docs.python.org/3/builtins/functions.html#float" class="intersphinx-link">float</a> | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code> = <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/functions.html#object" class="intersphinx-link">object</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/realtime/contracts/connection.py#L95">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/realtime/contracts/connection.py#L98">
       
       (source)
     </a>
@@ -822,7 +822,7 @@
   <div class="docstring functionBody">
     
     <div><p>Invoke one client method and await its correlated completion.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">target:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Explicit client method name.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">*args:</span><code><a href="https://docs.python.org/3/builtins/functions.html#object" class="intersphinx-link">object</a></code></td><td class="fieldArgDesc">Serializable positional arguments supplied to the client method.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">timeout:</span><code>float | None, <em>optional</em></code></td><td class="fieldArgDesc">Total send/result deadline in seconds. None uses the configured
-client-result timeout.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/functions.html#object" class="intersphinx-link">object</a></code></td><td class="fieldArgDesc">Client completion result, including None.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/exceptions.html#ConnectionError" class="intersphinx-link">ConnectionError</a></code></td><td>If the connection is not ready or disconnects.</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/exceptions.html#RuntimeError" class="intersphinx-link">RuntimeError</a></code></td><td>If the pending client-result budget is exhausted.</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/exceptions.html#ValueError" class="intersphinx-link">ValueError</a></code></td><td>If the target, argument count or deadline is invalid.</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/exceptions.html#TimeoutError" class="intersphinx-link">TimeoutError</a></code></td><td>If sending or receiving the completion exceeds the deadline.</td></tr><tr><td class="fieldArgContainer"><code>ClientInvocationError</code></td><td>If the client returns a completion error.</td></tr></table></div>
+client-result timeout.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/functions.html#object" class="intersphinx-link">object</a></code></td><td class="fieldArgDesc">Client completion result, including None.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/exceptions.html#ConnectionError" class="intersphinx-link">ConnectionError</a></code></td><td>If the connection is not ready or disconnects.</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/exceptions.html#RuntimeError" class="intersphinx-link">RuntimeError</a></code></td><td>If the pending client-result budget is exhausted.</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/exceptions.html#ValueError" class="intersphinx-link">ValueError</a></code></td><td>If the target, argument count or deadline is invalid.</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/exceptions.html#TimeoutError" class="intersphinx-link">TimeoutError</a></code></td><td>If sending or receiving the completion exceeds the deadline.</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.realtime.errors.ClientInvocationError.html" class="internal-link">orionis.realtime.errors.ClientInvocationError</a></code></td><td>If the client returns a completion error.</td></tr></table></div>
   </div>
 </div><div class="basemethod">
   
@@ -837,7 +837,7 @@ client-result timeout.</td></tr></table><table class="fieldTable"><tr class="fie
     
     
     <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">sendEncoded</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">data: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a> | <a href="https://docs.python.org/3/builtins/stdtypes.html#bytes" class="intersphinx-link">bytes</a></code></span>):</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/realtime/contracts/connection.py#L74">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/realtime/contracts/connection.py#L77">
       
       (source)
     </a>
@@ -863,7 +863,7 @@ client-result timeout.</td></tr></table><table class="fieldTable"><tr class="fie
   <div class="functionHeader">
     
     <span class="py-defname">__slots__</span>: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" class="intersphinx-link">tuple</a></code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/realtime/contracts/connection.py#L12">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/realtime/contracts/connection.py#L14">
       
       (source)
     </a>
@@ -875,7 +875,7 @@ client-result timeout.</td></tr></table><table class="fieldTable"><tr class="fie
   </div>
   <div class="functionBody">
     
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p>Declare that this class introduces no additional instance slots.</p></div>
     
   </div>
 </div><div class="baseproperty">
@@ -890,7 +890,7 @@ client-result timeout.</td></tr></table><table class="fieldTable"><tr class="fie
   <div class="functionHeader">
     <div><span class="decorator">@<a href="https://docs.python.org/3/builtins/functions.html#property" class="intersphinx-link">property</a><br /></span></div>
     <span class="py-defname">closing</span>: <code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/realtime/contracts/connection.py#L62">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/realtime/contracts/connection.py#L65">
       
       (source)
     </a>
@@ -917,7 +917,7 @@ client-result timeout.</td></tr></table><table class="fieldTable"><tr class="fie
   <div class="functionHeader">
     <div><span class="decorator">@<a href="https://docs.python.org/3/builtins/functions.html#property" class="intersphinx-link">property</a><br /></span></div>
     <span class="py-defname">context</span>: <code>HubContext</code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/realtime/contracts/connection.py#L14">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/realtime/contracts/connection.py#L17">
       
       (source)
     </a>
@@ -929,7 +929,7 @@ client-result timeout.</td></tr></table><table class="fieldTable"><tr class="fie
   </div>
   <div class="functionBody">
     
-    <div><p>Return the immutable connection identity and handshake context.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.realtime.HubContext.html" class="internal-link" title="orionis.realtime.HubContext">HubContext</a></code></td><td class="fieldArgDesc">Connection identity, public socket and authenticated user.</td></tr></table></div>
+    <div><p>Return the immutable connection identity and handshake context.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.realtime.HubContext.html" class="internal-link">orionis.realtime.HubContext</a></code></td><td class="fieldArgDesc">Connection identity, public socket and authenticated user.</td></tr></table></div>
     
   </div>
 </div><div class="baseproperty">
@@ -944,7 +944,7 @@ client-result timeout.</td></tr></table><table class="fieldTable"><tr class="fie
   <div class="functionHeader">
     <div><span class="decorator">@<a href="https://docs.python.org/3/builtins/functions.html#property" class="intersphinx-link">property</a><br /></span></div>
     <span class="py-defname">hub</span>: <code><a href="https://docs.python.org/3/builtins/functions.html#type" class="intersphinx-link">type</a>[<wbr></wbr>Hub]</code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/realtime/contracts/connection.py#L26">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/realtime/contracts/connection.py#L29">
       
       (source)
     </a>
@@ -956,7 +956,7 @@ client-result timeout.</td></tr></table><table class="fieldTable"><tr class="fie
   </div>
   <div class="functionBody">
     
-    <div><p>Return the Hub namespace owning this connection.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/functions.html#type" class="intersphinx-link">type</a>[<a href="orionis.realtime.Hub.html" class="internal-link" title="orionis.realtime.Hub">Hub</a>]</code></td><td class="fieldArgDesc">Application-owned Hub type associated with the connection.</td></tr></table></div>
+    <div><p>Return the Hub namespace owning this connection.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/functions.html#type" class="intersphinx-link">type</a>[<a href="orionis.realtime.Hub.html" class="internal-link">orionis.realtime.Hub</a>]</code></td><td class="fieldArgDesc">Application-owned Hub type associated with the connection.</td></tr></table></div>
     
   </div>
 </div><div class="baseproperty">
@@ -971,7 +971,7 @@ client-result timeout.</td></tr></table><table class="fieldTable"><tr class="fie
   <div class="functionHeader">
     <div><span class="decorator">@<a href="https://docs.python.org/3/builtins/functions.html#property" class="intersphinx-link">property</a><br /></span></div>
     <span class="py-defname">protocol</span>: <code>HubProtocol</code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/realtime/contracts/connection.py#L38">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/realtime/contracts/connection.py#L41">
       
       (source)
     </a>
@@ -983,7 +983,7 @@ client-result timeout.</td></tr></table><table class="fieldTable"><tr class="fie
   </div>
   <div class="functionBody">
     
-    <div><p>Return the immutable codec selected for this connection.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.realtime.HubProtocol.html" class="internal-link" title="orionis.realtime.HubProtocol">HubProtocol</a></code></td><td class="fieldArgDesc">Route-selected codec for protocol envelopes.</td></tr></table></div>
+    <div><p>Return the immutable codec selected for this connection.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.realtime.HubProtocol.html" class="internal-link">orionis.realtime.HubProtocol</a></code></td><td class="fieldArgDesc">Route-selected codec for protocol envelopes.</td></tr></table></div>
     
   </div>
 </div><div class="baseproperty">
@@ -998,7 +998,7 @@ client-result timeout.</td></tr></table><table class="fieldTable"><tr class="fie
   <div class="functionHeader">
     <div><span class="decorator">@<a href="https://docs.python.org/3/builtins/functions.html#property" class="intersphinx-link">property</a><br /></span></div>
     <span class="py-defname">ready</span>: <code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/realtime/contracts/connection.py#L50">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/realtime/contracts/connection.py#L53">
       
       (source)
     </a>
@@ -1024,7 +1024,7 @@ client-result timeout.</td></tr></table><table class="fieldTable"><tr class="fie
   <div class="orionis-footer-inner">
     <div class="orionis-footer-copy">
       <p>API documentation for <a href="https://orionis-framework.com/" class="projecthome">Orionis</a>.</p>
-      <p class="orionis-footer-meta">Generated with <a href="https://github.com/twisted/pydoctor/">Pydoctor</a> 25.10.1.<span class="orionis-footer-build"> Built 2026-11-03 09:36:58.</span></p>
+      <p class="orionis-footer-meta">Generated with <a href="https://github.com/twisted/pydoctor/">Pydoctor</a> 25.10.1.<span class="orionis-footer-build"> Built 2026-11-03 13:00:15.</span></p>
     </div>
     <nav class="orionis-footer-links" aria-label="Additional resources">
       <a href="https://docs.orionis-framework.com">Read the guide <span aria-hidden="true">↗</span></a>

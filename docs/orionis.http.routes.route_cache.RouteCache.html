@@ -490,15 +490,15 @@
         </div>
 
         <div class="extrasDocstring">
-          <p class="class-signature"><code><span class="py-keyword">class</span> <span class="py-defname">RouteCache</span>(<a href="orionis.http.routes.contracts.route_cache.IRouteCache.html" class="internal-link" title="orionis.http.routes.contracts.route_cache.IRouteCache">IRouteCache</a>): <a href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/http/routes/route_cache.py#L13" class="sourceLink">(source)</a></code></p><p><a href="classIndex.html#orionis.http.routes.route_cache.RouteCache">View In Hierarchy</a></p>
+          <p class="class-signature"><code><span class="py-keyword">class</span> <span class="py-defname">RouteCache</span>(<a href="orionis.http.routes.contracts.route_cache.IRouteCache.html" class="internal-link" title="orionis.http.routes.contracts.route_cache.IRouteCache">IRouteCache</a>): <a href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/http/routes/route_cache.py#L15" class="sourceLink">(source)</a></code></p><p><a href="classIndex.html#orionis.http.routes.route_cache.RouteCache">View In Hierarchy</a></p>
         </div>
 
         <div class="moduleDocstring">
-          <div><p class="undocumented">Undocumented</p></div>
+          <div><p>Read and write compiled routing metadata for application startup.</p></div>
         </div>
 
         <div id="split-tables">
-          <table class="children sortable" id="id1147">
+          <table class="children sortable" id="id1148">
   
   
   <tr class="staticmethod">
@@ -545,7 +545,7 @@
     
     <td>Constant</td>
     <td><code><a href="#VERSION" class="internal-link" title="orionis.http.routes.route_cache.RouteCache.VERSION">VERSION</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
+    <td>Version value used by <tt class="rst-docutils rst-literal">RouteCache</tt>.</td>
   </tr>
 </table>
           
@@ -567,7 +567,7 @@
     
     <div><span class="decorator">@<a href="https://docs.python.org/3/builtins/functions.html#staticmethod" class="intersphinx-link">staticmethod</a><br /></span></div>
     <span class="py-keyword">def</span>&#160;<span class="py-defname">__deserializeCompiledRoute</span><span class="function-signature long-signature">(<span class="rst-sig-param">route_data: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#dict" class="intersphinx-link">dict</a></code>, </span><span class="rst-sig-param">resolved_classes: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#dict" class="intersphinx-link">dict</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <wbr></wbr><a href="https://docs.python.org/3/builtins/functions.html#type" class="intersphinx-link">type</a>]</code>, </span><span class="rst-sig-param">method: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code>, </span><span class="rst-sig-symbol">*, </span><span class="rst-sig-param">static_path: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a> | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code> = <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></span>) -&gt; <code><a href="orionis.http.routes.entities.compiled_route.CompiledRoute.html" class="internal-link" title="orionis.http.routes.entities.compiled_route.CompiledRoute">CompiledRoute</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/http/routes/route_cache.py#L150">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/http/routes/route_cache.py#L155">
       
       (source)
     </a>
@@ -581,9 +581,11 @@
     
     <div><p>Rebuild a <tt class="rst-docutils rst-literal">CompiledRoute</tt> from a cache dict.</p>
 <p><tt class="rst-docutils rst-literal">regex</tt> and <tt class="rst-docutils rst-literal">converters</tt> are recomputed via
-<code><a href="orionis.http.routes.route_compiler.RouteCompiler.html#compilePath" class="internal-link" title="orionis.http.routes.route_compiler.RouteCompiler.compilePath">RouteCompiler.compilePath</a></code> so that callable converters
+<code><a href="orionis.http.routes.route_compiler.RouteCompiler.html#compilePath" class="internal-link">orionis.http.routes.route_compiler.RouteCompiler.compilePath</a></code> so that
+callable converters
 (including lambdas) never need to be serialised.</p>
-<table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">route<wbr></wbr>_data:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#dict" class="intersphinx-link">dict</a></code></td><td class="fieldArgDesc">Dict produced by <code><a href="#__serializeCompiledRoute" class="internal-link" title="orionis.http.routes.route_cache.RouteCache.__serializeCompiledRoute">__serializeCompiledRoute</a></code>.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">resolved<wbr></wbr>_classes:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#dict" class="intersphinx-link">dict</a>[<a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <a href="https://docs.python.org/3/builtins/functions.html#type" class="intersphinx-link">type</a>]</code></td><td class="fieldArgDesc">Class references shared across this cache load.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">method:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Dispatch method owning this cache bucket.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">static<wbr></wbr>_path:</span><code>str | None, <em>optional</em></code></td><td class="fieldArgDesc">Expected path for static entries; None selects a dynamic entry.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.http.routes.entities.compiled_route.CompiledRoute.html" class="internal-link" title="orionis.http.routes.entities.compiled_route.CompiledRoute">CompiledRoute</a></code></td><td class="fieldArgDesc">Fully initialised compiled route.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/exceptions.html#ValueError" class="intersphinx-link">ValueError</a></code></td><td>If transport, path or bucket metadata contradicts the cached route.</td></tr></table></div>
+<table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">route<wbr></wbr>_data:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#dict" class="intersphinx-link">dict</a></code></td><td class="fieldArgDesc">Dict produced by
+<code><a href="#__serializeCompiledRoute" class="internal-link">orionis.http.routes.route_cache.RouteCache.__serializeCompiledRoute</a></code>.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">resolved<wbr></wbr>_classes:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#dict" class="intersphinx-link">dict</a>[<a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <a href="https://docs.python.org/3/builtins/functions.html#type" class="intersphinx-link">type</a>]</code></td><td class="fieldArgDesc">Class references shared across this cache load.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">method:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Dispatch method owning this cache bucket.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">static<wbr></wbr>_path:</span><code>str | None, <em>optional</em></code></td><td class="fieldArgDesc">Expected path for static entries; None selects a dynamic entry.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.http.routes.entities.compiled_route.CompiledRoute.html" class="internal-link">orionis.http.routes.entities.compiled_route.CompiledRoute</a></code></td><td class="fieldArgDesc">Fully initialised compiled route.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/exceptions.html#ValueError" class="intersphinx-link">ValueError</a></code></td><td>If transport, path or bucket metadata contradicts the cached route.</td></tr></table></div>
   </div>
 </div><div class="basestaticmethod">
   
@@ -598,7 +600,7 @@
     
     <div><span class="decorator">@<a href="https://docs.python.org/3/builtins/functions.html#staticmethod" class="intersphinx-link">staticmethod</a><br /></span></div>
     <span class="py-keyword">def</span>&#160;<span class="py-defname">__deserializeFallback</span><span class="function-signature">(<span class="rst-sig-param">data: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#dict" class="intersphinx-link">dict</a> | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" class="intersphinx-link">tuple</a> | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/http/routes/route_cache.py#L273">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/http/routes/route_cache.py#L280">
       
       (source)
     </a>
@@ -610,7 +612,8 @@
   </div>
   <div class="docstring functionBody">
     
-    <div><p>Rebuild the fallback tuple from a cache descriptor dict.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">data:</span><code>dict | None</code></td><td class="fieldArgDesc">Descriptor produced by <code><a href="#__serializeFallback" class="internal-link" title="orionis.http.routes.route_cache.RouteCache.__serializeFallback">__serializeFallback</a></code>.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code>tuple | None</code></td><td class="fieldArgDesc">Fallback tuple for the dispatch engine, or <tt class="rst-docutils rst-literal">None</tt>.</td></tr></table></div>
+    <div><p>Rebuild the fallback tuple from a cache descriptor dict.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">data:</span><code>dict | None</code></td><td class="fieldArgDesc">Descriptor produced by
+<code><a href="#__serializeFallback" class="internal-link">orionis.http.routes.route_cache.RouteCache.__serializeFallback</a></code>.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code>tuple | None</code></td><td class="fieldArgDesc">Fallback tuple for the dispatch engine, or <tt class="rst-docutils rst-literal">None</tt>.</td></tr></table></div>
   </div>
 </div><div class="basestaticmethod">
   
@@ -625,7 +628,7 @@
     
     <div><span class="decorator">@<a href="https://docs.python.org/3/builtins/functions.html#staticmethod" class="intersphinx-link">staticmethod</a><br /></span></div>
     <span class="py-keyword">def</span>&#160;<span class="py-defname">__resolveClass</span><span class="function-signature long-signature">(<span class="rst-sig-param">dotted_path: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code>, </span><span class="rst-sig-param">resolved_classes: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#dict" class="intersphinx-link">dict</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <wbr></wbr><a href="https://docs.python.org/3/builtins/functions.html#type" class="intersphinx-link">type</a>] | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code> = <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/functions.html#type" class="intersphinx-link">type</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/http/routes/route_cache.py#L306">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/http/routes/route_cache.py#L314">
       
       (source)
     </a>
@@ -653,7 +656,7 @@ e.g. <tt class="rst-docutils rst-literal">'app.http.middleware.Auth'</tt>.</td><
     
     <div><span class="decorator">@<a href="https://docs.python.org/3/builtins/functions.html#staticmethod" class="intersphinx-link">staticmethod</a><br /></span></div>
     <span class="py-keyword">def</span>&#160;<span class="py-defname">__resolveQualname</span><span class="function-signature">(<span class="rst-sig-param">module_path: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code>, </span><span class="rst-sig-param">qualname: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/functions.html#object" class="intersphinx-link">object</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/http/routes/route_cache.py#L335">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/http/routes/route_cache.py#L343">
       
       (source)
     </a>
@@ -681,7 +684,7 @@ safely restored from cache.</td></tr></table></div>
     
     <div><span class="decorator">@<a href="https://docs.python.org/3/builtins/functions.html#staticmethod" class="intersphinx-link">staticmethod</a><br /></span></div>
     <span class="py-keyword">def</span>&#160;<span class="py-defname">__serializeCompiledRoute</span><span class="function-signature">(<span class="rst-sig-param">cr: <code><a href="orionis.http.routes.entities.compiled_route.CompiledRoute.html" class="internal-link" title="orionis.http.routes.entities.compiled_route.CompiledRoute">CompiledRoute</a></code></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/stdtypes.html#dict" class="intersphinx-link">dict</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/http/routes/route_cache.py#L105">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/http/routes/route_cache.py#L110">
       
       (source)
     </a>
@@ -697,7 +700,7 @@ safely restored from cache.</td></tr></table></div>
 <p><tt class="rst-docutils rst-literal">regex</tt> and <tt class="rst-docutils rst-literal">converters</tt> are omitted — they are fully
 deterministic from <tt class="rst-docutils rst-literal">path</tt> and recomputed on deserialisation.
 Middleware class references are stored as dotted import paths.</p>
-<table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">cr:</span><code><a href="orionis.http.routes.entities.compiled_route.CompiledRoute.html" class="internal-link" title="orionis.http.routes.entities.compiled_route.CompiledRoute">CompiledRoute</a></code></td><td class="fieldArgDesc">The compiled route to serialise.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/stdtypes.html#dict" class="intersphinx-link">dict</a></code></td><td class="fieldArgDesc">JSON-safe representation of the compiled route.</td></tr></table></div>
+<table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">cr:</span><code><a href="orionis.http.routes.entities.compiled_route.CompiledRoute.html" class="internal-link">orionis.http.routes.entities.compiled_route.CompiledRoute</a></code></td><td class="fieldArgDesc">The compiled route to serialise.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/stdtypes.html#dict" class="intersphinx-link">dict</a></code></td><td class="fieldArgDesc">JSON-safe representation of the compiled route.</td></tr></table></div>
   </div>
 </div><div class="basestaticmethod">
   
@@ -712,7 +715,7 @@ Middleware class references are stored as dotted import paths.</p>
     
     <div><span class="decorator">@<a href="https://docs.python.org/3/builtins/functions.html#staticmethod" class="intersphinx-link">staticmethod</a><br /></span></div>
     <span class="py-keyword">def</span>&#160;<span class="py-defname">__serializeFallback</span><span class="function-signature">(<span class="rst-sig-param">fallback: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" class="intersphinx-link">tuple</a> | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/stdtypes.html#dict" class="intersphinx-link">dict</a> | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/http/routes/route_cache.py#L238">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/http/routes/route_cache.py#L245">
       
       (source)
     </a>
@@ -739,7 +742,7 @@ Middleware class references are stored as dotted import paths.</p>
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">fromCache</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">cached: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#dict" class="intersphinx-link">dict</a></code></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" class="intersphinx-link">tuple</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#dict" class="intersphinx-link">dict</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#dict" class="intersphinx-link">dict</a>], <wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" class="intersphinx-link">tuple</a> | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a>]</code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/http/routes/route_cache.py#L56">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/http/routes/route_cache.py#L60">
       
       (source)
     </a>
@@ -751,7 +754,8 @@ Middleware class references are stored as dotted import paths.</p>
   </div>
   <div class="docstring functionBody">
     <div class="interfaceinfo">overrides <code><a href="orionis.http.routes.contracts.route_cache.IRouteCache.html#fromCache" class="internal-link">orionis.http.routes.contracts.route_cache.IRouteCache.fromCache</a></code></div>
-    <div><p>Rebuild compiled routes and the fallback handler from a cache dict.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">cached:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#dict" class="intersphinx-link">dict</a></code></td><td class="fieldArgDesc">Dict previously produced by <code><a href="#toCache" class="internal-link" title="orionis.http.routes.route_cache.RouteCache.toCache">toCache</a></code>.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" class="intersphinx-link">tuple</a>[<a href="https://docs.python.org/3/builtins/stdtypes.html#dict" class="intersphinx-link">dict</a>[<a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <a href="https://docs.python.org/3/builtins/stdtypes.html#dict" class="intersphinx-link">dict</a>], tuple | None]</code></td><td class="fieldArgDesc"><tt class="rst-docutils rst-literal">(routes, fallback)</tt> ready to be stored on the loader.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/exceptions.html#ValueError" class="intersphinx-link">ValueError</a></code></td><td>If the cache schema version is missing or incompatible.</td></tr></table></div>
+    <div><p>Rebuild compiled routes and the fallback handler from a cache dict.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">cached:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#dict" class="intersphinx-link">dict</a></code></td><td class="fieldArgDesc">Dict previously produced by
+<code><a href="#toCache" class="internal-link">orionis.http.routes.route_cache.RouteCache.toCache</a></code>.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" class="intersphinx-link">tuple</a>[<a href="https://docs.python.org/3/builtins/stdtypes.html#dict" class="intersphinx-link">dict</a>[<a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <a href="https://docs.python.org/3/builtins/stdtypes.html#dict" class="intersphinx-link">dict</a>], tuple | None]</code></td><td class="fieldArgDesc"><tt class="rst-docutils rst-literal">(routes, fallback)</tt> ready to be stored on the loader.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/exceptions.html#ValueError" class="intersphinx-link">ValueError</a></code></td><td>If the cache schema version is missing or incompatible.</td></tr></table></div>
   </div>
 </div><div class="basemethod">
   
@@ -766,7 +770,7 @@ Middleware class references are stored as dotted import paths.</p>
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">toCache</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">routes: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#dict" class="intersphinx-link">dict</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#dict" class="intersphinx-link">dict</a>]</code>, </span><span class="rst-sig-param">fallback: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" class="intersphinx-link">tuple</a> | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/stdtypes.html#dict" class="intersphinx-link">dict</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/http/routes/route_cache.py#L17">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/http/routes/route_cache.py#L21">
       
       (source)
     </a>
@@ -793,7 +797,7 @@ Middleware class references are stored as dotted import paths.</p>
   <div class="functionHeader">
     
     <span class="py-defname">VERSION</span>: <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/http/routes/route_cache.py#L15">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/http/routes/route_cache.py#L18">
       
       (source)
     </a>
@@ -805,7 +809,7 @@ Middleware class references are stored as dotted import paths.</p>
   </div>
   <div class="functionBody">
     
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p>Version value used by <tt class="rst-docutils rst-literal">RouteCache</tt>.</p></div>
     <table class="valueTable"><tr class="fieldStart"><td class="fieldName">Value</td></tr><tr><td><pre class="constant-value"><code>3</code></pre></td></tr></table>
   </div>
 </div>
@@ -819,7 +823,7 @@ Middleware class references are stored as dotted import paths.</p>
   <div class="orionis-footer-inner">
     <div class="orionis-footer-copy">
       <p>API documentation for <a href="https://orionis-framework.com/" class="projecthome">Orionis</a>.</p>
-      <p class="orionis-footer-meta">Generated with <a href="https://github.com/twisted/pydoctor/">Pydoctor</a> 25.10.1.<span class="orionis-footer-build"> Built 2026-11-03 09:36:58.</span></p>
+      <p class="orionis-footer-meta">Generated with <a href="https://github.com/twisted/pydoctor/">Pydoctor</a> 25.10.1.<span class="orionis-footer-build"> Built 2026-11-03 13:00:15.</span></p>
     </div>
     <nav class="orionis-footer-links" aria-label="Additional resources">
       <a href="https://docs.orionis-framework.com">Read the guide <span aria-hidden="true">↗</span></a>

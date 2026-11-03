@@ -149,8 +149,8 @@
       <div>
          
           <div class="childrenKindTitle">Contents</div>
-          <ul><li><a class="rst-internal rst-reference" href="#rst-registration-phase" id="rst-toc-entry-3">Registration phase</a></li>
-<li><a class="rst-internal rst-reference" href="#rst-boot-phase" id="rst-toc-entry-4">Boot phase</a></li>
+          <ul><li><a class="rst-internal rst-reference" href="#rst-registration-phase">Registration phase</a></li>
+<li><a class="rst-internal rst-reference" href="#rst-boot-phase">Boot phase</a></li>
 </ul>
         
 
@@ -232,8 +232,8 @@
                     <div>
          
           <div class="childrenKindTitle">Contents</div>
-          <ul><li><a class="rst-internal rst-reference" href="#rst-registration-phase" id="rst-toc-entry-5">Registration phase</a></li>
-<li><a class="rst-internal rst-reference" href="#rst-boot-phase" id="rst-toc-entry-6">Boot phase</a></li>
+          <ul><li><a class="rst-internal rst-reference" href="#rst-registration-phase">Registration phase</a></li>
+<li><a class="rst-internal rst-reference" href="#rst-boot-phase">Boot phase</a></li>
 </ul>
         
 
@@ -354,28 +354,31 @@
         </div>
 
         <div class="extrasDocstring">
-          <p class="class-signature"><code><span class="py-keyword">class</span> <span class="py-defname">ViewServiceProvider</span>(ServiceProvider): <a href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/view/provider.py#L47" class="sourceLink">(source)</a></code></p><p><a href="classIndex.html#orionis.view.provider.ViewServiceProvider">View In Hierarchy</a></p>
+          <p class="class-signature"><code><span class="py-keyword">class</span> <span class="py-defname">ViewServiceProvider</span>(ServiceProvider): <a href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/view/provider.py#L49" class="sourceLink">(source)</a></code></p><p><a href="classIndex.html#orionis.view.provider.ViewServiceProvider">View In Hierarchy</a></p>
         </div>
 
         <div class="moduleDocstring">
           <div><p>Register and boot the view system into the application container.</p>
 <div class="rst-section" id="rst-registration-phase">
-<h2 class="heading"><a class="rst-toc-backref" href="#rst-toc-entry-1">Registration phase</a></h2>
-<p>Binds <code><a href="orionis.view.contracts.environment.IViewEnvironment.html" class="internal-link" title="orionis.view.contracts.environment.IViewEnvironment">IViewEnvironment</a></code> → <code><a href="orionis.view.environment.ViewEnvironment.html" class="internal-link" title="orionis.view.environment.ViewEnvironment">ViewEnvironment</a></code>,
-<code><a href="orionis.view.contracts.engine.IViewEngine.html" class="internal-link" title="orionis.view.contracts.engine.IViewEngine">IViewEngine</a></code> → <code><a href="orionis.view.engine.Jinja2Engine.html" class="internal-link" title="orionis.view.engine.Jinja2Engine">Jinja2Engine</a></code>, and
-<code><a href="orionis.view.contracts.factory.IViewFactory.html" class="internal-link" title="orionis.view.contracts.factory.IViewFactory">IViewFactory</a></code> → <code><a href="orionis.view.factory.ViewFactory.html" class="internal-link" title="orionis.view.factory.ViewFactory">ViewFactory</a></code> as singletons.</p>
+<h2 class="heading">Registration phase</h2>
+<p>Binds <code><a href="orionis.view.contracts.environment.IViewEnvironment.html" class="internal-link">orionis.view.contracts.environment.IViewEnvironment</a></code> →
+<code><a href="orionis.view.environment.ViewEnvironment.html" class="internal-link">orionis.view.environment.ViewEnvironment</a></code>,
+<code><a href="orionis.view.contracts.engine.IViewEngine.html" class="internal-link">orionis.view.contracts.engine.IViewEngine</a></code> →
+<code><a href="orionis.view.engine.Jinja2Engine.html" class="internal-link">orionis.view.engine.Jinja2Engine</a></code>, and
+<code><a href="orionis.view.contracts.factory.IViewFactory.html" class="internal-link">orionis.view.contracts.factory.IViewFactory</a></code> →
+<code><a href="orionis.view.factory.ViewFactory.html" class="internal-link">orionis.view.factory.ViewFactory</a></code> as singletons.</p>
 </div>
 <div class="rst-section" id="rst-boot-phase">
-<h2 class="heading"><a class="rst-toc-backref" href="#rst-toc-entry-2">Boot phase</a></h2>
+<h2 class="heading">Boot phase</h2>
 <p>Registers template globals, filters, and extensions with the
-<code><a href="orionis.view.environment.ViewEnvironment.html" class="internal-link" title="orionis.view.environment.ViewEnvironment">ViewEnvironment</a></code> singleton, then pins the <code>View</code>
+<code><a href="orionis.view.environment.ViewEnvironment.html" class="internal-link">orionis.view.environment.ViewEnvironment</a></code> singleton, then pins the <tt class="rst-docutils rst-literal">View</tt>
 facade for zero-resolution access on the hot path.</p>
 </div>
 </div>
         </div>
 
         <div id="split-tables">
-          <table class="children sortable" id="id2206">
+          <table class="children sortable" id="id2214">
   
   
   <tr class="method">
@@ -409,7 +412,7 @@ facade for zero-resolution access on the hot path.</p>
     
     
     <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">boot</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>):</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/view/provider.py#L81">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/view/provider.py#L87">
       
       (source)
     </a>
@@ -421,7 +424,7 @@ facade for zero-resolution access on the hot path.</p>
   </div>
   <div class="docstring functionBody">
     
-    <div><p>Register globals, filters, and extensions; then pin the facade.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc"><span class="undocumented">Undocumented</span></td></tr></table></div>
+    <div><p>Register globals, filters, and extensions; then pin the facade.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">Register globals, filters, and extensions; then pin the facade.</td></tr></table></div>
   </div>
 </div><div class="basemethod">
   
@@ -436,7 +439,7 @@ facade for zero-resolution access on the hot path.</p>
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">register</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>):</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/view/provider.py#L64">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/view/provider.py#L69">
       
       (source)
     </a>
@@ -448,7 +451,7 @@ facade for zero-resolution access on the hot path.</p>
   </div>
   <div class="docstring functionBody">
     
-    <div><p>Bind view services as singletons in the application container.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc"><span class="undocumented">Undocumented</span></td></tr></table></div>
+    <div><p>Bind view services as singletons in the application container.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">Bind view services as singletons in the application container.</td></tr></table></div>
   </div>
 </div>
         </div>
@@ -461,7 +464,7 @@ facade for zero-resolution access on the hot path.</p>
   <div class="orionis-footer-inner">
     <div class="orionis-footer-copy">
       <p>API documentation for <a href="https://orionis-framework.com/" class="projecthome">Orionis</a>.</p>
-      <p class="orionis-footer-meta">Generated with <a href="https://github.com/twisted/pydoctor/">Pydoctor</a> 25.10.1.<span class="orionis-footer-build"> Built 2026-11-03 09:36:58.</span></p>
+      <p class="orionis-footer-meta">Generated with <a href="https://github.com/twisted/pydoctor/">Pydoctor</a> 25.10.1.<span class="orionis-footer-build"> Built 2026-11-03 13:00:15.</span></p>
     </div>
     <nav class="orionis-footer-links" aria-label="Additional resources">
       <a href="https://docs.orionis-framework.com">Read the guide <span aria-hidden="true">↗</span></a>

@@ -839,7 +839,7 @@
                     
                 </label>
 
-                <code><a href="orionis.realtime.hub.html" class="internal-link" title="orionis.realtime.hub">hub</a></code>
+                <code><a href="orionis.realtime.hub.module.html" class="internal-link" title="orionis.realtime.hub">hub</a></code>
 
                 <div class="expandableContent">
                     <div>
@@ -1313,6 +1313,16 @@
 
         
             <div class="itemName"><code><a href="orionis.realtime.protocol.html#MAX_ID_LENGTH" class="internal-link" title="orionis.realtime.protocol.MAX_ID_LENGTH">MAX<wbr></wbr>_ID<wbr></wbr>_LENGTH</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.realtime.protocol.html#ClientMessage" class="internal-link" title="orionis.realtime.protocol.ClientMessage"><wbr></wbr>Client<wbr></wbr>Message</a></code>
             </div>
         
 
@@ -2509,7 +2519,7 @@
         </div>
 
         <div class="extrasDocstring">
-          <p class="class-signature"><code><span class="py-keyword">class</span> <span class="py-defname">HubContext</span>: <a href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/realtime/hub.py#L10" class="sourceLink">(source)</a></code></p><p><a href="classIndex.html#orionis.realtime.HubContext">View In Hierarchy</a></p>
+          <p class="class-signature"><code><span class="py-keyword">class</span> <span class="py-defname">HubContext</span>: <a href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/realtime/hub.py#L12" class="sourceLink">(source)</a></code></p><p><a href="classIndex.html#orionis.realtime.HubContext">View In Hierarchy</a></p>
         </div>
 
         <div class="moduleDocstring">
@@ -2517,24 +2527,24 @@
         </div>
 
         <div id="split-tables">
-          <table class="children sortable" id="id1810">
+          <table class="children sortable" id="id1818">
   
   
   <tr class="classvariable">
     
     <td>Class Variable</td>
     <td><code><a href="#connection_id" class="internal-link" title="orionis.realtime.HubContext.connection_id">connection<wbr></wbr>_id</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
+    <td>Identifier of the current realtime connection.</td>
   </tr><tr class="classvariable">
     
     <td>Class Variable</td>
     <td><code><a href="#socket" class="internal-link" title="orionis.realtime.HubContext.socket">socket</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
+    <td>WebSocket associated with the current realtime invocation.</td>
   </tr><tr class="classvariable">
     
     <td>Class Variable</td>
     <td><code><a href="#user" class="internal-link" title="orionis.realtime.HubContext.user">user</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
+    <td>Authenticated identity associated with the current connection.</td>
   </tr>
 </table>
           
@@ -2555,7 +2565,7 @@
   <div class="functionHeader">
     
     <span class="py-defname">connection_id</span>: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/realtime/hub.py#L14">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/realtime/hub.py#L16">
       
       (source)
     </a>
@@ -2567,7 +2577,7 @@
   </div>
   <div class="functionBody">
     
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p>Identifier of the current realtime connection.</p></div>
     
   </div>
 </div><div class="baseclassvariable">
@@ -2582,7 +2592,7 @@
   <div class="functionHeader">
     
     <span class="py-defname">socket</span>: <code>WebSocket</code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/realtime/hub.py#L15">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/realtime/hub.py#L18">
       
       (source)
     </a>
@@ -2594,7 +2604,7 @@
   </div>
   <div class="functionBody">
     
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p>WebSocket associated with the current realtime invocation.</p></div>
     
   </div>
 </div><div class="baseclassvariable">
@@ -2609,7 +2619,7 @@
   <div class="functionHeader">
     
     <span class="py-defname">user</span>: <code><a href="https://docs.python.org/3/builtins/functions.html#object" class="intersphinx-link">object</a> | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/realtime/hub.py#L16">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/realtime/hub.py#L20">
       
       (source)
     </a>
@@ -2621,7 +2631,7 @@
   </div>
   <div class="functionBody">
     
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p>Authenticated identity associated with the current connection.</p></div>
     
   </div>
 </div>
@@ -2635,7 +2645,7 @@
   <div class="orionis-footer-inner">
     <div class="orionis-footer-copy">
       <p>API documentation for <a href="https://orionis-framework.com/" class="projecthome">Orionis</a>.</p>
-      <p class="orionis-footer-meta">Generated with <a href="https://github.com/twisted/pydoctor/">Pydoctor</a> 25.10.1.<span class="orionis-footer-build"> Built 2026-11-03 09:36:58.</span></p>
+      <p class="orionis-footer-meta">Generated with <a href="https://github.com/twisted/pydoctor/">Pydoctor</a> 25.10.1.<span class="orionis-footer-build"> Built 2026-11-03 13:00:15.</span></p>
     </div>
     <nav class="orionis-footer-links" aria-label="Additional resources">
       <a href="https://docs.orionis-framework.com">Read the guide <span aria-hidden="true">↗</span></a>

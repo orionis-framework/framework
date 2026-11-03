@@ -1569,8 +1569,51 @@
         
          
 
+        <div class="childrenKindTitle">Variables</div>
+        <ul>
+    
+    <li class="">
         
-         
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.mcp.protocol.input_shapes.html#FormValue" class="internal-link" title="orionis.mcp.protocol.input_shapes.FormValue"><wbr></wbr>Form<wbr></wbr>Value</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.mcp.protocol.input_shapes.html#Nonnegative" class="internal-link" title="orionis.mcp.protocol.input_shapes.Nonnegative"><wbr></wbr>Nonnegative</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.mcp.protocol.input_shapes.html#OptionalString" class="internal-link" title="orionis.mcp.protocol.input_shapes.OptionalString"><wbr></wbr>Optional<wbr></wbr>String</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.mcp.protocol.input_shapes.html#Priority" class="internal-link" title="orionis.mcp.protocol.input_shapes.Priority"><wbr></wbr>Priority</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
 
         
          
@@ -1628,7 +1671,7 @@
         </div>
 
         <div class="extrasDocstring">
-          <p class="class-signature"><code><span class="py-keyword">class</span> <span class="py-defname">FormSchema</span>(msgspec.Struct): <a href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/mcp/protocol/input_shapes.py#L62" class="sourceLink">(source)</a></code></p><p><a href="classIndex.html#orionis.mcp.protocol.input_shapes.FormSchema">View In Hierarchy</a></p>
+          <p class="class-signature"><code><span class="py-keyword">class</span> <span class="py-defname">FormSchema</span>(msgspec.Struct): <a href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/mcp/protocol/input_shapes.py#L82" class="sourceLink">(source)</a></code></p><p><a href="classIndex.html#orionis.mcp.protocol.input_shapes.FormSchema">View In Hierarchy</a></p>
         </div>
 
         <div class="moduleDocstring">
@@ -1636,29 +1679,29 @@
         </div>
 
         <div id="split-tables">
-          <table class="children sortable" id="id1386">
+          <table class="children sortable" id="id1390">
   
   
   <tr class="classvariable">
     
     <td>Class Variable</td>
     <td><code><a href="#properties" class="internal-link" title="orionis.mcp.protocol.input_shapes.FormSchema.properties">properties</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
+    <td>Field schemas indexed by the corresponding property name.</td>
   </tr><tr class="classvariable">
     
     <td>Class Variable</td>
     <td><code><a href="#required" class="internal-link" title="orionis.mcp.protocol.input_shapes.FormSchema.required">required</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
+    <td>Property names that must be present in the submitted object.</td>
   </tr><tr class="classvariable">
     
     <td>Class Variable</td>
     <td><code><a href="#schema" class="internal-link" title="orionis.mcp.protocol.input_shapes.FormSchema.schema">schema</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
+    <td>Schema produced by <tt class="rst-docutils rst-literal">msgspec.field</tt>.</td>
   </tr><tr class="classvariable">
     
     <td>Class Variable</td>
     <td><code><a href="#type" class="internal-link" title="orionis.mcp.protocol.input_shapes.FormSchema.type">type</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
+    <td>Discriminator identifying the message or schema variant.</td>
   </tr>
 </table>
           
@@ -1679,7 +1722,7 @@
   <div class="functionHeader">
     
     <span class="py-defname">properties</span>: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#dict" class="intersphinx-link">dict</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <wbr></wbr><a href="orionis.mcp.protocol.input_shapes.FormField.html" class="internal-link" title="orionis.mcp.protocol.input_shapes.FormField">FormField</a>]</code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/mcp/protocol/input_shapes.py#L66">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/mcp/protocol/input_shapes.py#L87">
       
       (source)
     </a>
@@ -1691,7 +1734,7 @@
   </div>
   <div class="functionBody">
     
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p>Field schemas indexed by the corresponding property name.</p></div>
     
   </div>
 </div><div class="baseclassvariable">
@@ -1706,7 +1749,7 @@
   <div class="functionHeader">
     
     <span class="py-defname">required</span>: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" class="intersphinx-link">tuple</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <wbr></wbr><span class="rst-variable-ellipsis">...</span>]</code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/mcp/protocol/input_shapes.py#L67">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/mcp/protocol/input_shapes.py#L89">
       
       (source)
     </a>
@@ -1718,7 +1761,7 @@
   </div>
   <div class="functionBody">
     
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p>Property names that must be present in the submitted object.</p></div>
     
   </div>
 </div><div class="baseclassvariable">
@@ -1732,8 +1775,8 @@
   </a>
   <div class="functionHeader">
     
-    <span class="py-defname">schema</span>: <code>OptionalString</code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/mcp/protocol/input_shapes.py#L68">
+    <span class="py-defname">schema</span>: <code><a href="orionis.mcp.protocol.input_shapes.html#OptionalString" class="internal-link" title="orionis.mcp.protocol.input_shapes.OptionalString">OptionalString</a></code> =
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/mcp/protocol/input_shapes.py#L91">
       
       (source)
     </a>
@@ -1745,7 +1788,7 @@
   </div>
   <div class="functionBody">
     
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p>Schema produced by <tt class="rst-docutils rst-literal">msgspec.field</tt>.</p></div>
     
   </div>
 </div><div class="baseclassvariable">
@@ -1760,7 +1803,7 @@
   <div class="functionHeader">
     
     <span class="py-defname">type</span>: <code><a href="https://docs.python.org/3/library/typing.html#typing.Literal" class="intersphinx-link">Literal</a>[<wbr></wbr><span class="rst-variable-quote">'</span><span class="rst-variable-string">object</span><span class="rst-variable-quote">'</span>]</code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/mcp/protocol/input_shapes.py#L65">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/mcp/protocol/input_shapes.py#L85">
       
       (source)
     </a>
@@ -1772,7 +1815,7 @@
   </div>
   <div class="functionBody">
     
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p>Discriminator identifying the message or schema variant.</p></div>
     
   </div>
 </div>
@@ -1786,7 +1829,7 @@
   <div class="orionis-footer-inner">
     <div class="orionis-footer-copy">
       <p>API documentation for <a href="https://orionis-framework.com/" class="projecthome">Orionis</a>.</p>
-      <p class="orionis-footer-meta">Generated with <a href="https://github.com/twisted/pydoctor/">Pydoctor</a> 25.10.1.<span class="orionis-footer-build"> Built 2026-11-03 09:36:58.</span></p>
+      <p class="orionis-footer-meta">Generated with <a href="https://github.com/twisted/pydoctor/">Pydoctor</a> 25.10.1.<span class="orionis-footer-build"> Built 2026-11-03 13:00:15.</span></p>
     </div>
     <nav class="orionis-footer-links" aria-label="Additional resources">
       <a href="https://docs.orionis-framework.com">Read the guide <span aria-hidden="true">↗</span></a>

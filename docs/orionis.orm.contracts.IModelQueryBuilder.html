@@ -2300,19 +2300,20 @@
         </div>
 
         <div class="extrasDocstring">
-          <p class="class-signature"><code><span class="py-keyword">class</span> <span class="py-defname">IModelQueryBuilder</span>(<a href="orionis.orm.contracts.base_builder.IQueryBuilderBase.html" class="internal-link" title="orionis.orm.contracts.base_builder.IQueryBuilderBase">IQueryBuilderBase</a>): <a href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/orm/contracts/builder.py#L11" class="sourceLink">(source)</a></code></p><p>Known subclasses: <code><a href="orionis.orm.contracts.relation.IRelation.html" class="internal-link">orionis.orm.contracts.relation.IRelation</a></code>, <code><a href="orionis.orm.query.ModelQueryBuilder.html" class="internal-link">orionis.orm.query.ModelQueryBuilder</a></code></p><p><a href="classIndex.html#orionis.orm.contracts.IModelQueryBuilder">View In Hierarchy</a></p>
+          <p class="class-signature"><code><span class="py-keyword">class</span> <span class="py-defname">IModelQueryBuilder</span>(<a href="orionis.orm.contracts.base_builder.IQueryBuilderBase.html" class="internal-link" title="orionis.orm.contracts.base_builder.IQueryBuilderBase">IQueryBuilderBase</a>): <a href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/orm/contracts/builder.py#L13" class="sourceLink">(source)</a></code></p><p>Known subclasses: <code><a href="orionis.orm.contracts.relation.IRelation.html" class="internal-link">orionis.orm.contracts.relation.IRelation</a></code>, <code><a href="orionis.orm.query.ModelQueryBuilder.html" class="internal-link">orionis.orm.query.ModelQueryBuilder</a></code></p><p><a href="classIndex.html#orionis.orm.contracts.IModelQueryBuilder">View In Hierarchy</a></p>
         </div>
 
         <div class="moduleDocstring">
           <div><p>Contract for the query builder bound to a model class.</p>
-<p>It inherits the whole query language from <code><a href="orionis.orm.contracts.base_builder.IQueryBuilderBase.html" class="internal-link" title="orionis.orm.contracts.base_builder.IQueryBuilderBase">IQueryBuilderBase</a></code>
+<p>It inherits the whole query language from
+<code><a href="orionis.orm.contracts.base_builder.IQueryBuilderBase.html" class="internal-link">orionis.orm.contracts.base_builder.IQueryBuilderBase</a></code>
 and only adds what model awareness brings: hydrated results,
 primary-key lookups, and relationship eager loading.</p>
 </div>
         </div>
 
         <div id="split-tables">
-          <table class="children sortable" id="id1556">
+          <table class="children sortable" id="id1560">
   
   
   <tr class="method">
@@ -2369,14 +2370,14 @@ primary-key lookups, and relationship eager loading.</p>
     
     <td>Class Variable</td>
     <td><code><a href="#__slots__" class="internal-link" title="orionis.orm.contracts.IModelQueryBuilder.__slots__">__slots__</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
+    <td>Declare that this class introduces no additional instance slots.</td>
   </tr>
 </table>
           
             <p class="inheritedFrom">
               Inherited from <code><a href="orionis.orm.contracts.base_builder.IQueryBuilderBase.html" class="internal-link" title="orionis.orm.contracts.base_builder.IQueryBuilderBase">IQueryBuilderBase</a></code>:
             </p>
-            <table class="children sortable" id="id1557">
+            <table class="children sortable" id="id1561">
   
   
   <tr class="basemethod">
@@ -2755,7 +2756,7 @@ primary-key lookups, and relationship eager loading.</p>
     
     <div><span class="decorator">@abstractmethod<br /></span></div>
     <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">find</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">key: <code>Any</code></span>) -&gt; <code>Model | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/orm/contracts/builder.py#L94">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/orm/contracts/builder.py#L98">
       
       (source)
     </a>
@@ -2767,7 +2768,7 @@ primary-key lookups, and relationship eager loading.</p>
   </div>
   <div class="docstring functionBody">
     <div class="interfaceinfo">overridden in <code><a href="orionis.orm.query.ModelQueryBuilder.html" class="internal-link">orionis.orm.query.ModelQueryBuilder</a></code></div>
-    <div><p>Retrieve a model by its primary key.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">key:</span><code>Any</code></td><td class="fieldArgDesc">Primary key value to look up.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.orm.Model.html" class="internal-link" title="orionis.orm.Model">Model</a> or <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">Matching model, or <tt class="rst-docutils rst-literal">None</tt> when absent.</td></tr></table></div>
+    <div><p>Retrieve a model by its primary key.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">key:</span><code><a href="https://docs.python.org/3/library/typing.html#typing.Any" class="intersphinx-link">typing.Any</a></code></td><td class="fieldArgDesc">Primary key value to look up.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.orm.Model.html" class="internal-link">orionis.orm.Model</a> or <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">Matching model, or <tt class="rst-docutils rst-literal">None</tt> when absent.</td></tr></table></div>
   </div>
 </div><div class="basemethod">
   
@@ -2782,7 +2783,7 @@ primary-key lookups, and relationship eager loading.</p>
     
     <div><span class="decorator">@abstractmethod<br /></span></div>
     <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">findOrFail</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">key: <code>Any</code></span>) -&gt; <code>Model</code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/orm/contracts/builder.py#L110">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/orm/contracts/builder.py#L114">
       
       (source)
     </a>
@@ -2794,7 +2795,7 @@ primary-key lookups, and relationship eager loading.</p>
   </div>
   <div class="docstring functionBody">
     <div class="interfaceinfo">overridden in <code><a href="orionis.orm.query.ModelQueryBuilder.html" class="internal-link">orionis.orm.query.ModelQueryBuilder</a></code></div>
-    <div><p>Retrieve a model by primary key or raise when absent.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">key:</span><code>Any</code></td><td class="fieldArgDesc">Primary key value to look up.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.orm.Model.html" class="internal-link" title="orionis.orm.Model">Model</a></code></td><td class="fieldArgDesc">Matching model.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code>ModelNotFoundException</code></td><td>If no record matches the key.</td></tr></table></div>
+    <div><p>Retrieve a model by primary key or raise when absent.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">key:</span><code><a href="https://docs.python.org/3/library/typing.html#typing.Any" class="intersphinx-link">typing.Any</a></code></td><td class="fieldArgDesc">Primary key value to look up.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.orm.Model.html" class="internal-link">orionis.orm.Model</a></code></td><td class="fieldArgDesc">Matching model.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.orm.exceptions.ModelNotFoundException.html" class="internal-link">orionis.orm.exceptions.ModelNotFoundException</a></code></td><td>If no record matches the key.</td></tr></table></div>
   </div>
 </div><div class="basemethod">
   
@@ -2809,7 +2810,7 @@ primary-key lookups, and relationship eager loading.</p>
     
     <div><span class="decorator">@abstractmethod<br /></span></div>
     <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">first</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>) -&gt; <code>Model | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/orm/contracts/builder.py#L67">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/orm/contracts/builder.py#L71">
       
       (source)
     </a>
@@ -2821,7 +2822,7 @@ primary-key lookups, and relationship eager loading.</p>
   </div>
   <div class="docstring functionBody">
     <div class="interfaceinfo">overridden in <code><a href="orionis.orm.query.ModelQueryBuilder.html" class="internal-link">orionis.orm.query.ModelQueryBuilder</a></code>, <code><a href="orionis.orm.relations.BelongsToManyRelation.html" class="internal-link">orionis.orm.relations.BelongsToManyRelation</a></code>, <code><a href="orionis.orm.relations.BelongsToManyRelation.html" class="internal-link">orionis.orm.relations.BelongsToManyRelation</a></code></div>
-    <div><p>Execute the query and hydrate only the first matching row.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.orm.Model.html" class="internal-link" title="orionis.orm.Model">Model</a> or <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">First matching model, or <tt class="rst-docutils rst-literal">None</tt> without matches.</td></tr></table></div>
+    <div><p>Execute the query and hydrate only the first matching row.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.orm.Model.html" class="internal-link">orionis.orm.Model</a> or <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">First matching model, or <tt class="rst-docutils rst-literal">None</tt> without matches.</td></tr></table></div>
   </div>
 </div><div class="basemethod">
   
@@ -2836,7 +2837,7 @@ primary-key lookups, and relationship eager loading.</p>
     
     <div><span class="decorator">@abstractmethod<br /></span></div>
     <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">firstOrFail</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>) -&gt; <code>Model</code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/orm/contracts/builder.py#L78">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/orm/contracts/builder.py#L82">
       
       (source)
     </a>
@@ -2848,7 +2849,7 @@ primary-key lookups, and relationship eager loading.</p>
   </div>
   <div class="docstring functionBody">
     <div class="interfaceinfo">overridden in <code><a href="orionis.orm.query.ModelQueryBuilder.html" class="internal-link">orionis.orm.query.ModelQueryBuilder</a></code></div>
-    <div><p>Return the first matching row or raise when none exists.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.orm.Model.html" class="internal-link" title="orionis.orm.Model">Model</a></code></td><td class="fieldArgDesc">First matching model.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code>ModelNotFoundException</code></td><td>If the query yields no rows.</td></tr></table></div>
+    <div><p>Return the first matching row or raise when none exists.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.orm.Model.html" class="internal-link">orionis.orm.Model</a></code></td><td class="fieldArgDesc">First matching model.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.orm.exceptions.ModelNotFoundException.html" class="internal-link">orionis.orm.exceptions.ModelNotFoundException</a></code></td><td>If the query yields no rows.</td></tr></table></div>
   </div>
 </div><div class="basemethod">
   
@@ -2863,7 +2864,7 @@ primary-key lookups, and relationship eager loading.</p>
     
     <div><span class="decorator">@abstractmethod<br /></span></div>
     <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">get</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>) -&gt; <code>Collection</code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/orm/contracts/builder.py#L56">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/orm/contracts/builder.py#L60">
       
       (source)
     </a>
@@ -2875,7 +2876,7 @@ primary-key lookups, and relationship eager loading.</p>
   </div>
   <div class="docstring functionBody">
     <div class="interfaceinfo">overridden in <code><a href="orionis.orm.query.ModelQueryBuilder.html" class="internal-link">orionis.orm.query.ModelQueryBuilder</a></code>, <code><a href="orionis.orm.relations.BelongsToManyRelation.html" class="internal-link">orionis.orm.relations.BelongsToManyRelation</a></code>, <code><a href="orionis.orm.relations.BelongsToManyRelation.html" class="internal-link">orionis.orm.relations.BelongsToManyRelation</a></code></div>
-    <div><p>Execute the query and hydrate every matching row.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.support.types.Collection.html" class="internal-link" title="orionis.support.types.Collection">Collection</a></code></td><td class="fieldArgDesc">Collection of hydrated model instances.</td></tr></table></div>
+    <div><p>Execute the query and hydrate every matching row.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Collection" class="intersphinx-link">collections.abc.Collection</a></code></td><td class="fieldArgDesc">Collection of hydrated model instances.</td></tr></table></div>
   </div>
 </div><div class="basemethod">
   
@@ -2890,7 +2891,7 @@ primary-key lookups, and relationship eager loading.</p>
     
     <div><span class="decorator">@abstractmethod<br /></span></div>
     <span class="py-keyword">def</span>&#160;<span class="py-defname">load</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">*names: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></span>) -&gt; <code>Self</code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/orm/contracts/builder.py#L40">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/orm/contracts/builder.py#L44">
       
       (source)
     </a>
@@ -2902,7 +2903,7 @@ primary-key lookups, and relationship eager loading.</p>
   </div>
   <div class="docstring functionBody">
     <div class="interfaceinfo">overridden in <code><a href="orionis.orm.query.ModelQueryBuilder.html" class="internal-link">orionis.orm.query.ModelQueryBuilder</a></code></div>
-    <div><p>Eager load the given relationships; alias of <tt class="rst-docutils rst-literal">withRelations</tt>.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">*names:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Relationship method names declared on the model.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.orm.contracts.IModelQueryBuilder.html" class="internal-link" title="orionis.orm.contracts.IModelQueryBuilder">IModelQueryBuilder</a></code></td><td class="fieldArgDesc">The same builder, enabling fluent chaining.</td></tr></table></div>
+    <div><p>Eager load the given relationships; alias of <tt class="rst-docutils rst-literal">withRelations</tt>.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">*names:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Relationship method names declared on the model.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.orm.contracts.IModelQueryBuilder.html" class="internal-link">orionis.orm.contracts.IModelQueryBuilder</a></code></td><td class="fieldArgDesc">The same builder, enabling fluent chaining.</td></tr></table></div>
   </div>
 </div><div class="basemethod">
   
@@ -2917,7 +2918,7 @@ primary-key lookups, and relationship eager loading.</p>
     
     <div><span class="decorator">@abstractmethod<br /></span></div>
     <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">paginate</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">page: <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code> = 1, </span><span class="rst-sig-param">per_page: <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code> = 15</span>) -&gt; <code>Paginator</code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/orm/contracts/builder.py#L163">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/orm/contracts/builder.py#L167">
       
       (source)
     </a>
@@ -2929,7 +2930,7 @@ primary-key lookups, and relationship eager loading.</p>
   </div>
   <div class="docstring functionBody">
     <div class="interfaceinfo">overridden in <code><a href="orionis.orm.query.ModelQueryBuilder.html" class="internal-link">orionis.orm.query.ModelQueryBuilder</a></code></div>
-    <div><p>Execute the query returning a length-aware page of results.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">page:</span><code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a>, <em>optional</em></code></td><td class="fieldArgDesc">Page number starting at 1. Defaults to the first page.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">per<wbr></wbr>_page:</span><code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a>, <em>optional</em></code></td><td class="fieldArgDesc">Number of items per page. Defaults to 15.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.orm.collections.Paginator.html" class="internal-link" title="orionis.orm.collections.Paginator">Paginator</a></code></td><td class="fieldArgDesc">Page of hydrated models with pagination metadata.</td></tr></table></div>
+    <div><p>Execute the query returning a length-aware page of results.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">page:</span><code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a>, <em>optional</em></code></td><td class="fieldArgDesc">Page number starting at 1. Defaults to the first page.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">per<wbr></wbr>_page:</span><code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a>, <em>optional</em></code></td><td class="fieldArgDesc">Number of items per page. Defaults to 15.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.orm.collections.Paginator.html" class="internal-link">orionis.orm.collections.Paginator</a></code></td><td class="fieldArgDesc">Page of hydrated models with pagination metadata.</td></tr></table></div>
   </div>
 </div><div class="basemethod">
   
@@ -2944,7 +2945,7 @@ primary-key lookups, and relationship eager loading.</p>
     
     <div><span class="decorator">@abstractmethod<br /></span></div>
     <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">pluck</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">column: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></span>) -&gt; <code>Collection</code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/orm/contracts/builder.py#L147">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/orm/contracts/builder.py#L151">
       
       (source)
     </a>
@@ -2956,7 +2957,7 @@ primary-key lookups, and relationship eager loading.</p>
   </div>
   <div class="docstring functionBody">
     <div class="interfaceinfo">overridden in <code><a href="orionis.orm.query.ModelQueryBuilder.html" class="internal-link">orionis.orm.query.ModelQueryBuilder</a></code></div>
-    <div><p>Return one column of every matching row.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">column:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Column whose values are collected.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.support.types.Collection.html" class="internal-link" title="orionis.support.types.Collection">Collection</a></code></td><td class="fieldArgDesc">Collection of column values.</td></tr></table></div>
+    <div><p>Return one column of every matching row.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">column:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Column whose values are collected.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Collection" class="intersphinx-link">collections.abc.Collection</a></code></td><td class="fieldArgDesc">Collection of column values.</td></tr></table></div>
   </div>
 </div><div class="basemethod">
   
@@ -2971,7 +2972,7 @@ primary-key lookups, and relationship eager loading.</p>
     
     <div><span class="decorator">@abstractmethod<br /></span></div>
     <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">value</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">column: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></span>) -&gt; <code>Any</code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/orm/contracts/builder.py#L131">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/orm/contracts/builder.py#L135">
       
       (source)
     </a>
@@ -2983,7 +2984,7 @@ primary-key lookups, and relationship eager loading.</p>
   </div>
   <div class="docstring functionBody">
     <div class="interfaceinfo">overridden in <code><a href="orionis.orm.query.ModelQueryBuilder.html" class="internal-link">orionis.orm.query.ModelQueryBuilder</a></code></div>
-    <div><p>Return a single column value of the first matching row.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">column:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Column whose value is returned.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code>Any</code></td><td class="fieldArgDesc">Column value, or <tt class="rst-docutils rst-literal">None</tt> without matches.</td></tr></table></div>
+    <div><p>Return a single column value of the first matching row.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">column:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Column whose value is returned.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/library/typing.html#typing.Any" class="intersphinx-link">typing.Any</a></code></td><td class="fieldArgDesc">Column value, or <tt class="rst-docutils rst-literal">None</tt> without matches.</td></tr></table></div>
   </div>
 </div><div class="basemethod">
   
@@ -2998,7 +2999,7 @@ primary-key lookups, and relationship eager loading.</p>
     
     <div><span class="decorator">@abstractmethod<br /></span></div>
     <span class="py-keyword">def</span>&#160;<span class="py-defname">withRelations</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">*names: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></span>) -&gt; <code>Self</code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/orm/contracts/builder.py#L24">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/orm/contracts/builder.py#L28">
       
       (source)
     </a>
@@ -3010,7 +3011,7 @@ primary-key lookups, and relationship eager loading.</p>
   </div>
   <div class="docstring functionBody">
     <div class="interfaceinfo">overridden in <code><a href="orionis.orm.query.ModelQueryBuilder.html" class="internal-link">orionis.orm.query.ModelQueryBuilder</a></code></div>
-    <div><p>Eager load the given relationships alongside the query.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">*names:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Relationship method names declared on the model.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.orm.contracts.IModelQueryBuilder.html" class="internal-link" title="orionis.orm.contracts.IModelQueryBuilder">IModelQueryBuilder</a></code></td><td class="fieldArgDesc">The same builder, enabling fluent chaining.</td></tr></table></div>
+    <div><p>Eager load the given relationships alongside the query.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">*names:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Relationship method names declared on the model.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.orm.contracts.IModelQueryBuilder.html" class="internal-link">orionis.orm.contracts.IModelQueryBuilder</a></code></td><td class="fieldArgDesc">The same builder, enabling fluent chaining.</td></tr></table></div>
   </div>
 </div><div class="baseclassvariable">
   
@@ -3024,7 +3025,7 @@ primary-key lookups, and relationship eager loading.</p>
   <div class="functionHeader">
     
     <span class="py-defname">__slots__</span>: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" class="intersphinx-link">tuple</a></code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/orm/contracts/builder.py#L22">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/orm/contracts/builder.py#L25">
       
       (source)
     </a>
@@ -3036,7 +3037,7 @@ primary-key lookups, and relationship eager loading.</p>
   </div>
   <div class="functionBody">
     <div class="interfaceinfo">overrides <code><a href="orionis.orm.contracts.base_builder.IQueryBuilderBase.html#__slots__" class="internal-link">orionis.orm.contracts.base_builder.IQueryBuilderBase.__slots__</a></code></div><div class="interfaceinfo">overridden in <code><a href="orionis.orm.contracts.relation.IRelation.html" class="internal-link">orionis.orm.contracts.relation.IRelation</a></code>, <code><a href="orionis.orm.query.ModelQueryBuilder.html" class="internal-link">orionis.orm.query.ModelQueryBuilder</a></code></div>
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p>Declare that this class introduces no additional instance slots.</p></div>
     
   </div>
 </div>
@@ -3050,7 +3051,7 @@ primary-key lookups, and relationship eager loading.</p>
   <div class="orionis-footer-inner">
     <div class="orionis-footer-copy">
       <p>API documentation for <a href="https://orionis-framework.com/" class="projecthome">Orionis</a>.</p>
-      <p class="orionis-footer-meta">Generated with <a href="https://github.com/twisted/pydoctor/">Pydoctor</a> 25.10.1.<span class="orionis-footer-build"> Built 2026-11-03 09:36:58.</span></p>
+      <p class="orionis-footer-meta">Generated with <a href="https://github.com/twisted/pydoctor/">Pydoctor</a> 25.10.1.<span class="orionis-footer-build"> Built 2026-11-03 13:00:15.</span></p>
     </div>
     <nav class="orionis-footer-links" aria-label="Additional resources">
       <a href="https://docs.orionis-framework.com">Read the guide <span aria-hidden="true">↗</span></a>

@@ -1047,11 +1047,11 @@
         </div>
 
         <div class="extrasDocstring">
-          <a href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/cache/stores/database.py" class="sourceLink">(source)</a>
+          <a href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/cache/stores/database.py" class="sourceLink">(source)</a>
         </div>
 
         <div class="moduleDocstring">
-          <div><p class="undocumented">Undocumented</p></div>
+          <div><p>Cache backend that stores entries in a relational database table.</p></div>
         </div>
 
         <div id="split-tables">
@@ -1082,17 +1082,17 @@
     
     <td>Constant</td>
     <td><code><a href="#_DEFAULT_LOCK_TABLE" class="internal-link" title="orionis.cache.stores.database._DEFAULT_LOCK_TABLE">_DEFAULT<wbr></wbr>_LOCK<wbr></wbr>_TABLE</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
+    <td>Default lock table used when the config does not declare one explicitly.</td>
   </tr><tr class="constant">
     
     <td>Constant</td>
     <td><code><a href="#_INCREMENT_ATTEMPTS" class="internal-link" title="orionis.cache.stores.database._INCREMENT_ATTEMPTS">_INCREMENT<wbr></wbr>_ATTEMPTS</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
+    <td>Compare-and-swap rounds allowed before an increment gives up on contention.</td>
   </tr><tr class="constant">
     
     <td>Constant</td>
     <td><code><a href="#_MISSING" class="internal-link" title="orionis.cache.stores.database._MISSING">_MISSING</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
+    <td>Sentinel object to distinguish "key not found" from a stored None value.</td>
   </tr>
 </table>
           
@@ -1114,7 +1114,7 @@
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">_build_entries_table</span><span class="function-signature">(<span class="rst-sig-param">table: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></span>) -&gt; <code>TableDefinition</code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/cache/stores/database.py#L26">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/cache/stores/database.py#L31">
       
       (source)
     </a>
@@ -1126,7 +1126,7 @@
   </div>
   <div class="docstring functionBody">
     
-    <div><p>Build the table definition for the cache entries table.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">table:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Logical table name for cache entries.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.orm.schema.TableDefinition.html" class="internal-link" title="orionis.orm.schema.TableDefinition">TableDefinition</a></code></td><td class="fieldArgDesc">Definition with <tt class="rst-docutils rst-literal">cache_key</tt> (primary key), <tt class="rst-docutils rst-literal">cache_value</tt>
+    <div><p>Build the table definition for the cache entries table.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">table:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Logical table name for cache entries.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.orm.schema.TableDefinition.html" class="internal-link">orionis.orm.schema.TableDefinition</a></code></td><td class="fieldArgDesc">Definition with <tt class="rst-docutils rst-literal">cache_key</tt> (primary key), <tt class="rst-docutils rst-literal">cache_value</tt>
 (JSON payload) and <tt class="rst-docutils rst-literal">expiration</tt> (epoch seconds, sub-second
 precision, nullable) columns.</td></tr></table></div>
   </div>
@@ -1143,7 +1143,7 @@ precision, nullable) columns.</td></tr></table></div>
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">_build_locks_table</span><span class="function-signature">(<span class="rst-sig-param">table: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></span>) -&gt; <code>TableDefinition</code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/cache/stores/database.py#L62">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/cache/stores/database.py#L67">
       
       (source)
     </a>
@@ -1155,7 +1155,7 @@ precision, nullable) columns.</td></tr></table></div>
   </div>
   <div class="docstring functionBody">
     
-    <div><p>Build the table definition for the atomic-locks table.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">table:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Logical table name for cache locks.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.orm.schema.TableDefinition.html" class="internal-link" title="orionis.orm.schema.TableDefinition">TableDefinition</a></code></td><td class="fieldArgDesc">Definition with <tt class="rst-docutils rst-literal">cache_key</tt> (primary key), <tt class="rst-docutils rst-literal">owner</tt> and
+    <div><p>Build the table definition for the atomic-locks table.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">table:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Logical table name for cache locks.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.orm.schema.TableDefinition.html" class="internal-link">orionis.orm.schema.TableDefinition</a></code></td><td class="fieldArgDesc">Definition with <tt class="rst-docutils rst-literal">cache_key</tt> (primary key), <tt class="rst-docutils rst-literal">owner</tt> and
 <tt class="rst-docutils rst-literal">expiration</tt> (epoch seconds, sub-second precision) columns.</td></tr></table></div>
   </div>
 </div><div class="basefunction">
@@ -1171,7 +1171,7 @@ precision, nullable) columns.</td></tr></table></div>
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">build</span><span class="function-signature long-signature">(<span class="rst-sig-param">connection: <code>IConnection</code>, </span><span class="rst-sig-param">table: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code>, </span><span class="rst-sig-param">lock_table: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a> | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code> = <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></span>) -&gt; <code><a href="orionis.cache.stores.database.DatabaseCacheBackend.html" class="internal-link" title="orionis.cache.stores.database.DatabaseCacheBackend">DatabaseCacheBackend</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/cache/stores/database.py#L722">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/cache/stores/database.py#L741">
       
       (source)
     </a>
@@ -1183,7 +1183,7 @@ precision, nullable) columns.</td></tr></table></div>
   </div>
   <div class="docstring functionBody">
     
-    <div><p>Build and return a <tt class="rst-docutils rst-literal">DatabaseCacheBackend</tt>.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">connection:</span><code><a href="orionis.database.contracts.IConnection.html" class="internal-link" title="orionis.database.contracts.IConnection">IConnection</a></code></td><td class="fieldArgDesc">Database connection used to store cache entries and locks.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">table:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Table name used to store cache entries.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">lock<wbr></wbr>_table:</span><code>str | None</code></td><td class="fieldArgDesc">Table name used to store atomic locks.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.cache.stores.database.DatabaseCacheBackend.html" class="internal-link" title="orionis.cache.stores.database.DatabaseCacheBackend">DatabaseCacheBackend</a></code></td><td class="fieldArgDesc">Configured database-backed cache backend.</td></tr></table></div>
+    <div><p>Build and return a <tt class="rst-docutils rst-literal">DatabaseCacheBackend</tt>.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">connection:</span><code><a href="orionis.database.contracts.IConnection.html" class="internal-link">orionis.database.contracts.IConnection</a></code></td><td class="fieldArgDesc">Database connection used to store cache entries and locks.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">table:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Table name used to store cache entries.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">lock<wbr></wbr>_table:</span><code>str | None</code></td><td class="fieldArgDesc">Table name used to store atomic locks.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.cache.stores.database.DatabaseCacheBackend.html" class="internal-link">orionis.cache.stores.database.DatabaseCacheBackend</a></code></td><td class="fieldArgDesc">Configured database-backed cache backend.</td></tr></table></div>
   </div>
 </div><div class="baseconstant">
   
@@ -1197,7 +1197,7 @@ precision, nullable) columns.</td></tr></table></div>
   <div class="functionHeader">
     
     <span class="py-defname">_DEFAULT_LOCK_TABLE</span>: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/cache/stores/database.py#L21">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/cache/stores/database.py#L24">
       
       (source)
     </a>
@@ -1209,7 +1209,7 @@ precision, nullable) columns.</td></tr></table></div>
   </div>
   <div class="functionBody">
     
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p>Default lock table used when the config does not declare one explicitly.</p></div>
     <table class="valueTable"><tr class="fieldStart"><td class="fieldName">Value</td></tr><tr><td><pre class="constant-value"><code><span class="rst-variable-quote">'</span><span class="rst-variable-string">cache_locks</span><span class="rst-variable-quote">'</span></code></pre></td></tr></table>
   </div>
 </div><div class="baseconstant">
@@ -1224,7 +1224,7 @@ precision, nullable) columns.</td></tr></table></div>
   <div class="functionHeader">
     
     <span class="py-defname">_INCREMENT_ATTEMPTS</span>: <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/cache/stores/database.py#L24">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/cache/stores/database.py#L28">
       
       (source)
     </a>
@@ -1236,7 +1236,7 @@ precision, nullable) columns.</td></tr></table></div>
   </div>
   <div class="functionBody">
     
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p>Compare-and-swap rounds allowed before an increment gives up on contention.</p></div>
     <table class="valueTable"><tr class="fieldStart"><td class="fieldName">Value</td></tr><tr><td><pre class="constant-value"><code>25</code></pre></td></tr></table>
   </div>
 </div><div class="baseconstant">
@@ -1251,7 +1251,7 @@ precision, nullable) columns.</td></tr></table></div>
   <div class="functionHeader">
     
     <span class="py-defname">_MISSING</span> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/cache/stores/database.py#L18">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/cache/stores/database.py#L20">
       
       (source)
     </a>
@@ -1263,7 +1263,7 @@ precision, nullable) columns.</td></tr></table></div>
   </div>
   <div class="functionBody">
     
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p>Sentinel object to distinguish "key not found" from a stored None value.</p></div>
     <table class="valueTable"><tr class="fieldStart"><td class="fieldName">Value</td></tr><tr><td><pre class="constant-value"><code><a href="https://docs.python.org/3/builtins/functions.html#object" class="intersphinx-link">object</a>()</code></pre></td></tr></table>
   </div>
 </div>
@@ -1277,7 +1277,7 @@ precision, nullable) columns.</td></tr></table></div>
   <div class="orionis-footer-inner">
     <div class="orionis-footer-copy">
       <p>API documentation for <a href="https://orionis-framework.com/" class="projecthome">Orionis</a>.</p>
-      <p class="orionis-footer-meta">Generated with <a href="https://github.com/twisted/pydoctor/">Pydoctor</a> 25.10.1.<span class="orionis-footer-build"> Built 2026-11-03 09:36:58.</span></p>
+      <p class="orionis-footer-meta">Generated with <a href="https://github.com/twisted/pydoctor/">Pydoctor</a> 25.10.1.<span class="orionis-footer-build"> Built 2026-11-03 13:00:15.</span></p>
     </div>
     <nav class="orionis-footer-links" aria-label="Additional resources">
       <a href="https://docs.orionis-framework.com">Read the guide <span aria-hidden="true">↗</span></a>

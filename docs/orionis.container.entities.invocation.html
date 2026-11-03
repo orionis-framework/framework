@@ -219,7 +219,7 @@
         
 
         
-            <div class="itemName"><code><a href="orionis.container.entities.invocation.InvocationPlan.html#is_async" class="internal-link" title="orionis.container.entities.invocation.InvocationPlan.is_async">is<wbr></wbr>_async</a></code>
+            <div class="itemName"><code><a href="orionis.container.entities.invocation.InvocationPlan.html#has_keyword_only" class="internal-link" title="orionis.container.entities.invocation.InvocationPlan.has_keyword_only">has<wbr></wbr>_keyword<wbr></wbr>_only</a></code>
             </div>
         
 
@@ -229,7 +229,7 @@
         
 
         
-            <div class="itemName"><code><a href="orionis.container.entities.invocation.InvocationPlan.html#has_keyword_only" class="internal-link" title="orionis.container.entities.invocation.InvocationPlan.has_keyword_only">has<wbr></wbr>_keyword<wbr></wbr>_only</a></code>
+            <div class="itemName"><code><a href="orionis.container.entities.invocation.InvocationPlan.html#is_async" class="internal-link" title="orionis.container.entities.invocation.InvocationPlan.is_async">is<wbr></wbr>_async</a></code>
             </div>
         
 
@@ -333,7 +333,7 @@
                     
                 </label>
 
-                <code><a href="orionis.container.entities.binding.html" class="internal-link" title="orionis.container.entities.binding">binding</a></code>
+                <code><a href="orionis.container.entities.binding.module.html" class="internal-link" title="orionis.container.entities.binding">binding</a></code>
 
                 <div class="expandableContent">
                     <div>
@@ -699,11 +699,11 @@
         </div>
 
         <div class="extrasDocstring">
-          <a href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/container/entities/invocation.py" class="sourceLink">(source)</a>
+          <a href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/container/entities/invocation.py" class="sourceLink">(source)</a>
         </div>
 
         <div class="moduleDocstring">
-          <div><p class="undocumented">Undocumented</p></div>
+          <div><p>Describe the immutable metadata needed to invoke one callable.</p></div>
         </div>
 
         <div id="split-tables">
@@ -756,7 +756,7 @@
     
     <div><span class="decorator">@<a href="https://docs.python.org/3/library/functools.html#functools.lru_cache" class="intersphinx-link">lru_cache</a>(<wbr></wbr>maxsize=1024)<br /></span></div>
     <span class="py-keyword">def</span>&#160;<span class="py-defname">_callable_plan</span><span class="function-signature">(<span class="rst-sig-param">target: <code><a href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Callable" class="intersphinx-link">Callable</a></code>, </span><span class="rst-sig-symbol">*, </span><span class="rst-sig-param">bound: <code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code> = <a href="https://docs.python.org/3/builtins/constants.html#False" class="intersphinx-link">False</a></span>) -&gt; <code><a href="orionis.container.entities.invocation.InvocationPlan.html" class="internal-link" title="orionis.container.entities.invocation.InvocationPlan">InvocationPlan</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/container/entities/invocation.py#L54">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/container/entities/invocation.py#L56">
       
       (source)
     </a>
@@ -768,7 +768,7 @@
   </div>
   <div class="docstring functionBody">
     
-    <div><p>Validate a callable and retain its parameter and coroutine metadata.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">target:</span><code><a href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Callable" class="intersphinx-link">Callable</a></code></td><td class="fieldArgDesc">Function underlying the callable.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">bound:</span><code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a>, <em>optional</em></code></td><td class="fieldArgDesc">Whether a receiver is supplied by Python's descriptor binding.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.container.entities.invocation.InvocationPlan.html" class="internal-link" title="orionis.container.entities.invocation.InvocationPlan">InvocationPlan</a></code></td><td class="fieldArgDesc">Metadata reusable across different instances of the same controller.</td></tr></table></div>
+    <div><p>Validate a callable and retain its parameter and coroutine metadata.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">target:</span><code><a href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Callable" class="intersphinx-link">collections.abc.Callable</a></code></td><td class="fieldArgDesc">Function underlying the callable.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">bound:</span><code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a>, <em>optional</em></code></td><td class="fieldArgDesc">Whether a receiver is supplied by Python's descriptor binding.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.container.entities.invocation.InvocationPlan.html" class="internal-link">orionis.container.entities.invocation.InvocationPlan</a></code></td><td class="fieldArgDesc">Metadata reusable across different instances of the same controller.</td></tr></table></div>
   </div>
 </div><div class="basefunction">
   
@@ -783,7 +783,7 @@
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">callable_plan</span><span class="function-signature">(<span class="rst-sig-param">target: <code><a href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Callable" class="intersphinx-link">Callable</a></code></span>) -&gt; <code><a href="orionis.container.entities.invocation.InvocationPlan.html" class="internal-link" title="orionis.container.entities.invocation.InvocationPlan">InvocationPlan</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/container/entities/invocation.py#L78">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/container/entities/invocation.py#L80">
       
       (source)
     </a>
@@ -795,7 +795,7 @@
   </div>
   <div class="docstring functionBody">
     
-    <div><p>Select a plan using the callable's function and receiver mode.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">target:</span><code><a href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Callable" class="intersphinx-link">Callable</a></code></td><td class="fieldArgDesc">Function or bound method invoked by the container.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.container.entities.invocation.InvocationPlan.html" class="internal-link" title="orionis.container.entities.invocation.InvocationPlan">InvocationPlan</a></code></td><td class="fieldArgDesc">Parameter plan that does not retain a bound receiver.</td></tr></table></div>
+    <div><p>Select a plan using the callable's function and receiver mode.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">target:</span><code><a href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Callable" class="intersphinx-link">collections.abc.Callable</a></code></td><td class="fieldArgDesc">Function or bound method invoked by the container.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.container.entities.invocation.InvocationPlan.html" class="internal-link">orionis.container.entities.invocation.InvocationPlan</a></code></td><td class="fieldArgDesc">Parameter plan that does not retain a bound receiver.</td></tr></table></div>
   </div>
 </div><div class="basefunction">
   
@@ -810,7 +810,7 @@
     
     <div><span class="decorator">@<a href="https://docs.python.org/3/library/functools.html#functools.lru_cache" class="intersphinx-link">lru_cache</a>(<wbr></wbr>maxsize=1024)<br /></span></div>
     <span class="py-keyword">def</span>&#160;<span class="py-defname">constructor_plan</span><span class="function-signature">(<span class="rst-sig-param">target: <code><a href="https://docs.python.org/3/builtins/functions.html#type" class="intersphinx-link">type</a></code>, </span><span class="rst-sig-param">constructor: <code><a href="https://docs.python.org/3/builtins/functions.html#object" class="intersphinx-link">object</a></code></span>) -&gt; <code><a href="orionis.container.entities.invocation.InvocationPlan.html" class="internal-link" title="orionis.container.entities.invocation.InvocationPlan">InvocationPlan</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/container/entities/invocation.py#L96">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/container/entities/invocation.py#L98">
       
       (source)
     </a>
@@ -822,7 +822,7 @@
   </div>
   <div class="docstring functionBody">
     
-    <div><p>Validate a concrete class and prepare its constructor metadata.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">target:</span><code><a href="https://docs.python.org/3/builtins/functions.html#type" class="intersphinx-link">type</a></code></td><td class="fieldArgDesc">Concrete class instantiated by the container.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">constructor:</span><code><a href="https://docs.python.org/3/builtins/functions.html#object" class="intersphinx-link">object</a></code></td><td class="fieldArgDesc">Current <tt class="rst-docutils rst-literal">__init__</tt> descriptor, included in the cache identity.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.container.entities.invocation.InvocationPlan.html" class="internal-link" title="orionis.container.entities.invocation.InvocationPlan">InvocationPlan</a></code></td><td class="fieldArgDesc">Shared constructor parameters with resolvable class-local types restored.</td></tr></table></div>
+    <div><p>Validate a concrete class and prepare its constructor metadata.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">target:</span><code><a href="https://docs.python.org/3/builtins/functions.html#type" class="intersphinx-link">type</a></code></td><td class="fieldArgDesc">Concrete class instantiated by the container.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">constructor:</span><code><a href="https://docs.python.org/3/builtins/functions.html#object" class="intersphinx-link">object</a></code></td><td class="fieldArgDesc">Current <tt class="rst-docutils rst-literal">__init__</tt> descriptor, included in the cache identity.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.container.entities.invocation.InvocationPlan.html" class="internal-link">orionis.container.entities.invocation.InvocationPlan</a></code></td><td class="fieldArgDesc">Shared constructor parameters with resolvable class-local types restored.</td></tr></table></div>
   </div>
 </div><div class="basefunction">
   
@@ -837,7 +837,7 @@
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">warm_controller_plan</span><span class="function-signature">(<span class="rst-sig-param">target: <code><a href="https://docs.python.org/3/builtins/functions.html#type" class="intersphinx-link">type</a></code>, </span><span class="rst-sig-param">method_name: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></span>):</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/container/entities/invocation.py#L177">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/container/entities/invocation.py#L179">
       
       (source)
     </a>
@@ -870,7 +870,7 @@ Plans remain subject to the bounded LRU capacity.</p>
   <div class="orionis-footer-inner">
     <div class="orionis-footer-copy">
       <p>API documentation for <a href="https://orionis-framework.com/" class="projecthome">Orionis</a>.</p>
-      <p class="orionis-footer-meta">Generated with <a href="https://github.com/twisted/pydoctor/">Pydoctor</a> 25.10.1.<span class="orionis-footer-build"> Built 2026-11-03 09:36:58.</span></p>
+      <p class="orionis-footer-meta">Generated with <a href="https://github.com/twisted/pydoctor/">Pydoctor</a> 25.10.1.<span class="orionis-footer-build"> Built 2026-11-03 13:00:15.</span></p>
     </div>
     <nav class="orionis-footer-links" aria-label="Additional resources">
       <a href="https://docs.orionis-framework.com">Read the guide <span aria-hidden="true">↗</span></a>

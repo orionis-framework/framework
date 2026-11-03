@@ -1552,6 +1552,16 @@
         
 
         
+            <div class="itemName"><code><a href="orionis.http.routes.route_resolver.html#DepthTable" class="internal-link" title="orionis.http.routes.route_resolver.DepthTable"><wbr></wbr>Depth<wbr></wbr>Table</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
             <div class="itemName"><code><a href="orionis.http.routes.route_resolver.html#Extractor" class="internal-link" title="orionis.http.routes.route_resolver.Extractor"><wbr></wbr>Extractor</a></code>
             </div>
         
@@ -1648,7 +1658,7 @@
                     
                 </input>
 
-                <label class="lbl-toggle notExpandable" for="">
+                <label class="lbl-toggle" for="expandableItemId11072">
                     
                     
                 </label>
@@ -1671,8 +1681,31 @@
         
          
 
+        <div class="childrenKindTitle">Variables</div>
+        <ul>
+    
+    <li class="">
         
-         
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.http.routes.types.html#MiddlewareInput" class="internal-link" title="orionis.http.routes.types.MiddlewareInput"><wbr></wbr>Middleware<wbr></wbr>Input</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.http.routes.types.html#RouteAction" class="internal-link" title="orionis.http.routes.types.RouteAction"><wbr></wbr>Route<wbr></wbr>Action</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
 
         
          
@@ -1756,15 +1789,18 @@
         </div>
 
         <div class="extrasDocstring">
-          <a href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/http/routes/functions.py" class="sourceLink">(source)</a>
+          <a href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/http/routes/functions.py" class="sourceLink">(source)</a>
         </div>
 
         <div class="moduleDocstring">
-          <div><p class="undocumented">Undocumented</p></div>
+          <div><p>Provide http routes operations.</p>
+<p>Includes <tt class="rst-docutils rst-literal">normalize_path</tt>, <tt class="rst-docutils rst-literal">normalize_request_path</tt>, <tt class="rst-docutils rst-literal">strip_regex_anchors</tt>,
+<tt class="rst-docutils rst-literal">flatten_middleware</tt>.</p>
+</div>
         </div>
 
         <div id="split-tables">
-          <table class="children sortable" id="id1138">
+          <table class="children sortable" id="id1139">
   
   
   <tr class="function">
@@ -1806,12 +1842,12 @@
     
     <td>Constant</td>
     <td><code><a href="#_ACTION_LIST_LENGTH" class="internal-link" title="orionis.http.routes.functions._ACTION_LIST_LENGTH">_ACTION<wbr></wbr>_LIST<wbr></wbr>_LENGTH</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
+    <td>Expected number of elements in a [Controller, method_name] action list.</td>
   </tr><tr class="constant">
     
     <td>Constant</td>
     <td><code><a href="#_MULTI_SLASH_RE" class="internal-link" title="orionis.http.routes.functions._MULTI_SLASH_RE">_MULTI<wbr></wbr>_SLASH<wbr></wbr>_RE</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
+    <td>Matches one or more consecutive forward slashes anywhere in a path.</td>
   </tr>
 </table>
           
@@ -1833,7 +1869,7 @@
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">_middleware_key</span><span class="function-signature long-signature">(<span class="rst-sig-param">middleware: <code><a href="https://docs.python.org/3/builtins/functions.html#type" class="intersphinx-link">type</a>[<wbr></wbr>BaseMiddleware | WebSocketMiddleware]</code></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" class="intersphinx-link">tuple</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>]</code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/http/routes/functions.py#L147">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/http/routes/functions.py#L155">
       
       (source)
     </a>
@@ -1845,7 +1881,7 @@
   </div>
   <div class="docstring functionBody">
     
-    <div><p>Return a stable ordering key for middleware supplied in sets.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">middleware:</span><code><a href="https://docs.python.org/3/builtins/functions.html#type" class="intersphinx-link">type</a>[BaseMiddleware | WebSocketMiddleware]</code></td><td class="fieldArgDesc">Middleware class to order consistently when using unordered containers.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" class="intersphinx-link">tuple</a>[<a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>]</code></td><td class="fieldArgDesc">The module name and qualified class name used as the sort key.</td></tr></table></div>
+    <div><p>Return a stable ordering key for middleware supplied in sets.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">middleware:</span><code><a href="https://docs.python.org/3/builtins/functions.html#type" class="intersphinx-link">type</a>[orionis.http.BaseMiddleware | orionis.http.WebSocketMiddleware]</code></td><td class="fieldArgDesc">Middleware class to order consistently when using unordered containers.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" class="intersphinx-link">tuple</a>[<a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>]</code></td><td class="fieldArgDesc">The module name and qualified class name used as the sort key.</td></tr></table></div>
   </div>
 </div><div class="basefunction">
   
@@ -1859,8 +1895,8 @@
   <div class="functionHeader">
     
     
-    <span class="py-keyword">def</span>&#160;<span class="py-defname">flatten_middleware</span><span class="function-signature long-signature">(<span class="rst-sig-param">*middleware: <code>MiddlewareInput</code></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/stdtypes.html#list" class="intersphinx-link">list</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/functions.html#type" class="intersphinx-link">type</a>[<wbr></wbr>BaseMiddleware | WebSocketMiddleware]]</code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/http/routes/functions.py#L92">
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">flatten_middleware</span><span class="function-signature long-signature">(<span class="rst-sig-param">*middleware: <code><a href="orionis.http.routes.types.html#MiddlewareInput" class="internal-link" title="orionis.http.routes.types.MiddlewareInput">MiddlewareInput</a></code></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/stdtypes.html#list" class="intersphinx-link">list</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/functions.html#type" class="intersphinx-link">type</a>[<wbr></wbr>BaseMiddleware | WebSocketMiddleware]]</code>:</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/http/routes/functions.py#L100">
       
       (source)
     </a>
@@ -1881,7 +1917,7 @@ flatten_middleware(A, B)
 flatten_middleware([A, B])
 flatten_middleware((A,), B)
 </pre>
-<table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">*middleware:</span><code>type | list | tuple | set | frozenset</code></td><td class="fieldArgDesc">Middleware classes or containers of middleware classes.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/stdtypes.html#list" class="intersphinx-link">list</a>[<a href="https://docs.python.org/3/builtins/functions.html#type" class="intersphinx-link">type</a>[BaseMiddleware | WebSocketMiddleware]]</code></td><td class="fieldArgDesc">Flat list of validated middleware classes, in the order
+<table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">*middleware:</span><code>type | list | tuple | set | frozenset</code></td><td class="fieldArgDesc">Middleware classes or containers of middleware classes.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/stdtypes.html#list" class="intersphinx-link">list</a>[<a href="https://docs.python.org/3/builtins/functions.html#type" class="intersphinx-link">type</a>[orionis.http.BaseMiddleware | orionis.http.WebSocketMiddleware]]</code></td><td class="fieldArgDesc">Flat list of validated middleware classes, in the order
 they were provided.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/exceptions.html#TypeError" class="intersphinx-link">TypeError</a></code></td><td>If an entry is neither HTTP nor WebSocket middleware.</td></tr></table></div>
   </div>
 </div><div class="basefunction">
@@ -1897,7 +1933,7 @@ they were provided.</td></tr></table><table class="fieldTable"><tr class="fieldS
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">is_valid_handler</span><span class="function-signature">(<span class="rst-sig-param">action: <code><a href="https://docs.python.org/3/builtins/functions.html#object" class="intersphinx-link">object</a></code></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/http/routes/functions.py#L165">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/http/routes/functions.py#L173">
       
       (source)
     </a>
@@ -1934,7 +1970,7 @@ TypeError or ValueError for an unsupported or malformed action.</td></tr></table
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">normalize_path</span><span class="function-signature">(<span class="rst-sig-param">path: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/http/routes/functions.py#L20">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/http/routes/functions.py#L28">
       
       (source)
     </a>
@@ -1969,7 +2005,7 @@ TypeError or ValueError for an unsupported or malformed action.</td></tr></table
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">normalize_request_path</span><span class="function-signature">(<span class="rst-sig-param">path: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/http/routes/functions.py#L49">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/http/routes/functions.py#L57">
       
       (source)
     </a>
@@ -1997,7 +2033,7 @@ on non-root paths.</td></tr></table></div>
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">parse_action</span><span class="function-signature">(<span class="rst-sig-param">action: <code><a href="https://docs.python.org/3/builtins/functions.html#object" class="intersphinx-link">object</a></code></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" class="intersphinx-link">tuple</a>[<wbr></wbr><a href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Callable" class="intersphinx-link">Callable</a>, <wbr></wbr><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a>] | <a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" class="intersphinx-link">tuple</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/functions.html#type" class="intersphinx-link">type</a>, <wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>]</code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/http/routes/functions.py#L194">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/http/routes/functions.py#L202">
       
       (source)
     </a>
@@ -2020,7 +2056,7 @@ lambdas. Callable instances, bound methods and builtins are unsupported.</li>
 </ol>
 <table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">action:</span><code><a href="https://docs.python.org/3/builtins/functions.html#object" class="intersphinx-link">object</a></code></td><td class="fieldArgDesc">Candidate action to validate against the three forms described above.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" class="intersphinx-link">tuple</a>[<wbr></wbr><a href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Callable" class="intersphinx-link">Callable</a>, <wbr></wbr><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a>] | <a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" class="intersphinx-link">tuple</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/functions.html#type" class="intersphinx-link">type</a>, <wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>]</code></td><td class="fieldArgDesc"><ul class="rst-simple">
 <li><code><a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" class="intersphinx-link">tuple</a></code>[<code><a href="https://docs.python.org/3/builtins/functions.html#type" class="intersphinx-link">type</a></code>, <code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code>] - When <em>action</em> is an invokable controller class.</li>
-<li><code><a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" class="intersphinx-link">tuple</a></code>[<code><a href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Callable" class="intersphinx-link">Callable</a></code>, <code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code>] - When <em>action</em> is a standalone callable.</li>
+<li><code><a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" class="intersphinx-link">tuple</a></code>[<code><a href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Callable" class="intersphinx-link">collections.abc.Callable</a></code>, <code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code>] - When <em>action</em> is a standalone callable.</li>
 <li><code><a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" class="intersphinx-link">tuple</a></code>[<code><a href="https://docs.python.org/3/builtins/functions.html#type" class="intersphinx-link">type</a></code>, <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code>] - When <em>action</em> is a <tt class="rst-docutils rst-literal">[ControllerClass, 'method_name']</tt> list.</li>
 </ul>
 </td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/exceptions.html#TypeError" class="intersphinx-link">TypeError</a></code></td><td>If a bare class does not define <tt class="rst-docutils rst-literal">__call__</tt>, if list elements
@@ -2041,7 +2077,7 @@ controller class does not expose the requested method.</td></tr></table></div>
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">strip_regex_anchors</span><span class="function-signature">(<span class="rst-sig-param">pattern: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/http/routes/functions.py#L72">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/http/routes/functions.py#L80">
       
       (source)
     </a>
@@ -2067,7 +2103,7 @@ controller class does not expose the requested method.</td></tr></table></div>
   <div class="functionHeader">
     
     <span class="py-defname">_ACTION_LIST_LENGTH</span>: <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/http/routes/functions.py#L15">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/http/routes/functions.py#L21">
       
       (source)
     </a>
@@ -2079,7 +2115,7 @@ controller class does not expose the requested method.</td></tr></table></div>
   </div>
   <div class="functionBody">
     
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p>Expected number of elements in a [Controller, method_name] action list.</p></div>
     <table class="valueTable"><tr class="fieldStart"><td class="fieldName">Value</td></tr><tr><td><pre class="constant-value"><code>2</code></pre></td></tr></table>
   </div>
 </div><div class="baseconstant">
@@ -2094,7 +2130,7 @@ controller class does not expose the requested method.</td></tr></table></div>
   <div class="functionHeader">
     
     <span class="py-defname">_MULTI_SLASH_RE</span>: <code><a href="https://docs.python.org/3/library/re.html#re.Pattern" class="intersphinx-link">re.Pattern</a></code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/http/routes/functions.py#L18">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/http/routes/functions.py#L25">
       
       (source)
     </a>
@@ -2106,7 +2142,7 @@ controller class does not expose the requested method.</td></tr></table></div>
   </div>
   <div class="functionBody">
     
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p>Matches one or more consecutive forward slashes anywhere in a path.</p></div>
     <table class="valueTable"><tr class="fieldStart"><td class="fieldName">Value</td></tr><tr><td><pre class="constant-value"><code><a href="https://docs.python.org/3/library/re.html#re.compile" class="intersphinx-link">re.compile</a>(r<span class="rst-variable-quote">'</span>/<span class="rst-re-op">{2,}</span><span class="rst-variable-quote">'</span>)</code></pre></td></tr></table>
   </div>
 </div>
@@ -2120,7 +2156,7 @@ controller class does not expose the requested method.</td></tr></table></div>
   <div class="orionis-footer-inner">
     <div class="orionis-footer-copy">
       <p>API documentation for <a href="https://orionis-framework.com/" class="projecthome">Orionis</a>.</p>
-      <p class="orionis-footer-meta">Generated with <a href="https://github.com/twisted/pydoctor/">Pydoctor</a> 25.10.1.<span class="orionis-footer-build"> Built 2026-11-03 09:36:58.</span></p>
+      <p class="orionis-footer-meta">Generated with <a href="https://github.com/twisted/pydoctor/">Pydoctor</a> 25.10.1.<span class="orionis-footer-build"> Built 2026-11-03 13:00:15.</span></p>
     </div>
     <nav class="orionis-footer-links" aria-label="Additional resources">
       <a href="https://docs.orionis-framework.com">Read the guide <span aria-hidden="true">↗</span></a>

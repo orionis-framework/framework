@@ -365,7 +365,7 @@
                     
                 </input>
 
-                <label class="lbl-toggle notExpandable" for="">
+                <label class="lbl-toggle" for="expandableItemId25043">
                     
                     
                 </label>
@@ -388,8 +388,21 @@
         
          
 
+        <div class="childrenKindTitle">Variables</div>
+        <ul>
+    
+    <li class="">
         
-         
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.queues.context.html#FailureCallback" class="internal-link" title="orionis.queues.context.FailureCallback"><wbr></wbr>Failure<wbr></wbr>Callback</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
 
         
          
@@ -1458,7 +1471,7 @@
                     
                 </input>
 
-                <label class="lbl-toggle notExpandable" for="">
+                <label class="lbl-toggle" for="expandableItemId25056">
                     
                     
                 </label>
@@ -1481,8 +1494,21 @@
         
          
 
+        <div class="childrenKindTitle">Variables</div>
+        <ul>
+    
+    <li class="">
         
-         
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.queues.types.html#DispatchCallback" class="internal-link" title="orionis.queues.types.DispatchCallback"><wbr></wbr>Dispatch<wbr></wbr>Callback</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
 
         
          
@@ -1560,6 +1586,16 @@
 
         
             <div class="itemName"><code><a href="orionis.queues.worker.html#_LOGGER" class="internal-link" title="orionis.queues.worker._LOGGER">_LOGGER</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.queues.worker.html#FailedResolver" class="internal-link" title="orionis.queues.worker.FailedResolver"><wbr></wbr>Failed<wbr></wbr>Resolver</a></code>
             </div>
         
 
@@ -2388,7 +2424,7 @@
         </div>
 
         <div class="extrasDocstring">
-          <p class="class-signature"><code><span class="py-keyword">class</span> <span class="py-defname">JobEnvelope</span>(msgspec.Struct): <a href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/queues/entities/envelope.py#L7" class="sourceLink">(source)</a></code></p><p><a href="classIndex.html#orionis.queues.JobEnvelope">View In Hierarchy</a></p>
+          <p class="class-signature"><code><span class="py-keyword">class</span> <span class="py-defname">JobEnvelope</span>(msgspec.Struct): <a href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/queues/entities/envelope.py#L9" class="sourceLink">(source)</a></code></p><p><a href="classIndex.html#orionis.queues.JobEnvelope">View In Hierarchy</a></p>
         </div>
 
         <div class="moduleDocstring">
@@ -2396,7 +2432,7 @@
         </div>
 
         <div id="split-tables">
-          <table class="children sortable" id="id1768">
+          <table class="children sortable" id="id1776">
   
   
   <tr class="method">
@@ -2408,52 +2444,52 @@
     
     <td>Class Variable</td>
     <td><code><a href="#backoff" class="internal-link" title="orionis.queues.JobEnvelope.backoff">backoff</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
+    <td>Delay policy applied before retrying a failed attempt.</td>
   </tr><tr class="classvariable">
     
     <td>Class Variable</td>
     <td><code><a href="#connection" class="internal-link" title="orionis.queues.JobEnvelope.connection">connection</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
+    <td>Configured connection used to store or dispatch the operation.</td>
   </tr><tr class="classvariable">
     
     <td>Class Variable</td>
     <td><code><a href="#id" class="internal-link" title="orionis.queues.JobEnvelope.id">id</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
+    <td>Identifier used to correlate or locate this protocol or storage record.</td>
   </tr><tr class="classvariable">
     
     <td>Class Variable</td>
     <td><code><a href="#job" class="internal-link" title="orionis.queues.JobEnvelope.job">job</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
+    <td>Registered job class or type identifier.</td>
   </tr><tr class="classvariable">
     
     <td>Class Variable</td>
     <td><code><a href="#max_tries" class="internal-link" title="orionis.queues.JobEnvelope.max_tries">max<wbr></wbr>_tries</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
+    <td>Maximum number of execution attempts allowed for the job.</td>
   </tr><tr class="classvariable">
     
     <td>Class Variable</td>
     <td><code><a href="#payload" class="internal-link" title="orionis.queues.JobEnvelope.payload">payload</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
+    <td>Serialized data required to execute or restore the job.</td>
   </tr><tr class="classvariable">
     
     <td>Class Variable</td>
     <td><code><a href="#queue" class="internal-link" title="orionis.queues.JobEnvelope.queue">queue</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
+    <td>Name of the queue receiving or storing the job.</td>
   </tr><tr class="classvariable">
     
     <td>Class Variable</td>
     <td><code><a href="#retry_until" class="internal-link" title="orionis.queues.JobEnvelope.retry_until">retry<wbr></wbr>_until</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
+    <td>Deadline after which the job must no longer be retried.</td>
   </tr><tr class="classvariable">
     
     <td>Class Variable</td>
     <td><code><a href="#timeout" class="internal-link" title="orionis.queues.JobEnvelope.timeout">timeout</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
+    <td>Maximum duration allowed for an execution attempt.</td>
   </tr><tr class="classvariable">
     
     <td>Class Variable</td>
     <td><code><a href="#version" class="internal-link" title="orionis.queues.JobEnvelope.version">version</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
+    <td>Version value used by <tt class="rst-docutils rst-literal">JobEnvelope</tt>.</td>
   </tr>
 </table>
           
@@ -2475,7 +2511,7 @@
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">__post_init__</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>):</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/queues/entities/envelope.py#L23">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/queues/entities/envelope.py#L35">
       
       (source)
     </a>
@@ -2501,7 +2537,7 @@
   <div class="functionHeader">
     
     <span class="py-defname">backoff</span>: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" class="intersphinx-link">tuple</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/functions.html#float" class="intersphinx-link">float</a>, <wbr></wbr><span class="rst-variable-ellipsis">...</span>]</code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/queues/entities/envelope.py#L19">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/queues/entities/envelope.py#L28">
       
       (source)
     </a>
@@ -2513,7 +2549,7 @@
   </div>
   <div class="functionBody">
     
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p>Delay policy applied before retrying a failed attempt.</p></div>
     
   </div>
 </div><div class="baseclassvariable">
@@ -2528,7 +2564,7 @@
   <div class="functionHeader">
     
     <span class="py-defname">connection</span>: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/queues/entities/envelope.py#L15">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/queues/entities/envelope.py#L20">
       
       (source)
     </a>
@@ -2540,7 +2576,7 @@
   </div>
   <div class="functionBody">
     
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p>Configured connection used to store or dispatch the operation.</p></div>
     
   </div>
 </div><div class="baseclassvariable">
@@ -2555,7 +2591,7 @@
   <div class="functionHeader">
     
     <span class="py-defname">id</span>: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/queues/entities/envelope.py#L12">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/queues/entities/envelope.py#L14">
       
       (source)
     </a>
@@ -2567,7 +2603,7 @@
   </div>
   <div class="functionBody">
     
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p>Identifier used to correlate or locate this protocol or storage record.</p></div>
     
   </div>
 </div><div class="baseclassvariable">
@@ -2582,7 +2618,7 @@
   <div class="functionHeader">
     
     <span class="py-defname">job</span>: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/queues/entities/envelope.py#L13">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/queues/entities/envelope.py#L16">
       
       (source)
     </a>
@@ -2594,7 +2630,7 @@
   </div>
   <div class="functionBody">
     
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p>Registered job class or type identifier.</p></div>
     
   </div>
 </div><div class="baseclassvariable">
@@ -2609,7 +2645,7 @@
   <div class="functionHeader">
     
     <span class="py-defname">max_tries</span>: <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/queues/entities/envelope.py#L17">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/queues/entities/envelope.py#L24">
       
       (source)
     </a>
@@ -2621,7 +2657,7 @@
   </div>
   <div class="functionBody">
     
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p>Maximum number of execution attempts allowed for the job.</p></div>
     
   </div>
 </div><div class="baseclassvariable">
@@ -2636,7 +2672,7 @@
   <div class="functionHeader">
     
     <span class="py-defname">payload</span>: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#bytes" class="intersphinx-link">bytes</a></code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/queues/entities/envelope.py#L14">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/queues/entities/envelope.py#L18">
       
       (source)
     </a>
@@ -2648,7 +2684,7 @@
   </div>
   <div class="functionBody">
     
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p>Serialized data required to execute or restore the job.</p></div>
     
   </div>
 </div><div class="baseclassvariable">
@@ -2663,7 +2699,7 @@
   <div class="functionHeader">
     
     <span class="py-defname">queue</span>: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/queues/entities/envelope.py#L16">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/queues/entities/envelope.py#L22">
       
       (source)
     </a>
@@ -2675,7 +2711,7 @@
   </div>
   <div class="functionBody">
     
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p>Name of the queue receiving or storing the job.</p></div>
     
   </div>
 </div><div class="baseclassvariable">
@@ -2690,7 +2726,7 @@
   <div class="functionHeader">
     
     <span class="py-defname">retry_until</span>: <code><a href="https://docs.python.org/3/builtins/functions.html#float" class="intersphinx-link">float</a> | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/queues/entities/envelope.py#L20">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/queues/entities/envelope.py#L30">
       
       (source)
     </a>
@@ -2702,7 +2738,7 @@
   </div>
   <div class="functionBody">
     
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p>Deadline after which the job must no longer be retried.</p></div>
     
   </div>
 </div><div class="baseclassvariable">
@@ -2717,7 +2753,7 @@
   <div class="functionHeader">
     
     <span class="py-defname">timeout</span>: <code><a href="https://docs.python.org/3/builtins/functions.html#float" class="intersphinx-link">float</a> | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/queues/entities/envelope.py#L18">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/queues/entities/envelope.py#L26">
       
       (source)
     </a>
@@ -2729,7 +2765,7 @@
   </div>
   <div class="functionBody">
     
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p>Maximum duration allowed for an execution attempt.</p></div>
     
   </div>
 </div><div class="baseclassvariable">
@@ -2744,7 +2780,7 @@
   <div class="functionHeader">
     
     <span class="py-defname">version</span>: <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/queues/entities/envelope.py#L21">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/queues/entities/envelope.py#L32">
       
       (source)
     </a>
@@ -2756,7 +2792,7 @@
   </div>
   <div class="functionBody">
     
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p>Version value used by <tt class="rst-docutils rst-literal">JobEnvelope</tt>.</p></div>
     
   </div>
 </div>
@@ -2770,7 +2806,7 @@
   <div class="orionis-footer-inner">
     <div class="orionis-footer-copy">
       <p>API documentation for <a href="https://orionis-framework.com/" class="projecthome">Orionis</a>.</p>
-      <p class="orionis-footer-meta">Generated with <a href="https://github.com/twisted/pydoctor/">Pydoctor</a> 25.10.1.<span class="orionis-footer-build"> Built 2026-11-03 09:36:58.</span></p>
+      <p class="orionis-footer-meta">Generated with <a href="https://github.com/twisted/pydoctor/">Pydoctor</a> 25.10.1.<span class="orionis-footer-build"> Built 2026-11-03 13:00:15.</span></p>
     </div>
     <nav class="orionis-footer-links" aria-label="Additional resources">
       <a href="https://docs.orionis-framework.com">Read the guide <span aria-hidden="true">↗</span></a>

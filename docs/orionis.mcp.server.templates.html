@@ -453,7 +453,7 @@
 
       <div class="thingTitle">
         <span>Package</span>
-        <code><a href="orionis.mcp.server.html" class="internal-link" title="The parent of this module">server</a></code> 
+        <code><a href="orionis.mcp.server.package.html" class="internal-link" title="The parent of this module">server</a></code> 
       </div>
       
       <div>
@@ -816,6 +816,16 @@
 
         
             <div class="itemName"><code><a href="orionis.mcp.server.compiler.html#_NAME" class="internal-link" title="orionis.mcp.server.compiler._NAME">_NAME</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.mcp.server.compiler.html#_JsonObject" class="internal-link" title="orionis.mcp.server.compiler._JsonObject">_<wbr></wbr>Json<wbr></wbr>Object</a></code>
             </div>
         
 
@@ -1365,7 +1375,7 @@
 </div>
 
         <div class="page-header">
-          <h1 class="module"><code><code><a href="index.html" class="internal-link">orionis</a></code><wbr></wbr>.<code><a href="orionis.mcp.html" class="internal-link" title="orionis.mcp">mcp</a></code><wbr></wbr>.<code><a href="orionis.mcp.server.html" class="internal-link" title="orionis.mcp.server">server</a></code><wbr></wbr>.<code><a href="orionis.mcp.server.templates.html" class="internal-link" title="orionis.mcp.server.templates">templates</a></code></code></h1>
+          <h1 class="module"><code><code><a href="index.html" class="internal-link">orionis</a></code><wbr></wbr>.<code><a href="orionis.mcp.html" class="internal-link" title="orionis.mcp">mcp</a></code><wbr></wbr>.<code><a href="orionis.mcp.server.package.html" class="internal-link" title="orionis.mcp.server">server</a></code><wbr></wbr>.<code><a href="orionis.mcp.server.templates.html" class="internal-link" title="orionis.mcp.server.templates">templates</a></code></code></h1>
           <div id="show-private">
             <button class="btn btn-link" onclick="togglePrivate()">Toggle Private API</button>
           </div>
@@ -1376,15 +1386,15 @@
         </div>
 
         <div class="extrasDocstring">
-          <a href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/mcp/server/templates.py" class="sourceLink">(source)</a>
+          <a href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/mcp/server/templates.py" class="sourceLink">(source)</a>
         </div>
 
         <div class="moduleDocstring">
-          <div><p class="undocumented">Undocumented</p></div>
+          <div><p>Compile expansion once and verify every inverse result by expansion.</p></div>
         </div>
 
         <div id="split-tables">
-          <table class="children sortable" id="id1482">
+          <table class="children sortable" id="id1486">
   
   
   <tr class="class">
@@ -1426,42 +1436,42 @@
     
     <td>Constant</td>
     <td><code><a href="#_ESCAPE" class="internal-link" title="orionis.mcp.server.templates._ESCAPE">_ESCAPE</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
+    <td>Compiled pattern used to recognize escape.</td>
   </tr><tr class="constant">
     
     <td>Constant</td>
     <td><code><a href="#_EXPRESSION" class="internal-link" title="orionis.mcp.server.templates._EXPRESSION">_EXPRESSION</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
+    <td>Compiled pattern used to recognize expression.</td>
   </tr><tr class="constant">
     
     <td>Constant</td>
     <td><code><a href="#_INVALID_LITERAL" class="internal-link" title="orionis.mcp.server.templates._INVALID_LITERAL">_INVALID<wbr></wbr>_LITERAL</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
+    <td>Compiled pattern used to recognize invalid literal.</td>
   </tr><tr class="constant">
     
     <td>Constant</td>
     <td><code><a href="#_MODIFIER" class="internal-link" title="orionis.mcp.server.templates._MODIFIER">_MODIFIER</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
+    <td><tt class="rst-docutils rst-literal"><span class="pre">(?::[1-9]\d{0,3}|\*)?</span></tt>.</td>
   </tr><tr class="constant">
     
     <td>Constant</td>
     <td><code><a href="#_PART" class="internal-link" title="orionis.mcp.server.templates._PART">_PART</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
+    <td>Compiled pattern used to recognize part.</td>
   </tr><tr class="constant">
     
     <td>Constant</td>
     <td><code><a href="#_SCHEME" class="internal-link" title="orionis.mcp.server.templates._SCHEME">_SCHEME</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
+    <td>Compiled pattern used to recognize scheme.</td>
   </tr><tr class="constant">
     
     <td>Constant</td>
     <td><code><a href="#_SIMPLE" class="internal-link" title="orionis.mcp.server.templates._SIMPLE">_SIMPLE</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
+    <td>Compiled pattern used to recognize simple.</td>
   </tr><tr class="constant">
     
     <td>Constant</td>
     <td><code><a href="#_VARNAME" class="internal-link" title="orionis.mcp.server.templates._VARNAME">_VARNAME</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
+    <td><tt class="rst-docutils rst-literal"><span class="pre">(?:\w|%[0-9A-Fa-f]{2})++(?:\.(?:\w|%[0-9A-Fa-f]{2})++)*+</span></tt>.</td>
   </tr>
 </table>
           
@@ -1483,7 +1493,7 @@
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">_decode_captures</span><span class="function-signature long-signature">(<span class="rst-sig-param">captures: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" class="intersphinx-link">tuple</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <wbr></wbr><span class="rst-variable-ellipsis">...</span>]</code>, </span><span class="rst-sig-param">groups: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" class="intersphinx-link">tuple</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <wbr></wbr><span class="rst-variable-ellipsis">...</span>]</code></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/stdtypes.html#dict" class="intersphinx-link">dict</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <wbr></wbr><a href="https://docs.python.org/3/builtins/functions.html#object" class="intersphinx-link">object</a>] | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/mcp/server/templates.py#L42">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/mcp/server/templates.py#L54">
       
       (source)
     </a>
@@ -1495,7 +1505,7 @@
   </div>
   <div class="docstring functionBody">
     
-    <div><p>Decode URI variables while checking repeated variable consistency.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">captures:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" class="intersphinx-link">tuple</a>[<a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, ...]</code></td><td class="fieldArgDesc">Variable names in capture order.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">groups:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" class="intersphinx-link">tuple</a>[<a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, ...]</code></td><td class="fieldArgDesc">Values captured by the compiled inverse pattern.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/stdtypes.html#dict" class="intersphinx-link">dict</a>[<a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <a href="https://docs.python.org/3/builtins/functions.html#object" class="intersphinx-link">object</a>] | None</code></td><td class="fieldArgDesc">Decoded variables, or None when repeated variables disagree.</td></tr></table></div>
+    <div><p>Decode URI variables while checking repeated variable consistency.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">captures:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" class="intersphinx-link">tuple</a>[<a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <tt class="rst-docutils rst-literal">...</tt>]</code></td><td class="fieldArgDesc">Variable names in capture order.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">groups:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" class="intersphinx-link">tuple</a>[<a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <tt class="rst-docutils rst-literal">...</tt>]</code></td><td class="fieldArgDesc">Values captured by the compiled inverse pattern.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/stdtypes.html#dict" class="intersphinx-link">dict</a>[<a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <a href="https://docs.python.org/3/builtins/functions.html#object" class="intersphinx-link">object</a>] | None</code></td><td class="fieldArgDesc">Decoded variables, or None when repeated variables disagree.</td></tr></table></div>
   </div>
 </div><div class="basefunction">
   
@@ -1510,7 +1520,7 @@
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">_expansion_value</span><span class="function-signature">(<span class="rst-sig-param">value: <code><a href="https://docs.python.org/3/builtins/functions.html#object" class="intersphinx-link">object</a></code></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/functions.html#object" class="intersphinx-link">object</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/mcp/server/templates.py#L145">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/mcp/server/templates.py#L157">
       
       (source)
     </a>
@@ -1537,7 +1547,7 @@
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">_simple_pattern</span><span class="function-signature">(<span class="rst-sig-param">template: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" class="intersphinx-link">tuple</a>[<wbr></wbr><a href="https://docs.python.org/3/library/re.html#re.Pattern" class="intersphinx-link">re.Pattern</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>], <wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" class="intersphinx-link">tuple</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <wbr></wbr><span class="rst-variable-ellipsis">...</span>]] | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/mcp/server/templates.py#L116">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/mcp/server/templates.py#L128">
       
       (source)
     </a>
@@ -1549,7 +1559,7 @@
   </div>
   <div class="docstring functionBody">
     
-    <div><p>Compile safe simple-string inverses; other expressions need a match hook.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">template:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Value supplied for <tt class="rst-docutils rst-literal">template</tt>.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" class="intersphinx-link">tuple</a>[<a href="https://docs.python.org/3/library/re.html#re.Pattern" class="intersphinx-link">re.Pattern</a>[<a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>], <a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" class="intersphinx-link">tuple</a>[<a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, ...]] | None</code></td><td class="fieldArgDesc">Result of the operation described above.</td></tr></table></div>
+    <div><p>Compile safe simple-string inverses; other expressions need a match hook.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">template:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Value supplied for <tt class="rst-docutils rst-literal">template</tt>.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><tt class="rst-docutils rst-literal">tuple[re.Pattern[str], tuple[str, <span class="pre">...]]</span> | None</tt></code></td><td class="fieldArgDesc">Result of the operation described above.</td></tr></table></div>
   </div>
 </div><div class="basefunction">
   
@@ -1564,7 +1574,7 @@
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">_uppercase_escape</span><span class="function-signature">(<span class="rst-sig-param">match: <code><a href="https://docs.python.org/3/library/re.html#re.Match" class="intersphinx-link">re.Match</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>]</code></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/mcp/server/templates.py#L26">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/mcp/server/templates.py#L38">
       
       (source)
     </a>
@@ -1576,7 +1586,7 @@
   </div>
   <div class="docstring functionBody">
     
-    <div><p>Normalize the hexadecimal digits of one percent escape.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">match:</span><code><a href="https://docs.python.org/3/library/re.html#re.Match" class="intersphinx-link">re.Match</a>[<a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>]</code></td><td class="fieldArgDesc">Matched percent escape.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Escape with uppercase hexadecimal digits.</td></tr></table></div>
+    <div><p>Normalize the hexadecimal digits of one percent escape.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">match:</span><code><tt class="rst-docutils rst-literal">re.Match[str]</tt></code></td><td class="fieldArgDesc">Matched percent escape.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Escape with uppercase hexadecimal digits.</td></tr></table></div>
   </div>
 </div><div class="basefunction">
   
@@ -1591,7 +1601,7 @@
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">_validate_template</span><span class="function-signature">(<span class="rst-sig-param">template: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></span>):</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/mcp/server/templates.py#L90">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/mcp/server/templates.py#L102">
       
       (source)
     </a>
@@ -1618,7 +1628,7 @@
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">validate_uri</span><span class="function-signature">(<span class="rst-sig-param">uri: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></span>):</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/mcp/server/templates.py#L68">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/mcp/server/templates.py#L80">
       
       (source)
     </a>
@@ -1644,7 +1654,7 @@
   <div class="functionHeader">
     
     <span class="py-defname">_ESCAPE</span> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/mcp/server/templates.py#L24">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/mcp/server/templates.py#L35">
       
       (source)
     </a>
@@ -1656,7 +1666,7 @@
   </div>
   <div class="functionBody">
     
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p>Compiled pattern used to recognize escape.</p></div>
     <table class="valueTable"><tr class="fieldStart"><td class="fieldName">Value</td></tr><tr><td><pre class="constant-value"><code><a href="https://docs.python.org/3/library/re.html#re.compile" class="intersphinx-link">re.compile</a>(r<span class="rst-variable-quote">'</span>%<span class="rst-re-group">[</span>0<span class="rst-re-op">-</span>9a<span class="rst-re-op">-</span>fA<span class="rst-re-op">-</span>F<span class="rst-re-group">]</span><span class="rst-re-op">{2}</span><span class="rst-variable-quote">'</span>)</code></pre></td></tr></table>
   </div>
 </div><div class="baseconstant">
@@ -1671,7 +1681,7 @@
   <div class="functionHeader">
     
     <span class="py-defname">_EXPRESSION</span> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/mcp/server/templates.py#L14">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/mcp/server/templates.py#L20">
       
       (source)
     </a>
@@ -1683,7 +1693,7 @@
   </div>
   <div class="functionBody">
     
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p>Compiled pattern used to recognize expression.</p></div>
     <table class="valueTable"><tr class="fieldStart"><td class="fieldName">Value</td></tr><tr><td><pre class="constant-value"><code><a href="https://docs.python.org/3/library/re.html#re.compile" class="intersphinx-link">re.compile</a>(<wbr></wbr>f'[+#./;?&amp;]?{_VARNAME}{_MODIFIER}(?:,{_VARNAME}{_MODIFIER})*+', <wbr></wbr><a href="https://docs.python.org/3/library/re.html#re.ASCII" class="intersphinx-link">re.ASCII</a><span class="rst-variable-linewrap">↵</span>
 )</code></pre></td></tr></table>
   </div>
@@ -1699,7 +1709,7 @@
   <div class="functionHeader">
     
     <span class="py-defname">_INVALID_LITERAL</span> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/mcp/server/templates.py#L20">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/mcp/server/templates.py#L29">
       
       (source)
     </a>
@@ -1711,7 +1721,7 @@
   </div>
   <div class="functionBody">
     
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p>Compiled pattern used to recognize invalid literal.</p></div>
     <table class="valueTable"><tr class="fieldStart"><td class="fieldName">Value</td></tr><tr><td><pre class="constant-value"><code><a href="https://docs.python.org/3/library/re.html#re.compile" class="intersphinx-link">re.compile</a>(r<span class="rst-variable-quote">'</span><span class="rst-re-group">[</span>\x00<span class="rst-re-op">-</span> \x7f"&lt;&gt;\\\^`\{\}<span class="rst-re-group">]</span><span class="rst-re-op">|</span>%<span class="rst-re-group">(?!</span><span class="rst-re-group">[</span>0<span class="rst-re-op">-</span>9A<span class="rst-re-op">-</span>Fa<span class="rst-re-op">-</span>f<span class="rst-re-group">]</span><span class="rst-re-op">{2}</span><span class="rst-re-group">)</span><span class="rst-re-op">|</span><span class="rst-re-group">[</span>\ud800<span class="rst-re-op">-</span>\udfff<span class="rst-re-group">]</span><span class="rst-variable-quote">'</span>)</code></pre></td></tr></table>
   </div>
 </div><div class="baseconstant">
@@ -1726,7 +1736,7 @@
   <div class="functionHeader">
     
     <span class="py-defname">_MODIFIER</span>: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/mcp/server/templates.py#L13">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/mcp/server/templates.py#L18">
       
       (source)
     </a>
@@ -1738,7 +1748,7 @@
   </div>
   <div class="functionBody">
     
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p><tt class="rst-docutils rst-literal"><span class="pre">(?::[1-9]\d{0,3}|\*)?</span></tt>.</p></div>
     <table class="valueTable"><tr class="fieldStart"><td class="fieldName">Value</td></tr><tr><td><pre class="constant-value"><code><span class="rst-variable-quote">'</span><span class="rst-variable-string">(?::[1-9]\\d{0,3}|\\*)?</span><span class="rst-variable-quote">'</span></code></pre></td></tr></table>
   </div>
 </div><div class="baseconstant">
@@ -1753,7 +1763,7 @@
   <div class="functionHeader">
     
     <span class="py-defname">_PART</span> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/mcp/server/templates.py#L19">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/mcp/server/templates.py#L27">
       
       (source)
     </a>
@@ -1765,7 +1775,7 @@
   </div>
   <div class="functionBody">
     
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p>Compiled pattern used to recognize part.</p></div>
     <table class="valueTable"><tr class="fieldStart"><td class="fieldName">Value</td></tr><tr><td><pre class="constant-value"><code><a href="https://docs.python.org/3/library/re.html#re.compile" class="intersphinx-link">re.compile</a>(r<span class="rst-variable-quote">'</span>\{<span class="rst-re-group">(</span><span class="rst-re-group">[</span><span class="rst-re-op">^</span>\{\}<span class="rst-re-group">]</span><span class="rst-re-op">*</span><span class="rst-re-group">)</span>\}<span class="rst-variable-quote">'</span>)</code></pre></td></tr></table>
   </div>
 </div><div class="baseconstant">
@@ -1780,7 +1790,7 @@
   <div class="functionHeader">
     
     <span class="py-defname">_SCHEME</span> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/mcp/server/templates.py#L23">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/mcp/server/templates.py#L33">
       
       (source)
     </a>
@@ -1792,7 +1802,7 @@
   </div>
   <div class="functionBody">
     
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p>Compiled pattern used to recognize scheme.</p></div>
     <table class="valueTable"><tr class="fieldStart"><td class="fieldName">Value</td></tr><tr><td><pre class="constant-value"><code><a href="https://docs.python.org/3/library/re.html#re.compile" class="intersphinx-link">re.compile</a>(r<span class="rst-variable-quote">'</span><span class="rst-re-group">[</span>A<span class="rst-re-op">-</span>Za<span class="rst-re-op">-</span>z<span class="rst-re-group">]</span><span class="rst-re-group">[</span>A<span class="rst-re-op">-</span>Za<span class="rst-re-op">-</span>z0<span class="rst-re-op">-</span>9\+\.-<span class="rst-re-group">]</span><span class="rst-re-op">*</span>:<span class="rst-variable-quote">'</span>)</code></pre></td></tr></table>
   </div>
 </div><div class="baseconstant">
@@ -1807,7 +1817,7 @@
   <div class="functionHeader">
     
     <span class="py-defname">_SIMPLE</span> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/mcp/server/templates.py#L18">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/mcp/server/templates.py#L25">
       
       (source)
     </a>
@@ -1819,7 +1829,7 @@
   </div>
   <div class="functionBody">
     
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p>Compiled pattern used to recognize simple.</p></div>
     <table class="valueTable"><tr class="fieldStart"><td class="fieldName">Value</td></tr><tr><td><pre class="constant-value"><code><a href="https://docs.python.org/3/library/re.html#re.compile" class="intersphinx-link">re.compile</a>(<wbr></wbr><a href="#_VARNAME" class="internal-link" title="orionis.mcp.server.templates._VARNAME">_VARNAME</a>, <wbr></wbr><a href="https://docs.python.org/3/library/re.html#re.ASCII" class="intersphinx-link">re.ASCII</a>)</code></pre></td></tr></table>
   </div>
 </div><div class="baseconstant">
@@ -1834,7 +1844,7 @@
   <div class="functionHeader">
     
     <span class="py-defname">_VARNAME</span>: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/mcp/server/templates.py#L12">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/mcp/server/templates.py#L14">
       
       (source)
     </a>
@@ -1846,7 +1856,7 @@
   </div>
   <div class="functionBody">
     
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p><tt class="rst-docutils rst-literal"><span class="pre">(?:\w|%[0-9A-Fa-f]{2})++(?:\.(?:\w|%[0-9A-Fa-f]{2})++)*+</span></tt>.</p></div>
     <table class="valueTable"><tr class="fieldStart"><td class="fieldName">Value</td></tr><tr><td><pre class="constant-value"><code><span class="rst-variable-quote">'</span><span class="rst-variable-string">(?:\\w|%[0-9A-Fa-f]{2})++(?:\\.(?:\\w|%[0-9A-Fa-f]{2})++)*+</span><span class="rst-variable-quote">'</span></code></pre></td></tr></table>
   </div>
 </div>
@@ -1860,7 +1870,7 @@
   <div class="orionis-footer-inner">
     <div class="orionis-footer-copy">
       <p>API documentation for <a href="https://orionis-framework.com/" class="projecthome">Orionis</a>.</p>
-      <p class="orionis-footer-meta">Generated with <a href="https://github.com/twisted/pydoctor/">Pydoctor</a> 25.10.1.<span class="orionis-footer-build"> Built 2026-11-03 09:36:58.</span></p>
+      <p class="orionis-footer-meta">Generated with <a href="https://github.com/twisted/pydoctor/">Pydoctor</a> 25.10.1.<span class="orionis-footer-build"> Built 2026-11-03 13:00:15.</span></p>
     </div>
     <nav class="orionis-footer-links" aria-label="Additional resources">
       <a href="https://docs.orionis-framework.com">Read the guide <span aria-hidden="true">↗</span></a>

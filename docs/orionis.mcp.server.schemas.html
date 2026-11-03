@@ -288,7 +288,7 @@
 
       <div class="thingTitle">
         <span>Package</span>
-        <code><a href="orionis.mcp.server.html" class="internal-link" title="The parent of this module">server</a></code> 
+        <code><a href="orionis.mcp.server.package.html" class="internal-link" title="The parent of this module">server</a></code> 
       </div>
       
       <div>
@@ -651,6 +651,16 @@
 
         
             <div class="itemName"><code><a href="orionis.mcp.server.compiler.html#_NAME" class="internal-link" title="orionis.mcp.server.compiler._NAME">_NAME</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.mcp.server.compiler.html#_JsonObject" class="internal-link" title="orionis.mcp.server.compiler._JsonObject">_<wbr></wbr>Json<wbr></wbr>Object</a></code>
             </div>
         
 
@@ -1200,7 +1210,7 @@
 </div>
 
         <div class="page-header">
-          <h1 class="module"><code><code><a href="index.html" class="internal-link">orionis</a></code><wbr></wbr>.<code><a href="orionis.mcp.html" class="internal-link" title="orionis.mcp">mcp</a></code><wbr></wbr>.<code><a href="orionis.mcp.server.html" class="internal-link" title="orionis.mcp.server">server</a></code><wbr></wbr>.<code><a href="orionis.mcp.server.schemas.html" class="internal-link" title="orionis.mcp.server.schemas">schemas</a></code></code></h1>
+          <h1 class="module"><code><code><a href="index.html" class="internal-link">orionis</a></code><wbr></wbr>.<code><a href="orionis.mcp.html" class="internal-link" title="orionis.mcp">mcp</a></code><wbr></wbr>.<code><a href="orionis.mcp.server.package.html" class="internal-link" title="orionis.mcp.server">server</a></code><wbr></wbr>.<code><a href="orionis.mcp.server.schemas.html" class="internal-link" title="orionis.mcp.server.schemas">schemas</a></code></code></h1>
           <div id="show-private">
             <button class="btn btn-link" onclick="togglePrivate()">Toggle Private API</button>
           </div>
@@ -1211,15 +1221,15 @@
         </div>
 
         <div class="extrasDocstring">
-          <a href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/mcp/server/schemas.py" class="sourceLink">(source)</a>
+          <a href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/mcp/server/schemas.py" class="sourceLink">(source)</a>
         </div>
 
         <div class="moduleDocstring">
-          <div><p class="undocumented">Undocumented</p></div>
+          <div><p>Provide mcp server operations through <tt class="rst-docutils rst-literal">compile_schema</tt>, <tt class="rst-docutils rst-literal">convert_payload</tt>.</p></div>
         </div>
 
         <div id="split-tables">
-          <table class="children sortable" id="id1481">
+          <table class="children sortable" id="id1485">
   
   
   <tr class="function">
@@ -1261,22 +1271,22 @@
     
     <td>Constant</td>
     <td><code><a href="#_ANNOTATION_KEYS" class="internal-link" title="orionis.mcp.server.schemas._ANNOTATION_KEYS">_ANNOTATION<wbr></wbr>_KEYS</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
+    <td>Annotation keys used by <tt class="rst-docutils rst-literal">schemas</tt>.</td>
   </tr><tr class="constant">
     
     <td>Constant</td>
     <td><code><a href="#_DEFINITIONS" class="internal-link" title="orionis.mcp.server.schemas._DEFINITIONS">_DEFINITIONS</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
+    <td><tt class="rst-docutils rst-literal">$defs</tt>.</td>
   </tr><tr class="constant">
     
     <td>Constant</td>
     <td><code><a href="#_DIALECT" class="internal-link" title="orionis.mcp.server.schemas._DIALECT">_DIALECT</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
+    <td><tt class="rst-docutils rst-literal"><span class="pre">https://json-schema.org/draft/2020-12/schema</span></tt>.</td>
   </tr><tr class="constant">
     
     <td>Constant</td>
     <td><code><a href="#_META_FIELDS" class="internal-link" title="orionis.mcp.server.schemas._META_FIELDS">_META<wbr></wbr>_FIELDS</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
+    <td>Meta fields definitions used by <tt class="rst-docutils rst-literal">schemas</tt>.</td>
   </tr>
 </table>
           
@@ -1298,7 +1308,7 @@
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">_check_metadata</span><span class="function-signature">(<span class="rst-sig-param">annotation: <code><a href="https://docs.python.org/3/builtins/functions.html#object" class="intersphinx-link">object</a></code></span>):</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/mcp/server/schemas.py#L56">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/mcp/server/schemas.py#L62">
       
       (source)
     </a>
@@ -1325,7 +1335,7 @@
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">_check_type</span><span class="function-signature">(<span class="rst-sig-param">annotation: <code><a href="https://docs.python.org/3/builtins/functions.html#object" class="intersphinx-link">object</a></code>, </span><span class="rst-sig-param">visited: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#set" class="intersphinx-link">set</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/functions.html#object" class="intersphinx-link">object</a>]</code></span>):</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/mcp/server/schemas.py#L126">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/mcp/server/schemas.py#L132">
       
       (source)
     </a>
@@ -1352,7 +1362,7 @@
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">_inline</span><span class="function-signature long-signature">(<span class="rst-sig-param">value: <code><a href="https://docs.python.org/3/builtins/functions.html#object" class="intersphinx-link">object</a></code>, </span><span class="rst-sig-param">definitions: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#dict" class="intersphinx-link">dict</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <wbr></wbr><a href="https://docs.python.org/3/builtins/functions.html#object" class="intersphinx-link">object</a>]</code>, </span><span class="rst-sig-param">ancestors: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" class="intersphinx-link">tuple</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <wbr></wbr><span class="rst-variable-ellipsis">...</span>]</code>, </span><span class="rst-sig-param">referenced: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#set" class="intersphinx-link">set</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>]</code></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/functions.html#object" class="intersphinx-link">object</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/mcp/server/schemas.py#L194">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/mcp/server/schemas.py#L200">
       
       (source)
     </a>
@@ -1364,7 +1374,7 @@
   </div>
   <div class="docstring functionBody">
     
-    <div><p>Inline acyclic local references while preserving recursive definitions.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">value:</span><code><a href="https://docs.python.org/3/builtins/functions.html#object" class="intersphinx-link">object</a></code></td><td class="fieldArgDesc">Value to inspect, transform or validate.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">definitions:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#dict" class="intersphinx-link">dict</a>[<a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <a href="https://docs.python.org/3/builtins/functions.html#object" class="intersphinx-link">object</a>]</code></td><td class="fieldArgDesc">Value supplied for <tt class="rst-docutils rst-literal">definitions</tt>.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">ancestors:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" class="intersphinx-link">tuple</a>[<a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, ...]</code></td><td class="fieldArgDesc">Value supplied for <tt class="rst-docutils rst-literal">ancestors</tt>.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">referenced:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#set" class="intersphinx-link">set</a>[<a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>]</code></td><td class="fieldArgDesc">Value supplied for <tt class="rst-docutils rst-literal">referenced</tt>.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/functions.html#object" class="intersphinx-link">object</a></code></td><td class="fieldArgDesc">Result of the operation described above.</td></tr></table></div>
+    <div><p>Inline acyclic local references while preserving recursive definitions.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">value:</span><code><a href="https://docs.python.org/3/builtins/functions.html#object" class="intersphinx-link">object</a></code></td><td class="fieldArgDesc">Value to inspect, transform or validate.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">definitions:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#dict" class="intersphinx-link">dict</a>[<a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <a href="https://docs.python.org/3/builtins/functions.html#object" class="intersphinx-link">object</a>]</code></td><td class="fieldArgDesc">Value supplied for <tt class="rst-docutils rst-literal">definitions</tt>.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">ancestors:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" class="intersphinx-link">tuple</a>[<a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <tt class="rst-docutils rst-literal">...</tt>]</code></td><td class="fieldArgDesc">Value supplied for <tt class="rst-docutils rst-literal">ancestors</tt>.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">referenced:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#set" class="intersphinx-link">set</a>[<a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>]</code></td><td class="fieldArgDesc">Value supplied for <tt class="rst-docutils rst-literal">referenced</tt>.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/functions.html#object" class="intersphinx-link">object</a></code></td><td class="fieldArgDesc">Result of the operation described above.</td></tr></table></div>
   </div>
 </div><div class="basefunction">
   
@@ -1379,7 +1389,7 @@
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">_schema_hook</span><span class="function-signature">(<span class="rst-sig-param">annotation: <code><a href="https://docs.python.org/3/builtins/functions.html#type" class="intersphinx-link">type</a></code></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/stdtypes.html#dict" class="intersphinx-link">dict</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <wbr></wbr><a href="https://docs.python.org/3/builtins/functions.html#object" class="intersphinx-link">object</a>]</code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/mcp/server/schemas.py#L37">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/mcp/server/schemas.py#L43">
       
       (source)
     </a>
@@ -1406,7 +1416,7 @@
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">_validate_schema_additions</span><span class="function-signature long-signature">(<span class="rst-sig-param">native: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#dict" class="intersphinx-link">dict</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <wbr></wbr><a href="https://docs.python.org/3/builtins/functions.html#object" class="intersphinx-link">object</a>]</code>, </span><span class="rst-sig-param">additions: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#list" class="intersphinx-link">list</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#dict" class="intersphinx-link">dict</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <wbr></wbr><a href="https://docs.python.org/3/builtins/functions.html#object" class="intersphinx-link">object</a>]]</code></span>):</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/mcp/server/schemas.py#L90">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/mcp/server/schemas.py#L96">
       
       (source)
     </a>
@@ -1433,7 +1443,7 @@
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">compile_schema</span><span class="function-signature">(<span class="rst-sig-param">annotation: <code><a href="https://docs.python.org/3/builtins/functions.html#object" class="intersphinx-link">object</a></code>, </span><span class="rst-sig-symbol">*, </span><span class="rst-sig-param">input_schema: <code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code> = <a href="https://docs.python.org/3/builtins/constants.html#False" class="intersphinx-link">False</a></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/stdtypes.html#dict" class="intersphinx-link">dict</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <wbr></wbr><a href="https://docs.python.org/3/builtins/functions.html#object" class="intersphinx-link">object</a>]</code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/mcp/server/schemas.py#L154">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/mcp/server/schemas.py#L160">
       
       (source)
     </a>
@@ -1460,7 +1470,7 @@
     
     
     <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">convert_payload</span><span class="function-signature">(<span class="rst-sig-param">value: <code><a href="https://docs.python.org/3/builtins/functions.html#object" class="intersphinx-link">object</a></code>, </span><span class="rst-sig-param">annotation: <code><a href="https://docs.python.org/3/builtins/functions.html#object" class="intersphinx-link">object</a></code></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/functions.html#object" class="intersphinx-link">object</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/mcp/server/schemas.py#L245">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/mcp/server/schemas.py#L251">
       
       (source)
     </a>
@@ -1486,7 +1496,7 @@
   <div class="functionHeader">
     
     <span class="py-defname">_ANNOTATION_KEYS</span> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/mcp/server/schemas.py#L21">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/mcp/server/schemas.py#L24">
       
       (source)
     </a>
@@ -1498,7 +1508,7 @@
   </div>
   <div class="functionBody">
     
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p>Annotation keys used by <tt class="rst-docutils rst-literal">schemas</tt>.</p></div>
     <table class="valueTable"><tr class="fieldStart"><td class="fieldName">Value</td></tr><tr><td><pre class="constant-value"><code><a href="https://docs.python.org/3/builtins/stdtypes.html#frozenset" class="intersphinx-link">frozenset</a>(<wbr></wbr>set([<wbr></wbr><span class="rst-variable-quote">'</span><span class="rst-variable-string">title</span><span class="rst-variable-quote">'</span>,
                <wbr></wbr><span class="rst-variable-quote">'</span><span class="rst-variable-string">description</span><span class="rst-variable-quote">'</span>,
                <wbr></wbr><span class="rst-variable-quote">'</span><span class="rst-variable-string">examples</span><span class="rst-variable-quote">'</span>,
@@ -1520,7 +1530,7 @@
   <div class="functionHeader">
     
     <span class="py-defname">_DEFINITIONS</span>: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/mcp/server/schemas.py#L35">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/mcp/server/schemas.py#L40">
       
       (source)
     </a>
@@ -1532,7 +1542,7 @@
   </div>
   <div class="functionBody">
     
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p><tt class="rst-docutils rst-literal">$defs</tt>.</p></div>
     <table class="valueTable"><tr class="fieldStart"><td class="fieldName">Value</td></tr><tr><td><pre class="constant-value"><code><span class="rst-variable-quote">'</span><span class="rst-variable-string">$defs</span><span class="rst-variable-quote">'</span></code></pre></td></tr></table>
   </div>
 </div><div class="baseconstant">
@@ -1547,7 +1557,7 @@
   <div class="functionHeader">
     
     <span class="py-defname">_DIALECT</span>: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/mcp/server/schemas.py#L34">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/mcp/server/schemas.py#L38">
       
       (source)
     </a>
@@ -1559,7 +1569,7 @@
   </div>
   <div class="functionBody">
     
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p><tt class="rst-docutils rst-literal"><span class="pre">https://json-schema.org/draft/2020-12/schema</span></tt>.</p></div>
     <table class="valueTable"><tr class="fieldStart"><td class="fieldName">Value</td></tr><tr><td><pre class="constant-value"><code><span class="rst-variable-quote">'</span><span class="rst-variable-string">https://json-schema.org/draft/2020-12/schema</span><span class="rst-variable-quote">'</span></code></pre></td></tr></table>
   </div>
 </div><div class="baseconstant">
@@ -1574,7 +1584,7 @@
   <div class="functionHeader">
     
     <span class="py-defname">_META_FIELDS</span>: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" class="intersphinx-link">tuple</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <wbr></wbr><span class="rst-variable-ellipsis">...</span>]</code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/mcp/server/schemas.py#L6">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/mcp/server/schemas.py#L8">
       
       (source)
     </a>
@@ -1586,7 +1596,7 @@
   </div>
   <div class="functionBody">
     
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p>Meta fields definitions used by <tt class="rst-docutils rst-literal">schemas</tt>.</p></div>
     <table class="valueTable"><tr class="fieldStart"><td class="fieldName">Value</td></tr><tr><td><pre class="constant-value"><code>(<wbr></wbr><span class="rst-variable-quote">'</span><span class="rst-variable-string">gt</span><span class="rst-variable-quote">'</span>,
  <wbr></wbr><span class="rst-variable-quote">'</span><span class="rst-variable-string">ge</span><span class="rst-variable-quote">'</span>,
  <wbr></wbr><span class="rst-variable-quote">'</span><span class="rst-variable-string">lt</span><span class="rst-variable-quote">'</span>,
@@ -1607,7 +1617,7 @@
   <div class="orionis-footer-inner">
     <div class="orionis-footer-copy">
       <p>API documentation for <a href="https://orionis-framework.com/" class="projecthome">Orionis</a>.</p>
-      <p class="orionis-footer-meta">Generated with <a href="https://github.com/twisted/pydoctor/">Pydoctor</a> 25.10.1.<span class="orionis-footer-build"> Built 2026-11-03 09:36:58.</span></p>
+      <p class="orionis-footer-meta">Generated with <a href="https://github.com/twisted/pydoctor/">Pydoctor</a> 25.10.1.<span class="orionis-footer-build"> Built 2026-11-03 13:00:15.</span></p>
     </div>
     <nav class="orionis-footer-links" aria-label="Additional resources">
       <a href="https://docs.orionis-framework.com">Read the guide <span aria-hidden="true">↗</span></a>

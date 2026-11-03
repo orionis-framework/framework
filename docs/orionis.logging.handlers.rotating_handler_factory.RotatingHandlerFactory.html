@@ -400,15 +400,15 @@
         </div>
 
         <div class="extrasDocstring">
-          <p class="class-signature"><code><span class="py-keyword">class</span> <span class="py-defname">RotatingHandlerFactory</span>: <a href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/logging/handlers/rotating_handler_factory.py#L236" class="sourceLink">(source)</a></code></p><p><a href="classIndex.html#orionis.logging.handlers.rotating_handler_factory.RotatingHandlerFactory">View In Hierarchy</a></p>
+          <p class="class-signature"><code><span class="py-keyword">class</span> <span class="py-defname">RotatingHandlerFactory</span>: <a href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/logging/handlers/rotating_handler_factory.py#L240" class="sourceLink">(source)</a></code></p><p><a href="classIndex.html#orionis.logging.handlers.rotating_handler_factory.RotatingHandlerFactory">View In Hierarchy</a></p>
         </div>
 
         <div class="moduleDocstring">
-          <div><p class="undocumented">Undocumented</p></div>
+          <div><p>Construct rotating log handlers from channel configuration.</p></div>
         </div>
 
         <div id="split-tables">
-          <table class="children sortable" id="id1283">
+          <table class="children sortable" id="id1286">
   
   
   <tr class="staticmethod">
@@ -437,7 +437,7 @@
     
     <div><span class="decorator">@<a href="https://docs.python.org/3/builtins/functions.html#staticmethod" class="intersphinx-link">staticmethod</a><br /></span></div>
     <span class="py-keyword">def</span>&#160;<span class="py-defname">createHandler</span><span class="function-signature">(<span class="rst-sig-param">channel_name: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code>, </span><span class="rst-sig-param">channel_config: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#dict" class="intersphinx-link">dict</a></code>, </span><span class="rst-sig-param">app_root: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></span>) -&gt; <code><a href="https://docs.python.org/3/library/logging.html#logging.Handler" class="intersphinx-link">Handler</a> | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/logging/handlers/rotating_handler_factory.py#L238">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/logging/handlers/rotating_handler_factory.py#L243">
       
       (source)
     </a>
@@ -449,7 +449,7 @@
   </div>
   <div class="docstring functionBody">
     
-    <div><p>Create and return a log handler based on the channel configuration.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">channel<wbr></wbr>_name:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Name of the channel (e.g., stack, hourly, daily).</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">channel<wbr></wbr>_config:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#dict" class="intersphinx-link">dict</a></code></td><td class="fieldArgDesc">Channel configuration dictionary.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">app<wbr></wbr>_root:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Root path of the application.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code>Handler | None</code></td><td class="fieldArgDesc">Configured log handler instance, or None if the type is unsupported.</td></tr></table></div>
+    <div><p>Create and return a log handler based on the channel configuration.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">channel<wbr></wbr>_name:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Name of the channel (e.g., stack, hourly, daily).</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">channel<wbr></wbr>_config:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#dict" class="intersphinx-link">dict</a></code></td><td class="fieldArgDesc">Channel configuration dictionary.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">app<wbr></wbr>_root:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Root path of the application.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><tt class="rst-docutils rst-literal">logging.Handler</tt> | None</code></td><td class="fieldArgDesc">Configured log handler instance, or None if the type is unsupported.</td></tr></table></div>
   </div>
 </div>
         </div>
@@ -462,7 +462,7 @@
   <div class="orionis-footer-inner">
     <div class="orionis-footer-copy">
       <p>API documentation for <a href="https://orionis-framework.com/" class="projecthome">Orionis</a>.</p>
-      <p class="orionis-footer-meta">Generated with <a href="https://github.com/twisted/pydoctor/">Pydoctor</a> 25.10.1.<span class="orionis-footer-build"> Built 2026-11-03 09:36:58.</span></p>
+      <p class="orionis-footer-meta">Generated with <a href="https://github.com/twisted/pydoctor/">Pydoctor</a> 25.10.1.<span class="orionis-footer-build"> Built 2026-11-03 13:00:15.</span></p>
     </div>
     <nav class="orionis-footer-links" aria-label="Additional resources">
       <a href="https://docs.orionis-framework.com">Read the guide <span aria-hidden="true">↗</span></a>

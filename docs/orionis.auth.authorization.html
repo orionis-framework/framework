@@ -225,7 +225,7 @@
                     
                 </label>
 
-                <code><a href="orionis.auth.authorization.policy.html" class="internal-link" title="orionis.auth.authorization.policy">policy</a></code>
+                <code><a href="orionis.auth.authorization.policy.module.html" class="internal-link" title="orionis.auth.authorization.policy">policy</a></code>
 
                 <div class="expandableContent">
                     <div>
@@ -1079,7 +1079,7 @@
         
 
         
-            <div class="itemName"><code><a href="orionis.auth.authorization.policy.html" class="internal-link" title="orionis.auth.authorization.policy">policy</a></code>
+            <div class="itemName"><code><a href="orionis.auth.authorization.policy.module.html" class="internal-link" title="orionis.auth.authorization.policy">policy</a></code>
             </div>
         
 
@@ -1224,7 +1224,7 @@
         
 
         
-            <div class="itemName"><code><a href="orionis.auth.concerns.authenticatable.html" class="internal-link" title="orionis.auth.concerns.authenticatable">authenticatable</a></code>
+            <div class="itemName"><code><a href="orionis.auth.concerns.authenticatable.module.html" class="internal-link" title="orionis.auth.concerns.authenticatable">authenticatable</a></code>
             </div>
         
 
@@ -1234,7 +1234,7 @@
         
 
         
-            <div class="itemName"><code><a href="orionis.auth.concerns.authorizable.html" class="internal-link" title="orionis.auth.concerns.authorizable">authorizable</a></code>
+            <div class="itemName"><code><a href="orionis.auth.concerns.authorizable.module.html" class="internal-link" title="orionis.auth.concerns.authorizable">authorizable</a></code>
             </div>
         
 
@@ -3320,11 +3320,11 @@
         </div>
 
         <div class="extrasDocstring">
-          <a href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/auth/authorization/__init__.py" class="sourceLink">(source)</a>
+          <a href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/auth/authorization/__init__.py" class="sourceLink">(source)</a>
         </div>
 
         <div class="moduleDocstring">
-          <div><p class="undocumented">Undocumented</p></div>
+          <div><p>Group the auth authorization components and public imports.</p></div>
         </div>
 
         <div id="split-tables">
@@ -3335,32 +3335,32 @@
     
     <td>Module</td>
     <td><code><a href="orionis.auth.authorization.authorizer.html" class="internal-link" title="orionis.auth.authorization.authorizer">authorizer</a></code></td>
-    <td><span class="rst-undocumented">No module docstring; 1/1 class documented</span></td>
+    <td>Answer authorization questions for a given request context.</td>
   </tr><tr class="module">
     
     <td>Module</td>
-    <td><code><a href="orionis.auth.authorization.policy.html" class="internal-link" title="orionis.auth.authorization.policy">policy</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
+    <td><code><a href="orionis.auth.authorization.policy.module.html" class="internal-link" title="orionis.auth.authorization.policy">policy</a></code></td>
+    <td>Base class for resource policies.</td>
   </tr><tr class="module">
     
     <td>Module</td>
     <td><code><a href="orionis.auth.authorization.registrar.html" class="internal-link" title="orionis.auth.authorization.registrar">registrar</a></code></td>
-    <td><span class="rst-undocumented">No module docstring; 0/6 constant, 1/1 class documented</span></td>
+    <td>Create permissions and roles, and attach them to identities.</td>
   </tr><tr class="module">
     
     <td>Module</td>
     <td><code><a href="orionis.auth.authorization.registry.html" class="internal-link" title="orionis.auth.authorization.registry">registry</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
+    <td>Map resource classes to the policy classes protecting them.</td>
   </tr><tr class="module">
     
     <td>Module</td>
     <td><code><a href="orionis.auth.authorization.repository.html" class="internal-link" title="orionis.auth.authorization.repository">repository</a></code></td>
-    <td><span class="rst-undocumented">No module docstring; 0/9 constant, 1/1 class documented</span></td>
+    <td>Load permissions and roles from the framework authorization tables.</td>
   </tr><tr class="module">
     
     <td>Module</td>
     <td><code><a href="orionis.auth.authorization.snapshot.html" class="internal-link" title="orionis.auth.authorization.snapshot">snapshot</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
+    <td>Hold the immutable authorization picture of a single request.</td>
   </tr>
 </table>
           
@@ -3387,7 +3387,7 @@
     
     <td>Constant</td>
     <td><code><a href="#EMPTY_SNAPSHOT" class="internal-link" title="orionis.auth.authorization.EMPTY_SNAPSHOT">EMPTY<wbr></wbr>_SNAPSHOT</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
+    <td>no permissions, no roles.</td>
   </tr>
 </table>
         </div>
@@ -3405,7 +3405,7 @@
   <div class="functionHeader">
     
     <span class="py-defname">EMPTY_SNAPSHOT</span>: <code><a href="orionis.auth.authorization.AuthorizationSnapshot.html" class="internal-link" title="orionis.auth.authorization.AuthorizationSnapshot">AuthorizationSnapshot</a></code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/auth/authorization/snapshot.py#L150">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/auth/authorization/snapshot.py#L159">
       
       (source)
     </a>
@@ -3417,7 +3417,7 @@
   </div>
   <div class="functionBody">
     
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p>no permissions, no roles.</p></div>
     <table class="valueTable"><tr class="fieldStart"><td class="fieldName">Value</td></tr><tr><td><pre class="constant-value"><code><a href="orionis.auth.authorization.AuthorizationSnapshot.html" class="internal-link" title="orionis.auth.authorization.AuthorizationSnapshot">AuthorizationSnapshot</a>(<wbr></wbr>permissions=(), <wbr></wbr>roles=())</code></pre></td></tr></table>
   </div>
 </div>
@@ -3431,7 +3431,7 @@
   <div class="orionis-footer-inner">
     <div class="orionis-footer-copy">
       <p>API documentation for <a href="https://orionis-framework.com/" class="projecthome">Orionis</a>.</p>
-      <p class="orionis-footer-meta">Generated with <a href="https://github.com/twisted/pydoctor/">Pydoctor</a> 25.10.1.<span class="orionis-footer-build"> Built 2026-11-03 09:36:58.</span></p>
+      <p class="orionis-footer-meta">Generated with <a href="https://github.com/twisted/pydoctor/">Pydoctor</a> 25.10.1.<span class="orionis-footer-build"> Built 2026-11-03 13:00:15.</span></p>
     </div>
     <nav class="orionis-footer-links" aria-label="Additional resources">
       <a href="https://docs.orionis-framework.com">Read the guide <span aria-hidden="true">↗</span></a>

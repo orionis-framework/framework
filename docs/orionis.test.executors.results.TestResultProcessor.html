@@ -713,15 +713,15 @@
         </div>
 
         <div class="extrasDocstring">
-          <p class="class-signature"><code><span class="py-keyword">class</span> <span class="py-defname">TestResultProcessor</span>(<a href="https://docs.python.org/3/library/unittest.html#unittest.TestResult" class="intersphinx-link">unittest.TestResult</a>): <a href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/test/executors/results.py#L30" class="sourceLink">(source)</a></code></p><p>Constructor: <code><a href="#__init__" class="internal-link" title="orionis.test.executors.results.TestResultProcessor.__init__">TestResultProcessor(stream, descriptions, verbosity, **kwargs)</a></code></p><p><a href="classIndex.html#orionis.test.executors.results.TestResultProcessor">View In Hierarchy</a></p>
+          <p class="class-signature"><code><span class="py-keyword">class</span> <span class="py-defname">TestResultProcessor</span>(<a href="https://docs.python.org/3/library/unittest.html#unittest.TestResult" class="intersphinx-link">unittest.TestResult</a>): <a href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/test/executors/results.py#L36" class="sourceLink">(source)</a></code></p><p>Constructor: <code><a href="#__init__" class="internal-link" title="orionis.test.executors.results.TestResultProcessor.__init__">TestResultProcessor(stream, descriptions, verbosity, **kwargs)</a></code></p><p><a href="classIndex.html#orionis.test.executors.results.TestResultProcessor">View In Hierarchy</a></p>
         </div>
 
         <div class="moduleDocstring">
-          <div><p class="undocumented">Undocumented</p></div>
+          <div><p>Collect test outcomes and render configured console feedback.</p></div>
         </div>
 
         <div id="split-tables">
-          <table class="children sortable" id="id2164">
+          <table class="children sortable" id="id2172">
   
   
   <tr class="method">
@@ -793,27 +793,27 @@
     
     <td>Instance Variable</td>
     <td><code><a href="#__console" class="internal-link" title="orionis.test.executors.results.TestResultProcessor.__console">__console</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
+    <td>Console produced by <tt class="rst-docutils rst-literal">Console</tt>.</td>
   </tr><tr class="instancevariable">
     
     <td>Instance Variable</td>
     <td><code><a href="#__max_width" class="internal-link" title="orionis.test.executors.results.TestResultProcessor.__max_width">__max<wbr></wbr>_width</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
+    <td>Maximum width used when rendering test-result panels.</td>
   </tr><tr class="instancevariable">
     
     <td>Instance Variable</td>
     <td><code><a href="#__print_verbosity" class="internal-link" title="orionis.test.executors.results.TestResultProcessor.__print_verbosity">__print<wbr></wbr>_verbosity</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
+    <td>1 prints one compact line per test and 2 prints a detailed panel. Any other value, including None, prints nothing. Supplied by the runner through <tt class="rst-docutils rst-literal">unittest.TextTestRunner._makeResult</tt>, by default None.</td>
   </tr><tr class="instancevariable">
     
     <td>Instance Variable</td>
     <td><code><a href="#__start_time" class="internal-link" title="orionis.test.executors.results.TestResultProcessor.__start_time">__start<wbr></wbr>_time</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
+    <td>Start time produced by <tt class="rst-docutils rst-literal">time.perf_counter</tt>.</td>
   </tr><tr class="instancevariable">
     
     <td>Instance Variable</td>
     <td><code><a href="#__test_results" class="internal-link" title="orionis.test.executors.results.TestResultProcessor.__test_results">__test<wbr></wbr>_results</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
+    <td>Structured outcomes collected during the current test run.</td>
   </tr>
 </table>
           
@@ -835,7 +835,7 @@
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">__createTestResult</span><span class="function-signature long-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">test: <code>unittest.case.TestCase</code>, </span><span class="rst-sig-param">status: <code><a href="orionis.test.enums.status.TestStatus.html" class="internal-link" title="orionis.test.enums.status.TestStatus">TestStatus</a></code>, </span><span class="rst-sig-param">exc_info: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" class="intersphinx-link">tuple</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/functions.html#type" class="intersphinx-link">type</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/exceptions.html#BaseException" class="intersphinx-link">BaseException</a>], <wbr></wbr><a href="https://docs.python.org/3/builtins/exceptions.html#BaseException" class="intersphinx-link">BaseException</a>, <wbr></wbr><a href="https://docs.python.org/3/builtins/functions.html#object" class="intersphinx-link">object</a>] | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code> = <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a>, </span><span class="rst-sig-symbol">*, </span><span class="rst-sig-param">subtest: <code>unittest.case.TestCase | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code> = <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></span>) -&gt; <code><a href="orionis.test.entities.result.TestResult.html" class="internal-link" title="orionis.test.entities.result.TestResult">TestResult</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/test/executors/results.py#L452">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/test/executors/results.py#L469">
       
       (source)
     </a>
@@ -847,7 +847,7 @@
   </div>
   <div class="docstring functionBody">
     
-    <div><p>Create and return a TestResult instance for the given test.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">test:</span><code>unittest.case.TestCase</code></td><td class="fieldArgDesc">The test case instance being processed.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">status:</span><code><a href="orionis.test.enums.status.TestStatus.html" class="internal-link" title="orionis.test.enums.status.TestStatus">TestStatus</a></code></td><td class="fieldArgDesc">The status of the test (e.g., PASSED, FAILED).</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">exc<wbr></wbr>_info:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" class="intersphinx-link">tuple</a>[<a href="https://docs.python.org/3/builtins/functions.html#type" class="intersphinx-link">type</a>[<a href="https://docs.python.org/3/builtins/exceptions.html#BaseException" class="intersphinx-link">BaseException</a>], <a href="https://docs.python.org/3/builtins/exceptions.html#BaseException" class="intersphinx-link">BaseException</a>, <a href="https://docs.python.org/3/builtins/functions.html#object" class="intersphinx-link">object</a>] or <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a>, <em>optional</em></code></td><td class="fieldArgDesc">Exception info tuple as returned by sys.exc_info(), by default None.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">subtest:</span><code>unittest.case.TestCase or <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a>, <em>optional</em></code></td><td class="fieldArgDesc">Subtest whose identity replaces the parent identity in the report.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.test.entities.result.TestResult.html" class="internal-link" title="orionis.test.entities.result.TestResult">TestResult</a></code></td><td class="fieldArgDesc">The constructed TestResult object containing test outcome details.</td></tr></table></div>
+    <div><p>Create and return a TestResult instance for the given test.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">test:</span><code><a href="https://docs.python.org/3/library/unittest.html#unittest.TestCase" class="intersphinx-link">unittest.TestCase</a></code></td><td class="fieldArgDesc">The test case instance being processed.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">status:</span><code><a href="orionis.test.enums.status.TestStatus.html" class="internal-link">orionis.test.enums.status.TestStatus</a></code></td><td class="fieldArgDesc">The status of the test (e.g., PASSED, FAILED).</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">exc<wbr></wbr>_info:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" class="intersphinx-link">tuple</a>[<a href="https://docs.python.org/3/builtins/functions.html#type" class="intersphinx-link">type</a>[<a href="https://docs.python.org/3/builtins/exceptions.html#BaseException" class="intersphinx-link">BaseException</a>], <a href="https://docs.python.org/3/builtins/exceptions.html#BaseException" class="intersphinx-link">BaseException</a>, <a href="https://docs.python.org/3/builtins/functions.html#object" class="intersphinx-link">object</a>] or <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a>, <em>optional</em></code></td><td class="fieldArgDesc">Exception info tuple as returned by sys.exc_info(), by default None.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">subtest:</span><code><a href="https://docs.python.org/3/library/unittest.html#unittest.TestCase" class="intersphinx-link">unittest.TestCase</a> or <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a>, <em>optional</em></code></td><td class="fieldArgDesc">Subtest whose identity replaces the parent identity in the report.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.test.entities.result.TestResult.html" class="internal-link">orionis.test.entities.result.TestResult</a></code></td><td class="fieldArgDesc">The constructed TestResult object containing test outcome details.</td></tr></table></div>
   </div>
 </div><div class="basemethod">
   
@@ -862,7 +862,7 @@
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">__extractTraceInfo</span><span class="function-signature long-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">exc_info: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" class="intersphinx-link">tuple</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/functions.html#type" class="intersphinx-link">type</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/exceptions.html#BaseException" class="intersphinx-link">BaseException</a>], <wbr></wbr><a href="https://docs.python.org/3/builtins/exceptions.html#BaseException" class="intersphinx-link">BaseException</a>, <wbr></wbr><a href="https://docs.python.org/3/builtins/functions.html#object" class="intersphinx-link">object</a>]</code>, </span><span class="rst-sig-param">file_path: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a> | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" class="intersphinx-link">tuple</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#list" class="intersphinx-link">list</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>], <wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#list" class="intersphinx-link">list</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" class="intersphinx-link">tuple</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a>, <wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>]], <wbr></wbr><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a> | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a>]</code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/test/executors/results.py#L411">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/test/executors/results.py#L428">
       
       (source)
     </a>
@@ -889,7 +889,7 @@
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">__init__</span><span class="function-signature long-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">stream: <code><a href="https://docs.python.org/3/builtins/functions.html#object" class="intersphinx-link">object</a></code> = <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a>, </span><span class="rst-sig-param">descriptions: <code><a href="https://docs.python.org/3/builtins/functions.html#object" class="intersphinx-link">object</a></code> = <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a>, </span><span class="rst-sig-param">verbosity: <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a> | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code> = <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a>, </span><span class="rst-sig-param">**kwargs: <code><a href="https://docs.python.org/3/builtins/functions.html#object" class="intersphinx-link">object</a></code></span>):</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/test/executors/results.py#L34">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/test/executors/results.py#L41">
       
       (source)
     </a>
@@ -919,7 +919,7 @@ through <tt class="rst-docutils rst-literal">unittest.TextTestRunner._makeResult
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">__printTestResult</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">result: <code><a href="orionis.test.entities.result.TestResult.html" class="internal-link" title="orionis.test.entities.result.TestResult">TestResult</a></code></span>):</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/test/executors/results.py#L270">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/test/executors/results.py#L287">
       
       (source)
     </a>
@@ -931,7 +931,7 @@ through <tt class="rst-docutils rst-literal">unittest.TextTestRunner._makeResult
   </div>
   <div class="docstring functionBody">
     
-    <div><p>Print the result of a test that did not fail.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">result:</span><code><a href="orionis.test.entities.result.TestResult.html" class="internal-link" title="orionis.test.entities.result.TestResult">TestResult</a></code></td><td class="fieldArgDesc">The test result instance to display.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">This method prints the formatted test result to the console and
+    <div><p>Print the result of a test that did not fail.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">result:</span><code><a href="orionis.test.entities.result.TestResult.html" class="internal-link">orionis.test.entities.result.TestResult</a></code></td><td class="fieldArgDesc">The test result instance to display.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">This method prints the formatted test result to the console and
 does not return a value.</td></tr></table></div>
   </div>
 </div><div class="basemethod">
@@ -947,7 +947,7 @@ does not return a value.</td></tr></table></div>
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">addError</span><span class="function-signature long-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">test: <code>unittest.case.TestCase</code>, </span><span class="rst-sig-param">err: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" class="intersphinx-link">tuple</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/functions.html#type" class="intersphinx-link">type</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/exceptions.html#BaseException" class="intersphinx-link">BaseException</a>], <wbr></wbr><a href="https://docs.python.org/3/builtins/exceptions.html#BaseException" class="intersphinx-link">BaseException</a>, <wbr></wbr><a href="https://docs.python.org/3/builtins/functions.html#object" class="intersphinx-link">object</a>]</code></span>):</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/test/executors/results.py#L134">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/test/executors/results.py#L151">
       
       (source)
     </a>
@@ -959,7 +959,7 @@ does not return a value.</td></tr></table></div>
   </div>
   <div class="docstring functionBody">
     
-    <div><p>Record an errored test result and print it.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">test:</span><code>unittest.case.TestCase</code></td><td class="fieldArgDesc">The test case instance that errored.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">err:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" class="intersphinx-link">tuple</a>[<a href="https://docs.python.org/3/builtins/functions.html#type" class="intersphinx-link">type</a>[<a href="https://docs.python.org/3/builtins/exceptions.html#BaseException" class="intersphinx-link">BaseException</a>], <a href="https://docs.python.org/3/builtins/exceptions.html#BaseException" class="intersphinx-link">BaseException</a>, <a href="https://docs.python.org/3/builtins/functions.html#object" class="intersphinx-link">object</a>]</code></td><td class="fieldArgDesc">The exception info tuple for the error.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">This method appends the result and prints it, then calls the
+    <div><p>Record an errored test result and print it.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">test:</span><code><a href="https://docs.python.org/3/library/unittest.html#unittest.TestCase" class="intersphinx-link">unittest.TestCase</a></code></td><td class="fieldArgDesc">The test case instance that errored.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">err:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" class="intersphinx-link">tuple</a>[<a href="https://docs.python.org/3/builtins/functions.html#type" class="intersphinx-link">type</a>[<a href="https://docs.python.org/3/builtins/exceptions.html#BaseException" class="intersphinx-link">BaseException</a>], <a href="https://docs.python.org/3/builtins/exceptions.html#BaseException" class="intersphinx-link">BaseException</a>, <a href="https://docs.python.org/3/builtins/functions.html#object" class="intersphinx-link">object</a>]</code></td><td class="fieldArgDesc">The exception info tuple for the error.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">This method appends the result and prints it, then calls the
 superclass method.</td></tr></table></div>
   </div>
 </div><div class="basemethod">
@@ -975,7 +975,7 @@ superclass method.</td></tr></table></div>
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">addExpectedFailure</span><span class="function-signature long-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">test: <code>unittest.case.TestCase</code>, </span><span class="rst-sig-param">err: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" class="intersphinx-link">tuple</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/functions.html#type" class="intersphinx-link">type</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/exceptions.html#BaseException" class="intersphinx-link">BaseException</a>], <wbr></wbr><a href="https://docs.python.org/3/builtins/exceptions.html#BaseException" class="intersphinx-link">BaseException</a>, <wbr></wbr><a href="https://docs.python.org/3/builtins/functions.html#object" class="intersphinx-link">object</a>]</code></span>):</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/test/executors/results.py#L221">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/test/executors/results.py#L238">
       
       (source)
     </a>
@@ -987,7 +987,7 @@ superclass method.</td></tr></table></div>
   </div>
   <div class="docstring functionBody">
     
-    <div><p>Report an expected failure as a skipped outcome.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">test:</span><code>unittest.case.TestCase</code></td><td class="fieldArgDesc">Test marked as an expected failure.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">err:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" class="intersphinx-link">tuple</a></code></td><td class="fieldArgDesc">Exception details retained for diagnostics.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">Complete the documented operation without returning a value.</td></tr></table></div>
+    <div><p>Report an expected failure as a skipped outcome.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">test:</span><code><a href="https://docs.python.org/3/library/unittest.html#unittest.TestCase" class="intersphinx-link">unittest.TestCase</a></code></td><td class="fieldArgDesc">Test marked as an expected failure.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">err:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" class="intersphinx-link">tuple</a></code></td><td class="fieldArgDesc">Exception details retained for diagnostics.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">Complete the documented operation without returning a value.</td></tr></table></div>
   </div>
 </div><div class="basemethod">
   
@@ -1002,7 +1002,7 @@ superclass method.</td></tr></table></div>
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">addFailure</span><span class="function-signature long-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">test: <code>unittest.case.TestCase</code>, </span><span class="rst-sig-param">err: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" class="intersphinx-link">tuple</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/functions.html#type" class="intersphinx-link">type</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/exceptions.html#BaseException" class="intersphinx-link">BaseException</a>], <wbr></wbr><a href="https://docs.python.org/3/builtins/exceptions.html#BaseException" class="intersphinx-link">BaseException</a>, <wbr></wbr><a href="https://docs.python.org/3/builtins/functions.html#object" class="intersphinx-link">object</a>]</code></span>):</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/test/executors/results.py#L108">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/test/executors/results.py#L125">
       
       (source)
     </a>
@@ -1014,7 +1014,7 @@ superclass method.</td></tr></table></div>
   </div>
   <div class="docstring functionBody">
     
-    <div><p>Record a failed test result and print it.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">test:</span><code>unittest.case.TestCase</code></td><td class="fieldArgDesc">The test case instance that failed.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">err:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" class="intersphinx-link">tuple</a>[<a href="https://docs.python.org/3/builtins/functions.html#type" class="intersphinx-link">type</a>[<a href="https://docs.python.org/3/builtins/exceptions.html#BaseException" class="intersphinx-link">BaseException</a>], <a href="https://docs.python.org/3/builtins/exceptions.html#BaseException" class="intersphinx-link">BaseException</a>, <a href="https://docs.python.org/3/builtins/functions.html#object" class="intersphinx-link">object</a>]</code></td><td class="fieldArgDesc">The exception info tuple for the failure.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">This method appends the result and prints it, then calls the
+    <div><p>Record a failed test result and print it.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">test:</span><code><a href="https://docs.python.org/3/library/unittest.html#unittest.TestCase" class="intersphinx-link">unittest.TestCase</a></code></td><td class="fieldArgDesc">The test case instance that failed.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">err:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" class="intersphinx-link">tuple</a>[<a href="https://docs.python.org/3/builtins/functions.html#type" class="intersphinx-link">type</a>[<a href="https://docs.python.org/3/builtins/exceptions.html#BaseException" class="intersphinx-link">BaseException</a>], <a href="https://docs.python.org/3/builtins/exceptions.html#BaseException" class="intersphinx-link">BaseException</a>, <a href="https://docs.python.org/3/builtins/functions.html#object" class="intersphinx-link">object</a>]</code></td><td class="fieldArgDesc">The exception info tuple for the failure.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">This method appends the result and prints it, then calls the
 superclass method.</td></tr></table></div>
   </div>
 </div><div class="basemethod">
@@ -1030,7 +1030,7 @@ superclass method.</td></tr></table></div>
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">addSkip</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">test: <code>unittest.case.TestCase</code>, </span><span class="rst-sig-param">reason: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></span>):</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/test/executors/results.py#L160">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/test/executors/results.py#L177">
       
       (source)
     </a>
@@ -1042,7 +1042,7 @@ superclass method.</td></tr></table></div>
   </div>
   <div class="docstring functionBody">
     
-    <div><p>Record a skipped test result and print it.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">test:</span><code>unittest.case.TestCase</code></td><td class="fieldArgDesc">The test case instance that was skipped.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">reason:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">The reason for skipping the test.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">This method appends the result and prints it, then calls the
+    <div><p>Record a skipped test result and print it.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">test:</span><code><a href="https://docs.python.org/3/library/unittest.html#unittest.TestCase" class="intersphinx-link">unittest.TestCase</a></code></td><td class="fieldArgDesc">The test case instance that was skipped.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">reason:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">The reason for skipping the test.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">This method appends the result and prints it, then calls the
 superclass method.</td></tr></table></div>
   </div>
 </div><div class="basemethod">
@@ -1058,7 +1058,7 @@ superclass method.</td></tr></table></div>
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">addSubTest</span><span class="function-signature long-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">test: <code>unittest.case.TestCase</code>, </span><span class="rst-sig-param">subtest: <code>unittest.case.TestCase</code>, </span><span class="rst-sig-param">err: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" class="intersphinx-link">tuple</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/functions.html#type" class="intersphinx-link">type</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/exceptions.html#BaseException" class="intersphinx-link">BaseException</a>], <wbr></wbr><a href="https://docs.python.org/3/builtins/exceptions.html#BaseException" class="intersphinx-link">BaseException</a>, <wbr></wbr><a href="https://docs.python.org/3/builtins/functions.html#object" class="intersphinx-link">object</a>] | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></span>):</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/test/executors/results.py#L186">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/test/executors/results.py#L203">
       
       (source)
     </a>
@@ -1070,7 +1070,7 @@ superclass method.</td></tr></table></div>
   </div>
   <div class="docstring functionBody">
     
-    <div><p>Record a failed subtest in both native and exported results.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">test:</span><code>unittest.case.TestCase</code></td><td class="fieldArgDesc">Parent test providing source and method metadata.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">subtest:</span><code>unittest.case.TestCase</code></td><td class="fieldArgDesc">Subtest providing its parameterized identifier.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">err:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" class="intersphinx-link">tuple</a> or <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">Exception details, or None when the subtest passed.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">Complete the documented operation without returning a value.</td></tr></table></div>
+    <div><p>Record a failed subtest in both native and exported results.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">test:</span><code><a href="https://docs.python.org/3/library/unittest.html#unittest.TestCase" class="intersphinx-link">unittest.TestCase</a></code></td><td class="fieldArgDesc">Parent test providing source and method metadata.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">subtest:</span><code><a href="https://docs.python.org/3/library/unittest.html#unittest.TestCase" class="intersphinx-link">unittest.TestCase</a></code></td><td class="fieldArgDesc">Subtest providing its parameterized identifier.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">err:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" class="intersphinx-link">tuple</a> or <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">Exception details, or None when the subtest passed.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">Complete the documented operation without returning a value.</td></tr></table></div>
   </div>
 </div><div class="basemethod">
   
@@ -1085,7 +1085,7 @@ superclass method.</td></tr></table></div>
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">addSuccess</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">test: <code>unittest.case.TestCase</code></span>):</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/test/executors/results.py#L88">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/test/executors/results.py#L105">
       
       (source)
     </a>
@@ -1097,7 +1097,7 @@ superclass method.</td></tr></table></div>
   </div>
   <div class="docstring functionBody">
     
-    <div><p>Record a successful test result and print it.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">test:</span><code>unittest.case.TestCase</code></td><td class="fieldArgDesc">The test case instance that succeeded.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">This method appends the result and prints it, then calls the
+    <div><p>Record a successful test result and print it.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">test:</span><code><a href="https://docs.python.org/3/library/unittest.html#unittest.TestCase" class="intersphinx-link">unittest.TestCase</a></code></td><td class="fieldArgDesc">The test case instance that succeeded.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">This method appends the result and prints it, then calls the
 superclass method.</td></tr></table></div>
   </div>
 </div><div class="basemethod">
@@ -1113,7 +1113,7 @@ superclass method.</td></tr></table></div>
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">addUnexpectedSuccess</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">test: <code>unittest.case.TestCase</code></span>):</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/test/executors/results.py#L246">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/test/executors/results.py#L263">
       
       (source)
     </a>
@@ -1125,7 +1125,7 @@ superclass method.</td></tr></table></div>
   </div>
   <div class="docstring functionBody">
     
-    <div><p>Report an unexpected success as a failed outcome.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">test:</span><code>unittest.case.TestCase</code></td><td class="fieldArgDesc">Test that passed despite its expected-failure marker.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">Complete the documented operation without returning a value.</td></tr></table></div>
+    <div><p>Report an unexpected success as a failed outcome.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">test:</span><code><a href="https://docs.python.org/3/library/unittest.html#unittest.TestCase" class="intersphinx-link">unittest.TestCase</a></code></td><td class="fieldArgDesc">Test that passed despite its expected-failure marker.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">Complete the documented operation without returning a value.</td></tr></table></div>
   </div>
 </div><div class="basemethod">
   
@@ -1140,7 +1140,7 @@ superclass method.</td></tr></table></div>
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">getTestResults</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/stdtypes.html#list" class="intersphinx-link">list</a>[<wbr></wbr><a href="orionis.test.entities.result.TestResult.html" class="internal-link" title="orionis.test.entities.result.TestResult">TestResult</a>]</code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/test/executors/results.py#L522">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/test/executors/results.py#L539">
       
       (source)
     </a>
@@ -1152,7 +1152,7 @@ superclass method.</td></tr></table></div>
   </div>
   <div class="docstring functionBody">
     
-    <div><p>Retrieve the list of test results collected during execution.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/stdtypes.html#list" class="intersphinx-link">list</a>[<a href="orionis.test.entities.result.TestResult.html" class="internal-link" title="orionis.test.entities.result.TestResult">TestResult</a>]</code></td><td class="fieldArgDesc">A list of TestResult instances representing the outcomes of
+    <div><p>Retrieve the list of test results collected during execution.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/stdtypes.html#list" class="intersphinx-link">list</a>[<a href="orionis.test.entities.result.TestResult.html" class="internal-link">orionis.test.entities.result.TestResult</a>]</code></td><td class="fieldArgDesc">A list of TestResult instances representing the outcomes of
 executed tests.</td></tr></table></div>
   </div>
 </div><div class="basemethod">
@@ -1168,7 +1168,7 @@ executed tests.</td></tr></table></div>
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">startTest</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">test: <code>unittest.case.TestCase</code></span>):</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/test/executors/results.py#L71">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/test/executors/results.py#L87">
       
       (source)
     </a>
@@ -1180,7 +1180,7 @@ executed tests.</td></tr></table></div>
   </div>
   <div class="docstring functionBody">
     
-    <div><p>Start timing for a test case execution.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">test:</span><code>unittest.case.TestCase</code></td><td class="fieldArgDesc">The test case instance being started.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">This method starts a timer and calls the superclass method.</td></tr></table></div>
+    <div><p>Start timing for a test case execution.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">test:</span><code><a href="https://docs.python.org/3/library/unittest.html#unittest.TestCase" class="intersphinx-link">unittest.TestCase</a></code></td><td class="fieldArgDesc">The test case instance being started.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">This method starts a timer and calls the superclass method.</td></tr></table></div>
   </div>
 </div><div class="baseinstancevariable">
   
@@ -1194,7 +1194,7 @@ executed tests.</td></tr></table></div>
   <div class="functionHeader">
     
     <span class="py-defname">__console</span> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/test/executors/results.py#L68">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/test/executors/results.py#L82">
       
       (source)
     </a>
@@ -1206,7 +1206,7 @@ executed tests.</td></tr></table></div>
   </div>
   <div class="functionBody">
     
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p>Console produced by <tt class="rst-docutils rst-literal">Console</tt>.</p></div>
     
   </div>
 </div><div class="baseinstancevariable">
@@ -1221,7 +1221,7 @@ executed tests.</td></tr></table></div>
   <div class="functionHeader">
     
     <span class="py-defname">__max_width</span> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/test/executors/results.py#L69">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/test/executors/results.py#L84">
       
       (source)
     </a>
@@ -1233,7 +1233,7 @@ executed tests.</td></tr></table></div>
   </div>
   <div class="functionBody">
     
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p>Maximum width used when rendering test-result panels.</p></div>
     
   </div>
 </div><div class="baseinstancevariable">
@@ -1248,7 +1248,7 @@ executed tests.</td></tr></table></div>
   <div class="functionHeader">
     
     <span class="py-defname">__print_verbosity</span>: <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a> | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/test/executors/results.py#L66">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/test/executors/results.py#L73">
       
       (source)
     </a>
@@ -1260,7 +1260,10 @@ executed tests.</td></tr></table></div>
   </div>
   <div class="functionBody">
     
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p>1 prints one compact line
+per test and 2 prints a detailed panel. Any other value, including None,
+prints nothing. Supplied by the runner through
+<tt class="rst-docutils rst-literal">unittest.TextTestRunner._makeResult</tt>, by default None.</p></div>
     
   </div>
 </div><div class="baseinstancevariable">
@@ -1275,7 +1278,7 @@ executed tests.</td></tr></table></div>
   <div class="functionHeader">
     
     <span class="py-defname">__start_time</span> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/test/executors/results.py#L85">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/test/executors/results.py#L101">
       
       (source)
     </a>
@@ -1287,7 +1290,7 @@ executed tests.</td></tr></table></div>
   </div>
   <div class="functionBody">
     
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p>Start time produced by <tt class="rst-docutils rst-literal">time.perf_counter</tt>.</p></div>
     
   </div>
 </div><div class="baseinstancevariable">
@@ -1302,7 +1305,7 @@ executed tests.</td></tr></table></div>
   <div class="functionHeader">
     
     <span class="py-defname">__test_results</span>: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#list" class="intersphinx-link">list</a>[<wbr></wbr><a href="orionis.test.entities.result.TestResult.html" class="internal-link" title="orionis.test.entities.result.TestResult">TestResult</a>]</code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/test/executors/results.py#L67">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/test/executors/results.py#L80">
       
       (source)
     </a>
@@ -1314,7 +1317,7 @@ executed tests.</td></tr></table></div>
   </div>
   <div class="functionBody">
     
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p>Structured outcomes collected during the current test run.</p></div>
     
   </div>
 </div>
@@ -1328,7 +1331,7 @@ executed tests.</td></tr></table></div>
   <div class="orionis-footer-inner">
     <div class="orionis-footer-copy">
       <p>API documentation for <a href="https://orionis-framework.com/" class="projecthome">Orionis</a>.</p>
-      <p class="orionis-footer-meta">Generated with <a href="https://github.com/twisted/pydoctor/">Pydoctor</a> 25.10.1.<span class="orionis-footer-build"> Built 2026-11-03 09:36:58.</span></p>
+      <p class="orionis-footer-meta">Generated with <a href="https://github.com/twisted/pydoctor/">Pydoctor</a> 25.10.1.<span class="orionis-footer-build"> Built 2026-11-03 13:00:15.</span></p>
     </div>
     <nav class="orionis-footer-links" aria-label="Additional resources">
       <a href="https://docs.orionis-framework.com">Read the guide <span aria-hidden="true">↗</span></a>

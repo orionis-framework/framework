@@ -410,44 +410,44 @@
         </div>
 
         <div class="extrasDocstring">
-          <p class="class-signature"><code><span class="py-keyword">class</span> <span class="py-defname">RegisterSchema</span>(<a href="orionis.schemas.Schema.html" class="internal-link" title="orionis.schemas.Schema">Schema</a>): <a href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/http/default/schemas/register.py#L12" class="sourceLink">(source)</a></code></p><p><a href="classIndex.html#orionis.http.default.schemas.register.RegisterSchema">View In Hierarchy</a></p>
+          <p class="class-signature"><code><span class="py-keyword">class</span> <span class="py-defname">RegisterSchema</span>(<a href="orionis.schemas.Schema.html" class="internal-link" title="orionis.schemas.Schema">Schema</a>): <a href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/http/default/schemas/register.py#L14" class="sourceLink">(source)</a></code></p><p><a href="classIndex.html#orionis.http.default.schemas.register.RegisterSchema">View In Hierarchy</a></p>
         </div>
 
         <div class="moduleDocstring">
-          <div><p class="undocumented">Undocumented</p></div>
+          <div><p>Validate the account details required for user registration.</p></div>
         </div>
 
         <div id="split-tables">
-          <table class="children sortable" id="id1028">
+          <table class="children sortable" id="id1029">
   
   
   <tr class="classvariable">
     
     <td>Class Variable</td>
     <td><code><a href="#email" class="internal-link" title="orionis.http.default.schemas.register.RegisterSchema.email">email</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
+    <td>Email address subject to the declared length and address constraints.</td>
   </tr><tr class="classvariable">
     
     <td>Class Variable</td>
     <td><code><a href="#name" class="internal-link" title="orionis.http.default.schemas.register.RegisterSchema.name">name</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
+    <td>Account display name subject to the declared validation constraints.</td>
   </tr><tr class="classvariable">
     
     <td>Class Variable</td>
     <td><code><a href="#password" class="internal-link" title="orionis.http.default.schemas.register.RegisterSchema.password">password</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
+    <td>Account password subject to the declared validation constraints.</td>
   </tr><tr class="classvariable">
     
     <td>Class Variable</td>
     <td><code><a href="#password_confirmation" class="internal-link" title="orionis.http.default.schemas.register.RegisterSchema.password_confirmation">password<wbr></wbr>_confirmation</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
+    <td>Repeated password value that must match the password field.</td>
   </tr>
 </table>
           
             <p class="inheritedFrom">
               Inherited from <code><a href="orionis.schemas.Schema.html" class="internal-link" title="orionis.schemas.Schema">Schema</a></code>:
             </p>
-            <table class="children sortable" id="id1029">
+            <table class="children sortable" id="id1030">
   
   
   <tr class="basemethod">
@@ -475,7 +475,7 @@
   <div class="functionHeader">
     
     <span class="py-defname">email</span>: <code>Field[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <wbr></wbr><a href="orionis.schemas.metadata.Message.html" class="internal-link" title="orionis.schemas.metadata.Message">Message</a>(<wbr></wbr><span class="rst-variable-quote">'</span><span class="rst-variable-string">Email must be a string.</span><span class="rst-variable-quote">'</span>), <wbr></wbr>Email(<wbr></wbr>message=<span class="rst-variable-quote">'</span><span class="rst-variable-string">Email must be a valid email address.</span><span class="rst-variable-quote">'</span>), <wbr></wbr>Unique(<wbr></wbr>table=<span class="rst-variable-quote">'</span><span class="rst-variable-string">users</span><span class="rst-variable-quote">'</span>, <wbr></wbr>column=<span class="rst-variable-quote">'</span><span class="rst-variable-string">email</span><span class="rst-variable-quote">'</span>, <wbr></wbr>message=<span class="rst-variable-quote">'</span><span class="rst-variable-string">Email already exists. Please use a different email address.</span><span class="rst-variable-quote">'</span>)]</code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/http/default/schemas/register.py#L22">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/http/default/schemas/register.py#L26">
       
       (source)
     </a>
@@ -487,7 +487,7 @@
   </div>
   <div class="functionBody">
     
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p>Email address subject to the declared length and address constraints.</p></div>
     
   </div>
 </div><div class="baseclassvariable">
@@ -502,7 +502,7 @@
   <div class="functionHeader">
     
     <span class="py-defname">name</span>: <code>Field[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <wbr></wbr><a href="orionis.schemas.metadata.Message.html" class="internal-link" title="orionis.schemas.metadata.Message">Message</a>(<wbr></wbr><span class="rst-variable-quote">'</span><span class="rst-variable-string">Name must be a string.</span><span class="rst-variable-quote">'</span>), <wbr></wbr><a href="orionis.schemas.constraints.MinLength.html" class="internal-link" title="orionis.schemas.constraints.MinLength">MinLength</a>(<wbr></wbr>6, <wbr></wbr>message=<span class="rst-variable-quote">'</span><span class="rst-variable-string">Name must be at least 6 characters long.</span><span class="rst-variable-quote">'</span>)]</code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/http/default/schemas/register.py#L16">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/http/default/schemas/register.py#L19">
       
       (source)
     </a>
@@ -514,7 +514,7 @@
   </div>
   <div class="functionBody">
     
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p>Account display name subject to the declared validation constraints.</p></div>
     
   </div>
 </div><div class="baseclassvariable">
@@ -529,7 +529,7 @@
   <div class="functionHeader">
     
     <span class="py-defname">password</span>: <code>Field[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <wbr></wbr><a href="orionis.schemas.metadata.Message.html" class="internal-link" title="orionis.schemas.metadata.Message">Message</a>(<wbr></wbr><span class="rst-variable-quote">'</span><span class="rst-variable-string">Password must be a string.</span><span class="rst-variable-quote">'</span>), <wbr></wbr>StrongPassword(<wbr></wbr>message=<span class="rst-variable-quote">'</span><span class="rst-variable-string">Password must contain at least one uppercase letter, one lowercase letter, one number, and one special character.</span><span class="rst-variable-quote">'</span>)]</code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/http/default/schemas/register.py#L33">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/http/default/schemas/register.py#L38">
       
       (source)
     </a>
@@ -541,7 +541,7 @@
   </div>
   <div class="functionBody">
     
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p>Account password subject to the declared validation constraints.</p></div>
     
   </div>
 </div><div class="baseclassvariable">
@@ -556,7 +556,7 @@
   <div class="functionHeader">
     
     <span class="py-defname">password_confirmation</span>: <code>Field[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <wbr></wbr><a href="orionis.schemas.metadata.Message.html" class="internal-link" title="orionis.schemas.metadata.Message">Message</a>(<wbr></wbr><span class="rst-variable-quote">'</span><span class="rst-variable-string">Password confirmation must be a string.</span><span class="rst-variable-quote">'</span>), <wbr></wbr>ConfirmPassword(<wbr></wbr>message=<span class="rst-variable-quote">'</span><span class="rst-variable-string">Password confirmation does not match the password.</span><span class="rst-variable-quote">'</span>)]</code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/http/default/schemas/register.py#L44">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/http/default/schemas/register.py#L50">
       
       (source)
     </a>
@@ -568,7 +568,7 @@
   </div>
   <div class="functionBody">
     
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p>Repeated password value that must match the password field.</p></div>
     
   </div>
 </div>
@@ -582,7 +582,7 @@
   <div class="orionis-footer-inner">
     <div class="orionis-footer-copy">
       <p>API documentation for <a href="https://orionis-framework.com/" class="projecthome">Orionis</a>.</p>
-      <p class="orionis-footer-meta">Generated with <a href="https://github.com/twisted/pydoctor/">Pydoctor</a> 25.10.1.<span class="orionis-footer-build"> Built 2026-11-03 09:36:58.</span></p>
+      <p class="orionis-footer-meta">Generated with <a href="https://github.com/twisted/pydoctor/">Pydoctor</a> 25.10.1.<span class="orionis-footer-build"> Built 2026-11-03 13:00:15.</span></p>
     </div>
     <nav class="orionis-footer-links" aria-label="Additional resources">
       <a href="https://docs.orionis-framework.com">Read the guide <span aria-hidden="true">↗</span></a>

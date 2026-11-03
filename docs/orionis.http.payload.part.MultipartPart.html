@@ -550,7 +550,7 @@
         </div>
 
         <div class="extrasDocstring">
-          <p class="class-signature"><code><span class="py-keyword">class</span> <span class="py-defname">MultipartPart</span>(<a href="orionis.http.payload.contracts.part.IMultipartPart.html" class="internal-link" title="orionis.http.payload.contracts.part.IMultipartPart">IMultipartPart</a>): <a href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/http/payload/part.py#L14" class="sourceLink">(source)</a></code></p><p>Constructor: <code><a href="#__init__" class="internal-link" title="orionis.http.payload.part.MultipartPart.__init__">MultipartPart(headers, memory_threshold)</a></code></p><p><a href="classIndex.html#orionis.http.payload.part.MultipartPart">View In Hierarchy</a></p>
+          <p class="class-signature"><code><span class="py-keyword">class</span> <span class="py-defname">MultipartPart</span>(<a href="orionis.http.payload.contracts.part.IMultipartPart.html" class="internal-link" title="orionis.http.payload.contracts.part.IMultipartPart">IMultipartPart</a>): <a href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/http/payload/part.py#L16" class="sourceLink">(source)</a></code></p><p>Constructor: <code><a href="#__init__" class="internal-link" title="orionis.http.payload.part.MultipartPart.__init__">MultipartPart(headers, memory_threshold)</a></code></p><p><a href="classIndex.html#orionis.http.payload.part.MultipartPart">View In Hierarchy</a></p>
         </div>
 
         <div class="moduleDocstring">
@@ -558,7 +558,7 @@
         </div>
 
         <div id="split-tables">
-          <table class="children sortable" id="id1101">
+          <table class="children sortable" id="id1102">
   
   
   <tr class="method">
@@ -585,42 +585,42 @@
     
     <td>Class Variable</td>
     <td><code><a href="#__slots__" class="internal-link" title="orionis.http.payload.part.MultipartPart.__slots__">__slots__</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
+    <td>Declare the instance attribute slots reserved by this class.</td>
   </tr><tr class="instancevariable">
     
     <td>Instance Variable</td>
     <td><code><a href="#_write" class="internal-link" title="orionis.http.payload.part.MultipartPart._write">_write</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
+    <td>Callable used to append bytes to the current multipart part.</td>
   </tr><tr class="instancevariable">
     
     <td>Instance Variable</td>
     <td><code><a href="#content_type" class="internal-link" title="orionis.http.payload.part.MultipartPart.content_type">content<wbr></wbr>_type</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
+    <td>Content type produced by <tt class="rst-docutils rst-literal">headers.get</tt>.</td>
   </tr><tr class="instancevariable">
     
     <td>Instance Variable</td>
     <td><code><a href="#data" class="internal-link" title="orionis.http.payload.part.MultipartPart.data">data</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
+    <td>Select the file or field buffer writer for this part.</td>
   </tr><tr class="instancevariable">
     
     <td>Instance Variable</td>
     <td><code><a href="#filename" class="internal-link" title="orionis.http.payload.part.MultipartPart.filename">filename</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
+    <td>Filename used when rendering or storing the resource.</td>
   </tr><tr class="instancevariable">
     
     <td>Instance Variable</td>
     <td><code><a href="#headers" class="internal-link" title="orionis.http.payload.part.MultipartPart.headers">headers</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
+    <td>Lowercased headers for this multipart part.</td>
   </tr><tr class="instancevariable">
     
     <td>Instance Variable</td>
     <td><code><a href="#is_file" class="internal-link" title="orionis.http.payload.part.MultipartPart.is_file">is<wbr></wbr>_file</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
+    <td>A part is treated as a file upload when a filename is declared.</td>
   </tr><tr class="instancevariable">
     
     <td>Instance Variable</td>
     <td><code><a href="#name" class="internal-link" title="orionis.http.payload.part.MultipartPart.name">name</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
+    <td>Assign field metadata extracted from the disposition attributes.</td>
   </tr>
 </table>
           
@@ -642,7 +642,7 @@
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">__init__</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">headers: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#dict" class="intersphinx-link">dict</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>]</code>, </span><span class="rst-sig-param">memory_threshold: <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code></span>):</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/http/payload/part.py#L27">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/http/payload/part.py#L30">
       
       (source)
     </a>
@@ -669,7 +669,7 @@
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">_parseContentDisposition</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">disposition: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/stdtypes.html#dict" class="intersphinx-link">dict</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>]</code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/http/payload/part.py#L79">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/http/payload/part.py#L89">
       
       (source)
     </a>
@@ -699,7 +699,7 @@ prefer successfully decoded extended attributes over plain values.</p>
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">finalize</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>) -&gt; <code><a href="orionis.http.payload.uploaded_file.UploadedFile.html" class="internal-link" title="orionis.http.payload.uploaded_file.UploadedFile">UploadedFile</a> | <a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/http/payload/part.py#L158">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/http/payload/part.py#L168">
       
       (source)
     </a>
@@ -716,7 +716,7 @@ prefer successfully decoded extended attributes over plain values.</p>
 (<tt class="rst-docutils rst-literal">base64</tt> or <tt class="rst-docutils rst-literal"><span class="pre">quoted-printable</span></tt>) and decodes to a string using
 the charset declared in the part's <tt class="rst-docutils rst-literal"><span class="pre">Content-Type</span></tt> header,
 falling back to UTF-8.</p>
-<table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code>UploadedFile | str</code></td><td class="fieldArgDesc">The <tt class="rst-docutils rst-literal">UploadedFile</tt> handle for file parts, or the decoded
+<table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code>orionis.http.payload.uploaded_file.UploadedFile | str</code></td><td class="fieldArgDesc">The <tt class="rst-docutils rst-literal">UploadedFile</tt> handle for file parts, or the decoded
 string for field parts.</td></tr></table></div>
   </div>
 </div><div class="basemethod">
@@ -732,7 +732,7 @@ string for field parts.</td></tr></table></div>
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">write</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">chunk: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#bytes" class="intersphinx-link">bytes</a> | <a href="https://docs.python.org/3/builtins/stdtypes.html#bytearray" class="intersphinx-link">bytearray</a> | <a href="https://docs.python.org/3/builtins/stdtypes.html#memoryview" class="intersphinx-link">memoryview</a></code></span>):</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/http/payload/part.py#L141">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/http/payload/part.py#L151">
       
       (source)
     </a>
@@ -758,7 +758,7 @@ string for field parts.</td></tr></table></div>
   <div class="functionHeader">
     
     <span class="py-defname">__slots__</span>: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" class="intersphinx-link">tuple</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <wbr></wbr><span class="rst-variable-ellipsis">...</span>]</code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/http/payload/part.py#L17">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/http/payload/part.py#L19">
       
       (source)
     </a>
@@ -770,7 +770,7 @@ string for field parts.</td></tr></table></div>
   </div>
   <div class="functionBody">
     <div class="interfaceinfo">overrides <code><a href="orionis.http.payload.contracts.part.IMultipartPart.html#__slots__" class="internal-link">orionis.http.payload.contracts.part.IMultipartPart.__slots__</a></code></div>
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p>Declare the instance attribute slots reserved by this class.</p></div>
     
   </div>
 </div><div class="baseinstancevariable">
@@ -785,7 +785,7 @@ string for field parts.</td></tr></table></div>
   <div class="functionHeader">
     
     <span class="py-defname">_write</span>: <code><a href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Callable" class="intersphinx-link">Callable</a>[<wbr></wbr>[<wbr></wbr>(<a href="https://docs.python.org/3/builtins/stdtypes.html#bytes" class="intersphinx-link">bytes</a> | <a href="https://docs.python.org/3/builtins/stdtypes.html#bytearray" class="intersphinx-link">bytearray</a> | <a href="https://docs.python.org/3/builtins/stdtypes.html#memoryview" class="intersphinx-link">memoryview</a>)], <wbr></wbr><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a>]</code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/http/payload/part.py#L67">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/http/payload/part.py#L76">
       
       (source)
     </a>
@@ -797,7 +797,7 @@ string for field parts.</td></tr></table></div>
   </div>
   <div class="functionBody">
     
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p>Callable used to append bytes to the current multipart part.</p></div>
     
   </div>
 </div><div class="baseinstancevariable">
@@ -812,7 +812,7 @@ string for field parts.</td></tr></table></div>
   <div class="functionHeader">
     
     <span class="py-defname">content_type</span>: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a> | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/http/payload/part.py#L60">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/http/payload/part.py#L66">
       
       (source)
     </a>
@@ -824,7 +824,7 @@ string for field parts.</td></tr></table></div>
   </div>
   <div class="functionBody">
     
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p>Content type produced by <tt class="rst-docutils rst-literal">headers.get</tt>.</p></div>
     
   </div>
 </div><div class="baseinstancevariable">
@@ -839,7 +839,7 @@ string for field parts.</td></tr></table></div>
   <div class="functionHeader">
     
     <span class="py-defname">data</span>: <code><a href="orionis.http.payload.uploaded_file.UploadedFile.html" class="internal-link" title="orionis.http.payload.uploaded_file.UploadedFile">UploadedFile</a> | <a href="https://docs.python.org/3/builtins/stdtypes.html#bytearray" class="intersphinx-link">bytearray</a></code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/http/payload/part.py#L66">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/http/payload/part.py#L74">
       
       (source)
     </a>
@@ -851,7 +851,7 @@ string for field parts.</td></tr></table></div>
   </div>
   <div class="functionBody">
     
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p>Select the file or field buffer writer for this part.</p></div>
     
   </div>
 </div><div class="baseinstancevariable">
@@ -866,7 +866,7 @@ string for field parts.</td></tr></table></div>
   <div class="functionHeader">
     
     <span class="py-defname">filename</span>: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a> | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/http/payload/part.py#L59">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/http/payload/part.py#L64">
       
       (source)
     </a>
@@ -878,7 +878,7 @@ string for field parts.</td></tr></table></div>
   </div>
   <div class="functionBody">
     
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p>Filename used when rendering or storing the resource.</p></div>
     
   </div>
 </div><div class="baseinstancevariable">
@@ -893,7 +893,7 @@ string for field parts.</td></tr></table></div>
   <div class="functionHeader">
     
     <span class="py-defname">headers</span> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/http/payload/part.py#L48">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/http/payload/part.py#L51">
       
       (source)
     </a>
@@ -905,7 +905,7 @@ string for field parts.</td></tr></table></div>
   </div>
   <div class="functionBody">
     
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p>Lowercased headers for this multipart part.</p></div>
     
   </div>
 </div><div class="baseinstancevariable">
@@ -920,7 +920,7 @@ string for field parts.</td></tr></table></div>
   <div class="functionHeader">
     
     <span class="py-defname">is_file</span>: <code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/http/payload/part.py#L63">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/http/payload/part.py#L70">
       
       (source)
     </a>
@@ -932,7 +932,7 @@ string for field parts.</td></tr></table></div>
   </div>
   <div class="functionBody">
     
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p>A part is treated as a file upload when a filename is declared.</p></div>
     
   </div>
 </div><div class="baseinstancevariable">
@@ -947,7 +947,7 @@ string for field parts.</td></tr></table></div>
   <div class="functionHeader">
     
     <span class="py-defname">name</span>: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a> | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/http/payload/part.py#L58">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/http/payload/part.py#L62">
       
       (source)
     </a>
@@ -959,7 +959,7 @@ string for field parts.</td></tr></table></div>
   </div>
   <div class="functionBody">
     
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p>Assign field metadata extracted from the disposition attributes.</p></div>
     
   </div>
 </div>
@@ -973,7 +973,7 @@ string for field parts.</td></tr></table></div>
   <div class="orionis-footer-inner">
     <div class="orionis-footer-copy">
       <p>API documentation for <a href="https://orionis-framework.com/" class="projecthome">Orionis</a>.</p>
-      <p class="orionis-footer-meta">Generated with <a href="https://github.com/twisted/pydoctor/">Pydoctor</a> 25.10.1.<span class="orionis-footer-build"> Built 2026-11-03 09:36:58.</span></p>
+      <p class="orionis-footer-meta">Generated with <a href="https://github.com/twisted/pydoctor/">Pydoctor</a> 25.10.1.<span class="orionis-footer-build"> Built 2026-11-03 13:00:15.</span></p>
     </div>
     <nav class="orionis-footer-links" aria-label="Additional resources">
       <a href="https://docs.orionis-framework.com">Read the guide <span aria-hidden="true">↗</span></a>

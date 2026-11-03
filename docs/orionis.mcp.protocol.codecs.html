@@ -593,8 +593,21 @@
         
          
 
+        <div class="childrenKindTitle">Variables</div>
+        <ul>
+    
+    <li class="">
         
-         
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.mcp.protocol.content.html#ContentBlock" class="internal-link" title="orionis.mcp.protocol.content.ContentBlock"><wbr></wbr>Content<wbr></wbr>Block</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
 
         
          
@@ -812,8 +825,51 @@
         
          
 
+        <div class="childrenKindTitle">Variables</div>
+        <ul>
+    
+    <li class="">
         
-         
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.mcp.protocol.input_shapes.html#FormValue" class="internal-link" title="orionis.mcp.protocol.input_shapes.FormValue"><wbr></wbr>Form<wbr></wbr>Value</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.mcp.protocol.input_shapes.html#Nonnegative" class="internal-link" title="orionis.mcp.protocol.input_shapes.Nonnegative"><wbr></wbr>Nonnegative</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.mcp.protocol.input_shapes.html#OptionalString" class="internal-link" title="orionis.mcp.protocol.input_shapes.OptionalString"><wbr></wbr>Optional<wbr></wbr>String</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.mcp.protocol.input_shapes.html#Priority" class="internal-link" title="orionis.mcp.protocol.input_shapes.Priority"><wbr></wbr>Priority</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
 
         
          
@@ -1481,8 +1537,41 @@
         
          
 
+        <div class="childrenKindTitle">Variables</div>
+        <ul>
+    
+    <li class="">
         
-         
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.mcp.protocol.requests.html#LoggingLevel" class="internal-link" title="orionis.mcp.protocol.requests.LoggingLevel"><wbr></wbr>Logging<wbr></wbr>Level</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.mcp.protocol.requests.html#Metadata" class="internal-link" title="orionis.mcp.protocol.requests.Metadata"><wbr></wbr>Metadata</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.mcp.protocol.requests.html#RequestId" class="internal-link" title="orionis.mcp.protocol.requests.RequestId"><wbr></wbr>Request<wbr></wbr>Id</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
 
         
          
@@ -1937,15 +2026,17 @@
         </div>
 
         <div class="extrasDocstring">
-          <a href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/mcp/protocol/codecs.py" class="sourceLink">(source)</a>
+          <a href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/mcp/protocol/codecs.py" class="sourceLink">(source)</a>
         </div>
 
         <div class="moduleDocstring">
-          <div><p class="undocumented">Undocumented</p></div>
+          <div><p>Provide mcp protocol operations.</p>
+<p>Includes <tt class="rst-docutils rst-literal">decode_envelope</tt>, <tt class="rst-docutils rst-literal">decode_params</tt>, <tt class="rst-docutils rst-literal">encode_error</tt>.</p>
+</div>
         </div>
 
         <div id="split-tables">
-          <table class="children sortable" id="id1364">
+          <table class="children sortable" id="id1368">
   
   
   <tr class="function">
@@ -1967,12 +2058,12 @@
     
     <td>Constant</td>
     <td><code><a href="#_ENVELOPE" class="internal-link" title="orionis.mcp.protocol.codecs._ENVELOPE">_ENVELOPE</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
+    <td>Envelope used by <tt class="rst-docutils rst-literal">codecs</tt>.</td>
   </tr><tr class="constant">
     
     <td>Constant</td>
     <td><code><a href="#METHOD_DECODERS" class="internal-link" title="orionis.mcp.protocol.codecs.METHOD_DECODERS">METHOD<wbr></wbr>_DECODERS</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
+    <td>Method decoders used by <tt class="rst-docutils rst-literal">codecs</tt>.</td>
   </tr>
 </table>
           
@@ -1994,7 +2085,7 @@
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">decode_envelope</span><span class="function-signature">(<span class="rst-sig-param">data: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#bytes" class="intersphinx-link">bytes</a></code></span>) -&gt; <code><a href="orionis.mcp.protocol.requests.JsonRpcRequest.html" class="internal-link" title="orionis.mcp.protocol.requests.JsonRpcRequest">JsonRpcRequest</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/mcp/protocol/codecs.py#L39">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/mcp/protocol/codecs.py#L46">
       
       (source)
     </a>
@@ -2006,7 +2097,7 @@
   </div>
   <div class="docstring functionBody">
     
-    <div><p>Parse a single UTF-8 JSON-RPC message without decoding its payload.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">data:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#bytes" class="intersphinx-link">bytes</a></code></td><td class="fieldArgDesc">Value supplied for <tt class="rst-docutils rst-literal">data</tt>.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.mcp.protocol.requests.JsonRpcRequest.html" class="internal-link" title="orionis.mcp.protocol.requests.JsonRpcRequest">JsonRpcRequest</a></code></td><td class="fieldArgDesc">Result of the operation described above.</td></tr></table></div>
+    <div><p>Parse a single UTF-8 JSON-RPC message without decoding its payload.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">data:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#bytes" class="intersphinx-link">bytes</a></code></td><td class="fieldArgDesc">Value supplied for <tt class="rst-docutils rst-literal">data</tt>.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.mcp.protocol.requests.JsonRpcRequest.html" class="internal-link">orionis.mcp.protocol.requests.JsonRpcRequest</a></code></td><td class="fieldArgDesc">Result of the operation described above.</td></tr></table></div>
   </div>
 </div><div class="basefunction">
   
@@ -2021,7 +2112,7 @@
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">decode_params</span><span class="function-signature">(<span class="rst-sig-param">request: <code><a href="orionis.mcp.protocol.requests.JsonRpcRequest.html" class="internal-link" title="orionis.mcp.protocol.requests.JsonRpcRequest">JsonRpcRequest</a></code></span>) -&gt; <code><a href="orionis.mcp.protocol.requests.RequestParams.html" class="internal-link" title="orionis.mcp.protocol.requests.RequestParams">RequestParams</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/mcp/protocol/codecs.py#L60">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/mcp/protocol/codecs.py#L67">
       
       (source)
     </a>
@@ -2033,7 +2124,7 @@
   </div>
   <div class="docstring functionBody">
     
-    <div><p>Validate method-specific parameters and per-request metadata.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">request:</span><code><a href="orionis.mcp.protocol.requests.JsonRpcRequest.html" class="internal-link" title="orionis.mcp.protocol.requests.JsonRpcRequest">JsonRpcRequest</a></code></td><td class="fieldArgDesc">Current request and its trusted execution context.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.mcp.protocol.requests.RequestParams.html" class="internal-link" title="orionis.mcp.protocol.requests.RequestParams">RequestParams</a></code></td><td class="fieldArgDesc">Result of the operation described above.</td></tr></table></div>
+    <div><p>Validate method-specific parameters and per-request metadata.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">request:</span><code><a href="orionis.mcp.protocol.requests.JsonRpcRequest.html" class="internal-link">orionis.mcp.protocol.requests.JsonRpcRequest</a></code></td><td class="fieldArgDesc">Current request and its trusted execution context.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.mcp.protocol.requests.RequestParams.html" class="internal-link">orionis.mcp.protocol.requests.RequestParams</a></code></td><td class="fieldArgDesc">Result of the operation described above.</td></tr></table></div>
   </div>
 </div><div class="basefunction">
   
@@ -2048,7 +2139,7 @@
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">encode_error</span><span class="function-signature long-signature">(<span class="rst-sig-param">exception: <code><a href="orionis.mcp.exceptions.McpProtocolException.html" class="internal-link" title="orionis.mcp.exceptions.McpProtocolException">McpProtocolException</a></code>, </span><span class="rst-sig-param">request_id: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a> | <a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a> | msgspec.UnsetType</code> = msgspec.UNSET</span>) -&gt; <code><a href="https://docs.python.org/3/builtins/stdtypes.html#bytes" class="intersphinx-link">bytes</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/mcp/protocol/codecs.py#L104">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/mcp/protocol/codecs.py#L111">
       
       (source)
     </a>
@@ -2060,7 +2151,7 @@
   </div>
   <div class="docstring functionBody">
     
-    <div><p>Serialize only explicitly public exception fields.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">exception:</span><code><a href="orionis.mcp.exceptions.McpProtocolException.html" class="internal-link" title="orionis.mcp.exceptions.McpProtocolException">McpProtocolException</a></code></td><td class="fieldArgDesc">Exception being inspected or reported.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">request<wbr></wbr>_id:</span><code>str | int | msgspec.UnsetType</code></td><td class="fieldArgDesc">Value supplied for <tt class="rst-docutils rst-literal">request_id</tt>.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/stdtypes.html#bytes" class="intersphinx-link">bytes</a></code></td><td class="fieldArgDesc">Result of the operation described above.</td></tr></table></div>
+    <div><p>Serialize only explicitly public exception fields.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">exception:</span><code><a href="orionis.mcp.exceptions.McpProtocolException.html" class="internal-link">orionis.mcp.exceptions.McpProtocolException</a></code></td><td class="fieldArgDesc">Exception being inspected or reported.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">request<wbr></wbr>_id:</span><code>str | int | <tt class="rst-docutils rst-literal">msgspec.UnsetType</tt></code></td><td class="fieldArgDesc">Value supplied for <tt class="rst-docutils rst-literal">request_id</tt>.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/stdtypes.html#bytes" class="intersphinx-link">bytes</a></code></td><td class="fieldArgDesc">Result of the operation described above.</td></tr></table></div>
   </div>
 </div><div class="baseconstant">
   
@@ -2074,7 +2165,7 @@
   <div class="functionHeader">
     
     <span class="py-defname">_ENVELOPE</span> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/mcp/protocol/codecs.py#L23">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/mcp/protocol/codecs.py#L28">
       
       (source)
     </a>
@@ -2086,7 +2177,7 @@
   </div>
   <div class="functionBody">
     
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p>Envelope used by <tt class="rst-docutils rst-literal">codecs</tt>.</p></div>
     <table class="valueTable"><tr class="fieldStart"><td class="fieldName">Value</td></tr><tr><td><pre class="constant-value"><code>msgspec.json.Decoder(<wbr></wbr><a href="orionis.mcp.protocol.requests.JsonRpcRequest.html" class="internal-link" title="orionis.mcp.protocol.requests.JsonRpcRequest">JsonRpcRequest</a>)</code></pre></td></tr></table>
   </div>
 </div><div class="baseconstant">
@@ -2101,7 +2192,7 @@
   <div class="functionHeader">
     
     <span class="py-defname">METHOD_DECODERS</span> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/mcp/protocol/codecs.py#L24">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/mcp/protocol/codecs.py#L30">
       
       (source)
     </a>
@@ -2113,7 +2204,7 @@
   </div>
   <div class="functionBody">
     
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p>Method decoders used by <tt class="rst-docutils rst-literal">codecs</tt>.</p></div>
     <table class="valueTable"><tr class="fieldStart"><td class="fieldName">Value</td></tr><tr><td><pre class="constant-value"><code><a href="https://docs.python.org/3/library/types.html#types.MappingProxyType" class="intersphinx-link">MappingProxyType</a>(<wbr></wbr>{<wbr></wbr><span class="rst-variable-quote">'</span><span class="rst-variable-string">server/discover</span><span class="rst-variable-quote">'</span>: msgspec.json.Decoder(<wbr></wbr><a href="orionis.mcp.protocol.requests.RequestParams.html" class="internal-link" title="orionis.mcp.protocol.requests.RequestParams">RequestParams</a>),
                   <wbr></wbr><span class="rst-variable-quote">'</span><span class="rst-variable-string">tools/list</span><span class="rst-variable-quote">'</span>: msgspec.json.Decoder(<wbr></wbr><a href="orionis.mcp.protocol.requests.PaginatedParams.html" class="internal-link" title="orionis.mcp.protocol.requests.PaginatedParams">PaginatedParams</a>),
                   <wbr></wbr><span class="rst-variable-quote">'</span><span class="rst-variable-string">tools/call</span><span class="rst-variable-quote">'</span>: msgspec.json.Decoder(<wbr></wbr><a href="orionis.mcp.protocol.requests.CallToolParams.html" class="internal-link" title="orionis.mcp.protocol.requests.CallToolParams">CallToolParams</a>),
@@ -2134,7 +2225,7 @@
   <div class="orionis-footer-inner">
     <div class="orionis-footer-copy">
       <p>API documentation for <a href="https://orionis-framework.com/" class="projecthome">Orionis</a>.</p>
-      <p class="orionis-footer-meta">Generated with <a href="https://github.com/twisted/pydoctor/">Pydoctor</a> 25.10.1.<span class="orionis-footer-build"> Built 2026-11-03 09:36:58.</span></p>
+      <p class="orionis-footer-meta">Generated with <a href="https://github.com/twisted/pydoctor/">Pydoctor</a> 25.10.1.<span class="orionis-footer-build"> Built 2026-11-03 13:00:15.</span></p>
     </div>
     <nav class="orionis-footer-links" aria-label="Additional resources">
       <a href="https://docs.orionis-framework.com">Read the guide <span aria-hidden="true">↗</span></a>

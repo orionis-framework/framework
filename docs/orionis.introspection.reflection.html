@@ -942,7 +942,7 @@
                     
                 </label>
 
-                <code><a href="orionis.introspection.reflection.html" class="internal-link" title="orionis.introspection.reflection">reflection</a></code>
+                <code><a href="orionis.introspection.reflection.module.html" class="internal-link" title="orionis.introspection.reflection">reflection</a></code>
 
                 <div class="expandableContent">
                     <div>
@@ -4957,15 +4957,15 @@
         </div>
 
         <div class="extrasDocstring">
-          <p class="class-signature"><code><span class="py-keyword">class</span> <span class="py-defname">Reflection</span>: <a href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/introspection/reflection.py#L25" class="sourceLink">(source)</a></code></p><p><a href="classIndex.html#orionis.introspection.Reflection">View In Hierarchy</a></p>
+          <p class="class-signature"><code><span class="py-keyword">class</span> <span class="py-defname">Reflection</span>: <a href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/introspection/reflection.py#L27" class="sourceLink">(source)</a></code></p><p><a href="classIndex.html#orionis.introspection.Reflection">View In Hierarchy</a></p>
         </div>
 
         <div class="moduleDocstring">
-          <div><p class="undocumented">Undocumented</p></div>
+          <div><p>Select reflection helpers for classes, instances, functions and modules.</p></div>
         </div>
 
         <div id="split-tables">
-          <table class="children sortable" id="id1245">
+          <table class="children sortable" id="id1247">
   
   
   <tr class="staticmethod">
@@ -5102,7 +5102,7 @@
     
     <td>Static Method</td>
     <td><code><a href="#isProtocol" class="internal-link" title="orionis.introspection.Reflection.isProtocol">is<wbr></wbr>Protocol</a></code></td>
-    <td>Determine if the object is a subclass of <code><a href="https://docs.python.org/3/library/typing.html#typing.Protocol" class="intersphinx-link">typing.Protocol</a></code>.</td>
+    <td>Determine if the object is a subclass of <tt class="rst-docutils rst-literal">typing.Protocol</tt>.</td>
   </tr><tr class="staticmethod">
     
     <td>Static Method</td>
@@ -5117,7 +5117,7 @@
     
     <td>Static Method</td>
     <td><code><a href="#isTypingConstruct" class="internal-link" title="orionis.introspection.Reflection.isTypingConstruct">is<wbr></wbr>Typing<wbr></wbr>Construct</a></code></td>
-    <td>Determine if the object is a construct from the <code><a href="https://docs.python.org/3/library/typing.html#module-typing" class="intersphinx-link">typing</a></code> module.</td>
+    <td>Determine if the object is a construct from the <tt class="rst-docutils rst-literal">typing</tt> module.</td>
   </tr><tr class="staticmethod">
     
     <td>Static Method</td>
@@ -5144,7 +5144,7 @@
     
     <div><span class="decorator">@<a href="https://docs.python.org/3/builtins/functions.html#staticmethod" class="intersphinx-link">staticmethod</a><br /></span></div>
     <span class="py-keyword">def</span>&#160;<span class="py-defname">abstract</span><span class="function-signature">(<span class="rst-sig-param">abstract: <code><a href="https://docs.python.org/3/builtins/functions.html#type" class="intersphinx-link">type</a></code></span>) -&gt; <code>IReflectionAbstract</code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/introspection/reflection.py#L49">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/introspection/reflection.py#L52">
       
       (source)
     </a>
@@ -5156,7 +5156,7 @@
   </div>
   <div class="docstring functionBody">
     
-    <div><p>Create a ReflectionAbstract for an abstract class.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">abstract:</span><code><a href="https://docs.python.org/3/builtins/functions.html#type" class="intersphinx-link">type</a></code></td><td class="fieldArgDesc">The abstract class to reflect.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.introspection.ReflectionAbstract.html" class="internal-link" title="orionis.introspection.ReflectionAbstract">ReflectionAbstract</a></code></td><td class="fieldArgDesc">Reflection object for the provided abstract class.</td></tr></table></div>
+    <div><p>Create a ReflectionAbstract for an abstract class.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">abstract:</span><code><a href="https://docs.python.org/3/builtins/functions.html#type" class="intersphinx-link">type</a></code></td><td class="fieldArgDesc">The abstract class to reflect.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.introspection.abstract.contracts.reflection.IReflectionAbstract.html" class="internal-link">orionis.introspection.abstract.contracts.reflection.IReflectionAbstract</a></code></td><td class="fieldArgDesc">Reflection object for the provided abstract class.</td></tr></table></div>
   </div>
 </div><div class="basestaticmethod">
   
@@ -5171,7 +5171,7 @@
     
     <div><span class="decorator">@<a href="https://docs.python.org/3/builtins/functions.html#staticmethod" class="intersphinx-link">staticmethod</a><br /></span></div>
     <span class="py-keyword">def</span>&#160;<span class="py-defname">callable</span><span class="function-signature">(<span class="rst-sig-param">fn: <code>Callable</code></span>) -&gt; <code>IReflectionCallable</code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/introspection/reflection.py#L107">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/introspection/reflection.py#L110">
       
       (source)
     </a>
@@ -5183,7 +5183,7 @@
   </div>
   <div class="docstring functionBody">
     
-    <div><p>Create a ReflectionCallable for a callable object.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">fn:</span><code>Callable</code></td><td class="fieldArgDesc">The function or method to wrap.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.introspection.ReflectionCallable.html" class="internal-link" title="orionis.introspection.ReflectionCallable">ReflectionCallable</a></code></td><td class="fieldArgDesc">Reflection object encapsulating the provided callable.</td></tr></table></div>
+    <div><p>Create a ReflectionCallable for a callable object.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">fn:</span><code><a href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Callable" class="intersphinx-link">collections.abc.Callable</a></code></td><td class="fieldArgDesc">The function or method to wrap.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.introspection.callables.contracts.reflection.IReflectionCallable.html" class="internal-link">orionis.introspection.callables.contracts.reflection.IReflectionCallable</a></code></td><td class="fieldArgDesc">Reflection object encapsulating the provided callable.</td></tr></table></div>
   </div>
 </div><div class="basestaticmethod">
   
@@ -5198,7 +5198,7 @@
     
     <div><span class="decorator">@<a href="https://docs.python.org/3/builtins/functions.html#staticmethod" class="intersphinx-link">staticmethod</a><br /></span></div>
     <span class="py-keyword">def</span>&#160;<span class="py-defname">concrete</span><span class="function-signature">(<span class="rst-sig-param">concrete: <code><a href="https://docs.python.org/3/builtins/functions.html#type" class="intersphinx-link">type</a></code></span>) -&gt; <code>IReflectionConcrete</code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/introspection/reflection.py#L69">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/introspection/reflection.py#L72">
       
       (source)
     </a>
@@ -5210,7 +5210,7 @@
   </div>
   <div class="docstring functionBody">
     
-    <div><p>Create a ReflectionConcrete for a concrete class.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">concrete:</span><code><a href="https://docs.python.org/3/builtins/functions.html#type" class="intersphinx-link">type</a></code></td><td class="fieldArgDesc">The concrete class to reflect.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.introspection.ReflectionConcrete.html" class="internal-link" title="orionis.introspection.ReflectionConcrete">ReflectionConcrete</a></code></td><td class="fieldArgDesc">Reflection object for the provided concrete class.</td></tr></table></div>
+    <div><p>Create a ReflectionConcrete for a concrete class.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">concrete:</span><code><a href="https://docs.python.org/3/builtins/functions.html#type" class="intersphinx-link">type</a></code></td><td class="fieldArgDesc">The concrete class to reflect.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.introspection.concretes.contracts.reflection.IReflectionConcrete.html" class="internal-link">orionis.introspection.concretes.contracts.reflection.IReflectionConcrete</a></code></td><td class="fieldArgDesc">Reflection object for the provided concrete class.</td></tr></table></div>
   </div>
 </div><div class="basestaticmethod">
   
@@ -5225,7 +5225,7 @@
     
     <div><span class="decorator">@<a href="https://docs.python.org/3/builtins/functions.html#staticmethod" class="intersphinx-link">staticmethod</a><br /></span></div>
     <span class="py-keyword">def</span>&#160;<span class="py-defname">instance</span><span class="function-signature">(<span class="rst-sig-param">instance: <code>Any</code></span>) -&gt; <code>IReflectionInstance</code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/introspection/reflection.py#L29">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/introspection/reflection.py#L32">
       
       (source)
     </a>
@@ -5237,7 +5237,7 @@
   </div>
   <div class="docstring functionBody">
     
-    <div><p>Create a ReflectionInstance for an object instance.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">instance:</span><code>Any</code></td><td class="fieldArgDesc">Object instance to reflect.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.introspection.ReflectionInstance.html" class="internal-link" title="orionis.introspection.ReflectionInstance">ReflectionInstance</a></code></td><td class="fieldArgDesc">Reflection object for the provided instance.</td></tr></table></div>
+    <div><p>Create a ReflectionInstance for an object instance.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">instance:</span><code><a href="https://docs.python.org/3/library/typing.html#typing.Any" class="intersphinx-link">typing.Any</a></code></td><td class="fieldArgDesc">Object instance to reflect.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.introspection.instances.contracts.reflection.IReflectionInstance.html" class="internal-link">orionis.introspection.instances.contracts.reflection.IReflectionInstance</a></code></td><td class="fieldArgDesc">Reflection object for the provided instance.</td></tr></table></div>
   </div>
 </div><div class="basestaticmethod">
   
@@ -5252,7 +5252,7 @@
     
     <div><span class="decorator">@<a href="https://docs.python.org/3/builtins/functions.html#staticmethod" class="intersphinx-link">staticmethod</a><br /></span></div>
     <span class="py-keyword">def</span>&#160;<span class="py-defname">isAbstract</span><span class="function-signature">(<span class="rst-sig-param">obj: <code>Any</code></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/introspection/reflection.py#L127">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/introspection/reflection.py#L130">
       
       (source)
     </a>
@@ -5264,7 +5264,7 @@
   </div>
   <div class="docstring functionBody">
     
-    <div><p>Determine if the object is an abstract base class.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">obj:</span><code>Any</code></td><td class="fieldArgDesc">Object to check for abstractness.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code></td><td class="fieldArgDesc">True if the object is an abstract base class, False otherwise.</td></tr></table></div>
+    <div><p>Determine if the object is an abstract base class.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">obj:</span><code><a href="https://docs.python.org/3/library/typing.html#typing.Any" class="intersphinx-link">typing.Any</a></code></td><td class="fieldArgDesc">Object to check for abstractness.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code></td><td class="fieldArgDesc">True if the object is an abstract base class, False otherwise.</td></tr></table></div>
   </div>
 </div><div class="basestaticmethod">
   
@@ -5279,7 +5279,7 @@
     
     <div><span class="decorator">@<a href="https://docs.python.org/3/builtins/functions.html#staticmethod" class="intersphinx-link">staticmethod</a><br /></span></div>
     <span class="py-keyword">def</span>&#160;<span class="py-defname">isAsyncGen</span><span class="function-signature">(<span class="rst-sig-param">obj: <code>Any</code></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/introspection/reflection.py#L177">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/introspection/reflection.py#L180">
       
       (source)
     </a>
@@ -5291,7 +5291,7 @@
   </div>
   <div class="docstring functionBody">
     
-    <div><p>Determine if the object is an asynchronous generator.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">obj:</span><code>Any</code></td><td class="fieldArgDesc">Object to check.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code></td><td class="fieldArgDesc">True if the object is an asynchronous generator, False otherwise.</td></tr></table></div>
+    <div><p>Determine if the object is an asynchronous generator.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">obj:</span><code><a href="https://docs.python.org/3/library/typing.html#typing.Any" class="intersphinx-link">typing.Any</a></code></td><td class="fieldArgDesc">Object to check.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code></td><td class="fieldArgDesc">True if the object is an asynchronous generator, False otherwise.</td></tr></table></div>
   </div>
 </div><div class="basestaticmethod">
   
@@ -5306,7 +5306,7 @@
     
     <div><span class="decorator">@<a href="https://docs.python.org/3/builtins/functions.html#staticmethod" class="intersphinx-link">staticmethod</a><br /></span></div>
     <span class="py-keyword">def</span>&#160;<span class="py-defname">isAsyncGenFunction</span><span class="function-signature">(<span class="rst-sig-param">obj: <code>Any</code></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/introspection/reflection.py#L195">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/introspection/reflection.py#L198">
       
       (source)
     </a>
@@ -5318,7 +5318,7 @@
   </div>
   <div class="docstring functionBody">
     
-    <div><p>Determine if the object is an asynchronous generator function.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">obj:</span><code>Any</code></td><td class="fieldArgDesc">Object to check.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code></td><td class="fieldArgDesc">True if the object is an asynchronous generator function,
+    <div><p>Determine if the object is an asynchronous generator function.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">obj:</span><code><a href="https://docs.python.org/3/library/typing.html#typing.Any" class="intersphinx-link">typing.Any</a></code></td><td class="fieldArgDesc">Object to check.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code></td><td class="fieldArgDesc">True if the object is an asynchronous generator function,
 False otherwise.</td></tr></table></div>
   </div>
 </div><div class="basestaticmethod">
@@ -5334,7 +5334,7 @@ False otherwise.</td></tr></table></div>
     
     <div><span class="decorator">@<a href="https://docs.python.org/3/builtins/functions.html#staticmethod" class="intersphinx-link">staticmethod</a><br /></span></div>
     <span class="py-keyword">def</span>&#160;<span class="py-defname">isAwaitable</span><span class="function-signature">(<span class="rst-sig-param">obj: <code>Any</code></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/introspection/reflection.py#L214">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/introspection/reflection.py#L217">
       
       (source)
     </a>
@@ -5346,7 +5346,7 @@ False otherwise.</td></tr></table></div>
   </div>
   <div class="docstring functionBody">
     
-    <div><p>Determine if the object can be awaited.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">obj:</span><code>Any</code></td><td class="fieldArgDesc">Object to check for awaitability.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code></td><td class="fieldArgDesc">True if the object is awaitable, otherwise False.</td></tr></table></div>
+    <div><p>Determine if the object can be awaited.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">obj:</span><code><a href="https://docs.python.org/3/library/typing.html#typing.Any" class="intersphinx-link">typing.Any</a></code></td><td class="fieldArgDesc">Object to check for awaitability.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code></td><td class="fieldArgDesc">True if the object is awaitable, otherwise False.</td></tr></table></div>
   </div>
 </div><div class="basestaticmethod">
   
@@ -5361,7 +5361,7 @@ False otherwise.</td></tr></table></div>
     
     <div><span class="decorator">@<a href="https://docs.python.org/3/builtins/functions.html#staticmethod" class="intersphinx-link">staticmethod</a><br /></span></div>
     <span class="py-keyword">def</span>&#160;<span class="py-defname">isBuiltIn</span><span class="function-signature">(<span class="rst-sig-param">obj: <code>Any</code></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/introspection/reflection.py#L232">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/introspection/reflection.py#L235">
       
       (source)
     </a>
@@ -5373,7 +5373,7 @@ False otherwise.</td></tr></table></div>
   </div>
   <div class="docstring functionBody">
     
-    <div><p>Determine if the object is a built-in function or method.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">obj:</span><code>Any</code></td><td class="fieldArgDesc">Object to check.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code></td><td class="fieldArgDesc">True if the object is a built-in function or method, False otherwise.</td></tr></table></div>
+    <div><p>Determine if the object is a built-in function or method.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">obj:</span><code><a href="https://docs.python.org/3/library/typing.html#typing.Any" class="intersphinx-link">typing.Any</a></code></td><td class="fieldArgDesc">Object to check.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code></td><td class="fieldArgDesc">True if the object is a built-in function or method, False otherwise.</td></tr></table></div>
   </div>
 </div><div class="basestaticmethod">
   
@@ -5388,7 +5388,7 @@ False otherwise.</td></tr></table></div>
     
     <div><span class="decorator">@<a href="https://docs.python.org/3/builtins/functions.html#staticmethod" class="intersphinx-link">staticmethod</a><br /></span></div>
     <span class="py-keyword">def</span>&#160;<span class="py-defname">isClass</span><span class="function-signature">(<span class="rst-sig-param">obj: <code>Any</code></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/introspection/reflection.py#L250">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/introspection/reflection.py#L253">
       
       (source)
     </a>
@@ -5400,7 +5400,7 @@ False otherwise.</td></tr></table></div>
   </div>
   <div class="docstring functionBody">
     
-    <div><p>Determine if the object is a class.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">obj:</span><code>Any</code></td><td class="fieldArgDesc">Object to check.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code></td><td class="fieldArgDesc">True if the object is a class, otherwise False.</td></tr></table></div>
+    <div><p>Determine if the object is a class.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">obj:</span><code><a href="https://docs.python.org/3/library/typing.html#typing.Any" class="intersphinx-link">typing.Any</a></code></td><td class="fieldArgDesc">Object to check.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code></td><td class="fieldArgDesc">True if the object is a class, otherwise False.</td></tr></table></div>
   </div>
 </div><div class="basestaticmethod">
   
@@ -5415,7 +5415,7 @@ False otherwise.</td></tr></table></div>
     
     <div><span class="decorator">@<a href="https://docs.python.org/3/builtins/functions.html#staticmethod" class="intersphinx-link">staticmethod</a><br /></span></div>
     <span class="py-keyword">def</span>&#160;<span class="py-defname">isCode</span><span class="function-signature">(<span class="rst-sig-param">obj: <code>Any</code></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/introspection/reflection.py#L267">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/introspection/reflection.py#L270">
       
       (source)
     </a>
@@ -5427,7 +5427,7 @@ False otherwise.</td></tr></table></div>
   </div>
   <div class="docstring functionBody">
     
-    <div><p>Determine if the object is a code object.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">obj:</span><code>Any</code></td><td class="fieldArgDesc">Object to check.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code></td><td class="fieldArgDesc">True if the object is a code object, otherwise False.</td></tr></table></div>
+    <div><p>Determine if the object is a code object.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">obj:</span><code><a href="https://docs.python.org/3/library/typing.html#typing.Any" class="intersphinx-link">typing.Any</a></code></td><td class="fieldArgDesc">Object to check.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code></td><td class="fieldArgDesc">True if the object is a code object, otherwise False.</td></tr></table></div>
   </div>
 </div><div class="basestaticmethod">
   
@@ -5442,7 +5442,7 @@ False otherwise.</td></tr></table></div>
     
     <div><span class="decorator">@<a href="https://docs.python.org/3/builtins/functions.html#staticmethod" class="intersphinx-link">staticmethod</a><br /></span></div>
     <span class="py-keyword">def</span>&#160;<span class="py-defname">isConcreteClass</span><span class="function-signature">(<span class="rst-sig-param">obj: <code>Any</code></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/introspection/reflection.py#L145">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/introspection/reflection.py#L148">
       
       (source)
     </a>
@@ -5454,7 +5454,7 @@ False otherwise.</td></tr></table></div>
   </div>
   <div class="docstring functionBody">
     
-    <div><p>Determine if the object is a concrete user-defined class.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">obj:</span><code>Any</code></td><td class="fieldArgDesc">Object to check for concreteness.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code></td><td class="fieldArgDesc">True if the object is a concrete class; False otherwise.</td></tr></table></div>
+    <div><p>Determine if the object is a concrete user-defined class.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">obj:</span><code><a href="https://docs.python.org/3/library/typing.html#typing.Any" class="intersphinx-link">typing.Any</a></code></td><td class="fieldArgDesc">Object to check for concreteness.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code></td><td class="fieldArgDesc">True if the object is a concrete class; False otherwise.</td></tr></table></div>
   </div>
 </div><div class="basestaticmethod">
   
@@ -5469,7 +5469,7 @@ False otherwise.</td></tr></table></div>
     
     <div><span class="decorator">@<a href="https://docs.python.org/3/builtins/functions.html#staticmethod" class="intersphinx-link">staticmethod</a><br /></span></div>
     <span class="py-keyword">def</span>&#160;<span class="py-defname">isCoroutine</span><span class="function-signature">(<span class="rst-sig-param">obj: <code>Any</code></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/introspection/reflection.py#L284">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/introspection/reflection.py#L287">
       
       (source)
     </a>
@@ -5481,7 +5481,7 @@ False otherwise.</td></tr></table></div>
   </div>
   <div class="docstring functionBody">
     
-    <div><p>Determine if the object is a coroutine.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">obj:</span><code>Any</code></td><td class="fieldArgDesc">Object to check.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code></td><td class="fieldArgDesc">True if the object is a coroutine, otherwise False.</td></tr></table></div>
+    <div><p>Determine if the object is a coroutine.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">obj:</span><code><a href="https://docs.python.org/3/library/typing.html#typing.Any" class="intersphinx-link">typing.Any</a></code></td><td class="fieldArgDesc">Object to check.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code></td><td class="fieldArgDesc">True if the object is a coroutine, otherwise False.</td></tr></table></div>
   </div>
 </div><div class="basestaticmethod">
   
@@ -5496,7 +5496,7 @@ False otherwise.</td></tr></table></div>
     
     <div><span class="decorator">@<a href="https://docs.python.org/3/builtins/functions.html#staticmethod" class="intersphinx-link">staticmethod</a><br /></span></div>
     <span class="py-keyword">def</span>&#160;<span class="py-defname">isCoroutineFunction</span><span class="function-signature">(<span class="rst-sig-param">obj: <code>Any</code></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/introspection/reflection.py#L301">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/introspection/reflection.py#L304">
       
       (source)
     </a>
@@ -5508,7 +5508,7 @@ False otherwise.</td></tr></table></div>
   </div>
   <div class="docstring functionBody">
     
-    <div><p>Determine if the object is a coroutine function.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">obj:</span><code>Any</code></td><td class="fieldArgDesc">Object to check.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code></td><td class="fieldArgDesc">True if the object is a coroutine function, otherwise False.</td></tr></table></div>
+    <div><p>Determine if the object is a coroutine function.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">obj:</span><code><a href="https://docs.python.org/3/library/typing.html#typing.Any" class="intersphinx-link">typing.Any</a></code></td><td class="fieldArgDesc">Object to check.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code></td><td class="fieldArgDesc">True if the object is a coroutine function, otherwise False.</td></tr></table></div>
   </div>
 </div><div class="basestaticmethod">
   
@@ -5523,7 +5523,7 @@ False otherwise.</td></tr></table></div>
     
     <div><span class="decorator">@<a href="https://docs.python.org/3/builtins/functions.html#staticmethod" class="intersphinx-link">staticmethod</a><br /></span></div>
     <span class="py-keyword">def</span>&#160;<span class="py-defname">isDataDescriptor</span><span class="function-signature">(<span class="rst-sig-param">obj: <code>Any</code></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/introspection/reflection.py#L318">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/introspection/reflection.py#L321">
       
       (source)
     </a>
@@ -5535,7 +5535,7 @@ False otherwise.</td></tr></table></div>
   </div>
   <div class="docstring functionBody">
     
-    <div><p>Determine if the object is a data descriptor.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">obj:</span><code>Any</code></td><td class="fieldArgDesc">Object to check.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code></td><td class="fieldArgDesc">True if the object is a data descriptor, otherwise False.</td></tr></table></div>
+    <div><p>Determine if the object is a data descriptor.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">obj:</span><code><a href="https://docs.python.org/3/library/typing.html#typing.Any" class="intersphinx-link">typing.Any</a></code></td><td class="fieldArgDesc">Object to check.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code></td><td class="fieldArgDesc">True if the object is a data descriptor, otherwise False.</td></tr></table></div>
   </div>
 </div><div class="basestaticmethod">
   
@@ -5550,7 +5550,7 @@ False otherwise.</td></tr></table></div>
     
     <div><span class="decorator">@<a href="https://docs.python.org/3/builtins/functions.html#staticmethod" class="intersphinx-link">staticmethod</a><br /></span></div>
     <span class="py-keyword">def</span>&#160;<span class="py-defname">isFrame</span><span class="function-signature">(<span class="rst-sig-param">obj: <code>Any</code></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/introspection/reflection.py#L335">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/introspection/reflection.py#L338">
       
       (source)
     </a>
@@ -5562,7 +5562,7 @@ False otherwise.</td></tr></table></div>
   </div>
   <div class="docstring functionBody">
     
-    <div><p>Determine if the object is a frame object.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">obj:</span><code>Any</code></td><td class="fieldArgDesc">Object to check.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code></td><td class="fieldArgDesc">True if the object is a frame object, otherwise False.</td></tr></table></div>
+    <div><p>Determine if the object is a frame object.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">obj:</span><code><a href="https://docs.python.org/3/library/typing.html#typing.Any" class="intersphinx-link">typing.Any</a></code></td><td class="fieldArgDesc">Object to check.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code></td><td class="fieldArgDesc">True if the object is a frame object, otherwise False.</td></tr></table></div>
   </div>
 </div><div class="basestaticmethod">
   
@@ -5577,7 +5577,7 @@ False otherwise.</td></tr></table></div>
     
     <div><span class="decorator">@<a href="https://docs.python.org/3/builtins/functions.html#staticmethod" class="intersphinx-link">staticmethod</a><br /></span></div>
     <span class="py-keyword">def</span>&#160;<span class="py-defname">isFunction</span><span class="function-signature">(<span class="rst-sig-param">obj: <code>Any</code></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/introspection/reflection.py#L352">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/introspection/reflection.py#L355">
       
       (source)
     </a>
@@ -5589,7 +5589,7 @@ False otherwise.</td></tr></table></div>
   </div>
   <div class="docstring functionBody">
     
-    <div><p>Determine if the object is a Python function.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">obj:</span><code>Any</code></td><td class="fieldArgDesc">Object to check.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code></td><td class="fieldArgDesc">True if the object is a function, otherwise False.</td></tr></table></div>
+    <div><p>Determine if the object is a Python function.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">obj:</span><code><a href="https://docs.python.org/3/library/typing.html#typing.Any" class="intersphinx-link">typing.Any</a></code></td><td class="fieldArgDesc">Object to check.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code></td><td class="fieldArgDesc">True if the object is a function, otherwise False.</td></tr></table></div>
   </div>
 </div><div class="basestaticmethod">
   
@@ -5604,7 +5604,7 @@ False otherwise.</td></tr></table></div>
     
     <div><span class="decorator">@<a href="https://docs.python.org/3/builtins/functions.html#staticmethod" class="intersphinx-link">staticmethod</a><br /></span></div>
     <span class="py-keyword">def</span>&#160;<span class="py-defname">isGenerator</span><span class="function-signature">(<span class="rst-sig-param">obj: <code>Any</code></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/introspection/reflection.py#L369">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/introspection/reflection.py#L372">
       
       (source)
     </a>
@@ -5616,7 +5616,7 @@ False otherwise.</td></tr></table></div>
   </div>
   <div class="docstring functionBody">
     
-    <div><p>Determine if the object is a generator.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">obj:</span><code>Any</code></td><td class="fieldArgDesc">Object to check.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code></td><td class="fieldArgDesc">True if the object is a generator, otherwise False.</td></tr></table></div>
+    <div><p>Determine if the object is a generator.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">obj:</span><code><a href="https://docs.python.org/3/library/typing.html#typing.Any" class="intersphinx-link">typing.Any</a></code></td><td class="fieldArgDesc">Object to check.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code></td><td class="fieldArgDesc">True if the object is a generator, otherwise False.</td></tr></table></div>
   </div>
 </div><div class="basestaticmethod">
   
@@ -5631,7 +5631,7 @@ False otherwise.</td></tr></table></div>
     
     <div><span class="decorator">@<a href="https://docs.python.org/3/builtins/functions.html#staticmethod" class="intersphinx-link">staticmethod</a><br /></span></div>
     <span class="py-keyword">def</span>&#160;<span class="py-defname">isGeneratorFunction</span><span class="function-signature">(<span class="rst-sig-param">obj: <code>Any</code></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/introspection/reflection.py#L386">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/introspection/reflection.py#L389">
       
       (source)
     </a>
@@ -5643,7 +5643,7 @@ False otherwise.</td></tr></table></div>
   </div>
   <div class="docstring functionBody">
     
-    <div><p>Determine if the object is a generator function.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">obj:</span><code>Any</code></td><td class="fieldArgDesc">Object to check.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code></td><td class="fieldArgDesc">True if the object is a generator function, otherwise False.</td></tr></table></div>
+    <div><p>Determine if the object is a generator function.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">obj:</span><code><a href="https://docs.python.org/3/library/typing.html#typing.Any" class="intersphinx-link">typing.Any</a></code></td><td class="fieldArgDesc">Object to check.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code></td><td class="fieldArgDesc">True if the object is a generator function, otherwise False.</td></tr></table></div>
   </div>
 </div><div class="basestaticmethod">
   
@@ -5658,7 +5658,7 @@ False otherwise.</td></tr></table></div>
     
     <div><span class="decorator">@<a href="https://docs.python.org/3/builtins/functions.html#staticmethod" class="intersphinx-link">staticmethod</a><br /></span></div>
     <span class="py-keyword">def</span>&#160;<span class="py-defname">isGeneric</span><span class="function-signature">(<span class="rst-sig-param">obj: <code>Any</code></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/introspection/reflection.py#L522">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/introspection/reflection.py#L525">
       
       (source)
     </a>
@@ -5670,7 +5670,7 @@ False otherwise.</td></tr></table></div>
   </div>
   <div class="docstring functionBody">
     
-    <div><p>Determine if the provided type is a generic type.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">obj:</span><code>Any</code></td><td class="fieldArgDesc">The type to check.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code></td><td class="fieldArgDesc">True if the type is generic, otherwise False.</td></tr></table></div>
+    <div><p>Determine if the provided type is a generic type.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">obj:</span><code><a href="https://docs.python.org/3/library/typing.html#typing.Any" class="intersphinx-link">typing.Any</a></code></td><td class="fieldArgDesc">The type to check.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code></td><td class="fieldArgDesc">True if the type is generic, otherwise False.</td></tr></table></div>
   </div>
 </div><div class="basestaticmethod">
   
@@ -5685,7 +5685,7 @@ False otherwise.</td></tr></table></div>
     
     <div><span class="decorator">@<a href="https://docs.python.org/3/builtins/functions.html#staticmethod" class="intersphinx-link">staticmethod</a><br /></span></div>
     <span class="py-keyword">def</span>&#160;<span class="py-defname">isGetSetDescriptor</span><span class="function-signature">(<span class="rst-sig-param">obj: <code>Any</code></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/introspection/reflection.py#L403">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/introspection/reflection.py#L406">
       
       (source)
     </a>
@@ -5697,7 +5697,7 @@ False otherwise.</td></tr></table></div>
   </div>
   <div class="docstring functionBody">
     
-    <div><p>Determine if the object is a getset descriptor.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">obj:</span><code>Any</code></td><td class="fieldArgDesc">Object to check.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code></td><td class="fieldArgDesc">True if the object is a getset descriptor, otherwise False.</td></tr></table></div>
+    <div><p>Determine if the object is a getset descriptor.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">obj:</span><code><a href="https://docs.python.org/3/library/typing.html#typing.Any" class="intersphinx-link">typing.Any</a></code></td><td class="fieldArgDesc">Object to check.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code></td><td class="fieldArgDesc">True if the object is a getset descriptor, otherwise False.</td></tr></table></div>
   </div>
 </div><div class="basestaticmethod">
   
@@ -5712,7 +5712,7 @@ False otherwise.</td></tr></table></div>
     
     <div><span class="decorator">@<a href="https://docs.python.org/3/builtins/functions.html#staticmethod" class="intersphinx-link">staticmethod</a><br /></span></div>
     <span class="py-keyword">def</span>&#160;<span class="py-defname">isInstance</span><span class="function-signature">(<span class="rst-sig-param">obj: <code>Any</code></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/introspection/reflection.py#L568">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/introspection/reflection.py#L571">
       
       (source)
     </a>
@@ -5724,7 +5724,7 @@ False otherwise.</td></tr></table></div>
   </div>
   <div class="docstring functionBody">
     
-    <div><p>Determine if the object is an instance of a user-defined class.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">obj:</span><code>Any</code></td><td class="fieldArgDesc">Object to evaluate.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code></td><td class="fieldArgDesc">True if the object is an instance of a user-defined class,
+    <div><p>Determine if the object is an instance of a user-defined class.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">obj:</span><code><a href="https://docs.python.org/3/library/typing.html#typing.Any" class="intersphinx-link">typing.Any</a></code></td><td class="fieldArgDesc">Object to evaluate.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code></td><td class="fieldArgDesc">True if the object is an instance of a user-defined class,
 False otherwise.</td></tr></table></div>
   </div>
 </div><div class="basestaticmethod">
@@ -5740,7 +5740,7 @@ False otherwise.</td></tr></table></div>
     
     <div><span class="decorator">@<a href="https://docs.python.org/3/builtins/functions.html#staticmethod" class="intersphinx-link">staticmethod</a><br /></span></div>
     <span class="py-keyword">def</span>&#160;<span class="py-defname">isMemberDescriptor</span><span class="function-signature">(<span class="rst-sig-param">obj: <code>Any</code></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/introspection/reflection.py#L420">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/introspection/reflection.py#L423">
       
       (source)
     </a>
@@ -5752,7 +5752,7 @@ False otherwise.</td></tr></table></div>
   </div>
   <div class="docstring functionBody">
     
-    <div><p>Determine if the object is a member descriptor.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">obj:</span><code>Any</code></td><td class="fieldArgDesc">Object to check.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code></td><td class="fieldArgDesc">True if the object is a member descriptor, otherwise False.</td></tr></table></div>
+    <div><p>Determine if the object is a member descriptor.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">obj:</span><code><a href="https://docs.python.org/3/library/typing.html#typing.Any" class="intersphinx-link">typing.Any</a></code></td><td class="fieldArgDesc">Object to check.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code></td><td class="fieldArgDesc">True if the object is a member descriptor, otherwise False.</td></tr></table></div>
   </div>
 </div><div class="basestaticmethod">
   
@@ -5767,7 +5767,7 @@ False otherwise.</td></tr></table></div>
     
     <div><span class="decorator">@<a href="https://docs.python.org/3/builtins/functions.html#staticmethod" class="intersphinx-link">staticmethod</a><br /></span></div>
     <span class="py-keyword">def</span>&#160;<span class="py-defname">isMethod</span><span class="function-signature">(<span class="rst-sig-param">obj: <code>Any</code></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/introspection/reflection.py#L437">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/introspection/reflection.py#L440">
       
       (source)
     </a>
@@ -5779,7 +5779,7 @@ False otherwise.</td></tr></table></div>
   </div>
   <div class="docstring functionBody">
     
-    <div><p>Determine if the object is a method.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">obj:</span><code>Any</code></td><td class="fieldArgDesc">Object to check.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code></td><td class="fieldArgDesc">True if the object is a method, otherwise False.</td></tr></table></div>
+    <div><p>Determine if the object is a method.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">obj:</span><code><a href="https://docs.python.org/3/library/typing.html#typing.Any" class="intersphinx-link">typing.Any</a></code></td><td class="fieldArgDesc">Object to check.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code></td><td class="fieldArgDesc">True if the object is a method, otherwise False.</td></tr></table></div>
   </div>
 </div><div class="basestaticmethod">
   
@@ -5794,7 +5794,7 @@ False otherwise.</td></tr></table></div>
     
     <div><span class="decorator">@<a href="https://docs.python.org/3/builtins/functions.html#staticmethod" class="intersphinx-link">staticmethod</a><br /></span></div>
     <span class="py-keyword">def</span>&#160;<span class="py-defname">isMethodDescriptor</span><span class="function-signature">(<span class="rst-sig-param">obj: <code>Any</code></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/introspection/reflection.py#L454">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/introspection/reflection.py#L457">
       
       (source)
     </a>
@@ -5806,7 +5806,7 @@ False otherwise.</td></tr></table></div>
   </div>
   <div class="docstring functionBody">
     
-    <div><p>Determine if the object is a method descriptor.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">obj:</span><code>Any</code></td><td class="fieldArgDesc">Object to check.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code></td><td class="fieldArgDesc">True if the object is a method descriptor, otherwise False.</td></tr></table></div>
+    <div><p>Determine if the object is a method descriptor.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">obj:</span><code><a href="https://docs.python.org/3/library/typing.html#typing.Any" class="intersphinx-link">typing.Any</a></code></td><td class="fieldArgDesc">Object to check.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code></td><td class="fieldArgDesc">True if the object is a method descriptor, otherwise False.</td></tr></table></div>
   </div>
 </div><div class="basestaticmethod">
   
@@ -5821,7 +5821,7 @@ False otherwise.</td></tr></table></div>
     
     <div><span class="decorator">@<a href="https://docs.python.org/3/builtins/functions.html#staticmethod" class="intersphinx-link">staticmethod</a><br /></span></div>
     <span class="py-keyword">def</span>&#160;<span class="py-defname">isModule</span><span class="function-signature">(<span class="rst-sig-param">obj: <code>Any</code></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/introspection/reflection.py#L471">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/introspection/reflection.py#L474">
       
       (source)
     </a>
@@ -5833,7 +5833,7 @@ False otherwise.</td></tr></table></div>
   </div>
   <div class="docstring functionBody">
     
-    <div><p>Determine if the object is a module.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">obj:</span><code>Any</code></td><td class="fieldArgDesc">Object to check.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code></td><td class="fieldArgDesc">True if the object is a module, otherwise False.</td></tr></table></div>
+    <div><p>Determine if the object is a module.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">obj:</span><code><a href="https://docs.python.org/3/library/typing.html#typing.Any" class="intersphinx-link">typing.Any</a></code></td><td class="fieldArgDesc">Object to check.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code></td><td class="fieldArgDesc">True if the object is a module, otherwise False.</td></tr></table></div>
   </div>
 </div><div class="basestaticmethod">
   
@@ -5848,7 +5848,7 @@ False otherwise.</td></tr></table></div>
     
     <div><span class="decorator">@<a href="https://docs.python.org/3/builtins/functions.html#staticmethod" class="intersphinx-link">staticmethod</a><br /></span></div>
     <span class="py-keyword">def</span>&#160;<span class="py-defname">isProtocol</span><span class="function-signature">(<span class="rst-sig-param">obj: <code>Any</code></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/introspection/reflection.py#L545">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/introspection/reflection.py#L548">
       
       (source)
     </a>
@@ -5860,8 +5860,8 @@ False otherwise.</td></tr></table></div>
   </div>
   <div class="docstring functionBody">
     
-    <div><p>Determine if the object is a subclass of <code><a href="https://docs.python.org/3/library/typing.html#typing.Protocol" class="intersphinx-link">typing.Protocol</a></code>.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">obj:</span><code>Any</code></td><td class="fieldArgDesc">Object or type to evaluate.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code></td><td class="fieldArgDesc">True if <code>obj</code> is a class that is a subclass of <code><a href="https://docs.python.org/3/library/typing.html#typing.Protocol" class="intersphinx-link">typing.Protocol</a></code>
-(but not <code>Protocol</code> itself), otherwise False.</td></tr></table></div>
+    <div><p>Determine if the object is a subclass of <tt class="rst-docutils rst-literal">typing.Protocol</tt>.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">obj:</span><code><a href="https://docs.python.org/3/library/typing.html#typing.Any" class="intersphinx-link">typing.Any</a></code></td><td class="fieldArgDesc">Object or type to evaluate.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code></td><td class="fieldArgDesc">True if <tt class="rst-docutils rst-literal">obj</tt> is a class that is a subclass of <tt class="rst-docutils rst-literal">typing.Protocol</tt>
+(but not <tt class="rst-docutils rst-literal">Protocol</tt> itself), otherwise False.</td></tr></table></div>
   </div>
 </div><div class="basestaticmethod">
   
@@ -5876,7 +5876,7 @@ False otherwise.</td></tr></table></div>
     
     <div><span class="decorator">@<a href="https://docs.python.org/3/builtins/functions.html#staticmethod" class="intersphinx-link">staticmethod</a><br /></span></div>
     <span class="py-keyword">def</span>&#160;<span class="py-defname">isRoutine</span><span class="function-signature">(<span class="rst-sig-param">obj: <code>Any</code></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/introspection/reflection.py#L488">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/introspection/reflection.py#L491">
       
       (source)
     </a>
@@ -5888,7 +5888,7 @@ False otherwise.</td></tr></table></div>
   </div>
   <div class="docstring functionBody">
     
-    <div><p>Determine if the object is a user-defined or built-in function or method.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">obj:</span><code>Any</code></td><td class="fieldArgDesc">Object to check.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code></td><td class="fieldArgDesc">True if the object is a routine, otherwise False.</td></tr></table></div>
+    <div><p>Determine if the object is a user-defined or built-in function or method.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">obj:</span><code><a href="https://docs.python.org/3/library/typing.html#typing.Any" class="intersphinx-link">typing.Any</a></code></td><td class="fieldArgDesc">Object to check.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code></td><td class="fieldArgDesc">True if the object is a routine, otherwise False.</td></tr></table></div>
   </div>
 </div><div class="basestaticmethod">
   
@@ -5903,7 +5903,7 @@ False otherwise.</td></tr></table></div>
     
     <div><span class="decorator">@<a href="https://docs.python.org/3/builtins/functions.html#staticmethod" class="intersphinx-link">staticmethod</a><br /></span></div>
     <span class="py-keyword">def</span>&#160;<span class="py-defname">isTraceback</span><span class="function-signature">(<span class="rst-sig-param">obj: <code>Any</code></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/introspection/reflection.py#L505">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/introspection/reflection.py#L508">
       
       (source)
     </a>
@@ -5915,7 +5915,7 @@ False otherwise.</td></tr></table></div>
   </div>
   <div class="docstring functionBody">
     
-    <div><p>Determine if the object is a traceback object.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">obj:</span><code>Any</code></td><td class="fieldArgDesc">Object to check.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code></td><td class="fieldArgDesc">True if the object is a traceback object, otherwise False.</td></tr></table></div>
+    <div><p>Determine if the object is a traceback object.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">obj:</span><code><a href="https://docs.python.org/3/library/typing.html#typing.Any" class="intersphinx-link">typing.Any</a></code></td><td class="fieldArgDesc">Object to check.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code></td><td class="fieldArgDesc">True if the object is a traceback object, otherwise False.</td></tr></table></div>
   </div>
 </div><div class="basestaticmethod">
   
@@ -5930,7 +5930,7 @@ False otherwise.</td></tr></table></div>
     
     <div><span class="decorator">@<a href="https://docs.python.org/3/builtins/functions.html#staticmethod" class="intersphinx-link">staticmethod</a><br /></span></div>
     <span class="py-keyword">def</span>&#160;<span class="py-defname">isTypingConstruct</span><span class="function-signature">(<span class="rst-sig-param">obj: <code>Any</code></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/introspection/reflection.py#L592">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/introspection/reflection.py#L595">
       
       (source)
     </a>
@@ -5942,7 +5942,7 @@ False otherwise.</td></tr></table></div>
   </div>
   <div class="docstring functionBody">
     
-    <div><p>Determine if the object is a construct from the <code><a href="https://docs.python.org/3/library/typing.html#module-typing" class="intersphinx-link">typing</a></code> module.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">obj:</span><code>Any</code></td><td class="fieldArgDesc">Object to evaluate.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code></td><td class="fieldArgDesc">True if the object is a recognized typing construct from the <code><a href="https://docs.python.org/3/library/typing.html#module-typing" class="intersphinx-link">typing</a></code>
+    <div><p>Determine if the object is a construct from the <tt class="rst-docutils rst-literal">typing</tt> module.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">obj:</span><code><a href="https://docs.python.org/3/library/typing.html#typing.Any" class="intersphinx-link">typing.Any</a></code></td><td class="fieldArgDesc">Object to evaluate.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code></td><td class="fieldArgDesc">True if the object is a recognized typing construct from the <tt class="rst-docutils rst-literal">typing</tt>
 module, otherwise False.</td></tr></table></div>
   </div>
 </div><div class="basestaticmethod">
@@ -5958,7 +5958,7 @@ module, otherwise False.</td></tr></table></div>
     
     <div><span class="decorator">@<a href="https://docs.python.org/3/builtins/functions.html#staticmethod" class="intersphinx-link">staticmethod</a><br /></span></div>
     <span class="py-keyword">def</span>&#160;<span class="py-defname">module</span><span class="function-signature">(<span class="rst-sig-param">module: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></span>) -&gt; <code>IReflectionModule</code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/introspection/reflection.py#L89">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/introspection/reflection.py#L92">
       
       (source)
     </a>
@@ -5970,7 +5970,7 @@ module, otherwise False.</td></tr></table></div>
   </div>
   <div class="docstring functionBody">
     
-    <div><p>Create a reflection object for a module.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">module:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Name of the module to reflect.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.introspection.ReflectionModule.html" class="internal-link" title="orionis.introspection.ReflectionModule">ReflectionModule</a></code></td><td class="fieldArgDesc">Reflection object for the specified module.</td></tr></table></div>
+    <div><p>Create a reflection object for a module.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">module:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Name of the module to reflect.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.introspection.modules.contracts.reflection.IReflectionModule.html" class="internal-link">orionis.introspection.modules.contracts.reflection.IReflectionModule</a></code></td><td class="fieldArgDesc">Reflection object for the specified module.</td></tr></table></div>
   </div>
 </div>
         </div>
@@ -5983,7 +5983,7 @@ module, otherwise False.</td></tr></table></div>
   <div class="orionis-footer-inner">
     <div class="orionis-footer-copy">
       <p>API documentation for <a href="https://orionis-framework.com/" class="projecthome">Orionis</a>.</p>
-      <p class="orionis-footer-meta">Generated with <a href="https://github.com/twisted/pydoctor/">Pydoctor</a> 25.10.1.<span class="orionis-footer-build"> Built 2026-11-03 09:36:58.</span></p>
+      <p class="orionis-footer-meta">Generated with <a href="https://github.com/twisted/pydoctor/">Pydoctor</a> 25.10.1.<span class="orionis-footer-build"> Built 2026-11-03 13:00:15.</span></p>
     </div>
     <nav class="orionis-footer-links" aria-label="Additional resources">
       <a href="https://docs.orionis-framework.com">Read the guide <span aria-hidden="true">↗</span></a>

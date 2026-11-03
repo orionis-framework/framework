@@ -1209,6 +1209,16 @@
         
 
         
+            <div class="itemName"><code><a href="orionis.foundation.config.filesystems.Local.html#local" class="internal-link" title="orionis.foundation.config.filesystems.Local.local">local</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
             <div class="itemName"><code><a href="orionis.foundation.config.filesystems.Local.html#path" class="internal-link" title="orionis.foundation.config.filesystems.Local.path">path</a></code>
             </div>
         
@@ -1670,19 +1680,18 @@
         </div>
 
         <div class="extrasDocstring">
-          <p class="class-signature"><code><span class="py-keyword">class</span> <span class="py-defname">Azure</span>(<a href="orionis.support.entities.BaseEntity.html" class="internal-link" title="orionis.support.entities.BaseEntity">BaseEntity</a>): <a href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/foundation/config/filesystems/entitites/azure.py#L7" class="sourceLink">(source)</a></code></p><p><a href="classIndex.html#orionis.foundation.config.filesystems.Azure">View In Hierarchy</a></p>
+          <p class="class-signature"><code><span class="py-keyword">class</span> <span class="py-defname">Azure</span>(<a href="orionis.support.entities.BaseEntity.html" class="internal-link" title="orionis.support.entities.BaseEntity">BaseEntity</a>): <a href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/foundation/config/filesystems/entitites/azure.py#L9" class="sourceLink">(source)</a></code></p><p><a href="classIndex.html#orionis.foundation.config.filesystems.Azure">View In Hierarchy</a></p>
         </div>
 
         <div class="moduleDocstring">
           <div><p>Represent an Azure Blob Storage configuration.</p>
 <p>Using this disk requires the official Azure SDK, which is an
 optional dependency: install it with <tt class="rst-docutils rst-literal">uv add 'orionis[azure]'</tt>.</p>
-<table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">driver</span></td><td class="fieldArgDesc">The filesystem driver name resolved by StorageManager.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">connection<wbr></wbr>_string</span></td><td class="fieldArgDesc">Azure storage connection string. When provided, it takes
-precedence over the account name and key.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">account<wbr></wbr>_name</span></td><td class="fieldArgDesc">Azure storage account name.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">account<wbr></wbr>_key</span></td><td class="fieldArgDesc">Azure storage account key.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">container</span></td><td class="fieldArgDesc">The blob container name.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">url</span></td><td class="fieldArgDesc">Public base URL used to build file URLs.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">This class does not return a value.</td></tr></table></div>
+<table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">This class does not return a value.</td></tr></table></div>
         </div>
 
         <div id="split-tables">
-          <table class="children sortable" id="id747">
+          <table class="children sortable" id="id748">
   
   
   <tr class="method">
@@ -1690,43 +1699,43 @@ precedence over the account name and key.</td></tr><tr><td class="fieldArgContai
     <td>Method</td>
     <td><code><a href="#__post_init__" class="internal-link" title="orionis.foundation.config.filesystems.Azure.__post_init__">__post<wbr></wbr>_init__</a></code></td>
     <td>Validate the types of the Azure entity attributes.</td>
-  </tr><tr class="classvariable">
+  </tr><tr class="instancevariable">
     
-    <td>Class Variable</td>
+    <td>Instance Variable</td>
     <td><code><a href="#account_key" class="internal-link" title="orionis.foundation.config.filesystems.Azure.account_key">account<wbr></wbr>_key</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
-  </tr><tr class="classvariable">
+    <td>Azure storage account key.</td>
+  </tr><tr class="instancevariable">
     
-    <td>Class Variable</td>
+    <td>Instance Variable</td>
     <td><code><a href="#account_name" class="internal-link" title="orionis.foundation.config.filesystems.Azure.account_name">account<wbr></wbr>_name</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
-  </tr><tr class="classvariable">
+    <td>Azure storage account name.</td>
+  </tr><tr class="instancevariable">
     
-    <td>Class Variable</td>
+    <td>Instance Variable</td>
     <td><code><a href="#connection_string" class="internal-link" title="orionis.foundation.config.filesystems.Azure.connection_string">connection<wbr></wbr>_string</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
-  </tr><tr class="classvariable">
+    <td>Azure storage connection string. When provided, it takes precedence over the account name and key.</td>
+  </tr><tr class="instancevariable">
     
-    <td>Class Variable</td>
+    <td>Instance Variable</td>
     <td><code><a href="#container" class="internal-link" title="orionis.foundation.config.filesystems.Azure.container">container</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
-  </tr><tr class="classvariable">
+    <td>The blob container name.</td>
+  </tr><tr class="instancevariable">
     
-    <td>Class Variable</td>
+    <td>Instance Variable</td>
     <td><code><a href="#driver" class="internal-link" title="orionis.foundation.config.filesystems.Azure.driver">driver</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
-  </tr><tr class="classvariable">
+    <td>The filesystem driver name resolved by StorageManager.</td>
+  </tr><tr class="instancevariable">
     
-    <td>Class Variable</td>
+    <td>Instance Variable</td>
     <td><code><a href="#url" class="internal-link" title="orionis.foundation.config.filesystems.Azure.url">url</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
+    <td>Public base URL used to build file URLs.</td>
   </tr>
 </table>
           
             <p class="inheritedFrom">
               Inherited from <code><a href="orionis.support.entities.BaseEntity.html" class="internal-link" title="orionis.support.entities.BaseEntity">BaseEntity</a></code>:
             </p>
-            <table class="children sortable" id="id748">
+            <table class="children sortable" id="id749">
   
   
   <tr class="baseclassmethod">
@@ -1748,7 +1757,7 @@ precedence over the account name and key.</td></tr><tr><td class="fieldArgContai
     
     <td>Class Variable</td>
     <td><code><a href="orionis.support.entities.BaseEntity.html#__slots__" class="internal-link" title="orionis.support.entities.BaseEntity.__slots__">__slots__</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
+    <td>Declare that this class introduces no additional instance slots.</td>
   </tr>
 </table>
             
@@ -1770,7 +1779,7 @@ precedence over the account name and key.</td></tr><tr><td class="fieldArgContai
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">__post_init__</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>):</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/foundation/config/filesystems/entitites/azure.py#L85">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/foundation/config/filesystems/entitites/azure.py#L87">
       
       (source)
     </a>
@@ -1782,9 +1791,9 @@ precedence over the account name and key.</td></tr><tr><td class="fieldArgContai
   </div>
   <div class="docstring functionBody">
     <div class="interfaceinfo">overrides <code><a href="orionis.support.entities.BaseEntity.html#__post_init__" class="internal-link">orionis.support.entities.BaseEntity.__post_init__</a></code></div>
-    <div><p>Validate the types of the Azure entity attributes.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg"><wbr></wbr>None</span></td><td class="fieldArgDesc"></td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">This method does not return a value.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/exceptions.html#TypeError" class="intersphinx-link">TypeError</a></code></td><td>If any attribute is of the wrong type.</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/exceptions.html#ValueError" class="intersphinx-link">ValueError</a></code></td><td>If the driver name is empty.</td></tr></table></div>
+    <div><p>Validate the types of the Azure entity attributes.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">This method does not return a value.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/exceptions.html#TypeError" class="intersphinx-link">TypeError</a></code></td><td>If any attribute is of the wrong type.</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/exceptions.html#ValueError" class="intersphinx-link">ValueError</a></code></td><td>If the driver name is empty.</td></tr></table></div>
   </div>
-</div><div class="baseclassvariable">
+</div><div class="baseinstancevariable">
   
   
   <a name="orionis.foundation.config.filesystems.Azure.account_key">
@@ -1796,7 +1805,7 @@ precedence over the account name and key.</td></tr><tr><td class="fieldArgContai
   <div class="functionHeader">
     
     <span class="py-defname">account_key</span>: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/foundation/config/filesystems/entitites/azure.py#L61">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/foundation/config/filesystems/entitites/azure.py#L63">
       
       (source)
     </a>
@@ -1808,10 +1817,10 @@ precedence over the account name and key.</td></tr><tr><td class="fieldArgContai
   </div>
   <div class="functionBody">
     
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p>Azure storage account key.</p></div>
     
   </div>
-</div><div class="baseclassvariable">
+</div><div class="baseinstancevariable">
   
   
   <a name="orionis.foundation.config.filesystems.Azure.account_name">
@@ -1823,7 +1832,7 @@ precedence over the account name and key.</td></tr><tr><td class="fieldArgContai
   <div class="functionHeader">
     
     <span class="py-defname">account_name</span>: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/foundation/config/filesystems/entitites/azure.py#L53">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/foundation/config/filesystems/entitites/azure.py#L55">
       
       (source)
     </a>
@@ -1835,10 +1844,10 @@ precedence over the account name and key.</td></tr><tr><td class="fieldArgContai
   </div>
   <div class="functionBody">
     
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p>Azure storage account name.</p></div>
     
   </div>
-</div><div class="baseclassvariable">
+</div><div class="baseinstancevariable">
   
   
   <a name="orionis.foundation.config.filesystems.Azure.connection_string">
@@ -1850,7 +1859,7 @@ precedence over the account name and key.</td></tr><tr><td class="fieldArgContai
   <div class="functionHeader">
     
     <span class="py-defname">connection_string</span>: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/foundation/config/filesystems/entitites/azure.py#L45">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/foundation/config/filesystems/entitites/azure.py#L47">
       
       (source)
     </a>
@@ -1862,10 +1871,11 @@ precedence over the account name and key.</td></tr><tr><td class="fieldArgContai
   </div>
   <div class="functionBody">
     
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p>Azure storage connection string. When provided, it takes
+precedence over the account name and key.</p></div>
     
   </div>
-</div><div class="baseclassvariable">
+</div><div class="baseinstancevariable">
   
   
   <a name="orionis.foundation.config.filesystems.Azure.container">
@@ -1877,7 +1887,7 @@ precedence over the account name and key.</td></tr><tr><td class="fieldArgContai
   <div class="functionHeader">
     
     <span class="py-defname">container</span>: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/foundation/config/filesystems/entitites/azure.py#L69">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/foundation/config/filesystems/entitites/azure.py#L71">
       
       (source)
     </a>
@@ -1889,10 +1899,10 @@ precedence over the account name and key.</td></tr><tr><td class="fieldArgContai
   </div>
   <div class="functionBody">
     
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p>The blob container name.</p></div>
     
   </div>
-</div><div class="baseclassvariable">
+</div><div class="baseinstancevariable">
   
   
   <a name="orionis.foundation.config.filesystems.Azure.driver">
@@ -1903,8 +1913,8 @@ precedence over the account name and key.</td></tr><tr><td class="fieldArgContai
   </a>
   <div class="functionHeader">
     
-    <span class="py-defname">driver</span>: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <em>default</em> <span class="rst-variable-string">"azure"</span></code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/foundation/config/filesystems/entitites/azure.py#L37">
+    <span class="py-defname">driver</span>: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <em>default</em> <span class="rst-variable-string">"</span><tt class="rst-docutils rst-literal">azure</tt><span class="rst-variable-string">"</span></code> =
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/foundation/config/filesystems/entitites/azure.py#L39">
       
       (source)
     </a>
@@ -1916,10 +1926,10 @@ precedence over the account name and key.</td></tr><tr><td class="fieldArgContai
   </div>
   <div class="functionBody">
     
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p>The filesystem driver name resolved by StorageManager.</p></div>
     
   </div>
-</div><div class="baseclassvariable">
+</div><div class="baseinstancevariable">
   
   
   <a name="orionis.foundation.config.filesystems.Azure.url">
@@ -1931,7 +1941,7 @@ precedence over the account name and key.</td></tr><tr><td class="fieldArgContai
   <div class="functionHeader">
     
     <span class="py-defname">url</span>: <code>str | None, <em>default</em> <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/foundation/config/filesystems/entitites/azure.py#L77">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/foundation/config/filesystems/entitites/azure.py#L79">
       
       (source)
     </a>
@@ -1943,7 +1953,7 @@ precedence over the account name and key.</td></tr><tr><td class="fieldArgContai
   </div>
   <div class="functionBody">
     
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p>Public base URL used to build file URLs.</p></div>
     
   </div>
 </div>
@@ -1957,7 +1967,7 @@ precedence over the account name and key.</td></tr><tr><td class="fieldArgContai
   <div class="orionis-footer-inner">
     <div class="orionis-footer-copy">
       <p>API documentation for <a href="https://orionis-framework.com/" class="projecthome">Orionis</a>.</p>
-      <p class="orionis-footer-meta">Generated with <a href="https://github.com/twisted/pydoctor/">Pydoctor</a> 25.10.1.<span class="orionis-footer-build"> Built 2026-11-03 09:36:58.</span></p>
+      <p class="orionis-footer-meta">Generated with <a href="https://github.com/twisted/pydoctor/">Pydoctor</a> 25.10.1.<span class="orionis-footer-build"> Built 2026-11-03 13:00:15.</span></p>
     </div>
     <nav class="orionis-footer-links" aria-label="Additional resources">
       <a href="https://docs.orionis-framework.com">Read the guide <span aria-hidden="true">↗</span></a>

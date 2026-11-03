@@ -149,7 +149,7 @@
       <div>
          
           <div class="childrenKindTitle">Contents</div>
-          <ul><li><a class="rst-internal rst-reference" href="#rst-concurrency" id="rst-toc-entry-8">Concurrency</a></li>
+          <ul><li><a class="rst-internal rst-reference" href="#rst-concurrency">Concurrency</a></li>
 </ul>
         
 
@@ -830,7 +830,7 @@
                     <div>
          
           <div class="childrenKindTitle">Contents</div>
-          <ul><li><a class="rst-internal rst-reference" href="#rst-concurrency" id="rst-toc-entry-9">Concurrency</a></li>
+          <ul><li><a class="rst-internal rst-reference" href="#rst-concurrency">Concurrency</a></li>
 </ul>
         
 
@@ -1100,7 +1100,7 @@
         </div>
 
         <div class="extrasDocstring">
-          <p class="class-signature"><code><span class="py-keyword">class</span> <span class="py-defname">HashManager</span>(<a href="orionis.hashing.contracts.IHashManager.html" class="internal-link" title="orionis.hashing.contracts.IHashManager">IHashManager</a>): <a href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/hashing/hash_manager.py#L9" class="sourceLink">(source)</a></code></p><p>Constructor: <code><a href="#__init__" class="internal-link" title="orionis.hashing.HashManager.__init__">HashManager(app)</a></code></p><p><a href="classIndex.html#orionis.hashing.HashManager">View In Hierarchy</a></p>
+          <p class="class-signature"><code><span class="py-keyword">class</span> <span class="py-defname">HashManager</span>(<a href="orionis.hashing.contracts.IHashManager.html" class="internal-link" title="orionis.hashing.contracts.IHashManager">IHashManager</a>): <a href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/hashing/hash_manager.py#L11" class="sourceLink">(source)</a></code></p><p>Constructor: <code><a href="#__init__" class="internal-link" title="orionis.hashing.HashManager.__init__">HashManager(app)</a></code></p><p><a href="classIndex.html#orionis.hashing.HashManager">View In Hierarchy</a></p>
         </div>
 
         <div class="moduleDocstring">
@@ -1109,7 +1109,7 @@
 operation to it, so application code never depends on a concrete
 algorithm.</p>
 <div class="rst-section" id="rst-concurrency">
-<h2 class="heading"><a class="rst-toc-backref" href="#rst-toc-entry-7">Concurrency</a></h2>
+<h2 class="heading">Concurrency</h2>
 <p>No locks are used. The only mutable state is the driver cache, written
 the first time a driver is resolved: a concurrent first resolution from
 several threads may build the same driver twice, and the last write
@@ -1124,7 +1124,7 @@ application.</p>
         </div>
 
         <div id="split-tables">
-          <table class="children sortable" id="id958">
+          <table class="children sortable" id="id959">
   
   
   <tr class="method">
@@ -1176,22 +1176,22 @@ application.</p>
     
     <td>Class Variable</td>
     <td><code><a href="#__slots__" class="internal-link" title="orionis.hashing.HashManager.__slots__">__slots__</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
+    <td>Declare the instance attribute slots reserved by this class.</td>
   </tr><tr class="instancevariable">
     
     <td>Instance Variable</td>
     <td><code><a href="#_config" class="internal-link" title="orionis.hashing.HashManager._config">_config</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
+    <td>Validated configuration used to construct and operate the service.</td>
   </tr><tr class="instancevariable">
     
     <td>Instance Variable</td>
     <td><code><a href="#_default" class="internal-link" title="orionis.hashing.HashManager._default">_default</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
+    <td>Value used when the client omits this argument.</td>
   </tr><tr class="instancevariable">
     
     <td>Instance Variable</td>
     <td><code><a href="#_drivers" class="internal-link" title="orionis.hashing.HashManager._drivers">_drivers</a></code></td>
-    <td><span class="rst-undocumented">Undocumented</span></td>
+    <td>Configured backend drivers cached by their registered names.</td>
   </tr>
 </table>
           
@@ -1213,7 +1213,7 @@ application.</p>
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">__init__</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">app: <code>IApplication</code></span>):</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/hashing/hash_manager.py#L33">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/hashing/hash_manager.py#L36">
       
       (source)
     </a>
@@ -1228,7 +1228,7 @@ application.</p>
     <div><p>Initialize the manager from the application hashing configuration.</p>
 <p>A missing <tt class="rst-docutils rst-literal">hashing</tt> section falls back to the defaults declared by
 the configuration entity.</p>
-<table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">app:</span><code><a href="orionis.IApplication.html" class="internal-link" title="orionis.IApplication">IApplication</a></code></td><td class="fieldArgDesc">Application container used to read the configuration.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">This method initializes the instance and returns None.</td></tr></table></div>
+<table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">app:</span><code><a href="orionis.IApplication.html" class="internal-link">orionis.IApplication</a></code></td><td class="fieldArgDesc">Application container used to read the configuration.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">This method initializes the instance and returns None.</td></tr></table></div>
   </div>
 </div><div class="basemethod">
   
@@ -1243,7 +1243,7 @@ the configuration entity.</p>
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">_build</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">name: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></span>) -&gt; <code>IHasher</code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/hashing/hash_manager.py#L101">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/hashing/hash_manager.py#L107">
       
       (source)
     </a>
@@ -1255,7 +1255,7 @@ the configuration entity.</p>
   </div>
   <div class="docstring functionBody">
     
-    <div><p>Instantiate the driver identified by <em>name</em>.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">name:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Driver name to build.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.hashing.contracts.IHasher.html" class="internal-link" title="orionis.hashing.contracts.IHasher">IHasher</a></code></td><td class="fieldArgDesc">Configured hasher instance.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code>HashDriverNotSupportedException</code></td><td>If <em>name</em> does not match any supported driver.</td></tr></table></div>
+    <div><p>Instantiate the driver identified by <em>name</em>.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">name:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Driver name to build.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.hashing.contracts.IHasher.html" class="internal-link">orionis.hashing.contracts.IHasher</a></code></td><td class="fieldArgDesc">Configured hasher instance.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.hashing.exceptions.HashDriverNotSupportedException.html" class="internal-link">orionis.hashing.exceptions.HashDriverNotSupportedException</a></code></td><td>If <em>name</em> does not match any supported driver.</td></tr></table></div>
   </div>
 </div><div class="basemethod">
   
@@ -1270,7 +1270,7 @@ the configuration entity.</p>
     
     
     <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">check</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">value: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code>, </span><span class="rst-sig-param">hashed: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/hashing/hash_manager.py#L180">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/hashing/hash_manager.py#L186">
       
       (source)
     </a>
@@ -1300,7 +1300,7 @@ free while the hash is recomputed.</p>
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">driver</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">name: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a> | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code> = <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></span>) -&gt; <code>IHasher</code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/hashing/hash_manager.py#L62">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/hashing/hash_manager.py#L68">
       
       (source)
     </a>
@@ -1313,8 +1313,8 @@ free while the hash is recomputed.</p>
   <div class="docstring functionBody">
     <div class="interfaceinfo">overrides <code><a href="orionis.hashing.contracts.IHashManager.html#driver" class="internal-link">orionis.hashing.contracts.IHashManager.driver</a></code></div>
     <div><p>Return the hasher bound to the named (or default) driver.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">name:</span><code>str | None</code></td><td class="fieldArgDesc">Driver name (<tt class="rst-docutils rst-literal">'argon2'</tt> or <tt class="rst-docutils rst-literal">'bcrypt'</tt>). <tt class="rst-docutils rst-literal">None</tt> selects
-the configured default driver.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.hashing.contracts.IHasher.html" class="internal-link" title="orionis.hashing.contracts.IHasher">IHasher</a></code></td><td class="fieldArgDesc">Hasher instance for the requested driver, created on first
-access and cached afterwards.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code>HashDriverNotSupportedException</code></td><td>If the requested driver is not supported.</td></tr></table></div>
+the configured default driver.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.hashing.contracts.IHasher.html" class="internal-link">orionis.hashing.contracts.IHasher</a></code></td><td class="fieldArgDesc">Hasher instance for the requested driver, created on first
+access and cached afterwards.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.hashing.exceptions.HashDriverNotSupportedException.html" class="internal-link">orionis.hashing.exceptions.HashDriverNotSupportedException</a></code></td><td>If the requested driver is not supported.</td></tr></table></div>
   </div>
 </div><div class="basemethod">
   
@@ -1329,7 +1329,7 @@ access and cached afterwards.</td></tr></table><table class="fieldTable"><tr cla
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">getAlgorithm</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/hashing/hash_manager.py#L218">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/hashing/hash_manager.py#L224">
       
       (source)
     </a>
@@ -1356,7 +1356,7 @@ access and cached afterwards.</td></tr></table><table class="fieldTable"><tr cla
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">getDefaultDriver</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/hashing/hash_manager.py#L90">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/hashing/hash_manager.py#L96">
       
       (source)
     </a>
@@ -1383,7 +1383,7 @@ access and cached afterwards.</td></tr></table><table class="fieldTable"><tr cla
     
     
     <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">make</span><span class="function-signature long-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">value: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code>, </span><span class="rst-sig-symbol">*, </span><span class="rst-sig-param">rounds: <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a> | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code> = <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a>, </span><span class="rst-sig-param">memory: <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a> | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code> = <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a>, </span><span class="rst-sig-param">threads: <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a> | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code> = <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/hashing/hash_manager.py#L143">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/hashing/hash_manager.py#L149">
       
       (source)
     </a>
@@ -1413,7 +1413,7 @@ free while the cost parameters are burned.</p>
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">needsRehash</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">hashed: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/hashing/hash_manager.py#L201">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/hashing/hash_manager.py#L207">
       
       (source)
     </a>
@@ -1441,7 +1441,7 @@ configuration.</td></tr></table></div>
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">setRounds</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">rounds: <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code></span>) -&gt; <code>Self</code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/hashing/hash_manager.py#L229">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/hashing/hash_manager.py#L235">
       
       (source)
     </a>
@@ -1453,7 +1453,7 @@ configuration.</td></tr></table></div>
   </div>
   <div class="docstring functionBody">
     <div class="interfaceinfo">overrides <code><a href="orionis.hashing.contracts.IHasher.html#setRounds" class="internal-link">orionis.hashing.contracts.IHasher.setRounds</a></code></div>
-    <div><p>Set the default cost factor used by the default driver.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">rounds:</span><code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code></td><td class="fieldArgDesc">New cost factor.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code>Self</code></td><td class="fieldArgDesc">The same manager instance, allowing fluent configuration.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code>HashConfigurationException</code></td><td>If the value is not valid for the active driver.</td></tr></table></div>
+    <div><p>Set the default cost factor used by the default driver.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">rounds:</span><code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code></td><td class="fieldArgDesc">New cost factor.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/library/typing.html#typing.Self" class="intersphinx-link">typing.Self</a></code></td><td class="fieldArgDesc">The same manager instance, allowing fluent configuration.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.hashing.exceptions.HashConfigurationException.html" class="internal-link">orionis.hashing.exceptions.HashConfigurationException</a></code></td><td>If the value is not valid for the active driver.</td></tr></table></div>
   </div>
 </div><div class="baseclassvariable">
   
@@ -1467,7 +1467,7 @@ configuration.</td></tr></table></div>
   <div class="functionHeader">
     
     <span class="py-defname">__slots__</span>: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" class="intersphinx-link">tuple</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <wbr></wbr><span class="rst-variable-ellipsis">...</span>]</code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/hashing/hash_manager.py#L31">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/hashing/hash_manager.py#L33">
       
       (source)
     </a>
@@ -1479,7 +1479,7 @@ configuration.</td></tr></table></div>
   </div>
   <div class="functionBody">
     <div class="interfaceinfo">overrides <code><a href="orionis.hashing.contracts.IHashManager.html#__slots__" class="internal-link">orionis.hashing.contracts.IHashManager.__slots__</a></code></div>
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p>Declare the instance attribute slots reserved by this class.</p></div>
     
   </div>
 </div><div class="baseinstancevariable">
@@ -1494,7 +1494,7 @@ configuration.</td></tr></table></div>
   <div class="functionHeader">
     
     <span class="py-defname">_config</span>: <code>_HashingConfig</code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/hashing/hash_manager.py#L51">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/hashing/hash_manager.py#L54">
       
       (source)
     </a>
@@ -1506,7 +1506,7 @@ configuration.</td></tr></table></div>
   </div>
   <div class="functionBody">
     
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p>Validated configuration used to construct and operate the service.</p></div>
     
   </div>
 </div><div class="baseinstancevariable">
@@ -1521,7 +1521,7 @@ configuration.</td></tr></table></div>
   <div class="functionHeader">
     
     <span class="py-defname">_default</span>: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/hashing/hash_manager.py#L57">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/hashing/hash_manager.py#L61">
       
       (source)
     </a>
@@ -1533,7 +1533,7 @@ configuration.</td></tr></table></div>
   </div>
   <div class="functionBody">
     
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p>Value used when the client omits this argument.</p></div>
     
   </div>
 </div><div class="baseinstancevariable">
@@ -1548,7 +1548,7 @@ configuration.</td></tr></table></div>
   <div class="functionHeader">
     
     <span class="py-defname">_drivers</span>: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#dict" class="intersphinx-link">dict</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <wbr></wbr>IHasher]</code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1dc2e8a3d54800ad65f75dc45e4817b153e2ef48/orionis/hashing/hash_manager.py#L58">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/f4f1214a11b5fea86e9aea9e68ca1b2eeaa8b081/orionis/hashing/hash_manager.py#L63">
       
       (source)
     </a>
@@ -1560,7 +1560,7 @@ configuration.</td></tr></table></div>
   </div>
   <div class="functionBody">
     
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p>Configured backend drivers cached by their registered names.</p></div>
     
   </div>
 </div>
@@ -1574,7 +1574,7 @@ configuration.</td></tr></table></div>
   <div class="orionis-footer-inner">
     <div class="orionis-footer-copy">
       <p>API documentation for <a href="https://orionis-framework.com/" class="projecthome">Orionis</a>.</p>
-      <p class="orionis-footer-meta">Generated with <a href="https://github.com/twisted/pydoctor/">Pydoctor</a> 25.10.1.<span class="orionis-footer-build"> Built 2026-11-03 09:36:58.</span></p>
+      <p class="orionis-footer-meta">Generated with <a href="https://github.com/twisted/pydoctor/">Pydoctor</a> 25.10.1.<span class="orionis-footer-build"> Built 2026-11-03 13:00:15.</span></p>
     </div>
     <nav class="orionis-footer-links" aria-label="Additional resources">
       <a href="https://docs.orionis-framework.com">Read the guide <span aria-hidden="true">↗</span></a>

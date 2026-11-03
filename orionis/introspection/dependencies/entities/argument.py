@@ -1,3 +1,5 @@
+"""Represent a function or method argument with type and resolution metadata."""
+
 from __future__ import annotations
 from dataclasses import dataclass
 from typing import Any
@@ -7,7 +9,7 @@ class Argument:
     """
     Represent a function or method argument with type and resolution metadata.
 
-    Parameters
+    Attributes
     ----------
     name : str
         The name of the argument.
@@ -17,7 +19,7 @@ class Argument:
         The module where the argument's type is defined.
     class_name : str
         The class representing the argument's type.
-    type : type[Any]
+    type : type[typing.Any]
         The Python type object for the argument's type.
     full_class_path : str
         The complete dotted path to the argument's type (module.class).
@@ -25,7 +27,7 @@ class Argument:
         Indicates if the argument is keyword-only (default is False).
     is_schema : bool, optional
         Indicates if the argument is a schema (default is False).
-    default : Any | None, optional
+    default : typing.Any | None, optional
         The default value of the argument, if any (default is None).
     """
 

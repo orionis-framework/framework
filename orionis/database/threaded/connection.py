@@ -1,3 +1,5 @@
+"""Execute one Core checkout and buffer its results on a reserved thread."""
+
 from __future__ import annotations
 from functools import partial
 from typing import TYPE_CHECKING, Any, Self
@@ -14,15 +16,17 @@ class ThreadedConnection:
     """Execute one Core checkout and buffer its results on a reserved thread."""
 
     __slots__ = ("_closed", "_connection", "_worker")
+    """Declare the instance attribute slots reserved by this class."""
 
     def __init__(self, connection: Connection, worker: ThreadedWorker) -> None:
-        """Retain an open Core connection and the worker that opened it.
+        """
+        Retain an open Core connection and the worker that opened it.
 
         Parameters
         ----------
-        connection : Connection
+        connection : orionis.database.Connection
             Open blocking Core connection.
-        worker : ThreadedWorker
+        worker : orionis.database.threaded.worker.ThreadedWorker
             Worker reserved for this checkout.
 
         Returns
@@ -31,21 +35,25 @@ class ThreadedConnection:
             Initialize the connection adapter without additional I/O.
         """
         self._connection = connection
+        """Open blocking Core connection."""
         self._worker = worker
+        """Worker reserved for this checkout."""
         self._closed = False
+        """Whether this resource has completed its close lifecycle."""
 
     @classmethod
     async def open(cls, engine: Engine) -> Self:
-        """Open a checkout and release late resources if the caller is cancelled.
+        """
+        Open a checkout and release late resources if the caller is cancelled.
 
         Parameters
         ----------
-        engine : Engine
+        engine : ``sqlalchemy.engine.Engine``
             Blocking engine supplying the checkout.
 
         Returns
         -------
-        Self
+        typing.Self
             Connection with an independently reserved worker.
         """
         worker = ThreadedWorker()
@@ -59,11 +67,12 @@ class ThreadedConnection:
         return cls(connection, worker)
 
     async def begin(self) -> ThreadedTransaction:
-        """Begin a root transaction on the reserved worker.
+        """
+        Begin a root transaction on the reserved worker.
 
         Returns
         -------
-        ThreadedTransaction
+        orionis.database.threaded.transaction.ThreadedTransaction
             Transaction adapter retaining the same worker.
         """
         transaction = await self._worker.run(
@@ -76,18 +85,19 @@ class ThreadedConnection:
         statement: Executable,
         parameters: Mapping[str, Any] | Sequence[Mapping[str, Any]] | None = None,
     ) -> ThreadedResult:
-        """Execute and materialize a statement entirely outside the event loop.
+        """
+        Execute and materialize a statement entirely outside the event loop.
 
         Parameters
         ----------
-        statement : Executable
+        statement : ``sqlalchemy.sql.expression.Executable``
             Compiled Core statement or parameterized textual query.
         parameters : Mapping | Sequence[Mapping] | None, optional
             Bindings for one statement or a batch.
 
         Returns
         -------
-        ThreadedResult
+        orionis.database.threaded.result.ThreadedResult
             Memory-only result safe to consume after checkout release.
         """
         return await self._worker.run(partial(self._execute, statement, parameters))
@@ -97,18 +107,19 @@ class ThreadedConnection:
         statement: Executable,
         parameters: Mapping[str, Any] | Sequence[Mapping[str, Any]] | None,
     ) -> ThreadedResult:
-        """Consume the live cursor before the worker completes its operation.
+        """
+        Consume the live cursor before the worker completes its operation.
 
         Parameters
         ----------
-        statement : Executable
+        statement : ``sqlalchemy.sql.expression.Executable``
             Core statement to execute.
         parameters : Mapping | Sequence[Mapping] | None
             Statement or batch bindings.
 
         Returns
         -------
-        ThreadedResult
+        orionis.database.threaded.result.ThreadedResult
             Fully buffered rows and result metadata.
         """
         return ThreadedResult(self._connection.execute(statement, parameters))
@@ -116,11 +127,12 @@ class ThreadedConnection:
     async def runSync[T](
         self, callback: Callable[..., T], *args: object, **kwargs: object,
     ) -> T:
-        """Execute a Core schema callback on the connection's reserved worker.
+        """
+        Execute a Core schema callback on the connection's reserved worker.
 
         Parameters
         ----------
-        callback : Callable[..., T]
+        callback : collections.abc.Callable[``...``, ``T``]
             Callback receiving the blocking Core connection first.
         *args : object
             Additional callback arguments.
@@ -129,7 +141,7 @@ class ThreadedConnection:
 
         Returns
         -------
-        T
+        ``T``
             Callback result after the blocking work completes.
         """
         return await self._worker.run(partial(

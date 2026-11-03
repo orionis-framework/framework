@@ -1,3 +1,5 @@
+"""Represent the configuration entity for a database-backed job store."""
+
 from __future__ import annotations
 from dataclasses import dataclass, field
 from typing import Self

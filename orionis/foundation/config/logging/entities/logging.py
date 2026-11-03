@@ -1,3 +1,5 @@
+"""Represent the logging system configuration."""
+
 from __future__ import annotations
 from dataclasses import dataclass, field, fields
 from typing import Self
@@ -7,6 +9,7 @@ from orionis.support.entities.base import BaseEntity
 
 # Pre-computed channel option names
 _CHANNEL_OPTIONS: frozenset[str] = frozenset(f.name for f in fields(Channels))
+"""Pre-computed channel option names."""
 
 @dataclass(frozen=True, kw_only=True)
 class Logging(BaseEntity):
@@ -17,7 +20,7 @@ class Logging(BaseEntity):
     ----------
     default : str
         The default logging channel to use.
-    channels : Channels or dict
+    channels : orionis.foundation.config.logging.Channels or dict
         A collection of available logging channels.
     queue_capacity : int
         Pending records per handler; zero retains synchronous emission.
@@ -55,7 +58,7 @@ class Logging(BaseEntity):
 
         Parameters
         ----------
-        self : Logging
+        self : orionis.foundation.config.logging.Logging
             The instance of the Logging class.
 
         Returns

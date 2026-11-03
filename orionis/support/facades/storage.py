@@ -1,7 +1,10 @@
+"""Resolve the storage service through the application facade."""
+
 from orionis.container.facades.facade import Facade
 from orionis.storage.contracts.manager import IStorageManager
 
 class Storage(Facade):
+    """Resolve the storage service through the application facade."""
 
     @classmethod
     def getFacadeAccessor(cls) -> type:
@@ -11,6 +14,6 @@ class Storage(Facade):
         Returns
         -------
         type
-            :class:`IStorageManager`.
+            :class:`orionis.storage.contracts.IStorageManager`.
         """
         return IStorageManager

@@ -1,3 +1,5 @@
+"""Define core paths for foundation."""
+
 from types import MappingProxyType
 
 CORE_APP_PATHS: MappingProxyType = MappingProxyType({
@@ -47,3 +49,4 @@ CORE_APP_PATHS: MappingProxyType = MappingProxyType({
     "storage_logs": "storage/logs",
     "tests": "tests",
 })
+"""Core app paths used by ``core_paths``."""

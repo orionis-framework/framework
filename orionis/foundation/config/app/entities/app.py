@@ -1,3 +1,5 @@
+"""Represent application configuration settings."""
+
 import base64
 from dataclasses import dataclass, field
 from zoneinfo import ZoneInfo, ZoneInfoNotFoundError
@@ -15,11 +17,11 @@ class App(BaseEntity):
     """
     Represent application configuration settings.
 
-    Parameters
+    Attributes
     ----------
     name : str, optional
         The name of the application. Default is 'Orionis Application'.
-    env : str | Environments, optional
+    env : str | orionis.foundation.config.app.Environments, optional
         The environment in which the application is running. Default is
         'DEVELOPMENT'.
     debug : bool, optional
@@ -33,7 +35,7 @@ class App(BaseEntity):
     language_path : str, optional
         Relative path to the JSON translation files. Default is
         'resources/lang/'.
-    cipher : str | Cipher, optional
+    cipher : str | orionis.foundation.config.app.Cipher, optional
         The cipher used for encryption. Default is 'AES_256_CBC'.
     key : str | bytes | None, optional
         The encryption key, normalized to bytes. None generates a persistent key.

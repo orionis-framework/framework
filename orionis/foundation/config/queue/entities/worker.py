@@ -1,3 +1,5 @@
+"""Configure strictly validated queue worker defaults."""
+
 from dataclasses import dataclass, field
 from orionis.environment import Env
 from orionis.foundation.config.validation import validate_integer, validate_seconds
@@ -8,7 +10,7 @@ class Worker(BaseEntity):
     """
     Configure strictly validated queue worker defaults.
 
-    Parameters
+    Attributes
     ----------
     concurrency : int
         Maximum concurrent jobs read from ``QUEUE_WORKER_CONCURRENCY``.
@@ -18,7 +20,7 @@ class Worker(BaseEntity):
         Positive execution seconds read from ``QUEUE_WORKER_TIMEOUT``.
     tries : int
         Maximum attempts read from ``QUEUE_WORKER_TRIES``.
-    backoff : tuple[float, ...] | list[float]
+    backoff : tuple[float, ``...``] | list[float]
         Nonnegative retry delays read from ``QUEUE_WORKER_BACKOFF``.
     """
 

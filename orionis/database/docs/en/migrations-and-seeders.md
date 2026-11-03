@@ -2,6 +2,24 @@
 
 Migrations describe ordered schema changes. Seeders insert initial data through separate classes. They are discovered through the application's `database_migrations` and `database_seeders` paths, normally `database/migrations` and `database/seeders`.
 
+## Prepare framework storage tables
+
+These commands create missing tables from framework-owned code, without discovering or executing files under `database/` or writing migration history:
+
+| Command | Configured tables | SQL connection |
+|---|---|---|
+| `auth:migrate` | `AUTH_TOKEN_TABLE` | Application default. |
+| `cache:migrate` | `DB_CACHE_TABLE` and `DB_CACHE_LOCK_TABLE` | `DB_CACHE_CONNECTION`. |
+| `queue:migrate` | Each SQL queue's `QUEUE_TABLE` and `QUEUE_FAILED_TABLE` | `QUEUE_DB_CONNECTION` and `QUEUE_FAILED_DB_CONNECTION`; additional configured SQL queues retain their own connections. |
+| `schedule:migrate` | `DB_TASK_TABLE` | `DB_TASK_CONNECTION`. |
+| `session:migrate` | `SESSION_DB_TABLE` | `SESSION_DB_CONNECTION`. |
+
+For example, run `python reactor auth:migrate` from the booted application. Commands use configuration values derived from these variables and do not accept `--database`. `QUEUE_DB_CONNECTION` identifies a connection, not a table.
+
+Preparation works even when memory, file, or sync is the active driver. Cache and scheduler require their `database` store configuration. Tokens, cache, queues, and sessions honor their SQL connection prefix; the scheduler uses its native APScheduler job store's table name and indexes without starting tasks.
+
+Repeated commands preserve records. They perform neither `DROP` nor `ALTER`: an existing table with a different layout requires an explicit migration. Failures return exit code 1; completed creation returns 0. Backend restrictions still apply, including enforced unique keys.
+
 ## Write a reversible migration
 
 Each file should contain its local `Migration` subclass; use zero-padded sequential prefixes to preserve lexical ordering. [Console generators](../../../console/docs/en/built-in-commands.md) create files following application conventions.

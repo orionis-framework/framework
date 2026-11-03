@@ -1,3 +1,5 @@
+"""Group the foundation config queue components and public imports."""
+
 from typing import TYPE_CHECKING as _TYPE_CHECKING
 from orionis._exports import resolve_export as _resolve_export
 
@@ -32,6 +34,7 @@ _EXPORTS = {
     "Sync": ("orionis.foundation.config.queue.entities.sync", "Sync"),
     "Worker": ("orionis.foundation.config.queue.entities.worker", "Worker"),
 }
+"""Public export names mapped to their defining modules and attributes."""
 
 def __getattr__(name: str) -> object:
     """

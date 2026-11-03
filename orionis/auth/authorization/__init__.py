@@ -1,3 +1,5 @@
+"""Group the auth authorization components and public imports."""
+
 from orionis.auth.authorization.policy import Policy
 from orionis.auth.authorization.registry import PolicyRegistry
 from orionis.auth.authorization.snapshot import (

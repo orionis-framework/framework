@@ -1,3 +1,5 @@
+"""Resolve exception handling and reporting for application failures."""
+
 import asyncio
 from typing import TYPE_CHECKING
 from orionis.failure.contracts.catch import ICatch
@@ -13,6 +15,7 @@ if TYPE_CHECKING:
 class Catch(ICatch):
 
     # ruff: noqa: TC001
+    """Resolve exception handling and reporting for application failures."""
 
     def __init__(self, app: IApplication) -> None:
         """
@@ -20,7 +23,7 @@ class Catch(ICatch):
 
         Parameters
         ----------
-        app : IApplication
+        app : orionis.IApplication
             The application instance used to resolve required services.
 
         Returns
@@ -29,8 +32,11 @@ class Catch(ICatch):
             This constructor does not return any value.
         """
         self.__app: IApplication = app
+        """The application instance used to resolve required services."""
         self.__exception_handler: IBaseExceptionHandler | None = None
+        """Application exception handler selected for reporting and rendering."""
         self.__handler_lock = asyncio.Lock()
+        """Synchronization primitive controlling access to handler lock."""
 
     async def exception(
         self,
@@ -44,12 +50,12 @@ class Catch(ICatch):
         ----------
         exception : BaseException
             The exception instance to handle.
-        request : Request | TransportAdapter | None, optional
+        request
             The HTTP request or transport adapter associated with the exception.
 
         Returns
         -------
-        None | Response
+        None | orionis.http.Response
             This method performs side effects and may return a Response.
 
         Raises

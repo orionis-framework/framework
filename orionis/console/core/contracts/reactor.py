@@ -1,3 +1,5 @@
+"""Define the contract for reactor implementations."""
+
 from __future__ import annotations
 from abc import ABC, abstractmethod
 from typing import TYPE_CHECKING, Any
@@ -6,6 +8,7 @@ if TYPE_CHECKING:
     from orionis.console.fluent.contracts.command import ICommand
 
 class IReactor(ABC):
+    """Define the contract for reactor implementations."""
 
     @abstractmethod
     def command(
@@ -20,12 +23,12 @@ class IReactor(ABC):
         ----------
         signature : str
             Command signature to register.
-        handler : list[type[Any] | str | None] | str
+        handler : list[type[typing.Any] | str | None] | str
             Handler class and optional method name.
 
         Returns
         -------
-        ICommand
+        orionis.console.fluent.contracts.command.ICommand
             The registered command instance.
         """
 

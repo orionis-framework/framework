@@ -1,3 +1,5 @@
+"""Define the contract for loader implementations."""
+
 from __future__ import annotations
 from abc import ABC, abstractmethod
 from typing import Any, TYPE_CHECKING
@@ -7,6 +9,7 @@ if TYPE_CHECKING:
     from orionis.console.fluent.contracts.command import ICommand
 
 class ILoader(ABC):
+    """Define the contract for loader implementations."""
 
     @abstractmethod
     async def get(self, signature: str) -> Command | None:
@@ -20,7 +23,7 @@ class ILoader(ABC):
 
         Returns
         -------
-        Command | None
+        orionis.console.entities.Command | None
             The Command instance if found, otherwise None.
         """
 
@@ -31,7 +34,7 @@ class ILoader(ABC):
 
         Returns
         -------
-        dict[str, Command]
+        dict[str, orionis.console.entities.Command]
             A dictionary mapping command signatures to Command instances.
         """
 
@@ -52,12 +55,12 @@ class ILoader(ABC):
         ----------
         signature : str
             Unique identifier for the command.
-        handler : list of Any
+        handler : list of typing.Any
             List containing the class and optionally the method name.
 
         Returns
         -------
-        ICommand
+        orionis.console.fluent.contracts.command.ICommand
             The created FluentCommand instance.
 
         Raises

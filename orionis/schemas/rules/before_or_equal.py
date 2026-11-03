@@ -1,3 +1,5 @@
+"""Ensure a date is equal to or comes before a reference moment."""
+
 from orionis.schemas.rules.temporal import resolve_moment, to_datetime
 from orionis.schemas.rule import Rule
 
@@ -13,9 +15,15 @@ class BeforeOrEqual(Rule):
     # ruff: noqa: ARG002
 
     __slots__ = ("_reference",)
+    """Declare the instance attribute slots reserved by this class."""
 
     __message__ = "Value must be a date on or before the reference moment."
+    """
+    Error text for message: ``Value must be a date on or before the reference
+    moment.``.
+    """
     __code__ = "before_or_equal"
+    """Code identifier: ``before_or_equal``."""
 
     def __init__(
         self,
@@ -41,6 +49,10 @@ class BeforeOrEqual(Rule):
         """
         super().__init__(message=message)
         self._reference: object = reference
+        """
+        Sibling field name, date string or datetime to compare against. Defaults to
+        the current moment.
+        """
 
     async def enforce(
         self,

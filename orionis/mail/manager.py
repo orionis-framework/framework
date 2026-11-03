@@ -1,3 +1,5 @@
+"""Resolve central mail configuration and delegate the shared fluent pipeline."""
+
 from collections.abc import Mapping
 from dataclasses import fields, is_dataclass
 from inspect import isawaitable
@@ -22,6 +24,7 @@ if TYPE_CHECKING:
 
 # Mailer names whose driver may be omitted in the configuration.
 _CONVENTIONAL_DRIVERS = frozenset({"smtp", "file"})
+"""Mailer names whose driver may be omitted in the configuration."""
 
 class MailManager(PendingMail, IMailManager):
     """
@@ -43,6 +46,7 @@ class MailManager(PendingMail, IMailManager):
     # ruff: noqa: PLC0415, TC001
 
     __slots__ = ("_app", "_composer", "_factories")
+    """Declare the instance attribute slots reserved by this class."""
 
     def __init__(self, app: IApplication, composer: MailComposer) -> None:
         """
@@ -50,9 +54,9 @@ class MailManager(PendingMail, IMailManager):
 
         Parameters
         ----------
-        app : IApplication
+        app : orionis.IApplication
             Central configuration and dependency container.
-        composer : MailComposer
+        composer : orionis.mail.composer.MailComposer
             Single pipeline for views, storage, validation, and MIME.
 
         Returns
@@ -61,8 +65,11 @@ class MailManager(PendingMail, IMailManager):
             Initialize an empty fluent chain and defer built-in factories.
         """
         self._app = app
+        """Central configuration and dependency container."""
         self._composer = composer
+        """Single pipeline for views, storage, validation, and MIME."""
         self._factories: dict[str, TransportFactory] = {}
+        """Factories registered to construct the available transport backends."""
         super().__init__(self._deliver, mailable_builder=self._buildMailable)
 
     async def _buildMailable(self, mailable: type[Mailable]) -> Mailable:
@@ -71,12 +78,12 @@ class MailManager(PendingMail, IMailManager):
 
         Parameters
         ----------
-        mailable : type[Mailable]
+        mailable : type[orionis.mail.Mailable]
             Reusable mail class requested by a send operation.
 
         Returns
         -------
-        Mailable
+        orionis.mail.Mailable
             A fresh declaration with constructor dependencies injected.
         """
         instance = await self._app.build(mailable)
@@ -93,7 +100,7 @@ class MailManager(PendingMail, IMailManager):
         ----------
         driver : str
             Unique implementation name used in a mailer's driver option.
-        factory : TransportFactory
+        factory : orionis.mail.types.TransportFactory
             Callable receiving the application and the normalized configuration
             and returning an IMailTransport or an awaitable of one.
 
@@ -104,7 +111,7 @@ class MailManager(PendingMail, IMailManager):
 
         Raises
         ------
-        MailConfigurationException
+        orionis.mail.exceptions.MailConfigurationException
             If registration is invalid or duplicates a built-in or custom driver.
         """
         if not isinstance(driver, str) or not driver.strip() or not callable(factory):
@@ -129,23 +136,23 @@ class MailManager(PendingMail, IMailManager):
         ----------
         name : str | None
             Explicit mailer name, or None for the central default.
-        envelope : Envelope
+        envelope : orionis.mail.entities.Envelope
             Final operation-local envelope.
-        content : Content
+        content : orionis.mail.entities.Content
             Normalized content declaration.
-        attachments : tuple[Attachment, ...]
+        attachments : tuple[orionis.mail.entities.Attachment, ``...``]
             Merged deferred attachments.
 
         Returns
         -------
-        MailResult
+        orionis.mail.entities.MailResult
             Result reported by the selected transport.
 
         Raises
         ------
-        MailConfigurationException
+        orionis.mail.exceptions.MailConfigurationException
             If the mailer, driver, or factory result is invalid.
-        MailException
+        orionis.mail.exceptions.MailException
             If composition, rendering, attachment resolution, or transport fails.
         """
         mailer, driver, config = self._resolveMailer(name)
@@ -190,20 +197,20 @@ class MailManager(PendingMail, IMailManager):
 
         Parameters
         ----------
-        envelope : Envelope
+        envelope : orionis.mail.entities.Envelope
             Operation-local envelope without a From header.
 
         Returns
         -------
-        Envelope
+        orionis.mail.entities.Envelope
             The received envelope when no global sender is configured, or an
             equivalent copy carrying the configured mailbox.
 
         Raises
         ------
-        MailConfigurationException
+        orionis.mail.exceptions.MailConfigurationException
             If the configured sender is neither a mapping nor an entity.
-        MailCompositionException
+        orionis.mail.exceptions.MailCompositionException
             If the configured mailbox or display name is invalid.
         """
         section = _configuration_mapping(self._app.config("mail"))
@@ -241,12 +248,12 @@ class MailManager(PendingMail, IMailManager):
 
         Returns
         -------
-        tuple[str, str, Mapping[str, object]]
+        tuple[str, str, collections.abc.Mapping[str, object]]
             Mailer name, driver name, and copied read-only configuration.
 
         Raises
         ------
-        MailConfigurationException
+        orionis.mail.exceptions.MailConfigurationException
             If the section, name, or selected entry is invalid or missing.
         """
         section = _configuration_mapping(self._app.config("mail"))
@@ -287,7 +294,7 @@ def _configuration_mapping(value: object) -> dict[str, object]:
 
     Raises
     ------
-    MailConfigurationException
+    orionis.mail.exceptions.MailConfigurationException
         If the configuration is neither a mapping nor an entity.
     """
     if isinstance(value, Mapping):

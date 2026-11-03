@@ -1,3 +1,5 @@
+"""Compile declared routes into runtime dispatch metadata."""
+
 from __future__ import annotations
 import re
 from operator import attrgetter
@@ -16,9 +18,11 @@ if TYPE_CHECKING:
 
 # Precompiled pattern for path parameter placeholders like {name} or {name:type}.
 _PARAM_RE: re.Pattern = re.compile(r"\{(\w+)(?::(\w+))?\}")
+"""Match path parameter placeholders, including optional converter names."""
 
 # Precompiled pattern to normalise named capture groups for collision detection.
 _NAMED_GROUP_RE: re.Pattern = re.compile(r"\(\?P<\w+>")
+"""Precompiled pattern to normalise named capture groups for collision detection."""
 
 def _validate_literal(fragment: str, path: str) -> None:
     """
@@ -51,7 +55,7 @@ def _action_name(handler: Callable | type) -> str:
 
     Parameters
     ----------
-    handler : Callable | type
+    handler : collections.abc.Callable | type
         Value supplied for ``handler``.
 
     Returns
@@ -100,6 +104,7 @@ def _register_name(names: dict[str, str], route: dict) -> None:
             raise ValueError(error_msg)
 
 class RouteCompiler(IRouteCompiler):
+    """Compile declared routes into runtime dispatch metadata."""
 
     def compile(
         self,
@@ -204,7 +209,8 @@ class RouteCompiler(IRouteCompiler):
         """
         Determine whether a path is static or dynamic and compile its regex.
 
-        This method is intentionally public so that :class:`RouteCache`
+        This method is intentionally public so that
+        :class:`orionis.http.routes.route_cache.RouteCache`
         can call it during cache deserialisation to reconstruct ``regex``
         and ``converters`` without ever persisting callable objects.
 
@@ -215,7 +221,7 @@ class RouteCompiler(IRouteCompiler):
 
         Returns
         -------
-        tuple[bool, re.Pattern | None, dict[str, Callable]]
+        tuple[bool, ``re.Pattern`` | None, dict[str, collections.abc.Callable]]
             ``(is_static, regex, converters)`` — ``regex`` and
             ``converters`` are ``None`` / empty for static paths.
         """
@@ -245,7 +251,7 @@ class RouteCompiler(IRouteCompiler):
 
         Returns
         -------
-        tuple[bool, CompiledRoute]
+        tuple[bool, orionis.http.routes.entities.compiled_route.CompiledRoute]
             ``(is_static, compiled_route)``.
         """
         # Determine the final middleware stack for this route, respecting
@@ -332,7 +338,7 @@ class RouteCompiler(IRouteCompiler):
 
         Returns
         -------
-        tuple[RouteType, dict]
+        tuple[orionis.http.routes.enums.route_types.RouteType, dict]
             A tuple of the resolved ``RouteType`` and an action
             descriptor dict containing the information needed to
             dispatch the request.
@@ -393,7 +399,7 @@ class RouteCompiler(IRouteCompiler):
 
         Returns
         -------
-        tuple[re.Pattern, dict[str, Callable]]
+        tuple[``re.Pattern``, dict[str, collections.abc.Callable]]
             Compiled regex pattern and a dict mapping parameter names
             to their converter callables.
 
@@ -455,7 +461,7 @@ class RouteCompiler(IRouteCompiler):
         ----------
         method : str
             HTTP method in uppercase.
-        regex : re.Pattern
+        regex : ``re.Pattern``
             Compiled route regex.
 
         Returns

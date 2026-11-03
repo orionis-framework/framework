@@ -1,3 +1,5 @@
+"""Display available commands and their usage information."""
+
 import argparse
 from typing import Any
 from rich.console import Console
@@ -9,6 +11,7 @@ from orionis.console.output.contracts.help_command import IHelpCommand
 class HelpCommand(IHelpCommand):
 
     # ruff: noqa: SLF001
+    """Display available commands and their usage information."""
 
     @staticmethod
     def parseActions(
@@ -19,12 +22,12 @@ class HelpCommand(IHelpCommand):
 
         Parameters
         ----------
-        actions : list of argparse.Action
+        actions : list of ``argparse.Action``
             List of argparse actions to parse.
 
         Returns
         -------
-        dict[str, Any]
+        dict[str, typing.Any]
             Dictionary containing categorized actions: help, positionals,
             optionals, and subcommands.
         """
@@ -100,7 +103,7 @@ class HelpCommand(IHelpCommand):
         ----------
         command_name : str
             Name of the command to display help for.
-        actions : list of argparse.Action
+        actions : list of ``argparse.Action``
             List of argparse actions to render in the help output.
         is_error : bool, optional
             If True, indicates this is an error output (default: False).

@@ -1,3 +1,5 @@
+"""Apply new seeders exactly once on the selected database connection."""
+
 import time
 from typing import TYPE_CHECKING, Any
 from orionis.database.contracts.connection import IConnection
@@ -28,6 +30,7 @@ class _ClaimFailed(Exception):
     """Signal that inserting a seeder claim failed inside a transaction."""
 
     __slots__ = ("error",)
+    """Declare the instance attribute slots reserved by this class."""
 
     def __init__(self, error: QueryException) -> None:
         """
@@ -35,7 +38,7 @@ class _ClaimFailed(Exception):
 
         Parameters
         ----------
-        error : QueryException
+        error : orionis.database.QueryException
             Query failure that prevented the claim.
 
         Returns
@@ -44,6 +47,7 @@ class _ClaimFailed(Exception):
             Complete the documented operation without returning a value.
         """
         self.error = error
+        """Query failure that prevented the claim."""
         super().__init__(str(error))
 
 def _build_seeders_table() -> TableDefinition:
@@ -52,7 +56,7 @@ def _build_seeders_table() -> TableDefinition:
 
     Returns
     -------
-    TableDefinition
+    orionis.orm.schema.TableDefinition
         Table with a unique seeder name, batch and completion timestamp.
     """
     id_column: ColumnDefinition = Integer().primary().autoIncrement()
@@ -79,6 +83,7 @@ def _build_seeders_table() -> TableDefinition:
     )
 
 _SEEDERS_TABLE: TableDefinition = _build_seeders_table()
+"""Seeders table used by ``runner``."""
 
 class SeederRunner:
     """
@@ -95,6 +100,7 @@ class SeederRunner:
     # ruff: noqa: TC001
 
     __slots__ = ("__app", "__conn_manager", "__discovered_cache")
+    """Declare the instance attribute slots reserved by this class."""
 
     def __init__(
         self,
@@ -106,9 +112,9 @@ class SeederRunner:
 
         Parameters
         ----------
-        app : IApplication
+        app : orionis.IApplication
             Application providing the seeder directory.
-        conn_manager : IConnectionManager
+        conn_manager : orionis.database.contracts.IConnectionManager
             Manager resolving configured database connections.
 
         Returns
@@ -117,8 +123,11 @@ class SeederRunner:
             Complete the documented operation without returning a value.
         """
         self.__app = app
+        """Application providing the seeder directory."""
         self.__conn_manager = conn_manager
+        """Manager resolving configured database connections."""
         self.__discovered_cache: dict[str, type[Seeder]] | None = None
+        """Cached results of filesystem discovery."""
 
     async def seed(
         self,
@@ -133,7 +142,7 @@ class SeederRunner:
         ----------
         connection : str or None, optional
             Named database connection, or the configured default.
-        events : SeederEvents or None, optional
+        events : orionis.database.seeders.events.SeederEvents or None, optional
             Progress callbacks for executed seeders.
 
         Returns
@@ -174,7 +183,7 @@ class SeederRunner:
 
         Parameters
         ----------
-        connection : IConnection
+        connection : orionis.database.contracts.IConnection
             Selected database connection.
 
         Returns
@@ -198,7 +207,7 @@ class SeederRunner:
 
         Returns
         -------
-        Path
+        pathlib.Path
             Absolute path under ``database/seeders``.
         """
         return self.__app.path("database_seeders")
@@ -209,7 +218,7 @@ class SeederRunner:
 
         Returns
         -------
-        dict of str to type of Seeder
+        dict of str ``to`` type of orionis.database.seeders.Seeder
             Seeder classes keyed by persisted filename stem.
 
         Raises
@@ -257,7 +266,7 @@ class SeederRunner:
 
         Parameters
         ----------
-        connection : IConnection
+        connection : orionis.database.contracts.IConnection
             Connection holding the tracking table.
 
         Returns
@@ -279,7 +288,7 @@ class SeederRunner:
 
         Parameters
         ----------
-        connection : IConnection
+        connection : orionis.database.contracts.IConnection
             Connection holding the tracking table.
         name : str
             Seeder filename stem.
@@ -312,15 +321,15 @@ class SeederRunner:
 
         Parameters
         ----------
-        connection : IConnection
+        connection : orionis.database.contracts.IConnection
             Connection shared by the seeder and tracking transaction.
         name : str
             Persisted seeder filename stem.
-        seeder_cls : type of Seeder
+        seeder_cls : type of orionis.database.seeders.Seeder
             Class to instantiate and execute.
         batch : int
             Batch assigned to this invocation.
-        events : SeederEvents
+        events : orionis.database.seeders.events.SeederEvents
             Progress callbacks.
 
         Returns

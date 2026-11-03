@@ -1,3 +1,5 @@
+"""Translate the ASGI WebSocket protocol into normalized operations."""
+
 from typing import TYPE_CHECKING
 from orionis.http.adapters.websocket.contracts.transport import IWebSocketTransport
 from orionis.http.exceptions.websocket import WebSocketDisconnected
@@ -7,15 +9,19 @@ if TYPE_CHECKING:
     from collections.abc import Awaitable, Callable, Mapping
 
 _HEADERS_VERSION = (2, 1)
+"""Headers version definitions used by ``asgi``."""
 _REASON_VERSION = (2, 3)
+"""Reason version definitions used by ``asgi``."""
 _HEADER_NAME_CHARACTERS = frozenset(
     "!#$%&'*+-.^_`|~0123456789abcdefghijklmnopqrstuvwxyz",
 )
+"""Header name characters used by ``asgi``."""
 
 class ASGIWebSocketTransport(IWebSocketTransport):
     """Translate the ASGI WebSocket protocol into normalized operations."""
 
     __slots__ = ("_handshake_received", "_receive", "_scope", "_send", "_version")
+    """Declare the instance attribute slots reserved by this class."""
 
     def __init__(
         self, scope: dict, receive: Callable[[], Awaitable[dict]],
@@ -28,9 +34,9 @@ class ASGIWebSocketTransport(IWebSocketTransport):
         ----------
         scope : dict
             Original ASGI connection scope.
-        receive : Callable
+        receive : collections.abc.Callable
             Server event reader.
-        send : Callable
+        send : collections.abc.Callable
             Server event writer.
 
         Returns
@@ -39,11 +45,16 @@ class ASGIWebSocketTransport(IWebSocketTransport):
             Prepare the pending handshake.
         """
         self._scope = scope
+        """Original ASGI connection scope."""
         self._receive = receive
+        """Server event reader."""
         self._send = send
+        """Server event writer."""
         self._handshake_received = False
+        """Handshake received flag used by ``ASGIWebSocketTransport``."""
         version = scope.get("asgi", {}).get("spec_version", "2.0")
         self._version = tuple(int(part) for part in version.split("."))
+        """Version string advertised by the implementation."""
 
     async def _connectEvent(self) -> None:
         """
@@ -56,7 +67,7 @@ class ASGIWebSocketTransport(IWebSocketTransport):
 
         Raises
         ------
-        WebSocketDisconnected
+        orionis.http.WebSocketDisconnected
             If the peer disconnects before acceptance.
         RuntimeError
             If the server supplies an invalid initial event.
@@ -81,7 +92,7 @@ class ASGIWebSocketTransport(IWebSocketTransport):
 
         Parameters
         ----------
-        headers : Mapping[str, str] | None
+        headers : collections.abc.Mapping[str, str] | None
             User supplied response headers.
 
         Returns
@@ -125,7 +136,7 @@ class ASGIWebSocketTransport(IWebSocketTransport):
         ----------
         subprotocol : str | None, optional
             Subprotocol offered by the client.
-        headers : Mapping[str, str] | None, optional
+        headers : collections.abc.Mapping[str, str] | None, optional
             Additional headers supported since ASGI HTTP 2.1.
 
         Returns
@@ -137,7 +148,7 @@ class ASGIWebSocketTransport(IWebSocketTransport):
         ------
         ValueError
             If the selected subprotocol was not offered.
-        WebSocketDisconnected
+        orionis.http.WebSocketDisconnected
             If the peer disappears during acceptance.
         """
         if (
@@ -164,14 +175,14 @@ class ASGIWebSocketTransport(IWebSocketTransport):
 
         Returns
         -------
-        WebSocketMessage
+        orionis.http.WebSocketMessage
             The payload or peer closure details.
 
         Raises
         ------
         RuntimeError
             If the server supplies an invalid event or two payloads.
-        WebSocketDisconnected
+        orionis.http.WebSocketDisconnected
             If a transport read raises an operating system error.
         """
         try:
@@ -208,7 +219,7 @@ class ASGIWebSocketTransport(IWebSocketTransport):
 
         Raises
         ------
-        WebSocketDisconnected
+        orionis.http.WebSocketDisconnected
             If the peer has closed the connection.
         """
         try:
@@ -232,7 +243,7 @@ class ASGIWebSocketTransport(IWebSocketTransport):
 
         Raises
         ------
-        WebSocketDisconnected
+        orionis.http.WebSocketDisconnected
             If the peer has closed the connection.
         """
         try:
@@ -256,7 +267,7 @@ class ASGIWebSocketTransport(IWebSocketTransport):
 
         Raises
         ------
-        WebSocketDisconnected
+        orionis.http.WebSocketDisconnected
             If the peer closes while rejection is sent.
         """
         try:
@@ -292,7 +303,7 @@ class ASGIWebSocketTransport(IWebSocketTransport):
 
         Raises
         ------
-        WebSocketDisconnected
+        orionis.http.WebSocketDisconnected
             If the peer closes before the event reaches the server.
         """
         event: dict = {"type": "websocket.close", "code": code}

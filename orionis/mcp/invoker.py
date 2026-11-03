@@ -1,3 +1,5 @@
+"""A reusable unbound handler plan; payloads never become keyword mappings."""
+
 import inspect
 import sys
 from dataclasses import dataclass
@@ -16,6 +18,7 @@ class _Parameter:
     """One compile-time classified argument, with no request references."""
 
     name: str
+    """Name identifying this declaration within its containing registry."""
     source: Literal[
         "payload",
         "request",
@@ -26,8 +29,11 @@ class _Parameter:
         "argument",
         "uri",
     ]
+    """Trusted source from which this argument is resolved."""
     value: object
+    """Type, default or lookup metadata used to resolve this argument."""
     positional: bool
+    """Whether this argument must be passed positionally."""
 
 def _classify(
     parameter: inspect.Parameter,
@@ -41,20 +47,20 @@ def _classify(
 
     Parameters
     ----------
-    parameter : inspect.Parameter
+    parameter : ``inspect.Parameter``
         Handler parameter whose source and positional mode are classified.
     annotation : object
         Native type annotation to inspect or validate.
     payload_type : object
         Declared payload type, or None when the handler has no payload.
-    argument_names : tuple[str, ...]
+    argument_names : tuple[str, ``...``]
         Named prompt arguments supplied by the protocol.
-    uri_names : tuple[str, ...]
+    uri_names : tuple[str, ``...``]
         Variables extracted from the resource URI template.
 
     Returns
     -------
-    _Parameter
+    orionis.mcp.invoker._Parameter
         Immutable binding plan with its trusted source, value and positional mode.
 
     Raises
@@ -106,8 +112,11 @@ class McpInvoker:
     """A reusable unbound handler plan; payloads never become keyword mappings."""
 
     function: Callable[..., object]
+    """Unbound handler function executed by the invocation plan."""
     parameters: tuple[_Parameter, ...]
+    """Binding plans for all handler parameters, including injected dependencies."""
     receiver: Literal["instance", "class", "none"]
+    """Whether the handler receives an instance, a class or no receiver."""
 
     @classmethod
     def compile(
@@ -130,14 +139,14 @@ class McpInvoker:
             Value supplied for ``method``.
         payload_type : object
             Value supplied for ``payload_type``.
-        argument_names : tuple[str, ...]
+        argument_names : tuple[str, ``...``]
             Value supplied for ``argument_names``.
-        uri_names : tuple[str, ...]
+        uri_names : tuple[str, ``...``]
             Value supplied for ``uri_names``.
 
         Returns
         -------
-        McpInvoker
+        orionis.mcp.invoker.McpInvoker
             Result of the operation described above.
         """
         descriptor = inspect.getattr_static(definition, method)
@@ -191,9 +200,9 @@ class McpInvoker:
         ----------
         instance : object
             Instance supplying values or receiving the invocation.
-        app : IContainer
+        app : orionis.container.contracts.container.IContainer
             Application container supplying configuration and dependencies.
-        request : McpRequest
+        request : orionis.mcp.McpRequest
             Current request and its trusted execution context.
         payload : object
             Input payload supplied for conversion or processing.
@@ -230,11 +239,11 @@ class McpInvoker:
 
         Parameters
         ----------
-        parameter : _Parameter
+        parameter : orionis.mcp.invoker._Parameter
             Value supplied for ``parameter``.
-        app : IContainer
+        app : orionis.container.contracts.container.IContainer
             Application container supplying configuration and dependencies.
-        request : McpRequest
+        request : orionis.mcp.McpRequest
             Current request and its trusted execution context.
         payload : object
             Input payload supplied for conversion or processing.
@@ -272,9 +281,9 @@ class McpInvoker:
 
         Parameters
         ----------
-        parameter : _Parameter
+        parameter : orionis.mcp.invoker._Parameter
             Value supplied for ``parameter``.
-        request : McpRequest
+        request : orionis.mcp.McpRequest
             Current request and its trusted execution context.
         payload : object
             Input payload supplied for conversion or processing.

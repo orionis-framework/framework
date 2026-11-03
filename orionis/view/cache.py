@@ -1,3 +1,5 @@
+"""Store compiled Jinja templates through the framework cache."""
+
 from __future__ import annotations
 from hashlib import sha1
 from pathlib import Path
@@ -7,11 +9,14 @@ from jinja2.bccache import Bucket, FileSystemBytecodeCache
 _TEMPLATE_EXTENSIONS: tuple[str, ...] = (
     ".html", ".htm", ".jinja", ".jinja2", ".j2",
 )
+"""Extensions stripped before building the cache filename."""
 
 # Digest characters appended to the readable stem to keep keys unique
 _DIGEST_LENGTH: int = 8
+"""Digest characters appended to the readable stem to keep keys unique."""
 
 class OrionisBytecodeCache(FileSystemBytecodeCache):
+    """Store compiled Jinja templates through the framework cache."""
 
     def getCacheKey(self, name: str, filename: str | None = None) -> str: # noqa: ARG002
         """
@@ -54,7 +59,7 @@ class OrionisBytecodeCache(FileSystemBytecodeCache):
 
         Parameters
         ----------
-        bucket : Bucket
+        bucket : ``jinja2.bccache.Bucket``
             Jinja2 bucket whose ``key`` is the sanitised template name.
 
         Returns

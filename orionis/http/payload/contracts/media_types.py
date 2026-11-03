@@ -1,9 +1,12 @@
+"""Define the contract for a media-type-to-parser registry."""
+
 from __future__ import annotations
 from abc import ABC, abstractmethod
 from collections.abc import Callable
 
 # Special type alias for synchronous body parsers
 BodyParser = Callable[[bytes], object]
+"""Special type alias for synchronous body parsers."""
 
 class IMediaTypeRegistry(ABC):
     """
@@ -14,6 +17,7 @@ class IMediaTypeRegistry(ABC):
     """
 
     __slots__ = ()
+    """Declare that this class introduces no additional instance slots."""
 
     # Register or overwrite a parser for the specified media type.
     @abstractmethod
@@ -26,12 +30,13 @@ class IMediaTypeRegistry(ABC):
         media_type : str
             Case-insensitive media-type string,
             e.g. ``"application/json"``.
-        parser : BodyParser
+        parser : orionis.http.payload.contracts.media_types.BodyParser
             Synchronous callable ``(bytes) -> object``.
 
         Returns
         -------
         None
+            Add or replace the parser for *media_type* in place.
         """
 
     # Retrieve the parser associated with the given media type.
@@ -47,7 +52,7 @@ class IMediaTypeRegistry(ABC):
 
         Returns
         -------
-        BodyParser | None
+        orionis.http.payload.contracts.media_types.BodyParser | None
             The registered callable, or ``None`` if not found.
         """
 
@@ -59,11 +64,11 @@ class IMediaTypeRegistry(ABC):
 
         Parameters
         ----------
-        parsers : dict[str, BodyParser]
+        parsers : dict[str, orionis.http.payload.contracts.media_types.BodyParser]
             Additional or replacement media-type-to-parser entries.
 
         Returns
         -------
-        IMediaTypeRegistry
+        orionis.http.payload.contracts.media_types.IMediaTypeRegistry
             New registry containing all entries from self plus *parsers*.
         """

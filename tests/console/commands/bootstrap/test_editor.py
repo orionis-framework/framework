@@ -64,7 +64,7 @@ class TestBootstrapEditor(TestCase):
         # Validate syntax without executing the generated module.
         compile(source, str(self.path), "exec")
 
-    def test_adds_each_routing_context_and_preserves_existing_arguments(self) -> None:
+    def testAddsEachRoutingContextAndPreservesExistingArguments(self) -> None:
         """
         Add each route context while retaining existing arguments.
 
@@ -97,7 +97,7 @@ class TestBootstrapEditor(TestCase):
                     [f"custom/{context}.py"],
                 )
 
-    def test_adds_missing_comma_without_losing_comment(self) -> None:
+    def testAddsMissingCommaWithoutLosingComment(self) -> None:
         """
         Add a missing argument comma while preserving its comment.
 
@@ -114,7 +114,7 @@ class TestBootstrapEditor(TestCase):
         self.assertIn("health='/up',  # health", result)
         self.assertValid(result)
 
-    def test_grouped_final_arguments_keep_their_original_type(self) -> None:
+    def testGroupedFinalArgumentsKeepTheirOriginalType(self) -> None:
         """
         Place new commas outside grouping parentheses and preserve values.
 
@@ -145,7 +145,7 @@ class TestBootstrapEditor(TestCase):
                 self.assertIsInstance(value, ast.Constant)
                 self.assertIn(f"{argument},  # Keep", result)
 
-    def test_single_line_empty_existing_trailing_comma_and_positional_calls(
+    def testSingleLineEmptyExistingTrailingCommaAndPositionalCalls(
         self,
     ) -> None:
         """
@@ -169,7 +169,7 @@ class TestBootstrapEditor(TestCase):
                 self.assertValid(result)
                 self.assertIn('websocket="routes/ws.py"', result)
 
-    def test_replaces_disabled_contexts_only(self) -> None:
+    def testReplacesDisabledContextsOnly(self) -> None:
         """
         Replace disabled route contexts without changing other arguments.
 
@@ -190,7 +190,7 @@ class TestBootstrapEditor(TestCase):
                 self.assertIn("health='/up'", result)
                 self.assertValid(result)
 
-    def test_updates_a_disabled_positional_context(self) -> None:
+    def testUpdatesADisabledPositionalContext(self) -> None:
         """
         Enable a disabled positional route context without changing its peers.
 
@@ -211,7 +211,7 @@ class TestBootstrapEditor(TestCase):
             result,
         )
 
-    def test_preserves_literal_and_dynamic_custom_paths(self) -> None:
+    def testPreservesLiteralAndDynamicCustomPaths(self) -> None:
         """
         Preserve custom route paths expressed as literals or dynamic values.
 
@@ -235,7 +235,7 @@ class TestBootstrapEditor(TestCase):
                 self.assertIsNone(editor.routing("api", self.base / "routes/api.py"))
                 self.assertEqual(self.path.read_bytes(), editor._original)
 
-    def test_reads_static_paths_and_reports_dynamic_values(self) -> None:
+    def testReadsStaticPathsAndReportsDynamicValues(self) -> None:
         """
         Read static route paths and identify unresolved dynamic values.
 
@@ -254,7 +254,7 @@ class TestBootstrapEditor(TestCase):
         self.assertIsNone(editor.routePaths("ai"))
         self.assertEqual(editor.routePaths("console"), [])
 
-    def test_expanded_routing_reports_dynamic_paths(self) -> None:
+    def testExpandedRoutingReportsDynamicPaths(self) -> None:
         """
         Defer expanded route dictionaries to the application's loaded values.
 
@@ -272,7 +272,7 @@ class TestBootstrapEditor(TestCase):
         with self.assertRaises(BootstrapEditError):
             editor.routing("api", self.base / "custom/api.py")
 
-    def test_explicit_disabled_context_is_not_an_unresolved_expansion(self) -> None:
+    def testExplicitDisabledContextIsNotAnUnresolvedExpansion(self) -> None:
         """
         Keep explicit None arguments separate from missing expanded contexts.
 
@@ -287,7 +287,7 @@ class TestBootstrapEditor(TestCase):
         )
         self.assertEqual(editor.routePaths("api"), [])
 
-    def test_multiple_effective_paths_are_registered_together(self) -> None:
+    def testMultipleEffectivePathsAreRegisteredTogether(self) -> None:
         """
         Retain every configured route file when adding a missing argument.
 
@@ -307,7 +307,7 @@ class TestBootstrapEditor(TestCase):
         self.assertEqual(updated.routePaths("api"), ["custom/one.py", "custom/two.py"])
         self.assertTrue(updated.hasRouting)
 
-    def test_generated_route_literals_use_double_quotes(self) -> None:
+    def testGeneratedRouteLiteralsUseDoubleQuotes(self) -> None:
         """
         Use double quotes for every inserted routing string literal.
 
@@ -345,7 +345,7 @@ class TestBootstrapEditor(TestCase):
                     )
                     self.assertIsNone(updated.routing("api", paths))
 
-    def test_escaped_paths_preserve_source_encoding_and_literal_values(self) -> None:
+    def testEscapedPathsPreserveSourceEncodingAndLiteralValues(self) -> None:
         """
         Preserve special path characters under source coding cookies and BOMs.
 
@@ -381,7 +381,7 @@ class TestBootstrapEditor(TestCase):
                 self.assertTrue(self.path.read_bytes().startswith(header))
                 self.assertIsNone(updated.routing("api", paths))
 
-    def test_reports_missing_direct_routing_registration(self) -> None:
+    def testReportsMissingDirectRoutingRegistration(self) -> None:
         """
         Expose whether the source contains a directly editable route call.
 
@@ -394,7 +394,7 @@ class TestBootstrapEditor(TestCase):
         editor = self.editor("app = Application()\nconfigure(app)\napp.create()\n")
         self.assertFalse(editor.hasRouting)
 
-    def test_missing_registration_precedes_create_and_keeps_its_comment(self) -> None:
+    def testMissingRegistrationPrecedesCreateAndKeepsItsComment(self) -> None:
         """
         Insert missing routing before creation and retain its leading comment.
 
@@ -423,7 +423,7 @@ class TestBootstrapEditor(TestCase):
         )
         self.assertValid(result)
 
-    def test_chained_creation_registers_routes_before_create(self) -> None:
+    def testChainedCreationRegistersRoutesBeforeCreate(self) -> None:
         """
         Insert routing before a chained application initialization.
 
@@ -447,7 +447,7 @@ class TestBootstrapEditor(TestCase):
         )
         self.assertValid(result)
 
-    def test_only_effective_last_routing_registration_is_updated(self) -> None:
+    def testOnlyEffectiveLastRoutingRegistrationIsUpdated(self) -> None:
         """
         Update the final routing call while preserving earlier calls.
 
@@ -467,7 +467,7 @@ class TestBootstrapEditor(TestCase):
         self.assertIn("app.withRouting(api='old.py')", result)
         self.assertIn('app.withRouting(health=\'/up\', api="routes/new.py")', result)
 
-    def test_alias_application_and_factory_return_are_supported(self) -> None:
+    def testAliasApplicationAndFactoryReturnAreSupported(self) -> None:
         """
         Support application import aliases and factory return registration.
 
@@ -496,7 +496,7 @@ class TestBootstrapEditor(TestCase):
         )
         self.assertValid(result)
 
-    def test_module_application_import_is_supported(self) -> None:
+    def testModuleApplicationImportIsSupported(self) -> None:
         """
         Support application construction through an imported module alias.
 
@@ -512,7 +512,7 @@ class TestBootstrapEditor(TestCase):
         )
         self.assertValid(editor.routing("web", self.base / "routes/web.py"))
 
-    def test_unrelated_nested_builder_calls_do_not_become_application_create(
+    def testUnrelatedNestedBuilderCallsDoNotBecomeApplicationCreate(
         self,
     ) -> None:
         """
@@ -529,7 +529,7 @@ class TestBootstrapEditor(TestCase):
         self.assertIn("cache=cache.create()", result)
         self.assertLess(result.index("withRouting"), result.rindex("app.create()"))
 
-    def test_lifespan_adds_import_and_callback_once_before_create(self) -> None:
+    def testLifespanAddsImportAndCallbackOnceBeforeCreate(self) -> None:
         """
         Import and register lifespan callbacks exactly once before creation.
 
@@ -569,7 +569,7 @@ class TestBootstrapEditor(TestCase):
             ),
         )
 
-    def test_lifespan_import_extends_existing_group_without_blank_lines(self) -> None:
+    def testLifespanImportExtendsExistingGroupWithoutBlankLines(self) -> None:
         """
         Extend multiline imports while preserving groups and attached comments.
 
@@ -607,7 +607,7 @@ class TestBootstrapEditor(TestCase):
         self.assertTrue(result.startswith(source[:source.index("# Keep local")]))
         self.assertValid(result)
 
-    def test_factory_lifespan_import_extends_local_import_group(self) -> None:
+    def testFactoryLifespanImportExtendsLocalImportGroup(self) -> None:
         """
         Extend factory imports without separating them or moving module imports.
 
@@ -644,7 +644,7 @@ class TestBootstrapEditor(TestCase):
         )
         self.assertValid(result)
 
-    def test_lifespan_import_preserves_headers_without_existing_imports(self) -> None:
+    def testLifespanImportPreservesHeadersWithoutExistingImports(self) -> None:
         """
         Preserve coding cookies and shebangs when adding the first import.
 
@@ -667,7 +667,7 @@ class TestBootstrapEditor(TestCase):
             result,
         )
 
-    def test_lifespan_import_follows_docstrings_and_future_imports(self) -> None:
+    def testLifespanImportFollowsDocstringsAndFutureImports(self) -> None:
         """
         Keep callback imports after module docstrings and future declarations.
 
@@ -688,7 +688,7 @@ class TestBootstrapEditor(TestCase):
         ))
         self.assertValid(result)
 
-    def test_lifespan_splits_terminal_chained_create_preserving_builder(self) -> None:
+    def testLifespanSplitsTerminalChainedCreatePreservingBuilder(self) -> None:
         """
         Split terminal creation to register callbacks after builder setup.
 
@@ -719,7 +719,7 @@ class TestBootstrapEditor(TestCase):
             result.index("app.create()"),
         )
 
-    def test_factory_reuses_module_level_lifespan_alias(self) -> None:
+    def testFactoryReusesModuleLevelLifespanAlias(self) -> None:
         """
         Reuse an existing module-level lifespan callback alias inside factories.
 
@@ -739,7 +739,7 @@ class TestBootstrapEditor(TestCase):
         )
         self.assertIsNone(editor.lifespan(self.base / "bootstrap/lifespan.py"))
 
-    def test_lifespan_recognizes_module_alias_call(self) -> None:
+    def testLifespanRecognizesModuleAliasCall(self) -> None:
         """
         Recognize existing lifespan registration through a module alias.
 
@@ -757,7 +757,7 @@ class TestBootstrapEditor(TestCase):
         )
         self.assertIsNone(editor.lifespan(self.base / "bootstrap/lifespan.py"))
 
-    def test_relative_and_package_imports_remain_idempotent(self) -> None:
+    def testRelativeAndPackageImportsRemainIdempotent(self) -> None:
         """
         Recognize relative callback imports and package module aliases.
 
@@ -784,7 +784,7 @@ class TestBootstrapEditor(TestCase):
                 editor = self.editor(source)
                 self.assertIsNone(editor.lifespan(self.base / "bootstrap/lifespan.py"))
 
-    def test_conditional_import_does_not_supply_the_new_registration(self) -> None:
+    def testConditionalImportDoesNotSupplyTheNewRegistration(self) -> None:
         """
         Import an executable callback instead of reusing TYPE_CHECKING imports.
 
@@ -803,7 +803,7 @@ class TestBootstrapEditor(TestCase):
         self.assertIn("_orionis_lifespan_1(app)", result)
         self.assertValid(result)
 
-    def test_late_import_does_not_get_called_before_it_is_bound(self) -> None:
+    def testLateImportDoesNotGetCalledBeforeItIsBound(self) -> None:
         """
         Use a new import when the existing callback import follows create.
 
@@ -823,7 +823,7 @@ class TestBootstrapEditor(TestCase):
             result.index("_orionis_lifespan_1(app)"), result.index("app.create()"),
         )
 
-    def test_lifespan_uses_existing_import_alias_when_call_is_missing(self) -> None:
+    def testLifespanUsesExistingImportAliasWhenCallIsMissing(self) -> None:
         """
         Reuse a callback import alias when inserting missing registration.
 
@@ -843,7 +843,7 @@ class TestBootstrapEditor(TestCase):
         self.assertIn("callbacks(app)", result)
         self.assertEqual(result.count("from bootstrap.lifespan"), 1)
 
-    def test_keyword_callback_argument_is_not_duplicated(self) -> None:
+    def testKeywordCallbackArgumentIsNotDuplicated(self) -> None:
         """
         Recognize explicit keyword application arguments in existing calls.
 
@@ -859,7 +859,7 @@ class TestBootstrapEditor(TestCase):
         )
         self.assertIsNone(editor.lifespan(self.base / "bootstrap/lifespan.py"))
 
-    def test_custom_registration_is_preserved(self) -> None:
+    def testCustomRegistrationIsPreserved(self) -> None:
         """
         Preserve custom lifespan callback registration.
 
@@ -878,7 +878,7 @@ class TestBootstrapEditor(TestCase):
         )
         self.assertIsNone(editor.lifespan(self.base / "bootstrap/lifespan.py"))
 
-    def test_lifespan_name_collision_gets_a_fresh_alias(self) -> None:
+    def testLifespanNameCollisionGetsAFreshAlias(self) -> None:
         """
         Choose a fresh lifespan callback alias when the default name is bound.
 
@@ -905,7 +905,7 @@ class TestBootstrapEditor(TestCase):
         self.assertIn("_orionis_lifespan_1(app)", result)
         self.assertValid(result)
 
-    def test_factory_lifespan_import_and_registration_keep_indentation(self) -> None:
+    def testFactoryLifespanImportAndRegistrationKeepIndentation(self) -> None:
         """
         Preserve factory indentation when importing and registering callbacks.
 
@@ -924,7 +924,7 @@ class TestBootstrapEditor(TestCase):
         self.assertIn("    register_lifespan_callbacks(app)", result)
         self.assertValid(result)
 
-    def test_utf8_columns_and_comments_are_preserved(self) -> None:
+    def testUtf8ColumnsAndCommentsArePreserved(self) -> None:
         """
         Preserve Unicode text and comments while locating AST source columns.
 
@@ -941,7 +941,7 @@ class TestBootstrapEditor(TestCase):
         self.assertIn('health=\'/salud/ñ\', api="routes/api.py")  # español', result)
         self.assertValid(result)
 
-    def test_encoding_bom_and_crlf_are_preserved_on_commit(self) -> None:
+    def testEncodingBomAndCrlfArePreservedOnCommit(self) -> None:
         """
         Preserve the original BOM and CRLF newlines when committing edits.
 
@@ -960,7 +960,7 @@ class TestBootstrapEditor(TestCase):
         self.assertEqual(content.count(b"\n"), content.count(b"\r\n"))
         self.assertIn("# español".encode(), content)
 
-    def test_non_utf8_coding_cookie_is_preserved(self) -> None:
+    def testNonUtf8CodingCookieIsPreserved(self) -> None:
         """
         Preserve a non-UTF-8 coding cookie and its encoded source content.
 
@@ -979,7 +979,7 @@ class TestBootstrapEditor(TestCase):
         editor.commit(editor.routing("api", self.base / "routes/api.py"))
         self.assertIn("# café".encode("latin-1"), self.path.read_bytes())
 
-    def test_commit_retries_transient_windows_replacement_failures(self) -> None:
+    def testCommitRetriesTransientWindowsReplacementFailures(self) -> None:
         """
         Publish the staged source after transient Windows file locks clear.
 
@@ -1019,7 +1019,7 @@ class TestBootstrapEditor(TestCase):
                 self.assertEqual(self.path.read_bytes().decode(editor.encoding), result)
                 self.assertEqual(list(self.path.parent.glob(".bootstrap-*")), [])
 
-    def test_commit_reports_persistent_windows_replacement_failures(self) -> None:
+    def testCommitReportsPersistentWindowsReplacementFailures(self) -> None:
         """
         Propagate a persistent Windows lock after the retry budget is exhausted.
 
@@ -1048,7 +1048,7 @@ class TestBootstrapEditor(TestCase):
         self.assertEqual(self.path.read_bytes(), original)
         self.assertEqual(list(self.path.parent.glob(".bootstrap-*")), [])
 
-    def test_commit_does_not_retry_other_replacement_errors(self) -> None:
+    def testCommitDoesNotRetryOtherReplacementErrors(self) -> None:
         """
         Propagate non-Windows and unsupported replacement errors immediately.
 
@@ -1080,7 +1080,7 @@ class TestBootstrapEditor(TestCase):
                 self.assertEqual(self.path.read_bytes(), original)
                 self.assertEqual(list(self.path.parent.glob(".bootstrap-*")), [])
 
-    def test_commit_preserves_concurrent_changes_between_replacement_attempts(
+    def testCommitPreservesConcurrentChangesBetweenReplacementAttempts(
         self,
     ) -> None:
         """
@@ -1110,7 +1110,7 @@ class TestBootstrapEditor(TestCase):
         self.assertEqual(self.path.read_bytes(), changed)
         self.assertEqual(list(self.path.parent.glob(".bootstrap-*")), [])
 
-    def test_second_commit_is_skipped_and_concurrent_changes_are_preserved(
+    def testSecondCommitIsSkippedAndConcurrentChangesArePreserved(
         self,
     ) -> None:
         """
@@ -1130,7 +1130,7 @@ class TestBootstrapEditor(TestCase):
         self.assertEqual(self.path.read_text(), "# Developer changed this file.\n")
         self.assertEqual(list(self.path.parent.glob(".bootstrap-*")), [])
 
-    def test_missing_final_newline_is_handled(self) -> None:
+    def testMissingFinalNewlineIsHandled(self) -> None:
         """
         Insert routing after source that lacks a final newline.
 
@@ -1145,7 +1145,7 @@ class TestBootstrapEditor(TestCase):
         self.assertValid(result)
         self.assertIn("Application()\n", result)
 
-    def test_ambiguous_or_conditional_application_is_rejected(self) -> None:
+    def testAmbiguousOrConditionalApplicationIsRejected(self) -> None:
         """
         Reject ambiguous or conditional application construction.
 
@@ -1163,7 +1163,7 @@ class TestBootstrapEditor(TestCase):
             with self.subTest(source=source), self.assertRaises(BootstrapEditError):
                 self.editor(source)
 
-    def test_conditional_registration_and_dynamic_kwargs_fail_without_writes(
+    def testConditionalRegistrationAndDynamicKwargsFailWithoutWrites(
         self,
     ) -> None:
         """
@@ -1186,7 +1186,7 @@ class TestBootstrapEditor(TestCase):
                     editor.routing("api", self.base / "routes/api.py")
                 self.assertEqual(self.path.read_text(), source)
 
-    def test_routing_after_create_is_rejected(self) -> None:
+    def testRoutingAfterCreateIsRejected(self) -> None:
         """
         Reject routing configuration after application creation.
 
@@ -1202,7 +1202,7 @@ class TestBootstrapEditor(TestCase):
         with self.assertRaises(BootstrapEditError):
             editor.routing("api", self.base / "routes/api.py")
 
-    def test_later_helper_routing_is_rejected_before_any_write(self) -> None:
+    def testLaterHelperRoutingIsRejectedBeforeAnyWrite(self) -> None:
         """
         Prevent helper routing from overwriting a newly inserted context.
 
@@ -1226,7 +1226,7 @@ class TestBootstrapEditor(TestCase):
                     editor.routing("api", self.base / "routes/api.py")
                 self.assertEqual(self.path.read_text(), source)
 
-    def test_outer_helper_runs_after_its_routing_argument(self) -> None:
+    def testOuterHelperRunsAfterItsRoutingArgument(self) -> None:
         """
         Account for Python argument evaluation when a helper encloses routing.
 
@@ -1245,7 +1245,7 @@ class TestBootstrapEditor(TestCase):
         with self.assertRaisesRegex(BootstrapEditError, "Helper configure"):
             editor.routing("api", self.base / "routes/api.py")
 
-    def test_registered_expansion_does_not_bypass_helper_guard(self) -> None:
+    def testRegisteredExpansionDoesNotBypassHelperGuard(self) -> None:
         """
         Run source safety checks even when runtime confirms an expanded route.
 
@@ -1264,7 +1264,7 @@ class TestBootstrapEditor(TestCase):
         with self.assertRaisesRegex(BootstrapEditError, "Helper configure"):
             editor.routing("api", self.base / "routes/api.py", registered=True)
 
-    def test_helper_routing_before_the_selected_call_is_safe(self) -> None:
+    def testHelperRoutingBeforeTheSelectedCallIsSafe(self) -> None:
         """
         Edit the final direct call when it follows helper configuration.
 
@@ -1282,7 +1282,7 @@ class TestBootstrapEditor(TestCase):
         )
         self.assertValid(editor.routing("api", self.base / "routes/api.py"))
 
-    def test_helper_called_with_another_receiver_is_safe(self) -> None:
+    def testHelperCalledWithAnotherReceiverIsSafe(self) -> None:
         """
         Ignore mutations of an object other than the selected application.
 
@@ -1300,7 +1300,7 @@ class TestBootstrapEditor(TestCase):
         )
         self.assertValid(editor.routing("api", self.base / "routes/api.py"))
 
-    def test_lifespan_helper_does_not_prevent_route_registration(self) -> None:
+    def testLifespanHelperDoesNotPreventRouteRegistration(self) -> None:
         """
         Accept ordinary callback helpers that only register lifespan events.
 
@@ -1318,7 +1318,7 @@ class TestBootstrapEditor(TestCase):
         )
         self.assertValid(editor.routing("api", self.base / "routes/api.py"))
 
-    def test_factory_helper_routing_is_rejected(self) -> None:
+    def testFactoryHelperRoutingIsRejected(self) -> None:
         """
         Bind factory application names to module helper parameters.
 
@@ -1340,7 +1340,7 @@ class TestBootstrapEditor(TestCase):
         with self.assertRaisesRegex(BootstrapEditError, "Helper configure"):
             editor.routing("api", self.base / "routes/api.py")
 
-    def test_helper_closure_over_the_application_is_rejected(self) -> None:
+    def testHelperClosureOverTheApplicationIsRejected(self) -> None:
         """
         Recognize helper routing through a local application closure.
 
@@ -1362,7 +1362,7 @@ class TestBootstrapEditor(TestCase):
         with self.assertRaisesRegex(BootstrapEditError, "Helper configure"):
             editor.routing("api", self.base / "routes/api.py")
 
-    def test_helper_global_name_does_not_capture_a_factory_local(self) -> None:
+    def testHelperGlobalNameDoesNotCaptureAFactoryLocal(self) -> None:
         """
         Keep module helper globals separate from equally named factory locals.
 
@@ -1383,7 +1383,7 @@ class TestBootstrapEditor(TestCase):
         )
         self.assertValid(editor.routing("api", self.base / "routes/api.py"))
 
-    def test_conditional_application_rebinding_is_rejected(self) -> None:
+    def testConditionalApplicationRebindingIsRejected(self) -> None:
         """
         Refuse ambiguous reassignment before selecting a routing receiver.
 
@@ -1401,7 +1401,7 @@ class TestBootstrapEditor(TestCase):
                 "app.create()\n",
             )
 
-    def test_conditional_helper_parameter_rebind_cannot_hide_route_mutation(
+    def testConditionalHelperParameterRebindCannotHideRouteMutation(
         self,
     ) -> None:
         """
@@ -1423,7 +1423,7 @@ class TestBootstrapEditor(TestCase):
         with self.assertRaisesRegex(BootstrapEditError, "Helper configure"):
             editor.routing("api", self.base / "routes/api.py")
 
-    def test_helper_local_binding_is_separate_from_application_closure(self) -> None:
+    def testHelperLocalBindingIsSeparateFromApplicationClosure(self) -> None:
         """
         Avoid treating a helper-local name as the application's global.
 
@@ -1442,7 +1442,7 @@ class TestBootstrapEditor(TestCase):
         )
         self.assertValid(editor.routing("api", self.base / "routes/api.py"))
 
-    def test_conditional_factory_returns_are_rejected(self) -> None:
+    def testConditionalFactoryReturnsAreRejected(self) -> None:
         """
         Reject registration around conditional application factory returns.
 
@@ -1462,7 +1462,7 @@ class TestBootstrapEditor(TestCase):
         with self.assertRaises(BootstrapEditError):
             editor.lifespan(self.base / "bootstrap/lifespan.py")
 
-    def test_external_or_invalid_lifespan_import_paths_are_rejected(self) -> None:
+    def testExternalOrInvalidLifespanImportPathsAreRejected(self) -> None:
         """
         Reject lifespan modules outside the root or with invalid import names.
 
@@ -1480,7 +1480,7 @@ class TestBootstrapEditor(TestCase):
             with self.subTest(path=path), self.assertRaises(BootstrapEditError):
                 editor.lifespan(path)
 
-    def test_generated_bootstrap_executes_in_the_correct_order(self) -> None:
+    def testGeneratedBootstrapExecutesInTheCorrectOrder(self) -> None:
         """
         Execute generated routing before application initialization.
 
@@ -1546,7 +1546,7 @@ class TestBootstrapEditor(TestCase):
             [("routing", {"api": "routes/api.py"}), ("created", None)],
         )
 
-    def test_modified_calls_have_unique_keyword_names(self) -> None:
+    def testModifiedCallsHaveUniqueKeywordNames(self) -> None:
         """
         Keep keyword argument names unique after routing edits.
 

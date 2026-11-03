@@ -1,3 +1,5 @@
+"""Own one compiled registry shared by native HTTP, STDIO, DI and the facade."""
+
 from __future__ import annotations
 import re
 from typing import TYPE_CHECKING
@@ -20,6 +22,7 @@ if TYPE_CHECKING:
     from orionis.mcp.transport.http import McpHttpTransport
 
 _LOCAL_NAME = re.compile(r"[A-Za-z0-9][A-Za-z0-9_.-]{0,127}")
+"""Compiled pattern used to recognize local name."""
 
 class McpManager(IMcpManager):
     """Own one compiled registry shared by native HTTP, STDIO, DI and the facade."""
@@ -27,6 +30,7 @@ class McpManager(IMcpManager):
     # ruff: noqa: PLC0415, SLF001, TC001
 
     __slots__ = ("_app", "_bus", "_compiled", "_config", "_local", "_router", "_web")
+    """Declare the instance attribute slots reserved by this class."""
 
     def __init__(
         self,
@@ -40,13 +44,13 @@ class McpManager(IMcpManager):
 
         Parameters
         ----------
-        app : IApplication
+        app : orionis.IApplication
             Application container supplying configuration and dependencies.
-        router : IRouter
+        router : orionis.http.routes.contracts.router.IRouter
             Value supplied for ``router``.
-        config : McpConfig
+        config : orionis.mcp.config.McpConfig
             Validated configuration controlling this component.
-        bus : IMcpEventBus
+        bus : orionis.mcp.contracts.event_bus.IMcpEventBus
             Value supplied for ``bus``.
 
         Returns
@@ -55,14 +59,21 @@ class McpManager(IMcpManager):
             Complete the documented operation without returning a value.
         """
         self._app = app
+        """Application container supplying configuration and dependencies."""
         self._router = router
+        """Value supplied for ``router``."""
         self._config = config
+        """Validated configuration controlling this component."""
         self._bus = bus
+        """Value supplied for ``bus``."""
         self._compiled: dict[type[Server], CompiledMcpServer] = {}
+        """Compiled server metadata indexed by the original server class."""
         self._web: dict[
             str, tuple[FluentRoute, CompiledMcpServer, McpHttpTransport],
         ] = {}
+        """HTTP routes, compiled servers and transports indexed by endpoint path."""
         self._local: dict[str, CompiledMcpServer] = {}
+        """Compiled servers indexed by their local STDIO registration names."""
 
     def _compile(self, server: type[Server]) -> CompiledMcpServer:
         """
@@ -70,12 +81,12 @@ class McpManager(IMcpManager):
 
         Parameters
         ----------
-        server : type[Server]
+        server : type[orionis.mcp.Server]
             Value supplied for ``server``.
 
         Returns
         -------
-        CompiledMcpServer
+        orionis.mcp.server.compiler.CompiledMcpServer
             Result of the operation described above.
         """
         if not isinstance(server, type) or not issubclass(server, Server):
@@ -93,12 +104,12 @@ class McpManager(IMcpManager):
         ----------
         path : str
             Fixed endpoint path without URI parameters, query strings or fragments.
-        server : type[Server]
+        server : type[orionis.mcp.Server]
             Server declaration to compile and bind to the endpoint.
 
         Returns
         -------
-        FluentRoute
+        orionis.http.routes.fluent.FluentRoute
             API POST route bound to the server's HTTP transport.
 
         Raises
@@ -138,7 +149,7 @@ class McpManager(IMcpManager):
         ----------
         name : str
             Value supplied for ``name``.
-        server : type[Server]
+        server : type[orionis.mcp.Server]
             Value supplied for ``server``.
 
         Returns
@@ -171,7 +182,7 @@ class McpManager(IMcpManager):
 
         Returns
         -------
-        CompiledMcpServer
+        orionis.mcp.server.compiler.CompiledMcpServer
             Compiled HTTP metadata by normalized native route path.
         """
         self.finalizeRoutes()
@@ -209,7 +220,7 @@ class McpManager(IMcpManager):
 
         Returns
         -------
-        CompiledMcpServer
+        orionis.mcp.server.compiler.CompiledMcpServer
             Compiled local metadata by its configured handle.
         """
         return self._local[name]
@@ -220,7 +231,7 @@ class McpManager(IMcpManager):
 
         Returns
         -------
-        tuple[tuple[str, str, type[Server]], ...]
+        tuple[tuple[str, str, type[orionis.mcp.Server]], ``...``]
             An immutable transport/address/declaration inventory.
         """
         self.finalizeRoutes()
@@ -238,12 +249,12 @@ class McpManager(IMcpManager):
 
         Parameters
         ----------
-        request : Request
+        request : orionis.http.Request
             Current request and its trusted execution context.
 
         Returns
         -------
-        Response
+        orionis.http.Response
             Result of the operation described above.
         """
         transport = self._web[normalize_request_path(request.path)][2]
@@ -280,7 +291,7 @@ class McpManager(IMcpManager):
 
         Parameters
         ----------
-        server : type[Server]
+        server : type[orionis.mcp.Server]
             Value supplied for ``server``.
 
         Returns
@@ -296,7 +307,7 @@ class McpManager(IMcpManager):
 
         Parameters
         ----------
-        server : type[Server]
+        server : type[orionis.mcp.Server]
             Value supplied for ``server``.
 
         Returns
@@ -312,7 +323,7 @@ class McpManager(IMcpManager):
 
         Parameters
         ----------
-        server : type[Server]
+        server : type[orionis.mcp.Server]
             Value supplied for ``server``.
 
         Returns
@@ -328,7 +339,7 @@ class McpManager(IMcpManager):
 
         Parameters
         ----------
-        server : type[Server]
+        server : type[orionis.mcp.Server]
             Value supplied for ``server``.
         uri : str
             Value supplied for ``uri``.
@@ -351,7 +362,7 @@ class McpManager(IMcpManager):
 
         Parameters
         ----------
-        server : type[Server]
+        server : type[orionis.mcp.Server]
             Value supplied for ``server``.
         method : str
             Value supplied for ``method``.

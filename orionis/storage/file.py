@@ -1,3 +1,5 @@
+"""Represent a single file on a storage disk."""
+
 from __future__ import annotations
 from typing import TYPE_CHECKING
 from orionis.storage.contracts.file import IFile
@@ -22,6 +24,7 @@ class File(IFile):
     """
 
     __slots__ = ("_driver", "_path")
+    """Declare the instance attribute slots reserved by this class."""
 
     def __init__(self, driver: IStorageDriver, path: str) -> None:
         """
@@ -29,7 +32,7 @@ class File(IFile):
 
         Parameters
         ----------
-        driver : IStorageDriver
+        driver : orionis.storage.contracts.IStorageDriver
             Driver of the disk that owns the file.
         path : str
             Root-relative file path; normalized on ingestion.
@@ -37,14 +40,17 @@ class File(IFile):
         Returns
         -------
         None
+            Initialize the file with its driver and canonical path.
 
         Raises
         ------
-        StoragePathException
+        orionis.storage.exceptions.StoragePathException
             If *path* is invalid or resolves to the disk root.
         """
         self._driver = driver
+        """Driver of the disk that owns the file."""
         self._path = normalizeFilePath(path)
+        """Root-relative file path; normalized on ingestion."""
 
     def path(self) -> str:
         """
@@ -70,7 +76,7 @@ class File(IFile):
 
         Raises
         ------
-        StorageFileNotFoundException
+        orionis.storage.exceptions.StorageFileNotFoundException
             If the file does not exist.
         """
         return await self._driver.read(self._path)
@@ -86,12 +92,12 @@ class File(IFile):
 
         Returns
         -------
-        AsyncIterator[bytes]
+        collections.abc.AsyncIterator[bytes]
             Asynchronous iterator yielding consecutive chunks.
 
         Raises
         ------
-        StorageFileNotFoundException
+        orionis.storage.exceptions.StorageFileNotFoundException
             If the file does not exist.
         """
         return self._driver.readStream(self._path, chunk_size)
@@ -113,7 +119,7 @@ class File(IFile):
 
         Returns
         -------
-        IFile
+        orionis.storage.contracts.IFile
             The file itself, enabling fluent chaining.
         """
         await self._driver.write(self._path, contents, visibility)
@@ -129,14 +135,14 @@ class File(IFile):
 
         Parameters
         ----------
-        stream : AsyncIterable[bytes]
+        stream : collections.abc.AsyncIterable[bytes]
             Asynchronous byte-chunk producer.
         visibility : str | None
             Visibility to apply, or ``None`` for the medium default.
 
         Returns
         -------
-        IFile
+        orionis.storage.contracts.IFile
             The file itself, enabling fluent chaining.
         """
         await self._driver.writeStream(self._path, stream, visibility)
@@ -154,12 +160,12 @@ class File(IFile):
 
         Returns
         -------
-        IStorageStream
+        orionis.storage.contracts.IStorageStream
             Lazily opened stream; use it as an async context manager.
 
         Raises
         ------
-        UnsupportedStorageOperationException
+        orionis.storage.exceptions.UnsupportedStorageOperationException
             If *mode* is not a supported binary mode.
         """
         return self._driver.open(self._path, mode)
@@ -199,12 +205,12 @@ class File(IFile):
 
         Returns
         -------
-        IFile
+        orionis.storage.contracts.IFile
             A new file object pointing at the copy.
 
         Raises
         ------
-        StorageFileNotFoundException
+        orionis.storage.exceptions.StorageFileNotFoundException
             If the source file does not exist.
         """
         destination = File(self._driver, target)
@@ -225,12 +231,12 @@ class File(IFile):
 
         Returns
         -------
-        IFile
+        orionis.storage.contracts.IFile
             A new file object pointing at the moved file.
 
         Raises
         ------
-        StorageFileNotFoundException
+        orionis.storage.exceptions.StorageFileNotFoundException
             If the source file does not exist.
         """
         destination = File(self._driver, target)
@@ -248,14 +254,14 @@ class File(IFile):
 
         Returns
         -------
-        IFile
+        orionis.storage.contracts.IFile
             A new file object pointing at the renamed file.
 
         Raises
         ------
-        StoragePathException
+        orionis.storage.exceptions.StoragePathException
             If *name* is empty or contains a directory separator.
-        StorageFileNotFoundException
+        orionis.storage.exceptions.StorageFileNotFoundException
             If the source file does not exist.
         """
         # A rename never relocates the file to another directory.
@@ -280,7 +286,7 @@ class File(IFile):
 
         Raises
         ------
-        StorageFileNotFoundException
+        orionis.storage.exceptions.StorageFileNotFoundException
             If the file does not exist.
         """
         return await self._driver.size(self._path)
@@ -302,12 +308,12 @@ class File(IFile):
 
         Returns
         -------
-        datetime
+        datetime.datetime
             Timezone-aware modification timestamp (UTC).
 
         Raises
         ------
-        StorageFileNotFoundException
+        orionis.storage.exceptions.StorageFileNotFoundException
             If the file does not exist.
         """
         return await self._driver.lastModified(self._path)
@@ -323,7 +329,7 @@ class File(IFile):
 
         Raises
         ------
-        UnsupportedStorageOperationException
+        orionis.storage.exceptions.UnsupportedStorageOperationException
             If the disk does not expose public URLs.
         """
         return await self._driver.url(self._path)
@@ -344,7 +350,7 @@ class File(IFile):
 
         Raises
         ------
-        UnsupportedStorageOperationException
+        orionis.storage.exceptions.UnsupportedStorageOperationException
             If the driver does not support temporary URLs.
         """
         return await self._driver.temporaryUrl(self._path, expires_in)
@@ -360,7 +366,7 @@ class File(IFile):
 
         Raises
         ------
-        StorageFileNotFoundException
+        orionis.storage.exceptions.StorageFileNotFoundException
             If the file does not exist.
         """
         return await self._driver.visibility(self._path)
@@ -376,12 +382,12 @@ class File(IFile):
 
         Returns
         -------
-        IFile
+        orionis.storage.contracts.IFile
             The file itself, enabling fluent chaining.
 
         Raises
         ------
-        StorageFileNotFoundException
+        orionis.storage.exceptions.StorageFileNotFoundException
             If the file does not exist.
         """
         await self._driver.setVisibility(self._path, visibility)
@@ -393,18 +399,18 @@ class File(IFile):
 
         Parameters
         ----------
-        destination : str | Path
+        destination : str | pathlib.Path
             Local target. When it points to an existing directory the
             file keeps its original name inside that directory.
 
         Returns
         -------
-        Path
+        pathlib.Path
             Absolute local path of the downloaded file.
 
         Raises
         ------
-        StorageFileNotFoundException
+        orionis.storage.exceptions.StorageFileNotFoundException
             If the file does not exist.
         """
         return await self._driver.download(self._path, destination)
@@ -416,7 +422,7 @@ class File(IFile):
         Parameters
         ----------
         algorithm : str
-            Any algorithm name accepted by :func:`hashlib.new`.
+            Any algorithm name accepted by ``hashlib.new``.
 
         Returns
         -------
@@ -425,7 +431,7 @@ class File(IFile):
 
         Raises
         ------
-        StorageFileNotFoundException
+        orionis.storage.exceptions.StorageFileNotFoundException
             If the file does not exist.
         """
         return await self._driver.hash(self._path, algorithm)
@@ -436,13 +442,13 @@ class File(IFile):
 
         Returns
         -------
-        FileInfo
+        orionis.storage.entities.FileInfo
             Immutable entity with size, MIME type, timestamps, hashes,
             visibility, and URL when available.
 
         Raises
         ------
-        StorageFileNotFoundException
+        orionis.storage.exceptions.StorageFileNotFoundException
             If the file does not exist.
         """
         return await self._driver.info(self._path)

@@ -1,3 +1,5 @@
+"""Define events for database seeders."""
+
 from orionis.database.migrations.events import MigrationEvents as SeederEvents
 from orionis.database.migrations.events import NO_EVENTS
 

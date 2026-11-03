@@ -1,3 +1,5 @@
+"""Length-aware page of query results."""
+
 from __future__ import annotations
 import json
 from typing import TYPE_CHECKING, Any
@@ -9,12 +11,13 @@ class Paginator:
     """
     Length-aware page of query results.
 
-    Wraps a :class:`Collection` of items together with the pagination
+    Wraps a :class:`collections.abc.Collection` of items together with the pagination
     metadata required to render page controls: total row count, current
     page, page size, and derived navigation flags.
     """
 
     __slots__ = ("_items", "_page", "_per_page", "_total")
+    """Declare the instance attribute slots reserved by this class."""
 
     def __init__(
         self,
@@ -28,7 +31,7 @@ class Paginator:
 
         Parameters
         ----------
-        items : Collection
+        items : collections.abc.Collection
             Items for the current page.
         total : int
             Total number of rows across all pages.
@@ -56,9 +59,13 @@ class Paginator:
             raise ValueError(error_msg)
 
         self._items = items
+        """Items for the current page."""
         self._total = max(0, int(total))
+        """Total number of rows across all pages."""
         self._page = page
+        """Current page number, starting at 1."""
         self._per_page = per_page
+        """Number of items per page."""
 
     # ── Data access ─────────────────────────────────────────────────────────
 
@@ -69,7 +76,7 @@ class Paginator:
 
         Returns
         -------
-        Collection
+        collections.abc.Collection
             Items of the current page.
         """
         return self._items
@@ -173,7 +180,7 @@ class Paginator:
 
         Parameters
         ----------
-        **kwargs : Any
+        **kwargs : typing.Any
             Additional keyword arguments forwarded to ``json.dumps``.
 
         Returns

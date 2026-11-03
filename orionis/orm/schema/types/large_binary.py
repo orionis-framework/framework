@@ -1,3 +1,5 @@
+"""A type for large binary byte data, such as ``BLOB``/``BYTEA``."""
+
 from __future__ import annotations
 from orionis.orm.schema.column.definition import ColumnDefinition
 from orionis.orm.schema.column.options import ColumnOptions
@@ -7,6 +9,7 @@ class LargeBinary(ColumnDefinition):
     """A type for large binary byte data, such as ``BLOB``/``BYTEA``."""
 
     __slots__ = ()
+    """Declare that this class introduces no additional instance slots."""
 
     def __init__(self, length: int | None = None) -> None:
         """

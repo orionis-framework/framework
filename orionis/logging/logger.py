@@ -1,3 +1,5 @@
+"""Resolve logging channels and dispatch structured log records."""
+
 import asyncio
 import logging
 from contextlib import suppress
@@ -15,10 +17,13 @@ class Logger(ILogger):
     # ruff: noqa: RUF012, TC001
 
     # Identify the standard logger channel.
+    """Resolve logging channels and dispatch structured log records."""
+
     name: ClassVar[str] = "__orionis__"
 
     # Share formatters configured with the same message and date formats.
     _formatter_cache: dict[str, logging.Formatter] = {}
+    """Share formatters configured with the same message and date formats."""
 
     def __init__(self: Self, app: IApplication) -> None:
         """
@@ -26,7 +31,7 @@ class Logger(ILogger):
 
         Parameters
         ----------
-        app : IApplication
+        app : orionis.IApplication
             Application instance providing configuration.
 
         Returns
@@ -35,15 +40,24 @@ class Logger(ILogger):
             This method does not return a value.
         """
         self.__app: IApplication = app
+        """Application instance providing configuration."""
         self.__config: dict = app.config("logging")
+        """Validated configuration used to construct and operate the service."""
         self.__logger: logging.Logger | None = None
+        """Logging implementation used to emit records."""
         self.__handlers_cache: dict[str, logging.Handler] = {}
+        """Previously constructed logging handlers indexed by channel."""
         self.__init_lock = Lock()
+        """Synchronization primitive controlling access to init lock."""
         # Store the default formatter and logger settings.
         self.__log_format: str = "%(asctime)s [%(levelname)s]: %(message)s"
+        """Store the default formatter and logger settings."""
         self.__date_format: str = "%Y-%m-%d %H:%M:%S"
+        """Date format identifier: ``%Y-%m-%d %H:%M:%S``."""
         self.__logger_name: str = "__orionis__"
+        """Logger name identifier: ``__orionis__``."""
         self.__default_level: int = logging.DEBUG
+        """Default level obtained from ``logging.DEBUG``."""
 
     def __initializeLogger(self: Self) -> None:
         """
@@ -135,12 +149,12 @@ class Logger(ILogger):
 
         Parameters
         ----------
-        handler : logging.Handler
+        handler : ``logging.Handler``
             Owned handler to wrap when queued logging is enabled.
 
         Returns
         -------
-        logging.Handler
+        ``logging.Handler``
             Queued wrapper when enabled, otherwise the original handler.
         """
         capacity = self.__config.get("queue_capacity", 0)
@@ -152,7 +166,7 @@ class Logger(ILogger):
 
         Returns
         -------
-        logging.Formatter
+        ``logging.Formatter``
             The configured formatter instance for log messages.
         """
         # Identify the formatter by its message and date formats.
@@ -190,7 +204,7 @@ class Logger(ILogger):
 
         Returns
         -------
-        logging.Handler | None
+        ``logging.Handler`` | None
             The configured handler instance, or None if creation fails.
         """
         try:
@@ -361,7 +375,7 @@ class Logger(ILogger):
 
         Returns
         -------
-        logging.Logger
+        ``logging.Logger``
             The configured logger instance.
 
         Raises
@@ -560,7 +574,7 @@ class Logger(ILogger):
         """
         Release resources when the logger is destroyed.
 
-        Calls the `close` method to ensure all handlers and resources are
+        Calls the ``close`` method to ensure all handlers and resources are
         properly released when the logger instance is garbage collected.
 
         Returns

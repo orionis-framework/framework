@@ -1,3 +1,5 @@
+"""Discover command classes and prepare their runtime registrations."""
+
 import argparse
 import importlib
 import re
@@ -20,13 +22,17 @@ from orionis.support.types.sentinel import MISSING as _MISSING
 
 # Define the sentinel type and command signature pattern.
 _MISSING_TYPE = type(_MISSING)
+"""Define the sentinel type and command signature pattern."""
 _CORE_COMMANDS_PATH = Path(__file__).with_name("commands.py").resolve()
+"""Core commands path used by ``loader``."""
 _SIGNATURE_RE: re.Pattern[str] = re.compile(
     r"[a-z][a-z0-9]*(?::[a-z][a-z0-9]*(?:-[a-z0-9]+)*)?",
 )
+"""Compiled pattern used to recognize signature re."""
 
 class Loader(ILoader):
     # ruff: noqa: TC001
+    """Discover command classes and prepare their runtime registrations."""
 
     def __init__(self, app: IApplication) -> None:
         """
@@ -34,7 +40,7 @@ class Loader(ILoader):
 
         Parameters
         ----------
-        app : IApplication
+        app : orionis.IApplication
             The application instance providing configuration and paths.
 
         Returns
@@ -44,16 +50,25 @@ class Loader(ILoader):
         """
         # Initialize internal lists and dictionaries for commands and metadata.
         self.__fluent_commands: list[ICommand] = []
+        """Initialize internal lists and dictionaries for commands and metadata."""
         self.__commands: dict[str, Command] = {}
+        """Discovered console commands indexed by their command signature."""
         self.__metadata: dict[str, Any] = {}
+        """Compiled metadata used to describe and invoke the registered operation."""
         self.__imported_modules: dict[str, Any] = {}
+        """Modules already imported during command discovery."""
         self.__app: IApplication = app
+        """The application instance providing configuration and paths."""
         self.__all_loaded: bool = False
+        """All loaded flag used by ``Loader``."""
         self.__metadata_loaded: bool = False
+        """Metadata loaded flag used by ``Loader``."""
 
         # Set up persistence for command caching.
         self.__use_cache: bool = False
+        """Set up persistence for command caching."""
         self.__persistence: IFileBasedCache | None = self.__getCachePersistence()
+        """Persistence produced by ``self.__getCachePersistence``."""
 
     def __getCachePersistence(self) -> IFileBasedCache | None:
         """
@@ -61,7 +76,7 @@ class Loader(ILoader):
 
         Returns
         -------
-        FileBasedCache | None
+        orionis.cache.FileBasedCache | None
             FileBasedCache instance for command caching, or None if no cache
             configuration is available.
         """
@@ -101,7 +116,7 @@ class Loader(ILoader):
 
         Returns
         -------
-        Command | None
+        orionis.console.entities.Command | None
             The Command instance if found, otherwise None.
         """
         # Load the command corresponding to the given signature
@@ -114,7 +129,7 @@ class Loader(ILoader):
 
         Returns
         -------
-        dict[str, Command]
+        dict[str, orionis.console.entities.Command]
             A dictionary mapping command signatures to Command instances.
         """
         # Load all commands into the internal dictionary if not already loaded
@@ -154,12 +169,12 @@ class Loader(ILoader):
         ----------
         signature : str
             Unique identifier for the command.
-        handler : list of Any
+        handler : list of typing.Any
             List containing the class and optionally the method name.
 
         Returns
         -------
-        ICommand
+        orionis.console.fluent.contracts.command.ICommand
             The created FluentCommand instance.
 
         Raises
@@ -346,7 +361,7 @@ class Loader(ILoader):
 
         Parameters
         ----------
-        obj : IBaseCommand
+        obj : orionis.console.base.contracts.command.IBaseCommand
             Command class instance to validate.
 
         Returns
@@ -404,7 +419,7 @@ class Loader(ILoader):
 
         Parameters
         ----------
-        obj : IBaseCommand
+        obj : orionis.console.base.contracts.command.IBaseCommand
             Command class instance to inspect.
 
         Returns
@@ -444,7 +459,7 @@ class Loader(ILoader):
 
         Parameters
         ----------
-        obj : IBaseCommand
+        obj : orionis.console.base.contracts.command.IBaseCommand
             Command class instance to validate.
 
         Returns
@@ -489,7 +504,7 @@ class Loader(ILoader):
 
         Parameters
         ----------
-        obj : IBaseCommand
+        obj : orionis.console.base.contracts.command.IBaseCommand
             Command class instance to validate.
 
         Returns
@@ -536,7 +551,7 @@ class Loader(ILoader):
 
         Parameters
         ----------
-        arg : Argument
+        arg : orionis.console.Argument
             The Argument instance to serialize.
 
         Returns
@@ -587,7 +602,7 @@ class Loader(ILoader):
 
         Returns
         -------
-        Argument
+        orionis.console.Argument
             A reconstructed Argument instance with restored properties.
         """
         d = dict(d)
@@ -645,7 +660,7 @@ class Loader(ILoader):
 
         Returns
         -------
-        argparse.ArgumentParser | None
+        ``argparse.ArgumentParser`` | None
             ArgumentParser instance configured with the command's arguments, or None
             if no arguments are present.
         """
@@ -682,7 +697,7 @@ class Loader(ILoader):
 
         Returns
         -------
-        Command
+        orionis.console.entities.Command
             The constructed Command instance.
         """
         # Import the module and retrieve the command class, caching imports

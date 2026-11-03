@@ -1,3 +1,5 @@
+"""Provide schemas operations through ``SchemaMeta``, ``Schema``."""
+
 from __future__ import annotations
 from annotationlib import Format, call_annotate_function
 import types
@@ -34,6 +36,7 @@ _CONSTRAINT_MSGSPEC_KEYS: dict[type, str] = {
     TimezoneAware: "tz_aware",
     TimezoneNaive: "tz_naive",
 }
+"""Mapping: ValidationMetadata subclass -> msgspec.Meta keyword argument name."""
 
 def _compile_annotation(
     annotation: object, *, nested: bool = False,
@@ -57,7 +60,7 @@ def _compile_annotation(
     ------
     TypeError
         If a collection item or union branch declares an unsupported rule.
-    MetadataConflictError
+    orionis.schemas.compiler.MetadataConflictError
         If constraint declarations are invalid or incompatible.
     """
     origin = get_origin(annotation)
@@ -104,7 +107,7 @@ def _compile_annotated(
     ------
     TypeError
         If nested metadata contains a rule requiring field-level execution.
-    MetadataConflictError
+    orionis.schemas.compiler.MetadataConflictError
         If constraint declarations are invalid or incompatible.
     """
     base, *metadata = arguments
@@ -141,8 +144,13 @@ def _compile_annotated(
 # The metaclass for all Schema subclasses.  Intercept class creation to compile
 # ValidationMetadata into msgspec.Meta and collect custom metadata for later use.
 _StructMeta = type(msgspec.Struct)
+"""
+The metaclass for all Schema subclasses. Intercept class creation to compile
+ValidationMetadata into msgspec.Meta and collect custom metadata for later use.
+"""
 
 class SchemaMeta(_StructMeta):
+    """Collect schema declarations and prepare their validation metadata."""
 
     def __new__(
         cls,
@@ -163,7 +171,7 @@ class SchemaMeta(_StructMeta):
             Metaclass constructing the schema.
         name : str
             Name of the schema class.
-        bases : tuple[type, ...]
+        bases : tuple[type, ``...``]
             Direct base classes.
         namespace : dict[str, object]
             Class body namespace.
@@ -172,14 +180,14 @@ class SchemaMeta(_StructMeta):
 
         Returns
         -------
-        SchemaMeta
+        orionis.schemas.schema.SchemaMeta
             Prepared schema class.
 
         Raises
         ------
         TypeError
             If field metadata contains an unsupported rule declaration.
-        MetadataConflictError
+        orionis.schemas.compiler.MetadataConflictError
             If constraint declarations are invalid or incompatible.
         """
         # Read the lazy annotation callback from the class namespace.
@@ -234,14 +242,14 @@ class SchemaMeta(_StructMeta):
 
         Parameters
         ----------
-        original_func : Callable[[int], dict[str, object]]
+        original_func : collections.abc.Callable[[int], dict[str, object]]
             Original PEP 649 annotation callback.
         constraint_msgs : dict[str, dict[str, str]]
             Mapping populated with each field's local validation messages.
 
         Returns
         -------
-        Callable[[int], dict[str, object]]
+        collections.abc.Callable[[int], dict[str, object]]
             Callback that compiles metadata while preserving string requests.
         """
         def _annotate(fmt: int) -> dict[str, object]:
@@ -262,7 +270,7 @@ class SchemaMeta(_StructMeta):
             ------
             TypeError
                 If nested metadata contains an unsupported rule declaration.
-            MetadataConflictError
+            orionis.schemas.compiler.MetadataConflictError
                 If constraint declarations are invalid or incompatible.
             """
             annotations = call_annotate_function(original_func, fmt)
@@ -351,7 +359,18 @@ class Schema(msgspec.Struct, metaclass=SchemaMeta):
             Dictionary containing recursively converted schema field values.
         """
         def _convert(value: object) -> object:
-            """Recursively convert structs and their supported containers."""
+            """Recursively convert structs and their supported containers.
+
+            Parameters
+            ----------
+            value : object
+                Schema field value or nested container to convert.
+
+            Returns
+            -------
+            object
+                Converted dictionary, list or tuple, or the original scalar.
+            """
             if isinstance(value, msgspec.Struct):
                 value = msgspec.structs.asdict(value)
             if isinstance(value, dict):

@@ -153,6 +153,22 @@ class DatabaseCacheBackend:
 
     # ── Schema bootstrap ─────────────────────────────────────────────────────
 
+    async def migrate(self) -> None:
+        """
+        Create the framework cache and lock tables without removing existing data.
+
+        Returns
+        -------
+        None
+            Create missing tables from the definitions used by this backend.
+
+        Raises
+        ------
+        QueryException
+            If the connection cannot create either table.
+        """
+        await self._ensureSchema()
+
     async def _ensureSchema(self) -> None:
         """
         Create the cache and lock tables on first use, if missing.

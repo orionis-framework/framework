@@ -1,3 +1,8 @@
+"""Provide database migrations operations.
+
+Includes ``current_migration_connection``, ``migration_connection_scope``.
+"""
+
 from __future__ import annotations
 from contextlib import contextmanager
 from contextvars import ContextVar
@@ -10,6 +15,7 @@ if TYPE_CHECKING:
 _MIGRATION_CONNECTION: ContextVar[IConnection | None] = ContextVar(
     "orionis_migration_connection", default=None,
 )
+"""Context-local migration connection isolated between asynchronous tasks."""
 
 def current_migration_connection() -> IConnection | None:
     """
@@ -17,7 +23,7 @@ def current_migration_connection() -> IConnection | None:
 
     Returns
     -------
-    IConnection or None
+    orionis.database.contracts.IConnection or None
         Connection inherited by unqualified schema and ORM operations.
     """
     return _MIGRATION_CONNECTION.get()
@@ -29,7 +35,7 @@ def migration_connection_scope(connection: IConnection) -> Generator[None]:
 
     Parameters
     ----------
-    connection : IConnection
+    connection : orionis.database.contracts.IConnection
         Connection selected by the migration runner.
 
     Yields

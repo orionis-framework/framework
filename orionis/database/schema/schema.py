@@ -1,3 +1,5 @@
+"""Apply database schema operations to the selected connection."""
+
 from typing import TYPE_CHECKING, Self
 from orionis.database.contracts.connection import IConnection
 from orionis.database.contracts.connection_manager import IConnectionManager
@@ -23,10 +25,12 @@ if TYPE_CHECKING:
 class Schema(ISchema):
 
     # ruff: noqa: TC001
+    """Apply database schema operations to the selected connection."""
 
     __slots__ = (
         "__conn_manager", "__connection_name", "__connection_selected",
     )
+    """Declare the instance attribute slots reserved by this class."""
 
     def __init__(self, conn_manager: IConnectionManager) -> None:
         """
@@ -34,17 +38,21 @@ class Schema(ISchema):
 
         Parameters
         ----------
-        conn_manager : IConnectionManager
+        conn_manager : orionis.database.contracts.IConnectionManager
             The connection manager for database operations.
 
         Returns
         -------
         None
+            Initialize the Schema instance.
         """
         # Initialize connection manager and state attributes
         self.__conn_manager: IConnectionManager = conn_manager
+        """The connection manager for database operations."""
         self.__connection_name: str | None = None
+        """Name of the configured database connection to use."""
         self.__connection_selected = False
+        """Connection selected flag used by ``Schema``."""
 
     def connection(self, name: str | None = None) -> Self:
         """
@@ -57,7 +65,7 @@ class Schema(ISchema):
 
         Returns
         -------
-        Self
+        typing.Self
             The current Schema instance for method chaining.
 
         Raises
@@ -78,7 +86,7 @@ class Schema(ISchema):
         Start a fluent table declaration block.
 
         ``async with schema.create(name) as table:`` yields a
-        :class:`~orionis.database.schema.blueprint.Blueprint` so columns
+        :class:`orionis.database.schema.Blueprint` so columns
         can be declared fluently (``table.string("username")``,
         ``table.timestamps()``, ...); the table is created once the
         block exits without raising.
@@ -91,7 +99,7 @@ class Schema(ISchema):
 
         Returns
         -------
-        TableCreation
+        orionis.database.schema.table_creation.TableCreation
             Async context manager that collects definitions and creates
             the table after a successful block.
         """
@@ -103,7 +111,7 @@ class Schema(ISchema):
 
         Parameters
         ----------
-        definition : TableDefinition
+        definition : orionis.orm.schema.TableDefinition
             Schema shared with a model through ``table_definition``.
             Historical migrations should import a versioned definition
             that remains unchanged when the model adopts a newer version.
@@ -125,7 +133,7 @@ class Schema(ISchema):
 
         Parameters
         ----------
-        model : type of Model
+        model : type of orionis.orm.Model
             Concrete model providing table and connection metadata. An explicit
             ``connection`` selection overrides the model's connection.
 
@@ -207,7 +215,7 @@ class Schema(ISchema):
 
         Returns
         -------
-        IConnection
+        orionis.database.contracts.IConnection
             The connection to use for schema operations.
         """
         # Use the migration transaction for unqualified schema operations.
@@ -234,7 +242,7 @@ class Schema(ISchema):
 
         Returns
         -------
-        TableDefinition
+        orionis.orm.schema.TableDefinition
             The complete table definition ready for compilation.
         """
         schema, table = self.__parseTableName(name)
@@ -300,7 +308,7 @@ class Schema(ISchema):
         definition : ColumnDefinition | Comment | ForeignKey | Index |
             PrimaryKey | Unique
             The schema definition to classify.
-        bucket : DefinitionBucket
+        bucket : orionis.database.schema.definition_bucket.DefinitionBucket
             Accumulator updated in place with the classified data.
 
         Returns
@@ -342,9 +350,9 @@ class Schema(ISchema):
 
         Parameters
         ----------
-        definition : Timestamps
+        definition : orionis.database.schema.Timestamps
             The timestamps marker carrying the ``timezone`` flag.
-        bucket : DefinitionBucket
+        bucket : orionis.database.schema.definition_bucket.DefinitionBucket
             Accumulator updated in place with the new columns.
 
         Returns

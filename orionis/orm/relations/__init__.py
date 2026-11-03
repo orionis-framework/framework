@@ -1,3 +1,5 @@
+"""Group the orm relations components and public imports."""
+
 from typing import TYPE_CHECKING as _TYPE_CHECKING
 from orionis._exports import resolve_export as _resolve_export
 
@@ -29,6 +31,7 @@ _EXPORTS = {
     "Relation": ("orionis.orm.relations.relation", "Relation"),
     "RelationsMixin": ("orionis.orm.relations.mixin", "RelationsMixin"),
 }
+"""Public export names mapped to their defining modules and attributes."""
 
 def __getattr__(name: str) -> object:
     """

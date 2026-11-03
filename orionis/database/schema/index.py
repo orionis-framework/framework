@@ -1,6 +1,9 @@
+"""Describe a database index and its indexed columns."""
+
 from orionis.orm.schema.constraints import TableIndex
 
 class Index:
+    """Describe a database index and its indexed columns."""
 
     def __init__(
         self,
@@ -24,6 +27,8 @@ class Index:
         Returns
         -------
         None
+            Create an index for database columns.
         """
         # Initialize index with provided columns and configuration.
         self.constraint = TableIndex(columns=columns, name=name, unique=unique)
+        """Initialize index with provided columns and configuration."""

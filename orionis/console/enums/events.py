@@ -1,3 +1,5 @@
+"""Provide console enums operations through ``TaskEvent``, ``SchedulerEvent``."""
+
 from enum import IntEnum
 
 class TaskEvent(IntEnum):

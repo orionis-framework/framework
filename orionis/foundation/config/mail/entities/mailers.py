@@ -1,3 +1,5 @@
+"""Represent mail transport configurations for the application."""
+
 from __future__ import annotations
 
 from dataclasses import dataclass, field
@@ -14,9 +16,9 @@ class Mailers(BaseEntity):
 
     Attributes
     ----------
-    smtp : Smtp | dict
+    smtp : orionis.foundation.config.mail.Smtp | dict
         The SMTP configuration used for sending emails.
-    file : File | dict
+    file : orionis.foundation.config.mail.File | dict
         The file-based mail transport configuration.
     """
 

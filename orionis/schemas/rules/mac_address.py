@@ -1,3 +1,5 @@
+"""Ensure a string is a valid MAC address."""
+
 import re
 from orionis.schemas.rule import Rule
 
@@ -7,6 +9,7 @@ _MAC_PATTERN = re.compile(
     r"|[0-9A-Fa-f]{2}(?:-[0-9A-Fa-f]{2}){5}"
     r"|[0-9A-Fa-f]{4}(?:\.[0-9A-Fa-f]{4}){2})$",
 )
+"""Colon, hyphen and Cisco dotted notations for a 48-bit hardware address."""
 
 class MacAddress(Rule):
     """
@@ -19,9 +22,12 @@ class MacAddress(Rule):
     # ruff: noqa: ARG002
 
     __slots__ = ()
+    """Declare that this class introduces no additional instance slots."""
 
     __message__ = "Value must be a valid MAC address."
+    """Error text for message: ``Value must be a valid MAC address.``."""
     __code__ = "mac_address"
+    """Code identifier: ``mac_address``."""
 
     async def enforce(
         self,

@@ -1,3 +1,5 @@
+"""Represent possible statuses for a test during execution."""
+
 from enum import StrEnum
 
 class TestStatus(StrEnum):
@@ -6,18 +8,18 @@ class TestStatus(StrEnum):
 
     Attributes
     ----------
-    PASSED : TestStatus
+    PASSED : orionis.test.enums.status.TestStatus
         Indicates the test completed successfully without errors or failures.
-    FAILED : TestStatus
+    FAILED : orionis.test.enums.status.TestStatus
         Indicates the test completed but did not produce the expected results.
-    ERRORED : TestStatus
+    ERRORED : orionis.test.enums.status.TestStatus
         Indicates an unexpected error occurred during test execution.
-    SKIPPED : TestStatus
+    SKIPPED : orionis.test.enums.status.TestStatus
         Indicates the test was intentionally not executed.
 
     Returns
     -------
-    TestStatus
+    orionis.test.enums.status.TestStatus
         Enumeration member representing the test status.
     """
 

@@ -110,7 +110,7 @@ class TestProtocolDisconnect(TestCase):
         )
         return application, application._Application__kernel_http_asgi.__self__
 
-    async def test_buffered_asgi_request_is_cancelled_on_disconnect_by_path(self):
+    async def testBufferedAsgiRequestIsCancelledOnDisconnectByPath(self):
         """Cancel an MCP JSON handler even when the global setting remains false.
 
         Returns
@@ -149,7 +149,7 @@ class TestProtocolDisconnect(TestCase):
         await asyncio.wait_for(task, 1)
         self.assertTrue(kernel.cleaned.is_set())
 
-    async def test_buffered_rsgi_request_is_cancelled_on_disconnect_by_path(self):
+    async def testBufferedRsgiRequestIsCancelledOnDisconnectByPath(self):
         """Reuse Granian's supported notifier for policy-marked RSGI endpoints.
 
         Returns

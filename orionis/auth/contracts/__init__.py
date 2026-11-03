@@ -1,3 +1,5 @@
+"""Group the auth contracts components and public imports."""
+
 from orionis.auth.contracts.authenticatable import IAuthenticatable
 from orionis.auth.contracts.authorizable import IAuthorizable
 from orionis.auth.contracts.authorizer import IAuthorizer

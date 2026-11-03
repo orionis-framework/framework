@@ -1,3 +1,5 @@
+"""Run the configured application test suite from the console."""
+
 from typing import ClassVar
 from orionis.console.args.argument import Argument
 from orionis.console.base.command import BaseCommand
@@ -8,28 +10,36 @@ from orionis.test.enums.status import TestStatus
 
 # Values considered truthy for boolean CLI/config arguments
 _TRUTHY_VALUES: frozenset = frozenset({1, "1", "true", "True"})
+"""Values considered truthy for boolean CLI/config arguments."""
 
 # Valid verbosity levels accepted by the test runner
 _VALID_VERBOSITY: frozenset = frozenset({0, 1, 2})
+"""Valid verbosity levels accepted by the test runner."""
 
 # Test result statuses that indicate a non-passing outcome
 _FAILURE_STATUSES: frozenset[TestStatus] = frozenset({
     TestStatus.FAILED,
     TestStatus.ERRORED,
 })
+"""Test result statuses that indicate a non-passing outcome."""
 
 class TestCommand(BaseCommand):
 
     # ruff: noqa: TC001
 
     # Indicates whether timestamps will be shown in the command output
+    """Run the configured application test suite from the console."""
+
     timestamps: bool = False
+    """Indicates whether timestamps will be shown in the command output."""
 
     # Command signature and description
     signature: str = "test"
+    """Command signature and description."""
 
     # Command description
     description: str = "Executes test cases defined in the project."
+    """Command description."""
 
     # List of Argument instances defining command-line options and arguments
     arguments: ClassVar[list[Argument]] = [
@@ -94,6 +104,7 @@ class TestCommand(BaseCommand):
             dest="with_panel",
         ),
     ]
+    """List of Argument instances defining command-line options and arguments."""
 
     def __resolveVerbosity(self, cli_value: object, app: IApplication) -> int | None:
         """
@@ -103,7 +114,7 @@ class TestCommand(BaseCommand):
         ----------
         cli_value : object
             Value supplied through the --verbosity flag, or None when absent.
-        app : IApplication
+        app : orionis.IApplication
             Application instance providing the configured fallback.
 
         Returns
@@ -151,9 +162,9 @@ class TestCommand(BaseCommand):
 
         Parameters
         ----------
-        app : IApplication
+        app : orionis.IApplication
             Application instance providing configuration and context.
-        test_engine : ITestingEngine
+        test_engine : orionis.test.contracts.engine.ITestingEngine
             Testing engine resolved by the container and driven by this command.
 
         Returns

@@ -1,31 +1,46 @@
+"""Provide schemas rules operations through ``probe_image``."""
+
 import struct
 
 # Magic numbers identifying every supported raster format.
 _PNG_SIGNATURE = b"\x89PNG\r\n\x1a\n"
+"""Magic numbers identifying every supported raster format."""
 _JPEG_SIGNATURE = b"\xff\xd8"
+"""Jpeg signature value used by ``image_probe``."""
 _BMP_SIGNATURE = b"BM"
+"""Bmp signature value used by ``image_probe``."""
 _GIF_SIGNATURES = (b"GIF87a", b"GIF89a")
+"""Gif signatures definitions used by ``image_probe``."""
 
 # JPEG start-of-frame markers; their payload carries the image dimensions.
 _SOF_MARKERS = frozenset(
     {0xC0, 0xC1, 0xC2, 0xC3, 0xC5, 0xC6, 0xC7, 0xC9, 0xCA, 0xCB, 0xCD, 0xCE, 0xCF},
 )
+"""JPEG start-of-frame markers; their payload carries the image dimensions."""
 
 # Byte introducing every JPEG marker.
 _JPEG_FILL = 0xFF
+"""Byte introducing every JPEG marker."""
 
 # JPEG markers that carry no payload and are skipped two bytes at a time.
 _STANDALONE_MARKERS = frozenset({0x01, 0xFF, *range(0xD0, 0xDA)})
+"""JPEG markers that carry no payload and are skipped two bytes at a time."""
 
 # Minimum header length required by each probe before unpacking.
 _PNG_HEADER = 24
+"""Minimum header length required by each probe before unpacking."""
 _GIF_HEADER = 10
+"""Gif header value used by ``image_probe``."""
 _BMP_HEADER = 26
+"""Bmp header value used by ``image_probe``."""
 _WEBP_HEADER = 30
+"""Webp header value used by ``image_probe``."""
 _JPEG_SEGMENT = 9
+"""Jpeg segment value used by ``image_probe``."""
 
 # Mask isolating the 14-bit dimensions stored in WebP bitstreams.
 _WEBP_MASK = 0x3FFF
+"""Mask isolating the 14-bit dimensions stored in WebP bitstreams."""
 
 def _probe_png(data: bytes) -> tuple[str, int, int] | None:
     """
@@ -162,6 +177,7 @@ def _probe_jpeg(data: bytes) -> tuple[str, int, int] | None:
 
 # Probes are ordered by signature cost; each one rejects foreign formats first.
 _PROBES = (_probe_png, _probe_jpeg, _probe_gif, _probe_bmp, _probe_webp)
+"""Probes are ordered by signature cost; each one rejects foreign formats first."""
 
 def probe_image(data: bytes) -> tuple[str, int, int] | None:
     """

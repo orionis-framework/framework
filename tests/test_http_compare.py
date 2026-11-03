@@ -166,7 +166,7 @@ def _chart_report() -> dict[str, Any]:
 class TestMeasurements(unittest.TestCase):
     """Verify successful throughput, latency units, and independent samples."""
 
-    def test_success_throughput_and_latency_units(self) -> None:
+    def testSuccessThroughputAndLatencyUnits(self) -> None:
         """
         Verify HTTP 200 throughput, error counts, and millisecond latencies.
 
@@ -187,7 +187,7 @@ class TestMeasurements(unittest.TestCase):
             "p99_latency_ms": 50,
         })
 
-    def test_measurement_rejects_absent_successes_or_zero_elapsed(self) -> None:
+    def testMeasurementRejectsAbsentSuccessesOrZeroElapsed(self) -> None:
         """
         Verify that missing successes or zero elapsed time invalidate a run.
 
@@ -210,7 +210,7 @@ class TestMeasurements(unittest.TestCase):
                 with self.assertRaises(ValueError):
                     parse_measurement(raw)
 
-    def test_measurement_rejects_invalid_numbers(self) -> None:
+    def testMeasurementRejectsInvalidNumbers(self) -> None:
         """
         Verify that measurements reject invalid counts and timings.
 
@@ -245,7 +245,7 @@ class TestMeasurements(unittest.TestCase):
                 with self.assertRaises(ValueError):
                     parse_measurement(raw)
 
-    def test_statistics_are_medians_of_individual_runs(self) -> None:
+    def testStatisticsAreMediansOfIndividualRuns(self) -> None:
         """
         Verify equally weighted per-run medians and accumulated totals.
 
@@ -267,7 +267,7 @@ class TestMeasurements(unittest.TestCase):
         self.assertEqual(result["errors"], 0)
         self.assertEqual(len(result["samples"]), 3)
 
-    def test_one_failing_run_invalidates_comparative_metrics(self) -> None:
+    def testOneFailingRunInvalidatesComparativeMetrics(self) -> None:
         """
         Verify that one failing run suppresses all comparative metrics.
 
@@ -289,7 +289,7 @@ class TestMeasurements(unittest.TestCase):
         for metric in METRICS:
             self.assertNotIn(metric, result)
 
-    def test_empty_measurements_cannot_publish_a_result(self) -> None:
+    def testEmptyMeasurementsCannotPublishAResult(self) -> None:
         """
         Verify that aggregation rejects an empty sample sequence.
 
@@ -305,7 +305,7 @@ class TestMeasurements(unittest.TestCase):
 class TestOrionisApplication(unittest.TestCase):
     """Verify the Orionis factory contains only native app configuration."""
 
-    def test_factory_uses_staged_routes_without_tracking(self) -> None:
+    def testFactoryUsesStagedRoutesWithoutTracking(self) -> None:
         """
         Verify native app creation uses staged routes without startup hooks.
 
@@ -348,7 +348,7 @@ class TestOrionisApplication(unittest.TestCase):
 class TestMinimalApplications(unittest.TestCase):
     """Verify the five native servers without publishing performance results."""
 
-    def test_native_asgi_routers_have_only_the_root_route(self) -> None:
+    def testNativeAsgiRoutersHaveOnlyTheRootRoute(self) -> None:
         """
         Verify native ASGI routers register only the measured root route.
 
@@ -365,7 +365,7 @@ class TestMinimalApplications(unittest.TestCase):
                 app = module.create_application()
                 self.assertEqual([route.path for route in app.routes], ["/"])
 
-    def test_native_apps_serve_only_hello_world(self) -> None:
+    def testNativeAppsServeOnlyHelloWorld(self) -> None:
         """
         Verify payload, keep-alive, route isolation, and native server cleanup.
 
@@ -473,7 +473,7 @@ class _LoadOptions(TypedDict):
 class TestLoadGenerator(unittest.TestCase):
     """Verify measurements and raw evidence survive subprocess failures."""
 
-    def test_load_preserves_output_and_measurement_shape(self) -> None:
+    def testLoadPreservesOutputAndMeasurementShape(self) -> None:
         """
         Verify successful load retains both streams and normalized metrics.
 
@@ -528,7 +528,7 @@ class TestLoadGenerator(unittest.TestCase):
             }])
             self.assertEqual(load.call_args.kwargs["timeout"], 31)
 
-    def test_load_preserves_output_on_process_failure(self) -> None:
+    def testLoadPreservesOutputOnProcessFailure(self) -> None:
         """
         Verify failed load retains diagnostics without parsing partial output.
 
@@ -586,7 +586,7 @@ class TestLoadGenerator(unittest.TestCase):
                 "load failed",
             )
 
-    def test_load_preserves_output_on_timeout(self) -> None:
+    def testLoadPreservesOutputOnTimeout(self) -> None:
         """
         Verify timed-out load retains flushed partial output.
 
@@ -647,7 +647,7 @@ class TestLoadGenerator(unittest.TestCase):
 class TestBenchmarkRunner(unittest.TestCase):
     """Verify equal server settings, warmup isolation, and worker cleanup."""
 
-    def test_help_omits_internal_options(self) -> None:
+    def testHelpOmitsInternalOptions(self) -> None:
         """
         Verify hidden CLI options remain accepted with their defaults.
 
@@ -661,7 +661,7 @@ class TestBenchmarkRunner(unittest.TestCase):
         self.assertEqual(parser.parse_args([]).warmup, 2)
         self.assertEqual(parser.parse_args(["--warmup", "0.5"]).warmup, 0.5)
 
-    def test_frameworks_use_their_assigned_servers(self) -> None:
+    def testFrameworksUseTheirAssignedServers(self) -> None:
         """
         Verify native servers and matching settings for every framework.
 
@@ -703,7 +703,7 @@ class TestBenchmarkRunner(unittest.TestCase):
                     *native_options,
                 ])
 
-    def test_orionis_preparation_uses_only_two_root_requests(self) -> None:
+    def testOrionisPreparationUsesOnlyTwoRootRequests(self) -> None:
         """
         Verify Orionis preparation sends only two root requests.
 
@@ -741,7 +741,7 @@ class TestBenchmarkRunner(unittest.TestCase):
                 self.assertEqual(connection.getresponse.call_count, 2)
                 connection.close.assert_called_once_with()
 
-    def test_startup_without_warmup_never_sends_http_requests(self) -> None:
+    def testStartupWithoutWarmupNeverSendsHttpRequests(self) -> None:
         """
         Verify other frameworks become ready without HTTP preparation.
 
@@ -779,7 +779,7 @@ class TestBenchmarkRunner(unittest.TestCase):
                 tcp.return_value.close.assert_called_once_with()
                 connect.assert_not_called()
 
-    def test_startup_without_warmup_still_waits_for_workers(self) -> None:
+    def testStartupWithoutWarmupStillWaitsForWorkers(self) -> None:
         """
         Verify skipping warmup does not bypass worker startup checks.
 
@@ -813,7 +813,7 @@ class TestBenchmarkRunner(unittest.TestCase):
         tcp.assert_not_called()
         pause.assert_called_once_with(0.1)
 
-    def test_unstarted_worker_times_out_before_measurements(self) -> None:
+    def testUnstartedWorkerTimesOutBeforeMeasurements(self) -> None:
         """
         Verify spawned workers require completed application startup.
 
@@ -847,7 +847,7 @@ class TestBenchmarkRunner(unittest.TestCase):
 
         connect.assert_not_called()
 
-    def test_uvicorn_waits_for_every_application_startup(self) -> None:
+    def testUvicornWaitsForEveryApplicationStartup(self) -> None:
         """
         Verify Uvicorn waits for every worker's application startup.
 
@@ -882,7 +882,7 @@ class TestBenchmarkRunner(unittest.TestCase):
                 check.assert_not_called()
                 tcp.assert_not_called()
 
-    def test_readiness_rejects_an_unowned_native_worker(self) -> None:
+    def testReadinessRejectsAnUnownedNativeWorker(self) -> None:
         """
         Verify readiness rejects worker processes without ownership.
 
@@ -909,7 +909,7 @@ class TestBenchmarkRunner(unittest.TestCase):
 
         connect.assert_not_called()
 
-    def test_preparation_rejects_invalid_http_responses(self) -> None:
+    def testPreparationRejectsInvalidHttpResponses(self) -> None:
         """
         Verify probe status, payload, media type, and keep-alive checks.
 
@@ -940,7 +940,7 @@ class TestBenchmarkRunner(unittest.TestCase):
                     compare_run._probe_response(connection)
                 response.read.assert_called_once_with()
 
-    def test_failed_preparation_never_starts_load(self) -> None:
+    def testFailedPreparationNeverStartsLoad(self) -> None:
         """
         Verify that failed preparation prevents load and cleans up the server.
 
@@ -975,7 +975,7 @@ class TestBenchmarkRunner(unittest.TestCase):
         self.assertNotIn("warmup", row)
         self.assertNotIn("samples", row)
 
-    def test_other_frameworks_start_measurements_without_warmup(self) -> None:
+    def testOtherFrameworksStartMeasurementsWithoutWarmup(self) -> None:
         """
         Verify other frameworks run only the requested measurement load.
 
@@ -1029,7 +1029,7 @@ class TestBenchmarkRunner(unittest.TestCase):
                 self.assertEqual(check.call_count, args.repetitions)
                 stop.assert_called_once_with(process, {})
 
-    def test_warmup_is_retained_but_excluded_from_measured_results(self) -> None:
+    def testWarmupIsRetainedButExcludedFromMeasuredResults(self) -> None:
         """
         Verify that retained warmup samples never affect measured results.
 
@@ -1093,7 +1093,7 @@ class TestBenchmarkRunner(unittest.TestCase):
                 self.assertEqual(check.call_count, 4)
                 stop.assert_called_once_with(process, {})
 
-    def test_cleanup_stops_known_workers_after_supervisor_has_exited(self) -> None:
+    def testCleanupStopsKnownWorkersAfterSupervisorHasExited(self) -> None:
         """
         Verify cleanup and kill escalation for an orphaned Windows worker.
 
@@ -1125,7 +1125,7 @@ class TestBenchmarkRunner(unittest.TestCase):
         self.assertEqual(wait.call_args_list[1].args[0], [worker])
         process.wait.assert_called_once_with(timeout=5)
 
-    def test_cleanup_terminates_each_owned_process_once(self) -> None:
+    def testCleanupTerminatesEachOwnedProcessOnce(self) -> None:
         """
         Verify cleanup terminates each owned process only once.
 
@@ -1151,7 +1151,7 @@ class TestBenchmarkRunner(unittest.TestCase):
         worker.kill.assert_not_called()
         process.wait.assert_called_once_with(timeout=5)
 
-    def test_native_workers_require_a_living_owned_process(self) -> None:
+    def testNativeWorkersRequireALivingOwnedProcess(self) -> None:
         """
         Verify dead, foreign, and zombie workers fail health checks.
 
@@ -1180,7 +1180,7 @@ class TestBenchmarkRunner(unittest.TestCase):
                 ):
                     compare_run.check_workers(process, {pid}, {})
 
-    def test_uvicorn_single_worker_is_the_server_process(self) -> None:
+    def testUvicornSingleWorkerIsTheServerProcess(self) -> None:
         """
         Verify Uvicorn's main process counts as a living single worker.
 
@@ -1209,7 +1209,7 @@ class TestBenchmarkRunner(unittest.TestCase):
                         with self.assertRaisesRegex(RuntimeError, "1234"):
                             compare_run.check_workers(process, {1234}, {})
 
-    def test_main_preserves_partial_samples_and_continues(self) -> None:
+    def testMainPreservesPartialSamplesAndContinues(self) -> None:
         """
         Verify that partial failures retain samples and allow later cases.
 
@@ -1319,7 +1319,7 @@ class TestBenchmarkRunner(unittest.TestCase):
         self.assertIn("| fastapi | asgi | 1 | failed | - | - | - | - | - |", markdown)
         self.assertIn("| starlette | asgi | 1 | ok | 100.00 |", markdown)
 
-    def test_main_keeps_failure_reports_for_all_exit_paths(self) -> None:
+    def testMainKeepsFailureReportsForAllExitPaths(self) -> None:
         """
         Verify failed exit paths retain diagnostic reports.
 
@@ -1397,7 +1397,7 @@ class TestBenchmarkRunner(unittest.TestCase):
                             else "Interrupted by user",
                         )
 
-    def test_windows_preserves_single_worker_comparisons(self) -> None:
+    def testWindowsPreservesSingleWorkerComparisons(self) -> None:
         """
         Verify Windows rejects unsupported multi-worker comparisons.
 
@@ -1436,7 +1436,7 @@ class TestBenchmarkRunner(unittest.TestCase):
             row["status"] == "unsupported" for row in report["results"]
         ))
 
-    def test_main_validates_only_selected_server_versions(self) -> None:
+    def testMainValidatesOnlySelectedServerVersions(self) -> None:
         """
         Verify version checks require only the selected server.
 
@@ -1494,7 +1494,7 @@ class TestBenchmarkRunner(unittest.TestCase):
                     else:
                         benchmark.assert_called_once()
 
-    def test_successful_main_writes_chart_from_saved_report(self) -> None:
+    def testSuccessfulMainWritesChartFromSavedReport(self) -> None:
         """
         Verify that a successful run saves charts matching its saved report.
 
@@ -1576,7 +1576,7 @@ class TestBenchmarkRunner(unittest.TestCase):
 class TestThroughputCharts(unittest.TestCase):
     """Verify comparable, ranked, accessible SVG charts without invented data."""
 
-    def test_svg_uses_sorted_three_worker_medians(self) -> None:
+    def testSvgUsesSortedThreeWorkerMedians(self) -> None:
         """
         Verify SVG ranking, scaling, worker filtering, and numeric results.
 
@@ -1616,7 +1616,7 @@ class TestThroughputCharts(unittest.TestCase):
             self.assertNotIn(detail, svg)
         self.assertNotIn("999,999", svg)
 
-    def test_chart_requires_only_result_groups_and_quantities(self) -> None:
+    def testChartRequiresOnlyResultGroupsAndQuantities(self) -> None:
         """
         Verify public results reproduce charts without runtime metadata.
 
@@ -1631,7 +1631,7 @@ class TestThroughputCharts(unittest.TestCase):
         svg = render_throughput_svg(report, 3)
         self.assertIn("29,800.00", svg)
 
-    def test_chart_rejects_incomplete_failed_or_errored_results(self) -> None:
+    def testChartRejectsIncompleteFailedOrErroredResults(self) -> None:
         """
         Verify that charts reject incomplete or failed comparison data.
 
@@ -1662,7 +1662,7 @@ class TestThroughputCharts(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, "complete, error-free"): # NOSONAR
             render_throughput_svg(_chart_report(), 4)
 
-    def test_chart_rejects_invalid_rates(self) -> None:
+    def testChartRejectsInvalidRates(self) -> None:
         """
         Verify that charts reject invalid numeric throughput rates.
 
@@ -1678,7 +1678,7 @@ class TestThroughputCharts(unittest.TestCase):
                 with self.assertRaisesRegex(ValueError, "finite and greater"):
                     render_throughput_svg(report, 3)
 
-    def test_chart_escapes_labels_and_omits_environment(self) -> None:
+    def testChartEscapesLabelsAndOmitsEnvironment(self) -> None:
         """
         Verify labels remain escaped text without exposing environment details.
 
@@ -1701,7 +1701,7 @@ class TestThroughputCharts(unittest.TestCase):
 class TestComparisonReports(unittest.TestCase):
     """Verify that every artifact publishes the same comparative results."""
 
-    def test_public_reports_omit_preparation_details(self) -> None:
+    def testPublicReportsOmitPreparationDetails(self) -> None:
         """
         Verify public formats omit warmup and unmeasured request counts.
 
@@ -1730,7 +1730,7 @@ class TestComparisonReports(unittest.TestCase):
                 self.assertNotIn("warmup", text.lower())
                 self.assertNotIn("1000000", text)
 
-    def test_artifacts_preserve_valid_data_and_label_failures(self) -> None:
+    def testArtifactsPreserveValidDataAndLabelFailures(self) -> None:
         """
         Verify consistent report artifacts and explicit failure placeholders.
 
@@ -1825,7 +1825,7 @@ class TestComparisonReports(unittest.TestCase):
         self.assertNotIn(failed["reason"], markdown)
         self.assertIn("Comparison failed or incomplete", markdown)
 
-    def test_setup_failure_details_stay_in_diagnostics(self) -> None:
+    def testSetupFailureDetailsStayInDiagnostics(self) -> None:
         """
         Verify setup failure details remain confined to diagnostics.
 
@@ -1854,7 +1854,7 @@ class TestComparisonReports(unittest.TestCase):
 class TestUvicornTransport(unittest.TestCase):
     """Verify native Uvicorn launching with the multi-worker TCP correction."""
 
-    def test_real_listener_disables_nagle_before_worker_sharing(self) -> None:
+    def testRealListenerDisablesNagleBeforeWorkerSharing(self) -> None:
         """
         Verify TCP_NODELAY propagates from the listener to accepted sockets.
 
@@ -1884,7 +1884,7 @@ class TestUvicornTransport(unittest.TestCase):
                     accepted.getsockopt(socket.IPPROTO_TCP, socket.TCP_NODELAY), 1,
                 )
 
-    def test_tcp_option_failure_closes_the_bound_listener(self) -> None:
+    def testTcpOptionFailureClosesTheBoundListener(self) -> None:
         """
         Verify TCP configuration failures close the bound listener.
 
@@ -1908,7 +1908,7 @@ class TestUvicornTransport(unittest.TestCase):
         )
         listener.close.assert_called_once_with()
 
-    def test_non_tcp_listener_is_left_unchanged(self) -> None:
+    def testNonTcpListenerIsLeftUnchanged(self) -> None:
         """
         Verify non-TCP listeners remain unchanged.
 
@@ -1926,7 +1926,7 @@ class TestUvicornTransport(unittest.TestCase):
         listener.setsockopt.assert_not_called()
         listener.close.assert_not_called()
 
-    def test_launcher_delegates_to_native_cli_and_restores_config(self) -> None:
+    def testLauncherDelegatesToNativeCliAndRestoresConfig(self) -> None:
         """
         Verify native CLI delegation uses a scoped configuration replacement.
 
@@ -1956,7 +1956,7 @@ class TestUvicornTransport(unittest.TestCase):
         main.assert_called_once_with()
         self.assertIs(entrypoint.Config, native_config)
 
-    def test_launcher_preserves_cli_failures_and_exit_codes(self) -> None:
+    def testLauncherPreservesCliFailuresAndExitCodes(self) -> None:
         """
         Verify native CLI failures and exit codes remain unchanged.
 

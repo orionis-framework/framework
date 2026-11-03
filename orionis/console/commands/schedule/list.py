@@ -1,3 +1,5 @@
+"""Display the application's registered scheduled tasks."""
+
 from rich import box
 from rich.console import Console
 from rich.panel import Panel
@@ -13,12 +15,15 @@ class ScheduleListCommand(BaseCommand):
 
     # Indicates whether timestamps will be shown in the command output
     timestamps: bool = False
+    """Indicates whether timestamps will be shown in the command output."""
 
     # Command signature and description
     signature: str = "schedule:list"
+    """Command signature and description."""
 
     # Command description
     description: str = "Lists all scheduled jobs defined in the application."
+    """Command description."""
 
     def __formatValue(self, value: object) -> str:
         """
@@ -49,9 +54,9 @@ class ScheduleListCommand(BaseCommand):
 
         Parameters
         ----------
-        app : IApplication
+        app : orionis.IApplication
             Application instance for configuration and service resolution.
-        console : Console
+        console : orionis.console.Console
             Rich Console instance for output.
 
         Returns

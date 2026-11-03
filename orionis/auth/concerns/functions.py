@@ -1,9 +1,16 @@
+"""Provide auth concerns operations.
+
+Includes ``authorizable_key``, ``model_primary_key``.
+"""
+
 from uuid import UUID
 from orionis.auth.exceptions import AuthException
 
 # Attribute used when the object does not expose ORM metadata.
 _FALLBACK_PRIMARY_KEY: str = "id"
+"""Attribute used when the object does not expose ORM metadata."""
 _MAX_KEY_LENGTH: int = 255
+"""Max key length value used by ``functions``."""
 
 def authorizable_key(identity: object) -> tuple[str, str]:
     """
@@ -21,7 +28,7 @@ def authorizable_key(identity: object) -> tuple[str, str]:
 
     Raises
     ------
-    AuthException
+    orionis.auth.AuthException
         If the identity has no valid persisted scalar key.
     """
     describe = getattr(identity, "getAuthorizableType", None)

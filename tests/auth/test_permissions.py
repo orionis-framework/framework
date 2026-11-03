@@ -9,6 +9,7 @@ from orionis.auth.authorization.repository import DatabasePermissionRepository
 from orionis.auth.context.context import AuthenticationContext
 from orionis.auth.exceptions import AuthException
 from orionis.auth.tokens.repository import AccessTokenRepository
+from orionis.console.commands.auth.migrate import AuthMigrateCommand
 from orionis.database.compiler import SQLCompiler
 from orionis.database.connection import Connection
 from orionis.database.connection_manager import ConnectionManager
@@ -24,17 +25,25 @@ from orionis.test import TestCase
 from tests.auth import test_manager as auth_fixtures
 
 _AUTH_MIGRATIONS = (
-    ("m0000000006_create_permissions_table", "CreatePermissionsTable"),
-    ("m0000000007_create_roles_table", "CreateRolesTable"),
+    (
+        "m0000000006_create_permissions_table",
+        "CreatePermissionsTable",
+    ),
+    (
+        "m0000000007_create_roles_table",
+        "CreateRolesTable",
+    ),
     (
         "m0000000008_create_model_has_permissions_table",
         "CreateModelHasPermissionsTable",
     ),
-    ("m0000000009_create_model_has_roles_table", "CreateModelHasRolesTable"),
-    ("m0000000010_create_role_has_permissions_table", "CreateRoleHasPermissionsTable"),
     (
-        "m0000000011_create_personal_access_tokens_table",
-        "CreatePersonalAccessTokensTable",
+        "m0000000009_create_model_has_roles_table",
+        "CreateModelHasRolesTable",
+    ),
+    (
+        "m0000000010_create_role_has_permissions_table",
+        "CreateRoleHasPermissionsTable",
     ),
 )
 
@@ -673,7 +682,7 @@ class TestDatabasePermissionRepository(_AuthorizationCase):
         )
 
 class TestAuthMigrations(TestCase):
-    """Run the shipped authorization and token migrations on an isolated database."""
+    """Test application authorization migrations with framework token storage."""
 
     async def asyncSetUp(self) -> None:
         """Bind migration schema access to a temporary database, never the app DB.
@@ -709,16 +718,17 @@ class TestAuthMigrations(TestCase):
         self.migrator._Migrator__discovered_cache = migrations
 
     async def testRealMigrationsSupportUuidOwnersAndRollback(self) -> None:
-        """Apply real DDL, issue grants and tokens, then roll back all six tables.
+        """Apply authorization migrations without coupling tokens to their rollback.
 
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            Verify UUID grants and token preservation after application rollback.
         """
         applied = await self.migrator.migrate()
-        self.assertEqual(len(applied), 6)
+        self.assertEqual(len(applied), 5)
         self.assertEqual(await self.migrator.migrate(), [])
+        self.assertEqual(await AuthMigrateCommand().handle(self.app, self.manager), 0)
         identity = _Identity(uuid4())
         await self.registrar.assignRole(identity, "editor")
         await self.registrar.grantToRole("editor", "posts.update")
@@ -733,6 +743,7 @@ class TestAuthMigrations(TestCase):
         )
         self.assertNotIn("users", {row["name"] for row in tables})
         self.assertEqual(await self.migrator.rollback(), list(reversed(applied)))
+        self.assertIsNotNone(await self.tokens.findByPlainText(issued.plain_text))
 
     async def testForeignKeysDoNotPermitOrphanedRoleGrants(self) -> None:
         """Keep role and permission deletion explicit while references exist.

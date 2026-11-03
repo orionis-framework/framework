@@ -1,3 +1,5 @@
+"""Report a terminal connection failure with available close details."""
+
 class WebSocketDisconnected(RuntimeError):
     """Report a terminal connection failure with available close details."""
 
@@ -18,5 +20,7 @@ class WebSocketDisconnected(RuntimeError):
             Initialize the failure.
         """
         self.code = code
+        """Close code, or abnormal closure when unavailable."""
         self.reason = reason
+        """Peer or locally generated close reason."""
         super().__init__(f"WebSocket disconnected ({code}): {reason}")

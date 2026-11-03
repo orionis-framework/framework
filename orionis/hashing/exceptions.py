@@ -1,3 +1,9 @@
+"""Provide hashing operations.
+
+Includes ``HashException``, ``HashConfigurationException``,
+``HashDriverNotSupportedException``, ``MissingHashDependencyException``.
+"""
+
 class HashException(Exception):
     """Base exception for every failure raised by the hashing module."""
 

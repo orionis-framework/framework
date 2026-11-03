@@ -1,3 +1,5 @@
+"""Define the contract for base scheduler implementations."""
+
 from __future__ import annotations
 from abc import ABC, abstractmethod
 from typing import TYPE_CHECKING
@@ -7,6 +9,7 @@ if TYPE_CHECKING:
     from orionis.console.entities.scheduler_event import SchedulerEvent
 
 class IBaseScheduler(ABC):
+    """Define the contract for base scheduler implementations."""
 
     @abstractmethod
     async def tasks(self, schedule: ISchedule) -> None:
@@ -14,12 +17,12 @@ class IBaseScheduler(ABC):
         Register scheduled tasks for the application.
 
         This method sets up tasks that the scheduler will execute using the provided
-        `schedule` object. Subclasses should override this method to define specific
+        ``schedule`` object. Subclasses should override this method to define specific
         tasks and their scheduling properties.
 
         Parameters
         ----------
-        schedule : ISchedule
+        schedule : orionis.console.contracts.ISchedule
             The schedule object used to register scheduled commands.
 
         Returns
@@ -43,7 +46,7 @@ class IBaseScheduler(ABC):
 
         Parameters
         ----------
-        event : SchedulerEvent
+        event : orionis.console.entities.SchedulerEvent
             The event object representing the scheduler start.
 
         Returns
@@ -59,7 +62,7 @@ class IBaseScheduler(ABC):
 
         Parameters
         ----------
-        event : SchedulerEvent
+        event : orionis.console.entities.SchedulerEvent
             The event object representing the scheduler pause.
 
         Returns
@@ -75,7 +78,7 @@ class IBaseScheduler(ABC):
 
         Parameters
         ----------
-        event : SchedulerEvent
+        event : orionis.console.entities.SchedulerEvent
             The event object representing the scheduler resumption.
 
         Returns
@@ -91,7 +94,7 @@ class IBaseScheduler(ABC):
 
         Parameters
         ----------
-        event : SchedulerEvent
+        event : orionis.console.entities.SchedulerEvent
             The event object representing the scheduler shutdown.
 
         Returns

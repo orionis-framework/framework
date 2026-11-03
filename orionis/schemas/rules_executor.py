@@ -1,3 +1,9 @@
+"""Provide schemas operations.
+
+Includes ``_cache_get``, ``_type_contains_nested``, ``_warm_child_plan``,
+``_collection_item_type``.
+"""
+
 from __future__ import annotations
 import operator
 import types
@@ -16,9 +22,17 @@ if TYPE_CHECKING:
 # values are tuples of field validation plans as returned by _build_plan().
 # Populated on demand by _build_plan and warmed at class creation time.
 _PLAN_CACHE_MAX = 1024
+"""
+Cache of validation plans for schema types. Keys are schema classes; values are
+tuples of field validation plans as returned by _build_plan(). Populated on demand
+by _build_plan and warmed at class creation time.
+"""
 _PLAN_CACHE: OrderedDict[type, tuple] = OrderedDict()
+"""Plan cache used by ``rules_executor``."""
 _PLAN_LOCK = RLock()
+"""Synchronization primitive controlling access to plan lock."""
 _BUILDING: set[type] = set()
+"""Building used by ``rules_executor``."""
 
 def _cache_get(klass: type) -> tuple | None:
     """
@@ -43,6 +57,10 @@ def _cache_get(klass: type) -> tuple | None:
 # Shared empty mapping returned for schemas without Orionis metadata.
 # Reused instead of allocating a fresh dict on every plan build.
 _EMPTY_META: dict[str, list[object]] = {}
+"""
+Shared empty mapping returned for schemas without Orionis metadata. Reused instead
+of allocating a fresh dict on every plan build.
+"""
 
 def _type_contains_nested(tp: object, *, rules_only: bool = False) -> bool:
     """
@@ -178,12 +196,12 @@ def _field_rules(
         Schema owning the field.
     field_name : str
         Name used in metadata error messages.
-    items : Iterable[object]
+    items : collections.abc.Iterable[object]
         Declared rule and documentation metadata.
 
     Returns
     -------
-    tuple[Rule, ...]
+    tuple[orionis.schemas.rule.Rule, ``...``]
         Rules in their declaration order.
 
     Raises

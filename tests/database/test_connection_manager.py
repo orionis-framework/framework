@@ -37,7 +37,7 @@ class _StubApp:
         """
         return self._config
 
-def _makeManager() -> ConnectionManager:
+def _make_manager() -> ConnectionManager:
     """Build a manager with two in-memory sqlite connections.
 
     Returns
@@ -65,7 +65,7 @@ class TestConnectionManager(TestCase):
         None
             Completes the operation described above.
         """
-        self._manager = _makeManager()
+        self._manager = _make_manager()
 
     async def asyncTearDown(self) -> None:
         """Dispose every cached connection after each test.

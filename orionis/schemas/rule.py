@@ -1,3 +1,5 @@
+"""Define a reusable validation rule and its failure message."""
+
 from inspect import iscoroutinefunction
 from orionis.schemas.contracts.constraint import IRule
 from orionis.schemas.entities.failure import ValidationFailure
@@ -5,7 +7,10 @@ from orionis.schemas.entities.failure import ValidationFailure
 class Rule(IRule):
 
     # Restrict rule instances to their declared attributes.
+    """Define a reusable validation rule and its failure message."""
+
     __slots__ = ("_code", "_message")
+    """Restrict rule instances to their declared attributes."""
 
     def __init_subclass__(cls, **kwargs: object) -> None:
         """
@@ -13,6 +18,8 @@ class Rule(IRule):
 
         Parameters
         ----------
+        cls : type
+            Subclass being initialized.
         **kwargs : object
             Class options forwarded to the next base class.
 
@@ -49,9 +56,11 @@ class Rule(IRule):
         # failure path only reads two slots.
         klass = type(self)
         self._code: str = getattr(klass, "__code__", klass.__name__.lower())
+        """Machine-readable status or error code."""
         self._message: str | None = (
             message if message is not None else getattr(klass, "__message__", None)
         )
+        """Override message used when validation fails."""
 
     async def enforce(
         self,
@@ -99,7 +108,7 @@ class Rule(IRule):
 
         Returns
         -------
-        ValidationFailure | None
+        orionis.schemas.entities.failure.ValidationFailure | None
             Failure details when validation fails; otherwise ``None``.
         """
         valid = await self.enforce(field, value, instance)

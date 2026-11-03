@@ -1,3 +1,9 @@
+"""Provide view globals operations.
+
+Includes ``_compile_route_template``, ``_build_route_path``, ``_load_named_routes``,
+``_global_route``.
+"""
+
 from __future__ import annotations
 import re
 from typing import TYPE_CHECKING, Any
@@ -12,14 +18,21 @@ if TYPE_CHECKING:
 
 # Matches route path placeholders such as ``{id}`` or ``{id:int}``.
 _ROUTE_PARAM_RE: re.Pattern = re.compile(r"\{(\w+)(?::\w+)?\}")
+"""Matches route path placeholders such as ``{id}`` or ``{id:int}``."""
 
 # Sentinel telling a missing placeholder apart from a legitimate ``None`` value.
 _MISSING: Any = object()
+"""Sentinel telling a missing placeholder apart from a legitimate ``None`` value."""
 
 # Interpolation plans keyed by route template: (literal chunks, parameter names).
 # Lock-free on purpose: plans are pure functions of their key, so a racing
 # writer can only store the value another thread would have computed.
 _ROUTE_PLAN_CACHE: dict[str, tuple[tuple[str, ...], tuple[str, ...]]] = {}
+"""
+Interpolation plans keyed by route template: (literal chunks, parameter names).
+Lock-free on purpose: plans are pure functions of their key, so a racing writer can
+only store the value another thread would have computed.
+"""
 
 def _compile_route_template(
     template: str,
@@ -34,7 +47,7 @@ def _compile_route_template(
 
     Returns
     -------
-    tuple[tuple[str, ...], tuple[str, ...]]
+    tuple[tuple[str, ``...``], tuple[str, ``...``]]
         Literal chunks surrounding each placeholder and the ordered
         placeholder names.  The result is memoised for later calls.
     """
@@ -63,18 +76,18 @@ def _build_route_path(
     ----------
     template : str
         Route path containing ``{name}`` or ``{name:type}`` segments.
-    params : dict[str, Any]
+    params : dict[str, typing.Any]
         Values available to fill the placeholders.
 
     Returns
     -------
-    tuple[str, dict[str, Any]]
+    tuple[str, dict[str, typing.Any]]
         The interpolated path and the parameters left unused, which the
         caller appends as a query string.
 
     Raises
     ------
-    ViewRouteException
+    orionis.view.exceptions.ViewRouteException
         If a placeholder has no matching value in *params*.
     """
     literals, names = (
@@ -107,7 +120,7 @@ async def _load_named_routes(app: IApplication) -> dict[str, str]:
 
     Parameters
     ----------
-    app : IApplication
+    app : orionis.IApplication
         Application container used to build the route loader.
 
     Returns
@@ -136,12 +149,12 @@ def _global_route(app: IApplication) -> Any:
 
     Parameters
     ----------
-    app : IApplication
+    app : orionis.IApplication
         Application container used for service resolution.
 
     Returns
     -------
-    Any
+    typing.Any
         Async callable that builds the URL of a named route.
     """
     named: dict[str, str] = {}
@@ -155,7 +168,7 @@ def _global_route(app: IApplication) -> Any:
         ----------
         name : str
             Registered route name.
-        **params : Any
+        **params : typing.Any
             Values for the path placeholders; leftover values are
             appended as the query string.
 
@@ -167,7 +180,7 @@ def _global_route(app: IApplication) -> Any:
 
         Raises
         ------
-        ViewRouteException
+        orionis.view.exceptions.ViewRouteException
             If no route is registered under *name*.
         """
         nonlocal loaded

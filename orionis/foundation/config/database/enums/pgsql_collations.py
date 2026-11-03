@@ -1,3 +1,5 @@
+"""Enumerate common PostgreSQL collations."""
+
 from enum import Enum
 
 class PGSQLCollation(Enum):
@@ -16,7 +18,7 @@ class PGSQLCollation(Enum):
 
     Returns
     -------
-    PGSQLCollation
+    orionis.foundation.config.database.PGSQLCollation
         The enumeration member representing a PostgreSQL collation.
     """
 

@@ -1,3 +1,5 @@
+"""Represent a scheduled event and configure its execution and timing."""
+
 from __future__ import annotations
 from dataclasses import dataclass, field
 from typing import TYPE_CHECKING
@@ -15,7 +17,7 @@ class Task(BaseEntity):
     """
     Represent a scheduled event and configure its execution and timing.
 
-    Parameters
+    Attributes
     ----------
     signature : str
         Unique identifier for the event.
@@ -27,11 +29,11 @@ class Task(BaseEntity):
         Description of the event's purpose.
     random_delay : int | None, optional
         Random delay in seconds before triggering.
-    start_date : datetime | None, optional
+    start_date : datetime.datetime | None, optional
         Date and time when the event becomes active.
-    end_date : datetime | None, optional
+    end_date : datetime.datetime | None, optional
         Date and time when the event becomes inactive.
-    trigger : CronTrigger | DateTrigger | IntervalTrigger | None, optional
+    trigger
         Trigger mechanism for event execution.
     details : str | None, optional
         Additional metadata about the event.
@@ -41,12 +43,12 @@ class Task(BaseEntity):
         Grace period in seconds for misfired events.
     coalesce : bool, optional
         Whether to coalesce missed runs into a single run. Defaults to True.
-    listeners : list[Callable[..., None]], optional
+    listeners : list[collections.abc.Callable[``...``, None]], optional
         Listeners for event-specific logic. Defaults to empty list.
 
     Returns
     -------
-    Task
+    orionis.console.entities.Task
         Instance of Task with specified configuration.
     """
 

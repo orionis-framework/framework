@@ -1,3 +1,5 @@
+"""Store expiring token digests and rotate them on persistent login."""
+
 import re
 import secrets
 import time
@@ -14,8 +16,11 @@ if TYPE_CHECKING:
     from orionis.http.responses import Response
 
 _MAX_COOKIE_LENGTH = 512
+"""Max cookie length value used by ``remember``."""
 _COOKIE_STATE = "_auth_remember_cookie"
+"""Cookie state identifier: ``_auth_remember_cookie``."""
 _COOKIE_PATTERN = re.compile(r"(.{1,255})\|(\d{1,12})\|([A-Za-z0-9_-]{43})")
+"""Compiled pattern used to recognize cookie pattern."""
 
 class RememberMe:
     """Store expiring token digests and rotate them on persistent login."""
@@ -29,9 +34,9 @@ class RememberMe:
 
         Parameters
         ----------
-        app : IApplication
+        app : orionis.IApplication
             Application exposing the remember-me and session configuration.
-        identities : IIdentityProvider
+        identities : orionis.auth.contracts.IIdentityProvider
             Provider used to retrieve identities and update remember tokens.
 
         Returns
@@ -45,10 +50,12 @@ class RememberMe:
             If the remember cookie name matches the session cookie name.
         """
         self.settings = RememberAuth(**(app.config("auth.remember") or {}))
+        """Settings produced by ``RememberAuth``."""
         if self.settings.cookie == app.config("session.cookie"):
             error_msg = "The remember cookie must differ from the session cookie."
             raise ValueError(error_msg)
         self.identities = identities
+        """Provider used to retrieve identities and update remember tokens."""
 
     # Bind the cookie value to its identity, expiry, and password hash.
     @staticmethod
@@ -60,7 +67,7 @@ class RememberMe:
         ----------
         cookie : str
             Public remember-cookie value.
-        identity : IAuthenticatable
+        identity : orionis.auth.contracts.IAuthenticatable
             Identity that owns the credential.
         expiry : int
             Unix timestamp when the credential expires.
@@ -80,7 +87,7 @@ class RememberMe:
 
         Parameters
         ----------
-        request : Request
+        request : orionis.http.Request
             Request that owns the pending response state.
         value : str
             Cookie value to issue, or an empty string to clear it.
@@ -110,7 +117,7 @@ class RememberMe:
 
         Parameters
         ----------
-        request : Request
+        request : orionis.http.Request
             Request that will emit the expired cookie.
 
         Returns
@@ -127,9 +134,9 @@ class RememberMe:
 
         Parameters
         ----------
-        request : Request
+        request : orionis.http.Request
             Request that will receive the remember cookie.
-        identity : IAuthenticatable
+        identity : orionis.auth.contracts.IAuthenticatable
             Active identity whose prior remembered credential is replaced.
 
         Returns
@@ -139,7 +146,7 @@ class RememberMe:
 
         Raises
         ------
-        AuthException
+        orionis.auth.AuthException
             If HTTPS is required but unavailable, or token persistence fails.
         """
         if self.settings.secure and getattr(request, "scheme", "") != "https":
@@ -168,7 +175,7 @@ class RememberMe:
 
         Parameters
         ----------
-        identity : IAuthenticatable
+        identity : orionis.auth.contracts.IAuthenticatable
             Identity that owns the persistent credential.
         expiry : int
             Unix timestamp when the credential expires.
@@ -187,12 +194,12 @@ class RememberMe:
 
         Parameters
         ----------
-        request : Request
+        request : orionis.http.Request
             Request carrying the remember cookie.
 
         Returns
         -------
-        IAuthenticatable | None
+        orionis.auth.contracts.IAuthenticatable | None
             Restored identity, or ``None`` when the cookie is invalid, expired,
             stale, or could not be rotated.
         """
@@ -245,7 +252,7 @@ class RememberMe:
 
         Parameters
         ----------
-        request : Request
+        request : orionis.http.Request
             Request that will emit the cleared cookie.
         identifier : object
             Persisted identity identifier associated with the current session.
@@ -268,9 +275,9 @@ class RememberMe:
 
         Parameters
         ----------
-        request : Request
+        request : orionis.http.Request
             Request that will emit the cleared cookie.
-        identity : IAuthenticatable
+        identity : orionis.auth.contracts.IAuthenticatable
             Identity whose remember token should be removed.
 
         Returns
@@ -290,9 +297,9 @@ def apply_remember_cookie(request: Request, response: Response) -> None:
 
     Parameters
     ----------
-    request : Request
+    request : orionis.http.Request
         Request containing a pending cookie change, if any.
-    response : Response
+    response : orionis.http.Response
         Response that will receive the cookie and cache-control headers.
 
     Returns

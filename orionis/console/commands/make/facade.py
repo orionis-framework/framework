@@ -1,3 +1,5 @@
+"""Generate a facade and its typing interface."""
+
 from typing import ClassVar
 from orionis.console.args.argument import Argument
 from orionis.console.commands.make._base import MakeStubCommand
@@ -7,11 +9,17 @@ class MakeFacade(MakeStubCommand):
     """Generate a facade and its typing interface."""
 
     timestamps: bool = False
+    """Timestamps flag used by ``MakeFacade``."""
     signature: str = "make:facade"
+    """Signature identifier: ``make:facade``."""
     description: str = "Creates a new facade class and interface."
+    """Description identifier: ``Creates a new facade class and interface.``."""
     template_name: str = "facade"
+    """Template name identifier: ``facade``."""
     path_key: str = "app_facades"
+    """Path key identifier: ``app_facades``."""
     success_label: str = "Facade"
+    """Success label identifier: ``Facade``."""
     arguments: ClassVar[list[Argument]] = [
         Argument(
             name_or_flags="name",
@@ -26,6 +34,7 @@ class MakeFacade(MakeStubCommand):
             help="The service identifier in the application container.",
         ),
     ]
+    """Command-line argument declarations accepted by this command."""
 
     def getReplacements(self) -> dict[str, str]:
         """
@@ -57,14 +66,14 @@ class MakeFacade(MakeStubCommand):
 
         Parameters
         ----------
-        app : IApplication
+        app : orionis.IApplication
             Application that resolves the destination path.
         name : str
             File name and optional nested directory path.
 
         Returns
         -------
-        tuple[tuple[str, str], ...]
+        tuple[tuple[str, str], ``...``]
             Success labels and generated application-relative paths.
         """
         implementation = self.createFile(app, name)

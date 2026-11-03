@@ -1,3 +1,5 @@
+"""Queue and display formatted HTTP request timing information."""
+
 from __future__ import annotations
 import asyncio
 import contextlib
@@ -13,34 +15,54 @@ if TYPE_CHECKING:
 
 # ANSI escape codes
 _RESET = "\033[0m"
+"""ANSI escape codes."""
 _BOLD = "\033[1m"
+"""Bold identifier: ``\x1b[1m``."""
 
 # Foreground
 _FG_BLACK = "\033[30m"
+"""Foreground."""
 _FG_WHITE = "\033[37m"
+"""Fg white identifier: ``\x1b[37m``."""
 _FG_CYAN = "\033[36m"
+"""Fg cyan identifier: ``\x1b[36m``."""
 _FG_GREY = "\033[90m"
+"""Fg grey identifier: ``\x1b[90m``."""
 
 # Background (standard)
 _BG_RED = "\033[41m"
+"""Background (standard)."""
 _BG_GREEN = "\033[42m"
+"""Bg green identifier: ``\x1b[42m``."""
 _BG_YELLOW = "\033[43m"
+"""Bg yellow identifier: ``\x1b[43m``."""
 _BG_BLUE = "\033[44m"
+"""Bg blue identifier: ``\x1b[44m``."""
 _BG_MAGENTA = "\033[45m"
+"""Bg magenta identifier: ``\x1b[45m``."""
 _BG_CYAN = "\033[46m"
+"""Bg cyan identifier: ``\x1b[46m``."""
 _BG_WHITE = "\033[47m"
+"""Bg white identifier: ``\x1b[47m``."""
 _BG_BRIGHT = "\033[100m"
+"""Bg bright identifier: ``\x1b[100m``."""
 
 # Background (256-colour approximations)
 _BG_GREY37 = "\033[48;5;237m"  # ≈ grey37
+"""Background (256-colour approximations)."""
 _BG_GREY50 = "\033[48;5;244m"  # ≈ grey50
+"""Bg grey50 identifier: ``\x1b[48;5;244m``."""
 _BG_GREY70 = "\033[48;5;250m"  # ≈ grey70
+"""Bg grey70 identifier: ``\x1b[48;5;250m``."""
 
 class HTTPRequestPrinter(IHTTPRequestPrinter):
     # ruff: noqa: ERA001
 
     # Minimum valid HTTP status code
+    """Queue and display formatted HTTP request timing information."""
+
     HTTP_MIN_STATUS_CODE: ClassVar[int] = 100
+    """Minimum valid HTTP status code."""
 
     # (bg_ansi, fg_ansi) tuples for HTTP methods
     HTTP_COLORS: ClassVar[dict] = {
@@ -56,6 +78,7 @@ class HTTPRequestPrinter(IHTTPRequestPrinter):
         "QUERY": (_BG_GREY37, _FG_WHITE),
         "default": (_BG_GREY37, _FG_WHITE),
     }
+    """(bg_ansi, fg_ansi) tuples for HTTP methods."""
 
     # (bg_ansi, fg_ansi) tuples for HTTP status categories
     STATUS_COLORS: ClassVar[dict] = {
@@ -66,6 +89,7 @@ class HTTPRequestPrinter(IHTTPRequestPrinter):
         "5xx": (_BG_RED, _FG_WHITE),
         "default": (_BG_GREY50, _FG_WHITE),
     }
+    """(bg_ansi, fg_ansi) tuples for HTTP status categories."""
 
     def __init__(self: Self) -> None:
         """
@@ -82,6 +106,7 @@ class HTTPRequestPrinter(IHTTPRequestPrinter):
         # Determine terminal width, clamped between 60 and 120 columns
         cols = shutil.get_terminal_size(fallback=(80, 24)).columns
         self._total_width = max(60, min(120, int(cols * 0.8)))
+        """Total width produced by ``max``."""
 
         # Precompute status icons by HTTP code category
         self.__status_icons: dict[str, str] = {
@@ -92,20 +117,27 @@ class HTTPRequestPrinter(IHTTPRequestPrinter):
             "5xx": " 🔴 ",
             "default": " ⚫ ",
         }
+        """Precompute status icons by HTTP code category."""
 
         # Enable HTTP request printing to console by default
         self.__enabled: bool = True
+        """Enable HTTP request printing to console by default."""
 
         # Async queue and worker task (initialized by start())
         self.__queue: asyncio.Queue | None = None
+        """Async queue and worker task (initialized by start())."""
         self.__worker_task: asyncio.Task | None = None
+        """Background task responsible for draining queued output."""
 
         # Internal timer set by startTimer(); None until first call
         self.__start_timer: float | None = None
+        """Internal timer set by startTimer(); None until first call."""
 
         # Cache stdout bound methods: LOAD_FAST vs sys.stdout LOAD_GLOBAL+LOAD_ATTR
         self._write = sys.stdout.write
+        """Cache stdout bound methods: LOAD_FAST vs sys.stdout LOAD_GLOBAL+LOAD_ATTR."""
         self._flush = sys.stdout.flush
+        """Flush obtained from ``sys.stdout.flush``."""
 
     def setEnabled(self: Self, *, enabled: bool) -> None:
         """
@@ -224,9 +256,9 @@ class HTTPRequestPrinter(IHTTPRequestPrinter):
 
         Parameters
         ----------
-        adapter : TransportAdapter
+        adapter : orionis.http.adapters.request.contracts.transport.TransportAdapter
             The transport adapter providing method and path information.
-        response : Response
+        response : orionis.http.Response
             The HTTP response object.
 
         Returns

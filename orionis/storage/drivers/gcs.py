@@ -1,3 +1,5 @@
+"""Storage driver backed by Google Cloud Storage."""
+
 from __future__ import annotations
 import asyncio
 import base64
@@ -33,18 +35,22 @@ if TYPE_CHECKING:
 
 # Default chunk size for streaming operations (64 KiB).
 _CHUNK_SIZE: int = 64 * 1024
+"""Default chunk size for streaming operations (64 KiB)."""
 
 # In-memory bytes before spooled buffers spill to disk (8 MiB).
 _SPOOL_THRESHOLD: int = 8 * 1024 * 1024
+"""In-memory bytes before spooled buffers spill to disk (8 MiB)."""
 
 # Content type applied when the MIME type cannot be guessed.
 _DEFAULT_CONTENT_TYPE: str = "application/octet-stream"
+"""Content type applied when the MIME type cannot be guessed."""
 
 # Predefined ACLs applied per visibility level.
 _ACL_MAP: dict[str, str] = {
     Visibility.PUBLIC.value: "publicRead",
     Visibility.PRIVATE.value: "private",
 }
+"""Predefined ACLs applied per visibility level."""
 
 class GoogleStorageDriver(IStorageDriver):
     """
@@ -76,6 +82,7 @@ class GoogleStorageDriver(IStorageDriver):
         "_not_found",
         "_project",
     )
+    """Declare the instance attribute slots reserved by this class."""
 
     def __init__(self: Self, config: object) -> None:
         """
@@ -93,17 +100,25 @@ class GoogleStorageDriver(IStorageDriver):
         Returns
         -------
         None
+            Initialize the driver from a GCS disk configuration entity.
         """
         self._project: str = str(getattr(config, "project_id", "") or "")
+        """Project produced by ``str``."""
         self._key_file: str | None = getattr(config, "key_file", None) or None
+        """Credential file used to initialize the cloud-storage client."""
         self._bucket_name: str = str(getattr(config, "bucket", "") or "")
+        """Bucket name produced by ``str``."""
 
         base_url = getattr(config, "url", None)
         self._base_url: str | None = base_url.rstrip("/") if base_url else None
+        """Base URL used when constructing public resource URLs."""
 
         self._bucket: Any = None
+        """Cloud-storage bucket containing the driver resources."""
         self._not_found: type[Exception] = Exception
+        """Not found supplied through ``Exception``."""
         self._cloud_error: type[Exception] = Exception
+        """Cloud error supplied through ``Exception``."""
 
     # ── SDK bootstrap and low-level helpers ──────────────────────────────────
 
@@ -113,12 +128,12 @@ class GoogleStorageDriver(IStorageDriver):
 
         Returns
         -------
-        Any
+        typing.Any
             Configured ``Bucket`` instance.
 
         Raises
         ------
-        MissingStorageDependencyException
+        orionis.storage.exceptions.MissingStorageDependencyException
             If ``google-cloud-storage`` is not installed.
         """
         if self._bucket is not None:
@@ -159,7 +174,7 @@ class GoogleStorageDriver(IStorageDriver):
 
         Returns
         -------
-        Any
+        typing.Any
             ``Blob`` handle bound to the bucket.
         """
         return self.__bucket().blob(normalized)
@@ -175,7 +190,7 @@ class GoogleStorageDriver(IStorageDriver):
 
         Returns
         -------
-        StorageFileNotFoundException
+        orionis.storage.exceptions.StorageFileNotFoundException
             Exception instance ready to be raised.
         """
         error_msg = f"File does not exist at path [{normalized}]."
@@ -192,12 +207,12 @@ class GoogleStorageDriver(IStorageDriver):
 
         Returns
         -------
-        Any
+        typing.Any
             ``Blob`` with populated properties.
 
         Raises
         ------
-        StorageFileNotFoundException
+        orionis.storage.exceptions.StorageFileNotFoundException
             If the object does not exist.
         """
         blob = self.__bucket().get_blob(normalized)
@@ -238,7 +253,7 @@ class GoogleStorageDriver(IStorageDriver):
 
         Raises
         ------
-        UnsupportedStorageOperationException
+        orionis.storage.exceptions.UnsupportedStorageOperationException
             If *visibility* is not a supported level.
         """
         acl = _ACL_MAP.get(str(visibility))
@@ -273,7 +288,7 @@ class GoogleStorageDriver(IStorageDriver):
 
         Parameters
         ----------
-        blob : Any
+        blob : typing.Any
             ``Blob`` with loaded metadata.
 
         Returns
@@ -311,7 +326,7 @@ class GoogleStorageDriver(IStorageDriver):
 
         Raises
         ------
-        StorageFileNotFoundException
+        orionis.storage.exceptions.StorageFileNotFoundException
             If the object does not exist.
         """
         normalized = normalizeFilePath(path)
@@ -355,7 +370,7 @@ class GoogleStorageDriver(IStorageDriver):
 
         Raises
         ------
-        StorageFileNotFoundException
+        orionis.storage.exceptions.StorageFileNotFoundException
             If the object does not exist.
         """
         normalized = normalizeFilePath(path)
@@ -366,7 +381,7 @@ class GoogleStorageDriver(IStorageDriver):
 
             Returns
             -------
-            Any
+            typing.Any
                 Readable object stream.
             """
             blob = self.__blobOrFail(normalized)
@@ -425,6 +440,7 @@ class GoogleStorageDriver(IStorageDriver):
         Returns
         -------
         None
+            Write *contents* to *path*, replacing any existing object.
         """
         normalized = normalizeFilePath(path)
         data = (
@@ -469,7 +485,7 @@ class GoogleStorageDriver(IStorageDriver):
         ----------
         path : str
             Root-relative file path.
-        stream : AsyncIterable[bytes]
+        stream : collections.abc.AsyncIterable[bytes]
             Asynchronous byte-chunk producer.
         visibility : str | None
             Visibility applied through a predefined ACL, or ``None``
@@ -478,6 +494,7 @@ class GoogleStorageDriver(IStorageDriver):
         Returns
         -------
         None
+            Write the chunks produced by *stream* to *path*.
         """
         normalized = normalizeFilePath(path)
         acl = self.__aclFor(visibility) if visibility is not None else None
@@ -554,10 +571,11 @@ class GoogleStorageDriver(IStorageDriver):
         Returns
         -------
         None
+            Copy the object at *source* to *target* server-side.
 
         Raises
         ------
-        StorageFileNotFoundException
+        orionis.storage.exceptions.StorageFileNotFoundException
             If the source object does not exist.
         """
         origin = normalizeFilePath(source)
@@ -595,10 +613,11 @@ class GoogleStorageDriver(IStorageDriver):
         Returns
         -------
         None
+            Move the object at *source* to *target*.
 
         Raises
         ------
-        StorageFileNotFoundException
+        orionis.storage.exceptions.StorageFileNotFoundException
             If the source object does not exist.
         """
         await self.copy(source, target)
@@ -637,7 +656,7 @@ class GoogleStorageDriver(IStorageDriver):
 
         Raises
         ------
-        StorageFileNotFoundException
+        orionis.storage.exceptions.StorageFileNotFoundException
             If the object does not exist.
         """
         normalized = normalizeFilePath(path)
@@ -663,7 +682,7 @@ class GoogleStorageDriver(IStorageDriver):
 
         Raises
         ------
-        StorageFileNotFoundException
+        orionis.storage.exceptions.StorageFileNotFoundException
             If the object does not exist.
         """
         normalized = normalizeFilePath(path)
@@ -681,12 +700,12 @@ class GoogleStorageDriver(IStorageDriver):
 
         Returns
         -------
-        datetime
+        datetime.datetime
             Timezone-aware modification timestamp.
 
         Raises
         ------
-        StorageFileNotFoundException
+        orionis.storage.exceptions.StorageFileNotFoundException
             If the object does not exist.
         """
         normalized = normalizeFilePath(path)
@@ -710,7 +729,7 @@ class GoogleStorageDriver(IStorageDriver):
 
         Raises
         ------
-        StorageFileNotFoundException
+        orionis.storage.exceptions.StorageFileNotFoundException
             If the object does not exist.
         """
         normalized = normalizeFilePath(path)
@@ -750,12 +769,13 @@ class GoogleStorageDriver(IStorageDriver):
         Returns
         -------
         None
+            Change the visibility of the object at *path*.
 
         Raises
         ------
-        StorageFileNotFoundException
+        orionis.storage.exceptions.StorageFileNotFoundException
             If the object does not exist.
-        UnsupportedStorageOperationException
+        orionis.storage.exceptions.UnsupportedStorageOperationException
             If *visibility* is not a supported level.
         """
         normalized = normalizeFilePath(path)
@@ -793,7 +813,7 @@ class GoogleStorageDriver(IStorageDriver):
         path : str
             Root-relative file path.
         algorithm : str
-            Any algorithm name accepted by :func:`hashlib.new`.
+            Any algorithm name accepted by ``hashlib.new``.
 
         Returns
         -------
@@ -802,9 +822,9 @@ class GoogleStorageDriver(IStorageDriver):
 
         Raises
         ------
-        StorageFileNotFoundException
+        orionis.storage.exceptions.StorageFileNotFoundException
             If the object does not exist.
-        UnsupportedStorageOperationException
+        orionis.storage.exceptions.UnsupportedStorageOperationException
             If *algorithm* is not available.
         """
         normalized = normalizeFilePath(path)
@@ -846,13 +866,13 @@ class GoogleStorageDriver(IStorageDriver):
 
         Returns
         -------
-        FileInfo
+        orionis.storage.entities.FileInfo
             Immutable entity with size, MIME type, timestamps, ETag,
             visibility, and URL.
 
         Raises
         ------
-        StorageFileNotFoundException
+        orionis.storage.exceptions.StorageFileNotFoundException
             If the object does not exist.
         """
         normalized = normalizeFilePath(path)
@@ -863,7 +883,7 @@ class GoogleStorageDriver(IStorageDriver):
 
             Returns
             -------
-            FileInfo
+            orionis.storage.entities.FileInfo
                 Object metadata.
             """
             blob = self.__blobOrFail(normalized)
@@ -900,6 +920,7 @@ class GoogleStorageDriver(IStorageDriver):
         Returns
         -------
         None
+            Create a zero-byte directory marker at *path*.
         """
         normalized = normalizePath(path)
         if not normalized:
@@ -1074,7 +1095,7 @@ class GoogleStorageDriver(IStorageDriver):
 
         Raises
         ------
-        MissingStorageDependencyException
+        orionis.storage.exceptions.MissingStorageDependencyException
             If ``google-cloud-storage`` is not installed.
         """
         normalized = normalizeFilePath(path)
@@ -1105,18 +1126,18 @@ class GoogleStorageDriver(IStorageDriver):
         ----------
         path : str
             Root-relative file path on the disk.
-        destination : str | Path
+        destination : str | pathlib.Path
             Local target. When it points to an existing directory the
             file keeps its original name inside that directory.
 
         Returns
         -------
-        Path
+        pathlib.Path
             Absolute local path of the downloaded file.
 
         Raises
         ------
-        StorageFileNotFoundException
+        orionis.storage.exceptions.StorageFileNotFoundException
             If the object does not exist.
         """
         normalized = normalizeFilePath(path)
@@ -1127,7 +1148,7 @@ class GoogleStorageDriver(IStorageDriver):
 
             Returns
             -------
-            Path
+            pathlib.Path
                 Destination of the downloaded object.
             """
             target = resolveDownloadTarget(normalized, destination)
@@ -1158,12 +1179,12 @@ class GoogleStorageDriver(IStorageDriver):
 
         Returns
         -------
-        AsyncStream
+        orionis.storage.AsyncStream
             Lazily opened stream; use it as an async context manager.
 
         Raises
         ------
-        UnsupportedStorageOperationException
+        orionis.storage.exceptions.UnsupportedStorageOperationException
             If *mode* is not a supported binary mode.
         """
         normalized = normalizeFilePath(path)
@@ -1175,7 +1196,7 @@ class GoogleStorageDriver(IStorageDriver):
 
             Returns
             -------
-            BinaryIO
+            typing.BinaryIO
                 Stream handle for reading or writing.
             """
             buffer = tempfile.SpooledTemporaryFile(  # noqa: SIM115
@@ -1203,7 +1224,7 @@ class GoogleStorageDriver(IStorageDriver):
 
             Parameters
             ----------
-            handle : BinaryIO
+            handle : typing.BinaryIO
                 Buffered stream being closed.
 
             Returns

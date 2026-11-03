@@ -1,3 +1,5 @@
+"""Define the contract for env implementations."""
+
 from __future__ import annotations
 from abc import ABC, abstractmethod
 from typing import Any, TYPE_CHECKING
@@ -8,8 +10,10 @@ if TYPE_CHECKING:
 class IEnv(ABC):
 
     # ruff: noqa: FBT001
+    """Define the contract for env implementations."""
 
     __slots__ = ()
+    """Declare that this class introduces no additional instance slots."""
 
     @classmethod
     @abstractmethod
@@ -108,7 +112,7 @@ class IEnv(ABC):
 
         Returns
         -------
-        dict[str, Any]
+        dict[str, typing.Any]
             Dictionary containing all environment variables loaded by DotEnv.
         """
 

@@ -1,11 +1,15 @@
+"""Extract structured details from exceptions and tracebacks."""
+
 from linecache import getlines
 import traceback
 from typing import Any
 from orionis.support.formatter.exceptions.contracts.parser import IExceptionParser
 
 class ExceptionParser(IExceptionParser):
+    """Extract structured details from exceptions and tracebacks."""
 
     __slots__ = ("_cache", "_error_code", "_exc_type", "_tb")
+    """Declare the instance attribute slots reserved by this class."""
 
     def __init__(self, exception: Exception) -> None:
         """
@@ -28,13 +32,17 @@ class ExceptionParser(IExceptionParser):
             exception, capture_locals=False,
         )
         self._tb = tb
+        """Tb supplied through ``tb``."""
         self._exc_type: str = (
             tb.exc_type.__name__
             if tb.exc_type
             else type(exception).__name__
         )
+        """Type of the exception being formatted."""
         self._error_code: Any = getattr(exception, "code", None)
+        """Error code produced by ``getattr``."""
         self._cache: dict[str, Any] | None = None
+        """Cache policy or cached state used by this component."""
 
     def toDict(self) -> dict[str, Any]:
         """
@@ -45,7 +53,7 @@ class ExceptionParser(IExceptionParser):
 
         Returns
         -------
-        dict[str, Any]
+        dict[str, typing.Any]
             Dictionary with keys:
             - 'error_type': str, type of the exception.
             - 'error_message': str, formatted traceback string.
@@ -108,12 +116,12 @@ class ExceptionParser(IExceptionParser):
 
         Parameters
         ----------
-        stack : traceback.StackSummary | list
+        stack : ``traceback.StackSummary`` | list
             Stack trace summary or an empty list.
 
         Returns
         -------
-        list[dict[str, Any]]
+        list[dict[str, typing.Any]]
             List of frame dicts ordered most-recent first.
         """
         if not stack:

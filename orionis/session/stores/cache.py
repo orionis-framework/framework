@@ -1,3 +1,5 @@
+"""Session store backed by the framework's cache system."""
+
 from datetime import UTC, datetime
 from math import ceil
 from typing import Any
@@ -8,6 +10,7 @@ from orionis.session.entities.record import SessionRecord
 
 # Namespace prefix keeping session entries away from unrelated cache keys.
 _KEY_PREFIX: str = "session:"
+"""Namespace prefix keeping session entries away from unrelated cache keys."""
 
 class CacheSessionStore(ISessionStore):
     """
@@ -21,13 +24,15 @@ class CacheSessionStore(ISessionStore):
     Notes
     -----
     ``ICacheManager`` exposes no way to enumerate stored keys, so this
-    store cannot (and does not need to) implement an active :meth:`gc`:
+    store cannot (and does not need to) implement an active
+    :meth:`orionis.session.stores.cache.CacheSessionStore.gc`:
     the backend evicts expired entries on its own.
     """
 
     # ruff: noqa: TC001
 
     __slots__ = ("_repository",)
+    """Declare the instance attribute slots reserved by this class."""
 
     def __init__(self, cache: ICacheManager, store: str | None = None) -> None:
         """
@@ -35,7 +40,7 @@ class CacheSessionStore(ISessionStore):
 
         Parameters
         ----------
-        cache : ICacheManager
+        cache : orionis.cache.contracts.ICacheManager
             The application's cache manager.
         store : str | None, optional
             Name of the cache store to use.  ``None`` selects the
@@ -44,8 +49,10 @@ class CacheSessionStore(ISessionStore):
         Returns
         -------
         None
+            Bind the store to the requested (or default) cache repository.
         """
         self._repository: ICacheRepository = cache.store(store)
+        """Repository produced by ``cache.store``."""
 
     async def read(self, session_id: str) -> SessionRecord | None:
         """
@@ -58,7 +65,7 @@ class CacheSessionStore(ISessionStore):
 
         Returns
         -------
-        SessionRecord | None
+        orionis.session.entities.record.SessionRecord | None
             The stored record, or ``None`` when absent or expired.
         """
         payload: dict[str, Any] | None = await self._repository.get(
@@ -96,12 +103,13 @@ class CacheSessionStore(ISessionStore):
 
         Parameters
         ----------
-        record : SessionRecord
+        record : orionis.session.entities.record.SessionRecord
             The record to persist.
 
         Returns
         -------
         None
+            Insert or replace the record keyed by its identifier.
         """
         ttl = (record.expires_at - datetime.now(UTC)).total_seconds()
 
@@ -117,11 +125,12 @@ class CacheSessionStore(ISessionStore):
         await self._repository.set(_KEY_PREFIX + record.id, payload, ttl=ceil(ttl))
 
     async def update(self, record: SessionRecord) -> bool:
-        """Replace a live cache session without recreating a missing key.
+        """
+        Replace a live cache session without recreating a missing key.
 
         Parameters
         ----------
-        record : SessionRecord
+        record : orionis.session.entities.record.SessionRecord
             Replacement record.
 
         Returns
@@ -165,5 +174,6 @@ class CacheSessionStore(ISessionStore):
         Returns
         -------
         None
+            No-op: expiry is enforced natively by the cache backend's TTL.
         """
 

@@ -1,7 +1,10 @@
+"""Validate logging paths without storing per-call state."""
+
 class __IsValidPath:
     """Validate logging paths without storing per-call state."""
 
     __slots__ = ()
+    """Declare that this class introduces no additional instance slots."""
 
     def __call__(self, value: str, *, suffix: bool = False) -> None:
         """
@@ -57,3 +60,4 @@ class __IsValidPath:
 
 # Exported singleton instance
 IsValidPath = __IsValidPath()
+"""Exported singleton instance."""

@@ -55,14 +55,14 @@ def matching_schema(
 
     Parameters
     ----------
-    schema : type[msgspec.Struct]
+    schema : type[``msgspec.Struct``]
         Schema whose object or array representation is expected.
     value : object
         Input to compare with the schema configuration.
 
     Returns
     -------
-    type[msgspec.Struct] | None
+    type[``msgspec.Struct``] | None
         Schema when its shape and tag match, otherwise ``None``.
     """
     config = schema.__struct_config__

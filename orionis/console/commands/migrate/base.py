@@ -1,3 +1,5 @@
+"""Base class shared by every migration console command."""
+
 from typing import ClassVar
 from orionis.console.args.argument import Argument
 from orionis.console.base.command import BaseCommand
@@ -15,6 +17,7 @@ class MigrationCommand(BaseCommand):
 
     # Indicates whether timestamps will be shown in the command output
     timestamps: bool = True
+    """Indicates whether timestamps will be shown in the command output."""
 
     # Every migration command targets an optional named connection
     arguments: ClassVar[list[Argument]] = [
@@ -26,6 +29,7 @@ class MigrationCommand(BaseCommand):
             dest="database",
         ),
     ]
+    """Every migration command targets an optional named connection."""
 
     def targetConnection(self) -> str | None:
         """
@@ -44,7 +48,7 @@ class MigrationCommand(BaseCommand):
 
         Returns
         -------
-        MigrationEvents
+        ``orionis.database.migrations.events.MigrationEvents``
             Callbacks printing RUNNING, DONE, and FAIL lines.
         """
         executor = Executor()

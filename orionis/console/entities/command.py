@@ -1,3 +1,5 @@
+"""Represent a console command and its metadata."""
+
 from __future__ import annotations
 from dataclasses import dataclass
 from typing import TYPE_CHECKING
@@ -12,7 +14,7 @@ class Command(BaseEntity):
     """
     Represent a console command and its metadata.
 
-    Parameters
+    Attributes
     ----------
     obj : type
         Type or class associated with the command.
@@ -24,14 +26,14 @@ class Command(BaseEntity):
         Command usage signature.
     description : str
         Brief description of the command.
-    args : list of Argument or argparse.ArgumentParser or None, optional
+    args
         Declarative argument list while the command is being defined, and the
         parser built from it once the loader materializes the command.
         Defaults to None.
 
     Returns
     -------
-    Command
+    orionis.console.entities.Command
         Instance containing metadata and configuration for a console command.
     """
 

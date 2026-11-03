@@ -1,3 +1,5 @@
+"""Run one explicitly registered local MCP server."""
+
 import sys
 from typing import ClassVar
 from orionis.console.args.argument import Argument
@@ -10,14 +12,21 @@ class McpStartCommand(BaseCommand):
     """Run one explicitly registered local MCP server."""
 
     timestamps = False
+    """Timestamps flag used by ``McpStartCommand``."""
     signature = "mcp:start"
+    """Signature identifier: ``mcp:start``."""
     description = "Start a registered MCP 2026-07-28 server over STDIO."
+    """
+    Description identifier: ``Start a registered MCP 2026-07-28 server over
+    STDIO.``.
+    """
     arguments: ClassVar[list[Argument]] = [
         Argument(
             name_or_flags="name", type_=str, required=True,
             help="Local server handle.",
         ),
     ]
+    """Command-line argument declarations accepted by this command."""
 
     async def handle(self, manager: IMcpManager) -> int:
         """
@@ -25,7 +34,7 @@ class McpStartCommand(BaseCommand):
 
         Parameters
         ----------
-        manager : IMcpManager
+        manager : orionis.mcp.contracts.manager.IMcpManager
             Value supplied for ``manager``.
 
         Returns

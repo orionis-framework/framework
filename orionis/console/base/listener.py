@@ -1,3 +1,5 @@
+"""Provide lifecycle hooks for scheduled task events."""
+
 from orionis.console.base.contracts.listener import IBaseTaskListener
 from orionis.console.output.console import Console
 from typing import TYPE_CHECKING
@@ -6,6 +8,7 @@ if TYPE_CHECKING:
     from orionis.console.entities.task_event import TaskEvent
 
 class BaseTaskListener(Console, IBaseTaskListener):
+    """Provide lifecycle hooks for scheduled task events."""
 
     async def onTaskAdded(self, event: TaskEvent) -> None:
         """
@@ -13,7 +16,7 @@ class BaseTaskListener(Console, IBaseTaskListener):
 
         Parameters
         ----------
-        event : TaskEvent
+        event : orionis.console.entities.TaskEvent
             The event object containing information about the added task.
 
         Returns
@@ -28,7 +31,7 @@ class BaseTaskListener(Console, IBaseTaskListener):
 
         Parameters
         ----------
-        event : TaskEvent
+        event : orionis.console.entities.TaskEvent
             The event object containing information about the removed task.
 
         Returns
@@ -43,7 +46,7 @@ class BaseTaskListener(Console, IBaseTaskListener):
 
         Parameters
         ----------
-        event : TaskEvent
+        event : orionis.console.entities.TaskEvent
             The event object containing information about the executed task.
 
         Returns
@@ -58,7 +61,7 @@ class BaseTaskListener(Console, IBaseTaskListener):
 
         Parameters
         ----------
-        event : TaskEvent
+        event : orionis.console.entities.TaskEvent
             The event object containing information about the task error.
 
         Returns
@@ -73,7 +76,7 @@ class BaseTaskListener(Console, IBaseTaskListener):
 
         Parameters
         ----------
-        event : TaskEvent
+        event : orionis.console.entities.TaskEvent
             The event object containing information about the missed task.
 
         Returns
@@ -88,7 +91,7 @@ class BaseTaskListener(Console, IBaseTaskListener):
 
         Parameters
         ----------
-        event : TaskEvent
+        event : orionis.console.entities.TaskEvent
             The event object containing information about the submitted task.
 
         Returns
@@ -103,7 +106,7 @@ class BaseTaskListener(Console, IBaseTaskListener):
 
         Parameters
         ----------
-        event : TaskEvent
+        event : orionis.console.entities.TaskEvent
             The event object containing information about the max instances event.
 
         Returns

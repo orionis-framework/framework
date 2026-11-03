@@ -1,3 +1,5 @@
+"""Represent the authentication and authorization configuration."""
+
 from dataclasses import dataclass, field
 from orionis.environment import Env
 from orionis.foundation.config.auth.entities.identity import Identity
@@ -10,6 +12,7 @@ from orionis.support.entities.base import BaseEntity
 
 # Define the supported authentication guard names.
 _GUARD_NAMES: frozenset[str] = frozenset(Guards._member_names_)
+"""Define the supported authentication guard names."""
 
 @dataclass(frozen=True, kw_only=True)
 class Auth(BaseEntity):
@@ -18,18 +21,18 @@ class Auth(BaseEntity):
 
     Attributes
     ----------
-    default : Guards | str
+    default : orionis.foundation.config.auth.enums.Guards | str
         Guard used when a middleware or a facade call does not name one.
         Accepts a ``Guards`` member or a plain string.
-    identity : Identity | dict
+    identity : orionis.foundation.config.auth.Identity | dict
         Where the application identity lives and how it is verified.
-    session : SessionAuth | dict
+    session : orionis.foundation.config.auth.SessionAuth | dict
         Options of the session guard used by web routes.
-    tokens : Tokens | dict
+    tokens : orionis.foundation.config.auth.Tokens | dict
         Options of the personal access token guard used by API routes.
-    passwords : PasswordReset | dict
+    passwords : orionis.foundation.config.auth.PasswordReset | dict
         Trusted reset URL, token table, lifetime and resend delay.
-    remember : RememberAuth | dict
+    remember : orionis.foundation.config.auth.RememberAuth | dict
         Optional persistent login cookie name, lifetime and HTTPS requirement.
     """
 

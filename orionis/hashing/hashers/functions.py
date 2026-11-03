@@ -1,3 +1,5 @@
+"""Provide hashing hashers operations through ``import_hasher_backend``."""
+
 import importlib
 from typing import Any
 from orionis.hashing.exceptions import MissingHashDependencyException
@@ -19,12 +21,12 @@ def import_hasher_backend(module: str, attribute: str, package: str) -> Any:
 
     Returns
     -------
-    Any
+    typing.Any
         The backend class ready to be instantiated.
 
     Raises
     ------
-    MissingHashDependencyException
+    orionis.hashing.exceptions.MissingHashDependencyException
         If the backend package is not installed.
     """
     from pwdlib.exceptions import HasherNotAvailable

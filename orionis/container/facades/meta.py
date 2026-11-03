@@ -1,3 +1,5 @@
+"""Provide container facades operations through ``FacadeMeta``, ``ScopedFacadeMeta``."""
+
 import inspect
 from typing import TYPE_CHECKING
 
@@ -7,6 +9,7 @@ if TYPE_CHECKING:
 
 # Cache for dispatcher functions to avoid recreating them on every access.
 _dispatcher_cache: dict[tuple[type, str], object] = {}
+"""Cache for dispatcher functions to avoid recreating them on every access."""
 
 class _FacadeDispatch:
     """Deferred facade call, awaitable and usable as an async context manager.
@@ -18,6 +21,7 @@ class _FacadeDispatch:
     """
 
     __slots__ = ("_args", "_cls", "_context", "_kwargs", "_name")
+    """Declare the instance attribute slots reserved by this class."""
 
     def __init__(
         self,
@@ -37,7 +41,7 @@ class _FacadeDispatch:
             Name of the attribute requested on the resolved service.
         args : tuple of object
             Positional arguments to forward to the resolved attribute.
-        kwargs : dict of str to object
+        kwargs : dict of str ``to`` object
             Keyword arguments to forward to the resolved attribute.
 
         Returns
@@ -46,10 +50,15 @@ class _FacadeDispatch:
             This method does not return a value.
         """
         self._cls = cls
+        """Facade class the attribute was requested on."""
         self._name = name
+        """Name of the attribute requested on the resolved service."""
         self._args = args
+        """Positional arguments to forward to the resolved attribute."""
         self._kwargs = kwargs
+        """Keyword arguments to forward to the resolved attribute."""
         self._context: object = None
+        """Runtime context made available to the operation and its callbacks."""
 
     async def __resolve(self) -> object:
         """
@@ -75,7 +84,7 @@ class _FacadeDispatch:
 
         Returns
         -------
-        Generator
+        collections.abc.Generator
             Iterator driving the underlying resolution coroutine.
         """
         return self.__awaitImpl().__await__()
@@ -122,7 +131,7 @@ class _FacadeDispatch:
             The exception type raised inside the block, if any.
         exc : BaseException or None
             The exception instance raised inside the block, if any.
-        traceback : TracebackType or None
+        traceback : types.TracebackType or None
             The traceback for the raised exception, if any.
 
         Returns
@@ -134,6 +143,7 @@ class _FacadeDispatch:
         return await self._context.__aexit__(exc_type, exc, traceback)
 
 class FacadeMeta(type):
+    """Resolve the facade meta service through the application facade."""
 
     def __getattr__(cls, name: str) -> object:
         """
@@ -141,6 +151,8 @@ class FacadeMeta(type):
 
         Parameters
         ----------
+        cls : type
+            Class on which the operation is performed.
         name : str
             Specify the requested attribute name.
 
@@ -176,7 +188,7 @@ class FacadeMeta(type):
 
             Returns
             -------
-            _FacadeDispatch
+            orionis.container.facades.meta._FacadeDispatch
                 Deferred call, awaitable directly or usable as an async
                 context manager.
             """
@@ -196,6 +208,8 @@ class ScopedFacadeMeta(FacadeMeta):
 
         Parameters
         ----------
+        cls : type
+            Class on which the operation is performed.
         name : str
             Service attribute requested by the caller.
 

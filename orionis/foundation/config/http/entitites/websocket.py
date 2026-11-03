@@ -1,3 +1,5 @@
+"""Configure connection admission, inbound messages and browser origins."""
+
 from __future__ import annotations
 from dataclasses import dataclass, field
 from orionis.environment import Env
@@ -21,7 +23,7 @@ class HTTPWebSocket(BaseEntity):
     max_message_size : int
         Maximum complete inbound message bytes.
         Defaults to 1 MiB from ``WEBSOCKET_MAX_MESSAGE_SIZE``.
-    allow_origins : tuple[str, ...]
+    allow_origins : tuple[str, ``...``]
         Additional allowed browser origins. Empty allows the same origin only.
         The wildcard ``"*"`` explicitly allows every origin. Defaults to an empty
         tuple from the shared ``CORS_ALLOW_ORIGINS`` environment variable.

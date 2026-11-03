@@ -1,3 +1,5 @@
+"""Represent the configuration of password reset functionality."""
+
 from dataclasses import dataclass, field
 from orionis.environment import Env
 from orionis.support.entities.base import BaseEntity

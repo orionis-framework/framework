@@ -1,3 +1,5 @@
+"""Group the auth concerns components and public imports."""
+
 from orionis.auth.concerns.authenticatable import Authenticatable
 from orionis.auth.concerns.authorizable import Authorizable
 from orionis.auth.concerns.functions import model_primary_key

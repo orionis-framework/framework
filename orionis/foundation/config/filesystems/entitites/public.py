@@ -1,3 +1,5 @@
+"""Represent a local filesystem configuration."""
+
 from __future__ import annotations
 from dataclasses import dataclass, field
 from orionis.environment import Env
@@ -9,9 +11,9 @@ class Public(BaseEntity):
     """
     Represent a local filesystem configuration.
 
-    Parameters
+    Attributes
     ----------
-    driver : str, default="local"
+    driver : str, default="``local``"
         The filesystem driver name resolved by StorageManager.
     path : str
         The absolute or relative path where public files are stored.
@@ -58,7 +60,7 @@ class Public(BaseEntity):
 
         Parameters
         ----------
-        self : Public
+        self : orionis.foundation.config.filesystems.Public
             The instance of the Public class.
 
         Returns

@@ -1,3 +1,5 @@
+"""Group the console base components and public imports."""
+
 from typing import TYPE_CHECKING as _TYPE_CHECKING
 from orionis._exports import resolve_export as _resolve_export
 
@@ -17,6 +19,7 @@ _EXPORTS = {
     "BaseScheduler": ("orionis.console.base.scheduler", "BaseScheduler"),
     "BaseTaskListener": ("orionis.console.base.listener", "BaseTaskListener"),
 }
+"""Public export names mapped to their defining modules and attributes."""
 
 def __getattr__(name: str) -> object:
     """

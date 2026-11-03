@@ -1,3 +1,5 @@
+"""Store the active dependency-injection scope in a context variable."""
+
 from __future__ import annotations
 import contextvars
 
@@ -7,10 +9,16 @@ class ScopedContext:
 
     # Define a context variable to hold the active scope.
     # The default value is None, indicating no active scope.
+    """Store the active dependency-injection scope in a context variable."""
+
     _active_scope: contextvars.ContextVar[object | None] = contextvars.ContextVar(
         "x-orionis-container-context-scope",
         default=None,
     )
+    """
+    Define a context variable to hold the active scope. The default value is None,
+    indicating no active scope.
+    """
 
     @classmethod
     def getCurrentScope(cls) -> object | None:
@@ -37,7 +45,7 @@ class ScopedContext:
 
         Returns
         -------
-        contextvars.Token
+        ``contextvars.Token``
             A token representing the previous state of the context variable.
         """
         # Set the active scope and return the token for possible reset.
@@ -50,7 +58,7 @@ class ScopedContext:
 
         Parameters
         ----------
-        token : contextvars.Token
+        token : ``contextvars.Token``
             The token representing the previous state to restore.
 
         Returns

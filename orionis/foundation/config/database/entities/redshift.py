@@ -1,3 +1,5 @@
+"""Configure Amazon Redshift with the official AWS Python connector."""
+
 from __future__ import annotations
 from dataclasses import dataclass, field
 from orionis.environment import Env
@@ -30,7 +32,7 @@ class Redshift(BaseEntity):
         Table name prefix.
     ssl : bool
         Enable TLS for database connections.
-    sslmode : str | RedshiftSSLMode
+    sslmode : str | orionis.foundation.config.database.RedshiftSSLMode
         Certificate verification policy, defaulting to verify-full.
     timeout : int | None
         Connection socket timeout in seconds, or None for no timeout.

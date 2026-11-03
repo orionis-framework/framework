@@ -1,3 +1,5 @@
+"""Progress callbacks reported while migrations run."""
+
 from __future__ import annotations
 from dataclasses import dataclass
 from typing import TYPE_CHECKING
@@ -87,3 +89,4 @@ class MigrationEvents:
 
 # Shared instance used when the caller reports no progress at all.
 NO_EVENTS: MigrationEvents = MigrationEvents()
+"""Shared instance used when the caller reports no progress at all."""

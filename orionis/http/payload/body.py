@@ -1,3 +1,8 @@
+"""Provide http payload operations.
+
+Includes ``PayloadTooLargeException``, ``BodyStream``.
+"""
+
 from __future__ import annotations
 from dataclasses import fields
 from typing import TYPE_CHECKING
@@ -11,6 +16,7 @@ if TYPE_CHECKING:
 _DEFAULT_LIMITS = {
     item.name: item.metadata["default"] for item in fields(HTTPBodyLimits)
 }
+"""Default limits used by ``body``."""
 
 class PayloadTooLargeException(ValueError):
     """Raise when the request body exceeds the configured size limit."""
@@ -41,6 +47,7 @@ class BodyStream(IBodyStream):
         "__max_size",
         "__receive",
     )
+    """Declare the instance attribute slots reserved by this class."""
 
     def __init__(
         self,
@@ -55,7 +62,7 @@ class BodyStream(IBodyStream):
 
         Parameters
         ----------
-        interface : Interface
+        interface : orionis.http.enums.Interface
             Transport protocol type (ASGI or RSGI).
         receive_or_protocol : object
             ASGI receive callable or RSGI ``HTTPProtocol`` instance.
@@ -69,13 +76,17 @@ class BodyStream(IBodyStream):
         Returns
         -------
         None
+            Initialize a BodyStream for the given transport interface.
         """
         # Initialize the body buffer to None (not yet read).
         self.__body: bytes | None = None
+        """Initialize the body buffer to None (not yet read)."""
         # Track whether the raw transport stream has been consumed.
         self.__consumed: bool = False
+        """Track whether the raw transport stream has been consumed."""
         # Record which transport provides the body chunks.
         self.__is_rsgi: bool = interface is Interface.RSGI
+        """Record which transport provides the body chunks."""
         for name, value in (
             ("max_body_size", max_body_size), ("max_buffer_size", max_buffer_size),
         ):
@@ -87,9 +98,18 @@ class BodyStream(IBodyStream):
                     error_msg = f"{name} must not be negative."
                     raise ValueError(error_msg)
         self.__max_size = max_body_size
+        """
+        Maximum allowed body size in bytes (default 16 MiB). An explicit ``None``
+        disables the transport limit for a manually built stream.
+        """
         self.__max_buffer_size = max_buffer_size
+        """
+        Maximum bytes buffered by read() (default 2 MiB). An explicit ``None``
+        disables this limit for a manually built stream.
+        """
         # Store the receive callable or RSGI protocol reference.
         self.__receive = receive_or_protocol
+        """ASGI receive callable or RSGI ``HTTPProtocol`` instance."""
 
     @property
     def isBuffered(self) -> bool:
@@ -134,7 +154,7 @@ class BodyStream(IBodyStream):
         RuntimeError
             If the stream was consumed by a streaming consumer
             (e.g. multipart) before the body was buffered.
-        PayloadTooLargeException
+        orionis.http.payload.body.PayloadTooLargeException
             If incoming data exceeds ``max_body_size``.
         """
         # Replay from buffer when the body has already been read.
@@ -195,7 +215,7 @@ class BodyStream(IBodyStream):
         RuntimeError
             If the stream was consumed by a streaming consumer
             without having been buffered first.
-        PayloadTooLargeException
+        orionis.http.payload.body.PayloadTooLargeException
             If the body exceeds ``max_body_size`` or ``max_buffer_size``.
         """
         # Return the cached buffer immediately if already read.

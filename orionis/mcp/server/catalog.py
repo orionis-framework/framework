@@ -1,3 +1,5 @@
+"""Hide catalog tools behind bounded search_tools and execute_tools tools."""
+
 from dataclasses import dataclass
 from typing import TYPE_CHECKING
 
@@ -9,8 +11,11 @@ class ToolCatalog:
     """Hide catalog tools behind bounded search_tools and execute_tools tools."""
 
     tools: tuple[type[Tool], ...]
+    """Value supplied for ``*tools``."""
     search_name: str
+    """Value supplied for ``search_name``."""
     execute_name: str
+    """Value supplied for ``execute_name``."""
 
     def __init__(
         self,
@@ -27,7 +32,7 @@ class ToolCatalog:
             Value supplied for ``search_name``.
         execute_name : str
             Value supplied for ``execute_name``.
-        *tools : type[Tool]
+        *tools : type[orionis.mcp.Tool]
             Value supplied for ``*tools``.
 
         Returns

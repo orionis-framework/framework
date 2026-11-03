@@ -1,3 +1,5 @@
+"""Provide test clients operations through ``McpTestResponse``, ``McpTestClient``."""
+
 from dataclasses import dataclass
 from typing import TYPE_CHECKING, Any
 import msgspec
@@ -21,7 +23,9 @@ class McpTestResponse:
     """Decoded result and notifications from a complete wire round trip."""
 
     message: dict[str, Any]
+    """Human-readable message associated with this operation or result."""
     notifications: tuple[dict[str, object], ...] = ()
+    """Notification categories selected by the subscriber."""
 
     def assertOk(self) -> None:
         """
@@ -62,6 +66,7 @@ class McpTestClient:
     """Open scopes on the supplied container; never create a parallel application."""
 
     __slots__ = ("app", "dispatcher")
+    """Declare the instance attribute slots reserved by this class."""
 
     def __init__(
         self,
@@ -74,11 +79,11 @@ class McpTestClient:
 
         Parameters
         ----------
-        app : IContainer
+        app : orionis.container.contracts.container.IContainer
             Application container supplying configuration and dependencies.
-        server : type[Server] | CompiledMcpServer
+        server
             Value supplied for ``server``.
-        config : McpConfig | None
+        config : orionis.mcp.config.McpConfig | None
             Validated configuration controlling this component.
 
         Returns
@@ -87,6 +92,7 @@ class McpTestClient:
             Complete the documented operation without returning a value.
         """
         self.app = app
+        """Application container supplying configuration and dependencies."""
         compiled = (
             server if isinstance(server, CompiledMcpServer) else compile_server(server)
         )
@@ -99,6 +105,7 @@ class McpTestClient:
                 config.subscription_buffer_size, config.max_subscriptions,
             ),
         )
+        """Dispatcher produced by ``McpDispatcher``."""
 
     async def stream(
         self,
@@ -179,7 +186,7 @@ class McpTestClient:
 
         Returns
         -------
-        McpTestResponse
+        orionis.test.McpTestResponse
             Result of the operation described above.
         """
         notifications = []
@@ -213,7 +220,7 @@ class McpTestClient:
 
         Returns
         -------
-        McpTestResponse
+        orionis.test.McpTestResponse
             Result of the operation described above.
         """
         return await self.request(

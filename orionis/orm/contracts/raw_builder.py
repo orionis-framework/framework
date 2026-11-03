@@ -1,3 +1,5 @@
+"""Contract for the model-less query builder over a plain table name."""
+
 from __future__ import annotations
 from abc import abstractmethod
 from typing import TYPE_CHECKING, Any, Self
@@ -11,7 +13,8 @@ class IRawQueryBuilder(IQueryBuilderBase):
     """
     Contract for the model-less query builder over a plain table name.
 
-    It inherits the whole query language from :class:`IQueryBuilderBase`
+    It inherits the whole query language from
+    :class:`orionis.orm.contracts.base_builder.IQueryBuilderBase`
     and only adds what is specific to running without a model: choosing
     the target table and connection, and returning plain dictionaries
     instead of hydrated instances.
@@ -20,6 +23,7 @@ class IRawQueryBuilder(IQueryBuilderBase):
     # ruff: noqa: ANN401
 
     __slots__ = ()
+    """Declare that this class introduces no additional instance slots."""
 
     @abstractmethod
     def connection(self, name: str) -> Self:
@@ -33,7 +37,7 @@ class IRawQueryBuilder(IQueryBuilderBase):
 
         Returns
         -------
-        IRawQueryBuilder
+        orionis.orm.contracts.raw_builder.IRawQueryBuilder
             The same builder, enabling fluent chaining.
         """
 
@@ -51,7 +55,7 @@ class IRawQueryBuilder(IQueryBuilderBase):
 
         Returns
         -------
-        IRawQueryBuilder
+        orionis.orm.contracts.raw_builder.IRawQueryBuilder
             The same builder, enabling fluent chaining.
         """
 
@@ -62,7 +66,7 @@ class IRawQueryBuilder(IQueryBuilderBase):
 
         Returns
         -------
-        Collection
+        collections.abc.Collection
             Collection of plain dictionaries, one per row.
         """
 
@@ -89,7 +93,7 @@ class IRawQueryBuilder(IQueryBuilderBase):
 
         Returns
         -------
-        Any
+        typing.Any
             Column value, or ``None`` without matches.
         """
 
@@ -105,7 +109,7 @@ class IRawQueryBuilder(IQueryBuilderBase):
 
         Returns
         -------
-        Collection
+        collections.abc.Collection
             Collection of column values.
         """
 
@@ -123,6 +127,6 @@ class IRawQueryBuilder(IQueryBuilderBase):
 
         Returns
         -------
-        Paginator
+        orionis.orm.collections.Paginator
             Page of rows with pagination metadata.
         """

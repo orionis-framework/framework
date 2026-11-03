@@ -1,3 +1,5 @@
+"""Provide dictionary serialization and field metadata for dataclass entities."""
+
 from __future__ import annotations
 from dataclasses import Field, MISSING, asdict, fields, is_dataclass
 from enum import Enum
@@ -7,6 +9,7 @@ from typing import Any
 _FIELD_METADATA_CACHE: dict[
     type, tuple[tuple[Field[Any], tuple[str, ...]], ...],
 ] = {}
+"""Cache normalized dataclass field metadata by entity class."""
 
 # Serialize enum members while preserving other values.
 def _enum_serializer(value: object) -> object:
@@ -49,6 +52,7 @@ class BaseEntity:
     """Provide dictionary serialization and field metadata for dataclass entities."""
 
     __slots__ = ()
+    """Declare that this class introduces no additional instance slots."""
 
     # Provide a no-op hook for subclass validation after initialization.
     def __post_init__(self) -> None:
@@ -71,7 +75,7 @@ class BaseEntity:
 
         Returns
         -------
-        tuple[tuple[Field[Any], tuple[str, ...]], ...]
+        ``tuple[tuple[dataclasses.Field[Any], tuple[str, ...]], ...]``
             Cached field definitions paired with their normalized type names.
         """
         try:
@@ -98,7 +102,7 @@ class BaseEntity:
 
         Returns
         -------
-        dict[str, Any]
+        dict[str, typing.Any]
             A recursively copied mapping of field names to values.
         """
         return asdict(self, dict_factory=_dict_factory)
@@ -110,7 +114,7 @@ class BaseEntity:
 
         Returns
         -------
-        list[dict[str, Any]]
+        list[dict[str, typing.Any]]
             Field descriptions containing names, types, defaults, and metadata.
         """
         result = []

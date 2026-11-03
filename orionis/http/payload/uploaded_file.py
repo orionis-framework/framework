@@ -1,3 +1,5 @@
+"""Hold an uploaded file in memory or spill it to a temporary file on disk."""
+
 from __future__ import annotations
 import re
 import tempfile
@@ -12,12 +14,15 @@ if TYPE_CHECKING:
 
 # Forbidden filename characters on POSIX and Windows systems
 _UNSAFE_FILENAME_RE = re.compile(r'[\x00-\x1f\x7f/\\:*?"<>|]')
+"""Forbidden filename characters on POSIX and Windows systems."""
 
 # Pattern to detect dotfiles and path-traversal prefixes
 _DOTFILE_RE = re.compile(r"^\.+")
+"""Pattern to detect dotfiles and path-traversal prefixes."""
 
 # Maximum chunk size for streaming file saves to disk (64 KiB)
 _CHUNK_SIZE = 64 * 1024
+"""Maximum chunk size for streaming file saves to disk (64 KiB)."""
 
 # Uploaded file container with automatic memory-to-disk spill support
 class UploadedFile(IUploadedFile):
@@ -43,6 +48,7 @@ class UploadedFile(IUploadedFile):
         "content_type",
         "filename",
     )
+    """Declare the instance attribute slots reserved by this class."""
 
     def __init__(
         self,
@@ -70,20 +76,28 @@ class UploadedFile(IUploadedFile):
         Returns
         -------
         None
+            Initialize a new ``UploadedFile`` for an incoming multipart part.
         """
         # Sanitize filename to block path traversal and forbidden characters
         self.filename = self._sanitizeFilename(filename)
+        """Original name of the uploaded file as reported by the client."""
         self.content_type = content_type
+        """MIME type declared by the client, or ``None`` if absent."""
         self._size = 0
+        """Size value used by ``UploadedFile``."""
         self._memory_threshold = memory_threshold
+        """Maximum in-memory bytes before spilling to disk (default 1 MiB)."""
         self._rolled = False
+        """Rolled flag used by ``UploadedFile``."""
         # SpooledTemporaryFile spills to disk once memory_threshold is exceeded
         self._file = tempfile.SpooledTemporaryFile(  # noqa: SIM115
             max_size=memory_threshold,
         )
+        """SpooledTemporaryFile spills to disk once memory_threshold is exceeded."""
         # Extract and normalize the sanitized filename extension.
         dot = self.filename.rfind(".")
         self._extension: str = self.filename[dot:].lower() if dot > 0 else ""
+        """Normalized extension derived from the uploaded filename."""
 
     @staticmethod
     def _sanitizeFilename(filename: str) -> str:
@@ -149,6 +163,7 @@ class UploadedFile(IUploadedFile):
         Returns
         -------
         None
+            Append *chunk* to the file buffer.
         """
         # Append independently of the cursor left by a previous read.
         self._file.seek(0, SEEK_END)
@@ -238,6 +253,7 @@ class UploadedFile(IUploadedFile):
         Returns
         -------
         None
+            Replace the file content with *data* and update the byte counter.
         """
         # Seek, truncate, then write to fully replace the buffered content
         self._file.seek(0)
@@ -257,12 +273,13 @@ class UploadedFile(IUploadedFile):
 
         Parameters
         ----------
-        path : str or Path
+        path : str or pathlib.Path
             Destination path for the saved file.
 
         Returns
         -------
         None
+            Write the file contents to *path* on the local filesystem.
         """
         dest = Path(path)
         # Rewind before streaming to ensure all buffered data is written
@@ -285,6 +302,7 @@ class UploadedFile(IUploadedFile):
         Returns
         -------
         None
+            Close the file handle and release all associated resources.
         """
         # SpooledTemporaryFile handles both in-memory and on-disk cleanup
         self._file.close()
@@ -296,6 +314,7 @@ class UploadedFile(IUploadedFile):
         Returns
         -------
         None
+            Release resources when the object is garbage collected.
         """
         # Suppress all exceptions to avoid disrupting the GC cycle
         with suppress(Exception):

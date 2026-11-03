@@ -1,3 +1,5 @@
+"""Define redshift for database."""
+
 from __future__ import annotations
 from importlib import import_module
 from importlib.util import find_spec
@@ -12,6 +14,10 @@ if find_spec("sqlalchemy_redshift") is not None:
     RedshiftConnectorDialect = import_module(
         "sqlalchemy_redshift.dialect",
     ).RedshiftDialect_redshift_connector
+    """
+    Redshift connector dialect obtained from
+    ``import_module('sqlalchemy_redshift.dialect').RedshiftDialect_redshift_connector``.
+    """
 
     class RedshiftDialect(RedshiftConnectorDialect):
         """
@@ -25,16 +31,27 @@ if find_spec("sqlalchemy_redshift") is not None:
         """
 
         __slots__ = ()
+        """Declare that this class introduces no additional instance slots."""
 
         insert_returning = False
+        """Insert returning flag used by ``RedshiftDialect``."""
         update_returning = False
+        """Update returning flag used by ``RedshiftDialect``."""
         delete_returning = False
+        """Delete returning flag used by ``RedshiftDialect``."""
         preexecute_autoincrement_sequences = False
+        """Preexecute autoincrement sequences flag used by ``RedshiftDialect``."""
         postfetch_lastrowid = False
+        """Postfetch lastrowid flag used by ``RedshiftDialect``."""
         supports_statement_cache = False
+        """Supports statement cache flag used by ``RedshiftDialect``."""
         # The official connector's executemany loops over individual network
         # calls. Core can page supported multi-value INSERTs without RETURNING.
         use_insertmanyvalues_wo_returning = True
+        """
+        The official connector's executemany loops over individual network calls.
+        Core can page supported multi-value INSERTs without RETURNING.
+        """
 
         @reflection.cache
         def hasTable(
@@ -50,7 +67,7 @@ if find_spec("sqlalchemy_redshift") is not None:
 
             Parameters
             ----------
-            connection : Connection
+            connection : orionis.database.Connection
                 Core connection used by SQLAlchemy's reflection dispatch.
             table_name : str
                 Exact table identifier to find.

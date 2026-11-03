@@ -1,3 +1,5 @@
+"""Represent the available logging channels and their configurations."""
+
 from __future__ import annotations
 from dataclasses import dataclass, field
 from orionis.foundation.config.logging.entities.chunked import Chunked
@@ -16,6 +18,7 @@ _CHANNEL_ENTITIES: tuple[tuple[str, type], ...] = (
     ("monthly", Monthly),
     ("chunked", Chunked),
 )
+"""Channel entities definitions used by ``channels``."""
 
 @dataclass(frozen=True, kw_only=True)
 class Channels(BaseEntity):
@@ -24,17 +27,17 @@ class Channels(BaseEntity):
 
     Attributes
     ----------
-    stack : Stack | dict
+    stack : orionis.foundation.config.logging.Stack | dict
         Configuration for stack log channel.
-    hourly : Hourly | dict
+    hourly : orionis.foundation.config.logging.Hourly | dict
         Configuration for hourly log rotation.
-    daily : Daily | dict
+    daily : orionis.foundation.config.logging.Daily | dict
         Configuration for daily log rotation.
-    weekly : Weekly | dict
+    weekly : orionis.foundation.config.logging.Weekly | dict
         Configuration for weekly log rotation.
-    monthly : Monthly | dict
+    monthly : orionis.foundation.config.logging.Monthly | dict
         Configuration for monthly log rotation.
-    chunked : Chunked | dict
+    chunked : orionis.foundation.config.logging.Chunked | dict
         Configuration for chunked log file storage.
     """
 

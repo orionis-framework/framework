@@ -1,3 +1,5 @@
+"""Declare the canonical dispatch and queue administration API."""
+
 from abc import ABC, abstractmethod
 from typing import TYPE_CHECKING
 
@@ -12,6 +14,7 @@ class IQueueManager(ABC):
     """Declare the canonical dispatch and queue administration API."""
 
     __slots__ = ()
+    """Declare that this class introduces no additional instance slots."""
 
     @abstractmethod
     def dispatch(self, job: BaseJob) -> PendingDispatch:
@@ -20,12 +23,12 @@ class IQueueManager(ABC):
 
         Parameters
         ----------
-        job : BaseJob
+        job : orionis.queues.BaseJob
             Serializable application job.
 
         Returns
         -------
-        PendingDispatch
+        orionis.queues.PendingDispatch
             Deferred operation with fluent selection and delay.
         """
 
@@ -41,7 +44,7 @@ class IQueueManager(ABC):
 
         Returns
         -------
-        IQueueDriver
+        orionis.queues.contracts.driver.IQueueDriver
             Driver shared by logical queues on this connection.
         """
 
@@ -59,14 +62,14 @@ class IQueueManager(ABC):
         ----------
         connection : str | None, optional
             Backend name, or the default.
-        queues : tuple[str, ...] | None, optional
+        queues : tuple[str, ``...``] | None, optional
             Priority-ordered channels, or the connection default.
         concurrency : int | None, optional
             Maximum simultaneous attempts, or the worker default.
 
         Returns
         -------
-        IWorker
+        orionis.queues.contracts.worker.IWorker
             Independent worker runtime.
         """
 
@@ -77,7 +80,7 @@ class IQueueManager(ABC):
 
         Returns
         -------
-        IFailedJobRepository
+        orionis.queues.contracts.failed_repository.IFailedJobRepository
             Central repository shared by connections.
         """
 

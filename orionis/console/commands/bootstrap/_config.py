@@ -1,3 +1,5 @@
+"""Download and validate missing configuration before creating local files."""
+
 import hashlib
 import json
 from http import HTTPStatus
@@ -17,9 +19,19 @@ _TREE_URL = (
     "https://api.github.com/repos/orionis-framework/skeleton/"
     "git/trees/master?recursive=1"
 )
+"""
+Tree url identifier:
+``https://api.github.com/repos/orionis-framework/skeleton/git/trees/master?recursive=1``.
+"""
 _RAW_ROOT = "https://raw.githubusercontent.com/orionis-framework/skeleton/master/"
+"""
+Raw root identifier:
+``https://raw.githubusercontent.com/orionis-framework/skeleton/master/``.
+"""
 _TIMEOUT = 30
+"""Timeout value used by ``_config``."""
 _SHA_LENGTH = 40
+"""Sha length value used by ``_config``."""
 
 class ConfigBootstrapper:
     """Download and validate missing configuration before creating local files."""
@@ -30,7 +42,7 @@ class ConfigBootstrapper:
 
         Parameters
         ----------
-        app : IApplication
+        app : orionis.IApplication
             Application supplying effective configuration paths.
 
         Returns
@@ -40,6 +52,7 @@ class ConfigBootstrapper:
         """
         # Retain the configured application without resolving paths early.
         self.app = app
+        """Application supplying effective configuration paths."""
 
     def bootstrap(self, file: str | None = None) -> list[tuple[str, str]]:
         """
@@ -101,14 +114,14 @@ class ConfigBootstrapper:
 
         Parameters
         ----------
-        entries : list[dict[str, Any]]
+        entries : list[dict[str, typing.Any]]
             Validated configuration entries from the official master branch.
         file : str
             Requested configuration module name without its Python extension.
 
         Returns
         -------
-        list[dict[str, Any]]
+        list[dict[str, typing.Any]]
             The single matching remote configuration file.
 
         Raises
@@ -143,7 +156,7 @@ class ConfigBootstrapper:
 
         Parameters
         ----------
-        destination : Path
+        destination : pathlib.Path
             Local configuration resource to inspect.
         kind : str
             Expected Git tree entry type, either ``tree`` or ``blob``.
@@ -176,11 +189,11 @@ class ConfigBootstrapper:
 
         Parameters
         ----------
-        destination : Path
+        destination : pathlib.Path
             Local configuration file or directory to create.
         kind : str
             Expected Git tree entry type, either ``tree`` or ``blob``.
-        pending : dict[Path, bytes]
+        pending : dict[pathlib.Path, bytes]
             Validated contents indexed by missing file destinations.
 
         Returns
@@ -216,7 +229,7 @@ class ConfigBootstrapper:
 
         Parameters
         ----------
-        entry : dict[str, Any]
+        entry : dict[str, typing.Any]
             Validated blob metadata from the official configuration tree.
 
         Returns
@@ -282,7 +295,7 @@ class ConfigBootstrapper:
 
         Returns
         -------
-        list[dict[str, Any]]
+        list[dict[str, typing.Any]]
             Valid configuration entries ordered with parent paths before children.
         """
         # Reject incomplete manifests before considering individual paths.
@@ -350,7 +363,7 @@ class ConfigBootstrapper:
 
         Parameters
         ----------
-        entry : dict[str, Any]
+        entry : dict[str, typing.Any]
             Validated configuration tree entry containing its repository path.
 
         Returns
@@ -368,9 +381,9 @@ class ConfigBootstrapper:
 
         Parameters
         ----------
-        root : Path
+        root : pathlib.Path
             Effective configuration root containing all permitted destinations.
-        destination : Path
+        destination : pathlib.Path
             Local resource path to validate before writing.
 
         Returns

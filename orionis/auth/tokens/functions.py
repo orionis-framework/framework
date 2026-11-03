@@ -1,3 +1,8 @@
+"""Provide auth tokens operations.
+
+Includes ``generate_token_secret``, ``hash_token_secret``.
+"""
+
 import hashlib
 import secrets
 

@@ -1,3 +1,5 @@
+"""Compile expansion once and verify every inverse result by expansion."""
+
 import inspect
 import re
 from collections.abc import Callable, Mapping, Sequence
@@ -10,18 +12,28 @@ if TYPE_CHECKING:
     from orionis.mcp.server.primitives import Resource
 
 _VARNAME = r"(?:\w|%[0-9A-Fa-f]{2})++(?:\.(?:\w|%[0-9A-Fa-f]{2})++)*+"
+"""
+Varname identifier: ``(?:\\w|%[0-9A-Fa-f]{2})++(?:\\.(?:\\w|%[0-9A-Fa-f]{2})++)*+``.
+"""
 _MODIFIER = r"(?::[1-9]\d{0,3}|\*)?"
+"""Modifier identifier: ``(?::[1-9]\\d{0,3}|\\*)?``."""
 _EXPRESSION = re.compile(
     rf"[+#./;?&]?{_VARNAME}{_MODIFIER}(?:,{_VARNAME}{_MODIFIER})*+",
     re.ASCII,
 )
+"""Compiled pattern used to recognize expression."""
 _SIMPLE = re.compile(_VARNAME, re.ASCII)
+"""Compiled pattern used to recognize simple."""
 _PART = re.compile(r"\{([^{}]*)\}")
+"""Compiled pattern used to recognize part."""
 _INVALID_LITERAL = re.compile(
     r'[\x00-\x20\x7f"<>\\^`{}]|%(?![0-9A-Fa-f]{2})|[\ud800-\udfff]',
 )
+"""Compiled pattern used to recognize invalid literal."""
 _SCHEME = re.compile(r"[A-Za-z][A-Za-z0-9+.-]*:")
+"""Compiled pattern used to recognize scheme."""
 _ESCAPE = re.compile(r"%[0-9a-fA-F]{2}")
+"""Compiled pattern used to recognize escape."""
 
 def _uppercase_escape(match: re.Match[str]) -> str:
     """
@@ -29,7 +41,7 @@ def _uppercase_escape(match: re.Match[str]) -> str:
 
     Parameters
     ----------
-    match : re.Match[str]
+    match : ``re.Match[str]``
         Matched percent escape.
 
     Returns
@@ -47,9 +59,9 @@ def _decode_captures(
 
     Parameters
     ----------
-    captures : tuple[str, ...]
+    captures : tuple[str, ``...``]
         Variable names in capture order.
-    groups : tuple[str, ...]
+    groups : tuple[str, ``...``]
         Values captured by the compiled inverse pattern.
 
     Returns
@@ -124,7 +136,7 @@ def _simple_pattern(template: str) -> tuple[re.Pattern[str], tuple[str, ...]] | 
 
     Returns
     -------
-    tuple[re.Pattern[str], tuple[str, ...]] | None
+    ``tuple[re.Pattern[str], tuple[str, ...]] | None``
         Result of the operation described above.
     """
     pieces: list[str] = []
@@ -169,11 +181,17 @@ class UriMatcher:
     """Compile expansion once and verify every inverse result by expansion."""
 
     template: str
+    """URI template from which the matcher was compiled."""
     variable_names: tuple[str, ...]
+    """Names of variables referenced by the URI template."""
     expander: URITemplate
+    """Callable used to expand a URI template with variable values."""
     pattern: re.Pattern[str] | None
+    """Compiled pattern used to match the declared URI template."""
     captures: tuple[str, ...]
+    """Capture metadata used to extract template variable values."""
     custom: Callable[[str], Mapping[str, object] | None] | None
+    """Custom implementations registered by the application."""
 
     @classmethod
     def compile(cls, definition: type[Resource]) -> UriMatcher:
@@ -182,12 +200,12 @@ class UriMatcher:
 
         Parameters
         ----------
-        definition : type[Resource]
+        definition : type[orionis.mcp.Resource]
             Class declaration whose metadata is being inspected.
 
         Returns
         -------
-        UriMatcher
+        orionis.mcp.server.templates.UriMatcher
             Result of the operation described above.
         """
         template = definition.uri_template

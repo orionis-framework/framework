@@ -1,3 +1,5 @@
+"""Map lowercased media-type strings to synchronous ``BodyParser`` callables."""
+
 from __future__ import annotations
 from collections.abc import Callable
 from orionis.http.payload.contracts.media_types import IMediaTypeRegistry
@@ -13,6 +15,10 @@ from orionis.http.payload.parsers import (
 # Special type alias for synchronous body parsers that take a bytes
 # payload and return a parsed object.
 BodyParser = Callable[[bytes], object]
+"""
+Special type alias for synchronous body parsers that take a bytes payload and return
+a parsed object.
+"""
 
 class MediaTypeRegistry(IMediaTypeRegistry):
     """
@@ -25,12 +31,13 @@ class MediaTypeRegistry(IMediaTypeRegistry):
 
     Parameters
     ----------
-    parsers : dict[str, BodyParser] | None
+    parsers : dict[str, orionis.http.payload.media_types.BodyParser] | None
         Initial mapping of media types to parsers.  Keys are lowercased
         automatically.  Defaults to an empty mapping.
     """
 
     __slots__ = ("_parsers",)
+    """Declare the instance attribute slots reserved by this class."""
 
     # Initialise the internal parser mapping from an optional dict.
     def __init__(self, parsers: dict[str, BodyParser] | None = None) -> None:
@@ -39,18 +46,23 @@ class MediaTypeRegistry(IMediaTypeRegistry):
 
         Parameters
         ----------
-        parsers : dict[str, BodyParser] | None
+        parsers : dict[str, orionis.http.payload.media_types.BodyParser] | None
             Initial media-type-to-parser mapping.  Keys are lowercased
             on ingestion.  Pass ``None`` to start with an empty registry.
 
         Returns
         -------
         None
+            Initialise the registry with an optional media-type mapping.
         """
         # Normalise all keys to lowercase on ingestion.
         self._parsers: dict[str, BodyParser] = (
             {k.lower(): v for k, v in parsers.items()} if parsers else {}
         )
+        """
+        Initial media-type-to-parser mapping. Keys are lowercased on ingestion. Pass
+        ``None`` to start with an empty registry.
+        """
 
     # Add or overwrite a single parser entry for the given media type.
     def register(self, media_type: str, parser: BodyParser) -> None:
@@ -62,12 +74,13 @@ class MediaTypeRegistry(IMediaTypeRegistry):
         media_type : str
             Case-insensitive media-type string,
             e.g. ``"application/json"``.
-        parser : BodyParser
+        parser : orionis.http.payload.media_types.BodyParser
             Synchronous callable ``(bytes) -> object``.
 
         Returns
         -------
         None
+            Add or replace the parser for *media_type* in place.
         """
         # Store the parser under the normalised lowercase key.
         self._parsers[media_type.lower()] = parser
@@ -84,7 +97,7 @@ class MediaTypeRegistry(IMediaTypeRegistry):
 
         Returns
         -------
-        BodyParser | None
+        orionis.http.payload.media_types.BodyParser | None
             The registered ``(bytes) -> object`` callable, or ``None``
             when *media_type* has no registered parser.
         """
@@ -101,12 +114,12 @@ class MediaTypeRegistry(IMediaTypeRegistry):
 
         Parameters
         ----------
-        parsers : dict[str, BodyParser]
+        parsers : dict[str, orionis.http.payload.media_types.BodyParser]
             Additional or replacement media-type-to-parser entries.
 
         Returns
         -------
-        MediaTypeRegistry
+        orionis.http.payload.media_types.MediaTypeRegistry
             New registry containing all entries from self plus *parsers*.
         """
         # New entries take precedence over existing ones.
@@ -136,3 +149,4 @@ DEFAULT_MEDIA_TYPES: MediaTypeRegistry = MediaTypeRegistry(
         "application/octet-stream": parse_binary,
     },
 )
+"""Pre-built registry covering the most common HTTP content types."""

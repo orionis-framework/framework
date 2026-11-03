@@ -50,7 +50,7 @@ Declared output is validated before serialization. Return `McpResponse.structure
 
 Add `shouldRegister(self, request: McpRequest) -> bool` for request-specific visibility and `authorize(...) -> bool` for access. The actual hook name is **shouldRegister**, not `available`. Both run during listing and direct invocation; hiding a tool does not leave an unchecked direct path.
 
-`request.identity` and `request.authentication` expose context identity; `client_capabilities` contains only this call's declarations. Requests are immutable snapshots, including nested mappings. Injected services retain their own concurrency rules; do not retain calls in singleton services.
+`request.identity` and `request.authentication` expose context identity; `clientCapabilities` contains only this call's declarations. Requests are immutable snapshots, including nested mappings. Injected services retain their own concurrency rules; do not retain calls in singleton services.
 
 `ToolAnnotations` describes read-only, destructive, idempotent and open-world behavior. These are client hints: they do not authorize actions or make transactions idempotent. Return `McpResponse.error(message)` for expected business failures; unexpected failures are sanitized before reaching clients.
 

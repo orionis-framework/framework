@@ -1,3 +1,5 @@
+"""Store effective SMTP settings without exposing credentials in repr."""
+
 from dataclasses import dataclass, field
 from typing import TYPE_CHECKING, Self
 from urllib.parse import unquote, urlsplit
@@ -8,9 +10,13 @@ if TYPE_CHECKING:
     from collections.abc import Mapping
 
 _MAX_PORT = 65535
+"""Max port value used by ``smtp_settings``."""
 _DEFAULT_PORT = 587
+"""Default port value used by ``smtp_settings``."""
 _SMTPS_PORT = 465
+"""Smtps port value used by ``smtp_settings``."""
 _FIRST_PRINTABLE = 32
+"""First printable value used by ``smtp_settings``."""
 
 # Accepted encryption names, including the empty string that a configuration
 # uses to request an explicit plaintext connection.
@@ -20,19 +26,23 @@ _ENCRYPTIONS: dict[str, MailEncryption] = {
     "none": MailEncryption.NONE,
     "": MailEncryption.NONE,
 }
+"""
+Accepted encryption names, including the empty string that a configuration uses to
+request an explicit plaintext connection.
+"""
 
 @dataclass(frozen=True, slots=True, kw_only=True)
 class SmtpSettings:
     """
     Store effective SMTP settings without exposing credentials in repr.
 
-    Parameters
+    Attributes
     ----------
     host : str
         Effective SMTP hostname.
     port : int
         Effective TCP port between 1 and 65535.
-    encryption : MailEncryption
+    encryption : orionis.mail.enums.MailEncryption
         Negotiated transport security mode.
     username : str
         Authentication user, empty when authentication is disabled.
@@ -40,7 +50,7 @@ class SmtpSettings:
         Authentication secret, empty when authentication is disabled.
     timeout : int | None
         Positive socket timeout in seconds, or None for an unbounded wait.
-    sensitive : tuple[str, ...]
+    sensitive : tuple[str, ``...``]
         Values redacted from transport diagnostics.
     """
 
@@ -59,17 +69,17 @@ class SmtpSettings:
 
         Parameters
         ----------
-        config : Mapping[str, object]
+        config : collections.abc.Mapping[str, object]
             One normalized mailer, without environment lookups.
 
         Returns
         -------
-        Self
+        typing.Self
             Validated immutable connection options.
 
         Raises
         ------
-        MailConfigurationException
+        orionis.mail.exceptions.MailConfigurationException
             If endpoint, encryption, credentials, timeout, or URL is invalid.
         """
         url = _text(config, "url", "")
@@ -117,7 +127,7 @@ def _text(config: Mapping[str, object], key: str, default: str) -> str:
 
     Parameters
     ----------
-    config : Mapping[str, object]
+    config : collections.abc.Mapping[str, object]
         Effective connection options.
     key : str
         Option name.
@@ -131,7 +141,7 @@ def _text(config: Mapping[str, object], key: str, default: str) -> str:
 
     Raises
     ------
-    MailConfigurationException
+    orionis.mail.exceptions.MailConfigurationException
         If a setting is not a string.
     """
     value = config.get(key, default)
@@ -156,7 +166,7 @@ def _port(value: object) -> int:
 
     Raises
     ------
-    MailConfigurationException
+    orionis.mail.exceptions.MailConfigurationException
         If the port is not an integer between 1 and 65535.
     """
     if (
@@ -184,7 +194,7 @@ def _timeout(value: object) -> int | None:
 
     Raises
     ------
-    MailConfigurationException
+    orionis.mail.exceptions.MailConfigurationException
         If the timeout is not a positive integer or None.
     """
     if value is None:
@@ -213,7 +223,7 @@ def _url_overrides(url: str) -> dict[str, object]:
 
     Raises
     ------
-    MailConfigurationException
+    orionis.mail.exceptions.MailConfigurationException
         If the URL is malformed or includes unsupported components.
     """
     if not url:

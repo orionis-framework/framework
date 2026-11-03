@@ -1,3 +1,5 @@
+"""Inspect the class and members of an existing object."""
+
 from __future__ import annotations
 import inspect
 import keyword
@@ -17,6 +19,7 @@ if TYPE_CHECKING:
 class ReflectionInstance(IReflectionInstance):
 
     # ruff: noqa : ANN401
+    """Inspect the class and members of an existing object."""
 
     def __init__(self, instance: Any) -> None:
         """
@@ -24,7 +27,7 @@ class ReflectionInstance(IReflectionInstance):
 
         Parameters
         ----------
-        instance : Any
+        instance : typing.Any
             The object instance to reflect.
 
         Raises
@@ -65,13 +68,22 @@ class ReflectionInstance(IReflectionInstance):
 
         # Store the instance and its class metadata.
         self._instance: Any = instance
+        """The object instance to reflect."""
         self._cls: type = cls
+        """Cls supplied through ``cls``."""
         self._class_name: str = cls.__name__
+        """Class name obtained from ``cls.__name__``."""
         self._module_name: str = module
+        """Module name supplied through ``module``."""
         # Python strips the leading underscores of the class name when it
         # mangles private members, so the prefix must be built the same way.
         self._private_prefix: str = f"_{self._class_name.lstrip('_')}"
+        """
+        Python strips the leading underscores of the class name when it mangles
+        private members, so the prefix must be built the same way.
+        """
         self._memory_cache: dict[str, Any] = {}
+        """Process-local cache of previously computed reflection results."""
 
     def __getitem__(self, key: str) -> object | None:
         """
@@ -237,7 +249,7 @@ class ReflectionInstance(IReflectionInstance):
         ----------
         name : str
             The member name as returned by dir().
-        attr : Any
+        attr : typing.Any
             The staticmethod descriptor.
         acc : dict[str, list[str]]
             Shared accumulator dict keyed by category name.
@@ -281,7 +293,7 @@ class ReflectionInstance(IReflectionInstance):
         ----------
         name : str
             The member name as returned by dir().
-        attr : Any
+        attr : typing.Any
             The classmethod descriptor.
         acc : dict[str, list[str]]
             Shared accumulator dict keyed by category name.
@@ -325,7 +337,7 @@ class ReflectionInstance(IReflectionInstance):
         ----------
         name : str
             The member name as returned by dir().
-        attr : Any
+        attr : typing.Any
             The function object.
         acc : dict[str, list[str]]
             Shared accumulator dict keyed by category name.
@@ -444,7 +456,7 @@ class ReflectionInstance(IReflectionInstance):
 
         Returns
         -------
-        Any
+        typing.Any
             The object instance being reflected upon.
         """
         return self._instance
@@ -653,14 +665,14 @@ class ReflectionInstance(IReflectionInstance):
         ----------
         name : str
             Name of the attribute to retrieve.
-        default : Any, optional
+        default : typing.Any, optional
             Value to return if the attribute does not exist. Defaults to None.
 
         Returns
         -------
-        Any
+        typing.Any
             Value of the specified attribute if it exists, otherwise the provided
-            `default` value.
+            ``default`` value.
 
         Raises
         ------
@@ -671,8 +683,8 @@ class ReflectionInstance(IReflectionInstance):
         -----
         This method first checks the instance's attributes dictionary for the
         given name. If not found, it attempts to retrieve the attribute directly
-        from the instance using `getattr`. If the attribute is still not found,
-        the `default` value is returned.
+        from the instance using ``getattr``. If the attribute is still not found,
+        the ``default`` value is returned.
         """
         # Retrieve all attributes and fall back to getattr for computed/property attrs
         return self.getAttributes().get(name, getattr(self._instance, name, default))
@@ -685,7 +697,7 @@ class ReflectionInstance(IReflectionInstance):
         ----------
         name : str
             Name of the attribute to set.
-        value : Any
+        value : typing.Any
             Value to assign to the attribute.
 
         Returns
@@ -817,7 +829,7 @@ class ReflectionInstance(IReflectionInstance):
 
         Returns
         -------
-        dict[str, Any]
+        dict[str, typing.Any]
             Dictionary mapping attribute names to their values for all visibility
             levels.
         """
@@ -835,13 +847,9 @@ class ReflectionInstance(IReflectionInstance):
         """
         Return all public attributes of the instance.
 
-        Parameters
-        ----------
-        self : ReflectionInstance
-
         Returns
         -------
-        dict[str, Any]
+        dict[str, typing.Any]
             Dictionary mapping public attribute names to their values. Excludes
             dunder, protected, and private attributes.
         """
@@ -856,13 +864,9 @@ class ReflectionInstance(IReflectionInstance):
         """
         Return all protected attributes of the instance.
 
-        Parameters
-        ----------
-        self : ReflectionInstance
-
         Returns
         -------
-        dict[str, Any]
+        dict[str, typing.Any]
             Dictionary containing protected attribute names and their values.
             Protected attributes start with a single underscore, are not dunder,
             and are not private (do not start with the class name).
@@ -878,13 +882,9 @@ class ReflectionInstance(IReflectionInstance):
         """
         Retrieve all private attributes of the instance.
 
-        Parameters
-        ----------
-        self : ReflectionInstance
-
         Returns
         -------
-        dict[str, Any]
+        dict[str, typing.Any]
             Dictionary mapping unmangled private attribute names to their values.
         """
         cache = self._memory_cache
@@ -898,13 +898,9 @@ class ReflectionInstance(IReflectionInstance):
         """
         Retrieve all dunder (double underscore) attributes of the instance.
 
-        Parameters
-        ----------
-        self : ReflectionInstance
-
         Returns
         -------
-        dict[str, Any]
+        dict[str, typing.Any]
             Dictionary mapping dunder attribute names to their values.
         """
         cache = self._memory_cache
@@ -920,7 +916,7 @@ class ReflectionInstance(IReflectionInstance):
 
         Returns
         -------
-        dict[str, Any]
+        dict[str, typing.Any]
             Dictionary mapping magic attribute names to their values.
         """
         # Magic attributes are equivalent to dunder attributes in Python
@@ -961,7 +957,7 @@ class ReflectionInstance(IReflectionInstance):
         ----------
         name : str
             Name of the method to set.
-        method : Callable
+        method : collections.abc.Callable
             Callable object to assign as the method.
 
         Returns
@@ -1048,7 +1044,7 @@ class ReflectionInstance(IReflectionInstance):
 
         Returns
         -------
-        inspect.Signature
+        ``inspect.Signature``
             Signature object representing the method's parameters and return type.
 
         Raises
@@ -1148,7 +1144,7 @@ class ReflectionInstance(IReflectionInstance):
 
         Parameters
         ----------
-        self : ReflectionInstance
+        self : orionis.introspection.ReflectionInstance
             The ReflectionInstance object.
 
         Returns
@@ -1186,7 +1182,7 @@ class ReflectionInstance(IReflectionInstance):
 
         Parameters
         ----------
-        self : ReflectionInstance
+        self : orionis.introspection.ReflectionInstance
             The ReflectionInstance object.
 
         Returns
@@ -1207,7 +1203,7 @@ class ReflectionInstance(IReflectionInstance):
 
         Parameters
         ----------
-        self : ReflectionInstance
+        self : orionis.introspection.ReflectionInstance
             The ReflectionInstance object.
 
         Returns
@@ -1230,7 +1226,7 @@ class ReflectionInstance(IReflectionInstance):
 
         Parameters
         ----------
-        self : ReflectionInstance
+        self : orionis.introspection.ReflectionInstance
             The ReflectionInstance object.
 
         Returns
@@ -1251,7 +1247,7 @@ class ReflectionInstance(IReflectionInstance):
 
         Parameters
         ----------
-        self : ReflectionInstance
+        self : orionis.introspection.ReflectionInstance
             The ReflectionInstance object.
 
         Returns
@@ -1392,7 +1388,7 @@ class ReflectionInstance(IReflectionInstance):
 
         Parameters
         ----------
-        self : ReflectionInstance
+        self : orionis.introspection.ReflectionInstance
             The ReflectionInstance object.
 
         Returns
@@ -1461,7 +1457,7 @@ class ReflectionInstance(IReflectionInstance):
 
         Parameters
         ----------
-        self : ReflectionInstance
+        self : orionis.introspection.ReflectionInstance
             The ReflectionInstance object.
 
         Returns
@@ -1559,10 +1555,6 @@ class ReflectionInstance(IReflectionInstance):
     def getProtectedStaticAsyncMethods(self) -> list[str]:
         """
         Retrieve all protected asynchronous static method names.
-
-        Parameters
-        ----------
-        None
 
         Returns
         -------
@@ -1727,7 +1719,7 @@ class ReflectionInstance(IReflectionInstance):
 
         Returns
         -------
-        Any
+        typing.Any
             Value of the specified property.
 
         Raises
@@ -1758,7 +1750,7 @@ class ReflectionInstance(IReflectionInstance):
 
         Returns
         -------
-        inspect.Signature
+        ``inspect.Signature``
             Signature of the property's getter method.
 
         Raises
@@ -1838,7 +1830,7 @@ class ReflectionInstance(IReflectionInstance):
 
         Returns
         -------
-        Signature
+        orionis.introspection.dependencies.entities.signature.Signature
             Structured representation of the constructor dependencies. Contains:
 
             - ``resolved``: dictionary of resolved dependencies with names and values.
@@ -1868,7 +1860,7 @@ class ReflectionInstance(IReflectionInstance):
 
         Returns
         -------
-        Signature
+        orionis.introspection.dependencies.entities.signature.Signature
             Structured representation of the method dependencies, including:
 
             - ``resolved``: dictionary of resolved dependencies with names and values.

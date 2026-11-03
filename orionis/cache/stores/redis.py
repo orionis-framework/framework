@@ -1,3 +1,5 @@
+"""Provide cache stores operations through ``build``."""
+
 from __future__ import annotations
 from aiocache.backends.redis import RedisCache
 from orionis.cache.serializers.json import MsgspecSerializer
@@ -24,7 +26,7 @@ def build(
 
     Returns
     -------
-    RedisCache
+    ``aiocache.backends.redis.RedisCache``
         Configured aiocache Redis backend.
     """
     return RedisCache(

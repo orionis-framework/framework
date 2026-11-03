@@ -1,3 +1,5 @@
+"""Load route declarations from configured application modules."""
+
 import importlib
 from typing import TYPE_CHECKING
 from orionis.cache.file_based_cache import FileBasedCache
@@ -17,7 +19,10 @@ class RouteLoader(IRouteLoader):
     # ruff: noqa: TC001, SLF001
 
     # Keep a deterministic import order so route registration is stable.
+    """Load route declarations from configured application modules."""
+
     _KINDS: tuple[str, ...] = ("web", "api")
+    """Keep a deterministic import order so route registration is stable."""
 
     def __init__(
         self,
@@ -31,13 +36,13 @@ class RouteLoader(IRouteLoader):
 
         Parameters
         ----------
-        app : IApplication
+        app : orionis.IApplication
             Application instance used to resolve paths and settings.
-        router : IRouter
+        router : orionis.http.routes.contracts.router.IRouter
             Router that holds the raw registered routes.
-        compiler : RouteCompiler
+        compiler : orionis.http.routes.route_compiler.RouteCompiler
             Compiler that converts raw routes to ``CompiledRoute`` objects.
-        cache : RouteCache
+        cache : orionis.http.routes.route_cache.RouteCache
             Serialiser/deserialiser for the compiled route cache.
 
         Returns
@@ -46,15 +51,25 @@ class RouteLoader(IRouteLoader):
             The instance is initialised; no value is returned.
         """
         self.__router = router
+        """Router that holds the raw registered routes."""
         self.__app = app
+        """Application instance used to resolve paths and settings."""
         self.__app_middleware: list[type[IBaseMiddleware]] = app.getMiddleware()
+        """App middleware produced by ``app.getMiddleware``."""
         self.__routes: dict[str, dict] = {}
+        """Route definitions registered in this routing context."""
         self.__loaded = False
+        """Loaded flag used by ``RouteLoader``."""
         self.__fallback: tuple | None = None
+        """Handler or route selected when no ordinary route matches."""
         self.__use_cache = False
+        """Use cache flag used by ``RouteLoader``."""
         self.__persistence: IFileBasedCache | None = self.__getCachePersistence()
+        """Persistence produced by ``self.__getCachePersistence``."""
         self.__compiler = compiler
+        """Compiler that converts raw routes to ``CompiledRoute`` objects."""
         self.__cache = cache
+        """Serialiser/deserialiser for the compiled route cache."""
 
     def load(self) -> dict[str, dict]:
         """
@@ -96,7 +111,7 @@ class RouteLoader(IRouteLoader):
 
         Returns
         -------
-        IFileBasedCache | None
+        orionis.cache.contracts.IFileBasedCache | None
             A ``FileBasedCache`` instance when the application has a
             compiled cache directory configured, ``None`` otherwise.
         """

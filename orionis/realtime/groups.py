@@ -1,3 +1,5 @@
+"""Manage group membership owned by the current Hub connection."""
+
 from __future__ import annotations
 from typing import TYPE_CHECKING
 
@@ -9,6 +11,7 @@ class HubGroups:
     """Manage group membership owned by the current Hub connection."""
 
     __slots__ = ("_connection_id", "_manager")
+    """Declare the instance attribute slots reserved by this class."""
 
     def __init__(self, manager: IConnectionManager, connection_id: str) -> None:
         """
@@ -16,7 +19,7 @@ class HubGroups:
 
         Parameters
         ----------
-        manager : IConnectionManager
+        manager : orionis.realtime.contracts.IConnectionManager
             Registry owning this connection and its Hub namespace.
         connection_id : str
             Current connection identifier.
@@ -27,7 +30,9 @@ class HubGroups:
             Store the registry and connection identifier for membership changes.
         """
         self._manager = manager
+        """Registry owning this connection and its Hub namespace."""
         self._connection_id = connection_id
+        """Current connection identifier."""
 
     async def join(self, group: str) -> None: # NOSONAR
         """

@@ -1,3 +1,5 @@
+"""Group the foundation config database enums components and public imports."""
+
 from typing import TYPE_CHECKING as _TYPE_CHECKING
 from orionis._exports import resolve_export as _resolve_export
 
@@ -81,6 +83,7 @@ _EXPORTS = {
         "SQLiteSynchronous",
     ),
 }
+"""Public export names mapped to their defining modules and attributes."""
 
 def __getattr__(name: str) -> object:
     """Resolve and cache a public database enum.

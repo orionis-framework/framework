@@ -1,3 +1,5 @@
+"""Provide console operations through ``protocol_stdout``, ``protocol_stdio``."""
+
 import sys
 from contextlib import contextmanager, redirect_stdout
 from contextvars import ContextVar
@@ -10,6 +12,7 @@ if TYPE_CHECKING:
 _PROTOCOL_STDOUT: ContextVar[BinaryIO | None] = ContextVar(
     "orionis_protocol_stdout", default=None,
 )
+"""Context-local protocol stdout isolated between asynchronous tasks."""
 
 def protocol_stdout() -> BinaryIO | None:
     """
@@ -17,7 +20,7 @@ def protocol_stdout() -> BinaryIO | None:
 
     Returns
     -------
-    BinaryIO | None
+    typing.BinaryIO | None
         The original protocol writer while diagnostic stdout is redirected.
     """
     return _PROTOCOL_STDOUT.get()
@@ -32,7 +35,7 @@ def protocol_stdio(arguments: Sequence[str] | None) -> Generator[None]:
 
     Parameters
     ----------
-    arguments : Sequence[str] | None
+    arguments : collections.abc.Sequence[str] | None
         Arguments supplied for this operation.
 
     Yields

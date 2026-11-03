@@ -1,3 +1,5 @@
+"""Represent one immutable UTF-8 server-sent event."""
+
 from __future__ import annotations
 import asyncio
 from collections.abc import AsyncIterable, Iterable
@@ -33,7 +35,7 @@ class ServerSentEvent:
     """
     Represent one immutable UTF-8 server-sent event.
 
-    Parameters
+    Attributes
     ----------
     data : str | None, optional
         Text payload; serialize structured values explicitly before passing them.
@@ -137,6 +139,7 @@ class _EventStreamIterator:
     """Encode an owned event source without prefetching or buffering events."""
 
     __slots__ = ("_asynchronous", "_close_task", "_iterator", "_source")
+    """Declare the instance attribute slots reserved by this class."""
 
     def __init__(
         self,
@@ -161,6 +164,7 @@ class _EventStreamIterator:
             If the source does not support synchronous or asynchronous iteration.
         """
         self._asynchronous = isinstance(source, AsyncIterable)
+        """Asynchronous produced by ``isinstance``."""
         if not self._asynchronous and not isinstance(source, Iterable):
             error_msg = (
                 "EventStreamResponse content must be "
@@ -173,12 +177,15 @@ class _EventStreamIterator:
             | Iterable[ServerSentEvent | str]
             | None
         ) = source
+        """Event source owned until the response adapter closes this wrapper."""
         self._close_task: Future[None] | None = None
+        """Shared task coordinating stream closure across concurrent callers."""
         self._iterator: (
             AsyncIterator[ServerSentEvent | str]
             | Iterator[ServerSentEvent | str]
             | None
         ) = None
+        """Underlying iterator supplying stream items."""
 
     def __aiter__(self) -> Self:
         """
@@ -186,7 +193,7 @@ class _EventStreamIterator:
 
         Returns
         -------
-        Self
+        typing.Self
             The wrapper without starting the producer.
         """
         return self
@@ -236,7 +243,7 @@ class _EventStreamIterator:
 
         Returns
         -------
-        Future[None] | None
+        asyncio.Future[None] | None
             Owned asynchronous cleanup, or None after synchronous/no cleanup.
         """
         source = self._source

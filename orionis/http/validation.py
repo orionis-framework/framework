@@ -1,3 +1,5 @@
+"""Provide http operations through ``validation_response``, ``previous_url``."""
+
 from __future__ import annotations
 from typing import TYPE_CHECKING
 from urllib.parse import urlsplit
@@ -10,8 +12,11 @@ if TYPE_CHECKING:
     from orionis.schemas.exceptions.validation import ValidationException
 
 _DEFAULT_PORTS: dict[str, int] = {"http": 80, "https": 443}
+"""Default ports definitions used by ``validation``."""
 _FIRST_PRINTABLE_CODE: int = 32
+"""First printable code value used by ``validation``."""
 _DELETE_CODE: int = 127
+"""Delete code value used by ``validation``."""
 
 def _url_origin(url: str) -> tuple[str, str | None, int | None]:
     """
@@ -85,16 +90,16 @@ async def validation_response(
 
     Parameters
     ----------
-    exc : ValidationException
+    exc : orionis.schemas.exceptions.ValidationException
         Failure carrying every field error found in the payload.
-    request : Request
+    request : orionis.http.Request
         Incoming HTTP request.
-    responses : IDefaultResponses
+    responses : orionis.http.default.contracts.responses.IDefaultResponses
         Default response factory used to render the error payload.
 
     Returns
     -------
-    Response
+    orionis.http.Response
         A ``422`` response, or a ``302`` redirect back to the previous page.
     """
     if request.wantsJson() or request.isAjax():
@@ -127,7 +132,7 @@ def previous_url(request: Request) -> str:
 
     Parameters
     ----------
-    request : Request
+    request : orionis.http.Request
         Incoming HTTP request.
 
     Returns

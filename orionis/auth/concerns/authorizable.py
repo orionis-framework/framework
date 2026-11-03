@@ -1,3 +1,5 @@
+"""Let any Orionis model own permissions and roles."""
+
 from typing import ClassVar
 from orionis.auth.concerns.functions import model_primary_key
 from orionis.auth.contracts.authorizable import IAuthorizable
@@ -11,15 +13,21 @@ class Authorizable:
     granted the very same permissions.
 
     The mixin is a plain class registered as a virtual implementation of
-    :class:`IAuthorizable`, because inheriting from the ABC directly would
+    :class:`orionis.auth.contracts.IAuthorizable`, because inheriting from the ABC
+    directly would
     clash with ``ModelMeta``, the metaclass of every Orionis model.
     """
 
     __slots__ = ()
+    """Declare that this class introduces no additional instance slots."""
 
     # Value stored in the ``model_type`` column. Leave it as ``None`` to
     # derive a stable dotted path from the class itself.
     AUTHORIZABLE_TYPE: ClassVar[str | None] = None
+    """
+    Value stored in the ``model_type`` column. Leave it as ``None`` to derive a
+    stable dotted path from the class itself.
+    """
 
     def getAuthorizableType(self) -> str:
         """

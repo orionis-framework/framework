@@ -1,3 +1,5 @@
+"""Define the contract for response implementations."""
+
 from __future__ import annotations
 from abc import ABC, abstractmethod
 from typing import TYPE_CHECKING, Any, Literal, Self
@@ -9,8 +11,10 @@ if TYPE_CHECKING:
 class IResponse(ABC):
 
     # ruff: noqa: PLR0913, ANN401
+    """Define the contract for response implementations."""
 
     __slots__ = ()
+    """Declare that this class introduces no additional instance slots."""
 
     @abstractmethod
     def render(self, content: Any) -> bytes:
@@ -19,7 +23,7 @@ class IResponse(ABC):
 
         Parameters
         ----------
-        content : Any
+        content : typing.Any
             The content to render.
 
         Returns
@@ -149,7 +153,7 @@ class IResponse(ABC):
             The cookie value. Defaults to an empty string.
         max_age : int | None, optional
             The maximum age of the cookie in seconds.
-        expires : datetime | str | int | None, optional
+        expires : datetime.datetime | str | int | None, optional
             The expiration date of the cookie.
         path : str | None, optional
             The path for which the cookie is valid.
@@ -222,7 +226,7 @@ class IResponse(ABC):
             The cookie value. Defaults to an empty string.
         max_age : int | None, optional
             The maximum age of the cookie in seconds.
-        expires : datetime | str | int | None, optional
+        expires : datetime.datetime | str | int | None, optional
             The expiration date of the cookie.
         path : str | None, optional
             The path for which the cookie is valid.
@@ -239,7 +243,7 @@ class IResponse(ABC):
 
         Returns
         -------
-        Self
+        typing.Self
             The same response instance, allowing fluent chaining.
         """
 
@@ -255,11 +259,12 @@ class IResponse(ABC):
         ----------
         cookies : Mapping[str, str | Mapping[str, Any]]
             Mapping of cookie names to either a plain value or a mapping of
-            keyword arguments accepted by :meth:`setCookie`.
+            keyword arguments accepted by
+            :meth:`orionis.http.contracts.response.IResponse.setCookie`.
 
         Returns
         -------
-        Self
+        typing.Self
             The same response instance, allowing fluent chaining.
         """
 
@@ -285,7 +290,7 @@ class IResponse(ABC):
 
         Returns
         -------
-        Self
+        typing.Self
             The same response instance, allowing fluent chaining.
         """
 
@@ -298,12 +303,12 @@ class IResponse(ABC):
         ----------
         key : str
             Flash data key.
-        value : Any, optional
+        value : typing.Any, optional
             Value to flash.
 
         Returns
         -------
-        Self
+        typing.Self
             The same response instance, allowing fluent chaining.
         """
 
@@ -314,13 +319,13 @@ class IResponse(ABC):
 
         Parameters
         ----------
-        values : Mapping[str, Any]
+        values : collections.abc.Mapping[str, typing.Any]
             Submitted form payload to remember.  Credential-like fields
             are stripped before storing.
 
         Returns
         -------
-        Self
+        typing.Self
             The same response instance, allowing fluent chaining.
         """
 
@@ -331,12 +336,12 @@ class IResponse(ABC):
 
         Parameters
         ----------
-        errors : Mapping[str, Any] | Exception
+        errors : collections.abc.Mapping[str, typing.Any] | Exception
             Mapping of field to message(s), or a validation exception.
 
         Returns
         -------
-        Self
+        typing.Self
             The same response instance, allowing fluent chaining.
         """
 
@@ -347,7 +352,7 @@ class IResponse(ABC):
 
         Returns
         -------
-        dict[str, Any] | None
+        dict[str, typing.Any] | None
             The queued key-value pairs, or None when nothing was queued.
         """
 
@@ -369,7 +374,7 @@ class IResponse(ABC):
 
         Returns
         -------
-        AsyncIterable[bytes] | None
+        collections.abc.AsyncIterable[bytes] | None
             The response stream, or None if not set.
         """
 

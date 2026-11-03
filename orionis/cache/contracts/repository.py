@@ -1,3 +1,5 @@
+"""Define the contract for cache repository implementations."""
+
 from abc import ABC, abstractmethod
 from typing import TYPE_CHECKING, Any, Self
 
@@ -7,8 +9,10 @@ if TYPE_CHECKING:
 class ICacheRepository(ABC):
 
     # ruff: noqa: ANN401
+    """Define the contract for cache repository implementations."""
 
     __slots__ = ()
+    """Declare that this class introduces no additional instance slots."""
 
     async def rememberOnce(
         self: Self,
@@ -28,7 +32,7 @@ class ICacheRepository(ABC):
             Cache or lease key to access.
         ttl : float | None
             Entry lifetime in seconds.
-        resolver : Callable
+        resolver : collections.abc.Callable
             Callback that supplies the missing cache value.
         wait_timeout : float
             Maximum number of seconds to wait for ownership.
@@ -37,7 +41,7 @@ class ICacheRepository(ABC):
 
         Returns
         -------
-        Any
+        typing.Any
             Cached value or the result produced by the owning resolver.
         """
         raise NotImplementedError
@@ -46,13 +50,14 @@ class ICacheRepository(ABC):
     async def replace(
         self: Self, key: str, value: Any, ttl: float | None = None,
     ) -> bool:
-        """Replace a live entry atomically without creating a missing key.
+        """
+        Replace a live entry atomically without creating a missing key.
 
         Parameters
         ----------
         key : str
             Cache key that must already exist.
-        value : Any
+        value : typing.Any
             Replacement value.
         ttl : float | None
             New lifetime in seconds, or None for no expiry.
@@ -75,7 +80,7 @@ class ICacheRepository(ABC):
 
         Returns
         -------
-        Any
+        typing.Any
             Cached value, or ``None`` when absent.
         """
 
@@ -88,7 +93,7 @@ class ICacheRepository(ABC):
         ----------
         key : str
             Cache key.
-        value : Any
+        value : typing.Any
             Value to cache.
         ttl : float | None
             Time-to-live in seconds.  ``None`` means no expiry.
@@ -154,7 +159,7 @@ class ICacheRepository(ABC):
 
         Returns
         -------
-        dict[str, Any]
+        dict[str, typing.Any]
             Mapping of key → value; missing keys map to ``None``.
         """
 
@@ -169,7 +174,7 @@ class ICacheRepository(ABC):
 
         Parameters
         ----------
-        values : dict[str, Any]
+        values : dict[str, typing.Any]
             Mapping of key → value.
         ttl : float | None
             Shared TTL in seconds.
@@ -196,12 +201,12 @@ class ICacheRepository(ABC):
             Cache key.
         ttl : float | None
             TTL applied when caching the resolved value.
-        resolver : Callable
+        resolver : collections.abc.Callable
             Zero-argument callable (sync or async) producing the value.
 
         Returns
         -------
-        Any
+        typing.Any
             Cached or freshly computed value.
         """
 
@@ -214,12 +219,12 @@ class ICacheRepository(ABC):
         ----------
         key : str
             Cache key.
-        resolver : Callable
+        resolver : collections.abc.Callable
             Zero-argument callable (sync or async) producing the value.
 
         Returns
         -------
-        Any
+        typing.Any
             Cached or freshly computed value.
         """
 
@@ -235,7 +240,7 @@ class ICacheRepository(ABC):
 
         Returns
         -------
-        Any
+        typing.Any
             Cached value, or ``None`` when absent.
         """
 
@@ -248,7 +253,7 @@ class ICacheRepository(ABC):
         ----------
         key : str
             Cache key.
-        value : Any
+        value : typing.Any
             Value to store.
         ttl : float | None
             Optional TTL in seconds.

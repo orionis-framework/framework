@@ -1,9 +1,15 @@
+"""Provide queues operations.
+
+Includes ``validate_name``, ``validate_seconds``, ``current_time``.
+"""
+
 import math
 import re
 from orionis.queues.exceptions import QueueConfigurationError
 from orionis.support.facades.datetime import DateTime
 
 _NAME_PATTERN = re.compile(r"[A-Za-z0-9][A-Za-z0-9_.-]{0,127}\Z")
+"""Compiled pattern used to recognize name pattern."""
 
 def validate_name(value: str, label: str) -> str:
     """

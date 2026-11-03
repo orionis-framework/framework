@@ -1,3 +1,5 @@
+"""Render a table schema summary."""
+
 from typing import ClassVar
 from orionis.console.args.argument import Argument
 from orionis.console.commands.db._inspection import DatabaseInspector
@@ -11,8 +13,14 @@ class DbTableCommand(MigrationCommand):
     # ruff: noqa: TC001
 
     timestamps: bool = False
+    """Timestamps flag used by ``DbTableCommand``."""
     signature: str = "db:table"
+    """Signature identifier: ``db:table``."""
     description: str = "Shows columns, indexes and keys for a database table."
+    """
+    Description identifier: ``Shows columns, indexes and keys for a database
+    table.``.
+    """
     arguments: ClassVar[list[Argument]] = [
         Argument(
             name_or_flags="table",
@@ -21,6 +29,7 @@ class DbTableCommand(MigrationCommand):
         ),
         *MigrationCommand.arguments,
     ]
+    """Command-line argument declarations accepted by this command."""
 
     async def handle(self, conn_manager: IConnectionManager) -> int:
         """
@@ -28,7 +37,7 @@ class DbTableCommand(MigrationCommand):
 
         Parameters
         ----------
-        conn_manager : IConnectionManager
+        conn_manager : orionis.database.contracts.IConnectionManager
             Connection manager used to resolve the active database.
 
         Returns

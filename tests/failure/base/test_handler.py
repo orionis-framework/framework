@@ -588,7 +588,7 @@ class TestBaseExceptionHandlerHandleHTTPKnownExceptions(TestCase):
         """
         BaseExceptionHandler.dont_catch = frozenset()
 
-    def _make_request_mock(self, *, wants_json: bool = False) -> MagicMock:
+    def _makeRequestMock(self, *, wants_json: bool = False) -> MagicMock:
         """
         Build a mock that mimics a plain HTTP Request object.
 
@@ -629,7 +629,7 @@ class TestBaseExceptionHandlerHandleHTTPKnownExceptions(TestCase):
         )
 
         exc = RouteNotFound("not found")
-        req = self._make_request_mock()
+        req = self._makeRequestMock()
         await handler.handleHTTP(exc, req)
 
         mock_responses.error.assert_awaited_once()
@@ -655,7 +655,7 @@ class TestBaseExceptionHandlerHandleHTTPKnownExceptions(TestCase):
         )
 
         exc = MethodNotAllowed("not allowed")
-        req = self._make_request_mock()
+        req = self._makeRequestMock()
         await handler.handleHTTP(exc, req)
 
         mock_responses.error.assert_awaited_once()
@@ -681,7 +681,7 @@ class TestBaseExceptionHandlerHandleHTTPKnownExceptions(TestCase):
         )
 
         exc = PayloadTooLargeException("too large")
-        req = self._make_request_mock()
+        req = self._makeRequestMock()
         await handler.handleHTTP(exc, req)
 
         mock_responses.error.assert_awaited_once()
@@ -707,7 +707,7 @@ class TestBaseExceptionHandlerHandleHTTPKnownExceptions(TestCase):
         )
 
         exc = UnsupportedMediaTypeException("unsupported")
-        req = self._make_request_mock()
+        req = self._makeRequestMock()
         await handler.handleHTTP(exc, req)
 
         mock_responses.error.assert_awaited_once()
@@ -733,7 +733,7 @@ class TestBaseExceptionHandlerHandleHTTPKnownExceptions(TestCase):
         )
 
         exc = CSRFTokenMismatchException("token mismatch")
-        req = self._make_request_mock()
+        req = self._makeRequestMock()
         await handler.handleHTTP(exc, req)
 
         mock_responses.error.assert_awaited_once()
@@ -759,7 +759,7 @@ class TestBaseExceptionHandlerHandleHTTPKnownExceptions(TestCase):
         type(handler).dont_catch = frozenset({RouteNotFound})  # type: ignore[assignment]
 
         exc = RouteNotFound("ignored")
-        req = self._make_request_mock()
+        req = self._makeRequestMock()
         result = await handler.handleHTTP(exc, req)
 
         self.assertIsNone(result)

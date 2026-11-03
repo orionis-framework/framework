@@ -1,3 +1,5 @@
+"""Read typed environment values through the environment service facade."""
+
 from __future__ import annotations
 from orionis.environment.contracts.env import IEnv
 from orionis.environment.core.dot_env import DotEnv
@@ -9,8 +11,10 @@ if TYPE_CHECKING:
 class Env(IEnv):
 
     # ruff: noqa: FBT001
+    """Read typed environment values through the environment service facade."""
 
     __slots__ = ()
+    """Declare that this class introduces no additional instance slots."""
 
     @classmethod
     def get(
@@ -55,7 +59,7 @@ class Env(IEnv):
             Name of the environment variable to set or update.
         value : str | float | bool | list | dict | tuple | set
             Value to assign to the environment variable.
-        type_hint : str | EnvironmentValueType | None, optional
+        type_hint : str | enums.EnvironmentValueType | None, optional
             Type hint for the variable. Supported types: 'str', 'int', 'float',
             'bool', 'list', 'dict', 'tuple', 'set', 'base64', 'path'.
         only_os : bool, optional
@@ -108,7 +112,7 @@ class Env(IEnv):
 
         Returns
         -------
-        dict[str, Any]
+        dict[str, typing.Any]
             Dictionary containing all environment variables loaded by DotEnv.
         """
         return DotEnv().all()

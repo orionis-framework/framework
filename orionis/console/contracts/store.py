@@ -1,3 +1,5 @@
+"""Define the contract for schedule store implementations."""
+
 from __future__ import annotations
 from abc import ABC, abstractmethod
 from typing import TYPE_CHECKING
@@ -10,6 +12,7 @@ if TYPE_CHECKING:
     )
 
 class IScheduleStore(ABC):
+    """Define the contract for schedule store implementations."""
 
     @property
     @abstractmethod
@@ -31,7 +34,7 @@ class IScheduleStore(ABC):
 
         Returns
         -------
-        ConfigScheduler
+        orionis.foundation.config.scheduler.Scheduler
             The scheduler configuration (store, jitter, max_instances,
             misfire_grace_time, coalesce, replace_existing, etc.).
         """
@@ -43,7 +46,7 @@ class IScheduleStore(ABC):
 
         Returns
         -------
-        RedisJobStore
+        ``apscheduler.jobstores.redis.RedisJobStore``
             A configured Redis job store instance.
 
         Raises
@@ -59,14 +62,14 @@ class IScheduleStore(ABC):
 
         Returns
         -------
-        SQLAlchemyJobStore
+        ``apscheduler.jobstores.sqlalchemy.SQLAlchemyJobStore``
             A configured SQLAlchemy job store instance.
 
         Raises
         ------
         RuntimeError
             If the database store configuration is not set.
-        MissingDatabaseDependencyException
+        orionis.database.MissingDatabaseDependencyException
             If the resolved driver package is not installed.
         """
 
@@ -84,6 +87,6 @@ class IScheduleStore(ABC):
         ------
         RuntimeError
             If database storage is absent or the backend is unsupported.
-        DatabaseException
+        orionis.database.DatabaseException
             If the connection, driver, or schema creation fails.
         """

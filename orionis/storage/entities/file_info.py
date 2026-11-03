@@ -1,3 +1,5 @@
+"""Immutable snapshot of a stored file's metadata."""
+
 # ruff: noqa: N815
 from __future__ import annotations
 from dataclasses import dataclass
@@ -21,13 +23,13 @@ class FileInfo:
         Canonical root-relative path of the file on its disk.
     size : int
         File size in bytes.
-    lastModified : datetime
+    lastModified : datetime.datetime
         Timezone-aware timestamp of the last modification.
     visibility : str
         Visibility level of the file (``'public'`` or ``'private'``).
     mimeType : str | None
         Guessed MIME type, or ``None`` when it cannot be determined.
-    createdAt : datetime | None
+    createdAt : datetime.datetime | None
         Timezone-aware creation timestamp, or ``None`` when the driver
         cannot provide it.
     etag : str | None

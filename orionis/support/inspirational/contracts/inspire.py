@@ -1,6 +1,9 @@
+"""Define the contract for inspire implementations."""
+
 from abc import ABC, abstractmethod
 
 class IInspire(ABC):
+    """Define the contract for inspire implementations."""
 
     @abstractmethod
     def random(self) -> dict:

@@ -1,3 +1,5 @@
+"""Resolve identities from an Orionis model declared in configuration."""
+
 import importlib
 from typing import TYPE_CHECKING
 from uuid import UUID
@@ -14,14 +16,20 @@ if TYPE_CHECKING:
 
 # Fallbacks applied when the configuration section is absent.
 _DEFAULT_MODEL: str = "app.models.user.User"
+"""Fallbacks applied when the configuration section is absent."""
 _DEFAULT_USERNAME: str = "email"
+"""Default username identifier: ``email``."""
 _DEFAULT_PASSWORD: str = "password"  # noqa: S105
+"""Default password identifier: ``password``."""
 _INTEGER_KEY_TYPES = frozenset({
     ColumnType.BIG_INTEGER, ColumnType.INTEGER, ColumnType.SMALL_INTEGER,
     ColumnType.BIGINT, ColumnType.INT, ColumnType.SMALLINT,
 })
+"""Integer key types used by ``provider``."""
 _MAX_IDENTIFIER_LENGTH = 255
+"""Max identifier length value used by ``provider``."""
 _MAX_PASSWORD_LENGTH = 4096
+"""Max password length value used by ``provider``."""
 
 class ModelIdentityProvider(IIdentityProvider):
     """
@@ -47,6 +55,7 @@ class ModelIdentityProvider(IIdentityProvider):
         "__model_path",
         "__username_field",
     )
+    """Declare the instance attribute slots reserved by this class."""
 
     def __init__(self, app: IApplication, hasher: IHashManager) -> None:
         """
@@ -54,9 +63,9 @@ class ModelIdentityProvider(IIdentityProvider):
 
         Parameters
         ----------
-        app : IApplication
+        app : orionis.IApplication
             Application exposing the ``auth.identity`` configuration.
-        hasher : IHashManager
+        hasher : orionis.hashing.contracts.IHashManager
             Hashing service used to verify submitted passwords.
 
         Returns
@@ -67,11 +76,15 @@ class ModelIdentityProvider(IIdentityProvider):
         self.__model_path: str = (
             app.config("auth.identity.model") or _DEFAULT_MODEL
         )
+        """Import path of the configured authenticatable model."""
         self.__username_field: str = (
             app.config("auth.identity.username") or _DEFAULT_USERNAME
         )
+        """Model field used to locate an identity by username."""
         self.__hasher = hasher
+        """Hashing service used to verify submitted passwords."""
         self.__model: type[Model] | None = None
+        """Model selected for generation or persistence."""
 
     def model(self) -> type[Model]:
         """
@@ -79,14 +92,14 @@ class ModelIdentityProvider(IIdentityProvider):
 
         Returns
         -------
-        type[Model]
+        type[orionis.orm.Model]
             Model class resolved from the configured dotted path.
 
         Raises
         ------
-        IdentityProviderException
+        orionis.auth.IdentityProviderException
             When the path cannot be imported or the resolved class does
-            not implement :class:`IAuthenticatable`.
+            not implement :class:`orionis.auth.contracts.IAuthenticatable`.
         """
         resolved = self.__model
         if resolved is not None:
@@ -126,7 +139,7 @@ class ModelIdentityProvider(IIdentityProvider):
 
         Returns
         -------
-        IAuthenticatable | None
+        orionis.auth.contracts.IAuthenticatable | None
             Matching identity, or ``None`` when it no longer exists.
         """
         if identifier is None:
@@ -181,13 +194,13 @@ class ModelIdentityProvider(IIdentityProvider):
 
         Parameters
         ----------
-        credentials : Mapping[str, object]
+        credentials : collections.abc.Mapping[str, object]
             Submitted credentials. Only the configured username field is
             read; the secret is deliberately ignored here.
 
         Returns
         -------
-        IAuthenticatable | None
+        orionis.auth.contracts.IAuthenticatable | None
             Matching identity, or ``None`` when no identity matches.
         """
         username = credentials.get(self.__username_field)
@@ -208,7 +221,7 @@ class ModelIdentityProvider(IIdentityProvider):
 
         Parameters
         ----------
-        identity : IAuthenticatable
+        identity : orionis.auth.contracts.IAuthenticatable
             Identity whose remember token should be updated.
         expected : str | None
             Current token expected in storage, or ``None`` if it is absent.
@@ -251,9 +264,9 @@ class ModelIdentityProvider(IIdentityProvider):
 
         Parameters
         ----------
-        identity : IAuthenticatable | None
+        identity : orionis.auth.contracts.IAuthenticatable | None
             Identity returned by ``retrieveByCredentials()``.
-        credentials : Mapping[str, object]
+        credentials : collections.abc.Mapping[str, object]
             Submitted credentials.
 
         Returns

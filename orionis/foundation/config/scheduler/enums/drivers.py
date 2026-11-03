@@ -1,3 +1,5 @@
+"""Enumerate supported scheduler job store drivers."""
+
 from enum import StrEnum
 
 class Drivers(StrEnum):
@@ -15,7 +17,7 @@ class Drivers(StrEnum):
 
     Returns
     -------
-    Drivers
+    orionis.foundation.config.scheduler.enums.Drivers
         An enumeration member representing a scheduler job store driver.
     """
 

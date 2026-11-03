@@ -1,3 +1,5 @@
+"""Define SSL modes for PostgreSQL connections."""
+
 from enum import Enum
 
 class PGSQLSSLMode(Enum):
@@ -25,7 +27,7 @@ class PGSQLSSLMode(Enum):
 
     Returns
     -------
-    PGSQLSSLMode
+    orionis.foundation.config.database.PGSQLSSLMode
         An enumeration member representing the SSL mode.
     """
 

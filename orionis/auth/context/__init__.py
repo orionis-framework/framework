@@ -1,3 +1,5 @@
+"""Group the auth context components and public imports."""
+
 from typing import TYPE_CHECKING as _TYPE_CHECKING
 from orionis._exports import resolve_export as _resolve_export
 
@@ -18,6 +20,7 @@ _EXPORTS = {
     "bind_auth_context": ("orionis.auth.context.functions", "bind_auth_context"),
     "current_auth_context": ("orionis.auth.context.functions", "current_auth_context"),
 }
+"""Public export names mapped to their defining modules and attributes."""
 
 def __getattr__(name: str) -> object:
     """

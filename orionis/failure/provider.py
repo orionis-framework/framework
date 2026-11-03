@@ -1,3 +1,5 @@
+"""Register catch services in the application container."""
+
 from __future__ import annotations
 from orionis.container.providers.service_provider import ServiceProvider
 from orionis.failure.catch import Catch
@@ -5,6 +7,7 @@ from orionis.failure.contracts.catch import ICatch
 from orionis.support.facades.catch import Catch as CatchFacade
 
 class CatchProvider(ServiceProvider):
+    """Register catch services in the application container."""
 
     def register(self) -> None:
         """
@@ -12,7 +15,7 @@ class CatchProvider(ServiceProvider):
 
         Parameters
         ----------
-        self : CathcProvider
+        self : orionis.failure.provider.CatchProvider
             The instance of the CathcProvider class.
 
         Returns
@@ -23,8 +26,8 @@ class CatchProvider(ServiceProvider):
 
         Notes
         -----
-        Binds the `ICatch` interface to the `Catch` implementation as a singleton,
-        using a specific alias. Ensures only one instance of `Catch` is created
+        Binds the ``ICatch`` interface to the ``Catch`` implementation as a singleton,
+        using a specific alias. Ensures only one instance of ``Catch`` is created
         and shared throughout the application's lifecycle.
         """
         self.app.singleton(ICatch, Catch, alias="x-orionis-ICatch")
@@ -35,7 +38,7 @@ class CatchProvider(ServiceProvider):
 
         Parameters
         ----------
-        self : CathcProvider
+        self : orionis.failure.provider.CatchProvider
             Instance of the CathcProvider class.
 
         Returns

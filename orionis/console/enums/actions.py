@@ -1,3 +1,5 @@
+"""Define valid action types for use with Python's argparse module."""
+
 from enum import Enum
 
 class ArgumentAction(Enum):

@@ -174,7 +174,27 @@
         
 
         
+            <div class="itemName"><code><a href="#_migrateDatabase" class="internal-link" title="orionis.console.tasks.store.ScheduleStore._migrateDatabase">_migrate<wbr></wbr>Database</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
             <div class="itemName"><code><a href="#database" class="internal-link" title="orionis.console.tasks.store.ScheduleStore.database">database</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#migrate" class="internal-link" title="orionis.console.tasks.store.ScheduleStore.migrate">migrate</a></code>
             </div>
         
 
@@ -275,7 +295,7 @@
         
         
             <div class="itemName expandableItem">
-                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId4405"> 
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId4519"> 
                     
                 </input>
 
@@ -315,7 +335,27 @@
         
 
         
+            <div class="itemName"><code><a href="#_migrateDatabase" class="internal-link" title="orionis.console.tasks.store.ScheduleStore._migrateDatabase">_migrate<wbr></wbr>Database</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
             <div class="itemName"><code><a href="#database" class="internal-link" title="orionis.console.tasks.store.ScheduleStore.database">database</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#migrate" class="internal-link" title="orionis.console.tasks.store.ScheduleStore.migrate">migrate</a></code>
             </div>
         
 
@@ -470,7 +510,7 @@
         </div>
 
         <div class="extrasDocstring">
-          <p class="class-signature"><code><span class="py-keyword">class</span> <span class="py-defname">ScheduleStore</span>(<a href="orionis.console.contracts.store.IScheduleStore.html" class="internal-link" title="orionis.console.contracts.store.IScheduleStore">IScheduleStore</a>): <a href="https://github.com/orionis-framework/framework/tree/cddd12900b7f7907cab71102ea2d3d150fc9db33/orionis/console/tasks/store.py#L17" class="sourceLink">(source)</a></code></p><p>Constructor: <code><a href="#__init__" class="internal-link" title="orionis.console.tasks.store.ScheduleStore.__init__">ScheduleStore(app, db_manager)</a></code></p><p><a href="classIndex.html#orionis.console.tasks.store.ScheduleStore">View In Hierarchy</a></p>
+          <p class="class-signature"><code><span class="py-keyword">class</span> <span class="py-defname">ScheduleStore</span>(<a href="orionis.console.contracts.store.IScheduleStore.html" class="internal-link" title="orionis.console.contracts.store.IScheduleStore">IScheduleStore</a>): <a href="https://github.com/orionis-framework/framework/tree/c2be36ee05ae0b3facf2364ff118e9458f1b6d8c/orionis/console/tasks/store.py#L19" class="sourceLink">(source)</a></code></p><p>Constructor: <code><a href="#__init__" class="internal-link" title="orionis.console.tasks.store.ScheduleStore.__init__">ScheduleStore(app, db_manager)</a></code></p><p><a href="classIndex.html#orionis.console.tasks.store.ScheduleStore">View In Hierarchy</a></p>
         </div>
 
         <div class="moduleDocstring">
@@ -478,7 +518,7 @@
         </div>
 
         <div id="split-tables">
-          <table class="children sortable" id="id458">
+          <table class="children sortable" id="id470">
   
   
   <tr class="method">
@@ -489,8 +529,18 @@
   </tr><tr class="method">
     
     <td>Method</td>
+    <td><code><a href="#_migrateDatabase" class="internal-link" title="orionis.console.tasks.store.ScheduleStore._migrateDatabase">_migrate<wbr></wbr>Database</a></code></td>
+    <td>Create the configured job store table and release its temporary engine.</td>
+  </tr><tr class="method">
+    
+    <td>Method</td>
     <td><code><a href="#database" class="internal-link" title="orionis.console.tasks.store.ScheduleStore.database">database</a></code></td>
     <td>Create a database job store for the scheduler.</td>
+  </tr><tr class="method">
+    
+    <td>Async Method</td>
+    <td><code><a href="#migrate" class="internal-link" title="orionis.console.tasks.store.ScheduleStore.migrate">migrate</a></code></td>
+    <td>Create the native database job table without starting the scheduler.</td>
   </tr><tr class="method">
     
     <td>Method</td>
@@ -542,7 +592,7 @@
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">__init__</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">app: <code>IApplication</code>, </span><span class="rst-sig-param">db_manager: <code>IConnectionManager</code></span>):</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/cddd12900b7f7907cab71102ea2d3d150fc9db33/orionis/console/tasks/store.py#L21">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/c2be36ee05ae0b3facf2364ff118e9458f1b6d8c/orionis/console/tasks/store.py#L23">
       
       (source)
     </a>
@@ -559,6 +609,33 @@
 </div><div class="basemethod">
   
   
+  <a name="orionis.console.tasks.store.ScheduleStore._migrateDatabase">
+    
+  </a>
+  <a name="_migrateDatabase">
+    
+  </a>
+  <div class="functionHeader">
+    
+    
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">_migrateDatabase</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>):</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/c2be36ee05ae0b3facf2364ff118e9458f1b6d8c/orionis/console/tasks/store.py#L199">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#_migrateDatabase" title="orionis.console.tasks.store.ScheduleStore._migrateDatabase">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    
+    <div><p>Create the configured job store table and release its temporary engine.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">Create APScheduler's native table and indexes if absent.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code>QueryException</code></td><td>If SQLAlchemy cannot create or close the storage; omit driver details.</td></tr></table></div>
+  </div>
+</div><div class="basemethod">
+  
+  
   <a name="orionis.console.tasks.store.ScheduleStore.database">
     
   </a>
@@ -569,7 +646,7 @@
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">database</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>) -&gt; <code>SQLAlchemyJobStore</code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/cddd12900b7f7907cab71102ea2d3d150fc9db33/orionis/console/tasks/store.py#L108">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/c2be36ee05ae0b3facf2364ff118e9458f1b6d8c/orionis/console/tasks/store.py#L110">
       
       (source)
     </a>
@@ -586,6 +663,33 @@
 </div><div class="basemethod">
   
   
+  <a name="orionis.console.tasks.store.ScheduleStore.migrate">
+    
+  </a>
+  <a name="migrate">
+    
+  </a>
+  <div class="functionHeader">
+    
+    
+    <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">migrate</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>):</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/c2be36ee05ae0b3facf2364ff118e9458f1b6d8c/orionis/console/tasks/store.py#L181">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#migrate" title="orionis.console.tasks.store.ScheduleStore.migrate">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    <div class="interfaceinfo">overrides <code><a href="orionis.console.contracts.store.IScheduleStore.html#migrate" class="internal-link">orionis.console.contracts.store.IScheduleStore.migrate</a></code></div>
+    <div><p>Create the native database job table without starting the scheduler.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">Create missing storage on a worker thread and preserve existing jobs.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/exceptions.html#RuntimeError" class="intersphinx-link">RuntimeError</a></code></td><td>If database storage is not configured or its backend is unsupported.</td></tr><tr><td class="fieldArgContainer"><code>DatabaseException</code></td><td>If the SQL connection, driver, or schema creation fails.</td></tr></table></div>
+  </div>
+</div><div class="basemethod">
+  
+  
   <a name="orionis.console.tasks.store.ScheduleStore.redis">
     
   </a>
@@ -596,7 +700,7 @@
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">redis</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>) -&gt; <code>RedisJobStore</code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/cddd12900b7f7907cab71102ea2d3d150fc9db33/orionis/console/tasks/store.py#L73">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/c2be36ee05ae0b3facf2364ff118e9458f1b6d8c/orionis/console/tasks/store.py#L75">
       
       (source)
     </a>
@@ -622,7 +726,7 @@
   <div class="functionHeader">
     
     <span class="py-defname">__application</span>: <code>IApplication</code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/cddd12900b7f7907cab71102ea2d3d150fc9db33/orionis/console/tasks/store.py#L42">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/c2be36ee05ae0b3facf2364ff118e9458f1b6d8c/orionis/console/tasks/store.py#L44">
       
       (source)
     </a>
@@ -649,7 +753,7 @@
   <div class="functionHeader">
     
     <span class="py-defname">__scheduler_conf</span>: <code>ConfigScheduler</code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/cddd12900b7f7907cab71102ea2d3d150fc9db33/orionis/console/tasks/store.py#L43">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/c2be36ee05ae0b3facf2364ff118e9458f1b6d8c/orionis/console/tasks/store.py#L45">
       
       (source)
     </a>
@@ -676,7 +780,7 @@
   <div class="functionHeader">
     
     <span class="py-defname">_db_manager</span>: <code>IConnectionManager</code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/cddd12900b7f7907cab71102ea2d3d150fc9db33/orionis/console/tasks/store.py#L46">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/c2be36ee05ae0b3facf2364ff118e9458f1b6d8c/orionis/console/tasks/store.py#L48">
       
       (source)
     </a>
@@ -703,7 +807,7 @@
   <div class="functionHeader">
     <div><span class="decorator">@<a href="https://docs.python.org/3/builtins/functions.html#property" class="intersphinx-link">property</a><br /></span></div>
     <span class="py-defname">config</span>: <code>ConfigScheduler</code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/cddd12900b7f7907cab71102ea2d3d150fc9db33/orionis/console/tasks/store.py#L60">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/c2be36ee05ae0b3facf2364ff118e9458f1b6d8c/orionis/console/tasks/store.py#L62">
       
       (source)
     </a>
@@ -731,7 +835,7 @@ misfire_grace_time, coalesce, replace_existing, etc.).</td></tr></table></div>
   <div class="functionHeader">
     <div><span class="decorator">@<a href="https://docs.python.org/3/builtins/functions.html#property" class="intersphinx-link">property</a><br /></span></div>
     <span class="py-defname">store</span>: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/cddd12900b7f7907cab71102ea2d3d150fc9db33/orionis/console/tasks/store.py#L48">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/c2be36ee05ae0b3facf2364ff118e9458f1b6d8c/orionis/console/tasks/store.py#L50">
       
       (source)
     </a>
@@ -757,7 +861,7 @@ misfire_grace_time, coalesce, replace_existing, etc.).</td></tr></table></div>
   <div class="orionis-footer-inner">
     <div class="orionis-footer-copy">
       <p>API documentation for <a href="https://orionis-framework.com/" class="projecthome">Orionis</a>.</p>
-      <p class="orionis-footer-meta">Generated with <a href="https://github.com/twisted/pydoctor/">Pydoctor</a> 25.10.1.<span class="orionis-footer-build"> Built 2026-10-30 15:04:37.</span></p>
+      <p class="orionis-footer-meta">Generated with <a href="https://github.com/twisted/pydoctor/">Pydoctor</a> 25.10.1.<span class="orionis-footer-build"> Built 2026-11-03 08:45:51.</span></p>
     </div>
     <nav class="orionis-footer-links" aria-label="Additional resources">
       <a href="https://docs.orionis-framework.com">Read the guide <span aria-hidden="true">↗</span></a>

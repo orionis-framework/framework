@@ -340,6 +340,9 @@
     <loc>https://api.orionis-framework.com/orionis.auth.tokens.repository.html</loc>
   </url>
   <url>
+    <loc>https://api.orionis-framework.com/orionis.auth.tokens.schema.html</loc>
+  </url>
+  <url>
     <loc>https://api.orionis-framework.com/orionis.background.BackgroundTask.html</loc>
   </url>
   <url>
@@ -535,6 +538,15 @@
     <loc>https://api.orionis-framework.com/orionis.console.cli.html</loc>
   </url>
   <url>
+    <loc>https://api.orionis-framework.com/orionis.console.commands.auth.html</loc>
+  </url>
+  <url>
+    <loc>https://api.orionis-framework.com/orionis.console.commands.auth.migrate.AuthMigrateCommand.html</loc>
+  </url>
+  <url>
+    <loc>https://api.orionis-framework.com/orionis.console.commands.auth.migrate.html</loc>
+  </url>
+  <url>
     <loc>https://api.orionis-framework.com/orionis.console.commands.bootstrap._base.BootstrapCommand.html</loc>
   </url>
   <url>
@@ -596,6 +608,15 @@
   </url>
   <url>
     <loc>https://api.orionis-framework.com/orionis.console.commands.bootstrap.routes.html</loc>
+  </url>
+  <url>
+    <loc>https://api.orionis-framework.com/orionis.console.commands.cache.html</loc>
+  </url>
+  <url>
+    <loc>https://api.orionis-framework.com/orionis.console.commands.cache.migrate.CacheMigrateCommand.html</loc>
+  </url>
+  <url>
+    <loc>https://api.orionis-framework.com/orionis.console.commands.cache.migrate.html</loc>
   </url>
   <url>
     <loc>https://api.orionis-framework.com/orionis.console.commands.db._inspection.DatabaseInspector.html</loc>
@@ -904,6 +925,12 @@
     <loc>https://api.orionis-framework.com/orionis.console.commands.schedule.list.ScheduleListCommand.html</loc>
   </url>
   <url>
+    <loc>https://api.orionis-framework.com/orionis.console.commands.schedule.migrate.html</loc>
+  </url>
+  <url>
+    <loc>https://api.orionis-framework.com/orionis.console.commands.schedule.migrate.ScheduleMigrateCommand.html</loc>
+  </url>
+  <url>
     <loc>https://api.orionis-framework.com/orionis.console.commands.schedule.work.html</loc>
   </url>
   <url>
@@ -926,6 +953,15 @@
   </url>
   <url>
     <loc>https://api.orionis-framework.com/orionis.console.commands.serve.serve.ServerCommand.html</loc>
+  </url>
+  <url>
+    <loc>https://api.orionis-framework.com/orionis.console.commands.session.html</loc>
+  </url>
+  <url>
+    <loc>https://api.orionis-framework.com/orionis.console.commands.session.migrate.html</loc>
+  </url>
+  <url>
+    <loc>https://api.orionis-framework.com/orionis.console.commands.session.migrate.SessionMigrateCommand.html</loc>
   </url>
   <url>
     <loc>https://api.orionis-framework.com/orionis.console.commands.support._clear.html</loc>

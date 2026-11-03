@@ -1,3 +1,5 @@
+"""Provide mcp transport operations through ``StandardReader``, ``StandardWriter``."""
+
 from __future__ import annotations
 import asyncio
 from concurrent.futures import CancelledError
@@ -12,6 +14,7 @@ class StandardReader:
     """Read at most one queued frame using an interruptible async queue boundary."""
 
     __slots__ = ("_closed", "_limit", "_loop", "_pending", "_queue", "_stream")
+    """Declare the instance attribute slots reserved by this class."""
 
     def __init__(self, stream: BinaryIO, limit: int) -> None:
         """
@@ -19,7 +22,7 @@ class StandardReader:
 
         Parameters
         ----------
-        stream : BinaryIO
+        stream : typing.BinaryIO
             Value supplied for ``stream``.
         limit : int
             Value supplied for ``limit``.
@@ -30,11 +33,17 @@ class StandardReader:
             Complete the documented operation without returning a value.
         """
         self._stream = stream
+        """Value supplied for ``stream``."""
         self._limit = limit
+        """Value supplied for ``limit``."""
         self._loop = asyncio.get_running_loop()
+        """Loop produced by ``asyncio.get_running_loop``."""
         self._queue: asyncio.Queue[bytes | OSError] = asyncio.Queue(maxsize=1)
+        """Name of the queue receiving or storing the job."""
         self._closed = threading.Event()
+        """Whether this resource has completed its close lifecycle."""
         self._pending: Future[None] | None = None
+        """Work that has been admitted and is awaiting completion."""
         threading.Thread(
             target=self._read, name="orionis.mcp.stdin", daemon=True,
         ).start()
@@ -144,6 +153,7 @@ class StandardWriter:
     """Serialize bounded queued output without blocking async cancellation."""
 
     __slots__ = ("_closed", "_loop", "_pending", "_queue", "_stream")
+    """Declare the instance attribute slots reserved by this class."""
 
     def __init__(self, stream: BinaryIO) -> None:
         """
@@ -151,7 +161,7 @@ class StandardWriter:
 
         Parameters
         ----------
-        stream : BinaryIO
+        stream : typing.BinaryIO
             Value supplied for ``stream``.
 
         Returns
@@ -160,12 +170,17 @@ class StandardWriter:
             Complete the documented operation without returning a value.
         """
         self._stream = stream
+        """Value supplied for ``stream``."""
         self._loop = asyncio.get_running_loop()
+        """Loop produced by ``asyncio.get_running_loop``."""
         self._queue: asyncio.Queue[tuple[bytes, asyncio.Future[None]]] = asyncio.Queue(
             1,
         )
+        """Name of the queue receiving or storing the job."""
         self._closed = threading.Event()
+        """Whether this resource has completed its close lifecycle."""
         self._pending: Future[tuple[bytes, asyncio.Future[None]]] | None = None
+        """Work that has been admitted and is awaiting completion."""
         threading.Thread(
             target=self._write, name="orionis.mcp.stdout", daemon=True,
         ).start()

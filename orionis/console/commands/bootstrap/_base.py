@@ -1,3 +1,5 @@
+"""Run component bootstrapping through native Reactor output and injection."""
+
 from asyncio import to_thread
 from pathlib import Path
 from typing import ClassVar
@@ -11,11 +13,14 @@ class BootstrapCommand(BaseCommand):
     """Run component bootstrapping through native Reactor output and injection."""
 
     timestamps = False
+    """Timestamps flag used by ``BootstrapCommand``."""
     context: ClassVar[str]
+    """Runtime context made available to the operation and its callbacks."""
     _action_styles: ClassVar[dict[str, ANSIColors]] = {
         "CREATED": ANSIColors.TEXT_BOLD_SUCCESS,
         "UPDATED": ANSIColors.TEXT_BOLD_INFO,
     }
+    """Console styles assigned to bootstrap resource actions."""
 
     def bootstrap(self, app: IApplication) -> list[tuple[str, str]]:
         """
@@ -23,7 +28,7 @@ class BootstrapCommand(BaseCommand):
 
         Parameters
         ----------
-        app : IApplication
+        app : orionis.IApplication
             Configured application injected by Reactor.
 
         Returns
@@ -40,7 +45,7 @@ class BootstrapCommand(BaseCommand):
 
         Parameters
         ----------
-        app : IApplication
+        app : orionis.IApplication
             Application providing its configured compiled cache directory.
 
         Returns
@@ -85,7 +90,7 @@ class BootstrapCommand(BaseCommand):
 
         Parameters
         ----------
-        app : IApplication
+        app : orionis.IApplication
             Configured application injected by Reactor.
 
         Returns

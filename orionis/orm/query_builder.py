@@ -1,3 +1,5 @@
+"""Entry point of the model-less query API, backing the ``DB`` facade."""
+
 from typing import TYPE_CHECKING, Self
 from orionis.database.contracts.connection_manager import IConnectionManager
 from orionis.database.contracts.transaction import ITransaction
@@ -22,6 +24,7 @@ class QueryBuilder(IQueryBuilder):
     # ruff: noqa: TC001
 
     __slots__ = ("_connection_name", "_db_manager")
+    """Declare the instance attribute slots reserved by this class."""
 
     def __init__(
         self,
@@ -33,7 +36,7 @@ class QueryBuilder(IQueryBuilder):
 
         Parameters
         ----------
-        db_manager : IConnectionManager
+        db_manager : orionis.database.contracts.IConnectionManager
             Manager resolving named database connections.
         connection_name : str or None, optional
             Connection every query defaults to, or ``None`` for the
@@ -45,7 +48,12 @@ class QueryBuilder(IQueryBuilder):
             This method does not return a value.
         """
         self._db_manager: IConnectionManager = db_manager
+        """Manager resolving named database connections."""
         self._connection_name: str | None = connection_name
+        """
+        Connection every query defaults to, or ``None`` for the configured default
+        connection.
+        """
 
     def connection(
         self,
@@ -66,7 +74,7 @@ class QueryBuilder(IQueryBuilder):
 
         Returns
         -------
-        QueryBuilder
+        orionis.orm.query_builder.QueryBuilder
             Gateway bound to the requested connection.
         """
         return type(self)(self._db_manager, name)
@@ -97,7 +105,7 @@ class QueryBuilder(IQueryBuilder):
 
         Returns
         -------
-        IRawQueryBuilder
+        orionis.orm.contracts.raw_builder.IRawQueryBuilder
             Fluent, model-less query builder over the table.
         """
         builder = RawQueryBuilder()
@@ -138,7 +146,7 @@ class QueryBuilder(IQueryBuilder):
 
         Raises
         ------
-        ConnectionNotFoundException
+        orionis.database.ConnectionNotFoundException
             If the connection is not declared in the configuration.
         """
         self._db_manager.setDefaultName(name)
@@ -169,7 +177,7 @@ class QueryBuilder(IQueryBuilder):
 
         Raises
         ------
-        QueryException
+        orionis.database.QueryException
             If the statement fails to execute.
         """
         return await self._resolve(name).select(sql, bindings)
@@ -200,7 +208,7 @@ class QueryBuilder(IQueryBuilder):
 
         Raises
         ------
-        QueryException
+        orionis.database.QueryException
             If the statement fails to execute.
         """
         return await self._resolve(name).execute(sql, bindings)
@@ -231,7 +239,7 @@ class QueryBuilder(IQueryBuilder):
 
         Raises
         ------
-        QueryException
+        orionis.database.QueryException
             If the statement fails to execute.
         """
         return await self._resolve(name).statement(sql, bindings)
@@ -256,7 +264,7 @@ class QueryBuilder(IQueryBuilder):
 
         Raises
         ------
-        TransactionException
+        orionis.database.TransactionException
             If the transaction cannot be started.
         """
         await self._resolve(name).begin()
@@ -281,7 +289,7 @@ class QueryBuilder(IQueryBuilder):
 
         Raises
         ------
-        TransactionException
+        orionis.database.TransactionException
             If no transaction is active.
         """
         await self._resolve(name).commit()
@@ -306,7 +314,7 @@ class QueryBuilder(IQueryBuilder):
 
         Raises
         ------
-        TransactionException
+        orionis.database.TransactionException
             If no transaction is active.
         """
         await self._resolve(name).rollback()
@@ -326,7 +334,7 @@ class QueryBuilder(IQueryBuilder):
 
         Returns
         -------
-        ITransaction
+        orionis.database.contracts.ITransaction
             Context manager committing on success and rolling back on
             error.
         """
@@ -344,12 +352,12 @@ class QueryBuilder(IQueryBuilder):
 
         Returns
         -------
-        IConnection
+        orionis.database.contracts.IConnection
             Connection bound to its configuration.
 
         Raises
         ------
-        ConnectionNotFoundException
+        orionis.database.ConnectionNotFoundException
             If the connection is not declared in the configuration.
         """
         target = name or self._connection_name

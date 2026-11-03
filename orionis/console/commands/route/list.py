@@ -1,3 +1,5 @@
+"""Display registered HTTP routes in URI order."""
+
 from rich import box
 from rich.console import Console
 from rich.table import Table
@@ -11,8 +13,11 @@ class RouteListCommand(BaseCommand):
     # ruff: noqa: TC001, TC002
 
     timestamps: bool = False
+    """Timestamps flag used by ``RouteListCommand``."""
     signature: str = "route:list"
+    """Signature identifier: ``route:list``."""
     description: str = "List the application's registered HTTP routes."
+    """Description identifier: ``List the application's registered HTTP routes.``."""
 
     def __getAction(self, route: CompiledRoute) -> str:
         """
@@ -20,7 +25,7 @@ class RouteListCommand(BaseCommand):
 
         Parameters
         ----------
-        route : CompiledRoute
+        route : orionis.http.routes.entities.compiled_route.CompiledRoute
             Route whose action descriptor is displayed.
 
         Returns
@@ -52,7 +57,7 @@ class RouteListCommand(BaseCommand):
 
         Parameters
         ----------
-        route : CompiledRoute
+        route : orionis.http.routes.entities.compiled_route.CompiledRoute
             Route whose effective middleware stack is displayed.
 
         Returns
@@ -71,12 +76,12 @@ class RouteListCommand(BaseCommand):
 
         Parameters
         ----------
-        route_loader : RouteLoader
+        route_loader : orionis.http.routes.loader.RouteLoader
             Loader that provides the application's compiled route buckets.
 
         Returns
         -------
-        list[CompiledRoute]
+        list[orionis.http.routes.entities.compiled_route.CompiledRoute]
             All registered routes sorted by path in ascending order.
         """
         compiled_routes = route_loader.load()
@@ -97,9 +102,9 @@ class RouteListCommand(BaseCommand):
 
         Parameters
         ----------
-        route_loader : RouteLoader
+        route_loader : orionis.http.routes.loader.RouteLoader
             Loader that provides the application's compiled route buckets.
-        console : Console
+        console : orionis.console.Console
             Rich console used to display route information.
 
         Returns

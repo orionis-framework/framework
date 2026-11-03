@@ -1,6 +1,9 @@
+"""Convert supported Python values into serializable representations."""
+
 from orionis.support.formatter.exceptions.parser import ExceptionParser
 
 class Parser:
+    """Convert supported Python values into serializable representations."""
 
     @staticmethod
     def exception(exception: Exception) -> ExceptionParser:
@@ -14,7 +17,7 @@ class Parser:
 
         Returns
         -------
-        ExceptionParser
+        orionis.support.formatter.exceptions.parser.ExceptionParser
             An ExceptionParser instance initialized with the provided exception.
         """
         # Instantiate and return an ExceptionParser for the given exception

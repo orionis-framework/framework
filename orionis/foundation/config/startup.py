@@ -1,3 +1,5 @@
+"""Represent the main configuration for Orionis Framework startup."""
+
 from __future__ import annotations
 from dataclasses import dataclass, field
 from orionis.foundation.config.app.entities.app import App
@@ -37,45 +39,46 @@ _SECTION_MAP: tuple[tuple[str, type], ...] = (
     ("view", View),
     ("testing", Testing),
 )
+"""Dispatch table: maps each field name to its expected concrete type."""
 
 @dataclass(frozen=True, kw_only=True)
 class Configuration(BaseEntity):
     """
     Represent the main configuration for Orionis Framework startup.
 
-    Parameters
+    Attributes
     ----------
-    app : App | dict, optional
+    app : orionis.foundation.config.app.App | dict, optional
         Application configuration settings.
-    auth : Auth | dict, optional
+    auth : orionis.foundation.config.auth.Auth | dict, optional
         Authentication configuration settings.
-    cache : Cache | dict, optional
+    cache : orionis.foundation.config.cache.Cache | dict, optional
         Cache configuration settings.
-    database : Database | dict, optional
+    database : orionis.foundation.config.database.Database | dict, optional
         Database configuration settings.
-    filesystems : Filesystems | dict, optional
+    filesystems : orionis.foundation.config.filesystems.Filesystems | dict, optional
         Filesystem configuration settings.
-    logging : Logging | dict, optional
+    logging : orionis.foundation.config.logging.Logging | dict, optional
         Logging configuration settings.
-    mail : Mail | dict, optional
+    mail : orionis.foundation.config.mail.Mail | dict, optional
         Mail configuration settings.
-    hashing : Hashing | dict, optional
+    hashing : orionis.foundation.config.hashing.Hashing | dict, optional
         Password hashing configuration settings.
-    scheduler : Scheduler | dict, optional
+    scheduler : orionis.foundation.config.scheduler.Scheduler | dict, optional
         Scheduled task configuration settings.
-    view : View | dict, optional
+    view : orionis.foundation.config.view.View | dict, optional
         Template rendering configuration settings.
-    http : HTTP | dict, optional
+    http : orionis.foundation.config.http.HTTP | dict, optional
         HTTP configuration settings.
-    queue : Queue | dict, optional
+    queue : orionis.foundation.config.queue.Queue | dict, optional
         Queue configuration settings.
-    realtime : RealtimeConfig | dict, optional
+    realtime : orionis.realtime.config.RealtimeConfig | dict, optional
         Realtime invocation, message and broadcast limits.
-    session : Session | dict, optional
+    session : orionis.foundation.config.session.Session | dict, optional
         Session configuration settings.
-    testing : Testing | dict, optional
+    testing : orionis.foundation.config.testing.Testing | dict, optional
         Testing configuration settings.
-    mcp : McpConfig | dict, optional
+    mcp : orionis.mcp.config.McpConfig | dict, optional
         MCP protocol limits and trusted browser origins.
 
     Raises

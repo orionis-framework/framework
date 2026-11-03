@@ -1,3 +1,8 @@
+"""Provide schemas operations.
+
+Includes ``register_messages``, ``annotation_messages``, ``constraint_plan``.
+"""
+
 from collections.abc import Collection, Mapping
 from typing import Annotated, Union, get_args, get_origin
 import types
@@ -7,13 +12,17 @@ _KEYS = (
     "gt", "ge", "lt", "le", "multiple_of", "pattern", "min_length",
     "max_length", "tz",
 )
+"""Keys definitions used by ``constraint_plan``."""
 _CACHE: dict[int, tuple[object, tuple[object, tuple]]] = {}
+"""Cache definitions used by ``constraint_plan``."""
 _MESSAGES: dict[int, tuple[object, dict[str, str]]] = {}
+"""Messages definitions used by ``constraint_plan``."""
 
 class _ConstraintMessages:
     """Keep annotations with distinct messages from sharing a typing cache key."""
 
     __slots__ = ("messages",)
+    """Declare the instance attribute slots reserved by this class."""
 
     def __init__(self, messages: dict[str, str]) -> None:
         """
@@ -30,6 +39,7 @@ class _ConstraintMessages:
             Store the supplied message mapping.
         """
         self.messages = messages
+        """Custom messages indexed by validation code."""
 
 def register_messages(annotation: object, messages: dict[str, str]) -> object:
     """
@@ -83,7 +93,7 @@ def _constraint_probes(
     ----------
     probe_base : object
         Unconstrained type checked by each probe.
-    meta : msgspec.Meta
+    meta : ``msgspec.Meta``
         Native constraint metadata to split into individual checks.
     messages : dict[str, str]
         Custom messages indexed by validation code.

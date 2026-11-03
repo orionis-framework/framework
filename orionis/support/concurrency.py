@@ -1,3 +1,9 @@
+"""Provide support operations.
+
+Includes ``WorkQueueFullError``, ``complete_on_cancel``, ``BoundedExecutor``,
+``threaded``.
+"""
+
 from __future__ import annotations
 import asyncio
 import contextvars
@@ -18,18 +24,19 @@ async def complete_on_cancel[T](
     *,
     on_cancel: Callable[[], object] | None = None,
 ) -> T:
-    """Wait for owned work before propagating caller cancellation.
+    """
+    Wait for owned work before propagating caller cancellation.
 
     Parameters
     ----------
-    awaitable : Awaitable[T]
+    awaitable : collections.abc.Awaitable[``T``]
         Operation that must finish before its resources can be released.
-    on_cancel : Callable[[], object] | None
+    on_cancel : collections.abc.Callable[[], object] | None
         Optional request to stop work that has not started yet.
 
     Returns
     -------
-    T
+    ``T``
         Operation result unless the caller was cancelled.
     """
     task = asyncio.ensure_future(awaitable)
@@ -93,11 +100,17 @@ class BoundedExecutor:
             )
             raise ValueError(error_msg)
         self._workers = max_workers
+        """Maximum simultaneous native calls."""
         self._name = name
+        """Prefix used for worker thread names."""
         self._capacity = BoundedSemaphore(max_workers + max_pending)
+        """Synchronization primitive controlling access to capacity."""
         self._lock = Lock()
+        """Lock protecting concurrent access to shared state."""
         self._pool: ThreadPoolExecutor | None = None
+        """Thread pool used to execute admitted blocking operations."""
         self._closed = False
+        """Whether this resource has completed its close lifecycle."""
 
     async def run[T](
         self: Self,
@@ -106,11 +119,12 @@ class BoundedExecutor:
         *args: object,
         **kwargs: object,
     ) -> T:
-        """Execute a synchronous callable with copied context and bounded admission.
+        """
+        Execute a synchronous callable with copied context and bounded admission.
 
         Parameters
         ----------
-        callback : Callable[..., T]
+        callback : collections.abc.Callable[``...``, ``T``]
             Synchronous operation with thread-safe dependencies.
         *args : object
             Positional callback arguments.
@@ -119,7 +133,7 @@ class BoundedExecutor:
 
         Returns
         -------
-        T
+        ``T``
             Result from the worker thread.
         """
         if not self._capacity.acquire(blocking=False):
@@ -174,18 +188,20 @@ class BoundedExecutor:
         await complete_on_cancel(asyncio.to_thread(self.close))
 
 _CALLBACK_WORKERS = BoundedExecutor(name="orionis-callback")
+"""Callback workers used by ``concurrency``."""
 
 def threaded[**P, T](callback: Callable[P, T]) -> Callable[P, Awaitable[T]]:
-    """Opt a synchronous handler into bounded thread execution.
+    """
+    Opt a synchronous handler into bounded thread execution.
 
     Parameters
     ----------
-    callback : Callable[P, T]
+    callback : collections.abc.Callable[``P``, ``T``]
         Blocking synchronous function. Dependencies must support worker threads.
 
     Returns
     -------
-    Callable[P, Awaitable[T]]
+    collections.abc.Callable[``P``, collections.abc.Awaitable[``T``]]
         Async wrapper preserving the signature used for dependency injection.
         Context variables propagate; CPU-bound Python still contends for the GIL.
     """
@@ -200,14 +216,14 @@ def threaded[**P, T](callback: Callable[P, T]) -> Callable[P, Awaitable[T]]:
 
         Parameters
         ----------
-        *args : P.args
+        *args : ``P.args``
             Positional arguments forwarded to the wrapped operation.
-        **kwargs : P.kwargs
+        **kwargs : ``P.kwargs``
             Keyword arguments forwarded to the wrapped operation.
 
         Returns
         -------
-        T
+        ``T``
             Result of the wrapped operation.
         """
         return await _CALLBACK_WORKERS.run(callback, *args, **kwargs)

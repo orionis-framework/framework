@@ -1,3 +1,5 @@
+"""Ensure an uploaded file is a raster image."""
+
 from orionis.schemas.rules.image_probe import probe_image
 from orionis.schemas.rules.measure import read_content
 from orionis.schemas.rule import Rule
@@ -14,9 +16,12 @@ class Image(Rule):
     # ruff: noqa: ARG002
 
     __slots__ = ()
+    """Declare that this class introduces no additional instance slots."""
 
     __message__ = "File must be a valid image."
+    """Error text for message: ``File must be a valid image.``."""
     __code__ = "image"
+    """Code identifier: ``image``."""
 
     async def enforce(
         self,

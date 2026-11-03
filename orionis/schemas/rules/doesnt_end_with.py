@@ -1,3 +1,5 @@
+"""Ensure a string does not end with any of the given suffixes."""
+
 from orionis.schemas.rule import Rule
 
 class DoesntEndWith(Rule):
@@ -6,9 +8,15 @@ class DoesntEndWith(Rule):
     # ruff: noqa: ARG002
 
     __slots__ = ("_suffixes",)
+    """Declare the instance attribute slots reserved by this class."""
 
     __message__ = "Value must not end with any of the forbidden suffixes."
+    """
+    Error text for message: ``Value must not end with any of the forbidden
+    suffixes.``.
+    """
     __code__ = "doesnt_end_with"
+    """Code identifier: ``doesnt_end_with``."""
 
     def __init__(self, *suffixes: str, message: str | None = None) -> None:
         """
@@ -36,6 +44,7 @@ class DoesntEndWith(Rule):
             error_msg = "DoesntEndWith requires at least one suffix."
             raise ValueError(error_msg)
         self._suffixes: tuple[str, ...] = suffixes
+        """Suffixes the value must not end with. At least one is required."""
 
     async def enforce(
         self,

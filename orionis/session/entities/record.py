@@ -1,3 +1,5 @@
+"""Persistent representation of a single session."""
+
 from __future__ import annotations
 from dataclasses import dataclass
 from typing import TYPE_CHECKING, Any
@@ -14,13 +16,13 @@ class SessionRecord:
     ``SessionManager`` and any ``ISessionStore`` implementation.
     It must never be exposed directly to application code.
 
-    Parameters
+    Attributes
     ----------
     id : str
         Unique session identifier (URL-safe random token).
-    data : dict[str, Any]
+    data : dict[str, typing.Any]
         Serialisable payload stored alongside the session.
-    expires_at : datetime
+    expires_at : datetime.datetime
         UTC datetime at which the record must be considered expired.
     """
 

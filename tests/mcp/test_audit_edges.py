@@ -161,7 +161,7 @@ class TestAuditEdges(TestCase):
         Container._instances.update(self.instances)
         ScopedContext.reset(self.scope)
 
-    async def test_subscription_authorization_di_and_outer_context_restoration(self):
+    async def testSubscriptionAuthorizationDiAndOuterContextRestoration(self):
         """Admit a URI only with matching nested DI, then restore its parent context.
 
         Returns
@@ -185,9 +185,9 @@ class TestAuditEdges(TestCase):
             self.assertEqual(dict(current.uri_variables), {})
         finally:
             await stream.aclose()
-        self.assertEqual(self.client.dispatcher.bus.listener_count, 0)
+        self.assertEqual(self.client.dispatcher.bus.listenerCount, 0)
 
-    async def test_raw_progress_never_encodes_invalid_json_rpc_notification(self):
+    async def testRawProgressNeverEncodesInvalidJsonRpcNotification(self):
         """NaN, boolean numbers and non-string messages become safe tool failures.
 
         Returns
@@ -208,7 +208,7 @@ class TestAuditEdges(TestCase):
                 response.assertTextContains("Tool execution failed")
                 self.assertNotIn("must not be reached", str(response.message))
 
-    async def test_stream_failure_keeps_safe_tool_error_semantics(self):
+    async def testStreamFailureKeepsSafeToolErrorSemantics(self):
         """A deferred exception still ends with isError after valid progress.
 
         Returns
@@ -230,7 +230,7 @@ class TestAuditEdges(TestCase):
         response.assertTextContains("Tool execution failed")
         self.assertNotIn("secret-database", str(response.message))
 
-    async def test_concurrent_close_callers_join_one_cleanup_future(self):
+    async def testConcurrentCloseCallersJoinOneCleanupFuture(self):
         """No closing caller returns while the owned source is still finalizing.
 
         Returns

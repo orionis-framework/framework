@@ -1,3 +1,9 @@
+"""Provide http routes operations.
+
+Includes ``normalize_path``, ``normalize_request_path``, ``strip_regex_anchors``,
+``flatten_middleware``.
+"""
+
 from __future__ import annotations
 import inspect
 import re
@@ -13,9 +19,11 @@ if TYPE_CHECKING:
 
 # Expected number of elements in a [Controller, method_name] action list.
 _ACTION_LIST_LENGTH: int = 2
+"""Expected number of elements in a [Controller, method_name] action list."""
 
 # Matches one or more consecutive forward slashes anywhere in a path.
 _MULTI_SLASH_RE: re.Pattern = re.compile(r"/{2,}")
+"""Matches one or more consecutive forward slashes anywhere in a path."""
 
 def normalize_path(path: str) -> str:
     """
@@ -110,7 +118,7 @@ def flatten_middleware(
 
     Returns
     -------
-    list[type[BaseMiddleware | WebSocketMiddleware]]
+    list[type[orionis.http.BaseMiddleware | orionis.http.WebSocketMiddleware]]
         Flat list of validated middleware classes, in the order
         they were provided.
 
@@ -152,7 +160,7 @@ def _middleware_key(
 
     Parameters
     ----------
-    middleware : type[BaseMiddleware | WebSocketMiddleware]
+    middleware : type[orionis.http.BaseMiddleware | orionis.http.WebSocketMiddleware]
         Middleware class to order consistently when using unordered containers.
 
     Returns
@@ -214,7 +222,7 @@ def parse_action( # NOSONAR
     -------
     tuple[type, None]
         When *action* is an invokable controller class.
-    tuple[Callable, None]
+    tuple[collections.abc.Callable, None]
         When *action* is a standalone callable.
     tuple[type, str]
         When *action* is a ``[ControllerClass, 'method_name']`` list.

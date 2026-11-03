@@ -1,3 +1,5 @@
+"""Create the framework personal access token table without removing data."""
+
 from orionis.auth.tokens.schema import build_tokens_table
 from orionis.console.base.command import BaseCommand
 from orionis.database.contracts.connection_manager import IConnectionManager
@@ -10,10 +12,16 @@ class AuthMigrateCommand(BaseCommand):
     # ruff: noqa: TC001
 
     __slots__ = ()
+    """Declare that this class introduces no additional instance slots."""
 
     timestamps: bool = False
+    """Timestamps flag used by ``AuthMigrateCommand``."""
     signature: str = "auth:migrate"
+    """Signature identifier: ``auth:migrate``."""
     description: str = "Create the configured personal access token table."
+    """
+    Description identifier: ``Create the configured personal access token table.``.
+    """
 
     async def handle(self, app: IApplication, manager: IConnectionManager) -> int:
         """
@@ -21,9 +29,9 @@ class AuthMigrateCommand(BaseCommand):
 
         Parameters
         ----------
-        app : IApplication
+        app : orionis.IApplication
             Application exposing the configured personal access token table.
-        manager : IConnectionManager
+        manager : orionis.database.contracts.IConnectionManager
             Manager resolving the default SQL connection used by token queries.
 
         Returns

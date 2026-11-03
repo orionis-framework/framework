@@ -1,3 +1,5 @@
+"""Define the contract for an asynchronous binary stream handle."""
+
 from __future__ import annotations
 from abc import ABC, abstractmethod
 from typing import TYPE_CHECKING, Self
@@ -19,6 +21,7 @@ class IStorageStream(ABC):
     """
 
     __slots__ = ()
+    """Declare that this class introduces no additional instance slots."""
 
     async def chunks(
         self: Self,
@@ -112,6 +115,7 @@ class IStorageStream(ABC):
         Returns
         -------
         None
+            Flush pending data and release the underlying handle.
         """
 
     @abstractmethod
@@ -121,7 +125,7 @@ class IStorageStream(ABC):
 
         Returns
         -------
-        IStorageStream
+        orionis.storage.contracts.IStorageStream
             The stream itself, ready for I/O operations.
         """
 
@@ -141,10 +145,11 @@ class IStorageStream(ABC):
             Exception class raised inside the context, if any.
         exc : BaseException | None
             Exception instance raised inside the context, if any.
-        traceback : TracebackType | None
+        traceback : types.TracebackType | None
             Traceback of the raised exception, if any.
 
         Returns
         -------
         None
+            Close the stream when leaving the async context.
         """

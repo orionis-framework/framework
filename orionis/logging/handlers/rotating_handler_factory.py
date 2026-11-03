@@ -1,3 +1,5 @@
+"""Construct rotating log handlers from channel configuration."""
+
 from __future__ import annotations
 from logging import FileHandler
 from pathlib import Path
@@ -34,7 +36,7 @@ def _create_stack(
 
     Returns
     -------
-    Handler
+    ``logging.Handler``
         Configured ``FileHandler`` instance.
     """
     full_path: Path = Path(app_root) / path_template
@@ -63,7 +65,7 @@ def _create_hourly(
 
     Returns
     -------
-    Handler
+    ``logging.Handler``
         Configured ``AdvancedRotatingFileHandler`` instance using an hourly
         suffix resolver.
     """
@@ -98,7 +100,7 @@ def _create_daily(
 
     Returns
     -------
-    Handler
+    ``logging.Handler``
         Configured ``AdvancedRotatingFileHandler`` instance using a daily
         suffix resolver.
     """
@@ -134,7 +136,7 @@ def _create_weekly(
 
     Returns
     -------
-    Handler
+    ``logging.Handler``
         Configured ``AdvancedRotatingFileHandler`` instance using a weekly
         suffix resolver.
     """
@@ -170,7 +172,7 @@ def _create_monthly(
 
     Returns
     -------
-    Handler
+    ``logging.Handler``
         Configured ``AdvancedRotatingFileHandler`` instance using a monthly
         suffix resolver.
     """
@@ -189,7 +191,8 @@ def _create_monthly(
 def _create_chunked(
     channel_config: dict, app_root: str, path_template: str, level: int,
 ) -> Handler:
-    """Create a size-based rotating file handler.
+    """
+    Create a size-based rotating file handler.
 
     Parameters
     ----------
@@ -204,7 +207,7 @@ def _create_chunked(
 
     Returns
     -------
-    Handler
+    ``logging.Handler``
         Configured ``AdvancedRotatingFileHandler`` instance using chunked
         rotation and compressed rotated files.
     """
@@ -232,8 +235,10 @@ _CHANNEL_CREATORS: dict[str, Callable[[dict, str, str, int], Handler]] = {
     "monthly": _create_monthly,
     "chunked": _create_chunked,
 }
+"""Mapping of channel types to their respective handler creation functions."""
 
 class RotatingHandlerFactory:
+    """Construct rotating log handlers from channel configuration."""
 
     @staticmethod
     def createHandler(
@@ -255,7 +260,7 @@ class RotatingHandlerFactory:
 
         Returns
         -------
-        Handler | None
+        ``logging.Handler`` | None
             Configured log handler instance, or None if the type is unsupported.
         """
         # Resolve log file path and log level from configuration

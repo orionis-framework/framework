@@ -1,3 +1,8 @@
+"""Provide console commands bootstrap operations.
+
+Includes ``BootstrapEditError``, ``BootstrapEditor``.
+"""
+
 from __future__ import annotations
 import ast
 import io
@@ -13,9 +18,12 @@ if TYPE_CHECKING:
     from collections.abc import Iterator
 
 _REPLACE_ATTEMPTS = 6
+"""Replace attempts value used by ``_editor``."""
 _REPLACE_BACKOFF_SECONDS = 0.005
+"""Replace backoff seconds value used by ``_editor``."""
 # Access denied, sharing violation, and lock violation.
 _WINDOWS_REPLACE_ERRORS = frozenset({5, 32, 33})
+"""Access denied, sharing violation, and lock violation."""
 
 class BootstrapEditError(ValueError):
     """A bootstrap cannot be updated without guessing about application flow."""
@@ -35,9 +43,9 @@ class BootstrapEditor:
 
         Parameters
         ----------
-        path : Path
+        path : pathlib.Path
             Bootstrap Python module to inspect.
-        base_path : Path
+        base_path : pathlib.Path
             Application root used for relative route and import paths.
 
         Returns
@@ -47,18 +55,27 @@ class BootstrapEditor:
         """
         # Capture source metadata before planning any modifications.
         self.path = Path(path)
+        """Bootstrap Python module to inspect."""
         self.base_path = Path(base_path).resolve()
+        """Application root used for relative route and import paths."""
         self._original = self.path.read_bytes()
+        """Original produced by ``self.path.read_bytes``."""
         self.encoding, _ = tokenize.detect_encoding(io.BytesIO(self._original).readline)
+        """Encoding produced by ``tokenize.detect_encoding``."""
         self.source = self._original.decode(self.encoding)
+        """Source produced by ``self._original.decode``."""
         self.newline = "\r\n" if "\r\n" in self.source else "\n"
+        """Newline sequence preserved when rewriting the source file."""
         try:
             self.tree = ast.parse(self.source, filename=str(self.path))
+            """Tree produced by ``ast.parse``."""
         except SyntaxError as exc:
             error_msg = f"Invalid Python in {self.path}: {exc}"
             raise BootstrapEditError(error_msg) from exc
         self._lines = self.source.splitlines(keepends=True)
+        """Lines produced by ``self.source.splitlines``."""
         self._offsets = [0]
+        """Character offsets used to translate source positions into edit ranges."""
         for line in self._lines:
             self._offsets.append(self._offsets[-1] + len(line))
         self._parents = {
@@ -66,8 +83,11 @@ class BootstrapEditor:
             for parent in ast.walk(self.tree)
             for child in ast.iter_child_nodes(parent)
         }
+        """Parent node associated with each node in the parsed syntax tree."""
         self.assignment, self.app_name = self._findApplication()
+        """Assignment produced by ``self._findApplication``."""
         self.scope = self._parents[self.assignment]
+        """Dependency-injection scope associated with the current operation."""
         if not isinstance(
             self.scope, (ast.Module, ast.FunctionDef, ast.AsyncFunctionDef),
         ):
@@ -77,7 +97,9 @@ class BootstrapEditor:
             )
             raise BootstrapEditError(error_msg)
         self.body = self.scope.body
+        """HTTP response body or encoded payload returned to the client."""
         self._nodes = list(self._scopeNodes(self.scope))
+        """Nodes produced by ``list``."""
         self._checkAssignments()
 
     def _applicationNames(self) -> tuple[set[str], set[str]]:
@@ -118,7 +140,7 @@ class BootstrapEditor:
 
         Parameters
         ----------
-        node : ast.AST
+        node : ``ast.AST``
             Expression to inspect.
         constructors : set[str]
             Recognized direct application constructor names.
@@ -149,7 +171,7 @@ class BootstrapEditor:
 
         Returns
         -------
-        tuple[ast.Assign | ast.AnnAssign, str]
+        tuple[``ast.Assign`` | ``ast.AnnAssign``, str]
             Return the assignment node and its application variable name.
         """
         # Require one unambiguous named application construction.
@@ -208,12 +230,12 @@ class BootstrapEditor:
 
         Parameters
         ----------
-        scope : ast.AST
+        scope : ``ast.AST``
             Lexical scope or descendant node to traverse.
 
         Yields
         ------
-        ast.AST
+        ``ast.AST``
             Emit nodes from the selected lexical scope.
 
         Returns
@@ -238,7 +260,7 @@ class BootstrapEditor:
 
         Parameters
         ----------
-        node : ast.AST | None
+        node : ``ast.AST`` | None
             Expression to inspect, or None when no expression exists.
 
         Returns
@@ -279,7 +301,7 @@ class BootstrapEditor:
 
         Parameters
         ----------
-        node : ast.AST
+        node : ``ast.AST``
             Syntax node with source location information.
 
         Returns
@@ -296,7 +318,7 @@ class BootstrapEditor:
 
         Parameters
         ----------
-        node : ast.AST
+        node : ``ast.AST``
             Syntax node with complete source location information.
 
         Returns
@@ -313,12 +335,12 @@ class BootstrapEditor:
 
         Parameters
         ----------
-        node : ast.AST
+        node : ``ast.AST``
             Descendant syntax node whose enclosing statement is needed.
 
         Returns
         -------
-        ast.stmt
+        ``ast.stmt``
             Return the statement that belongs directly to the selected scope.
         """
         # Ascend to the statement that can safely receive an insertion.
@@ -340,7 +362,7 @@ class BootstrapEditor:
 
         Returns
         -------
-        list[ast.Call]
+        list[``ast.Call``]
             Return matching calls ordered by their source end offsets.
         """
         # Inspect both named receivers and calls inside the initializer.
@@ -374,7 +396,7 @@ class BootstrapEditor:
 
         Returns
         -------
-        set[ast.Call]
+        set[``ast.Call``]
             Return the calls in the application assignment value chain.
         """
         # Follow the initializer receiver chain without visiting arguments.
@@ -393,7 +415,7 @@ class BootstrapEditor:
 
         Returns
         -------
-        ast.Call | None
+        ``ast.Call`` | None
             Return the effective routing call, or None when it is absent.
         """
         # Use the last routing call because it replaces earlier configuration.
@@ -420,14 +442,14 @@ class BootstrapEditor:
 
         Parameters
         ----------
-        call : ast.Call
+        call : ``ast.Call``
             Routing call to inspect.
         context : str
             Runtime context whose route argument is needed.
 
         Returns
         -------
-        ast.AST | None
+        ``ast.AST`` | None
             Return the argument expression, or None when it is absent.
         """
         # Respect the public positional order before inspecting keywords.
@@ -482,7 +504,7 @@ class BootstrapEditor:
 
         Parameters
         ----------
-        path : Path
+        path : pathlib.Path
             Effective route file path to represent.
 
         Returns
@@ -532,7 +554,7 @@ class BootstrapEditor:
 
         Parameters
         ----------
-        statement : ast.stmt
+        statement : ``ast.stmt``
             Standalone statement that follows the inserted lines.
         lines : list[str]
             Unindented source lines to insert.
@@ -568,7 +590,7 @@ class BootstrapEditor:
 
         Parameters
         ----------
-        statement : ast.stmt
+        statement : ``ast.stmt``
             Standalone statement that precedes the inserted lines.
         lines : list[str]
             Unindented source lines to insert.
@@ -708,7 +730,7 @@ class BootstrapEditor:
         ----------
         context : str
             Runtime context to register.
-        route_path : Path | list[Path]
+        route_path : pathlib.Path | list[pathlib.Path]
             Effective route file path or paths to register.
         registered : bool
             Whether runtime paths confirm a dynamic registration.
@@ -765,7 +787,7 @@ class BootstrapEditor:
 
         Parameters
         ----------
-        routing : ast.Call | None
+        routing : ``ast.Call`` | None
             Selected routing call, or None when registration is absent.
 
         Returns
@@ -807,9 +829,9 @@ class BootstrapEditor:
 
         Parameters
         ----------
-        helper : ast.FunctionDef | ast.AsyncFunctionDef
+        helper : ``ast.FunctionDef`` | ``ast.AsyncFunctionDef``
             Helper definition whose argument bindings are inspected.
-        call : ast.Call
+        call : ``ast.Call``
             Invocation that can pass the selected application.
 
         Returns
@@ -855,7 +877,7 @@ class BootstrapEditor:
 
         Parameters
         ----------
-        helper : ast.FunctionDef | ast.AsyncFunctionDef
+        helper : ``ast.FunctionDef`` | ``ast.AsyncFunctionDef``
             Helper definition to inspect within its lexical scope.
         parameters : set[str]
             Names that can still reference the application instance.
@@ -884,7 +906,7 @@ class BootstrapEditor:
 
         Parameters
         ----------
-        call : ast.Call
+        call : ``ast.Call``
             Routing call whose argument list must be extended.
         context : str
             Runtime context to add as a keyword argument.
@@ -941,7 +963,7 @@ class BootstrapEditor:
 
         Parameters
         ----------
-        last : ast.AST
+        last : ``ast.AST``
             Final argument node in the routing call.
         call_end : int
             Character offset immediately before the closing parenthesis.
@@ -985,7 +1007,7 @@ class BootstrapEditor:
 
         Parameters
         ----------
-        call : ast.Call
+        call : ``ast.Call``
             Routing call whose initialization order must be validated.
 
         Returns
@@ -1010,7 +1032,7 @@ class BootstrapEditor:
 
         Parameters
         ----------
-        lifespan_path : Path
+        lifespan_path : pathlib.Path
             Effective Python module containing lifespan callbacks.
 
         Returns
@@ -1194,7 +1216,7 @@ class BootstrapEditor:
 
         Parameters
         ----------
-        node : ast.ImportFrom
+        node : ``ast.ImportFrom``
             Import-from node whose module path must be resolved.
 
         Returns

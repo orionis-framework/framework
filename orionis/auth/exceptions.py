@@ -1,3 +1,9 @@
+"""Provide auth operations.
+
+Includes ``AuthException``, ``AuthConfigurationException``,
+``AuthenticationException``, ``AuthorizationException``.
+"""
+
 
 class AuthException(Exception):
     """Base exception for every failure raised by the authentication module."""

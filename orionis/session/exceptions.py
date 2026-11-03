@@ -1,3 +1,8 @@
+"""Provide session operations.
+
+Includes ``SessionException``, ``SessionStorageException``.
+"""
+
 from __future__ import annotations
 
 class SessionException(Exception):

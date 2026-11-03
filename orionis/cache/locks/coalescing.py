@@ -1,3 +1,5 @@
+"""Poll a Redis NX lease rather than relying on process-local waiter events."""
+
 import asyncio
 from contextlib import suppress
 from typing import TYPE_CHECKING, Any, Self
@@ -26,7 +28,7 @@ class RedisResolverLease:
 
         Parameters
         ----------
-        backend : Any
+        backend : typing.Any
             Storage backend implementing the cache operations.
         key : str
             Cache or lease key to access.
@@ -41,10 +43,15 @@ class RedisResolverLease:
             Complete the operation without returning a value.
         """
         self._backend = backend
+        """Storage backend implementing the cache operations."""
         self._key = backend.build_key(key + "-lock")
+        """Cache or lease key to access."""
         self._lease = lease
+        """Lease lifetime in seconds; use the store default when omitted."""
         self._wait = wait_timeout
+        """Maximum number of seconds to wait for ownership."""
         self._owner = uuid4().hex
+        """Ownership token used to identify the current holder."""
 
     async def _acquire(self: Self) -> None:
         """
@@ -80,7 +87,7 @@ class RedisResolverLease:
 
         Returns
         -------
-        Self
+        typing.Self
             This lease after successful ownership acquisition.
         """
         try:
@@ -109,7 +116,7 @@ class RedisResolverLease:
             Exception type raised by the context body, if any.
         _value : BaseException | None
             Exception raised by the context body, if any.
-        _traceback : TracebackType | None
+        _traceback : types.TracebackType | None
             Traceback attached to the context exception, if any.
 
         Returns
@@ -125,11 +132,12 @@ def resolver_lease(
     lease: float,
     wait_timeout: float,
 ) -> CacheLock | RedisResolverLease:
-    """Choose Redis polling or preserve the native lock of another backend.
+    """
+    Choose Redis polling or preserve the native lock of another backend.
 
     Parameters
     ----------
-    backend : Any
+    backend : typing.Any
         Repository backend, including aiocache Redis subclasses.
     key : str
         Repository-prefixed lock key.

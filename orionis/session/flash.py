@@ -1,3 +1,8 @@
+"""Provide session operations.
+
+Includes ``filter_input``, ``normalize_errors``, ``queue_bag``, ``apply_flash``.
+"""
+
 from __future__ import annotations
 from collections.abc import Mapping
 from typing import TYPE_CHECKING, Any, Self
@@ -8,10 +13,16 @@ if TYPE_CHECKING:
 # Reserved flash-bag keys owned by the framework.  Application code must
 # never write them directly; use ``withInput()`` / ``withErrors()`` instead.
 OLD_INPUT_KEY: str = "_old_input"
+"""
+Reserved flash-bag keys owned by the framework. Application code must never write
+them directly; use ``withInput()`` / ``withErrors()`` instead.
+"""
 ERRORS_KEY: str = "_errors"
+"""Session key containing flashed validation errors."""
 
 # Reserved session key holding the last page the user navigated to.
 PREVIOUS_URL_KEY: str = "_previous_url"
+"""Reserved session key holding the last page the user navigated to."""
 
 # Never carried over when repopulating a form.
 SENSITIVE_INPUT_FIELDS: frozenset[str] = frozenset(
@@ -24,9 +35,11 @@ SENSITIVE_INPUT_FIELDS: frozenset[str] = frozenset(
         "password_confirmation",
     },
 )
+"""Never carried over when repopulating a form."""
 
 # Hoisted so the isinstance check does not rebuild the tuple on every field.
 _SEQUENCE_TYPES: tuple[type, ...] = (list, tuple, set, frozenset)
+"""Hoisted so the isinstance check does not rebuild the tuple on every field."""
 
 def filter_input(values: Mapping[str, Any]) -> dict[str, Any]:
     """
@@ -34,14 +47,14 @@ def filter_input(values: Mapping[str, Any]) -> dict[str, Any]:
 
     Parameters
     ----------
-    values : Mapping[str, Any]
+    values : collections.abc.Mapping[str, typing.Any]
         Raw submitted payload.
 
     Returns
     -------
-    dict[str, Any]
+    dict[str, typing.Any]
         Copy of *values* without any field listed in
-        :data:`SENSITIVE_INPUT_FIELDS`.
+        :data:`orionis.session.flash.SENSITIVE_INPUT_FIELDS`.
     """
     # Most payloads carry no credential field at all: copy them wholesale.
     if SENSITIVE_INPUT_FIELDS.isdisjoint(values):
@@ -115,16 +128,17 @@ def queue_bag(
 
     Parameters
     ----------
-    flash : dict[str, Any]
+    flash : dict[str, typing.Any]
         Pending flash payload owned by a response or a pending view.
     key : str
         Reserved bag key.
-    values : Mapping[str, Any]
+    values : collections.abc.Mapping[str, typing.Any]
         Entries to merge into the bag.
 
     Returns
     -------
     None
+        Merge *values* into the reserved bag *key* of a pending flash payload.
     """
     current = flash.get(key)
     if isinstance(current, dict):
@@ -142,14 +156,15 @@ def apply_flash(session: ISession, data: Mapping[str, Any]) -> None:
 
     Parameters
     ----------
-    session : ISession
+    session : orionis.session.contracts.ISession
         Session receiving the flashed values.
-    data : Mapping[str, Any]
+    data : collections.abc.Mapping[str, typing.Any]
         Pending flash payload.
 
     Returns
     -------
     None
+        Write a pending flash payload into the session.
     """
     for key, value in data.items():
         if key == OLD_INPUT_KEY:
@@ -167,7 +182,9 @@ class _FlashData:
     """
 
     __slots__ = ("_flash",)
+    """Declare the instance attribute slots reserved by this class."""
     _flash: dict[str, Any] | None
+    """Session values scheduled for availability during the next request."""
 
     # ruff: noqa: ANN401
 
@@ -182,12 +199,12 @@ class _FlashData:
         ----------
         key : str
             Flash data key.
-        value : Any, optional
+        value : typing.Any, optional
             Value to flash.
 
         Returns
         -------
-        Self
+        typing.Self
             The same owner, allowing fluent chaining.
         """
         flash = self._flash
@@ -206,12 +223,12 @@ class _FlashData:
 
         Parameters
         ----------
-        values : Mapping[str, Any]
+        values : collections.abc.Mapping[str, typing.Any]
             Submitted form payload to remember.
 
         Returns
         -------
-        Self
+        typing.Self
             The same owner, allowing fluent chaining.
         """
         flash = self._flash
@@ -229,12 +246,12 @@ class _FlashData:
 
         Parameters
         ----------
-        errors : Mapping[str, Any] | Exception
+        errors : collections.abc.Mapping[str, typing.Any] | Exception
             Mapping of field to message(s), or a validation exception.
 
         Returns
         -------
-        Self
+        typing.Self
             The same owner, allowing fluent chaining.
         """
         flash = self._flash

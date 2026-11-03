@@ -1,3 +1,5 @@
+"""Serialize one checked-out DBAPI connection on one worker thread."""
+
 from __future__ import annotations
 import asyncio
 from concurrent.futures import ThreadPoolExecutor
@@ -19,14 +21,14 @@ async def _wait_for_completion[T](
 
     Parameters
     ----------
-    future : asyncio.Future[T]
+    future : asyncio.Future[``T``]
         Worker operation whose result must be collected before cleanup.
-    on_cancel : Callable[[T], Awaitable[None]] | None, optional
+    on_cancel : Callable[[``T``], Awaitable[None]] | None, optional
         Cleanup for resources completed after cancellation.
 
     Returns
     -------
-    T
+    ``T``
         Completed result when the caller was not cancelled.
 
     Raises
@@ -37,11 +39,12 @@ async def _wait_for_completion[T](
     notification = future.get_loop().create_future()
 
     def completed(_future: asyncio.Future[T]) -> None:
-        """Publish a successful notice independently of the worker outcome.
+        """
+        Publish a successful notice independently of the worker outcome.
 
         Parameters
         ----------
-        _future : asyncio.Future[T]
+        _future : asyncio.Future[``T``]
             Completed operation; its result is collected by the caller.
 
         Returns
@@ -78,6 +81,7 @@ class ThreadedWorker:
     """
 
     __slots__ = ("_closed", "_executor")
+    """Declare the instance attribute slots reserved by this class."""
 
     def __init__(self) -> None:
         """Prepare a worker without starting a thread or opening a connection.
@@ -88,9 +92,11 @@ class ThreadedWorker:
             Initialize a lazy single-thread executor.
         """
         self._closed = False
+        """Whether this resource has completed its close lifecycle."""
         self._executor = ThreadPoolExecutor(
             max_workers=1, thread_name_prefix="orionis-redshift",
         )
+        """Executor produced by ``ThreadPoolExecutor``."""
 
     async def run[T](
         self,
@@ -103,14 +109,14 @@ class ThreadedWorker:
 
         Parameters
         ----------
-        operation : Callable[[], T]
+        operation : collections.abc.Callable[[], ``T``]
             Blocking operation owned by this connection.
-        on_cancel : Callable[[T], None] | None, optional
+        on_cancel : collections.abc.Callable[[``T``], None] | None, optional
             Dispose a resource produced after its caller was cancelled.
 
         Returns
         -------
-        T
+        ``T``
             Completed operation result.
 
         Raises
@@ -128,11 +134,12 @@ class ThreadedWorker:
         )
 
         async def discard(value: T) -> None:
-            """Release a late result on the same worker that created it.
+            """
+            Release a late result on the same worker that created it.
 
             Parameters
             ----------
-            value : T
+            value : ``T``
                 Resource produced after the caller was cancelled.
 
             Returns

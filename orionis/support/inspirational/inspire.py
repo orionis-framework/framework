@@ -1,3 +1,5 @@
+"""Select inspirational quotations for console output."""
+
 import secrets
 from typing import ClassVar
 from orionis.console.output.console import Console
@@ -7,8 +9,10 @@ from orionis.support.inspirational.quotes import INSPIRATIONAL_QUOTES
 class Inspire(IInspire):
 
     # ruff: noqa: TC001
+    """Select inspirational quotations for console output."""
 
     __slots__ = ("_count", "_quotes")
+    """Declare the instance attribute slots reserved by this class."""
 
     _FALLBACK: ClassVar[dict] = {
         "quote": (
@@ -17,6 +21,7 @@ class Inspire(IInspire):
         ),
         "author": "Raul M. Uñate",
     }
+    """Fallback definitions used by ``Inspire``."""
 
     def __init__(self, quotes: list[dict] | None = None) -> None:
         """
@@ -42,6 +47,10 @@ class Inspire(IInspire):
         """
         if not quotes:
             self._quotes = INSPIRATIONAL_QUOTES
+            """
+            Quote dictionaries with ``quote`` and ``author`` keys. If omitted or
+            empty, use ``INSPIRATIONAL_QUOTES``.
+            """
         else:
             for row in quotes:
                 if not isinstance(row, dict):
@@ -54,6 +63,7 @@ class Inspire(IInspire):
                     raise ValueError(msg)
             self._quotes = quotes
         self._count = len(self._quotes)
+        """Count produced by ``len``."""
 
     def random(self) -> dict:
         """
@@ -74,7 +84,7 @@ class Inspire(IInspire):
 
         Parameters
         ----------
-        console : Console
+        console : orionis.console.Console
             Console used to write the formatted quote.
 
         Returns

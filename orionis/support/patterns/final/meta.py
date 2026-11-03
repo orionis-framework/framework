@@ -1,4 +1,7 @@
+"""Prevent subclassing of classes marked final by this metaclass."""
+
 class Final(type):
+    """Prevent subclassing of classes marked final by this metaclass."""
 
     def __new__(
         metacls: type,
@@ -17,7 +20,7 @@ class Final(type):
             The name of the new class.
         bases : tuple of type
             The base classes of the new class.
-        namespace : dict of str to object
+        namespace : dict of str ``to`` object
             The namespace containing class attributes.
 
         Returns
@@ -29,7 +32,6 @@ class Final(type):
         ------
         TypeError
             If attempting to inherit from a final class.
-
         """
         # Prevent inheritance from any class marked as final.
         # The class namespace records whether the base itself is final.

@@ -1,3 +1,5 @@
+"""Translate validation exceptions into structured field errors."""
+
 from __future__ import annotations
 import re
 import types
@@ -9,16 +11,20 @@ from orionis.schemas.rules_executor import _collection_item_type
 
 # Regular expressions for parsing msgspec error messages.
 MISSING_FIELD_RE = re.compile(r"missing required field `(?P<field>[^`]+)`")
+"""Regular expressions for parsing msgspec error messages."""
 
 # Keep quoted dictionary keys intact even when they contain dots or brackets.
 _PATH_PART_RE = re.compile(
     r"""(?:^|\.)(?P<field>[^.\[\]]+)|"""
     r"""\[(?P<key>'(?:\\.|[^'\\])*'|"(?:\\.|[^"\\])*"|[^\]'"]*)\]""",
 )
+"""Keep quoted dictionary keys intact even when they contain dots or brackets."""
 
 # Suffix msgspec appends to report the location of the offending value.
 _PATH_MARKER = " - at `$"
+"""Suffix msgspec appends to report the location of the offending value."""
 _PATH_MARKER_LEN = len(_PATH_MARKER)
+"""Path marker len used by ``exception_parser``."""
 
 # Ordered patterns for identifying constraint types from msgspec error messages.
 _CONSTRAINT_PATTERNS: tuple[tuple[str, str], ...] = (
@@ -34,16 +40,23 @@ _CONSTRAINT_PATTERNS: tuple[tuple[str, str], ...] = (
     (" < ", "lt"),
     ("Expected", "type"),
 )
+"""Ordered patterns for identifying constraint types from msgspec error messages."""
 
 # Sentinel for distinguishing "not in cache" from "cached result is None".
 _MISSING: object = object()
+"""Sentinel for distinguishing "not in cache" from "cached result is None"."""
 
 # Cache: schema_type → {field_name: field_type} built from msgspec.structs.fields().
 # Avoids repeated C-level calls to fields() on the error path.
 _STRUCT_FIELDS_MAP: dict[type, dict[str, object]] = {}
+"""
+Cache: schema_type → {field_name: field_type} built from msgspec.structs.fields().
+Avoids repeated C-level calls to fields() on the error path.
+"""
 
 # Cache: (schema_type, field_name) → nested schema type or None.
 _NESTED_TYPE_CACHE: dict[tuple[type, str], type | None] = {}
+"""Cache: (schema_type, field_name) → nested schema type or None."""
 
 def _get_fields_map(schema: type) -> dict[str, object]:
     """
@@ -69,7 +82,10 @@ def _get_fields_map(schema: type) -> dict[str, object]:
 class ValidationErrorParser:
 
     # Prevent per-instance dictionaries; the class is used statically.
+    """Translate validation exceptions into structured field errors."""
+
     __slots__ = ()
+    """Prevent per-instance dictionaries; the class is used statically."""
 
     @classmethod
     def parse(
@@ -82,14 +98,14 @@ class ValidationErrorParser:
 
         Parameters
         ----------
-        error : msgspec.ValidationError
+        error : ``msgspec.ValidationError``
             Provide the original validation exception.
         schema : type | None
             Optional schema class used to look up custom constraint messages.
 
         Returns
         -------
-        ValidationFailure
+        orionis.schemas.entities.failure.ValidationFailure
             Return a single validation failure describing the parsed error.
         """
         return cls.parseAt(error, schema, "")
@@ -106,7 +122,7 @@ class ValidationErrorParser:
 
         Parameters
         ----------
-        error : msgspec.ValidationError
+        error : ``msgspec.ValidationError``
             Provide the original validation exception.
         schema : type | None
             Root schema class used to look up custom constraint messages.
@@ -116,7 +132,7 @@ class ValidationErrorParser:
 
         Returns
         -------
-        ValidationFailure
+        orionis.schemas.entities.failure.ValidationFailure
             Return a single validation failure with a fully-qualified field.
         """
         text = str(error)
@@ -313,7 +329,7 @@ class ValidationErrorParser:
         ----------
         tp : object
             Annotation of the parent field.
-        selectors : tuple[str, ...]
+        selectors : tuple[str, ``...``]
             Sequence indices or dictionary keys preceding the nested field.
 
         Returns

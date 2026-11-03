@@ -1,3 +1,5 @@
+"""Plan bootstrap integration before creating optional project resources."""
+
 import ast
 from collections.abc import Mapping
 from typing import TYPE_CHECKING
@@ -14,6 +16,7 @@ _HTTP_PATHS = (
     "app_http_controllers", "app_http_middleware", "app_http_schemas",
     "app_http_schemas_rules",
 )
+"""Http paths definitions used by ``_service``."""
 _CONTEXT_PATHS = {
     "api": _HTTP_PATHS,
     "web": _HTTP_PATHS,
@@ -23,6 +26,7 @@ _CONTEXT_PATHS = {
         "app_mcp_servers", "app_mcp_tools", "app_mcp_resources", "app_mcp_prompts",
     ),
 }
+"""Context paths definitions used by ``_service``."""
 
 class Bootstrapper:
     """Plan bootstrap integration before creating optional project resources."""
@@ -33,7 +37,7 @@ class Bootstrapper:
 
         Parameters
         ----------
-        app : IApplication
+        app : orionis.IApplication
             Application providing effective routes and component paths.
 
         Returns
@@ -43,6 +47,7 @@ class Bootstrapper:
         """
         # Retain the live application so customized paths remain authoritative.
         self.app = app
+        """Application providing effective routes and component paths."""
 
     def _editor(self) -> BootstrapEditor:
         """
@@ -50,7 +55,7 @@ class Bootstrapper:
 
         Returns
         -------
-        BootstrapEditor
+        orionis.console.commands.bootstrap._editor.BootstrapEditor
             Editor for the effective entry point or conventional bootstrap file.
 
         Raises
@@ -78,7 +83,7 @@ class Bootstrapper:
 
         Parameters
         ----------
-        path : Path
+        path : pathlib.Path
             Effective component directory.
 
         Returns
@@ -97,7 +102,7 @@ class Bootstrapper:
 
         Parameters
         ----------
-        path : Path
+        path : pathlib.Path
             Exact effective target, including its original filename.
         content : str
             Rendered Python template.
@@ -143,14 +148,14 @@ class Bootstrapper:
 
         Parameters
         ----------
-        editor : BootstrapEditor
+        editor : orionis.console.commands.bootstrap._editor.BootstrapEditor
             Safely identified application bootstrap.
         context : str
             Context whose effective files are required.
 
         Returns
         -------
-        list[Path]
+        list[pathlib.Path]
             Effective route files or the context's default destination.
 
         Raises
@@ -206,7 +211,7 @@ class Bootstrapper:
 
         Parameters
         ----------
-        path : Path
+        path : pathlib.Path
             Route file to preserve and register if valid.
 
         Returns

@@ -1,3 +1,5 @@
+"""Define the contract for http request printer implementations."""
+
 from __future__ import annotations
 from abc import ABC, abstractmethod
 from typing import TYPE_CHECKING
@@ -6,6 +8,7 @@ if TYPE_CHECKING:
     from orionis.http.adapters.request.contracts.transport import TransportAdapter
     from orionis.http.responses import Response
 class IHTTPRequestPrinter(ABC):
+    """Define the contract for http request printer implementations."""
 
     @abstractmethod
     def setEnabled(self, *, enabled: bool) -> None:
@@ -84,9 +87,9 @@ class IHTTPRequestPrinter(ABC):
 
         Parameters
         ----------
-        adapter : TransportAdapter
+        adapter : orionis.http.adapters.request.contracts.transport.TransportAdapter
             The transport adapter providing method and path information.
-        response : Response
+        response : orionis.http.Response
             The HTTP response object.
 
         Returns

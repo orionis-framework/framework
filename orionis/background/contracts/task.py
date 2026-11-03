@@ -1,3 +1,5 @@
+"""Define the interface for background task execution."""
+
 from abc import ABC, abstractmethod
 
 class IBackgroundTask(ABC):
@@ -9,6 +11,7 @@ class IBackgroundTask(ABC):
     """
 
     __slots__ = ()
+    """Declare that this class introduces no additional instance slots."""
 
     @abstractmethod
     async def run(self) -> None:

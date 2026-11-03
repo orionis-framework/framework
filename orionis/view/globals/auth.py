@@ -1,3 +1,5 @@
+"""Provide view globals operations through ``_global_auth``."""
+
 from typing import TYPE_CHECKING
 from orionis.support.facades import Auth
 
@@ -10,7 +12,7 @@ def _global_auth() -> Callable[[], type[Auth]]:
 
     Returns
     -------
-    Callable[[], type[Auth]]
+    collections.abc.Callable[[], type[orionis.support.facades.Auth]]
         Callable exposing the authentication facade without caching a user.
     """
     def auth() -> type[Auth]:
@@ -19,7 +21,7 @@ def _global_auth() -> Callable[[], type[Auth]]:
 
         Returns
         -------
-        type[Auth]
+        type[orionis.support.facades.Auth]
             Facade exposing the current request's authentication context.
         """
         return Auth

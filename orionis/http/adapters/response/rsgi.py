@@ -1,3 +1,5 @@
+"""Translate HTTP responses into Granian RSGI operations."""
+
 from __future__ import annotations
 from typing import TYPE_CHECKING
 from orionis.http.adapters.response.contracts.response import ResponseAdapter
@@ -11,8 +13,10 @@ if TYPE_CHECKING:
     from orionis.http.adapters.request.contracts.transport import TransportAdapter
 
 class RSGIResponseAdapter(ResponseAdapter):
+    """Translate HTTP responses into Granian RSGI operations."""
 
     __slots__ = ()
+    """Declare that this class introduces no additional instance slots."""
 
     async def send(
         self,
@@ -25,11 +29,11 @@ class RSGIResponseAdapter(ResponseAdapter):
 
         Parameters
         ----------
-        adapter : TransportAdapter
+        adapter : orionis.http.adapters.request.contracts.transport.TransportAdapter
             Transport adapter containing request information.
-        response : Response
+        response : orionis.http.Response
             Response object to be sent back to the client.
-        protocol : HTTPProtocol
+        protocol : ``granian.rsgi.HTTPProtocol``
             Protocol instance used to send the response.
 
         Returns
@@ -88,9 +92,9 @@ class RSGIResponseAdapter(ResponseAdapter):
 
         Parameters
         ----------
-        response : Response
+        response : orionis.http.Response
             Response owning the selected stream.
-        protocol : HTTPProtocol
+        protocol : ``granian.rsgi.HTTPProtocol``
             RSGI response writer and disconnect notifier.
         status : int
             Response status code.
@@ -127,9 +131,9 @@ class RSGIResponseAdapter(ResponseAdapter):
 
         Parameters
         ----------
-        response : Response
+        response : orionis.http.Response
             Response whose metadata is sent.
-        protocol : HTTPProtocol
+        protocol : ``granian.rsgi.HTTPProtocol``
             RSGI response writer.
         status : int
             Response status code.
@@ -154,7 +158,7 @@ class RSGIResponseAdapter(ResponseAdapter):
 
         Parameters
         ----------
-        protocol : HTTPProtocol
+        protocol : ``granian.rsgi.HTTPProtocol``
             RSGI protocol exposing ``client_disconnect()``.
 
         Returns
@@ -176,9 +180,9 @@ class RSGIResponseAdapter(ResponseAdapter):
 
         Parameters
         ----------
-        iterator : AsyncIterator[bytes]
+        iterator : collections.abc.AsyncIterator[bytes]
             Owned iterator, closed even when stream creation fails.
-        protocol : HTTPProtocol
+        protocol : ``granian.rsgi.HTTPProtocol``
             RSGI response protocol.
         status : int
             Response status code.
@@ -214,11 +218,11 @@ class RSGIResponseAdapter(ResponseAdapter):
 
         Parameters
         ----------
-        adapter : TransportAdapter
+        adapter : orionis.http.adapters.request.contracts.transport.TransportAdapter
             Request headers used to select the file range.
-        response : FileResponse
+        response : orionis.http.FileResponse
             File metadata and source path.
-        protocol : HTTPProtocol
+        protocol : ``granian.rsgi.HTTPProtocol``
             RSGI response writer.
         status : int
             HTTP status for a complete file.
@@ -260,7 +264,7 @@ class RSGIResponseAdapter(ResponseAdapter):
         ----------
         headers : list of tuple of str
             Mutable headers list to append content-length into.
-        response : Response
+        response : orionis.http.Response
             Response object used to compute the expected body size.
 
         Returns

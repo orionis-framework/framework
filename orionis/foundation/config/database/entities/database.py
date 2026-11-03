@@ -1,3 +1,5 @@
+"""Represent the general database configuration."""
+
 from __future__ import annotations
 from dataclasses import dataclass, field
 from orionis.environment import Env
@@ -7,6 +9,7 @@ from orionis.support.entities.base import BaseEntity
 
 # Define the supported database connection names.
 _CONNECTION_NAMES: frozenset[str] = frozenset(ConnectionName._member_names_)
+"""Define the supported database connection names."""
 
 @dataclass(frozen=True, kw_only=True)
 class Database(BaseEntity):
@@ -15,10 +18,10 @@ class Database(BaseEntity):
 
     Attributes
     ----------
-    default : ConnectionName | str
+    default : orionis.foundation.config.database.ConnectionName | str
         The name of the default database connection to use. Accepts a
         ``ConnectionName`` enum member or a plain string (e.g. ``'sqlite'``).
-    connections : Connections or dict
+    connections : orionis.foundation.config.database.Connections or dict
         The different database connections available to the application.
     """
 
@@ -52,7 +55,7 @@ class Database(BaseEntity):
 
         Parameters
         ----------
-        self : Database
+        self : orionis.foundation.config.database.Database
             The instance of the Database class.
 
         Returns

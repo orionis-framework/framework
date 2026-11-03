@@ -1,3 +1,5 @@
+"""Render named templates and return :class:`orionis.http.HTMLResponse` objects."""
+
 from typing import Any
 from orionis.view.contracts.engine import IViewEngine
 from orionis.view.contracts.factory import IViewFactory
@@ -5,18 +7,21 @@ from orionis.view.pending import PendingView
 
 class ViewFactory(IViewFactory):
     """
-    Render named templates and return :class:`HTMLResponse` objects.
+    Render named templates and return :class:`orionis.http.HTMLResponse` objects.
 
-    :class:`ViewFactory` is the primary entry-point for controllers and
+    :class:`orionis.view.factory.ViewFactory` is the primary entry-point for controllers
+    and
     other HTTP-layer code that needs to produce HTML responses from
     templates.  It delegates all rendering work to the bound
-    :class:`IViewEngine` and wraps the output in a framework-native
-    :class:`HTMLResponse`.
+    :class:`orionis.view.contracts.engine.IViewEngine` and wraps the output in a
+    framework-native
+    :class:`orionis.http.HTMLResponse`.
     """
 
     # ruff: noqa: ANN401, TC001
 
     __slots__ = ("_engine",)
+    """Declare the instance attribute slots reserved by this class."""
 
     def __init__(self, engine: IViewEngine) -> None:
         """
@@ -24,14 +29,16 @@ class ViewFactory(IViewFactory):
 
         Parameters
         ----------
-        engine : IViewEngine
+        engine : orionis.view.contracts.engine.IViewEngine
             The view engine used to render templates.
 
         Returns
         -------
         None
+            Initialise the factory with a rendering engine.
         """
         self._engine: IViewEngine = engine
+        """The view engine used to render templates."""
 
     def make(self, template: str, **context: Any) -> PendingView:
         """
@@ -42,12 +49,12 @@ class ViewFactory(IViewFactory):
         template : str
             Template name using dot notation (e.g. ``'users.index'``) or a
             relative path (e.g. ``'users/index.html'``).
-        **context : Any
+        **context : typing.Any
             Keyword arguments forwarded as template variables.
 
         Returns
         -------
-        PendingView
+        orionis.view.pending.PendingView
             Awaitable proxy that renders the template on ``await`` and
             accepts chained response mutators such as ``withInput()``,
             ``withErrors()``, ``withFlash()``, ``withCookie()`` or
@@ -55,9 +62,9 @@ class ViewFactory(IViewFactory):
 
         Raises
         ------
-        ViewTemplateNotFoundException
+        orionis.view.exceptions.ViewTemplateNotFoundException
             When the view file cannot be located.
-        ViewRenderException
+        orionis.view.exceptions.ViewRenderException
             When rendering fails for any reason.
         """
         return PendingView(self._engine, template, context)

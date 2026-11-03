@@ -270,7 +270,7 @@ class TestStdioTransport(TestCase):
         await self.reader.queue.put(b"")
         await asyncio.wait_for(running, 1)
 
-    async def test_concurrent_calls_have_independent_scopes_and_framing(self):
+    async def testConcurrentCallsHaveIndependentScopesAndFraming(self):
         """A blocked first call does not delay a second response or share its scope.
 
         Returns
@@ -293,7 +293,7 @@ class TestStdioTransport(TestCase):
         self.assertTrue(all(frame.count(b"\n") == 1 for frame in self.writer.writes))
         self.assertEqual(transport._active, {})
 
-    async def test_cancellation_suppresses_result_and_reader_remains_live(self):
+    async def testCancellationSuppressesResultAndReaderRemainsLive(self):
         """Process cancellation on the shared channel while the tool is suspended.
 
         Returns
@@ -322,7 +322,7 @@ class TestStdioTransport(TestCase):
         await self.finish(running)
         self.assertEqual(len(self.writer.writes), 1)
 
-    async def test_eof_cancels_work_and_joins_scope_cleanup(self):
+    async def testEofCancelsWorkAndJoinsScopeCleanup(self):
         """Closing stdin disposes work without emitting late protocol output.
 
         Returns
@@ -340,7 +340,7 @@ class TestStdioTransport(TestCase):
         self.assertFalse(self.app.scopes[1].isActive)
         self.assertEqual(self.writer.writes, [])
 
-    async def test_capacity_and_duplicate_ids_do_not_allocate_more_work(self):
+    async def testCapacityAndDuplicateIdsDoNotAllocateMoreWork(self):
         """Keep admission bounded and retain the original task on an ID collision.
 
         Returns
@@ -362,7 +362,7 @@ class TestStdioTransport(TestCase):
         self.assertEqual(len(transport._active), 1)
         await self.finish(running)
 
-    async def test_malformed_frames_do_not_terminate_healthy_transport(self):
+    async def testMalformedFramesDoNotTerminateHealthyTransport(self):
         """Reject malformed JSON and response messages, then accept a valid request.
 
         Returns
@@ -385,7 +385,7 @@ class TestStdioTransport(TestCase):
         self.assertEqual((await asyncio.wait_for(self.writer.queue.get(), 1))["id"], 1)
         await self.finish(running)
 
-    async def test_broken_writer_terminates_reader_and_cleans_tasks(self):
+    async def testBrokenWriterTerminatesReaderAndCleansTasks(self):
         """A failed output pipe must not leave the owner stuck waiting for stdin.
 
         Returns
@@ -402,7 +402,7 @@ class TestStdioTransport(TestCase):
         self.assertEqual(transport._active, {})
         self.assertFalse(self.app.scopes[1].isActive)
 
-    async def test_daemon_standard_io_bounds_oversized_frame_and_resumes(self):
+    async def testDaemonStandardIoBoundsOversizedFrameAndResumes(self):
         """Read giant lines in bounded chunks and write without executor workers.
 
         Returns

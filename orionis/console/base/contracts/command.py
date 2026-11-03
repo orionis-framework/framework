@@ -1,3 +1,5 @@
+"""Define the contract for base command implementations."""
+
 from __future__ import annotations
 from abc import ABC, abstractmethod
 from typing import TYPE_CHECKING, Any, ClassVar
@@ -10,16 +12,22 @@ class IBaseCommand(ABC):
     # ruff: noqa: ANN401
 
     # Enable timestamps in console output by default
+    """Define the contract for base command implementations."""
+
     timestamps: ClassVar[bool] = True
+    """Enable timestamps in console output by default."""
 
     # Command signature string for registration and help text generation
     signature: ClassVar[str]
+    """Command signature string for registration and help text generation."""
 
     # Human-readable description for documentation and help display
     description: ClassVar[str]
+    """Human-readable description for documentation and help display."""
 
     # List of Argument instances defining command-line options and arguments
     arguments: ClassVar[list[Argument]] = []
+    """List of Argument instances defining command-line options and arguments."""
 
     @abstractmethod
     async def handle(self) -> None:
@@ -49,12 +57,12 @@ class IBaseCommand(ABC):
         ----------
         key : str
             Argument name to retrieve.
-        default : Any, optional
+        default : typing.Any, optional
             Value to return if key is not found. Defaults to None.
 
         Returns
         -------
-        Any
+        typing.Any
             Value of the argument if found, else the default value.
 
         Raises
@@ -72,7 +80,7 @@ class IBaseCommand(ABC):
 
         Returns
         -------
-        Dict[str, Any]
+        typing.Dict[str, typing.Any]
             The dictionary of all parsed arguments and options.
         """
 
@@ -83,7 +91,7 @@ class IBaseCommand(ABC):
 
         Parameters
         ----------
-        args : Dict[str, Any]
+        args : typing.Dict[str, typing.Any]
             Dictionary of parsed command-line arguments and options.
 
         Returns

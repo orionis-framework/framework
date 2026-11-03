@@ -1,7 +1,10 @@
+"""Ensure a value expresses an explicit acceptance."""
+
 from orionis.schemas.rule import Rule
 
 # Textual representations treated as an explicit acceptance.
 _ACCEPTED_TEXT: frozenset[str] = frozenset({"yes", "on", "1", "true"})
+"""Textual representations treated as an explicit acceptance."""
 
 class Accepted(Rule):
     """
@@ -14,9 +17,12 @@ class Accepted(Rule):
     # ruff: noqa: ARG002
 
     __slots__ = ()
+    """Declare that this class introduces no additional instance slots."""
 
     __message__ = "Value must be accepted."
+    """Error text for message: ``Value must be accepted.``."""
     __code__ = "accepted"
+    """Code identifier: ``accepted``."""
 
     async def enforce(
         self,

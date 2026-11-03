@@ -1,3 +1,5 @@
+"""Provide foundation operations through ``get_core_kernels_mapping``."""
+
 from types import MappingProxyType
 
 def get_core_kernels_mapping() -> MappingProxyType:
@@ -10,7 +12,7 @@ def get_core_kernels_mapping() -> MappingProxyType:
 
     Returns
     -------
-    MappingProxyType
+    types.MappingProxyType
         Immutable mapping with kernel type as key and a dictionary containing
         'module' and 'class' as values.
     """
@@ -22,3 +24,4 @@ def get_core_kernels_mapping() -> MappingProxyType:
     )
 
 CORE_KERNELS: MappingProxyType = get_core_kernels_mapping()
+"""Core kernels used by ``core_kernels``."""

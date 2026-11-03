@@ -1,3 +1,5 @@
+"""Collect test outcomes and render configured console feedback."""
+
 import inspect
 import linecache
 import time
@@ -16,20 +18,25 @@ _STATUS_STYLE: dict[TestStatus, str] = {
     TestStatus.FAILED: "magenta",
     TestStatus.ERRORED: "red",
 }
+"""Status-to-color mapping for Rich console output."""
 
 # Statuses that require detailed error rendering in verbosity=2 panels.
 _FAILURE_STATUSES: frozenset[TestStatus] = frozenset({
     TestStatus.ERRORED,
     TestStatus.FAILED,
 })
+"""Statuses that require detailed error rendering in verbosity=2 panels."""
 
 # Reusable Rich style strings for verbosity=2 panel content.
 _V2_BOLD_WHITE: str = "bold bright_white"
+"""Reusable Rich style strings for verbosity=2 panel content."""
 _V2_DIM: str = "dim white"
+"""V2 dim identifier: ``dim white``."""
 
 class TestResultProcessor(unittest.TestResult):
 
     # ruff: noqa: PLR2004,PLW2901
+    """Collect test outcomes and render configured console feedback."""
 
     def __init__(
         self,
@@ -64,9 +71,18 @@ class TestResultProcessor(unittest.TestResult):
 
         # Instance-scoped verbosity: concurrent runs never share this value.
         self.__print_verbosity: int | None = verbosity
+        """
+        Detail level used to print every recorded outcome: 1 prints one compact line
+        per test and 2 prints a detailed panel. Any other value, including None,
+        prints nothing. Supplied by the runner through
+        ``unittest.TextTestRunner._makeResult``, by default None.
+        """
         self.__test_results: list[TestResult] = []
+        """Structured outcomes collected during the current test run."""
         self.__console = Console()
+        """Console produced by ``Console``."""
         self.__max_width = self.__console.width * 0.8
+        """Maximum width used when rendering test-result panels."""
 
     def startTest(self, test: unittest.case.TestCase) -> None:
         """
@@ -74,7 +90,7 @@ class TestResultProcessor(unittest.TestResult):
 
         Parameters
         ----------
-        test : unittest.case.TestCase
+        test : unittest.TestCase
             The test case instance being started.
 
         Returns
@@ -83,6 +99,7 @@ class TestResultProcessor(unittest.TestResult):
             This method starts a timer and calls the superclass method.
         """
         self.__start_time = time.perf_counter()
+        """Start time produced by ``time.perf_counter``."""
         super().startTest(test)
 
     def addSuccess(self, test: unittest.case.TestCase) -> None:
@@ -91,7 +108,7 @@ class TestResultProcessor(unittest.TestResult):
 
         Parameters
         ----------
-        test : unittest.case.TestCase
+        test : unittest.TestCase
             The test case instance that succeeded.
 
         Returns
@@ -115,7 +132,7 @@ class TestResultProcessor(unittest.TestResult):
 
         Parameters
         ----------
-        test : unittest.case.TestCase
+        test : unittest.TestCase
             The test case instance that failed.
         err : tuple[type[BaseException], BaseException, object]
             The exception info tuple for the failure.
@@ -141,7 +158,7 @@ class TestResultProcessor(unittest.TestResult):
 
         Parameters
         ----------
-        test : unittest.case.TestCase
+        test : unittest.TestCase
             The test case instance that errored.
         err : tuple[type[BaseException], BaseException, object]
             The exception info tuple for the error.
@@ -167,7 +184,7 @@ class TestResultProcessor(unittest.TestResult):
 
         Parameters
         ----------
-        test : unittest.case.TestCase
+        test : unittest.TestCase
             The test case instance that was skipped.
         reason : str
             The reason for skipping the test.
@@ -194,9 +211,9 @@ class TestResultProcessor(unittest.TestResult):
 
         Parameters
         ----------
-        test : unittest.case.TestCase
+        test : unittest.TestCase
             Parent test providing source and method metadata.
-        subtest : unittest.case.TestCase
+        subtest : unittest.TestCase
             Subtest providing its parameterized identifier.
         err : tuple or None
             Exception details, or None when the subtest passed.
@@ -228,7 +245,7 @@ class TestResultProcessor(unittest.TestResult):
 
         Parameters
         ----------
-        test : unittest.case.TestCase
+        test : unittest.TestCase
             Test marked as an expected failure.
         err : tuple
             Exception details retained for diagnostics.
@@ -249,7 +266,7 @@ class TestResultProcessor(unittest.TestResult):
 
         Parameters
         ----------
-        test : unittest.case.TestCase
+        test : unittest.TestCase
             Test that passed despite its expected-failure marker.
 
         Returns
@@ -273,7 +290,7 @@ class TestResultProcessor(unittest.TestResult):
 
         Parameters
         ----------
-        result : TestResult
+        result : orionis.test.entities.result.TestResult
             The test result instance to display.
 
         Returns
@@ -462,18 +479,18 @@ class TestResultProcessor(unittest.TestResult):
 
         Parameters
         ----------
-        test : unittest.case.TestCase
+        test : unittest.TestCase
             The test case instance being processed.
-        status : TestStatus
+        status : orionis.test.enums.status.TestStatus
             The status of the test (e.g., PASSED, FAILED).
         exc_info : tuple[type[BaseException], BaseException, object] or None, optional
             Exception info tuple as returned by sys.exc_info(), by default None.
-        subtest : unittest.case.TestCase or None, optional
+        subtest : unittest.TestCase or None, optional
             Subtest whose identity replaces the parent identity in the report.
 
         Returns
         -------
-        TestResult
+        orionis.test.entities.result.TestResult
             The constructed TestResult object containing test outcome details.
         """
         # Measure elapsed time and extract class metadata from the test instance.
@@ -525,7 +542,7 @@ class TestResultProcessor(unittest.TestResult):
 
         Returns
         -------
-        list[TestResult]
+        list[orionis.test.entities.result.TestResult]
             A list of TestResult instances representing the outcomes of
             executed tests.
         """

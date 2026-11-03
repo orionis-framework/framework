@@ -1,3 +1,5 @@
+"""Group the orm collections components and public imports."""
+
 from typing import TYPE_CHECKING as _TYPE_CHECKING
 from orionis._exports import resolve_export as _resolve_export
 
@@ -16,6 +18,7 @@ _EXPORTS = {
     "ModelCollection": ("orionis.orm.collections.collection", "ModelCollection"),
     "Paginator": ("orionis.orm.collections.paginator", "Paginator"),
 }
+"""Public export names mapped to their defining modules and attributes."""
 
 def __getattr__(name: str) -> object:
     """

@@ -1,3 +1,5 @@
+"""Represent the security-related configuration for HTTP."""
+
 from __future__ import annotations
 from dataclasses import dataclass, field
 from typing import Literal
@@ -12,7 +14,7 @@ class HTTPSecurity(BaseEntity):
 
     Attributes
     ----------
-    allowed_hosts : list[str] | Literal["*"]
+    allowed_hosts : list[str] | typing.Literal["*"]
         List of allowed host names or '*' to allow all hosts.
     """
 
@@ -40,6 +42,7 @@ class HTTPSecurity(BaseEntity):
         Returns
         -------
         None
+            Validate security-related fields.
         """
         super().__post_init__()
         self.__validateAllowedHosts()
@@ -56,6 +59,7 @@ class HTTPSecurity(BaseEntity):
         Returns
         -------
         None
+            Validate the ``allowed_hosts`` field.
         """
         if self.allowed_hosts == "*":
             return
@@ -136,6 +140,7 @@ class HTTPSecurity(BaseEntity):
         Returns
         -------
         None
+            Add a host to the list if it is missing.
         """
         if not host or host in hosts:
             return

@@ -1,3 +1,5 @@
+"""Describe a storage attachment without opening it or resolving a disk."""
+
 from dataclasses import dataclass
 from typing import Self
 from orionis.mail.exceptions import MailAttachmentException, MailCompositionException
@@ -10,7 +12,7 @@ class Attachment:
     """
     Describe a storage attachment without opening it or resolving a disk.
 
-    Parameters
+    Attributes
     ----------
     path : str
         Logical disk-relative path, normalized on declaration.
@@ -38,7 +40,7 @@ class Attachment:
 
         Raises
         ------
-        MailAttachmentException
+        orionis.mail.exceptions.MailAttachmentException
             If a path, disk name, visible name, or MIME type is unsafe.
         """
         try:
@@ -81,12 +83,12 @@ class Attachment:
 
         Returns
         -------
-        Self
+        typing.Self
             An immutable attachment declaration, with no I/O performed.
 
         Raises
         ------
-        MailAttachmentException
+        orionis.mail.exceptions.MailAttachmentException
             If the declaration contains unsafe paths or metadata.
         """
         return cls(path=path, disk=disk, name=name, mime_type=mime_type)

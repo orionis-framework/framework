@@ -1,3 +1,5 @@
+"""Provide the base declaration interface for application schedules."""
+
 from __future__ import annotations
 from typing import TYPE_CHECKING
 from orionis.console.base.contracts.scheduler import IBaseScheduler
@@ -7,18 +9,19 @@ if TYPE_CHECKING:
     from orionis.console.entities.scheduler_event import SchedulerEvent
 
 class BaseScheduler(IBaseScheduler):
+    """Provide the base declaration interface for application schedules."""
 
     async def tasks(self, schedule: ISchedule) -> None:
         """
         Register scheduled tasks for the application.
 
         This method sets up tasks that the scheduler will execute using the provided
-        `schedule` object. Subclasses should override this method to define specific
+        ``schedule`` object. Subclasses should override this method to define specific
         tasks and their scheduling properties.
 
         Parameters
         ----------
-        schedule : ISchedule
+        schedule : orionis.console.contracts.ISchedule
             The schedule object used to register scheduled commands.
 
         Returns
@@ -41,7 +44,7 @@ class BaseScheduler(IBaseScheduler):
 
         Parameters
         ----------
-        event : SchedulerEvent
+        event : orionis.console.entities.SchedulerEvent
             The event object representing the scheduler start.
 
         Returns
@@ -56,7 +59,7 @@ class BaseScheduler(IBaseScheduler):
 
         Parameters
         ----------
-        event : SchedulerEvent
+        event : orionis.console.entities.SchedulerEvent
             The event object representing the scheduler pause.
 
         Returns
@@ -71,7 +74,7 @@ class BaseScheduler(IBaseScheduler):
 
         Parameters
         ----------
-        event : SchedulerEvent
+        event : orionis.console.entities.SchedulerEvent
             The event object representing the scheduler resumption.
 
         Returns
@@ -86,7 +89,7 @@ class BaseScheduler(IBaseScheduler):
 
         Parameters
         ----------
-        event : SchedulerEvent
+        event : orionis.console.entities.SchedulerEvent
             The event object representing the scheduler shutdown.
 
         Returns

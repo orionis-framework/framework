@@ -1,3 +1,5 @@
+"""Root marker for all Orionis field-level annotations."""
+
 class ValidationMetadata:
     """
     Root marker for all Orionis field-level annotations.
@@ -14,3 +16,4 @@ class ValidationMetadata:
     """
 
     __slots__ = ()
+    """Declare that this class introduces no additional instance slots."""

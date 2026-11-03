@@ -148,7 +148,9 @@ class TestOptimizeClearCommand(TestCase):
             console = Mock()
             remove_path = shutil.rmtree
 
-            def failForBuild(path: str | Path, *args: object, **kwargs: object) -> None:
+            def fail_for_build(
+                path: str | Path, *args: object, **kwargs: object,
+            ) -> None:
                 """Raise a permission error for the build directory only.
 
                 Parameters
@@ -175,7 +177,7 @@ class TestOptimizeClearCommand(TestCase):
                     raise PermissionError(message)
                 remove_path(path, *args, **kwargs)
 
-            with patch.object(optimize_clear.shutil, "rmtree", failForBuild):
+            with patch.object(optimize_clear.shutil, "rmtree", fail_for_build):
                 OptimizeClearCommand().handle(_Application(root), console)
 
             self.assertTrue(build_path.exists())

@@ -1,3 +1,5 @@
+"""Async cache repository backed by a configurable storage backend."""
+
 import asyncio
 import inspect
 import math
@@ -15,6 +17,7 @@ if TYPE_CHECKING:
 
 # Sentinel that distinguishes a missing cache key from a stored None value.
 _MISSING = object()
+"""Sentinel that distinguishes a missing cache key from a stored None value."""
 
 class _Flight:
     """Retain a completed result only while its concurrent waiters exist."""
@@ -29,13 +32,17 @@ class _Flight:
             Complete the operation without returning a value.
         """
         self.lock = asyncio.Lock()
+        """Synchronization primitive controlling access to lock."""
         self.value = _MISSING
+        """Payload retained for subsequent resolution or restoration."""
 
 _FLIGHTS: WeakValueDictionary[tuple, _Flight] = WeakValueDictionary()
+"""Flights used by ``repository``."""
 _RESOLVING: ContextVar[frozenset[tuple]] = ContextVar(
     "orionis-cache-resolving",
     default=frozenset(),
 )
+"""Context-local resolving isolated between asynchronous tasks."""
 
 class CacheRepository(ICacheRepository):
     """Async cache repository backed by a configurable storage backend.
@@ -47,6 +54,7 @@ class CacheRepository(ICacheRepository):
     # ruff: noqa: ANN401, PLC0415, SLF001
 
     __slots__ = ("_backend", "_prefix")
+    """Declare the instance attribute slots reserved by this class."""
 
     def __init__(self: Self, backend: Any, prefix: str = "") -> None:
         """
@@ -54,7 +62,7 @@ class CacheRepository(ICacheRepository):
 
         Parameters
         ----------
-        backend : Any
+        backend : typing.Any
             Storage backend implementing the low-level cache protocol.
         prefix : str, optional
             String prepended to every key, separated by ``:``.
@@ -66,7 +74,9 @@ class CacheRepository(ICacheRepository):
         """
         # Store the backend and prefix for use in all subsequent operations.
         self._backend = backend
+        """Storage backend implementing the low-level cache protocol."""
         self._prefix = prefix
+        """String prepended to every key, separated by ``:``."""
 
     # ── Key helper ──────────────────────────────────────────────────────────
 
@@ -92,13 +102,14 @@ class CacheRepository(ICacheRepository):
     async def replace(
         self: Self, key: str, value: Any, ttl: float | None = None,
     ) -> bool:
-        """Replace a live entry without resurrecting a deleted key.
+        """
+        Replace a live entry without resurrecting a deleted key.
 
         Parameters
         ----------
         key : str
             Existing cache key.
-        value : Any
+        value : typing.Any
             Replacement value.
         ttl : float | None
             New lifetime in seconds, or None for no expiry.
@@ -110,7 +121,7 @@ class CacheRepository(ICacheRepository):
 
         Raises
         ------
-        CacheStoreException
+        orionis.cache.exceptions.CacheStoreException
             If the backend has no atomic replacement primitive.
         """
         backend = self._backend
@@ -144,7 +155,7 @@ class CacheRepository(ICacheRepository):
 
         Returns
         -------
-        Any
+        typing.Any
             Cached value, or ``None`` when the key does not exist.
         """
         # Delegate the read to the backend using the prefixed key.
@@ -163,7 +174,7 @@ class CacheRepository(ICacheRepository):
         ----------
         key : str
             Cache key.
-        value : Any
+        value : typing.Any
             Value to store.
         ttl : float | None, optional
             Time-to-live in seconds.  ``None`` means no expiry.
@@ -233,7 +244,7 @@ class CacheRepository(ICacheRepository):
 
         Returns
         -------
-        dict[str, Any]
+        dict[str, typing.Any]
             Mapping that preserves the original (un-prefixed) key names.
         """
         # Prefix all keys before the batch read.
@@ -251,7 +262,7 @@ class CacheRepository(ICacheRepository):
 
         Parameters
         ----------
-        values : dict[str, Any]
+        values : dict[str, typing.Any]
             Mapping of key → value to store.
         ttl : float | None, optional
             Shared time-to-live in seconds.  ``None`` means no expiry.
@@ -284,12 +295,12 @@ class CacheRepository(ICacheRepository):
         ttl : float | None
             TTL applied when storing the resolved value.  ``None`` means
             no expiry.
-        resolver : Callable
+        resolver : collections.abc.Callable
             Zero-argument callable that produces the value.  May be async.
 
         Returns
         -------
-        Any
+        typing.Any
             Cached value, or the freshly computed value on a miss.
         """
         # Use a sentinel so that a legitimately stored None is not treated
@@ -325,7 +336,7 @@ class CacheRepository(ICacheRepository):
             Cache key within this repository's prefix.
         ttl : float | None
             Lifetime of the computed value, including a stored None.
-        resolver : Callable
+        resolver : collections.abc.Callable
             Synchronous or asynchronous value producer.
         wait_timeout : float
             Maximum local or Redis admission wait in seconds, per phase.
@@ -335,7 +346,7 @@ class CacheRepository(ICacheRepository):
 
         Returns
         -------
-        Any
+        typing.Any
             Cached or freshly resolved value. Failed or cancelled owners do
             not retain local locks; a later caller can retry.
         """
@@ -388,12 +399,12 @@ class CacheRepository(ICacheRepository):
         ----------
         key : str
             Cache key.
-        resolver : Callable
+        resolver : collections.abc.Callable
             Zero-argument callable that produces the value.  May be async.
 
         Returns
         -------
-        Any
+        typing.Any
             Cached value, or the freshly computed value on a miss.
         """
         # Delegate to remember with no TTL so the entry never expires.
@@ -410,7 +421,7 @@ class CacheRepository(ICacheRepository):
 
         Returns
         -------
-        Any
+        typing.Any
             Cached value, or ``None`` when the key is absent.
         """
         # Use the sentinel to distinguish a missing key from a stored None.
@@ -434,7 +445,7 @@ class CacheRepository(ICacheRepository):
         ----------
         key : str
             Cache key.
-        value : Any
+        value : typing.Any
             Value to store.
         ttl : float | None, optional
             Optional time-to-live in seconds.
@@ -503,7 +514,7 @@ class CacheRepository(ICacheRepository):
 
         Returns
         -------
-        CacheLock
+        orionis.cache.locks.lock.CacheLock
             Async context manager for the requested lock.
         """
         # Build a CacheLock bound to the prefixed key and optional timeout.

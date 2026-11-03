@@ -1,3 +1,5 @@
+"""Generate an application test case."""
+
 from pathlib import Path
 from orionis.console.commands.make._base import MakeStubCommand
 from orionis.foundation.contracts.application import IApplication  # noqa: TC001
@@ -6,11 +8,17 @@ class MakeTest(MakeStubCommand):
     """Generate an application test case."""
 
     timestamps: bool = False
+    """Timestamps flag used by ``MakeTest``."""
     signature: str = "make:test"
+    """Signature identifier: ``make:test``."""
     description: str = "Creates a new application test case."
+    """Description identifier: ``Creates a new application test case.``."""
     template_name: str = "test"
+    """Template name identifier: ``test``."""
     path_key: str = "tests"
+    """Path key identifier: ``tests``."""
     success_label: str = "Test"
+    """Success label identifier: ``Test``."""
 
     def createFiles(
         self,
@@ -22,14 +30,14 @@ class MakeTest(MakeStubCommand):
 
         Parameters
         ----------
-        app : IApplication
+        app : orionis.IApplication
             Application that resolves the tests directory.
         name : str
             Test name and optional nested directory path.
 
         Returns
         -------
-        tuple[tuple[str, str], ...]
+        tuple[tuple[str, str], ``...``]
             Label and generated path relative to the application root.
 
         Raises

@@ -1,3 +1,5 @@
+"""Define the base contract for all HTTP middlewares in the pipeline."""
+
 from __future__ import annotations
 from abc import ABC, abstractmethod
 from collections.abc import Awaitable, Callable
@@ -5,6 +7,7 @@ from typing import TYPE_CHECKING
 
 # No-arg async callable that advances to the next middleware layer
 NextCallable = Callable[[], Awaitable["Response"]]
+"""No-arg async callable that advances to the next middleware layer."""
 
 if TYPE_CHECKING:
     from orionis.http.request import Request
@@ -19,6 +22,7 @@ class IBaseMiddleware(ABC):
     """
 
     __slots__ = ()
+    """Declare that this class introduces no additional instance slots."""
 
     @abstractmethod
     async def handle(
@@ -26,18 +30,19 @@ class IBaseMiddleware(ABC):
         request: Request,
         call_next: NextCallable,
     ) -> Response:
-        """Process an incoming HTTP request and delegate to next handler.
+        """
+        Process an incoming HTTP request and delegate to next handler.
 
         Parameters
         ----------
-        request : Request
+        request : orionis.http.Request
             Incoming HTTP request instance.
-        call_next : NextCallable
+        call_next : orionis.http.NextCallable
             No-arg async callable that advances to the next middleware
             or final route handler in the pipeline.
 
         Returns
         -------
-        Response
+        orionis.http.Response
             Final HTTP response object.
         """

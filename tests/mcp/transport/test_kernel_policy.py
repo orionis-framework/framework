@@ -203,7 +203,7 @@ class _Protocol:
         """
         self.result = None
 
-    def response_bytes(self, status, headers, body):
+    def responseBytes(self, status, headers, body):
         """Record the complete native RSGI response.
 
         Parameters
@@ -222,7 +222,10 @@ class _Protocol:
         """
         self.result = status, dict(headers), body
 
-    def response_empty(self, status, headers):
+    # Preserve the Granian RSGI protocol name.
+    response_bytes = responseBytes
+
+    def responseEmpty(self, status, headers):
         """Record an empty native RSGI response.
 
         Parameters
@@ -237,7 +240,10 @@ class _Protocol:
         None
             Complete the documented checks or setup without a return value.
         """
-        self.response_bytes(status, headers, b"")
+        self.responseBytes(status, headers, b"")
+
+    # Preserve the Granian RSGI protocol name.
+    response_empty = responseEmpty
 
 class TestKernelPolicy(TestCase):
     """Keep native HTTP semantics while forcing protocol-safe MCP boundaries."""
@@ -359,7 +365,7 @@ class TestKernelPolicy(TestCase):
         self.assertNotIn(b"private", body)
         return headers
 
-    async def test_origins_precede_global_and_route_work_for_every_method(self):
+    async def testOriginsPrecedeGlobalAndRouteWorkForEveryMethod(self):
         """Invalid origins are rejected even during maintenance and OPTIONS.
 
         Returns
@@ -379,7 +385,7 @@ class TestKernelPolicy(TestCase):
                 self.assertProtocolError(result, 403)
         self.assertEqual(app.scopes, [])
 
-    async def test_native_method_options_and_unrelated_route_behavior(self):
+    async def testNativeMethodOptionsAndUnrelatedRouteBehavior(self):
         """Let routing return 405/OPTIONS while keeping neighboring HTML untouched.
 
         Returns
@@ -406,7 +412,7 @@ class TestKernelPolicy(TestCase):
             self.assertEqual((status, body), (200, b"<p>ordinary</p>"))
         self.assertEqual(catch.handled, [])
 
-    async def test_native_auth_failure_reports_without_html_in_debug_mode(self):
+    async def testNativeAuthFailureReportsWithoutHtmlInDebugMode(self):
         """Preserve Bearer authentication status even when browsers request HTML.
 
         Returns
@@ -425,7 +431,7 @@ class TestKernelPolicy(TestCase):
         self.assertEqual(len(policy._app.reported), 2)
         self.assertEqual(catch.handled, [])
 
-    async def test_redirects_and_shared_rejections_are_protocol_safe(self):
+    async def testRedirectsAndSharedRejectionsAreProtocolSafe(self):
         """Replace browser redirects and preserve retry/security headers on errors.
 
         Returns
@@ -450,7 +456,7 @@ class TestKernelPolicy(TestCase):
             kernel, _, _ = await self.kernel(maintenance=True)
             self.assertProtocolError(await self.request(kernel, interface), 503)
 
-    async def test_body_framing_failures_keep_native_status_and_protocol_body(self):
+    async def testBodyFramingFailuresKeepNativeStatusAndProtocolBody(self):
         """Sanitize global errors that happen before the MCP controller sees a body.
 
         Returns

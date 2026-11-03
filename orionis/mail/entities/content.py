@@ -1,3 +1,5 @@
+"""Declare literal bodies or views with one explicit isolated context."""
+
 from collections.abc import Mapping
 from dataclasses import dataclass, field
 from typing import cast
@@ -9,7 +11,7 @@ class Content:
     """
     Declare literal bodies or views with one explicit isolated context.
 
-    Parameters
+    Attributes
     ----------
     view : str | None
         HTML template identifier, mutually exclusive with html.
@@ -19,7 +21,7 @@ class Content:
         Literal plain text, mutually exclusive with text_view.
     text_view : str | None
         Plain-text template identifier.
-    data : Mapping[str, object] | None
+    data : collections.abc.Mapping[str, object] | None
         Context shared by both views, with copied read-only containers.
     """
 
@@ -40,7 +42,7 @@ class Content:
 
         Raises
         ------
-        MailCompositionException
+        orionis.mail.exceptions.MailCompositionException
             If bodies conflict, are absent, or have invalid types or context.
         """
         bodies = (self.view, self.html, self.text, self.text_view)

@@ -1,3 +1,5 @@
+"""Register dumper services in the application container."""
+
 from __future__ import annotations
 from orionis.console.debug.contracts.dumper import IDumper
 from orionis.console.debug.dumper import Dumper
@@ -5,6 +7,7 @@ from orionis.container.providers.service_provider import ServiceProvider
 from orionis.support.facades.debug import Debug
 
 class DumperProvider(ServiceProvider):
+    """Register dumper services in the application container."""
 
     def register(self) -> None:
         """

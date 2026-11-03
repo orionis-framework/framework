@@ -1,3 +1,5 @@
+"""Revert the most recently applied migration batches."""
+
 from typing import ClassVar
 from orionis.console.args.argument import Argument
 from orionis.console.commands.migrate.base import MigrationCommand
@@ -9,7 +11,11 @@ class MigrateRollbackCommand(MigrationCommand):
     # ruff: noqa: TC001
 
     signature: str = "migrate:rollback"
+    """Signature identifier: ``migrate:rollback``."""
     description: str = "Reverts the last batch(es) of database migrations."
+    """
+    Description identifier: ``Reverts the last batch(es) of database migrations.``.
+    """
     arguments: ClassVar[list[Argument]] = [
         *MigrationCommand.arguments,
         Argument(
@@ -23,6 +29,7 @@ class MigrateRollbackCommand(MigrationCommand):
             dest="step",
         ),
     ]
+    """Command-line argument declarations accepted by this command."""
 
     async def handle(self, migrator: Migrator) -> None:
         """
@@ -30,7 +37,7 @@ class MigrateRollbackCommand(MigrationCommand):
 
         Parameters
         ----------
-        migrator : Migrator
+        migrator : orionis.database.migrations.Migrator
             Service that discovers and reverts applied migrations.
 
         Returns

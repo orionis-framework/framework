@@ -1,3 +1,5 @@
+"""Fluent collector of column definitions for a single table."""
+
 from __future__ import annotations
 from typing import TYPE_CHECKING
 from orionis.database.schema.column import Column
@@ -26,6 +28,7 @@ class Blueprint:
     """
 
     __slots__ = ("__columns", "__constraints", "__factory_cache")
+    """Declare the instance attribute slots reserved by this class."""
 
     def __init__(self) -> None:
         """
@@ -37,19 +40,22 @@ class Blueprint:
             This method does not return a value.
         """
         self.__columns: list[ColumnDefinition] = []
+        """Column definitions included in the table schema."""
         self.__constraints: list[
             Comment | ForeignKey | Index | PrimaryKey | Unique
         ] = []
+        """Constraints declared for the table schema."""
         self.__factory_cache: dict[str, Callable[..., ColumnDefinition]] = {}
+        """Cached factories for constructing schema definitions."""
 
     def __getattr__(self, name: str) -> Callable[..., ColumnDefinition]:
         """
-        Proxy a column-factory call to :class:`Column`, recording it.
+        Proxy and record a schema column-factory call.
 
         This is what powers calls such as ``table.string("username")`` or
         ``table.boolean("is_admin")``: any factory exposed by
-        :class:`Column` becomes available on the blueprint, and the
-        resulting column is appended to this table automatically.
+        :class:`orionis.database.schema.Column` becomes available on the blueprint,
+        and the resulting column is appended to this table automatically.
 
         Parameters
         ----------
@@ -58,7 +64,7 @@ class Blueprint:
 
         Returns
         -------
-        Callable[..., ColumnDefinition]
+        collections.abc.Callable[``...``, orionis.orm.schema.column.ColumnDefinition]
             Wrapper that builds the column and appends it to this table.
 
         Raises
@@ -89,7 +95,7 @@ class Blueprint:
 
             Returns
             -------
-            ColumnDefinition
+            orionis.orm.schema.column.ColumnDefinition
                 Result of the operation described above.
             """
             column = factory(*args, **kwargs)
@@ -127,7 +133,7 @@ class Blueprint:
 
         Returns
         -------
-        Comment
+        orionis.database.schema.Comment
             The constraint recorded on this blueprint.
         """
         definition = Comment(text)
@@ -157,7 +163,7 @@ class Blueprint:
 
         Returns
         -------
-        ForeignKey
+        orionis.database.schema.ForeignKey
             The constraint recorded on this blueprint.
         """
         definition = ForeignKey(column, ref_table, ref_column, name=name)
@@ -185,7 +191,7 @@ class Blueprint:
 
         Returns
         -------
-        Index
+        orionis.database.schema.Index
             The constraint recorded on this blueprint.
         """
         definition = Index(*columns, name=name, unique=unique)
@@ -203,7 +209,7 @@ class Blueprint:
 
         Returns
         -------
-        PrimaryKey
+        orionis.database.schema.PrimaryKey
             The constraint recorded on this blueprint.
         """
         definition = PrimaryKey(*columns)
@@ -224,7 +230,7 @@ class Blueprint:
 
         Returns
         -------
-        Unique
+        orionis.database.schema.Unique
             The constraint recorded on this blueprint.
         """
         definition = Unique(*columns, name=name)
@@ -237,7 +243,7 @@ class Blueprint:
 
         Returns
         -------
-        tuple of ColumnDefinition
+        tuple of orionis.orm.schema.column.ColumnDefinition
             Snapshot of every column recorded on this blueprint.
         """
         return tuple(self.__columns)

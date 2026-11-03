@@ -1,3 +1,5 @@
+"""Represent Oracle database configuration for oracledb."""
+
 from __future__ import annotations
 from dataclasses import dataclass, field
 from orionis.environment import Env
@@ -29,9 +31,9 @@ class Oracle(BaseEntity):
         Full DSN string, used if service_name/sid are not specified.
     tns_name : str | None
         TNS alias name defined in tnsnames.ora.
-    encoding : str | OracleEncoding
+    encoding : str | orionis.foundation.config.database.OracleEncoding
         Character encoding for the connection.
-    nencoding : str | OracleNencoding
+    nencoding : str | orionis.foundation.config.database.OracleNencoding
         National character encoding for the connection.
     """
 
@@ -139,7 +141,7 @@ class Oracle(BaseEntity):
 
         Parameters
         ----------
-        self : Oracle
+        self : orionis.foundation.config.database.Oracle
             The Oracle configuration instance.
 
         Returns
@@ -196,12 +198,12 @@ class Oracle(BaseEntity):
         """
         Validate Oracle encoding parameters.
 
-        Validates the `encoding` and `nencoding` fields to ensure they are valid
+        Validates the ``encoding`` and ``nencoding`` fields to ensure they are valid
         OracleEncoding and OracleNencoding values.
 
         Parameters
         ----------
-        self : Oracle
+        self : orionis.foundation.config.database.Oracle
             The Oracle configuration instance.
 
         Returns
@@ -237,12 +239,12 @@ class Oracle(BaseEntity):
         """
         Validate the Oracle national encoding parameter.
 
-        Validates the `nencoding` field to ensure it is a valid
+        Validates the ``nencoding`` field to ensure it is a valid
         OracleNencoding value.
 
         Parameters
         ----------
-        self : Oracle
+        self : orionis.foundation.config.database.Oracle
             The Oracle configuration instance.
 
         Returns
@@ -286,7 +288,7 @@ class Oracle(BaseEntity):
 
         Parameters
         ----------
-        self : Oracle
+        self : orionis.foundation.config.database.Oracle
             The Oracle configuration instance.
 
         Returns

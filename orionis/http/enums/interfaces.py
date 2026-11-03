@@ -1,3 +1,5 @@
+"""Represent the supported HTTP interface types."""
+
 from enum import StrEnum
 
 class Interface(StrEnum):

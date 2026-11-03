@@ -1,3 +1,5 @@
+"""Contract for the view-environment wrapper."""
+
 from __future__ import annotations
 from abc import ABC, abstractmethod
 from typing import Any, TYPE_CHECKING
@@ -18,6 +20,7 @@ class IViewEnvironment(ABC):
     # ruff: noqa: ANN401
 
     __slots__ = ()
+    """Declare that this class introduces no additional instance slots."""
 
     @abstractmethod
     def addGlobal(self, name: str, value: Any) -> None:
@@ -28,12 +31,13 @@ class IViewEnvironment(ABC):
         ----------
         name : str
             Identifier used to reference the value inside templates.
-        value : Any
+        value : typing.Any
             Value or callable to expose as a template global.
 
         Returns
         -------
         None
+            Register a global variable or callable available in all templates.
         """
 
     @abstractmethod
@@ -45,13 +49,14 @@ class IViewEnvironment(ABC):
         ----------
         name : str
             Filter name used inside template expressions (e.g. ``| slug``).
-        callback : Callable
+        callback : collections.abc.Callable
             Function applied to the piped value.  The first argument receives
             the value being filtered.
 
         Returns
         -------
         None
+            Register a filter callable that templates can apply with ``|``.
         """
 
     @abstractmethod
@@ -63,12 +68,13 @@ class IViewEnvironment(ABC):
         ----------
         name : str
             Test name used in template expressions (e.g. ``is odd``).
-        callback : Callable
+        callback : collections.abc.Callable
             Function that receives the tested value and returns a bool.
 
         Returns
         -------
         None
+            Register a test callable used in Jinja2 ``is`` expressions.
         """
 
     @abstractmethod
@@ -78,29 +84,30 @@ class IViewEnvironment(ABC):
 
         Parameters
         ----------
-        extension : Any
-            A Jinja2 :class:`Extension` subclass or its dotted import path.
+        extension : typing.Any
+            A Jinja2 ``Extension`` subclass or its dotted import path.
 
         Returns
         -------
         None
+            Register a Jinja2 extension class with the environment.
 
         Raises
         ------
-        ViewException
+        orionis.view.exceptions.ViewException
             When the extension cannot be registered.
         """
 
     @abstractmethod
     def getJinjaEnvironment(self) -> Any:
         """
-        Return the underlying Jinja2 :class:`Environment` instance.
+        Return the underlying Jinja2 ``Environment`` instance.
 
         Access is intentionally restricted to this method so that all
         configuration changes flow through the typed helpers above.
 
         Returns
         -------
-        jinja2.Environment
+        ``jinja2.Environment``
             The configured Jinja2 environment.
         """

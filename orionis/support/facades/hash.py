@@ -1,7 +1,10 @@
+"""Resolve the hash service through the application facade."""
+
 from orionis.container.facades.facade import Facade
 from orionis.hashing.contracts.hash_manager import IHashManager
 
 class Hash(Facade):
+    """Resolve the hash service through the application facade."""
 
     @classmethod
     def getFacadeAccessor(cls) -> type:

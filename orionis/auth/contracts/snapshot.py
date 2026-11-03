@@ -1,3 +1,5 @@
+"""Define the immutable authorization picture of a single request."""
+
 from abc import ABC, abstractmethod
 
 class IAuthorizationSnapshot(ABC):
@@ -9,6 +11,7 @@ class IAuthorizationSnapshot(ABC):
     """
 
     __slots__ = ()
+    """Declare that this class introduces no additional instance slots."""
 
     @property
     @abstractmethod

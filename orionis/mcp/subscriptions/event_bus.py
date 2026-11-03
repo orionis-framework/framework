@@ -1,3 +1,5 @@
+"""Coalesce duplicate changes and close overloaded listeners gracefully."""
+
 import asyncio
 from collections import OrderedDict
 from typing import TYPE_CHECKING
@@ -10,11 +12,13 @@ if TYPE_CHECKING:
     from orionis.mcp.protocol.requests import SubscriptionFilter
 
 type Change = tuple[str, str | None]
+"""Type alias for ``tuple[str, str | None]``."""
 
 class _Listener:
     """Retain only a server key, accepted filter and bounded pending changes."""
 
     __slots__ = ("closed", "filters", "pending", "ready", "server")
+    """Declare the instance attribute slots reserved by this class."""
 
     def __init__(self, server: type, filters: SubscriptionFilter) -> None:
         """
@@ -24,7 +28,7 @@ class _Listener:
         ----------
         server : type
             Value supplied for ``server``.
-        filters : SubscriptionFilter
+        filters : orionis.mcp.protocol.requests.SubscriptionFilter
             Value supplied for ``filters``.
 
         Returns
@@ -33,10 +37,15 @@ class _Listener:
             Complete the documented operation without returning a value.
         """
         self.server = server
+        """Value supplied for ``server``."""
         self.filters = filters
+        """Value supplied for ``filters``."""
         self.pending: OrderedDict[Change, None] = OrderedDict()
+        """Work that has been admitted and is awaiting completion."""
         self.ready = asyncio.Event()
+        """Whether backend initialization has completed."""
         self.closed = False
+        """Closed flag used by ``_Listener``."""
 
     def accepts(self, method: str, uri: str | None) -> bool:
         """
@@ -70,6 +79,7 @@ class InMemoryMcpEventBus(IMcpEventBus):
     """Coalesce duplicate changes and close overloaded listeners gracefully."""
 
     __slots__ = ("_closed", "_listeners", "_max_listeners", "_size")
+    """Declare the instance attribute slots reserved by this class."""
 
     def __init__(self, buffer_size: int = 64, max_listeners: int = 1024) -> None:
         """
@@ -94,9 +104,13 @@ class InMemoryMcpEventBus(IMcpEventBus):
             error = "Subscription limits must be positive"
             raise ValueError(error)
         self._size = buffer_size
+        """Value supplied for ``buffer_size``."""
         self._max_listeners = max_listeners
+        """Value supplied for ``max_listeners``."""
         self._listeners: set[_Listener] = set()
+        """Listeners produced by ``set``."""
         self._closed = False
+        """Whether this resource has completed its close lifecycle."""
 
     @property
     def listenerCount(self) -> int:
@@ -122,12 +136,12 @@ class InMemoryMcpEventBus(IMcpEventBus):
         ----------
         server : type
             Value supplied for ``server``.
-        filters : SubscriptionFilter
+        filters : orionis.mcp.protocol.requests.SubscriptionFilter
             Value supplied for ``filters``.
 
         Returns
         -------
-        AsyncIterator[Change]
+        collections.abc.AsyncIterator[orionis.mcp.subscriptions.event_bus.Change]
             Result of the operation described above.
         """
         if self._closed or len(self._listeners) >= self._max_listeners:
@@ -179,7 +193,7 @@ class InMemoryMcpEventBus(IMcpEventBus):
 
         Parameters
         ----------
-        listener : _Listener
+        listener : orionis.mcp.subscriptions.event_bus._Listener
             Value supplied for ``listener``.
 
         Returns
@@ -211,6 +225,7 @@ class _Subscription(AsyncClosable):
     """An explicitly closable iterator, including before first iteration."""
 
     __slots__ = ("_bus", "_listener")
+    """Declare the instance attribute slots reserved by this class."""
 
     def __init__(self, bus: InMemoryMcpEventBus, listener: _Listener) -> None:
         """
@@ -218,9 +233,9 @@ class _Subscription(AsyncClosable):
 
         Parameters
         ----------
-        bus : InMemoryMcpEventBus
+        bus : orionis.mcp.subscriptions.event_bus.InMemoryMcpEventBus
             Value supplied for ``bus``.
-        listener : _Listener
+        listener : orionis.mcp.subscriptions.event_bus._Listener
             Value supplied for ``listener``.
 
         Returns
@@ -229,7 +244,9 @@ class _Subscription(AsyncClosable):
             Complete the documented operation without returning a value.
         """
         self._bus = bus
+        """Value supplied for ``bus``."""
         self._listener = listener
+        """Value supplied for ``listener``."""
 
     def __aiter__(self) -> AsyncIterator[Change]:
         """
@@ -237,7 +254,7 @@ class _Subscription(AsyncClosable):
 
         Returns
         -------
-        AsyncIterator[Change]
+        collections.abc.AsyncIterator[orionis.mcp.subscriptions.event_bus.Change]
             The subscription iterator.
         """
         return self
@@ -248,7 +265,7 @@ class _Subscription(AsyncClosable):
 
         Returns
         -------
-        Change
+        orionis.mcp.subscriptions.event_bus.Change
             Result of the operation described above.
         """
         listener = self._listener

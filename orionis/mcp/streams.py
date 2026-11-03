@@ -1,3 +1,5 @@
+"""Provide mcp operations through ``AsyncClosable``, ``OwnedStream``."""
+
 import asyncio
 from collections.abc import AsyncIterator, Iterator
 from typing import Protocol
@@ -7,6 +9,7 @@ class AsyncClosable(Protocol):
     """Describe the awaited close operation of an owned asynchronous source."""
 
     __slots__ = ()
+    """Declare that this class introduces no additional instance slots."""
 
     async def aclose(self) -> None:
         """
@@ -23,6 +26,7 @@ class OwnedStream[T](AsyncClosable):
     """Join source cleanup before propagating delivery errors or cancellation."""
 
     __slots__ = ("_cleanup", "_closed", "_owner", "_source")
+    """Declare the instance attribute slots reserved by this class."""
 
     def __init__(
         self, source: AsyncIterator[T] | Iterator[T],
@@ -33,9 +37,9 @@ class OwnedStream[T](AsyncClosable):
 
         Parameters
         ----------
-        source : AsyncIterator[T] | Iterator[T]
+        source : collections.abc.AsyncIterator[``T``] | collections.abc.Iterator[``T``]
             Source whose values or lifecycle are consumed by this operation.
-        owner : OwnedStream[object] | None
+        owner : orionis.mcp.streams.OwnedStream[object] | None
             Value supplied for ``owner``.
 
         Returns
@@ -44,9 +48,13 @@ class OwnedStream[T](AsyncClosable):
             Complete the documented operation without returning a value.
         """
         self._source = source
+        """Source whose values or lifecycle are consumed by this operation."""
         self._owner = owner
+        """Value supplied for ``owner``."""
         self._closed = False
+        """Whether this resource has completed its close lifecycle."""
         self._cleanup: asyncio.Future[None] | None = None
+        """Cleanup task shared by callers closing the owned stream."""
 
     def __aiter__(self) -> AsyncIterator[T]:
         """
@@ -54,7 +62,7 @@ class OwnedStream[T](AsyncClosable):
 
         Returns
         -------
-        AsyncIterator[T]
+        collections.abc.AsyncIterator[``T``]
             This single-consumer iterator.
         """
         return self
@@ -65,7 +73,7 @@ class OwnedStream[T](AsyncClosable):
 
         Returns
         -------
-        T
+        ``T``
             Result of the operation described above.
         """
         if self._closed:

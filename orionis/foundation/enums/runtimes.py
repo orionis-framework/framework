@@ -1,3 +1,5 @@
+"""Define runtime environments for the framework."""
+
 from enum import StrEnum
 
 class Runtime(StrEnum):
@@ -11,14 +13,14 @@ class Runtime(StrEnum):
 
     Attributes
     ----------
-    HTTP : Runtime
+    HTTP : orionis.foundation.enums.Runtime
         Represents the HTTP runtime environment.
-    CLI : Runtime
+    CLI : orionis.foundation.enums.Runtime
         Represents the CLI runtime environment.
 
     Returns
     -------
-    Runtime
+    orionis.foundation.enums.Runtime
         Enumeration member representing a runtime environment.
     """
 

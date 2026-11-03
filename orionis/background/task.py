@@ -1,3 +1,5 @@
+"""Represent a background task that can be executed asynchronously."""
+
 from __future__ import annotations
 import asyncio
 import functools
@@ -41,15 +43,16 @@ class BackgroundTask(IBackgroundTask):
 
     Parameters
     ----------
-    func : Callable
+    func : collections.abc.Callable
         The function to be executed in the background.
-    *args : Any
+    *args : typing.Any
         Positional arguments to pass to the function.
-    **kwargs : Any
+    **kwargs : typing.Any
         Keyword arguments to pass to the function.
     """
 
     __slots__ = ("__args", "__func", "__is_async", "__kwargs")
+    """Declare the instance attribute slots reserved by this class."""
 
     def __init__(
         self,
@@ -62,11 +65,11 @@ class BackgroundTask(IBackgroundTask):
 
         Parameters
         ----------
-        func : Callable
+        func : collections.abc.Callable
             The function to be executed in the background.
-        *args : Any
+        *args : typing.Any
             Positional arguments to pass to the function.
-        **kwargs : Any
+        **kwargs : typing.Any
             Keyword arguments to pass to the function.
 
         Returns
@@ -75,9 +78,13 @@ class BackgroundTask(IBackgroundTask):
             This method does not return a value.
         """
         self.__func: Callable[..., Any] = func
+        """The function to be executed in the background."""
         self.__args: tuple[object, ...] = args
+        """Positional arguments to pass to the function."""
         self.__kwargs: dict[str, object] = kwargs
+        """Keyword arguments to pass to the function."""
         self.__is_async: bool = is_async_callable(func)
+        """Is async produced by ``is_async_callable``."""
 
     async def __call__(self) -> None:
         """

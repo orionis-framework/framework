@@ -1,3 +1,5 @@
+"""Represent a configured storage disk."""
+
 from __future__ import annotations
 from typing import TYPE_CHECKING
 from orionis.storage.contracts.disk import IDisk
@@ -14,13 +16,14 @@ class Disk(IDisk):
     Represent a configured storage disk.
 
     The disk is the high-level entry point to a storage backend. It
-    builds :class:`~orionis.storage.file.File` and
-    :class:`~orionis.storage.directory.Directory` objects bound to its
+    builds :class:`orionis.storage.File` and
+    :class:`orionis.storage.Directory` objects bound to its
     driver, and its convenience methods always delegate to those
     objects so no logic is ever duplicated.
     """
 
     __slots__ = ("_driver", "_name")
+    """Declare the instance attribute slots reserved by this class."""
 
     def __init__(self, name: str, driver: IStorageDriver) -> None:
         """
@@ -30,15 +33,18 @@ class Disk(IDisk):
         ----------
         name : str
             Disk name as declared in the filesystems configuration.
-        driver : IStorageDriver
+        driver : orionis.storage.contracts.IStorageDriver
             Driver instance backing the disk.
 
         Returns
         -------
         None
+            Initialize the disk with its configuration name and driver.
         """
         self._name = name
+        """Disk name as declared in the filesystems configuration."""
         self._driver = driver
+        """Driver instance backing the disk."""
 
     def name(self) -> str:
         """
@@ -64,12 +70,12 @@ class Disk(IDisk):
 
         Returns
         -------
-        IFile
+        orionis.storage.contracts.IFile
             File object bound to this disk's driver.
 
         Raises
         ------
-        StoragePathException
+        orionis.storage.exceptions.StoragePathException
             If *path* is invalid or resolves to the disk root.
         """
         return File(self._driver, path)
@@ -86,12 +92,12 @@ class Disk(IDisk):
 
         Returns
         -------
-        IDirectory
+        orionis.storage.contracts.IDirectory
             Directory object bound to this disk's driver.
 
         Raises
         ------
-        StoragePathException
+        orionis.storage.exceptions.StoragePathException
             If *path* is invalid or escapes the disk root.
         """
         return Directory(self._driver, path)
@@ -118,7 +124,7 @@ class Disk(IDisk):
 
         Returns
         -------
-        IFile
+        orionis.storage.contracts.IFile
             File object pointing at the written file.
         """
         return await self.file(path).write(contents, visibility)
@@ -168,12 +174,12 @@ class Disk(IDisk):
 
         Returns
         -------
-        IFile
+        orionis.storage.contracts.IFile
             File object pointing at the copy.
 
         Raises
         ------
-        StorageFileNotFoundException
+        orionis.storage.exceptions.StorageFileNotFoundException
             If the source file does not exist.
         """
         return await self.file(source).copyTo(target)
@@ -191,12 +197,12 @@ class Disk(IDisk):
 
         Returns
         -------
-        IFile
+        orionis.storage.contracts.IFile
             File object pointing at the moved file.
 
         Raises
         ------
-        StorageFileNotFoundException
+        orionis.storage.exceptions.StorageFileNotFoundException
             If the source file does not exist.
         """
         return await self.file(source).moveTo(target)

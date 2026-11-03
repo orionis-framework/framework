@@ -1,3 +1,5 @@
+"""Parse query-string pairs while preserving repeated parameter values."""
+
 from typing import TYPE_CHECKING
 from urllib.parse import parse_qsl
 from orionis.support.patterns.final.meta import Final
@@ -6,8 +8,10 @@ if TYPE_CHECKING:
     from collections.abc import Iterator
 
 class QueryParams(metaclass=Final):
+    """Parse query-string pairs while preserving repeated parameter values."""
 
     __slots__ = ("_index", "_items")
+    """Declare the instance attribute slots reserved by this class."""
 
     def __init__(self, query_string: str) -> None:
         """
@@ -29,6 +33,7 @@ class QueryParams(metaclass=Final):
             keep_blank_values=True,
             strict_parsing=False,
         )
+        """Parse the query string into an ordered list of key-value pairs."""
         # Store single values and collect repeated parameters in order.
         index: dict[str, str | list[str]] = {}
         for key, value in self._items:
@@ -40,6 +45,7 @@ class QueryParams(metaclass=Final):
             else:
                 index[key] = [previous, value]
         self._index = index
+        """Lookup index used to resolve registered entries."""
 
     def get(self, key: str, default: str | None = None) -> str | None:
         """
@@ -103,10 +109,6 @@ class QueryParams(metaclass=Final):
     def multiItems(self) -> list[tuple[str, str]]:
         """
         Return all ``(key, value)`` pairs in insertion order.
-
-        Parameters
-        ----------
-        None
 
         Returns
         -------
@@ -199,7 +201,7 @@ class QueryParams(metaclass=Final):
 
         Returns
         -------
-        Iterator[tuple[str, str]]
+        collections.abc.Iterator[tuple[str, str]]
             Iterator over all key-value pairs.
         """
         # Return an iterator for the items.

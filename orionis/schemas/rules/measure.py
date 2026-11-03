@@ -1,13 +1,20 @@
+"""Measure field lengths, numeric values and uploaded file sizes."""
+
 import asyncio
 from collections.abc import Sized
 from decimal import Decimal
 
 # Bytes per kilobyte, the unit size rules use to express file sizes.
 KILOBYTE = 1024
+"""Bytes per kilobyte, the unit size rules use to express file sizes."""
 
 # Attributes an uploaded file exposes, used for structural detection so the
 # schema layer stays decoupled from the HTTP payload package.
 _FILE_ATTRIBUTES = ("read", "size", "filename")
+"""
+Attributes an uploaded file exposes, used for structural detection so the schema
+layer stays decoupled from the HTTP payload package.
+"""
 
 def is_file(value: object) -> bool:
     """

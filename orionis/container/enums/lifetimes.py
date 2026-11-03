@@ -1,3 +1,5 @@
+"""Define lifecycle types for dependency injection."""
+
 from __future__ import annotations
 from enum import Enum, auto
 
@@ -10,16 +12,16 @@ class Lifetime(Enum):
 
     Attributes
     ----------
-    TRANSIENT : Lifetime
+    TRANSIENT : orionis.container.enums.Lifetime
         Create a new instance every time the dependency is requested.
-    SINGLETON : Lifetime
+    SINGLETON : orionis.container.enums.Lifetime
         Create a single shared instance for the application's lifetime.
-    SCOPED : Lifetime
+    SCOPED : orionis.container.enums.Lifetime
         Create and share an instance within a defined scope.
 
     Returns
     -------
-    Lifetime
+    orionis.container.enums.Lifetime
         An enumeration member representing the selected lifecycle type.
     """
 

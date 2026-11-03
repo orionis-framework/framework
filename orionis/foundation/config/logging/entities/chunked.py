@@ -1,3 +1,5 @@
+"""Configure chunked log file rotation."""
+
 from __future__ import annotations
 from dataclasses import dataclass, field
 from orionis.environment import Env
@@ -6,6 +8,7 @@ from orionis.foundation.config.logging.validators import IsValidLevel, IsValidPa
 from orionis.support.entities.base import BaseEntity
 
 _DEFAULT_PATH: str = "storage/logs/chunked_{suffix}.log"
+"""Default path identifier: ``storage/logs/chunked_{suffix}.log``."""
 
 @dataclass(frozen=True, kw_only=True)
 class Chunked(BaseEntity):
@@ -21,7 +24,7 @@ class Chunked(BaseEntity):
     ----------
     path : str
         Filesystem path where chunked log files are stored.
-    level : int | str | Level
+    level : int | str | orionis.foundation.config.logging.Level
         Logging level for the log file. Accepts an integer, string, or Level enum.
     mb_size : int
         Maximum size (in megabytes) of a single log file before a new chunk is
@@ -81,7 +84,7 @@ class Chunked(BaseEntity):
 
         Parameters
         ----------
-        self : Chunked
+        self : orionis.foundation.config.logging.Chunked
             The instance of the Chunked configuration.
 
         Returns

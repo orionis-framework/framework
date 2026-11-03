@@ -1,3 +1,5 @@
+"""Fluent query builder over a plain table name."""
+
 from __future__ import annotations
 from typing import TYPE_CHECKING, Any, Self
 from orionis.orm.contracts.raw_builder import IRawQueryBuilder
@@ -12,23 +14,26 @@ if TYPE_CHECKING:
 
 # Default page size used by pagination.
 _DEFAULT_PER_PAGE: int = 15
+"""Default page size used by pagination."""
 
 class RawQueryBuilder(QueryBuilderBase, IRawQueryBuilder):
     """
     Fluent query builder over a plain table name.
 
-    Unlike :class:`orionis.orm.query.builder.ModelQueryBuilder`, it is
-    not bound to a :class:`Model`: rows are returned as plain
+    Unlike :class:`orionis.orm.query.ModelQueryBuilder`, it is
+    not bound to a :class:`orionis.orm.Model`: rows are returned as plain
     dictionaries and the target table carries no declared schema, so the
     SQL compiler declares each referenced column lazily. Built by
-    :meth:`orionis.orm.db.DB.table`.
+    ``orionis.support.facades.DB.table``.
 
-    Every clause method comes from :class:`QueryBuilderBase`, the same
+    Every clause method comes from
+    :class:`orionis.orm.query.base_builder.QueryBuilderBase`, the same
     engine model queries run on, so both entry points speak exactly the
     same query language and compile through the same pipeline.
     """
 
     __slots__ = ()
+    """Declare that this class introduces no additional instance slots."""
 
     # ── Target selection ────────────────────────────────────────────────────
 
@@ -43,7 +48,7 @@ class RawQueryBuilder(QueryBuilderBase, IRawQueryBuilder):
 
         Returns
         -------
-        RawQueryBuilder
+        orionis.orm.query.raw_builder.RawQueryBuilder
             The same builder, enabling fluent chaining.
         """
         return self.adoptConnection(name)
@@ -64,7 +69,7 @@ class RawQueryBuilder(QueryBuilderBase, IRawQueryBuilder):
 
         Returns
         -------
-        RawQueryBuilder
+        orionis.orm.query.raw_builder.RawQueryBuilder
             The same builder, enabling fluent chaining.
         """
         self._plan.table = self._resolveJoinTable(name)
@@ -79,14 +84,14 @@ class RawQueryBuilder(QueryBuilderBase, IRawQueryBuilder):
 
         Returns
         -------
-        Collection
+        collections.abc.Collection
             Collection of plain dictionaries, one per row.
 
         Raises
         ------
-        InvalidQueryException
+        orionis.orm.exceptions.InvalidQueryException
             If no table was selected.
-        QueryException
+        orionis.database.QueryException
             If the statement fails to compile or execute.
         """
         self._assertTarget()
@@ -105,9 +110,9 @@ class RawQueryBuilder(QueryBuilderBase, IRawQueryBuilder):
 
         Raises
         ------
-        InvalidQueryException
+        orionis.orm.exceptions.InvalidQueryException
             If no table was selected.
-        QueryException
+        orionis.database.QueryException
             If the statement fails to compile or execute.
         """
         self._assertTarget()
@@ -128,7 +133,7 @@ class RawQueryBuilder(QueryBuilderBase, IRawQueryBuilder):
 
         Returns
         -------
-        Any
+        typing.Any
             Column value, or ``None`` without matches.
         """
         row = await self.clone().select(column).first()
@@ -146,7 +151,7 @@ class RawQueryBuilder(QueryBuilderBase, IRawQueryBuilder):
 
         Returns
         -------
-        Collection
+        collections.abc.Collection
             Collection of column values.
         """
         rows = await self.clone().select(column).get()
@@ -170,12 +175,12 @@ class RawQueryBuilder(QueryBuilderBase, IRawQueryBuilder):
 
         Returns
         -------
-        Paginator
+        orionis.orm.collections.Paginator
             Page of rows with pagination metadata.
 
         Raises
         ------
-        InvalidQueryException
+        orionis.orm.exceptions.InvalidQueryException
             If the page or page size are not positive integers.
         """
         self.forPage(page, per_page)
@@ -191,7 +196,7 @@ class RawQueryBuilder(QueryBuilderBase, IRawQueryBuilder):
 
         Returns
         -------
-        IConnection
+        orionis.database.contracts.IConnection
             Named connection, or the default one.
         """
         return ConnectionResolver.connection(self._connection_name)
@@ -207,7 +212,7 @@ class RawQueryBuilder(QueryBuilderBase, IRawQueryBuilder):
 
         Raises
         ------
-        InvalidQueryException
+        orionis.orm.exceptions.InvalidQueryException
             If the builder has no target table.
         """
         if not self._plan.table.name:

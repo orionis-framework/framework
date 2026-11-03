@@ -30,7 +30,7 @@ _ANSI_ESCAPE = re.compile(r"\x1b\[[0-9;]*m")
 class TestBootstrapOutput(IsolatedAsyncioTestCase):
     """Verify aligned action rows without duplicate console severity badges."""
 
-    async def test_all_commands_render_aligned_status_only_colors(self) -> None:
+    async def testAllCommandsRenderAlignedStatusOnlyColors(self) -> None:
         """
         Render uniform action rows through every public bootstrap handler.
 
@@ -82,7 +82,7 @@ class TestBootstrapOutput(IsolatedAsyncioTestCase):
                 self.assertNotIn("SUCCESS", text)
                 self.assertNotIn("INFO", text)
 
-    async def test_resource_text_remains_literal(self) -> None:
+    async def testResourceTextRemainsLiteral(self) -> None:
         """
         Preserve path text and markup-like characters in action resources.
 
@@ -115,7 +115,7 @@ class TestBootstrapOutput(IsolatedAsyncioTestCase):
             + "\n",
         )
 
-    async def test_failures_keep_native_error_reporting(self) -> None:
+    async def testFailuresKeepNativeErrorReporting(self) -> None:
         """
         Report failed generation without emitting successful resource rows.
 

@@ -1,3 +1,5 @@
+"""Calculate worker counts from the current process and CPU environment."""
+
 from __future__ import annotations
 import math
 import os
@@ -18,15 +20,30 @@ def _get_cpu_count() -> int:
 
 # Store the process resource limits for the lifetime of this process.
 _CPU_COUNT: int = _get_cpu_count()
+"""Store the process resource limits for the lifetime of this process."""
 _RAM_TOTAL_BYTES: int = psutil.virtual_memory().total
+"""Ram total bytes used by ``workers``."""
 _BYTES_PER_GB: int = 1 << 30
+"""Bytes per gb used by ``workers``."""
 _DEFAULT_RAM_PER_WORKER_BYTES: int = 1 << 29
+"""Default ram per worker bytes used by ``workers``."""
 _ERR_INVALID_RAM_PER_WORKER: str = "RAM per worker must be a finite positive value."
+"""
+Error text for invalid ram per worker: ``RAM per worker must be a finite positive
+value.``.
+"""
 _ERR_RAM_PER_WORKER_TOO_SMALL: str = "RAM per worker must be at least one byte."
+"""
+Error text for ram per worker too small: ``RAM per worker must be at least one
+byte.``.
+"""
 
 class Workers(IWorkers):
     # Keep instances without per-object state.
+    """Calculate worker counts from the current process and CPU environment."""
+
     __slots__ = ()
+    """Keep instances without per-object state."""
 
     # Store the configured RAM budget in bytes.
     _ram_per_worker_bytes: int = _DEFAULT_RAM_PER_WORKER_BYTES
@@ -69,10 +86,6 @@ class Workers(IWorkers):
     def calculate(cls) -> int:
         """
         Calculate the recommended maximum number of worker processes.
-
-        Parameters
-        ----------
-        None
 
         Returns
         -------

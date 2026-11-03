@@ -1,3 +1,5 @@
+"""Contract of the entry point backing the ``DB`` facade."""
+
 from __future__ import annotations
 from abc import abstractmethod, ABC
 from typing import TYPE_CHECKING, Self
@@ -17,6 +19,7 @@ class IQueryBuilder(ABC):
     """
 
     __slots__ = ()
+    """Declare that this class introduces no additional instance slots."""
 
     @abstractmethod
     def connection(
@@ -34,12 +37,12 @@ class IQueryBuilder(ABC):
 
         Returns
         -------
-        Self
+        typing.Self
             Gateway bound to the requested connection.
 
         Raises
         ------
-        ConnectionNotFoundException
+        orionis.database.ConnectionNotFoundException
             If the connection is not declared in the configuration.
         """
 
@@ -66,7 +69,7 @@ class IQueryBuilder(ABC):
 
         Returns
         -------
-        IRawQueryBuilder
+        orionis.orm.contracts.raw_builder.IRawQueryBuilder
             Fluent, model-less query builder over the table.
         """
 
@@ -88,7 +91,7 @@ class IQueryBuilder(ABC):
 
         Raises
         ------
-        TransactionException
+        orionis.database.TransactionException
             If the transaction cannot be started.
         """
 
@@ -110,7 +113,7 @@ class IQueryBuilder(ABC):
 
         Raises
         ------
-        TransactionException
+        orionis.database.TransactionException
             If no transaction is active.
         """
 
@@ -132,7 +135,7 @@ class IQueryBuilder(ABC):
 
         Raises
         ------
-        TransactionException
+        orionis.database.TransactionException
             If no transaction is active.
         """
 
@@ -149,7 +152,7 @@ class IQueryBuilder(ABC):
 
         Returns
         -------
-        ITransaction
+        orionis.database.contracts.ITransaction
             Context manager committing on success and rolling back on
             error.
         """
@@ -182,7 +185,7 @@ class IQueryBuilder(ABC):
 
         Raises
         ------
-        ConnectionNotFoundException
+        orionis.database.ConnectionNotFoundException
             If the connection is not declared in the configuration.
         """
 
@@ -213,7 +216,7 @@ class IQueryBuilder(ABC):
 
         Raises
         ------
-        QueryException
+        orionis.database.QueryException
             If the statement fails to execute.
         """
 
@@ -244,7 +247,7 @@ class IQueryBuilder(ABC):
 
         Raises
         ------
-        QueryException
+        orionis.database.QueryException
             If the statement fails to execute.
         """
 
@@ -275,6 +278,6 @@ class IQueryBuilder(ABC):
 
         Raises
         ------
-        QueryException
+        orionis.database.QueryException
             If the statement fails to execute.
         """

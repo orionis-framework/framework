@@ -1,3 +1,5 @@
+"""Facade for the cache system."""
+
 from orionis.cache.contracts.cache_manager import ICacheManager
 from orionis.container.facades.facade import Facade
 
@@ -5,7 +7,8 @@ class Cache(Facade):
     """
     Facade for the cache system.
 
-    Proxies all calls to the bound :class:`ICacheManager` singleton.
+    Proxies all calls to the bound :class:`orionis.cache.contracts.ICacheManager`
+    singleton.
 
     Usage (facade pinned at boot)::
 
@@ -26,6 +29,6 @@ class Cache(Facade):
         Returns
         -------
         type
-            :class:`ICacheManager`.
+            :class:`orionis.cache.contracts.ICacheManager`.
         """
         return ICacheManager

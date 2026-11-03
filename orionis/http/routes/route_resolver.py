@@ -1,3 +1,5 @@
+"""Resolve compiled routes using static maps and ordered dynamic buckets."""
+
 from __future__ import annotations
 import re
 from collections import deque
@@ -16,6 +18,7 @@ if TYPE_CHECKING:
     from orionis.http.routes.entities.compiled_route import CompiledRoute
 
 _GROUP_NAME_RE: re.Pattern = re.compile(r"\(\?P<(\w+)>")
+"""Compiled pattern used to recognize group name re."""
 
 # Canonical dispatch method per incoming method string; HEAD is served
 # by the GET table.
@@ -30,14 +33,23 @@ _METHOD_MAP: dict[str, str] = {
     "OPTIONS": "OPTIONS",
     "WEBSOCKET": "WEBSOCKET",
 }
+"""
+Canonical dispatch method per incoming method string; HEAD is served by the GET
+table.
+"""
 
 ParamConverter = Callable[[str], object]
+"""Type alias for ``Callable[[str], object]``."""
 Extractor = tuple[str, int, ParamConverter]
+"""Type alias for ``tuple[str, int, ParamConverter]``."""
 BucketEntry = tuple[list[Extractor], "CompiledRoute"]
+"""Type alias for ``tuple[list[Extractor], 'CompiledRoute']``."""
 
 class _DepthBucket:
+    """Group compiled route candidates by their path segment structure."""
 
     __slots__ = ("entries", "marker_to_entry", "pattern")
+    """Declare the instance attribute slots reserved by this class."""
 
     def __init__(
         self,
@@ -50,9 +62,9 @@ class _DepthBucket:
 
         Parameters
         ----------
-        pattern : re.Pattern[str]
+        pattern : ``re.Pattern[str]``
             Compiled regex for the bucket's dynamic route candidates.
-        entries : list[BucketEntry]
+        entries : list[orionis.http.routes.route_resolver.BucketEntry]
             Extraction metadata and route pairs aligned with regex alternatives.
         marker_to_entry : dict[int, int] | None, optional
             Map of terminal capture group IDs to entry indices, or None for
@@ -64,18 +76,28 @@ class _DepthBucket:
             Initialize the matcher, ordered entries, and optional marker lookup.
         """
         self.pattern = pattern
+        """Compiled regex for the bucket's dynamic route candidates."""
         self.entries = entries
+        """Extraction metadata and route pairs aligned with regex alternatives."""
         self.marker_to_entry = marker_to_entry
+        """
+        Map of terminal capture group IDs to entry indices, or None for a
+        single-route bucket. Defaults to None.
+        """
 
 @dataclass(frozen=True, slots=True)
 class _PrefixIndex:
     """Select the first distinct segment after a shared static path prefix."""
 
     start: int
+    """Starting position used to search the route-prefix index."""
     branches: dict[str, _DepthBucket | _PrefixIndex]
+    """Child branches of the compiled route-prefix index."""
     fallback: _DepthBucket | None = None
+    """Handler or route selected when no ordinary route matches."""
 
 type DepthTable = dict[int, _DepthBucket | _PrefixIndex]
+"""Type alias for ``dict[int, _DepthBucket | _PrefixIndex]``."""
 
 def _select_bucket(
     table: DepthTable,
@@ -87,7 +109,7 @@ def _select_bucket(
 
     Parameters
     ----------
-    table : DepthTable
+    table : orionis.http.routes.route_resolver.DepthTable
         Dynamic candidates grouped by depth for one HTTP method.
     path : str
         Normalized request path used to traverse literal prefix branches.
@@ -96,7 +118,7 @@ def _select_bucket(
 
     Returns
     -------
-    _DepthBucket | None
+    orionis.http.routes.route_resolver._DepthBucket | None
         Bucket selected by depth and prefix, or None if no branch or fallback
         applies. The bucket's regex is not evaluated.
     """
@@ -121,9 +143,9 @@ def _path_allowed_for_method(
 
     Parameters
     ----------
-    static_table : dict[str, ResolvedRoute]
+    static_table : dict[str, orionis.http.routes.entities.resolved_route.ResolvedRoute]
         Static paths mapped to resolved routes for one HTTP method.
-    dynamic_table : DepthTable
+    dynamic_table : orionis.http.routes.route_resolver.DepthTable
         Dynamic candidates grouped by depth for the same method.
     path : str
         Normalized request path to check.
@@ -150,7 +172,7 @@ def _build_extractors(
 
     Parameters
     ----------
-    converters : dict[str, ParamConverter]
+    converters : dict[str, orionis.http.routes.route_resolver.ParamConverter]
         Parameter names mapped to converter callables, in extraction order.
     prefix : str
         Prefix prepended to parameter names in the regex capture groups.
@@ -159,7 +181,7 @@ def _build_extractors(
 
     Returns
     -------
-    list[Extractor]
+    list[orionis.http.routes.route_resolver.Extractor]
         Ordered list of ``(param_name, group_index, converter)`` tuples.
 
     Raises
@@ -178,17 +200,17 @@ def _build_matching_bucket(routes: list[CompiledRoute]) -> _DepthBucket:
 
     Parameters
     ----------
-    routes : list[CompiledRoute]
+    routes : list[orionis.http.routes.entities.compiled_route.CompiledRoute]
         Dynamic candidates at one depth, sorted by compiler priority.
 
     Returns
     -------
-    _DepthBucket
+    orionis.http.routes.route_resolver._DepthBucket
         Regex matcher with per-route extractors and optional alternative markers.
 
     Raises
     ------
-    re.PatternError
+    ``re.PatternError``
         If rewritten route patterns cannot form a valid combined regex.
     KeyError
         If a converter has no corresponding named capture group.
@@ -251,7 +273,7 @@ def _partition_route_segments(
 
     Parameters
     ----------
-    routes : list[CompiledRoute]
+    routes : list[orionis.http.routes.entities.compiled_route.CompiledRoute]
         Candidates sorted by compiler priority.
     start : int
         Character offset of the path segment to partition.
@@ -284,7 +306,7 @@ def _build_depth_bucket(
 
     Parameters
     ----------
-    routes : list[CompiledRoute]
+    routes : list[orionis.http.routes.entities.compiled_route.CompiledRoute]
         Dynamic candidates at one depth, sorted by compiler priority.
     start : int, optional
         Character offset of the next path segment to partition. Defaults to 1.
@@ -331,7 +353,7 @@ def _build_overlapping_index(
 
     Parameters
     ----------
-    routes : list[CompiledRoute]
+    routes : list[orionis.http.routes.entities.compiled_route.CompiledRoute]
         Complete candidate list in priority order for the shared matcher.
     start : int
         Character offset of the segment used to select a literal branch.
@@ -366,19 +388,19 @@ def _extract_result(match: re.Match[str], bucket: _DepthBucket) -> ResolvedRoute
 
     Parameters
     ----------
-    match : re.Match[str]
+    match : ``re.Match[str]``
         Successful match against the bucket's regex.
-    bucket : _DepthBucket
+    bucket : orionis.http.routes.route_resolver._DepthBucket
         Ordered route candidates and their parameter extraction metadata.
 
     Returns
     -------
-    ResolvedRoute
+    orionis.http.routes.entities.resolved_route.ResolvedRoute
         Compiled route with its extracted and converted parameter mapping.
 
     Raises
     ------
-    RouteNotFound
+    orionis.http.routes.exceptions.route_not_found.RouteNotFound
         If a combined match lacks its identifying route marker.
     ValueError, OverflowError
         If a parameter converter rejects a captured value.
@@ -416,14 +438,14 @@ def _extract_converter_fallback(
     ----------
     path : str
         Normalized request path to match against later routes.
-    bucket : _DepthBucket
+    bucket : orionis.http.routes.route_resolver._DepthBucket
         Ordered routes in the selected dynamic bucket.
-    match : re.Match[str]
+    match : ``re.Match[str]``
         Match whose parameter converter failed.
 
     Returns
     -------
-    ResolvedRoute | None
+    orionis.http.routes.entities.resolved_route.ResolvedRoute | None
         First later route whose parameters convert successfully, or None.
     """
     marker_to_entry = bucket.marker_to_entry
@@ -452,6 +474,7 @@ class RouteResolver(IRouteResolver):
         "_cache_max", "_cache_order", "_fallback", "_global_static",
         "_routes", "_tables",
     )
+    """Declare the instance attribute slots reserved by this class."""
 
     def __init__(
         self,
@@ -492,6 +515,7 @@ class RouteResolver(IRouteResolver):
             error_msg = "Hot cache size must not be negative."
             raise ValueError(error_msg)
         self._tables = {}
+        """Table metadata indexed for query compilation or route lookup."""
         all_routes: dict[int, CompiledRoute] = {}
         static_paths: set[str] = set()
         for method, bucket in routes.items():
@@ -514,10 +538,21 @@ class RouteResolver(IRouteResolver):
             for route in bucket["dynamic"]:
                 all_routes[id(route)] = route
         self._routes = tuple(all_routes.values())
+        """Compiler output grouped by method and static/dynamic paths."""
         self._global_static = frozenset(static_paths)
+        """Global static produced by ``frozenset``."""
         self._cache_order: deque[tuple[str, str]] = deque()
+        """Cache order produced by ``deque``."""
         self._cache_max = hot_cache_size
+        """
+        Maximum dynamic results cached across all methods; zero disables caching.
+        Defaults to 512.
+        """
         self._fallback = None if fallback == (None, None) else fallback
+        """
+        Fallback handler metadata. None or ``(None, None)`` disables the fallback.
+        Defaults to None.
+        """
 
     def resolve(self, method: str, path: str) -> ResolvedRoute:
         """
@@ -533,15 +568,15 @@ class RouteResolver(IRouteResolver):
 
         Returns
         -------
-        ResolvedRoute
+        orionis.http.routes.entities.resolved_route.ResolvedRoute
             Matched route and immutable, converted parameters. Cached results
             may be reused.
 
         Raises
         ------
-        RouteNotFound
+        orionis.http.routes.exceptions.route_not_found.RouteNotFound
             If no route can be resolved and no other method matches the path.
-        MethodNotAllowed
+        orionis.http.routes.exceptions.method_not_allowed.MethodNotAllowed
             If no HTTP route is resolved and another HTTP method matches.
         """
         canonical = _METHOD_MAP.get(method)
@@ -582,14 +617,14 @@ class RouteResolver(IRouteResolver):
 
         Returns
         -------
-        Never
+        typing.Never
             Always raise a routing exception; never return a value.
 
         Raises
         ------
-        MethodNotAllowed
+        orionis.http.routes.exceptions.method_not_allowed.MethodNotAllowed
             If another method has a static or regex match for the path.
-        RouteNotFound
+        orionis.http.routes.exceptions.route_not_found.RouteNotFound
             If no method has a static or regex match for the path.
         """
         if method == "WEBSOCKET":
@@ -619,7 +654,7 @@ class RouteResolver(IRouteResolver):
             Normalized request path.
         depth : int
             Number of path separators, or zero for the root path.
-        table : DepthTable
+        table : orionis.http.routes.route_resolver.DepthTable
             Dynamic route buckets for the request method.
         method : str
             Canonical request method used as part of the cache key.
@@ -628,13 +663,13 @@ class RouteResolver(IRouteResolver):
 
         Returns
         -------
-        ResolvedRoute | None
+        orionis.http.routes.entities.resolved_route.ResolvedRoute | None
             First matching route with valid parameter conversions, or None if
             no candidate succeeds.
 
         Raises
         ------
-        RouteNotFound
+        orionis.http.routes.exceptions.route_not_found.RouteNotFound
             If a combined match lacks its identifying route marker.
         """
         bucket = _select_bucket(table, path, depth)
@@ -705,7 +740,7 @@ class RouteResolver(IRouteResolver):
 
         Returns
         -------
-        list[CompiledRoute]
+        list[orionis.http.routes.entities.compiled_route.CompiledRoute]
             Routes deduplicated by identity in their original table traversal
             order. The returned list shares the compiled route objects.
         """
@@ -736,13 +771,13 @@ class RouteResolver(IRouteResolver):
 
         Parameters
         ----------
-        cache : dict[str, ResolvedRoute]
+        cache : dict[str, orionis.http.routes.entities.resolved_route.ResolvedRoute]
             Cache belonging to the request method.
         method : str
             Canonical request method.
         path : str
             Normalized request path.
-        result : ResolvedRoute
+        result : orionis.http.routes.entities.resolved_route.ResolvedRoute
             Immutable route resolution to retain.
 
         Returns

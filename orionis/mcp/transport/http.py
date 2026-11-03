@@ -1,3 +1,5 @@
+"""Serve a registered endpoint without owning routes, sessions or identities."""
+
 from __future__ import annotations
 from http import HTTPStatus
 from typing import TYPE_CHECKING, Self
@@ -24,12 +26,15 @@ if TYPE_CHECKING:
     from orionis.mcp.server.compiler import CompiledMcpServer
 
 _JSON_MEDIA_TYPE = "application/json"
+"""Json media type identifier: ``application/json``."""
 _ACCEPT_MEDIA_TYPES = frozenset({_JSON_MEDIA_TYPE, "text/event-stream"})
+"""Accept media types used by ``http``."""
 
 class _EventFrames(AsyncClosable):
     """Own an MCP byte iterator even if the HTTP stream is never started."""
 
     __slots__ = ("_release", "_source")
+    """Declare the instance attribute slots reserved by this class."""
 
     def __init__(
         self, source: AsyncIterator[bytes], release: Callable[[], None],
@@ -39,9 +44,9 @@ class _EventFrames(AsyncClosable):
 
         Parameters
         ----------
-        source : AsyncIterator[bytes]
+        source : collections.abc.AsyncIterator[bytes]
             Source whose values or lifecycle are consumed by this operation.
-        release : Callable[[], None]
+        release : collections.abc.Callable[[], None]
             Value supplied for ``release``.
 
         Returns
@@ -50,7 +55,9 @@ class _EventFrames(AsyncClosable):
             Complete the documented operation without returning a value.
         """
         self._source: AsyncIterator[bytes] | None = source
+        """Source whose values or lifecycle are consumed by this operation."""
         self._release = release
+        """Value supplied for ``release``."""
 
     def __aiter__(self) -> Self:
         """
@@ -58,7 +65,7 @@ class _EventFrames(AsyncClosable):
 
         Returns
         -------
-        Self
+        typing.Self
             This owned, single-use event source.
         """
         return self
@@ -69,7 +76,7 @@ class _EventFrames(AsyncClosable):
 
         Returns
         -------
-        ServerSentEvent
+        orionis.http.ServerSentEvent
             Result of the operation described above.
         """
         if self._source is None:
@@ -130,7 +137,7 @@ def _accepts_both(headers: Headers) -> bool:
 
     Parameters
     ----------
-    headers : Headers
+    headers : orionis.http.payload.estructures.headers.Headers
         Request headers containing the Accept representations.
 
     Returns
@@ -153,6 +160,7 @@ class McpHttpTransport:
     """Serve a registered endpoint without owning routes, sessions or identities."""
 
     __slots__ = ("_active", "_compiled", "_config", "_dispatcher", "_origins")
+    """Declare the instance attribute slots reserved by this class."""
 
     def __init__(
         self,
@@ -166,13 +174,13 @@ class McpHttpTransport:
 
         Parameters
         ----------
-        app : IApplication
+        app : orionis.IApplication
             Application container supplying configuration and dependencies.
-        compiled : CompiledMcpServer
+        compiled : orionis.mcp.server.compiler.CompiledMcpServer
             Precompiled metadata shared by request executions.
-        config : McpConfig
+        config : orionis.mcp.config.McpConfig
             Validated configuration controlling this component.
-        bus : IMcpEventBus
+        bus : orionis.mcp.contracts.event_bus.IMcpEventBus
             Value supplied for ``bus``.
 
         Returns
@@ -181,10 +189,15 @@ class McpHttpTransport:
             Complete the documented operation without returning a value.
         """
         self._compiled = compiled
+        """Precompiled metadata shared by request executions."""
         self._config = config
+        """Validated configuration controlling this component."""
         self._dispatcher = McpDispatcher(app, compiled, config, bus)
+        """Dispatcher produced by ``McpDispatcher``."""
         self._origins = frozenset(config.allowed_origins)
+        """Origins produced by ``frozenset``."""
         self._active = 0
+        """Active value used by ``McpHttpTransport``."""
 
     def _release(self) -> None:
         """
@@ -203,7 +216,7 @@ class McpHttpTransport:
 
         Parameters
         ----------
-        request : Request
+        request : orionis.http.Request
             Current request and its trusted execution context.
 
         Returns
@@ -232,7 +245,7 @@ class McpHttpTransport:
 
         Parameters
         ----------
-        request : Request
+        request : orionis.http.Request
             Current request and its trusted execution context.
 
         Returns
@@ -253,14 +266,14 @@ class McpHttpTransport:
 
         Parameters
         ----------
-        request : Request
+        request : orionis.http.Request
             Current request and its trusted execution context.
-        envelope : JsonRpcRequest
+        envelope : orionis.mcp.protocol.requests.JsonRpcRequest
             Value supplied for ``envelope``.
 
         Returns
         -------
-        RequestParams
+        orionis.mcp.protocol.requests.RequestParams
             Result of the operation described above.
         """
         params = self._dispatcher.decode(envelope)
@@ -280,12 +293,12 @@ class McpHttpTransport:
 
         Parameters
         ----------
-        request : Request
+        request : orionis.http.Request
             Current request and its trusted execution context.
 
         Returns
         -------
-        Response
+        orionis.http.Response
             Result of the operation described above.
         """
         request_id = msgspec.UNSET
@@ -352,14 +365,14 @@ class McpHttpTransport:
 
         Parameters
         ----------
-        exception : McpProtocolException
+        exception : orionis.mcp.exceptions.McpProtocolException
             Exception being inspected or reported.
-        request_id : str | int | msgspec.UnsetType
+        request_id : str | int | ``msgspec.UnsetType``
             Value supplied for ``request_id``.
 
         Returns
         -------
-        Response
+        orionis.http.Response
             Result of the operation described above.
         """
         return McpProtocolResponse(

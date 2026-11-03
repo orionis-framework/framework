@@ -1,3 +1,5 @@
+"""Measure elapsed execution time with a high-resolution counter."""
+
 from __future__ import annotations
 import time
 from typing import TYPE_CHECKING, Self
@@ -7,17 +9,30 @@ if TYPE_CHECKING:
     from types import TracebackType
 
 _ERR_NOT_MEASURED: str = "Counter has not been started and stopped properly."
+"""
+Error text for not measured: ``Counter has not been started and stopped properly.``.
+"""
 _ERR_NOT_STARTED: str = "Counter has not been started."
+"""Error text for not started: ``Counter has not been started.``."""
 _ERR_USE_ASTOP: str = "Cannot use stop() after astart(). Use astop() instead."
+"""
+Error text for use astop: ``Cannot use stop() after astart(). Use astop()
+instead.``.
+"""
 _ERR_USE_STOP: str = "Cannot use astop() after start(). Use stop() instead."
+"""
+Error text for use stop: ``Cannot use astop() after start(). Use stop() instead.``.
+"""
 
 class PerformanceCounter(IPerformanceCounter):
+    """Measure elapsed execution time with a high-resolution counter."""
 
     __slots__ = (
         "_diff_time",
         "_is_async_mode",
         "_start_time",
     )
+    """Declare the instance attribute slots reserved by this class."""
 
     def __init__(self: Self) -> None:
         """
@@ -32,8 +47,11 @@ class PerformanceCounter(IPerformanceCounter):
         """
         # Initialize the counter state.
         self._start_time: float | None = None
+        """Initialize the counter state."""
         self._diff_time: float | None = None
+        """Elapsed duration between the recorded performance-counter samples."""
         self._is_async_mode: bool = False
+        """Is async mode flag used by ``PerformanceCounter``."""
 
     def start(self: Self) -> PerformanceCounter:
         """
@@ -43,7 +61,7 @@ class PerformanceCounter(IPerformanceCounter):
 
         Returns
         -------
-        PerformanceCounter
+        orionis.support.performance.PerformanceCounter
             This instance for method chaining.
         """
         # Begin a synchronous measurement.
@@ -60,7 +78,7 @@ class PerformanceCounter(IPerformanceCounter):
 
         Returns
         -------
-        PerformanceCounter
+        orionis.support.performance.PerformanceCounter
             The current instance for method chaining.
         """
         # Begin an asynchronous measurement.
@@ -74,11 +92,11 @@ class PerformanceCounter(IPerformanceCounter):
         Stop the performance counter and compute elapsed time.
 
         Records the current high-resolution time as the end time and computes the
-        elapsed time since `start()` was called.
+        elapsed time since ``start()`` was called.
 
         Returns
         -------
-        PerformanceCounter
+        orionis.support.performance.PerformanceCounter
             The current instance for method chaining.
 
         Raises
@@ -105,11 +123,11 @@ class PerformanceCounter(IPerformanceCounter):
         Stop the performance counter asynchronously.
 
         Records the current high-resolution time as the end time and computes the
-        elapsed time since `astart()` was called.
+        elapsed time since ``astart()`` was called.
 
         Returns
         -------
-        PerformanceCounter
+        orionis.support.performance.PerformanceCounter
             This instance for method chaining.
 
         Raises
@@ -267,7 +285,7 @@ class PerformanceCounter(IPerformanceCounter):
 
         Returns
         -------
-        PerformanceCounter
+        orionis.support.performance.PerformanceCounter
             This instance for method chaining.
         """
         # Begin a new synchronous measurement.
@@ -285,7 +303,7 @@ class PerformanceCounter(IPerformanceCounter):
 
         Returns
         -------
-        PerformanceCounter
+        orionis.support.performance.PerformanceCounter
             This instance for method chaining.
         """
         # Begin a new asynchronous measurement.
@@ -300,7 +318,7 @@ class PerformanceCounter(IPerformanceCounter):
 
         Returns
         -------
-        PerformanceCounter
+        orionis.support.performance.PerformanceCounter
             This instance of the performance counter.
         """
         # Start the counter when entering the context
@@ -338,7 +356,7 @@ class PerformanceCounter(IPerformanceCounter):
 
         Returns
         -------
-        PerformanceCounter
+        orionis.support.performance.PerformanceCounter
             This instance of the performance counter.
         """
         # Start the counter when entering the asynchronous context.

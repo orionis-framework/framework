@@ -1,3 +1,5 @@
+"""Define the contract for a file received through HTTP."""
+
 from __future__ import annotations
 from abc import ABC, abstractmethod
 from typing import TYPE_CHECKING
@@ -15,6 +17,7 @@ class IUploadedFile(ABC):
     """
 
     __slots__ = ()
+    """Declare that this class introduces no additional instance slots."""
 
     @abstractmethod
     def originalName(self) -> str:
@@ -107,7 +110,7 @@ class IUploadedFile(ABC):
 
         Returns
         -------
-        IFile
+        orionis.storage.contracts.IFile
             File object pointing at the stored file.
         """
 
@@ -135,12 +138,12 @@ class IUploadedFile(ABC):
 
         Returns
         -------
-        IFile
+        orionis.storage.contracts.IFile
             File object pointing at the stored file.
 
         Raises
         ------
-        StoragePathException
+        orionis.storage.exceptions.StoragePathException
             If *name* is empty or contains a directory separator.
         """
 
@@ -166,7 +169,7 @@ class IUploadedFile(ABC):
 
         Returns
         -------
-        IFile
+        orionis.storage.contracts.IFile
             File object pointing at the stored file.
         """
 
@@ -192,6 +195,6 @@ class IUploadedFile(ABC):
 
         Returns
         -------
-        IFile
+        orionis.storage.contracts.IFile
             File object pointing at the stored file.
         """

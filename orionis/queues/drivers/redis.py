@@ -1,3 +1,5 @@
+"""Persist delayed jobs and fenced reservations through atomic Lua scripts."""
+
 from functools import lru_cache
 from hashlib import sha1
 from typing import TYPE_CHECKING, Self
@@ -15,7 +17,9 @@ if TYPE_CHECKING:
     from orionis.queues.entities.envelope import JobEnvelope
 
 _ENCODER = msgspec.json.Encoder()
+"""Encoder used by ``redis``."""
 _RESERVATION_FIELDS = 3
+"""Reservation fields value used by ``redis``."""
 
 @lru_cache(maxsize=16)
 def _script_digest(script: str) -> str:
@@ -44,6 +48,7 @@ for index, key in ipairs(KEYS) do
     end
 end
 """
+"""Validate key types before any transition can remove persisted queue state."""
 
 # Store the envelope and availability together without exposing partial state.
 _PUSH = (
@@ -56,6 +61,7 @@ redis.call('ZADD', KEYS[1], ARGV[3], ARGV[1])
 return 1
 """
 )
+"""Store the envelope and availability together without exposing partial state."""
 
 # Reclaim expired leases and move one due job into an owned reservation.
 _RESERVE = (
@@ -83,6 +89,7 @@ redis.call('ZADD', KEYS[2], ARGV[2], id)
 return {id, payload, attempts}
 """
 )
+"""Reclaim expired leases and move one due job into an owned reservation."""
 
 # Release only a token that still owns an unexpired lease.
 _RELEASE = (
@@ -97,6 +104,7 @@ redis.call('ZADD', KEYS[1], ARGV[4], ARGV[1])
 return 1
 """
 )
+"""Release only a token that still owns an unexpired lease."""
 
 # Remove only a token that still owns an unexpired lease.
 _DELETE = (
@@ -112,6 +120,7 @@ redis.call('HDEL', KEYS[5], ARGV[1])
 return 1
 """
 )
+"""Remove only a token that still owns an unexpired lease."""
 
 # Remove a queue's complete state and report its previous number of jobs.
 _CLEAR = """
@@ -119,11 +128,13 @@ local count = redis.call('HLEN', KEYS[3])
 redis.call('DEL', unpack(KEYS))
 return count
 """
+"""Remove a queue's complete state and report its previous number of jobs."""
 
 class RedisQueueDriver(IQueueDriver):
     """Persist delayed jobs and fenced reservations through atomic Lua scripts."""
 
     __slots__ = ("_client", "_owns_client", "_prefix")
+    """Declare the instance attribute slots reserved by this class."""
 
     def __init__(
         self: Self,
@@ -136,10 +147,10 @@ class RedisQueueDriver(IQueueDriver):
 
         Parameters
         ----------
-        config : RedisConfig | None, optional
+        config : orionis.foundation.config.queue.Redis | None, optional
             Validated host, port, database, password, and namespace settings.
             Use the configuration entity's environment defaults when omitted.
-        client : Redis or None, optional
+        client : ``redis.asyncio.Redis`` or None, optional
             Externally owned async client, primarily for explicit test fakes.
 
         Returns
@@ -149,7 +160,7 @@ class RedisQueueDriver(IQueueDriver):
 
         Raises
         ------
-        QueueStorageError
+        orionis.queues.exceptions.QueueStorageError
             If the configuration type or queue namespace is invalid.
         TypeError
             If an environment default has an invalid type.
@@ -165,7 +176,9 @@ class RedisQueueDriver(IQueueDriver):
             error_msg = "Redis queue prefixes must be nonempty without braces."
             raise QueueStorageError(error_msg)
         self._prefix = prefix
+        """Prefix applied when constructing names or storage keys."""
         self._owns_client = client is None
+        """Whether this object must close the client during its own cleanup."""
         self._client = (
             client
             if client is not None
@@ -177,6 +190,7 @@ class RedisQueueDriver(IQueueDriver):
                 protocol=2,
             )
         )
+        """Externally owned async client, primarily for explicit test fakes."""
 
     def _keys(self: Self, queue: str) -> tuple[str, ...]:
         """
@@ -224,7 +238,7 @@ class RedisQueueDriver(IQueueDriver):
 
         Raises
         ------
-        QueueStorageError
+        orionis.queues.exceptions.QueueStorageError
             If Redis cannot perform the transition.
         """
         try:
@@ -248,7 +262,7 @@ class RedisQueueDriver(IQueueDriver):
 
         Parameters
         ----------
-        envelope : JobEnvelope
+        envelope : orionis.queues.JobEnvelope
             Immutable serialized job configuration and state.
         delay : float, optional
             Seconds before the job becomes available.
@@ -260,7 +274,7 @@ class RedisQueueDriver(IQueueDriver):
 
         Raises
         ------
-        QueueStorageError
+        orionis.queues.exceptions.QueueStorageError
             If the identifier already exists or persistence fails.
         """
         delay = validate_seconds(delay, "delay")
@@ -291,12 +305,12 @@ class RedisQueueDriver(IQueueDriver):
 
         Returns
         -------
-        ReservedJob or None
+        orionis.queues.entities.reserved_job.ReservedJob or None
             Acquired reservation, or no available job.
 
         Raises
         ------
-        QueueStorageError
+        orionis.queues.exceptions.QueueStorageError
             If Redis returns invalid reservation data.
         """
         retry_after = validate_seconds(retry_after, "retry_after", positive=True)
@@ -342,7 +356,7 @@ class RedisQueueDriver(IQueueDriver):
 
         Parameters
         ----------
-        reserved : ReservedJob
+        reserved : orionis.queues.entities.reserved_job.ReservedJob
             Reservation owned by the releasing worker.
         delay : float, optional
             Seconds before the job becomes available again.
@@ -369,7 +383,7 @@ class RedisQueueDriver(IQueueDriver):
 
         Parameters
         ----------
-        reserved : ReservedJob
+        reserved : orionis.queues.entities.reserved_job.ReservedJob
             Reservation owned by the acknowledging worker.
 
         Returns

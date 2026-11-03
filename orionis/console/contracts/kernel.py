@@ -1,3 +1,5 @@
+"""Define the contract for kernel cli implementations."""
+
 from __future__ import annotations
 from abc import ABC, abstractmethod
 from typing import TYPE_CHECKING
@@ -6,8 +8,10 @@ if TYPE_CHECKING:
     from orionis.foundation.contracts.application import IApplication
 
 class IKernelCLI(ABC):
+    """Define the contract for kernel cli implementations."""
 
     __slots__ = ()
+    """Declare that this class introduces no additional instance slots."""
 
     @abstractmethod
     async def boot(
@@ -19,7 +23,7 @@ class IKernelCLI(ABC):
 
         Parameters
         ----------
-        application : IApplication
+        application : orionis.IApplication
             The application instance used to create the reactor.
 
         Returns

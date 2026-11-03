@@ -1,3 +1,5 @@
+"""Coordinate exclusive cache access through local or distributed locks."""
+
 from __future__ import annotations
 import asyncio
 import sys
@@ -35,18 +37,23 @@ def _is_backend(backend: object, module_name: str, class_name: str) -> bool:
 _FILE_LOCKS: WeakValueDictionary[
     tuple[asyncio.AbstractEventLoop, Path, str], asyncio.Lock,
 ] = WeakValueDictionary()
+"""Share active file-cache locks within each event loop and storage directory."""
 
 # Default lease applied when no timeout is given, matching the Redis branch.
 _DEFAULT_LEASE: float = 10
+"""Default lease applied when no timeout is given, matching the Redis branch."""
 
 # Delay between acquisition attempts while polling the database backend.
 _POLL_INTERVAL: float = 0.05
+"""Delay between acquisition attempts while polling the database backend."""
 
 class CacheLock:
 
     # ruff: noqa: ANN401, PLC0415
+    """Coordinate exclusive cache access through local or distributed locks."""
 
     __slots__ = ("_backend", "_impl", "_key", "_owner", "_timeout")
+    """Declare the instance attribute slots reserved by this class."""
 
     def __init__(
         self,
@@ -59,7 +66,7 @@ class CacheLock:
 
         Parameters
         ----------
-        backend : Any
+        backend : typing.Any
             Raw cache backend.
         key : str
             Cache key to lock on.
@@ -72,10 +79,15 @@ class CacheLock:
             Complete the documented operation without returning a value.
         """
         self._backend = backend
+        """Raw cache backend."""
         self._key = key
+        """Cache key to lock on."""
         self._timeout = timeout
+        """Lock timeout in seconds. ``None`` means no timeout."""
         self._impl: asyncio.Lock | RedLock | None = None
+        """Underlying lock implementation selected for the cache backend."""
         self._owner: str | None = None
+        """Ownership token used to identify the current holder."""
 
     async def __aenter__(self) -> Self:
         """
@@ -83,7 +95,7 @@ class CacheLock:
 
         Returns
         -------
-        Self
+        typing.Self
             This ``CacheLock`` instance.
         """
         if _is_backend(

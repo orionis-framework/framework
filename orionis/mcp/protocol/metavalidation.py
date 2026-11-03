@@ -1,21 +1,35 @@
+"""Provide mcp protocol operations.
+
+Includes ``validate_meta_key``, ``validate_metadata``,
+``validate_client_capabilities``, ``validate_implementation``.
+"""
+
 import re
 from collections.abc import Mapping
 import msgspec
 from orionis.mcp.protocol.metadata import ServerInfo
 
 _LABEL = r"[A-Za-z](?:[A-Za-z0-9-]*[A-Za-z0-9])?"
+"""Label identifier: ``[A-Za-z](?:[A-Za-z0-9-]*[A-Za-z0-9])?``."""
 _NAME = r"(?:[A-Za-z0-9](?:[A-Za-z0-9_.-]*[A-Za-z0-9])?)?"
+"""Name identifier: ``(?:[A-Za-z0-9](?:[A-Za-z0-9_.-]*[A-Za-z0-9])?)?``."""
 _META_KEY = re.compile(rf"(?:(?:{_LABEL})(?:\.{_LABEL})*/)?{_NAME}\Z")
+"""Compiled pattern used to recognize meta key."""
 _TRACE_PARENT = re.compile(
     r"([0-9a-f]{2})-([0-9a-f]{32})-([0-9a-f]{16})-([0-9a-f]{2})(.*)\Z",
 )
+"""Compiled pattern used to recognize trace parent."""
 _STATE_KEY = re.compile(
     r"(?:[a-z][a-z0-9_*/-]{0,255}|[a-z0-9][a-z0-9_*/-]{0,240}"
     r"@[a-z][a-z0-9_*/-]{0,13})\Z",
 )
+"""Compiled pattern used to recognize state key."""
 _TOKEN = re.compile(r"[!#$%&'*+.^_`|~0-9A-Za-z-]+\Z")
+"""Compiled pattern used to recognize token."""
 _MAX_TRACE_MEMBERS = 32
+"""Max trace members value used by ``metavalidation``."""
 _MAX_TRACE_VALUE = 256
+"""Max trace value value used by ``metavalidation``."""
 
 def validate_meta_key(key: str, *, extension: bool = False) -> None:
     """
@@ -83,7 +97,7 @@ def validate_client_capabilities(capabilities: Mapping[str, object]) -> None:
 
     Parameters
     ----------
-    capabilities : Mapping[str, object]
+    capabilities : collections.abc.Mapping[str, object]
         Value supplied for ``capabilities``.
 
     Returns
@@ -116,9 +130,9 @@ def _capability_settings(
     ----------
     key : str
         Capability name.
-    value : Mapping[str, object]
+    value : collections.abc.Mapping[str, object]
         Settings advertised by the client.
-    children : tuple[str, ...]
+    children : tuple[str, ``...``]
         Known child settings for closed capability names.
 
     Returns

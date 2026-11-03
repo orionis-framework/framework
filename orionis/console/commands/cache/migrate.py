@@ -1,3 +1,5 @@
+"""Create the configured framework cache tables without removing data."""
+
 from orionis.cache.exceptions import CacheStoreException
 from orionis.cache.stores.database import DatabaseCacheBackend
 from orionis.console.base.command import BaseCommand
@@ -11,10 +13,17 @@ class CacheMigrateCommand(BaseCommand):
     # ruff: noqa: TC001
 
     __slots__ = ()
+    """Declare that this class introduces no additional instance slots."""
 
     timestamps: bool = False
+    """Timestamps flag used by ``CacheMigrateCommand``."""
     signature: str = "cache:migrate"
+    """Signature identifier: ``cache:migrate``."""
     description: str = "Create the configured database cache and lock tables."
+    """
+    Description identifier: ``Create the configured database cache and lock
+    tables.``.
+    """
 
     async def handle(self, app: IApplication, manager: IConnectionManager) -> int:
         """
@@ -22,9 +31,9 @@ class CacheMigrateCommand(BaseCommand):
 
         Parameters
         ----------
-        app : IApplication
+        app : orionis.IApplication
             Application exposing the database cache configuration.
-        manager : IConnectionManager
+        manager : orionis.database.contracts.IConnectionManager
             Manager resolving the cache store's SQL connection.
 
         Returns

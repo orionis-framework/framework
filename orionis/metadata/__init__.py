@@ -1,3 +1,5 @@
+"""Group the metadata components and public imports."""
+
 from orionis.metadata.framework import (
     API,
     AUTHOR,

@@ -1,3 +1,5 @@
+"""Describe MCP response cache lifetime and visibility options."""
+
 import math
 from typing import TYPE_CHECKING, TypedDict, Literal, cast
 import msgspec
@@ -19,8 +21,12 @@ if TYPE_CHECKING:
     from orionis.mcp.server.compiler import CompiledPrimitive
 
 class CacheOptions(TypedDict):
+    """Describe MCP response cache lifetime and visibility options."""
+
     ttlMs: int
+    """Cache lifetime in milliseconds."""
     cacheScope: Literal["private", "public"]
+    """Visibility of the cached response: private or public."""
 
 def response_items(result: object) -> tuple[McpResponse, ...]:
     """
@@ -33,7 +39,7 @@ def response_items(result: object) -> tuple[McpResponse, ...]:
 
     Returns
     -------
-    tuple[McpResponse, ...]
+    tuple[orionis.mcp.McpResponse, ``...``]
         Result of the operation described above.
     """
     if isinstance(result, McpResponse):
@@ -60,14 +66,14 @@ async def tool_result(
 
     Parameters
     ----------
-    primitive : CompiledPrimitive
+    primitive : orionis.mcp.server.compiler.CompiledPrimitive
         Compiled tool, resource or prompt declaration.
-    responses : tuple[McpResponse, ...]
+    responses : tuple[orionis.mcp.McpResponse, ``...``]
         Value supplied for ``responses``.
 
     Returns
     -------
-    CallToolResult
+    orionis.mcp.protocol.results.CallToolResult
         Result of the operation described above.
     """
     values = [
@@ -100,12 +106,12 @@ def prompt_result(
     ----------
     description : str
         Value supplied for ``description``.
-    responses : tuple[McpResponse, ...]
+    responses : tuple[orionis.mcp.McpResponse, ``...``]
         Value supplied for ``responses``.
 
     Returns
     -------
-    GetPromptResult
+    orionis.mcp.protocol.results.GetPromptResult
         Result of the operation described above.
     """
     return GetPromptResult(
@@ -129,18 +135,18 @@ def resource_result(
 
     Parameters
     ----------
-    primitive : CompiledPrimitive
+    primitive : orionis.mcp.server.compiler.CompiledPrimitive
         Compiled tool, resource or prompt declaration.
-    request : McpRequest
+    request : orionis.mcp.McpRequest
         Current request and its trusted execution context.
-    responses : tuple[McpResponse, ...]
+    responses : tuple[orionis.mcp.McpResponse, ``...``]
         Value supplied for ``responses``.
-    cache : CacheOptions
+    cache : orionis.mcp.normalization.CacheOptions
         Value supplied for ``cache``.
 
     Returns
     -------
-    ReadResourceResult
+    orionis.mcp.protocol.results.ReadResourceResult
         Result of the operation described above.
     """
     contents = []
@@ -174,7 +180,7 @@ def _metadata(responses: tuple[McpResponse, ...]) -> dict[str, object]:
 
     Parameters
     ----------
-    responses : tuple[McpResponse, ...]
+    responses : tuple[orionis.mcp.McpResponse, ``...``]
         Value supplied for ``responses``.
 
     Returns
@@ -201,7 +207,7 @@ def progress_params(
 
     Parameters
     ----------
-    update : Progress
+    update : orionis.mcp.responses.Progress
         Value supplied for ``update``.
     token : str | int
         Value supplied for ``token``.

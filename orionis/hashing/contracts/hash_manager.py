@@ -1,3 +1,5 @@
+"""Define the contract for the hashing manager."""
+
 from __future__ import annotations
 from abc import abstractmethod
 from orionis.hashing.contracts.hasher import IHasher
@@ -12,6 +14,7 @@ class IHashManager(IHasher):
     """
 
     __slots__ = ()
+    """Declare that this class introduces no additional instance slots."""
 
     @abstractmethod
     def driver(self, name: str | None = None) -> IHasher:
@@ -26,12 +29,12 @@ class IHashManager(IHasher):
 
         Returns
         -------
-        IHasher
+        orionis.hashing.contracts.IHasher
             Hasher instance for the requested driver.
 
         Raises
         ------
-        HashDriverNotSupportedException
+        orionis.hashing.exceptions.HashDriverNotSupportedException
             If the requested driver is not supported.
         """
 

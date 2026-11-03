@@ -50,7 +50,7 @@ class _Listener(QueueListener):
             if self.error is None:
                 self.error = error
 
-    def enqueue_sentinel(self: Self) -> None:
+    def enqueueSentinel(self: Self) -> None:
         """
         Wait for space during shutdown so a full queue still drains.
 
@@ -60,6 +60,9 @@ class _Listener(QueueListener):
             Complete the operation without returning a value.
         """
         self.queue.put(self._sentinel)
+
+    # Preserve the logging.handlers.QueueListener protocol name.
+    enqueue_sentinel = enqueueSentinel
 
 class BoundedQueueHandler(logging.Handler):
     """

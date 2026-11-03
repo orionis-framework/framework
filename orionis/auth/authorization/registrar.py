@@ -1,3 +1,5 @@
+"""Create permissions and roles, and attach them to identities."""
+
 from typing import TYPE_CHECKING
 from orionis.auth.concerns.functions import authorizable_key
 from orionis.auth.exceptions import AuthException
@@ -9,12 +11,18 @@ if TYPE_CHECKING:
 
 # Tables shipped by the framework migrations.
 _PERMISSIONS_TABLE: str = "permissions"
+"""Tables shipped by the framework migrations."""
 _ROLES_TABLE: str = "roles"
+"""Roles table identifier: ``roles``."""
 _MODEL_PERMISSIONS_TABLE: str = "model_has_permissions"
+"""Model permissions table identifier: ``model_has_permissions``."""
 _MODEL_ROLES_TABLE: str = "model_has_roles"
+"""Model roles table identifier: ``model_has_roles``."""
 _ROLE_PERMISSIONS_TABLE: str = "role_has_permissions"
+"""Role permissions table identifier: ``role_has_permissions``."""
 
 _MAX_NAME_LENGTH: int = 255
+"""Max name length value used by ``registrar``."""
 
 class PermissionRegistrar:
     """
@@ -34,6 +42,7 @@ class PermissionRegistrar:
     # ruff: noqa: TC001 (Dependency Injection)
 
     __slots__ = ("__db",)
+    """Declare the instance attribute slots reserved by this class."""
 
     def __init__(self, db: IQueryBuilder) -> None:
         """
@@ -41,7 +50,7 @@ class PermissionRegistrar:
 
         Parameters
         ----------
-        db : IQueryBuilder
+        db : orionis.orm.contracts.query_builder.IQueryBuilder
             Gateway used to build queries over the authorization tables.
 
         Returns
@@ -50,6 +59,7 @@ class PermissionRegistrar:
             The registrar keeps only the injected gateway.
         """
         self.__db = db
+        """Gateway used to build queries over the authorization tables."""
 
     async def createPermission(self, name: str) -> object:
         """
@@ -93,7 +103,7 @@ class PermissionRegistrar:
 
         Parameters
         ----------
-        authorizable : IAuthorizable
+        authorizable : orionis.auth.contracts.IAuthorizable
             Identity receiving the permissions.
         *permissions : str
             Permission names. Missing permissions are created.
@@ -125,7 +135,7 @@ class PermissionRegistrar:
 
         Parameters
         ----------
-        authorizable : IAuthorizable
+        authorizable : orionis.auth.contracts.IAuthorizable
             Identity losing the permissions.
         *permissions : str
             Permission names. Unknown names are ignored.
@@ -158,7 +168,7 @@ class PermissionRegistrar:
 
         Parameters
         ----------
-        authorizable : IAuthorizable
+        authorizable : orionis.auth.contracts.IAuthorizable
             Identity receiving the roles.
         *roles : str
             Role names. Missing roles are created.
@@ -190,7 +200,7 @@ class PermissionRegistrar:
 
         Parameters
         ----------
-        authorizable : IAuthorizable
+        authorizable : orionis.auth.contracts.IAuthorizable
             Identity losing the roles.
         *roles : str
             Role names. Unknown names are ignored.
@@ -313,9 +323,9 @@ class PermissionRegistrar:
 
         Raises
         ------
-        QueryException
+        orionis.database.QueryException
             When the insert fails for a reason other than a duplicate.
-        AuthException
+        orionis.auth.AuthException
             When the name is empty, padded or longer than the schema permits.
         """
         if (
@@ -366,7 +376,7 @@ class PermissionRegistrar:
 
         Raises
         ------
-        QueryException
+        orionis.database.QueryException
             If insertion fails and no identical pivot row exists.
         """
         try:

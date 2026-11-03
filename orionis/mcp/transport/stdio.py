@@ -1,3 +1,8 @@
+"""Provide mcp transport operations.
+
+Includes ``LineReader``, ``LineWriter``, ``McpStdioTransport``.
+"""
+
 from __future__ import annotations
 import asyncio
 from contextlib import redirect_stdout
@@ -68,6 +73,7 @@ class McpStdioTransport:
         "_lock",
         "_running",
     )
+    """Declare the instance attribute slots reserved by this class."""
 
     def __init__(
         self,
@@ -81,13 +87,13 @@ class McpStdioTransport:
 
         Parameters
         ----------
-        app : IApplication
+        app : orionis.IApplication
             Application container supplying configuration and dependencies.
-        compiled : CompiledMcpServer
+        compiled : orionis.mcp.server.compiler.CompiledMcpServer
             Precompiled metadata shared by request executions.
-        config : McpConfig
+        config : orionis.mcp.config.McpConfig
             Validated configuration controlling this component.
-        bus : IMcpEventBus
+        bus : orionis.mcp.contracts.event_bus.IMcpEventBus
             Value supplied for ``bus``.
 
         Returns
@@ -96,14 +102,23 @@ class McpStdioTransport:
             Complete the documented operation without returning a value.
         """
         self._app = app
+        """Application container supplying configuration and dependencies."""
         self._config = config
+        """Validated configuration controlling this component."""
         self._dispatcher = McpDispatcher(app, compiled, config, bus)
+        """Dispatcher produced by ``McpDispatcher``."""
         self._active: dict[str | int, asyncio.Task[None]] = {}
+        """Operations currently running for this connection or transport."""
         self._lock = asyncio.Lock()
+        """Lock protecting concurrent access to shared state."""
         self._failed = asyncio.Event()
+        """Backend retaining failed-job records."""
         self._failure: BaseException | None = None
+        """Failure retained for propagation or reporting."""
         self._closing = False
+        """Whether resource cleanup is currently in progress."""
         self._running = False
+        """Running flag used by ``McpStdioTransport``."""
 
     async def _write(self, writer: LineWriter, data: bytes) -> None:
         """
@@ -111,7 +126,7 @@ class McpStdioTransport:
 
         Parameters
         ----------
-        writer : LineWriter
+        writer : orionis.mcp.transport.stdio.LineWriter
             Output stream receiving complete messages with backpressure.
         data : bytes
             Value supplied for ``data``.
@@ -133,9 +148,9 @@ class McpStdioTransport:
 
         Parameters
         ----------
-        writer : LineWriter
+        writer : orionis.mcp.transport.stdio.LineWriter
             Output stream receiving complete messages with backpressure.
-        source : AsyncIterator[bytes]
+        source : collections.abc.AsyncIterator[bytes]
             Source whose values or lifecycle are consumed by this operation.
 
         Returns
@@ -157,9 +172,9 @@ class McpStdioTransport:
 
         Parameters
         ----------
-        request : JsonRpcRequest
+        request : orionis.mcp.protocol.requests.JsonRpcRequest
             Current request and its trusted execution context.
-        writer : LineWriter
+        writer : orionis.mcp.transport.stdio.LineWriter
             Output stream receiving complete messages with backpressure.
 
         Returns
@@ -208,7 +223,7 @@ class McpStdioTransport:
 
         Parameters
         ----------
-        request : JsonRpcRequest
+        request : orionis.mcp.protocol.requests.JsonRpcRequest
             Current request and its trusted execution context.
 
         Returns
@@ -234,7 +249,7 @@ class McpStdioTransport:
         ----------
         data : bytes
             Value supplied for ``data``.
-        writer : LineWriter
+        writer : orionis.mcp.transport.stdio.LineWriter
             Output stream receiving complete messages with backpressure.
 
         Returns
@@ -271,9 +286,9 @@ class McpStdioTransport:
 
         Parameters
         ----------
-        reader : LineReader
+        reader : orionis.mcp.transport.stdio.LineReader
             Input stream supplying bounded messages.
-        writer : LineWriter
+        writer : orionis.mcp.transport.stdio.LineWriter
             Output stream receiving complete messages with backpressure.
 
         Returns
@@ -313,9 +328,9 @@ class McpStdioTransport:
 
         Parameters
         ----------
-        reader : LineReader
+        reader : orionis.mcp.transport.stdio.LineReader
             Input stream supplying bounded messages.
-        writer : LineWriter
+        writer : orionis.mcp.transport.stdio.LineWriter
             Output stream receiving complete messages with backpressure.
 
         Returns

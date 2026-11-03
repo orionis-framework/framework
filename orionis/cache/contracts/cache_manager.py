@@ -1,3 +1,5 @@
+"""Define the contract for cache manager implementations."""
+
 from __future__ import annotations
 from abc import ABC, abstractmethod
 from typing import TYPE_CHECKING, Any, Self
@@ -9,6 +11,7 @@ if TYPE_CHECKING:
 class ICacheManager(ABC):
 
     # ruff: noqa: ANN401
+    """Define the contract for cache manager implementations."""
 
     async def rememberOnce(
         self: Self,
@@ -28,7 +31,7 @@ class ICacheManager(ABC):
             Cache or lease key to access.
         ttl : float | None
             Entry lifetime in seconds.
-        resolver : Callable
+        resolver : collections.abc.Callable
             Callback that supplies the missing cache value.
         wait_timeout : float
             Maximum number of seconds to wait for ownership.
@@ -37,7 +40,7 @@ class ICacheManager(ABC):
 
         Returns
         -------
-        Any
+        typing.Any
             Cached value or the result produced by the owning resolver.
         """
         return await self.store().rememberOnce(
@@ -60,7 +63,7 @@ class ICacheManager(ABC):
 
         Returns
         -------
-        ICacheRepository
+        orionis.cache.contracts.ICacheRepository
             Repository bound to the requested store.
         """
 
@@ -76,7 +79,7 @@ class ICacheManager(ABC):
 
         Returns
         -------
-        Any
+        typing.Any
             Cached value, or ``None`` when absent.
         """
 
@@ -89,7 +92,7 @@ class ICacheManager(ABC):
         ----------
         key : str
             Cache key.
-        value : Any
+        value : typing.Any
             Value to cache.
         ttl : float | None
             Time-to-live in seconds.  ``None`` means no expiry.
@@ -155,7 +158,7 @@ class ICacheManager(ABC):
 
         Returns
         -------
-        dict[str, Any]
+        dict[str, typing.Any]
             Mapping of key → value.
         """
 
@@ -170,7 +173,7 @@ class ICacheManager(ABC):
 
         Parameters
         ----------
-        values : dict[str, Any]
+        values : dict[str, typing.Any]
             Mapping of key → value.
         ttl : float | None
             Shared TTL in seconds.
@@ -197,12 +200,12 @@ class ICacheManager(ABC):
             Cache key.
         ttl : float | None
             TTL applied when caching the resolved value.
-        resolver : Callable
+        resolver : collections.abc.Callable
             Zero-argument callable (sync or async) producing the value.
 
         Returns
         -------
-        Any
+        typing.Any
             Cached or freshly computed value.
         """
 
@@ -215,12 +218,12 @@ class ICacheManager(ABC):
         ----------
         key : str
             Cache key.
-        resolver : Callable
+        resolver : collections.abc.Callable
             Zero-argument callable (sync or async) producing the value.
 
         Returns
         -------
-        Any
+        typing.Any
             Cached or freshly computed value.
         """
 
@@ -236,7 +239,7 @@ class ICacheManager(ABC):
 
         Returns
         -------
-        Any
+        typing.Any
             Cached value, or ``None`` when absent.
         """
 
@@ -249,7 +252,7 @@ class ICacheManager(ABC):
         ----------
         key : str
             Cache key.
-        value : Any
+        value : typing.Any
             Value to store.
         ttl : float | None
             Optional TTL in seconds.

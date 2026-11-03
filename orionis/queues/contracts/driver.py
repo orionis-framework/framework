@@ -1,3 +1,5 @@
+"""Declare persistence and fenced transitions for a queue connection."""
+
 from abc import ABC, abstractmethod
 from typing import TYPE_CHECKING
 
@@ -9,6 +11,7 @@ class IQueueDriver(ABC):
     """Declare persistence and fenced transitions for a queue connection."""
 
     __slots__ = ()
+    """Declare that this class introduces no additional instance slots."""
 
     @abstractmethod
     async def push(self, envelope: JobEnvelope, delay: float = 0) -> str:
@@ -17,7 +20,7 @@ class IQueueDriver(ABC):
 
         Parameters
         ----------
-        envelope : JobEnvelope
+        envelope : orionis.queues.JobEnvelope
             Immutable execution data.
         delay : float, optional
             Seconds before the job becomes eligible.
@@ -39,14 +42,14 @@ class IQueueDriver(ABC):
 
         Parameters
         ----------
-        queues : tuple[str, ...]
+        queues : tuple[str, ``...``]
             Logical queues ordered from highest to lowest priority.
         retry_after : float
             Duration of the reservation lease.
 
         Returns
         -------
-        ReservedJob | None
+        orionis.queues.entities.reserved_job.ReservedJob | None
             The exclusive claim, or no eligible job.
         """
 
@@ -57,7 +60,7 @@ class IQueueDriver(ABC):
 
         Parameters
         ----------
-        reserved : ReservedJob
+        reserved : orionis.queues.entities.reserved_job.ReservedJob
             Claim whose token must still own the lease.
         delay : float, optional
             Seconds before another reservation becomes eligible.
@@ -75,7 +78,7 @@ class IQueueDriver(ABC):
 
         Parameters
         ----------
-        reserved : ReservedJob
+        reserved : orionis.queues.entities.reserved_job.ReservedJob
             Current claim.
 
         Returns

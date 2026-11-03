@@ -1,3 +1,5 @@
+"""Manage and execute a collection of background tasks sequentially."""
+
 from __future__ import annotations
 from typing import TYPE_CHECKING
 from orionis.background.task import BackgroundTask
@@ -9,11 +11,13 @@ class BackgroundTasks(BackgroundTask):
     """
     Manage and execute a collection of background tasks sequentially.
 
-    This class holds an ordered list of :class:`BackgroundTask` instances
+    This class holds an ordered list of :class:`orionis.background.BackgroundTask`
+    instances
     and runs them one after another when invoked.
     """
 
     __slots__ = ("tasks",)
+    """Declare the instance attribute slots reserved by this class."""
 
     def __init__(self, tasks: Sequence[BackgroundTask] | None = None) -> None:
         """
@@ -21,7 +25,7 @@ class BackgroundTasks(BackgroundTask):
 
         Parameters
         ----------
-        tasks : Sequence[BackgroundTask] | None
+        tasks : collections.abc.Sequence[orionis.background.BackgroundTask] | None
             Optional sequence of BackgroundTask instances to initialize with.
 
         Returns
@@ -31,6 +35,7 @@ class BackgroundTasks(BackgroundTask):
         """
         # Convert tasks to a list or initialize as empty if not provided
         self.tasks: list[BackgroundTask] = list(tasks) if tasks else []
+        """Optional sequence of BackgroundTask instances to initialize with."""
 
     def addTask(
         self, func: Callable, *args: object, **kwargs: object,
@@ -40,7 +45,7 @@ class BackgroundTasks(BackgroundTask):
 
         Parameters
         ----------
-        func : Callable
+        func : collections.abc.Callable
             The function to be executed as a background task.
         *args : object
             Positional arguments to pass to the function.

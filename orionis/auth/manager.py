@@ -1,3 +1,5 @@
+"""Expose authentication and authorization to application code."""
+
 from typing import TYPE_CHECKING
 from orionis.auth.context.context import AuthenticationContext
 from orionis.auth.context.functions import (
@@ -60,6 +62,7 @@ class AuthManager(IAuthManager):
         "__session_guard",
         "__tokens",
     )
+    """Declare the instance attribute slots reserved by this class."""
 
     def __init__(  # noqa: PLR0913
         self,
@@ -75,17 +78,17 @@ class AuthManager(IAuthManager):
 
         Parameters
         ----------
-        app : IApplication
+        app : orionis.IApplication
             Application exposing the ``auth`` configuration.
-        authorizer : IAuthorizer
+        authorizer : orionis.auth.contracts.IAuthorizer
             Component answering permission, role and policy questions.
-        permissions : IPermissionRepository
+        permissions : orionis.auth.contracts.IPermissionRepository
             Source the authorization snapshot is built from.
-        session_guard : ISessionGuard
+        session_guard : orionis.auth.contracts.ISessionGuard
             Guard backing web authentication.
-        token_guard : TokenGuard
+        token_guard : orionis.auth.guards.TokenGuard
             Guard backing personal access token authentication.
-        tokens : IAccessTokenRepository
+        tokens : orionis.auth.contracts.IAccessTokenRepository
             Store used to issue and revoke personal access tokens.
 
         Returns
@@ -94,18 +97,24 @@ class AuthManager(IAuthManager):
             The guard registry is built once, at boot time.
         """
         self.__authorizer = authorizer
+        """Component answering permission, role and policy questions."""
         self.__permissions = permissions
+        """Source the authorization snapshot is built from."""
         self.__tokens = tokens
+        """Store used to issue and revoke personal access tokens."""
         self.__session_guard = session_guard
+        """Guard backing web authentication."""
 
         # Register the configured guard classes by name.
         self.__guards: dict[str, IGuard] = {
             session_guard.name: session_guard,
             token_guard.name: token_guard,
         }
+        """Register the configured guard classes by name."""
         self.__default_guard: str = (
             app.config("auth.default") or session_guard.name
         )
+        """Name of the authentication guard selected when none is specified."""
 
     # ── Authentication state ──────────────────────────────────────────
 
@@ -115,7 +124,7 @@ class AuthManager(IAuthManager):
 
         Returns
         -------
-        IAuthenticationContext
+        orionis.auth.contracts.IAuthenticationContext
             Context bound to the active scope, or the shared guest
             context outside a request.
         """
@@ -127,7 +136,7 @@ class AuthManager(IAuthManager):
 
         Returns
         -------
-        IAuthenticatable | None
+        orionis.auth.contracts.IAuthenticatable | None
             Authenticated identity, or ``None`` for a guest request.
         """
         return current_auth_context().identity
@@ -176,12 +185,12 @@ class AuthManager(IAuthManager):
 
         Returns
         -------
-        IGuard
+        orionis.auth.contracts.IGuard
             Guard registered under the requested name.
 
         Raises
         ------
-        GuardNotFoundException
+        orionis.auth.GuardNotFoundException
             When no guard is registered under the given name.
         """
         key = name or self.__default_guard
@@ -207,7 +216,7 @@ class AuthManager(IAuthManager):
 
         Parameters
         ----------
-        credentials : Mapping[str, object]
+        credentials : collections.abc.Mapping[str, object]
             Submitted credentials, typically username and password.
         remember : bool, optional
             Persist a revocable credential for later browser sessions.
@@ -234,7 +243,7 @@ class AuthManager(IAuthManager):
 
         Parameters
         ----------
-        identity : IAuthenticatable
+        identity : orionis.auth.contracts.IAuthenticatable
             Identity to remember for subsequent requests.
 
         Returns
@@ -269,7 +278,7 @@ class AuthManager(IAuthManager):
 
         Returns
         -------
-        IAuthorizationSnapshot
+        orionis.auth.contracts.IAuthorizationSnapshot
             Immutable view of permissions, roles and token abilities.
         """
         return await current_auth_context().authorization()
@@ -313,7 +322,7 @@ class AuthManager(IAuthManager):
 
         Parameters
         ----------
-        permissions : Iterable[str]
+        permissions : collections.abc.Iterable[str]
             Permission names to evaluate.
 
         Returns
@@ -331,7 +340,7 @@ class AuthManager(IAuthManager):
 
         Parameters
         ----------
-        permissions : Iterable[str]
+        permissions : collections.abc.Iterable[str]
             Permission names to evaluate.
 
         Returns
@@ -375,9 +384,9 @@ class AuthManager(IAuthManager):
 
         Raises
         ------
-        AuthenticationException
+        orionis.auth.AuthenticationException
             When the request carries no authenticated identity.
-        AuthorizationException
+        orionis.auth.AuthorizationException
             When the identity is authenticated but lacks the permission.
         """
         context = current_auth_context()
@@ -447,9 +456,9 @@ class AuthManager(IAuthManager):
 
         Raises
         ------
-        AuthenticationException
+        orionis.auth.AuthenticationException
             When the request carries no authenticated identity.
-        AuthorizationException
+        orionis.auth.AuthorizationException
             When the policy denies the operation.
         """
         context = current_auth_context()
@@ -470,7 +479,7 @@ class AuthManager(IAuthManager):
         ----------
         resource : type
             Resource class protected by the policy.
-        policy : type[IPolicy]
+        policy : type[orionis.auth.contracts.IPolicy]
             Policy class implementing the abilities.
 
         Returns
@@ -497,29 +506,29 @@ class AuthManager(IAuthManager):
         ----------
         name : str
             Human readable label describing the token.
-        tokenable : IAuthorizable | None, optional
+        tokenable : orionis.auth.contracts.IAuthorizable | None, optional
             Identity owning the token. ``None`` uses the identity
             authenticated for the current request.
-        abilities : Iterable[str] | None, optional
+        abilities : collections.abc.Iterable[str] | None, optional
             Abilities the token may use. ``None`` keeps the full
             authorization of the identity.
-        expires_at : datetime | None, optional
+        expires_at : datetime.datetime | None, optional
             Moment the token stops being accepted.
 
         Returns
         -------
-        NewAccessToken
+        orionis.auth.entities.NewAccessToken
             Stored token metadata plus its plain text value.
 
         Raises
         ------
-        AuthenticationException
+        orionis.auth.AuthenticationException
             When no identity is available to own the token.
-        AuthorizationException
+        orionis.auth.AuthorizationException
             When a token-authenticated request tries to issue another token.
-        AuthException
+        orionis.auth.AuthException
             When the identity cannot own tokens because it does not
-            implement :class:`IAuthorizable`.
+            implement :class:`orionis.auth.contracts.IAuthorizable`.
         """
         context = current_auth_context()
         if context.credentialId is not None:
@@ -574,7 +583,7 @@ class AuthManager(IAuthManager):
 
         Parameters
         ----------
-        identity : IAuthenticatable
+        identity : orionis.auth.contracts.IAuthenticatable
             Identity that just authenticated.
         guard : str
             Name of the guard that authenticated it.
@@ -599,12 +608,12 @@ class AuthManager(IAuthManager):
 
         Returns
         -------
-        Request
+        orionis.http.Request
             Request being handled right now.
 
         Raises
         ------
-        AuthException
+        orionis.auth.AuthException
             When the caller is not inside an HTTP request, so no session
             is available to log in or out.
         """

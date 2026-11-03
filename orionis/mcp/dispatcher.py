@@ -1,3 +1,5 @@
+"""Provide mcp operations through ``DispatchResult``, ``McpDispatcher``."""
+
 import asyncio
 import base64
 from collections.abc import AsyncIterator, Mapping
@@ -76,24 +78,34 @@ if TYPE_CHECKING:
     from orionis.mcp.normalization import CacheOptions
 
 type TransportName = Literal["http", "stdio", "test"]
+"""Type alias for ``Literal['http', 'stdio', 'test']``."""
 _CURSOR_FIELDS = 2
+"""Cursor fields value used by ``dispatcher``."""
 _MAX_COMPLETIONS = 100
+"""Max completions value used by ``dispatcher``."""
 _DISCOVER_METHOD = "server/discover"
+"""Discover method identifier: ``server/discover``."""
 _TOOL_METHOD = "tools/call"
+"""Tool method identifier: ``tools/call``."""
 _PROMPT_METHOD = "prompts/get"
+"""Prompt method identifier: ``prompts/get``."""
 _INTERNAL_ERROR = "Internal error"
+"""Error text for internal error: ``Internal error``."""
 _RESULT_TYPES = {
     _TOOL_METHOD: CallToolResult,
     "resources/read": ReadResourceResult,
     _PROMPT_METHOD: GetPromptResult,
 }
+"""Result types definitions used by ``dispatcher``."""
 
 @dataclass(frozen=True, slots=True)
 class DispatchResult:
     """Encoded JSON or a lazy stream of encoded notifications and final result."""
 
     body: bytes | AsyncIterator[bytes]
+    """HTTP response body or encoded payload returned to the client."""
     status: int = 200
+    """Status value used by ``DispatchResult``."""
 
     @property
     def streaming(self) -> bool:
@@ -113,6 +125,7 @@ class McpDispatcher:
     __slots__ = (
         "_extensions", "_list_sources", "_server_id", "app", "bus", "config", "server",
     )
+    """Declare the instance attribute slots reserved by this class."""
 
     def __init__(
         self,
@@ -126,13 +139,13 @@ class McpDispatcher:
 
         Parameters
         ----------
-        app : IContainer
+        app : orionis.container.contracts.container.IContainer
             Application container supplying configuration and dependencies.
-        compiled : CompiledMcpServer
+        compiled : orionis.mcp.server.compiler.CompiledMcpServer
             Precompiled metadata shared by request executions.
-        config : McpConfig
+        config : orionis.mcp.config.McpConfig
             Validated configuration controlling this component.
-        event_bus : IMcpEventBus
+        event_bus : orionis.mcp.contracts.event_bus.IMcpEventBus
             Subscription service delivering server changes.
 
         Returns
@@ -141,17 +154,23 @@ class McpDispatcher:
             Complete the documented operation without returning a value.
         """
         self.app = app
+        """Application container supplying configuration and dependencies."""
         self.server = compiled
+        """Precompiled metadata shared by request executions."""
         self.config = config
+        """Validated configuration controlling this component."""
         self.bus = event_bus
+        """Subscription service delivering server changes."""
         self._extensions = {
             method: (extension, handler)
             for extension in compiled.extensions
             for method, handler in extension.methods.items()
         }
+        """Extensions registered for this server or transport."""
         self._server_id = (
             f"{compiled.definition.__module__}.{compiled.definition.__qualname__}"
         )
+        """Stable server identifier used to bind protected request state."""
         self._list_sources = {
             "tools/list": (compiled.tools.values(), ListToolsResult, "tools"),
             "resources/list": (
@@ -162,6 +181,7 @@ class McpDispatcher:
             ),
             "prompts/list": (compiled.prompts.values(), ListPromptsResult, "prompts"),
         }
+        """Compiled primitive collections used by listing operations."""
 
     def decode(self, envelope: JsonRpcRequest) -> RequestParams:
         """
@@ -169,12 +189,12 @@ class McpDispatcher:
 
         Parameters
         ----------
-        envelope : JsonRpcRequest
+        envelope : orionis.mcp.protocol.requests.JsonRpcRequest
             Value supplied for ``envelope``.
 
         Returns
         -------
-        RequestParams
+        orionis.mcp.protocol.requests.RequestParams
             Result of the operation described above.
         """
         extension = self._extensions.get(envelope.method)
@@ -209,14 +229,14 @@ class McpDispatcher:
         ----------
         data : bytes
             Value supplied for ``data``.
-        transport : TransportName
+        transport : orionis.mcp.dispatcher.TransportName
             Value supplied for ``transport``.
-        native_request : Request | None
+        native_request : orionis.http.Request | None
             Value supplied for ``native_request``.
 
         Returns
         -------
-        DispatchResult
+        orionis.mcp.dispatcher.DispatchResult
             Result of the operation described above.
         """
         envelope = None
@@ -252,18 +272,18 @@ class McpDispatcher:
 
         Parameters
         ----------
-        envelope : JsonRpcRequest
+        envelope : orionis.mcp.protocol.requests.JsonRpcRequest
             Value supplied for ``envelope``.
-        params : RequestParams
+        params : orionis.mcp.protocol.requests.RequestParams
             Parameters decoded for the requested operation.
-        transport : TransportName
+        transport : orionis.mcp.dispatcher.TransportName
             Value supplied for ``transport``.
-        native_request : Request | None
+        native_request : orionis.http.Request | None
             Value supplied for ``native_request``.
 
         Returns
         -------
-        DispatchResult
+        orionis.mcp.dispatcher.DispatchResult
             Result of the operation described above.
         """
         if envelope.id is msgspec.UNSET:
@@ -298,18 +318,18 @@ class McpDispatcher:
 
         Parameters
         ----------
-        envelope : JsonRpcRequest
+        envelope : orionis.mcp.protocol.requests.JsonRpcRequest
             Value supplied for ``envelope``.
-        params : RequestParams
+        params : orionis.mcp.protocol.requests.RequestParams
             Parameters decoded for the requested operation.
-        transport : TransportName
+        transport : orionis.mcp.dispatcher.TransportName
             Value supplied for ``transport``.
-        native : Request | None
+        native : orionis.http.Request | None
             Value supplied for ``native``.
 
         Returns
         -------
-        McpRequest
+        orionis.mcp.McpRequest
             Result of the operation described above.
         """
         retry = isinstance(params, InputResponseParams)
@@ -339,9 +359,9 @@ class McpDispatcher:
 
         Parameters
         ----------
-        request : McpRequest
+        request : orionis.mcp.McpRequest
             Current request and its trusted execution context.
-        params : RequestParams
+        params : orionis.mcp.protocol.requests.RequestParams
             Parameters decoded for the requested operation.
 
         Returns
@@ -389,9 +409,9 @@ class McpDispatcher:
 
         Parameters
         ----------
-        request : McpRequest
+        request : orionis.mcp.McpRequest
             Current request and its trusted execution context.
-        params : RequestParams
+        params : orionis.mcp.protocol.requests.RequestParams
             Parameters decoded for the requested operation.
 
         Returns
@@ -422,14 +442,14 @@ class McpDispatcher:
 
         Parameters
         ----------
-        request : McpRequest
+        request : orionis.mcp.McpRequest
             Current request and its trusted execution context.
         uri : str
             Value supplied for ``uri``.
 
         Returns
         -------
-        tuple[CompiledPrimitive | None, McpRequest]
+        tuple[CompiledPrimitive | None, orionis.mcp.McpRequest]
             Result of the operation described above.
         """
         try:
@@ -464,9 +484,9 @@ class McpDispatcher:
 
         Parameters
         ----------
-        primitive : CompiledPrimitive
+        primitive : orionis.mcp.server.compiler.CompiledPrimitive
             Compiled tool, resource or prompt declaration.
-        request : McpRequest
+        request : orionis.mcp.McpRequest
             Current request and its trusted execution context.
         listing : bool
             Value supplied for ``listing``.
@@ -508,9 +528,9 @@ class McpDispatcher:
 
         Parameters
         ----------
-        primitive : CompiledPrimitive
+        primitive : orionis.mcp.server.compiler.CompiledPrimitive
             Compiled tool, resource or prompt declaration.
-        request : McpRequest
+        request : orionis.mcp.McpRequest
             Current request and its trusted execution context.
 
         Returns
@@ -575,9 +595,9 @@ class McpDispatcher:
 
         Parameters
         ----------
-        primitive : CompiledPrimitive
+        primitive : orionis.mcp.server.compiler.CompiledPrimitive
             Compiled tool, resource or prompt declaration.
-        request : McpRequest
+        request : orionis.mcp.McpRequest
             Current request and its trusted execution context.
         result : object
             Value supplied for ``result``.
@@ -624,11 +644,11 @@ class McpDispatcher:
 
         Parameters
         ----------
-        primitive : CompiledPrimitive
+        primitive : orionis.mcp.server.compiler.CompiledPrimitive
             Compiled tool, resource or prompt declaration.
-        request : McpRequest
+        request : orionis.mcp.McpRequest
             Current request and its trusted execution context.
-        source : AsyncIterator[object]
+        source : collections.abc.AsyncIterator[object]
             Source whose values or lifecycle are consumed by this operation.
 
         Yields
@@ -684,9 +704,9 @@ class McpDispatcher:
 
         Parameters
         ----------
-        request : McpRequest
+        request : orionis.mcp.McpRequest
             Current request and its trusted execution context.
-        params : PaginatedParams
+        params : orionis.mcp.protocol.requests.PaginatedParams
             Parameters decoded for the requested operation.
 
         Returns
@@ -727,7 +747,7 @@ class McpDispatcher:
         ----------
         method : str
             Value supplied for ``method``.
-        cursor : str | msgspec.UnsetType
+        cursor : str | ``msgspec.UnsetType``
             Value supplied for ``cursor``.
 
         Returns
@@ -764,14 +784,14 @@ class McpDispatcher:
 
         Parameters
         ----------
-        primitive : CompiledPrimitive | None
+        primitive : orionis.mcp.server.compiler.CompiledPrimitive | None
             Compiled tool, resource or prompt declaration.
-        request : McpRequest | None
+        request : orionis.mcp.McpRequest | None
             Current request and its trusted execution context.
 
         Returns
         -------
-        CacheOptions
+        orionis.mcp.normalization.CacheOptions
             Result of the operation described above.
         """
         cache = primitive.cache if primitive is not None else self.server.cache
@@ -791,7 +811,7 @@ class McpDispatcher:
 
         Parameters
         ----------
-        request : McpRequest
+        request : orionis.mcp.McpRequest
             Current request and its trusted execution context.
         result : object
             Value supplied for ``result``.
@@ -829,14 +849,14 @@ class McpDispatcher:
 
         Parameters
         ----------
-        request : McpRequest
+        request : orionis.mcp.McpRequest
             Current request and its trusted execution context.
-        params : CompleteParams
+        params : orionis.mcp.protocol.requests.CompleteParams
             Parameters decoded for the requested operation.
 
         Returns
         -------
-        CompleteCompletionResult
+        orionis.mcp.protocol.results.CompleteCompletionResult
             Result of the operation described above.
         """
         if "completions" not in self.server.capabilities:
@@ -905,14 +925,14 @@ class McpDispatcher:
 
         Parameters
         ----------
-        request : McpRequest
+        request : orionis.mcp.McpRequest
             Current request and its trusted execution context.
-        params : ListenParams
+        params : orionis.mcp.protocol.requests.ListenParams
             Parameters decoded for the requested operation.
 
         Returns
         -------
-        AsyncIterator[bytes]
+        collections.abc.AsyncIterator[bytes]
             Result of the operation described above.
         """
         filters = params.notifications
@@ -943,7 +963,7 @@ class McpDispatcher:
 
         Parameters
         ----------
-        request : McpRequest
+        request : orionis.mcp.McpRequest
             Current request and its trusted execution context.
         uri : str
             Value supplied for ``uri``.
@@ -974,11 +994,11 @@ class McpDispatcher:
 
         Parameters
         ----------
-        request : McpRequest
+        request : orionis.mcp.McpRequest
             Current request and its trusted execution context.
-        filters : SubscriptionFilter
+        filters : orionis.mcp.protocol.requests.SubscriptionFilter
             Value supplied for ``filters``.
-        source : AsyncIterator[tuple[str, str | None]]
+        source : collections.abc.AsyncIterator[tuple[str, str | None]]
             Source whose values or lifecycle are consumed by this operation.
 
         Yields
@@ -1039,14 +1059,14 @@ class McpDispatcher:
 
         Parameters
         ----------
-        primitive : CompiledPrimitive
+        primitive : orionis.mcp.server.compiler.CompiledPrimitive
             Compiled tool, resource or prompt declaration.
-        request : McpRequest
+        request : orionis.mcp.McpRequest
             Current request and its trusted execution context.
 
         Returns
         -------
-        CallToolResult | InputRequiredResult
+        orionis.mcp.protocol.results.CallToolResult | orionis.mcp.InputRequiredResult
             Result of the operation described above.
         """
         if primitive.catalog is None:
@@ -1078,14 +1098,14 @@ class McpDispatcher:
 
         Parameters
         ----------
-        catalog : CompiledCatalog
+        catalog : orionis.mcp.server.compiler.CompiledCatalog
             Value supplied for ``catalog``.
-        request : McpRequest
+        request : orionis.mcp.McpRequest
             Current request and its trusted execution context.
 
         Returns
         -------
-        McpResponse
+        orionis.mcp.McpResponse
             Result of the operation described above.
         """
         query = cast("str", request.arguments.get("query", ""))
@@ -1120,14 +1140,14 @@ class McpDispatcher:
 
         Parameters
         ----------
-        catalog : CompiledCatalog
+        catalog : orionis.mcp.server.compiler.CompiledCatalog
             Value supplied for ``catalog``.
-        request : McpRequest
+        request : orionis.mcp.McpRequest
             Current request and its trusted execution context.
 
         Returns
         -------
-        McpResponse | InputRequiredResult
+        orionis.mcp.McpResponse | orionis.mcp.InputRequiredResult
             Result of the operation described above.
         """
         calls = cast("tuple[Mapping[str, object], ...]", request.arguments["calls"])

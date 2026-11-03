@@ -1,3 +1,5 @@
+"""Configure the synchronous queue connection."""
+
 from dataclasses import dataclass, field
 from orionis.environment import Env
 from orionis.foundation.config.queue.enums.drivers import Drivers
@@ -11,9 +13,9 @@ class Sync(BaseEntity):
     """
     Configure the synchronous queue connection.
 
-    Parameters
+    Attributes
     ----------
-    driver : Drivers | str
+    driver : orionis.foundation.config.queue.enums.Drivers | str
         Synchronous driver identifier.
     queue : str
         Default logical queue name read from ``QUEUE_SYNC_QUEUE``.

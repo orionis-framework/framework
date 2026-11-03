@@ -1,3 +1,5 @@
+"""Group the foundation config filesystems components and public imports."""
+
 from typing import TYPE_CHECKING as _TYPE_CHECKING
 from orionis._exports import resolve_export as _resolve_export
 
@@ -32,6 +34,7 @@ _EXPORTS = {
     "Local": ("orionis.foundation.config.filesystems.entitites.local", "Local"),
     "Public": ("orionis.foundation.config.filesystems.entitites.public", "Public"),
 }
+"""Public export names mapped to their defining modules and attributes."""
 
 def __getattr__(name: str) -> object:
     """

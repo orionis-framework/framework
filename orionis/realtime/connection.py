@@ -1,3 +1,5 @@
+"""Own tasks and pending client results for exactly one connection."""
+
 import asyncio
 from math import isfinite
 from typing import TYPE_CHECKING
@@ -11,7 +13,9 @@ if TYPE_CHECKING:
     from orionis.realtime.protocol import Completion, HubProtocol
 
 _TARGET_LIMIT = 128
+"""Target limit value used by ``connection``."""
 _ARGUMENT_LIMIT = 64
+"""Argument limit value used by ``connection``."""
 
 class RealtimeConnection:
     """Own tasks and pending client results for exactly one connection."""
@@ -23,6 +27,7 @@ class RealtimeConnection:
         "pending", "protocol",
         "ready", "socket",
     )
+    """Declare the instance attribute slots reserved by this class."""
 
     def __init__(
         self, context: HubContext, hub: type[Hub], protocol: HubProtocol,
@@ -33,13 +38,13 @@ class RealtimeConnection:
 
         Parameters
         ----------
-        context : HubContext
+        context : orionis.realtime.HubContext
             Connection identity and public socket.
-        hub : type[Hub]
+        hub : type[orionis.realtime.Hub]
             Application-owned Hub type.
-        protocol : HubProtocol
+        protocol : orionis.realtime.HubProtocol
             Route-selected codec.
-        config : RealtimeConfig
+        config : orionis.realtime.config.RealtimeConfig
             Invocation and broadcast limits.
 
         Returns
@@ -53,21 +58,37 @@ class RealtimeConnection:
             If no event loop is running to identify the connection owner.
         """
         self.context = context
+        """Connection identity and public socket."""
         self.socket: WebSocket = context.socket
+        """WebSocket associated with the current realtime invocation."""
         self.hub = hub
+        """Application-owned Hub type."""
         self.protocol = protocol
+        """Route-selected codec."""
         self.config = config
+        """Invocation and broadcast limits."""
         self.active: dict[str, asyncio.Task[None]] = {}
+        """Operations currently running for this connection or transport."""
         self.finishing: set[asyncio.Task[None]] = set()
+        """Finishing produced by ``set``."""
         self._cancel_requested: set[str] = set()
+        """Cancel requested produced by ``set``."""
         self.pending: dict[str, asyncio.Future[object]] = {}
+        """Work that has been admitted and is awaiting completion."""
         self.owner: asyncio.Task | None = asyncio.current_task()
+        """Owner produced by ``asyncio.current_task``."""
         self.ready = False
+        """Ready flag used by ``RealtimeConnection``."""
         self.closing = False
+        """Closing flag used by ``RealtimeConnection``."""
         self.failure: BaseException | None = None
+        """Failure retained for propagation or reporting."""
         self._counter = 0
+        """Counter value used by ``RealtimeConnection``."""
         self._write_lock = asyncio.Lock()
+        """Synchronization primitive controlling access to write lock."""
         self._write_task: asyncio.Task[None] | None = None
+        """Background task sending queued messages to the connection."""
 
     def _writeDone(self, task: asyncio.Task[None]) -> None:
         """
@@ -278,7 +299,7 @@ class RealtimeConnection:
             If the selected codec cannot encode an argument value.
         TimeoutError
             If sending or receiving the completion exceeds the deadline.
-        ClientInvocationError
+        orionis.realtime.errors.ClientInvocationError
             If the client returns a completion error.
         asyncio.CancelledError
             If the invocation is cancelled; its pending result is released.
@@ -328,7 +349,7 @@ class RealtimeConnection:
 
         Parameters
         ----------
-        completion : Completion
+        completion : orionis.realtime.protocol.Completion
             Validated client completion.
 
         Returns

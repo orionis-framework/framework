@@ -1,3 +1,5 @@
+"""Roll back migrations and immediately apply them again."""
+
 from typing import ClassVar
 from orionis.console.args.argument import Argument
 from orionis.console.commands.migrate.base import MigrationCommand
@@ -9,7 +11,9 @@ class MigrateRefreshCommand(MigrationCommand):
     # ruff: noqa: TC001
 
     signature: str = "migrate:refresh"
+    """Signature identifier: ``migrate:refresh``."""
     description: str = "Rolls back and re-applies database migrations."
+    """Description identifier: ``Rolls back and re-applies database migrations.``."""
     arguments: ClassVar[list[Argument]] = [
         *MigrationCommand.arguments,
         Argument(
@@ -23,6 +27,7 @@ class MigrateRefreshCommand(MigrationCommand):
             dest="step",
         ),
     ]
+    """Command-line argument declarations accepted by this command."""
 
     async def handle(self, migrator: Migrator) -> None:
         """
@@ -30,7 +35,7 @@ class MigrateRefreshCommand(MigrationCommand):
 
         Parameters
         ----------
-        migrator : Migrator
+        migrator : orionis.database.migrations.Migrator
             Service that discovers, reverts, and applies migrations.
 
         Returns

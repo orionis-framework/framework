@@ -1,3 +1,5 @@
+"""Ensure a value is greater than or equal to a sibling field."""
+
 from orionis.schemas.rules.measure import measure
 from orionis.schemas.rule import Rule
 
@@ -13,9 +15,15 @@ class GreaterThanOrEqualField(Rule):
     # ruff: noqa: ARG002
 
     __slots__ = ("_other_field",)
+    """Declare the instance attribute slots reserved by this class."""
 
     __message__ = "Value must be greater than or equal to the compared field."
+    """
+    Error text for message: ``Value must be greater than or equal to the compared
+    field.``.
+    """
     __code__ = "gte"
+    """Code identifier: ``gte``."""
 
     def __init__(self, other_field: str, *, message: str | None = None) -> None:
         """
@@ -35,6 +43,7 @@ class GreaterThanOrEqualField(Rule):
         """
         super().__init__(message=message)
         self._other_field: str = other_field
+        """Name of the sibling field holding the lower bound."""
 
     async def enforce(
         self,

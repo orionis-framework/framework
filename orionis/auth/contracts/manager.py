@@ -1,3 +1,5 @@
+"""Define the public entry point of the authentication module."""
+
 from abc import ABC, abstractmethod
 from typing import TYPE_CHECKING
 
@@ -22,6 +24,7 @@ class IAuthManager(ABC):
     """
 
     __slots__ = ()
+    """Declare that this class introduces no additional instance slots."""
 
     @abstractmethod
     def context(self) -> IAuthenticationContext:
@@ -30,7 +33,7 @@ class IAuthManager(ABC):
 
         Returns
         -------
-        IAuthenticationContext
+        orionis.auth.contracts.IAuthenticationContext
             Context bound to the active scope, or a shared guest context
             when the code runs outside an authenticated request.
         """
@@ -42,7 +45,7 @@ class IAuthManager(ABC):
 
         Returns
         -------
-        IAuthenticatable | None
+        orionis.auth.contracts.IAuthenticatable | None
             Authenticated identity, or ``None`` for a guest request.
         """
 
@@ -91,12 +94,12 @@ class IAuthManager(ABC):
 
         Returns
         -------
-        IGuard
+        orionis.auth.contracts.IGuard
             Guard registered under the requested name.
 
         Raises
         ------
-        GuardNotFoundException
+        orionis.auth.GuardNotFoundException
             When no guard is registered under the given name.
         """
 
@@ -109,7 +112,7 @@ class IAuthManager(ABC):
 
         Parameters
         ----------
-        credentials : Mapping[str, object]
+        credentials : collections.abc.Mapping[str, object]
             Submitted credentials, typically username and password.
         remember : bool, optional
             Keep the browser signed in using a revocable persistent credential.
@@ -127,7 +130,7 @@ class IAuthManager(ABC):
 
         Parameters
         ----------
-        identity : IAuthenticatable
+        identity : orionis.auth.contracts.IAuthenticatable
             Identity to remember for subsequent requests.
 
         Returns
@@ -154,7 +157,7 @@ class IAuthManager(ABC):
 
         Returns
         -------
-        IAuthorizationSnapshot
+        orionis.auth.contracts.IAuthorizationSnapshot
             Immutable view of permissions, roles and token abilities.
         """
 
@@ -197,7 +200,7 @@ class IAuthManager(ABC):
 
         Parameters
         ----------
-        permissions : Iterable[str]
+        permissions : collections.abc.Iterable[str]
             Permission names to evaluate.
 
         Returns
@@ -213,7 +216,7 @@ class IAuthManager(ABC):
 
         Parameters
         ----------
-        permissions : Iterable[str]
+        permissions : collections.abc.Iterable[str]
             Permission names to evaluate.
 
         Returns
@@ -255,9 +258,9 @@ class IAuthManager(ABC):
 
         Raises
         ------
-        AuthenticationException
+        orionis.auth.AuthenticationException
             When the request carries no authenticated identity.
-        AuthorizationException
+        orionis.auth.AuthorizationException
             When the identity is authenticated but lacks the permission.
         """
 
@@ -316,9 +319,9 @@ class IAuthManager(ABC):
 
         Raises
         ------
-        AuthenticationException
+        orionis.auth.AuthenticationException
             When the request carries no authenticated identity.
-        AuthorizationException
+        orionis.auth.AuthorizationException
             When the policy denies the operation.
         """
 
@@ -331,7 +334,7 @@ class IAuthManager(ABC):
         ----------
         resource : type
             Resource class protected by the policy.
-        policy : type[IPolicy]
+        policy : type[orionis.auth.contracts.IPolicy]
             Policy class implementing the abilities.
 
         Returns
@@ -356,25 +359,25 @@ class IAuthManager(ABC):
         ----------
         name : str
             Human readable label describing the token.
-        tokenable : IAuthorizable | None, optional
+        tokenable : orionis.auth.contracts.IAuthorizable | None, optional
             Identity owning the token. ``None`` uses the identity
             authenticated for the current request.
-        abilities : Iterable[str] | None, optional
+        abilities : collections.abc.Iterable[str] | None, optional
             Abilities the token may use. ``None`` keeps the full
             authorization of the identity.
-        expires_at : datetime | None, optional
+        expires_at : datetime.datetime | None, optional
             Moment the token stops being accepted.
 
         Returns
         -------
-        NewAccessToken
+        orionis.auth.entities.NewAccessToken
             Stored token metadata plus its plain text value.
 
         Raises
         ------
-        AuthenticationException
+        orionis.auth.AuthenticationException
             When no identity is available to own the token.
-        AuthorizationException
+        orionis.auth.AuthorizationException
             When a token-authenticated request tries to issue another token.
         """
 

@@ -1,3 +1,5 @@
+"""Group the auth components and public imports."""
+
 from typing import TYPE_CHECKING as _TYPE_CHECKING
 from orionis._exports import resolve_export as _resolve_export
 
@@ -58,6 +60,7 @@ _EXPORTS = {
     "PolicyNotFoundException": ("orionis.auth.exceptions", "PolicyNotFoundException"),
     "TokenException": ("orionis.auth.exceptions", "TokenException"),
 }
+"""Public export names mapped to their defining modules and attributes."""
 
 def __getattr__(name: str) -> object:
     """

@@ -1,3 +1,5 @@
+"""Base for non-integer numeric types, such as ``NUMERIC``/``DECIMAL``."""
+
 from __future__ import annotations
 from orionis.orm.schema.column.definition import ColumnDefinition
 from orionis.orm.schema.column.options import ColumnOptions
@@ -7,6 +9,7 @@ class Numeric(ColumnDefinition):
     """Base for non-integer numeric types, such as ``NUMERIC``/``DECIMAL``."""
 
     __slots__ = ()
+    """Declare that this class introduces no additional instance slots."""
 
     def __init__(
         self,

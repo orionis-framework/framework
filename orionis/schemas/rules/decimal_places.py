@@ -1,3 +1,5 @@
+"""Ensure a numeric value carries a given number of decimal places."""
+
 from decimal import Decimal, InvalidOperation
 from orionis.schemas.rule import Rule
 
@@ -12,9 +14,15 @@ class DecimalPlaces(Rule):
     # ruff: noqa: ARG002
 
     __slots__ = ("_maximum", "_minimum")
+    """Declare the instance attribute slots reserved by this class."""
 
     __message__ = "Value must have the required number of decimal places."
+    """
+    Error text for message: ``Value must have the required number of decimal
+    places.``.
+    """
     __code__ = "decimal"
+    """Code identifier: ``decimal``."""
 
     def __init__(
         self,
@@ -55,7 +63,12 @@ class DecimalPlaces(Rule):
             )
             raise ValueError(error_msg)
         self._minimum: int = minimum
+        """Lowest accepted number of decimal places."""
         self._maximum: int = upper
+        """
+        Highest accepted number of decimal places. Defaults to ``minimum``, which
+        requires an exact count.
+        """
 
     async def enforce(
         self,

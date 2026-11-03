@@ -1,3 +1,5 @@
+"""Reject every incoming request with 503 while in maintenance mode."""
+
 from __future__ import annotations
 from typing import TYPE_CHECKING
 
@@ -15,6 +17,7 @@ class UnderMaintenanceMiddleware:
     """
 
     __slots__ = ("__default_responses", "__under_maintenance")
+    """Declare the instance attribute slots reserved by this class."""
 
     def __init__(
         self,
@@ -29,15 +32,18 @@ class UnderMaintenanceMiddleware:
         ----------
         under_maintenance : bool
             ``True`` when the application is in maintenance mode.
-        default_responses : IDefaultResponses
+        default_responses : orionis.http.default.contracts.responses.IDefaultResponses
             Handler used to build the 503 response.
 
         Returns
         -------
         None
+            Initialize with the maintenance flag and default response handler.
         """
         self.__under_maintenance: bool = under_maintenance
+        """``True`` when the application is in maintenance mode."""
         self.__default_responses: IDefaultResponses = default_responses
+        """Handler used to build the 503 response."""
 
     async def handle(
         self,
@@ -50,7 +56,7 @@ class UnderMaintenanceMiddleware:
 
         Parameters
         ----------
-        adapter : TransportAdapter
+        adapter : orionis.http.adapters.request.contracts.transport.TransportAdapter
             Transport adapter providing header access and client-preference
             detection via ``wantsJson()``.
         under_maintenance : bool | None, optional
@@ -58,7 +64,7 @@ class UnderMaintenanceMiddleware:
 
         Returns
         -------
-        Response | None
+        orionis.http.Response | None
             A 503 response when the application is in maintenance mode,
             ``None`` otherwise.
         """

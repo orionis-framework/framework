@@ -1,3 +1,8 @@
+"""Provide realtime operations.
+
+Includes ``RPCErrorPayload``, ``Invoke``, ``Completion``, ``Cancel``.
+"""
+
 from math import isfinite
 from typing import TYPE_CHECKING
 import msgspec
@@ -7,16 +12,23 @@ if TYPE_CHECKING:
     from orionis.http.websocket_message import WebSocketMessage
 
 MAX_ID_LENGTH = 128
+"""Max id length value used by ``protocol``."""
 MAX_ARGUMENTS = 64
+"""Max arguments value used by ``protocol``."""
 MAX_ERROR_MESSAGE_LENGTH = 1024
+"""Max error message length value used by ``protocol``."""
 MAX_ERROR_CODE_LENGTH = 64
+"""Max error code length value used by ``protocol``."""
 _DEFAULT_MESSAGE_LIMIT = 1024 * 1024
+"""Default message limit used by ``protocol``."""
 
 class RPCErrorPayload(msgspec.Struct, frozen=True, forbid_unknown_fields=True):
     """Carry the public error returned by one completed invocation."""
 
     code: str
+    """Machine-readable status or error code."""
     message: str
+    """Human-readable message associated with this operation or result."""
 
 class Invoke(
     msgspec.Struct, tag="invoke", frozen=True, forbid_unknown_fields=True,
@@ -24,10 +36,15 @@ class Invoke(
     """Request one named server operation within a bounded invocation lifetime."""
 
     id: str
+    """Identifier used to correlate or locate this protocol or storage record."""
     target: str
+    """Public remote method name selected for invocation."""
     args: list[object] = msgspec.field(default_factory=list)
+    """Args produced by ``msgspec.field``."""
     kwargs: dict[str, object] = msgspec.field(default_factory=dict)
+    """Keyword options forwarded to construction of the underlying object."""
     timeout: float | None = None
+    """Maximum duration allowed for an execution attempt."""
 
 class Completion(
     msgspec.Struct, tag="completion", frozen=True, forbid_unknown_fields=True,
@@ -35,6 +52,7 @@ class Completion(
     """Finish a pending server-to-client call with exactly one result or error."""
 
     id: str
+    """Identifier used to correlate or locate this protocol or storage record."""
     result: object = msgspec.UNSET
     error: RPCErrorPayload | msgspec.UnsetType = msgspec.UNSET
 
@@ -44,6 +62,7 @@ class Cancel(
     """Cancel one active client-to-server invocation."""
 
     id: str
+    """Identifier used to correlate or locate this protocol or storage record."""
 
 class Ping(msgspec.Struct, tag="ping", frozen=True, forbid_unknown_fields=True):
     """Request an application-level pong without creating a heartbeat task."""
@@ -52,6 +71,7 @@ class Pong(msgspec.Struct, tag="pong", frozen=True, forbid_unknown_fields=True):
     """Acknowledge an application-level ping."""
 
 type ClientMessage = Invoke | Completion | Cancel | Ping | Pong
+"""Type alias for ``Invoke | Completion | Cancel | Ping | Pong``."""
 
 def validate_invocation_id(value: str) -> None:
     """
@@ -69,7 +89,7 @@ def validate_invocation_id(value: str) -> None:
 
     Raises
     ------
-    ProtocolError
+    orionis.realtime.errors.ProtocolError
         If the identifier is empty, oversized, non-ASCII or contains spaces or
         nonprintable characters.
     """
@@ -86,7 +106,7 @@ def _validate_invoke(message: Invoke) -> None:
 
     Parameters
     ----------
-    message : Invoke
+    message : orionis.realtime.protocol.Invoke
         Typed incoming invocation.
 
     Returns
@@ -96,7 +116,7 @@ def _validate_invoke(message: Invoke) -> None:
 
     Raises
     ------
-    ProtocolError
+    orionis.realtime.errors.ProtocolError
         If an invocation exceeds a structural limit.
     """
     validate_invocation_id(message.id)
@@ -121,7 +141,7 @@ def _validate_completion(message: Completion) -> None:
 
     Parameters
     ----------
-    message : Completion
+    message : orionis.realtime.protocol.Completion
         Typed client response.
 
     Returns
@@ -131,7 +151,7 @@ def _validate_completion(message: Completion) -> None:
 
     Raises
     ------
-    ProtocolError
+    orionis.realtime.errors.ProtocolError
         If the identifier, outcome or public error fields are invalid.
     """
     validate_invocation_id(message.id)
@@ -149,6 +169,7 @@ class HubProtocol:
     """Encode Orionis Realtime v1 using route-selected JSON or MessagePack."""
 
     __slots__ = ("_decoder", "_encoder", "_max_message_size", "name")
+    """Declare the instance attribute slots reserved by this class."""
 
     def __init__(
         self, name: str = "json", *, max_message_size: int = _DEFAULT_MESSAGE_LIMIT,
@@ -184,10 +205,14 @@ class HubProtocol:
             message = "Realtime message limit must be a positive integer"
             raise ValueError(message)
         self.name = name
+        """``json`` for text frames or ``msgpack`` for binary frames."""
         self._max_message_size = max_message_size
+        """Maximum incoming UTF-8 or binary byte length."""
         codec = msgspec.json if name == "json" else msgspec.msgpack
         self._decoder = codec.Decoder(ClientMessage)
+        """Decoder produced by ``codec.Decoder``."""
         self._encoder = codec.Encoder()
+        """Encoder produced by ``codec.Encoder``."""
 
     def decode(self, message: WebSocketMessage) -> ClientMessage:
         """
@@ -195,17 +220,17 @@ class HubProtocol:
 
         Parameters
         ----------
-        message : WebSocketMessage
+        message : orionis.http.WebSocketMessage
             Text JSON or binary MessagePack message selected by the route.
 
         Returns
         -------
-        ClientMessage
+        orionis.realtime.protocol.ClientMessage
             Strict typed request, completion, cancellation or ping/pong.
 
         Raises
         ------
-        ProtocolError
+        orionis.realtime.errors.ProtocolError
             If frame kind, size, fields or structural limits are invalid.
         """
         if self.name == "json":

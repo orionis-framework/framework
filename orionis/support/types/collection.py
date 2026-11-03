@@ -1,3 +1,5 @@
+"""Provide collection operations over an ordered sequence of values."""
+
 from __future__ import annotations
 import contextlib
 import json
@@ -23,12 +25,18 @@ _OPERATORS: dict[str, Any] = {
     ">": operator.gt,
     ">=": operator.ge,
 }
+"""Map comparison names to their implementations."""
 
 # Sentinel object: distinguishes "attribute absent" from a legitimate None
 # value in getattr calls, eliminating the hasattr+getattr double-lookup.
 _MISSING: object = object()
+"""
+Sentinel object: distinguishes "attribute absent" from a legitimate None value in
+getattr calls, eliminating the hasattr+getattr double-lookup.
+"""
 
 class Collection(ICollection):
+    """Provide collection operations over an ordered sequence of values."""
 
     def __hash__(self: Self) -> int:
         """
@@ -51,7 +59,7 @@ class Collection(ICollection):
 
         Parameters
         ----------
-        items : list[Any] or None, optional
+        items : list[typing.Any] or None, optional
             Initial items for the collection (default is None).
 
         Returns
@@ -60,7 +68,9 @@ class Collection(ICollection):
             This method does not return a value.
         """
         self._items = items or []
+        """Initial items for the collection (default is None)."""
         self.__appends__ = []
+        """Computed attributes appended when collection items are serialized."""
 
     def take(
         self: Self,
@@ -76,7 +86,7 @@ class Collection(ICollection):
 
         Returns
         -------
-        Collection
+        collections.abc.Collection
             A new Collection containing the specified number of items.
         """
         # Take items from the end if number is negative, otherwise from the start
@@ -93,7 +103,7 @@ class Collection(ICollection):
 
         Parameters
         ----------
-        callback : Callable | None, optional
+        callback : collections.abc.Callable | None, optional
             A function to filter items before returning the first one,
             by default None.
 
@@ -120,7 +130,7 @@ class Collection(ICollection):
 
         Parameters
         ----------
-        callback : Callable | None, optional
+        callback : collections.abc.Callable | None, optional
             Function to filter items before returning the last one, by default None.
 
         Returns
@@ -144,7 +154,7 @@ class Collection(ICollection):
 
         Returns
         -------
-        list of Any
+        list of typing.Any
             All items contained in the collection.
         """
         return self._items
@@ -247,7 +257,7 @@ class Collection(ICollection):
 
         Returns
         -------
-        Collection
+        collections.abc.Collection
             A new Collection containing sub-collections (chunks) of the specified size.
         """
         # Validate size parameter
@@ -265,7 +275,7 @@ class Collection(ICollection):
 
         Returns
         -------
-        Collection
+        collections.abc.Collection
             A new Collection containing all items from nested arrays, flattened.
         """
         items = []
@@ -284,9 +294,9 @@ class Collection(ICollection):
 
         Parameters
         ----------
-        key : str or Callable
+        key : str or collections.abc.Callable
             The key to check for, or a callback function.
-        value : Any, optional
+        value : typing.Any, optional
             The value to match when key is a string, by default None.
 
         Returns
@@ -326,12 +336,12 @@ class Collection(ICollection):
 
         Parameters
         ----------
-        items : list[Any] | Collection
+        items : list[typing.Any] | collections.abc.Collection
             The items to compare against.
 
         Returns
         -------
-        Collection
+        collections.abc.Collection
             A new collection containing items not found in the provided collection.
         """
         # Extract items from Collection if necessary
@@ -352,12 +362,12 @@ class Collection(ICollection):
 
         Parameters
         ----------
-        callback : Callable
+        callback : collections.abc.Callable
             The callback function to apply to each item.
 
         Returns
         -------
-        Collection
+        collections.abc.Collection
             The current collection instance.
         """
         self.__checkIsCallable(callback)
@@ -379,7 +389,7 @@ class Collection(ICollection):
 
         Parameters
         ----------
-        callback : Callable
+        callback : collections.abc.Callable
             The callback function to test each item.
 
         Returns
@@ -400,12 +410,12 @@ class Collection(ICollection):
 
         Parameters
         ----------
-        callback : Callable
+        callback : collections.abc.Callable
             Function to determine if an item should be included.
 
         Returns
         -------
-        Collection
+        collections.abc.Collection
             A new Collection containing items for which the callback returns True.
         """
         # Ensure the callback is callable before filtering
@@ -418,7 +428,7 @@ class Collection(ICollection):
 
         Returns
         -------
-        Collection
+        collections.abc.Collection
             A new Collection containing all items, flattened to a single dimension.
         """
 
@@ -433,7 +443,7 @@ class Collection(ICollection):
 
             Yields
             ------
-            Any
+            typing.Any
                 Scalar values in traversal order.
             """
             if isinstance(items, dict):
@@ -456,12 +466,12 @@ class Collection(ICollection):
 
         Parameters
         ----------
-        *keys : Any
+        *keys : typing.Any
             The keys of the items to remove from the collection.
 
         Returns
         -------
-        Collection
+        collections.abc.Collection
             The current collection instance after removal.
         """
         # Sort keys in reverse order to avoid index shifting issues during deletion
@@ -487,7 +497,7 @@ class Collection(ICollection):
 
         Returns
         -------
-        Collection
+        collections.abc.Collection
             A new Collection containing the paginated items.
         """
         # Validate parameters
@@ -512,14 +522,14 @@ class Collection(ICollection):
 
         Parameters
         ----------
-        key : Any
+        key : typing.Any
             The key or index to retrieve from the collection.
-        default : Any, optional
+        default : typing.Any, optional
             The value to return if the key is not found. Defaults to None.
 
         Returns
         -------
-        Any
+        typing.Any
             The item at the specified key, or the default value if not found.
         """
         try:
@@ -584,12 +594,12 @@ class Collection(ICollection):
 
         Parameters
         ----------
-        callback : Callable
+        callback : collections.abc.Callable
             Function to apply to each item.
 
         Returns
         -------
-        Collection
+        collections.abc.Collection
             A new Collection containing the mapped items.
         """
         # Ensure the callback is callable before mapping
@@ -611,12 +621,12 @@ class Collection(ICollection):
             The class to map items into.
         method : str | None, optional
             The method to call on the class, by default None.
-        **kwargs : Any
+        **kwargs : typing.Any
             Additional keyword arguments to pass to the constructor or method.
 
         Returns
         -------
-        Collection
+        collections.abc.Collection
             A new collection with the mapped instances.
         """
         # Validate that cls is a type
@@ -649,12 +659,12 @@ class Collection(ICollection):
 
         Parameters
         ----------
-        items : list[Any] | Collection
+        items : list[typing.Any] | collections.abc.Collection
             The items to merge into the collection.
 
         Returns
         -------
-        Collection
+        collections.abc.Collection
             The current collection instance with merged items.
 
         Raises
@@ -688,7 +698,7 @@ class Collection(ICollection):
 
         Returns
         -------
-        Collection
+        collections.abc.Collection
             A new collection containing the plucked values.
         """
         # Initialize attributes as dict or list based on presence of key
@@ -717,7 +727,7 @@ class Collection(ICollection):
 
         Returns
         -------
-        Any
+        typing.Any
             The last item from the collection, or None if empty.
         """
         # Return None if collection is empty
@@ -736,12 +746,12 @@ class Collection(ICollection):
 
         Parameters
         ----------
-        value : Any
+        value : typing.Any
             The value to prepend to the collection.
 
         Returns
         -------
-        Collection
+        collections.abc.Collection
             The current collection instance with the new item prepended.
         """
         # Insert the value at the start of the internal _items list
@@ -757,12 +767,12 @@ class Collection(ICollection):
 
         Parameters
         ----------
-        key : Any
+        key : typing.Any
             The key of the item to remove.
 
         Returns
         -------
-        Any
+        typing.Any
             The removed item, or None if not found.
         """
         # Retrieve the value at the specified key, then remove it from the collection
@@ -779,12 +789,12 @@ class Collection(ICollection):
 
         Parameters
         ----------
-        value : Any
+        value : typing.Any
             The value to add to the collection.
 
         Returns
         -------
-        Collection
+        collections.abc.Collection
             The current collection instance with the new item appended.
         """
         # Append the value to the internal _items list
@@ -801,14 +811,14 @@ class Collection(ICollection):
 
         Parameters
         ----------
-        key : Any
+        key : typing.Any
             The key or index at which to set the value.
-        value : Any
+        value : typing.Any
             The value to assign at the specified key.
 
         Returns
         -------
-        Collection
+        collections.abc.Collection
             The current collection instance with the updated item.
         """
         # Set the value at the specified key in the collection
@@ -829,7 +839,7 @@ class Collection(ICollection):
 
         Returns
         -------
-        Any | Collection | None
+        typing.Any | collections.abc.Collection | None
             A single random item if count is None, a Collection if count is given,
             or None if the collection is empty.
 
@@ -871,14 +881,14 @@ class Collection(ICollection):
 
         Parameters
         ----------
-        callback : Callable
+        callback : collections.abc.Callable
             The function to apply cumulatively to the items.
-        initial : Any, optional
+        initial : typing.Any, optional
             The initial value to start the reduction, by default 0.
 
         Returns
         -------
-        Any
+        typing.Any
             The reduced value after applying the callback.
         """
         # Use functools.reduce to accumulate values in the collection
@@ -893,12 +903,12 @@ class Collection(ICollection):
 
         Parameters
         ----------
-        callback : Callable
+        callback : collections.abc.Callable
             The callback function to test items.
 
         Returns
         -------
-        Collection
+        collections.abc.Collection
             The current collection instance with items not passing the test.
         """
         # Ensure the callback is callable before filtering
@@ -913,7 +923,7 @@ class Collection(ICollection):
 
         Returns
         -------
-        Collection
+        collections.abc.Collection
             The current collection instance with items in reversed order.
         """
         # Reverse the current collection in place.
@@ -926,7 +936,7 @@ class Collection(ICollection):
 
         Returns
         -------
-        list of Any
+        list of typing.Any
             The serialized items in the collection.
         """
 
@@ -980,7 +990,7 @@ class Collection(ICollection):
 
         Returns
         -------
-        Any
+        typing.Any
             The first item from the collection, or None if the collection is empty.
         """
         # Remove and return the first item using pull(0)
@@ -1000,7 +1010,7 @@ class Collection(ICollection):
 
         Returns
         -------
-        Collection
+        collections.abc.Collection
             The current collection instance with sorted items.
         """
         # Sort by key if provided, otherwise sort items directly
@@ -1070,7 +1080,7 @@ class Collection(ICollection):
 
         Returns
         -------
-        Collection
+        collections.abc.Collection
             A new Collection instance containing a dictionary where each key is a
             unique value from the specified key, and each value is a list of items
             sharing that key.
@@ -1094,12 +1104,12 @@ class Collection(ICollection):
 
         Parameters
         ----------
-        callback : Callable
+        callback : collections.abc.Callable
             The callback function to transform items.
 
         Returns
         -------
-        Collection
+        collections.abc.Collection
             The current collection instance with transformed items.
         """
         # Ensure the callback is callable before transforming items
@@ -1116,14 +1126,14 @@ class Collection(ICollection):
 
         Parameters
         ----------
-        key : str | Callable | None, optional
+        key : str | collections.abc.Callable | None, optional
             Field name or identity selector. Hashable selector results avoid
             quadratic comparisons for arbitrary user-defined objects. Without
             a key, built-in value trees also use equality-compatible indexing.
 
         Returns
         -------
-        Collection
+        collections.abc.Collection
             A new Collection containing only unique items.
         """
         # If no key is provided, use set to get unique items directly
@@ -1143,7 +1153,7 @@ class Collection(ICollection):
 
         Returns
         -------
-        Collection
+        collections.abc.Collection
             A new Collection containing only unique items.
         """
         try:
@@ -1159,12 +1169,12 @@ class Collection(ICollection):
 
         Parameters
         ----------
-        key : str | Callable
+        key : str | collections.abc.Callable
             Field name or identity selector used for each item.
 
         Returns
         -------
-        Collection
+        collections.abc.Collection
             A new Collection containing only unique items by the given key.
         """
         selector = key if callable(key) else lambda item: self.__dataGet(item, key)
@@ -1182,12 +1192,12 @@ class Collection(ICollection):
         ----------
         key : str
             The key to filter by.
-        *args : Any
+        *args : typing.Any
             The operator and value, or just the value.
 
         Returns
         -------
-        Collection
+        collections.abc.Collection
             A new Collection instance containing filtered items.
         """
         # Validate arguments
@@ -1230,12 +1240,12 @@ class Collection(ICollection):
         ----------
         key : str
             The key to filter by.
-        values : list[Any] | Collection
+        values : list[typing.Any] | collections.abc.Collection
             The list of values to check against.
 
         Returns
         -------
-        Collection
+        collections.abc.Collection
             A new collection containing items where the key's value is in values.
         """
         # Extract values from Collection if necessary
@@ -1277,12 +1287,12 @@ class Collection(ICollection):
         ----------
         key : str
             The key to filter by.
-        values : list[Any] | Collection
+        values : list[typing.Any] | collections.abc.Collection
             The list of values to check against.
 
         Returns
         -------
-        Collection
+        collections.abc.Collection
             A new Collection containing items where the key's value is not in values.
         """
         # Extract values from Collection if necessary
@@ -1321,12 +1331,12 @@ class Collection(ICollection):
 
         Parameters
         ----------
-        items : list[Any] | Collection
+        items : list[typing.Any] | collections.abc.Collection
             The items to zip with.
 
         Returns
         -------
-        Collection
+        collections.abc.Collection
             A new Collection containing pairs of items from both collections.
 
         Raises
@@ -1361,7 +1371,7 @@ class Collection(ICollection):
 
         Returns
         -------
-        Collection
+        collections.abc.Collection
             The current collection instance.
         """
         # Extend the __appends__ list with the provided attributes
@@ -1377,12 +1387,12 @@ class Collection(ICollection):
 
         Parameters
         ----------
-        relation_data : dict[str, Any]
+        relation_data : dict[str, typing.Any]
             The relation data to add.
 
         Returns
         -------
-        Collection
+        collections.abc.Collection
             The current collection instance.
         """
         # Add relation data to items if they support it
@@ -1401,12 +1411,12 @@ class Collection(ICollection):
 
         Parameters
         ----------
-        key : str | Callable | None
+        key : str | collections.abc.Callable | None
             The key to extract or callback to apply.
 
         Returns
         -------
-        list[Any] | None
+        list[typing.Any] | None
             List of extracted values, or None if key is not provided.
         """
         if not key:
@@ -1439,16 +1449,16 @@ class Collection(ICollection):
 
         Parameters
         ----------
-        item : Any
+        item : typing.Any
             The item to extract data from.
         key : str
             The key to look for, supports nested notation.
-        default : Any, optional
+        default : typing.Any, optional
             The value to return if the key is not found. Defaults to None.
 
         Returns
         -------
-        Any
+        typing.Any
             The extracted value if found, otherwise the default value.
         """
         try:
@@ -1478,12 +1488,12 @@ class Collection(ICollection):
 
         Parameters
         ----------
-        value : Any
+        value : typing.Any
             The value or callable to evaluate.
 
         Returns
         -------
-        Any
+        typing.Any
             The result of calling the value if it is callable, otherwise the value
             itself.
         """
@@ -1503,7 +1513,7 @@ class Collection(ICollection):
 
         Parameters
         ----------
-        callback : Any
+        callback : typing.Any
             The callback to check.
         raise_exception : bool, optional
             Whether to raise an exception if not callable. Default is True.
@@ -1537,9 +1547,9 @@ class Collection(ICollection):
 
         Parameters
         ----------
-        a : Any
+        a : typing.Any
             The first value to compare.
-        b : Any
+        b : typing.Any
             The second value to compare.
         op : str
             The comparison operator as a string.
@@ -1569,7 +1579,7 @@ class Collection(ICollection):
 
         Yields
         ------
-        Any
+        typing.Any
             Each item in the collection.
         """
         # Yield each item in the internal _items list
@@ -1611,7 +1621,7 @@ class Collection(ICollection):
 
         Returns
         -------
-        Any or Collection
+        typing.Any or collections.abc.Collection
             The item at the given index, or a new Collection for a slice.
         """
         # Return a new Collection if a slice is provided, else return the item.
@@ -1629,9 +1639,9 @@ class Collection(ICollection):
 
         Parameters
         ----------
-        key : Any
+        key : typing.Any
             The index or key at which to set the value.
-        value : Any
+        value : typing.Any
             The value to assign at the specified key.
 
         Returns
@@ -1651,7 +1661,7 @@ class Collection(ICollection):
 
         Parameters
         ----------
-        key : Any
+        key : typing.Any
             The index or key of the item to remove.
 
         Returns
@@ -1798,14 +1808,14 @@ class Collection(ICollection):
 
         Parameters
         ----------
-        items : list[Any] | Collection | object
+        items : list[typing.Any] | collections.abc.Collection | object
             The input to extract items from. If a Collection, its items are
             returned; otherwise, the input is returned unchanged.
 
         Returns
         -------
-        list[Any] | object
-            The extracted items if `items` is a Collection, otherwise the
+        list[typing.Any] | object
+            The extracted items if ``items`` is a Collection, otherwise the
             original input.
         """
         # If the input is a Collection, extract its items using the all() method

@@ -1,3 +1,5 @@
+"""Group the console contracts components and public imports."""
+
 from typing import TYPE_CHECKING as _TYPE_CHECKING
 from orionis._exports import resolve_export as _resolve_export
 
@@ -11,6 +13,7 @@ __all__ = [
 _EXPORTS = {
     "ISchedule": ("orionis.console.contracts.schedule", "ISchedule"),
 }
+"""Public export names mapped to their defining modules and attributes."""
 
 def __getattr__(name: str) -> object:
     """

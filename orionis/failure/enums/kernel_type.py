@@ -1,3 +1,5 @@
+"""Define available kernel types in the system."""
+
 from enum import Enum, auto
 
 class KernelContext(Enum):
@@ -6,14 +8,14 @@ class KernelContext(Enum):
 
     Attributes
     ----------
-    CONSOLE : KernelContext
+    CONSOLE : orionis.failure.enums.KernelContext
         Kernel for command-line or console execution.
-    HTTP : KernelContext
+    HTTP : orionis.failure.enums.KernelContext
         Kernel for HTTP environments, such as web servers.
 
     Returns
     -------
-    KernelContext
+    orionis.failure.enums.KernelContext
         An instance of the KernelContext enumeration.
     """
 

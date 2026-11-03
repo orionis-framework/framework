@@ -1,3 +1,5 @@
+"""Define the contract for collection implementations."""
+
 from __future__ import annotations
 from abc import ABC, abstractmethod
 from typing import TYPE_CHECKING, Any, Self
@@ -6,6 +8,7 @@ if TYPE_CHECKING:
     from collections.abc import Callable
 
 class ICollection(ABC):
+    """Define the contract for collection implementations."""
 
     @abstractmethod
     def take(
@@ -22,7 +25,7 @@ class ICollection(ABC):
 
         Returns
         -------
-        Collection
+        orionis.support.types.contracts.collection.ICollection
             A new Collection containing the specified number of items.
         """
 
@@ -36,7 +39,7 @@ class ICollection(ABC):
 
         Parameters
         ----------
-        callback : Callable | None, optional
+        callback : collections.abc.Callable | None, optional
             A function to filter items before returning the first one,
             by default None.
 
@@ -56,7 +59,7 @@ class ICollection(ABC):
 
         Parameters
         ----------
-        callback : Callable | None, optional
+        callback : collections.abc.Callable | None, optional
             Function to filter items before returning the last one, by default None.
 
         Returns
@@ -72,7 +75,7 @@ class ICollection(ABC):
 
         Returns
         -------
-        list of Any
+        list of typing.Any
             All items contained in the collection.
         """
 
@@ -149,7 +152,7 @@ class ICollection(ABC):
 
         Returns
         -------
-        Collection
+        orionis.support.types.contracts.collection.ICollection
             A new Collection containing sub-collections (chunks) of the specified size.
         """
 
@@ -160,7 +163,7 @@ class ICollection(ABC):
 
         Returns
         -------
-        Collection
+        orionis.support.types.contracts.collection.ICollection
             A new Collection containing all items from nested arrays, flattened.
         """
 
@@ -175,9 +178,9 @@ class ICollection(ABC):
 
         Parameters
         ----------
-        key : str or Callable
+        key : str or collections.abc.Callable
             The key to check for, or a callback function.
-        value : Any, optional
+        value : typing.Any, optional
             The value to match when key is a string, by default None.
 
         Returns
@@ -207,12 +210,12 @@ class ICollection(ABC):
 
         Parameters
         ----------
-        items : list[Any] | Collection
+        items : list[typing.Any] | collections.abc.Collection
             The items to compare against.
 
         Returns
         -------
-        Collection
+        orionis.support.types.contracts.collection.ICollection
             A new collection containing items not found in the provided collection.
         """
 
@@ -226,12 +229,12 @@ class ICollection(ABC):
 
         Parameters
         ----------
-        callback : Callable
+        callback : collections.abc.Callable
             The callback function to apply to each item.
 
         Returns
         -------
-        Collection
+        orionis.support.types.contracts.collection.ICollection
             The current collection instance.
         """
 
@@ -245,7 +248,7 @@ class ICollection(ABC):
 
         Parameters
         ----------
-        callback : Callable
+        callback : collections.abc.Callable
             The callback function to test each item.
 
         Returns
@@ -264,12 +267,12 @@ class ICollection(ABC):
 
         Parameters
         ----------
-        callback : Callable
+        callback : collections.abc.Callable
             Function to determine if an item should be included.
 
         Returns
         -------
-        Collection
+        orionis.support.types.contracts.collection.ICollection
             A new Collection containing items for which the callback returns True.
         """
 
@@ -280,7 +283,7 @@ class ICollection(ABC):
 
         Returns
         -------
-        Collection
+        orionis.support.types.contracts.collection.ICollection
             A new Collection containing all items, flattened to a single dimension.
         """
 
@@ -294,12 +297,12 @@ class ICollection(ABC):
 
         Parameters
         ----------
-        *keys : Any
+        *keys : typing.Any
             The keys of the items to remove from the collection.
 
         Returns
         -------
-        Collection
+        orionis.support.types.contracts.collection.ICollection
             The current collection instance after removal.
         """
 
@@ -321,7 +324,7 @@ class ICollection(ABC):
 
         Returns
         -------
-        Collection
+        orionis.support.types.contracts.collection.ICollection
             A new Collection containing the paginated items.
         """
 
@@ -336,14 +339,14 @@ class ICollection(ABC):
 
         Parameters
         ----------
-        key : Any
+        key : typing.Any
             The key or index to retrieve from the collection.
-        default : Any, optional
+        default : typing.Any, optional
             The value to return if the key is not found. Defaults to None.
 
         Returns
         -------
-        Any
+        typing.Any
             The item at the specified key, or the default value if not found.
         """
 
@@ -390,12 +393,12 @@ class ICollection(ABC):
 
         Parameters
         ----------
-        callback : Callable
+        callback : collections.abc.Callable
             Function to apply to each item.
 
         Returns
         -------
-        Collection
+        orionis.support.types.contracts.collection.ICollection
             A new Collection containing the mapped items.
         """
 
@@ -415,12 +418,12 @@ class ICollection(ABC):
             The class to map items into.
         method : str | None, optional
             The method to call on the class, by default None.
-        **kwargs : Any
+        **kwargs : typing.Any
             Additional keyword arguments to pass to the constructor or method.
 
         Returns
         -------
-        Collection
+        orionis.support.types.contracts.collection.ICollection
             A new collection with the mapped instances.
         """
 
@@ -434,12 +437,12 @@ class ICollection(ABC):
 
         Parameters
         ----------
-        items : list[Any] | Collection
+        items : list[typing.Any] | collections.abc.Collection
             The items to merge into the collection.
 
         Returns
         -------
-        Collection
+        orionis.support.types.contracts.collection.ICollection
             The current collection instance with merged items.
 
         Raises
@@ -466,7 +469,7 @@ class ICollection(ABC):
 
         Returns
         -------
-        Collection
+        orionis.support.types.contracts.collection.ICollection
             A new collection containing the plucked values.
         """
 
@@ -477,7 +480,7 @@ class ICollection(ABC):
 
         Returns
         -------
-        Any
+        typing.Any
             The last item from the collection.
         """
 
@@ -491,12 +494,12 @@ class ICollection(ABC):
 
         Parameters
         ----------
-        value : Any
+        value : typing.Any
             The value to prepend to the collection.
 
         Returns
         -------
-        Collection
+        orionis.support.types.contracts.collection.ICollection
             The current collection instance with the new item prepended.
         """
 
@@ -510,12 +513,12 @@ class ICollection(ABC):
 
         Parameters
         ----------
-        key : Any
+        key : typing.Any
             The key of the item to remove.
 
         Returns
         -------
-        Any
+        typing.Any
             The removed item, or None if not found.
         """
 
@@ -529,12 +532,12 @@ class ICollection(ABC):
 
         Parameters
         ----------
-        value : Any
+        value : typing.Any
             The value to add to the collection.
 
         Returns
         -------
-        Collection
+        orionis.support.types.contracts.collection.ICollection
             The current collection instance with the new item appended.
         """
 
@@ -549,14 +552,14 @@ class ICollection(ABC):
 
         Parameters
         ----------
-        key : Any
+        key : typing.Any
             The key or index at which to set the value.
-        value : Any
+        value : typing.Any
             The value to assign at the specified key.
 
         Returns
         -------
-        Collection
+        orionis.support.types.contracts.collection.ICollection
             The current collection instance with the updated item.
         """
 
@@ -575,7 +578,7 @@ class ICollection(ABC):
 
         Returns
         -------
-        Any | Collection | None
+        typing.Any | collections.abc.Collection | None
             A single random item if count is None, a Collection if count is given,
             or None if the collection is empty.
 
@@ -596,14 +599,14 @@ class ICollection(ABC):
 
         Parameters
         ----------
-        callback : Callable
+        callback : collections.abc.Callable
             The function to apply cumulatively to the items.
-        initial : Any, optional
+        initial : typing.Any, optional
             The initial value to start the reduction, by default 0.
 
         Returns
         -------
-        Any
+        typing.Any
             The reduced value after applying the callback.
         """
 
@@ -617,12 +620,12 @@ class ICollection(ABC):
 
         Parameters
         ----------
-        callback : Callable
+        callback : collections.abc.Callable
             The callback function to test items.
 
         Returns
         -------
-        Collection
+        orionis.support.types.contracts.collection.ICollection
             The current collection instance with items not passing the test.
         """
 
@@ -633,7 +636,7 @@ class ICollection(ABC):
 
         Returns
         -------
-        Collection
+        orionis.support.types.contracts.collection.ICollection
             The current collection instance with items in reversed order.
         """
 
@@ -644,7 +647,7 @@ class ICollection(ABC):
 
         Returns
         -------
-        list of Any
+        list of typing.Any
             The serialized items in the collection.
         """
 
@@ -655,7 +658,7 @@ class ICollection(ABC):
 
         Returns
         -------
-        Any
+        typing.Any
             The first item from the collection, or None if the collection is empty.
         """
 
@@ -674,7 +677,7 @@ class ICollection(ABC):
 
         Returns
         -------
-        Collection
+        orionis.support.types.contracts.collection.ICollection
             The current collection instance with sorted items.
         """
 
@@ -707,7 +710,7 @@ class ICollection(ABC):
 
         Parameters
         ----------
-        **kwargs : Any
+        **kwargs : typing.Any
             Additional arguments to pass to json.dumps.
 
         Returns
@@ -731,7 +734,7 @@ class ICollection(ABC):
 
         Returns
         -------
-        Collection
+        orionis.support.types.contracts.collection.ICollection
             A new Collection instance containing a dictionary where each key is a
             unique value from the specified key, and each value is a list of items
             sharing that key.
@@ -747,12 +750,12 @@ class ICollection(ABC):
 
         Parameters
         ----------
-        callback : Callable
+        callback : collections.abc.Callable
             The callback function to transform items.
 
         Returns
         -------
-        Collection
+        orionis.support.types.contracts.collection.ICollection
             The current collection instance with transformed items.
         """
 
@@ -766,12 +769,12 @@ class ICollection(ABC):
 
         Parameters
         ----------
-        key : str | Callable | None, optional
+        key : str | collections.abc.Callable | None, optional
             Field name or identity selector; None compares complete items.
 
         Returns
         -------
-        Collection
+        orionis.support.types.contracts.collection.ICollection
             A new Collection containing only unique items.
         """
 
@@ -788,12 +791,12 @@ class ICollection(ABC):
         ----------
         key : str
             The key to filter by.
-        *args : Any
+        *args : typing.Any
             The operator and value, or just the value.
 
         Returns
         -------
-        Collection
+        orionis.support.types.contracts.collection.ICollection
             A new Collection instance containing filtered items.
         """
 
@@ -810,12 +813,12 @@ class ICollection(ABC):
         ----------
         key : str
             The key to filter by.
-        values : list[Any] | Collection
+        values : list[typing.Any] | collections.abc.Collection
             The list of values to check against.
 
         Returns
         -------
-        Collection
+        orionis.support.types.contracts.collection.ICollection
             A new collection containing items where the key's value is in values.
         """
 
@@ -832,12 +835,12 @@ class ICollection(ABC):
         ----------
         key : str
             The key to filter by.
-        values : list[Any] | Collection
+        values : list[typing.Any] | collections.abc.Collection
             The list of values to check against.
 
         Returns
         -------
-        Collection
+        orionis.support.types.contracts.collection.ICollection
             A new Collection containing items where the key's value is not in values.
         """
 
@@ -851,12 +854,12 @@ class ICollection(ABC):
 
         Parameters
         ----------
-        items : list[Any] | Collection
+        items : list[typing.Any] | collections.abc.Collection
             The items to zip with.
 
         Returns
         -------
-        Collection
+        orionis.support.types.contracts.collection.ICollection
             A new Collection containing pairs of items from both collections.
 
         Raises
@@ -880,6 +883,6 @@ class ICollection(ABC):
 
         Returns
         -------
-        Collection
+        orionis.support.types.contracts.collection.ICollection
             The current collection instance.
         """

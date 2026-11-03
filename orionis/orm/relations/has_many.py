@@ -1,3 +1,5 @@
+"""One-to-many relationship: the related table owns the foreign key."""
+
 from __future__ import annotations
 from typing import TYPE_CHECKING
 from orionis.orm.relations.has_one_or_many import HasOneOrManyRelation
@@ -16,6 +18,7 @@ class HasManyRelation[TRelated: "Model"](HasOneOrManyRelation[TRelated]):
     """
 
     __slots__ = ()
+    """Declare that this class introduces no additional instance slots."""
 
     async def getResults(self) -> Collection:
         """
@@ -23,7 +26,7 @@ class HasManyRelation[TRelated: "Model"](HasOneOrManyRelation[TRelated]):
 
         Returns
         -------
-        Collection
+        collections.abc.Collection
             Related models; empty when the parent has no key or no row
             references it.
         """
@@ -42,10 +45,10 @@ class HasManyRelation[TRelated: "Model"](HasOneOrManyRelation[TRelated]):
 
         Parameters
         ----------
-        models : list of Model
+        models : list of orionis.orm.Model
             Parent instances being eager loaded together.
-        results : Collection
-            Related rows produced by :meth:`getEager`.
+        results : collections.abc.Collection
+            Related rows produced by ``getEager``.
         name : str
             Relationship name the results are stored under.
 

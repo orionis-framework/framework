@@ -1,3 +1,5 @@
+"""Define the contract for kernel http implementations."""
+
 from __future__ import annotations
 from abc import ABC, abstractmethod
 from typing import TYPE_CHECKING
@@ -6,8 +8,10 @@ if TYPE_CHECKING:
     from granian.rsgi import HTTPProtocol, Scope, WebsocketProtocol
 
 class IKernelHTTP(ABC):
+    """Define the contract for kernel http implementations."""
 
     __slots__ = ()
+    """Declare that this class introduces no additional instance slots."""
 
     def disconnectPaths(self) -> frozenset[str]:
         """
@@ -31,6 +35,7 @@ class IKernelHTTP(ABC):
         Returns
         -------
         None
+            Boot the HTTP kernel by initializing core components.
         """
 
     @abstractmethod
@@ -48,9 +53,9 @@ class IKernelHTTP(ABC):
 
         Parameters
         ----------
-        scope : Scope
+        scope : ``granian.rsgi.Scope``
             Granian RSGI scope object with connection metadata.
-        protocol : HTTPProtocol
+        protocol : ``granian.rsgi.HTTPProtocol``
             RSGI HTTP protocol object used to send the response.
 
         Returns
@@ -85,4 +90,5 @@ class IKernelHTTP(ABC):
         Returns
         -------
         None
+            Handle an incoming ASGI HTTP request end-to-end.
         """

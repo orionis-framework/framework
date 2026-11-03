@@ -1,3 +1,5 @@
+"""Generate an invokable or resource HTTP controller."""
+
 from typing import ClassVar
 from orionis.console.args.argument import Argument
 from orionis.console.commands.make._base import MakeStubCommand
@@ -11,17 +13,25 @@ _RESOURCE_ACTIONS: tuple[tuple[str, str], ...] = (
     ("update", "Update the specified resource"),
     ("destroy", "Remove the specified resource"),
 )
+"""Resource actions definitions used by ``http_controller``."""
 
 class MakeHttpController(MakeStubCommand):
     """Generate an invokable or resource HTTP controller."""
 
     timestamps: bool = False
+    """Timestamps flag used by ``MakeHttpController``."""
     signature: str = "make:http-controller"
+    """Signature identifier: ``make:http-controller``."""
     description: str = "Creates an invokable or resource HTTP controller."
+    """Description identifier: ``Creates an invokable or resource HTTP controller.``."""
     template_name: str = "http_controller"
+    """Template name identifier: ``http_controller``."""
     path_key: str = "app_http_controllers"
+    """Path key identifier: ``app_http_controllers``."""
     success_label: str = "HTTP controller"
+    """Success label identifier: ``HTTP controller``."""
     postfix: str | None = "Controller"
+    """Postfix identifier: ``Controller``."""
     arguments: ClassVar[list[Argument]] = [
         Argument(
             name_or_flags="name",
@@ -42,6 +52,7 @@ class MakeHttpController(MakeStubCommand):
             action="store_true",
         ),
     ]
+    """Command-line argument declarations accepted by this command."""
 
     def getControllerMethods(self) -> str:
         """

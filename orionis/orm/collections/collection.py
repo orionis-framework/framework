@@ -1,3 +1,5 @@
+"""Define collection for orm collections."""
+
 from orionis.support.types.collection import Collection
 
 # The ORM returns query results using the framework-wide Collection type;

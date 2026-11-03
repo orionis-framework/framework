@@ -1,8 +1,12 @@
+"""Define the contract for std class implementations."""
+
 from abc import ABC, abstractmethod
 
 class IStdClass(ABC):
+    """Define the contract for std class implementations."""
 
     __slots__ = ()
+    """Declare that this class introduces no additional instance slots."""
 
     @abstractmethod
     def toDict(self) -> dict:
@@ -32,7 +36,7 @@ class IStdClass(ABC):
 
         Raises
         ------
-        OrionisStdValueException
+        ValueError
             If an attribute name is reserved or conflicts with a class method.
         """
 

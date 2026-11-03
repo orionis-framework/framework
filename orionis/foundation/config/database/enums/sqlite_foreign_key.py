@@ -1,3 +1,5 @@
+"""Represent the state of foreign key constraints in SQLite."""
+
 from enum import Enum
 
 class SQLiteForeignKey(Enum):
@@ -13,7 +15,7 @@ class SQLiteForeignKey(Enum):
 
     Returns
     -------
-    SQLiteForeignKey
+    orionis.foundation.config.database.SQLiteForeignKey
         The enumeration member representing the foreign key state.
     """
 

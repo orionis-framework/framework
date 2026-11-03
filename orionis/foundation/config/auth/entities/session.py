@@ -1,3 +1,5 @@
+"""Represent the configuration of session based authentication."""
+
 from dataclasses import dataclass, field
 from orionis.environment import Env
 from orionis.support.entities.base import BaseEntity

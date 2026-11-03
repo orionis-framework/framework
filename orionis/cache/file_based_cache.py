@@ -1,3 +1,5 @@
+"""Persist named cache entries in a filesystem directory."""
+
 from __future__ import annotations
 import hashlib
 from pathlib import Path
@@ -6,6 +8,7 @@ import time
 from orionis.cache.serializer import Serializer
 
 class FileBasedCache:
+    """Persist named cache entries in a filesystem directory."""
 
     __slots__ = (
         "__file",
@@ -17,8 +20,10 @@ class FileBasedCache:
         "__path",
         "__sourceshashcache",
     )
+    """Declare the instance attribute slots reserved by this class."""
 
     CACHE_VERSION = 1
+    """Cache version value used by ``FileBasedCache``."""
 
     def __init__(
         self,
@@ -32,13 +37,13 @@ class FileBasedCache:
 
         Parameters
         ----------
-        path : Path
+        path : pathlib.Path
             Directory path where the cache file will be stored.
         filename : str
             Name of the cache file.
-        monitored_dirs : list[Path] or None, optional
+        monitored_dirs : list[pathlib.Path] or None, optional
             List of directories to monitor for changes.
-        monitored_files : list[Path] or None, optional
+        monitored_files : list[pathlib.Path] or None, optional
             List of files to monitor for changes.
 
         Returns
@@ -51,21 +56,29 @@ class FileBasedCache:
             raise TypeError(error_msg)
 
         self.__path = path
+        """Directory path where the cache file will be stored."""
         self.__file = path / filename
+        """Resolved filesystem path of the persistent cache entry."""
         # Store the resolved cache file path for later access.
         self.__file_resolved = self.__file.resolve()
+        """Store the resolved cache file path for later access."""
 
         # Directories and files to monitor for cache invalidation
         self.__monitored_dirs = monitored_dirs or []
+        """List of directories to monitor for changes."""
         self.__monitored_files = monitored_files or []
+        """List of files to monitor for changes."""
 
         # Ensure the cache directory exists
         self.__path.mkdir(parents=True, exist_ok=True)
 
         # Internal cache for source hash and timing
         self.__sourceshashcache: str | None = None
+        """Internal cache for source hash and timing."""
         self.__lasthashcheck: float = 0.0
+        """Lasthashcheck value used by ``FileBasedCache``."""
         self.__hashInterval: float = 0.5
+        """Hash interval value used by ``FileBasedCache``."""
 
     def get(self) -> dict | None:
         """
@@ -169,11 +182,11 @@ class FileBasedCache:
 
         Parameters
         ----------
-        cache_file : Path
+        cache_file : pathlib.Path
             Resolved cache file path to exclude from collection.
         seen : set[str]
             Set of already collected POSIX paths used for deduplication.
-        result : list[tuple[str, Path]]
+        result : list[tuple[str, pathlib.Path]]
             Output list updated in place with ``(posix_path, resolved_path)`` tuples.
 
         Returns
@@ -203,11 +216,11 @@ class FileBasedCache:
 
         Parameters
         ----------
-        cache_file : Path
+        cache_file : pathlib.Path
             Resolved cache file path to exclude from collection.
         seen : set[str]
             Set of already collected POSIX paths used for deduplication.
-        result : list[tuple[str, Path]]
+        result : list[tuple[str, pathlib.Path]]
             Output list updated in place with ``(posix_path, resolved_path)`` tuples.
 
         Returns
@@ -234,10 +247,9 @@ class FileBasedCache:
 
         Returns
         -------
-        list[tuple[str, Path]]
+        list[tuple[str, pathlib.Path]]
             Sorted ``(posix_path, resolved_path)`` pairs for unique monitored
             files.
-
         """
         cache_file = self.__file_resolved
         seen: set[str] = set()

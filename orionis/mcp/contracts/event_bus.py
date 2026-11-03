@@ -1,3 +1,5 @@
+"""Publish server changes without retaining identities or requests."""
+
 from abc import ABC, abstractmethod
 from typing import TYPE_CHECKING
 
@@ -9,6 +11,7 @@ class IMcpEventBus(ABC):
     """Publish server changes without retaining identities or requests."""
 
     __slots__ = ()
+    """Declare that this class introduces no additional instance slots."""
 
     @abstractmethod
     def listen(
@@ -23,12 +26,12 @@ class IMcpEventBus(ABC):
         ----------
         server : type
             Value supplied for ``server``.
-        filters : SubscriptionFilter
+        filters : orionis.mcp.protocol.requests.SubscriptionFilter
             Value supplied for ``filters``.
 
         Returns
         -------
-        AsyncIterator[tuple[str, str | None]]
+        collections.abc.AsyncIterator[tuple[str, str | None]]
             Result of the operation described above.
         """
 

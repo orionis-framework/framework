@@ -1,3 +1,5 @@
+"""Register connection manager services in the application container."""
+
 from __future__ import annotations
 from orionis.container.providers.service_provider import ServiceProvider
 from orionis.database.contracts.connection_manager import IConnectionManager
@@ -5,6 +7,7 @@ from orionis.database.contracts.connection_manager import IConnectionManager
 class ConnectionManagerProvider(ServiceProvider):
 
     # ruff: noqa: PLC0415
+    """Register connection manager services in the application container."""
 
     def register(self) -> None:
         """

@@ -1,3 +1,5 @@
+"""Build independent chains; every fluent call returns a new operation."""
+
 from collections.abc import Awaitable, Callable, Mapping, Sequence
 from dataclasses import replace
 from inspect import isawaitable, iscoroutine
@@ -27,6 +29,7 @@ class PendingMail:
     """
 
     __slots__ = ("_delivery", "_mailable_builder", "_options")
+    """Declare the instance attribute slots reserved by this class."""
 
     def __init__(
         self,
@@ -39,11 +42,11 @@ class PendingMail:
 
         Parameters
         ----------
-        delivery : Delivery
+        delivery : orionis.mail.types.Delivery
             Shared preparation and transport entry point.
-        options : MailOptions | None
+        options : orionis.mail.entities.MailOptions | None
             Immutable explicit options for this chain.
-        mailable_builder : Callable[[type[Mailable]], Awaitable[Mailable]] | None
+        mailable_builder
             Optional application-container resolver for Mailable classes.
 
         Returns
@@ -52,8 +55,11 @@ class PendingMail:
             Initialize a chain without performing I/O.
         """
         self._delivery = delivery
+        """Shared preparation and transport entry point."""
         self._mailable_builder = mailable_builder
+        """Optional application-container resolver for Mailable classes."""
         self._options = options if options is not None else MailOptions()
+        """Immutable explicit options for this chain."""
 
     def mailer(self, name: str) -> PendingMail:
         """
@@ -66,12 +72,12 @@ class PendingMail:
 
         Returns
         -------
-        PendingMail
+        orionis.mail.PendingMail
             A new operation; resolution remains deferred until sending.
 
         Raises
         ------
-        MailConfigurationException
+        orionis.mail.exceptions.MailConfigurationException
             If the name is not a non-empty string.
         """
         if not isinstance(name, str) or not name.strip():
@@ -93,14 +99,14 @@ class PendingMail:
 
         Parameters
         ----------
-        address : str | Address
+        address : str | orionis.mail.entities.Address
             Exactly one sender mailbox.
         name : str | None
             Optional name for a string mailbox only.
 
         Returns
         -------
-        PendingMail
+        orionis.mail.PendingMail
             Derived operation with an explicit From and transport sender.
         """
         return self._derive(Message(self._options).fromAddress(address, name))
@@ -111,14 +117,14 @@ class PendingMail:
 
         Parameters
         ----------
-        addresses : Recipients
+        addresses : orionis.mail.types.Recipients
             One mailbox or a list/tuple of mailboxes.
         name : str | None
             Optional name for a single string mailbox only.
 
         Returns
         -------
-        PendingMail
+        orionis.mail.PendingMail
             Derived operation retaining previous recipients.
         """
         return self._derive(Message(self._options).to(addresses, name))
@@ -129,14 +135,14 @@ class PendingMail:
 
         Parameters
         ----------
-        addresses : Recipients
+        addresses : orionis.mail.types.Recipients
             One mailbox or a list/tuple of mailboxes.
         name : str | None
             Optional name for a single string mailbox only.
 
         Returns
         -------
-        PendingMail
+        orionis.mail.PendingMail
             Derived operation retaining previous recipients.
         """
         return self._derive(Message(self._options).cc(addresses, name))
@@ -147,14 +153,14 @@ class PendingMail:
 
         Parameters
         ----------
-        addresses : Recipients
+        addresses : orionis.mail.types.Recipients
             One mailbox or a list/tuple of mailboxes.
         name : str | None
             Optional name for a single string mailbox only.
 
         Returns
         -------
-        PendingMail
+        orionis.mail.PendingMail
             Derived operation retaining previous recipients.
         """
         return self._derive(Message(self._options).bcc(addresses, name))
@@ -165,14 +171,14 @@ class PendingMail:
 
         Parameters
         ----------
-        addresses : Recipients
+        addresses : orionis.mail.types.Recipients
             One mailbox or a list/tuple of mailboxes.
         name : str | None
             Optional name for a single string mailbox only.
 
         Returns
         -------
-        PendingMail
+        orionis.mail.PendingMail
             Derived operation retaining previous reply destinations.
         """
         return self._derive(Message(self._options).replyTo(addresses, name))
@@ -188,7 +194,7 @@ class PendingMail:
 
         Returns
         -------
-        PendingMail
+        orionis.mail.PendingMail
             Derived operation with an explicit subject.
         """
         return self._derive(Message(self._options).subject(value))
@@ -199,12 +205,12 @@ class PendingMail:
 
         Parameters
         ----------
-        attachment : Attachment
+        attachment : orionis.mail.entities.Attachment
             Storage attachment declaration.
 
         Returns
         -------
-        PendingMail
+        orionis.mail.PendingMail
             Derived operation retaining previous attachments.
         """
         return self._derive(Message(self._options).attach(attachment))
@@ -244,22 +250,22 @@ class PendingMail:
         ----------
         value : Mailable | type[Mailable] | str | Content
             Declaration, resolvable Mailable class, or HTML view identifier.
-        data : Mapping[str, object] | None
+        data : collections.abc.Mapping[str, object] | None
             View context, accepted only when value is a string.
-        callback : MessageCallback | None
+        callback : orionis.mail.types.MessageCallback | None
             Operation-local configurator, not accepted for a Mailable.
 
         Returns
         -------
-        MailResult
+        orionis.mail.entities.MailResult
             Confirmed SMTP acceptance or file publication result.
 
         Raises
         ------
-        MailCompositionException
+        orionis.mail.exceptions.MailCompositionException
             If arguments, container resolution, declarations, callbacks, or
             content are invalid.
-        MailException
+        orionis.mail.exceptions.MailException
             If preparation or transport fails.
         """
         if isinstance(value, Mailable) or _is_mailable_class(value):
@@ -322,19 +328,19 @@ class PendingMail:
         ----------
         text : str
             Literal text, never rendered as a template.
-        callback : MessageCallback | None
+        callback : orionis.mail.types.MessageCallback | None
             Optional sync or async operation-local configurator.
 
         Returns
         -------
-        MailResult
+        orionis.mail.entities.MailResult
             Transport outcome.
 
         Raises
         ------
-        MailCompositionException
+        orionis.mail.exceptions.MailCompositionException
             If the body, callback, or resulting envelope is invalid.
-        MailException
+        orionis.mail.exceptions.MailException
             If preparation or transport fails.
         """
         return await self._sendDirect(Content(text=text), callback)
@@ -351,19 +357,19 @@ class PendingMail:
         ----------
         html : str
             Literal HTML, never rendered as a template.
-        callback : MessageCallback | None
+        callback : orionis.mail.types.MessageCallback | None
             Optional sync or async operation-local configurator.
 
         Returns
         -------
-        MailResult
+        orionis.mail.entities.MailResult
             Transport outcome.
 
         Raises
         ------
-        MailCompositionException
+        orionis.mail.exceptions.MailCompositionException
             If the body, callback, or resulting envelope is invalid.
-        MailException
+        orionis.mail.exceptions.MailException
             If preparation or transport fails.
         """
         return await self._sendDirect(Content(html=html), callback)
@@ -374,12 +380,12 @@ class PendingMail:
 
         Parameters
         ----------
-        message : Message
+        message : orionis.mail.Message
             Temporary synchronous configurator.
 
         Returns
         -------
-        PendingMail
+        orionis.mail.PendingMail
             Independent operation with no render or transport side effects.
         """
         return PendingMail(
@@ -394,19 +400,19 @@ class PendingMail:
 
         Parameters
         ----------
-        content : Content
+        content : orionis.mail.entities.Content
             Already validated content declaration.
         callback : object
             Configurator invoked exactly once and awaited when needed.
 
         Returns
         -------
-        MailResult
+        orionis.mail.entities.MailResult
             Shared delivery outcome.
 
         Raises
         ------
-        MailCompositionException
+        orionis.mail.exceptions.MailCompositionException
             If a callback fails or returns anything other than None or itself.
         """
         message = Message(self._options)
@@ -427,17 +433,17 @@ class PendingMail:
 
         Parameters
         ----------
-        mailable : Mailable
+        mailable : orionis.mail.Mailable
             Reusable synchronous declaration, never modified by sending.
 
         Returns
         -------
-        MailResult
+        orionis.mail.entities.MailResult
             Shared delivery outcome.
 
         Raises
         ------
-        MailCompositionException
+        orionis.mail.exceptions.MailCompositionException
             If declaration methods fail or do not return their contracted types.
         """
         try:
@@ -470,7 +476,7 @@ async def _run_callback(callback: object, message: Message) -> None:
     ----------
     callback : object
         Function, method, or callable object supplied by the caller.
-    message : Message
+    message : orionis.mail.Message
         Configurator exclusive to the current operation.
 
     Returns
@@ -480,7 +486,7 @@ async def _run_callback(callback: object, message: Message) -> None:
 
     Raises
     ------
-    MailCompositionException
+    orionis.mail.exceptions.MailCompositionException
         If the callback is not callable, fails, or returns another value.
     """
     if not callable(callback):
@@ -524,7 +530,7 @@ def _assert_declaration(value: object, expected: type, label: str) -> None:
 
     Raises
     ------
-    MailCompositionException
+    orionis.mail.exceptions.MailCompositionException
         If the declared value violates its synchronous contract.
     """
     if isinstance(value, expected):

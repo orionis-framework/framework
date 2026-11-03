@@ -1,3 +1,5 @@
+"""Encrypt and decrypt application payloads using configured cipher keys."""
+
 import base64
 import os
 from typing import ClassVar
@@ -31,24 +33,35 @@ class _Payload(msgspec.Struct, gc=False):
     cipher: str
 
 _PAYLOAD_DECODER = _msjson.Decoder(_Payload)
+"""Payload decoder used by ``encrypter``."""
 
 class Encrypter(IEncrypter):
 
     # ruff: noqa: TC001
 
     # Use __slots__ to prevent dynamic attribute creation and reduce memory usage
+    """Encrypt and decrypt application payloads using configured cipher keys."""
+
     __slots__ = ("_aesgcm", "_is_gcm", "cipher", "key")
+    """Use __slots__ to prevent dynamic attribute creation and reduce memory usage."""
 
     # Constants for key sizes, IV sizes, tag sizes, and supported ciphers
     AES_128_KEY_SIZE = 16
+    """Constants for key sizes, IV sizes, tag sizes, and supported ciphers."""
     AES_256_KEY_SIZE = 32
+    """Aes 256 key size value used by ``Encrypter``."""
     CBC_IV_SIZE = 16
+    """Cbc iv size value used by ``Encrypter``."""
     GCM_IV_SIZE = 12
+    """Gcm iv size value used by ``Encrypter``."""
     GCM_TAG_SIZE = 16
+    """Gcm tag size value used by ``Encrypter``."""
     PKCS7_BLOCK_SIZE = 16
+    """Pkcs7 block size value used by ``Encrypter``."""
     SUPPORTED_CIPHERS: ClassVar[frozenset[str]] = frozenset(
         cipher.value for cipher in OrionisCipher
     )
+    """Supported ciphers used by ``Encrypter``."""
 
     def __init__(
         self,
@@ -59,7 +72,7 @@ class Encrypter(IEncrypter):
 
         Parameters
         ----------
-        app : IApplication
+        app : orionis.IApplication
             The application instance providing configuration access.
 
         Returns
@@ -74,7 +87,9 @@ class Encrypter(IEncrypter):
         """
         # Get configuration values from application
         self.key: bytes = app.config("app.key")
+        """Get configuration values from application."""
         self.cipher: str = app.config("app.cipher")
+        """Cipher produced by ``app.config``."""
 
         # Validate cipher is supported
         if self.cipher not in self.SUPPORTED_CIPHERS:
@@ -95,8 +110,10 @@ class Encrypter(IEncrypter):
 
         # Select the cipher mode configured for this instance.
         self._is_gcm: bool = "GCM" in self.cipher
+        """Select the cipher mode configured for this instance."""
         # Prepare the authenticated cipher for GCM payloads.
         self._aesgcm: AESGCM | None = AESGCM(self.key) if self._is_gcm else None
+        """Prepare the authenticated cipher for GCM payloads."""
 
     def encrypt(
         self,
@@ -207,7 +224,7 @@ class Encrypter(IEncrypter):
 
         Returns
         -------
-        _Payload
+        orionis.encrypter.encrypter._Payload
             Decoded and schema-validated payload struct.
 
         Raises
@@ -231,7 +248,7 @@ class Encrypter(IEncrypter):
 
         Parameters
         ----------
-        data : _Payload
+        data : orionis.encrypter.encrypter._Payload
             Parsed payload struct (fields already validated by msgspec).
 
         Returns

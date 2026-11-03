@@ -1,3 +1,5 @@
+"""Inspect Python modules and the definitions they contain."""
+
 from __future__ import annotations
 import importlib
 import inspect
@@ -9,6 +11,7 @@ from orionis.introspection.modules.contracts.reflection import (
 )
 
 class ReflectionModule(IReflectionModule):
+    """Inspect Python modules and the definitions they contain."""
 
     def __init__(self, module: str) -> None:
         """
@@ -22,7 +25,7 @@ class ReflectionModule(IReflectionModule):
         Raises
         ------
         TypeError
-            If `module` is not a non-empty string or cannot be imported.
+            If ``module`` is not a non-empty string or cannot be imported.
 
         Returns
         -------
@@ -35,11 +38,13 @@ class ReflectionModule(IReflectionModule):
             raise TypeError(error_msg)
         try:
             self.__module = importlib.import_module(module)
+            """Name of the module to import and reflect upon."""
         except Exception as e:
             error_msg = f"Failed to import module '{module}': {e}"
             raise TypeError(error_msg) from e
         # Initialize memory cache for storing values
         self.__memory_cache: dict = {}
+        """Initialize memory cache for storing values."""
 
     def __getitem__(self, key: str) -> object | None:
         """
@@ -173,8 +178,8 @@ class ReflectionModule(IReflectionModule):
         Raises
         ------
         ValueError
-            If `cls` is not a class type, if `class_name` is not a valid identifier,
-            or if `class_name` is a reserved keyword.
+            If ``cls`` is not a class type, if ``class_name`` is not a valid identifier,
+            or if ``class_name`` is a reserved keyword.
 
         Returns
         -------
@@ -210,7 +215,7 @@ class ReflectionModule(IReflectionModule):
         Raises
         ------
         ValueError
-            If `class_name` is not a valid identifier or if the class does not exist.
+            If ``class_name`` is not a valid identifier or if the class does not exist.
 
         Returns
         -------
@@ -232,10 +237,6 @@ class ReflectionModule(IReflectionModule):
     def getClasses(self) -> dict:
         """
         Return a dictionary of classes defined in the module.
-
-        Parameters
-        ----------
-        None
 
         Returns
         -------
@@ -260,10 +261,6 @@ class ReflectionModule(IReflectionModule):
         """
         Return a dictionary of public classes defined in the module.
 
-        Parameters
-        ----------
-        None
-
         Returns
         -------
         dict
@@ -284,10 +281,6 @@ class ReflectionModule(IReflectionModule):
     def getProtectedClasses(self) -> dict:
         """
         Return a dictionary of protected classes defined in the module.
-
-        Parameters
-        ----------
-        None
 
         Returns
         -------
@@ -310,10 +303,6 @@ class ReflectionModule(IReflectionModule):
     def getPrivateClasses(self) -> dict:
         """
         Return a dictionary of private classes defined in the module.
-
-        Parameters
-        ----------
-        None
 
         Returns
         -------
@@ -357,10 +346,6 @@ class ReflectionModule(IReflectionModule):
         """
         Retrieve constants defined in the module.
 
-        Parameters
-        ----------
-        None
-
         Returns
         -------
         dict
@@ -384,10 +369,6 @@ class ReflectionModule(IReflectionModule):
         """
         Retrieve public constants defined in the module.
 
-        Parameters
-        ----------
-        None
-
         Returns
         -------
         dict
@@ -408,10 +389,6 @@ class ReflectionModule(IReflectionModule):
     def getProtectedConstants(self) -> dict:
         """
         Return protected constants defined in the module.
-
-        Parameters
-        ----------
-        None
 
         Returns
         -------
@@ -435,10 +412,6 @@ class ReflectionModule(IReflectionModule):
         """
         Retrieve private constants defined in the module.
 
-        Parameters
-        ----------
-        None
-
         Returns
         -------
         dict
@@ -460,10 +433,6 @@ class ReflectionModule(IReflectionModule):
     def getFunctions(self) -> dict:
         """
         Return a dictionary of functions defined in the module.
-
-        Parameters
-        ----------
-        None
 
         Returns
         -------
@@ -489,10 +458,6 @@ class ReflectionModule(IReflectionModule):
         """
         Return a dictionary of public functions defined in the module.
 
-        Parameters
-        ----------
-        None
-
         Returns
         -------
         dict
@@ -513,10 +478,6 @@ class ReflectionModule(IReflectionModule):
     def getPublicSyncFunctions(self) -> dict:
         """
         Return a dictionary of public synchronous functions in the module.
-
-        Parameters
-        ----------
-        None
 
         Returns
         -------
@@ -540,10 +501,6 @@ class ReflectionModule(IReflectionModule):
         """
         Return a dictionary of public asynchronous functions in the module.
 
-        Parameters
-        ----------
-        None
-
         Returns
         -------
         dict
@@ -565,10 +522,6 @@ class ReflectionModule(IReflectionModule):
     def getProtectedFunctions(self) -> dict:
         """
         Return a dictionary of protected functions defined in the module.
-
-        Parameters
-        ----------
-        None
 
         Returns
         -------
@@ -592,10 +545,6 @@ class ReflectionModule(IReflectionModule):
         """
         Return protected synchronous functions defined in the module.
 
-        Parameters
-        ----------
-        None
-
         Returns
         -------
         dict
@@ -617,10 +566,6 @@ class ReflectionModule(IReflectionModule):
     def getProtectedAsyncFunctions(self) -> dict:
         """
         Return protected asynchronous functions defined in the module.
-
-        Parameters
-        ----------
-        None
 
         Returns
         -------
@@ -644,10 +589,6 @@ class ReflectionModule(IReflectionModule):
         """
         Return private functions defined in the module.
 
-        Parameters
-        ----------
-        None
-
         Returns
         -------
         dict
@@ -669,10 +610,6 @@ class ReflectionModule(IReflectionModule):
     def getPrivateSyncFunctions(self) -> dict:
         """
         Return private synchronous functions defined in the module.
-
-        Parameters
-        ----------
-        None
 
         Returns
         -------
@@ -793,10 +730,6 @@ class ReflectionModule(IReflectionModule):
 
         Removes all cached entries stored in the reflection instance. Forces
         fresh computation on subsequent method calls.
-
-        Parameters
-        ----------
-        None
 
         Returns
         -------

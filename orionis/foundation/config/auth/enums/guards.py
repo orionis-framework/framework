@@ -1,3 +1,5 @@
+"""Enumerate the authentication guards shipped with the framework."""
+
 from enum import StrEnum
 
 class Guards(StrEnum):
@@ -13,7 +15,7 @@ class Guards(StrEnum):
 
     Returns
     -------
-    Guards
+    orionis.foundation.config.auth.enums.Guards
         An enumeration member representing an authentication guard.
     """
 

@@ -1,3 +1,5 @@
+"""Register reactor services in the application container."""
+
 from __future__ import annotations
 from orionis.console.core.contracts.reactor import IReactor
 from orionis.console.core.reactor import Reactor
@@ -5,12 +7,13 @@ from orionis.container.providers.service_provider import ServiceProvider
 from orionis.support.facades.reactor import Reactor as ReactorFacade
 
 class ReactorProvider(ServiceProvider):
+    """Register reactor services in the application container."""
 
     def register(self) -> None:
         """
         Register the reactor management service in the application container.
 
-        Bind the `IReactor` interface as a singleton to the `Reactor`
+        Bind the ``IReactor`` interface as a singleton to the ``Reactor``
         implementation in the application's dependency injection container.
 
         Returns

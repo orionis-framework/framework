@@ -1,3 +1,5 @@
+"""Ensure a string ends with one of the given suffixes."""
+
 from orionis.schemas.rule import Rule
 
 class EndsWith(Rule):
@@ -6,9 +8,12 @@ class EndsWith(Rule):
     # ruff: noqa: ARG002
 
     __slots__ = ("_suffixes",)
+    """Declare the instance attribute slots reserved by this class."""
 
     __message__ = "Value must end with one of the allowed suffixes."
+    """Error text for message: ``Value must end with one of the allowed suffixes.``."""
     __code__ = "ends_with"
+    """Code identifier: ``ends_with``."""
 
     def __init__(self, *suffixes: str, message: str | None = None) -> None:
         """
@@ -36,6 +41,7 @@ class EndsWith(Rule):
             error_msg = "EndsWith requires at least one suffix."
             raise ValueError(error_msg)
         self._suffixes: tuple[str, ...] = suffixes
+        """Suffixes the value may end with. At least one is required."""
 
     async def enforce(
         self,

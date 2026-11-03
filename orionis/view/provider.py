@@ -1,3 +1,5 @@
+"""Register and boot the view system into the application container."""
+
 from typing import Any
 from orionis.container.providers.service_provider import ServiceProvider
 from orionis.view.contracts.engine import IViewEngine
@@ -50,14 +52,17 @@ class ViewServiceProvider(ServiceProvider):
 
     Registration phase
     ------------------
-    Binds :class:`IViewEnvironment` → :class:`ViewEnvironment`,
-    :class:`IViewEngine` → :class:`Jinja2Engine`, and
-    :class:`IViewFactory` → :class:`ViewFactory` as singletons.
+    Binds :class:`orionis.view.contracts.environment.IViewEnvironment` →
+    :class:`orionis.view.environment.ViewEnvironment`,
+    :class:`orionis.view.contracts.engine.IViewEngine` →
+    :class:`orionis.view.engine.Jinja2Engine`, and
+    :class:`orionis.view.contracts.factory.IViewFactory` →
+    :class:`orionis.view.factory.ViewFactory` as singletons.
 
     Boot phase
     ----------
     Registers template globals, filters, and extensions with the
-    :class:`ViewEnvironment` singleton, then pins the :class:`View`
+    :class:`orionis.view.environment.ViewEnvironment` singleton, then pins the ``View``
     facade for zero-resolution access on the hot path.
     """
 
@@ -68,6 +73,7 @@ class ViewServiceProvider(ServiceProvider):
         Returns
         -------
         None
+            Bind view services as singletons in the application container.
         """
         # Environment wraps and owns the Jinja2 Environment instance
         self.app.singleton(IViewEnvironment, ViewEnvironment)
@@ -85,6 +91,7 @@ class ViewServiceProvider(ServiceProvider):
         Returns
         -------
         None
+            Register globals, filters, and extensions; then pin the facade.
         """
         # Resolve the shared environment singleton
         _env: IViewEnvironment = await self.app.make(IViewEnvironment)

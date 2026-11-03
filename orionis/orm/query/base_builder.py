@@ -1,3 +1,5 @@
+"""Engine shared by every Orionis query builder."""
+
 from __future__ import annotations
 import copy
 from typing import TYPE_CHECKING, Any, Self
@@ -34,22 +36,27 @@ if TYPE_CHECKING:
 
 # Number of arguments in the (operator, value) where form.
 _WHERE_WITH_OPERATOR: int = 2
+"""Number of arguments in the (operator, value) where form."""
 
 # Number of values required by a BETWEEN boundary pair.
 _BETWEEN_BOUNDS: int = 2
+"""Number of values required by a BETWEEN boundary pair."""
 
 # Default page size used by pagination.
 _DEFAULT_PER_PAGE: int = 15
+"""Default page size used by pagination."""
 
 # Column name assumed by latest()/oldest() without a declared timestamp.
 _DEFAULT_TIMESTAMP_COLUMN: str = "created_at"
+"""Column name assumed by latest()/oldest() without a declared timestamp."""
 
 
 class QueryBuilderBase:
     """
     Engine shared by every Orionis query builder.
 
-    It owns the mutable :class:`SelectPlan` and the whole fluent clause
+    It owns the mutable :class:`orionis.orm.query.SelectPlan` and the whole fluent
+    clause
     surface (projection, conditions, joins, grouping, ordering, paging,
     locking, unions) plus the terminals that do not depend on how rows
     are represented. Model-bound and model-less builders both derive
@@ -57,13 +64,15 @@ class QueryBuilderBase:
     implementation of the query language and one single SQL pipeline.
 
     Subclasses only provide how the query reaches the database
-    (:meth:`_connection`), how rows are represented (``get``/``first``),
+    (:meth:`orionis.orm.query.base_builder.QueryBuilderBase._connection`), how rows are
+    represented (``get``/``first``),
     and how values are serialized before being written.
     """
 
     # ruff: noqa: ANN401
 
     __slots__ = ("_connection_name", "_plan")
+    """Declare the instance attribute slots reserved by this class."""
 
     def __init__(self: Self, table: TableDefinition | None = None) -> None:
         """
@@ -71,7 +80,7 @@ class QueryBuilderBase:
 
         Parameters
         ----------
-        table : TableDefinition or None, optional
+        table : orionis.orm.schema.TableDefinition or None, optional
             Query target, or an empty definition until a table is selected.
 
         Returns
@@ -80,9 +89,11 @@ class QueryBuilderBase:
             This method does not return a value.
         """
         self._connection_name: str | None = None
+        """Name of the configured database connection to use."""
         self._plan = SelectPlan(
             table=table if table is not None else TableDefinition(name=""),
         )
+        """Plan produced by ``SelectPlan``."""
 
     # ── Plan access ─────────────────────────────────────────────────────────
 
@@ -96,7 +107,7 @@ class QueryBuilderBase:
 
         Returns
         -------
-        SelectPlan
+        orionis.orm.query.SelectPlan
             Live plan owned by this builder.
         """
         return self._plan
@@ -121,11 +132,11 @@ class QueryBuilderBase:
 
         Raises
         ------
-        InvalidQueryException
+        orionis.orm.exceptions.InvalidQueryException
             If no target table has been selected.
-        QueryException
+        orionis.database.QueryException
             If the query or a literal value cannot be compiled.
-        MissingDatabaseDependencyException
+        orionis.database.MissingDatabaseDependencyException
             If the selected connection's SQL dialect is unavailable.
         """
         if not self._plan.table.name:
@@ -146,7 +157,7 @@ class QueryBuilderBase:
 
         Returns
         -------
-        QueryBuilderBase
+        orionis.orm.query.base_builder.QueryBuilderBase
             Detached copy sharing the same target and connection.
         """
         duplicate = self._shallowCopy()
@@ -159,12 +170,12 @@ class QueryBuilderBase:
 
         Parameters
         ----------
-        plan : SelectPlan
+        plan : orionis.orm.query.SelectPlan
             Plan the builder continues refining.
 
         Returns
         -------
-        QueryBuilderBase
+        orionis.orm.query.base_builder.QueryBuilderBase
             The same builder, enabling fluent chaining.
         """
         self._plan = plan
@@ -176,7 +187,7 @@ class QueryBuilderBase:
 
         Returns
         -------
-        QueryBuilderBase
+        orionis.orm.query.base_builder.QueryBuilderBase
             Instance of the same class carrying the same bound state,
             including the slots declared by subclasses.
         """
@@ -193,7 +204,7 @@ class QueryBuilderBase:
 
         Returns
         -------
-        QueryBuilderBase
+        orionis.orm.query.base_builder.QueryBuilderBase
             The same builder, enabling fluent chaining.
         """
         self._connection_name = name
@@ -207,7 +218,7 @@ class QueryBuilderBase:
 
         Returns
         -------
-        IConnection
+        orionis.database.contracts.IConnection
             Connection used to execute the compiled statements.
 
         Raises
@@ -224,7 +235,7 @@ class QueryBuilderBase:
 
         Returns
         -------
-        QueryBuilderBase
+        orionis.orm.query.base_builder.QueryBuilderBase
             Fresh builder targeting the same table and connection.
         """
         # Imported here because the model-less builder derives from this
@@ -281,7 +292,10 @@ class QueryBuilderBase:
 
     def _defaultTimestampColumn(self: Self) -> str:
         """
-        Return the column :meth:`latest` and :meth:`oldest` default to.
+        Return the default timestamp column.
+
+        Used by :meth:`orionis.orm.query.base_builder.QueryBuilderBase.latest` and
+        :meth:`orionis.orm.query.base_builder.QueryBuilderBase.oldest`.
 
         Returns
         -------
@@ -317,7 +331,7 @@ class QueryBuilderBase:
 
         Returns
         -------
-        QueryBuilderBase
+        orionis.orm.query.base_builder.QueryBuilderBase
             The same builder, enabling fluent chaining.
         """
         self._plan.columns = columns
@@ -334,7 +348,7 @@ class QueryBuilderBase:
 
         Returns
         -------
-        QueryBuilderBase
+        orionis.orm.query.base_builder.QueryBuilderBase
             The same builder, enabling fluent chaining.
         """
         self._plan.columns = (*self._plan.columns, *columns)
@@ -362,7 +376,7 @@ class QueryBuilderBase:
 
         Returns
         -------
-        QueryBuilderBase
+        orionis.orm.query.base_builder.QueryBuilderBase
             The same builder, enabling fluent chaining.
         """
         expression = RawExpression(
@@ -379,7 +393,7 @@ class QueryBuilderBase:
 
         Parameters
         ----------
-        query : Any
+        query : typing.Any
             Callable receiving a fresh builder, another builder, or a
             ready-made select plan.
         alias : str
@@ -387,7 +401,7 @@ class QueryBuilderBase:
 
         Returns
         -------
-        QueryBuilderBase
+        orionis.orm.query.base_builder.QueryBuilderBase
             The same builder, enabling fluent chaining.
         """
         column = SubQueryColumn(plan=self._resolvePlan(query), alias=alias)
@@ -400,7 +414,7 @@ class QueryBuilderBase:
 
         Returns
         -------
-        QueryBuilderBase
+        orionis.orm.query.base_builder.QueryBuilderBase
             The same builder, enabling fluent chaining.
         """
         self._plan.distinct = True
@@ -418,19 +432,19 @@ class QueryBuilderBase:
 
         Parameters
         ----------
-        column : Any
+        column : typing.Any
             Column name, mapping of equality pairs, or grouping callable.
-        *args : Any
+        *args : typing.Any
             Either the bound value, or an operator followed by a value.
 
         Returns
         -------
-        QueryBuilderBase
+        orionis.orm.query.base_builder.QueryBuilderBase
             The same builder, enabling fluent chaining.
 
         Raises
         ------
-        InvalidQueryException
+        orionis.orm.exceptions.InvalidQueryException
             If the arguments do not match a supported form.
         """
         self._addWhere(self._plan.wheres, column, args, boolean="and")
@@ -442,19 +456,19 @@ class QueryBuilderBase:
 
         Parameters
         ----------
-        column : Any
+        column : typing.Any
             Column name, mapping of equality pairs, or grouping callable.
-        *args : Any
+        *args : typing.Any
             Either the bound value, or an operator followed by a value.
 
         Returns
         -------
-        QueryBuilderBase
+        orionis.orm.query.base_builder.QueryBuilderBase
             The same builder, enabling fluent chaining.
 
         Raises
         ------
-        InvalidQueryException
+        orionis.orm.exceptions.InvalidQueryException
             If the arguments do not match a supported form.
         """
         self._addWhere(self._plan.wheres, column, args, boolean="or")
@@ -468,12 +482,12 @@ class QueryBuilderBase:
         ----------
         column : str
             Column name to filter by.
-        values : Any
+        values : typing.Any
             Accepted values, or a subquery producing them.
 
         Returns
         -------
-        QueryBuilderBase
+        orionis.orm.query.base_builder.QueryBuilderBase
             The same builder, enabling fluent chaining.
         """
         return self._addMembership(column, values, WhereType.IN, "and")
@@ -486,12 +500,12 @@ class QueryBuilderBase:
         ----------
         column : str
             Column name to filter by.
-        values : Any
+        values : typing.Any
             Accepted values, or a subquery producing them.
 
         Returns
         -------
-        QueryBuilderBase
+        orionis.orm.query.base_builder.QueryBuilderBase
             The same builder, enabling fluent chaining.
         """
         return self._addMembership(column, values, WhereType.IN, "or")
@@ -504,12 +518,12 @@ class QueryBuilderBase:
         ----------
         column : str
             Column name to filter by.
-        values : Any
+        values : typing.Any
             Rejected values, or a subquery producing them.
 
         Returns
         -------
-        QueryBuilderBase
+        orionis.orm.query.base_builder.QueryBuilderBase
             The same builder, enabling fluent chaining.
         """
         return self._addMembership(column, values, WhereType.NOT_IN, "and")
@@ -522,12 +536,12 @@ class QueryBuilderBase:
         ----------
         column : str
             Column name to filter by.
-        values : Any
+        values : typing.Any
             Rejected values, or a subquery producing them.
 
         Returns
         -------
-        QueryBuilderBase
+        orionis.orm.query.base_builder.QueryBuilderBase
             The same builder, enabling fluent chaining.
         """
         return self._addMembership(column, values, WhereType.NOT_IN, "or")
@@ -543,7 +557,7 @@ class QueryBuilderBase:
 
         Returns
         -------
-        QueryBuilderBase
+        orionis.orm.query.base_builder.QueryBuilderBase
             The same builder, enabling fluent chaining.
         """
         return self._addTyped(column, WhereType.NULL, None, "and")
@@ -559,7 +573,7 @@ class QueryBuilderBase:
 
         Returns
         -------
-        QueryBuilderBase
+        orionis.orm.query.base_builder.QueryBuilderBase
             The same builder, enabling fluent chaining.
         """
         return self._addTyped(column, WhereType.NULL, None, "or")
@@ -575,7 +589,7 @@ class QueryBuilderBase:
 
         Returns
         -------
-        QueryBuilderBase
+        orionis.orm.query.base_builder.QueryBuilderBase
             The same builder, enabling fluent chaining.
         """
         return self._addTyped(column, WhereType.NOT_NULL, None, "and")
@@ -591,7 +605,7 @@ class QueryBuilderBase:
 
         Returns
         -------
-        QueryBuilderBase
+        orionis.orm.query.base_builder.QueryBuilderBase
             The same builder, enabling fluent chaining.
         """
         return self._addTyped(column, WhereType.NOT_NULL, None, "or")
@@ -604,17 +618,17 @@ class QueryBuilderBase:
         ----------
         column : str
             Column name to filter by.
-        bounds : Iterable
+        bounds : collections.abc.Iterable
             Exactly two values: the lower and upper boundaries.
 
         Returns
         -------
-        QueryBuilderBase
+        orionis.orm.query.base_builder.QueryBuilderBase
             The same builder, enabling fluent chaining.
 
         Raises
         ------
-        InvalidQueryException
+        orionis.orm.exceptions.InvalidQueryException
             If the boundaries are not exactly two values.
         """
         return self._addTyped(
@@ -632,17 +646,17 @@ class QueryBuilderBase:
         ----------
         column : str
             Column name to filter by.
-        bounds : Iterable
+        bounds : collections.abc.Iterable
             Exactly two values: the lower and upper boundaries.
 
         Returns
         -------
-        QueryBuilderBase
+        orionis.orm.query.base_builder.QueryBuilderBase
             The same builder, enabling fluent chaining.
 
         Raises
         ------
-        InvalidQueryException
+        orionis.orm.exceptions.InvalidQueryException
             If the boundaries are not exactly two values.
         """
         return self._addTyped(
@@ -665,7 +679,7 @@ class QueryBuilderBase:
 
         Returns
         -------
-        QueryBuilderBase
+        orionis.orm.query.base_builder.QueryBuilderBase
             The same builder, enabling fluent chaining.
         """
         return self._addTyped(column, WhereType.LIKE, pattern, "and")
@@ -683,7 +697,7 @@ class QueryBuilderBase:
 
         Returns
         -------
-        QueryBuilderBase
+        orionis.orm.query.base_builder.QueryBuilderBase
             The same builder, enabling fluent chaining.
         """
         return self._addTyped(column, WhereType.NOT_LIKE, pattern, "and")
@@ -701,7 +715,7 @@ class QueryBuilderBase:
 
         Returns
         -------
-        QueryBuilderBase
+        orionis.orm.query.base_builder.QueryBuilderBase
             The same builder, enabling fluent chaining.
         """
         return self._addTyped(column, WhereType.ILIKE, pattern, "and")
@@ -719,7 +733,7 @@ class QueryBuilderBase:
 
         Returns
         -------
-        QueryBuilderBase
+        orionis.orm.query.base_builder.QueryBuilderBase
             The same builder, enabling fluent chaining.
         """
         return self._addTyped(column, WhereType.NOT_ILIKE, pattern, "and")
@@ -737,7 +751,7 @@ class QueryBuilderBase:
 
         Returns
         -------
-        QueryBuilderBase
+        orionis.orm.query.base_builder.QueryBuilderBase
             The same builder, enabling fluent chaining.
         """
         return self._addTyped(column, WhereType.STARTS_WITH, value, "and")
@@ -755,7 +769,7 @@ class QueryBuilderBase:
 
         Returns
         -------
-        QueryBuilderBase
+        orionis.orm.query.base_builder.QueryBuilderBase
             The same builder, enabling fluent chaining.
         """
         return self._addTyped(column, WhereType.ENDS_WITH, value, "and")
@@ -773,7 +787,7 @@ class QueryBuilderBase:
 
         Returns
         -------
-        QueryBuilderBase
+        orionis.orm.query.base_builder.QueryBuilderBase
             The same builder, enabling fluent chaining.
         """
         return self._addTyped(column, WhereType.CONTAINS, value, "and")
@@ -794,7 +808,7 @@ class QueryBuilderBase:
 
         Returns
         -------
-        QueryBuilderBase
+        orionis.orm.query.base_builder.QueryBuilderBase
             The same builder, enabling fluent chaining.
         """
         return self._addTyped(column, WhereType.REGEXP, pattern, "and")
@@ -814,12 +828,12 @@ class QueryBuilderBase:
 
         Returns
         -------
-        QueryBuilderBase
+        orionis.orm.query.base_builder.QueryBuilderBase
             The same builder, enabling fluent chaining.
 
         Raises
         ------
-        InvalidQueryException
+        orionis.orm.exceptions.InvalidQueryException
             If the operator is not supported.
         """
         return self._addColumnComparison(first, operator, second, "and")
@@ -839,12 +853,12 @@ class QueryBuilderBase:
 
         Returns
         -------
-        QueryBuilderBase
+        orionis.orm.query.base_builder.QueryBuilderBase
             The same builder, enabling fluent chaining.
 
         Raises
         ------
-        InvalidQueryException
+        orionis.orm.exceptions.InvalidQueryException
             If the operator is not supported.
         """
         return self._addColumnComparison(first, operator, second, "or")
@@ -870,7 +884,7 @@ class QueryBuilderBase:
 
         Returns
         -------
-        QueryBuilderBase
+        orionis.orm.query.base_builder.QueryBuilderBase
             The same builder, enabling fluent chaining.
         """
         return self._addRaw(self._plan.wheres, sql, bindings, "and")
@@ -892,7 +906,7 @@ class QueryBuilderBase:
 
         Returns
         -------
-        QueryBuilderBase
+        orionis.orm.query.base_builder.QueryBuilderBase
             The same builder, enabling fluent chaining.
         """
         return self._addRaw(self._plan.wheres, sql, bindings, "or")
@@ -903,13 +917,13 @@ class QueryBuilderBase:
 
         Parameters
         ----------
-        query : Any
+        query : typing.Any
             Callable receiving a fresh builder, another builder, or a
             ready-made select plan.
 
         Returns
         -------
-        QueryBuilderBase
+        orionis.orm.query.base_builder.QueryBuilderBase
             The same builder, enabling fluent chaining.
         """
         return self._addExists(query, WhereType.EXISTS, "and")
@@ -920,13 +934,13 @@ class QueryBuilderBase:
 
         Parameters
         ----------
-        query : Any
+        query : typing.Any
             Callable receiving a fresh builder, another builder, or a
             ready-made select plan.
 
         Returns
         -------
-        QueryBuilderBase
+        orionis.orm.query.base_builder.QueryBuilderBase
             The same builder, enabling fluent chaining.
         """
         return self._addExists(query, WhereType.EXISTS, "or")
@@ -937,13 +951,13 @@ class QueryBuilderBase:
 
         Parameters
         ----------
-        query : Any
+        query : typing.Any
             Callable receiving a fresh builder, another builder, or a
             ready-made select plan.
 
         Returns
         -------
-        QueryBuilderBase
+        orionis.orm.query.base_builder.QueryBuilderBase
             The same builder, enabling fluent chaining.
         """
         return self._addExists(query, WhereType.NOT_EXISTS, "and")
@@ -954,13 +968,13 @@ class QueryBuilderBase:
 
         Parameters
         ----------
-        query : Any
+        query : typing.Any
             Callable receiving a fresh builder, another builder, or a
             ready-made select plan.
 
         Returns
         -------
-        QueryBuilderBase
+        orionis.orm.query.base_builder.QueryBuilderBase
             The same builder, enabling fluent chaining.
         """
         return self._addExists(query, WhereType.NOT_EXISTS, "or")
@@ -981,12 +995,13 @@ class QueryBuilderBase:
 
         Parameters
         ----------
-        table : str or TableDefinition
+        table : str or orionis.orm.schema.TableDefinition
             Table name to join, or its full definition when it declares
             a real schema (for instance ``Model.__meta__.table``).
-        first : Any, optional
+        first : typing.Any, optional
             Left-hand column of the ON condition, or a callable
-            receiving a :class:`JoinClause` to declare several ones.
+            receiving a :class:`orionis.orm.query.join_clause.JoinClause` to declare
+            several ones.
         operator : str or None, optional
             Comparison operator relating both sides.
         second : str or None, optional
@@ -996,12 +1011,12 @@ class QueryBuilderBase:
 
         Returns
         -------
-        QueryBuilderBase
+        orionis.orm.query.base_builder.QueryBuilderBase
             The same builder, enabling fluent chaining.
 
         Raises
         ------
-        InvalidQueryException
+        orionis.orm.exceptions.InvalidQueryException
             If the ON condition is incomplete.
         """
         return self._addJoin(
@@ -1025,11 +1040,11 @@ class QueryBuilderBase:
 
         Parameters
         ----------
-        table : str or TableDefinition
+        table : str or orionis.orm.schema.TableDefinition
             Table name to join, or its full definition.
-        first : Any, optional
+        first : typing.Any, optional
             Left-hand column of the ON condition, or a callable
-            receiving a :class:`JoinClause`.
+            receiving a :class:`orionis.orm.query.join_clause.JoinClause`.
         operator : str or None, optional
             Comparison operator relating both sides.
         second : str or None, optional
@@ -1039,12 +1054,12 @@ class QueryBuilderBase:
 
         Returns
         -------
-        QueryBuilderBase
+        orionis.orm.query.base_builder.QueryBuilderBase
             The same builder, enabling fluent chaining.
 
         Raises
         ------
-        InvalidQueryException
+        orionis.orm.exceptions.InvalidQueryException
             If the ON condition is incomplete.
         """
         return self._addJoin(
@@ -1068,11 +1083,11 @@ class QueryBuilderBase:
 
         Parameters
         ----------
-        table : str or TableDefinition
+        table : str or orionis.orm.schema.TableDefinition
             Table name to join, or its full definition.
-        first : Any, optional
+        first : typing.Any, optional
             Left-hand column of the ON condition, or a callable
-            receiving a :class:`JoinClause`.
+            receiving a :class:`orionis.orm.query.join_clause.JoinClause`.
         operator : str or None, optional
             Comparison operator relating both sides.
         second : str or None, optional
@@ -1082,12 +1097,12 @@ class QueryBuilderBase:
 
         Returns
         -------
-        QueryBuilderBase
+        orionis.orm.query.base_builder.QueryBuilderBase
             The same builder, enabling fluent chaining.
 
         Raises
         ------
-        InvalidQueryException
+        orionis.orm.exceptions.InvalidQueryException
             If the ON condition is incomplete.
         """
         return self._addJoin(
@@ -1111,11 +1126,11 @@ class QueryBuilderBase:
 
         Parameters
         ----------
-        table : str or TableDefinition
+        table : str or orionis.orm.schema.TableDefinition
             Table name to join, or its full definition.
-        first : Any, optional
+        first : typing.Any, optional
             Left-hand column of the ON condition, or a callable
-            receiving a :class:`JoinClause`.
+            receiving a :class:`orionis.orm.query.join_clause.JoinClause`.
         operator : str or None, optional
             Comparison operator relating both sides.
         second : str or None, optional
@@ -1125,12 +1140,12 @@ class QueryBuilderBase:
 
         Returns
         -------
-        QueryBuilderBase
+        orionis.orm.query.base_builder.QueryBuilderBase
             The same builder, enabling fluent chaining.
 
         Raises
         ------
-        InvalidQueryException
+        orionis.orm.exceptions.InvalidQueryException
             If the ON condition is incomplete.
         """
         return self._addJoin(
@@ -1151,14 +1166,14 @@ class QueryBuilderBase:
 
         Parameters
         ----------
-        table : str or TableDefinition
+        table : str or orionis.orm.schema.TableDefinition
             Table name to join, or its full definition.
         alias : str or None, optional
             Alias the joined table is referred to by inside the query.
 
         Returns
         -------
-        QueryBuilderBase
+        orionis.orm.query.base_builder.QueryBuilderBase
             The same builder, enabling fluent chaining.
         """
         self._plan.joins.append(
@@ -1183,14 +1198,14 @@ class QueryBuilderBase:
 
         Parameters
         ----------
-        query : Any
+        query : typing.Any
             Callable receiving a fresh builder, another builder, or a
             ready-made select plan.
         alias : str
             Name the derived table is referred to by.
-        first : Any, optional
+        first : typing.Any, optional
             Left-hand column of the ON condition, or a callable
-            receiving a :class:`JoinClause`.
+            receiving a :class:`orionis.orm.query.join_clause.JoinClause`.
         operator : str or None, optional
             Comparison operator relating both sides.
         second : str or None, optional
@@ -1198,12 +1213,12 @@ class QueryBuilderBase:
 
         Returns
         -------
-        QueryBuilderBase
+        orionis.orm.query.base_builder.QueryBuilderBase
             The same builder, enabling fluent chaining.
 
         Raises
         ------
-        InvalidQueryException
+        orionis.orm.exceptions.InvalidQueryException
             If the ON condition is incomplete.
         """
         return self._addJoin(
@@ -1226,14 +1241,14 @@ class QueryBuilderBase:
 
         Parameters
         ----------
-        query : Any
+        query : typing.Any
             Callable receiving a fresh builder, another builder, or a
             ready-made select plan.
         alias : str
             Name the derived table is referred to by.
-        first : Any, optional
+        first : typing.Any, optional
             Left-hand column of the ON condition, or a callable
-            receiving a :class:`JoinClause`.
+            receiving a :class:`orionis.orm.query.join_clause.JoinClause`.
         operator : str or None, optional
             Comparison operator relating both sides.
         second : str or None, optional
@@ -1241,12 +1256,12 @@ class QueryBuilderBase:
 
         Returns
         -------
-        QueryBuilderBase
+        orionis.orm.query.base_builder.QueryBuilderBase
             The same builder, enabling fluent chaining.
 
         Raises
         ------
-        InvalidQueryException
+        orionis.orm.exceptions.InvalidQueryException
             If the ON condition is incomplete.
         """
         return self._addJoin(
@@ -1269,14 +1284,14 @@ class QueryBuilderBase:
 
         Parameters
         ----------
-        query : Any
+        query : typing.Any
             Callable receiving a fresh builder, another builder, or a
             ready-made select plan.
         alias : str
             Name the derived table is referred to by.
-        first : Any, optional
+        first : typing.Any, optional
             Left-hand column of the ON condition, or a callable
-            receiving a :class:`JoinClause`.
+            receiving a :class:`orionis.orm.query.join_clause.JoinClause`.
         operator : str or None, optional
             Comparison operator relating both sides.
         second : str or None, optional
@@ -1284,12 +1299,12 @@ class QueryBuilderBase:
 
         Returns
         -------
-        QueryBuilderBase
+        orionis.orm.query.base_builder.QueryBuilderBase
             The same builder, enabling fluent chaining.
 
         Raises
         ------
-        InvalidQueryException
+        orionis.orm.exceptions.InvalidQueryException
             If the ON condition is incomplete.
         """
         return self._addJoin(
@@ -1314,12 +1329,12 @@ class QueryBuilderBase:
 
         Returns
         -------
-        QueryBuilderBase
+        orionis.orm.query.base_builder.QueryBuilderBase
             The same builder, enabling fluent chaining.
 
         Raises
         ------
-        InvalidQueryException
+        orionis.orm.exceptions.InvalidQueryException
             If the direction is not ``"asc"`` or ``"desc"``.
         """
         normalized = str(direction).strip().lower()
@@ -1342,7 +1357,7 @@ class QueryBuilderBase:
 
         Returns
         -------
-        QueryBuilderBase
+        orionis.orm.query.base_builder.QueryBuilderBase
             The same builder, enabling fluent chaining.
         """
         return self.orderBy(column or self._defaultTimestampColumn(), "desc")
@@ -1358,7 +1373,7 @@ class QueryBuilderBase:
 
         Returns
         -------
-        QueryBuilderBase
+        orionis.orm.query.base_builder.QueryBuilderBase
             The same builder, enabling fluent chaining.
         """
         return self.orderBy(column or self._defaultTimestampColumn(), "asc")
@@ -1374,7 +1389,7 @@ class QueryBuilderBase:
 
         Returns
         -------
-        QueryBuilderBase
+        orionis.orm.query.base_builder.QueryBuilderBase
             The same builder, enabling fluent chaining.
         """
         self._plan.groups.extend(columns)
@@ -1386,19 +1401,19 @@ class QueryBuilderBase:
 
         Parameters
         ----------
-        column : Any
+        column : typing.Any
             Column name, mapping of equality pairs, or grouping callable.
-        *args : Any
+        *args : typing.Any
             Either the bound value, or an operator followed by a value.
 
         Returns
         -------
-        QueryBuilderBase
+        orionis.orm.query.base_builder.QueryBuilderBase
             The same builder, enabling fluent chaining.
 
         Raises
         ------
-        InvalidQueryException
+        orionis.orm.exceptions.InvalidQueryException
             If the arguments do not match a supported form.
         """
         self._addWhere(self._plan.havings, column, args, boolean="and")
@@ -1410,19 +1425,19 @@ class QueryBuilderBase:
 
         Parameters
         ----------
-        column : Any
+        column : typing.Any
             Column name, mapping of equality pairs, or grouping callable.
-        *args : Any
+        *args : typing.Any
             Either the bound value, or an operator followed by a value.
 
         Returns
         -------
-        QueryBuilderBase
+        orionis.orm.query.base_builder.QueryBuilderBase
             The same builder, enabling fluent chaining.
 
         Raises
         ------
-        InvalidQueryException
+        orionis.orm.exceptions.InvalidQueryException
             If the arguments do not match a supported form.
         """
         self._addWhere(self._plan.havings, column, args, boolean="or")
@@ -1445,7 +1460,7 @@ class QueryBuilderBase:
 
         Returns
         -------
-        QueryBuilderBase
+        orionis.orm.query.base_builder.QueryBuilderBase
             The same builder, enabling fluent chaining.
         """
         return self._addRaw(self._plan.havings, sql, bindings, "and")
@@ -1461,12 +1476,12 @@ class QueryBuilderBase:
 
         Returns
         -------
-        QueryBuilderBase
+        orionis.orm.query.base_builder.QueryBuilderBase
             The same builder, enabling fluent chaining.
 
         Raises
         ------
-        InvalidQueryException
+        orionis.orm.exceptions.InvalidQueryException
             If the value is not a nonnegative integer, excluding booleans.
         """
         if not isinstance(value, int) or isinstance(value, bool) or value < 0:
@@ -1486,12 +1501,12 @@ class QueryBuilderBase:
 
         Returns
         -------
-        QueryBuilderBase
+        orionis.orm.query.base_builder.QueryBuilderBase
             The same builder, enabling fluent chaining.
 
         Raises
         ------
-        InvalidQueryException
+        orionis.orm.exceptions.InvalidQueryException
             If the value is not a nonnegative integer, excluding booleans.
         """
         if not isinstance(value, int) or isinstance(value, bool) or value < 0:
@@ -1502,7 +1517,9 @@ class QueryBuilderBase:
 
     def take(self: Self, value: int) -> Self:
         """
-        Limit the number of rows returned; alias of :meth:`limit`.
+        Limit the number of rows returned.
+
+        Alias of :meth:`orionis.orm.query.base_builder.QueryBuilderBase.limit`.
 
         Parameters
         ----------
@@ -1511,14 +1528,16 @@ class QueryBuilderBase:
 
         Returns
         -------
-        QueryBuilderBase
+        orionis.orm.query.base_builder.QueryBuilderBase
             The same builder, enabling fluent chaining.
         """
         return self.limit(value)
 
     def skip(self: Self, value: int) -> Self:
         """
-        Skip the given number of rows; alias of :meth:`offset`.
+        Skip the given number of rows.
+
+        Alias of :meth:`orionis.orm.query.base_builder.QueryBuilderBase.offset`.
 
         Parameters
         ----------
@@ -1527,7 +1546,7 @@ class QueryBuilderBase:
 
         Returns
         -------
-        QueryBuilderBase
+        orionis.orm.query.base_builder.QueryBuilderBase
             The same builder, enabling fluent chaining.
         """
         return self.offset(value)
@@ -1545,12 +1564,12 @@ class QueryBuilderBase:
 
         Returns
         -------
-        QueryBuilderBase
+        orionis.orm.query.base_builder.QueryBuilderBase
             The same builder, enabling fluent chaining.
 
         Raises
         ------
-        InvalidQueryException
+        orionis.orm.exceptions.InvalidQueryException
             If the page or page size are not positive integers.
         """
         if (
@@ -1575,7 +1594,7 @@ class QueryBuilderBase:
 
         Returns
         -------
-        QueryBuilderBase
+        orionis.orm.query.base_builder.QueryBuilderBase
             The same builder, enabling fluent chaining.
         """
         self._plan.lock = LockMode.UPDATE
@@ -1587,7 +1606,7 @@ class QueryBuilderBase:
 
         Returns
         -------
-        QueryBuilderBase
+        orionis.orm.query.base_builder.QueryBuilderBase
             The same builder, enabling fluent chaining.
         """
         self._plan.lock = LockMode.SHARE
@@ -1599,13 +1618,13 @@ class QueryBuilderBase:
 
         Parameters
         ----------
-        query : Any
+        query : typing.Any
             Callable receiving a fresh builder, another builder, or a
             ready-made select plan.
 
         Returns
         -------
-        QueryBuilderBase
+        orionis.orm.query.base_builder.QueryBuilderBase
             The same builder, enabling fluent chaining.
         """
         self._plan.unions.append(UnionClause(plan=self._resolvePlan(query)))
@@ -1617,13 +1636,13 @@ class QueryBuilderBase:
 
         Parameters
         ----------
-        query : Any
+        query : typing.Any
             Callable receiving a fresh builder, another builder, or a
             ready-made select plan.
 
         Returns
         -------
-        QueryBuilderBase
+        orionis.orm.query.base_builder.QueryBuilderBase
             The same builder, enabling fluent chaining.
         """
         self._plan.unions.append(
@@ -1689,7 +1708,7 @@ class QueryBuilderBase:
 
         Returns
         -------
-        Any
+        typing.Any
             Maximum value, or ``None`` without matches.
         """
         return await self._aggregate(AggregateFunction.MAX, column)
@@ -1705,7 +1724,7 @@ class QueryBuilderBase:
 
         Returns
         -------
-        Any
+        typing.Any
             Minimum value, or ``None`` without matches.
         """
         return await self._aggregate(AggregateFunction.MIN, column)
@@ -1738,7 +1757,7 @@ class QueryBuilderBase:
 
         Returns
         -------
-        Any
+        typing.Any
             Sum of the values, or ``0`` without matches.
         """
         value = await self._aggregate(AggregateFunction.SUM, column)
@@ -1760,12 +1779,12 @@ class QueryBuilderBase:
 
         Returns
         -------
-        InsertResult
+        orionis.database.entities.InsertResult
             Result carrying the generated key and affected row count.
 
         Raises
         ------
-        InvalidQueryException
+        orionis.orm.exceptions.InvalidQueryException
             If no values are provided.
         """
         rows = values if isinstance(values, list) else [values]
@@ -1779,7 +1798,8 @@ class QueryBuilderBase:
         return await self._connection().insert(plan)
 
     async def chunks(self: Self, size: int = 1000) -> AsyncIterator[Collection]:
-        """Read bounded result batches without changing the materializing get API.
+        """
+        Read bounded result batches without changing the materializing get API.
 
         Parameters
         ----------
@@ -1788,7 +1808,7 @@ class QueryBuilderBase:
 
         Yields
         ------
-        Collection
+        collections.abc.Collection
             Rows or models, with retrieved events and eager loading per batch.
             An explicit deterministic order is required. Use a surrounding
             transaction for a database-consistent snapshot during concurrent writes.
@@ -1836,7 +1856,7 @@ class QueryBuilderBase:
 
         Raises
         ------
-        InvalidQueryException
+        orionis.orm.exceptions.InvalidQueryException
             If no values are provided.
         """
         if not values:
@@ -1881,7 +1901,7 @@ class QueryBuilderBase:
 
         Parameters
         ----------
-        items : Collection
+        items : collections.abc.Collection
             Rows of the requested page.
         total : int
             Total number of rows matched by the query.
@@ -1892,7 +1912,7 @@ class QueryBuilderBase:
 
         Returns
         -------
-        Paginator
+        orionis.orm.collections.Paginator
             Length-aware page of results.
         """
         return Paginator(items=items, total=total, page=page, per_page=size)
@@ -1907,14 +1927,14 @@ class QueryBuilderBase:
 
         Parameters
         ----------
-        function : AggregateFunction
+        function : orionis.orm.query.AggregateFunction
             Aggregate function to apply.
         column : str
             Target column, or ``"*"`` for ``COUNT``.
 
         Returns
         -------
-        Any
+        typing.Any
             Aggregate scalar value.
         """
         self._beforeExecute()
@@ -1931,18 +1951,18 @@ class QueryBuilderBase:
 
         Parameters
         ----------
-        query : Any
+        query : typing.Any
             Callable receiving a fresh builder, another builder exposing
             ``toPlan()``, or a ready-made select plan.
 
         Returns
         -------
-        SelectPlan
+        orionis.orm.query.SelectPlan
             Plan describing the subquery.
 
         Raises
         ------
-        InvalidQueryException
+        orionis.orm.exceptions.InvalidQueryException
             If the argument is not a supported subquery source.
         """
         if isinstance(query, SelectPlan):
@@ -1960,16 +1980,16 @@ class QueryBuilderBase:
     @staticmethod
     def _resolveJoinTable(table: str | TableDefinition) -> TableDefinition:
         """
-        Normalize a join target into a :class:`TableDefinition`.
+        Normalize a join target into a :class:`orionis.orm.schema.TableDefinition`.
 
         Parameters
         ----------
-        table : str or TableDefinition
+        table : str or orionis.orm.schema.TableDefinition
             Table name to join, or its full definition.
 
         Returns
         -------
-        TableDefinition
+        orionis.orm.schema.TableDefinition
             A schemaless definition for a bare name, or ``table`` as is.
         """
         if isinstance(table, str):
@@ -1989,25 +2009,26 @@ class QueryBuilderBase:
 
         Parameters
         ----------
-        join_type : JoinType
+        join_type : orionis.orm.query.expressions.JoinType
             Kind of join to perform.
         table : str or TableDefinition or SelectPlan
             Joined source.
         on : tuple
             The ``(first, operator, second)`` ON condition, where
             ``first`` may instead be a callable receiving a
-            :class:`JoinClause` to declare several conditions.
+            :class:`orionis.orm.query.join_clause.JoinClause` to declare several
+            conditions.
         alias : str or None
             Alias the joined source is referred to by.
 
         Returns
         -------
-        QueryBuilderBase
+        orionis.orm.query.base_builder.QueryBuilderBase
             The same builder, enabling fluent chaining.
 
         Raises
         ------
-        InvalidQueryException
+        orionis.orm.exceptions.InvalidQueryException
             If the ON condition is incomplete.
         """
         first, operator, second = on
@@ -2053,16 +2074,16 @@ class QueryBuilderBase:
         ----------
         column : str
             Column name to filter by.
-        where_type : WhereType
+        where_type : orionis.orm.query.WhereType
             Kind of condition to append.
-        value : Any
+        value : typing.Any
             Bound value carried by the condition.
         boolean : str
             Logical connector with the previous clause.
 
         Returns
         -------
-        QueryBuilderBase
+        orionis.orm.query.base_builder.QueryBuilderBase
             The same builder, enabling fluent chaining.
         """
         self._plan.wheres.append(
@@ -2089,16 +2110,16 @@ class QueryBuilderBase:
         ----------
         column : str
             Column name to filter by.
-        values : Any
+        values : typing.Any
             Bound values, or a subquery producing them.
-        where_type : WhereType
+        where_type : orionis.orm.query.WhereType
             ``IN`` or ``NOT_IN``.
         boolean : str
             Logical connector with the previous clause.
 
         Returns
         -------
-        QueryBuilderBase
+        orionis.orm.query.base_builder.QueryBuilderBase
             The same builder, enabling fluent chaining.
         """
         resolved: Any
@@ -2138,12 +2159,12 @@ class QueryBuilderBase:
 
         Returns
         -------
-        QueryBuilderBase
+        orionis.orm.query.base_builder.QueryBuilderBase
             The same builder, enabling fluent chaining.
 
         Raises
         ------
-        InvalidQueryException
+        orionis.orm.exceptions.InvalidQueryException
             If the operator is not supported.
         """
         normalized = self._normalizeOperator(operator)
@@ -2170,7 +2191,7 @@ class QueryBuilderBase:
 
         Parameters
         ----------
-        target : list of WhereClause
+        target : list of orionis.orm.query.WhereClause
             Clause list receiving the condition.
         sql : str
             SQL fragment using named ``:param`` placeholders.
@@ -2181,7 +2202,7 @@ class QueryBuilderBase:
 
         Returns
         -------
-        QueryBuilderBase
+        orionis.orm.query.base_builder.QueryBuilderBase
             The same builder, enabling fluent chaining.
         """
         target.append(
@@ -2208,16 +2229,17 @@ class QueryBuilderBase:
 
         Parameters
         ----------
-        query : Any
-            Subquery source accepted by :meth:`_resolvePlan`.
-        where_type : WhereType
+        query : typing.Any
+            Subquery source accepted by
+            :meth:`orionis.orm.query.base_builder.QueryBuilderBase._resolvePlan`.
+        where_type : orionis.orm.query.WhereType
             ``EXISTS`` or ``NOT_EXISTS``.
         boolean : str
             Logical connector with the previous clause.
 
         Returns
         -------
-        QueryBuilderBase
+        orionis.orm.query.base_builder.QueryBuilderBase
             The same builder, enabling fluent chaining.
         """
         self._plan.wheres.append(
@@ -2246,9 +2268,9 @@ class QueryBuilderBase:
 
         Parameters
         ----------
-        target : list of WhereClause
+        target : list of orionis.orm.query.WhereClause
             Clause list receiving the condition.
-        column : Any
+        column : typing.Any
             Column name, mapping of equality pairs, or grouping callable.
         args : tuple
             Either the bound value, or an operator followed by a value.
@@ -2262,7 +2284,7 @@ class QueryBuilderBase:
 
         Raises
         ------
-        InvalidQueryException
+        orionis.orm.exceptions.InvalidQueryException
             If the arguments do not match a supported form.
         """
         # Grouping form: nested conditions wrapped in parentheses.
@@ -2314,12 +2336,12 @@ class QueryBuilderBase:
 
         Parameters
         ----------
-        callback : Callable
+        callback : collections.abc.Callable
             Callable receiving a nested builder bound to the same table.
 
         Returns
         -------
-        list of WhereClause
+        list of orionis.orm.query.WhereClause
             Conditions declared inside the group, in declaration order.
         """
         nested = self._newQuery()
@@ -2333,7 +2355,7 @@ class QueryBuilderBase:
 
         Parameters
         ----------
-        operator : Any
+        operator : typing.Any
             Operator supplied by the caller.
 
         Returns
@@ -2343,7 +2365,7 @@ class QueryBuilderBase:
 
         Raises
         ------
-        InvalidQueryException
+        orionis.orm.exceptions.InvalidQueryException
             If the operator is not supported.
         """
         normalized = str(operator).strip().lower()
@@ -2359,7 +2381,7 @@ class QueryBuilderBase:
 
         Parameters
         ----------
-        bounds : Iterable
+        bounds : collections.abc.Iterable
             Boundary values supplied by the caller.
 
         Returns
@@ -2369,7 +2391,7 @@ class QueryBuilderBase:
 
         Raises
         ------
-        InvalidQueryException
+        orionis.orm.exceptions.InvalidQueryException
             If the boundaries are not exactly two values.
         """
         values = tuple(bounds)
@@ -2385,7 +2407,7 @@ class QueryBuilderBase:
 
         Parameters
         ----------
-        values : Iterable
+        values : collections.abc.Iterable
             Values to materialize; collections are unwrapped.
 
         Returns

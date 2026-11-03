@@ -1,3 +1,5 @@
+"""Provide view filters operations through ``_filter_markdown``."""
+
 from __future__ import annotations
 from typing import Any
 
@@ -9,7 +11,7 @@ def _filter_markdown() -> Any:
 
     Returns
     -------
-    Any
+    typing.Any
         Callable rendering a Markdown string to HTML.
     """
     def render_markdown(value: Any) -> str:
@@ -18,7 +20,7 @@ def _filter_markdown() -> Any:
 
         Parameters
         ----------
-        value : Any
+        value : typing.Any
             Markdown-formatted string to convert.
 
         Returns

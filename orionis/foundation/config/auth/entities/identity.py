@@ -1,3 +1,5 @@
+"""Represent how the application identity is located and verified."""
+
 from dataclasses import dataclass, field
 from orionis.environment import Env
 from orionis.support.entities.base import BaseEntity

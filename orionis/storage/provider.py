@@ -1,3 +1,5 @@
+"""Service provider for the Orionis storage system."""
+
 from __future__ import annotations
 from orionis.container.providers.deferrable_provider import DeferrableProvider
 from orionis.container.providers.service_provider import ServiceProvider
@@ -8,8 +10,10 @@ class StorageProvider(ServiceProvider, DeferrableProvider):
     """
     Service provider for the Orionis storage system.
 
-    Binds :class:`IStorageManager` to :class:`StorageManager` as a
-    singleton and pins the :class:`Storage` facade so that attribute
+    Binds :class:`orionis.storage.contracts.IStorageManager` to
+    :class:`orionis.storage.StorageManager` as a
+    singleton and pins the :class:`orionis.support.facades.Storage` facade so that
+    attribute
     access is direct without container resolution overhead on every
     call.
     """
@@ -24,7 +28,7 @@ class StorageProvider(ServiceProvider, DeferrableProvider):
         Returns
         -------
         list[type]
-            List containing :class:`IStorageManager`.
+            List containing :class:`orionis.storage.contracts.IStorageManager`.
         """
         return [IStorageManager]
 

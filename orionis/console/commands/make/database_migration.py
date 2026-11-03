@@ -1,3 +1,5 @@
+"""Generate a migration named for its creation date and time."""
+
 import re
 from pathlib import Path
 from orionis.console.commands.make._base import MakeStubCommand
@@ -8,11 +10,17 @@ class MakeDatabaseMigration(MakeStubCommand):
     """Generate a migration named for its creation date and time."""
 
     timestamps: bool = False
+    """Timestamps flag used by ``MakeDatabaseMigration``."""
     signature: str = "make:database-migration"
+    """Signature identifier: ``make:database-migration``."""
     description: str = "Creates a timestamped database migration."
+    """Description identifier: ``Creates a timestamped database migration.``."""
     template_name: str = "database_migration"
+    """Template name identifier: ``database_migration``."""
     path_key: str = "database_migrations"
+    """Path key identifier: ``database_migrations``."""
     success_label: str = "Database migration"
+    """Success label identifier: ``Database migration``."""
 
     def createFiles(
         self,
@@ -24,14 +32,14 @@ class MakeDatabaseMigration(MakeStubCommand):
 
         Parameters
         ----------
-        app : IApplication
+        app : orionis.IApplication
             Application that resolves the migrations directory.
         name : str
             Migration name and optional nested directory path.
 
         Returns
         -------
-        tuple[tuple[str, str], ...]
+        tuple[tuple[str, str], ``...``]
             Label and application-relative path of the new migration.
 
         Raises

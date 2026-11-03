@@ -1,3 +1,5 @@
+"""Open request sessions and persist their response-side changes."""
+
 from typing import TYPE_CHECKING
 from orionis.console.debug.dumper import HttpDump
 from orionis.failure.contracts.catch import ICatch
@@ -13,16 +15,21 @@ if TYPE_CHECKING:
 
 # Only plain navigations are worth remembering as the "previous page".
 _NAVIGATION_METHODS: frozenset[str] = frozenset({"GET", "HEAD"})
+"""Only plain navigations are worth remembering as the "previous page"."""
 
 # Successful responses eligible to become the previous page.
 _SUCCESS_MIN: int = 200
+"""Successful responses eligible to become the previous page."""
 _SUCCESS_MAX: int = 300
+"""Success max value used by ``start_session``."""
 
 class StartSessionMiddleware(BaseMiddleware):
 
     # ruff: noqa: TC001, BLE001
+    """Open request sessions and persist their response-side changes."""
 
     __slots__ = ("_catch", "_manager", "_track_previous_url")
+    """Declare the instance attribute slots reserved by this class."""
 
     def __init__(self, manager: SessionManager, catch: ICatch) -> None:
         """
@@ -30,18 +37,22 @@ class StartSessionMiddleware(BaseMiddleware):
 
         Parameters
         ----------
-        manager : SessionManager
+        manager : orionis.session.manager.SessionManager
             Session manager used for the start / save cycle.
-        catch : ICatch
+        catch : orionis.failure.contracts.ICatch
             Framework exception handler producing responses before persistence.
 
         Returns
         -------
         None
+            Initialise the middleware with the given session manager.
         """
         self._manager = manager
+        """Session manager used for the start / save cycle."""
         self._catch = catch
+        """Framework exception handler producing responses before persistence."""
         self._track_previous_url = manager.tracksPreviousUrl
+        """Track previous url obtained from ``manager.tracksPreviousUrl``."""
 
     async def handle(
         self,
@@ -53,7 +64,7 @@ class StartSessionMiddleware(BaseMiddleware):
 
         Parameters
         ----------
-        request : Request
+        request : orionis.http.Request
             Incoming HTTP request.
         call_next : Callable[[], Awaitable[Response]]
             No-arg async callable that advances to the next middleware
@@ -61,7 +72,7 @@ class StartSessionMiddleware(BaseMiddleware):
 
         Returns
         -------
-        Response
+        orionis.http.Response
             The outgoing HTTP response, optionally augmented with a
             ``Set-Cookie`` header when the session was used.
         """
@@ -88,23 +99,24 @@ class StartSessionMiddleware(BaseMiddleware):
         request: Request,
         call_next: Callable[[], Awaitable[Response]],
     ) -> Response:
-        """Render failures while the session is still available for persistence.
+        """
+        Render failures while the session is still available for persistence.
 
         Parameters
         ----------
-        request : Request
+        request : orionis.http.Request
             Incoming request.
         call_next : Callable[[], Awaitable[Response]]
             Remaining middleware and controller pipeline.
 
         Returns
         -------
-        Response
+        orionis.http.Response
             Normal response or the framework's exception response.
 
         Raises
         ------
-        HttpDump
+        orionis.console.debug.dumper.HttpDump
             If a dump must propagate to the HTTP kernel after session cleanup.
         """
         try:
@@ -129,16 +141,17 @@ class StartSessionMiddleware(BaseMiddleware):
 
         Parameters
         ----------
-        request : Request
+        request : orionis.http.Request
             Incoming HTTP request.
-        response : Response
+        response : orionis.http.Response
             Outgoing HTTP response.
-        session : ISession
+        session : orionis.session.contracts.ISession
             Active session for this request.
 
         Returns
         -------
         None
+            Record the current URL as the page to redirect back to.
         """
         if request.method not in _NAVIGATION_METHODS:
             return

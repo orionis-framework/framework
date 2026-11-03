@@ -1,3 +1,5 @@
+"""Share concurrent schema bootstrap for queue and failed-job storage."""
+
 from __future__ import annotations
 from typing import TYPE_CHECKING, Self
 from orionis.database.exceptions import QueryException
@@ -12,10 +14,15 @@ class _DatabaseStorage:
     """Share concurrent schema bootstrap for queue and failed-job storage."""
 
     __slots__ = ("_ready",)
+    """Declare the instance attribute slots reserved by this class."""
     _connection: IConnection
+    """Configured connection used to store or dispatch the operation."""
     _definition: TableDefinition
+    """Original declaration from which runtime metadata was compiled."""
     _ready: bool
+    """Whether backend initialization has completed."""
     _ready_lock: asyncio.Lock
+    """Lock coordinating one-time initialization of the backend."""
 
     async def _ensureSchema(self: Self) -> None:
         """

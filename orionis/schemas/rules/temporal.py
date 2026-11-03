@@ -1,3 +1,8 @@
+"""Provide schemas rules operations.
+
+Includes ``to_datetime``, ``parse_moment``, ``resolve_moment``.
+"""
+
 from datetime import date, datetime
 from typing import TYPE_CHECKING
 from orionis.support.facades.datetime import DateTime
@@ -16,7 +21,7 @@ def to_datetime(value: object) -> pendulum.DateTime | None:
 
     Returns
     -------
-    pendulum.DateTime | None
+    ``pendulum.DateTime`` | None
         Coerced datetime, or ``None`` when the value is not a moment.
     """
     # ``pendulum.DateTime`` subclasses ``datetime``, so it is handled here too.
@@ -42,7 +47,7 @@ def parse_moment(text: str) -> pendulum.DateTime | None:
 
     Returns
     -------
-    pendulum.DateTime | None
+    ``pendulum.DateTime`` | None
         Parsed datetime, or ``None`` when the text is not a valid date.
     """
     keyword = text.strip().lower()
@@ -75,7 +80,7 @@ def resolve_moment(reference: object, instance: object) -> pendulum.DateTime | N
 
     Returns
     -------
-    pendulum.DateTime | None
+    ``pendulum.DateTime`` | None
         Resolved datetime, or ``None`` when the reference is not a moment.
     """
     if reference is None:

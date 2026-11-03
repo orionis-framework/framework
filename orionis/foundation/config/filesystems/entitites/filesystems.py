@@ -1,3 +1,5 @@
+"""Represent the filesystems configuration."""
+
 from __future__ import annotations
 from dataclasses import dataclass, field
 from orionis.environment import Env
@@ -7,6 +9,7 @@ from orionis.support.entities.base import BaseEntity
 
 # Define the supported filesystem disk names.
 _DISK_NAMES: frozenset[str] = frozenset(DiskName._member_names_)
+"""Define the supported filesystem disk names."""
 
 @dataclass(frozen=True, kw_only=True)
 class Filesystems(BaseEntity):
@@ -15,10 +18,10 @@ class Filesystems(BaseEntity):
 
     Attributes
     ----------
-    default : DiskName | str
+    default : orionis.foundation.config.filesystems.enums.DiskName | str
         The name of the default filesystem disk to use. Accepts a
         ``DiskName`` enum member or a plain string (e.g. ``'local'``).
-    disks : Disks | dict
+    disks : orionis.foundation.config.filesystems.Disks | dict
         A collection of available filesystem disks.
     """
 
@@ -47,7 +50,7 @@ class Filesystems(BaseEntity):
 
         Parameters
         ----------
-        self : Filesystems
+        self : orionis.foundation.config.filesystems.Filesystems
             The instance of the Filesystems class.
 
         Returns

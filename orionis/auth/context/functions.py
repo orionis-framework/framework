@@ -1,3 +1,8 @@
+"""Provide auth context operations.
+
+Includes ``authentication_lock``, ``current_auth_context``, ``bind_auth_context``.
+"""
+
 import asyncio
 from orionis.auth.context.context import GUEST_CONTEXT, AuthenticationContext
 from orionis.auth.contracts.context import IAuthenticationContext
@@ -6,6 +11,7 @@ from orionis.container.context.manager import ScopeManager
 from orionis.container.context.scope import ScopedContext
 
 _AUTH_LOCK = object()
+"""Sentinel distinguishing auth lock from ordinary values."""
 
 def authentication_lock() -> asyncio.Lock:
     """
@@ -18,7 +24,7 @@ def authentication_lock() -> asyncio.Lock:
 
     Raises
     ------
-    AuthException
+    orionis.auth.AuthException
         If the owning scope is not active.
     """
     scope = ScopedContext.getCurrentScope()
@@ -42,7 +48,7 @@ def current_auth_context() -> IAuthenticationContext:
 
     Returns
     -------
-    IAuthenticationContext
+    orionis.auth.contracts.IAuthenticationContext
         Context of the running request, or the shared guest context when
         no scope is active or nothing was bound yet.
     """
@@ -61,7 +67,7 @@ def bind_auth_context(context: IAuthenticationContext) -> None:
 
     Parameters
     ----------
-    context : IAuthenticationContext
+    context : orionis.auth.contracts.IAuthenticationContext
         Context resolved for the running request.
 
     Returns
@@ -71,7 +77,7 @@ def bind_auth_context(context: IAuthenticationContext) -> None:
 
     Raises
     ------
-    AuthException
+    orionis.auth.AuthException
         When no container scope is active, which means the caller is not
         inside a request and has nowhere to store the context.
     """

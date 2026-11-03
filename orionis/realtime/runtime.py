@@ -1,3 +1,5 @@
+"""Execute a precompiled Hub using the existing application and scopes."""
+
 import asyncio
 import logging
 import secrets
@@ -25,11 +27,13 @@ if TYPE_CHECKING:
     from orionis.realtime.metadata import RemoteMethod
 
 _LOGGER = logging.getLogger(__name__)
+"""Logger used by ``runtime``."""
 
 class HubRuntime:
     """Execute a precompiled Hub using the existing application and scopes."""
 
     __slots__ = ("_app", "_dispatch", "_hub", "_manager", "_protocol")
+    """Declare the instance attribute slots reserved by this class."""
 
     def __init__(
         self, app: IApplication, manager: IConnectionManager,
@@ -40,11 +44,11 @@ class HubRuntime:
 
         Parameters
         ----------
-        app : IApplication
+        app : orionis.IApplication
             Existing application and dependency container.
-        manager : IConnectionManager
+        manager : orionis.realtime.contracts.IConnectionManager
             Shared worker-local registry and targeting service.
-        hub : type[Hub]
+        hub : type[orionis.realtime.Hub]
             Application-declared Hub class.
         protocol : str, optional
             JSON or MessagePack selected by the route.
@@ -62,12 +66,17 @@ class HubRuntime:
             If remote names, aliases, protocol or message size are invalid.
         """
         self._app = app
+        """Existing application and dependency container."""
         self._manager = manager
+        """Shared worker-local registry and targeting service."""
         self._hub = hub
+        """Application-declared Hub class."""
         self._dispatch = compile_hub(hub)
+        """Dispatch produced by ``compile_hub``."""
         self._protocol = HubProtocol(
             protocol, max_message_size=manager.config.max_message_size,
         )
+        """JSON or MessagePack selected by the route."""
 
     def _bindContext(
         self, scope: ScopeManager, connection: RealtimeConnection,
@@ -77,9 +86,9 @@ class HubRuntime:
 
         Parameters
         ----------
-        scope : ScopeManager
+        scope : orionis.container.context.manager.ScopeManager
             Active connection or invocation scope.
-        connection : RealtimeConnection
+        connection : orionis.realtime.connection.RealtimeConnection
             Owner of network state.
 
         Returns
@@ -103,12 +112,12 @@ class HubRuntime:
 
         Parameters
         ----------
-        connection : RealtimeConnection
+        connection : orionis.realtime.connection.RealtimeConnection
             Connection used for lifecycle and client targeting.
 
         Returns
         -------
-        Hub
+        orionis.realtime.Hub
             Fresh instance with constructor injection resolved.
         """
         instance = await self._app.build(self._hub)
@@ -123,7 +132,7 @@ class HubRuntime:
 
         Parameters
         ----------
-        socket : WebSocket
+        socket : orionis.http.WebSocket
             Socket already registered in a kernel connection scope.
 
         Returns
@@ -198,7 +207,7 @@ class HubRuntime:
 
         Parameters
         ----------
-        connection : RealtimeConnection
+        connection : orionis.realtime.connection.RealtimeConnection
             Already unregistered connection.
         code : int
             Observed or locally selected closure code.
@@ -237,7 +246,7 @@ class HubRuntime:
 
         Parameters
         ----------
-        connection : RealtimeConnection
+        connection : orionis.realtime.connection.RealtimeConnection
             Ready connection with finite owned task registries.
 
         Returns
@@ -247,9 +256,9 @@ class HubRuntime:
 
         Raises
         ------
-        ProtocolError
+        orionis.realtime.errors.ProtocolError
             If decoding fails or an active invocation identifier is reused.
-        WebSocketDisconnected
+        orionis.http.WebSocketDisconnected
             If socket operations report a disconnected peer.
         asyncio.CancelledError
             If the connection reader is cancelled.
@@ -277,9 +286,9 @@ class HubRuntime:
 
         Parameters
         ----------
-        connection : RealtimeConnection
+        connection : orionis.realtime.connection.RealtimeConnection
             Connection owning the invocation ID namespace.
-        envelope : Invoke
+        envelope : orionis.realtime.protocol.Invoke
             Structurally validated client invocation.
 
         Returns
@@ -289,7 +298,7 @@ class HubRuntime:
 
         Raises
         ------
-        ProtocolError
+        orionis.realtime.errors.ProtocolError
             If an active invocation ID is reused.
         """
         if envelope.id in connection.active:
@@ -332,13 +341,13 @@ class HubRuntime:
 
         Parameters
         ----------
-        connection : RealtimeConnection
+        connection : orionis.realtime.connection.RealtimeConnection
             Owner of tasks and response delivery.
-        method : RemoteMethod
+        method : orionis.realtime.metadata.RemoteMethod
             Boot-compiled callable and binding metadata.
-        envelope : Invoke
+        envelope : orionis.realtime.protocol.Invoke
             Validated client values, never executable metadata.
-        auth : AuthenticationContext
+        auth : orionis.auth.context.AuthenticationContext
             Fresh authentication context with independent authorization cache.
 
         Returns
@@ -414,11 +423,11 @@ class HubRuntime:
 
         Parameters
         ----------
-        connection : RealtimeConnection
+        connection : orionis.realtime.connection.RealtimeConnection
             Connection providing natural send backpressure.
         invocation_id : str
             Correlation ID selected at admission.
-        source : AsyncIterable[object]
+        source : collections.abc.AsyncIterable[object]
             Application-produced asynchronous stream.
 
         Returns
@@ -457,7 +466,7 @@ class HubRuntime:
 
         Parameters
         ----------
-        connection : RealtimeConnection
+        connection : orionis.realtime.connection.RealtimeConnection
             Response destination.
         invocation_id : str
             Previously validated correlation ID.

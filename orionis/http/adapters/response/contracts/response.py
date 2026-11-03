@@ -1,3 +1,5 @@
+"""Write abstraction for sending an HTTP response over a protocol transport."""
+
 from __future__ import annotations
 from abc import ABC, abstractmethod
 from typing import TYPE_CHECKING
@@ -15,6 +17,7 @@ class ResponseAdapter(ABC):
     """
 
     __slots__ = ()
+    """Declare that this class introduces no additional instance slots."""
 
     @abstractmethod
     async def send(
@@ -29,10 +32,10 @@ class ResponseAdapter(ABC):
 
         Parameters
         ----------
-        adapter : TransportAdapter
+        adapter : orionis.http.adapters.request.contracts.transport.TransportAdapter
             Transport adapter containing request information used to inspect
             the HTTP method and headers.
-        response : Response
+        response : orionis.http.Response
             Response object to be serialised and sent back to the client.
         *args : object
             Protocol-specific positional arguments (e.g. ASGI ``send``

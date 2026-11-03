@@ -1,3 +1,5 @@
+"""Define the component answering authorization questions."""
+
 from abc import ABC, abstractmethod
 from typing import TYPE_CHECKING
 
@@ -16,6 +18,7 @@ class IAuthorizer(ABC):
     """
 
     __slots__ = ()
+    """Declare that this class introduces no additional instance slots."""
 
     @abstractmethod
     async def can(
@@ -28,7 +31,7 @@ class IAuthorizer(ABC):
 
         Parameters
         ----------
-        context : IAuthenticationContext
+        context : orionis.auth.contracts.IAuthenticationContext
             Authentication context of the current request.
         permission : str
             Permission name to evaluate.
@@ -50,9 +53,9 @@ class IAuthorizer(ABC):
 
         Parameters
         ----------
-        context : IAuthenticationContext
+        context : orionis.auth.contracts.IAuthenticationContext
             Authentication context of the current request.
-        permissions : Iterable[str]
+        permissions : collections.abc.Iterable[str]
             Permission names to evaluate.
 
         Returns
@@ -72,9 +75,9 @@ class IAuthorizer(ABC):
 
         Parameters
         ----------
-        context : IAuthenticationContext
+        context : orionis.auth.contracts.IAuthenticationContext
             Authentication context of the current request.
-        permissions : Iterable[str]
+        permissions : collections.abc.Iterable[str]
             Permission names to evaluate.
 
         Returns
@@ -94,7 +97,7 @@ class IAuthorizer(ABC):
 
         Parameters
         ----------
-        context : IAuthenticationContext
+        context : orionis.auth.contracts.IAuthenticationContext
             Authentication context of the current request.
         role : str
             Role name to evaluate.
@@ -117,7 +120,7 @@ class IAuthorizer(ABC):
 
         Parameters
         ----------
-        context : IAuthenticationContext
+        context : orionis.auth.contracts.IAuthenticationContext
             Authentication context of the current request.
         ability : str
             Ability declared by the policy of the resource.
@@ -132,7 +135,7 @@ class IAuthorizer(ABC):
 
         Raises
         ------
-        PolicyNotFoundException
+        orionis.auth.PolicyNotFoundException
             When no policy is registered for the resource type.
         """
 
@@ -145,7 +148,7 @@ class IAuthorizer(ABC):
         ----------
         resource : type
             Resource class protected by the policy.
-        policy : type[IPolicy]
+        policy : type[orionis.auth.contracts.IPolicy]
             Policy class implementing the abilities.
 
         Returns

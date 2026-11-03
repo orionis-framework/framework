@@ -1,3 +1,5 @@
+"""Provide foundation operations through ``get_core_exception_handler_mapping``."""
+
 from types import MappingProxyType
 
 def get_core_exception_handler_mapping() -> MappingProxyType:
@@ -6,7 +8,7 @@ def get_core_exception_handler_mapping() -> MappingProxyType:
 
     Returns
     -------
-    MappingProxyType
+    types.MappingProxyType
         An immutable mapping containing the 'module' and 'class' keys, referencing
         the default exception handler's module and class name.
     """
@@ -15,3 +17,4 @@ def get_core_exception_handler_mapping() -> MappingProxyType:
     )
 
 CORE_EXCEPTION_HANDLER: MappingProxyType = get_core_exception_handler_mapping()
+"""Core exception handler used by ``core_exception_handler``."""

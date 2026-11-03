@@ -1,3 +1,5 @@
+"""Expose independent composition and centrally configured mail delivery."""
+
 from __future__ import annotations
 from abc import ABC, abstractmethod
 from typing import TYPE_CHECKING, overload
@@ -23,6 +25,7 @@ class IMailManager(ABC):
     """
 
     __slots__ = ()
+    """Declare that this class introduces no additional instance slots."""
 
     @abstractmethod
     def mailer(self, name: str) -> PendingMail:
@@ -36,12 +39,12 @@ class IMailManager(ABC):
 
         Returns
         -------
-        PendingMail
+        orionis.mail.PendingMail
             A synchronous chain with lazy transport resolution.
 
         Raises
         ------
-        MailConfigurationException
+        orionis.mail.exceptions.MailConfigurationException
             If the name is not a non-empty string.
         """
 
@@ -56,19 +59,19 @@ class IMailManager(ABC):
 
         Parameters
         ----------
-        address : str | Address
+        address : str | orionis.mail.entities.Address
             From header and transport sender.
         name : str | None
             Optional display name, valid only with a string address.
 
         Returns
         -------
-        PendingMail
+        orionis.mail.PendingMail
             A synchronous chain without I/O.
 
         Raises
         ------
-        MailCompositionException
+        orionis.mail.exceptions.MailCompositionException
             If the mailbox is invalid or a name is supplied twice.
         """
 
@@ -79,19 +82,19 @@ class IMailManager(ABC):
 
         Parameters
         ----------
-        addresses : Recipients
+        addresses : orionis.mail.types.Recipients
             Single mailbox or list/tuple of mailboxes.
         name : str | None
             Display name for a single string mailbox only.
 
         Returns
         -------
-        PendingMail
+        orionis.mail.PendingMail
             A synchronous independent chain.
 
         Raises
         ------
-        MailCompositionException
+        orionis.mail.exceptions.MailCompositionException
             If a mailbox is invalid or combined with an ambiguous name.
         """
 
@@ -102,19 +105,19 @@ class IMailManager(ABC):
 
         Parameters
         ----------
-        addresses : Recipients
+        addresses : orionis.mail.types.Recipients
             Single mailbox or list/tuple of mailboxes.
         name : str | None
             Display name for a single string mailbox only.
 
         Returns
         -------
-        PendingMail
+        orionis.mail.PendingMail
             A synchronous independent chain.
 
         Raises
         ------
-        MailCompositionException
+        orionis.mail.exceptions.MailCompositionException
             If a mailbox is invalid or combined with an ambiguous name.
         """
 
@@ -125,19 +128,19 @@ class IMailManager(ABC):
 
         Parameters
         ----------
-        addresses : Recipients
+        addresses : orionis.mail.types.Recipients
             Single mailbox or list/tuple of mailboxes.
         name : str | None
             Display name for a single string mailbox only.
 
         Returns
         -------
-        PendingMail
+        orionis.mail.PendingMail
             A synchronous independent chain.
 
         Raises
         ------
-        MailCompositionException
+        orionis.mail.exceptions.MailCompositionException
             If a mailbox is invalid or combined with an ambiguous name.
         """
 
@@ -148,19 +151,19 @@ class IMailManager(ABC):
 
         Parameters
         ----------
-        addresses : Recipients
+        addresses : orionis.mail.types.Recipients
             Single mailbox or list/tuple of mailboxes.
         name : str | None
             Display name for a single string mailbox only.
 
         Returns
         -------
-        PendingMail
+        orionis.mail.PendingMail
             A synchronous independent chain.
 
         Raises
         ------
-        MailCompositionException
+        orionis.mail.exceptions.MailCompositionException
             If a mailbox is invalid or combined with an ambiguous name.
         """
 
@@ -176,12 +179,12 @@ class IMailManager(ABC):
 
         Returns
         -------
-        PendingMail
+        orionis.mail.PendingMail
             A synchronous independent chain.
 
         Raises
         ------
-        MailCompositionException
+        orionis.mail.exceptions.MailCompositionException
             If the subject is not text or contains control characters.
         """
 
@@ -192,17 +195,17 @@ class IMailManager(ABC):
 
         Parameters
         ----------
-        attachment : Attachment
+        attachment : orionis.mail.entities.Attachment
             Storage attachment declaration.
 
         Returns
         -------
-        PendingMail
+        orionis.mail.PendingMail
             A synchronous independent chain.
 
         Raises
         ------
-        MailCompositionException
+        orionis.mail.exceptions.MailCompositionException
             If the value is not an attachment declaration.
         """
 
@@ -243,21 +246,21 @@ class IMailManager(ABC):
 
         Parameters
         ----------
-        value : Mailable | type[Mailable] | str | Content
+        value
             A Mailable instance or class, an HTML view name, or explicit content.
-        data : Mapping[str, object] | None
+        data : collections.abc.Mapping[str, object] | None
             Explicit view data, allowed only with a string view name.
-        callback : MessageCallback | None
+        callback : orionis.mail.types.MessageCallback | None
             Sync or async Message configurator, forbidden with a Mailable.
 
         Returns
         -------
-        MailResult
+        orionis.mail.entities.MailResult
             Confirmed acceptance, partial acceptance, or file storage.
 
         Raises
         ------
-        MailException
+        orionis.mail.exceptions.MailException
             If configuration, preparation, or transport fails.
         """
 
@@ -274,17 +277,17 @@ class IMailManager(ABC):
         ----------
         text : str
             Literal text, possibly empty.
-        callback : MessageCallback | None
+        callback : orionis.mail.types.MessageCallback | None
             Optional operation-local configurator.
 
         Returns
         -------
-        MailResult
+        orionis.mail.entities.MailResult
             Transport outcome.
 
         Raises
         ------
-        MailException
+        orionis.mail.exceptions.MailException
             If configuration, preparation, or transport fails.
         """
 
@@ -301,17 +304,17 @@ class IMailManager(ABC):
         ----------
         html : str
             Literal HTML, possibly empty.
-        callback : MessageCallback | None
+        callback : orionis.mail.types.MessageCallback | None
             Optional operation-local configurator.
 
         Returns
         -------
-        MailResult
+        orionis.mail.entities.MailResult
             Transport outcome.
 
         Raises
         ------
-        MailException
+        orionis.mail.exceptions.MailException
             If configuration, preparation, or transport fails.
         """
 
@@ -324,7 +327,7 @@ class IMailManager(ABC):
         ----------
         driver : str
             Unique transport implementation name.
-        factory : TransportFactory
+        factory : orionis.mail.types.TransportFactory
             Callable receiving the application and the normalized configuration
             and returning an IMailTransport or an awaitable of one.
 
@@ -335,6 +338,6 @@ class IMailManager(ABC):
 
         Raises
         ------
-        MailConfigurationException
+        orionis.mail.exceptions.MailConfigurationException
             If the name or factory is invalid or the driver already exists.
         """

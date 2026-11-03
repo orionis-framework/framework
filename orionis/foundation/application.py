@@ -1,3 +1,5 @@
+"""Configure the container and serve requests within one worker event loop."""
+
 from __future__ import annotations
 import asyncio
 import inspect
@@ -51,19 +53,31 @@ if TYPE_CHECKING:
     from orionis.container.contracts.deferrable_provider import IDeferrableProvider
 
 _SENTINEL = object()
+"""Sentinel distinguishing sentinel from ordinary values."""
 _ASGI_BODY_QUEUE_SIZE = 8
+"""Asgi body queue size value used by ``application``."""
 _CWD = Path.cwd()
+"""Cwd used by ``application``."""
 _CORE_PATHS_PATH = Path(__file__).with_name("core_paths.py").resolve()
+"""Core paths path used by ``application``."""
 _CONFIG_KEY_CACHE_SIZE = 256
+"""Config key cache size value used by ``application``."""
 _MAINTENANCE_REFRESH_NS = 100_000_000
+"""Maintenance refresh ns value used by ``application``."""
 _ROUTER_FACADE_MODULE = "orionis.support.facades"
+"""Router facade module identifier: ``orionis.support.facades``."""
 _ERR_NOT_CONFIGURED: str = (
     "Application configuration is not initialized. Please call create() first."
 )
+"""
+Error text for not configured: ``Application configuration is not initialized.
+Please call create() first.``.
+"""
 
 @lru_cache(maxsize=_CONFIG_KEY_CACHE_SIZE)
 def _parse_config_key(key: str) -> tuple[str, ...]:
-    """Parse a dot-notated configuration key into immutable path components.
+    """
+    Parse a dot-notated configuration key into immutable path components.
 
     Parameters
     ----------
@@ -72,7 +86,7 @@ def _parse_config_key(key: str) -> tuple[str, ...]:
 
     Returns
     -------
-    tuple[str, ...]
+    tuple[str, ``...``]
         Path components shared independently of application configuration values.
     """
     return tuple(key.split("."))
@@ -81,13 +95,14 @@ def _create_http_handler_task(
     loop: asyncio.AbstractEventLoop,
     coroutine: Coroutine,
 ) -> asyncio.Task:
-    """Start a monitored handler through the event loop's task factory.
+    """
+    Start a monitored handler through the event loop's task factory.
 
     Parameters
     ----------
     loop : asyncio.AbstractEventLoop
         Running request event loop.
-    coroutine : Coroutine
+    coroutine : collections.abc.Coroutine
         Kernel handler coroutine to schedule.
 
     Returns
@@ -151,7 +166,7 @@ async def _rsgi_disconnect_watcher(
 
     Parameters
     ----------
-    protocol : HTTPProtocol
+    protocol : ``granian.rsgi.HTTPProtocol``
         Protocol providing the client disconnect awaitable.
     handler_task : asyncio.Task
         Kernel task associated with the connection.
@@ -187,7 +202,7 @@ async def _await_http_tasks(
 
     Returns
     -------
-    Any
+    typing.Any
         Kernel result, or None after a client disconnect.
 
     Raises
@@ -225,6 +240,72 @@ class Application(Container, IApplication):
     Concurrent tasks share kernel initialization and provider startup locks.
     Mutable application state is not synchronized across threads or event loops.
     Python and RSGI special methods retain their protocol-defined names.
+
+    Attributes
+    ----------
+    __start_at
+        Store the application startup timestamp in nanoseconds.
+    __basePath
+        Validate and store the basePath as the application root.
+    __is_compiled
+        Flag to determine if working with previously compiled state.
+    __compiled_state_store
+        Cache driver for storing compiled configuration.
+    __hook_events
+        Lifecycle event callbacks for each runtime (HTTP/CLI/global). These are not
+        cached and execute on each lifecycle event.
+    __scheduler_resolved
+        Initialize references to resolved service classes.
+    __exception_handler_resolved
+        Exception-handler instance cached after its first resolution.
+    __booted
+        Initialize application state flags.
+    __configured
+        Configured flag used by ``Application``.
+    __runtime_config_initialized
+        Runtime config initialized flag used by ``Application``.
+    __is_production_cache
+        Is production cache flag used by ``Application``.
+    __is_debug_cache
+        Is debug cache flag used by ``Application``.
+    __maintenance_marker
+        Store the shared maintenance marker and its last observed state.
+    __maintenance_cache
+        Most recently observed maintenance-mode state.
+    __maintenance_lock
+        Synchronization primitive controlling access to maintenance lock.
+    __bootstrap
+        Initialize configuration dictionaries.
+    __runtime_config
+        Mutable runtime view of the committed application configuration.
+    __http_disconnect_monitoring
+        Http disconnect monitoring flag used by ``Application``.
+    __kernel_http_lock
+        Synchronization primitive controlling access to kernel http lock.
+    __kernel_cli_lock
+        Synchronization primitive controlling access to kernel cli lock.
+    __cache_resolved_providers
+        Initialize deferred providers cache.
+    __pending_boot_providers
+        Pending boot providers produced by ``deque``.
+    __provider_boot_lock
+        Synchronization primitive controlling access to provider boot lock.
+    __providers_registry_initialized
+        Initialize providers registry sentinel.
+    __entry_point
+        Store the file path where the application was started.
+    _deferred_providers
+        Initialize deferred providers storage for tracking.
+    __compiled
+        Compilation and configuration caching logic.
+    __compiled_path
+        Directory containing compiled application bootstrap metadata.
+    __compiled_invalidation_paths_dirs
+        Compiled invalidation paths dirs produced by ``set``.
+    __compiled_invalidation_paths_files
+        Compiled invalidation paths files produced by ``set``.
+    _Application__initialized
+        Mark the Application as initialized to enforce singleton behavior.
     """
 
     # ruff: noqa: SLF001, ANN401, BLE001, PLC0415, PLR0913
@@ -244,14 +325,14 @@ class Application(Container, IApplication):
         ----------
         scope : dict
             ASGI connection scope containing request metadata and type.
-        receive : Callable[[], Awaitable[dict[str, Any]]]
+        receive : typing.Callable[[], typing.Awaitable[dict[str, typing.Any]]]
             ASGI receive callable for message retrieval.
-        send : Callable[[dict[str, Any]], Awaitable[None]]
+        send : typing.Callable[[dict[str, typing.Any]], typing.Awaitable[None]]
             ASGI send callable for response transmission.
 
         Returns
         -------
-        Any | None
+        typing.Any | None
             Result from the lifespan or HTTP handler, or ``None`` for
             unsupported scope types.
         """
@@ -278,9 +359,9 @@ class Application(Container, IApplication):
 
         Parameters
         ----------
-        receive : Callable[[], Awaitable[dict]]
+        receive : collections.abc.Callable[[], collections.abc.Awaitable[dict]]
             ASGI receive callable for lifespan message retrieval.
-        send : Callable[[dict], Awaitable[None]]
+        send : collections.abc.Callable[[dict], collections.abc.Awaitable[None]]
             ASGI send callable for lifespan response transmission.
 
         Returns
@@ -365,14 +446,14 @@ class Application(Container, IApplication):
         ----------
         scope : dict
             ASGI connection scope containing request metadata.
-        receive : Callable[[], Awaitable[dict[str, Any]]]
+        receive : typing.Callable[[], typing.Awaitable[dict[str, typing.Any]]]
             ASGI receive callable provided by the server.
-        send : Callable[[dict[str, Any]], Awaitable[None]]
+        send : typing.Callable[[dict[str, typing.Any]], typing.Awaitable[None]]
             ASGI send callable for transmitting the response.
 
         Returns
         -------
-        Any | None
+        typing.Any | None
             Result of the kernel handler, or ``None`` if the client
             disconnected before the response was sent.
         """
@@ -415,9 +496,9 @@ class Application(Container, IApplication):
 
         Parameters
         ----------
-        scope : Scope
+        scope : ``granian.rsgi.Scope``
             The connection scope information.
-        protocol : HTTPProtocol | WebsocketProtocol | ProtocolError | ProtocolClosed
+        protocol
             The RSGI protocol instance representing the connection.
 
         Returns
@@ -491,9 +572,9 @@ class Application(Container, IApplication):
 
         Parameters
         ----------
-        scope : Scope
+        scope : ``granian.rsgi.Scope``
             The connection scope information for the RSGI protocol.
-        protocol : HTTPProtocol
+        protocol : ``granian.rsgi.HTTPProtocol``
             The RSGI protocol instance; must expose a ``client_disconnect``
             coroutine that resolves when the client closes the connection.
 
@@ -554,10 +635,13 @@ class Application(Container, IApplication):
             self.config("app.interface", interface)
             kernel = await self.__loadHTTPKernel()
             self.__http_disconnect_paths = kernel.disconnectPaths()
+            """Http disconnect paths produced by ``kernel.disconnectPaths``."""
             asgi_handler = kernel.handleASGI
             rsgi_handler = kernel.handleRSGI
             self.__kernel_http_asgi = asgi_handler
+            """Kernel http asgi supplied through ``asgi_handler``."""
             self.__kernel_http_rsgi = rsgi_handler
+            """Kernel http rsgi supplied through ``rsgi_handler``."""
 
     async def __loadHTTPKernel(
         self: Self,
@@ -567,7 +651,7 @@ class Application(Container, IApplication):
 
         Returns
         -------
-        IKernelHTTP
+        orionis.http.contracts.kernel.IKernelHTTP
             An instance of the configured HTTP kernel.
 
         Raises
@@ -603,7 +687,7 @@ class Application(Container, IApplication):
 
         Returns
         -------
-        IKernelCLI
+        orionis.console.contracts.kernel.IKernelCLI
             An instance of the configured CLI kernel.
 
         Raises
@@ -688,6 +772,7 @@ class Application(Container, IApplication):
             if inspect.isawaitable(boot_result):
                 await boot_result
             self.__kernel_cli = kernel.handle
+            """Kernel cli obtained from ``kernel.handle``."""
 
     # --- Application Properties ---
 
@@ -698,7 +783,7 @@ class Application(Container, IApplication):
 
         Returns
         -------
-        Self or None
+        typing.Self or None
             Application singleton for this class, if already instantiated.
             Its configuration may still be uninitialized before ``create()``.
         """
@@ -831,7 +916,7 @@ class Application(Container, IApplication):
 
         Returns
         -------
-        Path
+        pathlib.Path
             The base directory path of the application.
         """
         return self.__basePath
@@ -856,7 +941,7 @@ class Application(Container, IApplication):
 
         Returns
         -------
-        Path or None
+        pathlib.Path or None
             The directory path for compiled cache storage, or None if not
             configured.
         """
@@ -869,7 +954,7 @@ class Application(Container, IApplication):
 
         Returns
         -------
-        list of Path
+        list of pathlib.Path
             List of directory paths monitored for cache invalidation.
         """
         return list(self.__compiled_invalidation_paths_dirs)
@@ -881,7 +966,7 @@ class Application(Container, IApplication):
 
         Returns
         -------
-        list of Path
+        list of pathlib.Path
             List of file paths monitored for cache invalidation.
         """
         return list(self.__compiled_invalidation_paths_files)
@@ -897,7 +982,7 @@ class Application(Container, IApplication):
 
         Parameters
         ----------
-        base_path : Path
+        base_path : pathlib.Path
             The base directory path of the application.
 
         Returns
@@ -1050,18 +1135,18 @@ class Application(Container, IApplication):
 
         Parameters
         ----------
-        path : Path or str
+        path : pathlib.Path or str
             The path to validate and resolve.
 
         Returns
         -------
-        Path
+        pathlib.Path
             The validated and resolved Path object.
 
         Raises
         ------
         TypeError
-            If `path` is not a Path or str.
+            If ``path`` is not a Path or str.
         """
         # Convert string to Path. basePath may not be set yet (e.g. during __init__),
         # so fall back to the process working directory for relative strings.
@@ -1090,23 +1175,23 @@ class Application(Container, IApplication):
 
         Parameters
         ----------
-        lifespan : Lifespan
+        lifespan : orionis.foundation.enums.Lifespan
             The application lifespan event to register callbacks for.
-        *callbacks : Callable[..., Any] | Callable[..., Awaitable[Any]]
+        *callbacks
             One or more callback functions to execute during the event.
-        runtime : Runtime | None, optional
+        runtime : orionis.foundation.enums.Runtime | None, optional
             The runtime environment for which to register the callbacks.
             If None, callbacks are registered for all runtimes.
 
         Returns
         -------
-        Self
+        typing.Self
             The current Application instance for method chaining.
 
         Raises
         ------
         TypeError
-            If `lifespan` is not a Lifespan enum or any callback is not callable.
+            If ``lifespan`` is not a Lifespan enum or any callback is not callable.
         ValueError
             If no callbacks are provided.
 
@@ -1153,7 +1238,7 @@ class Application(Container, IApplication):
 
         Parameters
         ----------
-        runtime : Runtime
+        runtime : orionis.foundation.enums.Runtime
             The runtime environment (HTTP or CLI) for which to
             execute startup callbacks.
         http_interface : str, optional
@@ -1206,7 +1291,7 @@ class Application(Container, IApplication):
 
         Parameters
         ----------
-        runtime : Runtime
+        runtime : orionis.foundation.enums.Runtime
             The runtime environment (HTTP or CLI) for which to
             execute shutdown callbacks.
 
@@ -1252,7 +1337,7 @@ class Application(Container, IApplication):
 
         Returns
         -------
-        dict[str, Any]
+        dict[str, typing.Any]
             Default bootstrap configuration dictionary with all core sections
             initialized for application startup.
         """
@@ -1471,13 +1556,13 @@ class Application(Container, IApplication):
 
         Parameters
         ----------
-        middleware : tuple[type[IBaseMiddleware], ...]
+        middleware
             Middleware classes to register. Each must inherit from
             IBaseMiddleware.
 
         Returns
         -------
-        Self
+        typing.Self
             The current Application instance for method chaining.
         """
         # Return early if configuration is already cached: middleware is
@@ -1511,7 +1596,7 @@ class Application(Container, IApplication):
 
         Returns
         -------
-        list[type[IBaseMiddleware]]
+        list[type[orionis.http.layer.contracts.middleware.IBaseMiddleware]]
             A list of middleware classes registered in the application.
         """
         # Resolve and return middleware classes from bootstrap metadata.
@@ -1531,13 +1616,13 @@ class Application(Container, IApplication):
 
         Parameters
         ----------
-        providers : tuple[type[IServiceProvider], ...]
+        providers
             Service provider classes to register. Each must inherit from
             IServiceProvider.
 
         Returns
         -------
-        Self
+        typing.Self
             The current Application instance for method chaining.
 
         Raises
@@ -1570,7 +1655,7 @@ class Application(Container, IApplication):
 
         Parameters
         ----------
-        self : Application
+        self : orionis.Application
             The current Application instance.
 
         Returns
@@ -1613,7 +1698,7 @@ class Application(Container, IApplication):
 
         Parameters
         ----------
-        provider_class : type[IServiceProvider]
+        provider_class : type[container.contracts.service_provider.IServiceProvider]
             The service provider class to validate.
 
         Returns
@@ -1651,7 +1736,7 @@ class Application(Container, IApplication):
 
         Parameters
         ----------
-        provider : type[IServiceProvider]
+        provider : type[orionis.container.contracts.service_provider.IServiceProvider]
             The service provider class to register.
 
         Returns
@@ -1686,7 +1771,7 @@ class Application(Container, IApplication):
 
         Parameters
         ----------
-        provider : type[IDeferrableProvider]
+        provider : type[container.contracts.deferrable_provider.IDeferrableProvider]
             The service provider class to register.
 
         Returns
@@ -1738,7 +1823,7 @@ class Application(Container, IApplication):
 
         Parameters
         ----------
-        provider : type[IServiceProvider]
+        provider : type[orionis.container.contracts.service_provider.IServiceProvider]
             The service provider class to register.
 
         Returns
@@ -1807,7 +1892,7 @@ class Application(Container, IApplication):
 
         Parameters
         ----------
-        self : Application
+        self : orionis.Application
             The current application instance.
 
         Returns
@@ -1924,7 +2009,7 @@ class Application(Container, IApplication):
 
         Returns
         -------
-        Self
+        typing.Self
             The current Application instance for method chaining.
 
         Raises
@@ -2014,13 +2099,13 @@ class Application(Container, IApplication):
 
         Returns
         -------
-        list[Path]
+        list[pathlib.Path]
             List of resolved Path objects for valid routing files.
 
         Raises
         ------
         TypeError
-            If `paths` is not a str, list[str], or None, or if a file does not
+            If ``paths`` is not a str, list[str], or None, or if a file does not
             contain valid routing definitions.
         FileNotFoundError
             If a specified routing file does not exist.
@@ -2081,12 +2166,12 @@ class Application(Container, IApplication):
 
         Parameters
         ----------
-        handler : type[IBaseExceptionHandler]
+        handler : type[orionis.failure.contracts.handler.IBaseExceptionHandler]
             Exception handler class to use. Must inherit from BaseExceptionHandler.
 
         Returns
         -------
-        Self
+        typing.Self
             The current Application instance for method chaining.
 
         Raises
@@ -2138,12 +2223,12 @@ class Application(Container, IApplication):
 
         Parameters
         ----------
-        self : Application
+        self : orionis.Application
             The current application instance.
 
         Returns
         -------
-        IBaseExceptionHandler
+        orionis.failure.contracts.handler.IBaseExceptionHandler
             The registered exception handler instance. If none is set, returns
             the default BaseExceptionHandler instance.
 
@@ -2179,12 +2264,12 @@ class Application(Container, IApplication):
 
         Parameters
         ----------
-        scheduler : type[IBaseScheduler]
+        scheduler : type[orionis.console.base.contracts.scheduler.IBaseScheduler]
             The scheduler class to be used. Must inherit from IBaseScheduler.
 
         Returns
         -------
-        Self
+        typing.Self
             The current Application instance for method chaining.
 
         Raises
@@ -2230,7 +2315,7 @@ class Application(Container, IApplication):
 
         Returns
         -------
-        IBaseScheduler
+        orionis.console.base.contracts.scheduler.IBaseScheduler
             The registered scheduler instance.
 
         Raises
@@ -2270,7 +2355,7 @@ class Application(Container, IApplication):
 
         Returns
         -------
-        Self
+        typing.Self
             The current Application instance for method chaining.
         """
         # Return early if configuration is already cached
@@ -2297,12 +2382,12 @@ class Application(Container, IApplication):
         ----------
         **auth_config : object
             Keyword arguments for authentication configuration. Keys must match
-            the fields of the `Auth` dataclass from
-            `orionis.foundation.config.auth.entities.auth.Auth`.
+            the fields of the ``Auth`` dataclass from
+            ``orionis.foundation.config.auth.entities.auth.Auth``.
 
         Returns
         -------
-        Self
+        typing.Self
             The current Application instance for method chaining.
         """
         # Return early if configuration is already cached
@@ -2319,7 +2404,8 @@ class Application(Container, IApplication):
         return self
 
     def withConfigMcp(self: Self, **mcp_config: object) -> Self:
-        """Configure validated MCP limits and the explicit Origin allowlist.
+        """
+        Configure validated MCP limits and the explicit Origin allowlist.
 
         Parameters
         ----------
@@ -2328,7 +2414,7 @@ class Application(Container, IApplication):
 
         Returns
         -------
-        Self
+        typing.Self
             The application for further configuration.
         """
         if self.__is_compiled:
@@ -2348,12 +2434,12 @@ class Application(Container, IApplication):
         ----------
         **cache_config : object
             Keyword arguments representing cache configuration options. Keys must
-            match the field names and types expected by the `Cache` dataclass from
-            `orionis.foundation.config.cache.entities.cache.Cache`.
+            match the field names and types expected by the ``Cache`` dataclass from
+            ``orionis.foundation.config.cache.entities.cache.Cache``.
 
         Returns
         -------
-        Self
+        typing.Self
             The current Application instance to enable method chaining.
         """
         # Return early if configuration is already cached
@@ -2380,12 +2466,12 @@ class Application(Container, IApplication):
         ----------
         **http_config : object
             Keyword arguments for HTTP configuration. Keys must match the field
-            names and types expected by the `HTTP` dataclass from
-            `orionis.foundation.config.http.entitites.http.HTTP`.
+            names and types expected by the ``HTTP`` dataclass from
+            ``orionis.foundation.config.http.entitites.http.HTTP``.
 
         Returns
         -------
-        Self
+        typing.Self
             The current Application instance for method chaining.
         """
         # Return early if configuration is already cached
@@ -2412,12 +2498,12 @@ class Application(Container, IApplication):
         ----------
         **database_config : object
             Keyword arguments for database configuration. Keys must match the
-            fields of the `Database` dataclass from
-            `orionis.foundation.config.database.entities.database.Database`.
+            fields of the ``Database`` dataclass from
+            ``orionis.foundation.config.database.entities.database.Database``.
 
         Returns
         -------
-        Self
+        typing.Self
             The current Application instance for method chaining.
         """
         # Return early if configuration is already cached
@@ -2444,12 +2530,12 @@ class Application(Container, IApplication):
         ----------
         **filesystems_config : object
             Keyword arguments for filesystems configuration. Keys must match the
-            fields of the `Filesystems` dataclass from
-            `orionis.foundation.config.filesystems.entitites.filesystems.Filesystems`.
+            fields of the ``Filesystems`` dataclass from
+            ``orionis.foundation.config.filesystems.entitites.filesystems.Filesystems``.
 
         Returns
         -------
-        Self
+        typing.Self
             The current Application instance for method chaining.
         """
         # Return early if already cached
@@ -2476,12 +2562,12 @@ class Application(Container, IApplication):
         ----------
         **logging_config : object
             Keyword arguments for logging configuration. Keys must match the
-            fields of the `Logging` dataclass from
-            `orionis.foundation.config.logging.entities.logging.Logging`.
+            fields of the ``Logging`` dataclass from
+            ``orionis.foundation.config.logging.entities.logging.Logging``.
 
         Returns
         -------
-        Self
+        typing.Self
             The current Application instance for method chaining.
         """
         # Return early if already cached
@@ -2508,12 +2594,12 @@ class Application(Container, IApplication):
         ----------
         **mail_config : object
             Keyword arguments for mail configuration. Keys must match the fields
-            of the `Mail` dataclass from
-            `orionis.foundation.config.mail.entities.mail.Mail`.
+            of the ``Mail`` dataclass from
+            ``orionis.foundation.config.mail.entities.mail.Mail``.
 
         Returns
         -------
-        Self
+        typing.Self
             The current Application instance for method chaining.
         """
         # Return early if configuration is already cached
@@ -2540,12 +2626,12 @@ class Application(Container, IApplication):
         ----------
         **queue_config : object
             Keyword arguments representing queue configuration options. Keys must
-            match the field names and types expected by the `Queue` dataclass from
-            `orionis.foundation.config.queue.entities.queue.Queue`.
+            match the field names and types expected by the ``Queue`` dataclass from
+            ``orionis.foundation.config.queue.entities.queue.Queue``.
 
         Returns
         -------
-        Self
+        typing.Self
             The current Application instance for method chaining.
         """
         # Return early if configuration is already cached
@@ -2572,12 +2658,12 @@ class Application(Container, IApplication):
         ----------
         **session_config : object
             Keyword arguments for session configuration. Keys must match the
-            fields of the `Session` dataclass from
-            `orionis.foundation.config.session.entities.session.Session`.
+            fields of the ``Session`` dataclass from
+            ``orionis.foundation.config.session.entities.session.Session``.
 
         Returns
         -------
-        Self
+        typing.Self
             The current Application instance for method chaining.
         """
         # Return early if configuration is already cached
@@ -2604,12 +2690,12 @@ class Application(Container, IApplication):
         ----------
         **testing_config : object
             Keyword arguments for testing configuration. Keys must match the
-            fields of the `Testing` dataclass from
-            `orionis.foundation.config.testing.entities.testing.Testing`.
+            fields of the ``Testing`` dataclass from
+            ``orionis.foundation.config.testing.entities.testing.Testing``.
 
         Returns
         -------
-        Self
+        typing.Self
             The current Application instance for method chaining.
         """
         # Return early if configuration is already cached
@@ -2634,7 +2720,7 @@ class Application(Container, IApplication):
 
         Parameters
         ----------
-        **paths : str | Path | None
+        **paths : str | pathlib.Path | None
             Optional directory path overrides. Valid keys are 'app', 'console',
             'exceptions', 'http', 'models', 'providers', 'notifications',
             'services', 'jobs', 'bootstrap', 'config', 'database', 'resources',
@@ -2642,7 +2728,7 @@ class Application(Container, IApplication):
 
         Returns
         -------
-        Self
+        typing.Self
             The current Application instance for method chaining.
         """
         # Return early if configuration is already cached
@@ -2687,16 +2773,16 @@ class Application(Container, IApplication):
 
         Parameters
         ----------
-        default_config : dict[str, Any]
+        default_config : dict[str, typing.Any]
             The base configuration dictionary containing default values.
-        custom_config : dict[str, Any]
+        custom_config : dict[str, typing.Any]
             The custom configuration dictionary to merge into defaults.
-        dataclasses : set[tuple[str, str, str, Type[Any]]] | None, optional
+        dataclasses : set[tuple[str, str, str, type[typing.Any]]] | None, optional
             Set of tuples containing dataclass info to merge, or None.
 
         Returns
         -------
-        dict[str, Any]
+        dict[str, typing.Any]
             The merged configuration dictionary containing all sections.
         """
 
@@ -2713,9 +2799,9 @@ class Application(Container, IApplication):
             ----------
             section : str
                 Name of the configuration section.
-            values : dict[str, Any]
+            values : dict[str, typing.Any]
                 Values overriding existing keys within the section.
-            base : dict[str, Any]
+            base : dict[str, typing.Any]
                 Destination configuration modified in place.
 
             Returns
@@ -2898,7 +2984,7 @@ class Application(Container, IApplication):
 
         Returns
         -------
-        Self
+        typing.Self
             The current Application instance for method chaining.
         """
         # Prevent duplicate initialization if already booted
@@ -2939,14 +3025,15 @@ class Application(Container, IApplication):
         return self
 
     async def boot(self: Self) -> Self:
-        """Create the application and await eager providers for headless use.
+        """
+        Create the application and await eager providers for headless use.
 
         Repeated and concurrent calls share provider startup coordination.
         HTTP and Reactor continue to own their kernels and lifecycle callbacks.
 
         Returns
         -------
-        Self
+        typing.Self
             The application with all eager provider boot methods completed.
 
         Raises
@@ -3051,7 +3138,7 @@ class Application(Container, IApplication):
 
         Parameters
         ----------
-        key_parts : tuple[str, ...]
+        key_parts : tuple[str, ``...``]
             Keys representing the path in the nested dictionary.
 
         Returns
@@ -3077,7 +3164,7 @@ class Application(Container, IApplication):
 
         Parameters
         ----------
-        key_parts : tuple[str, ...]
+        key_parts : tuple[str, ``...``]
             Keys representing the path in the nested dictionary.
         value : object
             The value to set at the specified nested key path.
@@ -3118,7 +3205,7 @@ class Application(Container, IApplication):
 
         Returns
         -------
-        Path | Mapping[str, Path] | None
+        pathlib.Path | collections.abc.Mapping[str, pathlib.Path] | None
             The resolved path for the given key, all paths as a read-only
             mapping, or None if the key does not exist.
 
@@ -3170,7 +3257,7 @@ class Application(Container, IApplication):
 
         Returns
         -------
-        list[Path] | dict | None
+        list[pathlib.Path] | dict | None
             List of Path objects for the specified routing type, the complete
             routing configuration dictionary if no key is provided, or None
             if the key is not one of the valid routing types.

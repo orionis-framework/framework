@@ -1,3 +1,5 @@
+"""Define the stateful operations supported by session authentication."""
+
 from abc import abstractmethod
 from typing import TYPE_CHECKING
 from orionis.auth.contracts.guard import IGuard
@@ -11,6 +13,7 @@ class ISessionGuard(IGuard):
     """Define the stateful operations supported by session authentication."""
 
     __slots__ = ()
+    """Declare that this class introduces no additional instance slots."""
 
     @abstractmethod
     async def attempt(
@@ -24,16 +27,16 @@ class ISessionGuard(IGuard):
 
         Parameters
         ----------
-        request : Request
+        request : orionis.http.Request
             Incoming HTTP request owning the session.
-        credentials : Mapping[str, object]
+        credentials : collections.abc.Mapping[str, object]
             Submitted credentials, typically the username and password.
         remember : bool, optional
             Issue a persistent login credential after verifying the password.
 
         Returns
         -------
-        IAuthenticatable | None
+        orionis.auth.contracts.IAuthenticatable | None
             Authenticated identity, or ``None`` when the credentials do
             not match any identity.
         """
@@ -48,9 +51,9 @@ class ISessionGuard(IGuard):
 
         Parameters
         ----------
-        request : Request
+        request : orionis.http.Request
             Incoming HTTP request owning the session.
-        identity : IAuthenticatable
+        identity : orionis.auth.contracts.IAuthenticatable
             Identity to remember for subsequent requests.
 
         Returns
@@ -66,7 +69,7 @@ class ISessionGuard(IGuard):
 
         Parameters
         ----------
-        request : Request
+        request : orionis.http.Request
             Incoming HTTP request owning the session.
 
         Returns

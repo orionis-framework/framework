@@ -1,3 +1,5 @@
+"""Provide orm factories operations through ``copy_attributes``."""
+
 from copy import deepcopy
 from inspect import iscoroutine
 from types import NoneType
@@ -5,6 +7,7 @@ from typing import Any
 from orionis.orm.factories.exceptions import FactoryDefinitionException
 
 _ATOMIC_TYPES = frozenset({NoneType, bool, bytes, complex, float, int, str})
+"""Atomic types used by ``_attributes``."""
 
 def copy_attributes(value: object, source: str) -> dict[str, Any]:
     """
@@ -19,12 +22,12 @@ def copy_attributes(value: object, source: str) -> dict[str, Any]:
 
     Returns
     -------
-    dict of str to Any
+    dict of str ``to`` typing.Any
         Independent attributes, including nested containers.
 
     Raises
     ------
-    FactoryDefinitionException
+    orionis.orm.factories.FactoryDefinitionException
         If the value is not a dictionary with string keys.
     """
     if type(value) is dict:

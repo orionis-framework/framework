@@ -1,3 +1,5 @@
+"""Answer authorization questions for a given request context."""
+
 import inspect
 from typing import TYPE_CHECKING
 from orionis.auth.authorization.registry import PolicyRegistry
@@ -29,6 +31,7 @@ class Authorizer(IAuthorizer):
     # ruff: noqa: TC001 (Dependency Injection)
 
     __slots__ = ("__app", "__registry")
+    """Declare the instance attribute slots reserved by this class."""
 
     def __init__(self, app: IApplication) -> None:
         """
@@ -36,7 +39,7 @@ class Authorizer(IAuthorizer):
 
         Parameters
         ----------
-        app : IApplication
+        app : orionis.IApplication
             Container used to build policy instances with their own
             dependencies injected.
 
@@ -46,7 +49,12 @@ class Authorizer(IAuthorizer):
             The registry starts empty and is filled during boot.
         """
         self.__app = app
+        """
+        Container used to build policy instances with their own dependencies
+        injected.
+        """
         self.__registry = PolicyRegistry()
+        """Registered implementations indexed by their public identifiers."""
 
     def registry(self) -> PolicyRegistry:
         """
@@ -54,7 +62,7 @@ class Authorizer(IAuthorizer):
 
         Returns
         -------
-        PolicyRegistry
+        orionis.auth.authorization.PolicyRegistry
             Registry holding the resource to policy bindings.
         """
         return self.__registry
@@ -67,7 +75,7 @@ class Authorizer(IAuthorizer):
         ----------
         resource : type
             Resource class protected by the policy.
-        policy : type[IPolicy]
+        policy : type[orionis.auth.contracts.IPolicy]
             Policy class implementing the abilities.
 
         Returns
@@ -87,7 +95,7 @@ class Authorizer(IAuthorizer):
 
         Parameters
         ----------
-        context : IAuthenticationContext
+        context : orionis.auth.contracts.IAuthenticationContext
             Authentication context of the current request.
         permission : str
             Permission name to evaluate.
@@ -113,9 +121,9 @@ class Authorizer(IAuthorizer):
 
         Parameters
         ----------
-        context : IAuthenticationContext
+        context : orionis.auth.contracts.IAuthenticationContext
             Authentication context of the current request.
-        permissions : Iterable[str]
+        permissions : collections.abc.Iterable[str]
             Permission names to evaluate.
 
         Returns
@@ -140,9 +148,9 @@ class Authorizer(IAuthorizer):
 
         Parameters
         ----------
-        context : IAuthenticationContext
+        context : orionis.auth.contracts.IAuthenticationContext
             Authentication context of the current request.
-        permissions : Iterable[str]
+        permissions : collections.abc.Iterable[str]
             Permission names to evaluate.
 
         Returns
@@ -167,7 +175,7 @@ class Authorizer(IAuthorizer):
 
         Parameters
         ----------
-        context : IAuthenticationContext
+        context : orionis.auth.contracts.IAuthenticationContext
             Authentication context of the current request.
         role : str
             Role name to evaluate.
@@ -193,7 +201,7 @@ class Authorizer(IAuthorizer):
 
         Parameters
         ----------
-        context : IAuthenticationContext
+        context : orionis.auth.contracts.IAuthenticationContext
             Authentication context of the current request.
         ability : str
             Ability declared by the policy of the resource.
@@ -210,7 +218,7 @@ class Authorizer(IAuthorizer):
 
         Raises
         ------
-        PolicyNotFoundException
+        orionis.auth.PolicyNotFoundException
             When the resource type has no policy, or the policy does not
             declare the requested ability.
         """

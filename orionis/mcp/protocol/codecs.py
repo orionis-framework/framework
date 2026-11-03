@@ -1,3 +1,8 @@
+"""Provide mcp protocol operations.
+
+Includes ``decode_envelope``, ``decode_params``, ``encode_error``.
+"""
+
 from types import MappingProxyType
 import msgspec
 from orionis.mcp.exceptions import McpInvalidParams, McpProtocolException
@@ -21,6 +26,7 @@ from orionis.mcp.protocol.requests import (
 from orionis.mcp.protocol.results import Error, ErrorResponse
 
 _ENVELOPE = msgspec.json.Decoder(JsonRpcRequest)
+"""Envelope used by ``codecs``."""
 METHOD_DECODERS = MappingProxyType(
     {
         "server/discover": msgspec.json.Decoder(RequestParams),
@@ -35,6 +41,7 @@ METHOD_DECODERS = MappingProxyType(
         "subscriptions/listen": msgspec.json.Decoder(ListenParams),
     },
 )
+"""Method decoders used by ``codecs``."""
 
 def decode_envelope(data: bytes) -> JsonRpcRequest:
     """
@@ -47,7 +54,7 @@ def decode_envelope(data: bytes) -> JsonRpcRequest:
 
     Returns
     -------
-    JsonRpcRequest
+    orionis.mcp.protocol.requests.JsonRpcRequest
         Result of the operation described above.
     """
     try:
@@ -63,12 +70,12 @@ def decode_params(request: JsonRpcRequest) -> RequestParams:
 
     Parameters
     ----------
-    request : JsonRpcRequest
+    request : orionis.mcp.protocol.requests.JsonRpcRequest
         Current request and its trusted execution context.
 
     Returns
     -------
-    RequestParams
+    orionis.mcp.protocol.requests.RequestParams
         Result of the operation described above.
     """
     decoder = METHOD_DECODERS.get(request.method)
@@ -110,9 +117,9 @@ def encode_error(
 
     Parameters
     ----------
-    exception : McpProtocolException
+    exception : orionis.mcp.exceptions.McpProtocolException
         Exception being inspected or reported.
-    request_id : str | int | msgspec.UnsetType
+    request_id : str | int | ``msgspec.UnsetType``
         Value supplied for ``request_id``.
 
     Returns

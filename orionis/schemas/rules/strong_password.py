@@ -1,10 +1,16 @@
+"""Ensure a string is strong enough to be used as a password."""
+
 from orionis.schemas.rule import Rule
 
 # Constants for password validation
 _MIN_LENGTH = 8
+"""Constants for password validation."""
 _UPPER: frozenset[str] = frozenset("ABCDEFGHIJKLMNOPQRSTUVWXYZ")
+"""Upper used by ``strong_password``."""
 _LOWER: frozenset[str] = frozenset("abcdefghijklmnopqrstuvwxyz")
+"""Lower used by ``strong_password``."""
 _DIGIT: frozenset[str] = frozenset("0123456789")
+"""Digit used by ``strong_password``."""
 
 class StrongPassword(Rule):
     """
@@ -17,12 +23,15 @@ class StrongPassword(Rule):
     # ruff: noqa: ARG002
 
     __slots__ = ()
+    """Declare that this class introduces no additional instance slots."""
 
     __message__ = (
         f"Password must be at least {_MIN_LENGTH} characters long, "
         "contain an uppercase letter, a lowercase letter, and a digit."
     )
+    """Human-readable message associated with this operation or result."""
     __code__ = "strong_password"
+    """Code identifier: ``strong_password``."""
 
     async def enforce(
         self,

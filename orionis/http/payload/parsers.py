@@ -1,3 +1,9 @@
+"""Provide http payload operations.
+
+Includes ``parse_content_type``, ``parse_json``, ``parse_msgpack``,
+``parse_urlencoded``.
+"""
+
 from __future__ import annotations
 from typing import TYPE_CHECKING
 from urllib.parse import parse_qsl
@@ -108,7 +114,7 @@ def parse_json(raw: bytes) -> object:
 
     Raises
     ------
-    msgspec.DecodeError
+    ``msgspec.DecodeError``
         If *raw* is not valid JSON.
     """
     # Decode the JSON bytes into a Python value.
@@ -130,7 +136,7 @@ def parse_msgpack(raw: bytes) -> object:
 
     Raises
     ------
-    msgspec.DecodeError
+    ``msgspec.DecodeError``
         If *raw* is not valid MessagePack.
     """
     # Decode the MessagePack bytes into a Python value.
@@ -200,14 +206,14 @@ def parse_xml(raw: bytes) -> XMLElement:
 
     Returns
     -------
-    xml.etree.ElementTree.Element
+    ``xml.etree.ElementTree.Element``
         Root element of the parsed document.
 
     Raises
     ------
-    xml.etree.ElementTree.ParseError
+    ``xml.etree.ElementTree.ParseError``
         If *raw* is malformed XML.
-    defusedxml.common.EntitiesForbidden
+    ``defusedxml.common.EntitiesForbidden``
         If the document declares an internal or external entity. This is a
         subclass of ``defusedxml.common.DefusedXmlException``, not ParseError.
     """

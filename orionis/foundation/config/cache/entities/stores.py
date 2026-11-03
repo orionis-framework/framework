@@ -1,3 +1,5 @@
+"""Represent a collection of cache storage backends for the application."""
+
 from __future__ import annotations
 from dataclasses import dataclass, field
 from typing import Self
@@ -16,15 +18,15 @@ class Stores(BaseEntity):
 
     Attributes
     ----------
-    file : File | dict
+    file : orionis.foundation.config.cache.File | dict
         File-based cache storage configuration.
-    memory : Memory | dict | None
+    memory : orionis.foundation.config.cache.Memory | dict | None
         In-memory cache storage configuration. Defaults to ``None``.
-    redis : Redis | dict | None
+    redis : orionis.foundation.config.cache.Redis | dict | None
         Redis cache storage configuration. Defaults to ``None``.
-    memcached : Memcached | dict | None
+    memcached : orionis.foundation.config.cache.Memcached | dict | None
         Memcached cache storage configuration. Defaults to ``None``.
-    database : Database | dict | None
+    database : orionis.foundation.config.cache.Database | dict | None
         Database-backed cache storage configuration. Defaults to
         ``None``.
     """

@@ -1,3 +1,5 @@
+"""Ensure a string contains only 7-bit ASCII characters."""
+
 from orionis.schemas.rule import Rule
 
 class Ascii(Rule):
@@ -6,9 +8,12 @@ class Ascii(Rule):
     # ruff: noqa: ARG002
 
     __slots__ = ()
+    """Declare that this class introduces no additional instance slots."""
 
     __message__ = "Value must contain only 7-bit ASCII characters."
+    """Error text for message: ``Value must contain only 7-bit ASCII characters.``."""
     __code__ = "ascii"
+    """Code identifier: ``ascii``."""
 
     async def enforce(
         self,

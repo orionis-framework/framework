@@ -5422,6 +5422,9 @@
     <loc>https://api.orionis-framework.com/orionis.realtime.runtime.HubRuntime.html</loc>
   </url>
   <url>
+    <loc>https://api.orionis-framework.com/orionis.schemas.coercion.html</loc>
+  </url>
+  <url>
     <loc>https://api.orionis-framework.com/orionis.schemas.compiler.html</loc>
   </url>
   <url>
@@ -5537,6 +5540,9 @@
   </url>
   <url>
     <loc>https://api.orionis-framework.com/orionis.schemas.meta.validation.ValidationMetadata.html</loc>
+  </url>
+  <url>
+    <loc>https://api.orionis-framework.com/orionis.schemas.metadata.Coerce.html</loc>
   </url>
   <url>
     <loc>https://api.orionis-framework.com/orionis.schemas.metadata.Description.html</loc>
@@ -5671,6 +5677,12 @@
     <loc>https://api.orionis-framework.com/orionis.schemas.rules.email.module.html</loc>
   </url>
   <url>
+    <loc>https://api.orionis-framework.com/orionis.schemas.rules.Empty.html</loc>
+  </url>
+  <url>
+    <loc>https://api.orionis-framework.com/orionis.schemas.rules.empty.module.html</loc>
+  </url>
+  <url>
     <loc>https://api.orionis-framework.com/orionis.schemas.rules.Encoding.html</loc>
   </url>
   <url>
@@ -5756,6 +5768,12 @@
   </url>
   <url>
     <loc>https://api.orionis-framework.com/orionis.schemas.rules.MimeTypes.html</loc>
+  </url>
+  <url>
+    <loc>https://api.orionis-framework.com/orionis.schemas.rules.no_empty.html</loc>
+  </url>
+  <url>
+    <loc>https://api.orionis-framework.com/orionis.schemas.rules.NoEmpty.html</loc>
   </url>
   <url>
     <loc>https://api.orionis-framework.com/orionis.schemas.rules.Size.html</loc>

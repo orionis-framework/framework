@@ -7596,6 +7596,14 @@
             <div class="kind">Package</div>
             <div class="privacy">PUBLIC</div>
             <div class="summary">Group the schemas components and public imports.</div>
+          </li><li id="orionis.schemas.coercion">
+            
+            <div class="fullName">orionis<wbr></wbr>.schemas<wbr></wbr>.coercion</div>
+            <div class="url">orionis.schemas.coercion.html</div>
+            <div class="type">Module</div>
+            <div class="kind">Module</div>
+            <div class="privacy">PUBLIC</div>
+            <div class="summary">Prepare explicitly coercible values without changing the source payload.</div>
           </li><li id="orionis.schemas.compiler">
             
             <div class="fullName">orionis<wbr></wbr>.schemas<wbr></wbr>.compiler</div>
@@ -7892,6 +7900,14 @@
             <div class="kind">Module</div>
             <div class="privacy">PUBLIC</div>
             <div class="summary">Ensure a string is a valid email address.</div>
+          </li><li id="orionis.schemas.rules.empty">
+            
+            <div class="fullName">orionis<wbr></wbr>.schemas<wbr></wbr>.rules<wbr></wbr>.empty</div>
+            <div class="url">orionis.schemas.rules.empty.module.html</div>
+            <div class="type">Module</div>
+            <div class="kind">Module</div>
+            <div class="privacy">PUBLIC</div>
+            <div class="summary">Ensure a field contains an empty value.</div>
           </li><li id="orionis.schemas.rules.encoding">
             
             <div class="fullName">orionis<wbr></wbr>.schemas<wbr></wbr>.rules<wbr></wbr>.encoding</div>
@@ -8003,7 +8019,7 @@
             <div class="type">Module</div>
             <div class="kind">Module</div>
             <div class="privacy">PUBLIC</div>
-            <div class="summary">Measure field lengths, numeric values and uploaded file sizes.</div>
+            <div class="summary">Measure field values and recognize empty data without consuming it.</div>
           </li><li id="orionis.schemas.rules.mime_types">
             
             <div class="fullName">orionis<wbr></wbr>.schemas<wbr></wbr>.rules<wbr></wbr>.mime<wbr></wbr>_types</div>
@@ -8012,6 +8028,14 @@
             <div class="kind">Module</div>
             <div class="privacy">PUBLIC</div>
             <div class="summary">Ensure an uploaded file declares one of the accepted MIME types.</div>
+          </li><li id="orionis.schemas.rules.no_empty">
+            
+            <div class="fullName">orionis<wbr></wbr>.schemas<wbr></wbr>.rules<wbr></wbr>.no<wbr></wbr>_empty</div>
+            <div class="url">orionis.schemas.rules.no_empty.html</div>
+            <div class="type">Module</div>
+            <div class="kind">Module</div>
+            <div class="privacy">PUBLIC</div>
+            <div class="summary">Ensure a field contains a non-empty value.</div>
           </li><li id="orionis.schemas.rules.size">
             
             <div class="fullName">orionis<wbr></wbr>.schemas<wbr></wbr>.rules<wbr></wbr>.size</div>
@@ -65072,6 +65096,14 @@ been started.</tt>.</div>
             <div class="kind">Class Variable</div>
             <div class="privacy">PUBLIC</div>
             <div class="summary">Declare that this class introduces no additional instance slots.</div>
+          </li><li id="orionis.schemas.metadata.Coerce">
+            
+            <div class="fullName">orionis<wbr></wbr>.schemas<wbr></wbr>.metadata<wbr></wbr>.<wbr></wbr>Coerce</div>
+            <div class="url">orionis.schemas.metadata.Coerce.html</div>
+            <div class="type">Class</div>
+            <div class="kind">Class</div>
+            <div class="privacy">PUBLIC</div>
+            <div class="summary">Convert a field to its declared type before validating its constraints.</div>
           </li><li id="orionis.schemas.metadata.Title">
             
             <div class="fullName">orionis<wbr></wbr>.schemas<wbr></wbr>.metadata<wbr></wbr>.<wbr></wbr>Title</div>
@@ -65392,6 +65424,14 @@ been started.</tt>.</div>
             <div class="kind">Function</div>
             <div class="privacy">PUBLIC</div>
             <div class="summary">Report whether a value behaves like an uploaded file.</div>
+          </li><li id="orionis.schemas.rules.measure.is_empty">
+            
+            <div class="fullName">orionis<wbr></wbr>.schemas<wbr></wbr>.rules<wbr></wbr>.measure<wbr></wbr>.is<wbr></wbr>_empty</div>
+            <div class="url">orionis.schemas.rules.measure.html#is_empty</div>
+            <div class="type">Function</div>
+            <div class="kind">Function</div>
+            <div class="privacy">PUBLIC</div>
+            <div class="summary">Recognize empty text, containers, numbers and uploaded files.</div>
           </li><li id="orionis.schemas.rules.measure.read_content">
             
             <div class="fullName">orionis<wbr></wbr>.schemas<wbr></wbr>.rules<wbr></wbr>.measure<wbr></wbr>.read<wbr></wbr>_content</div>
@@ -66464,6 +66504,38 @@ been started.</tt>.</div>
             <div class="kind">Constant</div>
             <div class="privacy">PUBLIC</div>
             <div class="summary">Fallback used when the exception is built without any failure.</div>
+          </li><li id="orionis.schemas.instance_payload._PLANS">
+            
+            <div class="fullName">orionis<wbr></wbr>.schemas<wbr></wbr>.instance<wbr></wbr>_payload<wbr></wbr>._PLANS</div>
+            <div class="url">orionis.schemas.instance_payload.html#_PLANS</div>
+            <div class="type">Attribute</div>
+            <div class="kind">Constant</div>
+            <div class="privacy">PUBLIC</div>
+            <div class="summary">Plans definitions used by <tt class="rst-docutils rst-literal">instance_payload</tt>.</div>
+          </li><li id="orionis.schemas.instance_payload.matching_type">
+            
+            <div class="fullName">orionis<wbr></wbr>.schemas<wbr></wbr>.instance<wbr></wbr>_payload<wbr></wbr>.matching<wbr></wbr>_type</div>
+            <div class="url">orionis.schemas.instance_payload.html#matching_type</div>
+            <div class="type">Function</div>
+            <div class="kind">Function</div>
+            <div class="privacy">PUBLIC</div>
+            <div class="summary">Select a schema or collection annotation matching an input representation.</div>
+          </li><li id="orionis.schemas.instance_payload.matching_schema">
+            
+            <div class="fullName">orionis<wbr></wbr>.schemas<wbr></wbr>.instance<wbr></wbr>_payload<wbr></wbr>.matching<wbr></wbr>_schema</div>
+            <div class="url">orionis.schemas.instance_payload.html#matching_schema</div>
+            <div class="type">Function</div>
+            <div class="kind">Function</div>
+            <div class="privacy">PUBLIC</div>
+            <div class="summary">Match a schema's wire representation and optional discriminator tag.</div>
+          </li><li id="orionis.schemas.instance_payload.instance_payload">
+            
+            <div class="fullName">orionis<wbr></wbr>.schemas<wbr></wbr>.instance<wbr></wbr>_payload<wbr></wbr>.instance<wbr></wbr>_payload</div>
+            <div class="url">orionis.schemas.instance_payload.html#instance_payload</div>
+            <div class="type">Function</div>
+            <div class="kind">Function</div>
+            <div class="privacy">PUBLIC</div>
+            <div class="summary">Expand structs using their wire names, tags and container shape.</div>
           </li><li id="orionis.schemas.rules_executor._PLAN_CACHE_MAX">
             
             <div class="fullName">orionis<wbr></wbr>.schemas<wbr></wbr>.rules<wbr></wbr>_executor<wbr></wbr>._PLAN<wbr></wbr>_CACHE<wbr></wbr>_MAX</div>
@@ -66576,6 +66648,70 @@ been started.</tt>.</div>
             <div class="kind">Function</div>
             <div class="privacy">PUBLIC</div>
             <div class="summary">Inner validation loop: execute a pre-resolved plan against an instance.</div>
+          </li><li id="orionis.schemas.coercion._contains_coercion">
+            
+            <div class="fullName">orionis<wbr></wbr>.schemas<wbr></wbr>.coercion<wbr></wbr>._contains<wbr></wbr>_coercion</div>
+            <div class="url">orionis.schemas.coercion.html#_contains_coercion</div>
+            <div class="type">Function</div>
+            <div class="kind">Function</div>
+            <div class="privacy">PUBLIC</div>
+            <div class="summary">Find coercion metadata in an annotation or its nested schema graph.</div>
+          </li><li id="orionis.schemas.coercion._field_plan">
+            
+            <div class="fullName">orionis<wbr></wbr>.schemas<wbr></wbr>.coercion<wbr></wbr>._field<wbr></wbr>_plan</div>
+            <div class="url">orionis.schemas.coercion.html#_field_plan</div>
+            <div class="type">Function</div>
+            <div class="kind">Function</div>
+            <div class="privacy">PUBLIC</div>
+            <div class="summary">Cache the fields requiring coercion, including their encoded positions.</div>
+          </li><li id="orionis.schemas.coercion.coerce_payload">
+            
+            <div class="fullName">orionis<wbr></wbr>.schemas<wbr></wbr>.coercion<wbr></wbr>.coerce<wbr></wbr>_payload</div>
+            <div class="url">orionis.schemas.coercion.html#coerce_payload</div>
+            <div class="type">Function</div>
+            <div class="kind">Function</div>
+            <div class="privacy">PUBLIC</div>
+            <div class="summary">Normalize marked schema fields using copy-on-write input containers.</div>
+          </li><li id="orionis.schemas.coercion._coerce_mapping">
+            
+            <div class="fullName">orionis<wbr></wbr>.schemas<wbr></wbr>.coercion<wbr></wbr>._coerce<wbr></wbr>_mapping</div>
+            <div class="url">orionis.schemas.coercion.html#_coerce_mapping</div>
+            <div class="type">Function</div>
+            <div class="kind">Function</div>
+            <div class="privacy">PUBLIC</div>
+            <div class="summary">Normalize selected mapping entries without changing their source.</div>
+          </li><li id="orionis.schemas.coercion._coerce_array">
+            
+            <div class="fullName">orionis<wbr></wbr>.schemas<wbr></wbr>.coercion<wbr></wbr>._coerce<wbr></wbr>_array</div>
+            <div class="url">orionis.schemas.coercion.html#_coerce_array</div>
+            <div class="type">Function</div>
+            <div class="kind">Function</div>
+            <div class="privacy">PUBLIC</div>
+            <div class="summary">Normalize declared array fields without consuming the discriminator tag.</div>
+          </li><li id="orionis.schemas.coercion._coerce_collection">
+            
+            <div class="fullName">orionis<wbr></wbr>.schemas<wbr></wbr>.coercion<wbr></wbr>._coerce<wbr></wbr>_collection</div>
+            <div class="url">orionis.schemas.coercion.html#_coerce_collection</div>
+            <div class="type">Function</div>
+            <div class="kind">Function</div>
+            <div class="privacy">PUBLIC</div>
+            <div class="summary">Prepare collection values while preserving keys and fixed tuple positions.</div>
+          </li><li id="orionis.schemas.coercion._coerce_union">
+            
+            <div class="fullName">orionis<wbr></wbr>.schemas<wbr></wbr>.coercion<wbr></wbr>._coerce<wbr></wbr>_union</div>
+            <div class="url">orionis.schemas.coercion.html#_coerce_union</div>
+            <div class="type">Function</div>
+            <div class="kind">Function</div>
+            <div class="privacy">PUBLIC</div>
+            <div class="summary">Preserve compatible union branches and normalize only matching structures.</div>
+          </li><li id="orionis.schemas.coercion._coerce_value">
+            
+            <div class="fullName">orionis<wbr></wbr>.schemas<wbr></wbr>.coercion<wbr></wbr>._coerce<wbr></wbr>_value</div>
+            <div class="url">orionis.schemas.coercion.html#_coerce_value</div>
+            <div class="type">Function</div>
+            <div class="kind">Function</div>
+            <div class="privacy">PUBLIC</div>
+            <div class="summary">Normalize a selected annotation before applying any value constraints.</div>
           </li><li id="orionis.schemas.exception_parser.MISSING_FIELD_RE">
             
             <div class="fullName">orionis<wbr></wbr>.schemas<wbr></wbr>.exception<wbr></wbr>_parser<wbr></wbr>.MISSING<wbr></wbr>_FIELD<wbr></wbr>_RE</div>
@@ -66856,22 +66992,6 @@ been started.</tt>.</div>
             <div class="kind">Class Method</div>
             <div class="privacy">PUBLIC</div>
             <div class="summary">Collect conversion and rule failures independently for each child.</div>
-          </li><li id="orionis.schemas.instance_payload._PLANS">
-            
-            <div class="fullName">orionis<wbr></wbr>.schemas<wbr></wbr>.instance<wbr></wbr>_payload<wbr></wbr>._PLANS</div>
-            <div class="url">orionis.schemas.instance_payload.html#_PLANS</div>
-            <div class="type">Attribute</div>
-            <div class="kind">Constant</div>
-            <div class="privacy">PUBLIC</div>
-            <div class="summary">Plans definitions used by <tt class="rst-docutils rst-literal">instance_payload</tt>.</div>
-          </li><li id="orionis.schemas.instance_payload.instance_payload">
-            
-            <div class="fullName">orionis<wbr></wbr>.schemas<wbr></wbr>.instance<wbr></wbr>_payload<wbr></wbr>.instance<wbr></wbr>_payload</div>
-            <div class="url">orionis.schemas.instance_payload.html#instance_payload</div>
-            <div class="type">Function</div>
-            <div class="kind">Function</div>
-            <div class="privacy">PUBLIC</div>
-            <div class="summary">Expand structs using their wire names, tags and container shape.</div>
           </li><li id="orionis.schemas.validator.Schema">
             
             <div class="fullName">orionis<wbr></wbr>.schemas<wbr></wbr>.validator<wbr></wbr>.<wbr></wbr>Schema</div>
@@ -90551,6 +90671,46 @@ prefixes.</tt>.</div>
             <div class="kind">Method</div>
             <div class="privacy">PUBLIC</div>
             <div class="summary">Validate a field value as an email address.</div>
+          </li><li id="orionis.schemas.rules.Empty">
+            
+            <div class="fullName">orionis<wbr></wbr>.schemas<wbr></wbr>.rules<wbr></wbr>.<wbr></wbr>Empty</div>
+            <div class="url">orionis.schemas.rules.Empty.html</div>
+            <div class="type">Class</div>
+            <div class="kind">Class</div>
+            <div class="privacy">PUBLIC</div>
+            <div class="summary">Accept None, blank strings, zero, False and zero-length values.</div>
+          </li><li id="orionis.schemas.rules.Empty.__slots__">
+            
+            <div class="fullName">orionis<wbr></wbr>.schemas<wbr></wbr>.rules<wbr></wbr>.<wbr></wbr>Empty<wbr></wbr>.__slots__</div>
+            <div class="url">orionis.schemas.rules.Empty.html#__slots__</div>
+            <div class="type">Attribute</div>
+            <div class="kind">Class Variable</div>
+            <div class="privacy">PUBLIC</div>
+            <div class="summary">Declare that this class introduces no additional instance slots.</div>
+          </li><li id="orionis.schemas.rules.Empty.__code__">
+            
+            <div class="fullName">orionis<wbr></wbr>.schemas<wbr></wbr>.rules<wbr></wbr>.<wbr></wbr>Empty<wbr></wbr>.__code__</div>
+            <div class="url">orionis.schemas.rules.Empty.html#__code__</div>
+            <div class="type">Attribute</div>
+            <div class="kind">Class Variable</div>
+            <div class="privacy">PUBLIC</div>
+            <div class="summary"><tt class="rst-docutils rst-literal">empty</tt>.</div>
+          </li><li id="orionis.schemas.rules.Empty.__message__">
+            
+            <div class="fullName">orionis<wbr></wbr>.schemas<wbr></wbr>.rules<wbr></wbr>.<wbr></wbr>Empty<wbr></wbr>.__message__</div>
+            <div class="url">orionis.schemas.rules.Empty.html#__message__</div>
+            <div class="type">Attribute</div>
+            <div class="kind">Class Variable</div>
+            <div class="privacy">PUBLIC</div>
+            <div class="summary">Default message reported for a non-empty value.</div>
+          </li><li id="orionis.schemas.rules.Empty.enforce">
+            
+            <div class="fullName">orionis<wbr></wbr>.schemas<wbr></wbr>.rules<wbr></wbr>.<wbr></wbr>Empty<wbr></wbr>.enforce</div>
+            <div class="url">orionis.schemas.rules.Empty.html#enforce</div>
+            <div class="type">Function</div>
+            <div class="kind">Method</div>
+            <div class="privacy">PUBLIC</div>
+            <div class="summary">Check that a field value is empty.</div>
           </li><li id="orionis.schemas.rules.Encoding">
             
             <div class="fullName">orionis<wbr></wbr>.schemas<wbr></wbr>.rules<wbr></wbr>.<wbr></wbr>Encoding</div>
@@ -91193,6 +91353,46 @@ field.</tt>.</div>
             <div class="kind">Method</div>
             <div class="privacy">PUBLIC</div>
             <div class="summary">Validate an uploaded file against the accepted MIME types.</div>
+          </li><li id="orionis.schemas.rules.NoEmpty">
+            
+            <div class="fullName">orionis<wbr></wbr>.schemas<wbr></wbr>.rules<wbr></wbr>.<wbr></wbr>No<wbr></wbr>Empty</div>
+            <div class="url">orionis.schemas.rules.NoEmpty.html</div>
+            <div class="type">Class</div>
+            <div class="kind">Class</div>
+            <div class="privacy">PUBLIC</div>
+            <div class="summary">Reject exactly the values accepted by Empty.</div>
+          </li><li id="orionis.schemas.rules.NoEmpty.__slots__">
+            
+            <div class="fullName">orionis<wbr></wbr>.schemas<wbr></wbr>.rules<wbr></wbr>.<wbr></wbr>No<wbr></wbr>Empty<wbr></wbr>.__slots__</div>
+            <div class="url">orionis.schemas.rules.NoEmpty.html#__slots__</div>
+            <div class="type">Attribute</div>
+            <div class="kind">Class Variable</div>
+            <div class="privacy">PUBLIC</div>
+            <div class="summary">Declare that this class introduces no additional instance slots.</div>
+          </li><li id="orionis.schemas.rules.NoEmpty.__code__">
+            
+            <div class="fullName">orionis<wbr></wbr>.schemas<wbr></wbr>.rules<wbr></wbr>.<wbr></wbr>No<wbr></wbr>Empty<wbr></wbr>.__code__</div>
+            <div class="url">orionis.schemas.rules.NoEmpty.html#__code__</div>
+            <div class="type">Attribute</div>
+            <div class="kind">Class Variable</div>
+            <div class="privacy">PUBLIC</div>
+            <div class="summary"><tt class="rst-docutils rst-literal">no_empty</tt>.</div>
+          </li><li id="orionis.schemas.rules.NoEmpty.__message__">
+            
+            <div class="fullName">orionis<wbr></wbr>.schemas<wbr></wbr>.rules<wbr></wbr>.<wbr></wbr>No<wbr></wbr>Empty<wbr></wbr>.__message__</div>
+            <div class="url">orionis.schemas.rules.NoEmpty.html#__message__</div>
+            <div class="type">Attribute</div>
+            <div class="kind">Class Variable</div>
+            <div class="privacy">PUBLIC</div>
+            <div class="summary">Default message reported for an empty value.</div>
+          </li><li id="orionis.schemas.rules.NoEmpty.enforce">
+            
+            <div class="fullName">orionis<wbr></wbr>.schemas<wbr></wbr>.rules<wbr></wbr>.<wbr></wbr>No<wbr></wbr>Empty<wbr></wbr>.enforce</div>
+            <div class="url">orionis.schemas.rules.NoEmpty.html#enforce</div>
+            <div class="type">Function</div>
+            <div class="kind">Method</div>
+            <div class="privacy">PUBLIC</div>
+            <div class="summary">Check that a field value is not empty.</div>
           </li><li id="orionis.schemas.rules.Size">
             
             <div class="fullName">orionis<wbr></wbr>.schemas<wbr></wbr>.rules<wbr></wbr>.<wbr></wbr>Size</div>

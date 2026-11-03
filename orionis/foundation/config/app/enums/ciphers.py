@@ -1,3 +1,5 @@
+"""Enumerate supported AES cipher modes."""
+
 from enum import Enum
 
 class Cipher(Enum):

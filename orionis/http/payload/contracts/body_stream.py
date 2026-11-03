@@ -1,3 +1,5 @@
+"""Define the minimal contract for reading an HTTP request body."""
+
 from __future__ import annotations
 from abc import ABC, abstractmethod
 from typing import TYPE_CHECKING
@@ -16,6 +18,7 @@ class IBodyStream(ABC):
     """
 
     __slots__ = ()
+    """Declare that this class introduces no additional instance slots."""
 
     @property
     @abstractmethod
@@ -62,7 +65,7 @@ class IBodyStream(ABC):
         RuntimeError
             If the stream was consumed by a streaming consumer before
             the body was buffered.
-        PayloadTooLargeException
+        orionis.http.payload.body.PayloadTooLargeException
             If incoming data exceeds the configured body-size limit.
         """
 

@@ -1,3 +1,5 @@
+"""Provide console debug operations through ``HttpDump``, ``Dumper``."""
+
 import inspect
 from typing import Any
 from orionis.console.debug.contracts.dumper import IDumper
@@ -10,6 +12,7 @@ class HttpDump(RuntimeError):
     """Carry a snapshot that only the debug HTTP error boundary may render."""
 
     __slots__ = ("dumper", "insert_line")
+    """Declare the instance attribute slots reserved by this class."""
 
     def __init__(self, dumper: VarDumper, *, insert_line: bool = False) -> None:
         """
@@ -17,7 +20,7 @@ class HttpDump(RuntimeError):
 
         Parameters
         ----------
-        dumper : VarDumper
+        dumper : orionis.console.output.var_dumper.VarDumper
             Configured dumper containing the cloned values.
         insert_line : bool, optional
             Whether the rendered fragment includes separating lines.
@@ -32,7 +35,9 @@ class HttpDump(RuntimeError):
             "request dispatch.",
         )
         self.dumper = dumper
+        """Configured dumper containing the cloned values."""
         self.insert_line = insert_line
+        """Whether the rendered fragment includes separating lines."""
 
 class Dumper(IDumper):
     """Implement synchronous dumping independently of application boot.
@@ -61,7 +66,7 @@ class Dumper(IDumper):
 
         Parameters
         ----------
-        *args : Any
+        *args : typing.Any
             Variables to dump.
         show_types : bool, optional
             Whether to show variable types. Default is False.
@@ -149,7 +154,7 @@ class Dumper(IDumper):
 
         Parameters
         ----------
-        *args : Any
+        *args : typing.Any
             Variables to dump.
         show_types : bool, optional
             Whether to show variable types. Default is False.

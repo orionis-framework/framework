@@ -1,3 +1,5 @@
+"""Group the foundation config mail components and public imports."""
+
 from typing import TYPE_CHECKING as _TYPE_CHECKING
 from orionis._exports import resolve_export as _resolve_export
 
@@ -26,6 +28,7 @@ _EXPORTS = {
     "Mailers": ("orionis.foundation.config.mail.entities.mailers", "Mailers"),
     "Smtp": ("orionis.foundation.config.mail.entities.smtp", "Smtp"),
 }
+"""Public export names mapped to their defining modules and attributes."""
 
 def __getattr__(name: str) -> object:
     """

@@ -1,3 +1,5 @@
+"""Generate an explicitly imported factory for an application model."""
+
 import keyword
 import re
 from pathlib import Path
@@ -7,8 +9,11 @@ from orionis.console.commands.make._base import MakeStubCommand
 from orionis.foundation.contracts.application import IApplication  # noqa: TC001
 
 _NAME_RE: re.Pattern[str] = re.compile(r"[A-Za-z]\w*", re.ASCII)
+"""Compiled pattern used to recognize name re."""
 _ACRONYM_RE: re.Pattern[str] = re.compile(r"([A-Z]+)([A-Z][a-z])")
+"""Compiled pattern used to recognize acronym re."""
 _CAMEL_RE: re.Pattern[str] = re.compile(r"([a-z0-9])([A-Z])")
+"""Compiled pattern used to recognize camel re."""
 
 def _parse_name(name: str) -> tuple[tuple[str, ...], str]:
     """
@@ -21,7 +26,7 @@ def _parse_name(name: str) -> tuple[tuple[str, ...], str]:
 
     Returns
     -------
-    tuple[tuple[str, ...], str]
+    tuple[tuple[str, ``...``], str]
         Snake case module components and the corresponding class name.
 
     Raises
@@ -57,14 +62,24 @@ class MakeFactory(MakeStubCommand):
     """Generate an explicitly imported factory for an application model."""
 
     __slots__ = ()
+    """Declare that this class introduces no additional instance slots."""
 
     timestamps: bool = False
+    """Timestamps flag used by ``MakeFactory``."""
     signature: str = "make:factory"
+    """Signature identifier: ``make:factory``."""
     description: str = "Creates a model factory in the database directory."
+    """
+    Description identifier: ``Creates a model factory in the database directory.``.
+    """
     template_name: str = "factory"
+    """Template name identifier: ``factory``."""
     path_key: str = "database_factories"
+    """Path key identifier: ``database_factories``."""
     success_label: str = "Model factory"
+    """Success label identifier: ``Model factory``."""
     postfix: str | None = "Factory"
+    """Postfix identifier: ``Factory``."""
     arguments: ClassVar[list[Argument]] = [
         Argument(
             name_or_flags="name",
@@ -79,6 +94,7 @@ class MakeFactory(MakeStubCommand):
             help="Model name below app/models, for example User or sales/Order.",
         ),
     ]
+    """Command-line argument declarations accepted by this command."""
 
     def createFiles(
         self,
@@ -90,14 +106,14 @@ class MakeFactory(MakeStubCommand):
 
         Parameters
         ----------
-        app : IApplication
+        app : orionis.IApplication
             Application that resolves the destination and model paths.
         name : str
             Factory class or file name, with optional nested directories.
 
         Returns
         -------
-        tuple[tuple[str, str], ...]
+        tuple[tuple[str, str], ``...``]
             Success label and the generated application-relative path.
 
         Raises

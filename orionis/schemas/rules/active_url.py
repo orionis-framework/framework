@@ -1,3 +1,5 @@
+"""Ensure a URL points at a hostname that currently resolves."""
+
 import asyncio
 import socket
 from urllib.parse import urlsplit
@@ -15,9 +17,12 @@ class ActiveUrl(Rule):
     # ruff: noqa: ARG002
 
     __slots__ = ()
+    """Declare that this class introduces no additional instance slots."""
 
     __message__ = "Value must be a URL with a resolvable hostname."
+    """Error text for message: ``Value must be a URL with a resolvable hostname.``."""
     __code__ = "active_url"
+    """Code identifier: ``active_url``."""
 
     async def enforce(
         self,

@@ -1,3 +1,5 @@
+"""Represent a Google Cloud Storage configuration."""
+
 from __future__ import annotations
 from dataclasses import dataclass, field
 from orionis.environment import Env
@@ -13,9 +15,9 @@ class GCS(BaseEntity):
     library, which is an optional dependency: install it with
     ``uv add 'orionis[gcs]'``.
 
-    Parameters
+    Attributes
     ----------
-    driver : str, default="gcs"
+    driver : str, default="``gcs``"
         The filesystem driver name. Built-in names are "gcs" and "google".
     project_id : str
         Google Cloud project identifier.
@@ -76,10 +78,6 @@ class GCS(BaseEntity):
     def __post_init__(self) -> None:
         """
         Validate the types of the GCS entity attributes.
-
-        Parameters
-        ----------
-        None
 
         Returns
         -------

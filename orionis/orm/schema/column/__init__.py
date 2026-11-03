@@ -1,3 +1,5 @@
+"""Group the orm schema column components and public imports."""
+
 from typing import TYPE_CHECKING as _TYPE_CHECKING
 from orionis._exports import resolve_export as _resolve_export
 
@@ -14,6 +16,7 @@ _EXPORTS = {
     "ColumnDefinition": ("orionis.orm.schema.column.definition", "ColumnDefinition"),
     "ColumnOptions": ("orionis.orm.schema.column.options", "ColumnOptions"),
 }
+"""Public export names mapped to their defining modules and attributes."""
 
 def __getattr__(name: str) -> object:
     """

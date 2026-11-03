@@ -1,3 +1,5 @@
+"""Rotate log files using size limits and resolved time suffixes."""
+
 from __future__ import annotations
 import gzip
 import re
@@ -14,6 +16,7 @@ if TYPE_CHECKING:
 class AdvancedRotatingFileHandler(Handler):
 
     # ruff: noqa: PERF401, PLR0913
+    """Rotate log files using size limits and resolved time suffixes."""
 
     def __init__(
         self,
@@ -34,7 +37,7 @@ class AdvancedRotatingFileHandler(Handler):
         ----------
         path_template : str
             Path template containing the {suffix} placeholder.
-        suffix_resolver : SuffixResolver
+        suffix_resolver : orionis.logging.contracts.suffix_resolver.SuffixResolver
             Resolver for determining the suffix for rotation.
         max_bytes : int | None, optional
             Maximum file size in bytes before rotation (for chunked rotation).
@@ -57,30 +60,46 @@ class AdvancedRotatingFileHandler(Handler):
         super().__init__()
 
         self.path_template = path_template
+        """Path template containing the {suffix} placeholder."""
         self.suffix_resolver = suffix_resolver
+        """Resolver for determining the suffix for rotation."""
         self.max_bytes = max_bytes
+        """Maximum file size in bytes before rotation (for chunked rotation)."""
         self.backup_count = backup_count
+        """Maximum number of backup files to retain."""
         self.encoding = encoding
+        """File encoding."""
         self.delay = delay
+        """If True, delay file opening until the first log record."""
         self.compress_rotated = compress_rotated
+        """If True, compress rotated files using gzip."""
         self.app_root = Path(app_root)
+        """Application root directory."""
 
         self.stream = None
+        """Iterator supplying response body chunks."""
         self.current_path = None
+        """Filesystem path of the active log file."""
         self.current_suffix = None
+        """Suffix identifying the active log-rotation window."""
         self.file_size = 0
+        """File size value used by ``AdvancedRotatingFileHandler``."""
 
         # Ensure thread safety for file operations.
         self._lock = Lock()
+        """Ensure thread safety for file operations."""
 
         # Store resolved paths for recent suffixes.
         self._path_cache: dict[str, str] = {}
+        """Store resolved paths for recent suffixes."""
         self._cache_monotonic_expiry: float = 0.0
+        """Cache monotonic expiry value used by ``AdvancedRotatingFileHandler``."""
 
         # Match rotated files belonging to this path template.
         basename = Path(path_template).name
         escaped = re.escape(basename).replace(re.escape("{suffix}"), ".*")
         self._cleanup_pattern: re.Pattern = re.compile(rf"{escaped}(?:\.gz)?\Z")
+        """Compiled pattern used to recognize cleanup pattern."""
 
         if not self.delay:
             self._ensureStream()
@@ -288,7 +307,7 @@ class AdvancedRotatingFileHandler(Handler):
 
         Parameters
         ----------
-        record : LogRecord
+        record : ``logging.LogRecord``
             The log record to emit.
 
         Returns

@@ -1,3 +1,5 @@
+"""Serialize explicit job state through a registry of application-trusted types."""
+
 import inspect
 import math
 from dataclasses import dataclass
@@ -14,19 +16,28 @@ from orionis.queues.exceptions import (
 from orionis.queues.job import BaseJob
 
 _MAX_PAYLOAD_BYTES = 1024 * 1024
+"""Max payload bytes used by ``serializer``."""
 _MAX_STATE_DEPTH = 32
+"""Max state depth value used by ``serializer``."""
 _TUPLE_EXTENSION = 1
+"""Tuple extension value used by ``serializer``."""
 _OPTIONS = frozenset({"tries", "timeout", "backoff"})
+"""Options used by ``serializer``."""
 _SCALAR_TYPES = frozenset({str, bytes, int, float, bool, type(None)})
+"""Scalar types used by ``serializer``."""
 
 @dataclass(frozen=True, slots=True)
 class _JobMetadata:
     """Retain trusted class metadata independently of live job instances."""
 
     job_type: type[BaseJob]
+    """Job class associated with the compiled serialization metadata."""
     names: tuple[str, ...]
+    """Field names accepted by the compiled serializer."""
     name_set: frozenset[str]
+    """Field-name set used for fast validation of serialized input."""
     annotations: dict[str, object]
+    """Declared metadata describing behavior or validation types."""
 
 def _validate_annotation(annotation: object) -> bool:
     """
@@ -70,7 +81,7 @@ def _pack_value(value: object, depth: int = 0) -> object:
 
     Raises
     ------
-    QueuePayloadError
+    orionis.queues.exceptions.QueuePayloadError
         If state exceeds the depth limit, contains unsupported objects,
         nonfinite numbers, or dictionary keys that are not plain strings.
     """
@@ -120,7 +131,7 @@ def _validate_unpacked_value(value: object, depth: int = 0) -> None:
 
     Raises
     ------
-    QueuePayloadError
+    orionis.queues.exceptions.QueuePayloadError
         If state exceeds the depth limit or contains unsupported values.
     """
     if depth > _MAX_STATE_DEPTH:
@@ -160,7 +171,7 @@ def _unpack_extension(code: int, data: memoryview) -> tuple[object, ...]:
 
     Returns
     -------
-    tuple[object, ...]
+    tuple[object, ``...``]
         Restored primitive tuple.
     """
     if code != _TUPLE_EXTENSION:
@@ -182,7 +193,7 @@ def _collect_job_fields(
 
     Parameters
     ----------
-    parent : type[BaseJob]
+    parent : type[orionis.queues.BaseJob]
         Registered job class or one of its BaseJob ancestors.
     names : dict[str, None]
         Ordered persistent field names collected across the hierarchy.
@@ -211,17 +222,17 @@ def _job_metadata(job_type: type[BaseJob]) -> _JobMetadata:
 
     Parameters
     ----------
-    job_type : type[BaseJob]
+    job_type : type[orionis.queues.BaseJob]
         Concrete job class registered by application code.
 
     Returns
     -------
-    _JobMetadata
+    orionis.queues.serializer._JobMetadata
         Persistent field names and optional primitive type constraints.
 
     Raises
     ------
-    QueueConfigurationError
+    orionis.queues.exceptions.QueueConfigurationError
         If persistent fields are private, shadow job options, or use
         unsupported annotations.
     """
@@ -244,6 +255,7 @@ class JobSerializer(IJobSerializer):
     """Serialize explicit job state through a registry of application-trusted types."""
 
     __slots__ = ("_decoder", "_encoder", "_registry", "_state_decoder", "_types")
+    """Declare the instance attribute slots reserved by this class."""
 
     def __init__(self) -> None:
         """
@@ -255,10 +267,15 @@ class JobSerializer(IJobSerializer):
             Retain codecs without importing application job modules.
         """
         self._registry: dict[str, _JobMetadata] = {}
+        """Registered implementations indexed by their public identifiers."""
         self._types: dict[type[BaseJob], tuple[str, _JobMetadata]] = {}
+        """Types registered for validation, serialization or schema operations."""
         self._encoder = msgspec.json.Encoder()
+        """Encoder produced by ``msgspec.json.Encoder``."""
         self._decoder = msgspec.json.Decoder(JobEnvelope)
+        """Decoder produced by ``msgspec.json.Decoder``."""
         self._state_decoder = msgspec.msgpack.Decoder(ext_hook=_unpack_extension)
+        """State decoder produced by ``msgspec.msgpack.Decoder``."""
 
     def register(self, job_type: type[BaseJob]) -> None:
         """
@@ -266,7 +283,7 @@ class JobSerializer(IJobSerializer):
 
         Parameters
         ----------
-        job_type : type[BaseJob]
+        job_type : type[orionis.queues.BaseJob]
             Class imported by application bootstrap or dispatched locally.
 
         Returns
@@ -304,7 +321,7 @@ class JobSerializer(IJobSerializer):
 
         Parameters
         ----------
-        job : BaseJob
+        job : orionis.queues.BaseJob
             Trusted application job instance.
 
         Returns
@@ -314,7 +331,7 @@ class JobSerializer(IJobSerializer):
 
         Raises
         ------
-        QueuePayloadError
+        orionis.queues.exceptions.QueuePayloadError
             If state is undeclared, unsupported, or exceeds the payload limit.
         """
         job_type = type(job)
@@ -350,7 +367,7 @@ class JobSerializer(IJobSerializer):
 
         Returns
         -------
-        BaseJob
+        orionis.queues.BaseJob
             Reconstructed job awaiting scoped DI invocation.
         """
         metadata = self._registry.get(identity)
@@ -383,7 +400,7 @@ class JobSerializer(IJobSerializer):
 
         Parameters
         ----------
-        metadata : _JobMetadata
+        metadata : orionis.queues.serializer._JobMetadata
             Trusted persistent field constraints.
         values : dict[str, object]
             Restored or declared primitive state.
@@ -420,7 +437,7 @@ class JobSerializer(IJobSerializer):
 
         Parameters
         ----------
-        envelope : JobEnvelope
+        envelope : orionis.queues.JobEnvelope
             Validated execution data.
 
         Returns
@@ -443,7 +460,7 @@ class JobSerializer(IJobSerializer):
 
         Returns
         -------
-        JobEnvelope
+        orionis.queues.JobEnvelope
             Immutable options ready for registry-based state decoding.
         """
         self._checkSize(payload)

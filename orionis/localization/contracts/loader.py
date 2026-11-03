@@ -1,3 +1,5 @@
+"""Define the contract for translation file loaders."""
+
 from __future__ import annotations
 from abc import ABC, abstractmethod
 from typing import TYPE_CHECKING
@@ -16,6 +18,7 @@ class ITranslationLoader(ABC):
     """
 
     __slots__ = ()
+    """Declare that this class introduces no additional instance slots."""
 
     @abstractmethod
     def load(self, locale: str) -> TranslationMap:
@@ -35,13 +38,13 @@ class ITranslationLoader(ABC):
 
         Returns
         -------
-        TranslationMap
+        orionis.localization.types.TranslationMap
             Flat mapping of translation key to translated text. An
             empty mapping is returned when no source exists.
 
         Raises
         ------
-        TranslationSyntaxException
+        orionis.localization.TranslationSyntaxException
             If a translation file is not UTF-8 encoded, contains
             invalid JSON, or its root element is not an object.
         """
@@ -53,7 +56,7 @@ class ITranslationLoader(ABC):
 
         Returns
         -------
-        tuple[str, ...]
+        tuple[str, ``...``]
             Sorted locale codes discovered from root JSON files and
             grouped directories inside the language path.
         """

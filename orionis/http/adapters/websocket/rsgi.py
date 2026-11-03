@@ -1,3 +1,5 @@
+"""Adapt Granian's actual RSGI WebsocketProtocol and accepted transport."""
+
 from typing import TYPE_CHECKING
 from granian._granian import RSGIProtocolClosed
 from granian.rsgi import WebsocketMessageType
@@ -10,11 +12,13 @@ if TYPE_CHECKING:
     from granian._granian import RSGIWebsocketProtocol, RSGIWebsocketTransport
 
 _NORMAL_CLOSE = 1000
+"""Normal close value used by ``rsgi``."""
 
 class RSGIWebSocketTransport(IWebSocketTransport):
     """Adapt Granian's actual RSGI WebsocketProtocol and accepted transport."""
 
     __slots__ = ("_protocol", "_transport")
+    """Declare the instance attribute slots reserved by this class."""
 
     def __init__(self, protocol: RSGIWebsocketProtocol) -> None:
         """
@@ -22,7 +26,7 @@ class RSGIWebSocketTransport(IWebSocketTransport):
 
         Parameters
         ----------
-        protocol : WebsocketProtocol
+        protocol : ``WebsocketProtocol``
             Granian's handshake and close interface.
 
         Returns
@@ -31,7 +35,9 @@ class RSGIWebSocketTransport(IWebSocketTransport):
             Prepare a transport that will be bound during acceptance.
         """
         self._protocol = protocol
+        """Granian's handshake and close interface."""
         self._transport: RSGIWebsocketTransport | None = None
+        """Native protocol transport backing the framework adapter."""
 
     @property
     def supportsCloseDetails(self) -> bool:
@@ -56,7 +62,7 @@ class RSGIWebSocketTransport(IWebSocketTransport):
         ----------
         subprotocol : str | None, optional
             Unsupported by this RSGI version.
-        headers : Mapping[str, str] | None, optional
+        headers : collections.abc.Mapping[str, str] | None, optional
             Unsupported by this RSGI version.
 
         Returns
@@ -68,7 +74,7 @@ class RSGIWebSocketTransport(IWebSocketTransport):
         ------
         NotImplementedError
             If unsupported handshake options are requested.
-        WebSocketDisconnected
+        orionis.http.WebSocketDisconnected
             If the server reports an already closed connection.
         """
         if subprotocol is not None or headers:
@@ -85,7 +91,7 @@ class RSGIWebSocketTransport(IWebSocketTransport):
 
         Returns
         -------
-        RSGIWebsocketTransport
+        ``granian._granian.RSGIWebsocketTransport``
             Granian's active message transport.
 
         Raises
@@ -104,14 +110,14 @@ class RSGIWebSocketTransport(IWebSocketTransport):
 
         Returns
         -------
-        WebSocketMessage
+        orionis.http.WebSocketMessage
             Message with unknown peer close details represented as code 1006.
 
         Raises
         ------
         RuntimeError
             If the server supplies an invalid message kind or payload.
-        WebSocketDisconnected
+        orionis.http.WebSocketDisconnected
             If the server reports a transport disconnection.
         """
         try:
@@ -143,7 +149,7 @@ class RSGIWebSocketTransport(IWebSocketTransport):
 
         Raises
         ------
-        WebSocketDisconnected
+        orionis.http.WebSocketDisconnected
             If the peer has closed the transport.
         """
         try:
@@ -167,7 +173,7 @@ class RSGIWebSocketTransport(IWebSocketTransport):
 
         Raises
         ------
-        WebSocketDisconnected
+        orionis.http.WebSocketDisconnected
             If the peer has closed the transport.
         """
         try:

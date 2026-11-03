@@ -1,3 +1,5 @@
+"""Describe a stored personal access token."""
+
 from dataclasses import asdict, dataclass
 from typing import TYPE_CHECKING
 
@@ -25,13 +27,13 @@ class AccessToken:
     abilities : frozenset[str] | None
         Abilities the token may use, or ``None`` when the token keeps the
         full authorization of the identity.
-    created_at : datetime | None
+    created_at : datetime.datetime | None
         Moment the token was issued.
-    expires_at : datetime | None
+    expires_at : datetime.datetime | None
         Moment the token stops being accepted.
-    last_used_at : datetime | None
+    last_used_at : datetime.datetime | None
         Moment the token was last presented on a request.
-    revoked_at : datetime | None
+    revoked_at : datetime.datetime | None
         Moment the token was revoked.
     """
 

@@ -1,3 +1,5 @@
+"""Generate and persist an application encryption key."""
+
 from typing import ClassVar
 from orionis.console.args.argument import Argument
 from orionis.console.base.command import BaseCommand
@@ -14,8 +16,11 @@ class KeyGenerateCommand(BaseCommand):
     # ruff: noqa: TC001
 
     timestamps: bool = False
+    """Timestamps flag used by ``KeyGenerateCommand``."""
     signature: str = "key:generate"
+    """Signature identifier: ``key:generate``."""
     description: str = "Generate the application encryption key."
+    """Description identifier: ``Generate the application encryption key.``."""
     arguments: ClassVar[list[Argument]] = [
         Argument(
             name_or_flags="--force",
@@ -24,6 +29,7 @@ class KeyGenerateCommand(BaseCommand):
             help="Replace the existing application key.",
         ),
     ]
+    """Command-line argument declarations accepted by this command."""
 
     def handle(
         self,
@@ -35,9 +41,9 @@ class KeyGenerateCommand(BaseCommand):
 
         Parameters
         ----------
-        app : IApplication
+        app : orionis.IApplication
             Application providing the configured cipher.
-        console : Console
+        console : orionis.console.Console
             Console used to report the result.
 
         Returns

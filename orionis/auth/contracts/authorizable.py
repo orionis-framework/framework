@@ -1,3 +1,5 @@
+"""Define how an identity is addressed by the authorization tables."""
+
 from abc import ABC, abstractmethod
 
 class IAuthorizable(ABC):
@@ -9,6 +11,7 @@ class IAuthorizable(ABC):
     """
 
     __slots__ = ()
+    """Declare that this class introduces no additional instance slots."""
 
     @abstractmethod
     def getAuthorizableType(self) -> str:

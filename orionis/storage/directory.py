@@ -1,3 +1,5 @@
+"""Represent a directory on a storage disk."""
+
 from __future__ import annotations
 from typing import TYPE_CHECKING
 from orionis.storage.contracts.directory import IDirectory
@@ -14,11 +16,12 @@ class Directory(IDirectory):
 
     The object encapsulates its canonical path and the driver of the
     disk it belongs to. Listing methods always return
-    :class:`~orionis.storage.file.File` and :class:`Directory`
+    :class:`orionis.storage.File` and :class:`orionis.storage.Directory`
     objects — never plain strings.
     """
 
     __slots__ = ("_driver", "_path")
+    """Declare the instance attribute slots reserved by this class."""
 
     def __init__(self, driver: IStorageDriver, path: str = "") -> None:
         """
@@ -26,7 +29,7 @@ class Directory(IDirectory):
 
         Parameters
         ----------
-        driver : IStorageDriver
+        driver : orionis.storage.contracts.IStorageDriver
             Driver of the disk that owns the directory.
         path : str
             Root-relative directory path; normalized on ingestion.
@@ -35,14 +38,20 @@ class Directory(IDirectory):
         Returns
         -------
         None
+            Initialize the directory with its driver and canonical path.
 
         Raises
         ------
-        StoragePathException
+        orionis.storage.exceptions.StoragePathException
             If *path* is invalid or escapes the disk root.
         """
         self._driver = driver
+        """Driver of the disk that owns the directory."""
         self._path = normalizePath(path)
+        """
+        Root-relative directory path; normalized on ingestion. The empty string
+        denotes the disk root.
+        """
 
     def path(self) -> str:
         """
@@ -62,7 +71,7 @@ class Directory(IDirectory):
 
         Returns
         -------
-        IDirectory
+        orionis.storage.contracts.IDirectory
             The directory itself, enabling fluent chaining.
         """
         await self._driver.createDirectory(self._path)
@@ -96,7 +105,7 @@ class Directory(IDirectory):
 
         Returns
         -------
-        list[IFile]
+        list[orionis.storage.contracts.IFile]
             File objects for every direct child file, sorted by path.
         """
         paths = await self._driver.files(self._path, recursive=False)
@@ -108,7 +117,7 @@ class Directory(IDirectory):
 
         Returns
         -------
-        list[IFile]
+        list[orionis.storage.contracts.IFile]
             File objects for all nested files, sorted by path.
         """
         paths = await self._driver.files(self._path, recursive=True)
@@ -120,7 +129,7 @@ class Directory(IDirectory):
 
         Returns
         -------
-        list[IDirectory]
+        list[orionis.storage.contracts.IDirectory]
             Directory objects for every direct child directory,
             sorted by path.
         """
@@ -133,7 +142,7 @@ class Directory(IDirectory):
 
         Returns
         -------
-        list[IDirectory]
+        list[orionis.storage.contracts.IDirectory]
             Directory objects for all nested directories, sorted by
             path.
         """

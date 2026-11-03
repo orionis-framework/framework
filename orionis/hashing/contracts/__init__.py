@@ -1,3 +1,5 @@
+"""Group the hashing contracts components and public imports."""
+
 from orionis.hashing.contracts.hash_manager import IHashManager
 from orionis.hashing.contracts.hasher import IHasher
 

@@ -1,3 +1,5 @@
+"""Reflect dependency metadata from callables, constructors, and methods."""
+
 from __future__ import annotations
 import functools
 import inspect
@@ -13,16 +15,20 @@ from orionis.introspection.dependencies.entities.signature import (
 )
 
 _SKIP_NAMES: frozenset[str] = frozenset({"self", "cls"})
+"""Skip names used by ``reflection``."""
 _SKIP_KINDS: frozenset[int] = frozenset({
     inspect.Parameter.VAR_POSITIONAL,
     inspect.Parameter.VAR_KEYWORD,
 })
+"""Skip kinds used by ``reflection``."""
 _KEYWORD_ONLY: int          = inspect.Parameter.KEYWORD_ONLY
 _PARAM_EMPTY                = inspect.Parameter.empty
 _ANY_TYPE: type             = type(Any)
+"""Any type used by ``reflection``."""
 _ANY_MODULE: str            = _ANY_TYPE.__module__
 _ANY_NAME: str              = _ANY_TYPE.__name__
 _ANY_FULL_PATH: str         = f"{_ANY_MODULE}.{_ANY_NAME}"
+"""Any full path used by ``reflection``."""
 _STRUCT_TYPE: type          = msgspec.Struct
 
 @functools.lru_cache(maxsize=1024)
@@ -32,12 +38,12 @@ def _get_signature(target: Any) -> inspect.Signature:
 
     Parameters
     ----------
-    target : Any
+    target : typing.Any
         Callable, method, function, or class to inspect.
 
     Returns
     -------
-    inspect.Signature
+    ``inspect.Signature``
         Cached signature object for the provided target.
     """
     return inspect.signature(target)
@@ -53,7 +59,7 @@ def _resolve_parameter_hint(
     ----------
     annotation : str
         Parameter annotation requiring evaluation.
-    globalns : dict[str, Any]
+    globalns : dict[str, typing.Any]
         Namespace of the callable's defining module.
 
     Returns
@@ -76,14 +82,14 @@ def _resolve_future_annotations(
 
     Parameters
     ----------
-    target : Any
+    target : typing.Any
         Callable declaring the annotations.
-    signature : inspect.Signature
+    signature : ``inspect.Signature``
         Signature whose parameters may contain string annotations.
 
     Returns
     -------
-    inspect.Signature
+    ``inspect.Signature``
         Signature with available types substituted and defaults preserved.
     """
     parameters = tuple(signature.parameters.values())
@@ -128,13 +134,13 @@ def _resolve_annotation(annotation: Any) -> tuple[str, str, Any]:
 
     Parameters
     ----------
-    annotation : Any
+    annotation : typing.Any
         The annotation object from an ``inspect.Parameter``. May be a string
         (forward reference) or an actual type/class.
 
     Returns
     -------
-    tuple[str, str, Any]
+    tuple[str, str, typing.Any]
         A three-element tuple ``(module_name, class_name, type_or_annotation)``
         where ``module_name`` and ``class_name`` identify the annotation's
         origin, and ``type_or_annotation`` is the resolved type (or ``str``
@@ -153,12 +159,12 @@ def _build_dependencies(signature: inspect.Signature) -> Signature:  # NOSONAR
 
     Parameters
     ----------
-    signature : inspect.Signature
+    signature : ``inspect.Signature``
         The signature object to analyze.
 
     Returns
     -------
-    Signature
+    orionis.introspection.dependencies.entities.signature.Signature
         An object containing categorized resolved and unresolved
         parameter dependencies.
     """
@@ -263,14 +269,14 @@ def _cached_resolved_signature(target: Any, *, bound: bool = False) -> Signature
 
     Parameters
     ----------
-    target : Any
+    target : typing.Any
         Object whose inspectable signature is resolved into dependencies.
     bound : bool, optional
         Whether the first positional parameter is supplied by method binding.
 
     Returns
     -------
-    Signature
+    orionis.introspection.dependencies.entities.signature.Signature
         Dependency signature built from the target's inspectable signature.
 
     Raises
@@ -306,12 +312,12 @@ def _get_resolved_signature(target: Any) -> Signature:
 
     Parameters
     ----------
-    target : Any
+    target : typing.Any
         Callable whose parameters are inspected.
 
     Returns
     -------
-    Signature
+    orionis.introspection.dependencies.entities.signature.Signature
         Shared metadata keyed by the underlying function and binding mode.
     """
     if isinstance(target, MethodType):
@@ -334,6 +340,7 @@ class ReflectDependencies(IReflectDependencies):
     # ruff: noqa: ANN401
 
     __slots__ = ("_target",)
+    """Declare the instance attribute slots reserved by this class."""
 
     def __init__(self, target: Any | None = None) -> None:
         """
@@ -341,7 +348,7 @@ class ReflectDependencies(IReflectDependencies):
 
         Parameters
         ----------
-        target : Any | None, optional
+        target : typing.Any | None, optional
             The object whose dependencies are to be reflected.
 
         Returns
@@ -351,6 +358,7 @@ class ReflectDependencies(IReflectDependencies):
         """
         # Store the target for subsequent reflection calls.
         self._target = target
+        """The object whose dependencies are to be reflected."""
 
     def constructorSignature(self) -> Signature:
         """
@@ -358,7 +366,7 @@ class ReflectDependencies(IReflectDependencies):
 
         Returns
         -------
-        Signature
+        orionis.introspection.dependencies.entities.signature.Signature
             Contains resolved and unresolved parameter dependencies.
 
         Raises
@@ -380,13 +388,15 @@ class ReflectDependencies(IReflectDependencies):
 
         Returns
         -------
-        Signature
+        orionis.introspection.dependencies.entities.signature.Signature
             Categorized resolved and unresolved parameter dependencies.
 
         Raises
         ------
+        AttributeError
+            If the target has no method with the requested name.
         ValueError
-            If the method does not exist or its signature cannot be inspected.
+            If the method's signature cannot be inspected.
         """
         # Retrieve the bound method by name then resolve its dependencies.
         return _get_resolved_signature(getattr(self._target, method_name))
@@ -397,7 +407,7 @@ class ReflectDependencies(IReflectDependencies):
 
         Returns
         -------
-        Signature
+        orionis.introspection.dependencies.entities.signature.Signature
             Contains resolved and unresolved parameter dependencies.
 
         Raises

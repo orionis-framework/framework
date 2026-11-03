@@ -1,3 +1,5 @@
+"""Define the contract for reflection instance implementations."""
+
 from abc import ABC, abstractmethod
 from typing import TYPE_CHECKING, Any
 
@@ -11,6 +13,7 @@ if TYPE_CHECKING:
 class IReflectionInstance(ABC):
 
     # ruff :noqa: ANN401
+    """Define the contract for reflection instance implementations."""
 
     @abstractmethod
     def getInstance(self) -> Any:
@@ -19,7 +22,7 @@ class IReflectionInstance(ABC):
 
         Returns
         -------
-        Any
+        typing.Any
             The object instance being reflected upon.
         """
 
@@ -159,14 +162,14 @@ class IReflectionInstance(ABC):
         ----------
         name : str
             Name of the attribute to retrieve.
-        default : Any, optional
+        default : typing.Any, optional
             Value to return if the attribute does not exist. Defaults to None.
 
         Returns
         -------
-        Any
+        typing.Any
             Value of the specified attribute if it exists, otherwise the provided
-            `default` value.
+            ``default`` value.
 
         Raises
         ------
@@ -177,8 +180,8 @@ class IReflectionInstance(ABC):
         -----
         This method first checks the instance's attributes dictionary for the
         given name. If not found, it attempts to retrieve the attribute directly
-        from the instance using `getattr`. If the attribute is still not found,
-        the `default` value is returned.
+        from the instance using ``getattr``. If the attribute is still not found,
+        the ``default`` value is returned.
         """
 
     @abstractmethod
@@ -190,7 +193,7 @@ class IReflectionInstance(ABC):
         ----------
         name : str
             Name of the attribute to set.
-        value : Any
+        value : typing.Any
             Value to assign to the attribute.
 
         Returns
@@ -240,7 +243,7 @@ class IReflectionInstance(ABC):
 
         Returns
         -------
-        dict[str, Any]
+        dict[str, typing.Any]
             Dictionary mapping attribute names to their values for all visibility
             levels.
         """
@@ -250,13 +253,9 @@ class IReflectionInstance(ABC):
         """
         Return all public attributes of the instance.
 
-        Parameters
-        ----------
-        self : ReflectionInstance
-
         Returns
         -------
-        dict[str, Any]
+        dict[str, typing.Any]
             Dictionary mapping public attribute names to their values. Excludes
             dunder, protected, and private attributes.
         """
@@ -266,13 +265,9 @@ class IReflectionInstance(ABC):
         """
         Return all protected attributes of the instance.
 
-        Parameters
-        ----------
-        self : ReflectionInstance
-
         Returns
         -------
-        dict[str, Any]
+        dict[str, typing.Any]
             Dictionary containing protected attribute names and their values.
             Protected attributes start with a single underscore, are not dunder,
             and are not private (do not start with the class name).
@@ -283,13 +278,9 @@ class IReflectionInstance(ABC):
         """
         Retrieve all private attributes of the instance.
 
-        Parameters
-        ----------
-        self : ReflectionInstance
-
         Returns
         -------
-        dict[str, Any]
+        dict[str, typing.Any]
             Dictionary mapping unmangled private attribute names to their values.
         """
 
@@ -298,13 +289,9 @@ class IReflectionInstance(ABC):
         """
         Retrieve all dunder (double underscore) attributes of the instance.
 
-        Parameters
-        ----------
-        self : ReflectionInstance
-
         Returns
         -------
-        dict[str, Any]
+        dict[str, typing.Any]
             Dictionary mapping dunder attribute names to their values.
         """
 
@@ -315,7 +302,7 @@ class IReflectionInstance(ABC):
 
         Returns
         -------
-        dict[str, Any]
+        dict[str, typing.Any]
             Dictionary mapping magic attribute names to their values.
         """
 
@@ -348,7 +335,7 @@ class IReflectionInstance(ABC):
         ----------
         name : str
             Name of the method to set.
-        method : Callable
+        method : collections.abc.Callable
             Callable object to assign as the method.
 
         Returns
@@ -396,7 +383,7 @@ class IReflectionInstance(ABC):
 
         Returns
         -------
-        inspect.Signature
+        ``inspect.Signature``
             Signature object representing the method's parameters and return type.
 
         Raises
@@ -449,7 +436,7 @@ class IReflectionInstance(ABC):
 
         Parameters
         ----------
-        self : ReflectionInstance
+        self : orionis.introspection.ReflectionInstance
             The ReflectionInstance object.
 
         Returns
@@ -477,7 +464,7 @@ class IReflectionInstance(ABC):
 
         Parameters
         ----------
-        self : ReflectionInstance
+        self : orionis.introspection.ReflectionInstance
             The ReflectionInstance object.
 
         Returns
@@ -493,7 +480,7 @@ class IReflectionInstance(ABC):
 
         Parameters
         ----------
-        self : ReflectionInstance
+        self : orionis.introspection.ReflectionInstance
             The ReflectionInstance object.
 
         Returns
@@ -511,7 +498,7 @@ class IReflectionInstance(ABC):
 
         Parameters
         ----------
-        self : ReflectionInstance
+        self : orionis.introspection.ReflectionInstance
             The ReflectionInstance object.
 
         Returns
@@ -527,7 +514,7 @@ class IReflectionInstance(ABC):
 
         Parameters
         ----------
-        self : ReflectionInstance
+        self : orionis.introspection.ReflectionInstance
             The ReflectionInstance object.
 
         Returns
@@ -628,7 +615,7 @@ class IReflectionInstance(ABC):
 
         Parameters
         ----------
-        self : ReflectionInstance
+        self : orionis.introspection.ReflectionInstance
             The ReflectionInstance object.
 
         Returns
@@ -677,7 +664,7 @@ class IReflectionInstance(ABC):
 
         Parameters
         ----------
-        self : ReflectionInstance
+        self : orionis.introspection.ReflectionInstance
             The ReflectionInstance object.
 
         Returns
@@ -745,10 +732,6 @@ class IReflectionInstance(ABC):
     def getProtectedStaticAsyncMethods(self) -> list[str]:
         """
         Retrieve all protected asynchronous static method names.
-
-        Parameters
-        ----------
-        None
 
         Returns
         -------
@@ -867,7 +850,7 @@ class IReflectionInstance(ABC):
 
         Returns
         -------
-        Any
+        typing.Any
             Value of the specified property.
 
         Raises
@@ -888,7 +871,7 @@ class IReflectionInstance(ABC):
 
         Returns
         -------
-        inspect.Signature
+        ``inspect.Signature``
             Signature of the property's getter method.
 
         Raises
@@ -925,7 +908,7 @@ class IReflectionInstance(ABC):
 
         Returns
         -------
-        Signature
+        orionis.introspection.dependencies.entities.signature.Signature
             Structured representation of the constructor dependencies. Contains:
 
             - ``resolved``: dictionary of resolved dependencies with names and values.
@@ -945,7 +928,7 @@ class IReflectionInstance(ABC):
 
         Returns
         -------
-        Signature
+        orionis.introspection.dependencies.entities.signature.Signature
             Structured representation of the method dependencies, including:
 
             - ``resolved``: dictionary of resolved dependencies with names and values.

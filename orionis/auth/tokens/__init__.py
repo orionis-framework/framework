@@ -1,3 +1,5 @@
+"""Group the auth tokens components and public imports."""
+
 from typing import TYPE_CHECKING as _TYPE_CHECKING
 from orionis._exports import resolve_export as _resolve_export
 
@@ -16,6 +18,7 @@ _EXPORTS = {
     "generate_token_secret": ("orionis.auth.tokens.functions", "generate_token_secret"),
     "hash_token_secret": ("orionis.auth.tokens.functions", "hash_token_secret"),
 }
+"""Public export names mapped to their defining modules and attributes."""
 
 def __getattr__(name: str) -> object:
     """

@@ -49,6 +49,8 @@ python reactor db:table --help
 
 Do not schedule `migrate:fresh`, `db:wipe`, or `queue:clear` as routine production housekeeping. They remove data or pending work, rather than cleaning completed-job records.
 
+`auth:migrate`, `cache:migrate`, `queue:migrate`, `schedule:migrate`, and `session:migrate` prepare [framework-owned storage tables](../../../database/docs/en/migrations-and-seeders.md#prepare-framework-storage-tables). They use service definitions and configured table/connection settings, rather than migrations under `database/`. Missing tables are created without deleting records or starting workers or scheduled tasks.
+
 ## Serve, inspect, and test
 
 `serve` starts the development server with its supported options; see [HTTP](../../../http/docs/en/README.md) for the web lifecycle. `route:list` inspects registered routes. `test` runs Orionis testing; selection and modes belong to [Testing](../../../test/docs/en/README.md). Development servers and workers are long-running processes and need supervision in operational environments.

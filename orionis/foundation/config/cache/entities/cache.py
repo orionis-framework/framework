@@ -1,3 +1,5 @@
+"""Represent the cache configuration for the application."""
+
 from __future__ import annotations
 from dataclasses import dataclass, field
 from orionis.environment import Env
@@ -7,6 +9,7 @@ from orionis.support.entities.base import BaseEntity
 
 # Define the supported cache driver names.
 _DRIVER_NAMES: frozenset[str] = frozenset(Drivers._member_names_)
+"""Define the supported cache driver names."""
 
 @dataclass(frozen=True, kw_only=True)
 class Cache(BaseEntity):
@@ -15,14 +18,14 @@ class Cache(BaseEntity):
 
     Attributes
     ----------
-    default : Drivers | str
+    default : orionis.foundation.config.cache.Drivers | str
         The default cache storage type. Accepts a ``Drivers`` enum member
         or a plain string (e.g. ``'memory'``, ``'file'``). Resolved from
         the ``CACHE_STORE`` environment variable or ``Drivers.FILE.value``.
     prefix : str
         Global key prefix applied to all cache entries. Resolved from
         the ``CACHE_PREFIX`` environment variable or ``'orionis'``.
-    stores : Stores | dict
+    stores : orionis.foundation.config.cache.Stores | dict
         Configuration for the available cache stores. Defaults to a
         ``Stores`` instance backed by a file store.
     """

@@ -1,3 +1,5 @@
+"""Group the foundation config cache components and public imports."""
+
 from typing import TYPE_CHECKING as _TYPE_CHECKING
 from orionis._exports import resolve_export as _resolve_export
 
@@ -32,6 +34,7 @@ _EXPORTS = {
     "Redis": ("orionis.foundation.config.cache.entities.redis", "Redis"),
     "Stores": ("orionis.foundation.config.cache.entities.stores", "Stores"),
 }
+"""Public export names mapped to their defining modules and attributes."""
 
 def __getattr__(name: str) -> object:
     """

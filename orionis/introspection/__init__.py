@@ -1,3 +1,5 @@
+"""Group the introspection components and public imports."""
+
 from typing import TYPE_CHECKING as _TYPE_CHECKING
 from orionis._exports import resolve_export as _resolve_export
 
@@ -32,6 +34,7 @@ _EXPORTS = {
     "ReflectionInstance": ("orionis.introspection.instances.reflection", "ReflectionInstance"),
     "ReflectionModule": ("orionis.introspection.modules.reflection", "ReflectionModule"),
 }
+"""Public export names mapped to their defining modules and attributes."""
 
 def __getattr__(name: str) -> object:
     """

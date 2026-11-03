@@ -1,3 +1,9 @@
+"""
+Create column definitions for database schema declarations.
+
+Factories return :class:`orionis.orm.schema.column.ColumnDefinition` builders.
+"""
+
 from __future__ import annotations
 from typing import TYPE_CHECKING
 from orionis.orm.schema.types import (
@@ -14,7 +20,11 @@ if TYPE_CHECKING:
     from orionis.orm.schema.column import ColumnDefinition
 
 class Column:
-    """Create :class:`ColumnDefinition` builders for schema declarations."""
+    """
+    Create column definitions for database schema declarations.
+
+    Factories return :class:`orionis.orm.schema.column.ColumnDefinition` builders.
+    """
 
     @staticmethod
     def id(name: str = "id") -> BigInteger:
@@ -28,7 +38,7 @@ class Column:
 
         Returns
         -------
-        BigInteger
+        orionis.orm.schema.types.BigInteger
             Column definition ready for schema declarations.
         """
         # BigInteger has no type-specific constructor arguments.
@@ -48,7 +58,7 @@ class Column:
 
         Returns
         -------
-        BigInteger
+        orionis.orm.schema.types.BigInteger
             Column definition ready for schema declarations.
         """
         # BigInteger has no type-specific constructor arguments.
@@ -78,7 +88,7 @@ class Column:
 
         Returns
         -------
-        Boolean
+        orionis.orm.schema.types.Boolean
             Column definition ready for schema declarations.
         """
         # Forward the CHECK-constraint options to the underlying type.
@@ -101,7 +111,7 @@ class Column:
 
         Returns
         -------
-        Date
+        orionis.orm.schema.types.Date
             Column definition ready for schema declarations.
         """
         # Date has no type-specific constructor arguments.
@@ -124,7 +134,7 @@ class Column:
 
         Returns
         -------
-        DateTime
+        orionis.orm.schema.types.DateTime
             Column definition ready for schema declarations.
         """
         # Forward timezone support to the underlying type.
@@ -156,7 +166,7 @@ class Column:
 
         Returns
         -------
-        Double
+        orionis.orm.schema.types.Double
             Column definition ready for schema declarations.
         """
         # Forward the numeric precision options to the underlying type.
@@ -201,7 +211,7 @@ class Column:
 
         Returns
         -------
-        Enum
+        orionis.orm.schema.types.Enum
             Column definition ready for schema declarations.
 
         Raises
@@ -245,7 +255,7 @@ class Column:
 
         Returns
         -------
-        Float
+        orionis.orm.schema.types.Float
             Column definition ready for schema declarations.
         """
         # Forward the numeric precision options to the underlying type.
@@ -269,7 +279,7 @@ class Column:
 
         Returns
         -------
-        Integer
+        orionis.orm.schema.types.Integer
             Column definition ready for schema declarations.
         """
         # Integer has no type-specific constructor arguments.
@@ -302,7 +312,7 @@ class Column:
 
         Returns
         -------
-        Interval
+        orionis.orm.schema.types.Interval
             Column definition ready for schema declarations.
         """
         # Forward the native interval precision options.
@@ -329,7 +339,7 @@ class Column:
 
         Returns
         -------
-        LargeBinary
+        orionis.orm.schema.types.LargeBinary
             Column definition ready for schema declarations.
 
         Raises
@@ -354,7 +364,7 @@ class Column:
 
         Returns
         -------
-        MatchType
+        orionis.orm.schema.types.MatchType
             Column definition ready for schema declarations.
         """
         # MatchType has no type-specific constructor arguments.
@@ -389,7 +399,7 @@ class Column:
 
         Returns
         -------
-        Numeric
+        orionis.orm.schema.types.Numeric
             Column definition ready for schema declarations.
 
         Raises
@@ -419,7 +429,7 @@ class Column:
 
         Returns
         -------
-        NumericCommon
+        orionis.orm.schema.types.NumericCommon
             Column definition ready for schema declarations.
         """
         # NumericCommon has no type-specific constructor arguments.
@@ -450,7 +460,7 @@ class Column:
 
         Returns
         -------
-        PickleType
+        orionis.orm.schema.types.PickleType
             Column definition ready for schema declarations.
         """
         # Forward the pickle protocol and implementation options.
@@ -472,7 +482,7 @@ class Column:
 
         Returns
         -------
-        SchemaType
+        orionis.orm.schema.types.SchemaType
             Column definition ready for schema declarations.
         """
         # Forward the schema-level construct name.
@@ -492,7 +502,7 @@ class Column:
 
         Returns
         -------
-        SmallInteger
+        orionis.orm.schema.types.SmallInteger
             Column definition ready for schema declarations.
         """
         # SmallInteger has no type-specific constructor arguments.
@@ -520,7 +530,7 @@ class Column:
 
         Returns
         -------
-        String
+        orionis.orm.schema.types.String
             Column definition ready for schema declarations.
 
         Raises
@@ -553,7 +563,7 @@ class Column:
 
         Returns
         -------
-        Text
+        orionis.orm.schema.types.Text
             Column definition ready for schema declarations.
         """
         # Forward the length and collation options.
@@ -573,7 +583,7 @@ class Column:
 
         Returns
         -------
-        Time
+        orionis.orm.schema.types.Time
             Column definition ready for schema declarations.
         """
         # Time has no type-specific constructor arguments.
@@ -601,7 +611,7 @@ class Column:
 
         Returns
         -------
-        Unicode
+        orionis.orm.schema.types.Unicode
             Column definition ready for schema declarations.
         """
         # Forward the length and collation options.
@@ -629,7 +639,7 @@ class Column:
 
         Returns
         -------
-        UnicodeText
+        orionis.orm.schema.types.UnicodeText
             Column definition ready for schema declarations.
         """
         # Forward the length and collation options.
@@ -658,7 +668,7 @@ class Column:
 
         Returns
         -------
-        Uuid
+        orionis.orm.schema.types.Uuid
             Column definition ready for schema declarations.
         """
         # Forward the UUID representation options.
@@ -682,7 +692,7 @@ class Column:
         ----------
         name : str
             Name assigned to the column.
-        item_type : ColumnDefinition
+        item_type : orionis.orm.schema.column.ColumnDefinition
             Column definition of the array elements.
         as_tuple : bool, optional
             Whether results are converted to tuples instead of lists.
@@ -693,7 +703,7 @@ class Column:
 
         Returns
         -------
-        StrictArray
+        orionis.orm.schema.types.StrictArray
             Column definition ready for schema declarations.
         """
         # Forward the element type and array-shape options.
@@ -718,7 +728,7 @@ class Column:
 
         Returns
         -------
-        StrictBigInt
+        orionis.orm.schema.types.StrictBigInt
             Column definition ready for schema declarations.
         """
         # StrictBigInt has no type-specific constructor arguments.
@@ -740,7 +750,7 @@ class Column:
 
         Returns
         -------
-        StrictBinary
+        orionis.orm.schema.types.StrictBinary
             Column definition ready for schema declarations.
         """
         # Forward the optional length to the underlying type.
@@ -762,7 +772,7 @@ class Column:
 
         Returns
         -------
-        StrictBlob
+        orionis.orm.schema.types.StrictBlob
             Column definition ready for schema declarations.
         """
         # Forward the optional length to the underlying type.
@@ -790,7 +800,7 @@ class Column:
 
         Returns
         -------
-        StrictChar
+        orionis.orm.schema.types.StrictChar
             Column definition ready for schema declarations.
         """
         # Forward the length and collation options.
@@ -818,7 +828,7 @@ class Column:
 
         Returns
         -------
-        StrictClob
+        orionis.orm.schema.types.StrictClob
             Column definition ready for schema declarations.
         """
         # Forward the length and collation options.
@@ -853,7 +863,7 @@ class Column:
 
         Returns
         -------
-        StrictDecimal
+        orionis.orm.schema.types.StrictDecimal
             Column definition ready for schema declarations.
 
         Raises
@@ -895,7 +905,7 @@ class Column:
 
         Returns
         -------
-        StrictDoublePrecision
+        orionis.orm.schema.types.StrictDoublePrecision
             Column definition ready for schema declarations.
         """
         # Forward the numeric precision options to the underlying type.
@@ -919,7 +929,7 @@ class Column:
 
         Returns
         -------
-        StrictInt
+        orionis.orm.schema.types.StrictInt
             Column definition ready for schema declarations.
         """
         # StrictInt has no type-specific constructor arguments.
@@ -942,7 +952,7 @@ class Column:
 
         Returns
         -------
-        StrictJson
+        orionis.orm.schema.types.StrictJson
             Column definition ready for schema declarations.
         """
         # Forward the None-handling option to the underlying type.
@@ -970,7 +980,7 @@ class Column:
 
         Returns
         -------
-        StrictNChar
+        orionis.orm.schema.types.StrictNChar
             Column definition ready for schema declarations.
         """
         # Forward the length and collation options.
@@ -998,7 +1008,7 @@ class Column:
 
         Returns
         -------
-        StrictNVarChar
+        orionis.orm.schema.types.StrictNVarChar
             Column definition ready for schema declarations.
         """
         # Forward the length and collation options.
@@ -1030,7 +1040,7 @@ class Column:
 
         Returns
         -------
-        StrictReal
+        orionis.orm.schema.types.StrictReal
             Column definition ready for schema declarations.
         """
         # Forward the numeric precision options to the underlying type.
@@ -1054,7 +1064,7 @@ class Column:
 
         Returns
         -------
-        StrictSmallInt
+        orionis.orm.schema.types.StrictSmallInt
             Column definition ready for schema declarations.
         """
         # StrictSmallInt has no type-specific constructor arguments.
@@ -1077,7 +1087,7 @@ class Column:
 
         Returns
         -------
-        StrictTimestamp
+        orionis.orm.schema.types.StrictTimestamp
             Column definition ready for schema declarations.
         """
         # Forward timezone support to the underlying type.
@@ -1099,7 +1109,7 @@ class Column:
 
         Returns
         -------
-        StrictVarBinary
+        orionis.orm.schema.types.StrictVarBinary
             Column definition ready for schema declarations.
         """
         # Forward the optional length to the underlying type.
@@ -1127,7 +1137,7 @@ class Column:
 
         Returns
         -------
-        StrictVarChar
+        orionis.orm.schema.types.StrictVarChar
             Column definition ready for schema declarations.
         """
         # Forward the length and collation options.

@@ -1,3 +1,5 @@
+"""Render the framework default HTTP error and status responses."""
+
 import json
 import platform
 from pathlib import Path
@@ -23,11 +25,17 @@ from orionis.support.formatter.exceptions.parser import ExceptionParser
 
 # Human-readable labels for validated HTTP status codes.
 _STATUS_MESSAGES: dict[int, str] = {}
+"""Human-readable labels for validated HTTP status codes."""
 _MIN_STATUS_CODE: int = 100
+"""Min status code value used by ``responses``."""
 _MAX_STATUS_CODE: int = 599
+"""Max status code value used by ``responses``."""
 _FRAMEWORK_VERSION: str = f"v{VERSION}"
+"""Framework version used by ``responses``."""
 _PYTHON_VERSION: str = platform.python_version()
+"""Python version used by ``responses``."""
 _LOCALE_CONFIG_KEY: str = "app.locale"
+"""Locale config key identifier: ``app.locale``."""
 
 def _validate_status_code(status_code: int | HTTPStatus) -> int:
     """
@@ -35,7 +43,7 @@ def _validate_status_code(status_code: int | HTTPStatus) -> int:
 
     Parameters
     ----------
-    status_code : int | HTTPStatus
+    status_code : int | orionis.http.enums.HTTPStatus
         HTTP status supplied to the default error response.
 
     Returns
@@ -83,25 +91,36 @@ def _status_message(status_code: int) -> str:
 class DefaultResponses(IDefaultResponses):
 
     # ruff: noqa: TC001
+    """Render the framework default HTTP error and status responses."""
 
     __slots__ = (
         "__app", "__app_locale", "__app_name", "__asset_paths",
         "__directory", "__engine", "__memory_cache",
     )
+    """Declare the instance attribute slots reserved by this class."""
 
     _FAVICON_CACHE_CONTROL_AGE: str = "public, max-age=31536000, immutable"
+    """Favicon cache control age identifier: ``public, max-age=31536000, immutable``."""
     _FAVICON_NAME: str = "favicon.ico"
+    """Favicon name identifier: ``favicon.ico``."""
     _FONT_CONTENT_TYPE: str = "font/ttf"
+    """Font content type identifier: ``font/ttf``."""
     _WEB_FONT_CONTENT_TYPE: str = "font/woff2"
+    """Web font content type identifier: ``font/woff2``."""
     _GENERAL_CACHE_CONTROL: str = "no-cache, no-store, must-revalidate"
+    """General cache control identifier: ``no-cache, no-store, must-revalidate``."""
     _NO_CACHE_HEADERS: ClassVar[dict[str, str]] = {
         "cache-control": _GENERAL_CACHE_CONTROL,
     }
+    """No cache headers definitions used by ``DefaultResponses``."""
 
     # Only these package-owned files can be served through the reserved URL.
     ASSET_PREFIX: str = "/_orionis/assets/"
+    """Only these package-owned files can be served through the reserved URL."""
     _ASSET_BASE: str = ASSET_PREFIX.rstrip("/")
+    """Asset base used by ``DefaultResponses``."""
     _ASSETS_DIR: Path = Path(__file__).parent / "assets"
+    """Assets dir used by ``DefaultResponses``."""
     _ASSET_HEADERS: ClassVar[dict[str, dict[str, str]]] = {
         name: {
             "content-type": content_type,
@@ -124,6 +143,7 @@ class DefaultResponses(IDefaultResponses):
             ("orionis-mark.png", "image/png"),
         )
     }
+    """Asset headers used by ``DefaultResponses``."""
 
     # Favicon candidates in order of preference.
     _FAVICON_CANDIDATES: ClassVar[tuple[tuple[str, dict[str, str]], ...]] = (
@@ -140,18 +160,21 @@ class DefaultResponses(IDefaultResponses):
             "cache-control": _FAVICON_CACHE_CONTROL_AGE,
         }),
     )
+    """Favicon candidates in order of preference."""
     _ROBOTS_CANDIDATES: ClassVar[tuple[tuple[str, dict[str, str]], ...]] = (
         ("robots.txt", {
             "content-type": "text/plain",
             "cache-control": "public, max-age=3600",
         }),
     )
+    """Robots candidates definitions used by ``DefaultResponses``."""
     _SITEMAP_CANDIDATES: ClassVar[tuple[tuple[str, dict[str, str]], ...]] = (
         ("sitemap.xml", {
             "content-type": "application/xml",
             "cache-control": "public, max-age=600",
         }),
     )
+    """Sitemap candidates definitions used by ``DefaultResponses``."""
 
     _TEMPLATES: ClassVar[dict[str, str]] = {
         "up": "__orionis__/default/up.html",
@@ -160,6 +183,7 @@ class DefaultResponses(IDefaultResponses):
         "exception": "__orionis__/default/exception.html",
         "dump": "__orionis__/default/dump.html",
     }
+    """Templates definitions used by ``DefaultResponses``."""
 
     # Map the maintenance flag to the health response metadata.
     _HEALTH_STATES: ClassVar[dict[bool, tuple[HTTPStatus, str, str, str]]] = {
@@ -172,6 +196,7 @@ class DefaultResponses(IDefaultResponses):
             "state_page_503:html",
         ),
     }
+    """Map the maintenance flag to the health response metadata."""
 
     def __init__(
         self,
@@ -184,11 +209,11 @@ class DefaultResponses(IDefaultResponses):
 
         Parameters
         ----------
-        app : IApplication
+        app : orionis.IApplication
             The application instance providing configuration and services.
-        directory : IDirectory
+        directory : orionis.foundation.contracts.directory.IDirectory
             The directory service for accessing storage paths.
-        engine : IViewEngine
+        engine : orionis.view.contracts.engine.IViewEngine
             Official asynchronous template rendering engine.
 
         Returns
@@ -198,16 +223,23 @@ class DefaultResponses(IDefaultResponses):
         """
         # Store application, directory and official view engine dependencies.
         self.__app: IApplication = app
+        """The application instance providing configuration and services."""
         self.__directory: IDirectory = directory
+        """The directory service for accessing storage paths."""
         self.__engine: IViewEngine = engine
+        """Official asynchronous template rendering engine."""
 
         # Store the application name and locale.
         self.__app_name: str = self.__app.config("app.name")
+        """Store the application name and locale."""
         self.__app_locale: str = self.__app.config(_LOCALE_CONFIG_KEY)
+        """App locale produced by ``self.__app.config``."""
 
         # Initialize storage for asset paths and rendered page bodies.
         self.__memory_cache: dict[str, object] = {}
+        """Initialize storage for asset paths and rendered page bodies."""
         self.__asset_paths: dict[str, Path] = {}
+        """Resolved paths of assets used by the default response templates."""
 
     def __getitem__(self, key: str) -> object | None:
         """
@@ -290,7 +322,7 @@ class DefaultResponses(IDefaultResponses):
 
         Returns
         -------
-        FileResponse or Response
+        orionis.http.FileResponse or orionis.http.Response
             A FileResponse containing the favicon if found, otherwise a
             Response with status 404.
         """
@@ -308,7 +340,7 @@ class DefaultResponses(IDefaultResponses):
 
         Returns
         -------
-        FileResponse or Response
+        orionis.http.FileResponse or orionis.http.Response
             FileResponse with robots.txt if found, otherwise Response with 404.
         """
         return await self.__publicFile(
@@ -324,7 +356,7 @@ class DefaultResponses(IDefaultResponses):
 
         Returns
         -------
-        FileResponse or Response
+        orionis.http.FileResponse or orionis.http.Response
             FileResponse with sitemap.xml if found, otherwise Response with status 404.
         """
         return await self.__publicFile(
@@ -339,13 +371,14 @@ class DefaultResponses(IDefaultResponses):
         *,
         fallback: tuple[str, dict[str, str]] | None = None,
     ) -> FileResponse | HTMLResponse:
-        """Select a public file and recover when a previously selected file vanishes.
+        """
+        Select a public file and recover when a previously selected file vanishes.
 
         Parameters
         ----------
         key : str
             Cache entry for the selected path and headers.
-        candidates : tuple[tuple[str, dict[str, str]], ...]
+        candidates : tuple[tuple[str, dict[str, str]], ``...``]
             Public filenames and headers in order of preference.
         missing_message : str
             Description displayed when no candidate is available.
@@ -354,7 +387,7 @@ class DefaultResponses(IDefaultResponses):
 
         Returns
         -------
-        FileResponse | HTMLResponse
+        orionis.http.FileResponse | orionis.http.HTMLResponse
             Independent file stream or an HTML error response.
         """
         cache = self.__memory_cache
@@ -388,18 +421,19 @@ class DefaultResponses(IDefaultResponses):
 
     @staticmethod
     def __fileResponse(path: Path, headers: dict[str, str]) -> FileResponse | None:
-        """Build an independent response for an available regular file.
+        """
+        Build an independent response for an available regular file.
 
         Parameters
         ----------
-        path : Path
+        path : pathlib.Path
             Candidate file whose current metadata is read by FileResponse.
         headers : dict[str, str]
             Fixed file headers including its content type.
 
         Returns
         -------
-        FileResponse | None
+        orionis.http.FileResponse | None
             New response, or None when the file is unavailable or not regular.
         """
         try:
@@ -415,12 +449,12 @@ class DefaultResponses(IDefaultResponses):
 
         Parameters
         ----------
-        request : Request
+        request : orionis.http.Request
             The HTTP request object.
 
         Returns
         -------
-        HTMLResponse or JSONResponse
+        orionis.http.HTMLResponse or orionis.http.JSONResponse
             HTMLResponse with the state page content or JSONResponse with the
             application status. Status is 200 if healthy, 503 if under
             maintenance.
@@ -477,7 +511,7 @@ class DefaultResponses(IDefaultResponses):
 
         Parameters
         ----------
-        status_code : int | HTTPStatus
+        status_code : int | orionis.http.enums.HTTPStatus
             Integer HTTP status between 100 and 599. Unlisted codes use
             an ``HTTP <code>`` label on the HTML page.
         content : str | dict
@@ -490,7 +524,7 @@ class DefaultResponses(IDefaultResponses):
 
         Returns
         -------
-        HTMLResponse or JSONResponse
+        orionis.http.HTMLResponse or orionis.http.JSONResponse
             HTMLResponse with rendered error page, or JSONResponse if
             expects_json is True.
 
@@ -557,12 +591,12 @@ class DefaultResponses(IDefaultResponses):
             HTTP method of the request that caused the exception.
         exception : BaseException
             Exception instance to be rendered.
-        status_code : int | HTTPStatus, optional
+        status_code : int | orionis.http.enums.HTTPStatus, optional
             HTTP status code for the response. Defaults to 500.
 
         Returns
         -------
-        HTMLResponse
+        orionis.http.HTMLResponse
             Rendered exception page as an HTMLResponse with the given status code.
         """
         status_code = _validate_status_code(status_code)
@@ -603,7 +637,7 @@ class DefaultResponses(IDefaultResponses):
 
         Returns
         -------
-        HTMLResponse
+        orionis.http.HTMLResponse
             Uncached debug page using the shared local styles and fonts.
         """
         fragment = Markup(content)  # noqa: S704 - generated by VarDumper.toHtml()
@@ -662,7 +696,7 @@ class DefaultResponses(IDefaultResponses):
 
         Returns
         -------
-        FileResponse | Response
+        orionis.http.FileResponse | orionis.http.Response
             Local asset with its fixed MIME type, or an empty 404 response.
         """
         headers = self._ASSET_HEADERS.get(path)

@@ -1,3 +1,5 @@
+"""Contract for a many-to-many relationship backed by a pivot table."""
+
 from __future__ import annotations
 from abc import abstractmethod
 from typing import TYPE_CHECKING, Any
@@ -10,11 +12,13 @@ class IBelongsToManyRelation(IRelation):
     """
     Contract for a many-to-many relationship backed by a pivot table.
 
-    Extends :class:`IRelation` with the pivot-specific operations that
+    Extends :class:`orionis.orm.contracts.relation.IRelation` with the pivot-specific
+    operations that
     have no equivalent on the single-table relationship kinds.
     """
 
     __slots__ = ()
+    """Declare that this class introduces no additional instance slots."""
 
     @abstractmethod
     def wherePivot(
@@ -29,12 +33,12 @@ class IBelongsToManyRelation(IRelation):
         ----------
         column : str
             Pivot table column name.
-        *args : Any
+        *args : typing.Any
             Either the bound value, or an operator followed by a value.
 
         Returns
         -------
-        IBelongsToManyRelation
+        orionis.orm.contracts.belongs_to_many_relation.IBelongsToManyRelation
             The same relationship, enabling fluent chaining.
         """
 
@@ -49,7 +53,7 @@ class IBelongsToManyRelation(IRelation):
 
         Parameters
         ----------
-        ids : Any
+        ids : typing.Any
             A related id, model instance, iterable of either, or a
             mapping of id to per-row pivot attributes.
         attributes : dict or None, optional
@@ -69,7 +73,7 @@ class IBelongsToManyRelation(IRelation):
 
         Parameters
         ----------
-        ids : Any, optional
+        ids : typing.Any, optional
             A related id, model instance, or iterable of either;
             ``None`` detaches every related record.
 
@@ -86,12 +90,12 @@ class IBelongsToManyRelation(IRelation):
 
         Parameters
         ----------
-        ids : Iterable
+        ids : collections.abc.Iterable
             Related ids or model instances that must remain attached.
 
         Returns
         -------
-        dict of str to list
+        dict of str ``to`` list
             ``"attached"`` and ``"detached"`` related id lists.
         """
 
@@ -102,11 +106,11 @@ class IBelongsToManyRelation(IRelation):
 
         Parameters
         ----------
-        ids : Iterable
+        ids : collections.abc.Iterable
             Related ids or model instances to toggle.
 
         Returns
         -------
-        dict of str to list
+        dict of str ``to`` list
             ``"attached"`` and ``"detached"`` related id lists.
         """

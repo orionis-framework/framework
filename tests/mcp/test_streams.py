@@ -55,7 +55,7 @@ class _Source:
 class TestOwnedStreams(TestCase):
     """Keep cleanup reliable when delivery never starts or is cancelled twice."""
 
-    async def test_unstarted_outer_closes_source_once(self):
+    async def testUnstartedOuterClosesSourceOnce(self):
         """Close both owners before the outer generator enters its body.
 
         Returns
@@ -82,7 +82,7 @@ class TestOwnedStreams(TestCase):
         await owner.aclose()
         self.assertEqual((source.reads, source.closes), (0, 1))
 
-    async def test_backpressure_has_no_prefetch(self):
+    async def testBackpressureHasNoPrefetch(self):
         """Advance the source only after the consumer asks for an item.
 
         Returns
@@ -98,7 +98,7 @@ class TestOwnedStreams(TestCase):
         self.assertEqual(source.reads, 1)
         await stream.aclose()
 
-    async def test_repeated_cancellation_joins_cleanup(self):
+    async def testRepeatedCancellationJoinsCleanup(self):
         """Preserve finalization when the owner is cancelled more than once.
 
         Returns
@@ -121,7 +121,7 @@ class TestOwnedStreams(TestCase):
             await close
         self.assertEqual(source.closes, 1)
 
-    async def test_synchronous_generator_finally(self):
+    async def testSynchronousGeneratorFinally(self):
         """Run synchronous generator cleanup after early stream closure.
 
         Returns

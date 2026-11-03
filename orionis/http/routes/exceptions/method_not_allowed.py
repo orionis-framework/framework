@@ -1,3 +1,5 @@
+"""Signal that the requested path exists under a different HTTP method."""
+
 from __future__ import annotations
 
 

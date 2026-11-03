@@ -1,3 +1,5 @@
+"""Own one server-independent connection with direct awaited messaging."""
+
 import asyncio
 from types import SimpleNamespace
 from typing import TYPE_CHECKING
@@ -13,14 +15,21 @@ if TYPE_CHECKING:
     from orionis.http.payload.estructures.headers import Headers
 
 _DEFAULT_MESSAGE_LIMIT = 1024 * 1024
+"""Default message limit used by ``websocket``."""
 _MIN_HTTP_ERROR = 400
+"""Min http error value used by ``websocket``."""
 _MAX_HTTP_ERROR = 599
+"""Max http error value used by ``websocket``."""
 _MIN_CUSTOM_CLOSE = 3000
+"""Min custom close value used by ``websocket``."""
 _MAX_CUSTOM_CLOSE = 4999
+"""Max custom close value used by ``websocket``."""
 _MAX_CLOSE_REASON = 123
+"""Max close reason value used by ``websocket``."""
 _VALID_CLOSE_CODES = frozenset({
     1000, 1001, 1002, 1003, 1007, 1008, 1009, 1010, 1011, 1012, 1013, 1014,
 })
+"""Valid close codes used by ``websocket``."""
 
 class WebSocket:
     """Own one server-independent connection with direct awaited messaging."""
@@ -30,6 +39,7 @@ class WebSocket:
         "_connection_state", "_max_message_size", "_params", "_receive_lock",
         "_send_lock", "_state", "_transport",
     )
+    """Declare the instance attribute slots reserved by this class."""
 
     def __init__(
         self, transport: IWebSocketTransport, adapter: TransportAdapter, *,
@@ -41,11 +51,11 @@ class WebSocket:
 
         Parameters
         ----------
-        transport : IWebSocketTransport
+        transport : adapters.websocket.contracts.transport.IWebSocketTransport
             Server adapter implementing awaited network operations.
-        adapter : TransportAdapter
+        adapter : orionis.http.adapters.request.contracts.transport.TransportAdapter
             Handshake metadata, including normalized proxy information.
-        params : Mapping[str, object] | None, optional
+        params : collections.abc.Mapping[str, object] | None, optional
             Converted route parameters owned by this connection.
         max_message_size : int, optional
             Positive maximum incoming message size in bytes.
@@ -68,16 +78,27 @@ class WebSocket:
             error_msg = "WebSocket max_message_size must be a positive integer"
             raise ValueError(error_msg)
         self._transport = transport
+        """Server adapter implementing awaited network operations."""
         self._adapter = adapter
+        """Handshake metadata, including normalized proxy information."""
         self._params = dict(params or {})
+        """Converted route parameters owned by this connection."""
         self._max_message_size = max_message_size
+        """Positive maximum incoming message size in bytes."""
         self._connection_state = WebSocketState.CONNECTING
+        """Connection state obtained from ``WebSocketState.CONNECTING``."""
         self._accepted = False
+        """Accepted flag used by ``WebSocket``."""
         self._close_code = int(WebSocketStatus.ABNORMAL_CLOSURE)
+        """Close code produced by ``int``."""
         self._close_reason = ""
+        """Close reason identifier: ``''``."""
         self._send_lock = asyncio.Lock()
+        """Synchronization primitive controlling access to send lock."""
         self._receive_lock = asyncio.Lock()
+        """Synchronization primitive controlling access to receive lock."""
         self._state = SimpleNamespace()
+        """State selected by the maintenance-mode command."""
 
     @property
     def path(self) -> str:
@@ -98,7 +119,7 @@ class WebSocket:
 
         Returns
         -------
-        Headers
+        orionis.http.payload.estructures.headers.Headers
             Server supplied header collection.
         """
         return self._adapter.headers()
@@ -110,7 +131,7 @@ class WebSocket:
 
         Returns
         -------
-        SimpleNamespace
+        types.SimpleNamespace
             Mutable attributes shared only by this connection's pipeline.
         """
         return self._state
@@ -122,7 +143,7 @@ class WebSocket:
 
         Returns
         -------
-        WebSocketState
+        orionis.http.WebSocketState
             Current connection lifecycle phase.
         """
         return self._connection_state
@@ -185,7 +206,7 @@ class WebSocket:
         ----------
         subprotocol : str | None, optional
             Selected client-offered protocol, when supported by the server.
-        headers : Mapping[str, str] | None, optional
+        headers : collections.abc.Mapping[str, str] | None, optional
             Additional acceptance headers, when supported by the server.
 
         Returns
@@ -197,7 +218,7 @@ class WebSocket:
         ------
         RuntimeError
             If acceptance or closure already completed.
-        WebSocketDisconnected
+        orionis.http.WebSocketDisconnected
             If the peer closes during acceptance.
         """
         async with self._send_lock:
@@ -250,7 +271,7 @@ class WebSocket:
         ------
         RuntimeError
             If acceptance has not completed.
-        WebSocketDisconnected
+        orionis.http.WebSocketDisconnected
             If the connection is closing or closed.
         """
         if (
@@ -268,14 +289,14 @@ class WebSocket:
 
         Returns
         -------
-        WebSocketMessage
+        orionis.http.WebSocketMessage
             Complete data or terminal peer event, delivered once.
 
         Raises
         ------
         RuntimeError
             If unaccepted or another receiver is already active.
-        WebSocketDisconnected
+        orionis.http.WebSocketDisconnected
             If closed, oversized, or the underlying transport disconnects.
         """
         self._requireOpen()
@@ -312,12 +333,12 @@ class WebSocket:
 
         Returns
         -------
-        WebSocketMessage
+        orionis.http.WebSocketMessage
             Text or binary data message.
 
         Raises
         ------
-        WebSocketDisconnected
+        orionis.http.WebSocketDisconnected
             If the peer sends its terminal event.
         """
         message = await self.receive()
@@ -338,7 +359,7 @@ class WebSocket:
         ------
         TypeError
             If the next message is binary.
-        WebSocketDisconnected
+        orionis.http.WebSocketDisconnected
             If the connection ends.
         """
         return (await self._receiveData()).text
@@ -356,7 +377,7 @@ class WebSocket:
         ------
         TypeError
             If the next message contains text.
-        WebSocketDisconnected
+        orionis.http.WebSocketDisconnected
             If the connection ends.
         """
         return (await self._receiveData()).bytes
@@ -372,9 +393,9 @@ class WebSocket:
 
         Raises
         ------
-        msgspec.DecodeError
+        ``msgspec.DecodeError``
             If the payload is invalid JSON.
-        WebSocketDisconnected
+        orionis.http.WebSocketDisconnected
             If the connection ends.
         """
         message = await self._receiveData()
@@ -398,7 +419,7 @@ class WebSocket:
         ------
         TypeError
             If data is neither text nor bytes.
-        WebSocketDisconnected
+        orionis.http.WebSocketDisconnected
             If the peer closes before delivery.
         """
         if not isinstance(data, (str, bytes)):
@@ -531,7 +552,7 @@ class WebSocket:
 
         Parameters
         ----------
-        code : WebSocketStatus | int, optional
+        code : orionis.http.enums.WebSocketStatus | int, optional
             Valid wire close code.
         reason : str, optional
             Close reason bounded to 123 UTF-8 bytes.
@@ -584,7 +605,7 @@ class WebSocket:
 
         Returns
         -------
-        WebSocket
+        orionis.http.WebSocket
             This connection as a single-consumer async iterator.
         """
         return self
@@ -595,7 +616,7 @@ class WebSocket:
 
         Returns
         -------
-        WebSocketMessage
+        orionis.http.WebSocketMessage
             Next text or binary message.
 
         Raises

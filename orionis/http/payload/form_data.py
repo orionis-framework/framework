@@ -1,3 +1,5 @@
+"""Hold parsed multipart form fields and uploaded files."""
+
 from __future__ import annotations
 from typing import TYPE_CHECKING, Self
 from orionis.http.payload.contracts.form_data import IFormData
@@ -19,6 +21,7 @@ class FormData(IFormData):
     """
 
     __slots__ = ("_index", "_items")
+    """Declare the instance attribute slots reserved by this class."""
 
     # Constructor building the item list and positional index
     def __init__(
@@ -30,7 +33,7 @@ class FormData(IFormData):
 
         Parameters
         ----------
-        items : list[tuple[str, str | UploadedFile]]
+        items : list[tuple[str, str | orionis.http.payload.uploaded_file.UploadedFile]]
             Ordered ``(field_name, value)`` pairs from the multipart
             stream parser. Multiple pairs with the same name are
             preserved in insertion order.
@@ -41,6 +44,10 @@ class FormData(IFormData):
             Always returns ``None``.
         """
         self._items: list[tuple[str, str | UploadedFile]] = list(items)
+        """
+        Ordered ``(field_name, value)`` pairs from the multipart stream parser.
+        Multiple pairs with the same name are preserved in insertion order.
+        """
         # Store single values and collect repeated fields in order.
         index: dict[str, str | UploadedFile | list[str | UploadedFile]] = {}
         for key, value in self._items:
@@ -52,6 +59,7 @@ class FormData(IFormData):
             else:
                 index[key] = [previous, value]
         self._index = index
+        """Lookup index used to resolve registered entries."""
 
     # ---- Backward-compatible grouped views ----
 
@@ -80,7 +88,7 @@ class FormData(IFormData):
 
         Returns
         -------
-        dict[str, list[UploadedFile]]
+        dict[str, list[orionis.http.payload.uploaded_file.UploadedFile]]
             Mapping of field names to ``UploadedFile`` instances
             in insertion order.
         """
@@ -130,7 +138,7 @@ class FormData(IFormData):
 
         Returns
         -------
-        list[str | UploadedFile]
+        list[str | orionis.http.payload.uploaded_file.UploadedFile]
             All values for *key*, or an empty list if absent.
         """
         value = self._index.get(key)
@@ -146,7 +154,7 @@ class FormData(IFormData):
 
         Returns
         -------
-        list[tuple[str, str | UploadedFile]]
+        list[tuple[str, str | orionis.http.payload.uploaded_file.UploadedFile]]
             The underlying item sequence; callers must not mutate it.
         """
         return self._items
@@ -158,7 +166,7 @@ class FormData(IFormData):
 
         Returns
         -------
-        list[tuple[str, str | UploadedFile]]
+        list[tuple[str, str | orionis.http.payload.uploaded_file.UploadedFile]]
             A copy of the underlying item sequence.
         """
         return list(self._items)
@@ -207,7 +215,7 @@ class FormData(IFormData):
 
         Returns
         -------
-        Iterator[str]
+        collections.abc.Iterator[str]
             Each unique field name exactly once.
         """
         # The index dict preserves insertion order of first occurrence.
@@ -262,7 +270,7 @@ class FormData(IFormData):
 
         Returns
         -------
-        Self
+        typing.Self
             The ``FormData`` instance itself.
         """
         return self
@@ -283,7 +291,7 @@ class FormData(IFormData):
             Exception class if one was raised, otherwise ``None``.
         exc_val : BaseException | None
             Exception instance if one was raised, otherwise ``None``.
-        exc_tb : TracebackType | None
+        exc_tb : types.TracebackType | None
             Traceback if an exception was raised, otherwise ``None``.
 
         Returns

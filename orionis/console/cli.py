@@ -1,3 +1,5 @@
+"""Provide console operations through ``main``."""
+
 import os
 import sys
 from importlib import import_module

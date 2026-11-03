@@ -1,3 +1,9 @@
+"""Provide localization operations.
+
+Includes ``TranslationException``, ``InvalidLocaleException``,
+``TranslationFileNotFoundException``, ``TranslationSyntaxException``.
+"""
+
 from __future__ import annotations
 
 class TranslationException(Exception):

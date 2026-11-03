@@ -1,3 +1,5 @@
+"""Represent the configuration for a logging stack."""
+
 from __future__ import annotations
 from dataclasses import dataclass, field
 from orionis.environment import Env
@@ -6,24 +8,25 @@ from orionis.foundation.config.logging.validators import IsValidLevel, IsValidPa
 from orionis.support.entities.base import BaseEntity
 
 _DEFAULT_PATH: str = "storage/logs/stack.log"
+"""Default path identifier: ``storage/logs/stack.log``."""
 
 @dataclass(frozen=True, kw_only=True)
 class Stack(BaseEntity):
     """
     Represent the configuration for a logging stack.
 
-    Parameters
+    Attributes
     ----------
     path : str
         The file path where the log is stored.
-    level : int | str | Level
+    level : int | str | orionis.foundation.config.logging.Level
         The logging level (e.g., DEBUG, INFO, WARNING, ERROR, CRITICAL).
 
     Attributes
     ----------
     path : str
         The file path where the log is stored.
-    level : int | str | Level
+    level : int | str | orionis.foundation.config.logging.Level
         The logging level.
     """
 

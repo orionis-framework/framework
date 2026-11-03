@@ -1,10 +1,15 @@
+"""Represent dynamically assigned attributes as a simple data object."""
+
 from orionis.support.types.contracts.std import IStdClass
 
 _DUNDER = "__"
+"""Dunder identifier: ``__``."""
 
 class StdClass(IStdClass):
+    """Represent dynamically assigned attributes as a simple data object."""
 
     RESERVED: frozenset
+    """Attribute names reserved by the class and its inheritance hierarchy."""
 
     @classmethod
     def __init_subclass__(cls, **kwargs: object) -> None:
@@ -189,7 +194,7 @@ class StdClass(IStdClass):
 
         Returns
         -------
-        StdClass
+        orionis.support.types.StdClass
             A new StdClass instance with attributes set from the dictionary.
         """
         # Allocate the instance without routing values through keyword arguments.

@@ -1,3 +1,5 @@
+"""Share compiled servers, native routes, local transports, and change events."""
+
 from abc import ABC, abstractmethod
 from typing import TYPE_CHECKING
 
@@ -12,6 +14,7 @@ class IMcpManager(ABC):
     """Share compiled servers, native routes, local transports, and change events."""
 
     __slots__ = ()
+    """Declare that this class introduces no additional instance slots."""
 
     @abstractmethod
     def web(self, path: str, server: type[Server]) -> FluentRoute:
@@ -22,12 +25,12 @@ class IMcpManager(ABC):
         ----------
         path : str
             Value supplied for ``path``.
-        server : type[Server]
+        server : type[orionis.mcp.Server]
             Value supplied for ``server``.
 
         Returns
         -------
-        FluentRoute
+        orionis.http.routes.fluent.FluentRoute
             Result of the operation described above.
         """
 
@@ -40,7 +43,7 @@ class IMcpManager(ABC):
         ----------
         name : str
             Value supplied for ``name``.
-        server : type[Server]
+        server : type[orionis.mcp.Server]
             Value supplied for ``server``.
 
         Returns
@@ -72,7 +75,7 @@ class IMcpManager(ABC):
 
         Returns
         -------
-        CompiledMcpServer
+        orionis.mcp.server.compiler.CompiledMcpServer
             Result of the operation described above.
         """
 
@@ -88,7 +91,7 @@ class IMcpManager(ABC):
 
         Returns
         -------
-        CompiledMcpServer
+        orionis.mcp.server.compiler.CompiledMcpServer
             Result of the operation described above.
         """
 
@@ -99,7 +102,7 @@ class IMcpManager(ABC):
 
         Returns
         -------
-        tuple[tuple[str, str, type[Server]], ...]
+        tuple[tuple[str, str, type[orionis.mcp.Server]], ``...``]
             Result of the operation described above.
         """
 
@@ -110,12 +113,12 @@ class IMcpManager(ABC):
 
         Parameters
         ----------
-        request : Request
+        request : orionis.http.Request
             Current request and its trusted execution context.
 
         Returns
         -------
-        Response
+        orionis.http.Response
             Result of the operation described above.
         """
 
@@ -142,7 +145,7 @@ class IMcpManager(ABC):
 
         Parameters
         ----------
-        server : type[Server]
+        server : type[orionis.mcp.Server]
             Value supplied for ``server``.
 
         Returns
@@ -158,7 +161,7 @@ class IMcpManager(ABC):
 
         Parameters
         ----------
-        server : type[Server]
+        server : type[orionis.mcp.Server]
             Value supplied for ``server``.
 
         Returns
@@ -174,7 +177,7 @@ class IMcpManager(ABC):
 
         Parameters
         ----------
-        server : type[Server]
+        server : type[orionis.mcp.Server]
             Value supplied for ``server``.
 
         Returns
@@ -190,7 +193,7 @@ class IMcpManager(ABC):
 
         Parameters
         ----------
-        server : type[Server]
+        server : type[orionis.mcp.Server]
             Value supplied for ``server``.
         uri : str
             Value supplied for ``uri``.

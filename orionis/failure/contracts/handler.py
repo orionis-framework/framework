@@ -1,3 +1,5 @@
+"""Define the contract for base exception handler implementations."""
+
 from __future__ import annotations
 from abc import ABC, abstractmethod
 from typing import TYPE_CHECKING
@@ -11,6 +13,7 @@ if TYPE_CHECKING:
     from orionis.http.responses import Response
 
 class IBaseExceptionHandler(ABC):
+    """Define the contract for base exception handler implementations."""
 
     @abstractmethod
     def toThrowable(
@@ -27,7 +30,7 @@ class IBaseExceptionHandler(ABC):
 
         Returns
         -------
-        Throwable
+        orionis.failure.entities.Throwable
             Structured Throwable object containing class, message, arguments,
             and traceback.
         """
@@ -64,12 +67,12 @@ class IBaseExceptionHandler(ABC):
         ----------
         exception : BaseException
             The exception instance that was caught.
-        log : ILogger
+        log : orionis.logging.contracts.ILogger
             The logger instance for error reporting.
 
         Returns
         -------
-        Throwable or None
+        orionis.failure.entities.Throwable or None
             The structured Throwable object if reported, otherwise None.
         """
 
@@ -86,7 +89,7 @@ class IBaseExceptionHandler(ABC):
         ----------
         exception : BaseException
             The exception instance that was caught.
-        console : IConsole
+        console : orionis.console.output.contracts.console.IConsole
             The console instance for output.
 
         Returns
@@ -113,6 +116,6 @@ class IBaseExceptionHandler(ABC):
 
         Returns
         -------
-        Response | None
+        orionis.http.Response | None
             The HTTP response if handled, otherwise None.
         """

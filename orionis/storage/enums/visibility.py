@@ -1,3 +1,5 @@
+"""Enumerate the visibility levels supported by storage drivers."""
+
 from __future__ import annotations
 from enum import StrEnum
 

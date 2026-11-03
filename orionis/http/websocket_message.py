@@ -1,3 +1,8 @@
+"""Provide http operations.
+
+Includes ``WebSocketMessageType``, ``WebSocketState``, ``WebSocketMessage``.
+"""
+
 from dataclasses import dataclass
 from enum import Enum
 
@@ -5,25 +10,36 @@ class WebSocketMessageType(Enum):
     """Identify a normalized complete WebSocket message."""
 
     TEXT = "text"
+    """Text identifier: ``text``."""
     BYTES = "bytes"
+    """Bytes identifier: ``bytes``."""
     DISCONNECT = "disconnect"
+    """Disconnect identifier: ``disconnect``."""
 
 class WebSocketState(Enum):
     """Describe the connection lifecycle independently of its server."""
 
     CONNECTING = "connecting"
+    """Connecting identifier: ``connecting``."""
     CONNECTED = "connected"
+    """Connected identifier: ``connected``."""
     CLOSING = "closing"
+    """Closing identifier: ``closing``."""
     CLOSED = "closed"
+    """Closed identifier: ``closed``."""
 
 @dataclass(frozen=True, slots=True, kw_only=True)
 class WebSocketMessage:
     """Retain an immutable message without copying its payload."""
 
     type: WebSocketMessageType
+    """Discriminator identifying the message or schema variant."""
     data: str | bytes | None = None
+    """Decoded content carried by this message or request."""
     code: int | None = None
+    """Machine-readable status or error code."""
     reason: str | None = None
+    """Human-readable reason associated with connection closure."""
 
     def isText(self) -> bool:
         """

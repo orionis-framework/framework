@@ -1,3 +1,5 @@
+"""Define the contract for testing engine implementations."""
+
 from __future__ import annotations
 from abc import ABC, abstractmethod
 from typing import Self, TYPE_CHECKING
@@ -7,6 +9,7 @@ if TYPE_CHECKING:
     from orionis.test.entities.result import TestResult
 
 class ITestingEngine(ABC):
+    """Define the contract for testing engine implementations."""
 
     @abstractmethod
     def setVerbosity(self, verbosity: int) -> Self:
@@ -20,7 +23,7 @@ class ITestingEngine(ABC):
 
         Returns
         -------
-        Self
+        typing.Self
             Returns self for method chaining.
         """
 
@@ -36,7 +39,7 @@ class ITestingEngine(ABC):
 
         Returns
         -------
-        Self
+        typing.Self
             Returns self for method chaining.
         """
 
@@ -52,7 +55,7 @@ class ITestingEngine(ABC):
 
         Returns
         -------
-        Self
+        typing.Self
             Returns self for method chaining.
         """
 
@@ -68,7 +71,7 @@ class ITestingEngine(ABC):
 
         Returns
         -------
-        Self
+        typing.Self
             Returns self for method chaining.
         """
 
@@ -84,7 +87,7 @@ class ITestingEngine(ABC):
 
         Returns
         -------
-        Self
+        typing.Self
             Returns self for method chaining.
         """
 
@@ -95,7 +98,7 @@ class ITestingEngine(ABC):
 
         Returns
         -------
-        Self
+        typing.Self
             Returns self for method chaining.
         """
 
@@ -121,6 +124,6 @@ class ITestingEngine(ABC):
 
         Returns
         -------
-        list[TestResult]
+        list[orionis.test.entities.result.TestResult]
             List of TestResult objects containing test execution outcomes.
         """

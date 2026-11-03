@@ -1,7 +1,10 @@
+"""Resolve the lang service through the application facade."""
+
 from orionis.container.facades.facade import Facade
 from orionis.localization.contracts.translator import ITranslator
 
 class Lang(Facade):
+    """Resolve the lang service through the application facade."""
 
     @classmethod
     def getFacadeAccessor(cls) -> type:
@@ -11,6 +14,6 @@ class Lang(Facade):
         Returns
         -------
         type
-            :class:`ITranslator`.
+            :class:`orionis.localization.contracts.ITranslator`.
         """
         return ITranslator

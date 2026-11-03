@@ -1,3 +1,5 @@
+"""Storage driver backed by Azure Blob Storage."""
+
 from __future__ import annotations
 import asyncio
 import hashlib
@@ -31,9 +33,11 @@ if TYPE_CHECKING:
 
 # Default chunk size for streaming operations (64 KiB).
 _CHUNK_SIZE: int = 64 * 1024
+"""Default chunk size for streaming operations (64 KiB)."""
 
 # In-memory bytes before spooled buffers spill to disk (8 MiB).
 _SPOOL_THRESHOLD: int = 8 * 1024 * 1024
+"""In-memory bytes before spooled buffers spill to disk (8 MiB)."""
 
 class AzureStorageDriver(IStorageDriver):
     """
@@ -49,8 +53,10 @@ class AzureStorageDriver(IStorageDriver):
     call runs on a worker thread via :func:`asyncio.to_thread`.
     Directories are virtual: prefixes are inferred from blob names and
     explicit directories are stored as zero-byte ``path/`` markers.
-    Azure has no per-blob visibility: :meth:`visibility` reflects the
-    container access level and :meth:`setVisibility` is unsupported.
+    Azure has no per-blob visibility:
+    :meth:`orionis.storage.drivers.AzureStorageDriver.visibility` reflects the
+    container access level and
+    :meth:`orionis.storage.drivers.AzureStorageDriver.setVisibility` is unsupported.
     """
 
     # ruff: noqa: ANN401
@@ -66,6 +72,7 @@ class AzureStorageDriver(IStorageDriver):
         "_not_found",
         "_sdk",
     )
+    """Declare the instance attribute slots reserved by this class."""
 
     def __init__(self: Self, config: object) -> None:
         """
@@ -86,21 +93,31 @@ class AzureStorageDriver(IStorageDriver):
         Returns
         -------
         None
+            Initialize the driver from an Azure disk configuration entity.
         """
         self._connection_string: str = str(
             getattr(config, "connection_string", "") or "",
         )
+        """Connection string produced by ``str``."""
         self._account_name: str = str(getattr(config, "account_name", "") or "")
+        """Account name produced by ``str``."""
         self._account_key: str = str(getattr(config, "account_key", "") or "")
+        """Account key produced by ``str``."""
         self._container_name: str = str(getattr(config, "container", "") or "")
+        """Container name produced by ``str``."""
 
         base_url = getattr(config, "url", None)
         self._base_url: str | None = base_url.rstrip("/") if base_url else None
+        """Base URL used when constructing public resource URLs."""
 
         self._container: Any = None
+        """Azure Blob container used by the storage driver."""
         self._sdk: Any = None
+        """Loaded cloud-storage SDK used by the configured driver."""
         self._not_found: type[Exception] = Exception
+        """Not found supplied through ``Exception``."""
         self._http_error: type[Exception] = Exception
+        """Http error supplied through ``Exception``."""
 
         # Derive account credentials from the connection string when
         # they were not provided explicitly.
@@ -130,12 +147,12 @@ class AzureStorageDriver(IStorageDriver):
 
         Returns
         -------
-        Any
+        typing.Any
             Configured ``ContainerClient`` instance.
 
         Raises
         ------
-        MissingStorageDependencyException
+        orionis.storage.exceptions.MissingStorageDependencyException
             If ``azure-storage-blob`` is not installed.
         """
         if self._container is not None:
@@ -181,7 +198,7 @@ class AzureStorageDriver(IStorageDriver):
 
         Returns
         -------
-        Any
+        typing.Any
             ``BlobClient`` bound to the blob.
         """
         return self.__containerClient().get_blob_client(normalized)
@@ -197,7 +214,7 @@ class AzureStorageDriver(IStorageDriver):
 
         Returns
         -------
-        StorageFileNotFoundException
+        orionis.storage.exceptions.StorageFileNotFoundException
             Exception instance ready to be raised.
         """
         error_msg = f"File does not exist at path [{normalized}]."
@@ -214,12 +231,12 @@ class AzureStorageDriver(IStorageDriver):
 
         Returns
         -------
-        Any
+        typing.Any
             ``BlobProperties`` for the blob.
 
         Raises
         ------
-        StorageFileNotFoundException
+        orionis.storage.exceptions.StorageFileNotFoundException
             If the blob does not exist.
         """
         blob = self.__blob(normalized)
@@ -258,7 +275,7 @@ class AzureStorageDriver(IStorageDriver):
 
         Returns
         -------
-        Any
+        typing.Any
             ``ContentSettings`` with the guessed MIME type, or ``None``
             when no type could be guessed.
         """
@@ -306,7 +323,7 @@ class AzureStorageDriver(IStorageDriver):
 
         Raises
         ------
-        StorageFileNotFoundException
+        orionis.storage.exceptions.StorageFileNotFoundException
             If the blob does not exist.
         """
         normalized = normalizeFilePath(path)
@@ -353,7 +370,7 @@ class AzureStorageDriver(IStorageDriver):
 
         Raises
         ------
-        StorageFileNotFoundException
+        orionis.storage.exceptions.StorageFileNotFoundException
             If the blob does not exist.
         """
         normalized = normalizeFilePath(path)
@@ -365,7 +382,7 @@ class AzureStorageDriver(IStorageDriver):
 
             Returns
             -------
-            Any
+            typing.Any
                 Readable object stream.
             """
             blob = self.__blob(normalized)
@@ -429,6 +446,7 @@ class AzureStorageDriver(IStorageDriver):
         Returns
         -------
         None
+            Write *contents* to *path*, replacing any existing blob.
         """
         normalized = normalizeFilePath(path)
         del visibility
@@ -472,7 +490,7 @@ class AzureStorageDriver(IStorageDriver):
         ----------
         path : str
             Root-relative file path.
-        stream : AsyncIterable[bytes]
+        stream : collections.abc.AsyncIterable[bytes]
             Asynchronous byte-chunk producer.
         visibility : str | None
             Ignored by this driver.
@@ -480,6 +498,7 @@ class AzureStorageDriver(IStorageDriver):
         Returns
         -------
         None
+            Write the chunks produced by *stream* to *path*.
         """
         normalized = normalizeFilePath(path)
         del visibility
@@ -559,10 +578,11 @@ class AzureStorageDriver(IStorageDriver):
         Returns
         -------
         None
+            Copy the blob at *source* to *target*.
 
         Raises
         ------
-        StorageFileNotFoundException
+        orionis.storage.exceptions.StorageFileNotFoundException
             If the source blob does not exist.
         """
         origin = normalizeFilePath(source)
@@ -616,10 +636,11 @@ class AzureStorageDriver(IStorageDriver):
         Returns
         -------
         None
+            Move the blob at *source* to *target*.
 
         Raises
         ------
-        StorageFileNotFoundException
+        orionis.storage.exceptions.StorageFileNotFoundException
             If the source blob does not exist.
         """
         await self.copy(source, target)
@@ -646,7 +667,7 @@ class AzureStorageDriver(IStorageDriver):
 
         Raises
         ------
-        StorageFileNotFoundException
+        orionis.storage.exceptions.StorageFileNotFoundException
             If the blob does not exist.
         """
         normalized = normalizeFilePath(path)
@@ -672,7 +693,7 @@ class AzureStorageDriver(IStorageDriver):
 
         Raises
         ------
-        StorageFileNotFoundException
+        orionis.storage.exceptions.StorageFileNotFoundException
             If the blob does not exist.
         """
         normalized = normalizeFilePath(path)
@@ -691,12 +712,12 @@ class AzureStorageDriver(IStorageDriver):
 
         Returns
         -------
-        datetime
+        datetime.datetime
             Timezone-aware modification timestamp.
 
         Raises
         ------
-        StorageFileNotFoundException
+        orionis.storage.exceptions.StorageFileNotFoundException
             If the blob does not exist.
         """
         normalized = normalizeFilePath(path)
@@ -724,7 +745,7 @@ class AzureStorageDriver(IStorageDriver):
 
         Raises
         ------
-        StorageFileNotFoundException
+        orionis.storage.exceptions.StorageFileNotFoundException
             If the blob does not exist.
         """
         normalized = normalizeFilePath(path)
@@ -775,7 +796,7 @@ class AzureStorageDriver(IStorageDriver):
 
         Raises
         ------
-        UnsupportedStorageOperationException
+        orionis.storage.exceptions.UnsupportedStorageOperationException
             Always, since Azure has no per-blob visibility.
         """
         del visibility
@@ -798,7 +819,7 @@ class AzureStorageDriver(IStorageDriver):
         path : str
             Root-relative file path.
         algorithm : str
-            Any algorithm name accepted by :func:`hashlib.new`.
+            Any algorithm name accepted by ``hashlib.new``.
 
         Returns
         -------
@@ -807,9 +828,9 @@ class AzureStorageDriver(IStorageDriver):
 
         Raises
         ------
-        StorageFileNotFoundException
+        orionis.storage.exceptions.StorageFileNotFoundException
             If the blob does not exist.
-        UnsupportedStorageOperationException
+        orionis.storage.exceptions.UnsupportedStorageOperationException
             If *algorithm* is not available.
         """
         normalized = normalizeFilePath(path)
@@ -854,13 +875,13 @@ class AzureStorageDriver(IStorageDriver):
 
         Returns
         -------
-        FileInfo
+        orionis.storage.entities.FileInfo
             Immutable entity with size, MIME type, timestamps, ETag,
             visibility, and URL.
 
         Raises
         ------
-        StorageFileNotFoundException
+        orionis.storage.exceptions.StorageFileNotFoundException
             If the blob does not exist.
         """
         normalized = normalizeFilePath(path)
@@ -871,7 +892,7 @@ class AzureStorageDriver(IStorageDriver):
 
             Returns
             -------
-            FileInfo
+            orionis.storage.entities.FileInfo
                 Object metadata.
             """
             props = self.__propsSync(normalized)
@@ -918,6 +939,7 @@ class AzureStorageDriver(IStorageDriver):
         Returns
         -------
         None
+            Create a zero-byte directory marker at *path*.
         """
         normalized = normalizePath(path)
         if not normalized:
@@ -1104,9 +1126,9 @@ class AzureStorageDriver(IStorageDriver):
 
         Raises
         ------
-        UnsupportedStorageOperationException
+        orionis.storage.exceptions.UnsupportedStorageOperationException
             If no account key is available for signing.
-        MissingStorageDependencyException
+        orionis.storage.exceptions.MissingStorageDependencyException
             If ``azure-storage-blob`` is not installed.
         """
         normalized = normalizeFilePath(path)
@@ -1148,18 +1170,18 @@ class AzureStorageDriver(IStorageDriver):
         ----------
         path : str
             Root-relative file path on the disk.
-        destination : str | Path
+        destination : str | pathlib.Path
             Local target. When it points to an existing directory the
             file keeps its original name inside that directory.
 
         Returns
         -------
-        Path
+        pathlib.Path
             Absolute local path of the downloaded file.
 
         Raises
         ------
-        StorageFileNotFoundException
+        orionis.storage.exceptions.StorageFileNotFoundException
             If the blob does not exist.
         """
         normalized = normalizeFilePath(path)
@@ -1170,7 +1192,7 @@ class AzureStorageDriver(IStorageDriver):
 
             Returns
             -------
-            Path
+            pathlib.Path
                 Destination of the downloaded object.
             """
             target = resolveDownloadTarget(normalized, destination)
@@ -1203,12 +1225,12 @@ class AzureStorageDriver(IStorageDriver):
 
         Returns
         -------
-        AsyncStream
+        orionis.storage.AsyncStream
             Lazily opened stream; use it as an async context manager.
 
         Raises
         ------
-        UnsupportedStorageOperationException
+        orionis.storage.exceptions.UnsupportedStorageOperationException
             If *mode* is not a supported binary mode.
         """
         normalized = normalizeFilePath(path)
@@ -1220,7 +1242,7 @@ class AzureStorageDriver(IStorageDriver):
 
             Returns
             -------
-            BinaryIO
+            typing.BinaryIO
                 Stream handle for reading or writing.
             """
             buffer = tempfile.SpooledTemporaryFile(  # noqa: SIM115
@@ -1248,7 +1270,7 @@ class AzureStorageDriver(IStorageDriver):
 
             Parameters
             ----------
-            handle : BinaryIO
+            handle : typing.BinaryIO
                 Buffered stream being closed.
 
             Returns

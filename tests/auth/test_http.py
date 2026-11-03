@@ -310,7 +310,7 @@ class _RsgiProtocol:
         self.headers: list[tuple[str, str]] = []
         self.body = b""
 
-    def response_bytes(
+    def responseBytes(
         self, status: int, headers: list[tuple[str, str]], body: bytes,
     ) -> None:
         """Record the protocol response supplied by the adapter.
@@ -330,6 +330,9 @@ class _RsgiProtocol:
             Completes the operation described above.
         """
         self.status, self.headers, self.body = status, headers, body
+
+    # Preserve the Granian RSGI protocol name.
+    response_bytes = responseBytes
 
 def route(path: str, function: str, *, web: bool = False) -> CompiledRoute:
     """Build a route descriptor using native middleware classes.

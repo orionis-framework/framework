@@ -1,3 +1,5 @@
+"""Define the contract for a configured storage disk."""
+
 from __future__ import annotations
 from abc import ABC, abstractmethod
 from typing import TYPE_CHECKING
@@ -11,13 +13,14 @@ class IDisk(ABC):
     Define the contract for a configured storage disk.
 
     A disk is the entry point to a storage backend. It builds
-    :class:`~orionis.storage.contracts.file.IFile` and
-    :class:`~orionis.storage.contracts.directory.IDirectory` objects
+    :class:`orionis.storage.contracts.IFile` and
+    :class:`orionis.storage.contracts.IDirectory` objects
     bound to its driver and offers a small set of convenience methods
     that always delegate to those objects.
     """
 
     __slots__ = ()
+    """Declare that this class introduces no additional instance slots."""
 
     @abstractmethod
     def name(self) -> str:
@@ -42,7 +45,7 @@ class IDisk(ABC):
 
         Returns
         -------
-        IFile
+        orionis.storage.contracts.IFile
             File object bound to this disk's driver.
         """
 
@@ -59,7 +62,7 @@ class IDisk(ABC):
 
         Returns
         -------
-        IDirectory
+        orionis.storage.contracts.IDirectory
             Directory object bound to this disk's driver.
         """
 
@@ -84,7 +87,7 @@ class IDisk(ABC):
 
         Returns
         -------
-        IFile
+        orionis.storage.contracts.IFile
             File object pointing at the written file.
         """
 
@@ -134,12 +137,12 @@ class IDisk(ABC):
 
         Returns
         -------
-        IFile
+        orionis.storage.contracts.IFile
             File object pointing at the copy.
 
         Raises
         ------
-        StorageFileNotFoundException
+        orionis.storage.exceptions.StorageFileNotFoundException
             If the source file does not exist.
         """
 
@@ -157,11 +160,11 @@ class IDisk(ABC):
 
         Returns
         -------
-        IFile
+        orionis.storage.contracts.IFile
             File object pointing at the moved file.
 
         Raises
         ------
-        StorageFileNotFoundException
+        orionis.storage.exceptions.StorageFileNotFoundException
             If the source file does not exist.
         """

@@ -1,3 +1,5 @@
+"""Accumulator of ON conditions for a join declared with a callback."""
+
 from __future__ import annotations
 from typing import TYPE_CHECKING
 from orionis.orm.query.expressions import JoinCondition
@@ -15,6 +17,7 @@ class JoinClause:
     """
 
     __slots__ = ("_conditions",)
+    """Declare the instance attribute slots reserved by this class."""
 
     def __init__(self) -> None:
         """
@@ -26,6 +29,7 @@ class JoinClause:
             This method does not return a value.
         """
         self._conditions: list[JoinCondition] = []
+        """Predicates composing the join condition."""
 
     def on(self, first: str, operator: str, second: str) -> Self:
         """
@@ -42,7 +46,7 @@ class JoinClause:
 
         Returns
         -------
-        JoinClause
+        orionis.orm.query.join_clause.JoinClause
             The same clause, enabling fluent chaining.
         """
         self._conditions.append(
@@ -65,7 +69,7 @@ class JoinClause:
 
         Returns
         -------
-        JoinClause
+        orionis.orm.query.join_clause.JoinClause
             The same clause, enabling fluent chaining.
         """
         self._conditions.append(
@@ -81,7 +85,7 @@ class JoinClause:
 
         Returns
         -------
-        list of JoinCondition
+        list of orionis.orm.query.expressions.JoinCondition
             Conditions in declaration order.
         """
         return self._conditions

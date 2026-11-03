@@ -1,3 +1,5 @@
+"""Define how an authenticated identity is extracted from a request."""
+
 from abc import ABC, abstractmethod
 from typing import TYPE_CHECKING
 
@@ -14,6 +16,7 @@ class IGuard(ABC):
     """
 
     __slots__ = ()
+    """Declare that this class introduces no additional instance slots."""
 
     @property
     @abstractmethod
@@ -34,12 +37,12 @@ class IGuard(ABC):
 
         Parameters
         ----------
-        request : Request
+        request : orionis.http.Request
             Incoming HTTP request.
 
         Returns
         -------
-        GuardResult | None
+        orionis.auth.entities.GuardResult | None
             Resolved identity together with the abilities of the presented
             credential, or ``None`` when the request is anonymous.
         """

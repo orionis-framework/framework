@@ -122,6 +122,22 @@ class DatabaseSessionStore(ISessionStore):
 
     # ── Schema bootstrap ─────────────────────────────────────────────────────
 
+    async def migrate(self) -> None:
+        """
+        Create the framework session table without removing existing data.
+
+        Returns
+        -------
+        None
+            Create the configured table if missing using the store's definition.
+
+        Raises
+        ------
+        QueryException
+            If the connection cannot create the table.
+        """
+        await self._ensureSchema()
+
     async def _ensureSchema(self) -> None:
         """
         Create the sessions table on first use, if missing.

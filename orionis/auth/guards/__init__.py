@@ -1,3 +1,5 @@
+"""Group the auth guards components and public imports."""
+
 from typing import TYPE_CHECKING as _TYPE_CHECKING
 from orionis._exports import resolve_export as _resolve_export
 
@@ -14,6 +16,7 @@ _EXPORTS = {
     "SessionGuard": ("orionis.auth.guards.session_guard", "SessionGuard"),
     "TokenGuard": ("orionis.auth.guards.token_guard", "TokenGuard"),
 }
+"""Public export names mapped to their defining modules and attributes."""
 
 def __getattr__(name: str) -> object:
     """

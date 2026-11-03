@@ -1,3 +1,5 @@
+"""Represent a CORS configuration compatible with Starlette CORSMiddleware."""
+
 from __future__ import annotations
 import re
 from dataclasses import dataclass, field
@@ -14,6 +16,7 @@ from orionis.support.entities.base import BaseEntity
 _ALLOWED_HTTP_METHODS: frozenset[str] = frozenset(
     {"GET", "HEAD", "POST", "PUT", "DELETE", "OPTIONS", "PATCH", "QUERY"},
 )
+"""Module-level frozenset: avoids recreating the set per __validateAllowMethods call."""
 
 @dataclass(frozen=True, kw_only=True)
 class Cors(BaseEntity):

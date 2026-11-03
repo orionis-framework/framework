@@ -121,7 +121,7 @@ class TestMcpState(TestCase):
         Container._instances.update(self.instances)
         ScopedContext.reset(self.scope)
 
-    def test_cross_worker_retry_uses_fresh_id(self):
+    def testCrossWorkerRetryUsesFreshId(self):
         """Only stable request context is bound; retry IDs and metadata may differ.
 
         Returns
@@ -138,7 +138,7 @@ class TestMcpState(TestCase):
         )
         self.assertEqual(self.worker.open(retry), {"step": 1, "nullable": None})
 
-    def test_request_server_and_principal_binding(self):
+    def testRequestServerAndPrincipalBinding(self):
         """Prevent other identities, credentials, methods or servers reusing state.
 
         Returns
@@ -179,7 +179,7 @@ class TestMcpState(TestCase):
             with self.subTest(changes=changes), self.assertRaises(McpInvalidParams): # NOSONAR # noqa: E501
                 self.worker.open(replace(retry, **changes))
 
-    def test_expiry_and_wrong_purpose(self):
+    def testExpiryAndWrongPurpose(self):
         """Reject authenticated envelopes that are stale or intended for another API.
 
         Returns
@@ -196,7 +196,7 @@ class TestMcpState(TestCase):
             with self.subTest(changes=changes), self.assertRaises(McpInvalidParams): # NOSONAR # noqa: E501
                 self.worker.open(replace(self.request, request_state=altered))
 
-    def test_tamper_and_cipher_downgrade(self):
+    def testTamperAndCipherDowngrade(self):
         """Verify native AEAD authentication and configured cipher enforcement.
 
         Returns
@@ -219,7 +219,7 @@ class TestMcpState(TestCase):
             with self.subTest(changes=changes), self.assertRaises(McpInvalidParams): # NOSONAR # noqa: E501
                 self.worker.open(replace(self.request, request_state=altered))
 
-    def test_invalid_ttl_and_missing_server_context(self):
+    def testInvalidTtlAndMissingServerContext(self):
         """Fail clearly before sealing unbound or unexpectedly long-lived state.
 
         Returns
@@ -233,7 +233,7 @@ class TestMcpState(TestCase):
         with self.assertRaises(ValueError): # NOSONAR
             self.state.seal(replace(self.request, server_id=""), {})
 
-    def test_cbc_is_not_accepted_for_mrtr_state(self):
+    def testCbcIsNotAcceptedForMrtrState(self):
         """The native framework may support CBC while MCP state requires integrity.
 
         Returns

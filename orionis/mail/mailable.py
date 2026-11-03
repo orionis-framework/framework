@@ -1,3 +1,5 @@
+"""Declare reusable mail without I/O or per-send mutation."""
+
 from abc import ABC, abstractmethod
 from typing import TYPE_CHECKING
 
@@ -19,6 +21,7 @@ class Mailable(ABC):
     """
 
     __slots__ = ()
+    """Declare that this class introduces no additional instance slots."""
 
     @abstractmethod
     def envelope(self) -> Envelope:
@@ -27,7 +30,7 @@ class Mailable(ABC):
 
         Returns
         -------
-        Envelope
+        orionis.mail.entities.Envelope
             Immutable envelope, augmented by explicit PendingMail data.
         """
 
@@ -38,7 +41,7 @@ class Mailable(ABC):
 
         Returns
         -------
-        Content
+        orionis.mail.entities.Content
             Content whose rendering is deferred until sending.
         """
 
@@ -48,7 +51,7 @@ class Mailable(ABC):
 
         Returns
         -------
-        Sequence[Attachment]
+        collections.abc.Sequence[orionis.mail.entities.Attachment]
             Empty by default; subclasses may return their own declarations.
         """
         return ()

@@ -1,3 +1,5 @@
+"""Service provider for the Orionis encryption system."""
+
 from __future__ import annotations
 from orionis.container.providers.service_provider import ServiceProvider
 from orionis.encrypter.contracts.encrypter import IEncrypter
@@ -7,8 +9,10 @@ class EncrypterProvider(ServiceProvider):
     """
     Service provider for the Orionis encryption system.
 
-    Binds :class:`IEncrypter` to :class:`Encrypter` as a singleton and pins
-    the :class:`Crypt` facade so the synchronous ``Crypt.encrypt(...)`` and
+    Binds :class:`orionis.encrypter.contracts.IEncrypter` to
+    :class:`orionis.encrypter.Encrypter` as a singleton and pins
+    the :class:`orionis.support.facades.Crypt` facade so the synchronous
+    ``Crypt.encrypt(...)`` and
     ``Crypt.decrypt(...)`` calls resolve without container overhead.
     """
 

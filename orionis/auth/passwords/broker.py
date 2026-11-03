@@ -1,3 +1,5 @@
+"""Issue hashed credentials and consume them with the password atomically."""
+
 import re
 import secrets
 import time
@@ -32,11 +34,11 @@ class PasswordBroker:
 
         Parameters
         ----------
-        app : IApplication
+        app : orionis.IApplication
             Application providing password-reset configuration.
-        db : IQueryBuilder
+        db : orionis.orm.contracts.query_builder.IQueryBuilder
             Query builder used to access the reset table.
-        hashing : IHashManager
+        hashing : orionis.hashing.contracts.IHashManager
             Password hasher used to fingerprint and replace passwords.
 
         Returns
@@ -47,10 +49,15 @@ class PasswordBroker:
         """
         # Resolve the configured identity once for this broker.
         self.settings = PasswordReset(**(app.config("auth.passwords") or {}))
+        """Resolve the configured identity once for this broker."""
         self.model = ModelIdentityProvider(app, hashing).model()
+        """Model selected for generation or persistence."""
         self.db = db.connection(self.model.connection)
+        """Query builder used to access the reset table."""
         self.hashing = hashing
+        """Password hasher used to fingerprint and replace passwords."""
         self.tokens = AccessTokenRepository(app, self.db)
+        """Tokens produced by ``AccessTokenRepository``."""
 
     def _records(self, email: str) -> IRawQueryBuilder:
         """
@@ -63,7 +70,7 @@ class PasswordBroker:
 
         Returns
         -------
-        IRawQueryBuilder
+        orionis.orm.contracts.raw_builder.IRawQueryBuilder
             Fresh query scoped to the configured reset table and email.
         """
         # Keep each operation isolated in a fresh query builder.
@@ -80,7 +87,7 @@ class PasswordBroker:
 
         Returns
         -------
-        tuple[Model, str] | None
+        tuple[orionis.orm.Model, str] | None
             The identity and plain token when issued, or ``None`` when the
             identity is unknown or a recent token is still in its cooldown.
         """
@@ -128,7 +135,7 @@ class PasswordBroker:
 
         Returns
         -------
-        Model | None
+        orionis.orm.Model | None
             Matching identity when the token is valid and current, otherwise
             ``None``.
         """
@@ -189,7 +196,7 @@ class PasswordBroker:
 
         Returns
         -------
-        Model | None
+        orionis.orm.Model | None
             Updated identity when the reset succeeds, or ``None`` when the
             token is invalid, stale, expired, or already consumed.
         """

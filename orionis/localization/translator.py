@@ -1,3 +1,5 @@
+"""Resolve translation lines for the active locale."""
+
 from __future__ import annotations
 import re
 from typing import TYPE_CHECKING
@@ -13,18 +15,21 @@ if TYPE_CHECKING:
 _LOCALE_PATTERN: re.Pattern[str] = re.compile(
     r"^[A-Za-z0-9]+(?:[_-][A-Za-z0-9]+)*$",
 )
+"""Safe locale codes: alphanumeric groups separated by "-" or "_"."""
 
 # Explicit exact condition on a plural segment, e.g. "{0} none".
 _EXACT_PATTERN: re.Pattern[str] = re.compile(
     r"^\{([^}]*)\}(.*)$",
     re.DOTALL,
 )
+"""Explicit exact condition on a plural segment, e.g. "{0} none"."""
 
 # Explicit range condition on a plural segment, e.g. "[2,*] many".
 _RANGE_PATTERN: re.Pattern[str] = re.compile(
     r"^\[([^\],]*),([^\]]*)\](.*)$",
     re.DOTALL,
 )
+"""Explicit range condition on a plural segment, e.g. "[2,*] many"."""
 
 class Translator(ITranslator):
     """
@@ -33,19 +38,25 @@ class Translator(ITranslator):
     The translator performs O(1) lookups against the in-memory
     repository, falls back to the configured fallback locale, applies
     style ``:name`` parameter replacement, and selects
-    pluralized segments through :meth:`choice`.
+    pluralized segments through :meth:`orionis.localization.Translator.choice`.
 
     Notes
     -----
     The provider binds a single instance for the whole process and the
-    class uses no lock, so :meth:`setLocale`, :meth:`missing`,
-    :meth:`reload`, :meth:`forget` and :meth:`flush` are global side
+    class uses no lock, so :meth:`orionis.localization.Translator.setLocale`,
+    :meth:`orionis.localization.Translator.missing`,
+    :meth:`orionis.localization.Translator.reload`,
+    :meth:`orionis.localization.Translator.forget` and
+    :meth:`orionis.localization.Translator.flush` are global side
     effects visible to every concurrent task. Pass an explicit
-    ``locale`` to :meth:`get`, :meth:`has` or :meth:`choice` to select a
+    ``locale`` to :meth:`orionis.localization.Translator.get`,
+    :meth:`orionis.localization.Translator.has` or
+    :meth:`orionis.localization.Translator.choice` to select a
     language for a single call instead.
     """
 
     __slots__ = ("_fallback", "_loader", "_locale", "_missing", "_repository")
+    """Declare the instance attribute slots reserved by this class."""
 
     def __init__(
         self,
@@ -64,25 +75,31 @@ class Translator(ITranslator):
             Active locale code.
         fallback : str
             Locale used when a translation is missing.
-        loader : ITranslationLoader
+        loader : orionis.localization.contracts.ITranslationLoader
             Loader used to discover the available locales.
-        repository : ITranslationRepository
+        repository : orionis.localization.contracts.ITranslationRepository
             In-memory cache resolving translation maps per locale.
 
         Returns
         -------
         None
+            Initialize the translator with its locales and collaborators.
 
         Raises
         ------
-        InvalidLocaleException
+        orionis.localization.InvalidLocaleException
             If either locale code is malformed.
         """
         self._loader = loader
+        """Loader used to discover the available locales."""
         self._repository = repository
+        """In-memory cache resolving translation maps per locale."""
         self._locale = self.__assertLocale(locale)
+        """Active locale code."""
         self._fallback = self.__assertLocale(fallback)
+        """Locale used when a translation is missing."""
         self._missing: MissingKeyHandler | None = None
+        """Callback used when a translation key cannot be resolved."""
 
     # ── Translation resolution ───────────────────────────────────────────────
 
@@ -117,7 +134,7 @@ class Translator(ITranslator):
 
         Raises
         ------
-        InvalidLocaleException
+        orionis.localization.InvalidLocaleException
             If an explicit locale is malformed.
         """
         target = self.__assertLocale(locale) if locale is not None else self._locale
@@ -162,7 +179,7 @@ class Translator(ITranslator):
 
         Raises
         ------
-        InvalidLocaleException
+        orionis.localization.InvalidLocaleException
             If an explicit locale is malformed.
         """
         target = self.__assertLocale(locale) if locale is not None else self._locale
@@ -213,7 +230,7 @@ class Translator(ITranslator):
 
         Raises
         ------
-        InvalidLocaleException
+        orionis.localization.InvalidLocaleException
             If an explicit locale is malformed.
         """
         # Resolve the raw line and split it into plural segments.
@@ -242,10 +259,11 @@ class Translator(ITranslator):
         Returns
         -------
         None
+            Change the active locale at runtime.
 
         Raises
         ------
-        InvalidLocaleException
+        orionis.localization.InvalidLocaleException
             If the locale is malformed.
         """
         self._locale = self.__assertLocale(locale)
@@ -267,7 +285,7 @@ class Translator(ITranslator):
 
         Returns
         -------
-        tuple[str, ...]
+        tuple[str, ``...``]
             Sorted locale codes discovered in the language path.
         """
         return self._loader.availableLocales()
@@ -286,10 +304,11 @@ class Translator(ITranslator):
         Returns
         -------
         None
+            Discard cached translations so they are re-read from disk.
 
         Raises
         ------
-        InvalidLocaleException
+        orionis.localization.InvalidLocaleException
             If an explicit locale is malformed.
         """
         if locale is None:
@@ -313,7 +332,7 @@ class Translator(ITranslator):
 
         Raises
         ------
-        InvalidLocaleException
+        orionis.localization.InvalidLocaleException
             If the locale is malformed.
         """
         return self._repository.forget(self.__assertLocale(locale))
@@ -325,6 +344,7 @@ class Translator(ITranslator):
         Returns
         -------
         None
+            Discard every cached translation map.
         """
         self._repository.flush()
 
@@ -338,13 +358,14 @@ class Translator(ITranslator):
 
         Parameters
         ----------
-        handler : MissingKeyHandler | None
+        handler : orionis.localization.types.MissingKeyHandler | None
             Callable invoked on missing keys, or ``None`` to remove the
             current handler.
 
         Returns
         -------
         None
+            Register a handler invoked when a translation key is missing.
         """
         self._missing = handler
 
@@ -366,7 +387,7 @@ class Translator(ITranslator):
 
         Raises
         ------
-        InvalidLocaleException
+        orionis.localization.InvalidLocaleException
             If the locale is empty, malformed, or unsafe for path use.
         """
         # Reject codes that could escape the language path or be empty.

@@ -1,3 +1,5 @@
+"""Apply every database seeder that has not been run yet."""
+
 from orionis.console.commands.migrate.base import MigrationCommand
 from orionis.database.seeders.runner import SeederRunner
 
@@ -7,7 +9,9 @@ class SeedCommand(MigrationCommand):
     # ruff: noqa: TC001
 
     signature: str = "seed"
+    """Signature identifier: ``seed``."""
     description: str = "Runs all pending database seeders."
+    """Description identifier: ``Runs all pending database seeders.``."""
 
     async def handle(self, seeder_runner: SeederRunner) -> None:
         """
@@ -15,7 +19,7 @@ class SeedCommand(MigrationCommand):
 
         Parameters
         ----------
-        seeder_runner : SeederRunner
+        seeder_runner : orionis.database.seeders.SeederRunner
             Service that discovers and runs pending seeders.
 
         Returns

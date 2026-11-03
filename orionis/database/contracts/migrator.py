@@ -1,3 +1,5 @@
+"""Contract for the database migration runner."""
+
 from __future__ import annotations
 from abc import ABC, abstractmethod
 from typing import TYPE_CHECKING, Any
@@ -16,6 +18,7 @@ class IMigrator(ABC):
     """
 
     __slots__ = ()
+    """Declare that this class introduces no additional instance slots."""
 
     @abstractmethod
     async def migrate(
@@ -31,7 +34,7 @@ class IMigrator(ABC):
         ----------
         connection : str or None, optional
             Named connection to migrate, or ``None`` for the default one.
-        events : MigrationEvents or None, optional
+        events : ``MigrationEvents`` or None, optional
             Progress callbacks reported for each migration.
 
         Returns
@@ -65,7 +68,7 @@ class IMigrator(ABC):
             recent one. Defaults to ``1``.
         connection : str or None, optional
             Named connection to roll back, or ``None`` for the default.
-        events : MigrationEvents or None, optional
+        events : ``MigrationEvents`` or None, optional
             Progress callbacks reported for each migration.
 
         Returns
@@ -78,7 +81,7 @@ class IMigrator(ABC):
         ------
         ValueError
             If ``steps`` is not a positive integer.
-        MigrationNotFoundException
+        orionis.database.MigrationNotFoundException
             If a recorded migration has no matching migration file.
         """
 
@@ -96,7 +99,7 @@ class IMigrator(ABC):
         ----------
         connection : str or None, optional
             Named connection to reset, or ``None`` for the default one.
-        events : MigrationEvents or None, optional
+        events : ``MigrationEvents`` or None, optional
             Progress callbacks reported for each migration.
 
         Returns
@@ -106,7 +109,7 @@ class IMigrator(ABC):
 
         Raises
         ------
-        MigrationNotFoundException
+        orionis.database.MigrationNotFoundException
             If a recorded migration has no matching migration file.
         """
 
@@ -128,7 +131,7 @@ class IMigrator(ABC):
             every recorded migration.
         connection : str or None, optional
             Named connection to refresh, or ``None`` for the default.
-        events : MigrationEvents or None, optional
+        events : ``MigrationEvents`` or None, optional
             Progress callbacks reported for each migration.
 
         Returns
@@ -156,7 +159,7 @@ class IMigrator(ABC):
         ----------
         connection : str or None, optional
             Named connection to rebuild, or ``None`` for the default.
-        events : MigrationEvents or None, optional
+        events : ``MigrationEvents`` or None, optional
             Progress callbacks reported for each migration.
 
         Returns

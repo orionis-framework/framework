@@ -1,3 +1,5 @@
+"""Enumerate PostgreSQL encodings supported for database storage."""
+
 from enum import Enum
 
 class PGSQLCharset(Enum):
@@ -80,7 +82,7 @@ class PGSQLCharset(Enum):
 
     Returns
     -------
-    PGSQLCharset
+    orionis.foundation.config.database.PGSQLCharset
         The enumeration member representing a PostgreSQL database encoding.
     """
 

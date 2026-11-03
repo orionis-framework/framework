@@ -1,3 +1,5 @@
+"""Represent the configuration entity for the bcrypt hashing driver."""
+
 from __future__ import annotations
 from dataclasses import dataclass, field
 from orionis.environment import Env
@@ -5,7 +7,9 @@ from orionis.support.entities.base import BaseEntity
 
 # Bounds imposed by the bcrypt algorithm itself
 _MIN_ROUNDS: int = 4
+"""Bounds imposed by the bcrypt algorithm itself."""
 _MAX_ROUNDS: int = 31
+"""Max rounds value used by ``bcrypt``."""
 
 @dataclass(frozen=True, kw_only=True)
 class Bcrypt(BaseEntity):

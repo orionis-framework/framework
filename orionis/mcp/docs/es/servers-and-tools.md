@@ -50,7 +50,7 @@ Una salida declarada se valida antes de serializar. Devuelve `McpResponse.struct
 
 Añade `shouldRegister(self, request: McpRequest) -> bool` para visibilidad por petición y `authorize(...) -> bool` para acceso. El nombre real del hook es **shouldRegister**, no `available`. Ambos se revisan al listar y al invocar directamente; ocultar una herramienta no deja una vía directa sin comprobar.
 
-`request.identity` y `request.authentication` exponen la identidad del contexto; `client_capabilities` contiene únicamente lo declarado por esta llamada. Es un snapshot inmutable: mappings anidados son de solo lectura. Los servicios inyectados conservan sus propias reglas de concurrencia, así que evita guardar una llamada en servicios singleton.
+`request.identity` y `request.authentication` exponen la identidad del contexto; `clientCapabilities` contiene únicamente lo declarado por esta llamada. Es un snapshot inmutable: mappings anidados son de solo lectura. Los servicios inyectados conservan sus propias reglas de concurrencia, así que evita guardar una llamada en servicios singleton.
 
 `ToolAnnotations` describe read-only, destructive, idempotent y open-world. Son hints de cliente; no autorizan acciones ni hacen una transacción idempotente. Para errores de negocio previstos devuelve `McpResponse.error(message)`; fallos inesperados se sanea antes de presentarlos al cliente.
 

@@ -1,3 +1,5 @@
+"""Configure testing settings."""
+
 from __future__ import annotations
 from dataclasses import dataclass, field
 from orionis.environment import Env
@@ -8,15 +10,18 @@ from orionis.support.entities.base import BaseEntity
 
 # Pre-computed valid verbosity values: avoids building a list on every Testing() init.
 _VERBOSITY_VALUES: frozenset[int] = frozenset(mode.value for mode in VerbosityMode)
+"""
+Pre-computed valid verbosity values: avoids building a list on every Testing() init.
+"""
 
 @dataclass(frozen=True, kw_only=True)
 class Testing(BaseEntity):
     """
     Configure testing settings.
 
-    Parameters
+    Attributes
     ----------
-    verbosity : int | VerbosityMode
+    verbosity : int | orionis.foundation.config.testing.enums.VerbosityMode
         Level of detail in test output. 0: silent, 1: standard, 2: detailed.
         Defaults to 2 (detailed).
     fail_fast : bool
@@ -90,6 +95,7 @@ class Testing(BaseEntity):
             "default": False,
         },
     )
+    """Cache results produced by ``field``."""
 
     def __post_init__(self) -> None:
         """

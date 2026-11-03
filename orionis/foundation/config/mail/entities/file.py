@@ -1,3 +1,5 @@
+"""Represent a file configuration entity for storing outgoing emails."""
+
 from __future__ import annotations
 from dataclasses import dataclass, field
 from orionis.environment import Env

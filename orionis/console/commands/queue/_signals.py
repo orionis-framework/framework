@@ -1,3 +1,5 @@
+"""Install temporary worker shutdown handlers on the main thread."""
+
 import asyncio
 import signal
 from contextlib import suppress
@@ -15,11 +17,11 @@ def _stop_worker(worker: IWorker, _signal: int, _frame: FrameType | None) -> Non
 
     Parameters
     ----------
-    worker : IWorker
+    worker : orionis.queues.contracts.worker.IWorker
         Active worker that should stop reserving jobs.
     _signal : int
         Delivered process signal.
-    _frame : FrameType | None
+    _frame : types.FrameType | None
         Interrupted interpreter frame.
 
     Returns
@@ -33,6 +35,7 @@ class WorkerSignals:
     """Install temporary worker shutdown handlers on the main thread."""
 
     __slots__ = ("_handlers", "_loop", "_worker")
+    """Declare the instance attribute slots reserved by this class."""
 
     def __init__(self, worker: IWorker) -> None:
         """
@@ -40,7 +43,7 @@ class WorkerSignals:
 
         Parameters
         ----------
-        worker : IWorker
+        worker : orionis.queues.contracts.worker.IWorker
             Worker receiving graceful shutdown requests.
 
         Returns
@@ -49,8 +52,11 @@ class WorkerSignals:
             Complete the documented operation without returning a value.
         """
         self._worker = worker
+        """Worker receiving graceful shutdown requests."""
         self._loop = asyncio.get_running_loop()
+        """Loop produced by ``asyncio.get_running_loop``."""
         self._handlers: dict[int, object] = {}
+        """Handlers retained for dispatch or restoration during cleanup."""
 
     def __enter__(self) -> None:
         """

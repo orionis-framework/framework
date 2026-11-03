@@ -1,3 +1,5 @@
+"""Contract for a database transaction usable as an async context manager."""
+
 from __future__ import annotations
 from abc import ABC, abstractmethod
 from typing import TYPE_CHECKING
@@ -15,6 +17,7 @@ class ITransaction(ABC):
     """
 
     __slots__ = ()
+    """Declare that this class introduces no additional instance slots."""
 
     @abstractmethod
     async def __aenter__(self) -> ITransaction:
@@ -23,12 +26,12 @@ class ITransaction(ABC):
 
         Returns
         -------
-        ITransaction
+        orionis.database.contracts.ITransaction
             The active transaction context.
 
         Raises
         ------
-        TransactionException
+        orionis.database.TransactionException
             If the transaction cannot be started.
         """
 
@@ -48,7 +51,7 @@ class ITransaction(ABC):
             Exception class raised inside the block, if any.
         exc : BaseException or None
             Exception instance raised inside the block, if any.
-        traceback : TracebackType or None
+        traceback : types.TracebackType or None
             Traceback associated with the exception, if any.
 
         Returns

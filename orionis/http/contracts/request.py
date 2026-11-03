@@ -1,3 +1,5 @@
+"""Define the contract for request implementations."""
+
 from __future__ import annotations
 from abc import ABC, abstractmethod
 from typing import TYPE_CHECKING, Any
@@ -15,8 +17,10 @@ if TYPE_CHECKING:
 class IRequest(ABC):
 
     # ruff: noqa: ANN401
+    """Define the contract for request implementations."""
 
     __slots__ = ()
+    """Declare that this class introduces no additional instance slots."""
 
     @abstractmethod
     def close(self) -> None:
@@ -62,7 +66,7 @@ class IRequest(ABC):
 
         Returns
         -------
-        Headers
+        orionis.http.payload.estructures.headers.Headers
             The headers associated with the request.
         """
     @property
@@ -73,7 +77,7 @@ class IRequest(ABC):
 
         Returns
         -------
-        QueryParams
+        orionis.http.payload.estructures.query_params.QueryParams
             The parsed query parameters as a QueryParams object.
         """
 
@@ -85,7 +89,7 @@ class IRequest(ABC):
 
         Returns
         -------
-        Cookies
+        orionis.http.payload.estructures.cookies.Cookies
             The parsed cookies as a Cookies object.
         """
 
@@ -121,7 +125,7 @@ class IRequest(ABC):
 
         Returns
         -------
-        dict[str, Any]
+        dict[str, typing.Any]
             The forwarded information as a dictionary.
         """
 
@@ -168,7 +172,7 @@ class IRequest(ABC):
 
         Returns
         -------
-        Interface
+        orionis.http.enums.Interface
             The interface type of the request.
         """
 
@@ -323,7 +327,7 @@ class IRequest(ABC):
 
         Returns
         -------
-        AsyncGenerator[bytes]
+        collections.abc.AsyncGenerator[bytes]
             Yields chunks of the request body as bytes.
         """
 
@@ -357,7 +361,7 @@ class IRequest(ABC):
 
         Raises
         ------
-        UnsupportedMediaTypeException
+        orionis.http.request.UnsupportedMediaTypeException
             If the Content-Type is not ``application/json`` (or a
             ``+json`` subtype).
         ValueError
@@ -371,7 +375,7 @@ class IRequest(ABC):
 
         Returns
         -------
-        Any
+        typing.Any
             Structured data parsed from the request body, or raw bytes if no
             parser is available.
         """
@@ -383,7 +387,7 @@ class IRequest(ABC):
 
         Returns
         -------
-        dict[str, Any]
+        dict[str, typing.Any]
             The parsed form data as a dictionary.
         """
 
@@ -419,14 +423,14 @@ class IRequest(ABC):
 
         Returns
         -------
-        ET.Element
+        ``xml.etree.ElementTree.Element``
             The root element parsed from the XML request body.
 
         Raises
         ------
-        xml.etree.ElementTree.ParseError
+        ``xml.etree.ElementTree.ParseError``
             If the XML body is malformed.
-        defusedxml.common.EntitiesForbidden
+        ``defusedxml.common.EntitiesForbidden``
             If the document declares an internal or external entity. This is a
             subclass of ``defusedxml.common.DefusedXmlException``, not ParseError.
         """
@@ -444,7 +448,7 @@ class IRequest(ABC):
 
         Raises
         ------
-        msgspec.DecodeError
+        ``msgspec.DecodeError``
             If the payload is not valid MessagePack.
         """
 
@@ -455,12 +459,12 @@ class IRequest(ABC):
 
         Returns
         -------
-        FormData
+        orionis.http.payload.form_data.FormData
             The parsed multipart form data.
 
         Raises
         ------
-        UnsupportedMediaTypeException
+        orionis.http.request.UnsupportedMediaTypeException
             If the Content-Type is not multipart/form-data.
         ValueError
             If the multipart boundary is missing.
@@ -482,12 +486,12 @@ class IRequest(ABC):
 
         Returns
         -------
-        dict[str, Any]
+        dict[str, typing.Any]
             Flat dictionary suitable for downstream validation (FormRequest).
 
         Raises
         ------
-        UnsupportedMediaTypeException
+        orionis.http.request.UnsupportedMediaTypeException
             If the ``Content-Type`` cannot be converted to a dictionary.
         ValueError
             If a JSON or MessagePack body is empty or cannot be decoded,
@@ -523,7 +527,7 @@ class IRequest(ABC):
 
         Returns
         -------
-        dict[str, Any]
+        dict[str, typing.Any]
             The raw scope dictionary provided by the transport layer.
         """
 
@@ -550,7 +554,7 @@ class IRequest(ABC):
 
         Returns
         -------
-        dict[str, Any]
+        dict[str, typing.Any]
             A dictionary of all path parameters.
         """
 
@@ -573,3 +577,4 @@ class IRequest(ABC):
 
     # Template-facing attribute shares the camelCase contract.
     csrf_token = property(csrfToken)
+    """Template-facing attribute shares the camelCase contract."""

@@ -1,3 +1,8 @@
+"""Provide queues operations.
+
+Includes ``validate_table_name``, ``build_jobs_table``, ``build_failed_jobs_table``.
+"""
+
 import re
 from orionis.orm.schema.constraints import TableIndex
 from orionis.orm.schema.table import TableDefinition
@@ -5,6 +10,7 @@ from orionis.orm.schema.types import Double, Integer, LargeBinary, String, Text
 from orionis.queues.exceptions import QueueConfigurationError
 
 _TABLE_NAME = re.compile(r"[A-Za-z_]\w*", re.ASCII)
+"""Compiled pattern used to recognize table name."""
 
 def validate_table_name(table: str) -> str:
     """
@@ -22,7 +28,7 @@ def validate_table_name(table: str) -> str:
 
     Raises
     ------
-    QueueConfigurationError
+    orionis.queues.exceptions.QueueConfigurationError
         If the table identifier is invalid.
     """
     if not isinstance(table, str) or _TABLE_NAME.fullmatch(table) is None:
@@ -41,7 +47,7 @@ def build_jobs_table(table: str) -> TableDefinition:
 
     Returns
     -------
-    TableDefinition
+    orionis.orm.schema.TableDefinition
         Queue schema with lease fencing and fractional epoch timestamps.
     """
     return TableDefinition(
@@ -73,7 +79,7 @@ def build_failed_jobs_table(table: str) -> TableDefinition:
 
     Returns
     -------
-    TableDefinition
+    orionis.orm.schema.TableDefinition
         Failure schema retaining the original envelope and exception details.
     """
     return TableDefinition(

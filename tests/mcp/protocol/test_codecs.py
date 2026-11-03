@@ -40,7 +40,7 @@ class TestCodecs(TestCase):
             ),
         )
 
-    def test_typed_payload_stays_inside_arguments(self):
+    def testTypedPayloadStaysInsideArguments(self):
         """A dependency-looking argument cannot become an invocation kwarg.
 
         Returns
@@ -53,7 +53,7 @@ class TestCodecs(TestCase):
         params = decode_params(request)
         self.assertEqual(params.arguments, {"repository": "attacker"})
 
-    def test_invalid_envelopes(self):
+    def testInvalidEnvelopes(self):
         """Reject batches, null/bool/fractional IDs and response messages.
 
         Returns
@@ -76,7 +76,7 @@ class TestCodecs(TestCase):
                 decode_envelope(data)
             self.assertEqual(caught.exception.code, -32600)
 
-    def test_parse_error_has_no_null_id(self):
+    def testParseErrorHasNoNullId(self):
         """The modern schema omits an unknown ID instead of serializing null.
 
         Returns
@@ -90,7 +90,7 @@ class TestCodecs(TestCase):
         self.assertEqual(result["error"]["code"], -32700)
         self.assertNotIn("id", result)
 
-    def test_unsupported_version_lists_only_modern(self):
+    def testUnsupportedVersionListsOnlyModern(self):
         """Reject other versions without negotiation or fallback.
 
         Returns
@@ -111,7 +111,7 @@ class TestCodecs(TestCase):
         self.assertEqual(result["error"]["code"], -32022)
         self.assertEqual(result["error"]["data"]["supported"], ["2026-07-28"])
 
-    def test_initialize_is_unknown(self):
+    def testInitializeIsUnknown(self):
         """Keep legacy negotiation outside the dispatcher.
 
         Returns
@@ -124,7 +124,7 @@ class TestCodecs(TestCase):
         self.assertEqual(caught.exception.code, -32601)
         self.assertIn("2026-07-28", caught.exception.message)
 
-    def test_metadata_is_mandatory(self):
+    def testMetadataIsMandatory(self):
         """Every independent request carries its own version and capabilities.
 
         Returns
@@ -144,7 +144,7 @@ class TestCodecs(TestCase):
                 decode_params(self.request("server/discover", _meta=meta))
             self.assertEqual(caught.exception.code, -32602)
 
-    def test_prompt_arguments_are_strings(self):
+    def testPromptArgumentsAreStrings(self):
         """Reject JSON numbers instead of coercing them into prompt strings.
 
         Returns
@@ -155,7 +155,7 @@ class TestCodecs(TestCase):
         with self.assertRaises(McpProtocolException): # NOSONAR
             decode_params(self.request("prompts/get", name="x", arguments={"tone": 1}))
 
-    def test_notifications_have_no_id(self):
+    def testNotificationsHaveNoId(self):
         """Distinguish a notification from a null-ID request.
 
         Returns

@@ -1,6 +1,9 @@
+"""Resolve and validate the key used to protect session data."""
+
 import secrets
 
 class SecretKey:
+    """Resolve and validate the key used to protect session data."""
 
     @staticmethod
     def random(length: int = 32) -> str:

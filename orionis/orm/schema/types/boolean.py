@@ -1,3 +1,5 @@
+"""A bool datatype, typically ``BOOLEAN`` or ``SMALLINT`` in DDL."""
+
 from __future__ import annotations
 from orionis.orm.schema.column.definition import ColumnDefinition
 from orionis.orm.schema.column.options import ColumnOptions
@@ -7,6 +9,7 @@ class Boolean(ColumnDefinition):
     """A bool datatype, typically ``BOOLEAN`` or ``SMALLINT`` in DDL."""
 
     __slots__ = ()
+    """Declare that this class introduces no additional instance slots."""
 
     def __init__(
         self,

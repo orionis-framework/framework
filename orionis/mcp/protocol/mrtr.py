@@ -130,7 +130,7 @@ def _require(request: McpRequest, capability: str, feature: str | None = None) -
     None
         Complete the documented operation without returning a value.
     """
-    value = request.client_capabilities.get(capability)
+    value = request.clientCapabilities.get(capability)
     supported = isinstance(value, Mapping) and (
         feature is None or feature in value
         or (capability == "elicitation" and feature == "form" and not value)

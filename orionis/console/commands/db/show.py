@@ -1,3 +1,5 @@
+"""Render connection details and a table summary."""
+
 from typing import ClassVar
 from orionis.console.args.argument import Argument
 from orionis.console.commands.db._inspection import DatabaseInspector
@@ -5,6 +7,7 @@ from orionis.console.commands.migrate.base import MigrationCommand
 from orionis.database.contracts.connection_manager import IConnectionManager
 
 _KIB: int = 1024
+"""Kib value used by ``show``."""
 
 def format_bytes(size: int | None) -> str:
     """
@@ -35,8 +38,11 @@ class DbShowCommand(MigrationCommand):
     # ruff: noqa: TC001, E501
 
     timestamps: bool = False
+    """Timestamps flag used by ``DbShowCommand``."""
     signature: str = "db:show"
+    """Signature identifier: ``db:show``."""
     description: str = "Shows database information and table summaries."
+    """Description identifier: ``Shows database information and table summaries.``."""
     arguments: ClassVar[list[Argument]] = [
         *MigrationCommand.arguments,
         Argument(
@@ -52,6 +58,7 @@ class DbShowCommand(MigrationCommand):
             dest="views",
         ),
     ]
+    """Command-line argument declarations accepted by this command."""
 
     async def handle(self, conn_manager: IConnectionManager) -> None: # NOSONAR
         """
@@ -59,7 +66,7 @@ class DbShowCommand(MigrationCommand):
 
         Parameters
         ----------
-        conn_manager : IConnectionManager
+        conn_manager : orionis.database.contracts.IConnectionManager
             Connection manager used to resolve the active database.
 
         Returns

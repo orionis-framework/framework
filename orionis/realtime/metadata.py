@@ -1,3 +1,5 @@
+"""Describe one pre-authorized method without retaining a Hub instance."""
+
 from __future__ import annotations
 import inspect
 from collections.abc import AsyncIterable, AsyncIterator, Mapping, Sequence
@@ -23,13 +25,18 @@ from orionis.schemas.schema import Schema as OrionisSchema
 
 _EMPTY = inspect.Parameter.empty
 _INVALID_ARGUMENTS = "invalid_arguments"
+"""Invalid arguments identifier: ``invalid_arguments``."""
 _VALIDATION_ERROR = "validation_error"
+"""Protocol error code returned when invocation arguments fail validation."""
 _ARGUMENTS_MESSAGE = "Invalid arguments"
+"""Error text for arguments message: ``Invalid arguments``."""
 _SCALARS = frozenset({
     str, int, float, bool, bytes, object, type(None), datetime, date, time,
     timedelta, Decimal, UUID, Any,
 })
+"""Scalars used by ``metadata``."""
 _COLLECTIONS = frozenset({list, tuple, dict, set, frozenset, Sequence, Mapping})
+"""Collections used by ``metadata``."""
 
 def _base_annotation(annotation: object) -> object:
     """
@@ -106,7 +113,9 @@ class _SchemaPlan:
     """Retain trusted field names and existing rule metadata for one Struct."""
 
     fields: tuple[str, ...]
+    """Fields included in the compiled schema plan."""
     rules: tuple
+    """Validation rules applied by the compiled schema plan."""
 
 def _schema_plans(annotation: object) -> Mapping[type, _SchemaPlan]: # NOSONAR
     """
@@ -119,7 +128,7 @@ def _schema_plans(annotation: object) -> Mapping[type, _SchemaPlan]: # NOSONAR
 
     Returns
     -------
-    Mapping[type, _SchemaPlan]
+    collections.abc.Mapping[type, orionis.realtime.metadata._SchemaPlan]
         Immutable traversal metadata, including recursive Struct references.
     """
     plans: dict[type, _SchemaPlan] = {}
@@ -175,7 +184,7 @@ async def _validate_schemas( # NOSONAR
     ----------
     value : object
         Converted schema or collection with a compiled schema-containing type.
-    plans : Mapping[type, _SchemaPlan]
+    plans : collections.abc.Mapping[type, orionis.realtime.metadata._SchemaPlan]
         Trusted field and rule metadata compiled during Hub registration.
 
     Returns
@@ -185,7 +194,7 @@ async def _validate_schemas( # NOSONAR
 
     Raises
     ------
-    ValidationException
+    orionis.schemas.exceptions.ValidationException
         If a contained schema violates a framework rule.
     """
     if isinstance(value, msgspec.Struct):
@@ -211,10 +220,15 @@ class _ClientParameter:
     """Retain the immutable conversion plan for one client-owned parameter."""
 
     name: str
+    """Name identifying this declaration within its containing registry."""
     annotation: object
+    """Declared Python type used to validate the client argument."""
     default: object
+    """Value used when the client omits this argument."""
     keyword_only: bool
+    """Whether the client argument must be passed by keyword."""
     schema_plans: Mapping[type, _SchemaPlan]
+    """Compiled schema-validation plans for the argument."""
 
     async def convert(self, value: object) -> object:
         """
@@ -232,7 +246,7 @@ class _ClientParameter:
 
         Raises
         ------
-        RPCError
+        orionis.realtime.errors.RPCError
             If type constraints or schema rules reject the value.
         """
         try:
@@ -248,11 +262,17 @@ class RemoteMethod:
     """Describe one pre-authorized method without retaining a Hub instance."""
 
     method_name: str
+    """Python method name implementing the remote target."""
     is_stream: bool
+    """Whether the remote method produces streamed results."""
     dependencies: Mapping[str, type]
+    """Service dependencies resolved for the remote invocation."""
     parameters: tuple[_ClientParameter, ...]
+    """Client-supplied parameters accepted by the remote method."""
     positional: tuple[_ClientParameter, ...]
+    """Parameter metadata used to bind positional client arguments."""
     client_names: frozenset[str]
+    """Names of arguments the client is permitted to supply."""
 
     async def bind(
         self, args: list[object], kwargs: dict[str, object],
@@ -274,7 +294,7 @@ class RemoteMethod:
 
         Raises
         ------
-        RPCError
+        orionis.realtime.errors.RPCError
             If an argument is missing, duplicated, unknown or invalid.
         """
         if (
@@ -304,16 +324,16 @@ def _method_plan(hub: type[Hub], name: str, function: FunctionType) -> RemoteMet
 
     Parameters
     ----------
-    hub : type[Hub]
+    hub : type[orionis.realtime.Hub]
         Registered hub class.
     name : str
         Server-owned Python method name.
-    function : FunctionType
+    function : types.FunctionType
         Original decorated function.
 
     Returns
     -------
-    RemoteMethod
+    orionis.realtime.metadata.RemoteMethod
         Complete safe binding and dispatch plan.
 
     Raises
@@ -385,12 +405,12 @@ def compile_hub(hub: type[Hub]) -> Mapping[str, RemoteMethod]:
 
     Parameters
     ----------
-    hub : type[Hub]
+    hub : type[orionis.realtime.Hub]
         Developer-owned Hub subclass registered during application boot.
 
     Returns
     -------
-    Mapping[str, RemoteMethod]
+    collections.abc.Mapping[str, orionis.realtime.metadata.RemoteMethod]
         Bounded cached dispatch map; no instance or payload is retained.
 
     Raises

@@ -1,3 +1,5 @@
+"""Coordinate disk resolution for the storage component."""
+
 from pathlib import Path
 from typing import TYPE_CHECKING
 from orionis.foundation.config.filesystems.entitites.filesystems import Filesystems
@@ -24,7 +26,7 @@ class StorageManager(IStorageManager):
     Coordinate disk resolution for the storage component.
 
     The manager reads the ``filesystems`` configuration, builds
-    :class:`~orionis.storage.disk.Disk` objects bound to their drivers,
+    :class:`orionis.storage.Disk` objects bound to their drivers,
     and caches them per name. It knows nothing about files or
     directories: that behavior lives in the domain objects returned by
     each disk.
@@ -33,6 +35,7 @@ class StorageManager(IStorageManager):
     # ruff: noqa: PLC0415, TC001
 
     __slots__ = ("_app", "_base_path", "_config", "_custom", "_default", "_disks")
+    """Declare the instance attribute slots reserved by this class."""
 
     def __init__(self, app: IApplication) -> None:
         """
@@ -40,16 +43,19 @@ class StorageManager(IStorageManager):
 
         Parameters
         ----------
-        app : IApplication
+        app : orionis.IApplication
             Application container used to read the configuration and
             the base path.
 
         Returns
         -------
         None
+            Initialize the manager and resolve the active configuration.
         """
         self._app = app
+        """Application container used to read the configuration and the base path."""
         self._base_path: Path = app.basePath
+        """Base path obtained from ``app.basePath``."""
 
         # Normalize the raw configuration into the validated entity.
         config_data = app.config("filesystems")
@@ -58,10 +64,14 @@ class StorageManager(IStorageManager):
             if isinstance(config_data, dict)
             else config_data
         )
+        """Validated configuration used to construct and operate the service."""
 
         self._default: str = str(self._config.default)
+        """Value used when the client omits this argument."""
         self._disks: dict[str, IDisk] = {}
+        """Storage disks cached after their first resolution."""
         self._custom: dict[str, Callable[[object], IStorageDriver]] = {}
+        """Custom implementations registered by the application."""
 
     # ── Disk resolution ──────────────────────────────────────────────────────
 
@@ -79,14 +89,14 @@ class StorageManager(IStorageManager):
 
         Returns
         -------
-        IDisk
+        orionis.storage.contracts.IDisk
             Disk bound to its configured driver.
 
         Raises
         ------
-        DiskNotFoundException
+        orionis.storage.exceptions.DiskNotFoundException
             If the disk is not declared in the configuration.
-        DriverNotSupportedException
+        orionis.storage.exceptions.DriverNotSupportedException
             If the disk references a driver with no implementation.
         """
         resolved = name or self._default
@@ -104,12 +114,12 @@ class StorageManager(IStorageManager):
 
         Returns
         -------
-        IDisk
+        orionis.storage.contracts.IDisk
             The disk configured as default.
 
         Raises
         ------
-        DiskNotFoundException
+        orionis.storage.exceptions.DiskNotFoundException
             If the default disk is not declared in the configuration.
         """
         return self.disk()
@@ -132,12 +142,13 @@ class StorageManager(IStorageManager):
         ----------
         driver : str
             Driver name as referenced by disk configurations.
-        factory : Callable[[object], IStorageDriver]
+        factory : typing.Callable[[object], contracts.IStorageDriver]
             Callable building the driver from a disk configuration.
 
         Returns
         -------
         None
+            Register a custom driver factory under *driver*.
         """
         self._custom[driver] = factory
 
@@ -150,12 +161,12 @@ class StorageManager(IStorageManager):
 
         Parameters
         ----------
-        source : IHttpUploadedFile
+        source : orionis.http.payload.contracts.uploaded_file.IUploadedFile
             Buffered multipart payload produced by the HTTP layer.
 
         Returns
         -------
-        IUploadedFile
+        orionis.storage.contracts.IUploadedFile
             Uploaded file bound to this manager for disk resolution.
         """
         return UploadedFile(source=source, manager=self)
@@ -178,7 +189,7 @@ class StorageManager(IStorageManager):
 
         Raises
         ------
-        DiskNotFoundException
+        orionis.storage.exceptions.DiskNotFoundException
             If the disk is not declared in the configuration.
         """
         config = getattr(self._config.disks, name, None)
@@ -201,14 +212,14 @@ class StorageManager(IStorageManager):
 
         Returns
         -------
-        IStorageDriver
+        orionis.storage.contracts.IStorageDriver
             Configured driver instance.
 
         Raises
         ------
-        DiskNotFoundException
+        orionis.storage.exceptions.DiskNotFoundException
             If the disk is not declared in the configuration.
-        DriverNotSupportedException
+        orionis.storage.exceptions.DriverNotSupportedException
             If the disk references a driver with no implementation.
         """
         config = self.__diskConfig(name)
@@ -265,7 +276,7 @@ class StorageManager(IStorageManager):
 
         Returns
         -------
-        IStorageDriver
+        orionis.storage.contracts.IStorageDriver
             Local driver rooted inside the application base path.
         """
         # Relative roots are anchored to the application base path.

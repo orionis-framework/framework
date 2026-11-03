@@ -1,3 +1,5 @@
+"""Wire the localization component from the application configuration."""
+
 from pathlib import Path
 from orionis.foundation.contracts.application import IApplication
 from orionis.localization.contracts.manager import ILocalizationManager
@@ -20,6 +22,7 @@ class LocalizationManager(ILocalizationManager):
     """
 
     __slots__ = ("_app", "_translator")
+    """Declare the instance attribute slots reserved by this class."""
 
     def __init__(self, app: IApplication) -> None:
         """
@@ -27,15 +30,18 @@ class LocalizationManager(ILocalizationManager):
 
         Parameters
         ----------
-        app : IApplication
+        app : orionis.IApplication
             Application container providing configuration and paths.
 
         Returns
         -------
         None
+            Initialize the manager with the application container.
         """
         self._app = app
+        """Application container providing configuration and paths."""
         self._translator: ITranslator | None = None
+        """Translator used to resolve localized messages."""
 
     def translator(self) -> ITranslator:
         """
@@ -43,12 +49,12 @@ class LocalizationManager(ILocalizationManager):
 
         Returns
         -------
-        ITranslator
+        orionis.localization.contracts.ITranslator
             Translator configured from the application settings.
 
         Raises
         ------
-        InvalidLocaleException
+        orionis.localization.InvalidLocaleException
             If the configured locale or fallback locale is malformed.
         """
         if self._translator is None:
@@ -61,12 +67,12 @@ class LocalizationManager(ILocalizationManager):
 
         Returns
         -------
-        ITranslator
+        orionis.localization.contracts.ITranslator
             Translator bound to a fresh loader and repository.
 
         Raises
         ------
-        InvalidLocaleException
+        orionis.localization.InvalidLocaleException
             If the configured locale or fallback locale is malformed.
         """
         # Read the localization settings from the app configuration.

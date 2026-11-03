@@ -1,8 +1,11 @@
+"""Ensure a string contains only alphabetic characters."""
+
 import unicodedata
 from orionis.schemas.rule import Rule
 
 # Unicode general category prefixes accepted as alphabetic content.
 _LETTER_CATEGORIES: frozenset[str] = frozenset({"L", "M"})
+"""Unicode general category prefixes accepted as alphabetic content."""
 
 class Alpha(Rule):
     """
@@ -15,9 +18,12 @@ class Alpha(Rule):
     # ruff: noqa: ARG002
 
     __slots__ = ("_ascii_only",)
+    """Declare the instance attribute slots reserved by this class."""
 
     __message__ = "Value must contain only alphabetic characters."
+    """Error text for message: ``Value must contain only alphabetic characters.``."""
     __code__ = "alpha"
+    """Code identifier: ``alpha``."""
 
     def __init__(
         self,
@@ -42,6 +48,7 @@ class Alpha(Rule):
         """
         super().__init__(message=message)
         self._ascii_only: bool = ascii_only
+        """Whether to restrict the value to ASCII letters."""
 
     async def enforce(
         self,

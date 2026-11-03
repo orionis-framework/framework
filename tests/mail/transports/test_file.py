@@ -47,7 +47,7 @@ class PublicationBoundary:
         self.started = threading.Event()
         self.synced = False
 
-    def token_hex(self, _size: int) -> str:
+    def tokenHex(self, _size: int) -> str:
         """Return a deterministic safe name for collision tests.
 
         Parameters
@@ -61,6 +61,9 @@ class PublicationBoundary:
             Value produced by the helper.
         """
         return self.name
+
+    # Preserve the secrets module protocol name.
+    token_hex = tokenHex
 
     def fsync(self, descriptor: int) -> None:
         """Sync a real temporary file or simulate a persistence failure.

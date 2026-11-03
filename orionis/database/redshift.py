@@ -37,7 +37,7 @@ if find_spec("sqlalchemy_redshift") is not None:
         use_insertmanyvalues_wo_returning = True
 
         @reflection.cache
-        def has_table(
+        def hasTable(
             self, connection: Connection, table_name: str,
             schema: str | None = None, **_kw: object,
         ) -> bool:
@@ -73,6 +73,9 @@ if find_spec("sqlalchemy_redshift") is not None:
                       AND table_name = :table_name
                 )
             """), {"schema": schema, "table_name": table_name}).scalar())
+
+        # Preserve the SQLAlchemy reflection protocol name.
+        has_table = hasTable
 else:
     RedshiftConnectorDialect = None
     RedshiftDialect = None

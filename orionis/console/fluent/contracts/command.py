@@ -1,3 +1,5 @@
+"""Define the contract for command implementations."""
+
 from __future__ import annotations
 from abc import ABC, abstractmethod
 from typing import TYPE_CHECKING
@@ -6,6 +8,7 @@ if TYPE_CHECKING:
     from orionis.console.entities.command import Command as CommandEntity
 
 class ICommand(ABC):
+    """Define the contract for command implementations."""
 
     @abstractmethod
     def timestamp(self, *, enabled: bool = True) -> ICommand:
@@ -21,7 +24,7 @@ class ICommand(ABC):
 
         Returns
         -------
-        Command
+        orionis.console.fluent.contracts.command.ICommand
             Returns self for method chaining.
 
         Raises
@@ -44,7 +47,7 @@ class ICommand(ABC):
 
         Returns
         -------
-        Command
+        orionis.console.fluent.contracts.command.ICommand
             Returns self for method chaining.
 
         Raises
@@ -67,7 +70,7 @@ class ICommand(ABC):
 
         Returns
         -------
-        Command
+        orionis.console.fluent.contracts.command.ICommand
             Returns self for method chaining.
 
         Raises
@@ -85,6 +88,6 @@ class ICommand(ABC):
 
         Returns
         -------
-        tuple of (str, CommandEntity)
+        tuple of (str, orionis.console.entities.Command)
             Command signature and CommandEntity instance.
         """

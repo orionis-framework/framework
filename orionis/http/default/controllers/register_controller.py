@@ -1,3 +1,5 @@
+"""Handle the built-in account-registration endpoints."""
+
 from typing import cast
 from app.models.user import User
 from orionis.auth import MustVerifyEmail
@@ -15,11 +17,16 @@ from orionis.support.facades.lang import Lang
 class RegisterController(BaseController):
 
     # ruff: noqa: TC001, BLE001
+    """Handle the built-in account-registration endpoints."""
 
     REGISTER_VIEW_NAME: str = "auth.register"
+    """Register view name identifier: ``auth.register``."""
     REGISTER_REDIRECT_PATH: str = "/login"
+    """Register redirect path identifier: ``/login``."""
     VERIFY_VIEW_NAME: str = "auth.verify-email"
+    """Verify view name identifier: ``auth.verify-email``."""
     VERIFY_PARAM_NAME: str = "id"
+    """Verify param name identifier: ``id``."""
 
     async def index(
         self,
@@ -29,7 +36,7 @@ class RegisterController(BaseController):
 
         Returns
         -------
-        HttpResponse
+        orionis.http.Response
             Rendered response for the registration page.
         """
         return await response.view(self.REGISTER_VIEW_NAME)
@@ -44,15 +51,15 @@ class RegisterController(BaseController):
 
         Parameters
         ----------
-        payload : RegisterSchema
+        payload : orionis.http.default.schemas.register.RegisterSchema
             Incoming request carrying the submitted account data.
 
-        request : Request
+        request : orionis.http.Request
             Current request and its trusted execution context.
 
         Returns
         -------
-        HttpResponse
+        orionis.http.Response
             Redirect to login after the account is created.
         """
         await DB.beginTransaction()
@@ -117,12 +124,12 @@ class RegisterController(BaseController):
         ----------
         base_url : str
             The base URL of the application, used to construct the verification link.
-        user : User
+        user : ``app.models.user.User``
             The user to whom the verification email will be sent.
 
         Returns
         -------
-        MailResult
+        orionis.mail.entities.MailResult
             The result of the email sending operation.
         """
         crypt_id: str = Crypt.encrypt(str(user.id))
@@ -149,13 +156,13 @@ class RegisterController(BaseController):
 
         Parameters
         ----------
-        request : Request
+        request : orionis.http.Request
             Incoming request carrying the encrypted identifier in its query
             string.
 
         Returns
         -------
-        HttpResponse
+        orionis.http.Response
             Rendered outcome page reporting the verification state.
         """
         user: User | None = await self.__resolveUser(
@@ -192,7 +199,7 @@ class RegisterController(BaseController):
 
         Returns
         -------
-        User | None
+        ``app.models.user.User`` | None
             Matching user, or ``None`` when the link is absent, forged or
             points to an account that no longer exists.
         """

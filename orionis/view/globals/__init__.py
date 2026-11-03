@@ -1,3 +1,5 @@
+"""Group the view globals components and public imports."""
+
 from typing import TYPE_CHECKING as _TYPE_CHECKING
 from orionis._exports import resolve_export as _resolve_export
 
@@ -94,6 +96,7 @@ _EXPORTS = {
     "_global_trans": ("orionis.view.globals.lang", "_global_trans"),
     "_global_url": ("orionis.view.globals.url", "_global_url"),
 }
+"""Public export names mapped to their defining modules and attributes."""
 
 def __getattr__(name: str) -> object:
     """

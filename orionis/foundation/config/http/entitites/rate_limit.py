@@ -1,3 +1,5 @@
+"""Represent the rate-limiting configuration for HTTP."""
+
 from __future__ import annotations
 from dataclasses import dataclass, field
 from orionis.environment import Env
@@ -24,7 +26,7 @@ class HTTPRateLimit(BaseEntity):
         Maximum retained clients in the memory store.
     rate_limit_max_events : int
         Maximum retained accepted timestamps in the memory store.
-    rate_limit_redis : Redis | dict
+    rate_limit_redis : orionis.foundation.config.http.Redis | dict
         Redis connection settings, used only by the Redis store.
     rate_limit_redis_prefix : str
         Application namespace for Redis quota keys.
@@ -117,6 +119,7 @@ class HTTPRateLimit(BaseEntity):
         Returns
         -------
         None
+            Validate rate-limiting fields.
         """
         super().__post_init__()
         self.__validateRateLimiting()
@@ -167,6 +170,7 @@ class HTTPRateLimit(BaseEntity):
         Returns
         -------
         None
+            Validate rate-limiting constraints.
         """
         if not isinstance(self.rate_limit_enabled, bool):
             error_msg = "Invalid type for 'rate_limit_enabled': expected a boolean."

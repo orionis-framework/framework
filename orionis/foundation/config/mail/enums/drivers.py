@@ -1,3 +1,5 @@
+"""Enumeration of supported mail drivers."""
+
 from enum import StrEnum
 
 class MailDriver(StrEnum):

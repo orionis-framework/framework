@@ -1,3 +1,5 @@
+"""Report SMTP acceptance or file storage, never final mailbox delivery."""
+
 from dataclasses import dataclass, field
 from types import MappingProxyType
 from typing import TYPE_CHECKING
@@ -17,7 +19,7 @@ class MailResult:
     single-line text; transports must redact credentials before constructing
     the result. Stored messages have no SMTP acceptance or rejection entries.
 
-    Parameters
+    Attributes
     ----------
     message_id : str
         Message-ID of the transmitted or stored message.
@@ -25,15 +27,15 @@ class MailResult:
         Selected configuration name.
     driver : str
         Registered transport implementation name.
-    status : MailStatus
+    status : orionis.mail.enums.MailStatus
         Confirmed outcome of the operation.
-    recipients : tuple[str, ...]
+    recipients : tuple[str, ``...``]
         Intended transport recipients.
-    accepted_recipients : tuple[str, ...]
+    accepted_recipients : tuple[str, ``...``]
         Recipients confirmed by an SMTP transaction.
-    rejected_recipients : Mapping[str, tuple[int, str]]
+    rejected_recipients : collections.abc.Mapping[str, tuple[int, str]]
         Rejected recipients mapped to their SMTP code and sanitized reason.
-    file_path : Path | None
+    file_path : pathlib.Path | None
         Published file for stored messages, or None for SMTP.
     """
 

@@ -1,3 +1,5 @@
+"""Handle built-in profile and password-management endpoints."""
+
 from typing import cast
 from app.models.user import User
 from orionis.auth.contracts.identity_provider import IIdentityProvider
@@ -10,6 +12,7 @@ from orionis.http.default.schemas.change_password import ChangePasswordSchema
 class ProfileController(BaseController):
 
     # ruff: noqa: TC001, BLE001
+    """Handle built-in profile and password-management endpoints."""
 
     async def index(self, auth: IAuthManager) -> HTMLResponse:
         """
@@ -17,13 +20,13 @@ class ProfileController(BaseController):
 
         Parameters
         ----------
-        auth : IAuthManager
+        auth : orionis.auth.contracts.IAuthManager
             Authentication service holding the identity resolved for the
             current request.
 
         Returns
         -------
-        HTMLResponse
+        orionis.http.HTMLResponse
             Rendered profile page exposing only public account attributes.
         """
         # Read and cast the identity to the expected User model.
@@ -54,18 +57,18 @@ class ProfileController(BaseController):
 
         Parameters
         ----------
-        payload : ChangePasswordSchema
+        payload : orionis.http.default.schemas.change_password.ChangePasswordSchema
             Validated payload; invalid submissions never reach this method.
-        auth : IAuthManager
+        auth : orionis.auth.contracts.IAuthManager
             Authentication service owning the identity of the current request.
-        identities : IIdentityProvider
+        identities : orionis.auth.contracts.IIdentityProvider
             Identity provider used to verify the submitted current password.
-        hashing : IHashManager
+        hashing : orionis.hashing.contracts.IHashManager
             Hash manager used to derive the stored password hash.
 
         Returns
         -------
-        RedirectResponse
+        orionis.http.RedirectResponse
             Redirect back to the profile page, carrying either a field error
             or a success message.
         """

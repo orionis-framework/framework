@@ -1,3 +1,5 @@
+"""Parse request cookies and expose their decoded values."""
+
 # Keep public view annotations resolvable through runtime introspection.
 from collections.abc import ItemsView, KeysView, ValuesView  # noqa: TC003
 from typing import TYPE_CHECKING
@@ -8,8 +10,10 @@ if TYPE_CHECKING:
     from collections.abc import Iterator
 
 class Cookies(metaclass=Final):
+    """Parse request cookies and expose their decoded values."""
 
     __slots__ = ("_data",)
+    """Declare the instance attribute slots reserved by this class."""
 
     def __init__(self, cookie_header: str | None) -> None:
         """
@@ -26,6 +30,7 @@ class Cookies(metaclass=Final):
             This method does not return a value.
         """
         self._data: dict[str, str] = {}
+        """Decoded content carried by this message or request."""
 
         if not cookie_header:
             return
@@ -123,7 +128,7 @@ class Cookies(metaclass=Final):
 
         Returns
         -------
-        ItemsView[str, str]
+        collections.abc.ItemsView[str, str]
             A view object displaying the cookie's key-value pairs.
         """
         return self._data.items()
@@ -134,7 +139,7 @@ class Cookies(metaclass=Final):
 
         Returns
         -------
-        KeysView[str]
+        collections.abc.KeysView[str]
             A view object displaying the cookie's keys.
         """
         return self._data.keys()
@@ -145,7 +150,7 @@ class Cookies(metaclass=Final):
 
         Returns
         -------
-        ValuesView[str]
+        collections.abc.ValuesView[str]
             A view object displaying the cookie's values.
         """
         return self._data.values()
@@ -156,7 +161,7 @@ class Cookies(metaclass=Final):
 
         Returns
         -------
-        Iterator[tuple[str, str]]
+        collections.abc.Iterator[tuple[str, str]]
             An iterator over the cookie's key-value pairs.
         """
         return iter(self._data.items())

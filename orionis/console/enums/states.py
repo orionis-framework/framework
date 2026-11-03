@@ -1,3 +1,5 @@
+"""Represent the possible states of a schedule."""
+
 from enum import Enum
 
 class ScheduleStates(Enum):

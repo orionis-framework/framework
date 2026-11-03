@@ -1,3 +1,5 @@
+"""Configure finite per-connection RPC budgets and broadcast concurrency."""
+
 from dataclasses import dataclass, field
 from orionis.environment import Env
 from orionis.foundation.config.validation import validate_integer, validate_seconds
@@ -20,6 +22,7 @@ class RealtimeConfig(BaseEntity):
             "default": 1024 * 1024,
         },
     )
+    """Max message size produced by ``field``."""
 
     max_concurrent_invocations: int = field(
         default_factory=lambda: Env.get("REALTIME_MAX_CONCURRENT_INVOCATIONS", 16),
@@ -28,6 +31,7 @@ class RealtimeConfig(BaseEntity):
             "default": 16,
         },
     )
+    """Max concurrent invocations produced by ``field``."""
 
     max_pending_client_invocations: int = field(
         default_factory=lambda: Env.get(
@@ -38,6 +42,7 @@ class RealtimeConfig(BaseEntity):
             "default": 32,
         },
     )
+    """Max pending client invocations produced by ``field``."""
 
     invocation_timeout: float = field(
         default_factory=lambda: Env.get("REALTIME_INVOCATION_TIMEOUT", 30.0),
@@ -46,6 +51,7 @@ class RealtimeConfig(BaseEntity):
             "default": 30.0,
         },
     )
+    """Invocation timeout produced by ``field``."""
 
     client_result_timeout: float = field(
         default_factory=lambda: Env.get("REALTIME_CLIENT_RESULT_TIMEOUT", 30.0),
@@ -54,6 +60,7 @@ class RealtimeConfig(BaseEntity):
             "default": 30.0,
         },
     )
+    """Client result timeout produced by ``field``."""
 
     broadcast_concurrency: int = field(
         default_factory=lambda: Env.get("REALTIME_BROADCAST_CONCURRENCY", 32),
@@ -62,6 +69,7 @@ class RealtimeConfig(BaseEntity):
             "default": 32,
         },
     )
+    """Broadcast concurrency produced by ``field``."""
 
     max_groups_per_connection: int = field(
         default_factory=lambda: Env.get("REALTIME_MAX_GROUPS_PER_CONNECTION", 64),
@@ -70,6 +78,7 @@ class RealtimeConfig(BaseEntity):
             "default": 64,
         },
     )
+    """Max groups per connection produced by ``field``."""
 
     def __post_init__(self) -> None:
         """

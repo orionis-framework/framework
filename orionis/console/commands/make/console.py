@@ -1,3 +1,5 @@
+"""Generate a custom command for the Orionis CLI."""
+
 import re
 from asyncio import to_thread
 from typing import ClassVar
@@ -9,6 +11,7 @@ from orionis.foundation.contracts.application import IApplication
 _SIGNATURE_RE: re.Pattern[str] = re.compile(
     r"[a-z][a-z0-9]*(?::[a-z][a-z0-9]*(?:-[a-z0-9]+)*)?",
 )
+"""Compiled pattern used to recognize signature re."""
 
 # ruff: noqa: TC001
 
@@ -16,16 +19,24 @@ class MakeConsoleCommand(MakeStubCommand):
     """Generate a custom command for the Orionis CLI."""
 
     timestamps: bool = False
+    """Timestamps flag used by ``MakeConsoleCommand``."""
     signature: str = "make:console-command"
+    """Signature identifier: ``make:console-command``."""
     description: str = "Creates a new custom console command."
+    """Description identifier: ``Creates a new custom console command.``."""
     template_name: str = "console_command"
+    """Template name identifier: ``console_command``."""
     path_key: str = "app_console_commands"
+    """Path key identifier: ``app_console_commands``."""
     success_label: str = "Console command"
+    """Success label identifier: ``Console command``."""
     postfix: str | None = "Command"
+    """Postfix identifier: ``Command``."""
     replacement_arguments: ClassVar[dict[str, str]] = {
         "signature": "signature",
         "description": "description",
     }
+    """Command arguments forwarded to template placeholder replacement."""
     arguments: ClassVar[list[Argument]] = [
         Argument(
             name_or_flags="name",
@@ -46,6 +57,7 @@ class MakeConsoleCommand(MakeStubCommand):
             help="A short description shown in command help.",
         ),
     ]
+    """Command-line argument declarations accepted by this command."""
 
     def getReplacements(self) -> dict[str, str]:
         """
@@ -78,9 +90,9 @@ class MakeConsoleCommand(MakeStubCommand):
 
         Parameters
         ----------
-        app : IApplication
+        app : orionis.IApplication
             Application that resolves the destination path.
-        reactor : IReactor
+        reactor : orionis.console.core.contracts.reactor.IReactor
             Registered command collection used to reject duplicate signatures.
 
         Returns

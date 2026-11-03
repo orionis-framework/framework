@@ -1,3 +1,8 @@
+"""Provide view globals operations.
+
+Includes ``_disk_file_url``, ``_global_asset``, ``_global_secure_asset``.
+"""
+
 from __future__ import annotations
 from typing import TYPE_CHECKING, Any
 from orionis.foundation.config.filesystems import DiskName
@@ -21,7 +26,7 @@ async def _disk_file_url(
 
     Parameters
     ----------
-    app : IApplication
+    app : orionis.IApplication
         Application container used to resolve the storage manager.
     path : str
         Disk-relative file path (e.g. ``'css/app.css'``).
@@ -35,7 +40,7 @@ async def _disk_file_url(
 
     Raises
     ------
-    UnsupportedStorageOperationException
+    orionis.storage.exceptions.UnsupportedStorageOperationException
         If the resolved disk does not expose public URLs.
     """
     storage: IStorageManager = await app.make(IStorageManager)
@@ -47,12 +52,12 @@ def _global_asset(app: IApplication) -> Any:
 
     Parameters
     ----------
-    app : IApplication
+    app : orionis.IApplication
         Application container used to resolve the storage manager.
 
     Returns
     -------
-    Any
+    typing.Any
         Async callable that builds the public URL of a stored file.
     """
     async def asset(path: str, disk: str | None = None) -> str:
@@ -73,7 +78,7 @@ def _global_asset(app: IApplication) -> Any:
 
         Raises
         ------
-        UnsupportedStorageOperationException
+        orionis.storage.exceptions.UnsupportedStorageOperationException
             If the resolved disk does not expose public URLs.
         """
         return await _disk_file_url(app, path, disk)
@@ -86,12 +91,12 @@ def _global_secure_asset(app: IApplication) -> Any:
 
     Parameters
     ----------
-    app : IApplication
+    app : orionis.IApplication
         Application container used to resolve the storage manager.
 
     Returns
     -------
-    Any
+    typing.Any
         Async callable that builds the HTTPS URL of a stored file.
     """
     async def secure_asset(path: str, disk: str | None = None) -> str:
@@ -113,7 +118,7 @@ def _global_secure_asset(app: IApplication) -> Any:
 
         Raises
         ------
-        UnsupportedStorageOperationException
+        orionis.storage.exceptions.UnsupportedStorageOperationException
             If the resolved disk does not expose public URLs.
         """
         return _to_secure_url(await _disk_file_url(app, path, disk))

@@ -108,7 +108,7 @@ class DemoServer(Server):
 class TestCompiledServer(TestCase):
     """Compile definitions without resolving any application service."""
 
-    def test_native_schema_and_metadata(self):
+    def testNativeSchemaAndMetadata(self):
         """Keep native constraints, descriptions and compiled header bindings.
 
         Returns
@@ -133,7 +133,7 @@ class TestCompiledServer(TestCase):
         self.assertEqual(metadata["outputSchema"]["type"], "array")
         self.assertIn("completions", compiled.capabilities)
 
-    async def test_native_validation_and_output(self):
+    async def testNativeValidationAndOutput(self):
         """Validate constraints and reject output that violates the advertised type.
 
         Returns
@@ -152,7 +152,7 @@ class TestCompiledServer(TestCase):
             await validate_output(tool, ["wrong"])
         self.assertEqual(await validate_output(tool, [1, 2]), [1, 2])
 
-    def test_immutable_snapshot(self):
+    def testImmutableSnapshot(self):
         """Compiled metadata and registries cannot be mutated between callers.
 
         Returns
@@ -168,7 +168,7 @@ class TestCompiledServer(TestCase):
         with self.assertRaises(FrozenInstanceError):
             compiled.instructions = "changed"
 
-    def test_duplicates_fail_at_boot(self):
+    def testDuplicatesFailAtBoot(self):
         """Never silently overwrite tools or URI registrations.
 
         Returns
@@ -184,7 +184,7 @@ class TestCompiledServer(TestCase):
             with self.subTest(field=field), self.assertRaises(ValueError):
                 compile_server(definition)
 
-    def test_catalog_is_hidden_and_indexed(self):
+    def testCatalogIsHiddenAndIndexed(self):
         """Advertise synthetic operations without leaking all catalog schemas.
 
         Returns
@@ -206,7 +206,7 @@ class TestCompiledServer(TestCase):
         self.assertIn("city name", compiled.catalogs[0].index[0][1])
         self.assertEqual(compiled.tools["execute_tools"].synthetic, "execute")
 
-    def test_catalog_collision_fails(self):
+    def testCatalogCollisionFails(self):
         """Hidden tools cannot collide with ordinary or synthetic tool names.
 
         Returns
@@ -224,7 +224,7 @@ class TestCompiledServer(TestCase):
         with self.assertRaises(ValueError):
             compile_server(definition)
 
-    def test_prompt_required_and_string_arguments(self):
+    def testPromptRequiredAndStringArguments(self):
         """Prompt strings and argument names are validated independently of DI.
 
         Returns
@@ -238,7 +238,7 @@ class TestCompiledServer(TestCase):
                 validate_prompt_arguments(prompt, values)
         validate_prompt_arguments(prompt, {"topic": "weather"})
 
-    def test_empty_server_omits_capabilities(self):
+    def testEmptyServerOmitsCapabilities(self):
         """Do not advertise absent completion or primitive implementations.
 
         Returns
@@ -249,7 +249,7 @@ class TestCompiledServer(TestCase):
         definition = type("Empty", (Server,), {"name": "Empty"})
         self.assertEqual(dict(compile_server(definition).capabilities), {})
 
-    def test_unsupported_extra_validation_is_rejected(self):
+    def testUnsupportedExtraValidationIsRejected(self):
         """Do not advertise JSON Schema constraints that msgspec cannot enforce.
 
         Returns
@@ -266,7 +266,7 @@ class TestCompiledServer(TestCase):
         with self.assertRaisesRegex(ValueError, "not enforced"):
             compile_server(server)
 
-    def test_recursive_schema_preserves_definitions(self):
+    def testRecursiveSchemaPreservesDefinitions(self):
         """Keep local references intact when making the input root an object.
 
         Returns
@@ -300,7 +300,7 @@ class TestCompiledServer(TestCase):
         self.assertEqual(schema["type"], "object")
         self.assertIn("Node", schema["$defs"])
 
-    async def test_noarg_tool_rejects_payload(self):
+    async def testNoargToolRejectsPayload(self):
         """The advertised empty object schema is enforced at runtime.
 
         Returns
@@ -325,7 +325,7 @@ class TestCompiledServer(TestCase):
         with self.assertRaises(msgspec.ValidationError):
             await validate_payload(primitive, {"unexpected": True})
 
-    def test_extensions_require_decoders_and_cannot_override_core(self):
+    def testExtensionsRequireDecodersAndCannotOverrideCore(self):
         """Extension routing is explicit and collision checked before boot.
 
         Returns
@@ -347,7 +347,7 @@ class TestCompiledServer(TestCase):
             with self.assertRaises(ValueError):
                 compile_server(server)
 
-    def test_cache_hint_validation(self):
+    def testCacheHintValidation(self):
         """A boolean or negative TTL cannot reach protocol output.
 
         Returns
@@ -359,7 +359,7 @@ class TestCompiledServer(TestCase):
             with self.subTest(ttl=ttl), self.assertRaises(ValueError):
                 CacheHint(ttl_ms=ttl)
 
-    def test_static_metadata_and_extension_schema_integrity(self):
+    def testStaticMetadataAndExtensionSchemaIntegrity(self):
         """Fail boot when declarations or extension hooks break native contracts.
 
         Returns
@@ -427,7 +427,7 @@ class TestCompiledServer(TestCase):
             },
         )
 
-    def test_inherited_generic_and_cache_policy(self):
+    def testInheritedGenericAndCachePolicy(self):
         """A subclass keeps its generic payload and inherits its server's cache hint.
 
         Returns

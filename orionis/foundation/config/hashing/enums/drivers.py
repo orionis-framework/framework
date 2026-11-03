@@ -1,3 +1,5 @@
+"""Enumerate supported password hashing drivers."""
+
 from enum import StrEnum
 
 class Drivers(StrEnum):
@@ -13,7 +15,7 @@ class Drivers(StrEnum):
 
     Returns
     -------
-    Drivers
+    orionis.foundation.config.hashing.Drivers
         An enumeration member representing a hashing driver.
     """
 

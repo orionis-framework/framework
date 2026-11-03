@@ -1,3 +1,4 @@
+from orionis.console.commands.auth.migrate import AuthMigrateCommand
 from orionis.console.commands.bootstrap.config import BootstrapConfigCommand
 from orionis.console.commands.bootstrap.lifespan import BootstrapLifespanCommand
 from orionis.console.commands.bootstrap.routes import (
@@ -7,6 +8,7 @@ from orionis.console.commands.bootstrap.routes import (
     BootstrapWebCommand,
     BootstrapWebsocketCommand,
 )
+from orionis.console.commands.cache.migrate import CacheMigrateCommand
 from orionis.console.commands.db.seed import DbSeedCommand
 from orionis.console.commands.db.show import DbShowCommand
 from orionis.console.commands.db.table import DbTableCommand
@@ -52,9 +54,11 @@ from orionis.console.commands.queue.retry import QueueRetryCommand
 from orionis.console.commands.queue.work import QueueWorkCommand
 from orionis.console.commands.route.list import RouteListCommand
 from orionis.console.commands.schedule.list import ScheduleListCommand
+from orionis.console.commands.schedule.migrate import ScheduleMigrateCommand
 from orionis.console.commands.schedule.work import ScheduleWorkCommand
 from orionis.console.commands.seed.seed import SeedCommand
 from orionis.console.commands.serve.serve import ServerCommand
+from orionis.console.commands.session.migrate import SessionMigrateCommand
 from orionis.console.commands.support.about import VersionCommand
 from orionis.console.commands.support.clear_cache import ClearCacheCommand
 from orionis.console.commands.support.clear_logs import ClearLogsCommand
@@ -81,6 +85,7 @@ def get_core_commands_mapping() -> tuple[type, ...]:
     """
     # Return the command classes registered by the framework.
     return (
+        AuthMigrateCommand,
         BootstrapApiCommand,
         BootstrapAiCommand,
         BootstrapConsoleCommand,
@@ -88,6 +93,7 @@ def get_core_commands_mapping() -> tuple[type, ...]:
         BootstrapWebsocketCommand,
         BootstrapConfigCommand,
         BootstrapLifespanCommand,
+        CacheMigrateCommand,
         OptimizeClearCommand,
         OptimizeCommand,
         KeyGenerateCommand,
@@ -138,6 +144,7 @@ def get_core_commands_mapping() -> tuple[type, ...]:
         MigrateStatusCommand,
         SeedCommand,
         ScheduleListCommand,
+        ScheduleMigrateCommand,
         ScheduleWorkCommand,
         QueueMigrateCommand,
         QueueWorkCommand,
@@ -145,6 +152,7 @@ def get_core_commands_mapping() -> tuple[type, ...]:
         QueueRetryCommand,
         QueueForgetCommand,
         QueueClearCommand,
+        SessionMigrateCommand,
         RouteListCommand,
         TestCommand,
         VersionCommand,

@@ -1,3 +1,5 @@
+"""Start the application server using the selected runtime options."""
+
 import asyncio
 import os
 import sys
@@ -15,22 +17,33 @@ if TYPE_CHECKING:
 
 # Characters additionally allowed in the sanitized process name, besides alphanumeric
 _EXTRA_ALLOWED: frozenset[str] = frozenset({"_", "-"})
+"""
+Characters additionally allowed in the sanitized process name, besides alphanumeric.
+"""
 
 # Number of logical CPUs available; resolved once at import time
 _CPU_COUNT: int = os.cpu_count() or 1
+"""Number of logical CPUs available; resolved once at import time."""
 
 class ServerCommand(BaseCommand):
 
     # ruff: noqa: S606, S104, TC001, PLC0415, SLF001
+    """Start the application server using the selected runtime options."""
 
     timestamps = False
+    """Timestamps flag used by ``ServerCommand``."""
 
     # Command signature and description
     signature = "serve"
+    """Command signature and description."""
     description = (
         "Initializes the Orionis server with Granian "
         "(The Rust HTTP server for Python)."
     )
+    """
+    Description identifier: ``Initializes the Orionis server with Granian (The Rust
+    HTTP server for Python).``.
+    """
     arguments: ClassVar[list[Argument]] = [
         Argument(
             name_or_flags=["--interface", "-i"],
@@ -74,6 +87,7 @@ class ServerCommand(BaseCommand):
             required=False,
         ),
     ]
+    """Command-line argument declarations accepted by this command."""
 
     def __init__(self) -> None:
         """
@@ -86,9 +100,13 @@ class ServerCommand(BaseCommand):
         """
         super().__init__()
         self.__lock = asyncio.Lock()
+        """Lock protecting concurrent access to shared state."""
         self.__env: dict[str, str] = {}
+        """Environment overrides passed to the application server process."""
         self.__cmd: list[str] = []
+        """Argument vector used to launch the application server."""
         self.__call_in_shutdown: Callable | None = None
+        """Callbacks invoked when the server shuts down."""
 
     # -------------------------------------------------------------------------
     # Environment
@@ -136,7 +154,7 @@ class ServerCommand(BaseCommand):
 
         Parameters
         ----------
-        app : IApplication
+        app : orionis.IApplication
             The running application instance.
 
         Returns
@@ -178,11 +196,6 @@ class ServerCommand(BaseCommand):
         """
         Append the worker-process count to the command.
 
-        Parameters
-        ----------
-        app : IApplication
-            The running application instance.
-
         Returns
         -------
         None
@@ -218,7 +231,7 @@ class ServerCommand(BaseCommand):
 
         Parameters
         ----------
-        app : IApplication
+        app : orionis.IApplication
             The running application instance.
 
         Returns
@@ -250,7 +263,7 @@ class ServerCommand(BaseCommand):
 
         Parameters
         ----------
-        app : IApplication
+        app : orionis.IApplication
             The running application instance.
 
         Returns
@@ -288,7 +301,7 @@ class ServerCommand(BaseCommand):
 
         Parameters
         ----------
-        app : IApplication
+        app : orionis.IApplication
             The running application instance.
 
         Returns
@@ -389,7 +402,7 @@ class ServerCommand(BaseCommand):
 
         Parameters
         ----------
-        app : IApplication
+        app : orionis.IApplication
             The running application instance.
 
         Returns
@@ -411,11 +424,12 @@ class ServerCommand(BaseCommand):
             """Delegate RSGI calls and suppress framework lifecycle hooks."""
 
             def __init__(self, inner: IApplication) -> None:
-                """Store a reference to the wrapped application.
+                """
+                Store a reference to the wrapped application.
 
                 Parameters
                 ----------
-                inner : IApplication
+                inner : orionis.IApplication
                     The real application to delegate RSGI calls to.
 
                 Returns
@@ -586,7 +600,7 @@ class ServerCommand(BaseCommand):
 
         Parameters
         ----------
-        app : IApplication
+        app : orionis.IApplication
             The running application instance.
 
         Returns
@@ -607,7 +621,7 @@ class ServerCommand(BaseCommand):
 
         Parameters
         ----------
-        app : IApplication
+        app : orionis.IApplication
             The running application instance.
 
         Returns

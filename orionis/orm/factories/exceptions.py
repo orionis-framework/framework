@@ -1,3 +1,9 @@
+"""Provide orm factories operations.
+
+Includes ``FactoryException``, ``FactoryConfigurationException``,
+``FactoryDefinitionException``, ``FactoryDependencyException``.
+"""
+
 class FactoryException(Exception):
     """Base exception for model factory failures."""
 

@@ -1,3 +1,5 @@
+"""Parse a multipart byte stream into form fields and uploaded files."""
+
 from __future__ import annotations
 from asyncio import CancelledError, create_task, shield, to_thread
 from contextlib import suppress
@@ -16,18 +18,27 @@ if TYPE_CHECKING:
 _DEFAULT_LIMITS = {
     item.name: item.metadata["default"] for item in fields(HTTPBodyLimits)
 }
+"""Default limits used by ``stream_parser``."""
 
 # Integer constants for the parser state machine.
 _STATE_SEARCH_BOUNDARY: int = 0
+"""Integer constants for the parser state machine."""
 _STATE_READ_HEADERS: int = 1
+"""State read headers value used by ``stream_parser``."""
 _STATE_READ_BODY: int = 2
+"""State read body value used by ``stream_parser``."""
 _STATE_FINISHED: int = 3
+"""State finished value used by ``stream_parser``."""
 _DELIMITER_INVALID: int = -2
+"""Delimiter invalid used by ``stream_parser``."""
 
 # Byte values for RFC 2046 protocol characters.
 _BYTE_DASH: int = ord("-")
+"""Byte values for RFC 2046 protocol characters."""
 _MAX_BOUNDARY_SIZE = 70
+"""Max boundary size value used by ``stream_parser``."""
 _CHUNK_SIZE = 64 * 1024
+"""Chunk size used by ``stream_parser``."""
 
 async def complete_in_thread[T](function: Callable[..., T], *args: object) -> T:
     """
@@ -35,19 +46,19 @@ async def complete_in_thread[T](function: Callable[..., T], *args: object) -> T:
 
     Parameters
     ----------
-    function : Callable[..., T]
+    function : collections.abc.Callable[``...``, ``T``]
         Function to execute in a worker thread.
     *args : object
         Positional arguments passed to the function.
 
     Returns
     -------
-    T
+    ``T``
         The result returned by the function.
 
     Raises
     ------
-    CancelledError
+    asyncio.CancelledError
         After the worker finishes, preserving the first cancellation even if
         further cancellations arrive while waiting for safe resource cleanup.
     """
@@ -66,7 +77,63 @@ async def complete_in_thread[T](function: Callable[..., T], *args: object) -> T:
 
 
 class MultipartStreamParser(IMultipartStreamParser):
-    """Parse a multipart byte stream into form fields and uploaded files."""
+    """
+    Parse a multipart byte stream into form fields and uploaded files.
+
+    Attributes
+    ----------
+    stream
+        Async byte stream produced by the transport layer.
+    boundary
+        Raw multipart boundary token (without leading ``--``).
+    buffer
+        Allocate the working buffer for incoming byte chunks.
+    max_files
+        Maximum number of file parts accepted (default 32).
+    max_fields
+        Maximum number of field parts accepted (default 128).
+    max_header_size
+        Maximum byte size of the MIME headers for each part (default 16 KiB).
+    max_part_size
+        Maximum byte size of a single part (default 10 MiB).
+    memory_threshold
+        Bytes before a file part spills to disk (default 256 KiB).
+    max_body_size
+        Maximum transport bytes, including preamble and epilogue (16 MiB).
+    max_field_size
+        Maximum raw bytes of a single text field (default 1 MiB).
+    max_memory_size
+        Retained field/file memory budget (default 8 MiB), excluding transport buffers,
+        object metadata and temporary copies.
+    files_count
+        Initialize runtime counters to zero.
+    fields_count
+        Fields count value used by ``MultipartStreamParser``.
+    current_part_size
+        Current part size value used by ``MultipartStreamParser``.
+    _totalSize
+        Total size value used by ``MultipartStreamParser``.
+    _memorySize
+        Memory size value used by ``MultipartStreamParser``.
+    _partMemorySize
+        Part memory size value used by ``MultipartStreamParser``.
+    _pendingChunk
+        Pending chunk value used by ``MultipartStreamParser``.
+    _pendingOffset
+        Pending offset value used by ``MultipartStreamParser``.
+    _atStart
+        At start flag used by ``MultipartStreamParser``.
+    _eof
+        Eof flag used by ``MultipartStreamParser``.
+    _headerSearch
+        Header search value used by ``MultipartStreamParser``.
+    _paddingStart
+        Position at which multipart boundary padding begins.
+    _paddingEnd
+        Padding end value used by ``MultipartStreamParser``.
+    _currentPart
+        Multipart part currently receiving parsed headers or body bytes.
+    """
 
     __slots__ = (
         "_atStart",
@@ -95,6 +162,7 @@ class MultipartStreamParser(IMultipartStreamParser):
         "memory_threshold",
         "stream",
     )
+    """Declare the instance attribute slots reserved by this class."""
 
     def __init__(  # noqa: PLR0913
         self,
@@ -115,7 +183,7 @@ class MultipartStreamParser(IMultipartStreamParser):
 
         Parameters
         ----------
-        stream : AsyncIterable[bytes]
+        stream : collections.abc.AsyncIterable[bytes]
             Async byte stream produced by the transport layer.
         boundary : bytes
             Raw multipart boundary token (without leading ``--``).
@@ -141,6 +209,7 @@ class MultipartStreamParser(IMultipartStreamParser):
         Returns
         -------
         None
+            Initialize a new ``MultipartStreamParser`` instance.
         """
         if not boundary:
             error_msg = "Missing multipart boundary"
@@ -282,7 +351,7 @@ class MultipartStreamParser(IMultipartStreamParser):
 
         Parameters
         ----------
-        part : MultipartPart
+        part : orionis.http.payload.part.MultipartPart
             Current multipart part being populated.
         length : int
             Number of bytes to append from the current buffer.
@@ -327,7 +396,7 @@ class MultipartStreamParser(IMultipartStreamParser):
 
         Returns
         -------
-        MultipartPart
+        orionis.http.payload.part.MultipartPart
             Initialized multipart part with its metadata and body buffer.
         """
         headers: dict[str, str] = {}
@@ -403,7 +472,7 @@ class MultipartStreamParser(IMultipartStreamParser):
 
         Returns
         -------
-        MultipartPart | None
+        orionis.http.payload.part.MultipartPart | None
             The initialized part when headers are complete, otherwise ``None``.
         """
         buf = self.buffer
@@ -428,7 +497,7 @@ class MultipartStreamParser(IMultipartStreamParser):
 
         Parameters
         ----------
-        part : MultipartPart
+        part : orionis.http.payload.part.MultipartPart
             Part whose content should be finalized.
 
         Returns
@@ -467,7 +536,7 @@ class MultipartStreamParser(IMultipartStreamParser):
 
         Parameters
         ----------
-        stream : AsyncIterator[bytes]
+        stream : collections.abc.AsyncIterator[bytes]
             Async byte stream providing incoming chunks.
 
         Returns
@@ -508,7 +577,7 @@ class MultipartStreamParser(IMultipartStreamParser):
 
         Parameters
         ----------
-        current_part : MultipartPart
+        current_part : orionis.http.payload.part.MultipartPart
             Part being read from the incoming multipart stream.
         form_items : list[tuple[str, object]]
             Accumulated form values collected so far.
@@ -519,7 +588,7 @@ class MultipartStreamParser(IMultipartStreamParser):
 
         Returns
         -------
-        tuple[int, MultipartPart | None]
+        tuple[int, orionis.http.payload.part.MultipartPart | None]
             Parser state and the current part after processing the segment.
         """
         buf = self.buffer
@@ -553,7 +622,7 @@ class MultipartStreamParser(IMultipartStreamParser):
         ----------
         state : int
             Current parser state.
-        current_part : MultipartPart | None
+        current_part : orionis.http.payload.part.MultipartPart | None
             Current part being streamed.
         form_items : list[tuple[str, object]]
             Accumulated form values collected so far.
@@ -564,7 +633,7 @@ class MultipartStreamParser(IMultipartStreamParser):
 
         Returns
         -------
-        tuple[int, MultipartPart | None, bool]
+        tuple[int, orionis.http.payload.part.MultipartPart | None, bool]
             Next state, part pointer, and whether the loop should continue.
         """
         if state == _STATE_SEARCH_BOUNDARY:
@@ -599,7 +668,7 @@ class MultipartStreamParser(IMultipartStreamParser):
 
         Returns
         -------
-        FormData
+        orionis.http.payload.form_data.FormData
             Parsed form data container for all field and file parts.
         """
         state = _STATE_SEARCH_BOUNDARY
@@ -634,7 +703,7 @@ class MultipartStreamParser(IMultipartStreamParser):
 
         Returns
         -------
-        FormData
+        orionis.http.payload.form_data.FormData
             Container with all parsed field values and uploaded files.
         """
         form_items: list[tuple[str, object]] = []

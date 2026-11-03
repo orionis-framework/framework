@@ -1,3 +1,8 @@
+"""Provide schemas operations.
+
+Includes ``GreaterThan``, ``GreaterThanOrEqual``, ``LessThan``, ``LessThanOrEqual``.
+"""
+
 from __future__ import annotations
 from dataclasses import dataclass, field
 from orionis.schemas.meta.constraint import ConstraintMetadata
@@ -48,7 +53,7 @@ class GreaterThan(ConstraintMetadata):
     """
     Assert that a numeric value is *strictly* greater than ``value``.
 
-    Parameters
+    Attributes
     ----------
     value : int | float
         The exclusive lower bound.
@@ -64,7 +69,7 @@ class GreaterThanOrEqual(ConstraintMetadata):
     """
     Assert that a numeric value is greater than or equal to ``value``.
 
-    Parameters
+    Attributes
     ----------
     value : int | float
         The inclusive lower bound.
@@ -80,7 +85,7 @@ class LessThan(ConstraintMetadata):
     """
     Assert that a numeric value is *strictly* less than ``value``.
 
-    Parameters
+    Attributes
     ----------
     value : int | float
         The exclusive upper bound.
@@ -96,7 +101,7 @@ class LessThanOrEqual(ConstraintMetadata):
     """
     Assert that a numeric value is less than or equal to ``value``.
 
-    Parameters
+    Attributes
     ----------
     value : int | float
         The inclusive upper bound.
@@ -112,7 +117,7 @@ class MultipleOf(ConstraintMetadata):
     """
     Assert that a numeric value is a multiple of ``value``.
 
-    Parameters
+    Attributes
     ----------
     value : int | float
         The divisor; the field value must be evenly divisible by this.
@@ -132,7 +137,7 @@ class Pattern(ConstraintMetadata):
     """
     Assert that a string value matches the given ``regex`` pattern.
 
-    Parameters
+    Attributes
     ----------
     regex : str
         A regular expression that the field value must fully match.
@@ -148,7 +153,7 @@ class MinLength(ConstraintMetadata):
     """
     Assert that a string or collection has at least ``value`` characters/items.
 
-    Parameters
+    Attributes
     ----------
     value : int
         The minimum allowed length (inclusive).
@@ -164,7 +169,7 @@ class MaxLength(ConstraintMetadata):
     """
     Assert that a string or collection has at most ``value`` characters/items.
 
-    Parameters
+    Attributes
     ----------
     value : int
         The maximum allowed length (inclusive).
@@ -186,7 +191,7 @@ class TimezoneAware(ConstraintMetadata):
 
     Requires the annotated value to carry explicit timezone information.
 
-    Parameters
+    Attributes
     ----------
     message : str | None
         Custom error message reported when this constraint fails.
@@ -201,7 +206,7 @@ class TimezoneNaive(ConstraintMetadata):
 
     Requires the annotated value to have *no* timezone information.
 
-    Parameters
+    Attributes
     ----------
     message : str | None
         Custom error message reported when this constraint fails.

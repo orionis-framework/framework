@@ -1,3 +1,5 @@
+"""Refers to the return type of the ``MATCH`` operator."""
+
 from __future__ import annotations
 from orionis.orm.schema.column.definition import ColumnDefinition
 from orionis.orm.schema.types.column_type import ColumnType
@@ -6,6 +8,7 @@ class MatchType(ColumnDefinition):
     """Refers to the return type of the ``MATCH`` operator."""
 
     __slots__ = ()
+    """Declare that this class introduces no additional instance slots."""
 
     def __init__(self) -> None:
         """

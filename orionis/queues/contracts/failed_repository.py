@@ -1,3 +1,5 @@
+"""Declare durable terminal failure inspection and removal."""
+
 from abc import ABC, abstractmethod
 from typing import TYPE_CHECKING
 
@@ -9,6 +11,7 @@ class IFailedJobRepository(ABC):
     """Declare durable terminal failure inspection and removal."""
 
     __slots__ = ()
+    """Declare that this class introduces no additional instance slots."""
 
     @abstractmethod
     async def record(
@@ -22,7 +25,7 @@ class IFailedJobRepository(ABC):
 
         Parameters
         ----------
-        reserved : ReservedJob
+        reserved : orionis.queues.entities.reserved_job.ReservedJob
             Failed claim, including corrupt wire data when applicable.
         connection : str
             Queue connection name.
@@ -31,7 +34,7 @@ class IFailedJobRepository(ABC):
 
         Returns
         -------
-        FailedJob
+        orionis.queues.entities.failed_job.FailedJob
             Durable failure record.
         """
 
@@ -42,7 +45,7 @@ class IFailedJobRepository(ABC):
 
         Returns
         -------
-        tuple[FailedJob, ...]
+        tuple[orionis.queues.entities.failed_job.FailedJob, ``...``]
             Failure records available for inspection.
         """
 
@@ -58,7 +61,7 @@ class IFailedJobRepository(ABC):
 
         Returns
         -------
-        FailedJob | None
+        orionis.queues.entities.failed_job.FailedJob | None
             Matching failure, if present.
         """
 

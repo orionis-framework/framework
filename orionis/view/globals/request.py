@@ -1,3 +1,5 @@
+"""Provide view globals operations through ``_global_request``."""
+
 from __future__ import annotations
 from typing import TYPE_CHECKING, Any
 from orionis.http.contracts.request import IRequest
@@ -13,12 +15,12 @@ def _global_request(app: IApplication) -> Any:
 
     Parameters
     ----------
-    app : IApplication
+    app : orionis.IApplication
         Application container used for service resolution.
 
     Returns
     -------
-    Any
+    typing.Any
         Async callable that resolves the current HTTP request.
     """
     async def request() -> IRequest | None:
@@ -27,7 +29,7 @@ def _global_request(app: IApplication) -> Any:
 
         Returns
         -------
-        IRequest | None
+        orionis.http.contracts.request.IRequest | None
             The HTTP request bound to the active request scope, or
             ``None`` when no request is in scope.
         """

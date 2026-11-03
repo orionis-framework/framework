@@ -1,3 +1,5 @@
+"""Represent a collection of scheduler job store backends."""
+
 from __future__ import annotations
 from dataclasses import dataclass, field
 from typing import Self
@@ -14,11 +16,11 @@ class Stores(BaseEntity):
 
     Attributes
     ----------
-    memory : Memory | dict | None
+    memory : orionis.foundation.config.scheduler.Memory | dict | None
         In-memory job store configuration. Defaults to ``None``.
-    redis : Redis | dict | None
+    redis : orionis.foundation.config.scheduler.Redis | dict | None
         Redis job store configuration. Defaults to ``None``.
-    database : Database | dict | None
+    database : orionis.foundation.config.scheduler.Database | dict | None
         Database-backed job store configuration. Defaults to ``None``.
     """
 

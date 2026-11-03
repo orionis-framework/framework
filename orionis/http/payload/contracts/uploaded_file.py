@@ -1,3 +1,5 @@
+"""Define the contract for an uploaded file held in memory or on disk."""
+
 from __future__ import annotations
 from abc import ABC, abstractmethod
 from typing import TYPE_CHECKING
@@ -16,6 +18,7 @@ class IUploadedFile(ABC):
     """
 
     __slots__ = ()
+    """Declare that this class introduces no additional instance slots."""
 
     @property
     @abstractmethod
@@ -57,6 +60,7 @@ class IUploadedFile(ABC):
         Returns
         -------
         None
+            Append *chunk* to the file buffer.
         """
 
     @abstractmethod
@@ -82,7 +86,7 @@ class IUploadedFile(ABC):
 
         Returns
         -------
-        Iterator[bytes]
+        collections.abc.Iterator[bytes]
             Iterator yielding consecutive chunks from the beginning
             of the buffered content.
         """
@@ -100,6 +104,7 @@ class IUploadedFile(ABC):
         Returns
         -------
         None
+            Replace the file content with *data* and update the byte counter.
         """
 
     @abstractmethod
@@ -109,12 +114,13 @@ class IUploadedFile(ABC):
 
         Parameters
         ----------
-        path : str or Path
+        path : str or pathlib.Path
             Destination path for the saved file.
 
         Returns
         -------
         None
+            Write the file contents to *path* on the local filesystem.
         """
 
     @abstractmethod
@@ -125,4 +131,5 @@ class IUploadedFile(ABC):
         Returns
         -------
         None
+            Close the file handle and release all associated resources.
         """

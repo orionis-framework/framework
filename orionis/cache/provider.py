@@ -1,3 +1,5 @@
+"""Service provider for the Orionis cache system."""
+
 from orionis.cache.contracts.cache_manager import ICacheManager
 from orionis.container.providers.deferrable_provider import DeferrableProvider
 from orionis.container.providers.service_provider import ServiceProvider
@@ -7,8 +9,9 @@ class CacheProvider(ServiceProvider, DeferrableProvider):
     """
     Service provider for the Orionis cache system.
 
-    Binds :class:`ICacheManager` to :class:`CacheManager` as a singleton
-    and pins the :class:`Cache` facade so that attribute access is direct
+    Binds :class:`orionis.cache.contracts.ICacheManager` to
+    :class:`orionis.cache.CacheManager` as a singleton
+    and pins the ``Cache`` facade so that attribute access is direct
     without container resolution overhead on every call.
     """
 
@@ -22,7 +25,7 @@ class CacheProvider(ServiceProvider, DeferrableProvider):
         Returns
         -------
         list[type]
-            List containing :class:`ICacheManager`.
+            List containing :class:`orionis.cache.contracts.ICacheManager`.
         """
         return [ICacheManager]
 

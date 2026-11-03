@@ -1,6 +1,9 @@
+"""Resolve the log service through the application facade."""
+
 from orionis.container.facades.facade import Facade
 
 class Log(Facade):
+    """Resolve the log service through the application facade."""
 
     @classmethod
     def getFacadeAccessor(cls) -> str:

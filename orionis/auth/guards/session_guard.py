@@ -1,3 +1,5 @@
+"""Resolve the identity of web requests from the HTTP session."""
+
 import secrets
 from typing import TYPE_CHECKING
 from uuid import UUID
@@ -18,6 +20,7 @@ if TYPE_CHECKING:
 
 # Fallback applied when the configuration section is absent.
 _DEFAULT_SESSION_KEY: str = "_auth_identifier"
+"""Fallback applied when the configuration section is absent."""
 
 class SessionGuard(ISessionGuard):
     """
@@ -39,6 +42,7 @@ class SessionGuard(ISessionGuard):
         "__csrf_key", "__csrf_length", "__identities", "__password_key",
         "__remember", "__session_key",
     )
+    """Declare the instance attribute slots reserved by this class."""
 
     def __init__(self, app: IApplication, identities: IIdentityProvider) -> None:
         """
@@ -46,9 +50,9 @@ class SessionGuard(ISessionGuard):
 
         Parameters
         ----------
-        app : IApplication
+        app : orionis.IApplication
             Application exposing the ``auth.session`` configuration.
-        identities : IIdentityProvider
+        identities : orionis.auth.contracts.IIdentityProvider
             Provider turning a stored identifier into an identity.
 
         Returns
@@ -59,11 +63,17 @@ class SessionGuard(ISessionGuard):
         self.__session_key: str = (
             app.config("auth.session.key") or _DEFAULT_SESSION_KEY
         )
+        """Session key under which the authenticated identity is stored."""
         self.__password_key: str = self.__session_key + "_password"
+        """Session key used to retain the authenticated password fingerprint."""
         self.__identities = identities
+        """Provider turning a stored identifier into an identity."""
         self.__csrf_key: str = app.config("http.csrf.session_key") or "_csrf_token"
+        """Session key containing the CSRF token."""
         self.__csrf_length: int = app.config("http.csrf.token_length") or 32
+        """Length of newly generated CSRF tokens."""
         self.__remember = RememberMe(app, identities)
+        """Optional request value enabling persistent authentication."""
 
     @property
     def name(self) -> str:
@@ -86,12 +96,12 @@ class SessionGuard(ISessionGuard):
 
         Parameters
         ----------
-        request : Request
+        request : orionis.http.Request
             Incoming HTTP request.
 
         Returns
         -------
-        GuardResult | None
+        orionis.auth.entities.GuardResult | None
             Resolved identity, or ``None`` when the request is anonymous.
         """
         session = self.__session(request)
@@ -129,16 +139,16 @@ class SessionGuard(ISessionGuard):
 
         Parameters
         ----------
-        request : Request
+        request : orionis.http.Request
             Incoming HTTP request owning the session.
-        credentials : Mapping[str, object]
+        credentials : collections.abc.Mapping[str, object]
             Submitted credentials.
         remember : bool, optional
             Persist a revocable login credential after password verification.
 
         Returns
         -------
-        IAuthenticatable | None
+        orionis.auth.contracts.IAuthenticatable | None
             Authenticated identity, or ``None`` when the credentials do
             not match. The answer never reveals whether the account
             exists or the password was wrong.
@@ -169,12 +179,12 @@ class SessionGuard(ISessionGuard):
 
         Parameters
         ----------
-        request : Request
+        request : orionis.http.Request
             Incoming request carrying the remember-me credential.
 
         Returns
         -------
-        GuardResult | None
+        orionis.auth.entities.GuardResult | None
             Authenticated session result, or ``None`` if restoration fails.
         """
         identity = await self.__remember.restore(request)
@@ -189,9 +199,9 @@ class SessionGuard(ISessionGuard):
 
         Parameters
         ----------
-        request : Request
+        request : orionis.http.Request
             Incoming HTTP request owning the session.
-        identity : IAuthenticatable
+        identity : orionis.auth.contracts.IAuthenticatable
             Identity to remember for subsequent requests.
 
         Returns
@@ -201,7 +211,7 @@ class SessionGuard(ISessionGuard):
 
         Raises
         ------
-        AuthException
+        orionis.auth.AuthException
             When the request has no session, which means the route is not
             part of the web pipeline, or the identity has no persisted key.
         """
@@ -237,7 +247,7 @@ class SessionGuard(ISessionGuard):
 
         Parameters
         ----------
-        request : Request
+        request : orionis.http.Request
             Incoming HTTP request owning the session.
 
         Returns
@@ -263,12 +273,12 @@ class SessionGuard(ISessionGuard):
 
         Parameters
         ----------
-        request : Request
+        request : orionis.http.Request
             Incoming HTTP request.
 
         Returns
         -------
-        ISession | None
+        orionis.session.contracts.ISession | None
             Session started by the web pipeline, or ``None`` for routes
             that do not start one.
         """

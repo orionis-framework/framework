@@ -1,3 +1,5 @@
+"""Provide console commands support operations through ``clear_files``."""
+
 from __future__ import annotations
 from typing import TYPE_CHECKING
 
@@ -13,9 +15,9 @@ def clear_files(
 
     Parameters
     ----------
-    directory : Path
+    directory : pathlib.Path
         Directory searched recursively.
-    suffix : str | tuple[str, ...]
+    suffix : str | tuple[str, ``...``]
         File suffix or suffixes to remove, including each leading dot.
 
     Returns

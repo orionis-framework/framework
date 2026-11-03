@@ -1,3 +1,5 @@
+"""Define the contract for base task listener implementations."""
+
 from abc import ABC, abstractmethod
 from typing import TYPE_CHECKING
 
@@ -5,6 +7,7 @@ if TYPE_CHECKING:
     from orionis.console.entities.task_event import TaskEvent
 
 class IBaseTaskListener(ABC):
+    """Define the contract for base task listener implementations."""
 
     @abstractmethod
     async def onTaskAdded(self, event: TaskEvent) -> None:
@@ -13,7 +16,7 @@ class IBaseTaskListener(ABC):
 
         Parameters
         ----------
-        event : TaskEvent
+        event : orionis.console.entities.TaskEvent
             The event object containing information about the added task.
 
         Returns
@@ -29,7 +32,7 @@ class IBaseTaskListener(ABC):
 
         Parameters
         ----------
-        event : TaskEvent
+        event : orionis.console.entities.TaskEvent
             The event object containing information about the removed task.
 
         Returns
@@ -45,7 +48,7 @@ class IBaseTaskListener(ABC):
 
         Parameters
         ----------
-        event : TaskEvent
+        event : orionis.console.entities.TaskEvent
             The event object containing information about the executed task.
 
         Returns
@@ -61,7 +64,7 @@ class IBaseTaskListener(ABC):
 
         Parameters
         ----------
-        event : TaskEvent
+        event : orionis.console.entities.TaskEvent
             The event object containing information about the task error.
 
         Returns
@@ -77,7 +80,7 @@ class IBaseTaskListener(ABC):
 
         Parameters
         ----------
-        event : TaskEvent
+        event : orionis.console.entities.TaskEvent
             The event object containing information about the missed task.
 
         Returns
@@ -93,7 +96,7 @@ class IBaseTaskListener(ABC):
 
         Parameters
         ----------
-        event : TaskEvent
+        event : orionis.console.entities.TaskEvent
             The event object containing information about the submitted task.
 
         Returns
@@ -109,7 +112,7 @@ class IBaseTaskListener(ABC):
 
         Parameters
         ----------
-        event : TaskEvent
+        event : orionis.console.entities.TaskEvent
             The event object containing information about the max instances event.
 
         Returns

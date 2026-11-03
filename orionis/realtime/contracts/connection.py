@@ -1,3 +1,5 @@
+"""Describe the connection surface required by the worker-local registry."""
+
 from __future__ import annotations
 from typing import TYPE_CHECKING, Protocol
 
@@ -10,6 +12,7 @@ class RealtimeConnectionLike(Protocol):
     """Describe the connection surface required by the worker-local registry."""
 
     __slots__ = ()
+    """Declare that this class introduces no additional instance slots."""
 
     @property
     def context(self) -> HubContext:
@@ -18,7 +21,7 @@ class RealtimeConnectionLike(Protocol):
 
         Returns
         -------
-        HubContext
+        orionis.realtime.HubContext
             Connection identity, public socket and authenticated user.
         """
         ...
@@ -30,7 +33,7 @@ class RealtimeConnectionLike(Protocol):
 
         Returns
         -------
-        type[Hub]
+        type[orionis.realtime.Hub]
             Application-owned Hub type associated with the connection.
         """
         ...
@@ -42,7 +45,7 @@ class RealtimeConnectionLike(Protocol):
 
         Returns
         -------
-        HubProtocol
+        orionis.realtime.HubProtocol
             Route-selected codec for protocol envelopes.
         """
         ...
@@ -124,7 +127,7 @@ class RealtimeConnectionLike(Protocol):
             If the target, argument count or deadline is invalid.
         TimeoutError
             If sending or receiving the completion exceeds the deadline.
-        ClientInvocationError
+        orionis.realtime.errors.ClientInvocationError
             If the client returns a completion error.
         """
         ...

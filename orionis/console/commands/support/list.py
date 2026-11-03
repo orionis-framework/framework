@@ -1,3 +1,5 @@
+"""Display available commands and their usage information."""
+
 from rich.console import Console
 from rich.panel import Panel
 from orionis.console.base.command import BaseCommand
@@ -9,25 +11,32 @@ _USAGE_HEADER: str = (
     "[bold cyan]Example:[/]\n  python reactor app:command --flag\n\n"
     "[bold cyan]Available Commands:[/]\n"
 )
+"""Show usage, an example, and the available command list heading."""
 
 # Show the help option after the registered commands.
 _USAGE_FOOTER: str = (
     "\n[bold cyan]Options:[/]\n"
     "  -h, --help    Show this help message and exit"
 )
+"""Show the help option after the registered commands."""
 
 class HelpCommand(BaseCommand):
 
     # ruff: noqa: TC001, TC002
 
     # Control whether this command includes timestamps in its output.
+    """Display available commands and their usage information."""
+
     timestamps: bool = False
+    """Control whether this command includes timestamps in its output."""
 
     # Identify the command in the CLI registry.
     signature: str = "list"
+    """Identify the command in the CLI registry."""
 
     # Describe the information displayed by this command.
     description: str = "Show available commands and usage."
+    """Describe the information displayed by this command."""
 
     async def handle(
         self,
@@ -39,9 +48,9 @@ class HelpCommand(BaseCommand):
 
         Parameters
         ----------
-        reactor : IReactor
-            Reactor instance providing command metadata via `info()` method.
-        console : Console
+        reactor : orionis.console.core.contracts.reactor.IReactor
+            Reactor instance providing command metadata via ``info()`` method.
+        console : orionis.console.Console
             Rich console instance for output.
 
         Returns

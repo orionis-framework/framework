@@ -1,3 +1,5 @@
+"""Storage driver keeping every object in process memory."""
+
 from __future__ import annotations
 import asyncio
 import hashlib
@@ -24,11 +26,13 @@ if TYPE_CHECKING:
 
 # Default chunk size for streaming operations (64 KiB).
 _CHUNK_SIZE: int = 64 * 1024
+"""Default chunk size for streaming operations (64 KiB)."""
 
 # Binary modes accepted by open().
 _ALLOWED_MODES: frozenset[str] = frozenset(
     {"rb", "wb", "ab", "rb+", "wb+", "ab+"},
 )
+"""Binary modes accepted by open()."""
 
 def _now() -> datetime:
     """
@@ -36,7 +40,7 @@ def _now() -> datetime:
 
     Returns
     -------
-    datetime
+    datetime.datetime
         Current time in UTC.
     """
     return datetime.now(tz=UTC)
@@ -52,9 +56,9 @@ class _MemoryEntry:
         Raw file contents.
     visibility : str
         Visibility level of the file.
-    created_at : datetime
+    created_at : datetime.datetime
         Timestamp of the first write.
-    modified_at : datetime
+    modified_at : datetime.datetime
         Timestamp of the most recent write.
     """
 
@@ -71,7 +75,8 @@ class MemoryStorageDriver(IStorageDriver):
     full driver contract over plain dictionaries, enabling fakes such
     as a future ``Storage.fake()`` without touching the rest of the
     component. Directories exist implicitly through file prefixes and
-    explicitly through :meth:`createDirectory`.
+    explicitly through
+    :meth:`orionis.storage.drivers.MemoryStorageDriver.createDirectory`.
 
     Concurrency
     -----------
@@ -84,6 +89,7 @@ class MemoryStorageDriver(IStorageDriver):
     """
 
     __slots__ = ("_base_url", "_directories", "_files")
+    """Declare the instance attribute slots reserved by this class."""
 
     def __init__(self, base_url: str | None = None) -> None:
         """
@@ -98,10 +104,17 @@ class MemoryStorageDriver(IStorageDriver):
         Returns
         -------
         None
+            Initialize an empty in-memory disk.
         """
         self._files: dict[str, _MemoryEntry] = {}
+        """File contents retained by the in-memory storage backend."""
         self._directories: set[str] = set()
+        """Directories produced by ``set``."""
         self._base_url: str | None = base_url.rstrip("/") if base_url else None
+        """
+        Base URL used to build public file URLs, or ``None`` when the disk does not
+        expose URLs.
+        """
 
     # ── Internal helpers ─────────────────────────────────────────────────────
 
@@ -116,12 +129,12 @@ class MemoryStorageDriver(IStorageDriver):
 
         Returns
         -------
-        _MemoryEntry
+        orionis.storage.drivers.memory._MemoryEntry
             Stored entry for the path.
 
         Raises
         ------
-        StorageFileNotFoundException
+        orionis.storage.exceptions.StorageFileNotFoundException
             If no file exists at the path.
         """
         entry = self._files.get(normalized)
@@ -151,6 +164,7 @@ class MemoryStorageDriver(IStorageDriver):
         Returns
         -------
         None
+            Persist *data* under *normalized*, preserving creation time.
         """
         existing = self._files.get(normalized)
         if existing is None:
@@ -271,7 +285,7 @@ class MemoryStorageDriver(IStorageDriver):
         data : bytes
             Raw bytes to hash.
         algorithm : str
-            Any algorithm name accepted by :func:`hashlib.new`.
+            Any algorithm name accepted by ``hashlib.new``.
 
         Returns
         -------
@@ -280,7 +294,7 @@ class MemoryStorageDriver(IStorageDriver):
 
         Raises
         ------
-        UnsupportedStorageOperationException
+        orionis.storage.exceptions.UnsupportedStorageOperationException
             If *algorithm* is not available.
         """
         try:
@@ -309,7 +323,7 @@ class MemoryStorageDriver(IStorageDriver):
 
         Raises
         ------
-        StorageFileNotFoundException
+        orionis.storage.exceptions.StorageFileNotFoundException
             If the file does not exist.
         """
         return self.__entryOrFail(normalizeFilePath(path)).content
@@ -336,7 +350,7 @@ class MemoryStorageDriver(IStorageDriver):
 
         Raises
         ------
-        StorageFileNotFoundException
+        orionis.storage.exceptions.StorageFileNotFoundException
             If the file does not exist.
         """
         content = self.__entryOrFail(normalizeFilePath(path)).content
@@ -382,6 +396,7 @@ class MemoryStorageDriver(IStorageDriver):
         Returns
         -------
         None
+            Write *contents* to *path*, replacing any existing file.
         """
         data = (
             contents.encode("utf-8")
@@ -403,7 +418,7 @@ class MemoryStorageDriver(IStorageDriver):
         ----------
         path : str
             Root-relative file path.
-        stream : AsyncIterable[bytes]
+        stream : collections.abc.AsyncIterable[bytes]
             Asynchronous byte-chunk producer.
         visibility : str | None
             Visibility to apply, or ``None`` to keep the current one.
@@ -411,6 +426,7 @@ class MemoryStorageDriver(IStorageDriver):
         Returns
         -------
         None
+            Write the chunks produced by *stream* to *path*.
         """
         buffer = bytearray()
         async for chunk in stream:
@@ -447,10 +463,11 @@ class MemoryStorageDriver(IStorageDriver):
         Returns
         -------
         None
+            Copy the file at *source* to *target*.
 
         Raises
         ------
-        StorageFileNotFoundException
+        orionis.storage.exceptions.StorageFileNotFoundException
             If the source file does not exist.
         """
         entry = self.__entryOrFail(normalizeFilePath(source))
@@ -473,10 +490,11 @@ class MemoryStorageDriver(IStorageDriver):
         Returns
         -------
         None
+            Move the file at *source* to *target*.
 
         Raises
         ------
-        StorageFileNotFoundException
+        orionis.storage.exceptions.StorageFileNotFoundException
             If the source file does not exist.
         """
         normalized = normalizeFilePath(source)
@@ -502,7 +520,7 @@ class MemoryStorageDriver(IStorageDriver):
 
         Raises
         ------
-        StorageFileNotFoundException
+        orionis.storage.exceptions.StorageFileNotFoundException
             If the file does not exist.
         """
         return len(self.__entryOrFail(normalizeFilePath(path)).content)
@@ -534,12 +552,12 @@ class MemoryStorageDriver(IStorageDriver):
 
         Returns
         -------
-        datetime
+        datetime.datetime
             Timezone-aware modification timestamp (UTC).
 
         Raises
         ------
-        StorageFileNotFoundException
+        orionis.storage.exceptions.StorageFileNotFoundException
             If the file does not exist.
         """
         return self.__entryOrFail(normalizeFilePath(path)).modified_at
@@ -560,7 +578,7 @@ class MemoryStorageDriver(IStorageDriver):
 
         Raises
         ------
-        StorageFileNotFoundException
+        orionis.storage.exceptions.StorageFileNotFoundException
             If the file does not exist.
         """
         return self.__entryOrFail(normalizeFilePath(path)).visibility
@@ -579,12 +597,13 @@ class MemoryStorageDriver(IStorageDriver):
         Returns
         -------
         None
+            Change the visibility of the file at *path*.
 
         Raises
         ------
-        StorageFileNotFoundException
+        orionis.storage.exceptions.StorageFileNotFoundException
             If the file does not exist.
-        UnsupportedStorageOperationException
+        orionis.storage.exceptions.UnsupportedStorageOperationException
             If *visibility* is not a supported level.
         """
         normalized_visibility = str(visibility)
@@ -606,7 +625,7 @@ class MemoryStorageDriver(IStorageDriver):
         path : str
             Root-relative file path.
         algorithm : str
-            Any algorithm name accepted by :func:`hashlib.new`.
+            Any algorithm name accepted by ``hashlib.new``.
 
         Returns
         -------
@@ -615,9 +634,9 @@ class MemoryStorageDriver(IStorageDriver):
 
         Raises
         ------
-        StorageFileNotFoundException
+        orionis.storage.exceptions.StorageFileNotFoundException
             If the file does not exist.
-        UnsupportedStorageOperationException
+        orionis.storage.exceptions.UnsupportedStorageOperationException
             If *algorithm* is not available.
         """
         entry = self.__entryOrFail(normalizeFilePath(path))
@@ -634,13 +653,13 @@ class MemoryStorageDriver(IStorageDriver):
 
         Returns
         -------
-        FileInfo
+        orionis.storage.entities.FileInfo
             Immutable entity with size, MIME type, timestamps, hashes,
             visibility, and URL when available.
 
         Raises
         ------
-        StorageFileNotFoundException
+        orionis.storage.exceptions.StorageFileNotFoundException
             If the file does not exist.
         """
         normalized = normalizeFilePath(path)
@@ -671,6 +690,7 @@ class MemoryStorageDriver(IStorageDriver):
         Returns
         -------
         None
+            Create the directory at *path*, including missing parents.
         """
         normalized = normalizePath(path)
         if normalized:
@@ -808,7 +828,7 @@ class MemoryStorageDriver(IStorageDriver):
 
         Raises
         ------
-        UnsupportedStorageOperationException
+        orionis.storage.exceptions.UnsupportedStorageOperationException
             If the disk has no base URL configured.
         """
         normalized = normalizeFilePath(path)
@@ -840,7 +860,7 @@ class MemoryStorageDriver(IStorageDriver):
 
         Raises
         ------
-        UnsupportedStorageOperationException
+        orionis.storage.exceptions.UnsupportedStorageOperationException
             Always, since memory disks cannot sign URLs.
         """
         error_msg = (
@@ -856,18 +876,18 @@ class MemoryStorageDriver(IStorageDriver):
         ----------
         path : str
             Root-relative file path on the disk.
-        destination : str | Path
+        destination : str | pathlib.Path
             Local target. When it points to an existing directory the
             file keeps its original name inside that directory.
 
         Returns
         -------
-        Path
+        pathlib.Path
             Absolute local path of the downloaded file.
 
         Raises
         ------
-        StorageFileNotFoundException
+        orionis.storage.exceptions.StorageFileNotFoundException
             If the file does not exist.
         """
         normalized = normalizeFilePath(path)
@@ -879,7 +899,7 @@ class MemoryStorageDriver(IStorageDriver):
 
             Returns
             -------
-            Path
+            pathlib.Path
                 Destination of the written object.
             """
             # Keep the original name when the destination is a directory.
@@ -906,12 +926,12 @@ class MemoryStorageDriver(IStorageDriver):
 
         Returns
         -------
-        AsyncStream
+        orionis.storage.AsyncStream
             Lazily opened stream; use it as an async context manager.
 
         Raises
         ------
-        UnsupportedStorageOperationException
+        orionis.storage.exceptions.UnsupportedStorageOperationException
             If *mode* is not a supported binary mode.
         """
         normalized = normalizeFilePath(path)
@@ -925,7 +945,7 @@ class MemoryStorageDriver(IStorageDriver):
 
             Returns
             -------
-            BinaryIO
+            typing.BinaryIO
                 Stream handle for reading or writing.
             """
             # Read-oriented modes require the file to already exist.
@@ -945,7 +965,7 @@ class MemoryStorageDriver(IStorageDriver):
 
             Parameters
             ----------
-            handle : BinaryIO
+            handle : typing.BinaryIO
                 Buffered stream being closed.
 
             Returns

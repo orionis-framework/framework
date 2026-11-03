@@ -1,3 +1,5 @@
+"""Holds Python objects, serialized using ``pickle``."""
+
 from __future__ import annotations
 from orionis.orm.schema.column.definition import ColumnDefinition
 from orionis.orm.schema.column.options import ColumnOptions
@@ -7,6 +9,7 @@ class PickleType(ColumnDefinition):
     """Holds Python objects, serialized using ``pickle``."""
 
     __slots__ = ()
+    """Declare that this class introduces no additional instance slots."""
 
     def __init__(
         self,

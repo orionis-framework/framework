@@ -1,12 +1,25 @@
+"""
+Add DDL support shared by schema-level column types.
+
+Mixed into :class:`orionis.orm.schema.types.Boolean` and
+:class:`orionis.orm.schema.types.Enum`.
+"""
+
 from __future__ import annotations
 from orionis.orm.schema.column.definition import ColumnDefinition
 from orionis.orm.schema.column.options import ColumnOptions
 from orionis.orm.schema.types.column_type import ColumnType
 
 class SchemaType(ColumnDefinition):
-    """Adds schema-level DDL, mixed into :class:`Boolean`/:class:`Enum`."""
+    """
+    Add DDL support shared by schema-level column types.
+
+    Mixed into :class:`orionis.orm.schema.types.Boolean` and
+    :class:`orionis.orm.schema.types.Enum`.
+    """
 
     __slots__ = ()
+    """Declare that this class introduces no additional instance slots."""
 
     def __init__(self, name: str | None = None) -> None:
         """

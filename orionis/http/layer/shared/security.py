@@ -1,3 +1,5 @@
+"""Enforce baseline HTTP security policies on every request."""
+
 from __future__ import annotations
 from typing import TYPE_CHECKING
 from orionis.foundation.config.http.entitites.security import HTTPSecurity
@@ -26,24 +28,27 @@ class SecurityMiddleware:
         "__default_responses",
         "__enforce_hosts",
     )
+    """Declare the instance attribute slots reserved by this class."""
 
     def __init__(
         self,
         config: dict,
         default_responses: IDefaultResponses,
     ) -> None:
-        """Initialize the middleware with the given security configuration.
+        """
+        Initialize the middleware with the given security configuration.
 
         Parameters
         ----------
         config : dict
             A dictionary whose keys must match ``HTTPSecurity`` fields.
-        default_responses : IDefaultResponses
+        default_responses : orionis.http.default.contracts.responses.IDefaultResponses
             Predefined default responses for common HTTP errors.
 
         Returns
         -------
         None
+            Initialize the middleware with the given security configuration.
         """
         # Validate the raw configuration through the entity dataclass.
         cfg = HTTPSecurity(**config)
@@ -64,13 +69,17 @@ class SecurityMiddleware:
                 else:
                     exact.add(host)
         self.__allowed_hosts: frozenset[str] = frozenset(exact)
+        """Allowed hosts produced by ``frozenset``."""
         self.__allowed_host_suffixes: tuple[str, ...] = tuple(suffixes)
+        """Allowed host suffixes produced by ``tuple``."""
 
         # Host validation is skipped entirely when no allowlist is set.
         self.__enforce_hosts: bool = bool(exact or suffixes)
+        """Host validation is skipped entirely when no allowlist is set."""
 
         # Store the default responses for use in the handler.
         self.__default_responses = default_responses
+        """Predefined default responses for common HTTP errors."""
 
     @staticmethod
     def __extractHostname(raw_host: str) -> str:
@@ -125,7 +134,8 @@ class SecurityMiddleware:
         self,
         adapter: TransportAdapter,
     ) -> Response | None:
-        """Inspect the incoming request and enforce all security policies.
+        """
+        Inspect the incoming request and enforce all security policies.
 
         Runs three sequential checks in order: CRLF-injection
         detection, duplicate Host header guard, and host allowlist
@@ -134,13 +144,13 @@ class SecurityMiddleware:
 
         Parameters
         ----------
-        adapter : TransportAdapter
+        adapter : orionis.http.adapters.request.contracts.transport.TransportAdapter
             Transport abstraction providing header access and
             client-preference detection.
 
         Returns
         -------
-        Response | None
+        orionis.http.Response | None
             An HTTP error response when a check fails, or ``None``
             when the request is considered safe to proceed.
         """

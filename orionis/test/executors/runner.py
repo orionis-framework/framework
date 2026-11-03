@@ -1,3 +1,5 @@
+"""Execute test suites and report their structured results."""
+
 import asyncio
 import os
 import time
@@ -18,6 +20,7 @@ if TYPE_CHECKING:
 class TestRunner(unittest.TextTestRunner):
 
     # ruff: noqa: FBT001, FBT002
+    """Execute test suites and report their structured results."""
 
     resultclass = TestResultProcessor
 
@@ -71,7 +74,12 @@ class TestRunner(unittest.TextTestRunner):
 
         # Initialize a Rich console for output
         self.__console: Console = Console()
+        """Initialize a Rich console for output."""
         self.__with_panel: bool = with_panel
+        """
+        Render the Rich start and summary panels around the run. When False both
+        panels are skipped and the console is never cleared, by default True.
+        """
 
     def __startPanel(self) -> None:
         """
@@ -139,7 +147,7 @@ class TestRunner(unittest.TextTestRunner):
 
         Parameters
         ----------
-        test_result : list[TestResult]
+        test_result : list[orionis.test.entities.result.TestResult]
             List of test result objects to summarize.
         time_taken : float
             Total time taken to execute the test suite.
@@ -198,12 +206,12 @@ class TestRunner(unittest.TextTestRunner):
 
         Parameters
         ----------
-        test : unittest.suite.TestSuite
+        test : unittest.TestSuite
             The test case or suite to execute.
 
         Returns
         -------
-        unittest.result.TestResult
+        unittest.TestResult
             The result object containing test execution details.
         """
         # Display the start panel before running tests.

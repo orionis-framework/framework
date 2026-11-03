@@ -1,3 +1,5 @@
+"""Enumeration of supported session storage drivers."""
+
 from enum import StrEnum
 
 class SessionDriver(StrEnum):

@@ -1,3 +1,5 @@
+"""Define params types for http routes."""
+
 import uuid
 
 PARAM_TYPES = {
@@ -20,3 +22,4 @@ PARAM_TYPES = {
         "converter": uuid.UUID,
     },
 }
+"""Param types definitions used by ``params_types``."""

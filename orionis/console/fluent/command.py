@@ -1,3 +1,5 @@
+"""Build console command registrations through a fluent interface."""
+
 from __future__ import annotations
 from typing import TYPE_CHECKING, Any, Self
 from orionis.console.args.argument import Argument
@@ -8,6 +10,7 @@ if TYPE_CHECKING:
     from collections.abc import Callable
 
 class Command(ICommand):
+    """Build console command registrations through a fluent interface."""
 
     def __init__(
         self,
@@ -24,9 +27,9 @@ class Command(ICommand):
         ----------
         signature : str
             Command signature for CLI invocation.
-        concrete : Callable[..., Any]
+        concrete : collections.abc.Callable[``...``, typing.Any]
             Class implementing command logic.
-        method : str, default='handle'
+        method : str, default='``handle``'
             Method name to execute in concrete class.
 
         Returns
@@ -61,21 +64,27 @@ class Command(ICommand):
 
         # Store the command signature
         self.__signature = signature
+        """Command signature for CLI invocation."""
 
         # Store the concrete class reference
         self.__concrete = concrete
+        """Class implementing command logic."""
 
         # Store the method name
         self.__method = method
+        """Method name to execute in concrete class."""
 
         # Enable timestamp display by default
         self.__timestamp = True
+        """Enable timestamp display by default."""
 
         # Set default description
         self.__description = "No description provided."
+        """Set default description."""
 
         # Initialize empty arguments list
         self.__arguments = []
+        """Initialize empty arguments list."""
 
     def timestamp(self, *, enabled: bool = True) -> Self:
         """
@@ -90,7 +99,7 @@ class Command(ICommand):
 
         Returns
         -------
-        Command
+        orionis.console.fluent.Command
             Returns self for method chaining.
 
         Raises
@@ -122,7 +131,7 @@ class Command(ICommand):
 
         Returns
         -------
-        Command
+        orionis.console.fluent.Command
             Returns self for method chaining.
 
         Raises
@@ -154,7 +163,7 @@ class Command(ICommand):
 
         Returns
         -------
-        Command
+        orionis.console.fluent.Command
             Returns self for method chaining.
 
         Raises
@@ -187,7 +196,7 @@ class Command(ICommand):
 
         Returns
         -------
-        tuple of (str, CommandEntity)
+        tuple of (str, orionis.console.entities.Command)
             Command signature and CommandEntity instance.
         """
         # Create and return a CommandEntity with configured properties

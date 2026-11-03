@@ -1,8 +1,11 @@
+"""Ensure a value can be represented in a given character encoding."""
+
 from orionis.schemas.rules.measure import read_content
 from orionis.schemas.rule import Rule
 
 # Codec aliases that are always available through the standard library.
 _DEFAULT_ENCODING = "utf-8"
+"""Codec aliases that are always available through the standard library."""
 
 class Encoding(Rule):
     """
@@ -15,9 +18,12 @@ class Encoding(Rule):
     # ruff: noqa: ARG002
 
     __slots__ = ("_encoding",)
+    """Declare the instance attribute slots reserved by this class."""
 
     __message__ = "Value must match the required character encoding."
+    """Error text for message: ``Value must match the required character encoding.``."""
     __code__ = "encoding"
+    """Code identifier: ``encoding``."""
 
     def __init__(
         self,
@@ -52,6 +58,7 @@ class Encoding(Rule):
             error_msg = f"Unknown character encoding: {encoding!r}."
             raise ValueError(error_msg) from exc
         self._encoding: str = encoding
+        """Codec name the value must be representable in."""
 
     async def enforce(
         self,

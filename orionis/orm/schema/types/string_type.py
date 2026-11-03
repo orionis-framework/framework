@@ -1,3 +1,5 @@
+"""The base for all string and character types. In SQL, ``VARCHAR``."""
+
 from __future__ import annotations
 from orionis.orm.schema.column.definition import ColumnDefinition
 from orionis.orm.schema.column.options import ColumnOptions
@@ -8,6 +10,7 @@ class String(ColumnDefinition):
     """The base for all string and character types. In SQL, ``VARCHAR``."""
 
     __slots__ = ()
+    """Declare that this class introduces no additional instance slots."""
 
     def __init__(
         self,

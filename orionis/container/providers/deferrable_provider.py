@@ -1,3 +1,5 @@
+"""Mark service providers that support deferred loading."""
+
 from __future__ import annotations
 from orionis.container.contracts.deferrable_provider import IDeferrableProvider
 

@@ -1,3 +1,5 @@
+"""Read and write compiled routing metadata for application startup."""
+
 from __future__ import annotations
 
 import importlib
@@ -11,8 +13,10 @@ from orionis.http.routes.route_compiler import RouteCompiler
 
 
 class RouteCache(IRouteCache):
+    """Read and write compiled routing metadata for application startup."""
 
     VERSION = 3
+    """Version value used by ``RouteCache``."""
 
     def toCache(
         self,
@@ -63,7 +67,8 @@ class RouteCache(IRouteCache):
         Parameters
         ----------
         cached : dict
-            Dict previously produced by :meth:`toCache`.
+            Dict previously produced by
+            :meth:`orionis.http.routes.route_cache.RouteCache.toCache`.
 
         Returns
         -------
@@ -113,7 +118,7 @@ class RouteCache(IRouteCache):
 
         Parameters
         ----------
-        cr : CompiledRoute
+        cr : orionis.http.routes.entities.compiled_route.CompiledRoute
             The compiled route to serialise.
 
         Returns
@@ -159,13 +164,15 @@ class RouteCache(IRouteCache):
         Rebuild a ``CompiledRoute`` from a cache dict.
 
         ``regex`` and ``converters`` are recomputed via
-        :meth:`RouteCompiler.compilePath` so that callable converters
+        :meth:`orionis.http.routes.route_compiler.RouteCompiler.compilePath` so that
+        callable converters
         (including lambdas) never need to be serialised.
 
         Parameters
         ----------
         route_data : dict
-            Dict produced by :meth:`__serializeCompiledRoute`.
+            Dict produced by
+            :meth:`orionis.http.routes.route_cache.RouteCache.__serializeCompiledRoute`.
         resolved_classes : dict[str, type]
             Class references shared across this cache load.
         method : str
@@ -175,7 +182,7 @@ class RouteCache(IRouteCache):
 
         Returns
         -------
-        CompiledRoute
+        orionis.http.routes.entities.compiled_route.CompiledRoute
             Fully initialised compiled route.
 
         Raises
@@ -278,7 +285,8 @@ class RouteCache(IRouteCache):
         Parameters
         ----------
         data : dict | None
-            Descriptor produced by :meth:`__serializeFallback`.
+            Descriptor produced by
+            :meth:`orionis.http.routes.route_cache.RouteCache.__serializeFallback`.
 
         Returns
         -------

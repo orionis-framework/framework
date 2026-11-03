@@ -1,3 +1,5 @@
+"""Raised when a second fallback route is registered."""
+
 from __future__ import annotations
 
 

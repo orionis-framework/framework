@@ -1,3 +1,5 @@
+"""Group the http components and public imports."""
+
 from typing import TYPE_CHECKING as _TYPE_CHECKING
 from orionis._exports import resolve_export as _resolve_export
 
@@ -54,6 +56,7 @@ __all__ = [
 ]
 
 _WEBSOCKET_MESSAGE_MODULE = "orionis.http.websocket_message"
+"""Module path used to resolve the public WebSocket message exports."""
 
 _EXPORTS = {
     "BaseMiddleware": ("orionis.http.middleware", "BaseMiddleware"),
@@ -82,6 +85,7 @@ _EXPORTS = {
     "WebSocketNext": ("orionis.http.websocket_middleware", "WebSocketNext"),
     "response": ("orionis.http.factory", "response"),
 }
+"""Public export names mapped to their defining modules and attributes."""
 
 def __getattr__(name: str) -> object:
     """

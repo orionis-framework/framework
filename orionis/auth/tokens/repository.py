@@ -1,3 +1,5 @@
+"""Persist personal access tokens through the Orionis query builder."""
+
 from datetime import UTC, datetime, timedelta
 from typing import TYPE_CHECKING, Self
 import msgspec
@@ -17,13 +19,19 @@ if TYPE_CHECKING:
 
 # Fallbacks applied when the configuration section is absent.
 _DEFAULT_TABLE: str = "personal_access_tokens"
+"""Fallbacks applied when the configuration section is absent."""
 _DEFAULT_SECRET_BYTES: int = 40
+"""Default secret bytes value used by ``repository``."""
 _MAX_TOKEN_LENGTH: int = 512
+"""Max token length value used by ``repository``."""
 _MAX_NAME_LENGTH: int = 255
+"""Max name length value used by ``repository``."""
 _MAX_ABILITIES: int = 256
+"""Max abilities value used by ``repository``."""
 
 # Column holding the digest of the presented secret.
 _TOKEN_COLUMN: str = "token"  # noqa: S105
+"""Column holding the digest of the presented secret."""
 
 class AccessTokenRepository(IAccessTokenRepository):
     """
@@ -45,6 +53,7 @@ class AccessTokenRepository(IAccessTokenRepository):
     # ruff: noqa: TC001 (Dependency Injection)
 
     __slots__ = ("__db", "__expiration", "__secret_bytes", "__table")
+    """Declare the instance attribute slots reserved by this class."""
 
     def __init__(self: Self, app: IApplication, db: IQueryBuilder) -> None:
         """
@@ -52,9 +61,9 @@ class AccessTokenRepository(IAccessTokenRepository):
 
         Parameters
         ----------
-        app : IApplication
+        app : orionis.IApplication
             Application exposing the ``auth.tokens`` configuration.
-        db : IQueryBuilder
+        db : orionis.orm.contracts.query_builder.IQueryBuilder
             Gateway used to build queries over the token table.
 
         Returns
@@ -63,11 +72,15 @@ class AccessTokenRepository(IAccessTokenRepository):
             Only configuration values and the gateway are retained.
         """
         self.__db = db
+        """Gateway used to build queries over the token table."""
         self.__table: str = app.config("auth.tokens.table") or _DEFAULT_TABLE
+        """Database table used to persist access-token records."""
         self.__expiration: int | None = app.config("auth.tokens.expiration")
+        """Expiration produced by ``app.config``."""
         self.__secret_bytes: int = (
             app.config("auth.tokens.secret_bytes") or _DEFAULT_SECRET_BYTES
         )
+        """Encoded application secret used to protect token lookups."""
 
     async def create(
         self: Self,
@@ -82,24 +95,24 @@ class AccessTokenRepository(IAccessTokenRepository):
 
         Parameters
         ----------
-        tokenable : IAuthorizable
+        tokenable : orionis.auth.contracts.IAuthorizable
             Identity the token belongs to.
         name : str
             Human readable label describing the token.
-        abilities : Iterable[str] | None, optional
+        abilities : collections.abc.Iterable[str] | None, optional
             Abilities the token may use, or ``None`` to keep the full
             authorization of the identity.
-        expires_at : datetime | None, optional
+        expires_at : datetime.datetime | None, optional
             Explicit expiration. ``None`` applies the configured default.
 
         Returns
         -------
-        NewAccessToken
+        orionis.auth.entities.NewAccessToken
             Stored metadata plus the plain text value of the token.
 
         Raises
         ------
-        TokenException
+        orionis.auth.TokenException
             When the token name is empty.
         """
         if (
@@ -173,7 +186,7 @@ class AccessTokenRepository(IAccessTokenRepository):
 
         Returns
         -------
-        AccessToken | None
+        orionis.auth.entities.AccessToken | None
             Matching token, or ``None`` when the value is unknown, has
             been revoked or has already expired.
         """
@@ -245,7 +258,7 @@ class AccessTokenRepository(IAccessTokenRepository):
 
         Returns
         -------
-        AccessToken | None
+        orionis.auth.entities.AccessToken | None
             Validated token, or None for invalid, revoked or expired metadata.
         """
         # A revoked token is treated exactly like an unknown one.
@@ -332,7 +345,7 @@ class AccessTokenRepository(IAccessTokenRepository):
 
         Parameters
         ----------
-        tokenable : IAuthorizable
+        tokenable : orionis.auth.contracts.IAuthorizable
             Identity whose tokens must be revoked.
 
         Returns
@@ -381,7 +394,7 @@ def _utc_now() -> datetime:
 
     Returns
     -------
-    datetime
+    datetime.datetime
         Current UTC moment without timezone information.
     """
     return datetime.now(UTC).replace(tzinfo=None)
@@ -402,12 +415,12 @@ def _as_datetime(value: object) -> datetime | None:
 
     Returns
     -------
-    datetime | None
+    datetime.datetime | None
         Parsed UTC moment without an offset, or ``None`` for SQL NULL.
 
     Raises
     ------
-    TokenException
+    orionis.auth.TokenException
         If a non-null timestamp is malformed.
     """
     if value is None:
@@ -431,7 +444,7 @@ def _unexpired_tokens(query: QueryBuilderBase) -> None:
 
     Parameters
     ----------
-    query : QueryBuilderBase
+    query : orionis.orm.query.base_builder.QueryBuilderBase
         Nested group assembled by the query builder.
 
     Returns
@@ -447,7 +460,7 @@ def _is_expired(value: datetime | None) -> bool:
 
     Parameters
     ----------
-    value : datetime | None
+    value : datetime.datetime | None
         Normalised expiration moment of the token.
 
     Returns
@@ -497,7 +510,7 @@ def _decode_abilities(value: object) -> frozenset[str] | None:
 
     Raises
     ------
-    TokenException
+    orionis.auth.TokenException
         If the stored payload is not an array of non-empty strings.
     """
     if value is None:
@@ -519,7 +532,7 @@ def _normalize_abilities(abilities: Iterable[str] | None) -> frozenset[str] | No
 
     Parameters
     ----------
-    abilities : Iterable[str] | None
+    abilities : collections.abc.Iterable[str] | None
         Explicit restrictions, or None for an unrestricted credential.
 
     Returns
@@ -529,7 +542,7 @@ def _normalize_abilities(abilities: Iterable[str] | None) -> frozenset[str] | No
 
     Raises
     ------
-    TokenException
+    orionis.auth.TokenException
         If the input is a string or contains invalid ability names.
     """
     if abilities is None:

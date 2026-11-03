@@ -1,10 +1,14 @@
+"""Represent the configuration of personal access token authentication."""
+
 from dataclasses import dataclass, field
 from orionis.environment import Env
 from orionis.support.entities.base import BaseEntity
 
 # Number of random bytes used to build the secret half of a token.
 _MIN_SECRET_BYTES: int = 32
+"""Number of random bytes used to build the secret half of a token."""
 _MAX_SECRET_BYTES: int = 128
+"""Max secret bytes value used by ``tokens``."""
 
 @dataclass(frozen=True, kw_only=True)
 class Tokens(BaseEntity):

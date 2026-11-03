@@ -1,3 +1,5 @@
+"""Represent the configuration for daily log file rotation."""
+
 from __future__ import annotations
 from dataclasses import dataclass, field
 from datetime import time
@@ -7,6 +9,7 @@ from orionis.foundation.config.logging.validators import IsValidLevel, IsValidPa
 from orionis.support.entities.base import BaseEntity
 
 _DEFAULT_PATH: str = "storage/logs/daily_{suffix}.log"
+"""Default path identifier: ``storage/logs/daily_{suffix}.log``."""
 
 @dataclass(frozen=True, kw_only=True)
 class Daily(BaseEntity):
@@ -17,11 +20,11 @@ class Daily(BaseEntity):
     ----------
     path : str
         The file path where the log is stored.
-    level : int | str | Level
+    level : int | str | orionis.foundation.config.logging.Level
         The logging level (e.g., 'info', 'error', 'debug').
     retention_days : int
         The number of days to retain log files before deletion.
-    at : time | str
+    at : datetime.time | str
         The time of day when the log rotation should occur.
     """
 
@@ -72,10 +75,6 @@ class Daily(BaseEntity):
     def __post_init__(self) -> None:
         """
         Validate and normalize attributes after dataclass initialization.
-
-        Parameters
-        ----------
-        None
 
         Returns
         -------

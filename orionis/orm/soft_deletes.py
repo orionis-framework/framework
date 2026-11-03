@@ -1,3 +1,5 @@
+"""Soft delete behavior shared by every model."""
+
 from __future__ import annotations
 from typing import TYPE_CHECKING
 
@@ -11,10 +13,12 @@ class SoftDeletesMixin:
     A model opts in by declaring ``soft_deletes = True`` together with a
     ``deleted_at`` column. Deleting then stamps that column instead of
     removing the row, queries exclude stamped rows by default, and the
-    row can be brought back with :meth:`restore`.
+    row can be brought back with
+    :meth:`orionis.orm.soft_deletes.SoftDeletesMixin.restore`.
     """
 
     __slots__ = ()
+    """Declare that this class introduces no additional instance slots."""
 
     def trashed(self) -> bool:
         """
@@ -41,7 +45,7 @@ class SoftDeletesMixin:
 
         Raises
         ------
-        QueryException
+        orionis.database.QueryException
             If the statement fails to execute.
         """
         column = self.__meta__.deleted_column
@@ -67,7 +71,7 @@ class SoftDeletesMixin:
 
         Raises
         ------
-        QueryException
+        orionis.database.QueryException
             If the statement fails to execute.
         """
         if not self._exists:
@@ -85,7 +89,7 @@ class SoftDeletesMixin:
 
         Parameters
         ----------
-        timestamp : datetime
+        timestamp : datetime.datetime
             Value written into the soft delete column.
 
         Returns
@@ -95,7 +99,7 @@ class SoftDeletesMixin:
 
         Raises
         ------
-        QueryException
+        orionis.database.QueryException
             If the statement fails to execute.
         """
         self._attributes[self.__meta__.deleted_column] = timestamp

@@ -1,3 +1,5 @@
+"""Composite ``UNIQUE`` constraint spanning one or more columns."""
+
 from __future__ import annotations
 from dataclasses import dataclass
 

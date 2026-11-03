@@ -1,3 +1,5 @@
+"""Base class for HTTP middleware implementations."""
+
 from __future__ import annotations
 from typing import TYPE_CHECKING
 from orionis.http.layer.contracts.middleware import IBaseMiddleware, NextCallable
@@ -10,6 +12,7 @@ class BaseMiddleware(IBaseMiddleware):
     """Base class for HTTP middleware implementations."""
 
     __slots__ = ()
+    """Declare that this class introduces no additional instance slots."""
 
     async def handle(
         self,
@@ -26,15 +29,15 @@ class BaseMiddleware(IBaseMiddleware):
 
         Parameters
         ----------
-        request : Request
+        request : orionis.http.Request
             Incoming HTTP request instance.
-        call_next : NextCallable
+        call_next : orionis.http.NextCallable
             No-arg async callable that advances to the next middleware
             or final route handler in the pipeline.
 
         Returns
         -------
-        Response
+        orionis.http.Response
             HTTP response object returned by the next handler.
 
         Raises

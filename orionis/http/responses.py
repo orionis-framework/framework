@@ -1,3 +1,9 @@
+"""Provide http operations.
+
+Includes ``Response``, ``ResponseTemplate``, ``HTMLResponse``,
+``PlainTextResponse``.
+"""
+
 from __future__ import annotations
 import asyncio
 import json
@@ -26,6 +32,7 @@ if TYPE_CHECKING:
 
 class Response(_FlashData, IResponse):
     # ruff: noqa: ANN401, C901, PLR0913, PLR2004
+    """Represent an HTTP response with status, headers, cookies and body."""
 
     __slots__ = (
         "_body",
@@ -37,9 +44,11 @@ class Response(_FlashData, IResponse):
         "media_type",
         "status_code",
     )
+    """Declare the instance attribute slots reserved by this class."""
 
     # Encode text responses using UTF-8.
     charset: ClassVar[str] = "utf-8"
+    """Encode text responses using UTF-8."""
 
     def __init__(  # NOSONAR
         self: Self,
@@ -54,15 +63,15 @@ class Response(_FlashData, IResponse):
 
         Parameters
         ----------
-        content : Any, optional
+        content : typing.Any, optional
             The response content or stream.
-        status_code : HTTPStatus | int, optional
+        status_code : orionis.http.enums.HTTPStatus | int, optional
             The HTTP status code for the response.
-        headers : Mapping[str, str] | None, optional
+        headers : collections.abc.Mapping[str, str] | None, optional
             The headers to include in the response.
         media_type : str | None, optional
             The media type of the response.
-        background : BackgroundTask | None, optional
+        background : orionis.background.BackgroundTask | None, optional
             The background task to run after response.
 
         Returns
@@ -79,13 +88,18 @@ class Response(_FlashData, IResponse):
             raise ValueError(error_msg)
 
         self.status_code = status_code
+        """The HTTP status code for the response."""
         self.media_type = media_type
+        """The media type of the response."""
 
         self._body: bytes | None = None
+        """HTTP response body or encoded payload returned to the client."""
         self._stream: AsyncIterable[bytes] | None = None
+        """Iterator supplying response body chunks."""
 
         # Initialize flash data when it is first queued.
         self._flash: dict[str, Any] | None = None
+        """Initialize flash data when it is first queued."""
 
         # Retain asynchronous content as a response stream.
         if hasattr(content, "__aiter__"):
@@ -94,7 +108,9 @@ class Response(_FlashData, IResponse):
             self._body = self.render(content)
 
         self._headers: dict[str, str | list[str]] = {}
+        """The headers to include in the response."""
         self._raw_headers: tuple[tuple[bytes, bytes], ...] | None = None
+        """Protocol-ready header pairs emitted with the response."""
 
         if headers:
             # Accept dictionaries and other mapping implementations.
@@ -118,6 +134,7 @@ class Response(_FlashData, IResponse):
             raise TypeError(error_msg)
 
         self.background = background
+        """The background task to run after response."""
 
     def render(self: Self, content: Any) -> bytes:
         """
@@ -125,7 +142,7 @@ class Response(_FlashData, IResponse):
 
         Parameters
         ----------
-        content : Any
+        content : typing.Any
             The content to render.
 
         Returns
@@ -327,7 +344,7 @@ class Response(_FlashData, IResponse):
             The cookie value. Defaults to an empty string.
         max_age : int | None, optional
             The maximum age of the cookie in seconds.
-        expires : datetime | str | int | None, optional
+        expires : datetime.datetime | str | int | None, optional
             The expiration date of the cookie.
         path : str | None, optional
             The path for which the cookie is valid.
@@ -454,7 +471,7 @@ class Response(_FlashData, IResponse):
             The cookie value. Defaults to an empty string.
         max_age : int | None, optional
             The maximum age of the cookie in seconds.
-        expires : datetime | str | int | None, optional
+        expires : datetime.datetime | str | int | None, optional
             The expiration date of the cookie.
         path : str | None, optional
             The path for which the cookie is valid.
@@ -471,7 +488,7 @@ class Response(_FlashData, IResponse):
 
         Returns
         -------
-        Self
+        typing.Self
             The same response instance, allowing fluent chaining.
         """
         self.setCookie(
@@ -497,13 +514,13 @@ class Response(_FlashData, IResponse):
 
         Parameters
         ----------
-        cookies : Mapping[str, str | Mapping[str, Any]]
+        cookies : typing.Mapping[str, str | typing.Mapping[str, typing.Any]]
             Mapping of cookie names to either a plain value or a mapping of
-            keyword arguments accepted by :meth:`setCookie`.
+            keyword arguments accepted by :meth:`orionis.http.Response.setCookie`.
 
         Returns
         -------
-        Self
+        typing.Self
             The same response instance, allowing fluent chaining.
         """
         for key, options in cookies.items():
@@ -534,7 +551,7 @@ class Response(_FlashData, IResponse):
 
         Returns
         -------
-        Self
+        typing.Self
             The same response instance, allowing fluent chaining.
         """
         self.deleteCookie(key, path=path, domain=domain)
@@ -546,7 +563,7 @@ class Response(_FlashData, IResponse):
 
         Returns
         -------
-        dict[str, Any] | None
+        dict[str, typing.Any] | None
             The queued key-value pairs, or None when nothing was queued.
         """
         return self._flash
@@ -568,7 +585,7 @@ class Response(_FlashData, IResponse):
 
         Returns
         -------
-        AsyncIterable[bytes] | None
+        collections.abc.AsyncIterable[bytes] | None
             The response stream, or None if not set.
         """
         return self._stream
@@ -629,17 +646,22 @@ class ResponseTemplate:
         Constant response content, encoded once as UTF-8.
     status_code : int, optional
         HTTP status shared by newly created responses.
-    headers : Mapping[str, str] | None, optional
+    headers : collections.abc.Mapping[str, str] | None, optional
         Constant headers copied and encoded when the template is constructed.
     media_type : str | None, optional
         Response media type metadata.
     """
 
     body: bytes
+    """HTTP response body or encoded payload returned to the client."""
     status_code: int
+    """Valid HTTP response status."""
     media_type: str | None
+    """Media type metadata copied to each response."""
     _headers: tuple[tuple[str, str], ...] = field(repr=False)
+    """Constant headers copied from the caller's mapping."""
     _raw_headers: tuple[tuple[bytes, bytes], ...] = field(repr=False)
+    """Protocol-ready header pairs emitted with the response."""
 
     def __init__(
         self: Self,
@@ -657,7 +679,7 @@ class ResponseTemplate:
             Constant content to encode once.
         status_code : int, optional
             Valid HTTP response status.
-        headers : Mapping[str, str] | None, optional
+        headers : collections.abc.Mapping[str, str] | None, optional
             Constant headers copied from the caller's mapping.
         media_type : str | None, optional
             Media type metadata copied to each response.
@@ -692,7 +714,7 @@ class ResponseTemplate:
 
         Returns
         -------
-        Response
+        orionis.http.Response
             Mutable response sharing only immutable body and encoded headers.
         """
         response = object.__new__(Response)
@@ -716,10 +738,14 @@ class ResponseTemplate:
         return response
 
 class HTMLResponse(Response):
+    """Render an HTML response with the corresponding content type."""
+
     __slots__ = ()
+    """Declare that this class introduces no additional instance slots."""
 
     # Content type advertised by this response.
     _CONTENT_TYPE: ClassVar[str] = "text/html; charset=utf-8"
+    """Content type advertised by this response."""
 
     def __init__(
         self: Self,
@@ -735,11 +761,11 @@ class HTMLResponse(Response):
         ----------
         content : str | bytes, optional
             HTML content to include in the response.
-        status_code : HTTPStatus | int, optional
+        status_code : orionis.http.enums.HTTPStatus | int, optional
             HTTP status code for the response.
-        headers : Mapping[str, str] | None, optional
+        headers : collections.abc.Mapping[str, str] | None, optional
             Optional response headers.
-        background : BackgroundTask | None, optional
+        background : orionis.background.BackgroundTask | None, optional
             Optional background task to run after response.
 
         Returns
@@ -761,10 +787,14 @@ class HTMLResponse(Response):
             self.setHeader("content-type", self._CONTENT_TYPE)
 
 class PlainTextResponse(Response):
+    """Return a plain-text HTTP response."""
+
     __slots__ = ()
+    """Declare that this class introduces no additional instance slots."""
 
     # Content type advertised by this response.
     _CONTENT_TYPE: ClassVar[str] = "text/plain; charset=utf-8"
+    """Content type advertised by this response."""
 
     def __init__(
         self: Self,
@@ -780,11 +810,11 @@ class PlainTextResponse(Response):
         ----------
         content : str | bytes, optional
             The plain text content for the response.
-        status_code : HTTPStatus | int, optional
+        status_code : orionis.http.enums.HTTPStatus | int, optional
             The HTTP status code for the response.
-        headers : Mapping[str, str] | None, optional
+        headers : collections.abc.Mapping[str, str] | None, optional
             Optional response headers.
-        background : BackgroundTask | None, optional
+        background : orionis.background.BackgroundTask | None, optional
             Optional background task to run after response.
 
         Returns
@@ -806,15 +836,19 @@ class PlainTextResponse(Response):
             self.setHeader("content-type", self._CONTENT_TYPE)
 
 class JSONResponse(Response):
+    """Encode a JSON response while preserving response metadata."""
+
     __slots__ = (
         "_json_default",
         "_json_ensure_ascii",
         "_json_indent",
         "_json_separators",
     )
+    """Declare the instance attribute slots reserved by this class."""
 
     # Content type advertised by this response.
     _CONTENT_TYPE: ClassVar[str] = "application/json; charset=utf-8"
+    """Content type advertised by this response."""
 
     def __init__(
         self: Self,
@@ -833,13 +867,13 @@ class JSONResponse(Response):
 
         Parameters
         ----------
-        content : Any
+        content : typing.Any
             Content to serialize as JSON.
-        status_code : HTTPStatus | int, optional
+        status_code : orionis.http.enums.HTTPStatus | int, optional
             HTTP status code for the response.
-        headers : Mapping[str, str] | None, optional
+        headers : collections.abc.Mapping[str, str] | None, optional
             Response headers to include.
-        background : BackgroundTask | None, optional
+        background : orionis.background.BackgroundTask | None, optional
             Background task to run after response.
         indent : int | None, optional
             Indentation level for pretty-printing JSON.
@@ -847,7 +881,7 @@ class JSONResponse(Response):
             Whether to escape non-ASCII characters.
         separators : tuple[str, str] | None, optional
             Item and key separators for JSON output.
-        default : Any | None, optional
+        default : typing.Any | None, optional
             Custom encoder for unsupported types.
 
         Returns
@@ -857,12 +891,16 @@ class JSONResponse(Response):
         """
         # Store options before super().__init__ so render() can access them
         self._json_indent = indent
+        """Indentation level for pretty-printing JSON."""
         self._json_ensure_ascii = ensure_ascii
+        """Whether to escape non-ASCII characters."""
         self._json_separators = separators
+        """Item and key separators for JSON output."""
         # Select the custom encoder or the default type handler.
         self._json_default = (
             default if default is not None else JSONResponse._defaultEncoder
         )
+        """Select the custom encoder or the default type handler."""
 
         # Initialize the parent Response with JSON media type
         super().__init__(
@@ -885,7 +923,7 @@ class JSONResponse(Response):
 
         Parameters
         ----------
-        content : Any
+        content : typing.Any
             The content to serialize as JSON.
 
         Returns
@@ -929,12 +967,12 @@ class JSONResponse(Response):
 
         Parameters
         ----------
-        obj : Any
+        obj : typing.Any
             The object to encode.
 
         Returns
         -------
-        Any
+        typing.Any
             The encoded object suitable for JSON serialization.
 
         Raises
@@ -962,10 +1000,14 @@ class JSONResponse(Response):
         raise TypeError(error_msg)
 
 class RedirectResponse(Response):
+    """Return an HTTP redirect to the configured location."""
+
     __slots__ = ()
+    """Declare that this class introduces no additional instance slots."""
 
     # Content type advertised by this response.
     _CONTENT_TYPE: ClassVar[str] = "text/plain; charset=utf-8"
+    """Content type advertised by this response."""
 
     def __init__(
         self: Self,
@@ -981,11 +1023,11 @@ class RedirectResponse(Response):
         ----------
         url : str
             Target URL for redirection.
-        status_code : HTTPStatus | int, optional
+        status_code : orionis.http.enums.HTTPStatus | int, optional
             Redirect status code (301, 302, 303, 307, 308).
-        headers : Mapping[str, str] | None, optional
+        headers : collections.abc.Mapping[str, str] | None, optional
             Optional additional headers.
-        background : BackgroundTask | None, optional
+        background : orionis.background.BackgroundTask | None, optional
             Optional background task.
 
         Returns
@@ -1020,7 +1062,10 @@ class RedirectResponse(Response):
                 self.setHeader("content-type", self._CONTENT_TYPE)
 
 class StreamingResponse(Response):
+    """Stream response chunks without buffering the complete body."""
+
     __slots__ = ()
+    """Declare that this class introduces no additional instance slots."""
 
     def __init__(  # NOSONAR
         self: Self,
@@ -1035,15 +1080,15 @@ class StreamingResponse(Response):
 
         Parameters
         ----------
-        content : AsyncIterable[bytes] | Iterable[bytes]
+        content : collections.abc.AsyncIterable[bytes] | collections.abc.Iterable[bytes]
             Streaming content source.
-        status_code : HTTPStatus | int, optional
+        status_code : orionis.http.enums.HTTPStatus | int, optional
             HTTP status code for the response.
-        headers : Mapping[str, str] | None, optional
+        headers : collections.abc.Mapping[str, str] | None, optional
             Optional response headers.
         media_type : str | None, optional
             Optional media type for the response.
-        background : BackgroundTask | None, optional
+        background : orionis.background.BackgroundTask | None, optional
             Optional background task to run after response.
 
         Returns
@@ -1071,6 +1116,7 @@ class StreamingResponse(Response):
         )
 
         self._body = None
+        """HTTP response body or encoded payload returned to the client."""
 
         if media_type:
             response_type = type(self)
@@ -1103,12 +1149,12 @@ class StreamingResponse(Response):
 
         Parameters
         ----------
-        iterable : Iterable[bytes]
+        iterable : collections.abc.Iterable[bytes]
             The synchronous iterable yielding byte chunks.
 
         Returns
         -------
-        AsyncIterable[bytes]
+        collections.abc.AsyncIterable[bytes]
             An asynchronous iterable yielding byte chunks.
 
         Raises
@@ -1130,6 +1176,7 @@ class EventStreamResponse(StreamingResponse):
     """Stream typed server-sent events through the existing response transport."""
 
     __slots__ = ()
+    """Declare that this class introduces no additional instance slots."""
 
     def __init__(
         self: Self,
@@ -1143,13 +1190,13 @@ class EventStreamResponse(StreamingResponse):
 
         Parameters
         ----------
-        content : AsyncIterable[ServerSentEvent | str] | Iterable[ServerSentEvent | str]
+        content
             Events or strings, each encoded only when the transport requests it.
-        status_code : HTTPStatus | int, optional
+        status_code : orionis.http.enums.HTTPStatus | int, optional
             HTTP status code for the response.
-        headers : Mapping[str, str] | None, optional
+        headers : collections.abc.Mapping[str, str] | None, optional
             Response headers; Content-Length is discarded for event streams.
-        background : BackgroundTask | None, optional
+        background : orionis.background.BackgroundTask | None, optional
             Task to run after successful delivery and producer cleanup.
 
         Returns
@@ -1186,7 +1233,7 @@ class EventStreamResponse(StreamingResponse):
 
         Returns
         -------
-        _EventStreamIterator
+        orionis.http.sse._EventStreamIterator
             Lazy encoder whose ``aclose()`` method finalizes the event source.
         """
         return cast("_EventStreamIterator", self._stream)
@@ -1220,7 +1267,10 @@ class EventStreamResponse(StreamingResponse):
         return headers
 
 class FileResponse(StreamingResponse):
+    """Serve a filesystem resource through an HTTP response."""
+
     __slots__ = ("_chunk_size", "_file_size", "_path")
+    """Declare the instance attribute slots reserved by this class."""
 
     def __init__(
         self: Self,
@@ -1237,11 +1287,11 @@ class FileResponse(StreamingResponse):
 
         Parameters
         ----------
-        path : str | Path
+        path : str | pathlib.Path
             Path to the file to serve.
         status_code : int, default=200
             HTTP status code for the response.
-        headers : Mapping[str, str] | None, optional
+        headers : collections.abc.Mapping[str, str] | None, optional
             Optional response headers.
         media_type : str | None, optional
             Optional media type for the response.
@@ -1249,7 +1299,7 @@ class FileResponse(StreamingResponse):
             Optional filename for Content-Disposition header.
         chunk_size : int, default=65536
             Size of file chunks to read and send.
-        background : BackgroundTask | None, optional
+        background : orionis.background.BackgroundTask | None, optional
             Optional background task to run after response.
 
         Returns
@@ -1258,6 +1308,7 @@ class FileResponse(StreamingResponse):
             This constructor does not return a value.
         """
         self._path = Path(path)
+        """Path to the file to serve."""
 
         file_stat = self._path.stat()
         if not S_ISREG(file_stat.st_mode):
@@ -1271,6 +1322,7 @@ class FileResponse(StreamingResponse):
             error_msg = "chunk_size must be greater than zero"
             raise ValueError(error_msg)
         self._chunk_size = chunk_size
+        """Size of file chunks to read and send."""
 
         if media_type is None:
             guessed, _ = mimetypes.guess_file_type(self._path)
@@ -1288,6 +1340,7 @@ class FileResponse(StreamingResponse):
 
         # Advertise the file size recorded during validation.
         self._file_size = file_stat.st_size
+        """Advertise the file size recorded during validation."""
         if type(self) is FileResponse:
             self._headers["content-length"] = str(self._file_size)
             if filename:
@@ -1306,7 +1359,7 @@ class FileResponse(StreamingResponse):
 
         Returns
         -------
-        Path
+        pathlib.Path
             The path to the file being served.
         """
         return self._path
@@ -1328,7 +1381,7 @@ class FileResponse(StreamingResponse):
 
         Returns
         -------
-        AsyncIterable[bytes]
+        collections.abc.AsyncIterable[bytes]
             An asynchronous iterable yielding file chunks as bytes.
         """
         # Read file chunks through the event loop executor.

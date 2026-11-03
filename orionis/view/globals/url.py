@@ -1,3 +1,9 @@
+"""Provide view globals operations.
+
+Includes ``_request_base_url``, ``_absolute_url``, ``_to_secure_url``,
+``_global_url``.
+"""
+
 from __future__ import annotations
 from typing import TYPE_CHECKING, Any
 from urllib.parse import urlencode
@@ -10,11 +16,15 @@ if TYPE_CHECKING:
 
 # Prefixes identifying an already absolute URL.
 _ABSOLUTE_PREFIXES: tuple[str, ...] = ("http://", "https://", "//")  # NOSONAR
+"""Prefixes identifying an already absolute URL."""
 
 # Scheme prefixes rewritten by the ``secure_*`` template globals.
 _INSECURE_PREFIX: str = "http://"  # NOSONAR
+"""Scheme prefixes rewritten by the ``secure_*`` template globals."""
 _SECURE_PREFIX: str = "https://"
+"""Secure prefix identifier: ``https://``."""
 _SCHEMELESS_PREFIX: str = "//"
+"""Schemeless prefix identifier: ``//``."""
 
 async def _request_base_url(app: IApplication) -> str:
     """
@@ -22,7 +32,7 @@ async def _request_base_url(app: IApplication) -> str:
 
     Parameters
     ----------
-    app : IApplication
+    app : orionis.IApplication
         Application container used for service resolution.
 
     Returns
@@ -47,11 +57,11 @@ async def _absolute_url(
 
     Parameters
     ----------
-    app : IApplication
+    app : orionis.IApplication
         Application container used for service resolution.
     path : str
         Absolute URL or application-relative path.
-    query : dict[str, Any]
+    query : dict[str, typing.Any]
         Query string values appended to the resulting URL.
 
     Returns
@@ -100,12 +110,12 @@ def _global_url(app: IApplication) -> Any:
 
     Parameters
     ----------
-    app : IApplication
+    app : orionis.IApplication
         Application container used for service resolution.
 
     Returns
     -------
-    Any
+    typing.Any
         Async callable that builds a URL from a path.
     """
     async def url(path: str = "/", **query: Any) -> str:
@@ -117,7 +127,7 @@ def _global_url(app: IApplication) -> Any:
         path : str, optional
             Application-relative path, or an already absolute URL, which
             is returned untouched apart from the query string.
-        **query : Any
+        **query : typing.Any
             Values encoded as the query string of the URL.
 
         Returns
@@ -136,12 +146,12 @@ def _global_secure_url(app: IApplication) -> Any:
 
     Parameters
     ----------
-    app : IApplication
+    app : orionis.IApplication
         Application container used for service resolution.
 
     Returns
     -------
-    Any
+    typing.Any
         Async callable that builds an HTTPS URL from a path.
     """
     async def secure_url(path: str = "/", **query: Any) -> str:
@@ -153,7 +163,7 @@ def _global_secure_url(app: IApplication) -> Any:
         path : str, optional
             Application-relative path, or an already absolute URL, whose
             scheme is forced to HTTPS.
-        **query : Any
+        **query : typing.Any
             Values encoded as the query string of the URL.
 
         Returns

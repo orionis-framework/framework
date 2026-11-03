@@ -1,3 +1,9 @@
+"""Provide database operations.
+
+Includes ``resolve_driver``, ``missing_dependency_error``, ``build_engine_url``,
+``engine_options``.
+"""
+
 from __future__ import annotations
 from asyncio import create_task, ensure_future
 import re
@@ -28,6 +34,7 @@ _ASYNC_DIALECTS: dict[str, str] = {
     "sqlserver": "mssql+aioodbc",
     "redshift": "redshift+redshift_connector",
 }
+"""Map of Orionis driver names to SQLAlchemy async dialect names."""
 
 # Map of Orionis driver names to (driver package, install extra) hints.
 _ASYNC_DRIVER_PACKAGES: dict[str, tuple[str, str]] = {
@@ -38,6 +45,7 @@ _ASYNC_DRIVER_PACKAGES: dict[str, tuple[str, str]] = {
     "sqlserver": ("aioodbc", "orionis[sqlserver]"),
     "redshift": ("redshift_connector", "orionis[redshift]"),
 }
+"""Map of Orionis driver names to (driver package, install extra) hints."""
 
 # Map of Orionis driver names to SQLAlchemy dialects backed by a blocking
 # (synchronous) DBAPI driver. Used to build engines for consumers that
@@ -50,6 +58,11 @@ _SYNC_DIALECTS: dict[str, str] = {
     "sqlserver": "mssql+pyodbc",
     "redshift": "redshift+redshift_connector",
 }
+"""
+Map of Orionis driver names to SQLAlchemy dialects backed by a blocking
+(synchronous) DBAPI driver. Used to build engines for consumers that cannot use the
+async engine, such as APScheduler's scheduleTaskStore.
+"""
 
 # Map of Orionis driver names to (driver package, install extra) hints for the
 # synchronous DBAPI drivers above. SQLite needs nothing extra (stdlib
@@ -63,35 +76,48 @@ _SYNC_DRIVER_PACKAGES: dict[str, tuple[str, str]] = {
     "sqlserver": ("pyodbc", "orionis[sqlserver]"),
     "redshift": ("redshift_connector", "orionis[redshift]"),
 }
+"""
+Map of Orionis driver names to (driver package, install extra) hints for the
+synchronous DBAPI drivers above. SQLite needs nothing extra (stdlib sqlite3); Oracle
+reuses the async package, which also works synchronously. The other extras install
+both the async and sync driver together.
+"""
 
 # Default ODBC driver used for SQL Server connections.
 _DEFAULT_ODBC_DRIVER: str = "ODBC Driver 18 for SQL Server"
+"""Default ODBC driver used for SQL Server connections."""
 
 # Charset and collation identifiers accepted in session commands.
 _IDENTIFIER_PATTERN: re.Pattern[str] = re.compile(r"^\w+$", re.ASCII)
+"""Charset and collation identifiers accepted in session commands."""
 
 # MySQL strict sql_mode flags.
 _MYSQL_STRICT_MODE: str = (
     "ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,"
     "NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION"
 )
+"""MySQL strict sql_mode flags."""
 
 # MySQL relaxed sql_mode applied when strict mode is disabled.
 _MYSQL_RELAXED_MODE: str = "NO_ENGINE_SUBSTITUTION"
+"""MySQL relaxed sql_mode applied when strict mode is disabled."""
 
 # SQLite database markers that identify an in-memory database.
 _SQLITE_MEMORY_MARKERS: frozenset[str] = frozenset({":memory:", ""})
+"""SQLite database markers that identify an in-memory database."""
 
 _REDSHIFT_CONNECT_OPTIONS: tuple[str, ...] = (
     "ssl", "sslmode", "timeout", "iam", "region", "cluster_identifier",
     "db_user", "profile", "is_serverless", "serverless_work_group",
     "serverless_acct_id",
 )
+"""Redshift connect options definitions used by ``dialect``."""
 
 class _MySQLParameterEscaper:
     """Escape binary parameters independently of aiomysql's removed converter."""
 
     __slots__ = ("_original",)
+    """Declare the instance attribute slots reserved by this class."""
 
     def __init__(self, original: Callable[[object], object]) -> None:
         """
@@ -99,7 +125,7 @@ class _MySQLParameterEscaper:
 
         Parameters
         ----------
-        original : Callable
+        original : collections.abc.Callable
             Original escape method owned by this connection.
 
         Returns
@@ -108,6 +134,7 @@ class _MySQLParameterEscaper:
             Initialize a connection-local converter without global mutations.
         """
         self._original = original
+        """Original escape method owned by this connection."""
 
     def __call__(self, value: object) -> object:
         """
@@ -169,7 +196,7 @@ def resolve_driver(config: dict[str, Any]) -> str:
 
     Raises
     ------
-    UnsupportedDriverException
+    orionis.database.UnsupportedDriverException
         If the driver is missing or has no registered dialect.
     """
     driver = str(config.get("driver", "")).strip().lower()
@@ -195,7 +222,7 @@ def missing_dependency_error(
     ----------
     driver : str
         Orionis driver name whose package is missing.
-    cause : ImportError | NoSuchModuleError
+    cause : ImportError | ``sqlalchemy.exc.NoSuchModuleError``
         Original missing driver or dialect error raised by the engine.
     sync : bool, optional
         Whether the missing package is the blocking (synchronous) driver
@@ -203,7 +230,7 @@ def missing_dependency_error(
 
     Returns
     -------
-    MissingDatabaseDependencyException
+    orionis.database.MissingDatabaseDependencyException
         Exception with an actionable uv installation hint.
     """
     packages: dict[str, tuple[str, str]] = (
@@ -234,12 +261,12 @@ def build_engine_url(
 
     Returns
     -------
-    URL
+    ``sqlalchemy.URL``
         Engine URL for the configured driver.
 
     Raises
     ------
-    UnsupportedDriverException
+    orionis.database.UnsupportedDriverException
         If the driver has no registered dialect.
     """
     driver = resolve_driver(config)
@@ -380,7 +407,7 @@ def configure_engine(
 
     Parameters
     ----------
-    engine : AsyncEngine | ThreadedEngine
+    engine : ``AsyncEngine`` | ThreadedEngine
         Engine to configure.
     config : dict
         Connection configuration.
@@ -446,7 +473,7 @@ def _begin_sqlite_transaction(connection: SqlConnection) -> None:
 
     Parameters
     ----------
-    connection : SqlConnection
+    connection : ``sqlalchemy.engine.Connection``
         Connection whose execution options select the transaction mode.
 
     Returns
@@ -481,6 +508,7 @@ class _AsyncNativeCreator:
     """Collect a late native client before propagating caller cancellation."""
 
     __slots__ = ("_creator",)
+    """Declare the instance attribute slots reserved by this class."""
 
     def __init__(
         self, creator: Callable[..., Awaitable[_AsyncDBAPIClient]],
@@ -490,7 +518,7 @@ class _AsyncNativeCreator:
 
         Parameters
         ----------
-        creator : Callable
+        creator : collections.abc.Callable
             Factory that asynchronously creates a native database client.
 
         Returns
@@ -499,6 +527,7 @@ class _AsyncNativeCreator:
             Retain the factory for later connection attempts.
         """
         self._creator = creator
+        """Factory that asynchronously creates a native database client."""
 
     async def __call__(
         self, *args: object, **kwargs: object,
@@ -515,7 +544,7 @@ class _AsyncNativeCreator:
 
         Returns
         -------
-        _AsyncDBAPIClient
+        orionis.database.dialect._AsyncDBAPIClient
             Created native database client.
         """
         async def close_late(client: _AsyncDBAPIClient) -> None:
@@ -524,7 +553,7 @@ class _AsyncNativeCreator:
 
             Parameters
             ----------
-            client : _AsyncDBAPIClient
+            client : orionis.database.dialect._AsyncDBAPIClient
                 Late result from the native creator.
 
             Returns
@@ -546,7 +575,7 @@ def _configure_async_native_creation(engine: AsyncEngine, driver: str) -> None:
 
     Parameters
     ----------
-    engine : AsyncEngine
+    engine : ``sqlalchemy.ext.asyncio.AsyncEngine``
         Engine whose native creator will be wrapped.
     driver : str
         Orionis driver name used to select the native creator.
@@ -568,13 +597,13 @@ def _configure_async_native_creation(engine: AsyncEngine, driver: str) -> None:
 
         Parameters
         ----------
-        dialect : Dialect
+        dialect : ``sqlalchemy.engine.interfaces.Dialect``
             SQLAlchemy dialect creating the native connection.
         _record : object
             Pool record supplied by SQLAlchemy; unused.
-        _args : list of Any
+        _args : list of typing.Any
             Positional arguments supplied by the dialect; unused.
-        parameters : dict of str to Any
+        parameters : dict of str ``to`` typing.Any
             Connection parameters containing the native creator.
 
         Returns
@@ -666,7 +695,7 @@ def _sqlite_url(config: dict[str, Any], dialect: str) -> URL:
 
     Returns
     -------
-    URL
+    ``sqlalchemy.URL``
         SQLite engine URL.
     """
     database = str(config.get("database", "") or "")
@@ -711,7 +740,7 @@ def _server_url(driver: str, config: dict[str, Any], dialect: str) -> URL:
 
     Returns
     -------
-    URL
+    ``sqlalchemy.URL``
         Engine URL with credentials, host, port, and database.
     """
     return URL.create(
@@ -741,7 +770,7 @@ def _server_query(driver: str, config: dict[str, Any]) -> dict[str, str]:
 
     Returns
     -------
-    dict of str to str
+    dict of str ``to`` str
         Query parameters for the engine URL.
     """
     query: dict[str, str] = {}
@@ -778,7 +807,7 @@ def _oracle_url(config: dict[str, Any], dialect: str) -> URL:
 
     Returns
     -------
-    URL
+    ``sqlalchemy.URL``
         Oracle engine URL using service name or SID addressing.
     """
     # When a DSN or TNS alias is present, addressing happens via
@@ -814,7 +843,7 @@ def _oracle_query(config: dict[str, Any], sid: str | None) -> dict[str, str]:
 
     Returns
     -------
-    dict of str to str
+    dict of str ``to`` str
         Query parameters for the engine URL.
     """
     service_name = _config_text(config, "service_name")
@@ -880,7 +909,7 @@ def _normalize_switch(value: Any) -> str:  # noqa: ANN401
 
     Parameters
     ----------
-    value : Any
+    value : typing.Any
         Boolean, string, or enum member describing the switch state.
 
     Returns
@@ -899,7 +928,7 @@ def _yes_no(value: Any) -> str:  # noqa: ANN401
 
     Parameters
     ----------
-    value : Any
+    value : typing.Any
         Boolean, string, or enum member describing the switch state.
 
     Returns
@@ -918,7 +947,7 @@ def _enum_value(value: Any) -> str:  # noqa: ANN401
 
     Parameters
     ----------
-    value : Any
+    value : typing.Any
         Enum member, string, or ``None``.
 
     Returns

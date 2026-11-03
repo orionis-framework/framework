@@ -1,3 +1,5 @@
+"""Base class for resource policies."""
+
 from orionis.auth.contracts.policy import IPolicy
 
 class Policy(IPolicy):
@@ -18,6 +20,7 @@ class Policy(IPolicy):
     """
 
     __slots__ = ()
+    """Declare that this class introduces no additional instance slots."""
 
     async def before(self, identity: object, ability: str) -> bool | None:  # noqa: ARG002
         """

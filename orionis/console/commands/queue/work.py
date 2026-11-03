@@ -1,3 +1,5 @@
+"""Run an asynchronous worker over prioritized logical queues."""
+
 from typing import ClassVar
 from orionis.console.args.argument import Argument
 from orionis.console.base.command import BaseCommand
@@ -10,10 +12,17 @@ class QueueWorkCommand(BaseCommand):
     """Run an asynchronous worker over prioritized logical queues."""
 
     __slots__ = ()
+    """Declare that this class introduces no additional instance slots."""
 
     timestamps: bool = False
+    """Timestamps flag used by ``QueueWorkCommand``."""
     signature: str = "queue:work"
+    """Signature identifier: ``queue:work``."""
     description: str = "Consume queued jobs with retries and graceful shutdown."
+    """
+    Description identifier: ``Consume queued jobs with retries and graceful
+    shutdown.``.
+    """
     arguments: ClassVar[list[Argument]] = [
         Argument(name_or_flags="connection", type_=str, nargs="?", default=None),
         Argument(name_or_flags="--queue", type_=str, default=None),
@@ -26,6 +35,7 @@ class QueueWorkCommand(BaseCommand):
             dest="stop_when_empty",
         ),
     ]
+    """Command-line argument declarations accepted by this command."""
 
     async def handle(self, manager: IQueueManager) -> int:
         """
@@ -33,7 +43,7 @@ class QueueWorkCommand(BaseCommand):
 
         Parameters
         ----------
-        manager : IQueueManager
+        manager : orionis.queues.contracts.manager.IQueueManager
             Queue manager resolved from the current application container.
 
         Returns

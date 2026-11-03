@@ -1,8 +1,11 @@
+"""Ensure a value represents a whole number."""
+
 import re
 from orionis.schemas.rule import Rule
 
 # Optionally signed sequence of digits, matching a whole number in text form.
 _INTEGER_PATTERN = re.compile(r"^[+-]?\d+$")
+"""Optionally signed sequence of digits, matching a whole number in text form."""
 
 class Integer(Rule):
     """
@@ -15,9 +18,12 @@ class Integer(Rule):
     # ruff: noqa: ARG002
 
     __slots__ = ()
+    """Declare that this class introduces no additional instance slots."""
 
     __message__ = "Value must be an integer."
+    """Error text for message: ``Value must be an integer.``."""
     __code__ = "integer"
+    """Code identifier: ``integer``."""
 
     async def enforce(
         self,

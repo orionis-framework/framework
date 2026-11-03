@@ -1,3 +1,5 @@
+"""Define the contract for dependency-reflection implementations."""
+
 from __future__ import annotations
 from abc import ABC, abstractmethod
 from typing import TYPE_CHECKING
@@ -16,6 +18,7 @@ class IReflectDependencies(ABC):
     """
 
     __slots__ = ()
+    """Declare that this class introduces no additional instance slots."""
 
     @abstractmethod
     def constructorSignature(self) -> Signature:
@@ -24,12 +27,12 @@ class IReflectDependencies(ABC):
 
         Returns
         -------
-        Signature
+        orionis.introspection.dependencies.entities.signature.Signature
             Contains resolved and unresolved parameter dependencies.
 
         Raises
         ------
-        ReflectionValueError
+        ValueError
             If the constructor signature cannot be inspected.
         """
 
@@ -45,13 +48,15 @@ class IReflectDependencies(ABC):
 
         Returns
         -------
-        Signature
+        orionis.introspection.dependencies.entities.signature.Signature
             Categorized resolved and unresolved parameter dependencies.
 
         Raises
         ------
-        ReflectionValueError
-            If the method does not exist or its signature cannot be inspected.
+        AttributeError
+            If the target has no method with the requested name.
+        ValueError
+            If the method's signature cannot be inspected.
         """
 
     @abstractmethod
@@ -61,11 +66,13 @@ class IReflectDependencies(ABC):
 
         Returns
         -------
-        Signature
+        orionis.introspection.dependencies.entities.signature.Signature
             Contains resolved and unresolved parameter dependencies.
 
         Raises
         ------
-        ReflectionValueError
-            If the target is not callable or its signature cannot be inspected.
+        TypeError
+            If the target is not callable.
+        ValueError
+            If the target's signature cannot be inspected.
         """

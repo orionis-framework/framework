@@ -1,10 +1,18 @@
 """Version and metadata names from the official MCP schema."""
 
 MCP_PROTOCOL_VERSION = "2026-07-28"
+"""Mcp protocol version identifier: ``2026-07-28``."""
 SUPPORTED_VERSIONS = (MCP_PROTOCOL_VERSION,)
+"""Supported versions definitions used by ``constants``."""
 PROTOCOL_VERSION = "io.modelcontextprotocol/protocolVersion"
+"""Protocol version identifier: ``io.modelcontextprotocol/protocolVersion``."""
 CLIENT_CAPABILITIES = "io.modelcontextprotocol/clientCapabilities"
+"""Client capabilities identifier: ``io.modelcontextprotocol/clientCapabilities``."""
 CLIENT_INFO = "io.modelcontextprotocol/clientInfo"
+"""Client info identifier: ``io.modelcontextprotocol/clientInfo``."""
 SERVER_INFO = "io.modelcontextprotocol/serverInfo"
+"""Server info identifier: ``io.modelcontextprotocol/serverInfo``."""
 SUBSCRIPTION_ID = "io.modelcontextprotocol/subscriptionId"
+"""Subscription id identifier: ``io.modelcontextprotocol/subscriptionId``."""
 LOG_LEVEL = "io.modelcontextprotocol/logLevel"
+"""Log level identifier: ``io.modelcontextprotocol/logLevel``."""

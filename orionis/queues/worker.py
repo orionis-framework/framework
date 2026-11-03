@@ -1,3 +1,5 @@
+"""Provide queues operations through ``WorkerOptions``, ``Worker``."""
+
 import asyncio
 import logging
 from collections.abc import Awaitable, Callable
@@ -19,17 +21,24 @@ if TYPE_CHECKING:
     from orionis.queues.entities.reserved_job import ReservedJob
 
 _LOGGER = logging.getLogger(__name__)
+"""Logger used by ``worker``."""
 type FailedResolver = Callable[[], Awaitable[IFailedJobRepository]]
+"""Type alias for ``Callable[[], Awaitable[IFailedJobRepository]]``."""
 
 @dataclass(frozen=True, slots=True)
 class WorkerOptions:
     """Retain stable validated settings for an independent worker runtime."""
 
     connection: str
+    """Configured connection used to store or dispatch the operation."""
     queues: tuple[str, ...] = ("default",)
+    """Queue names selected for worker polling."""
     concurrency: int = 1
+    """Concurrency value used by ``WorkerOptions``."""
     retry_after: float = 90.0
+    """Retry after value used by ``WorkerOptions``."""
     sleep: float = 1.0
+    """Sleep value used by ``WorkerOptions``."""
 
     def __post_init__(self) -> None:
         """
@@ -42,7 +51,7 @@ class WorkerOptions:
 
         Raises
         ------
-        QueueConfigurationError
+        orionis.queues.exceptions.QueueConfigurationError
             If concurrency, queue selection, routing names or durations are invalid.
         """
         if (isinstance(self.concurrency, bool)
@@ -77,6 +86,7 @@ class Worker(IWorker):
         "_started",
         "_stop",
     )
+    """Declare the instance attribute slots reserved by this class."""
 
     def __init__(
         self, app: IApplication, driver: IQueueDriver,
@@ -88,13 +98,13 @@ class Worker(IWorker):
 
         Parameters
         ----------
-        app : IApplication
+        app : orionis.IApplication
             Application container used to create an isolated scope per job.
-        driver : IQueueDriver
+        driver : orionis.queues.contracts.driver.IQueueDriver
             Backend used to reserve, release and acknowledge jobs.
-        serializer : IJobSerializer
+        serializer : orionis.queues.contracts.serializer.IJobSerializer
             Serializer used to restore envelopes and registered jobs.
-        options : WorkerOptions
+        options : orionis.queues.worker.WorkerOptions
             Validated connection, queues, concurrency, lease and poll settings.
         failed : IFailedJobRepository | FailedResolver | None, optional
             Failure repository or async resolver invoked on terminal failure.
@@ -106,19 +116,36 @@ class Worker(IWorker):
             Store dependencies and initialize counters and stop state.
         """
         self._app = app
+        """Application container used to create an isolated scope per job."""
         self._driver = driver
+        """Backend used to reserve, release and acknowledge jobs."""
         self._serializer = serializer
+        """Serializer used to restore envelopes and registered jobs."""
         self._connection = options.connection
+        """Configured connection used to store or dispatch the operation."""
         self._queues = options.queues
+        """Queue names selected for worker polling."""
         self._concurrency = options.concurrency
+        """Concurrency obtained from ``options.concurrency``."""
         self._retry_after = options.retry_after
+        """Retry after obtained from ``options.retry_after``."""
         self._sleep = options.sleep
+        """Sleep obtained from ``options.sleep``."""
         self._failed = None if callable(failed) else failed
+        """
+        Failure repository or async resolver invoked on terminal failure. If
+        ``None``, terminal failures cannot be recorded.
+        """
         self._failed_resolver = failed if callable(failed) else None
+        """Resolver supplying the configured failed-job storage backend."""
         self._stop = asyncio.Event()
+        """Stop produced by ``asyncio.Event``."""
         self._running = False
+        """Running flag used by ``Worker``."""
         self._started = 0
+        """Started value used by ``Worker``."""
         self._processed = 0
+        """Processed value used by ``Worker``."""
 
     def stop(self) -> None:
         """
@@ -154,7 +181,7 @@ class Worker(IWorker):
 
         Raises
         ------
-        QueueConfigurationError
+        orionis.queues.exceptions.QueueConfigurationError
             If already running or a supplied job limit is not a positive integer.
         asyncio.CancelledError
             If cancelled, after in-flight consumers finish.
@@ -237,9 +264,9 @@ class Worker(IWorker):
 
         Parameters
         ----------
-        reserved : ReservedJob
+        reserved : orionis.queues.entities.reserved_job.ReservedJob
             Backend reservation containing routing metadata and attempt count.
-        envelope : JobEnvelope
+        envelope : orionis.queues.JobEnvelope
             Decoded dispatch metadata and retry policy to match and enforce.
 
         Returns
@@ -249,11 +276,11 @@ class Worker(IWorker):
 
         Raises
         ------
-        QueuePayloadError
+        orionis.queues.exceptions.QueuePayloadError
             If routing metadata differs or the attempt count is invalid.
-        QueueConfigurationError
+        orionis.queues.exceptions.QueueConfigurationError
             If the timeout is missing or not shorter than worker ``retry_after``.
-        QueueRetryError
+        orionis.queues.exceptions.QueueRetryError
             If attempts exceed ``max_tries`` or the retry deadline has expired.
         """
         if (reserved.id != envelope.id or reserved.queue != envelope.queue
@@ -285,7 +312,7 @@ class Worker(IWorker):
 
         Parameters
         ----------
-        reserved : ReservedJob
+        reserved : orionis.queues.entities.reserved_job.ReservedJob
             Backend reservation containing the payload, attempt count and lease.
         raise_errors : bool, optional
             Propagate execution errors and bypass automatic retries when true.
@@ -348,7 +375,7 @@ class Worker(IWorker):
 
         Parameters
         ----------
-        reserved : ReservedJob
+        reserved : orionis.queues.entities.reserved_job.ReservedJob
             Reservation whose execution was interrupted before completion.
 
         Returns
@@ -368,7 +395,7 @@ class Worker(IWorker):
 
         Parameters
         ----------
-        context : JobContext
+        context : orionis.queues.JobContext
             Lifecycle state containing the reservation's explicit transitions.
         raise_errors : bool
             Raise a recorded failure when immediate execution requires propagation.
@@ -401,9 +428,9 @@ class Worker(IWorker):
 
         Parameters
         ----------
-        reserved : ReservedJob
+        reserved : orionis.queues.entities.reserved_job.ReservedJob
             Current reservation used to release or record the failed attempt.
-        envelope : JobEnvelope | None
+        envelope : orionis.queues.JobEnvelope | None
             Decoded retry policy, or ``None`` if the envelope is unavailable.
         exception : Exception
             Original error used to determine retry eligibility and record failure.
@@ -417,7 +444,7 @@ class Worker(IWorker):
 
         Raises
         ------
-        QueueConfigurationError
+        orionis.queues.exceptions.QueueConfigurationError
             If a terminal failure has no available failed-job repository.
         Exception
             If the backend or failure repository cannot complete the transition.
@@ -445,7 +472,7 @@ class Worker(IWorker):
 
         Parameters
         ----------
-        reserved : ReservedJob
+        reserved : orionis.queues.entities.reserved_job.ReservedJob
             Reservation whose lease must still be valid before recording failure.
         exception : Exception
             Original job exception stored in the failure repository.
@@ -457,7 +484,7 @@ class Worker(IWorker):
 
         Raises
         ------
-        QueueConfigurationError
+        orionis.queues.exceptions.QueueConfigurationError
             If no failed-job repository can be resolved.
         Exception
             If repository resolution, failure recording or job deletion fails.

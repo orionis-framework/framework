@@ -1,3 +1,5 @@
+"""Inspect abstract class declarations and their members."""
+
 from __future__ import annotations
 import inspect
 import keyword
@@ -28,6 +30,7 @@ _EXCLUDED_DUNDER_ATTRS: frozenset[str] = frozenset({
     "__abstractmethods__", "__code__", "__defaults__",
     "__kwdefaults__", "__closure__",
 })
+"""Dunder attributes built into the language, excluded from user-defined detection."""
 
 class _Flags(NamedTuple):
     """
@@ -51,6 +54,7 @@ class _Flags(NamedTuple):
     is_pub: bool
 
 class ReflectionAbstract(IReflectionAbstract):
+    """Inspect abstract class declarations and their members."""
 
     __slots__ = (
         "_abstract",
@@ -60,6 +64,7 @@ class ReflectionAbstract(IReflectionAbstract):
         "_private_prefix",
         "_scanned",
     )
+    """Declare the instance attribute slots reserved by this class."""
 
     def __init__(self, abstract: type) -> None:
         """
@@ -87,14 +92,23 @@ class ReflectionAbstract(IReflectionAbstract):
 
         # Capture frequently accessed class metadata into slots at construction time
         self._abstract: type = abstract
+        """Provide the abstract base class to inspect."""
         abstract_name: str = abstract.__name__
         self._abstract_name: str = abstract_name
+        """Abstract name supplied through ``abstract_name``."""
         self._abstract_module: str = abstract.__module__
+        """Abstract module obtained from ``abstract.__module__``."""
         # Python strips the leading underscores of the class name when it
         # mangles private members, so the prefix must be built the same way.
         self._private_prefix: str = f"_{abstract_name.lstrip('_')}"
+        """
+        Python strips the leading underscores of the class name when it mangles
+        private members, so the prefix must be built the same way.
+        """
         self._cache: dict = {}
+        """Cache policy or cached state used by this component."""
         self._scanned: bool = False
+        """Scanned flag used by ``ReflectionAbstract``."""
 
     def __getitem__(self, key: str) -> object | None:
         """
@@ -265,7 +279,7 @@ class ReflectionAbstract(IReflectionAbstract):
         ----------
         attr : str
             Raw attribute name as exposed by class introspection.
-        flags : _Flags
+        flags : orionis.introspection.abstract.reflection._Flags
             Precomputed visibility flags for ``attr``.
         b : dict
             Mutable bucket mapping populated during reflection.
@@ -299,7 +313,7 @@ class ReflectionAbstract(IReflectionAbstract):
             Raw attribute name produced by class introspection.
         value : staticmethod
             Static method descriptor to classify.
-        flags : _Flags
+        flags : orionis.introspection.abstract.reflection._Flags
             Precomputed visibility and dunder flags for ``attr``.
         b : dict
             Mutable reflection bucket updated in place.
@@ -337,7 +351,7 @@ class ReflectionAbstract(IReflectionAbstract):
             Method attribute name as declared on the class.
         value : classmethod
             Bound ``classmethod`` descriptor to inspect.
-        flags : _Flags
+        flags : orionis.introspection.abstract.reflection._Flags
             Precomputed visibility and dunder flags for ``attr``.
         b : dict
             Mutable reflection bucket updated in place.
@@ -375,7 +389,7 @@ class ReflectionAbstract(IReflectionAbstract):
             Raw attribute name from the inspected class namespace.
         value : object
             Callable object bound to ``attr``.
-        flags : _Flags
+        flags : orionis.introspection.abstract.reflection._Flags
             Precomputed visibility and dunder-state flags for ``attr``.
         b : dict[str, object]
             Mutable classification bucket updated in place.
@@ -414,7 +428,7 @@ class ReflectionAbstract(IReflectionAbstract):
             Attribute name to classify.
         value : object
             Attribute value to store in the target bucket.
-        flags : _Flags
+        flags : orionis.introspection.abstract.reflection._Flags
             Precomputed visibility flags for ``attr``.
         b : dict[str, object]
             Mutable classification bucket updated in place.
@@ -570,7 +584,7 @@ class ReflectionAbstract(IReflectionAbstract):
 
         Returns
         -------
-        Type
+        typing.Type
             The abstract base class type provided during initialization.
         """
         return self._abstract
@@ -641,10 +655,6 @@ class ReflectionAbstract(IReflectionAbstract):
         """
         Retrieve the source code of the reflected abstract class.
 
-        Parameters
-        ----------
-        None
-
         Returns
         -------
         str
@@ -671,10 +681,6 @@ class ReflectionAbstract(IReflectionAbstract):
     def getFile(self) -> str:
         """
         Retrieve the absolute file path of the reflected abstract class.
-
-        Parameters
-        ----------
-        None
 
         Returns
         -------
@@ -856,10 +862,6 @@ class ReflectionAbstract(IReflectionAbstract):
         """
         Retrieve all public class-level attributes.
 
-        Parameters
-        ----------
-        None
-
         Returns
         -------
         dict
@@ -874,10 +876,6 @@ class ReflectionAbstract(IReflectionAbstract):
         """
         Retrieve all protected class-level attributes.
 
-        Parameters
-        ----------
-        None
-
         Returns
         -------
         dict
@@ -891,10 +889,6 @@ class ReflectionAbstract(IReflectionAbstract):
     def getPrivateAttributes(self) -> dict:
         """
         Retrieve all private class-level attributes.
-
-        Parameters
-        ----------
-        None
 
         Returns
         -------
@@ -994,7 +988,7 @@ class ReflectionAbstract(IReflectionAbstract):
 
         Returns
         -------
-        inspect.Signature
+        ``inspect.Signature``
             Signature object of the specified method.
 
         Raises
@@ -1078,10 +1072,6 @@ class ReflectionAbstract(IReflectionAbstract):
         """
         Return all protected instance method names.
 
-        Parameters
-        ----------
-        None
-
         Returns
         -------
         list of str
@@ -1108,10 +1098,6 @@ class ReflectionAbstract(IReflectionAbstract):
     def getProtectedAsyncMethods(self) -> list[str]:
         """
         Return all protected asynchronous method names.
-
-        Parameters
-        ----------
-        None
 
         Returns
         -------
@@ -1156,7 +1142,7 @@ class ReflectionAbstract(IReflectionAbstract):
 
         Parameters
         ----------
-        self : ReflectionAbstract
+        self : orionis.introspection.ReflectionAbstract
             The reflection instance.
 
         Returns
@@ -1214,7 +1200,7 @@ class ReflectionAbstract(IReflectionAbstract):
 
         Parameters
         ----------
-        self : ReflectionAbstract
+        self : orionis.introspection.ReflectionAbstract
             The reflection instance.
 
         Returns
@@ -1229,10 +1215,6 @@ class ReflectionAbstract(IReflectionAbstract):
         """
         Return all protected synchronous class method names.
 
-        Parameters
-        ----------
-        self : ReflectionAbstract
-
         Returns
         -------
         list of str
@@ -1245,10 +1227,6 @@ class ReflectionAbstract(IReflectionAbstract):
     def getProtectedClassAsyncMethods(self) -> list[str]:
         """
         Return all protected asynchronous class method names.
-
-        Parameters
-        ----------
-        self : ReflectionAbstract
 
         Returns
         -------
@@ -1263,10 +1241,6 @@ class ReflectionAbstract(IReflectionAbstract):
         """
         Return a list of private class methods.
 
-        Parameters
-        ----------
-        self : ReflectionAbstract
-
         Returns
         -------
         list of str
@@ -1278,10 +1252,6 @@ class ReflectionAbstract(IReflectionAbstract):
     def getPrivateClassSyncMethods(self) -> list[str]:
         """
         Return all private synchronous class method names.
-
-        Parameters
-        ----------
-        self : ReflectionAbstract
 
         Returns
         -------
@@ -1324,10 +1294,6 @@ class ReflectionAbstract(IReflectionAbstract):
         """
         Return all public synchronous static method names.
 
-        Parameters
-        ----------
-        self : ReflectionAbstract
-
         Returns
         -------
         list of str
@@ -1341,10 +1307,6 @@ class ReflectionAbstract(IReflectionAbstract):
         """
         Return all public asynchronous static method names.
 
-        Parameters
-        ----------
-        self : ReflectionAbstract
-
         Returns
         -------
         list of str
@@ -1356,10 +1318,6 @@ class ReflectionAbstract(IReflectionAbstract):
     def getProtectedStaticMethods(self) -> list[str]:
         """
         Return a list of protected static method names.
-
-        Parameters
-        ----------
-        self : ReflectionAbstract
 
         Returns
         -------
@@ -1375,10 +1333,6 @@ class ReflectionAbstract(IReflectionAbstract):
         """
         Return all protected synchronous static method names.
 
-        Parameters
-        ----------
-        self : ReflectionAbstract
-
         Returns
         -------
         list of str
@@ -1392,10 +1346,6 @@ class ReflectionAbstract(IReflectionAbstract):
         """
         Return all protected asynchronous static method names.
 
-        Parameters
-        ----------
-        self : ReflectionAbstract
-
         Returns
         -------
         list of str
@@ -1407,10 +1357,6 @@ class ReflectionAbstract(IReflectionAbstract):
     def getPrivateStaticMethods(self) -> list[str]:
         """
         Return a list of private static method names.
-
-        Parameters
-        ----------
-        self : ReflectionAbstract
 
         Returns
         -------
@@ -1424,10 +1370,6 @@ class ReflectionAbstract(IReflectionAbstract):
         """
         Return all private synchronous static method names.
 
-        Parameters
-        ----------
-        self : ReflectionAbstract
-
         Returns
         -------
         list of str
@@ -1440,10 +1382,6 @@ class ReflectionAbstract(IReflectionAbstract):
     def getPrivateStaticAsyncMethods(self) -> list[str]:
         """
         Return all private asynchronous static method names.
-
-        Parameters
-        ----------
-        self : ReflectionAbstract
 
         Returns
         -------
@@ -1484,7 +1422,7 @@ class ReflectionAbstract(IReflectionAbstract):
 
         Returns
         -------
-        List[str]
+        typing.List[str]
             List of property names with name mangling prefixes removed for clarity.
         """
         # Single-pass scan fills this aggregated list; return it directly
@@ -1494,10 +1432,6 @@ class ReflectionAbstract(IReflectionAbstract):
     def getPublicProperties(self) -> list[str]:
         """
         Return all public property names from the abstract class.
-
-        Parameters
-        ----------
-        self : ReflectionAbstract
 
         Returns
         -------
@@ -1513,10 +1447,6 @@ class ReflectionAbstract(IReflectionAbstract):
         """
         Retrieve all protected properties from the abstract class.
 
-        Parameters
-        ----------
-        self : ReflectionAbstract
-
         Returns
         -------
         list of str
@@ -1531,10 +1461,6 @@ class ReflectionAbstract(IReflectionAbstract):
     def getPrivateProperties(self) -> list[str]:
         """
         Retrieve all private properties from the abstract class.
-
-        Parameters
-        ----------
-        self : ReflectionAbstract
 
         Returns
         -------
@@ -1557,7 +1483,7 @@ class ReflectionAbstract(IReflectionAbstract):
 
         Returns
         -------
-        inspect.Signature
+        ``inspect.Signature``
             Signature object of the property's getter method.
 
         Raises
@@ -1629,7 +1555,7 @@ class ReflectionAbstract(IReflectionAbstract):
 
         Returns
         -------
-        Signature
+        orionis.introspection.dependencies.entities.signature.Signature
             Structured representation of constructor dependencies, including
             resolved (names and values) and unresolved (parameter names without
             default values or annotations).
@@ -1653,7 +1579,7 @@ class ReflectionAbstract(IReflectionAbstract):
 
         Returns
         -------
-        Signature
+        orionis.introspection.dependencies.entities.signature.Signature
             Structured representation of method dependencies, including resolved
             and unresolved dependencies.
 

@@ -1,3 +1,5 @@
+"""Adapt an ASGI scope dictionary to the transport adapter contract."""
+
 from __future__ import annotations
 from typing import TYPE_CHECKING
 from orionis.http.adapters.request.contracts.transport import TransportAdapter
@@ -8,6 +10,7 @@ if TYPE_CHECKING:
 
 # Sentinel that marks per-request lazy fields as "not yet resolved"
 _MISSING: Any = object()
+"""Sentinel that marks per-request lazy fields as "not yet resolved"."""
 
 class ASGITransportAdapter(TransportAdapter):
     """
@@ -29,6 +32,7 @@ class ASGITransportAdapter(TransportAdapter):
         "__scope",
         "__wants_json",
     )
+    """Store scope data, request state, and resolved fields."""
 
     def __init__(self, scope: dict) -> None:
         """
@@ -46,13 +50,18 @@ class ASGITransportAdapter(TransportAdapter):
         """
         # Store the request scope.
         self.__scope: dict = scope
+        """Provide the ASGI scope mapping."""
         # Keep all overrides and computed fields in one dictionary.
         self.__overrides: dict[str, Any] = {}
+        """Keep all overrides and computed fields in one dictionary."""
         # Mark fields to be resolved on their first access.
         self.__client: Any = _MISSING
+        """Mark fields to be resolved on their first access."""
         self.__wants_json: Any = _MISSING
+        """Wants json supplied through ``_MISSING``."""
         # Parse the request headers.
         self.__headers: Headers = self.__buildHeadersASGI()
+        """Parse the request headers."""
 
     def __getitem__(self, key: str) -> object | None:
         """
@@ -130,7 +139,7 @@ class ASGITransportAdapter(TransportAdapter):
 
         Returns
         -------
-        Headers
+        orionis.http.payload.estructures.headers.Headers
             Return decoded and indexed request headers.
         """
         # Decode raw byte pairs to latin-1 strings.
@@ -242,7 +251,7 @@ class ASGITransportAdapter(TransportAdapter):
 
         Returns
         -------
-        Headers
+        orionis.http.payload.estructures.headers.Headers
             Return the prebuilt ``Headers`` instance.
         """
         # Return cached headers object built at initialization.
@@ -256,7 +265,7 @@ class ASGITransportAdapter(TransportAdapter):
         ----------
         key : str
             Specify the key to set.
-        value : Any
+        value : typing.Any
             Provide the value to store.
 
         Returns

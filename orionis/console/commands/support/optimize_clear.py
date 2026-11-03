@@ -1,3 +1,5 @@
+"""Remove generated optimization artifacts from the application."""
+
 import shutil
 import sys
 from pathlib import Path
@@ -8,9 +10,11 @@ from orionis.foundation.contracts.application import IApplication
 _VENV_DIR_NAMES: frozenset[str] = frozenset(
     {".venv", "venv", "env", ".env", "virtualenv"},
 )
+"""Venv dir names used by ``optimize_clear``."""
 _ACTIVE_VENV_BASENAME: str = (
     Path(sys.prefix).name if sys.prefix != sys.base_prefix else ""
 )
+"""Active venv basename used by ``optimize_clear``."""
 _SKIP_DIRS: frozenset[str] = _VENV_DIR_NAMES | frozenset(
     {
         ".git",
@@ -22,11 +26,15 @@ _SKIP_DIRS: frozenset[str] = _VENV_DIR_NAMES | frozenset(
         "node_modules",
     },
 )
+"""Skip dirs used by ``optimize_clear``."""
 if _ACTIVE_VENV_BASENAME:
     _SKIP_DIRS |= frozenset({_ACTIVE_VENV_BASENAME})
 _BUILD_DIR_NAMES: tuple[str, ...] = ("build", "dist")
+"""Build dir names definitions used by ``optimize_clear``."""
 _COMPILED_CACHE_FILES: tuple[str, ...] = ("config", "commands", "routes")
+"""Compiled cache files definitions used by ``optimize_clear``."""
 _BYTECODE_SUFFIXES: frozenset[str] = frozenset({".pyc", ".pyo"})
+"""Bytecode suffixes used by ``optimize_clear``."""
 
 class OptimizeClearCommand(BaseCommand):
     """Remove generated optimization artifacts from the application."""
@@ -34,11 +42,17 @@ class OptimizeClearCommand(BaseCommand):
     # ruff: noqa: TC001
 
     timestamps: bool = True
+    """Timestamps flag used by ``OptimizeClearCommand``."""
     signature: str = "optimize:clear"
+    """Signature identifier: ``optimize:clear``."""
     description: str = (
         "Removes compiled configuration, route, and command caches, "
         "Python bytecode, and build artifacts."
     )
+    """
+    Description identifier: ``Removes compiled configuration, route, and command
+    caches, Python bytecode, and build artifacts.``.
+    """
 
     def handle(
         self,
@@ -50,9 +64,9 @@ class OptimizeClearCommand(BaseCommand):
 
         Parameters
         ----------
-        app : IApplication
+        app : orionis.IApplication
             Application providing the project and cache paths.
-        console : Console
+        console : orionis.console.Console
             Console used to report cleanup results and failures.
 
         Returns
@@ -91,7 +105,7 @@ class OptimizeClearCommand(BaseCommand):
 
         Parameters
         ----------
-        base_path : Path
+        base_path : pathlib.Path
             Root directory walked while virtual environments are excluded.
 
         Returns
@@ -130,7 +144,7 @@ class OptimizeClearCommand(BaseCommand):
 
         Parameters
         ----------
-        base_path : Path
+        base_path : pathlib.Path
             Application root containing generated build artifacts.
 
         Returns
@@ -158,7 +172,7 @@ class OptimizeClearCommand(BaseCommand):
 
         Parameters
         ----------
-        app : IApplication
+        app : orionis.IApplication
             Application providing the configured compiled cache path.
 
         Returns
@@ -184,7 +198,7 @@ class OptimizeClearCommand(BaseCommand):
 
         Parameters
         ----------
-        path : Path
+        path : pathlib.Path
             Filesystem path to remove.
         errors : list[str]
             List updated with a description when removal fails.
@@ -219,7 +233,7 @@ class OptimizeClearCommand(BaseCommand):
 
         Parameters
         ----------
-        console : Console
+        console : orionis.console.Console
             Console used to display the summary and errors.
         label : str
             Name of the cleanup group.

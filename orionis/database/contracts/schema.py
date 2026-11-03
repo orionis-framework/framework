@@ -1,3 +1,5 @@
+"""Define the contract for schema implementations."""
+
 from __future__ import annotations
 from abc import abstractmethod, ABC
 from typing import TYPE_CHECKING, Self
@@ -8,8 +10,10 @@ if TYPE_CHECKING:
     from orionis.orm.schema.table import TableDefinition
 
 class ISchema(ABC):
+    """Define the contract for schema implementations."""
 
     __slots__ = ()
+    """Declare that this class introduces no additional instance slots."""
 
     @abstractmethod
     def connection(self, name: str | None = None) -> Self:
@@ -23,7 +27,7 @@ class ISchema(ABC):
 
         Returns
         -------
-        Self
+        typing.Self
             The current Schema instance for method chaining.
 
         Raises
@@ -52,7 +56,7 @@ class ISchema(ABC):
 
         Returns
         -------
-        TableCreation
+        orionis.database.schema.table_creation.TableCreation
             Async context manager that collects definitions and creates
             the table after a successful block.
         """
@@ -64,7 +68,7 @@ class ISchema(ABC):
 
         Parameters
         ----------
-        definition : TableDefinition
+        definition : orionis.orm.schema.TableDefinition
             Definition shared by a model and a historical migration.
 
         Returns
@@ -80,7 +84,7 @@ class ISchema(ABC):
 
         Parameters
         ----------
-        model : type of Model
+        model : type of orionis.orm.Model
             Model providing precompiled table and connection metadata.
 
         Returns

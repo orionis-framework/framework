@@ -1,3 +1,5 @@
+"""Bound MCP work and explicitly allow trusted HTTP browser origins."""
+
 from dataclasses import dataclass, field
 from orionis.environment import Env
 from orionis.foundation.config.validation import (

@@ -189,7 +189,7 @@ class TestFinalMeta(TestCase):
         class _Config(metaclass=Final):
             VERSION: str = "1.0"
 
-            def get_version(self) -> str:
+            def getVersion(self) -> str:
                 """Return the configured version.
 
                 Returns
@@ -200,7 +200,7 @@ class TestFinalMeta(TestCase):
                 return self.VERSION
 
         obj = _Config()
-        self.assertEqual(obj.get_version(), "1.0")
+        self.assertEqual(obj.getVersion(), "1.0")
         self.assertEqual(_Config.VERSION, "1.0")
 
     # ------------------------------------------------ identity / type checks

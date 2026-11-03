@@ -58,7 +58,7 @@ class BootstrapCommand(BaseCommand):
                     FileBasedCache(path=cache_path, filename=name).clear()
         return actions
 
-    def _write_action(self, action: str, resource: str) -> None:
+    def _writeAction(self, action: str, resource: str) -> None:
         """
         Write one aligned resource action with a single colored status.
 
@@ -98,7 +98,7 @@ class BootstrapCommand(BaseCommand):
         try:
             actions = await to_thread(self._execute, app)
             for action, resource in actions:
-                self._write_action(action, resource)
+                self._writeAction(action, resource)
             return 0
         except (OSError, TypeError, ValueError, RuntimeError, SyntaxError) as error:
             self.error(f"{self.signature}: {error}", timestamp=False)

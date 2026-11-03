@@ -1,9 +1,12 @@
+"""Register service services in the application container."""
+
 from orionis.container.contracts.service_provider import IServiceProvider
 from orionis.foundation.contracts.application import IApplication
 
 class ServiceProvider(IServiceProvider):
 
     # ruff: noqa: TC001
+    """Register service services in the application container."""
 
     def __init__(
         self,
@@ -14,7 +17,7 @@ class ServiceProvider(IServiceProvider):
 
         Parameters
         ----------
-        app : IApplication
+        app : orionis.IApplication
             The application container instance to which this service
             provider will be attached.
 
@@ -24,6 +27,10 @@ class ServiceProvider(IServiceProvider):
             This constructor does not return a value.
         """
         self.app = app
+        """
+        The application container instance to which this service provider will be
+        attached.
+        """
 
     def register(self) -> None:
         """

@@ -1,3 +1,5 @@
+"""Hold the immutable authorization picture of a single request."""
+
 from typing import TYPE_CHECKING
 from orionis.auth.contracts.snapshot import IAuthorizationSnapshot
 
@@ -23,6 +25,7 @@ class AuthorizationSnapshot(IAuthorizationSnapshot):
     """
 
     __slots__ = ("__abilities", "__permissions", "__roles")
+    """Declare the instance attribute slots reserved by this class."""
 
     def __init__(
         self,
@@ -35,12 +38,12 @@ class AuthorizationSnapshot(IAuthorizationSnapshot):
 
         Parameters
         ----------
-        permissions : Iterable[str]
+        permissions : collections.abc.Iterable[str]
             Permission names owned by the identity, direct ones and the
             ones inherited from its roles.
-        roles : Iterable[str]
+        roles : collections.abc.Iterable[str]
             Role names assigned to the identity.
-        abilities : Iterable[str] | None, optional
+        abilities : collections.abc.Iterable[str] | None, optional
             Abilities restricting the presented credential.
 
         Returns
@@ -49,10 +52,16 @@ class AuthorizationSnapshot(IAuthorizationSnapshot):
             The snapshot is initialised with immutable collections.
         """
         self.__permissions: frozenset[str] = frozenset(permissions)
+        """
+        Permission names owned by the identity, direct ones and the ones inherited
+        from its roles.
+        """
         self.__roles: frozenset[str] = frozenset(roles)
+        """Role names assigned to the identity."""
         self.__abilities: frozenset[str] | None = (
             None if abilities is None else frozenset(abilities)
         )
+        """Abilities restricting the presented credential."""
 
     @property
     def permissions(self) -> frozenset[str]:
@@ -151,3 +160,4 @@ EMPTY_SNAPSHOT: AuthorizationSnapshot = AuthorizationSnapshot(
     permissions=(),
     roles=(),
 )
+"""Shared snapshot handed to guest requests: no permissions, no roles."""

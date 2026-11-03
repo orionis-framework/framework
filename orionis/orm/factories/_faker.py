@@ -1,3 +1,5 @@
+"""Provide orm factories operations through ``create_faker``."""
+
 from locale import normalize
 from faker import Faker
 from faker.config import AVAILABLE_LOCALES
@@ -37,9 +39,8 @@ def create_faker(locale: str | None, seed: int | None) -> Fake:
 
     Returns
     -------
-    Fake
+    orionis.orm.factories.Fake
         Typed Orionis facade over the instance-local data provider.
-
     """
     requested = _application_locale() if locale is None else locale
     normalized = normalize(requested.replace("-", "_")).split(".")[0]

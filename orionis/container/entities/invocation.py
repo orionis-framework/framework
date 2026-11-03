@@ -1,3 +1,5 @@
+"""Describe the immutable metadata needed to invoke one callable."""
+
 from __future__ import annotations
 import inspect
 from dataclasses import dataclass, field
@@ -20,9 +22,9 @@ class InvocationPlan:
     """
     Describe the immutable metadata needed to invoke one callable.
 
-    Parameters
+    Attributes
     ----------
-    arguments : tuple[Argument, ...]
+    arguments : tuple[Argument, ``...``]
         Parameters in declaration order, excluding a bound receiver.
     is_async : bool
         Whether invocation requires awaiting the callable's result.
@@ -58,14 +60,14 @@ def _callable_plan(target: Callable, *, bound: bool = False) -> InvocationPlan:
 
     Parameters
     ----------
-    target : Callable
+    target : collections.abc.Callable
         Function underlying the callable.
     bound : bool, optional
         Whether a receiver is supplied by Python's descriptor binding.
 
     Returns
     -------
-    InvocationPlan
+    orionis.container.entities.invocation.InvocationPlan
         Metadata reusable across different instances of the same controller.
     """
     ReflectionCallable(target)
@@ -81,12 +83,12 @@ def callable_plan(target: Callable) -> InvocationPlan:
 
     Parameters
     ----------
-    target : Callable
+    target : collections.abc.Callable
         Function or bound method invoked by the container.
 
     Returns
     -------
-    InvocationPlan
+    orionis.container.entities.invocation.InvocationPlan
         Parameter plan that does not retain a bound receiver.
     """
     if isinstance(target, MethodType):
@@ -107,7 +109,7 @@ def constructor_plan(target: type, constructor: object) -> InvocationPlan:
 
     Returns
     -------
-    InvocationPlan
+    orionis.container.entities.invocation.InvocationPlan
         Shared constructor parameters with resolvable class-local types restored.
     """
     ReflectionConcrete(target)

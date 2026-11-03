@@ -1,3 +1,5 @@
+"""Define quotes for support inspirational."""
+
 # ruff : noqa: E501, RUF001
 INSPIRATIONAL_QUOTES: tuple[dict, ...] = (
     {"quote": "Bitterness is like cancer. It eats upon the host.", "author": "Maya Angelou"},
@@ -362,3 +364,4 @@ INSPIRATIONAL_QUOTES: tuple[dict, ...] = (
     {"quote": "This is it. This is life, the one you get.", "author": "Jeff Barry"},
     {"quote": "Greatness is not measured by what you build, but by what you inspire others to create.","author": "Raul M. Uñate"},
 )
+"""Inspirational quotes definitions used by ``quotes``."""

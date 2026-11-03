@@ -1,3 +1,5 @@
+"""Validate structured input against declared fields and validation rules."""
+
 from __future__ import annotations
 from typing import TYPE_CHECKING
 import msgspec
@@ -26,7 +28,10 @@ _Struct = msgspec.Struct
 class Schema:
 
     # Prevent per-instance dictionaries; the class is used statically.
+    """Validate structured input against declared fields and validation rules."""
+
     __slots__ = ()
+    """Prevent per-instance dictionaries; the class is used statically."""
 
     @staticmethod
     async def validate(payload: object, schema: type[SchemaType]) -> SchemaType:
@@ -37,17 +42,17 @@ class Schema:
         ----------
         payload : object
             Input data or root struct to expand and revalidate.
-        schema : type[SchemaType]
+        schema : type[orionis.schemas.Schema]
             Schema class used for conversion and rule validation.
 
         Returns
         -------
-        SchemaType
+        orionis.schemas.Schema
             Converted instance satisfying structural constraints and rules.
 
         Raises
         ------
-        ValidationException
+        orionis.schemas.exceptions.ValidationException
             If conversion, constraints or rules reject the payload. Include
             collected failures grouped by field.
         """

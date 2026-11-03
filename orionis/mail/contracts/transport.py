@@ -1,3 +1,5 @@
+"""Send already prepared mail without knowing views or storage declarations."""
+
 from __future__ import annotations
 from abc import ABC, abstractmethod
 from typing import TYPE_CHECKING
@@ -15,6 +17,7 @@ class IMailTransport(ABC):
     """
 
     __slots__ = ()
+    """Declare that this class introduces no additional instance slots."""
 
     @abstractmethod
     async def send(
@@ -29,7 +32,7 @@ class IMailTransport(ABC):
 
         Parameters
         ----------
-        message : PreparedMail
+        message : orionis.mail.entities.PreparedMail
             Immutable MIME bytes plus a separate transport envelope.
         mailer : str
             Selected configuration name.
@@ -38,11 +41,11 @@ class IMailTransport(ABC):
 
         Returns
         -------
-        MailResult
+        orionis.mail.entities.MailResult
             Confirmed acceptance, partial acceptance, or storage result.
 
         Raises
         ------
-        MailTransportException
+        orionis.mail.exceptions.MailTransportException
             If the operation fails or all recipients are rejected.
         """

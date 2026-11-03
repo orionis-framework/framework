@@ -1,3 +1,5 @@
+"""Provide a high-level interface for date and time operations."""
+
 from __future__ import annotations
 import pendulum
 from datetime import datetime as stdlib_datetime
@@ -9,17 +11,21 @@ class DateTime:
     Provide a high-level interface for date and time operations.
 
     All methods are class-level, using a configurable default timezone
-    and locale backed by `pendulum` for immutable datetime arithmetic.
+    and locale backed by ``pendulum`` for immutable datetime arithmetic.
     """
 
     # ruff: noqa: PLR0913
 
     __slots__ = ()
+    """Declare that this class introduces no additional instance slots."""
 
     # Default timezone and locale
     _timezone: str = "UTC"
+    """Default timezone and locale."""
     _locale: str = "en"
+    """Locale identifier: ``en``."""
     _zoneinfo_cache: ClassVar[dict[str, ZoneInfo]] = {}
+    """Previously resolved time-zone objects indexed by zone name."""
 
     @classmethod
     def _loadConfig(
@@ -129,7 +135,7 @@ class DateTime:
 
         Returns
         -------
-        ZoneInfo
+        zoneinfo.ZoneInfo
             The ZoneInfo instance corresponding to the configured timezone.
         """
         _tz = cls._timezone
@@ -151,7 +157,7 @@ class DateTime:
 
         Returns
         -------
-        pendulum.DateTime
+        ``pendulum.DateTime``
             The current date and time in the specified or default timezone.
         """
         return pendulum.now(tz if tz is not None else cls._timezone)
@@ -168,7 +174,7 @@ class DateTime:
 
         Returns
         -------
-        pendulum.Date
+        ``pendulum.Date``
             The current date in the specified or default timezone.
         """
         return pendulum.today(tz if tz is not None else cls._timezone)
@@ -185,7 +191,7 @@ class DateTime:
 
         Returns
         -------
-        pendulum.Date
+        ``pendulum.Date``
             The date for tomorrow in the specified or default timezone.
         """
         return pendulum.tomorrow(tz if tz is not None else cls._timezone)
@@ -202,7 +208,7 @@ class DateTime:
 
         Returns
         -------
-        pendulum.Date
+        ``pendulum.Date``
             The date for yesterday in the specified or default timezone.
         """
         return pendulum.yesterday(tz if tz is not None else cls._timezone)
@@ -229,7 +235,7 @@ class DateTime:
 
         Returns
         -------
-        pendulum.DateTime
+        ``pendulum.DateTime``
             Parsed datetime object in the specified or default timezone.
         """
         # Determine the timezone to use
@@ -266,7 +272,7 @@ class DateTime:
 
         Returns
         -------
-        pendulum.DateTime
+        ``pendulum.DateTime``
             Parsed datetime object in the specified or default timezone.
         """
         return pendulum.from_format(
@@ -309,7 +315,7 @@ class DateTime:
 
         Returns
         -------
-        pendulum.DateTime
+        ``pendulum.DateTime``
             Datetime object expressed in the local system timezone.
         """
         return pendulum.local(
@@ -349,7 +355,7 @@ class DateTime:
 
         Returns
         -------
-        pendulum.DateTime
+        ``pendulum.DateTime``
             Datetime object with no timezone information attached.
         """
         return pendulum.naive(
@@ -372,7 +378,7 @@ class DateTime:
 
         Returns
         -------
-        pendulum.DateTime
+        ``pendulum.DateTime``
             Datetime object in the specified or default timezone.
         """
         _tz = tz if tz is not None else cls._timezone
@@ -389,14 +395,14 @@ class DateTime:
 
         Parameters
         ----------
-        dt : datetime.datetime or pendulum.DateTime
+        dt : datetime.datetime or ``pendulum.DateTime``
             Datetime object to convert.
         tz : str or None, optional
             Specific timezone name. If None, uses the configured default.
 
         Returns
         -------
-        pendulum.DateTime
+        ``pendulum.DateTime``
             Datetime object in the specified or default timezone.
 
         Raises
@@ -454,7 +460,7 @@ class DateTime:
 
         Returns
         -------
-        pendulum.DateTime
+        ``pendulum.DateTime``
             Datetime object in the specified or default timezone.
         """
         return pendulum.datetime(
@@ -502,7 +508,7 @@ class DateTime:
 
         Returns
         -------
-        pendulum.Duration
+        ``pendulum.Duration``
             The resulting Duration instance.
         """
         return pendulum.duration(
@@ -530,9 +536,9 @@ class DateTime:
 
         Parameters
         ----------
-        start : pendulum.DateTime
+        start : ``pendulum.DateTime``
             The start of the interval.
-        end : pendulum.DateTime
+        end : ``pendulum.DateTime``
             The end of the interval.
         absolute : bool, optional
             Whether to force a positive interval regardless of the order
@@ -540,7 +546,7 @@ class DateTime:
 
         Returns
         -------
-        pendulum.Interval
+        ``pendulum.Interval``
             The resulting Interval instance.
         """
         return pendulum.interval(start, end, absolute=absolute)
@@ -560,14 +566,14 @@ class DateTime:
         unit : str
             Unit of time: 'second', 'minute', 'hour', 'day', 'week',
             'month', 'quarter', 'year', 'decade' or 'century'.
-        dt : pendulum.DateTime | None, optional
+        dt : ``pendulum.DateTime`` | None, optional
             The datetime to use. If None, uses the current datetime.
         tz : str | None, optional
             The timezone to use. If None, uses the configured default.
 
         Returns
         -------
-        pendulum.DateTime
+        ``pendulum.DateTime``
             The datetime at the start of the given unit.
         """
         # Use current datetime if none is provided
@@ -590,14 +596,14 @@ class DateTime:
         unit : str
             Unit of time: 'second', 'minute', 'hour', 'day', 'week',
             'month', 'quarter', 'year', 'decade' or 'century'.
-        dt : pendulum.DateTime | None, optional
+        dt : ``pendulum.DateTime`` | None, optional
             The datetime to use. If None, uses the current datetime.
         tz : str | None, optional
             The timezone to use. If None, uses the configured default.
 
         Returns
         -------
-        pendulum.DateTime
+        ``pendulum.DateTime``
             The datetime at the end of the given unit.
         """
         # Use current datetime if none is provided
@@ -614,14 +620,14 @@ class DateTime:
 
         Parameters
         ----------
-        dt : pendulum.DateTime | None, optional
+        dt : ``pendulum.DateTime`` | None, optional
             The datetime to use. If None, uses the current datetime.
         tz : str | None, optional
             The timezone to use. If None, uses the configured default.
 
         Returns
         -------
-        pendulum.DateTime
+        ``pendulum.DateTime``
             The datetime at the start of the day.
         """
         # Use current datetime if none is provided
@@ -638,14 +644,14 @@ class DateTime:
 
         Parameters
         ----------
-        dt : pendulum.DateTime | None, optional
+        dt : ``pendulum.DateTime`` | None, optional
             The datetime to use. If None, uses the current datetime.
         tz : str | None, optional
             The timezone to use. If None, uses the configured default.
 
         Returns
         -------
-        pendulum.DateTime
+        ``pendulum.DateTime``
             The datetime at the end of the day.
         """
         # Use current datetime if none is provided
@@ -662,12 +668,12 @@ class DateTime:
 
         Parameters
         ----------
-        dt : str | datetime.datetime | pendulum.DateTime
+        dt : str | datetime.datetime | ``pendulum.DateTime``
             Date to convert. Accepts string, standard datetime, or pendulum.DateTime.
 
         Returns
         -------
-        pendulum.DateTime
+        ``pendulum.DateTime``
             The date converted to the configured timezone.
         """
         _tz = cls._timezone
@@ -692,7 +698,7 @@ class DateTime:
 
         Parameters
         ----------
-        dt : pendulum.DateTime | None, optional
+        dt : ``pendulum.DateTime`` | None, optional
             Date to format. If None, uses now().
         format_string : str, optional
             Output format string.
@@ -719,14 +725,14 @@ class DateTime:
 
         Parameters
         ----------
-        dt : pendulum.DateTime | None, optional
+        dt : ``pendulum.DateTime`` | None, optional
             The datetime to use. If None, uses the current datetime.
         tz : str | None, optional
             The timezone to use. If None, uses the configured default.
 
         Returns
         -------
-        pendulum.DateTime
+        ``pendulum.DateTime``
             The datetime at the start of the week.
         """
         # Use current datetime if none is provided
@@ -743,14 +749,14 @@ class DateTime:
 
         Parameters
         ----------
-        dt : pendulum.DateTime | None, optional
+        dt : ``pendulum.DateTime`` | None, optional
             The datetime to use. If None, uses the current datetime.
         tz : str | None, optional
             The timezone to use. If None, uses the configured default.
 
         Returns
         -------
-        pendulum.DateTime
+        ``pendulum.DateTime``
             The datetime at the end of the week.
         """
         # Use current datetime if none is provided
@@ -767,14 +773,14 @@ class DateTime:
 
         Parameters
         ----------
-        dt : pendulum.DateTime | None, optional
+        dt : ``pendulum.DateTime`` | None, optional
             The datetime to use. If None, uses the current datetime.
         tz : str | None, optional
             The timezone to use. If None, uses the configured default.
 
         Returns
         -------
-        pendulum.DateTime
+        ``pendulum.DateTime``
             The datetime at the start of the month.
         """
         # Use current datetime if none is provided
@@ -791,14 +797,14 @@ class DateTime:
 
         Parameters
         ----------
-        dt : pendulum.DateTime | None, optional
+        dt : ``pendulum.DateTime`` | None, optional
             The datetime to use. If None, uses the current datetime.
         tz : str | None, optional
             The timezone to use. If None, uses the configured default.
 
         Returns
         -------
-        pendulum.DateTime
+        ``pendulum.DateTime``
             The datetime at the end of the month.
         """
         # Use current datetime if none is provided
@@ -815,14 +821,14 @@ class DateTime:
 
         Parameters
         ----------
-        dt : pendulum.DateTime | None, optional
+        dt : ``pendulum.DateTime`` | None, optional
             The datetime to use. If None, uses the current datetime.
         tz : str | None, optional
             The timezone to use. If None, uses the configured default.
 
         Returns
         -------
-        pendulum.DateTime
+        ``pendulum.DateTime``
             The datetime at the start of the year.
         """
         # Use current datetime if none is provided
@@ -839,14 +845,14 @@ class DateTime:
 
         Parameters
         ----------
-        dt : pendulum.DateTime | None, optional
+        dt : ``pendulum.DateTime`` | None, optional
             The datetime to use. If None, uses the current datetime.
         tz : str | None, optional
             The timezone to use. If None, uses the configured default.
 
         Returns
         -------
-        pendulum.DateTime
+        ``pendulum.DateTime``
             The datetime at the end of the year.
         """
         # Use current datetime if none is provided
@@ -861,14 +867,14 @@ class DateTime:
 
         Parameters
         ----------
-        dt : pendulum.DateTime
+        dt : ``pendulum.DateTime``
             The original date.
         days : int
             Number of days to add.
 
         Returns
         -------
-        pendulum.DateTime
+        ``pendulum.DateTime``
             The resulting date after adding the specified days.
         """
         # Add the specified number of days to the date
@@ -881,14 +887,14 @@ class DateTime:
 
         Parameters
         ----------
-        dt : pendulum.DateTime
+        dt : ``pendulum.DateTime``
             The original datetime.
         hours : int
             Number of hours to add.
 
         Returns
         -------
-        pendulum.DateTime
+        ``pendulum.DateTime``
             The resulting datetime after adding the specified hours.
         """
         # Add the specified number of hours to the datetime
@@ -903,14 +909,14 @@ class DateTime:
 
         Parameters
         ----------
-        dt : pendulum.DateTime
+        dt : ``pendulum.DateTime``
             The original datetime.
         minutes : int
             Number of minutes to add.
 
         Returns
         -------
-        pendulum.DateTime
+        ``pendulum.DateTime``
             The resulting datetime after adding the specified minutes.
         """
         # Add the specified number of minutes to the datetime
@@ -925,9 +931,9 @@ class DateTime:
 
         Parameters
         ----------
-        dt1 : pendulum.DateTime
+        dt1 : ``pendulum.DateTime``
             The first date.
-        dt2 : pendulum.DateTime
+        dt2 : ``pendulum.DateTime``
             The second date.
 
         Returns
@@ -947,9 +953,9 @@ class DateTime:
 
         Parameters
         ----------
-        dt1 : pendulum.DateTime
+        dt1 : ``pendulum.DateTime``
             The first datetime.
-        dt2 : pendulum.DateTime
+        dt2 : ``pendulum.DateTime``
             The second datetime.
 
         Returns
@@ -969,7 +975,7 @@ class DateTime:
 
         Parameters
         ----------
-        dt : pendulum.DateTime | None, optional
+        dt : ``pendulum.DateTime`` | None, optional
             The datetime to check. If None, uses the current datetime.
 
         Returns
@@ -989,7 +995,7 @@ class DateTime:
 
         Parameters
         ----------
-        dt : pendulum.DateTime
+        dt : ``pendulum.DateTime``
             The datetime to check.
 
         Returns
@@ -1012,7 +1018,7 @@ class DateTime:
 
         Parameters
         ----------
-        dt : pendulum.DateTime
+        dt : ``pendulum.DateTime``
             The datetime to check.
 
         Returns
@@ -1029,7 +1035,7 @@ class DateTime:
 
         Parameters
         ----------
-        dt : pendulum.DateTime
+        dt : ``pendulum.DateTime``
             The datetime to check.
 
         Returns
@@ -1046,7 +1052,7 @@ class DateTime:
 
         Parameters
         ----------
-        dt : pendulum.DateTime | None, optional
+        dt : ``pendulum.DateTime`` | None, optional
             The datetime to check. If None, uses the current datetime.
 
         Returns
@@ -1070,9 +1076,9 @@ class DateTime:
 
         Parameters
         ----------
-        dt : pendulum.DateTime
+        dt : ``pendulum.DateTime``
             The reference date (e.g. a date of birth).
-        other : pendulum.DateTime | None, optional
+        other : ``pendulum.DateTime`` | None, optional
             The date to compare against. If None, uses the current datetime
             in the configured timezone.
 
@@ -1093,14 +1099,14 @@ class DateTime:
 
         Parameters
         ----------
-        dt : pendulum.DateTime
+        dt : ``pendulum.DateTime``
             The reference datetime.
-        *others : pendulum.DateTime
+        *others : ``pendulum.DateTime``
             Candidate datetimes to compare against the reference.
 
         Returns
         -------
-        pendulum.DateTime
+        ``pendulum.DateTime``
             The candidate closest to ``dt``.
         """
         return dt.closest(*others)
@@ -1114,14 +1120,14 @@ class DateTime:
 
         Parameters
         ----------
-        dt : pendulum.DateTime
+        dt : ``pendulum.DateTime``
             The reference datetime.
-        *others : pendulum.DateTime
+        *others : ``pendulum.DateTime``
             Candidate datetimes to compare against the reference.
 
         Returns
         -------
-        pendulum.DateTime
+        ``pendulum.DateTime``
             The candidate farthest from ``dt``.
         """
         return dt.farthest(*others)
@@ -1145,7 +1151,7 @@ class DateTime:
 
         Parameters
         ----------
-        dt : pendulum.DateTime
+        dt : ``pendulum.DateTime``
             The original datetime.
         years : int, optional
             Number of years to add, by default 0.
@@ -1166,7 +1172,7 @@ class DateTime:
 
         Returns
         -------
-        pendulum.DateTime
+        ``pendulum.DateTime``
             The resulting datetime after adding the specified units.
         """
         return dt.add(
@@ -1194,7 +1200,7 @@ class DateTime:
 
         Parameters
         ----------
-        dt : pendulum.DateTime
+        dt : ``pendulum.DateTime``
             The original datetime.
         years : int, optional
             Number of years to subtract, by default 0.
@@ -1215,7 +1221,7 @@ class DateTime:
 
         Returns
         -------
-        pendulum.DateTime
+        ``pendulum.DateTime``
             The resulting datetime after subtracting the specified units.
         """
         return dt.subtract(
@@ -1237,9 +1243,9 @@ class DateTime:
 
         Parameters
         ----------
-        dt1 : pendulum.DateTime
+        dt1 : ``pendulum.DateTime``
             The reference datetime.
-        dt2 : pendulum.DateTime | None, optional
+        dt2 : ``pendulum.DateTime`` | None, optional
             The datetime to compare against. If None, uses the current
             datetime in the configured timezone.
         absolute : bool, optional
@@ -1247,7 +1253,7 @@ class DateTime:
 
         Returns
         -------
-        pendulum.Interval
+        ``pendulum.Interval``
             The Interval instance exposing in_years()/in_months()/
             in_weeks()/in_days()/in_hours()/in_minutes()/in_seconds().
         """
@@ -1267,9 +1273,9 @@ class DateTime:
 
         Parameters
         ----------
-        dt : pendulum.DateTime
+        dt : ``pendulum.DateTime``
             The reference datetime.
-        other : pendulum.DateTime | None, optional
+        other : ``pendulum.DateTime`` | None, optional
             The datetime to compare against. If None, uses the current
             datetime.
         absolute : bool, optional
@@ -1302,10 +1308,10 @@ class DateTime:
 
         Parameters
         ----------
-        dt : pendulum.DateTime
+        dt : ``pendulum.DateTime``
             The original datetime.
         day_of_week : int | None, optional
-            Target day of the week (e.g. `pendulum.WEDNESDAY`). If None,
+            Target day of the week (e.g. ``pendulum.WEDNESDAY``). If None,
             uses the day of the week of ``dt``.
         keep_time : bool, optional
             Whether to keep the time component instead of resetting it
@@ -1313,7 +1319,7 @@ class DateTime:
 
         Returns
         -------
-        pendulum.DateTime
+        ``pendulum.DateTime``
             The datetime of the next matching day.
         """
         return dt.next(day_of_week, keep_time=keep_time)
@@ -1331,10 +1337,10 @@ class DateTime:
 
         Parameters
         ----------
-        dt : pendulum.DateTime
+        dt : ``pendulum.DateTime``
             The original datetime.
         day_of_week : int | None, optional
-            Target day of the week (e.g. `pendulum.WEDNESDAY`). If None,
+            Target day of the week (e.g. ``pendulum.WEDNESDAY``). If None,
             uses the day of the week of ``dt``.
         keep_time : bool, optional
             Whether to keep the time component instead of resetting it
@@ -1342,7 +1348,7 @@ class DateTime:
 
         Returns
         -------
-        pendulum.DateTime
+        ``pendulum.DateTime``
             The datetime of the previous matching day.
         """
         return dt.previous(day_of_week, keep_time=keep_time)
@@ -1358,15 +1364,15 @@ class DateTime:
 
         Parameters
         ----------
-        dt1 : pendulum.DateTime
+        dt1 : ``pendulum.DateTime``
             The reference datetime.
-        dt2 : pendulum.DateTime | None, optional
+        dt2 : ``pendulum.DateTime`` | None, optional
             The datetime to average with. If None, uses the current
             datetime in the configured timezone.
 
         Returns
         -------
-        pendulum.DateTime
+        ``pendulum.DateTime``
             The datetime halfway between ``dt1`` and ``dt2``.
         """
         return dt1.average(dt2)
@@ -1383,18 +1389,18 @@ class DateTime:
 
         Parameters
         ----------
-        dt : pendulum.DateTime
+        dt : ``pendulum.DateTime``
             The original datetime.
         unit : str
             Unit of time: 'month', 'quarter' or 'year'.
         day_of_week : int | None, optional
             Constrain the result to a specific day of the week
-            (e.g. `pendulum.MONDAY`). If None, returns the first day
+            (e.g. ``pendulum.MONDAY``). If None, returns the first day
             of the unit regardless of weekday.
 
         Returns
         -------
-        pendulum.DateTime
+        ``pendulum.DateTime``
             The resulting datetime.
         """
         return dt.first_of(unit, day_of_week)
@@ -1411,18 +1417,18 @@ class DateTime:
 
         Parameters
         ----------
-        dt : pendulum.DateTime
+        dt : ``pendulum.DateTime``
             The original datetime.
         unit : str
             Unit of time: 'month', 'quarter' or 'year'.
         day_of_week : int | None, optional
             Constrain the result to a specific day of the week
-            (e.g. `pendulum.FRIDAY`). If None, returns the last day
+            (e.g. ``pendulum.FRIDAY``). If None, returns the last day
             of the unit regardless of weekday.
 
         Returns
         -------
-        pendulum.DateTime
+        ``pendulum.DateTime``
             The resulting datetime.
         """
         return dt.last_of(unit, day_of_week)
@@ -1440,23 +1446,23 @@ class DateTime:
 
         Parameters
         ----------
-        dt : pendulum.DateTime
+        dt : ``pendulum.DateTime``
             The original datetime.
         unit : str
             Unit of time: 'month', 'quarter' or 'year'.
         nth : int
             The occurrence index to look for (1-based).
         day_of_week : int
-            Target day of the week (e.g. `pendulum.MONDAY`).
+            Target day of the week (e.g. ``pendulum.MONDAY``).
 
         Returns
         -------
-        pendulum.DateTime
+        ``pendulum.DateTime``
             The resulting datetime.
 
         Raises
         ------
-        PendulumException
+        ``PendulumException``
             If the given occurrence does not exist within the unit.
         """
         return dt.nth_of(unit, nth, day_of_week)

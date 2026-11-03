@@ -1,3 +1,8 @@
+"""Provide mcp transport operations.
+
+Includes ``McpProtocolResponse``, ``origin_allowed``, ``McpHttpPolicy``.
+"""
+
 from http import HTTPStatus
 import logging
 from typing import TYPE_CHECKING, ClassVar
@@ -23,12 +28,19 @@ if TYPE_CHECKING:
     from orionis.http.request import Request
 
 _REDIRECTION_START = 300
+"""Redirection start value used by ``policy``."""
 _CLIENT_ERROR_START = 400
+"""Client error start value used by ``policy``."""
 _SERVER_ERROR_START = 500
+"""Server error start value used by ``policy``."""
 _JSON_MEDIA_TYPE = "application/json"
+"""Json media type identifier: ``application/json``."""
 _REPLACED_HEADERS = frozenset({"content-type", "content-length", "location"})
+"""Replaced headers used by ``policy``."""
 _AUTHENTICATION_HEADERS = frozenset({"www-authenticate", "allow"})
+"""Authentication headers used by ``policy``."""
 _LOGGER = logging.getLogger(__name__)
+"""Logger used by ``policy``."""
 _EXCEPTION_STATUS = {
     AuthenticationException: HTTPStatus.UNAUTHORIZED,
     AuthorizationException: HTTPStatus.FORBIDDEN,
@@ -39,11 +51,13 @@ _EXCEPTION_STATUS = {
     CSRFTokenMismatchException: HTTPStatus.FORBIDDEN,
     ValidationException: HTTPStatus.UNPROCESSABLE_ENTITY,
 }
+"""Exception status definitions used by ``policy``."""
 
 class McpProtocolResponse(Response):
     """Mark encoded protocol output to keep adaptation constant-time."""
 
     __slots__ = ()
+    """Declare that this class introduces no additional instance slots."""
 
     def __init__(
         self, content: bytes, status_code: int = 200,
@@ -58,7 +72,7 @@ class McpProtocolResponse(Response):
             Value supplied for ``content``.
         status_code : int
             Value supplied for ``status_code``.
-        headers : Mapping[str, str] | None
+        headers : collections.abc.Mapping[str, str] | None
             Value supplied for ``headers``.
         media_type : str
             Value supplied for ``media_type``.
@@ -81,7 +95,7 @@ def origin_allowed(headers: Headers, origins: frozenset[str]) -> bool:
 
     Parameters
     ----------
-    headers : Headers
+    headers : orionis.http.payload.estructures.headers.Headers
         Value supplied for ``headers``.
     origins : frozenset[str]
         Value supplied for ``origins``.
@@ -105,7 +119,7 @@ def _error(status: int) -> McpProtocolResponse:
 
     Returns
     -------
-    McpProtocolResponse
+    orionis.mcp.transport.policy.McpProtocolResponse
         Result of the operation described above.
     """
     try:
@@ -130,7 +144,9 @@ class McpHttpPolicy(IHttpEndpointPolicy):
     """Enforce MCP origin and error rules around the existing HTTP pipeline."""
 
     __slots__ = ("_app", "_origins")
+    """Declare the instance attribute slots reserved by this class."""
     monitor_disconnects: ClassVar[bool] = True
+    """Monitor disconnects flag used by ``McpHttpPolicy``."""
 
     def __init__(self, app: IApplication, config: McpConfig) -> None:
         """
@@ -138,9 +154,9 @@ class McpHttpPolicy(IHttpEndpointPolicy):
 
         Parameters
         ----------
-        app : IApplication
+        app : orionis.IApplication
             Application container supplying configuration and dependencies.
-        config : McpConfig
+        config : orionis.mcp.config.McpConfig
             Validated configuration controlling this component.
 
         Returns
@@ -149,7 +165,9 @@ class McpHttpPolicy(IHttpEndpointPolicy):
             Complete the documented operation without returning a value.
         """
         self._app = app
+        """Application container supplying configuration and dependencies."""
         self._origins = frozenset(config.allowed_origins)
+        """Origins produced by ``frozenset``."""
 
     def before(self, adapter: TransportAdapter) -> Response | None:
         """
@@ -157,12 +175,12 @@ class McpHttpPolicy(IHttpEndpointPolicy):
 
         Parameters
         ----------
-        adapter : TransportAdapter
+        adapter : orionis.http.adapters.request.contracts.transport.TransportAdapter
             Value supplied for ``adapter``.
 
         Returns
         -------
-        Response | None
+        orionis.http.Response | None
             Result of the operation described above.
         """
         return None if origin_allowed(adapter.headers(), self._origins) else _error(403)
@@ -173,12 +191,12 @@ class McpHttpPolicy(IHttpEndpointPolicy):
 
         Parameters
         ----------
-        response : Response
+        response : orionis.http.Response
             Value supplied for ``response``.
 
         Returns
         -------
-        Response
+        orionis.http.Response
             Result of the operation described above.
         """
         if isinstance(response, McpProtocolResponse):
@@ -216,7 +234,7 @@ class McpHttpPolicy(IHttpEndpointPolicy):
 
         Returns
         -------
-        Response
+        orionis.http.Response
             Result of the operation described above.
         """
         del request

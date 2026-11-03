@@ -1,3 +1,5 @@
+"""Hash passwords with Argon2id."""
+
 from typing import TYPE_CHECKING, Any, Self
 from orionis.hashing.contracts.hasher import IHasher
 from orionis.hashing.exceptions import HashConfigurationException
@@ -11,13 +13,19 @@ if TYPE_CHECKING:
 
 # Backend location and distribution name reported when it is missing
 _BACKEND_MODULE: str = "pwdlib.hashers.argon2"
+"""Backend location and distribution name reported when it is missing."""
 _BACKEND_CLASS: str = "Argon2Hasher"
+"""Backend class identifier: ``Argon2Hasher``."""
 _BACKEND_PACKAGE: str = "pwdlib[argon2]"
+"""Backend package identifier: ``pwdlib[argon2]``."""
 
 # Default cost parameters recommended for interactive logins
 DEFAULT_MEMORY: int = 65536
+"""Default cost parameters recommended for interactive logins."""
 DEFAULT_THREADS: int = 4
+"""Default threads value used by ``argon2_hasher``."""
 DEFAULT_TIME: int = 3
+"""Default time value used by ``argon2_hasher``."""
 
 class Argon2Hasher(IHasher):
     """Hash passwords with Argon2id.
@@ -42,6 +50,7 @@ class Argon2Hasher(IHasher):
         "_threads",
         "_time",
     )
+    """Declare the instance attribute slots reserved by this class."""
 
     def __init__(
         self: Self,
@@ -62,7 +71,7 @@ class Argon2Hasher(IHasher):
             Degree of parallelism.
         time : int
             Number of iterations.
-        executor : BoundedExecutor | None
+        executor : orionis.support.concurrency.BoundedExecutor | None
             Caller-owned dedicated executor, or the shared bounded hashing pool.
 
         Returns
@@ -72,18 +81,27 @@ class Argon2Hasher(IHasher):
 
         Raises
         ------
-        HashConfigurationException
+        orionis.hashing.exceptions.HashConfigurationException
             If any cost parameter is not a positive integer.
         """
         self._memory = self._validate("memory", memory)
+        """Memory cost in kibibytes."""
         self._executor = HASH_WORKERS if executor is None else executor
+        """Caller-owned dedicated executor, or the shared bounded hashing pool."""
         self._threads = self._validate("threads", threads)
+        """Degree of parallelism."""
         self._time = self._validate("time", time)
+        """Number of iterations."""
 
         # The backend is imported and built on first use to keep the
         # driver constructible even when the dependency is absent.
         self._backend_class: Any = None
+        """
+        The backend is imported and built on first use to keep the driver
+        constructible even when the dependency is absent.
+        """
         self._backend: Any = None
+        """Backend implementation used to perform the configured operation."""
 
     @staticmethod
     def _validate(name: str, value: int) -> int:
@@ -104,7 +122,7 @@ class Argon2Hasher(IHasher):
 
         Raises
         ------
-        HashConfigurationException
+        orionis.hashing.exceptions.HashConfigurationException
             If the value is not an integer greater than zero.
         """
         if not isinstance(value, int) or isinstance(value, bool) or value < 1:
@@ -121,12 +139,12 @@ class Argon2Hasher(IHasher):
 
         Returns
         -------
-        Any
+        typing.Any
             Backend class provided by the underlying library.
 
         Raises
         ------
-        MissingHashDependencyException
+        orionis.hashing.exceptions.MissingHashDependencyException
             If the backend package is not installed.
         """
         if self._backend_class is None:
@@ -152,7 +170,7 @@ class Argon2Hasher(IHasher):
 
         Returns
         -------
-        Any
+        typing.Any
             Configured backend instance.
         """
         return self._backendClass()(
@@ -167,7 +185,7 @@ class Argon2Hasher(IHasher):
 
         Returns
         -------
-        Any
+        typing.Any
             Backend instance reused across calls.
         """
         if self._backend is None:
@@ -203,7 +221,7 @@ class Argon2Hasher(IHasher):
 
         Raises
         ------
-        HashConfigurationException
+        orionis.hashing.exceptions.HashConfigurationException
             If any override is not a positive integer.
         """
         # Reuse the cached backend unless the call overrides a cost value
@@ -249,7 +267,7 @@ class Argon2Hasher(IHasher):
 
         Raises
         ------
-        HashConfigurationException
+        orionis.hashing.exceptions.HashConfigurationException
             If any override is not a positive integer.
         """
         return await self._executor.run(
@@ -356,12 +374,12 @@ class Argon2Hasher(IHasher):
 
         Returns
         -------
-        Self
+        typing.Self
             The same instance, allowing fluent configuration.
 
         Raises
         ------
-        HashConfigurationException
+        orionis.hashing.exceptions.HashConfigurationException
             If the value is not a positive integer.
         """
         self._time = self._validate("time", rounds)
@@ -381,12 +399,12 @@ class Argon2Hasher(IHasher):
 
         Returns
         -------
-        Self
+        typing.Self
             The same instance, allowing fluent configuration.
 
         Raises
         ------
-        HashConfigurationException
+        orionis.hashing.exceptions.HashConfigurationException
             If the value is not a positive integer.
         """
         self._memory = self._validate("memory", memory)
@@ -404,12 +422,12 @@ class Argon2Hasher(IHasher):
 
         Returns
         -------
-        Self
+        typing.Self
             The same instance, allowing fluent configuration.
 
         Raises
         ------
-        HashConfigurationException
+        orionis.hashing.exceptions.HashConfigurationException
             If the value is not a positive integer.
         """
         self._threads = self._validate("threads", threads)

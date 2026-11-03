@@ -1,3 +1,5 @@
+"""Enumerate MySQL character sets usable by the configured connection drivers."""
+
 from enum import Enum
 
 class MySQLCharset(Enum):
@@ -72,7 +74,7 @@ class MySQLCharset(Enum):
 
     Returns
     -------
-    MySQLCharset
+    orionis.foundation.config.database.MySQLCharset
         The enumeration member representing a MySQL connection character set.
     """
 

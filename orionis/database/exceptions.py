@@ -1,3 +1,9 @@
+"""Provide database operations.
+
+Includes ``DatabaseException``, ``ConnectionNotFoundException``,
+``MigrationNotFoundException``, ``MissingDatabaseDependencyException``.
+"""
+
 from __future__ import annotations
 
 class DatabaseException(Exception):

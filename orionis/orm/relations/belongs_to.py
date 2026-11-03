@@ -1,3 +1,5 @@
+"""Inverse relationship: the foreign key lives on the parent row."""
+
 from __future__ import annotations
 from typing import TYPE_CHECKING
 from orionis.orm.metaclass import snake_case
@@ -18,6 +20,7 @@ class BelongsToRelation[TRelated: "Model"](Relation[TRelated]):
     """
 
     __slots__ = ("_foreign_key", "_owner_key")
+    """Declare the instance attribute slots reserved by this class."""
 
     def __init__(
         self,
@@ -31,9 +34,9 @@ class BelongsToRelation[TRelated: "Model"](Relation[TRelated]):
 
         Parameters
         ----------
-        parent : Model
+        parent : orionis.orm.Model
             Model instance the relationship is accessed from.
-        related : type of Model
+        related : type of orionis.orm.Model
             Model class the relationship targets.
         foreign_key : str or None
             Column on the parent referencing the related row; defaults
@@ -48,7 +51,15 @@ class BelongsToRelation[TRelated: "Model"](Relation[TRelated]):
             This method does not return a value.
         """
         self._foreign_key = foreign_key or f"{snake_case(related.__name__)}_id"
+        """
+        Column on the parent referencing the related row; defaults to
+        ``snake_case(RelatedClass) + "_id"``.
+        """
         self._owner_key = owner_key or related.__meta__.primary_key
+        """
+        Column on the related table identifying the owning row; defaults to the
+        related model's primary key.
+        """
         super().__init__(parent, related)
 
     def addConstraints(self) -> None:
@@ -74,7 +85,7 @@ class BelongsToRelation[TRelated: "Model"](Relation[TRelated]):
 
         Parameters
         ----------
-        models : list of Model
+        models : list of orionis.orm.Model
             Child instances being eager loaded together.
 
         Returns
@@ -88,6 +99,7 @@ class BelongsToRelation[TRelated: "Model"](Relation[TRelated]):
             if (value := getattr(model, self._foreign_key)) is not None
         }
         self._eager_keys_empty = not keys
+        """Whether eager loading has no parent keys to query."""
         self.whereIn(self._owner_key, keys)
 
     async def getResults(self) -> TRelated | None:
@@ -96,7 +108,7 @@ class BelongsToRelation[TRelated: "Model"](Relation[TRelated]):
 
         Returns
         -------
-        Model or None
+        orionis.orm.Model or None
             Owning model, or ``None`` when the foreign key is unset or
             references no row.
         """
@@ -115,10 +127,10 @@ class BelongsToRelation[TRelated: "Model"](Relation[TRelated]):
 
         Parameters
         ----------
-        models : list of Model
+        models : list of orionis.orm.Model
             Child instances being eager loaded together.
-        results : Collection
-            Owning rows produced by :meth:`getEager`.
+        results : collections.abc.Collection
+            Owning rows produced by ``getEager``.
         name : str
             Relationship name the result is stored under.
 

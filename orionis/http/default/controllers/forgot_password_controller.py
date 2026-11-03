@@ -1,3 +1,5 @@
+"""Handle the built-in password-reset request endpoints."""
+
 from urllib.parse import urlencode
 from orionis.auth.passwords.broker import PasswordBroker
 from orionis.background.task import BackgroundTask
@@ -13,15 +15,22 @@ from orionis.support.facades import Mail
 from orionis.support.facades.lang import Lang
 
 _MAX_EMAIL_LENGTH = 255
+"""Max email length value used by ``forgot_password_controller``."""
 _TOKEN_LENGTH = 43
+"""Token length value used by ``forgot_password_controller``."""
 
 class ForgotPasswordController(BaseController):
 
     # ruff: noqa: TC001, BLE001
+    """Handle the built-in password-reset request endpoints."""
 
     SENT_MESSAGE = (
         "If an account matches that email, you will receive a password reset link."
     )
+    """
+    Confirmation shown after a password-reset request, regardless of whether
+    the account exists.
+    """
 
     async def index(self) -> HTMLResponse:
         """
@@ -29,7 +38,7 @@ class ForgotPasswordController(BaseController):
 
         Returns
         -------
-        HTMLResponse
+        orionis.http.HTMLResponse
             Rendered forgot-password page response.
         """
         # Render the forgot-password page without exposing any sensitive information.
@@ -46,16 +55,16 @@ class ForgotPasswordController(BaseController):
 
         Parameters
         ----------
-        payload : ForgotPasswordSchema
+        payload : orionis.http.default.schemas.forgot_password.ForgotPasswordSchema
             Validated email address submitted by the requester.
-        request : Request
+        request : orionis.http.Request
             Current HTTP request used to build the reset URL.
-        broker : PasswordBroker
+        broker : orionis.auth.passwords.broker.PasswordBroker
             Service that issues and validates reset tokens.
 
         Returns
         -------
-        HttpResponse
+        orionis.http.Response
             Private redirect response returned before account lookup.
         """
         # Immediately return a private redirect response while the reset
@@ -85,7 +94,7 @@ class ForgotPasswordController(BaseController):
             Email address submitted for password recovery.
         base_url : str
             Application base URL used to construct the link.
-        broker : PasswordBroker
+        broker : orionis.auth.passwords.broker.PasswordBroker
             Service that issues the reset token and loads the account.
 
         Returns
@@ -130,14 +139,14 @@ class ForgotPasswordController(BaseController):
 
         Parameters
         ----------
-        request : Request
+        request : orionis.http.Request
             Current HTTP request containing the email and token query values.
-        broker : PasswordBroker
+        broker : orionis.auth.passwords.broker.PasswordBroker
             Service that validates the reset token.
 
         Returns
         -------
-        HTMLResponse
+        orionis.http.HTMLResponse
             Reset form response with the link validity state.
         """
         # Extract the email and token from the query parameters.
@@ -162,14 +171,14 @@ class ForgotPasswordController(BaseController):
 
         Parameters
         ----------
-        request : Request
+        request : orionis.http.Request
             Current HTTP request containing the reset form payload.
-        broker : PasswordBroker
+        broker : orionis.auth.passwords.broker.PasswordBroker
             Service that validates and consumes the reset token.
 
         Returns
         -------
-        HttpResponse
+        orionis.http.Response
             Reset form response for invalid input, or a private login redirect
             after a successful reset.
         """
@@ -265,7 +274,7 @@ class ForgotPasswordController(BaseController):
 
         Returns
         -------
-        HTMLResponse
+        orionis.http.HTMLResponse
             Private reset form response with optional validation errors.
         """
         # Prepare the pending response for the reset form.
@@ -300,12 +309,12 @@ class ForgotPasswordController(BaseController):
 
         Parameters
         ----------
-        result : HttpResponse
+        result : orionis.http.Response
             Response whose security headers are updated.
 
         Returns
         -------
-        HttpResponse
+        orionis.http.Response
             The same response with privacy and indexing headers applied.
         """
         # Set headers to prevent caching and referrer leakage.

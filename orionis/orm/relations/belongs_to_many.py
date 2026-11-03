@@ -1,3 +1,5 @@
+"""Many-to-many relationship backed by an intermediate pivot table."""
+
 from __future__ import annotations
 import asyncio
 from collections import defaultdict
@@ -27,11 +29,12 @@ class BelongsToManyRelation[TRelated: "Model"](
     yet), this relationship resolves in two steps:
 
     1. Query the pivot table for the related keys linked to the parent
-       key(s) involved (:class:`RawQueryBuilder`, since the pivot table
+       key(s) involved (:class:`orionis.orm.query.raw_builder.RawQueryBuilder`, since
+       the pivot table
        has no model).
     2. Query the related model table with ``whereIn(related_key, ids)``,
        reusing the regular, fully hydrated
-       :class:`~orionis.orm.query.builder.ModelQueryBuilder` machinery.
+       :class:`orionis.orm.query.ModelQueryBuilder` machinery.
 
     Composite pivot keys are out of scope: like the rest of the ORM,
     every key involved is a single column.
@@ -50,6 +53,7 @@ class BelongsToManyRelation[TRelated: "Model"](
         "_related_pivot_key",
         "_table",
     )
+    """Declare the instance attribute slots reserved by this class."""
 
     def __init__(  # noqa: PLR0913
         self,
@@ -66,9 +70,9 @@ class BelongsToManyRelation[TRelated: "Model"](
 
         Parameters
         ----------
-        parent : Model
+        parent : orionis.orm.Model
             Model instance the relationship is accessed from.
-        related : type of Model
+        related : type of orionis.orm.Model
             Model class the relationship targets.
         table : str or None
             Pivot table name; defaults to both model names in
@@ -95,20 +99,46 @@ class BelongsToManyRelation[TRelated: "Model"](
         """
         parent_cls = type(parent)
         self._table = table or self._defaultPivotTable(parent_cls, related)
+        """
+        Pivot table name; defaults to both model names in snake_case, singular,
+        joined by ``"_"`` in alphabetical order (for instance ``role_user``).
+        """
         self._foreign_pivot_key = (
             foreign_pivot_key or f"{snake_case(parent_cls.__name__)}_id"
         )
+        """
+        Pivot column referencing the parent; defaults to ``snake_case(ParentClass) +
+        "_id"``.
+        """
         self._related_pivot_key = (
             related_pivot_key or f"{snake_case(related.__name__)}_id"
         )
+        """
+        Pivot column referencing the related row; defaults to
+        ``snake_case(RelatedClass) + "_id"``.
+        """
         self._parent_key = parent_key or parent_cls.__meta__.primary_key
+        """
+        Column on the parent matched against ``foreign_pivot_key``; defaults to the
+        parent's primary key.
+        """
         self._related_key = related_key or related.__meta__.primary_key
+        """
+        Column on the related table matched against ``related_pivot_key``; defaults
+        to the related model's primary key.
+        """
         self._parent_keys: tuple[Any, ...] = ()
+        """Parent identifiers participating in the relation query."""
         self._pivot_wheres: list[tuple[str, tuple[Any, ...]]] = []
+        """Predicates applied to the relation pivot table."""
         self._related_map: dict[Any, list[Any]] = {}
+        """Related models indexed for assignment to their parent objects."""
         self._pivot_constraint: WhereClause | None = None
+        """Constraint used to scope the pivot-table query."""
         self._prepare_lock: asyncio.Lock | None = None
+        """Lock coordinating one-time preparation of the relation query."""
         self._prepared = False
+        """Prepared flag used by ``BelongsToManyRelation``."""
         super().__init__(parent, related)
 
     @staticmethod
@@ -118,9 +148,9 @@ class BelongsToManyRelation[TRelated: "Model"](
 
         Parameters
         ----------
-        parent_cls : type of Model
+        parent_cls : type of orionis.orm.Model
             Parent model class.
-        related : type of Model
+        related : type of orionis.orm.Model
             Related model class.
 
         Returns
@@ -138,7 +168,8 @@ class BelongsToManyRelation[TRelated: "Model"](
         """
         Capture the parent key used to resolve the pivot rows.
 
-        The pivot query itself is deferred to :meth:`get`/other
+        The pivot query itself is deferred to
+        :meth:`orionis.orm.relations.BelongsToManyRelation.get`/other
         terminals, since resolving it requires an awaited query the
         constructor cannot perform.
 
@@ -156,7 +187,7 @@ class BelongsToManyRelation[TRelated: "Model"](
 
         Parameters
         ----------
-        models : list of Model
+        models : list of orionis.orm.Model
             Parent instances being eager loaded together.
 
         Returns
@@ -172,6 +203,7 @@ class BelongsToManyRelation[TRelated: "Model"](
         self._invalidatePivot()
         self._parent_keys = tuple(keys)
         self._eager_keys_empty = not keys
+        """Whether eager loading has no parent keys to query."""
 
     def _pivotQuery(self) -> RawQueryBuilder:
         """
@@ -179,7 +211,7 @@ class BelongsToManyRelation[TRelated: "Model"](
 
         Returns
         -------
-        RawQueryBuilder
+        orionis.orm.query.raw_builder.RawQueryBuilder
             Fresh builder bound to the pivot table and the connection
             the relationship runs on.
         """
@@ -194,7 +226,7 @@ class BelongsToManyRelation[TRelated: "Model"](
 
         Returns
         -------
-        Collection
+        collections.abc.Collection
             Related models; empty when the parent has no key or no
             pivot row links it to anything.
         """
@@ -211,10 +243,10 @@ class BelongsToManyRelation[TRelated: "Model"](
 
         Parameters
         ----------
-        models : list of Model
+        models : list of orionis.orm.Model
             Parent instances being eager loaded together.
-        results : Collection
-            Related rows produced by :meth:`getEager`.
+        results : collections.abc.Collection
+            Related rows produced by ``getEager``.
         name : str
             Relationship name the results are stored under.
 
@@ -287,7 +319,7 @@ class BelongsToManyRelation[TRelated: "Model"](
 
         Returns
         -------
-        Self
+        typing.Self
             Independent relationship builder with copied query state.
         """
         duplicate = super().clone()
@@ -328,7 +360,7 @@ class BelongsToManyRelation[TRelated: "Model"](
 
         Returns
         -------
-        Collection
+        collections.abc.Collection
             Collection of hydrated related model instances.
         """
         if not await self._prepare():
@@ -341,7 +373,7 @@ class BelongsToManyRelation[TRelated: "Model"](
 
         Returns
         -------
-        Model or None
+        orionis.orm.Model or None
             First linked related model, or ``None`` without matches.
         """
         if not await self._prepare():
@@ -358,14 +390,14 @@ class BelongsToManyRelation[TRelated: "Model"](
 
         Parameters
         ----------
-        function : AggregateFunction
+        function : orionis.orm.query.AggregateFunction
             Aggregate operation to perform.
         column : str
             Related-model column passed to the aggregate operation.
 
         Returns
         -------
-        Any
+        typing.Any
             Result returned by the query builder's aggregate operation.
         """
         await self._prepare()
@@ -377,7 +409,7 @@ class BelongsToManyRelation[TRelated: "Model"](
 
         Parameters
         ----------
-        values : dict of str to Any
+        values : dict of str ``to`` typing.Any
             Column values to apply to the linked related records.
 
         Returns
@@ -439,12 +471,12 @@ class BelongsToManyRelation[TRelated: "Model"](
         ----------
         column : str
             Pivot table column name.
-        *args : Any
+        *args : typing.Any
             Either the bound value, or an operator followed by a value.
 
         Returns
         -------
-        BelongsToManyRelation
+        orionis.orm.relations.BelongsToManyRelation
             The same relationship, enabling fluent chaining.
         """
         self._invalidatePivot()
@@ -463,7 +495,7 @@ class BelongsToManyRelation[TRelated: "Model"](
 
         Parameters
         ----------
-        ids : Any
+        ids : typing.Any
             A related id, model instance, iterable of either, or a
             mapping of id (or model) to per-row pivot attributes.
         attributes : dict or None, optional
@@ -506,7 +538,7 @@ class BelongsToManyRelation[TRelated: "Model"](
 
         Parameters
         ----------
-        ids : Any, optional
+        ids : typing.Any, optional
             A related id, model instance, or iterable of either;
             ``None`` detaches every related record currently linked.
 
@@ -533,12 +565,12 @@ class BelongsToManyRelation[TRelated: "Model"](
 
         Parameters
         ----------
-        ids : Iterable
+        ids : collections.abc.Iterable
             Related ids or model instances that must remain attached.
 
         Returns
         -------
-        dict of str to list
+        dict of str ``to`` list
             ``"attached"`` and ``"detached"`` related id lists.
         """
         target = set(self._normalizeIds(ids))
@@ -560,12 +592,12 @@ class BelongsToManyRelation[TRelated: "Model"](
 
         Parameters
         ----------
-        ids : Iterable
+        ids : collections.abc.Iterable
             Related ids or model instances to toggle.
 
         Returns
         -------
-        dict of str to list
+        dict of str ``to`` list
             ``"attached"`` and ``"detached"`` related id lists.
         """
         id_list = self._normalizeIds(ids)
@@ -600,7 +632,7 @@ class BelongsToManyRelation[TRelated: "Model"](
 
         Parameters
         ----------
-        ids : Any
+        ids : typing.Any
             A related id, model instance, or iterable of either.
 
         Returns
@@ -618,12 +650,12 @@ class BelongsToManyRelation[TRelated: "Model"](
 
         Parameters
         ----------
-        item : Any
+        item : typing.Any
             Related id, or a model instance to read the related key from.
 
         Returns
         -------
-        Any
+        typing.Any
             Related id value.
         """
         # Imported locally: importing the Model class at module level

@@ -1,3 +1,5 @@
+"""Define the contract for connection manager implementations."""
+
 from __future__ import annotations
 from abc import ABC, abstractmethod
 from typing import TYPE_CHECKING, Any
@@ -6,8 +8,10 @@ if TYPE_CHECKING:
     from orionis.database.contracts.connection import IConnection
 
 class IConnectionManager(ABC):
+    """Define the contract for connection manager implementations."""
 
     __slots__ = ()
+    """Declare that this class introduces no additional instance slots."""
 
     @abstractmethod
     def connection(self, name: str | None = None) -> IConnection:
@@ -24,12 +28,12 @@ class IConnectionManager(ABC):
 
         Returns
         -------
-        IConnection
+        orionis.database.contracts.IConnection
             Connection bound to its configuration.
 
         Raises
         ------
-        ConnectionNotFoundException
+        orionis.database.ConnectionNotFoundException
             If the connection is not declared in the configuration.
         """
 
@@ -39,7 +43,8 @@ class IConnectionManager(ABC):
         Register or replace a named connection configuration at runtime.
 
         A live connection built from a previous configuration keeps
-        serving until :meth:`disconnect` is called for that name.
+        serving until :meth:`orionis.database.contracts.IConnectionManager.disconnect`
+        is called for that name.
 
         Parameters
         ----------
@@ -106,7 +111,7 @@ class IConnectionManager(ABC):
 
         Raises
         ------
-        ConnectionNotFoundException
+        orionis.database.ConnectionNotFoundException
             If the connection is not declared in the configuration.
         """
 
@@ -145,6 +150,6 @@ class IConnectionManager(ABC):
 
         Raises
         ------
-        ConnectionNotFoundException
+        orionis.database.ConnectionNotFoundException
             If the connection is not declared in the configuration.
         """

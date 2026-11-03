@@ -1,3 +1,5 @@
+"""Group the orm exceptions components and public imports."""
+
 from __future__ import annotations
 
 class OrmException(Exception):

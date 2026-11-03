@@ -1,3 +1,5 @@
+"""Read-only view over the validation errors flashed for this request."""
+
 from __future__ import annotations
 from typing import TYPE_CHECKING, Any
 from orionis.session.contracts.session import ISession
@@ -9,6 +11,7 @@ if TYPE_CHECKING:
 
 # Returned when no session is reachable, so templates never blow up.
 _EMPTY: dict[str, list[str]] = {}
+"""Returned when no session is reachable, so templates never blow up."""
 
 class ErrorBag:
     """
@@ -21,6 +24,7 @@ class ErrorBag:
     """
 
     __slots__ = ("_app",)
+    """Declare the instance attribute slots reserved by this class."""
 
     def __init__(self, app: IApplication) -> None:
         """
@@ -28,14 +32,16 @@ class ErrorBag:
 
         Parameters
         ----------
-        app : IApplication
+        app : orionis.IApplication
             Application container used for service resolution.
 
         Returns
         -------
         None
+            Bind the bag to the application container.
         """
         self._app = app
+        """Application container used for service resolution."""
 
     async def __resolve(self) -> dict[str, list[str]]:
         """
@@ -138,12 +144,12 @@ def _global_errors(app: IApplication) -> Any:
 
     Parameters
     ----------
-    app : IApplication
+    app : orionis.IApplication
         Application container used for service resolution.
 
     Returns
     -------
-    Any
+    typing.Any
         Bag exposing the validation errors flashed for this request.
     """
     return ErrorBag(app)

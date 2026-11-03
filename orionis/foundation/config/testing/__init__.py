@@ -1,3 +1,5 @@
+"""Group the foundation config testing components and public imports."""
+
 from typing import TYPE_CHECKING as _TYPE_CHECKING
 from orionis._exports import resolve_export as _resolve_export
 
@@ -14,6 +16,7 @@ _EXPORTS = {
     "Testing": ("orionis.foundation.config.testing.entities.testing", "Testing"),
     "VerbosityMode": ("orionis.foundation.config.testing.enums", "VerbosityMode"),
 }
+"""Public export names mapped to their defining modules and attributes."""
 
 def __getattr__(name: str) -> object:
     """

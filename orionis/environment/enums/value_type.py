@@ -1,3 +1,5 @@
+"""Define supported types for casting environment variable values."""
+
 from enum import Enum
 
 class EnvironmentValueType(Enum):

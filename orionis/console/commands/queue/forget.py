@@ -1,3 +1,5 @@
+"""Remove one failed job record."""
+
 from typing import ClassVar
 from orionis.console.args.argument import Argument
 from orionis.console.base.command import BaseCommand
@@ -8,13 +10,18 @@ class QueueForgetCommand(BaseCommand):
     """Remove one failed job record."""
 
     __slots__ = ()
+    """Declare that this class introduces no additional instance slots."""
 
     timestamps: bool = False
+    """Timestamps flag used by ``QueueForgetCommand``."""
     signature: str = "queue:forget"
+    """Signature identifier: ``queue:forget``."""
     description: str = "Delete a failed job by its identifier."
+    """Description identifier: ``Delete a failed job by its identifier.``."""
     arguments: ClassVar[list[Argument]] = [
         Argument(name_or_flags="id", type_=str, help="Failed job identifier."),
     ]
+    """Command-line argument declarations accepted by this command."""
 
     async def handle(self, manager: IQueueManager) -> int:
         """
@@ -22,7 +29,7 @@ class QueueForgetCommand(BaseCommand):
 
         Parameters
         ----------
-        manager : IQueueManager
+        manager : orionis.queues.contracts.manager.IQueueManager
             Queue manager providing persistent failure storage.
 
         Returns

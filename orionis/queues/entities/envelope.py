@@ -1,3 +1,5 @@
+"""Carry immutable, versioned job data independently of backend state."""
+
 import math
 from uuid import UUID
 import msgspec
@@ -10,15 +12,25 @@ class JobEnvelope(
     """Carry immutable, versioned job data independently of backend state."""
 
     id: str
+    """Identifier used to correlate or locate this protocol or storage record."""
     job: str
+    """Registered job class or type identifier."""
     payload: bytes
+    """Serialized data required to execute or restore the job."""
     connection: str
+    """Configured connection used to store or dispatch the operation."""
     queue: str
+    """Name of the queue receiving or storing the job."""
     max_tries: int
+    """Maximum number of execution attempts allowed for the job."""
     timeout: float | None
+    """Maximum duration allowed for an execution attempt."""
     backoff: tuple[float, ...]
+    """Delay policy applied before retrying a failed attempt."""
     retry_until: float | None = None
+    """Deadline after which the job must no longer be retried."""
     version: int = 1
+    """Version value used by ``JobEnvelope``."""
 
     def __post_init__(self) -> None:
         """

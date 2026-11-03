@@ -1,3 +1,5 @@
+"""Define how a persisted identity becomes an application object."""
+
 from abc import ABC, abstractmethod
 from typing import TYPE_CHECKING
 
@@ -15,6 +17,7 @@ class IIdentityProvider(ABC):
     """
 
     __slots__ = ()
+    """Declare that this class introduces no additional instance slots."""
 
     async def updateRememberToken( # NOSONAR
         self,
@@ -22,7 +25,8 @@ class IIdentityProvider(ABC):
         expected: str | None,  # noqa: ARG002
         token: str | None,  # noqa: ARG002
     ) -> bool:
-        """Optionally compare and replace a persistent credential atomically.
+        """
+        Optionally compare and replace a persistent credential atomically.
 
         Providers supporting remember-me must also compare the current password
         and require an active identity when issuing a non-null token. Providers
@@ -30,7 +34,7 @@ class IIdentityProvider(ABC):
 
         Parameters
         ----------
-        identity : IAuthenticatable
+        identity : orionis.auth.contracts.IAuthenticatable
             Value supplied for ``identity``.
         expected : str | None
             Value supplied for ``expected``.
@@ -56,7 +60,7 @@ class IIdentityProvider(ABC):
 
         Returns
         -------
-        IAuthenticatable | None
+        orionis.auth.contracts.IAuthenticatable | None
             Matching identity, or ``None`` when it no longer exists.
         """
 
@@ -73,12 +77,12 @@ class IIdentityProvider(ABC):
 
         Parameters
         ----------
-        credentials : Mapping[str, object]
+        credentials : collections.abc.Mapping[str, object]
             Submitted credentials.
 
         Returns
         -------
-        IAuthenticatable | None
+        orionis.auth.contracts.IAuthenticatable | None
             Matching identity, or ``None`` when no identity matches.
         """
 
@@ -93,9 +97,9 @@ class IIdentityProvider(ABC):
 
         Parameters
         ----------
-        identity : IAuthenticatable | None
+        identity : orionis.auth.contracts.IAuthenticatable | None
             Identity whose stored password should be checked.
-        credentials : Mapping[str, object]
+        credentials : collections.abc.Mapping[str, object]
             Submitted credentials.
 
         Returns

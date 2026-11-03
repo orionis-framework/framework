@@ -6,6 +6,7 @@ import tokenize
 from pathlib import Path
 from tempfile import TemporaryDirectory
 from unittest import TestCase
+from unittest.mock import call as mock_call, patch
 from orionis.console.commands.bootstrap._editor import (
     BootstrapEditError,
     BootstrapEditor,
@@ -977,6 +978,137 @@ class TestBootstrapEditor(TestCase):
         editor = BootstrapEditor(self.path, self.base)
         editor.commit(editor.routing("api", self.base / "routes/api.py"))
         self.assertIn("# café".encode("latin-1"), self.path.read_bytes())
+
+    def test_commit_retries_transient_windows_replacement_failures(self) -> None:
+        """
+        Publish the staged source after transient Windows file locks clear.
+
+        Returns
+        -------
+        None
+            Verify bounded backoff, atomic publication, and temporary cleanup.
+        """
+        original_replace = Path.replace
+        replacements: list[Path] = []
+        error = PermissionError(13, "File is temporarily locked")
+
+        def replace_after_unlock(source: Path, target: Path) -> Path:
+            """Publish the same staging file after five sharing failures."""
+            replacements.append(source)
+            if len(replacements) < 6:
+                raise error
+            return original_replace(source, target)
+
+        for winerror in (5, 32, 33):
+            with self.subTest(winerror=winerror):
+                editor = self.editor("app = Application()\napp.create()\n")
+                result = editor.routing("api", self.base / "routes/api.py")
+                error.winerror = winerror
+                replacements.clear()
+                with (
+                    patch.object(Path, "replace", new=replace_after_unlock),
+                    patch("orionis.console.commands.bootstrap._editor.sleep") as wait,
+                ):
+                    self.assertTrue(editor.commit(result))
+                self.assertEqual(len(replacements), 6)
+                self.assertEqual(len(set(replacements)), 1)
+                self.assertEqual(
+                    wait.call_args_list,
+                    [mock_call(delay) for delay in (0.005, 0.01, 0.02, 0.04, 0.08)],
+                )
+                self.assertEqual(self.path.read_bytes().decode(editor.encoding), result)
+                self.assertEqual(list(self.path.parent.glob(".bootstrap-*")), [])
+
+    def test_commit_reports_persistent_windows_replacement_failures(self) -> None:
+        """
+        Propagate a persistent Windows lock after the retry budget is exhausted.
+
+        Returns
+        -------
+        None
+            Verify the original source and exception survive failed publication.
+        """
+        editor = self.editor("app = Application()\napp.create()\n")
+        original = self.path.read_bytes()
+        result = editor.routing("api", self.base / "routes/api.py")
+        error = PermissionError(13, "File remains locked")
+        error.winerror = 5
+        with (
+            patch.object(Path, "replace", side_effect=error) as replace,
+            patch("orionis.console.commands.bootstrap._editor.sleep") as wait,
+            self.assertRaises(PermissionError) as raised,
+        ):
+            editor.commit(result)
+        self.assertIs(raised.exception, error)
+        self.assertEqual(replace.call_count, 6)
+        self.assertEqual(
+            wait.call_args_list,
+            [mock_call(delay) for delay in (0.005, 0.01, 0.02, 0.04, 0.08)],
+        )
+        self.assertEqual(self.path.read_bytes(), original)
+        self.assertEqual(list(self.path.parent.glob(".bootstrap-*")), [])
+
+    def test_commit_does_not_retry_other_replacement_errors(self) -> None:
+        """
+        Propagate non-Windows and unsupported replacement errors immediately.
+
+        Returns
+        -------
+        None
+            Verify failures preserve original source without retries or staging.
+        """
+        protected = PermissionError(13, "Write-protected file")
+        protected.winerror = 19
+        for error in (
+            PermissionError(13, "Access denied"),
+            protected,
+            FileNotFoundError("Destination is missing"),
+        ):
+            with self.subTest(error=error):
+                editor = self.editor("app = Application()\napp.create()\n")
+                original = self.path.read_bytes()
+                result = editor.routing("api", self.base / "routes/api.py")
+                with (
+                    patch.object(Path, "replace", side_effect=error) as replace,
+                    patch("orionis.console.commands.bootstrap._editor.sleep") as wait,
+                    self.assertRaises(type(error)) as raised,
+                ):
+                    editor.commit(result)
+                self.assertIs(raised.exception, error)
+                replace.assert_called_once()
+                wait.assert_not_called()
+                self.assertEqual(self.path.read_bytes(), original)
+                self.assertEqual(list(self.path.parent.glob(".bootstrap-*")), [])
+
+    def test_commit_preserves_concurrent_changes_between_replacement_attempts(
+        self,
+    ) -> None:
+        """
+        Refuse to overwrite source changed while waiting for a Windows file lock.
+
+        Returns
+        -------
+        None
+            Verify each replacement attempt checks for concurrent source edits.
+        """
+        editor = self.editor("app = Application()\napp.create()\n")
+        result = editor.routing("api", self.base / "routes/api.py")
+        changed = b"# Developer changed this file.\n"
+        error = PermissionError(13, "File is temporarily locked")
+        error.winerror = 32
+        with (
+            patch.object(Path, "replace", side_effect=error) as replace,
+            patch(
+                "orionis.console.commands.bootstrap._editor.sleep",
+                side_effect=lambda _: self.path.write_bytes(changed),
+            ) as wait,
+            self.assertRaises(BootstrapEditError),
+        ):
+            editor.commit(result)
+        replace.assert_called_once()
+        wait.assert_called_once_with(0.005)
+        self.assertEqual(self.path.read_bytes(), changed)
+        self.assertEqual(list(self.path.parent.glob(".bootstrap-*")), [])
 
     def test_second_commit_is_skipped_and_concurrent_changes_are_preserved(
         self,

@@ -1,3 +1,5 @@
+"""Resolve log suffixes for monthly rotation windows."""
+
 from __future__ import annotations
 from datetime import datetime, time
 from orionis.logging.contracts.suffix_resolver import SuffixResolver
@@ -6,15 +8,18 @@ from orionis.support.facades.datetime import DateTime
 class MonthlySuffixResolver(SuffixResolver):
 
     # ruff: noqa: PLR2004
+    """Resolve log suffixes for monthly rotation windows."""
 
     __slots__ = ("at_time", "tz")
+    """Declare the instance attribute slots reserved by this class."""
 
     def __init__(self, at_time: time | None = None) -> None:
-        """Initialize the resolver with an optional rotation time.
+        """
+        Initialize the resolver with an optional rotation time.
 
         Parameters
         ----------
-        at_time : time or None, optional
+        at_time : datetime.time or None, optional
             The time of day when rotation should occur. Defaults to midnight.
 
         Returns
@@ -23,14 +28,17 @@ class MonthlySuffixResolver(SuffixResolver):
             This method does not return a value.
         """
         self.at_time = at_time or time(0, 0, 0)
+        """The time of day when rotation should occur. Defaults to midnight."""
         self.tz = DateTime.getZoneInfo()
+        """Tz produced by ``DateTime.getZoneInfo``."""
 
     def getSuffix(self, dt: datetime | None = None) -> str:
-        """Return the suffix string for the given datetime.
+        """
+        Return the suffix string for the given datetime.
 
         Parameters
         ----------
-        dt : datetime or None, optional
+        dt : datetime.datetime or None, optional
             The datetime to generate the suffix for. If None, uses current
             local datetime.
 
@@ -45,16 +53,17 @@ class MonthlySuffixResolver(SuffixResolver):
         return dt.strftime("%Y-%m")
 
     def getNextRotationTime(self, current_time: datetime) -> datetime:
-        """Compute the next rotation datetime after the current time.
+        """
+        Compute the next rotation datetime after the current time.
 
         Parameters
         ----------
-        current_time : datetime
+        current_time : datetime.datetime
             The current datetime.
 
         Returns
         -------
-        datetime
+        datetime.datetime
             The datetime when the next rotation should occur.
         """
         # Determine the first day of the next month

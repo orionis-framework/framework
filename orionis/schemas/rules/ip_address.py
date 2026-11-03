@@ -1,8 +1,11 @@
+"""Ensure a string is a valid IP address."""
+
 import ipaddress
 from orionis.schemas.rule import Rule
 
 # IP versions the rule is able to enforce.
 _VERSIONS: frozenset[int] = frozenset({4, 6})
+"""IP versions the rule is able to enforce."""
 
 class IpAddress(Rule):
     """
@@ -15,9 +18,12 @@ class IpAddress(Rule):
     # ruff: noqa: ARG002
 
     __slots__ = ("_version",)
+    """Declare the instance attribute slots reserved by this class."""
 
     __message__ = "Value must be a valid IP address."
+    """Error text for message: ``Value must be a valid IP address.``."""
     __code__ = "ip"
+    """Code identifier: ``ip``."""
 
     def __init__(
         self,
@@ -51,6 +57,10 @@ class IpAddress(Rule):
             error_msg = f"Unsupported IP version: {version!r}. Use 4, 6 or None."
             raise ValueError(error_msg)
         self._version: int | None = version
+        """
+        Required IP version, either ``4`` or ``6``. Use ``None`` to accept both
+        families.
+        """
 
     async def enforce(
         self,

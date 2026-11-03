@@ -1,3 +1,5 @@
+"""Resolve lazy connections and expose the canonical deferred dispatch API."""
+
 import asyncio
 import inspect
 from importlib import import_module
@@ -30,19 +32,19 @@ def _discover_jobs(base_path: Path, jobs_path: Path) -> tuple[type[BaseJob], ...
 
     Parameters
     ----------
-    base_path : Path
+    base_path : pathlib.Path
         Application root used to resolve Python module names.
-    jobs_path : Path
+    jobs_path : pathlib.Path
         Jobs directory resolved from the application's ``app_jobs`` path.
 
     Returns
     -------
-    tuple[type[BaseJob], ...]
+    tuple[type[orionis.queues.BaseJob], ``...``]
         Concrete job classes defined in the discovered application modules.
 
     Raises
     ------
-    QueueConfigurationError
+    orionis.queues.exceptions.QueueConfigurationError
         If a discovered module cannot be imported.
     """
     modules = {
@@ -82,6 +84,7 @@ class QueueManager(IQueueManager):
         "_failed_lock",
         "_serializer",
     )
+    """Declare the instance attribute slots reserved by this class."""
 
     def __init__(self, app: IApplication, serializer: IJobSerializer) -> None:
         """
@@ -89,9 +92,9 @@ class QueueManager(IQueueManager):
 
         Parameters
         ----------
-        app : IApplication
+        app : orionis.IApplication
             Existing application container.
-        serializer : IJobSerializer
+        serializer : orionis.queues.contracts.serializer.IJobSerializer
             Singleton registered-job serializer.
 
         Returns
@@ -107,13 +110,20 @@ class QueueManager(IQueueManager):
             If queue settings or their storage relationships are invalid.
         """
         self._app = app
+        """Existing application container."""
         self._serializer = serializer
+        """Singleton registered-job serializer."""
         configuration = app.config("queue")
         self._config = QueueConfig(**configuration).toDict()
+        """Validated configuration used to construct and operate the service."""
         self._drivers: dict[str, IQueueDriver] = {}
+        """Configured backend drivers cached by their registered names."""
         self._driver_lock = asyncio.Lock()
+        """Synchronization primitive controlling access to driver lock."""
         self._failed: IFailedJobRepository | None = None
+        """Backend retaining failed-job records."""
         self._failed_lock = asyncio.Lock()
+        """Synchronization primitive controlling access to failed lock."""
 
     async def boot(self) -> None:
         """
@@ -126,7 +136,7 @@ class QueueManager(IQueueManager):
 
         Raises
         ------
-        QueueConfigurationError
+        orionis.queues.exceptions.QueueConfigurationError
             If the jobs path is invalid or a discovered module cannot be imported.
         """
         jobs_path = self._app.path("app_jobs")
@@ -143,12 +153,12 @@ class QueueManager(IQueueManager):
 
         Parameters
         ----------
-        job : BaseJob
+        job : orionis.queues.BaseJob
             Application job containing persistent constructor state.
 
         Returns
         -------
-        PendingDispatch
+        orionis.queues.PendingDispatch
             Fluent operation submitted only when awaited.
         """
         if not isinstance(job, BaseJob):
@@ -189,7 +199,7 @@ class QueueManager(IQueueManager):
 
         Parameters
         ----------
-        job : BaseJob
+        job : orionis.queues.BaseJob
             Job containing only declared serializable state.
         connection : str | None
             Explicit backend selection.
@@ -237,7 +247,7 @@ class QueueManager(IQueueManager):
 
         Returns
         -------
-        IQueueDriver
+        orionis.queues.contracts.driver.IQueueDriver
             Backend shared by its logical channels.
         """
         selected = self._connectionName(name)
@@ -262,7 +272,7 @@ class QueueManager(IQueueManager):
 
         Returns
         -------
-        IQueueDriver
+        orionis.queues.contracts.driver.IQueueDriver
             Driver whose real I/O starts with its first operation.
         """
         options = self._config["connections"][name]
@@ -297,14 +307,14 @@ class QueueManager(IQueueManager):
         ----------
         connection : str | None, optional
             Explicit backend or central default.
-        queues : tuple[str, ...] | None, optional
+        queues : tuple[str, ``...``] | None, optional
             Channels ordered by priority.
         concurrency : int | None, optional
             Simultaneous job executions or configured default.
 
         Returns
         -------
-        Worker
+        orionis.queues.worker.Worker
             Consumer runtime sharing the existing application container.
         """
         selected = self._connectionName(connection)
@@ -334,7 +344,7 @@ class QueueManager(IQueueManager):
 
         Returns
         -------
-        IFailedJobRepository
+        orionis.queues.contracts.failed_repository.IFailedJobRepository
             Repository shared by all queue connections.
         """
         if self._failed is not None:
@@ -362,9 +372,9 @@ class QueueManager(IQueueManager):
 
         Raises
         ------
-        DatabaseException
+        orionis.database.DatabaseException
             If a configured SQL connection cannot be resolved or its DDL fails.
-        QueueStorageError
+        orionis.queues.exceptions.QueueStorageError
             If a database does not enforce the required unique constraints.
         """
         manager = await self._app.make(IConnectionManager)

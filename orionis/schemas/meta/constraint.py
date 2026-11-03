@@ -1,3 +1,5 @@
+"""Intermediate marker for validation constraints."""
+
 from orionis.schemas.meta.validation import ValidationMetadata
 
 class ConstraintMetadata(ValidationMetadata):
@@ -12,3 +14,4 @@ class ConstraintMetadata(ValidationMetadata):
     """
 
     __slots__ = ()
+    """Declare that this class introduces no additional instance slots."""

@@ -49,6 +49,8 @@ python reactor db:table --help
 
 No programes `migrate:fresh`, `db:wipe` ni `queue:clear` como mantenimiento rutinario de producción. Borran datos o trabajo pendiente; no equivalen a limpieza de registros completados.
 
+`auth:migrate`, `cache:migrate`, `queue:migrate`, `schedule:migrate` y `session:migrate` preparan las [tablas internas del framework](../../../database/docs/es/migrations-and-seeders.md#preparar-tablas-internas-del-framework). Usan las definiciones del servicio y su configuración de tabla/conexión, no las migraciones del directorio `database/`. Crean tablas faltantes sin borrar registros ni iniciar workers o tareas.
+
 ## Servir, inspeccionar y probar
 
 `serve` inicia el servidor de desarrollo según los argumentos disponibles; revisa [HTTP](../../../http/docs/es/README.md) para el ciclo web. `route:list` inspecciona rutas registradas. `test` ejecuta el sistema de pruebas de Orionis; su modo y selección pertenecen a [Testing](../../../test/docs/es/README.md). Las tareas de desarrollo y workers son procesos de larga duración: necesitan supervisión si se usan en un entorno operativo.

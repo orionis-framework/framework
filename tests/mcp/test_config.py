@@ -7,7 +7,7 @@ from orionis.test import TestCase
 class TestMcpConfig(TestCase):
     """Verify finite budgets and an explicit browser-origin trust boundary."""
 
-    def test_defaults_export_one_config_type_with_frozen_fields(self):
+    def testDefaultsExportOneConfigTypeWithFrozenFields(self):
         """Keep shared configuration fields frozen and origin lists independent.
 
         Returns
@@ -24,7 +24,7 @@ class TestMcpConfig(TestCase):
         with self.assertRaises(FrozenInstanceError):
             configured.max_request_size = 0
 
-    def test_every_integer_budget_rejects_bool_non_integer_and_zero(self):
+    def testEveryIntegerBudgetRejectsBoolNonIntegerAndZero(self):
         """Reject values that disable or silently coerce security limits.
 
         Returns
@@ -44,7 +44,7 @@ class TestMcpConfig(TestCase):
                 ):
                     McpConfig(**{field.name: value})
 
-    def test_keepalive_and_page_size_limits(self):
+    def testKeepaliveAndPageSizeLimits(self):
         """Prevent busy-loop keepalives and impossible default pagination.
 
         Returns
@@ -58,7 +58,7 @@ class TestMcpConfig(TestCase):
         with self.assertRaises(ValueError):
             McpConfig(default_page_size=101, max_page_size=100)
 
-    def test_origins_require_explicit_http_authorities(self):
+    def testOriginsRequireExplicitHttpAuthorities(self):
         """Reject wildcard, credentialed, malformed, and path-bearing origins.
 
         Returns
@@ -89,7 +89,7 @@ class TestMcpConfig(TestCase):
             with self.subTest(origins=origins), self.assertRaises(TypeError):
                 McpConfig(allowed_origins=origins)
 
-    def test_valid_origin_collection_is_copied_to_a_list(self):
+    def testValidOriginCollectionIsCopiedToAList(self):
         """Keep configured origin lists independent from the caller's list.
 
         Returns
@@ -103,7 +103,7 @@ class TestMcpConfig(TestCase):
         self.assertEqual(configured.allowed_origins, origins[:-1])
         self.assertIsNot(configured.allowed_origins, origins)
 
-    def test_tuple_origins_remain_accepted_as_lists(self):
+    def testTupleOriginsRemainAcceptedAsLists(self):
         """Preserve existing tuple inputs while exposing origin lists.
 
         Returns

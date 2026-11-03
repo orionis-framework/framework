@@ -1,7 +1,10 @@
+"""Define the contract for service provider implementations."""
+
 from __future__ import annotations
 from abc import ABC, abstractmethod
 
 class IServiceProvider(ABC):
+    """Define the contract for service provider implementations."""
 
     @abstractmethod
     def register(self) -> None:

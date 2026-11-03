@@ -1,11 +1,15 @@
+"""Resolve log suffixes for hourly rotation windows."""
+
 from __future__ import annotations
 from datetime import datetime, timedelta
 from orionis.logging.contracts.suffix_resolver import SuffixResolver
 from orionis.support.facades.datetime import DateTime
 
 class HourlySuffixResolver(SuffixResolver):
+    """Resolve log suffixes for hourly rotation windows."""
 
     __slots__ = ("tz",)
+    """Declare the instance attribute slots reserved by this class."""
 
     def __init__(self) -> None:
         """
@@ -17,6 +21,7 @@ class HourlySuffixResolver(SuffixResolver):
             This method does not return a value.
         """
         self.tz = DateTime.getZoneInfo()
+        """Tz produced by ``DateTime.getZoneInfo``."""
 
     def getSuffix(self, dt: datetime | None = None) -> str:
         """
@@ -24,7 +29,7 @@ class HourlySuffixResolver(SuffixResolver):
 
         Parameters
         ----------
-        dt : datetime or None, optional
+        dt : datetime.datetime or None, optional
             The datetime object to generate the suffix for. If None, uses the
             current local datetime.
 
@@ -44,12 +49,12 @@ class HourlySuffixResolver(SuffixResolver):
 
         Parameters
         ----------
-        current_time : datetime
+        current_time : datetime.datetime
             The current datetime to base the next rotation time on.
 
         Returns
         -------
-        datetime
+        datetime.datetime
             The datetime object representing the next rotation time at the
             start of the next hour.
         """

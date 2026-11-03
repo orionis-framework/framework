@@ -61,7 +61,7 @@ class TestMetadata(TestCase):
             ),
         )
 
-    def test_nested_capabilities_and_client_information(self):
+    def testNestedCapabilitiesAndClientInformation(self):
         """Reject malformed known settings without closing unknown capability names.
 
         Returns
@@ -95,7 +95,7 @@ class TestMetadata(TestCase):
                 },
             )
 
-    def test_metadata_names_reserved_policy_and_valid_trace_context(self):
+    def testMetadataNamesReservedPolicyAndValidTraceContext(self):
         """Accept namespaced metadata and the documented OpenTelemetry conventions.
 
         Returns
@@ -119,7 +119,7 @@ class TestMetadata(TestCase):
             with self.subTest(key=bad), self.assertRaises(McpInvalidParams):
                 self.decode({}, **{bad: 1})
 
-    def test_invalid_trace_context(self):
+    def testInvalidTraceContext(self):
         """Reject malformed and zero trace IDs or duplicate tracestate vendors.
 
         Returns
@@ -140,7 +140,7 @@ class TestMetadata(TestCase):
 class TestOutputValidation(TestCase):
     """A typed Struct constructor must not bypass protocol validation."""
 
-    def test_valid_content_variants_and_explicit_null(self):
+    def testValidContentVariantsAndExplicitNull(self):
         """Preserve valid embedded resources, prompt messages, and JSON null output.
 
         Returns
@@ -177,7 +177,7 @@ class TestOutputValidation(TestCase):
             "resources/read",
         )
 
-    def test_invalid_direct_struct_values(self):
+    def testInvalidDirectStructValues(self):
         """Reject malformed content before the final JSON writer can serialize it.
 
         Returns
@@ -200,7 +200,7 @@ class TestOutputValidation(TestCase):
             ):
                 validate_result(CallToolResult(content=(content,)), "tools/call")
 
-    def test_result_tags_method_roles_and_cache_hints(self):
+    def testResultTagsMethodRolesAndCacheHints(self):
         """Enforce the result discriminator and the requested result family.
 
         Returns
@@ -287,7 +287,7 @@ class TestMultiRoundTrip(TestCase):
             item["params"] = params
         return InputRequiredResult(inputRequests={"question": item})
 
-    def test_requires_declared_capability_and_eligible_method(self):
+    def testRequiresDeclaredCapabilityAndEligibleMethod(self):
         """Form support is evaluated against this call's capabilities only.
 
         Returns
@@ -314,7 +314,7 @@ class TestMultiRoundTrip(TestCase):
         with self.assertRaises(McpInvalidParams): # NOSONAR
             validate_input_required(InputRequiredResult(), self.request())
 
-    def test_form_schemas_reject_nesting_and_invalid_enumerations(self):
+    def testFormSchemasRejectNestingAndInvalidEnumerations(self):
         """Only the protocol's primitive and string enum form fields are allowed.
 
         Returns
@@ -361,7 +361,7 @@ class TestMultiRoundTrip(TestCase):
             self.request({"elicitation": {"form": {}}}),
         )
 
-    def test_wire_only_roots_and_sampling(self):
+    def testWireOnlyRootsAndSampling(self):
         """Support correct embedded shapes without introducing old session APIs.
 
         Returns
@@ -393,7 +393,7 @@ class TestMultiRoundTrip(TestCase):
             self.request({"sampling": {"tools": {}}}),
         )
 
-    def test_exact_client_input_response_union(self):
+    def testExactClientInputResponseUnion(self):
         """Accept explicit result variants and reject errors or nested form values.
 
         Returns

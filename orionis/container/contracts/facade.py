@@ -1,6 +1,9 @@
+"""Define the contract for facade implementations."""
+
 from abc import ABC, abstractmethod
 
 class IFacade(ABC):
+    """Define the contract for facade implementations."""
 
     @classmethod
     @abstractmethod

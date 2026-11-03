@@ -1,3 +1,5 @@
+"""Own scoped service instances and their creation and cleanup lifecycle."""
+
 import asyncio
 from typing import Any, TypeVar, Self, TYPE_CHECKING
 from orionis.container.context.scope import ScopedContext
@@ -6,12 +8,15 @@ if TYPE_CHECKING:
     import types
 
 T = TypeVar("T")
+"""Type parameter preserving the value type across manager operations."""
 
 class ScopeManager:
 
     # ruff: noqa: ANN401
+    """Own scoped service instances and their creation and cleanup lifecycle."""
 
     __slots__ = ("__active", "__closed", "__creation_locks", "_instances", "_token")
+    """Declare the instance attribute slots reserved by this class."""
 
     def __init__(self) -> None:
         """
@@ -26,9 +31,13 @@ class ScopeManager:
         """
         # Dictionary to hold instances for the current scope
         self._instances: dict[object, object] = {}
+        """Dictionary to hold instances for the current scope."""
         self.__active = False
+        """Active flag used by ``ScopeManager``."""
         self.__closed = False
+        """Whether this resource has completed its close lifecycle."""
         self.__creation_locks: dict[object, asyncio.Lock] | None = None
+        """Locks coordinating concurrent creation of the same scoped service."""
 
     def creationLock(self, key: object) -> asyncio.Lock:
         """
@@ -155,7 +164,7 @@ class ScopeManager:
 
         Returns
         -------
-        Self
+        typing.Self
             The current ScopeManager instance.
 
         Raises
@@ -167,6 +176,7 @@ class ScopeManager:
             error_msg = "A container scope can only be entered once."
             raise RuntimeError(error_msg)
         self._token = ScopedContext.setCurrentScope(self)
+        """Context-variable token used to restore the previous scope."""
         self.__active = True
         return self
 
@@ -211,7 +221,7 @@ class ScopeManager:
 
         Returns
         -------
-        Any or None
+        typing.Any or None
             The resolved instance associated with the key, or None if not found.
         """
         # Attempt to get the instance from the internal dictionary
@@ -241,7 +251,7 @@ class ScopeManager:
         ----------
         key : object
             Key to associate with the instance.
-        value : Any
+        value : typing.Any
             Instance to store, can be synchronous or a coroutine.
 
         Returns
@@ -266,7 +276,7 @@ class ScopeManager:
 
         Returns
         -------
-        Any
+        typing.Any
             The resolved instance associated with the key.
 
         Raises

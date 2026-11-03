@@ -1,3 +1,5 @@
+"""Named database connection encapsulating the SQL engine."""
+
 from __future__ import annotations
 from asyncio import CancelledError, create_task, current_task, ensure_future
 from contextlib import asynccontextmanager
@@ -43,6 +45,7 @@ if TYPE_CHECKING:
 
 # Error message used when transaction control has no active transaction.
 _NO_ACTIVE_TRANSACTION: str = "No active transaction on this connection."
+"""Error message used when transaction control has no active transaction."""
 
 @lru_cache(maxsize=256)
 def _text_statement(sql: str) -> TextClause:
@@ -56,7 +59,7 @@ def _text_statement(sql: str) -> TextClause:
 
     Returns
     -------
-    TextClause
+    ``sqlalchemy.sql.elements.TextClause``
         SQLAlchemy textual statement with parsed bind parameters.
     """
     return text(sql)
@@ -65,6 +68,7 @@ class _TransactionState:
     """Per-task stack of open transactions bound to one raw connection."""
 
     __slots__ = ("connection", "owner", "transactions")
+    """Declare the instance attribute slots reserved by this class."""
 
     def __init__(
         self,
@@ -76,9 +80,9 @@ class _TransactionState:
 
         Parameters
         ----------
-        connection : AsyncConnection | ThreadedConnection
+        connection : ``AsyncConnection`` | ThreadedConnection
             Open connection shared by all transaction levels.
-        transaction : AsyncTransaction | ThreadedTransaction
+        transaction : ``AsyncTransaction`` | ThreadedTransaction
             Root transaction used to initialize the stack.
 
         Returns
@@ -87,8 +91,11 @@ class _TransactionState:
             Store the connection, owning task, and transaction stack.
         """
         self.connection = connection
+        """Open connection shared by all transaction levels."""
         self.owner = current_task()
+        """Owner produced by ``current_task``."""
         self.transactions: list[AsyncTransaction | ThreadedTransaction] = [transaction]
+        """Transaction scopes currently associated with the connection context."""
 
     async def __aenter__(self) -> AsyncConnection | ThreadedConnection:
         """
@@ -96,7 +103,7 @@ class _TransactionState:
 
         Returns
         -------
-        AsyncConnection | ThreadedConnection
+        ``AsyncConnection`` | ThreadedConnection
             Open connection retained by the transaction owner.
         """
         return self.connection
@@ -121,7 +128,7 @@ class Connection(IConnection):
     Named database connection encapsulating the SQL engine.
 
     The connection lazily builds its async engine from the Orionis
-    configuration, compiles query plans through :class:`SQLCompiler`,
+    configuration, compiles query plans through :class:`orionis.database.SQLCompiler`,
     and exposes only framework-owned types: dictionaries, integers,
     and result entities. Transactions are task-local and support
     nesting through savepoints when supported. Redshift uses the official
@@ -132,6 +139,7 @@ class Connection(IConnection):
     # ruff: noqa: ANN401
 
     __slots__ = ("_compiler", "_config", "_engine", "_name", "_tx_state")
+    """Declare the instance attribute slots reserved by this class."""
 
     def __init__(
         self,
@@ -147,7 +155,7 @@ class Connection(IConnection):
         ----------
         name : str
             Name identifying this connection in the manager.
-        config : dict of str to Any
+        config : dict of str ``to`` typing.Any
             Driver, connection settings, and optional table prefix.
 
         Returns
@@ -157,23 +165,28 @@ class Connection(IConnection):
 
         Raises
         ------
-        UnsupportedDriverException
+        orionis.database.UnsupportedDriverException
             If the driver is missing or unsupported.
         """
         # Validate the driver eagerly so misconfiguration fails fast.
         driver = resolve_driver(config)
 
         self._name = name
+        """Name identifying this connection in the manager."""
         self._config = dict(config)
+        """Driver, connection settings, and optional table prefix."""
         self._engine: AsyncEngine | ThreadedEngine | None = None
+        """Database engine, created lazily when the connection is first used."""
         self._compiler = SQLCompiler(
             str(self._config.get("prefix", "") or ""), driver=driver,
         )
+        """Compiler produced by ``SQLCompiler``."""
         # Task-local transaction state keeps concurrent tasks isolated.
         self._tx_state: ContextVar[_TransactionState | None] = ContextVar(
             f"orionis_db_tx_{name}",
             default=None,
         )
+        """Task-local transaction state keeps concurrent tasks isolated."""
 
     def getName(self) -> str:
         """
@@ -203,7 +216,7 @@ class Connection(IConnection):
 
         Parameters
         ----------
-        plan : SelectPlan
+        plan : orionis.orm.query.SelectPlan
             Query plan to render with the configured connection dialect.
         literal_binds : bool, optional
             Include bound values for debugging instead of placeholders. Values
@@ -216,9 +229,9 @@ class Connection(IConnection):
 
         Raises
         ------
-        QueryException
+        orionis.database.QueryException
             If the plan or a literal value cannot be compiled.
-        MissingDatabaseDependencyException
+        orionis.database.MissingDatabaseDependencyException
             If the configured SQL dialect is unavailable.
         """
         try:
@@ -257,9 +270,9 @@ class Connection(IConnection):
 
         Parameters
         ----------
-        query : SelectPlan or str
+        query : orionis.orm.query.SelectPlan or str
             Query plan to compile, or SQL using named ``:param`` placeholders.
-        bindings : Mapping of str to Any, optional
+        bindings : collections.abc.Mapping of str ``to`` typing.Any, optional
             Parameters for raw SQL only; ignored when ``query`` is a plan.
 
         Returns
@@ -270,7 +283,7 @@ class Connection(IConnection):
 
         Raises
         ------
-        QueryException
+        orionis.database.QueryException
             If compilation, execution, or connection cleanup fails.
         """
         if isinstance(query, str):
@@ -294,18 +307,18 @@ class Connection(IConnection):
 
         Parameters
         ----------
-        plan : InsertPlan
+        plan : orionis.orm.query.InsertPlan
             Target table and one or more rows to insert.
 
         Returns
         -------
-        InsertResult
+        orionis.database.entities.InsertResult
             Affected row count and optional first primary-key value. Keys are
             reported only for single-row inserts when the driver provides one.
 
         Raises
         ------
-        QueryException
+        orionis.database.QueryException
             If compilation, execution, or connection cleanup fails.
         """
         parameters = (
@@ -354,7 +367,7 @@ class Connection(IConnection):
 
         Parameters
         ----------
-        plan : UpdatePlan
+        plan : orionis.orm.query.UpdatePlan
             Target table, replacement values, and filtering conditions.
 
         Returns
@@ -364,7 +377,7 @@ class Connection(IConnection):
 
         Raises
         ------
-        QueryException
+        orionis.database.QueryException
             If compilation, execution, or connection cleanup fails.
         """
         statement = self._compiler.compileUpdate(plan)
@@ -381,7 +394,7 @@ class Connection(IConnection):
 
         Parameters
         ----------
-        plan : DeletePlan
+        plan : orionis.orm.query.DeletePlan
             Target table and conditions selecting the rows to delete.
 
         Returns
@@ -391,7 +404,7 @@ class Connection(IConnection):
 
         Raises
         ------
-        QueryException
+        orionis.database.QueryException
             If compilation, execution, or connection cleanup fails.
         """
         statement = self._compiler.compileDelete(plan)
@@ -408,17 +421,17 @@ class Connection(IConnection):
 
         Parameters
         ----------
-        plan : SelectPlan
+        plan : orionis.orm.query.SelectPlan
             Query plan whose first row and column provide the result.
 
         Returns
         -------
-        Any
+        typing.Any
             First column of the first row, or ``None`` when no rows are returned.
 
         Raises
         ------
-        QueryException
+        orionis.database.QueryException
             If compilation, execution, or connection cleanup fails.
         """
         statement = self._compiler.compileSelect(plan)
@@ -438,7 +451,7 @@ class Connection(IConnection):
         ----------
         sql : str
             Data-modifying SQL with optional named ``:param`` placeholders.
-        bindings : Mapping of str to Any, optional
+        bindings : collections.abc.Mapping of str ``to`` typing.Any, optional
             Values bound to the statement's named parameters.
 
         Returns
@@ -448,7 +461,7 @@ class Connection(IConnection):
 
         Raises
         ------
-        QueryException
+        orionis.database.QueryException
             If execution or cleanup fails; SQL and bound values are omitted.
         """
         async with self._acquire() as connection:
@@ -469,7 +482,7 @@ class Connection(IConnection):
         ----------
         sql : str
             SQL statement with optional named ``:param`` placeholders.
-        bindings : Mapping of str to Any, optional
+        bindings : collections.abc.Mapping of str ``to`` typing.Any, optional
             Values bound to the statement's named parameters.
 
         Returns
@@ -479,7 +492,7 @@ class Connection(IConnection):
 
         Raises
         ------
-        QueryException
+        orionis.database.QueryException
             If execution or connection cleanup fails.
         """
         async with self._acquire() as connection:
@@ -499,7 +512,7 @@ class Connection(IConnection):
 
         Parameters
         ----------
-        table : TableDefinition
+        table : orionis.orm.schema.TableDefinition
             Logical table definition; the connection prefix is applied.
         if_not_exists : bool, optional
             Skip creation when the table already exists. Defaults to ``True``.
@@ -511,7 +524,7 @@ class Connection(IConnection):
 
         Raises
         ------
-        QueryException
+        orionis.database.QueryException
             If schema compilation, creation, or connection cleanup fails.
         """
         statement = self._compiler.compileCreateTable(
@@ -556,7 +569,7 @@ class Connection(IConnection):
 
         Raises
         ------
-        QueryException
+        orionis.database.QueryException
             If schema compilation, execution, or connection cleanup fails.
         """
         statement = self._compiler.compileDropTable(
@@ -579,7 +592,7 @@ class Connection(IConnection):
 
         Raises
         ------
-        TransactionException
+        orionis.database.TransactionException
             If acquisition or transaction control fails, nesting is unsupported,
             or an active transaction belongs to another task.
         """
@@ -631,9 +644,9 @@ class Connection(IConnection):
 
         Raises
         ------
-        TransactionException
+        orionis.database.TransactionException
             If no level is active, it belongs to another task, or commit fails.
-        QueryException
+        orionis.database.QueryException
             If releasing the settled connection fails.
         """
         state = self._transactionState()
@@ -671,9 +684,9 @@ class Connection(IConnection):
 
         Raises
         ------
-        TransactionException
+        orionis.database.TransactionException
             If no level is active, it belongs to another task, or rollback fails.
-        QueryException
+        orionis.database.QueryException
             If releasing the settled connection fails.
         """
         state = self._transactionState()
@@ -706,7 +719,7 @@ class Connection(IConnection):
 
         Returns
         -------
-        ITransaction
+        orionis.database.contracts.ITransaction
             Unentered context manager that commits on success or rolls back
             when its block raises an exception.
         """
@@ -741,7 +754,7 @@ class Connection(IConnection):
 
         Raises
         ------
-        QueryException
+        orionis.database.QueryException
             If engine disposal fails.
         """
         if self._engine is not None:
@@ -760,12 +773,12 @@ class Connection(IConnection):
 
         Returns
         -------
-        AsyncEngine | ThreadedEngine
+        ``sqlalchemy.ext.asyncio.AsyncEngine`` | threaded.engine.ThreadedEngine
             Native async engine or Redshift's thread-backed engine adapter.
 
         Raises
         ------
-        MissingDatabaseDependencyException
+        orionis.database.MissingDatabaseDependencyException
             If a required DBAPI package or registered dialect is unavailable.
         """
         if self._engine is None:
@@ -794,12 +807,12 @@ class Connection(IConnection):
 
         Returns
         -------
-        _TransactionState | None
+        orionis.database.connection._TransactionState | None
             State for this task, or ``None`` if no usable state exists.
 
         Raises
         ------
-        TransactionException
+        orionis.database.TransactionException
             If another task owns an inherited state with active transaction levels.
         """
         state = self._tx_state.get()
@@ -836,14 +849,14 @@ class Connection(IConnection):
 
         Returns
         -------
-        AbstractAsyncContextManager or _TransactionState
+        contextlib.AbstractAsyncContextManager or connection._TransactionState
             Context yielding the raw connection used for statement execution.
 
         Raises
         ------
-        TransactionException
+        orionis.database.TransactionException
             If an active transaction is inherited from another task.
-        MissingDatabaseDependencyException
+        orionis.database.MissingDatabaseDependencyException
             If engine creation requires an unavailable driver or dialect.
         """
         state = self._transactionState()
@@ -868,14 +881,14 @@ class Connection(IConnection):
 
             Yields
             ------
-            AsyncConnection | ThreadedConnection
+            ``sqlalchemy.ext.asyncio.AsyncConnection`` | connection.ThreadedConnection
                 Raw connection with an active temporary transaction.
 
             Raises
             ------
-            QueryException
+            orionis.database.QueryException
                 If a SQLAlchemy error occurs during connection use or cleanup.
-            CancelledError
+            asyncio.CancelledError
                 If cancelled while acquiring or using the temporary connection.
             """
             try:
@@ -915,21 +928,21 @@ class Connection(IConnection):
 
         Parameters
         ----------
-        connection : AsyncConnection | ThreadedConnection
+        connection
             Open raw connection used for execution.
-        statement : Any
+        statement : typing.Any
             SQLAlchemy executable, including textual statements.
-        parameters : Mapping or Sequence of Mapping or None, optional
+        parameters
             Named bind parameters or per-row parameter mappings for a batch.
 
         Returns
         -------
-        CursorResult | ThreadedResult
+        ``sqlalchemy.engine.CursorResult`` | threaded.result.ThreadedResult
             Raw driver result to be consumed by the calling connection method.
 
         Raises
         ------
-        QueryException
+        orionis.database.QueryException
             If execution raises a SQLAlchemy error; driver details are omitted.
         """
         try:
@@ -954,12 +967,12 @@ class Connection(IConnection):
 
         Parameters
         ----------
-        error : SQLAlchemyError
+        error : ``sqlalchemy.exc.SQLAlchemyError``
             Original SQLAlchemy error; only its class name is retained.
 
         Returns
         -------
-        QueryException
+        orionis.database.QueryException
             Framework exception without SQL, parameters, or the driver message.
         """
         return QueryException(
@@ -976,7 +989,7 @@ class Connection(IConnection):
 
         Parameters
         ----------
-        state : _TransactionState
+        state : orionis.database.connection._TransactionState
             State whose remaining transaction levels determine whether to close.
 
         Returns
@@ -986,7 +999,7 @@ class Connection(IConnection):
 
         Raises
         ------
-        QueryException
+        orionis.database.QueryException
             If closing the settled connection fails.
         """
         if not state.transactions:

@@ -1,3 +1,5 @@
+"""Provide container facades operations through ``Facade``, ``ScopedFacade``."""
+
 from typing import Any, TYPE_CHECKING
 from orionis.container.context.manager import ScopeManager
 from orionis.container.context.scope import ScopedContext
@@ -11,8 +13,12 @@ class Facade(metaclass=FacadeMeta):
     # ruff: noqa: PLC0415
 
     # Cached application instance shared across all facade subclasses
+    """Resolve container services through a shared class-level interface."""
+
     _application: IApplication | None = None
+    """Cached application instance shared across all facade subclasses."""
     _pinned_instance: Any = None
+    """Resolved service retained while the facade is pinned."""
 
     @classmethod
     def getFacadeAccessor(cls) -> str | type:

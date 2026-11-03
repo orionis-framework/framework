@@ -1,3 +1,5 @@
+"""Remove compiled template bytecode from the configured view cache."""
+
 from pathlib import Path
 from orionis.console.base.command import BaseCommand
 from orionis.console.commands.support._clear import clear_files
@@ -10,8 +12,11 @@ class ClearViewsCommand(BaseCommand):
     # ruff: noqa: TC001
 
     timestamps: bool = False
+    """Timestamps flag used by ``ClearViewsCommand``."""
     signature: str = "clear:views"
+    """Signature identifier: ``clear:views``."""
     description: str = "Clear compiled view templates."
+    """Description identifier: ``Clear compiled view templates.``."""
 
     def handle(self, app: IApplication, console: Console) -> int:
         """
@@ -19,9 +24,9 @@ class ClearViewsCommand(BaseCommand):
 
         Parameters
         ----------
-        app : IApplication
+        app : orionis.IApplication
             Application providing view cache configuration and base path.
-        console : Console
+        console : orionis.console.Console
             Console used to report the cleanup result.
 
         Returns

@@ -1,3 +1,5 @@
+"""Group the foundation enums components and public imports."""
+
 from orionis.foundation.enums.lifespan import Lifespan
 from orionis.foundation.enums.runtimes import Runtime
 

@@ -1,3 +1,8 @@
+"""Provide http adapters response operations.
+
+Includes ``open_file``, ``complete_file_read``.
+"""
+
 from __future__ import annotations
 import asyncio
 from contextlib import suppress
@@ -14,12 +19,12 @@ async def _drain_future[T](pending: Future[T]) -> T:
 
     Parameters
     ----------
-    pending : Future[T]
+    pending : asyncio.Future[``T``]
         Worker operation whose resources must remain owned until completion.
 
     Returns
     -------
-    T
+    ``T``
         Completed worker result, including an opened handle awaiting cleanup.
     """
     while not pending.done():
@@ -33,14 +38,14 @@ async def open_file(path: Path, start: int = 0) -> BinaryIO:
 
     Parameters
     ----------
-    path : Path
+    path : pathlib.Path
         Path of the file to open.
     start : int, optional
         Byte offset at which to position the file.
 
     Returns
     -------
-    BinaryIO
+    typing.BinaryIO
         The opened file positioned at ``start``.
 
     Raises
@@ -54,7 +59,7 @@ async def open_file(path: Path, start: int = 0) -> BinaryIO:
 
         Returns
         -------
-        BinaryIO
+        typing.BinaryIO
             Result of the operation described above.
         """
         file = path.open("rb")
@@ -83,7 +88,7 @@ async def complete_file_read(pending: Future[bytes]) -> bytes:
 
     Parameters
     ----------
-    pending : Future[bytes]
+    pending : asyncio.Future[bytes]
         Future representing the pending file read.
 
     Returns

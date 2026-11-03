@@ -1,7 +1,10 @@
+"""Map resource classes to the policy classes protecting them."""
+
 from orionis.auth.contracts.policy import IPolicy
 
 # Sentinel distinguishing "not cached yet" from a cached ``None`` result.
 _MISSING: object = object()
+"""Sentinel distinguishing "not cached yet" from a cached ``None`` result."""
 
 class PolicyRegistry:
     """
@@ -19,6 +22,7 @@ class PolicyRegistry:
     """
 
     __slots__ = ("__lookup", "__policies")
+    """Declare the instance attribute slots reserved by this class."""
 
     def __init__(self) -> None:
         """
@@ -30,7 +34,9 @@ class PolicyRegistry:
             The registry starts without any policy binding.
         """
         self.__policies: dict[type, type[IPolicy]] = {}
+        """Policy classes registered for each protected resource type."""
         self.__lookup: dict[type, type[IPolicy] | None] = {}
+        """Cached resource-to-policy resolutions used during authorization."""
 
     def register(self, resource: type, policy: type[IPolicy]) -> None:
         """
@@ -40,7 +46,7 @@ class PolicyRegistry:
         ----------
         resource : type
             Resource class protected by the policy.
-        policy : type[IPolicy]
+        policy : type[orionis.auth.contracts.IPolicy]
             Policy class implementing the abilities.
 
         Returns
@@ -76,7 +82,7 @@ class PolicyRegistry:
 
         Returns
         -------
-        type[IPolicy] | None
+        type[orionis.auth.contracts.IPolicy] | None
             Registered policy class, or ``None`` when the resource and
             none of its ancestors declare one.
         """
@@ -101,7 +107,7 @@ class PolicyRegistry:
 
         Returns
         -------
-        dict[type, type[IPolicy]]
+        dict[type, type[orionis.auth.contracts.IPolicy]]
             Shallow copy, so callers cannot mutate the registry.
         """
         return dict(self.__policies)

@@ -1,3 +1,9 @@
+"""Provide view globals operations.
+
+Includes ``_global_trans``, ``_global_choice``, ``_global_locale``,
+``_global_locales``.
+"""
+
 from __future__ import annotations
 from typing import Any
 from orionis.support.facades.lang import Lang
@@ -10,7 +16,7 @@ def _global_trans() -> Any:
 
     Returns
     -------
-    Any
+    typing.Any
         Callable that translates a key for a given or the active locale.
     """
     def trans(key: str, locale: str | None = None, **replace: Any) -> str:
@@ -23,7 +29,7 @@ def _global_trans() -> Any:
             Translation key, literal text or dot-notated grouped key.
         locale : str | None, optional
             Locale to translate into, or ``None`` for the active locale.
-        **replace : Any
+        **replace : typing.Any
             Placeholder values substituted into the resolved line.
 
         Returns
@@ -41,7 +47,7 @@ def _global_choice() -> Any:
 
     Returns
     -------
-    Any
+    typing.Any
         Callable that translates a pluralized key based on a quantity.
     """
     def choice(
@@ -61,7 +67,7 @@ def _global_choice() -> Any:
             Quantity used to select the proper segment.
         locale : str | None, optional
             Locale to translate into, or ``None`` for the active locale.
-        **replace : Any
+        **replace : typing.Any
             Placeholder values substituted into the selected segment.
 
         Returns
@@ -79,7 +85,7 @@ def _global_locale() -> Any:
 
     Returns
     -------
-    Any
+    typing.Any
         Callable that returns the active application locale.
     """
     def locale() -> str:
@@ -101,7 +107,7 @@ def _global_locales() -> Any:
 
     Returns
     -------
-    Any
+    typing.Any
         Callable that returns every locale with a translation source.
     """
     def locales() -> tuple[str, ...]:
@@ -110,7 +116,7 @@ def _global_locales() -> Any:
 
         Returns
         -------
-        tuple[str, ...]
+        tuple[str, ``...``]
             Sorted locale codes discovered in the language path.
         """
         return Lang.availableLocales()

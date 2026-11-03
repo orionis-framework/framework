@@ -26,6 +26,7 @@ _EXPORTS = {
     "MemoryStorageDriver": ("orionis.storage.drivers.memory", "MemoryStorageDriver"),
     "S3StorageDriver": ("orionis.storage.drivers.s3", "S3StorageDriver"),
 }
+"""Public export names mapped to their defining modules and attributes."""
 
 
 def __getattr__(name: str) -> object:

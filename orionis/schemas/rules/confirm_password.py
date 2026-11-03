@@ -1,7 +1,10 @@
+"""Ensure a value matches the password supplied in a sibling field."""
+
 from orionis.schemas.rule import Rule
 
 # Sentinel telling apart "field absent" from "field present but None".
 _MISSING: object = object()
+"""Sentinel telling apart "field absent" from "field present but None"."""
 
 class ConfirmPassword(Rule):
     """
@@ -14,9 +17,12 @@ class ConfirmPassword(Rule):
     # ruff: noqa: ARG002
 
     __slots__ = ("_other_field",)
+    """Declare the instance attribute slots reserved by this class."""
 
     __message__ = "Value must match the password field."
+    """Error text for message: ``Value must match the password field.``."""
     __code__ = "confirm_password"
+    """Code identifier: ``confirm_password``."""
 
     def __init__(
         self,
@@ -49,6 +55,7 @@ class ConfirmPassword(Rule):
             error_msg = "ConfirmPassword requires the name of the password field."
             raise ValueError(error_msg)
         self._other_field: str = other_field
+        """Name of the sibling field holding the password to match."""
 
     async def enforce(
         self,

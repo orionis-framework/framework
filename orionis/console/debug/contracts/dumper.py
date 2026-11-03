@@ -1,3 +1,5 @@
+"""Define the contract for dumper implementations."""
+
 from __future__ import annotations
 from abc import ABC, abstractmethod
 from typing import Any
@@ -5,6 +7,7 @@ from typing import Any
 class IDumper(ABC):
 
     # ruff: noqa: PLR0913
+    """Define the contract for dumper implementations."""
 
     @staticmethod
     @abstractmethod
@@ -24,7 +27,7 @@ class IDumper(ABC):
 
         Parameters
         ----------
-        *args : Any
+        *args : typing.Any
             Variables to dump.
         show_types : bool, optional
             Whether to show variable types. Default is False.
@@ -78,7 +81,7 @@ class IDumper(ABC):
 
         Parameters
         ----------
-        *args : Any
+        *args : typing.Any
             Variables to dump.
         show_types : bool, optional
             Whether to show variable types. Default is False.

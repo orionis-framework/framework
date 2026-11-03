@@ -1,3 +1,5 @@
+"""Represent Oracle national character sets supported by Oracle Database."""
+
 from enum import Enum
 
 class OracleNencoding(Enum):
@@ -16,7 +18,7 @@ class OracleNencoding(Enum):
 
     Returns
     -------
-    OracleNencoding
+    orionis.foundation.config.database.OracleNencoding
         An enumeration member representing the Oracle encoding type.
     """
 

@@ -1,7 +1,10 @@
+"""Define the contract for file based cache implementations."""
+
 from __future__ import annotations
 from abc import ABC, abstractmethod
 
 class IFileBasedCache(ABC):
+    """Define the contract for file based cache implementations."""
 
     @abstractmethod
     def get(self) -> dict | None:

@@ -1,3 +1,9 @@
+"""Provide console operations.
+
+Includes ``bootstrap_recovery``, ``recovering_route``,
+``bootstrap_recovery_active``.
+"""
+
 from contextlib import contextmanager
 from contextvars import ContextVar
 from typing import TYPE_CHECKING
@@ -6,10 +12,13 @@ if TYPE_CHECKING:
     from collections.abc import Generator, Sequence
 
 _CONTEXTS = frozenset({"api", "ai", "console", "web", "websocket"})
+"""Contexts used by ``bootstrap``."""
 _COMMANDS = _CONTEXTS | {"config", "lifespan"}
+"""Commands used by ``bootstrap``."""
 _RECOVERING: ContextVar[str | None] = ContextVar(
     "orionis_bootstrap_route", default=None,
 )
+"""Context-local recovering isolated between asynchronous tasks."""
 
 @contextmanager
 def bootstrap_recovery(arguments: Sequence[str] | None) -> Generator[None]:
@@ -18,7 +27,7 @@ def bootstrap_recovery(arguments: Sequence[str] | None) -> Generator[None]:
 
     Parameters
     ----------
-    arguments : Sequence[str] | None
+    arguments : collections.abc.Sequence[str] | None
         CLI arguments, optionally preceded by the Reactor executable.
 
     Returns

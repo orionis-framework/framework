@@ -1,3 +1,5 @@
+"""Enumerate standard logging levels."""
+
 import logging
 from enum import Enum
 
@@ -27,7 +29,7 @@ class Level(Enum):
 
     Returns
     -------
-    Level
+    orionis.foundation.config.logging.Level
         The enumeration member representing a logging level.
     """
 

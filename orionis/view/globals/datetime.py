@@ -1,3 +1,5 @@
+"""Provide view globals operations through ``_global_now``, ``_global_today``."""
+
 from __future__ import annotations
 from typing import TYPE_CHECKING, Any
 from orionis.support.facades.datetime import DateTime
@@ -13,7 +15,7 @@ def _global_now() -> Any:
 
     Returns
     -------
-    Any
+    typing.Any
         Callable returning the current date and time.
     """
     def now() -> pendulum.DateTime:
@@ -22,7 +24,7 @@ def _global_now() -> Any:
 
         Returns
         -------
-        DateTime
+        orionis.support.facades.DateTime
             The current date and time.
         """
         return DateTime.now()
@@ -35,7 +37,7 @@ def _global_today() -> Any:
 
     Returns
     -------
-    Any
+    typing.Any
         Callable returning the current date without time component.
     """
     def today() -> pendulum.Date:
@@ -44,7 +46,7 @@ def _global_today() -> Any:
 
         Returns
         -------
-        Date
+        orionis.orm.schema.types.Date
             The current date in the configured timezone.
         """
         return DateTime.today()

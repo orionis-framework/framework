@@ -1,3 +1,5 @@
+"""Provide http default operations through ``build_chatgpt_url``."""
+
 from typing import TYPE_CHECKING, Any
 from urllib.parse import quote, unquote_to_bytes
 
@@ -6,20 +8,32 @@ if TYPE_CHECKING:
 
 # Apply a conservative application limit to the complete outgoing URL.
 CHATGPT_URL_MAX_LENGTH: int = 2048
+"""Apply a conservative application limit to the complete outgoing URL."""
 _CHATGPT_URL_PREFIX: str = "https://chatgpt.com/?prompt="
+"""Chatgpt url prefix identifier: ``https://chatgpt.com/?prompt=``."""
 _PROMPT_BUDGET: int = CHATGPT_URL_MAX_LENGTH - len(_CHATGPT_URL_PREFIX)
+"""Prompt budget used by ``assistance``."""
 _PROMPT_START: str = (
     "Diagnose this Orionis Framework/Python error and suggest a fix. "
     "Respond in the language of locale "
 )
+"""Opening instruction included in the bounded error-assistance prompt."""
 _FRAME_HEADING: str = "\nFrames (most recent first):\n"
+"""Section heading introducing the error traceback frames."""
 _SOURCE_NOTICE: str = "\n[Source snippets omitted to fit the URL limit.]"
+"""Source notice identifier: `` [Source snippets omitted to fit the URL limit.]``."""
 _TRUNCATION_NOTICE: str = (
     "\n[Truncated to fit URL: source snippets omitted; "
     "{omitted} older frames omitted.]"
 )
+"""
+Truncation notice identifier: `` [Truncated to fit URL: source snippets omitted;
+{omitted} older frames omitted.]``.
+"""
 _MIN_FRAME_BUDGET: int = 48
+"""Min frame budget value used by ``assistance``."""
 _ESCAPE_WIDTH: int = 3
+"""Escape width value used by ``assistance``."""
 
 def _encode_bounded(
     value: str, limit: int, *, tail: bool = False,
@@ -92,7 +106,7 @@ def _header_parts(
 
     Parameters
     ----------
-    traceback_data : dict[str, Any]
+    traceback_data : dict[str, typing.Any]
         Parsed exception data.
     locale : str
         Requested response locale.
@@ -103,7 +117,7 @@ def _header_parts(
 
     Returns
     -------
-    Iterator[str]
+    collections.abc.Iterator[str]
         Individual unencoded header fields.
     """
     yield from (
@@ -121,7 +135,7 @@ def _prompt_parts(
 
     Parameters
     ----------
-    traceback_data : dict[str, Any]
+    traceback_data : dict[str, typing.Any]
         Parsed exception data.
     locale : str
         Requested response locale.
@@ -134,7 +148,7 @@ def _prompt_parts(
 
     Returns
     -------
-    Iterator[str]
+    collections.abc.Iterator[str]
         Unencoded prompt fields in traceback order.
     """
     yield from _header_parts(
@@ -150,14 +164,14 @@ def _frame_parts(
 
     Parameters
     ----------
-    frames : Iterable[dict[str, Any]]
+    frames : collections.abc.Iterable[dict[str, typing.Any]]
         Traceback frames in most-recent-first order.
     sources : bool
         Whether to include failing source lines.
 
     Returns
     -------
-    Iterator[str]
+    collections.abc.Iterator[str]
         Unencoded frame fields.
     """
     for frame in frames:
@@ -179,7 +193,7 @@ def _try_prompt(
 
     Parameters
     ----------
-    parts : Iterable[str]
+    parts : collections.abc.Iterable[str]
         Prompt fields to encode.
     notice : str, optional
         Limit notice appended to the prompt.
@@ -214,7 +228,7 @@ def _compact_header(
 
     Parameters
     ----------
-    traceback_data : dict[str, Any]
+    traceback_data : dict[str, typing.Any]
         Parsed exception data.
     locale : str
         Requested response locale.
@@ -242,7 +256,7 @@ def _compact_frame(frame: dict[str, Any], budget: int) -> str:
 
     Parameters
     ----------
-    frame : dict[str, Any]
+    frame : dict[str, typing.Any]
         Parsed traceback frame.
     budget : int
         Maximum encoded length assigned to the frame.
@@ -269,7 +283,7 @@ def _compact_prompt(
 
     Parameters
     ----------
-    traceback_data : dict[str, Any]
+    traceback_data : dict[str, typing.Any]
         Parsed exception data.
     locale : str
         Requested response locale.
@@ -337,7 +351,7 @@ def build_chatgpt_url(
 
     Parameters
     ----------
-    traceback_data : dict[str, Any]
+    traceback_data : dict[str, typing.Any]
         ExceptionParser output, including frames in most-recent-first order.
     locale : str
         Locale requested for the diagnostic response.

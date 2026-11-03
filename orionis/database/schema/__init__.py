@@ -1,3 +1,5 @@
+"""Group the database schema components and public imports."""
+
 from typing import TYPE_CHECKING as _TYPE_CHECKING
 from orionis._exports import resolve_export as _resolve_export
 
@@ -32,6 +34,7 @@ _EXPORTS = {
     "Timestamps": ("orionis.database.schema.timestamp", "Timestamps"),
     "Unique": ("orionis.database.schema.unique", "Unique"),
 }
+"""Public export names mapped to their defining modules and attributes."""
 
 def __getattr__(name: str) -> object:
     """

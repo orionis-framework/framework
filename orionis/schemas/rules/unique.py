@@ -1,3 +1,5 @@
+"""Ensure a value is not already stored in a database column."""
+
 from typing import TYPE_CHECKING
 from orionis.schemas.rule import Rule
 
@@ -15,9 +17,12 @@ class Unique(Rule):
     # ruff: noqa: ARG002, PLC0415, PLR0913
 
     __message__ = "Value must be unique."
+    """Error text for message: ``Value must be unique.``."""
     __code__ = "unique"
+    """Code identifier: ``unique``."""
 
     __slots__ = ("_column", "_connection", "_ignore", "_ignore_column", "_table")
+    """Declare the instance attribute slots reserved by this class."""
 
     def __init__(
         self,
@@ -55,10 +60,18 @@ class Unique(Rule):
         """
         super().__init__(message=message)
         self._table: str = table
+        """Logical table name, without the connection prefix."""
         self._column: str = column
+        """Column name within the table."""
         self._ignore: object = ignore
+        """
+        Row identifier excluded from the lookup, so updating a record does not clash
+        with itself.
+        """
         self._ignore_column: str = ignore_column
+        """Column ``ignore`` is matched against."""
         self._connection: str | None = connection
+        """Named connection to query, or ``None`` for the default one."""
 
     async def enforce(
         self,
@@ -103,7 +116,7 @@ class Unique(Rule):
 
         Returns
         -------
-        SelectPlan
+        orionis.orm.query.SelectPlan
             Plan matching at most one row that breaks uniqueness.
         """
         from orionis.orm.query.raw_builder import RawQueryBuilder

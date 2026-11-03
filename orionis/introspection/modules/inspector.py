@@ -1,3 +1,5 @@
+"""Load modules and inspect their exported definitions."""
+
 from __future__ import annotations
 import ast
 import importlib
@@ -8,14 +10,19 @@ from types import MappingProxyType
 from typing import Any
 
 _EXCLUDED_DIRECTORIES = frozenset({"__pycache__", "site-packages"})
+"""Excluded directories used by ``inspector``."""
 _VENV_DIRECTORIES = frozenset({".env", ".venv", "env", "venv"})
+"""Venv directories used by ``inspector``."""
 
 class ModuleInspector:
 
     # ruff: noqa: RUF012
 
     # Cache for resolved class objects keyed by fully-qualified name
+    """Load modules and inspect their exported definitions."""
+
     __cache_resolved_classes: dict[str, type] = {}
+    """Cache for resolved class objects keyed by fully-qualified name."""
 
     @staticmethod
     def discoverModules(
@@ -32,9 +39,9 @@ class ModuleInspector:
 
         Parameters
         ----------
-        base_path : Path
+        base_path : pathlib.Path
             Root directory of the application.
-        target_path : Path
+        target_path : pathlib.Path
             Directory to search for Python modules.
 
         Returns
@@ -213,7 +220,7 @@ class ModuleInspector:
 
         Parameters
         ----------
-        file_path : Path
+        file_path : pathlib.Path
             Path to the file to analyze.
         target_modules : set[str]
             Set of module names to check for imports.
@@ -264,7 +271,7 @@ class ModuleInspector:
 
         Returns
         -------
-        set[tuple[str, str, str, type[Any]]]
+        set[tuple[str, str, str, type[typing.Any]]]
             Set of tuples containing file name (without extension), module path,
             class name, and class type for each discovered frozen dataclass.
 

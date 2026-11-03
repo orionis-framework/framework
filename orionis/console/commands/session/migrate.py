@@ -1,3 +1,5 @@
+"""Create the configured framework session table without removing data."""
+
 from orionis.console.base.command import BaseCommand
 from orionis.database.contracts.connection_manager import IConnectionManager
 from orionis.database.exceptions import DatabaseException
@@ -10,10 +12,14 @@ class SessionMigrateCommand(BaseCommand):
     # ruff: noqa: TC001
 
     __slots__ = ()
+    """Declare that this class introduces no additional instance slots."""
 
     timestamps: bool = False
+    """Timestamps flag used by ``SessionMigrateCommand``."""
     signature: str = "session:migrate"
+    """Signature identifier: ``session:migrate``."""
     description: str = "Create the configured database session table."
+    """Description identifier: ``Create the configured database session table.``."""
 
     async def handle(self, app: IApplication, manager: IConnectionManager) -> int:
         """
@@ -21,9 +27,9 @@ class SessionMigrateCommand(BaseCommand):
 
         Parameters
         ----------
-        app : IApplication
+        app : orionis.IApplication
             Application exposing the session table and SQL connection settings.
-        manager : IConnectionManager
+        manager : orionis.database.contracts.IConnectionManager
             Manager resolving the configured SQL connection.
 
         Returns

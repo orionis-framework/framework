@@ -1,3 +1,5 @@
+"""Intermediate marker for documentation / JSON Schema metadata."""
+
 from orionis.schemas.meta.validation import ValidationMetadata
 
 class DocumentMetadata(ValidationMetadata):
@@ -10,3 +12,4 @@ class DocumentMetadata(ValidationMetadata):
     """
 
     __slots__ = ()
+    """Declare that this class introduces no additional instance slots."""

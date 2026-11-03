@@ -1,3 +1,5 @@
+"""Static bridge between the ORM and the database connection manager."""
+
 from __future__ import annotations
 from typing import TYPE_CHECKING, ClassVar
 from orionis.database.migrations.context import current_migration_connection
@@ -17,6 +19,7 @@ class ConnectionResolver:
     """
 
     _manager: ClassVar[IConnectionManager | None] = None
+    """Connection manager used to resolve database services."""
 
     @classmethod
     def setManager(cls, manager: IConnectionManager) -> None:
@@ -25,7 +28,7 @@ class ConnectionResolver:
 
         Parameters
         ----------
-        manager : IConnectionManager
+        manager : orionis.database.contracts.IConnectionManager
             Manager resolving named database connections.
 
         Returns
@@ -42,12 +45,12 @@ class ConnectionResolver:
 
         Returns
         -------
-        IConnectionManager
+        orionis.database.contracts.IConnectionManager
             Manager resolving named database connections.
 
         Raises
         ------
-        OrmConfigurationException
+        orionis.orm.exceptions.OrmConfigurationException
             If no manager has been installed yet.
         """
         if cls._manager is None:
@@ -70,14 +73,14 @@ class ConnectionResolver:
 
         Returns
         -------
-        IConnection
+        orionis.database.contracts.IConnection
             Resolved connection.
 
         Raises
         ------
-        OrmConfigurationException
+        orionis.orm.exceptions.OrmConfigurationException
             If no manager has been installed yet.
-        ConnectionNotFoundException
+        orionis.database.ConnectionNotFoundException
             If the connection is not declared in the configuration.
         """
         if name is None:

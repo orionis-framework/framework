@@ -1,3 +1,5 @@
+"""Ensure an uploaded image satisfies the given dimension constraints."""
+
 from orionis.schemas.rules.image_probe import probe_image
 from orionis.schemas.rules.measure import read_content
 from orionis.schemas.rule import Rule
@@ -66,9 +68,12 @@ class Dimensions(Rule):
         "_ratio",
         "_width",
     )
+    """Declare the instance attribute slots reserved by this class."""
 
     __message__ = "Image must satisfy the required dimensions."
+    """Error text for message: ``Image must satisfy the required dimensions.``."""
     __code__ = "dimensions"
+    """Code identifier: ``dimensions``."""
 
     def __init__(  # noqa: PLR0913
         self,
@@ -122,14 +127,23 @@ class Dimensions(Rule):
         """
         super().__init__(message=message)
         self._min_width: int | None = min_width
+        """Lowest accepted width in pixels."""
         self._max_width: int | None = max_width
+        """Highest accepted width in pixels."""
         self._min_height: int | None = min_height
+        """Lowest accepted height in pixels."""
         self._max_height: int | None = max_height
+        """Highest accepted height in pixels."""
         self._width: int | None = width
+        """Exact required width in pixels."""
         self._height: int | None = height
+        """Exact required height in pixels."""
         self._ratio: float | None = _parse_ratio(ratio, "ratio")
+        """Exact required aspect ratio."""
         self._min_ratio: float | None = _parse_ratio(min_ratio, "min_ratio")
+        """Lowest accepted aspect ratio."""
         self._max_ratio: float | None = _parse_ratio(max_ratio, "max_ratio")
+        """Highest accepted aspect ratio."""
 
     async def enforce(
         self,

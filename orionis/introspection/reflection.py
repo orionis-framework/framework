@@ -1,3 +1,5 @@
+"""Select reflection helpers for classes, instances, functions and modules."""
+
 from __future__ import annotations
 import abc
 import inspect
@@ -25,6 +27,7 @@ if TYPE_CHECKING:
 class Reflection:
 
     # ruff: noqa: ANN401, PLC0415
+    """Select reflection helpers for classes, instances, functions and modules."""
 
     @staticmethod
     def instance(instance: Any) -> IReflectionInstance:
@@ -33,12 +36,12 @@ class Reflection:
 
         Parameters
         ----------
-        instance : Any
+        instance : typing.Any
             Object instance to reflect.
 
         Returns
         -------
-        ReflectionInstance
+        orionis.introspection.instances.contracts.reflection.IReflectionInstance
             Reflection object for the provided instance.
         """
         from orionis.introspection.instances.reflection import (
@@ -58,7 +61,7 @@ class Reflection:
 
         Returns
         -------
-        ReflectionAbstract
+        orionis.introspection.abstract.contracts.reflection.IReflectionAbstract
             Reflection object for the provided abstract class.
         """
         from orionis.introspection.abstract.reflection import (
@@ -78,7 +81,7 @@ class Reflection:
 
         Returns
         -------
-        ReflectionConcrete
+        orionis.introspection.concretes.contracts.reflection.IReflectionConcrete
             Reflection object for the provided concrete class.
         """
         from orionis.introspection.concretes.reflection import (
@@ -98,7 +101,7 @@ class Reflection:
 
         Returns
         -------
-        ReflectionModule
+        orionis.introspection.modules.contracts.reflection.IReflectionModule
             Reflection object for the specified module.
         """
         from orionis.introspection.modules.reflection import ReflectionModule
@@ -111,12 +114,12 @@ class Reflection:
 
         Parameters
         ----------
-        fn : Callable
+        fn : collections.abc.Callable
             The function or method to wrap.
 
         Returns
         -------
-        ReflectionCallable
+        orionis.introspection.callables.contracts.reflection.IReflectionCallable
             Reflection object encapsulating the provided callable.
         """
         from orionis.introspection.callables.reflection import (
@@ -131,7 +134,7 @@ class Reflection:
 
         Parameters
         ----------
-        obj : Any
+        obj : typing.Any
             Object to check for abstractness.
 
         Returns
@@ -149,7 +152,7 @@ class Reflection:
 
         Parameters
         ----------
-        obj : Any
+        obj : typing.Any
             Object to check for concreteness.
 
         Returns
@@ -181,7 +184,7 @@ class Reflection:
 
         Parameters
         ----------
-        obj : Any
+        obj : typing.Any
             Object to check.
 
         Returns
@@ -199,7 +202,7 @@ class Reflection:
 
         Parameters
         ----------
-        obj : Any
+        obj : typing.Any
             Object to check.
 
         Returns
@@ -218,7 +221,7 @@ class Reflection:
 
         Parameters
         ----------
-        obj : Any
+        obj : typing.Any
             Object to check for awaitability.
 
         Returns
@@ -236,7 +239,7 @@ class Reflection:
 
         Parameters
         ----------
-        obj : Any
+        obj : typing.Any
             Object to check.
 
         Returns
@@ -254,7 +257,7 @@ class Reflection:
 
         Parameters
         ----------
-        obj : Any
+        obj : typing.Any
             Object to check.
 
         Returns
@@ -271,7 +274,7 @@ class Reflection:
 
         Parameters
         ----------
-        obj : Any
+        obj : typing.Any
             Object to check.
 
         Returns
@@ -288,7 +291,7 @@ class Reflection:
 
         Parameters
         ----------
-        obj : Any
+        obj : typing.Any
             Object to check.
 
         Returns
@@ -305,7 +308,7 @@ class Reflection:
 
         Parameters
         ----------
-        obj : Any
+        obj : typing.Any
             Object to check.
 
         Returns
@@ -322,7 +325,7 @@ class Reflection:
 
         Parameters
         ----------
-        obj : Any
+        obj : typing.Any
             Object to check.
 
         Returns
@@ -339,7 +342,7 @@ class Reflection:
 
         Parameters
         ----------
-        obj : Any
+        obj : typing.Any
             Object to check.
 
         Returns
@@ -356,7 +359,7 @@ class Reflection:
 
         Parameters
         ----------
-        obj : Any
+        obj : typing.Any
             Object to check.
 
         Returns
@@ -373,7 +376,7 @@ class Reflection:
 
         Parameters
         ----------
-        obj : Any
+        obj : typing.Any
             Object to check.
 
         Returns
@@ -390,7 +393,7 @@ class Reflection:
 
         Parameters
         ----------
-        obj : Any
+        obj : typing.Any
             Object to check.
 
         Returns
@@ -407,7 +410,7 @@ class Reflection:
 
         Parameters
         ----------
-        obj : Any
+        obj : typing.Any
             Object to check.
 
         Returns
@@ -424,7 +427,7 @@ class Reflection:
 
         Parameters
         ----------
-        obj : Any
+        obj : typing.Any
             Object to check.
 
         Returns
@@ -441,7 +444,7 @@ class Reflection:
 
         Parameters
         ----------
-        obj : Any
+        obj : typing.Any
             Object to check.
 
         Returns
@@ -458,7 +461,7 @@ class Reflection:
 
         Parameters
         ----------
-        obj : Any
+        obj : typing.Any
             Object to check.
 
         Returns
@@ -475,7 +478,7 @@ class Reflection:
 
         Parameters
         ----------
-        obj : Any
+        obj : typing.Any
             Object to check.
 
         Returns
@@ -492,7 +495,7 @@ class Reflection:
 
         Parameters
         ----------
-        obj : Any
+        obj : typing.Any
             Object to check.
 
         Returns
@@ -509,7 +512,7 @@ class Reflection:
 
         Parameters
         ----------
-        obj : Any
+        obj : typing.Any
             Object to check.
 
         Returns
@@ -526,7 +529,7 @@ class Reflection:
 
         Parameters
         ----------
-        obj : Any
+        obj : typing.Any
             The type to check.
 
         Returns
@@ -545,18 +548,18 @@ class Reflection:
     @staticmethod
     def isProtocol(obj: Any) -> bool:
         """
-        Determine if the object is a subclass of `typing.Protocol`.
+        Determine if the object is a subclass of ``typing.Protocol``.
 
         Parameters
         ----------
-        obj : Any
+        obj : typing.Any
             Object or type to evaluate.
 
         Returns
         -------
         bool
-            True if `obj` is a class that is a subclass of `typing.Protocol`
-            (but not `Protocol` itself), otherwise False.
+            True if ``obj`` is a class that is a subclass of ``typing.Protocol``
+            (but not ``Protocol`` itself), otherwise False.
         """
         # Return the condition directly
         return (
@@ -572,7 +575,7 @@ class Reflection:
 
         Parameters
         ----------
-        obj : Any
+        obj : typing.Any
             Object to evaluate.
 
         Returns
@@ -592,17 +595,17 @@ class Reflection:
     @staticmethod
     def isTypingConstruct(obj: Any) -> bool:
         """
-        Determine if the object is a construct from the `typing` module.
+        Determine if the object is a construct from the ``typing`` module.
 
         Parameters
         ----------
-        obj : Any
+        obj : typing.Any
             Object to evaluate.
 
         Returns
         -------
         bool
-            True if the object is a recognized typing construct from the `typing`
+            True if the object is a recognized typing construct from the ``typing``
             module, otherwise False.
         """
         # List of known typing constructs for comparison

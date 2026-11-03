@@ -1,3 +1,5 @@
+"""Relationship factories and loaded-relation storage for every model."""
+
 from __future__ import annotations
 from typing import TYPE_CHECKING, Any
 from orionis.orm.relations.belongs_to import BelongsToRelation
@@ -32,10 +34,11 @@ class RelationsMixin:
 
     The mixin also owns the ``_relations`` mapping every model instance
     carries, used to cache eager-loaded results
-    (:meth:`~orionis.orm.query.builder.ModelQueryBuilder.withRelations`).
+    (:meth:`orionis.orm.query.ModelQueryBuilder.withRelations`).
     """
 
     __slots__ = ()
+    """Declare that this class introduces no additional instance slots."""
 
     # ── Relationship factories ──────────────────────────────────────────────
 
@@ -50,7 +53,7 @@ class RelationsMixin:
 
         Parameters
         ----------
-        related : type of Model
+        related : type of orionis.orm.Model
             Model class the relationship targets.
         foreign_key : str or None, optional
             Column on the related table referencing this model; defaults
@@ -61,7 +64,7 @@ class RelationsMixin:
 
         Returns
         -------
-        HasOneRelation
+        orionis.orm.relations.HasOneRelation
             Relationship query builder bound to this instance.
         """
         return HasOneRelation(self, related, foreign_key, local_key)
@@ -77,7 +80,7 @@ class RelationsMixin:
 
         Parameters
         ----------
-        related : type of Model
+        related : type of orionis.orm.Model
             Model class the relationship targets.
         foreign_key : str or None, optional
             Column on the related table referencing this model; defaults
@@ -88,7 +91,7 @@ class RelationsMixin:
 
         Returns
         -------
-        HasManyRelation
+        orionis.orm.relations.HasManyRelation
             Relationship query builder bound to this instance.
         """
         return HasManyRelation(self, related, foreign_key, local_key)
@@ -104,7 +107,7 @@ class RelationsMixin:
 
         Parameters
         ----------
-        related : type of Model
+        related : type of orionis.orm.Model
             Model class the relationship targets.
         foreign_key : str or None, optional
             Column on this model referencing the related row; defaults
@@ -115,7 +118,7 @@ class RelationsMixin:
 
         Returns
         -------
-        BelongsToRelation
+        orionis.orm.relations.BelongsToRelation
             Relationship query builder bound to this instance.
         """
         return BelongsToRelation(self, related, foreign_key, owner_key)
@@ -134,7 +137,7 @@ class RelationsMixin:
 
         Parameters
         ----------
-        related : type of Model
+        related : type of orionis.orm.Model
             Model class the relationship targets.
         table : str or None, optional
             Pivot table name; defaults to both model names in
@@ -155,7 +158,7 @@ class RelationsMixin:
 
         Returns
         -------
-        BelongsToManyRelation
+        orionis.orm.relations.BelongsToManyRelation
             Relationship query builder bound to this instance.
         """
         return BelongsToManyRelation(
@@ -178,13 +181,13 @@ class RelationsMixin:
         ----------
         name : str
             Relationship name.
-        value : Any
+        value : typing.Any
             Resolved relationship result (a model, ``None``, or a
             Collection, depending on the relationship kind).
 
         Returns
         -------
-        Model
+        orionis.orm.Model
             The same instance, enabling fluent chaining.
         """
         self._relations[name] = value
@@ -198,12 +201,12 @@ class RelationsMixin:
         ----------
         name : str
             Relationship name.
-        default : Any, optional
+        default : typing.Any, optional
             Value returned when the relationship was never loaded.
 
         Returns
         -------
-        Any
+        typing.Any
             Stored relationship result, or the default when unset.
         """
         return self._relations.get(name, default)
@@ -221,6 +224,7 @@ class RelationsMixin:
         -------
         bool
             ``True`` when the relationship was already loaded, whether
-            by eager loading or a prior :meth:`setRelation` call.
+            by eager loading or a prior
+            :meth:`orionis.orm.relations.RelationsMixin.setRelation` call.
         """
         return name in self._relations

@@ -1,3 +1,5 @@
+"""Provide view globals operations through ``_global_app``."""
+
 from __future__ import annotations
 from typing import TYPE_CHECKING, Any
 
@@ -12,12 +14,12 @@ def _global_app(app: IApplication) -> Any:
 
     Parameters
     ----------
-    app : IApplication
+    app : orionis.IApplication
         Application container to expose in templates.
 
     Returns
     -------
-    Any
+    typing.Any
         Callable returning the application instance.
     """
     def application() -> IApplication:
@@ -26,7 +28,7 @@ def _global_app(app: IApplication) -> Any:
 
         Returns
         -------
-        IApplication
+        orionis.IApplication
             The running application container.
         """
         return app

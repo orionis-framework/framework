@@ -1,3 +1,5 @@
+"""Represent an AWS S3 storage configuration."""
+
 from __future__ import annotations
 from dataclasses import dataclass, field
 from orionis.environment import Env
@@ -9,9 +11,9 @@ class S3(BaseEntity):
     """
     Represent an AWS S3 storage configuration.
 
-    Parameters
+    Attributes
     ----------
-    driver : str, default="aws"
+    driver : str, default="orionis.foundation.config.filesystems.entitites.aws"
         The filesystem driver name. Built-in names are "aws" and "s3".
     key : str
         AWS access key ID.
@@ -104,10 +106,6 @@ class S3(BaseEntity):
 
         Ensures all required attributes are of correct type and, where applicable,
         are non-empty.
-
-        Parameters
-        ----------
-        None
 
         Returns
         -------

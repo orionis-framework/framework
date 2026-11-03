@@ -1,3 +1,5 @@
+"""Register logger services in the application container."""
+
 from __future__ import annotations
 from orionis.container.providers.service_provider import ServiceProvider
 from orionis.logging.contracts.logger import ILogger
@@ -5,14 +7,15 @@ from orionis.logging import Logger
 from orionis.support.facades.logger import Log as LoggerFacade
 
 class LoggerProvider(ServiceProvider):
+    """Register logger services in the application container."""
 
     def register(self) -> None:
         """
         Register the Logger service implementation in the application container.
 
-        Bind the `Logger` class to the `ILogger` contract within the application's
+        Bind the ``Logger`` class to the ``ILogger`` contract within the application's
         dependency injection container. Retrieve the logging configuration from the
-        application, create a `Logger` instance using this configuration, and
+        application, create a ``Logger`` instance using this configuration, and
         register it with an alias for internal framework identification.
 
         Returns

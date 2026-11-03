@@ -1,3 +1,8 @@
+"""Provide console commands bootstrap operations.
+
+Includes ``application_path``, ``display_path``.
+"""
+
 from pathlib import Path
 from typing import TYPE_CHECKING
 from orionis.foundation.core_paths import CORE_APP_PATHS
@@ -11,14 +16,14 @@ def application_path(app: IApplication, key: str) -> Path:
 
     Parameters
     ----------
-    app : IApplication
+    app : orionis.IApplication
         Configured application owning the path registry.
     key : str
         Centralized application path key.
 
     Returns
     -------
-    Path
+    pathlib.Path
         Absolute destination honoring the effective application configuration.
 
     Raises
@@ -41,9 +46,9 @@ def display_path(app: IApplication, path: Path) -> str:
 
     Parameters
     ----------
-    app : IApplication
+    app : orionis.IApplication
         Application providing the project root.
-    path : Path
+    path : pathlib.Path
         Resource to display.
 
     Returns

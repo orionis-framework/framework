@@ -1,6 +1,9 @@
+"""Resolve the catch service through the application facade."""
+
 from orionis.container.facades.facade import Facade
 
 class Catch(Facade):
+    """Resolve the catch service through the application facade."""
 
     @classmethod
     def getFacadeAccessor(cls) -> str:

@@ -1,3 +1,8 @@
+"""Provide orm operations.
+
+Includes ``snake_case``, ``pluralize``, ``ModelMetadata``, ``ModelMeta``.
+"""
+
 from __future__ import annotations
 import re
 from copy import copy
@@ -13,23 +18,31 @@ if TYPE_CHECKING:
 
 # Pattern splitting CamelCase words for snake_case conversion.
 _CAMEL_BOUNDARY = re.compile(r"(?<!^)(?=[A-Z])")
+"""Pattern splitting CamelCase words for snake_case conversion."""
 
 # Suffixes that pluralize with "es".
 _ES_SUFFIXES: tuple[str, ...] = ("s", "x", "z", "ch", "sh")
+"""Suffixes that pluralize with "es"."""
 
 # English vowels used by the pluralization heuristic.
 _VOWELS: frozenset[str] = frozenset("aeiou")
+"""English vowels used by the pluralization heuristic."""
 
 # Wildcard marking every attribute as guarded.
 _GUARD_ALL: str = "*"
+"""Wildcard marking every attribute as guarded."""
 
 # Prefixes and suffix identifying the accessor/mutator naming convention.
 _ACCESSOR_PREFIX: str = "get"
+"""Prefixes and suffix identifying the accessor/mutator naming convention."""
 _MUTATOR_PREFIX: str = "set"
+"""Mutator prefix identifier: ``set``."""
 _ACCESSOR_SUFFIX: str = "Attribute"
+"""Accessor suffix identifier: ``Attribute``."""
 
 # Prefix identifying a local query scope declared on a model.
 _SCOPE_PREFIX: str = "scope"
+"""Prefix identifying a local query scope declared on a model."""
 
 # Lifecycle events a model can dispatch.
 MODEL_EVENTS: tuple[str, ...] = (
@@ -45,6 +58,7 @@ MODEL_EVENTS: tuple[str, ...] = (
     "restoring",
     "restored",
 )
+"""Lifecycle events a model can dispatch."""
 
 # Builder entry points forwarded from the model class via the metaclass.
 _FORWARDED_BUILDER_METHODS: frozenset[str] = frozenset({
@@ -126,6 +140,7 @@ _FORWARDED_BUILDER_METHODS: frozenset[str] = frozenset({
     "withoutTrashed",
     "onlyTrashed",
 })
+"""Builder entry points forwarded from the model class via the metaclass."""
 
 def snake_case(name: str) -> str:
     """
@@ -180,15 +195,15 @@ class ModelMetadata:
     ----------
     table_name : str
         Logical table name of the model.
-    table : TableDefinition
+    table : orionis.orm.schema.TableDefinition
         Table definition consumed by the SQL compiler.
-    columns : dict of str to ColumnDefinition
+    columns : dict of str ``to`` orionis.orm.schema.column.ColumnDefinition
         Column definitions keyed by attribute name.
     primary_key : str
         Name of the primary key column.
-    casts : dict of str to str
+    casts : dict of str ``to`` str
         Declared cast names keyed by attribute name.
-    cast_lookup : dict of str to Callable
+    cast_lookup : dict of str ``to`` collections.abc.Callable
         Precompiled cast handlers keyed by attribute name.
     fillable : frozenset of str
         Attributes allowed for mass assignment.
@@ -210,17 +225,17 @@ class ModelMetadata:
         Soft delete timestamp column, when the model soft deletes.
     uses_unique_ids : bool
         Whether the primary key is a client-generated unique identifier.
-    accessors : dict of str to str
+    accessors : dict of str ``to`` str
         Accessor method names keyed by the attribute they expose.
-    mutators : dict of str to str
+    mutators : dict of str ``to`` str
         Mutator method names keyed by the attribute they transform.
     appends : frozenset of str
         Accessor-backed attributes added to the serialized output.
-    scopes : dict of str to str
+    scopes : dict of str ``to`` str
         Local scope method names keyed by their fluent call name.
-    global_scopes : dict of str to Callable
+    global_scopes : dict of str ``to`` collections.abc.Callable
         Constraints applied to every query, keyed by scope name.
-    events : dict of str to tuple
+    events : dict of str ``to`` tuple
         Immutable (registration identity, listener) pairs keyed by event name.
     """
 
@@ -318,10 +333,10 @@ class ModelMeta(type):
             Base classes of the class being created.
         namespace : dict
             Class namespace as declared in the class body.
-        **kwargs : Any
+        **kwargs : typing.Any
             Additional keyword arguments forwarded to ``type``.
 
-        mcs : type[ModelMeta]
+        mcs : type[orionis.orm.metaclass.ModelMeta]
             Metaclass creating the model, including specialized subclasses.
 
         Returns
@@ -396,12 +411,14 @@ class ModelMeta(type):
 
         Parameters
         ----------
+        cls : type
+            Class on which the operation is performed.
         name : str
             Attribute name requested on the model class.
 
         Returns
         -------
-        Any
+        typing.Any
             Bound builder method for whitelisted entry points, or a
             bound local scope declared by the model.
 
@@ -438,17 +455,17 @@ class ModelMeta(type):
             Model class being created.
         name : str
             Name of the model class.
-        namespace : dict of str to Any
+        namespace : dict of str ``to`` typing.Any
             Attributes declared in the model class body.
 
         Returns
         -------
-        TableDefinition
+        orionis.orm.schema.TableDefinition
             Resolved table definition for the model.
 
         Raises
         ------
-        OrmConfigurationException
+        orionis.orm.exceptions.OrmConfigurationException
             If the shared definition is invalid, conflicts with model
             settings, or is combined with inline column declarations.
         """
@@ -492,7 +509,7 @@ class ModelMeta(type):
 
         Returns
         -------
-        dict of str to ColumnDefinition
+        dict of str ``to`` orionis.orm.schema.column.ColumnDefinition
             Columns deferred to concrete descendants.
         """
         pending: dict[str, ColumnDefinition] = {}
@@ -532,7 +549,7 @@ class ModelMeta(type):
 
         Returns
         -------
-        dict of str to ColumnDefinition
+        dict of str ``to`` orionis.orm.schema.column.ColumnDefinition
             Column definitions keyed by attribute name.
         """
         columns: dict[str, ColumnDefinition] = {}
@@ -605,7 +622,7 @@ class ModelMeta(type):
             Class being created.
         namespace : dict
             Class namespace as declared in the class body.
-        columns : dict of str to ColumnDefinition
+        columns : dict of str ``to`` orionis.orm.schema.column.ColumnDefinition
             Collected column definitions.
 
         Returns
@@ -637,7 +654,7 @@ class ModelMeta(type):
 
         Returns
         -------
-        dict of str to str
+        dict of str ``to`` str
             Cast names keyed by attribute name.
         """
         casts: dict[str, str] = {}
@@ -729,7 +746,7 @@ class ModelMeta(type):
 
         Returns
         -------
-        dict of str to Callable
+        dict of str ``to`` collections.abc.Callable
             Global scopes the new class starts with.
         """
         scopes: dict[str, Callable[[Any], None]] = {}
@@ -753,7 +770,7 @@ class ModelMeta(type):
 
         Returns
         -------
-        dict of str to tuple
+        dict of str ``to`` tuple
             Listener snapshots with their registration identities.
         """
         events: dict[str, list[tuple[object, Callable[..., Any]]]] = {}

@@ -1,3 +1,5 @@
+"""Discover configured tests, execute them and persist optional result caches."""
+
 import asyncio
 import fnmatch
 import json
@@ -20,13 +22,21 @@ if TYPE_CHECKING:
 # Fallbacks mirroring orionis.foundation.config.testing.Testing, applied when a
 # configuration key is absent (app.config returns None for unknown keys).
 _DEFAULT_VERBOSITY: int = 2
+"""
+Fallbacks mirroring orionis.foundation.config.testing.Testing, applied when a
+configuration key is absent (app.config returns None for unknown keys).
+"""
 _DEFAULT_START_DIR: str = "tests"
+"""Default start dir identifier: ``tests``."""
 _DEFAULT_FILE_PATTERN: str = "test_*.py"
+"""Default file pattern identifier: ``test_*.py``."""
 _DEFAULT_METHOD_PATTERN: str = "test*"
+"""Default method pattern identifier: ``test*``."""
 
 class TestingEngine(ITestingEngine):
 
     # ruff: noqa: TC001
+    """Discover configured tests, execute them and persist optional result caches."""
 
     def __init__(
         self,
@@ -42,7 +52,7 @@ class TestingEngine(ITestingEngine):
 
         Parameters
         ----------
-        app : IApplication
+        app : orionis.IApplication
             Application instance providing configuration values.
 
         Returns
@@ -55,26 +65,35 @@ class TestingEngine(ITestingEngine):
 
         # Retrieve configuration values from the application instance.
         self.__base_path: Path = app.basePath
+        """Retrieve configuration values from the application instance."""
         self.__verbosity: int = (
             _DEFAULT_VERBOSITY if verbosity is None else verbosity
         )
+        """Configured detail level for test-runner output."""
         self.__fail_fast: bool = app.config("testing.fail_fast") in [
             1, True, "1", "true", "True",
         ]
+        """Whether the test run stops after the first failure."""
         self.__start_dir: str = (
             app.config("testing.start_dir") or _DEFAULT_START_DIR
         )
+        """Directory from which test discovery begins."""
         self.__file_pattern: str = (
             app.config("testing.file_pattern") or _DEFAULT_FILE_PATTERN
         )
+        """Filename pattern selecting modules for test discovery."""
         self.__method_pattern: str = (
             app.config("testing.method_pattern") or _DEFAULT_METHOD_PATTERN
         )
+        """Method-name pattern selecting test cases."""
         self.__json_cache: bool = bool(app.config("testing.cache_results"))
+        """Json cache produced by ``bool``."""
         self.__cache_folder: Path = (
             app.path("storage_framework") / "cache" / "testing"
         )
+        """Directory used to persist structured test-run results."""
         self.__with_panel: bool = True  # Default to showing the start panel
+        """With panel flag used by ``TestingEngine``."""
 
     def setVerbosity(self, verbosity: int) -> Self:
         """
@@ -87,7 +106,7 @@ class TestingEngine(ITestingEngine):
 
         Returns
         -------
-        Self
+        typing.Self
             Returns self for method chaining.
         """
         self.__verbosity = verbosity
@@ -104,7 +123,7 @@ class TestingEngine(ITestingEngine):
 
         Returns
         -------
-        Self
+        typing.Self
             Returns self for method chaining.
         """
         self.__fail_fast = fail_fast
@@ -121,7 +140,7 @@ class TestingEngine(ITestingEngine):
 
         Returns
         -------
-        Self
+        typing.Self
             Returns self for method chaining.
         """
         self.__start_dir = start_dir
@@ -138,7 +157,7 @@ class TestingEngine(ITestingEngine):
 
         Returns
         -------
-        Self
+        typing.Self
             Returns self for method chaining.
         """
         self.__file_pattern = file_pattern
@@ -155,7 +174,7 @@ class TestingEngine(ITestingEngine):
 
         Returns
         -------
-        Self
+        typing.Self
             Returns self for method chaining.
         """
         # Update the method pattern in TestCase to ensure
@@ -172,7 +191,7 @@ class TestingEngine(ITestingEngine):
 
         Returns
         -------
-        Self
+        typing.Self
             Returns self for method chaining.
         """
         self.__with_panel = False
@@ -191,7 +210,7 @@ class TestingEngine(ITestingEngine):
 
         Returns
         -------
-        Generator[unittest.TestCase, None, None]
+        collections.abc.Generator[unittest.TestCase, None, None]
             Generator yielding individual test cases.
         """
         # Recursively extract test cases from nested suites.
@@ -256,7 +275,7 @@ class TestingEngine(ITestingEngine):
 
         Parameters
         ----------
-        results : list[TestResult]
+        results : list[orionis.test.entities.result.TestResult]
             List of test results to save.
 
         Returns
@@ -295,7 +314,7 @@ class TestingEngine(ITestingEngine):
 
         Returns
         -------
-        list[TestResult]
+        list[orionis.test.entities.result.TestResult]
             List of TestResult objects containing test execution outcomes.
         """
         # Build a fresh suite so consecutive runs never accumulate tests.

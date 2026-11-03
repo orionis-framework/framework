@@ -1,3 +1,5 @@
+"""Define the contract for task implementations."""
+
 from __future__ import annotations
 from abc import ABC, abstractmethod
 from typing import TYPE_CHECKING
@@ -9,6 +11,7 @@ if TYPE_CHECKING:
     from orionis.console.enums.events import TaskEvent as TaskEventListener
 
 class ITask(ABC):
+    """Define the contract for task implementations."""
 
     @abstractmethod
     def entity(
@@ -38,7 +41,7 @@ class ITask(ABC):
 
         Returns
         -------
-        TaskEntity
+        orionis.console.entities.Task
             The TaskEntity instance containing the task's data.
 
         Raises
@@ -64,7 +67,7 @@ class ITask(ABC):
 
         Returns
         -------
-        Task
+        orionis.console.fluent.contracts.task.ITask
             The current Task instance for method chaining.
         """
 
@@ -84,13 +87,13 @@ class ITask(ABC):
 
         Returns
         -------
-        Task
+        orionis.console.fluent.contracts.task.ITask
             This instance for method chaining.
 
         Raises
         ------
         ValueError
-            If `seconds` is not a positive integer.
+            If ``seconds`` is not a positive integer.
         """
 
     @abstractmethod
@@ -109,7 +112,7 @@ class ITask(ABC):
 
         Returns
         -------
-        Task
+        orionis.console.fluent.contracts.task.ITask
             The current instance for method chaining.
 
         Raises
@@ -148,7 +151,7 @@ class ITask(ABC):
 
         Returns
         -------
-        Self
+        typing.Self
             The current Task instance for method chaining.
 
         Raises
@@ -189,7 +192,7 @@ class ITask(ABC):
 
         Returns
         -------
-        Self
+        typing.Self
             The current Task instance for method chaining.
 
         Raises
@@ -216,7 +219,7 @@ class ITask(ABC):
 
         Returns
         -------
-        Task
+        orionis.console.fluent.contracts.task.ITask
             The current Task instance for method chaining.
 
         Raises
@@ -240,7 +243,7 @@ class ITask(ABC):
 
         Returns
         -------
-        Task
+        orionis.console.fluent.contracts.task.ITask
             This instance for method chaining.
         """
 
@@ -255,20 +258,20 @@ class ITask(ABC):
 
         Parameters
         ----------
-        event : TaskEventListener
+        event : orionis.console.enums.TaskEvent
             The event type to listen for.
-        callback : Callable
+        callback : collections.abc.Callable
             The function to call when the event occurs.
 
         Returns
         -------
-        Task
+        orionis.console.fluent.contracts.task.ITask
             The current Task instance for method chaining.
 
         Raises
         ------
         ValueError
-            If `event` is not a TaskEventListener or `callback` is not callable.
+            If ``event`` is not a TaskEventListener or ``callback`` is not callable.
         """
 
     @abstractmethod
@@ -281,12 +284,12 @@ class ITask(ABC):
 
         Parameters
         ----------
-        listener : BaseTaskListener
+        listener : orionis.console.base.BaseTaskListener
             Listener instance implementing the BaseTaskListener interface.
 
         Returns
         -------
-        Self
+        typing.Self
             The current Task instance for method chaining.
 
         Raises
@@ -349,7 +352,7 @@ class ITask(ABC):
         """
         Schedule the task to run at fixed intervals in seconds.
 
-        Validate that `seconds` is a positive integer. Set an IntervalTrigger to run
+        Validate that ``seconds`` is a positive integer. Set an IntervalTrigger to run
         at the specified interval. If a random delay is set, raise an error. Return
         True if scheduling is configured.
 
@@ -366,7 +369,7 @@ class ITask(ABC):
         Raises
         ------
         ValueError
-            If `seconds` is not a positive integer or if random delay is set.
+            If ``seconds`` is not a positive integer or if random delay is set.
         """
 
     @abstractmethod
@@ -377,8 +380,8 @@ class ITask(ABC):
         Schedule the task to run every five seconds.
 
         This method sets up the event to execute at a fixed interval of five seconds
-        using an `IntervalTrigger`. The scheduling window can be limited by the
-        `start_date` and `end_date` attributes if they are set. If a random delay
+        using an ``IntervalTrigger``. The scheduling window can be limited by the
+        ``start_date`` and ``end_date`` attributes if they are set. If a random delay
         (jitter) is configured, it will be applied to the trigger.
 
         Returns
@@ -395,7 +398,7 @@ class ITask(ABC):
         Schedule the task to run every ten seconds.
 
         Configure the event to execute at a fixed interval of ten seconds using an
-        IntervalTrigger. The schedule can be limited by `start_date` and `end_date`.
+        IntervalTrigger. The schedule can be limited by ``start_date`` and ``end_date``.
         If a random delay (jitter) is set, it is not applied.
 
         Returns
@@ -412,7 +415,8 @@ class ITask(ABC):
         Schedule the task to run every fifteen seconds.
 
         Configure the event to execute at a fixed interval of fifteen seconds using an
-        IntervalTrigger. The schedule can be restricted by `start_date` and `end_date`.
+        IntervalTrigger. The schedule can be restricted by ``start_date`` and
+        ``end_date``.
         If a random delay (jitter) is set, it is not applied.
 
         Returns
@@ -429,7 +433,8 @@ class ITask(ABC):
         Schedule the task to run every twenty seconds.
 
         Configures the event to execute at a fixed interval of twenty seconds using an
-        IntervalTrigger. The schedule can be restricted by `start_date` and `end_date`.
+        IntervalTrigger. The schedule can be restricted by ``start_date`` and
+        ``end_date``.
         If a random delay (jitter) is set, it is not applied.
 
         Returns
@@ -446,8 +451,8 @@ class ITask(ABC):
         Schedule the task to run every twenty-five seconds.
 
         Configure the event to execute at a fixed interval of twenty-five seconds using
-        an IntervalTrigger. The schedule can be restricted by `start_date` and
-        `end_date`. If a random delay (jitter) is set, it is not applied.
+        an IntervalTrigger. The schedule can be restricted by ``start_date`` and
+        ``end_date``. If a random delay (jitter) is set, it is not applied.
 
         Returns
         -------
@@ -463,7 +468,7 @@ class ITask(ABC):
         Schedule the task to run every thirty seconds.
 
         Configures the event to execute at a fixed interval of thirty seconds using an
-        IntervalTrigger. The schedule can be limited by `start_date` and `end_date`.
+        IntervalTrigger. The schedule can be limited by ``start_date`` and ``end_date``.
         If a random delay (jitter) is set, it is not applied.
 
         Returns
@@ -480,8 +485,8 @@ class ITask(ABC):
         Schedule the task to run every thirty-five seconds.
 
         Configures the event to execute at a fixed interval of thirty-five seconds
-        using an IntervalTrigger. The schedule can be restricted by `start_date`
-        and `end_date`. If a random delay (jitter) is set, it is not applied.
+        using an IntervalTrigger. The schedule can be restricted by ``start_date``
+        and ``end_date``. If a random delay (jitter) is set, it is not applied.
 
         Returns
         -------
@@ -498,7 +503,8 @@ class ITask(ABC):
         Schedule the task to run every forty seconds.
 
         Configure the event to execute at a fixed interval of forty seconds using an
-        IntervalTrigger. The schedule can be restricted by `start_date` and `end_date`.
+        IntervalTrigger. The schedule can be restricted by ``start_date`` and
+        ``end_date``.
         If a random delay (jitter) is set, it is not applied.
 
         Returns
@@ -515,7 +521,8 @@ class ITask(ABC):
         Schedule the task to run every forty-five seconds.
 
         Configures the event to execute at a fixed interval of forty-five seconds using
-        an IntervalTrigger. The schedule can be limited by `start_date` and `end_date`.
+        an IntervalTrigger. The schedule can be limited by ``start_date`` and
+        ``end_date``.
         If a random delay (jitter) is set, it is not applied.
 
         Returns
@@ -532,8 +539,8 @@ class ITask(ABC):
         Schedule the task to run every fifty seconds.
 
         Configure the event to execute at a fixed interval of fifty seconds using an
-        IntervalTrigger. The scheduling window can be restricted by `start_date` and
-        `end_date`. If a random delay (jitter) is set, it is not applied.
+        IntervalTrigger. The scheduling window can be restricted by ``start_date`` and
+        ``end_date``. If a random delay (jitter) is set, it is not applied.
 
         Returns
         -------
@@ -549,8 +556,8 @@ class ITask(ABC):
         Schedule the task to run every fifty-five seconds.
 
         Configure the event to execute at a fixed interval of fifty-five seconds using
-        an IntervalTrigger. The scheduling window can be restricted by `start_date`
-        and `end_date`. If a random delay (jitter) is set, it is not applied.
+        an IntervalTrigger. The scheduling window can be restricted by ``start_date``
+        and ``end_date``. If a random delay (jitter) is set, it is not applied.
 
         Returns
         -------
@@ -566,8 +573,8 @@ class ITask(ABC):
         """
         Schedule the task to run at fixed intervals in minutes.
 
-        Validates that `minutes` is a positive integer. Sets an IntervalTrigger with
-        the specified interval, using any configured `start_date`, `end_date`, and
+        Validates that ``minutes`` is a positive integer. Sets an IntervalTrigger with
+        the specified interval, using any configured ``start_date``, ``end_date``, and
         random delay (jitter) if set.
 
         Parameters
@@ -589,7 +596,7 @@ class ITask(ABC):
         """
         Schedule the task to run every minute at a specific second.
 
-        Validate that `seconds` is an integer in [0, 59]. Set a CronTrigger to execute
+        Validate that ``seconds`` is an integer in [0, 59]. Set a CronTrigger to execute
         at the specified second of every minute. Ignore any previously set jitter.
 
         Parameters
@@ -645,8 +652,8 @@ class ITask(ABC):
         Schedule the task to run every five minutes.
 
         Configures the event to execute at a fixed interval of five minutes using an
-        IntervalTrigger. The scheduling window can be restricted by `start_date` and
-        `end_date`. Applies random delay (jitter) if set.
+        IntervalTrigger. The scheduling window can be restricted by ``start_date`` and
+        ``end_date``. Applies random delay (jitter) if set.
 
         Returns
         -------
@@ -663,8 +670,8 @@ class ITask(ABC):
         Schedule the task to run every five minutes at a specific second.
 
         Set the event to execute at the specified second (0-59) of every five-minute
-        interval. The scheduling window can be restricted by `start_date` and
-        `end_date`. If a random delay (jitter) is configured, it will be applied.
+        interval. The scheduling window can be restricted by ``start_date`` and
+        ``end_date``. If a random delay (jitter) is configured, it will be applied.
 
         Parameters
         ----------
@@ -685,8 +692,8 @@ class ITask(ABC):
         Schedule to run every ten minutes.
 
         Configures the event to execute at a fixed interval of ten minutes using an
-        IntervalTrigger. The scheduling window can be restricted by `start_date` and
-        `end_date`. If a random delay (jitter) is set, it is applied to the trigger.
+        IntervalTrigger. The scheduling window can be restricted by ``start_date`` and
+        ``end_date``. If a random delay (jitter) is set, it is applied to the trigger.
 
         Returns
         -------
@@ -704,7 +711,7 @@ class ITask(ABC):
 
         Configures the event to execute at the specified second (0-59) of every
         ten-minute interval. Ignores any previously set random delay (jitter).
-        The scheduling window can be restricted by `start_date` and `end_date`.
+        The scheduling window can be restricted by ``start_date`` and ``end_date``.
 
         Parameters
         ----------
@@ -725,7 +732,7 @@ class ITask(ABC):
         Schedule the task to run every fifteen minutes.
 
         Set up an interval trigger for execution every fifteen minutes. The schedule
-        can be limited by `start_date` and `end_date`. If a random delay (jitter) is
+        can be limited by ``start_date`` and ``end_date``. If a random delay (jitter) is
         set, it is applied to the trigger.
 
         Returns
@@ -743,8 +750,8 @@ class ITask(ABC):
         Schedule to run every fifteen minutes at a specific second.
 
         This method sets the event to execute at the given second (0-59) of every
-        fifteen-minute interval. The schedule can be limited by `start_date` and
-        `end_date`. If a random delay (jitter) is set, it is applied to the trigger.
+        fifteen-minute interval. The schedule can be limited by ``start_date`` and
+        ``end_date``. If a random delay (jitter) is set, it is applied to the trigger.
 
         Parameters
         ----------
@@ -765,13 +772,13 @@ class ITask(ABC):
         Schedule to run every twenty minutes.
 
         This method sets the event to execute at a fixed interval of twenty minutes
-        using an IntervalTrigger. The schedule can be limited by `start_date` and
-        `end_date`. If a random delay (jitter) is set, it is applied to the trigger.
+        using an IntervalTrigger. The schedule can be limited by ``start_date`` and
+        ``end_date``. If a random delay (jitter) is set, it is applied to the trigger.
 
         Returns
         -------
         bool
-            Always returns True after delegating scheduling to `everyMinute`.
+            Always returns True after delegating scheduling to ``everyMinute``.
         """
 
     @abstractmethod
@@ -783,8 +790,8 @@ class ITask(ABC):
         Schedule to run every twenty minutes at a specific second.
 
         Configures the event to execute at the specified second (0-59) of every
-        twenty-minute interval. The schedule can be restricted by `start_date`
-        and `end_date`. If a random delay (jitter) is set, it is applied to the
+        twenty-minute interval. The schedule can be restricted by ``start_date``
+        and ``end_date``. If a random delay (jitter) is set, it is applied to the
         trigger.
 
         Parameters
@@ -807,13 +814,13 @@ class ITask(ABC):
 
         Configures the event to execute at a fixed interval of twenty-five minutes
         using an IntervalTrigger. The scheduling window can be restricted by
-        `start_date` and `end_date`. If a random delay (jitter) is set, it is
+        ``start_date`` and ``end_date``. If a random delay (jitter) is set, it is
         applied to the trigger.
 
         Returns
         -------
         bool
-            Always returns True after delegating scheduling to `everyMinute`.
+            Always returns True after delegating scheduling to ``everyMinute``.
         """
 
     @abstractmethod
@@ -825,7 +832,7 @@ class ITask(ABC):
         Schedule to run every twenty-five minutes at a specific second.
 
         Set up the event to execute at the given second (0-59) of every twenty-five-
-        minute interval. The schedule can be limited by `start_date` and `end_date`.
+        minute interval. The schedule can be limited by ``start_date`` and ``end_date``.
 
         Parameters
         ----------
@@ -846,13 +853,14 @@ class ITask(ABC):
         Schedule the task to run every thirty minutes.
 
         Configures the event to execute at a fixed interval of thirty minutes using an
-        IntervalTrigger. The schedule can be restricted by `start_date` and `end_date`.
+        IntervalTrigger. The schedule can be restricted by ``start_date`` and
+        ``end_date``.
         If a random delay (jitter) is set, it is applied to the trigger.
 
         Returns
         -------
         bool
-            Always returns True after delegating scheduling to `everyMinute`.
+            Always returns True after delegating scheduling to ``everyMinute``.
         """
 
     @abstractmethod
@@ -864,8 +872,9 @@ class ITask(ABC):
         Schedule to run every thirty minutes at a specific second.
 
         Configures the event to execute at the given second (0-59) of every
-        thirty-minute interval. The schedule can be restricted by `start_date`
-        and `end_date`. If a random delay (jitter) is set, it is applied to the trigger.
+        thirty-minute interval. The schedule can be restricted by ``start_date``
+        and ``end_date``. If a random delay (jitter) is set, it is applied to the
+        trigger.
 
         Parameters
         ----------
@@ -886,13 +895,13 @@ class ITask(ABC):
         Schedule to run every thirty-five minutes.
 
         This method sets the event to execute at a fixed interval of thirty-five minutes
-        using an `IntervalTrigger`. The schedule can be limited by `start_date` and
-        `end_date`. If a random delay (jitter) is set, it is applied to the trigger.
+        using an ``IntervalTrigger``. The schedule can be limited by ``start_date`` and
+        ``end_date``. If a random delay (jitter) is set, it is applied to the trigger.
 
         Returns
         -------
         bool
-            Always returns True after delegating scheduling to `everyMinute`.
+            Always returns True after delegating scheduling to ``everyMinute``.
         """
 
     @abstractmethod
@@ -916,7 +925,7 @@ class ITask(ABC):
         Raises
         ------
         ValueError
-            If `seconds` is not an integer between 0 and 59 (inclusive).
+            If ``seconds`` is not an integer between 0 and 59 (inclusive).
 
         Notes
         -----
@@ -931,13 +940,14 @@ class ITask(ABC):
         Schedule the task to run every forty minutes.
 
         Configures the event to execute at a fixed interval of forty minutes using an
-        IntervalTrigger. The schedule can be restricted by `start_date` and `end_date`.
+        IntervalTrigger. The schedule can be restricted by ``start_date`` and
+        ``end_date``.
         If a random delay (jitter) is set, it is applied to the trigger.
 
         Returns
         -------
         bool
-            Always returns True after delegating scheduling to `everyMinute`.
+            Always returns True after delegating scheduling to ``everyMinute``.
         """
 
     @abstractmethod
@@ -949,8 +959,9 @@ class ITask(ABC):
         Schedule to run every forty minutes at a specific second.
 
         Configures the event to execute at the specified second (0-59) of every
-        forty-minute interval. The scheduling window can be restricted by `start_date`
-        and `end_date`. If a random delay (jitter) is set, it is applied to the trigger.
+        forty-minute interval. The scheduling window can be restricted by ``start_date``
+        and ``end_date``. If a random delay (jitter) is set, it is applied to the
+        trigger.
 
         Parameters
         ----------
@@ -971,13 +982,13 @@ class ITask(ABC):
         Schedule the task to run every forty-five minutes.
 
         Configure the event to execute at a fixed interval of forty-five minutes using
-        an IntervalTrigger. The schedule can be restricted by `start_date` and
-        `end_date`. If a random delay (jitter) is set, it is applied to the trigger.
+        an IntervalTrigger. The schedule can be restricted by ``start_date`` and
+        ``end_date``. If a random delay (jitter) is set, it is applied to the trigger.
 
         Returns
         -------
         bool
-            Always returns True after delegating scheduling to `everyMinute`.
+            Always returns True after delegating scheduling to ``everyMinute``.
         """
 
     @abstractmethod
@@ -989,7 +1000,7 @@ class ITask(ABC):
         Schedule the task to run every forty-five minutes at a specific second.
 
         Set up the event to execute at the given second (0-59) of every forty-five-
-        minute interval. The schedule can be limited by `start_date` and `end_date`.
+        minute interval. The schedule can be limited by ``start_date`` and ``end_date``.
         If a random delay (jitter) is set, it is applied to the trigger.
 
         Parameters
@@ -1011,13 +1022,14 @@ class ITask(ABC):
         Schedule to run every fifty minutes.
 
         Configures the event to execute at a fixed interval of fifty minutes using an
-        IntervalTrigger. The schedule can be restricted by `start_date` and `end_date`.
+        IntervalTrigger. The schedule can be restricted by ``start_date`` and
+        ``end_date``.
         If a random delay (jitter) is set, it is applied to the trigger.
 
         Returns
         -------
         bool
-            Always returns True after delegating scheduling to `everyMinute`.
+            Always returns True after delegating scheduling to ``everyMinute``.
         """
 
     @abstractmethod
@@ -1029,8 +1041,9 @@ class ITask(ABC):
         Schedule to run every fifty minutes at a specific second.
 
         Configures the event to execute at the specified second (0-59) of every
-        fifty-minute interval. The scheduling window can be restricted by `start_date`
-        and `end_date`. If a random delay (jitter) is set, it is applied to the trigger.
+        fifty-minute interval. The scheduling window can be restricted by ``start_date``
+        and ``end_date``. If a random delay (jitter) is set, it is applied to the
+        trigger.
 
         Parameters
         ----------
@@ -1045,7 +1058,7 @@ class ITask(ABC):
         Raises
         ------
         ValueError
-            If `seconds` is not an integer between 0 and 59 (inclusive).
+            If ``seconds`` is not an integer between 0 and 59 (inclusive).
         """
 
     @abstractmethod
@@ -1056,13 +1069,13 @@ class ITask(ABC):
         Schedule the task to run every fifty-five minutes.
 
         Configure the event to execute at a fixed interval of fifty-five minutes using
-        an IntervalTrigger. The schedule can be restricted by `start_date` and
-        `end_date`. If a random delay (jitter) is set, it is applied to the trigger.
+        an IntervalTrigger. The schedule can be restricted by ``start_date`` and
+        ``end_date``. If a random delay (jitter) is set, it is applied to the trigger.
 
         Returns
         -------
         bool
-            Always returns True after delegating scheduling to `everyMinute`.
+            Always returns True after delegating scheduling to ``everyMinute``.
         """
 
     @abstractmethod
@@ -1086,7 +1099,7 @@ class ITask(ABC):
 
         Notes
         -----
-        This method delegates scheduling to `everyMinutesAt` with an interval of
+        This method delegates scheduling to ``everyMinutesAt`` with an interval of
         55 minutes and the specified second.
         """
 
@@ -1098,7 +1111,7 @@ class ITask(ABC):
         Schedule the task to run every hour.
 
         Configure the event to execute once every hour. The schedule starts from
-        `start_date` and ends at `end_date` if set. If a random delay (jitter) is
+        ``start_date`` and ends at ``end_date`` if set. If a random delay (jitter) is
         configured, it is applied to the trigger. The event is triggered at regular
         hourly intervals.
 
@@ -1117,7 +1130,7 @@ class ITask(ABC):
         """
         Schedule the task to run every hour at a specific minute and second.
 
-        Validate that `minute` and `second` are integers within valid ranges. Set up
+        Validate that ``minute`` and ``second`` are integers within valid ranges. Set up
         an IntervalTrigger to execute the event every hour at the specified minute and
         second. Store a human-readable description of the schedule.
 
@@ -1136,7 +1149,7 @@ class ITask(ABC):
         Raises
         ------
         ValueError
-            If `minute` or `second` are not integers in valid ranges.
+            If ``minute`` or ``second`` are not integers in valid ranges.
         """
 
     @abstractmethod
@@ -1147,7 +1160,8 @@ class ITask(ABC):
         Schedule the task to run at every odd hour of the day.
 
         Configure the event to execute at every odd-numbered hour using a CronTrigger.
-        The schedule can be restricted by `start_date` and `end_date`. If a random delay
+        The schedule can be restricted by ``start_date`` and ``end_date``. If a random
+        delay
         (jitter) is set, it is applied to the trigger.
 
         Returns
@@ -1164,7 +1178,8 @@ class ITask(ABC):
         Schedule the task to run at every even hour of the day.
 
         Configure the event to execute at every even-numbered hour using a CronTrigger.
-        The schedule can be restricted by `start_date` and `end_date`. If a random delay
+        The schedule can be restricted by ``start_date`` and ``end_date``. If a random
+        delay
         (jitter) is set, it is applied to the trigger.
 
         Returns
@@ -1181,7 +1196,8 @@ class ITask(ABC):
         """
         Schedule the task to run at fixed intervals in hours.
 
-        Validate that `hours` is a positive integer. Set up an IntervalTrigger with the
+        Validate that ``hours`` is a positive integer. Set up an IntervalTrigger with
+        the
         specified interval in hours, using any configured start and end dates,
         and random delay (jitter) if set.
 
@@ -1236,14 +1252,15 @@ class ITask(ABC):
         """
         Schedule the task to run every two hours.
 
-        Use the `everyHours` method with an interval of two hours. The schedule can be
-        restricted by `start_date` and `end_date`. If a random delay (jitter) is set,
+        Use the ``everyHours`` method with an interval of two hours. The schedule can be
+        restricted by ``start_date`` and ``end_date``. If a random delay (jitter) is
+        set,
         it will be applied to the trigger.
 
         Returns
         -------
         bool
-            Always returns True after delegating scheduling to `everyHours`.
+            Always returns True after delegating scheduling to ``everyHours``.
         """
 
     @abstractmethod
@@ -1256,7 +1273,7 @@ class ITask(ABC):
         Schedule to run every two hours at a specific minute and second.
 
         Validate input ranges for minute and second. Delegate scheduling to
-        `everyHoursAt` with an interval of two hours and the specified time.
+        ``everyHoursAt`` with an interval of two hours and the specified time.
 
         Parameters
         ----------
@@ -1278,14 +1295,16 @@ class ITask(ABC):
         """
         Schedule the task to run every three hours.
 
-        Use the `everyHours` method with an interval of three hours. The schedule can be
-        restricted by `start_date` and `end_date`. If a random delay (jitter) is set, it
+        Use the ``everyHours`` method with an interval of three hours. The schedule can
+        be
+        restricted by ``start_date`` and ``end_date``. If a random delay (jitter) is
+        set, it
         will be applied to the trigger.
 
         Returns
         -------
         bool
-            Always returns True after delegating scheduling to `everyHours`.
+            Always returns True after delegating scheduling to ``everyHours``.
         """
 
     @abstractmethod
@@ -1298,7 +1317,8 @@ class ITask(ABC):
         Schedule to run every three hours at a specific minute and second.
 
         Set up the event to execute every three hours at the given minute and second.
-        The schedule can be limited by `start_date` and `end_date`. Jitter is not used.
+        The schedule can be limited by ``start_date`` and ``end_date``. Jitter is not
+        used.
 
         Parameters
         ----------
@@ -1315,7 +1335,7 @@ class ITask(ABC):
         Raises
         ------
         ValueError
-            If `minute` or `second` are not integers in valid ranges.
+            If ``minute`` or ``second`` are not integers in valid ranges.
         """
 
     @abstractmethod
@@ -1325,14 +1345,16 @@ class ITask(ABC):
         """
         Schedule the task to run every four hours.
 
-        Use the `everyHours` method with an interval of four hours. The schedule can be
-        restricted by `start_date` and `end_date`. If a random delay (jitter) is set, it
+        Use the ``everyHours`` method with an interval of four hours. The schedule can
+        be
+        restricted by ``start_date`` and ``end_date``. If a random delay (jitter) is
+        set, it
         will be applied to the trigger.
 
         Returns
         -------
         bool
-            Always returns True after delegating scheduling to `everyHours`.
+            Always returns True after delegating scheduling to ``everyHours``.
         """
 
     @abstractmethod
@@ -1345,7 +1367,7 @@ class ITask(ABC):
         Schedule to run every four hours at a specific minute and second.
 
         Validate input ranges for minute and second. Delegate scheduling to
-        `everyHoursAt` with an interval of four hours and the specified time.
+        ``everyHoursAt`` with an interval of four hours and the specified time.
 
         Parameters
         ----------
@@ -1367,14 +1389,16 @@ class ITask(ABC):
         """
         Schedule the task to run every five hours.
 
-        Use the `everyHours` method with an interval of five hours. The schedule can be
-        restricted by `start_date` and `end_date`. If a random delay (jitter) is set, it
+        Use the ``everyHours`` method with an interval of five hours. The schedule can
+        be
+        restricted by ``start_date`` and ``end_date``. If a random delay (jitter) is
+        set, it
         will be applied to the trigger.
 
         Returns
         -------
         bool
-            Always returns True after delegating scheduling to `everyHours`.
+            Always returns True after delegating scheduling to ``everyHours``.
         """
 
     @abstractmethod
@@ -1387,7 +1411,7 @@ class ITask(ABC):
         Schedule to run every five hours at a specific minute and second.
 
         Validates input ranges for minute and second. Delegates scheduling to
-        `everyHoursAt` with an interval of five hours and the specified time.
+        ``everyHoursAt`` with an interval of five hours and the specified time.
 
         Parameters
         ----------
@@ -1409,13 +1433,13 @@ class ITask(ABC):
         """
         Schedule to run every six hours.
 
-        Delegates scheduling to `everyHours` with an interval of six hours.
+        Delegates scheduling to ``everyHours`` with an interval of six hours.
         Returns True if scheduling was configured.
 
         Returns
         -------
         bool
-            Always returns True after delegating scheduling to `everyHours`.
+            Always returns True after delegating scheduling to ``everyHours``.
         """
 
     @abstractmethod
@@ -1428,7 +1452,7 @@ class ITask(ABC):
         Schedule to run every six hours at a specific minute and second.
 
         Validate input ranges for minute and second. Delegate scheduling to
-        `everyHoursAt` with an interval of six hours and the specified time.
+        ``everyHoursAt`` with an interval of six hours and the specified time.
 
         Parameters
         ----------
@@ -1450,13 +1474,14 @@ class ITask(ABC):
         """
         Schedule to run every seven hours.
 
-        Use `everyHours` with an interval of seven hours. Restrict schedule with
-        `start_date` and `end_date` if set. Apply random delay (jitter) if configured.
+        Use ``everyHours`` with an interval of seven hours. Restrict schedule with
+        ``start_date`` and ``end_date`` if set. Apply random delay (jitter) if
+        configured.
 
         Returns
         -------
         bool
-            Always returns True after delegating scheduling to `everyHours`.
+            Always returns True after delegating scheduling to ``everyHours``.
         """
 
     @abstractmethod
@@ -1469,7 +1494,7 @@ class ITask(ABC):
         Schedule to run every seven hours at a specific minute and second.
 
         Validate input ranges for minute and second. Delegate scheduling to
-        `everyHoursAt` with an interval of seven hours and the specified time.
+        ``everyHoursAt`` with an interval of seven hours and the specified time.
 
         Parameters
         ----------
@@ -1491,13 +1516,13 @@ class ITask(ABC):
         """
         Schedule to run every eight hours.
 
-        Delegate scheduling to `everyHours` with an interval of eight hours.
+        Delegate scheduling to ``everyHours`` with an interval of eight hours.
         Return True if scheduling was configured.
 
         Returns
         -------
         bool
-            Always returns True after delegating scheduling to `everyHours`.
+            Always returns True after delegating scheduling to ``everyHours``.
         """
 
     @abstractmethod
@@ -1510,7 +1535,7 @@ class ITask(ABC):
         Schedule to run every eight hours at a specific minute and second.
 
         Validate input ranges for minute and second. Delegate scheduling to
-        `everyHoursAt` with an interval of eight hours and the specified time.
+        ``everyHoursAt`` with an interval of eight hours and the specified time.
 
         Parameters
         ----------
@@ -1532,7 +1557,7 @@ class ITask(ABC):
         """
         Schedule to run every nine hours.
 
-        Delegates scheduling to `everyHours` with an interval of nine hours.
+        Delegates scheduling to ``everyHours`` with an interval of nine hours.
         Returns True if scheduling was configured.
 
         Returns
@@ -1551,7 +1576,7 @@ class ITask(ABC):
         Schedule to run every nine hours at a specific minute and second.
 
         Validate input ranges for minute and second. Delegate scheduling to
-        `everyHoursAt` with an interval of nine hours and the specified time.
+        ``everyHoursAt`` with an interval of nine hours and the specified time.
 
         Parameters
         ----------
@@ -1573,14 +1598,14 @@ class ITask(ABC):
         """
         Schedule to run every ten hours.
 
-        Delegate scheduling to `everyHours` with an interval of ten hours.
-        The scheduling window can be restricted by `start_date` and `end_date`.
+        Delegate scheduling to ``everyHours`` with an interval of ten hours.
+        The scheduling window can be restricted by ``start_date`` and ``end_date``.
         Applies random delay (jitter) if configured.
 
         Returns
         -------
         bool
-            Always returns True after delegating scheduling to `everyHours`.
+            Always returns True after delegating scheduling to ``everyHours``.
         """
 
     @abstractmethod
@@ -1593,7 +1618,7 @@ class ITask(ABC):
         Schedule to run every ten hours at a specific minute and second.
 
         Validate input ranges for minute and second. Delegate scheduling to
-        `everyHoursAt` with an interval of ten hours and the specified time.
+        ``everyHoursAt`` with an interval of ten hours and the specified time.
 
         Parameters
         ----------
@@ -1615,7 +1640,7 @@ class ITask(ABC):
         """
         Schedule to run every eleven hours.
 
-        Delegates scheduling to `everyHours` with an interval of 11 hours.
+        Delegates scheduling to ``everyHours`` with an interval of 11 hours.
         Returns True if scheduling was configured.
 
         Returns
@@ -1634,7 +1659,7 @@ class ITask(ABC):
         Schedule to run every eleven hours at a specific minute and second.
 
         Validate input ranges for minute and second. Delegate scheduling to
-        `everyHoursAt` with an interval of 11 hours and the specified time.
+        ``everyHoursAt`` with an interval of 11 hours and the specified time.
 
         Parameters
         ----------
@@ -1656,14 +1681,14 @@ class ITask(ABC):
         """
         Schedule to run every twelve hours.
 
-        Delegates scheduling to `everyHours` with an interval of 12 hours.
-        The scheduling window can be restricted by `start_date` and `end_date`.
+        Delegates scheduling to ``everyHours`` with an interval of 12 hours.
+        The scheduling window can be restricted by ``start_date`` and ``end_date``.
         Applies random delay (jitter) if configured.
 
         Returns
         -------
         bool
-            Always returns True after delegating scheduling to `everyHours`.
+            Always returns True after delegating scheduling to ``everyHours``.
         """
 
     @abstractmethod
@@ -1676,7 +1701,7 @@ class ITask(ABC):
         Schedule to run every twelve hours at a specific minute and second.
 
         Validate input ranges for minute and second. Delegate scheduling to
-        `everyHoursAt` with an interval of 12 hours and the specified time.
+        ``everyHoursAt`` with an interval of 12 hours and the specified time.
 
         Parameters
         ----------
@@ -1699,7 +1724,7 @@ class ITask(ABC):
         Schedule the task to run once per day.
 
         Configure the event to execute daily at midnight using a CronTrigger.
-        Restrict the schedule with `start_date` and `end_date` if set.
+        Restrict the schedule with ``start_date`` and ``end_date`` if set.
         Apply random delay (jitter) if configured.
 
         Returns
@@ -1744,7 +1769,7 @@ class ITask(ABC):
         """
         Schedule to run at fixed intervals measured in days.
 
-        Validates that `days` is a positive integer. Sets up an IntervalTrigger with
+        Validates that ``days`` is a positive integer. Sets up an IntervalTrigger with
         the specified interval in days, using any configured start and end dates, and
         random delay (jitter) if set.
 
@@ -1797,12 +1822,12 @@ class ITask(ABC):
         """
         Schedule to run every two days.
 
-        Delegates scheduling to `everyDays` with an interval of 2 days.
+        Delegates scheduling to ``everyDays`` with an interval of 2 days.
 
         Returns
         -------
         bool
-            Always returns True after delegating scheduling to `everyDays`.
+            Always returns True after delegating scheduling to ``everyDays``.
         """
 
     @abstractmethod
@@ -1816,7 +1841,7 @@ class ITask(ABC):
         Schedule to run every two days at a specific hour, minute, and second.
 
         Validate input ranges for hour, minute, and second. Delegate scheduling to
-        `everyDaysAt` with an interval of 2 days and the specified time.
+        ``everyDaysAt`` with an interval of 2 days and the specified time.
 
         Parameters
         ----------
@@ -1840,7 +1865,7 @@ class ITask(ABC):
         """
         Schedule to run every three days.
 
-        Delegates scheduling to `everyDays` with an interval of 3 days. Returns True.
+        Delegates scheduling to ``everyDays`` with an interval of 3 days. Returns True.
 
         Returns
         -------
@@ -1859,7 +1884,7 @@ class ITask(ABC):
         Schedule to run every three days at a specific hour, minute, and second.
 
         Validates input ranges for hour, minute, and second. Delegates scheduling to
-        `everyDaysAt` with an interval of 3 days and the specified time.
+        ``everyDaysAt`` with an interval of 3 days and the specified time.
 
         Parameters
         ----------
@@ -1886,7 +1911,7 @@ class ITask(ABC):
         Returns
         -------
         bool
-            Always returns True after delegating scheduling to `everyDays`.
+            Always returns True after delegating scheduling to ``everyDays``.
         """
 
     @abstractmethod
@@ -1921,14 +1946,14 @@ class ITask(ABC):
         """
         Schedule to run every five days.
 
-        Use the `everyDays` method with an interval of five days. The scheduling
-        window can be restricted by `start_date` and `end_date`. If a random delay
+        Use the ``everyDays`` method with an interval of five days. The scheduling
+        window can be restricted by ``start_date`` and ``end_date``. If a random delay
         (jitter) is configured, it is applied to the trigger.
 
         Returns
         -------
         bool
-            Always returns True after delegating scheduling to `everyDays`.
+            Always returns True after delegating scheduling to ``everyDays``.
         """
 
     @abstractmethod
@@ -1942,7 +1967,7 @@ class ITask(ABC):
         Schedule event to run every five days at a specific hour, minute, and second.
 
         Validate input ranges for hour, minute, and second. Delegate scheduling to
-        `everyDaysAt` with an interval of 5 days and the specified time.
+        ``everyDaysAt`` with an interval of 5 days and the specified time.
 
         Parameters
         ----------
@@ -1966,8 +1991,9 @@ class ITask(ABC):
         """
         Schedule the task to run every six days.
 
-        Use the `everyDays` method with an interval of six days. The scheduling window
-        can be restricted by `start_date` and `end_date`. If a random delay (jitter) is
+        Use the ``everyDays`` method with an interval of six days. The scheduling window
+        can be restricted by ``start_date`` and ``end_date``. If a random delay (jitter)
+        is
         configured, it is applied to the trigger.
 
         Returns
@@ -1987,7 +2013,7 @@ class ITask(ABC):
         Schedule event to run every six days at a specific hour, minute, and second.
 
         Validate input ranges for hour, minute, and second. Delegate scheduling to
-        `everyDaysAt` with an interval of 6 days and the specified time.
+        ``everyDaysAt`` with an interval of 6 days and the specified time.
 
         Parameters
         ----------
@@ -2011,8 +2037,8 @@ class ITask(ABC):
         """
         Schedule the task to run every seven days.
 
-        Use the `everyDays` method with an interval of seven days. The scheduling
-        window can be restricted by `start_date` and `end_date`. If a random delay
+        Use the ``everyDays`` method with an interval of seven days. The scheduling
+        window can be restricted by ``start_date`` and ``end_date``. If a random delay
         (jitter) is configured, it is applied to the trigger.
 
         Returns
@@ -2032,7 +2058,7 @@ class ITask(ABC):
         Schedule event to run every seven days at a specific hour, minute, and second.
 
         Validate input ranges for hour, minute, and second. Delegate scheduling to
-        `everyDaysAt` with an interval of 7 days and the specified time.
+        ``everyDaysAt`` with an interval of 7 days and the specified time.
 
         Parameters
         ----------
@@ -2079,7 +2105,8 @@ class ITask(ABC):
         Raises
         ------
         ValueError
-            If `hour`, `minute`, or `second` are not integers within their valid ranges.
+            If ``hour``, ``minute``, or ``second`` are not integers within their valid
+            ranges.
         """
 
     @abstractmethod
@@ -2258,7 +2285,8 @@ class ITask(ABC):
         Schedule the task to run every week.
 
         Configure the event to execute once per week on Sunday at 00:00:00. The schedule
-        can be restricted by `start_date` and `end_date`. If a random delay (jitter) is
+        can be restricted by ``start_date`` and ``end_date``. If a random delay (jitter)
+        is
         configured, it is applied to the trigger.
 
         Returns
@@ -2275,7 +2303,7 @@ class ITask(ABC):
         """
         Configure the event to run at fixed intervals measured in weeks.
 
-        Validates that the `weeks` parameter is a positive integer. Sets up an
+        Validates that the ``weeks`` parameter is a positive integer. Sets up an
         IntervalTrigger with the specified interval in weeks. Returns True if
         the scheduling was successfully configured.
 
@@ -2292,7 +2320,7 @@ class ITask(ABC):
         Raises
         ------
         ValueError
-            If `weeks` is not a positive integer.
+            If ``weeks`` is not a positive integer.
         """
 
     @abstractmethod

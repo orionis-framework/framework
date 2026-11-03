@@ -1,3 +1,8 @@
+"""Provide realtime operations.
+
+Includes ``validate_remote_name``, ``remote``, ``remote``, ``remote``.
+"""
+
 from types import FunctionType
 from typing import TYPE_CHECKING, cast, overload
 
@@ -5,7 +10,9 @@ if TYPE_CHECKING:
     from collections.abc import Callable
 
 MAX_TARGET_LENGTH = 128
+"""Max target length value used by ``decorators``."""
 REMOTE_ATTRIBUTE = "__orionis_remote_name__"
+"""Remote attribute identifier: ``__orionis_remote_name__``."""
 
 def validate_remote_name(name: str) -> None:
     """
@@ -35,54 +42,14 @@ def validate_remote_name(name: str) -> None:
         raise ValueError(message)
 
 @overload
-def remote[F: Callable](function: F, *, name: str | None = None) -> F:  # noqa: D418
-    """
-    Mark a supplied instance method for remote dispatch.
-
-    Parameters
-    ----------
-    function : F
-        Original instance-method function.
-    name : str | None, optional
-        Public alias, or None to use the Python method name.
-
-    Returns
-    -------
-    F
-        Original function with validated remote metadata attached.
-
-    Raises
-    ------
-    TypeError
-        If the supplied object is not a Python function.
-    ValueError
-        If the method name or alias is invalid, or metadata is already attached.
-    """
+def remote[F: Callable](function: F, *, name: str | None = None) -> F:
+    ...
 
 @overload
-def remote[F: Callable](  # noqa: D418
+def remote[F: Callable](
     function: None = None, *, name: str | None = None,
 ) -> Callable[[F], F]:
-    """
-    Create a decorator for remote dispatch with an optional alias.
-
-    Parameters
-    ----------
-    function : None, optional
-        Omit the function to return a decorator.
-    name : str | None, optional
-        Public alias, or None to use the decorated method's Python name.
-
-    Returns
-    -------
-    Callable[[F], F]
-        Decorator attaching metadata without wrapping the original function.
-
-    Raises
-    ------
-    ValueError
-        If the supplied alias is invalid.
-    """
+    ...
 
 def remote[F: Callable](
     function: F | None = None, *, name: str | None = None,
@@ -92,14 +59,14 @@ def remote[F: Callable](
 
     Parameters
     ----------
-    function : F | None, optional
+    function : ``F`` | None, optional
         Method supplied by bare decorator syntax.
     name : str | None, optional
         Explicit public alias, otherwise the Python method name.
 
     Returns
     -------
-    F | Callable[[F], F]
+    ``F`` | collections.abc.Callable[[``F``], ``F``]
         Original function, or a decorator returning the original function.
 
     Raises
@@ -118,12 +85,12 @@ def remote[F: Callable](
 
         Parameters
         ----------
-        target : F
+        target : ``F``
             Developer-owned instance method.
 
         Returns
         -------
-        F
+        ``F``
             The exact input callable.
 
         Raises

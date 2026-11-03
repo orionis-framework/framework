@@ -1,3 +1,5 @@
+"""Represent a task execution event with scheduling and result information."""
+
 from __future__ import annotations
 from dataclasses import dataclass, field
 from typing import Any
@@ -9,23 +11,23 @@ class TaskEvent(BaseEntity):
     """
     Represent a task execution event with scheduling and result information.
 
-    Parameters
+    Attributes
     ----------
     code : int
         Event status or result code.
     signature : str
         Task signature identifier.
-    jobstore : str, default "memory"
+    jobstore : str, default "``memory``"
         Storage backend for the job.
-    scheduled_run_times : Any | None, default None
+    scheduled_run_times : typing.Any | None, default None
         Collection of scheduled execution times.
-    scheduled_run_time : Any | None, default None
+    scheduled_run_time : typing.Any | None, default None
         Specific scheduled execution time.
-    retval : Any | None, default None
+    retval : typing.Any | None, default None
         Return value from task execution.
-    exception : Any | None, default None
+    exception : typing.Any | None, default None
         Exception raised during task execution.
-    traceback : Any | None, default None
+    traceback : typing.Any | None, default None
         Exception traceback information.
     """
 
@@ -34,6 +36,7 @@ class TaskEvent(BaseEntity):
     description: str = field(
         default="",
     )
+    """Description produced by ``field``."""
 
     signature: str
 
@@ -69,7 +72,7 @@ class TaskEvent(BaseEntity):
 
         Parameters
         ----------
-        self : TaskEvent
+        self : orionis.console.entities.TaskEvent
             The instance of TaskEvent being initialized.
 
         Returns

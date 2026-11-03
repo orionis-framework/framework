@@ -28,7 +28,7 @@ class _StubTemplate:
         self.error: Exception | None = error
         self.calls: list[dict[str, object]] = []
 
-    async def render_async(self, **context: object) -> str:
+    async def renderAsync(self, **context: object) -> str:
         """
         Return the canned HTML or raise the configured error.
 
@@ -51,6 +51,9 @@ class _StubTemplate:
         if self.error is not None:
             raise self.error
         return self.html
+
+    # Preserve the Jinja2 template protocol name.
+    render_async = renderAsync
 
 class _StubJinjaEnvironment:
     """Jinja2 environment double resolving a single stubbed template."""
@@ -75,7 +78,7 @@ class _StubJinjaEnvironment:
         self.error: Exception | None = error
         self.requested: list[str] = []
 
-    def get_template(self, path: str) -> _StubTemplate | None:
+    def getTemplate(self, path: str) -> _StubTemplate | None:
         """
         Return the stubbed template or raise the configured error.
 
@@ -98,6 +101,9 @@ class _StubJinjaEnvironment:
         if self.error is not None:
             raise self.error
         return self.template
+
+    # Preserve the Jinja2 environment protocol name.
+    get_template = getTemplate
 
 class _StubViewEnvironment:
     """View environment double exposing a stubbed Jinja2 environment."""

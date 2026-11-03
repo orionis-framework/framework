@@ -1,3 +1,5 @@
+"""Own worker-local connections and isolate every group by Hub class."""
+
 import asyncio
 from typing import TYPE_CHECKING
 from orionis.foundation.config.realtime.entities.realtime import (
@@ -16,6 +18,7 @@ class _Broadcast:
     """Share one immutable encoded payload per codec among bounded workers."""
 
     __slots__ = ("encoded", "failed", "hub", "manager", "recipients", "sent")
+    """Declare the instance attribute slots reserved by this class."""
 
     def __init__(
         self,
@@ -29,11 +32,11 @@ class _Broadcast:
 
         Parameters
         ----------
-        manager : IConnectionManager
+        manager : orionis.realtime.contracts.IConnectionManager
             Registry used to recheck availability immediately before sending.
-        hub : type[Hub]
+        hub : type[orionis.realtime.Hub]
             Hub namespace restricting all recipients.
-        recipients : tuple[str, ...]
+        recipients : tuple[str, ``...``]
             Snapshot of recipient identifiers; no connections are retained.
         encoded : dict[str, str | bytes]
             Immutable frame payloads, encoded once per selected codec.
@@ -44,11 +47,17 @@ class _Broadcast:
             Store delivery inputs and initialize successful and failed counts.
         """
         self.manager = manager
+        """Registry used to recheck availability immediately before sending."""
         self.hub = hub
+        """Hub namespace restricting all recipients."""
         self.recipients = iter(recipients)
+        """Snapshot of recipient identifiers; no connections are retained."""
         self.encoded = encoded
+        """Immutable frame payloads, encoded once per selected codec."""
         self.sent = 0
+        """Sent value used by ``_Broadcast``."""
         self.failed = 0
+        """Failed value used by ``_Broadcast``."""
 
     async def run(self) -> None:
         """
@@ -81,6 +90,7 @@ class ConnectionManager(IConnectionManager):
     """
 
     __slots__ = ("_config", "_connections", "_groups", "_hubs", "_memberships")
+    """Declare the instance attribute slots reserved by this class."""
 
     def __init__(self, config: RealtimeConfig) -> None:
         """
@@ -88,7 +98,7 @@ class ConnectionManager(IConnectionManager):
 
         Parameters
         ----------
-        config : RealtimeConfig
+        config : orionis.realtime.config.RealtimeConfig
             Group and broadcast limits shared by this application.
 
         Returns
@@ -97,10 +107,15 @@ class ConnectionManager(IConnectionManager):
             Store limits and initialize empty connection and membership maps.
         """
         self._config = config
+        """Group and broadcast limits shared by this application."""
         self._connections: dict[str, RealtimeConnectionLike] = {}
+        """Active realtime connections indexed by identifier."""
         self._hubs: dict[type[Hub], set[str]] = {}
+        """Hub registrations associated with active connections."""
         self._groups: dict[tuple[type[Hub], str], set[str]] = {}
+        """Realtime group membership and targeting interface."""
         self._memberships: dict[str, set[str]] = {}
+        """Group memberships indexed by connection identifier."""
 
     @property
     def config(self) -> RealtimeConfig:
@@ -109,7 +124,7 @@ class ConnectionManager(IConnectionManager):
 
         Returns
         -------
-        RealtimeConfig
+        orionis.realtime.config.RealtimeConfig
             Application-wide invocation, group and broadcast limits.
         """
         return self._config
@@ -144,7 +159,7 @@ class ConnectionManager(IConnectionManager):
 
         Parameters
         ----------
-        connection : RealtimeConnectionLike
+        connection : orionis.realtime.contracts.RealtimeConnectionLike
             Connection with a cryptographically generated unique identifier.
 
         Returns
@@ -172,7 +187,7 @@ class ConnectionManager(IConnectionManager):
 
         Parameters
         ----------
-        connection : RealtimeConnectionLike
+        connection : orionis.realtime.contracts.RealtimeConnectionLike
             Exact connection instance to release; repeated release is harmless.
 
         Returns
@@ -205,12 +220,12 @@ class ConnectionManager(IConnectionManager):
         ----------
         connection_id : str
             Identifier of the requested connection.
-        hub : type[Hub] | None, optional
+        hub : type[orionis.realtime.Hub] | None, optional
             Required owning Hub class, or None to omit namespace filtering.
 
         Returns
         -------
-        RealtimeConnectionLike | None
+        orionis.realtime.contracts.RealtimeConnectionLike | None
             Ready, nonclosing connection in the requested namespace, or None.
         """
         connection = self._connections.get(connection_id)
@@ -226,7 +241,7 @@ class ConnectionManager(IConnectionManager):
 
         Returns
         -------
-        tuple[RealtimeConnectionLike, ...]
+        tuple[orionis.realtime.contracts.RealtimeConnectionLike, ``...``]
             Active and provisional connections owned at the time of the call.
         """
         return tuple(self._connections.values())
@@ -237,12 +252,12 @@ class ConnectionManager(IConnectionManager):
 
         Parameters
         ----------
-        hub : type[Hub]
+        hub : type[orionis.realtime.Hub]
             Owning Hub class.
 
         Returns
         -------
-        tuple[str, ...]
+        tuple[str, ``...``]
             Current ready recipients; no connection objects are retained.
         """
         return tuple(
@@ -256,14 +271,14 @@ class ConnectionManager(IConnectionManager):
 
         Parameters
         ----------
-        hub : type[Hub]
+        hub : type[orionis.realtime.Hub]
             Owning Hub class.
         group : str
             Group name within that Hub.
 
         Returns
         -------
-        tuple[str, ...]
+        tuple[str, ``...``]
             Current ready recipients of the named group.
 
         Raises
@@ -355,12 +370,12 @@ class ConnectionManager(IConnectionManager):
 
         Parameters
         ----------
-        hub : type[Hub]
+        hub : type[orionis.realtime.Hub]
             Hub class whose clients should receive events or invocations.
 
         Returns
         -------
-        HubClients
+        orionis.realtime.HubClients
             Client selectors without a connection-specific caller.
 
         Raises
@@ -381,16 +396,16 @@ class ConnectionManager(IConnectionManager):
 
         Parameters
         ----------
-        hub : type[Hub]
+        hub : type[orionis.realtime.Hub]
             Hub namespace restricting every recipient.
-        connection_ids : tuple[str, ...]
+        connection_ids : tuple[str, ``...``]
             Recipient identifiers selected by the application.
         envelope : object
             Typed or mapping envelope accepted by the selected Hub codecs.
 
         Returns
         -------
-        BroadcastResult
+        orionis.realtime.BroadcastResult
             Successful and failed recipient counts; cancellation propagates.
 
         Raises

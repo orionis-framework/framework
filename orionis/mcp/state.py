@@ -1,3 +1,5 @@
+"""Seal state across workers sharing an application key and GCM cipher."""
+
 import hashlib
 import hmac
 import time
@@ -14,18 +16,26 @@ class _State(msgspec.Struct, frozen=True):
     """Authenticate the complete structured envelope before exposing state."""
 
     purpose: str
+    """Purpose restricting where protected request state may be reused."""
     expires: float
+    """Expiration deadline for the cached or protected value."""
     principal: str
+    """Authenticated principal to which the state value is bound."""
     request: str
+    """Request identity to which the state value is bound."""
     value: object
+    """Payload retained for subsequent resolution or restoration."""
 
 _STATE_DECODER = msgspec.json.Decoder(_State)
+"""State decoder used by ``state``."""
 _INVALID_STATE = "Invalid request state"
+"""Invalid state identifier: ``Invalid request state``."""
 
 class McpState:
     """Seal state across workers sharing an application key and GCM cipher."""
 
     __slots__ = ("_encrypter",)
+    """Declare the instance attribute slots reserved by this class."""
 
     def __init__(self, app: IApplication, encrypter: IEncrypter) -> None:
         """
@@ -33,9 +43,9 @@ class McpState:
 
         Parameters
         ----------
-        app : IApplication
+        app : orionis.IApplication
             Application container supplying configuration and dependencies.
-        encrypter : IEncrypter
+        encrypter : orionis.encrypter.contracts.IEncrypter
             Value supplied for ``encrypter``.
 
         Returns
@@ -47,6 +57,7 @@ class McpState:
             message = "MCP requestState requires app.cipher AES-128-GCM or AES-256-GCM"
             raise ValueError(message)
         self._encrypter = encrypter
+        """Value supplied for ``encrypter``."""
 
     def seal(self, request: McpRequest, value: object, *, ttl: int = 300) -> str:
         """
@@ -54,7 +65,7 @@ class McpState:
 
         Parameters
         ----------
-        request : McpRequest
+        request : orionis.mcp.McpRequest
             Current request and its trusted execution context.
         value : object
             Value to inspect, transform or validate.
@@ -84,7 +95,7 @@ class McpState:
 
         Parameters
         ----------
-        request : McpRequest
+        request : orionis.mcp.McpRequest
             Current request and its trusted execution context.
 
         Returns
@@ -114,7 +125,7 @@ def _fingerprint(request: McpRequest) -> str:
 
     Parameters
     ----------
-    request : McpRequest
+    request : orionis.mcp.McpRequest
         Current request and its trusted execution context.
 
     Returns
@@ -141,7 +152,7 @@ def _principal(request: McpRequest) -> str:
 
     Parameters
     ----------
-    request : McpRequest
+    request : orionis.mcp.McpRequest
         Current request and its trusted execution context.
 
     Returns

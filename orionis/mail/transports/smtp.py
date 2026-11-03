@@ -1,3 +1,5 @@
+"""Use one verified SMTP connection per message, entirely on a worker."""
+
 import smtplib
 import ssl
 from contextlib import suppress
@@ -19,8 +21,11 @@ if TYPE_CHECKING:
     from orionis.mail.entities.prepared import PreparedMail
 
 _SMTP_READY = 220
+"""Smtp ready value used by ``smtp``."""
 _MAX_BATCH = 100
+"""Max batch value used by ``smtp``."""
 _BATCH_WORKERS = BoundedExecutor(4, max_pending=16, name="orionis-smtp-batch")
+"""Batch workers used by ``smtp``."""
 
 class SmtpTransport(IMailTransport):
     """
@@ -31,6 +36,7 @@ class SmtpTransport(IMailTransport):
     """
 
     __slots__ = ("_settings",)
+    """Declare the instance attribute slots reserved by this class."""
 
     def __init__(self: Self, settings: SmtpSettings) -> None:
         """
@@ -38,7 +44,7 @@ class SmtpTransport(IMailTransport):
 
         Parameters
         ----------
-        settings : SmtpSettings
+        settings : orionis.mail.entities.SmtpSettings
             Immutable effective connection options.
 
         Returns
@@ -47,6 +53,7 @@ class SmtpTransport(IMailTransport):
             Store transport configuration only.
         """
         self._settings = settings
+        """Immutable effective connection options."""
 
     async def send(
         self: Self,
@@ -60,7 +67,7 @@ class SmtpTransport(IMailTransport):
 
         Parameters
         ----------
-        message : PreparedMail
+        message : orionis.mail.entities.PreparedMail
             Already materialized MIME and a validated separate envelope.
         mailer : str
             Configuration name reported in the result.
@@ -69,12 +76,12 @@ class SmtpTransport(IMailTransport):
 
         Returns
         -------
-        MailResult
+        orionis.mail.entities.MailResult
             Total or partial acceptance confirmed by the SMTP transaction.
 
         Raises
         ------
-        MailTransportException
+        orionis.mail.exceptions.MailTransportException
             If the transaction fails or every recipient is rejected.
         """
         return await Loop.execute(self._sendSync, message, mailer, driver)
@@ -91,7 +98,7 @@ class SmtpTransport(IMailTransport):
 
         Parameters
         ----------
-        messages : Iterable[PreparedMail]
+        messages : collections.abc.Iterable[orionis.mail.entities.PreparedMail]
             At most 100 already-composed messages with these transport settings.
         mailer : str
             Mailer identifier included in results.
@@ -100,7 +107,7 @@ class SmtpTransport(IMailTransport):
 
         Returns
         -------
-        tuple[MailResult, ...]
+        tuple[orionis.mail.entities.MailResult, ``...``]
             Ordered delivery results. MailBatchException retains completed
             results and the uncertain message index if the batch aborts.
             Cancellation waits for the accepted batch before closing resources.
@@ -124,7 +131,7 @@ class SmtpTransport(IMailTransport):
 
         Parameters
         ----------
-        message : PreparedMail
+        message : orionis.mail.entities.PreparedMail
             Complete operation-local message.
         mailer : str
             Selected configuration name.
@@ -133,12 +140,12 @@ class SmtpTransport(IMailTransport):
 
         Returns
         -------
-        MailResult
+        orionis.mail.entities.MailResult
             Confirmed recipient acceptance after a successful transaction.
 
         Raises
         ------
-        MailTransportException
+        orionis.mail.exceptions.MailTransportException
             Sanitized failure identifying stage, exception type, and SMTP code.
         """
         try:
@@ -158,7 +165,7 @@ class SmtpTransport(IMailTransport):
 
         Parameters
         ----------
-        messages : tuple[PreparedMail, ...]
+        messages : tuple[orionis.mail.entities.PreparedMail, ``...``]
             Prepared messages to send through one SMTP session.
         mailer : str
             Configured mailer name attached to delivery results.
@@ -167,7 +174,7 @@ class SmtpTransport(IMailTransport):
 
         Returns
         -------
-        tuple[MailResult, ...]
+        tuple[orionis.mail.entities.MailResult, ``...``]
             Delivery results in message order after the complete batch succeeds.
         """
         settings = self._settings
@@ -247,23 +254,23 @@ class SmtpTransport(IMailTransport):
 
         Parameters
         ----------
-        message : PreparedMail
+        message : orionis.mail.entities.PreparedMail
             Intended recipient union and message identifier.
         mailer : str
             Selected configuration name.
         driver : str
             Registered driver name.
-        refused : Mapping[str, tuple[int, bytes | str]]
+        refused : collections.abc.Mapping[str, tuple[int, bytes | str]]
             Recipient rejections returned after the transaction succeeded.
 
         Returns
         -------
-        MailResult
+        orionis.mail.entities.MailResult
             Accepted or partial, with sanitized immutable rejection metadata.
 
         Raises
         ------
-        MailTransportException
+        orionis.mail.exceptions.MailTransportException
             If no recipient was accepted.
         """
         accepted = tuple(
@@ -293,9 +300,9 @@ def _mail_options(client: smtplib.SMTP, message: PreparedMail) -> list[str]:
 
     Parameters
     ----------
-    client : smtplib.SMTP
+    client : ``smtplib.SMTP``
         Connection after EHLO and any required TLS negotiation.
-    message : PreparedMail
+    message : orionis.mail.entities.PreparedMail
         Prepared message with its UTF-8 requirement.
 
     Returns
@@ -305,7 +312,7 @@ def _mail_options(client: smtplib.SMTP, message: PreparedMail) -> list[str]:
 
     Raises
     ------
-    MailTransportException
+    orionis.mail.exceptions.MailTransportException
         If an international mailbox cannot be transmitted without loss.
     """
     if not message.smtp_utf8:
@@ -322,7 +329,7 @@ def _tls_context() -> ssl.SSLContext:
 
     Returns
     -------
-    ssl.SSLContext
+    ``ssl.SSLContext``
         A client context using the system trust store.
     """
     context = ssl.create_default_context()
@@ -340,19 +347,19 @@ def create_smtp_transport(
 
     Parameters
     ----------
-    app : IApplication
+    app : orionis.IApplication
         Container supplied uniformly to every transport factory.
-    config : Mapping[str, object]
+    config : collections.abc.Mapping[str, object]
         Normalized selected mailer settings.
 
     Returns
     -------
-    IMailTransport
+    orionis.mail.contracts.IMailTransport
         Configured connection-per-message SMTP transport.
 
     Raises
     ------
-    MailConfigurationException
+    orionis.mail.exceptions.MailConfigurationException
         If the effective SMTP settings are invalid.
     """
     return SmtpTransport(SmtpSettings.fromConfig(config))

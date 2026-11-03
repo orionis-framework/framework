@@ -1,3 +1,5 @@
+"""Contract for a single named database connection."""
+
 from __future__ import annotations
 from abc import ABC, abstractmethod
 from typing import TYPE_CHECKING, Any
@@ -27,6 +29,7 @@ class IConnection(ABC):
     # ruff: noqa: ANN401
 
     __slots__ = ()
+    """Declare that this class introduces no additional instance slots."""
 
     @abstractmethod
     def getName(self) -> str:
@@ -61,7 +64,7 @@ class IConnection(ABC):
 
         Parameters
         ----------
-        plan : SelectPlan
+        plan : orionis.orm.query.SelectPlan
             Query plan to render with the configured connection dialect.
         literal_binds : bool, optional
             Include values for debugging when their types support SQL literals.
@@ -74,9 +77,9 @@ class IConnection(ABC):
 
         Raises
         ------
-        QueryException
+        orionis.database.QueryException
             If the plan or a literal value cannot be compiled.
-        MissingDatabaseDependencyException
+        orionis.database.MissingDatabaseDependencyException
             If the configured SQL dialect is unavailable.
         """
 
@@ -93,10 +96,10 @@ class IConnection(ABC):
 
         Parameters
         ----------
-        query : SelectPlan or str
+        query : orionis.orm.query.SelectPlan or str
             Compiled query plan, or a raw SQL string using named
             ``:param`` placeholders.
-        bindings : Mapping of str to Any, optional
+        bindings : collections.abc.Mapping of str ``to`` typing.Any, optional
             Bound parameters for raw SQL strings.
 
         Returns
@@ -106,7 +109,7 @@ class IConnection(ABC):
 
         Raises
         ------
-        QueryException
+        orionis.database.QueryException
             If the statement fails to compile or execute.
         """
 
@@ -117,17 +120,17 @@ class IConnection(ABC):
 
         Parameters
         ----------
-        plan : InsertPlan
+        plan : orionis.orm.query.InsertPlan
             Insert plan with the target table and row values.
 
         Returns
         -------
-        InsertResult
+        orionis.database.entities.InsertResult
             Result carrying the generated key and affected row count.
 
         Raises
         ------
-        QueryException
+        orionis.database.QueryException
             If the statement fails to compile or execute.
         """
 
@@ -138,7 +141,7 @@ class IConnection(ABC):
 
         Parameters
         ----------
-        plan : UpdatePlan
+        plan : orionis.orm.query.UpdatePlan
             Update plan with values and filtering conditions.
 
         Returns
@@ -148,7 +151,7 @@ class IConnection(ABC):
 
         Raises
         ------
-        QueryException
+        orionis.database.QueryException
             If the statement fails to compile or execute.
         """
 
@@ -159,7 +162,7 @@ class IConnection(ABC):
 
         Parameters
         ----------
-        plan : DeletePlan
+        plan : orionis.orm.query.DeletePlan
             Delete plan with filtering conditions.
 
         Returns
@@ -169,7 +172,7 @@ class IConnection(ABC):
 
         Raises
         ------
-        QueryException
+        orionis.database.QueryException
             If the statement fails to compile or execute.
         """
 
@@ -180,17 +183,17 @@ class IConnection(ABC):
 
         Parameters
         ----------
-        plan : SelectPlan
+        plan : orionis.orm.query.SelectPlan
             Query plan, typically carrying an aggregate projection.
 
         Returns
         -------
-        Any
+        typing.Any
             Scalar value, or ``None`` when the query yields no rows.
 
         Raises
         ------
-        QueryException
+        orionis.database.QueryException
             If the statement fails to compile or execute.
         """
 
@@ -207,7 +210,7 @@ class IConnection(ABC):
         ----------
         sql : str
             Raw SQL using named ``:param`` placeholders.
-        bindings : Mapping of str to Any, optional
+        bindings : collections.abc.Mapping of str ``to`` typing.Any, optional
             Bound parameters for the statement.
 
         Returns
@@ -217,7 +220,7 @@ class IConnection(ABC):
 
         Raises
         ------
-        QueryException
+        orionis.database.QueryException
             If the statement fails to execute.
         """
 
@@ -236,7 +239,7 @@ class IConnection(ABC):
         ----------
         sql : str
             Raw SQL statement.
-        bindings : Mapping of str to Any, optional
+        bindings : collections.abc.Mapping of str ``to`` typing.Any, optional
             Bound parameters for the statement.
 
         Returns
@@ -246,7 +249,7 @@ class IConnection(ABC):
 
         Raises
         ------
-        QueryException
+        orionis.database.QueryException
             If the statement fails to execute.
         """
 
@@ -264,7 +267,7 @@ class IConnection(ABC):
 
         Parameters
         ----------
-        table : TableDefinition
+        table : orionis.orm.schema.TableDefinition
             Table definition to materialize.
         if_not_exists : bool, optional
             Whether to guard the statement with ``IF NOT EXISTS`` so that
@@ -277,7 +280,7 @@ class IConnection(ABC):
 
         Raises
         ------
-        QueryException
+        orionis.database.QueryException
             If the DDL statement fails to execute.
         """
 
@@ -309,7 +312,7 @@ class IConnection(ABC):
 
         Raises
         ------
-        QueryException
+        orionis.database.QueryException
             If the DDL statement fails to execute.
         """
 
@@ -327,7 +330,7 @@ class IConnection(ABC):
 
         Raises
         ------
-        TransactionException
+        orionis.database.TransactionException
             If the transaction cannot be started.
         """
 
@@ -343,7 +346,7 @@ class IConnection(ABC):
 
         Raises
         ------
-        TransactionException
+        orionis.database.TransactionException
             If no transaction is active.
         """
 
@@ -359,7 +362,7 @@ class IConnection(ABC):
 
         Raises
         ------
-        TransactionException
+        orionis.database.TransactionException
             If no transaction is active.
         """
 
@@ -370,7 +373,7 @@ class IConnection(ABC):
 
         Returns
         -------
-        ITransaction
+        orionis.database.contracts.ITransaction
             Context manager committing on success and rolling back on error.
         """
 

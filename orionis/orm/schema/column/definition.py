@@ -1,3 +1,5 @@
+"""Framework-agnostic description of a database column."""
+
 from __future__ import annotations
 import operator
 from dataclasses import fields
@@ -11,24 +13,28 @@ if TYPE_CHECKING:
 
 # Sentinel used to distinguish "no default" from a legitimate ``None`` default.
 _NO_DEFAULT: object = object()
+"""Sentinel used to distinguish "no default" from a legitimate ``None`` default."""
 
 # Field names copied from ColumnOptions onto every ColumnDefinition instance.
 _OPTION_FIELDS: tuple[str, ...] = tuple(field.name for field in fields(ColumnOptions))
+"""Field names copied from ColumnOptions onto every ColumnDefinition instance."""
 
 # Read every declared column option in declaration order.
 _OPTION_GETTER: Callable[[ColumnOptions], tuple[Any, ...]] = operator.attrgetter(
     *_OPTION_FIELDS,
 )
+"""Read every declared column option in declaration order."""
 
 # Store the values used by columns with no type-specific options.
 _DEFAULT_OPTION_VALUES: tuple[Any, ...] = _OPTION_GETTER(ColumnOptions())
+"""Store the values used by columns with no type-specific options."""
 
 class ColumnDefinition:
     """
     Framework-agnostic description of a database column.
 
-    Column types such as :class:`~orionis.orm.schema.types.Integer` or
-    :class:`~orionis.orm.schema.types.String` subclass this definition and
+    Column types such as :class:`orionis.orm.schema.types.Integer` or
+    :class:`orionis.orm.schema.types.String` subclass this definition and
     expose a fluent API to declare constraints. The definition never touches
     the underlying SQL engine; the database compiler translates it later.
     """
@@ -72,6 +78,7 @@ class ColumnDefinition:
         "validate_strings",
         "zero_indexes",
     )
+    """Declare the instance attribute slots reserved by this class."""
 
     def __init__(
         self,
@@ -83,12 +90,13 @@ class ColumnDefinition:
 
         Parameters
         ----------
-        column_type : ColumnType
+        column_type : orionis.orm.schema.types.ColumnType
             Logical column type used by the SQL compiler.
-        options : ColumnOptions or None, optional
+        options : orionis.orm.schema.column.ColumnOptions or None, optional
             Type-specific knobs mirroring the SQLAlchemy constructor
             keywords of the concrete subclass. Defaults to every
-            :class:`ColumnOptions` field at its own default value.
+            :class:`orionis.orm.schema.column.ColumnOptions` field at its own default
+            value.
 
         Returns
         -------
@@ -97,7 +105,9 @@ class ColumnDefinition:
         """
         # Attribute name is attached later by the model metaclass.
         self.name: str = ""
+        """Attribute name is attached later by the model metaclass."""
         self.column_type = column_type
+        """Logical column type used by the SQL compiler."""
         values = (
             _DEFAULT_OPTION_VALUES if options is None else _OPTION_GETTER(options)
         )
@@ -106,13 +116,21 @@ class ColumnDefinition:
         ):
             setattr(self, field_name, value)
         self.is_primary: bool = False
+        """Is primary flag used by ``ColumnDefinition``."""
         self.is_nullable: bool = False
+        """Is nullable flag used by ``ColumnDefinition``."""
         self.is_unique: bool = False
+        """Is unique flag used by ``ColumnDefinition``."""
         self.has_index: bool = False
+        """Has index flag used by ``ColumnDefinition``."""
         self.is_auto_increment: bool = False
+        """Is auto increment flag used by ``ColumnDefinition``."""
         self.default_value: Any = _NO_DEFAULT
+        """Default value supplied through ``_NO_DEFAULT``."""
         self.foreign_ref: ForeignReference | None = None
+        """Foreign-key target referenced by this column."""
         self.comment_text: str | None = None
+        """Comment attached to the column definition."""
 
     # ── Fluent constraints ──────────────────────────────────────────────────
 
@@ -122,7 +140,7 @@ class ColumnDefinition:
 
         Returns
         -------
-        ColumnDefinition
+        orionis.orm.schema.column.ColumnDefinition
             The same definition, enabling fluent chaining.
         """
         self.is_primary = True
@@ -134,7 +152,7 @@ class ColumnDefinition:
 
         Returns
         -------
-        ColumnDefinition
+        orionis.orm.schema.column.ColumnDefinition
             The same definition, enabling fluent chaining.
         """
         self.is_nullable = True
@@ -146,12 +164,12 @@ class ColumnDefinition:
 
         Parameters
         ----------
-        value : Any
+        value : typing.Any
             Static value, or a zero-argument callable evaluated per insert.
 
         Returns
         -------
-        ColumnDefinition
+        orionis.orm.schema.column.ColumnDefinition
             The same definition, enabling fluent chaining.
         """
         self.default_value = value
@@ -163,7 +181,7 @@ class ColumnDefinition:
 
         Returns
         -------
-        ColumnDefinition
+        orionis.orm.schema.column.ColumnDefinition
             The same definition, enabling fluent chaining.
         """
         self.is_unique = True
@@ -175,7 +193,7 @@ class ColumnDefinition:
 
         Returns
         -------
-        ColumnDefinition
+        orionis.orm.schema.column.ColumnDefinition
             The same definition, enabling fluent chaining.
         """
         self.has_index = True
@@ -192,7 +210,7 @@ class ColumnDefinition:
 
         Returns
         -------
-        ColumnDefinition
+        orionis.orm.schema.column.ColumnDefinition
             The same definition, enabling fluent chaining.
 
         Raises
@@ -209,7 +227,7 @@ class ColumnDefinition:
 
         Returns
         -------
-        ColumnDefinition
+        orionis.orm.schema.column.ColumnDefinition
             The same definition, enabling fluent chaining.
         """
         self.is_auto_increment = True
@@ -226,7 +244,7 @@ class ColumnDefinition:
 
         Returns
         -------
-        ColumnDefinition
+        orionis.orm.schema.column.ColumnDefinition
             The same definition, enabling fluent chaining.
         """
         self.comment_text = str(text).strip()

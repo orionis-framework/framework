@@ -1,3 +1,5 @@
+"""Recover missing official configuration files from the master branch."""
+
 from typing import ClassVar
 from orionis.console.args.argument import Argument
 from orionis.console.commands.bootstrap._base import BootstrapCommand
@@ -8,7 +10,12 @@ class BootstrapConfigCommand(BootstrapCommand):
     """Recover missing official configuration files from the master branch."""
 
     signature = "bootstrap:config"
+    """Signature identifier: ``bootstrap:config``."""
     description = "Restore missing configuration files from the official master branch."
+    """
+    Description identifier: ``Restore missing configuration files from the official
+    master branch.``.
+    """
     arguments: ClassVar[list[Argument]] = [
         Argument(
             name_or_flags="file",
@@ -21,6 +28,7 @@ class BootstrapConfigCommand(BootstrapCommand):
             ),
         ),
     ]
+    """Command-line argument declarations accepted by this command."""
 
     def bootstrap(self, app: IApplication) -> list[tuple[str, str]]:
         """
@@ -28,7 +36,7 @@ class BootstrapConfigCommand(BootstrapCommand):
 
         Parameters
         ----------
-        app : IApplication
+        app : orionis.IApplication
             Application providing the effective config path.
 
         Returns

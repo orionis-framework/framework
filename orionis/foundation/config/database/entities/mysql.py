@@ -1,3 +1,5 @@
+"""Data class to represent the MySQL database configuration."""
+
 from __future__ import annotations
 from dataclasses import dataclass, field
 from orionis.environment.facade import Env
@@ -44,7 +46,7 @@ class MySQL(BaseEntity):
         Whether to prefix index names.
     strict : bool
         Whether to enforce strict SQL mode.
-    engine : Optional[str]
+    engine : typing.Optional[str]
         The storage engine for the MySQL database (optional).
     """
 
@@ -166,7 +168,7 @@ class MySQL(BaseEntity):
 
         Parameters
         ----------
-        self : MySQL
+        self : orionis.foundation.config.database.MySQL
             Instance of the MySQL configuration entity.
 
         Returns
@@ -209,7 +211,7 @@ class MySQL(BaseEntity):
 
         Parameters
         ----------
-        self : MySQL
+        self : orionis.foundation.config.database.MySQL
             Instance of the MySQL configuration entity.
 
         Returns
@@ -252,7 +254,7 @@ class MySQL(BaseEntity):
 
         Parameters
         ----------
-        self : MySQL
+        self : orionis.foundation.config.database.MySQL
             Instance of the MySQL configuration entity.
 
         Returns
@@ -295,7 +297,7 @@ class MySQL(BaseEntity):
 
         Parameters
         ----------
-        self : MySQL
+        self : orionis.foundation.config.database.MySQL
             Instance of the MySQL configuration entity.
 
         Returns

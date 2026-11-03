@@ -1,3 +1,5 @@
+"""Define the possible lifespan events for the application."""
+
 from enum import StrEnum
 
 class Lifespan(StrEnum):

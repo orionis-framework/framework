@@ -1,3 +1,5 @@
+"""Adapt a Granian RSGI scope to the transport adapter contract."""
+
 from __future__ import annotations
 from typing import TYPE_CHECKING, Self
 from orionis.http.adapters.request.contracts.transport import TransportAdapter
@@ -9,6 +11,7 @@ if TYPE_CHECKING:
 
 # Sentinel that marks per-request lazy fields as "not yet resolved"
 _MISSING: Any = object()
+"""Sentinel that marks per-request lazy fields as "not yet resolved"."""
 
 class RSGITransportAdapter(TransportAdapter):
     """
@@ -30,6 +33,7 @@ class RSGITransportAdapter(TransportAdapter):
         "__scope",
         "__wants_json",
     )
+    """Store scope data, request state, and resolved fields."""
 
     def __init__(self: Self, scope: Scope) -> None:
         """
@@ -37,7 +41,7 @@ class RSGITransportAdapter(TransportAdapter):
 
         Parameters
         ----------
-        scope : Scope
+        scope : ``granian.rsgi.Scope``
             The Granian RSGI scope object.
 
         Returns
@@ -47,13 +51,18 @@ class RSGITransportAdapter(TransportAdapter):
         """
         # Store the original RSGI scope object.
         self.__scope: Scope = scope
+        """The Granian RSGI scope object."""
         # Keep overrides and computed values in a single state dictionary.
         self.__overrides: dict[str, Any] = {}
+        """Keep overrides and computed values in a single state dictionary."""
         # Resolve lazy fields on first access using the _MISSING sentinel.
         self.__client: Any = _MISSING
+        """Resolve lazy fields on first access using the _MISSING sentinel."""
         self.__wants_json: Any = _MISSING
+        """Wants json supplied through ``_MISSING``."""
         # Parse the request headers.
         self.__headers: Headers = self.__buildHeadersRSGI()
+        """Parse the request headers."""
 
     def __getitem__(self: Self, key: str) -> object | None:
         """
@@ -131,7 +140,7 @@ class RSGITransportAdapter(TransportAdapter):
 
         Returns
         -------
-        Headers
+        orionis.http.payload.estructures.headers.Headers
             Return parsed headers as lowercase name/value pairs.
         """
         return Headers._fromRSGI(self.__scope.headers)  # noqa: SLF001
@@ -246,7 +255,7 @@ class RSGITransportAdapter(TransportAdapter):
 
         Returns
         -------
-        Headers
+        orionis.http.payload.estructures.headers.Headers
             Return the cached ``Headers`` instance built at initialization.
         """
         # Return the cached headers object.
@@ -260,7 +269,7 @@ class RSGITransportAdapter(TransportAdapter):
         ----------
         key : str
             The attribute name to set.
-        value : Any
+        value : typing.Any
             The value to store.
 
         Returns

@@ -1,3 +1,5 @@
+"""Async context manager driving a connection-level transaction."""
+
 from __future__ import annotations
 from typing import TYPE_CHECKING
 from orionis.database.contracts.transaction import ITransaction
@@ -16,6 +18,7 @@ class Transaction(ITransaction):
     """
 
     __slots__ = ("_connection",)
+    """Declare the instance attribute slots reserved by this class."""
 
     def __init__(self, connection: IConnection) -> None:
         """
@@ -23,7 +26,7 @@ class Transaction(ITransaction):
 
         Parameters
         ----------
-        connection : IConnection
+        connection : orionis.database.contracts.IConnection
             Connection whose transaction lifecycle is managed.
 
         Returns
@@ -32,6 +35,7 @@ class Transaction(ITransaction):
             This method does not return a value.
         """
         self._connection: IConnection = connection
+        """Connection whose transaction lifecycle is managed."""
 
     async def __aenter__(self) -> ITransaction:
         """
@@ -39,12 +43,12 @@ class Transaction(ITransaction):
 
         Returns
         -------
-        ITransaction
+        orionis.database.contracts.ITransaction
             The active transaction context.
 
         Raises
         ------
-        TransactionException
+        orionis.database.TransactionException
             If the transaction cannot be started.
         """
         await self._connection.begin()
@@ -65,7 +69,7 @@ class Transaction(ITransaction):
             Exception class raised inside the block, if any.
         exc : BaseException or None
             Exception instance raised inside the block, if any.
-        traceback : TracebackType or None
+        traceback : types.TracebackType or None
             Traceback associated with the exception, if any.
 
         Returns

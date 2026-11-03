@@ -1,3 +1,5 @@
+"""Define the contract for route resolver implementations."""
+
 from __future__ import annotations
 
 from abc import ABC, abstractmethod
@@ -7,6 +9,7 @@ if TYPE_CHECKING:
     from orionis.http.routes.entities.resolved_route import ResolvedRoute
 
 class IRouteResolver(ABC):
+    """Define the contract for route resolver implementations."""
 
     @abstractmethod
     def resolve(
@@ -26,14 +29,14 @@ class IRouteResolver(ABC):
 
         Returns
         -------
-        ResolvedRoute
+        orionis.http.routes.entities.resolved_route.ResolvedRoute
             Matched route and converted path parameters.
 
         Raises
         ------
-        RouteNotFound
+        orionis.http.routes.exceptions.route_not_found.RouteNotFound
             Raise when no route matches the path.
-        MethodNotAllowed
+        orionis.http.routes.exceptions.method_not_allowed.MethodNotAllowed
             Raise when the path exists under a different method.
         """
 
@@ -58,11 +61,6 @@ class IRouteResolver(ABC):
         """
         Return the registered fallback handler.
 
-        Parameters
-        ----------
-        None
-            This method does not accept parameters.
-
         Returns
         -------
         tuple | None
@@ -74,14 +72,9 @@ class IRouteResolver(ABC):
         """
         Return all compiled routes across all HTTP methods.
 
-        Parameters
-        ----------
-        None
-            This method does not accept parameters.
-
         Returns
         -------
-        list[CompiledRoute]
+        list[orionis.http.routes.entities.compiled_route.CompiledRoute]
             Deduplicated list of every registered compiled route.
         """
 
@@ -89,11 +82,6 @@ class IRouteResolver(ABC):
     def invalidateCache(self) -> None:
         """
         Clear the hot-path cache.
-
-        Parameters
-        ----------
-        None
-            This method does not accept parameters.
 
         Returns
         -------

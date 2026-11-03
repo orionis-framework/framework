@@ -1,3 +1,5 @@
+"""Ensure an uploaded file declares one of the accepted MIME types."""
+
 from orionis.schemas.rules.measure import is_file
 from orionis.schemas.rule import Rule
 
@@ -12,9 +14,12 @@ class MimeTypes(Rule):
     # ruff: noqa: ARG002
 
     __slots__ = ("_exact", "_prefixes")
+    """Declare the instance attribute slots reserved by this class."""
 
     __message__ = "File must match one of the accepted MIME types."
+    """Error text for message: ``File must match one of the accepted MIME types.``."""
     __code__ = "mimetypes"
+    """Code identifier: ``mimetypes``."""
 
     def __init__(self, *mime_types: str, message: str | None = None) -> None:
         """
@@ -54,7 +59,9 @@ class MimeTypes(Rule):
                 exact.add(normalized)
 
         self._exact: frozenset[str] = frozenset(exact)
+        """Exact produced by ``frozenset``."""
         self._prefixes: tuple[str, ...] = tuple(prefixes)
+        """Prefixes produced by ``tuple``."""
 
     async def enforce(
         self,

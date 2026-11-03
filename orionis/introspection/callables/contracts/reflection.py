@@ -1,3 +1,5 @@
+"""Define the contract for reflection callable implementations."""
+
 from __future__ import annotations
 from abc import ABC, abstractmethod
 from typing import TYPE_CHECKING
@@ -11,7 +13,10 @@ if TYPE_CHECKING:
 class IReflectionCallable(ABC):
 
     # Empty slots so subclasses can define __slots__ without inheriting __dict__
+    """Define the contract for reflection callable implementations."""
+
     __slots__ = ()
+    """Empty slots so subclasses can define __slots__ without inheriting __dict__."""
 
     @abstractmethod
     def getCallable(self) -> callable:
@@ -113,7 +118,7 @@ class IReflectionCallable(ABC):
 
         Returns
         -------
-        inspect.Signature
+        ``inspect.Signature``
             The signature object representing the callable's parameters,
             default values, and type annotations.
         """
@@ -129,7 +134,7 @@ class IReflectionCallable(ABC):
 
         Returns
         -------
-        Signature
+        orionis.introspection.dependencies.entities.signature.Signature
             A structure that holds the resolved and unresolved dependencies
             derived from the callable's parameter annotations.
         """

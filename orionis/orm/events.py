@@ -1,3 +1,5 @@
+"""Lifecycle event behavior shared by every model."""
+
 from __future__ import annotations
 import inspect
 from typing import TYPE_CHECKING, Any
@@ -15,6 +17,7 @@ _HALTABLE_EVENTS: frozenset[str] = frozenset({
     "deleting",
     "restoring",
 })
+"""Events whose listeners can abort the operation by returning ``False``."""
 
 class EventsMixin:
     """
@@ -27,6 +30,7 @@ class EventsMixin:
     """
 
     __slots__ = ()
+    """Declare that this class introduces no additional instance slots."""
 
     @classmethod
     def registerEvent(
@@ -41,7 +45,7 @@ class EventsMixin:
         ----------
         event : str
             Event name; one of the supported lifecycle events.
-        listener : Callable
+        listener : collections.abc.Callable
             Callable receiving the model instance. It may be a
             coroutine function and, for "before" events, returning
             ``False`` aborts the operation.
@@ -53,7 +57,7 @@ class EventsMixin:
 
         Raises
         ------
-        OrmException
+        orionis.orm.exceptions.OrmException
             If the event name is not supported.
         """
         if event not in MODEL_EVENTS:
@@ -74,7 +78,7 @@ class EventsMixin:
 
         Parameters
         ----------
-        observer : Any
+        observer : typing.Any
             Object or class exposing methods named after the events it
             listens to.
 

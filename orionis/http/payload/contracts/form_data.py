@@ -1,3 +1,5 @@
+"""Define the contract for parsed multipart form data."""
+
 from __future__ import annotations
 from abc import ABC, abstractmethod
 from typing import TYPE_CHECKING, Self
@@ -19,6 +21,7 @@ class IFormData(ABC):
     """
 
     __slots__ = ()
+    """Declare that this class introduces no additional instance slots."""
 
     # Abstract property returning text fields grouped by name
     @property
@@ -42,7 +45,7 @@ class IFormData(ABC):
 
         Returns
         -------
-        dict[str, list[UploadedFile]]
+        dict[str, list[orionis.http.payload.uploaded_file.UploadedFile]]
             Mapping of field names to ``UploadedFile`` instances
             in insertion order.
         """
@@ -56,7 +59,7 @@ class IFormData(ABC):
 
         Returns
         -------
-        list[tuple[str, str | UploadedFile]]
+        list[tuple[str, str | orionis.http.payload.uploaded_file.UploadedFile]]
             The underlying item sequence; callers must not mutate it.
         """
 
@@ -96,7 +99,7 @@ class IFormData(ABC):
 
         Returns
         -------
-        list[str | UploadedFile]
+        list[str | orionis.http.payload.uploaded_file.UploadedFile]
             All values for *key*, or an empty list if absent.
         """
 
@@ -108,7 +111,7 @@ class IFormData(ABC):
 
         Returns
         -------
-        list[tuple[str, str | UploadedFile]]
+        list[tuple[str, str | orionis.http.payload.uploaded_file.UploadedFile]]
             A copy of the underlying item sequence.
         """
 
@@ -166,7 +169,7 @@ class IFormData(ABC):
 
         Returns
         -------
-        Iterator[str]
+        collections.abc.Iterator[str]
             Each unique field name exactly once.
         """
 
@@ -202,7 +205,7 @@ class IFormData(ABC):
 
         Returns
         -------
-        Self
+        typing.Self
             The ``IFormData`` instance itself.
         """
 
@@ -223,7 +226,7 @@ class IFormData(ABC):
             Exception class if one was raised, otherwise ``None``.
         exc_val : BaseException | None
             Exception instance if one was raised, otherwise ``None``.
-        exc_tb : TracebackType | None
+        exc_tb : types.TracebackType | None
             Traceback if an exception was raised, otherwise ``None``.
 
         Returns

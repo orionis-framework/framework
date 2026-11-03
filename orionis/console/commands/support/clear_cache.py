@@ -1,3 +1,5 @@
+"""Clear entries from the application's configured default cache store."""
+
 import sys
 from orionis.cache.contracts.cache_manager import ICacheManager
 from orionis.cache.exceptions import CacheException
@@ -11,8 +13,14 @@ class ClearCacheCommand(BaseCommand):
     # ruff: noqa: TC001
 
     timestamps: bool = False
+    """Timestamps flag used by ``ClearCacheCommand``."""
     signature: str = "clear:cache"
+    """Signature identifier: ``clear:cache``."""
     description: str = "Clear entries from the default application cache store."
+    """
+    Description identifier: ``Clear entries from the default application cache
+    store.``.
+    """
 
     async def handle(self, cache: ICacheManager, console: Console) -> int:
         """
@@ -20,9 +28,9 @@ class ClearCacheCommand(BaseCommand):
 
         Parameters
         ----------
-        cache : ICacheManager
+        cache : orionis.cache.contracts.ICacheManager
             Cache manager for the running application.
-        console : Console
+        console : orionis.console.Console
             Console used to report the operation result.
 
         Returns

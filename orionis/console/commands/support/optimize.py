@@ -1,3 +1,5 @@
+"""Validate application Python sources without writing bytecode."""
+
 import sys
 from pathlib import Path
 from orionis.console.base.command import BaseCommand
@@ -7,9 +9,11 @@ from orionis.foundation.contracts.application import IApplication
 _VENV_DIR_NAMES: frozenset[str] = frozenset(
     {".venv", "venv", "env", ".env", "virtualenv"},
 )
+"""Venv dir names used by ``optimize``."""
 _ACTIVE_VENV_BASENAME: str = (
     Path(sys.prefix).name if sys.prefix != sys.base_prefix else ""
 )
+"""Active venv basename used by ``optimize``."""
 _SKIP_DIRS: frozenset[str] = _VENV_DIR_NAMES | frozenset(
     {
         ".git",
@@ -22,6 +26,7 @@ _SKIP_DIRS: frozenset[str] = _VENV_DIR_NAMES | frozenset(
         "node_modules",
     },
 )
+"""Skip dirs used by ``optimize``."""
 if _ACTIVE_VENV_BASENAME:
     _SKIP_DIRS |= frozenset({_ACTIVE_VENV_BASENAME})
 
@@ -31,8 +36,14 @@ class OptimizeCommand(BaseCommand):
     # ruff: noqa: TC001
 
     timestamps: bool = True
+    """Timestamps flag used by ``OptimizeCommand``."""
     signature: str = "optimize"
+    """Signature identifier: ``optimize``."""
     description: str = "Validate application Python files without writing bytecode."
+    """
+    Description identifier: ``Validate application Python files without writing
+    bytecode.``.
+    """
 
     def handle(self, app: IApplication, console: Console) -> int: # NOSONAR
         """
@@ -40,9 +51,9 @@ class OptimizeCommand(BaseCommand):
 
         Parameters
         ----------
-        app : IApplication
+        app : orionis.IApplication
             Application providing the project root.
-        console : Console
+        console : orionis.console.Console
             Console used to report validation results.
 
         Returns

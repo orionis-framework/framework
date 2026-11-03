@@ -1,6 +1,9 @@
+"""Resolve the debug service through the application facade."""
+
 from orionis.container.facades.facade import Facade
 
 class Debug(Facade):
+    """Resolve the debug service through the application facade."""
 
     @classmethod
     def getFacadeAccessor(cls) -> str:

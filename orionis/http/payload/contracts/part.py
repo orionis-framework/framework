@@ -1,3 +1,5 @@
+"""Define the contract for a single part within a multipart HTTP request body."""
+
 from __future__ import annotations
 from abc import ABC, abstractmethod
 from typing import TYPE_CHECKING
@@ -14,6 +16,7 @@ class IMultipartPart(ABC):
     """
 
     __slots__ = ()
+    """Declare that this class introduces no additional instance slots."""
 
     @abstractmethod
     def write(self, chunk: bytes | bytearray | memoryview) -> None:
@@ -38,7 +41,7 @@ class IMultipartPart(ABC):
 
         Returns
         -------
-        UploadedFile | str
+        orionis.http.payload.uploaded_file.UploadedFile | str
             The ``UploadedFile`` handle for file parts, or the decoded
             string for field parts.
         """

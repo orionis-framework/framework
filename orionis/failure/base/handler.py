@@ -1,3 +1,5 @@
+"""Provide shared reporting and response hooks for exceptions."""
+
 from typing import ClassVar
 from orionis.auth.context.functions import current_auth_context
 from orionis.auth.exceptions import (
@@ -29,13 +31,17 @@ _HTTP_STATUS_MAP: dict[type[BaseException], tuple[int, str]] = {
     UnsupportedMediaTypeException: (415, "Unsupported media type"),
     CSRFTokenMismatchException: (419, "CSRF token mismatch"),
 }
+"""Map handled exception types to their public HTTP status and message."""
 
 class BaseExceptionHandler(IBaseExceptionHandler):
 
     # ruff: noqa: TC001
 
     # Exceptions that should not be caught by the handler
+    """Provide shared reporting and response hooks for exceptions."""
+
     dont_catch: ClassVar[frozenset[type[BaseException]]] = frozenset()
+    """Exceptions that should not be caught by the handler."""
 
     def __init__(
         self,
@@ -47,9 +53,9 @@ class BaseExceptionHandler(IBaseExceptionHandler):
 
         Parameters
         ----------
-        default_responses : DefaultResponses
+        default_responses : orionis.http.default.responses.DefaultResponses
             Default responses for HTTP error handling.
-        application : IApplication
+        application : orionis.IApplication
             The application instance containing configuration and context.
 
         Returns
@@ -59,7 +65,9 @@ class BaseExceptionHandler(IBaseExceptionHandler):
         """
         # Default responses for HTTP error handling
         self.__default_responses = default_responses
+        """Default responses for HTTP error handling."""
         self.__application = application
+        """The application instance containing configuration and context."""
 
     def toThrowable(
         self,
@@ -75,7 +83,7 @@ class BaseExceptionHandler(IBaseExceptionHandler):
 
         Returns
         -------
-        Throwable
+        orionis.failure.entities.Throwable
             Structured Throwable object containing class, message, arguments,
             and traceback.
         """
@@ -133,12 +141,12 @@ class BaseExceptionHandler(IBaseExceptionHandler):
         ----------
         exception : BaseException
             The exception instance that was caught.
-        log : ILogger
+        log : orionis.logging.contracts.ILogger
             The logger instance for error reporting.
 
         Returns
         -------
-        Throwable or None
+        orionis.failure.entities.Throwable or None
             The structured Throwable object if reported, otherwise None.
         """
         # Skip reporting if the exception should be ignored
@@ -170,7 +178,7 @@ class BaseExceptionHandler(IBaseExceptionHandler):
         ----------
         exception : BaseException
             The exception instance that was caught.
-        console : IConsole
+        console : orionis.console.output.contracts.console.IConsole
             The console instance for output.
 
         Returns
@@ -197,12 +205,12 @@ class BaseExceptionHandler(IBaseExceptionHandler):
         ----------
         exception : BaseException
             The exception instance that was caught.
-        request : Request | TransportAdapter
+        request
             The HTTP request instance or transport adapter that was being processed.
 
         Returns
         -------
-        Response | None
+        orionis.http.Response | None
             The HTTP response if handled, otherwise None.
         """
         # Skip reporting if the exception should be ignored

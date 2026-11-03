@@ -1,3 +1,5 @@
+"""Represent a throwable entity within the framework."""
+
 from __future__ import annotations
 from dataclasses import dataclass
 from typing import TYPE_CHECKING
@@ -10,7 +12,7 @@ class Throwable:
     """
     Represent a throwable entity within the framework.
 
-    Parameters
+    Attributes
     ----------
     classtype : type
         The class type of the throwable, typically an exception class.
@@ -19,12 +21,12 @@ class Throwable:
     args : tuple
         Arguments passed to the throwable, usually corresponding to the
         exception arguments.
-    traceback : TracebackType | None, optional
+    traceback : types.TracebackType | None, optional
         The native traceback object, if available. Defaults to None.
 
     Returns
     -------
-    Throwable
+    orionis.failure.entities.Throwable
         An instance encapsulating exception details.
     """
 

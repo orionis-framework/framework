@@ -550,3 +550,26 @@ class TestDatabaseSessionStore(TestCase):
             finally:
                 await first_connection.disconnect()
                 await second_connection.disconnect()
+
+    async def testMigrateCreatesFrameworkSchemaAndPreservesRecords(self) -> None:
+        """
+        Create the internal session schema and preserve data on repeated migration.
+
+        Returns
+        -------
+        None
+            Verify column names and records across independent store migrations.
+        """
+        await self._store.migrate()
+        columns = await self._connection.select("PRAGMA table_info(sessions)")
+        self.assertEqual(
+            [column["name"] for column in columns], ["id", "payload", "expires_at"],
+        )
+        record = _make_record("preserved")
+        await self._store.write(record)
+
+        another_store = DatabaseSessionStore(self._connection, "sessions")
+        await another_store.migrate()
+        restored = await another_store.read(record.id)
+        self.assertIsNotNone(restored)
+        self.assertEqual(restored.data, record.data)

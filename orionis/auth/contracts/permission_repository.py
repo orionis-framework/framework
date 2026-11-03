@@ -1,3 +1,5 @@
+"""Define how the effective permissions of an identity are loaded."""
+
 from abc import ABC, abstractmethod
 from typing import TYPE_CHECKING
 
@@ -8,6 +10,7 @@ class IPermissionRepository(ABC):
     """Define how the effective permissions of an identity are loaded."""
 
     __slots__ = ()
+    """Declare that this class introduces no additional instance slots."""
 
     @abstractmethod
     async def loadFor(
@@ -19,7 +22,7 @@ class IPermissionRepository(ABC):
 
         Parameters
         ----------
-        authorizable : IAuthorizable
+        authorizable : orionis.auth.contracts.IAuthorizable
             Identity whose authorization must be resolved.
 
         Returns

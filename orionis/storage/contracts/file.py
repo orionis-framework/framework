@@ -1,3 +1,5 @@
+"""Define the contract for a single file on a storage disk."""
+
 from __future__ import annotations
 from abc import ABC, abstractmethod
 from typing import TYPE_CHECKING
@@ -19,6 +21,7 @@ class IFile(ABC):
     """
 
     __slots__ = ()
+    """Declare that this class introduces no additional instance slots."""
 
     @abstractmethod
     def path(self) -> str:
@@ -43,7 +46,7 @@ class IFile(ABC):
 
         Raises
         ------
-        StorageFileNotFoundException
+        orionis.storage.exceptions.StorageFileNotFoundException
             If the file does not exist.
         """
 
@@ -59,12 +62,12 @@ class IFile(ABC):
 
         Returns
         -------
-        AsyncIterator[bytes]
+        collections.abc.AsyncIterator[bytes]
             Asynchronous iterator yielding consecutive chunks.
 
         Raises
         ------
-        StorageFileNotFoundException
+        orionis.storage.exceptions.StorageFileNotFoundException
             If the file does not exist.
         """
 
@@ -86,7 +89,7 @@ class IFile(ABC):
 
         Returns
         -------
-        IFile
+        orionis.storage.contracts.IFile
             The file itself, enabling fluent chaining.
         """
 
@@ -101,14 +104,14 @@ class IFile(ABC):
 
         Parameters
         ----------
-        stream : AsyncIterable[bytes]
+        stream : collections.abc.AsyncIterable[bytes]
             Asynchronous byte-chunk producer.
         visibility : str | None
             Visibility to apply, or ``None`` for the medium default.
 
         Returns
         -------
-        IFile
+        orionis.storage.contracts.IFile
             The file itself, enabling fluent chaining.
         """
 
@@ -125,7 +128,7 @@ class IFile(ABC):
 
         Returns
         -------
-        IStorageStream
+        orionis.storage.contracts.IStorageStream
             Lazily opened stream; use it as an async context manager.
         """
 
@@ -163,12 +166,12 @@ class IFile(ABC):
 
         Returns
         -------
-        IFile
+        orionis.storage.contracts.IFile
             A new file object pointing at the copy.
 
         Raises
         ------
-        StorageFileNotFoundException
+        orionis.storage.exceptions.StorageFileNotFoundException
             If the source file does not exist.
         """
 
@@ -184,12 +187,12 @@ class IFile(ABC):
 
         Returns
         -------
-        IFile
+        orionis.storage.contracts.IFile
             A new file object pointing at the moved file.
 
         Raises
         ------
-        StorageFileNotFoundException
+        orionis.storage.exceptions.StorageFileNotFoundException
             If the source file does not exist.
         """
 
@@ -205,14 +208,14 @@ class IFile(ABC):
 
         Returns
         -------
-        IFile
+        orionis.storage.contracts.IFile
             A new file object pointing at the renamed file.
 
         Raises
         ------
-        StoragePathException
+        orionis.storage.exceptions.StoragePathException
             If *name* is empty or contains a directory separator.
-        StorageFileNotFoundException
+        orionis.storage.exceptions.StorageFileNotFoundException
             If the source file does not exist.
         """
 
@@ -228,7 +231,7 @@ class IFile(ABC):
 
         Raises
         ------
-        StorageFileNotFoundException
+        orionis.storage.exceptions.StorageFileNotFoundException
             If the file does not exist.
         """
 
@@ -250,12 +253,12 @@ class IFile(ABC):
 
         Returns
         -------
-        datetime
+        datetime.datetime
             Timezone-aware modification timestamp (UTC).
 
         Raises
         ------
-        StorageFileNotFoundException
+        orionis.storage.exceptions.StorageFileNotFoundException
             If the file does not exist.
         """
 
@@ -271,7 +274,7 @@ class IFile(ABC):
 
         Raises
         ------
-        UnsupportedStorageOperationException
+        orionis.storage.exceptions.UnsupportedStorageOperationException
             If the disk does not expose public URLs.
         """
 
@@ -292,7 +295,7 @@ class IFile(ABC):
 
         Raises
         ------
-        UnsupportedStorageOperationException
+        orionis.storage.exceptions.UnsupportedStorageOperationException
             If the driver does not support temporary URLs.
         """
 
@@ -308,7 +311,7 @@ class IFile(ABC):
 
         Raises
         ------
-        StorageFileNotFoundException
+        orionis.storage.exceptions.StorageFileNotFoundException
             If the file does not exist.
         """
 
@@ -324,12 +327,12 @@ class IFile(ABC):
 
         Returns
         -------
-        IFile
+        orionis.storage.contracts.IFile
             The file itself, enabling fluent chaining.
 
         Raises
         ------
-        StorageFileNotFoundException
+        orionis.storage.exceptions.StorageFileNotFoundException
             If the file does not exist.
         """
 
@@ -340,18 +343,18 @@ class IFile(ABC):
 
         Parameters
         ----------
-        destination : str | Path
+        destination : str | pathlib.Path
             Local target. When it points to an existing directory the
             file keeps its original name inside that directory.
 
         Returns
         -------
-        Path
+        pathlib.Path
             Absolute local path of the downloaded file.
 
         Raises
         ------
-        StorageFileNotFoundException
+        orionis.storage.exceptions.StorageFileNotFoundException
             If the file does not exist.
         """
 
@@ -363,7 +366,7 @@ class IFile(ABC):
         Parameters
         ----------
         algorithm : str
-            Any algorithm name accepted by :func:`hashlib.new`.
+            Any algorithm name accepted by ``hashlib.new``.
 
         Returns
         -------
@@ -372,7 +375,7 @@ class IFile(ABC):
 
         Raises
         ------
-        StorageFileNotFoundException
+        orionis.storage.exceptions.StorageFileNotFoundException
             If the file does not exist.
         """
 
@@ -383,12 +386,12 @@ class IFile(ABC):
 
         Returns
         -------
-        FileInfo
+        orionis.storage.entities.FileInfo
             Immutable entity with size, MIME type, timestamps, hashes,
             visibility, and URL when available.
 
         Raises
         ------
-        StorageFileNotFoundException
+        orionis.storage.exceptions.StorageFileNotFoundException
             If the file does not exist.
         """

@@ -1,3 +1,5 @@
+"""Register scheduled tasks and coordinate their scheduler integration."""
+
 import asyncio
 import functools
 import inspect
@@ -65,8 +67,13 @@ globals()["_executeScheduledCommand"] = _execute_scheduled_command
 
 class Schedule(ISchedule):
     # ruff: noqa: BLE001, PLC0415, TC001
+    """Register scheduled tasks and coordinate their scheduler integration."""
 
     _SCHEDULER_NOT_STARTED_ERROR = "The Orionis task scheduler has not been started."
+    """
+    Error text for scheduler not started error: ``The Orionis task scheduler has not
+    been started.``.
+    """
 
     def __init__(
         self: Self,
@@ -79,11 +86,11 @@ class Schedule(ISchedule):
 
         Parameters
         ----------
-        reactor : IReactor
+        reactor : orionis.console.core.contracts.reactor.IReactor
             Reactor instance for command execution.
-        exception_handler : ICatch
+        exception_handler : orionis.failure.contracts.ICatch
             Exception handler for managing errors.
-        stores : IScheduleStore
+        stores : orionis.console.contracts.store.IScheduleStore
             Schedule store for managing job stores.
 
         Returns
@@ -92,23 +99,41 @@ class Schedule(ISchedule):
             This constructor does not return a value.
         """
         self.__reactor: IReactor = reactor
+        """Reactor instance for command execution."""
         self.__exception_handler: ICatch = exception_handler
+        """Exception handler for managing errors."""
         self.__stores: IScheduleStore = stores
+        """Schedule store for managing job stores."""
         self.__config: ConfigScheduler = stores.config
+        """Validated configuration used to construct and operate the service."""
         self.__available_command_signatures: set[str] = set()
+        """Available command signatures produced by ``set``."""
         self.__job_store: str = self.__config.store
+        """Job store obtained from ``self.__config.store``."""
         self.__scheduler: AsyncIOScheduler | None = None
+        """Scheduler instance responsible for registering and running tasks."""
         self.__scheduler_listeners: dict[SchedulerEvent, Callable] = {}
+        """Callbacks subscribed to scheduler lifecycle events."""
         self.__tasks_listeners: dict[str, dict[TaskEvent, Callable]] = {}
+        """Callbacks subscribed to scheduled-task events."""
         self.__fluent_tasks: dict[str, ITask] = {}
+        """Task declarations awaiting conversion to scheduler jobs."""
         self.__tasks: dict[str, TaskEntity] = {}
+        """Tasks registered for scheduling or lifecycle management."""
         self.__state: ScheduleStates = ScheduleStates.STOPPED
+        """State selected by the maintenance-mode command."""
         self.__running_tasks: set[str] = set()
+        """Running tasks produced by ``set``."""
         self.__paused_tasks: set[str] = set()
+        """Paused tasks produced by ``set``."""
         self.__removed_tasks: set[str] = set()
+        """Removed tasks produced by ``set``."""
         self.__pending_listener_tasks: set[asyncio.Task] = set()
+        """Pending listener tasks produced by ``set``."""
         self.__shutdown_event = asyncio.Event()
+        """Shutdown event produced by ``asyncio.Event``."""
         self.__wait_to_shutdown: float = 0.5
+        """Wait to shutdown value used by ``Schedule``."""
 
     async def __loadAvailableCommands(self: Self) -> None:
         """
@@ -239,7 +264,7 @@ class Schedule(ISchedule):
 
         Parameters
         ----------
-        event : APSchedulerEvent
+        event : ``apscheduler.events.SchedulerEvent``
             The scheduler event that occurred.
 
         Returns
@@ -297,7 +322,7 @@ class Schedule(ISchedule):
 
         Parameters
         ----------
-        event : APJobEvent
+        event : ``apscheduler.events.JobEvent``
             The job event that occurred.
 
         Returns
@@ -381,7 +406,7 @@ class Schedule(ISchedule):
 
         Parameters
         ----------
-        coroutine : Coroutine
+        coroutine : collections.abc.Coroutine
             The coroutine to be executed as an async task.
 
         Returns
@@ -425,7 +450,7 @@ class Schedule(ISchedule):
         """
         Add the database or redis jobstore matching the configured driver.
 
-        `stores.database`/`stores.redis` default to None when not declared
+        ``stores.database``/``stores.redis`` default to None when not declared
         in config, so this validates explicitly instead of letting an
         AttributeError leak out of the config object when the selected
         driver's dedicated section was never configured.
@@ -590,14 +615,14 @@ class Schedule(ISchedule):
 
         Parameters
         ----------
-        event : SchedulerEvent
+        event : orionis.console.enums.SchedulerEvent
             The scheduler event to listen for.
-        listener : Callable
+        listener : collections.abc.Callable
             The callable to invoke when the event occurs.
 
         Returns
         -------
-        Self
+        typing.Self
             The Schedule instance for method chaining.
 
         Raises
@@ -696,7 +721,7 @@ class Schedule(ISchedule):
 
         Returns
         -------
-        ITask
+        orionis.console.fluent.contracts.task.ITask
             Task instance for further configuration.
 
         Raises
@@ -964,7 +989,7 @@ class Schedule(ISchedule):
 
         Parameters
         ----------
-        self : Schedule
+        self : orionis.console.tasks.schedule.Schedule
             The Schedule instance.
 
         Returns
@@ -1004,7 +1029,7 @@ class Schedule(ISchedule):
 
         Parameters
         ----------
-        self : Schedule
+        self : orionis.console.tasks.schedule.Schedule
             The Schedule instance.
 
         Returns
@@ -1063,7 +1088,7 @@ class Schedule(ISchedule):
         Raises
         ------
         TypeError
-            If `wait` is neither None nor a non-negative integer (bool is
+            If ``wait`` is neither None nor a non-negative integer (bool is
             explicitly rejected even though it is technically an int subtype).
         """
         # Only override the configured grace period (defaults to 0.5s, see

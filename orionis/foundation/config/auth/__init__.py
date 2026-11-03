@@ -1,3 +1,5 @@
+"""Group the foundation config auth components and public imports."""
+
 from typing import TYPE_CHECKING as _TYPE_CHECKING
 from orionis._exports import resolve_export as _resolve_export
 
@@ -29,6 +31,7 @@ _EXPORTS = {
     "SessionAuth": ("orionis.foundation.config.auth.entities.session", "SessionAuth"),
     "Tokens": ("orionis.foundation.config.auth.entities.tokens", "Tokens"),
 }
+"""Public export names mapped to their defining modules and attributes."""
 
 def __getattr__(name: str) -> object:
     """

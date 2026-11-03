@@ -1,3 +1,5 @@
+"""Base class for every query builder bound to a parent model instance."""
+
 from __future__ import annotations
 from contextvars import ContextVar
 from typing import TYPE_CHECKING, Any
@@ -10,12 +12,14 @@ if TYPE_CHECKING:
     from orionis.orm.model import Model
 
 _CONSTRAINTS: ContextVar[bool] = ContextVar("orm_relation_constraints", default=True)
+"""Context-local constraints isolated between asynchronous tasks."""
 
 class Relation[TRelated: "Model"](ModelQueryBuilder[TRelated], IRelation):
     """
     Base class for every query builder bound to a parent model instance.
 
-    A relationship is a regular :class:`ModelQueryBuilder` targeting the
+    A relationship is a regular :class:`orionis.orm.query.ModelQueryBuilder` targeting
+    the
     related model, pre-constrained to the rows belonging to a specific
     parent instance. Concrete kinds (``hasOne``, ``hasMany``,
     ``belongsTo``, ``belongsToMany``, and future polymorphic or
@@ -24,6 +28,7 @@ class Relation[TRelated: "Model"](ModelQueryBuilder[TRelated], IRelation):
     """
 
     __slots__ = ("_eager_keys_empty", "_parent")
+    """Declare the instance attribute slots reserved by this class."""
 
     def __init__(self, parent: Model, related: type[TRelated]) -> None:
         """
@@ -31,9 +36,9 @@ class Relation[TRelated: "Model"](ModelQueryBuilder[TRelated], IRelation):
 
         Parameters
         ----------
-        parent : Model
+        parent : orionis.orm.Model
             Model instance the relationship is accessed from.
-        related : type of Model
+        related : type of orionis.orm.Model
             Model class the relationship targets.
 
         Returns
@@ -43,7 +48,9 @@ class Relation[TRelated: "Model"](ModelQueryBuilder[TRelated], IRelation):
         """
         super().__init__(related)
         self._parent = parent
+        """Model instance the relationship is accessed from."""
         self._eager_keys_empty = False
+        """Eager keys empty flag used by ``Relation``."""
         if _CONSTRAINTS.get():
             self.addConstraints()
 
@@ -67,7 +74,7 @@ class Relation[TRelated: "Model"](ModelQueryBuilder[TRelated], IRelation):
 
         Parameters
         ----------
-        models : list of Model
+        models : list of orionis.orm.Model
             Parent instances being eager loaded together.
 
         Returns
@@ -84,7 +91,7 @@ class Relation[TRelated: "Model"](ModelQueryBuilder[TRelated], IRelation):
 
         Returns
         -------
-        Any
+        typing.Any
             A single model, ``None``, or a ``Collection``, depending on
             the relationship kind.
         """
@@ -101,7 +108,7 @@ class Relation[TRelated: "Model"](ModelQueryBuilder[TRelated], IRelation):
 
         Returns
         -------
-        Collection
+        collections.abc.Collection
             Every related row across the whole eager-loaded batch.
         """
         if self._eager_keys_empty:
@@ -119,10 +126,10 @@ class Relation[TRelated: "Model"](ModelQueryBuilder[TRelated], IRelation):
 
         Parameters
         ----------
-        models : list of Model
+        models : list of orionis.orm.Model
             Parent instances being eager loaded together.
-        results : Collection
-            Rows produced by :meth:`getEager`.
+        results : collections.abc.Collection
+            Rows produced by :meth:`orionis.orm.relations.Relation.getEager`.
         name : str
             Relationship name the results are stored under.
 
@@ -145,8 +152,9 @@ class Relation[TRelated: "Model"](ModelQueryBuilder[TRelated], IRelation):
 
         Returns
         -------
-        Generator
-            Delegate generator driving :meth:`getResults`.
+        collections.abc.Generator
+            Delegate generator driving
+            :meth:`orionis.orm.relations.Relation.getResults`.
         """
         return self.getResults().__await__()
 
@@ -165,14 +173,14 @@ class Relation[TRelated: "Model"](ModelQueryBuilder[TRelated], IRelation):
 
         Parameters
         ----------
-        callback : Callable
+        callback : collections.abc.Callable
             Zero-argument callable constructing the relationship,
             typically a bound relationship method such as
             ``model.posts``.
 
         Returns
         -------
-        Relation
+        orionis.orm.relations.Relation
             The relationship built by ``callback``, unconstrained.
         """
         token = _CONSTRAINTS.set(False)

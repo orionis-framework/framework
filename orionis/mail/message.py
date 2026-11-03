@@ -1,3 +1,5 @@
+"""Configure one direct send without exposing a mutable MIME message."""
+
 from dataclasses import replace
 from typing import TYPE_CHECKING, Self
 from orionis.mail.entities.address import Address, addresses, one_address
@@ -18,6 +20,7 @@ class Message:
     """
 
     __slots__ = ("_options",)
+    """Declare the instance attribute slots reserved by this class."""
 
     def __init__(self, options: MailOptions | None = None) -> None:
         """
@@ -25,7 +28,7 @@ class Message:
 
         Parameters
         ----------
-        options : MailOptions | None
+        options : orionis.mail.entities.MailOptions | None
             Initial immutable snapshot supplied by PendingMail.
 
         Returns
@@ -34,6 +37,7 @@ class Message:
             Retain an immutable snapshot, replaced by each mutator.
         """
         self._options = options if options is not None else MailOptions()
+        """Initial immutable snapshot supplied by PendingMail."""
 
     def fromAddress(self, address: str | Address, name: str | None = None) -> Self:
         """
@@ -41,14 +45,14 @@ class Message:
 
         Parameters
         ----------
-        address : str | Address
+        address : str | orionis.mail.entities.Address
             Exactly one sender mailbox.
         name : str | None
             Display name for a string mailbox only.
 
         Returns
         -------
-        Self
+        typing.Self
             This configurator.
         """
         self._options = replace(
@@ -63,14 +67,14 @@ class Message:
 
         Parameters
         ----------
-        addresses : Recipients
+        addresses : orionis.mail.types.Recipients
             One mailbox or a list/tuple of mailboxes.
         name : str | None
             Display name for one string mailbox only.
 
         Returns
         -------
-        Self
+        typing.Self
             This configurator.
         """
         return self._appendRecipients("to", addresses, name)
@@ -81,14 +85,14 @@ class Message:
 
         Parameters
         ----------
-        addresses : Recipients
+        addresses : orionis.mail.types.Recipients
             One mailbox or a list/tuple of mailboxes.
         name : str | None
             Display name for one string mailbox only.
 
         Returns
         -------
-        Self
+        typing.Self
             This configurator.
         """
         return self._appendRecipients("cc", addresses, name)
@@ -99,14 +103,14 @@ class Message:
 
         Parameters
         ----------
-        addresses : Recipients
+        addresses : orionis.mail.types.Recipients
             One mailbox or a list/tuple of mailboxes.
         name : str | None
             Display name for one string mailbox only.
 
         Returns
         -------
-        Self
+        typing.Self
             This configurator.
         """
         return self._appendRecipients("bcc", addresses, name)
@@ -117,14 +121,14 @@ class Message:
 
         Parameters
         ----------
-        addresses : Recipients
+        addresses : orionis.mail.types.Recipients
             One mailbox or a list/tuple of mailboxes.
         name : str | None
             Display name for one string mailbox only.
 
         Returns
         -------
-        Self
+        typing.Self
             This configurator.
         """
         return self._appendRecipients("reply_to", addresses, name)
@@ -140,7 +144,7 @@ class Message:
 
         Returns
         -------
-        Self
+        typing.Self
             This configurator.
         """
         self._options = replace(self._options, subject=header_value(value, "Subject"))
@@ -152,17 +156,17 @@ class Message:
 
         Parameters
         ----------
-        attachment : Attachment
+        attachment : orionis.mail.entities.Attachment
             Safe immutable attachment declaration.
 
         Returns
         -------
-        Self
+        typing.Self
             This configurator.
 
         Raises
         ------
-        MailCompositionException
+        orionis.mail.exceptions.MailCompositionException
             If the supplied object is not an Attachment.
         """
         if not isinstance(attachment, Attachment):
@@ -187,14 +191,14 @@ class Message:
         ----------
         field : str
             Internal recipient collection name.
-        value : Recipients
+        value : orionis.mail.types.Recipients
             Supplied recipient declaration.
         name : str | None
             Optional single-mailbox display name.
 
         Returns
         -------
-        Self
+        typing.Self
             This configurator with its snapshot replaced.
         """
         added = addresses(value, name)
@@ -208,7 +212,7 @@ class Message:
 
         Returns
         -------
-        MailOptions
+        orionis.mail.entities.MailOptions
             A snapshot unaffected by later mutations of this Message.
         """
         return self._options

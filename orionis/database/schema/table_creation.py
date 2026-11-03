@@ -1,3 +1,5 @@
+"""Async context manager returned by ``Schema.create``."""
+
 from typing import TYPE_CHECKING
 from orionis.database.schema.blueprint import Blueprint
 
@@ -10,12 +12,13 @@ class TableCreation:
     Async context manager returned by ``Schema.create``.
 
     ``async with schema.create(name) as table:`` yields a
-    :class:`~orionis.database.schema.blueprint.Blueprint` so columns can
+    :class:`orionis.database.schema.Blueprint` so columns can
     be declared inside the block; the table is created on exit unless
     the block raised an exception.
     """
 
     __slots__ = ("__blueprint", "__name", "__schema")
+    """Declare the instance attribute slots reserved by this class."""
 
     def __init__(
         self,
@@ -27,7 +30,7 @@ class TableCreation:
 
         Parameters
         ----------
-        schema : Schema
+        schema : orionis.database.schema.schema.Schema
             The schema instance that will perform the creation.
         name : str
             The name of the table to create.
@@ -38,8 +41,11 @@ class TableCreation:
             This method does not return a value.
         """
         self.__schema = schema
+        """The schema instance that will perform the creation."""
         self.__name = name
+        """The name of the table to create."""
         self.__blueprint: Blueprint | None = None
+        """Table blueprint being converted into a schema operation."""
 
     async def __aenter__(self) -> Blueprint:
         """
@@ -47,7 +53,7 @@ class TableCreation:
 
         Returns
         -------
-        Blueprint
+        orionis.database.schema.Blueprint
             Collector used to declare columns via method calls.
         """
         self.__blueprint = Blueprint()
@@ -68,7 +74,7 @@ class TableCreation:
             The exception type raised inside the block, if any.
         exc : BaseException or None
             The exception instance raised inside the block, if any.
-        traceback : TracebackType or None
+        traceback : types.TracebackType or None
             The traceback for the raised exception, if any.
 
         Returns

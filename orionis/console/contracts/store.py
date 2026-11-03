@@ -69,3 +69,21 @@ class IScheduleStore(ABC):
         MissingDatabaseDependencyException
             If the resolved driver package is not installed.
         """
+
+    @abstractmethod
+    async def migrate(self) -> None:
+        """
+        Create the configured database job table without starting the scheduler.
+
+        Returns
+        -------
+        None
+            Create missing native storage and preserve existing job data.
+
+        Raises
+        ------
+        RuntimeError
+            If database storage is absent or the backend is unsupported.
+        DatabaseException
+            If the connection, driver, or schema creation fails.
+        """

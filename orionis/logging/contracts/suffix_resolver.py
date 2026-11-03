@@ -1,3 +1,5 @@
+"""Define how rotating log files derive their time-based suffixes."""
+
 from __future__ import annotations
 from abc import ABC, abstractmethod
 from typing import TYPE_CHECKING
@@ -6,8 +8,10 @@ if TYPE_CHECKING:
     from datetime import datetime
 
 class SuffixResolver(ABC):
+    """Define how rotating log files derive their time-based suffixes."""
 
     __slots__ = ()
+    """Declare that this class introduces no additional instance slots."""
 
     @abstractmethod
     def getSuffix(self, dt: datetime | None = None) -> str:
@@ -16,7 +20,7 @@ class SuffixResolver(ABC):
 
         Parameters
         ----------
-        dt : datetime or None, optional
+        dt : datetime.datetime or None, optional
             The datetime for which to obtain the suffix. If None, uses current time.
 
         Returns
@@ -32,11 +36,11 @@ class SuffixResolver(ABC):
 
         Parameters
         ----------
-        current_time : datetime
+        current_time : datetime.datetime
             The current datetime to base the next rotation calculation.
 
         Returns
         -------
-        datetime
+        datetime.datetime
             The next rotation datetime.
         """

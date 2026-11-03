@@ -1,3 +1,5 @@
+"""Represent the categorized dependency signature of a callable."""
+
 from __future__ import annotations
 from dataclasses import dataclass
 from typing import TYPE_CHECKING
@@ -15,13 +17,13 @@ class Signature(BaseEntity):
     Groups parameter dependencies into resolved, unresolved, and ordered
     buckets that downstream IoC logic can consume directly.
 
-    Parameters
+    Attributes
     ----------
-    resolved : dict[str, Argument]
+    resolved : dict[str, orionis.introspection.dependencies.entities.argument.Argument]
         Parameters whose types or defaults are fully known.
     unresolved : dict[str, Argument]
         Parameters that lack sufficient type or default information.
-    ordered : dict[str, Argument]
+    ordered : dict[str, orionis.introspection.dependencies.entities.argument.Argument]
         All parameters in their original declaration order.
     """
 
@@ -109,7 +111,7 @@ class Signature(BaseEntity):
 
         Returns
         -------
-        dict[str, Argument]
+        dict[str, orionis.introspection.dependencies.entities.argument.Argument]
             Mapping of parameter names to resolved Argument objects.
         """
         return self.resolved
@@ -120,7 +122,7 @@ class Signature(BaseEntity):
 
         Returns
         -------
-        dict[str, Argument]
+        dict[str, orionis.introspection.dependencies.entities.argument.Argument]
             Mapping of parameter names to unresolved Argument objects.
         """
         return self.unresolved
@@ -131,7 +133,7 @@ class Signature(BaseEntity):
 
         Returns
         -------
-        dict[str, Argument]
+        dict[str, orionis.introspection.dependencies.entities.argument.Argument]
             Mapping of all parameter names to their Argument objects.
         """
         return self.ordered
@@ -142,7 +144,7 @@ class Signature(BaseEntity):
 
         Returns
         -------
-        dict[str, Argument]
+        dict[str, orionis.introspection.dependencies.entities.argument.Argument]
             Subset of ordered containing only positional arguments.
         """
         return {
@@ -155,7 +157,7 @@ class Signature(BaseEntity):
 
         Returns
         -------
-        dict[str, Argument]
+        dict[str, orionis.introspection.dependencies.entities.argument.Argument]
             Subset of ordered containing only keyword-only arguments.
         """
         return {k: v for k, v in self.ordered.items() if v.is_keyword_only}
@@ -170,7 +172,7 @@ class Signature(BaseEntity):
 
         Returns
         -------
-        dict[str, Argument]
+        dict[str, orionis.introspection.dependencies.entities.argument.Argument]
             A new dict with the same contents as ordered.
         """
         return dict(self.ordered)
@@ -181,7 +183,7 @@ class Signature(BaseEntity):
 
         Returns
         -------
-        dict[str, Argument]
+        dict[str, orionis.introspection.dependencies.entities.argument.Argument]
             A new dict with the same contents as resolved.
         """
         return dict(self.resolved)
@@ -192,7 +194,7 @@ class Signature(BaseEntity):
 
         Returns
         -------
-        dict[str, Argument]
+        dict[str, orionis.introspection.dependencies.entities.argument.Argument]
             A new dict with the same contents as unresolved.
         """
         return dict(self.unresolved)
@@ -207,7 +209,7 @@ class Signature(BaseEntity):
 
         Returns
         -------
-        dict_items[str, Argument]
+        collections.abc.ItemsView[str, Argument]
             Iterable of (name, Argument) pairs from ``ordered``.
         """
         return self.ordered.items()

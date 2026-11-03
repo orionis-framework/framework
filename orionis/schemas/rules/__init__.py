@@ -1,3 +1,5 @@
+"""Group the schemas rules components and public imports."""
+
 from typing import TYPE_CHECKING as _TYPE_CHECKING
 from orionis._exports import resolve_export as _resolve_export
 
@@ -119,6 +121,7 @@ _EXPORTS = {
     "Uppercase": ("orionis.schemas.rules.uppercase", "Uppercase"),
     "Uuid": ("orionis.schemas.rules.uuid_string", "Uuid"),
 }
+"""Public export names mapped to their defining modules and attributes."""
 
 def __getattr__(name: str) -> object:
     """Resolve and cache a public schema rule.

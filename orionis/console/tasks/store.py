@@ -1,3 +1,5 @@
+"""Construct scheduler job stores from application configuration."""
+
 from __future__ import annotations
 import asyncio
 from typing import TYPE_CHECKING, Any
@@ -19,6 +21,7 @@ if TYPE_CHECKING:
 class ScheduleStore(IScheduleStore):
 
     # ruff: noqa: PLC0415, TC001
+    """Construct scheduler job stores from application configuration."""
 
     def __init__(
         self,
@@ -30,9 +33,9 @@ class ScheduleStore(IScheduleStore):
 
         Parameters
         ----------
-        app : IApplication
+        app : orionis.IApplication
             The application instance.
-        db_manager : IConnectionManager
+        db_manager : orionis.database.contracts.IConnectionManager
             The database connection manager.
 
         Returns
@@ -42,10 +45,13 @@ class ScheduleStore(IScheduleStore):
         """
         # Cache the application and build the scheduler configuration.
         self.__application: IApplication = app
+        """The application instance."""
         self.__scheduler_conf: ConfigScheduler = ConfigScheduler(
             **self.__application.config("scheduler"),
         )
+        """Scheduler conf produced by ``ConfigScheduler``."""
         self._db_manager: IConnectionManager = db_manager
+        """The database connection manager."""
 
     @property
     def store(self) -> str:
@@ -66,7 +72,7 @@ class ScheduleStore(IScheduleStore):
 
         Returns
         -------
-        ConfigScheduler
+        orionis.foundation.config.scheduler.Scheduler
             The scheduler configuration (store, jitter, max_instances,
             misfire_grace_time, coalesce, replace_existing, etc.).
         """
@@ -78,7 +84,7 @@ class ScheduleStore(IScheduleStore):
 
         Returns
         -------
-        RedisJobStore
+        ``apscheduler.jobstores.redis.RedisJobStore``
             A configured Redis job store instance.
 
         Raises
@@ -113,14 +119,14 @@ class ScheduleStore(IScheduleStore):
 
         Returns
         -------
-        SQLAlchemyJobStore
+        ``apscheduler.jobstores.sqlalchemy.SQLAlchemyJobStore``
             A configured SQLAlchemy job store instance.
 
         Raises
         ------
         RuntimeError
             If the database store is absent or its backend lacks required capabilities.
-        MissingDatabaseDependencyException
+        orionis.database.MissingDatabaseDependencyException
             If the resolved driver package is not installed.
         """
         # Validate that the database store configuration is present.
@@ -191,7 +197,7 @@ class ScheduleStore(IScheduleStore):
         ------
         RuntimeError
             If database storage is not configured or its backend is unsupported.
-        DatabaseException
+        orionis.database.DatabaseException
             If the SQL connection, driver, or schema creation fails.
         """
         await asyncio.to_thread(self._migrateDatabase)
@@ -207,7 +213,7 @@ class ScheduleStore(IScheduleStore):
 
         Raises
         ------
-        QueryException
+        orionis.database.QueryException
             If SQLAlchemy cannot create or close the storage; omit driver details.
         """
         from sqlalchemy.exc import SQLAlchemyError

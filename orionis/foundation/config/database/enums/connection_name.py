@@ -1,3 +1,5 @@
+"""Enumerate the built-in database connection names supported by Orionis."""
+
 from enum import StrEnum
 
 class ConnectionName(StrEnum):
@@ -21,7 +23,7 @@ class ConnectionName(StrEnum):
 
     Returns
     -------
-    ConnectionName
+    orionis.foundation.config.database.ConnectionName
         An enumeration member representing a database connection name.
     """
 

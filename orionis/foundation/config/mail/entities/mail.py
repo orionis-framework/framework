@@ -1,3 +1,5 @@
+"""Represent the mail configuration entity."""
+
 from __future__ import annotations
 from copy import deepcopy
 from dataclasses import dataclass, field, fields
@@ -17,11 +19,11 @@ class Mail(BaseEntity):
 
     Attributes
     ----------
-    default : str or MailDriver
+    default : str or orionis.foundation.config.mail.MailDriver
         The default configured mailer name or its transport driver.
-    from_address : FromAddress or dict
+    from_address : orionis.foundation.config.mail.FromAddress or dict
         Global sender applied to every message that declares no From header.
-    mailers : Mailers or dict
+    mailers : orionis.foundation.config.mail.Mailers or dict
         Conventional entities or arbitrary mailer names mapped to their settings.
     """
 

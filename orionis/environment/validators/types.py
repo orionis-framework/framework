@@ -1,9 +1,15 @@
+"""Validate supported environment type hints before values are cast."""
+
 from __future__ import annotations
 import functools
 from orionis.environment.enums.value_type import EnvironmentValueType
 
 # Pre-build allowed types list once — avoids repeated list comprehension in error paths
 _ALLOWED_TYPE_HINT_VALUES: list[str] = [e.value for e in EnvironmentValueType]
+"""
+Pre-build allowed types list once — avoids repeated list comprehension in error
+paths.
+"""
 
 @functools.lru_cache(maxsize=64)
 def _normalize_type_hint(type_hint: str | EnvironmentValueType) -> str:
@@ -15,7 +21,7 @@ def _normalize_type_hint(type_hint: str | EnvironmentValueType) -> str:
 
     Parameters
     ----------
-    type_hint : str or EnvironmentValueType
+    type_hint : str or orionis.environment.enums.EnvironmentValueType
         The type hint to normalize.
 
     Returns
@@ -42,6 +48,7 @@ def _normalize_type_hint(type_hint: str | EnvironmentValueType) -> str:
 
 
 class __ValidateTypes:
+    """Validate supported environment type hints before values are cast."""
 
     def __call__(
         self,
@@ -56,7 +63,7 @@ class __ValidateTypes:
         ----------
         value : str, int, float, bool, list, dict, tuple, or set
             The value whose type is to be validated and determined.
-        type_hint : str or EnvironmentValueType, optional
+        type_hint : str or orionis.environment.enums.EnvironmentValueType, optional
             An optional type hint specifying the expected type. Can be a string
             or an EnvironmentValueType.
 
@@ -104,3 +111,4 @@ class __ValidateTypes:
 
 # Instance to be used for key name validation
 ValidateTypes = __ValidateTypes()
+"""Instance to be used for key name validation."""

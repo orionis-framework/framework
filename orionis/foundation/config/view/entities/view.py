@@ -1,3 +1,5 @@
+"""Represent view engine configuration for the application."""
+
 from __future__ import annotations
 from dataclasses import dataclass, field
 from orionis.environment import Env

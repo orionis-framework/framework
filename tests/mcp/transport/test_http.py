@@ -297,7 +297,7 @@ class TestHttpTransport(TestCase):
         """
         return McpHttpTransport(self.state, self.compiled, McpConfig(**options), None)
 
-    async def test_normal_json_is_preencoded_without_double_serialization(self):
+    async def testNormalJsonIsPreencodedWithoutDoubleSerialization(self):
         """Keep protocol bytes intact and do not retain the completed request slot.
 
         Returns
@@ -315,7 +315,7 @@ class TestHttpTransport(TestCase):
             (1, 1, 0),
         )
 
-    async def test_origins_are_exact_allowlisted_and_checked_before_body(self):
+    async def testOriginsAreExactAllowlistedAndCheckedBeforeBody(self):
         """Reject later list additions, null, duplicate and deceptive origins.
 
         Returns
@@ -341,7 +341,7 @@ class TestHttpTransport(TestCase):
         request, _, _ = self.request(extra=((b"origin", b"https://trusted.example"),))
         self.assertEqual((await transport.handle(request)).getStatusCode(), 200)
 
-    async def test_method_accept_content_type_and_body_limits(self):
+    async def testMethodAcceptContentTypeAndBodyLimits(self):
         """Bound framing failures without invoking protocol handlers.
 
         Returns
@@ -363,7 +363,7 @@ class TestHttpTransport(TestCase):
         self.assertEqual((await transport.handle(request)).getStatusCode(), 415)
         self.assertEqual(self.state.calls, 0)
 
-    async def test_unknown_method_and_legacy_headers_have_distinct_statuses(self):
+    async def testUnknownMethodAndLegacyHeadersHaveDistinctStatuses(self):
         """Run the header gate before method dispatch, preserving unknown-method 404.
 
         Returns
@@ -386,7 +386,7 @@ class TestHttpTransport(TestCase):
             -32020,
         )
 
-    async def test_native_sse_frames_heartbeat_and_closes_source(self):
+    async def testNativeSseFramesHeartbeatAndClosesSource(self):
         """Let the existing ASGI adapter frame, backpressure and close MCP output.
 
         Returns
@@ -424,7 +424,7 @@ class TestHttpTransport(TestCase):
         self.assertTrue(bodies[1].startswith(b"data: {"))
         self.assertEqual((source.closed, transport._active), (1, 0))
 
-    async def test_unstarted_and_disconnected_sse_release_admission(self):
+    async def testUnstartedAndDisconnectedSseReleaseAdmission(self):
         """Release subscriptions and slots on unstarted or disconnected streams.
 
         Returns
@@ -469,7 +469,7 @@ class TestHttpTransport(TestCase):
         await asyncio.wait_for(task, 1)
         self.assertEqual((source.closed, transport._active), (1, 0))
 
-    async def test_compiled_tool_headers_gate_dispatch(self):
+    async def testCompiledToolHeadersGateDispatch(self):
         """A valid envelope cannot bypass a tool's compiled mirrored arguments.
 
         Returns
@@ -527,7 +527,7 @@ class TestHttpTransport(TestCase):
             self.state.calls = 0
             registry.clear()
 
-    async def test_notifications_have_no_response_body_or_dispatch(self):
+    async def testNotificationsHaveNoResponseBodyOrDispatch(self):
         """Honor accepted notification framing without creating a request task.
 
         Returns

@@ -1,6 +1,9 @@
+"""Describe a uniqueness constraint on table columns."""
+
 from orionis.orm.schema.constraints import UniqueConstraint
 
 class Unique:
+    """Describe a uniqueness constraint on table columns."""
 
     def __init__(self, *columns: str, name: str | None = None) -> None:
         """
@@ -20,3 +23,4 @@ class Unique:
             Complete the documented operation without returning a value.
         """
         self.constraint = UniqueConstraint(columns=columns, name=name)
+        """Constraint produced by ``UniqueConstraint``."""

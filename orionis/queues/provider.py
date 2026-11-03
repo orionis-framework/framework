@@ -1,3 +1,5 @@
+"""Register queue services eagerly while keeping backend I/O lazy."""
+
 from orionis.container.providers.service_provider import ServiceProvider
 from orionis.foundation.enums.lifespan import Lifespan
 from orionis.queues.contracts.manager import IQueueManager
@@ -14,6 +16,7 @@ class QueueProvider(ServiceProvider):
     """
 
     __slots__ = ()
+    """Declare that this class introduces no additional instance slots."""
 
     def register(self) -> None:
         """
@@ -39,7 +42,7 @@ class QueueProvider(ServiceProvider):
 
         Raises
         ------
-        QueueConfigurationError
+        orionis.queues.exceptions.QueueConfigurationError
             If the jobs path is invalid or a discovered module cannot be imported.
         """
         manager = await self.app.make(IQueueManager)

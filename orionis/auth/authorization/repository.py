@@ -1,3 +1,5 @@
+"""Load permissions and roles from the framework authorization tables."""
+
 from typing import TYPE_CHECKING
 from orionis.auth.concerns.functions import authorizable_key
 from orionis.auth.contracts.permission_repository import IPermissionRepository
@@ -11,16 +13,28 @@ if TYPE_CHECKING:
 # Tables shipped by the framework migrations. They follow the polymorphic
 # layout so any model can own permissions and roles.
 _PERMISSIONS_TABLE: str = "permissions"
+"""
+Tables shipped by the framework migrations. They follow the polymorphic layout so
+any model can own permissions and roles.
+"""
 _ROLES_TABLE: str = "roles"
+"""Roles table identifier: ``roles``."""
 _MODEL_PERMISSIONS_TABLE: str = "model_has_permissions"
+"""Model permissions table identifier: ``model_has_permissions``."""
 _MODEL_ROLES_TABLE: str = "model_has_roles"
+"""Model roles table identifier: ``model_has_roles``."""
 _ROLE_PERMISSIONS_TABLE: str = "role_has_permissions"
+"""Role permissions table identifier: ``role_has_permissions``."""
 
 # Column names reused across the three queries below.
 _MODEL_TYPE: str = "model_type"
+"""Column names reused across the three queries below."""
 _MODEL_ID: str = "model_id"
+"""Model id identifier: ``model_id``."""
 _ROLE_ID: str = "role_id"
+"""Role id identifier: ``role_id``."""
 _PERMISSION_ID: str = "permission_id"
+"""Permission id identifier: ``permission_id``."""
 
 class DatabasePermissionRepository(IPermissionRepository):
     """
@@ -39,6 +53,7 @@ class DatabasePermissionRepository(IPermissionRepository):
     # ruff: noqa: TC001 (Dependency Injection)
 
     __slots__ = ("__db",)
+    """Declare the instance attribute slots reserved by this class."""
 
     def __init__(self, db: IQueryBuilder) -> None:
         """
@@ -46,7 +61,7 @@ class DatabasePermissionRepository(IPermissionRepository):
 
         Parameters
         ----------
-        db : IQueryBuilder
+        db : orionis.orm.contracts.query_builder.IQueryBuilder
             Gateway used to build queries over the authorization tables.
 
         Returns
@@ -55,6 +70,7 @@ class DatabasePermissionRepository(IPermissionRepository):
             The repository keeps only the injected gateway.
         """
         self.__db = db
+        """Gateway used to build queries over the authorization tables."""
 
     async def loadFor(
         self,
@@ -65,7 +81,7 @@ class DatabasePermissionRepository(IPermissionRepository):
 
         Parameters
         ----------
-        authorizable : IAuthorizable
+        authorizable : orionis.auth.contracts.IAuthorizable
             Identity whose authorization must be resolved.
 
         Returns
@@ -107,7 +123,7 @@ class DatabasePermissionRepository(IPermissionRepository):
 
         Returns
         -------
-        IRawQueryBuilder
+        orionis.orm.contracts.raw_builder.IRawQueryBuilder
             Query exposing role names tagged with their authorization kind.
         """
         return (
@@ -141,7 +157,7 @@ class DatabasePermissionRepository(IPermissionRepository):
 
         Returns
         -------
-        IRawQueryBuilder
+        orionis.orm.contracts.raw_builder.IRawQueryBuilder
             Query exposing direct permission names and their kind.
         """
         return (
@@ -175,7 +191,7 @@ class DatabasePermissionRepository(IPermissionRepository):
 
         Returns
         -------
-        IRawQueryBuilder
+        orionis.orm.contracts.raw_builder.IRawQueryBuilder
             Query exposing permissions from roles attached in this statement.
         """
         return (

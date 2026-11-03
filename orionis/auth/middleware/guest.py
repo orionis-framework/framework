@@ -1,3 +1,5 @@
+"""Keep web login and registration routes restricted to guests."""
+
 from typing import TYPE_CHECKING, ClassVar
 from orionis.auth.contracts.manager import IAuthManager
 from orionis.auth.contracts.permission_repository import IPermissionRepository
@@ -14,6 +16,7 @@ if TYPE_CHECKING:
 
 # Target used when ``auth.session.home`` is absent from the configuration.
 _DEFAULT_HOME: str = "/home"
+"""Target used when ``auth.session.home`` is absent from the configuration."""
 
 class GuestMiddleware(ResolveIdentityMiddleware):
     """
@@ -27,11 +30,13 @@ class GuestMiddleware(ResolveIdentityMiddleware):
     # ruff: noqa: TC001 (Dependency Injection)
 
     __slots__ = ("_home",)
+    """Declare the instance attribute slots reserved by this class."""
 
     guard: ClassVar[str | None] = Guards.SESSION.value
 
     # Explicit destination replacing the configured home page.
     redirect_to: ClassVar[str | None] = None
+    """Explicit destination replacing the configured home page."""
 
     def __init__(
         self,
@@ -44,11 +49,11 @@ class GuestMiddleware(ResolveIdentityMiddleware):
 
         Parameters
         ----------
-        app : IApplication
+        app : orionis.IApplication
             Application exposing the ``auth.session`` configuration.
-        manager : IAuthManager
+        manager : orionis.auth.contracts.IAuthManager
             Manager exposing the configured guards.
-        permissions : IPermissionRepository
+        permissions : orionis.auth.contracts.IPermissionRepository
             Source the authorization snapshot is built from.
 
         Returns
@@ -60,6 +65,7 @@ class GuestMiddleware(ResolveIdentityMiddleware):
         self._home: str = (
             self.redirect_to or app.config("auth.session.home") or _DEFAULT_HOME
         )
+        """Redirect destination for users who are already authenticated."""
 
     async def handle(self, request: Request, call_next: NextCallable) -> Response:
         """
@@ -67,19 +73,19 @@ class GuestMiddleware(ResolveIdentityMiddleware):
 
         Parameters
         ----------
-        request : Request
+        request : orionis.http.Request
             Incoming request.
-        call_next : NextCallable
+        call_next : orionis.http.NextCallable
             Remaining route pipeline.
 
         Returns
         -------
-        Response
+        orionis.http.Response
             Guest response or a browser redirect to the home page.
 
         Raises
         ------
-        AuthorizationException
+        orionis.auth.AuthorizationException
             If an authenticated JSON or AJAX client accesses a guest-only route.
         """
         context = await self._establish(request)

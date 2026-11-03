@@ -1,3 +1,5 @@
+"""Provide view globals operations through ``_global_old``."""
+
 from __future__ import annotations
 from typing import TYPE_CHECKING, Any
 from orionis.session.contracts.session import ISession
@@ -13,12 +15,12 @@ def _global_old(app: IApplication) -> Any:
 
     Parameters
     ----------
-    app : IApplication
+    app : orionis.IApplication
         Application container used for service resolution.
 
     Returns
     -------
-    Any
+    typing.Any
         Async callable that reads the previously submitted form input.
     """
     async def old(key: str, default: Any = None) -> Any:
@@ -33,12 +35,12 @@ def _global_old(app: IApplication) -> Any:
         ----------
         key : str
             Form field name.
-        default : Any, optional
+        default : typing.Any, optional
             Fallback value when the field was not submitted.
 
         Returns
         -------
-        Any
+        typing.Any
             The previously submitted value, ``default``, or an empty
             string when both are ``None``.
         """

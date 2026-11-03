@@ -1,7 +1,9 @@
 from __future__ import annotations
+import asyncio
 from typing import TYPE_CHECKING, Any
 from orionis.console.contracts.store import IScheduleStore
 from orionis.database.contracts.connection_manager import IConnectionManager
+from orionis.database.exceptions import QueryException
 from orionis.foundation.config.scheduler.entities.database import Database
 from orionis.foundation.config.scheduler.entities.redis import Redis
 from orionis.foundation.config.scheduler.entities.scheduler import (
@@ -175,3 +177,47 @@ class ScheduleStore(IScheduleStore):
             raise missing_dependency_error(
                 resolve_driver(config), exc, sync=True,
             ) from exc
+
+    async def migrate(self) -> None:
+        """
+        Create the native database job table without starting the scheduler.
+
+        Returns
+        -------
+        None
+            Create missing storage on a worker thread and preserve existing jobs.
+
+        Raises
+        ------
+        RuntimeError
+            If database storage is not configured or its backend is unsupported.
+        DatabaseException
+            If the SQL connection, driver, or schema creation fails.
+        """
+        await asyncio.to_thread(self._migrateDatabase)
+
+    def _migrateDatabase(self) -> None:
+        """
+        Create the configured job store table and release its temporary engine.
+
+        Returns
+        -------
+        None
+            Create APScheduler's native table and indexes if absent.
+
+        Raises
+        ------
+        QueryException
+            If SQLAlchemy cannot create or close the storage; omit driver details.
+        """
+        from sqlalchemy.exc import SQLAlchemyError
+
+        try:
+            store = self.database()
+            try:
+                store.jobs_t.create(bind=store.engine, checkfirst=True)
+            finally:
+                store.shutdown()
+        except SQLAlchemyError as error:
+            message = f"Scheduler table migration failed ({type(error).__name__})."
+            raise QueryException(message) from None

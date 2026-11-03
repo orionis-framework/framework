@@ -1,3 +1,5 @@
+"""Carry structured schema-validation failures."""
+
 from __future__ import annotations
 from typing import TYPE_CHECKING
 
@@ -7,8 +9,10 @@ if TYPE_CHECKING:
 
 # Fallback used when the exception is built without any failure.
 _DEFAULT_MESSAGE = "The given data was invalid."
+"""Fallback used when the exception is built without any failure."""
 
 class ValidationException(Exception):
+    """Carry structured schema-validation failures."""
 
     def __init__(
         self,
@@ -20,7 +24,7 @@ class ValidationException(Exception):
 
         Parameters
         ----------
-        failures : ValidationFailure | Sequence[ValidationFailure]
+        failures
             Single failure or collected payload failures in reporting order.
         message : str | None, optional
             Override the summary message reported to the client.
@@ -46,9 +50,13 @@ class ValidationException(Exception):
                 bucket.append(detail)
 
         self.failures = collected
+        """Single failure or collected payload failures in reporting order."""
         self.failure = collected[0] if collected else None
+        """Failure retained for propagation or reporting."""
         self.errors = errors
+        """Errors supplied through ``errors``."""
         self.message = message or self._summary(collected)
+        """Override the summary message reported to the client."""
 
         super().__init__(self.message)
 
@@ -59,7 +67,7 @@ class ValidationException(Exception):
 
         Parameters
         ----------
-        failures : tuple[ValidationFailure, ...]
+        failures : tuple[orionis.schemas.entities.failure.ValidationFailure, ``...``]
             Every failure collected for the payload.
 
         Returns

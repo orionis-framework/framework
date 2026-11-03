@@ -1,3 +1,5 @@
+"""Validate the account details required for user registration."""
+
 from orionis.schemas import Schema
 from orionis.schemas.constraints import (
     ConfirmPassword,
@@ -12,12 +14,14 @@ from orionis.schemas.metadata import Message
 class RegisterSchema(Schema):
 
     # ruff: noqa: TC001
+    """Validate the account details required for user registration."""
 
     name: Field[
         str,
         Message("Name must be a string."),
         MinLength(6, message="Name must be at least 6 characters long."),
     ]
+    """Account display name subject to the declared validation constraints."""
 
     email: Field[
         str,
@@ -29,6 +33,7 @@ class RegisterSchema(Schema):
             message="Email already exists. Please use a different email address.",
         ),
     ]
+    """Email address subject to the declared length and address constraints."""
 
     password: Field[
         str,
@@ -40,9 +45,11 @@ class RegisterSchema(Schema):
             ),
         ),
     ]
+    """Account password subject to the declared validation constraints."""
 
     password_confirmation: Field[
         str,
         Message("Password confirmation must be a string."),
         ConfirmPassword(message="Password confirmation does not match the password."),
     ]
+    """Repeated password value that must match the password field."""

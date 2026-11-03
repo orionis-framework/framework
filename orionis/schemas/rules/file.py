@@ -1,3 +1,5 @@
+"""Ensure a value is a successfully uploaded file."""
+
 from orionis.schemas.rules.measure import is_file
 from orionis.schemas.rule import Rule
 
@@ -7,9 +9,12 @@ class File(Rule):
     # ruff: noqa: ARG002
 
     __slots__ = ()
+    """Declare that this class introduces no additional instance slots."""
 
     __message__ = "Value must be an uploaded file."
+    """Error text for message: ``Value must be an uploaded file.``."""
     __code__ = "file"
+    """Code identifier: ``file``."""
 
     async def enforce(
         self,

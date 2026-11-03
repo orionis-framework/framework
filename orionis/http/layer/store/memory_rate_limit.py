@@ -1,3 +1,5 @@
+"""Track rate-limit counters in process-local memory."""
+
 from __future__ import annotations
 from collections import deque
 from dataclasses import dataclass, field
@@ -10,18 +12,24 @@ class _RateLimitBucket:
     """Track accepted timestamps and the time the last one expires."""
 
     expires_at: float
+    """Timestamp after which the stored value is no longer valid."""
     timestamps: deque[float] = field(default_factory=deque)
+    """Timestamps produced by ``field``."""
 
 class MemoryRateLimitStore:
+    """Track rate-limit counters in process-local memory."""
 
     __slots__ = (
         "__keys", "__lock", "__max_events", "__max_keys", "__storage",
         "__ticks", "__total_events",
     )
+    """Declare the instance attribute slots reserved by this class."""
 
     # Inspect a bounded group of keys after each group of request attempts.
     _GC_INTERVAL: int = 16
+    """Inspect a bounded group of keys after each group of request attempts."""
     _GC_BATCH_SIZE: int = 64
+    """Gc batch size value used by ``MemoryRateLimitStore``."""
 
     def __init__(
         self,
@@ -42,16 +50,24 @@ class MemoryRateLimitStore:
         Returns
         -------
         None
+            Initialize an empty rate-limit store.
         """
         validate_integer(max_keys, "max_keys", minimum=1)
         validate_integer(max_events, "max_events", minimum=1)
         self.__max_keys = max_keys
+        """Maximum number of retained client buckets."""
         self.__max_events = max_events
+        """Maximum number of accepted timestamps retained across all clients."""
         self.__lock = Lock()
+        """Lock protecting concurrent access to shared state."""
         self.__total_events = 0
+        """Total events value used by ``MemoryRateLimitStore``."""
         self.__storage: dict[str, _RateLimitBucket] = {}
+        """Entries retained by the in-memory storage backend."""
         self.__keys: deque[str] = deque()
+        """Keys produced by ``deque``."""
         self.__ticks: int = 0
+        """Ticks value used by ``MemoryRateLimitStore``."""
 
     async def hit( # NOSONAR
         self,
@@ -163,7 +179,7 @@ class MemoryRateLimitStore:
 
         Returns
         -------
-        _RateLimitBucket | None
+        orionis.http.layer.store.memory_rate_limit._RateLimitBucket | None
             New empty bucket, or None when the store cannot retain more clients.
         """
         if self.__atCapacity():
@@ -201,6 +217,7 @@ class MemoryRateLimitStore:
         Returns
         -------
         None
+            Inspect the next group of keys and remove expired buckets.
         """
         keys = self.__keys
         storage = self.__storage

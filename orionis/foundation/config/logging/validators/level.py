@@ -1,3 +1,5 @@
+"""Validate if a value is a valid logging level."""
+
 from __future__ import annotations
 from typing import ClassVar
 from orionis.foundation.config.logging.enums import Level
@@ -18,6 +20,7 @@ class _IsValidLevel:
     """
 
     __slots__ = ()
+    """Declare that this class introduces no additional instance slots."""
 
     _level_names: ClassVar[frozenset[str]] = frozenset(level.name for level in Level)
     _level_values: ClassVar[frozenset[int]] = frozenset(level.value for level in Level)
@@ -28,7 +31,7 @@ class _IsValidLevel:
 
         Parameters
         ----------
-        value : Level | int | str
+        value : orionis.foundation.config.logging.Level | int | str
             The logging level to normalize. Can be an integer, string, or Level enum.
 
         Returns
@@ -75,7 +78,7 @@ class _IsValidLevel:
 
         Parameters
         ----------
-        value : Level | int | str
+        value : orionis.foundation.config.logging.Level | int | str
             Value to validate as a logging level. Can be int, str, or Level enum.
 
         Returns
@@ -95,3 +98,4 @@ class _IsValidLevel:
 
 # Exported singleton instance
 IsValidLevel = _IsValidLevel()
+"""Exported singleton instance."""

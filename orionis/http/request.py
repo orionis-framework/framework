@@ -1,3 +1,5 @@
+"""Provide http operations through ``UnsupportedMediaTypeException``, ``Request``."""
+
 from __future__ import annotations
 from types import SimpleNamespace
 from typing import TYPE_CHECKING, Any
@@ -19,11 +21,17 @@ from orionis.http.payload.parsers import (
 from orionis.http.payload.stream_parser import MultipartStreamParser
 
 _MIME_JSON = "application/json"
+"""Mime json identifier: ``application/json``."""
 _MIME_MULTIPART = "multipart/form-data"
+"""Mime multipart identifier: ``multipart/form-data``."""
 _MIME_MSGPACK = "application/msgpack"
+"""Mime msgpack identifier: ``application/msgpack``."""
 _MIME_URLENCODED = "application/x-www-form-urlencoded"
+"""Mime urlencoded identifier: ``application/x-www-form-urlencoded``."""
 _BEARER_PREFIX = "bearer "
+"""Authorization scheme prefix recognized for bearer-token authentication."""
 _BEARER_PREFIX_LEN = 7
+"""Bearer prefix len value used by ``request``."""
 
 def _asgi_server_authority(
     server: tuple[str, int | None],
@@ -69,6 +77,68 @@ class UnsupportedMediaTypeException(Exception):
     """
 
 class Request(IRequest):
+    """
+    Expose HTTP request metadata, input, authentication and session state.
+
+    Attributes
+    ----------
+    __scope
+        Dependency-injection scope associated with the current operation.
+    __adapter
+        Provides the parsed scope dict and header accessor.
+    __interface
+        Transport protocol type (ASGI or RSGI).
+    __body_stream
+        Pre-constructed stream, or None to create it on first body access.
+    __body_limits
+        Finite request and multipart limits. Defaults to HTTPBodyLimits().
+    __receive_or_protocol
+        ASGI receive callable or RSGI protocol used for lazy body creation.
+    __registry
+        Content-type parser registry. Defaults to ``DEFAULT_MEDIA_TYPES``.
+    __cached_url
+        Cached url value, computed on first access.
+    __cached_base_url
+        Cached base url value, computed on first access.
+    __cached_headers
+        Cached headers value, computed on first access.
+    __cached_query_params
+        Cached query params value, computed on first access.
+    __cached_cookies
+        Cached cookies value, computed on first access.
+    __cached_ip
+        Cached ip value, computed on first access.
+    __cached_port
+        Cached port value, computed on first access.
+    __cached_method
+        Cached method value, computed on first access.
+    __cached_scheme
+        Cached scheme value, computed on first access.
+    __cached_http_version
+        Cached http version value, computed on first access.
+    __cached_data
+        Cached data value, computed on first access.
+    __cached_json
+        Cached json value, computed on first access.
+    __json_parsed
+        Json parsed flag used by ``Request``.
+    __cached_form
+        Cached form value, computed on first access.
+    __cached_multipart
+        Cached multipart value, computed on first access.
+    __cached_forwarded
+        Cached forwarded value, computed on first access.
+    __cached_content_type
+        Cached content type value, computed on first access.
+    __cached_path
+        Cached path value, computed on first access.
+    __cached_accept_lower
+        Cached accept lower value, computed on first access.
+    __path_params
+        Values extracted from the matched route path.
+    __state
+        State selected by the maintenance-mode command.
+    """
 
     __slots__ = (
         "__adapter",
@@ -100,6 +170,7 @@ class Request(IRequest):
         "__scope",
         "__state",
     )
+    """Declare the instance attribute slots reserved by this class."""
 
     def __init__(  # noqa: PLR0913 - Preserve injected streams and transport options.
         self,
@@ -117,24 +188,25 @@ class Request(IRequest):
 
         Parameters
         ----------
-        interface : Interface
+        interface : orionis.http.enums.Interface
             Transport protocol type (ASGI or RSGI).
-        adapter : TransportAdapter
+        adapter : orionis.http.adapters.request.contracts.transport.TransportAdapter
             Provides the parsed scope dict and header accessor.
-        body_stream : IBodyStream | None, optional
+        body_stream
             Pre-constructed stream, or None to create it on first body access.
         receive_or_protocol : object, optional
             ASGI receive callable or RSGI protocol used for lazy body creation.
-        registry : MediaTypeRegistry | None, optional
+        registry : orionis.http.payload.media_types.MediaTypeRegistry | None, optional
             Content-type parser registry.  Defaults to ``DEFAULT_MEDIA_TYPES``.
-        params : Mapping[str, Any] | None, optional
+        params : collections.abc.Mapping[str, typing.Any] | None, optional
             Path parameters extracted from the URL. Defaults to None.
-        body_limits : HTTPBodyLimits | None, optional
+        body_limits : orionis.foundation.config.http.HTTPBodyLimits | None, optional
             Finite request and multipart limits. Defaults to HTTPBodyLimits().
 
         Returns
         -------
         None
+            Initialize an HTTP request from an interface, adapter, and body stream.
         """
         self.__scope: dict[str, Any] | None = None
         self.__adapter = adapter
@@ -180,7 +252,7 @@ class Request(IRequest):
 
         Returns
         -------
-        dict[str, Any]
+        dict[str, typing.Any]
             Request-local scope snapshot, retained for subsequent reads.
         """
         scope = self.__scope
@@ -195,7 +267,7 @@ class Request(IRequest):
 
         Returns
         -------
-        IBodyStream
+        orionis.http.payload.contracts.body_stream.IBodyStream
             Body reader shared by all payload parsing methods.
         """
         stream = self.__body_stream
@@ -356,7 +428,7 @@ class Request(IRequest):
 
         Returns
         -------
-        dict[str, Any]
+        dict[str, typing.Any]
             Parsed JSON object from the request body.
 
         Raises
@@ -392,7 +464,7 @@ class Request(IRequest):
 
         Returns
         -------
-        dict[str, Any]
+        dict[str, typing.Any]
             Parsed form mapping where repeated keys are preserved as lists.
         """
         # Parse raw bytes directly into a multi-value dictionary.
@@ -405,7 +477,7 @@ class Request(IRequest):
 
         Returns
         -------
-        dict[str, Any]
+        dict[str, typing.Any]
             Merged mapping of multipart fields and uploaded files.
         """
         # Collect repeated field values in insertion order.
@@ -427,7 +499,7 @@ class Request(IRequest):
 
         Returns
         -------
-        dict[str, Any]
+        dict[str, typing.Any]
             Decoded MessagePack mapping.
 
         Raises
@@ -523,7 +595,7 @@ class Request(IRequest):
 
         Returns
         -------
-        Interface
+        orionis.http.enums.Interface
             The interface type of the request.
         """
         return self.__interface
@@ -578,7 +650,7 @@ class Request(IRequest):
 
         Returns
         -------
-        Headers
+        orionis.http.payload.estructures.headers.Headers
             The headers associated with the request.
         """
         if self.__cached_headers is None:
@@ -592,7 +664,7 @@ class Request(IRequest):
 
         Returns
         -------
-        QueryParams
+        orionis.http.payload.estructures.query_params.QueryParams
             Parsed query parameters.  Result is cached after the first call.
         """
         if self.__cached_query_params is not None:
@@ -617,7 +689,7 @@ class Request(IRequest):
 
         Returns
         -------
-        Cookies
+        orionis.http.payload.estructures.cookies.Cookies
             The parsed cookies as a Cookies object.
         """
         if self.__cached_cookies is not None:
@@ -682,7 +754,7 @@ class Request(IRequest):
 
         Returns
         -------
-        dict[str, Any]
+        dict[str, typing.Any]
             The forwarded information as a dictionary.
         """
         if self.__cached_forwarded is not None:
@@ -791,7 +863,7 @@ class Request(IRequest):
 
         Returns
         -------
-        dict[str, Any]
+        dict[str, typing.Any]
             The raw scope dictionary provided by the transport layer.
         """
         return self.__getScope()
@@ -808,7 +880,7 @@ class Request(IRequest):
 
         Returns
         -------
-        AsyncGenerator[bytes]
+        collections.abc.AsyncGenerator[bytes]
             Yields chunks of the request body as bytes.
         """
         async for chunk in self.__getBodyStream().stream():
@@ -868,7 +940,7 @@ class Request(IRequest):
 
         Raises
         ------
-        UnsupportedMediaTypeException
+        orionis.http.request.UnsupportedMediaTypeException
             If the Content-Type is not ``application/json`` (or a
             ``+json`` subtype).
         ValueError
@@ -908,14 +980,14 @@ class Request(IRequest):
 
         Returns
         -------
-        XMLElement (xml.etree.ElementTree.Element)
+        ``xml.etree.ElementTree.Element`` (``xml.etree.ElementTree.Element``)
             Root element of the parsed XML document.
 
         Raises
         ------
-        xml.etree.ElementTree.ParseError
+        ``xml.etree.ElementTree.ParseError``
             If the payload is malformed XML.
-        defusedxml.common.EntitiesForbidden
+        ``defusedxml.common.EntitiesForbidden``
             If the document declares an internal or external entity. This is a
             subclass of ``defusedxml.common.DefusedXmlException``, not ParseError.
         """
@@ -934,7 +1006,7 @@ class Request(IRequest):
 
         Raises
         ------
-        msgspec.DecodeError
+        ``msgspec.DecodeError``
             If the payload is not valid MessagePack.
         """
         raw = await self.__getBodyStream().read()
@@ -946,12 +1018,12 @@ class Request(IRequest):
 
         Returns
         -------
-        dict[str, Any]
+        dict[str, typing.Any]
             Parsed form fields. Result is cached.
 
         Raises
         ------
-        UnsupportedMediaTypeException
+        orionis.http.request.UnsupportedMediaTypeException
             If the Content-Type is not ``application/x-www-form-urlencoded``.
         """
         if self.__cached_form is not None:
@@ -978,12 +1050,12 @@ class Request(IRequest):
 
         Returns
         -------
-        FormData
+        orionis.http.payload.form_data.FormData
             Parsed multipart form data. Result is cached.
 
         Raises
         ------
-        UnsupportedMediaTypeException
+        orionis.http.request.UnsupportedMediaTypeException
             If the Content-Type is not ``multipart/form-data``.
         ValueError
             If the multipart boundary is absent.
@@ -1078,12 +1150,12 @@ class Request(IRequest):
 
         Returns
         -------
-        dict[str, Any]
+        dict[str, typing.Any]
             Flat dictionary suitable for downstream request validation.
 
         Raises
         ------
-        UnsupportedMediaTypeException
+        orionis.http.request.UnsupportedMediaTypeException
             Raise if ``Content-Type`` cannot be converted to a dictionary.
         ValueError
             Raise if a JSON or MessagePack body is empty or cannot be decoded,
@@ -1206,7 +1278,7 @@ class Request(IRequest):
 
         Returns
         -------
-        dict[str, Any]
+        dict[str, typing.Any]
             A dictionary of all path parameters.
         """
         if self.__path_params is None:
@@ -1232,3 +1304,4 @@ class Request(IRequest):
 
     # Template-facing attribute shares the camelCase implementation.
     csrf_token = property(csrfToken)
+    """Template-facing attribute shares the camelCase implementation."""

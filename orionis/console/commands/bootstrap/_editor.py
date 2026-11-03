@@ -66,7 +66,7 @@ class BootstrapEditor:
             for parent in ast.walk(self.tree)
             for child in ast.iter_child_nodes(parent)
         }
-        self.assignment, self.app_name = self._find_application()
+        self.assignment, self.app_name = self._findApplication()
         self.scope = self._parents[self.assignment]
         if not isinstance(
             self.scope, (ast.Module, ast.FunctionDef, ast.AsyncFunctionDef),
@@ -77,10 +77,10 @@ class BootstrapEditor:
             )
             raise BootstrapEditError(error_msg)
         self.body = self.scope.body
-        self._nodes = list(self._scope_nodes(self.scope))
-        self._check_assignments()
+        self._nodes = list(self._scopeNodes(self.scope))
+        self._checkAssignments()
 
-    def _application_names(self) -> tuple[set[str], set[str]]:
+    def _applicationNames(self) -> tuple[set[str], set[str]]:
         """
         Collect supported application constructor and module aliases.
 
@@ -110,7 +110,7 @@ class BootstrapEditor:
         return constructors, modules
 
     @staticmethod
-    def _is_constructor(
+    def _isConstructor(
         node: ast.AST, constructors: set[str], modules: set[str],
     ) -> bool:
         """
@@ -143,7 +143,7 @@ class BootstrapEditor:
             return ast.unparse(node.func.value) in modules
         return False
 
-    def _find_application(self) -> tuple[ast.Assign | ast.AnnAssign, str]:
+    def _findApplication(self) -> tuple[ast.Assign | ast.AnnAssign, str]:
         """
         Locate the unique named application construction assignment.
 
@@ -153,7 +153,7 @@ class BootstrapEditor:
             Return the assignment node and its application variable name.
         """
         # Require one unambiguous named application construction.
-        constructors, modules = self._application_names()
+        constructors, modules = self._applicationNames()
         candidates = []
         for node in ast.walk(self.tree):
             target = None
@@ -164,7 +164,7 @@ class BootstrapEditor:
             if (
                 isinstance(target, ast.Name)
                 and node.value is not None
-                and self._is_constructor(node.value, constructors, modules)
+                and self._isConstructor(node.value, constructors, modules)
             ):
                 candidates.append((node, target.id))
         if len(candidates) != 1:
@@ -172,7 +172,7 @@ class BootstrapEditor:
             raise BootstrapEditError(error_msg)
         return candidates[0]
 
-    def _check_assignments(self) -> None:
+    def _checkAssignments(self) -> None:
         """
         Reject application reassignments that obscure the selected receiver.
 
@@ -194,7 +194,7 @@ class BootstrapEditor:
                 isinstance(t, ast.Name) and t.id == self.app_name for t in targets
             ) and (
                 not isinstance(node, ast.Assign)
-                or self._root_name(node.value) != self.app_name
+                or self._rootName(node.value) != self.app_name
             ):
                 error_msg = (
                     f"Application {self.app_name!r} is reassigned in {self.path}."
@@ -202,7 +202,7 @@ class BootstrapEditor:
                 raise BootstrapEditError(error_msg)
 
     @staticmethod
-    def _scope_nodes(scope: ast.AST) -> Iterator[ast.AST]:
+    def _scopeNodes(scope: ast.AST) -> Iterator[ast.AST]:
         """
         Walk a lexical scope without entering unrelated nested definitions.
 
@@ -229,10 +229,10 @@ class BootstrapEditor:
                 (ast.FunctionDef, ast.AsyncFunctionDef, ast.ClassDef, ast.Lambda),
             ):
                 continue
-            yield from BootstrapEditor._scope_nodes(child)
+            yield from BootstrapEditor._scopeNodes(child)
 
     @staticmethod
-    def _root_name(node: ast.AST | None) -> str | None:
+    def _rootName(node: ast.AST | None) -> str | None:
         """
         Resolve the named receiver beneath a fluent method-call chain.
 
@@ -345,7 +345,7 @@ class BootstrapEditor:
         """
         # Inspect both named receivers and calls inside the initializer.
         calls = []
-        initializer_nodes = self._initializer_calls()
+        initializer_nodes = self._initializerCalls()
         for node in self._nodes:
             if not (
                 isinstance(node, ast.Call)
@@ -353,7 +353,7 @@ class BootstrapEditor:
                 and node.func.attr == method
             ):
                 continue
-            if self._root_name(node) == self.app_name or node in initializer_nodes:
+            if self._rootName(node) == self.app_name or node in initializer_nodes:
                 statement = self._statement(node)
                 if not isinstance(
                     statement, (ast.Expr, ast.Assign, ast.AnnAssign, ast.Return),
@@ -368,7 +368,7 @@ class BootstrapEditor:
                 calls.append(node)
         return sorted(calls, key=self._end)
 
-    def _initializer_calls(self) -> set[ast.Call]:
+    def _initializerCalls(self) -> set[ast.Call]:
         """
         Collect fluent calls that construct the named application.
 
@@ -387,7 +387,7 @@ class BootstrapEditor:
             node = node.func.value
         return calls
 
-    def _routing_call(self) -> ast.Call | None:
+    def _routingCall(self) -> ast.Call | None:
         """
         Find the final directly editable application routing call.
 
@@ -411,10 +411,10 @@ class BootstrapEditor:
             Return whether a supported routing call exists.
         """
         # Inspect the selected application routing configuration.
-        return self._routing_call() is not None
+        return self._routingCall() is not None
 
     @staticmethod
-    def _routing_value(call: ast.Call, context: str) -> ast.AST | None:
+    def _routingValue(call: ast.Call, context: str) -> ast.AST | None:
         """
         Find a context argument in a supported routing call.
 
@@ -457,10 +457,10 @@ class BootstrapEditor:
             Return literal paths, an empty list if unset, or None if dynamic.
         """
         # Distinguish omitted contexts from unresolved expanded arguments.
-        call = self._routing_call()
+        call = self._routingCall()
         if call is None:
             return []
-        value = self._routing_value(call, context)
+        value = self._routingValue(call, context)
         if value is None or (isinstance(value, ast.Constant) and value.value is None):
             expanded = value is None and any(kw.arg is None for kw in call.keywords)
             return None if expanded else []
@@ -476,7 +476,7 @@ class BootstrapEditor:
             return list(literal)
         return None
 
-    def _path_literal(self, path: Path) -> str:
+    def _pathLiteral(self, path: Path) -> str:
         """
         Encode a route path as a project-relative Python string literal.
 
@@ -604,7 +604,7 @@ class BootstrapEditor:
         )
         return end, end, content
 
-    def _callback_import(self, import_line: str) -> tuple[int, int, str]:
+    def _callbackImport(self, import_line: str) -> tuple[int, int, str]:
         """
         Extend the visible import block without adding an empty import group.
 
@@ -692,7 +692,7 @@ class BootstrapEditor:
             return [self._before(statement, lines)]
         returns = [node for node in self.body if isinstance(node, ast.Return)]
         if returns:
-            if len(returns) != 1 or self._root_name(returns[0].value) != self.app_name:
+            if len(returns) != 1 or self._rootName(returns[0].value) != self.app_name:
                 error_msg = f"Cannot identify the application return in {self.path}."
                 raise BootstrapEditError(error_msg)
             return [self._before(returns[0], lines)]
@@ -719,16 +719,16 @@ class BootstrapEditor:
             Return updated source, or None when the context is already enabled.
         """
         # Validate source-level safety before planning the context change.
-        call = self._routing_call()
-        self._check_indirect_routing(call)
+        call = self._routingCall()
+        self._checkIndirectRouting(call)
         literal = (
-            "[" + ", ".join(self._path_literal(path) for path in route_path) + "]"
+            "[" + ", ".join(self._pathLiteral(path) for path in route_path) + "]"
             if isinstance(route_path, list)
-            else self._path_literal(route_path)
+            else self._pathLiteral(route_path)
         )
         if call is None:
             creates = self._calls("create") + self._calls("boot")
-            initializer = self._initializer_calls()
+            initializer = self._initializerCalls()
             if creates and creates[0] in initializer:
                 create = creates[0]
                 position = self._end(create.func.value)
@@ -740,13 +740,13 @@ class BootstrapEditor:
                     [f"{self.app_name}.withRouting({context}={literal})"],
                 ),
             )
-        value = self._routing_value(call, context)
+        value = self._routingValue(call, context)
         if value is not None:
             if not (
                 isinstance(value, ast.Constant) and value.value in (None, "")
             ) and not (isinstance(value, (ast.List, ast.Tuple)) and not value.elts):
                 return None
-            self._check_routing_order(call)
+            self._checkRoutingOrder(call)
             return self._edited([(self._start(value), self._end(value), literal)])
         if any(keyword.arg is None for keyword in call.keywords):
             if registered:
@@ -756,10 +756,10 @@ class BootstrapEditor:
                 f"in {self.path}."
             )
             raise BootstrapEditError(error_msg)
-        self._check_routing_order(call)
-        return self._append_keyword(call, context, literal)
+        self._checkRoutingOrder(call)
+        return self._appendKeyword(call, context, literal)
 
-    def _check_indirect_routing(self, routing: ast.Call | None) -> None:
+    def _checkIndirectRouting(self, routing: ast.Call | None) -> None:
         """
         Reject later helpers that can replace the selected routing setup.
 
@@ -790,8 +790,8 @@ class BootstrapEditor:
                 self._parents.get(node), ast.Await,
             ):
                 continue
-            parameters = self._helper_application_parameters(helper, node)
-            if self._helper_replaces_routing(helper, parameters):
+            parameters = self._helperApplicationParameters(helper, node)
+            if self._helperReplacesRouting(helper, parameters):
                 error_msg = (
                     f"Helper {helper.name}() can replace withRouting() after "
                     f"the selected configuration in {self.path}; "
@@ -799,7 +799,7 @@ class BootstrapEditor:
                 )
                 raise BootstrapEditError(error_msg)
 
-    def _helper_application_parameters(
+    def _helperApplicationParameters(
         self, helper: ast.FunctionDef | ast.AsyncFunctionDef, call: ast.Call,
     ) -> set[str]:
         """
@@ -823,18 +823,18 @@ class BootstrapEditor:
         for parameter, value in zip(positional, call.args, strict=False):
             if isinstance(value, ast.Starred):
                 break
-            if self._root_name(value) == self.app_name:
+            if self._rootName(value) == self.app_name:
                 parameters.add(parameter.arg)
         named = {arg.arg for arg in [*helper.args.args, *helper.args.kwonlyargs]}
         parameters.update(
             keyword.arg for keyword in call.keywords
-            if keyword.arg in named and self._root_name(keyword.value) == self.app_name
+            if keyword.arg in named and self._rootName(keyword.value) == self.app_name
         )
         # A local helper can also close over the application without receiving
         # an explicit argument. Module helpers cannot capture a factory local.
         arguments = {arg.arg for arg in [*positional, *helper.args.kwonlyargs]}
         local_bindings = {
-            node.id for node in self._scope_nodes(helper)
+            node.id for node in self._scopeNodes(helper)
             if isinstance(node, ast.Name) and isinstance(node.ctx, ast.Store)
         }
         if (
@@ -844,7 +844,7 @@ class BootstrapEditor:
             parameters.add(self.app_name)
         return parameters
 
-    def _helper_replaces_routing(
+    def _helperReplacesRouting(
         self, helper: ast.FunctionDef | ast.AsyncFunctionDef, parameters: set[str],
     ) -> bool:
         # A supplied parameter can still reference the original application
@@ -869,11 +869,11 @@ class BootstrapEditor:
         return any(
             isinstance(node, ast.Call) and isinstance(node.func, ast.Attribute)
             and node.func.attr == "withRouting"
-            and self._root_name(node) in parameters
-            for node in self._scope_nodes(helper)
+            and self._rootName(node) in parameters
+            for node in self._scopeNodes(helper)
         )
 
-    def _append_keyword( # NOSONAR
+    def _appendKeyword( # NOSONAR
         self,
         call: ast.Call,
         context: str,
@@ -907,7 +907,7 @@ class BootstrapEditor:
             edits = []
             if arguments:
                 last = max(arguments, key=self._end)
-                argument_end, has_comma = self._argument_tail(last, end)
+                argument_end, has_comma = self._argumentTail(last, end)
                 if not has_comma:
                     edits.append((argument_end, argument_end, ","))
                 indent = self._lines[arguments[0].lineno - 1][: arguments[0].col_offset]
@@ -935,7 +935,7 @@ class BootstrapEditor:
             separator = ""
         return self._edited([(end, end, f"{separator}{context}={literal}")])
 
-    def _argument_tail(self, last: ast.AST, call_end: int) -> tuple[int, bool]:
+    def _argumentTail(self, last: ast.AST, call_end: int) -> tuple[int, bool]:
         """
         Find grouping parentheses beyond a positional argument AST node.
 
@@ -979,7 +979,7 @@ class BootstrapEditor:
             return end, False
         return end, False
 
-    def _check_routing_order(self, call: ast.Call) -> None:
+    def _checkRoutingOrder(self, call: ast.Call) -> None:
         """
         Reject routing configuration placed after application initialization.
 
@@ -1031,15 +1031,15 @@ class BootstrapEditor:
             error_msg = f"Lifespan module {relative} is not a valid Python module path."
             raise BootstrapEditError(error_msg)
         module = ".".join(relative.parts)
-        names, modules, custom_names = self._lifespan_bindings(module)
-        if self._has_lifespan_registration(names, modules, custom_names):
+        names, modules, custom_names = self._lifespanBindings(module)
+        if self._hasLifespanRegistration(names, modules, custom_names):
             return None
         if names:
             call_name = min(names)
         elif modules:
             call_name = min(modules) + ".register_lifespan_callbacks"
         else:
-            call_name = self._fresh_callback_name()
+            call_name = self._freshCallbackName()
         edits = self._registration(
             [
                 "# Register callbacks for a specific application lifespan event.",
@@ -1051,10 +1051,10 @@ class BootstrapEditor:
                 "" if call_name == "register_lifespan_callbacks" else f" as {call_name}"
             )
             import_line = f"from {module} import register_lifespan_callbacks{alias}"
-            edits.append(self._callback_import(import_line))
+            edits.append(self._callbackImport(import_line))
         return self._edited(edits)
 
-    def _lifespan_bindings(  # NOSONAR
+    def _lifespanBindings(  # NOSONAR
         self, module: str,
     ) -> tuple[set[str], set[str], set[str]]:
         """
@@ -1090,7 +1090,7 @@ class BootstrapEditor:
             if node in self.body and node.lineno >= cutoff:
                 continue
             if isinstance(node, ast.ImportFrom):
-                imported_module = self._import_module(node)
+                imported_module = self._importModule(node)
                 for alias in node.names:
                     if alias.name == "register_lifespan_callbacks":
                         if imported_module == module:
@@ -1107,7 +1107,7 @@ class BootstrapEditor:
                         modules.add(alias.asname or alias.name)
         return names, modules, custom_names
 
-    def _has_lifespan_registration(
+    def _hasLifespanRegistration(
         self,
         names: set[str],
         modules: set[str],
@@ -1146,7 +1146,7 @@ class BootstrapEditor:
                 (keyword.value for keyword in node.keywords if keyword.arg == "app"),
                 None,
             )
-            if callback and self._root_name(argument) == self.app_name:
+            if callback and self._rootName(argument) == self.app_name:
                 statement = self._statement(node)
                 if not isinstance(statement, ast.Expr):
                     error_msg = (
@@ -1157,7 +1157,7 @@ class BootstrapEditor:
                 return True
         return False
 
-    def _fresh_callback_name(self) -> str:
+    def _freshCallbackName(self) -> str:
         """
         Choose an unused callback import name in the application scope.
 
@@ -1188,7 +1188,7 @@ class BootstrapEditor:
             suffix += 1
         return f"_orionis_lifespan_{suffix}"
 
-    def _import_module(self, node: ast.ImportFrom) -> str | None:
+    def _importModule(self, node: ast.ImportFrom) -> str | None:
         """
         Resolve an import node to its absolute application module path.
 

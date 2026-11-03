@@ -1,3 +1,5 @@
+"""Turn any Orionis model into an authenticatable identity."""
+
 from typing import ClassVar
 from orionis.auth.concerns.functions import model_primary_key
 from orionis.auth.contracts.authenticatable import IAuthenticatable
@@ -14,15 +16,21 @@ class Authenticatable:
             password = String(255)
 
     The mixin is a plain class registered as a virtual implementation of
-    :class:`IAuthenticatable`. Inheriting from the ABC directly would
+    :class:`orionis.auth.contracts.IAuthenticatable`. Inheriting from the ABC directly
+    would
     clash with ``ModelMeta``, the metaclass of every Orionis model.
     """
 
     __slots__ = ()
+    """Declare that this class introduces no additional instance slots."""
 
     # Attribute holding the password hash. Override it when the model
     # stores the hash under a different name.
     AUTH_PASSWORD: ClassVar[str] = "password"  # noqa: S105
+    """
+    Attribute holding the password hash. Override it when the model stores the hash
+    under a different name.
+    """
 
     def getAuthIdentifierName(self) -> str:
         """

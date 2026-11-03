@@ -1,3 +1,5 @@
+"""Represent the configuration entity for a Redis job store."""
+
 from __future__ import annotations
 from dataclasses import dataclass, field
 from typing import Self
@@ -71,6 +73,7 @@ class Redis(BaseEntity):
             "default": None,
         },
     )
+    """Account password subject to the declared validation constraints."""
 
     key: str = field(
         default_factory=lambda: Env.get("REDIS_TASKS_KEY", "scheduler:tasks"),

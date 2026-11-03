@@ -27,7 +27,7 @@ class TestTemplateWorkers(TestCase):
         calls = []
 
         class Loader(jinja2.DictLoader):
-            def get_source(
+            def getSource(
                 self: Self, environment: jinja2.Environment, template: str,
             ) -> tuple[str, None, Callable[[], bool]]:
                 """
@@ -47,6 +47,9 @@ class TestTemplateWorkers(TestCase):
                 """
                 threads.append(threading.get_ident())
                 return super().get_source(environment, template)
+
+            # Preserve the Jinja2 loader protocol name.
+            get_source = getSource
 
         environment = jinja2.Environment(
             autoescape=True,

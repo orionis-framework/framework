@@ -1,3 +1,5 @@
+"""Represent an Azure Blob Storage configuration."""
+
 from __future__ import annotations
 from dataclasses import dataclass, field
 from orionis.environment import Env
@@ -12,9 +14,9 @@ class Azure(BaseEntity):
     Using this disk requires the official Azure SDK, which is an
     optional dependency: install it with ``uv add 'orionis[azure]'``.
 
-    Parameters
+    Attributes
     ----------
-    driver : str, default="azure"
+    driver : str, default="``azure``"
         The filesystem driver name resolved by StorageManager.
     connection_string : str
         Azure storage connection string. When provided, it takes
@@ -85,10 +87,6 @@ class Azure(BaseEntity):
     def __post_init__(self) -> None:
         """
         Validate the types of the Azure entity attributes.
-
-        Parameters
-        ----------
-        None
 
         Returns
         -------

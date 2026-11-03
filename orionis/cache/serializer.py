@@ -1,3 +1,5 @@
+"""Encode and decode cache values with the configured serialization format."""
+
 from __future__ import annotations
 import base64
 import datetime as dt
@@ -18,7 +20,9 @@ if TYPE_CHECKING:
 
 # Keys for type-discriminated payloads in the encoder output
 _TK: str = "__type__"
+"""Keys for type-discriminated payloads in the encoder output."""
 _VK: str = "__value__"
+"""Vk identifier: ``__value__``."""
 
 def _identity(o: Any) -> Any:
     """
@@ -29,12 +33,12 @@ def _identity(o: Any) -> Any:
 
     Parameters
     ----------
-    o : Any
+    o : typing.Any
         Value to pass through.
 
     Returns
     -------
-    Any
+    typing.Any
         The same object *o*, unmodified.
     """
     return o
@@ -49,14 +53,14 @@ def _encode_subclass(obj: Any, t: type) -> Any:  # NOSONAR
 
     Parameters
     ----------
-    obj : Any
+    obj : typing.Any
         Object whose type is not present in ``_ENCODE_EXACT``.
     t : type
         ``type(obj)``, passed by the caller to avoid recomputing it.
 
     Returns
     -------
-    Any
+    typing.Any
         JSON-compatible representation of *obj*.
 
     Raises
@@ -171,6 +175,7 @@ _ENCODE_EXACT: dict[type, Callable[[Any], Any]] = {
         _VK: {"real": o.real, "imag": o.imag},
     },
 }
+"""Map supported types to their encoder functions."""
 
 def _encode(obj: Any) -> Any:
     """
@@ -182,12 +187,12 @@ def _encode(obj: Any) -> Any:
 
     Parameters
     ----------
-    obj : Any
+    obj : typing.Any
         The Python object to encode.
 
     Returns
     -------
-    Any
+    typing.Any
         A JSON-serialisable representation of *obj*.
 
     Raises
@@ -213,12 +218,12 @@ def _dec_missing(_: Any) -> Any:
 
     Parameters
     ----------
-    _ : Any
+    _ : typing.Any
         Ignored encoded payload.
 
     Returns
     -------
-    Any
+    typing.Any
         The ``MISSING`` sentinel.
     """
     return MISSING
@@ -234,7 +239,7 @@ def _dec_type(val: str) -> Any:
 
     Returns
     -------
-    Any
+    typing.Any
         The class object referenced by *val*.
     """
     module_name, _, class_name = val.rpartition(".")
@@ -252,7 +257,7 @@ def _dec_enum(val: dict) -> Any:
 
     Returns
     -------
-    Any
+    typing.Any
         The enum member corresponding to the encoded value.
     """
     module_name, _, class_name = val["class"].rpartition(".")
@@ -265,7 +270,7 @@ def _dec_timedelta(v: Any) -> dt.timedelta:
 
     Parameters
     ----------
-    v : Any
+    v : typing.Any
         Mapping of timedelta constructor fields.
 
     Returns
@@ -281,7 +286,7 @@ def _dec_tuple(v: Any) -> tuple:
 
     Parameters
     ----------
-    v : Any
+    v : typing.Any
         Encoded iterable of tuple elements.
 
     Returns
@@ -297,7 +302,7 @@ def _dec_set(v: Any) -> set:
 
     Parameters
     ----------
-    v : Any
+    v : typing.Any
         Encoded iterable of set elements.
 
     Returns
@@ -313,7 +318,7 @@ def _dec_frozenset(v: Any) -> frozenset:
 
     Parameters
     ----------
-    v : Any
+    v : typing.Any
         Encoded iterable of frozenset elements.
 
     Returns
@@ -329,7 +334,7 @@ def _dec_complex(v: Any) -> complex:
 
     Parameters
     ----------
-    v : Any
+    v : typing.Any
         Mapping with ``real`` and ``imag`` components.
 
     Returns
@@ -357,6 +362,7 @@ _DECODE_DISPATCH: dict[str, Callable[[Any], Any]] = {
     "type": _dec_type,
     "enum": _dec_enum,
 }
+"""Dispatch table: keyed by the type string written by the encoder."""
 
 def _decode(obj: Any) -> Any:
     """
@@ -364,12 +370,12 @@ def _decode(obj: Any) -> Any:
 
     Parameters
     ----------
-    obj : Any
+    obj : typing.Any
         Value produced by the serializer, including nested lists and mappings.
 
     Returns
     -------
-    Any
+    typing.Any
         Decoded Python object, with typed payload wrappers resolved via
         ``_DECODE_DISPATCH``.
 
@@ -394,6 +400,7 @@ def _decode(obj: Any) -> Any:
 class Serializer:
 
     # ruff: noqa: ANN401, PLR0911, C901
+    """Encode and decode cache values with the configured serialization format."""
 
     @staticmethod
     def dumps(data: Any, indent: int | None = None) -> str:
@@ -402,7 +409,7 @@ class Serializer:
 
         Parameters
         ----------
-        data : Any
+        data : typing.Any
             The object to serialize.
         indent : int or None, optional
             Number of spaces for indentation in the output JSON string.
@@ -429,7 +436,7 @@ class Serializer:
 
         Returns
         -------
-        Any
+        typing.Any
             The deserialized Python object.
         """
         return _decode(_msgjson.decode(raw))
@@ -441,9 +448,9 @@ class Serializer:
 
         Parameters
         ----------
-        data : Any
+        data : typing.Any
             The object to serialize and write.
-        file_path : Path
+        file_path : pathlib.Path
             The file path where the serialized data will be written.
 
         Returns
@@ -474,12 +481,12 @@ class Serializer:
 
         Parameters
         ----------
-        file_path : Path
+        file_path : pathlib.Path
             Path to the file from which to load and deserialize data.
 
         Returns
         -------
-        Any
+        typing.Any
             The deserialized Python object, or None if the file does not exist or is
             empty.
         """

@@ -1,3 +1,5 @@
+"""Remove saved test-run result files."""
+
 from orionis.console.base.command import BaseCommand
 from orionis.console.commands.support._clear import clear_files
 from orionis.console.output.console import Console
@@ -9,8 +11,11 @@ class ClearTestingCommand(BaseCommand):
     # ruff: noqa: TC001
 
     timestamps: bool = False
+    """Timestamps flag used by ``ClearTestingCommand``."""
     signature: str = "clear:testing"
+    """Signature identifier: ``clear:testing``."""
     description: str = "Clear cached test-run results."
+    """Description identifier: ``Clear cached test-run results.``."""
 
     def handle(self, app: IApplication, console: Console) -> int:
         """
@@ -18,9 +23,9 @@ class ClearTestingCommand(BaseCommand):
 
         Parameters
         ----------
-        app : IApplication
+        app : orionis.IApplication
             Application providing the framework storage path.
-        console : Console
+        console : orionis.console.Console
             Console used to report the cleanup result.
 
         Returns

@@ -1,3 +1,5 @@
+"""Represent the global sender applied to messages that declare no From."""
+
 from __future__ import annotations
 from dataclasses import dataclass, field
 from orionis.environment import Env

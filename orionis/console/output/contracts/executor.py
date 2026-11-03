@@ -1,7 +1,10 @@
+"""Define the contract for executor implementations."""
+
 from __future__ import annotations
 from abc import ABC, abstractmethod
 
 class IExecutor(ABC):
+    """Define the contract for executor implementations."""
 
     @abstractmethod
     def running(self, program: str, time: str = "") -> None:

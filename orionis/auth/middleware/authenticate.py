@@ -1,3 +1,9 @@
+"""Provide auth middleware operations.
+
+Includes ``AuthenticateMiddleware``, ``AuthenticateSessionMiddleware``,
+``AuthenticateTokenMiddleware``.
+"""
+
 from typing import TYPE_CHECKING, ClassVar
 from orionis.auth.context.functions import current_auth_context
 from orionis.auth.contracts.manager import IAuthManager
@@ -16,6 +22,10 @@ if TYPE_CHECKING:
 # Status used when a browser is sent to the login page instead of
 # receiving the plain 401 error document.
 _REDIRECT_STATUS: int = 302
+"""
+Status used when a browser is sent to the login page instead of receiving the plain
+401 error document.
+"""
 
 class AuthenticateMiddleware(ResolveIdentityMiddleware):
     """
@@ -36,9 +46,11 @@ class AuthenticateMiddleware(ResolveIdentityMiddleware):
     # ruff: noqa: TC001 (Dependency Injection)
 
     __slots__ = ("_redirect_to",)
+    """Declare the instance attribute slots reserved by this class."""
 
     # Cache-Control applied to every answer of a protected route.
     cache_control: ClassVar[str | None] = "no-store, private"
+    """Cache-Control applied to every answer of a protected route."""
 
     def __init__(
         self,
@@ -51,11 +63,11 @@ class AuthenticateMiddleware(ResolveIdentityMiddleware):
 
         Parameters
         ----------
-        app : IApplication
+        app : orionis.IApplication
             Application exposing the ``auth.session`` configuration.
-        manager : IAuthManager
+        manager : orionis.auth.contracts.IAuthManager
             Manager exposing the configured guards.
-        permissions : IPermissionRepository
+        permissions : orionis.auth.contracts.IPermissionRepository
             Source the authorization snapshot is built from.
 
         Returns
@@ -65,6 +77,7 @@ class AuthenticateMiddleware(ResolveIdentityMiddleware):
         """
         super().__init__(manager, permissions)
         self._redirect_to: str | None = app.config("auth.session.redirect_to")
+        """Redirect to produced by ``app.config``."""
 
     async def handle(
         self,
@@ -76,20 +89,20 @@ class AuthenticateMiddleware(ResolveIdentityMiddleware):
 
         Parameters
         ----------
-        request : Request
+        request : orionis.http.Request
             Incoming HTTP request.
-        call_next : NextCallable
+        call_next : orionis.http.NextCallable
             Callable advancing to the next layer.
 
         Returns
         -------
-        Response
+        orionis.http.Response
             Response produced by the rest of the pipeline, or a redirect
             to the login page for anonymous browser requests.
 
         Raises
         ------
-        AuthenticationException
+        orionis.auth.AuthenticationException
             When no identity backs the request and no redirect target is
             configured for browsers.
         """
@@ -110,17 +123,17 @@ class AuthenticateMiddleware(ResolveIdentityMiddleware):
 
         Parameters
         ----------
-        request : Request
+        request : orionis.http.Request
             Incoming HTTP request.
 
         Returns
         -------
-        Response
+        orionis.http.Response
             Redirect to the configured login page.
 
         Raises
         ------
-        AuthenticationException
+        orionis.auth.AuthenticationException
             When the client expects a machine readable answer, or no
             redirect target is configured. The exception is translated
             into a ``401`` response by the framework exception handler.
@@ -143,6 +156,7 @@ class AuthenticateSessionMiddleware(AuthenticateMiddleware):
     """Require an identity authenticated through the HTTP session."""
 
     __slots__ = ()
+    """Declare that this class introduces no additional instance slots."""
 
     guard: ClassVar[str | None] = Guards.SESSION.value
 
@@ -150,5 +164,6 @@ class AuthenticateTokenMiddleware(AuthenticateMiddleware):
     """Require an identity authenticated through a personal access token."""
 
     __slots__ = ()
+    """Declare that this class introduces no additional instance slots."""
 
     guard: ClassVar[str | None] = Guards.TOKEN.value

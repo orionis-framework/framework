@@ -86,7 +86,7 @@ class TestInvoker(TestCase):
         Container._instances.update(self.instances)
         ScopedContext.reset(self.scope_token)
 
-    async def test_payload_cannot_override_dependency(self):
+    async def testPayloadCannotOverrideDependency(self):
         """A malicious repository argument remains inside the typed payload.
 
         Returns
@@ -107,7 +107,7 @@ class TestInvoker(TestCase):
         result = await primitive.handler.invoke(instance, self.app, request, payload)
         self.assertEqual(result, ("attacker", repository, 1, "native"))
 
-    async def test_concurrent_scopes_do_not_share_request_or_dependency(self):
+    async def testConcurrentScopesDoNotShareRequestOrDependency(self):
         """Native scoped dependencies and immutable requests remain isolated.
 
         Returns
@@ -146,7 +146,7 @@ class TestInvoker(TestCase):
         self.assertIsNot(first[1], second[1])
         self.assertEqual((first[2], second[2]), (1, 2))
 
-    async def test_generators_are_not_consumed_or_awaited(self):
+    async def testGeneratorsAreNotConsumedOrAwaited(self):
         """The dispatcher owns generator iteration and lifecycle cleanup.
 
         Returns
@@ -175,7 +175,7 @@ class TestInvoker(TestCase):
         self.assertEqual(await anext(result), "part")
         await result.aclose()
 
-    def test_variadic_handler_is_rejected(self):
+    def testVariadicHandlerIsRejected(self):
         """Broad kwargs cannot create an alternate payload-to-DI channel.
 
         Returns
@@ -203,7 +203,7 @@ class TestInvoker(TestCase):
         with self.assertRaisesRegex(TypeError, "variadic"):
             McpInvoker.compile(Unsafe, "handle")
 
-    def test_request_detaches_nested_mutable_input(self):
+    def testRequestDetachesNestedMutableInput(self):
         """Caller mutations cannot change a request while another task reads it.
 
         Returns

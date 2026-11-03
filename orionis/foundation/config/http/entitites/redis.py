@@ -1,3 +1,5 @@
+"""Configure the Redis connection used by HTTP rate limiting."""
+
 from __future__ import annotations
 from dataclasses import dataclass, field
 from orionis.environment import Env

@@ -1,3 +1,5 @@
+"""Redispatch one failed job through its original connection."""
+
 from typing import ClassVar
 from orionis.console.args.argument import Argument
 from orionis.console.base.command import BaseCommand
@@ -8,13 +10,18 @@ class QueueRetryCommand(BaseCommand):
     """Redispatch one failed job through its original connection."""
 
     __slots__ = ()
+    """Declare that this class introduces no additional instance slots."""
 
     timestamps: bool = False
+    """Timestamps flag used by ``QueueRetryCommand``."""
     signature: str = "queue:retry"
+    """Signature identifier: ``queue:retry``."""
     description: str = "Retry a failed job by its identifier."
+    """Description identifier: ``Retry a failed job by its identifier.``."""
     arguments: ClassVar[list[Argument]] = [
         Argument(name_or_flags="id", type_=str, help="Failed job identifier."),
     ]
+    """Command-line argument declarations accepted by this command."""
 
     async def handle(self, manager: IQueueManager) -> int:
         """
@@ -22,7 +29,7 @@ class QueueRetryCommand(BaseCommand):
 
         Parameters
         ----------
-        manager : IQueueManager
+        manager : orionis.queues.contracts.manager.IQueueManager
             Queue manager coordinating dispatch and failure record removal.
 
         Returns

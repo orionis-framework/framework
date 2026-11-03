@@ -1,3 +1,5 @@
+"""Define the contract for reflection concrete implementations."""
+
 from __future__ import annotations
 from abc import ABC, abstractmethod
 from typing import Any, TYPE_CHECKING
@@ -12,6 +14,7 @@ if TYPE_CHECKING:
 class IReflectionConcrete(ABC):
 
     # ruff: noqa: ANN401
+    """Define the contract for reflection concrete implementations."""
 
     @abstractmethod
     def getClass(self) -> type:
@@ -20,7 +23,7 @@ class IReflectionConcrete(ABC):
 
         Returns
         -------
-        Type
+        typing.Type
             The class type provided during initialization.
         """
 
@@ -151,12 +154,12 @@ class IReflectionConcrete(ABC):
         ----------
         name : str
             Name of the attribute to retrieve.
-        default : Any, optional
+        default : typing.Any, optional
             Value to return if the attribute is not found. Defaults to None.
 
         Returns
         -------
-        Any
+        typing.Any
             Value of the attribute if found, otherwise the default value.
         """
 
@@ -282,7 +285,7 @@ class IReflectionConcrete(ABC):
         """
         Return all magic (dunder) class attributes.
 
-        This method is an alias for `getDunderAttributes()` and provides access
+        This method is an alias for ``getDunderAttributes()`` and provides access
         to double underscore attributes.
 
         Returns
@@ -319,7 +322,7 @@ class IReflectionConcrete(ABC):
         ----------
         name : str
             Name for the new method.
-        method : Callable
+        method : collections.abc.Callable
             Callable object to set as a method.
 
         Returns
@@ -369,7 +372,7 @@ class IReflectionConcrete(ABC):
 
         Returns
         -------
-        inspect.Signature
+        ``inspect.Signature``
             Signature object containing parameter and return information.
 
         Raises
@@ -834,7 +837,7 @@ class IReflectionConcrete(ABC):
 
         Returns
         -------
-        Any
+        typing.Any
             The current value of the property.
 
         Raises
@@ -855,7 +858,7 @@ class IReflectionConcrete(ABC):
 
         Returns
         -------
-        inspect.Signature
+        ``inspect.Signature``
             The signature object of the property's getter function.
 
         Raises
@@ -892,7 +895,7 @@ class IReflectionConcrete(ABC):
 
         Returns
         -------
-        inspect.Signature
+        ``inspect.Signature``
             Signature object for the __init__ method, containing parameter
             information.
         """
@@ -907,7 +910,7 @@ class IReflectionConcrete(ABC):
 
         Returns
         -------
-        Signature
+        orionis.introspection.dependencies.entities.signature.Signature
             Structured representation of resolved and unresolved dependencies.
         """
 
@@ -923,7 +926,7 @@ class IReflectionConcrete(ABC):
 
         Returns
         -------
-        Signature
+        orionis.introspection.dependencies.entities.signature.Signature
             Structured representation of resolved and unresolved dependencies.
 
         Raises

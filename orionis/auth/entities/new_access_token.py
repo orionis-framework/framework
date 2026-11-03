@@ -1,3 +1,5 @@
+"""Pair a freshly issued token with its plain text value."""
+
 from dataclasses import dataclass, field
 from orionis.auth.entities.access_token import AccessToken
 
@@ -13,7 +15,7 @@ class NewAccessToken:
 
     Attributes
     ----------
-    access_token : AccessToken
+    access_token : orionis.auth.entities.AccessToken
         Metadata of the stored token.
     plain_text : str
         Value the client must send in the ``Authorization`` header. It is

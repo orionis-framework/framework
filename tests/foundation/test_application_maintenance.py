@@ -98,7 +98,7 @@ class _ReadableMarker:
         self.read_count = 0
         self.read_lock = Lock()
 
-    def read_text(self, *, encoding: str) -> str:
+    def readText(self, *, encoding: str) -> str:
         """Read the marker or raise the configured filesystem error.
 
         Parameters
@@ -116,6 +116,9 @@ class _ReadableMarker:
         if self.error:
             raise PermissionError
         return self.path.read_text(encoding=encoding)
+
+    # Preserve the pathlib.Path protocol name.
+    read_text = readText
 
 class TestApplicationMaintenance(TestCase):
     """Verify runtime maintenance state follows its shared state file."""

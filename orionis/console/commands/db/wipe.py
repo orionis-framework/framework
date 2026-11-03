@@ -1,3 +1,8 @@
+"""Provide console commands db operations.
+
+Includes ``WipeResult``, ``DatabaseWiper``, ``DbWipeCommand``.
+"""
+
 import sys
 from dataclasses import dataclass
 from itertools import chain
@@ -13,13 +18,17 @@ class WipeResult:
     """Store counts for objects removed by a database wipe."""
 
     tables: int
+    """Number of database tables removed by the wipe operation."""
     views: int
+    """Number of database views removed by the wipe operation."""
     types: int
+    """Number of user-defined database types removed by the wipe operation."""
 
 class DatabaseWiper:
     """Remove user-defined objects from a selected connection."""
 
     __slots__ = ("_inspector",)
+    """Declare the instance attribute slots reserved by this class."""
 
     def __init__(self, inspector: DatabaseInspector) -> None:
         """
@@ -27,7 +36,7 @@ class DatabaseWiper:
 
         Parameters
         ----------
-        inspector : DatabaseInspector
+        inspector : orionis.console.commands.db._inspection.DatabaseInspector
             Inspector for the target database connection.
 
         Returns
@@ -36,6 +45,7 @@ class DatabaseWiper:
             Complete the documented operation without returning a value.
         """
         self._inspector = inspector
+        """Inspector for the target database connection."""
 
     async def wipe(self) -> WipeResult:
         """
@@ -43,7 +53,7 @@ class DatabaseWiper:
 
         Returns
         -------
-        WipeResult
+        orionis.console.commands.db.wipe.WipeResult
             Number of tables, views, and types found before removal.
         """
         inspector = self._inspector
@@ -586,7 +596,12 @@ class DbWipeCommand(BaseCommand):
     # ruff: noqa: TC001
 
     signature: str = "db:wipe"
+    """Signature identifier: ``db:wipe``."""
     description: str = "Drop all user tables, views, and types in a database."
+    """
+    Description identifier: ``Drop all user tables, views, and types in a
+    database.``.
+    """
     arguments: ClassVar[list[Argument]] = [
         Argument(
             name_or_flags=["--database", "-d"],
@@ -602,6 +617,7 @@ class DbWipeCommand(BaseCommand):
             help="Wipe without an interactive confirmation.",
         ),
     ]
+    """Command-line argument declarations accepted by this command."""
 
     async def handle(self, conn_manager: IConnectionManager) -> int:
         """
@@ -609,7 +625,7 @@ class DbWipeCommand(BaseCommand):
 
         Parameters
         ----------
-        conn_manager : IConnectionManager
+        conn_manager : orionis.database.contracts.IConnectionManager
             Manager resolving the requested database connection.
 
         Returns

@@ -1,3 +1,5 @@
+"""Normalize server operations without owning application lifecycle state."""
+
 from abc import ABC, abstractmethod
 from typing import TYPE_CHECKING
 
@@ -9,6 +11,7 @@ class IWebSocketTransport(ABC):
     """Normalize server operations without owning application lifecycle state."""
 
     __slots__ = ()
+    """Declare that this class introduces no additional instance slots."""
 
     @property
     def supportsCloseDetails(self) -> bool:
@@ -34,7 +37,7 @@ class IWebSocketTransport(ABC):
         ----------
         subprotocol : str | None, optional
             Negotiated client-offered subprotocol.
-        headers : Mapping[str, str] | None, optional
+        headers : collections.abc.Mapping[str, str] | None, optional
             Additional handshake response headers when supported.
 
         Returns
@@ -50,7 +53,7 @@ class IWebSocketTransport(ABC):
 
         Returns
         -------
-        WebSocketMessage
+        orionis.http.WebSocketMessage
             Text, binary or disconnect event.
         """
 

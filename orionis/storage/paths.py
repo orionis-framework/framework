@@ -1,3 +1,5 @@
+"""Provide storage operations through ``normalize_path``, ``normalize_file_path``."""
+
 from __future__ import annotations
 from orionis.storage.exceptions import StoragePathException
 
@@ -24,7 +26,7 @@ def normalize_path(path: str) -> str:
 
     Raises
     ------
-    StoragePathException
+    orionis.storage.exceptions.StoragePathException
         If the path contains a null byte, a ``:`` character, or a
         ``..`` sequence that escapes the disk root.
     """
@@ -61,7 +63,7 @@ def normalize_file_path(path: str) -> str:
     """
     Normalize a storage path and require it to reference a file.
 
-    Apply :func:`normalize_path` and additionally reject the empty
+    Apply :func:`orionis.storage.paths.normalize_path` and additionally reject the empty
     result, since the disk root can never be treated as a file.
 
     Parameters
@@ -76,7 +78,7 @@ def normalize_file_path(path: str) -> str:
 
     Raises
     ------
-    StoragePathException
+    orionis.storage.exceptions.StoragePathException
         If the path is invalid or resolves to the disk root.
     """
     # Reuse the shared normalization rules for consistency.
@@ -93,6 +95,7 @@ _LEGACY_EXPORTS = {
     "normalizePath": normalize_path,
     "normalizeFilePath": normalize_file_path,
 }
+"""Legacy exports definitions used by ``paths``."""
 
 def __getattr__(name: str) -> object:
     """

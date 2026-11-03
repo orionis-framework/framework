@@ -150,7 +150,7 @@ class TestConfigBootstrapper(unittest.TestCase):
         for path, content in files.items():
             self.responses[_RAW_ROOT + path] = content
 
-    def test_downloads_only_config_from_master_and_preserves_byte_content(self) -> None:
+    def testDownloadsOnlyConfigFromMasterAndPreservesByteContent(self) -> None:
         """Restore nested configuration and exclude unrelated files.
 
         Returns
@@ -186,7 +186,7 @@ class TestConfigBootstrapper(unittest.TestCase):
                 self.assertFalse((self.base / path).exists())
         self.assertEqual({path.name for path in self.base.iterdir()}, {"config"})
 
-    def test_preserves_existing_files_and_second_run_only_lists_tree(self) -> None:
+    def testPreservesExistingFilesAndSecondRunOnlyListsTree(self) -> None:
         """Keep developer changes and avoid redundant blob requests or writes.
 
         Returns
@@ -217,7 +217,7 @@ class TestConfigBootstrapper(unittest.TestCase):
         self.assertEqual(existing.stat().st_mtime_ns, original_mtime)
         self.assertEqual((config / "database.py").stat().st_mtime_ns, created_mtime)
 
-    def test_selected_file_downloads_only_requested_configuration(self) -> None:
+    def testSelectedFileDownloadsOnlyRequestedConfiguration(self) -> None:
         """Restore one requested module without downloading its siblings.
 
         Returns
@@ -245,7 +245,7 @@ class TestConfigBootstrapper(unittest.TestCase):
             {path.name for path in (self.base / "config").iterdir()}, {"app.py"},
         )
 
-    def test_selection_accepts_new_names_from_remote_tree(self) -> None:
+    def testSelectionAcceptsNewNamesFromRemoteTree(self) -> None:
         """Discover selectable modules from GitHub instead of a fixed list.
 
         Returns
@@ -271,7 +271,7 @@ class TestConfigBootstrapper(unittest.TestCase):
         self.assertIn(("CREATED", "config/observability.py"), result)
         self.assertFalse((self.base / "config" / "app.py").exists())
 
-    def test_selection_preserves_existing_file_without_blob_requests(self) -> None:
+    def testSelectionPreservesExistingFileWithoutBlobRequests(self) -> None:
         """Keep selected local bytes and timestamps without fetching any blob.
 
         Returns
@@ -294,7 +294,7 @@ class TestConfigBootstrapper(unittest.TestCase):
         self.assertEqual(existing.stat().st_mtime_ns, original_mtime)
         self.assertFalse((self.base / "config" / "auth.py").exists())
 
-    def test_unknown_selection_lists_only_remote_modules_before_writes(self) -> None:
+    def testUnknownSelectionListsOnlyRemoteModulesBeforeWrites(self) -> None:
         """Reject unknown names and list sorted top-level Python module names.
 
         Returns
@@ -325,7 +325,7 @@ class TestConfigBootstrapper(unittest.TestCase):
                 self.assertEqual(self.urls, [_TREE_URL])
                 self.assertEqual(list(self.base.iterdir()), [])
 
-    def test_command_reports_created_then_exists_for_selected_file(self) -> None:
+    def testCommandReportsCreatedThenExistsForSelectedFile(self) -> None:
         """Pass parsed selection through handle and report both resource states.
 
         Returns
@@ -354,7 +354,7 @@ class TestConfigBootstrapper(unittest.TestCase):
         self.assertFalse((self.base / "config" / "auth.py").exists())
         self.assertEqual(self.urls.count(_RAW_ROOT + "config/app.py"), 1)
 
-    def test_command_without_file_restores_all_configuration(self) -> None:
+    def testCommandWithoutFileRestoresAllConfiguration(self) -> None:
         """Retain complete restoration when the optional argument is omitted.
 
         Returns
@@ -376,7 +376,7 @@ class TestConfigBootstrapper(unittest.TestCase):
         self.assertEqual((self.base / "config" / "app.py").read_bytes(), b"app")
         self.assertEqual((self.base / "config" / "auth.py").read_bytes(), b"auth")
 
-    def test_command_reports_unknown_selection_and_returns_one(self) -> None:
+    def testCommandReportsUnknownSelectionAndReturnsOne(self) -> None:
         """Surface unknown selections through command output and a failing code.
 
         Returns
@@ -402,7 +402,7 @@ class TestConfigBootstrapper(unittest.TestCase):
         self.assertEqual(self.urls, [_TREE_URL])
         self.assertEqual(list(self.base.iterdir()), [])
 
-    def test_respects_effective_custom_config_path(self) -> None:
+    def testRespectsEffectiveCustomConfigPath(self) -> None:
         """Use the application's loaded path instead of hardcoding config/.
 
         Returns
@@ -438,7 +438,7 @@ class TestConfigBootstrapper(unittest.TestCase):
         self.assertIn(("CREATED", "settings/runtime/app.py"), result)
         self.assertFalse((self.base / "config").exists())
 
-    def test_resolves_relative_custom_path_against_application_base(self) -> None:
+    def testResolvesRelativeCustomPathAgainstApplicationBase(self) -> None:
         """Interpret relative effective paths from the project root.
 
         Returns
@@ -471,7 +471,7 @@ class TestConfigBootstrapper(unittest.TestCase):
 
         self.assertTrue((self.base / "settings" / "app.py").is_file())
 
-    def test_network_failure_keeps_project_unchanged(self) -> None:
+    def testNetworkFailureKeepsProjectUnchanged(self) -> None:
         """Preserve the project when the master tree cannot be downloaded.
 
         Returns
@@ -488,7 +488,7 @@ class TestConfigBootstrapper(unittest.TestCase):
 
         self.assertEqual(list(self.base.iterdir()), [])
 
-    def test_blob_failure_does_not_write_previously_downloaded_files(self) -> None:
+    def testBlobFailureDoesNotWritePreviouslyDownloadedFiles(self) -> None:
         """Stage all remote responses before making filesystem changes.
 
         Returns
@@ -506,7 +506,7 @@ class TestConfigBootstrapper(unittest.TestCase):
 
         self.assertEqual(list(self.base.iterdir()), [])
 
-    def test_invalid_http_status_is_an_error(self) -> None:
+    def testInvalidHttpStatusIsAnError(self) -> None:
         """Reject HTTP responses even when a response body is available.
 
         Returns
@@ -523,7 +523,7 @@ class TestConfigBootstrapper(unittest.TestCase):
             ConfigBootstrapper(self.app).bootstrap()
         self.assertFalse((self.base / "config").exists())
 
-    def test_incorrect_blob_bytes_are_rejected(self) -> None:
+    def testIncorrectBlobBytesAreRejected(self) -> None:
         """Check size and Git object digest to reject corrupt success responses.
 
         Returns
@@ -540,7 +540,7 @@ class TestConfigBootstrapper(unittest.TestCase):
 
         self.assertFalse((self.base / "config").exists())
 
-    def test_interrupted_response_identifies_failed_resource(self) -> None:
+    def testInterruptedResponseIdentifiesFailedResource(self) -> None:
         """Translate interrupted HTTP body reads into a handled download error.
 
         Returns
@@ -560,7 +560,7 @@ class TestConfigBootstrapper(unittest.TestCase):
             ConfigBootstrapper(self.app).bootstrap()
         self.assertEqual(list(self.base.iterdir()), [])
 
-    def test_invalid_blob_metadata_is_rejected_before_downloads(self) -> None:
+    def testInvalidBlobMetadataIsRejectedBeforeDownloads(self) -> None:
         """Require valid sizes and Git hashes before requesting any file bytes.
 
         Returns
@@ -581,7 +581,7 @@ class TestConfigBootstrapper(unittest.TestCase):
         self.assertEqual(self.urls, [_TREE_URL] * 4)
         self.assertEqual(list(self.base.iterdir()), [])
 
-    def test_invalid_tree_responses_are_rejected(self) -> None:
+    def testInvalidTreeResponsesAreRejected(self) -> None:
         """Handle malformed, missing and truncated manifests explicitly.
 
         Returns
@@ -604,7 +604,7 @@ class TestConfigBootstrapper(unittest.TestCase):
                     ConfigBootstrapper(self.app).bootstrap()
         self.assertFalse((self.base / "config").exists())
 
-    def test_remote_traversal_and_links_are_rejected_before_writes(self) -> None:
+    def testRemoteTraversalAndLinksAreRejectedBeforeWrites(self) -> None:
         """Validate portable paths and refuse remote symlinks or submodules.
 
         Returns
@@ -636,7 +636,7 @@ class TestConfigBootstrapper(unittest.TestCase):
                     ConfigBootstrapper(self.app).bootstrap()
         self.assertEqual(list(self.base.iterdir()), [])
 
-    def test_duplicate_remote_paths_are_rejected(self) -> None:
+    def testDuplicateRemotePathsAreRejected(self) -> None:
         """Reject duplicate and platform-dependent case collisions.
 
         Returns
@@ -657,7 +657,7 @@ class TestConfigBootstrapper(unittest.TestCase):
 
         self.assertFalse((self.base / "config").exists())
 
-    def test_existing_directory_cannot_stand_in_for_a_config_file(self) -> None:
+    def testExistingDirectoryCannotStandInForAConfigFile(self) -> None:
         """Report a conflicting local resource instead of announcing success.
 
         Returns
@@ -674,7 +674,7 @@ class TestConfigBootstrapper(unittest.TestCase):
 
         self.assertTrue((self.base / "config" / "app.py").is_dir())
 
-    def test_local_directory_link_cannot_escape_config(self) -> None:
+    def testLocalDirectoryLinkCannotEscapeConfig(self) -> None:
         """Protect the config boundary from preexisting links to outside paths.
 
         Returns

@@ -1,3 +1,5 @@
+"""Define the authenticated state bound to a single request."""
+
 from abc import ABC, abstractmethod
 from typing import TYPE_CHECKING
 
@@ -15,6 +17,7 @@ class IAuthenticationContext(ABC):
     """
 
     __slots__ = ()
+    """Declare that this class introduces no additional instance slots."""
 
     @property
     @abstractmethod
@@ -24,7 +27,7 @@ class IAuthenticationContext(ABC):
 
         Returns
         -------
-        IAuthenticatable | None
+        orionis.auth.contracts.IAuthenticatable | None
             Resolved identity, or ``None`` for a guest request.
         """
 
@@ -111,7 +114,7 @@ class IAuthenticationContext(ABC):
 
         Returns
         -------
-        IAuthorizationSnapshot
+        orionis.auth.contracts.IAuthorizationSnapshot
             Immutable view of the permissions, roles and abilities that
             apply to the current request.
         """

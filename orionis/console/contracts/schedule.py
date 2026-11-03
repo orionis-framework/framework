@@ -1,3 +1,5 @@
+"""Define the contract for schedule implementations."""
+
 from __future__ import annotations
 from abc import ABC, abstractmethod
 from typing import Self, TYPE_CHECKING
@@ -8,6 +10,7 @@ if TYPE_CHECKING:
     from orionis.console.fluent.contracts.task import ITask
 
 class ISchedule(ABC):
+    """Define the contract for schedule implementations."""
 
     @abstractmethod
     async def info(self) -> list[dict]:
@@ -46,14 +49,14 @@ class ISchedule(ABC):
 
         Parameters
         ----------
-        event : SchedulerEvent
+        event : orionis.console.enums.SchedulerEvent
             The scheduler event to listen for.
-        listener : Callable
+        listener : collections.abc.Callable
             The callable to invoke when the event occurs.
 
         Returns
         -------
-        Self
+        typing.Self
             The Schedule instance for method chaining.
 
         Raises
@@ -129,7 +132,7 @@ class ISchedule(ABC):
 
         Returns
         -------
-        ITask
+        orionis.console.fluent.contracts.task.ITask
             Task instance for further configuration.
 
         Raises
@@ -255,11 +258,6 @@ class ISchedule(ABC):
         """
         Pause the scheduler if it is running.
 
-        Parameters
-        ----------
-        self : Schedule
-            The Schedule instance.
-
         Returns
         -------
         bool
@@ -275,11 +273,6 @@ class ISchedule(ABC):
     def resume(self) -> bool:
         """
         Resume the scheduler if it is paused.
-
-        Parameters
-        ----------
-        self : Schedule
-            The Schedule instance.
 
         Returns
         -------

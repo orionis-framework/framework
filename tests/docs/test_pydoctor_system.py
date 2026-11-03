@@ -201,6 +201,34 @@ value: "not a valid type!"
         self.assertGreater(system.violations, 0)
         self.assertIn("syntax error in annotation", diagnostics)
 
+    def testSchemaPreparationTypesRenderWithoutUnavailableLinks(self) -> None:
+        """Keep ellipses and external schema types literal in production docstrings.
+
+        Returns
+        -------
+        None
+            Reject unsupported link targets when rendering schema preparation docs.
+        """
+        from pydoctor import epydoc2stan, model # pyright: ignore[reportMissingImports]
+        from pydoctor.stanutils import flatten # pyright: ignore[reportMissingImports]
+
+        schemas = Path(__file__).resolve().parents[2] / "orionis" / "schemas"
+        for filename in ("coercion.py", "instance_payload.py"):
+            with self.subTest(module=filename):
+                system, diagnostics = self._buildSystem(
+                    (schemas / filename).read_text(encoding="utf-8"),
+                )
+                output = io.StringIO()
+                with contextlib.redirect_stdout(output):
+                    for obj in system.allobjects.values():
+                        if isinstance(obj, model.Function):
+                            flatten(epydoc2stan.format_docstring(obj))
+                diagnostics += output.getvalue()
+                for target in ("...", "msgspec.Struct"):
+                    self.assertNotIn(
+                        f'Cannot find link target for "{target}"', diagnostics,
+                    )
+
     def testCaseInsensitivePageNamesRemainDistinct(self) -> None:
         """Keep a re-exported class from overwriting its module on Windows.
 

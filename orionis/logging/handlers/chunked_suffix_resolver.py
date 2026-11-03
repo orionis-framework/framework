@@ -1,3 +1,5 @@
+"""Resolve log suffixes for configured time chunks."""
+
 from __future__ import annotations
 from datetime import datetime, timedelta
 from threading import Lock
@@ -5,8 +7,10 @@ from orionis.logging.contracts.suffix_resolver import SuffixResolver
 from orionis.support.facades.datetime import DateTime
 
 class ChunkedSuffixResolver(SuffixResolver):
+    """Resolve log suffixes for configured time chunks."""
 
     __slots__ = ("_counter", "_lock", "tz")
+    """Declare the instance attribute slots reserved by this class."""
 
     def __init__(self) -> None:
         """
@@ -20,8 +24,11 @@ class ChunkedSuffixResolver(SuffixResolver):
             This method does not return a value.
         """
         self._counter = 0
+        """Counter value used by ``ChunkedSuffixResolver``."""
         self._lock = Lock()
+        """Lock protecting concurrent access to shared state."""
         self.tz = DateTime.getZoneInfo()
+        """Tz produced by ``DateTime.getZoneInfo``."""
 
     def getSuffix(self, dt: datetime | None = None) -> str:
         """
@@ -29,7 +36,7 @@ class ChunkedSuffixResolver(SuffixResolver):
 
         Parameters
         ----------
-        dt : datetime or None, optional
+        dt : datetime.datetime or None, optional
             The datetime to use for the suffix. If None, uses current time.
 
         Returns
@@ -51,12 +58,12 @@ class ChunkedSuffixResolver(SuffixResolver):
 
         Parameters
         ----------
-        current_time : datetime
+        current_time : datetime.datetime
             The current datetime.
 
         Returns
         -------
-        datetime
+        datetime.datetime
             The next rotation time. For size-based rotation, this is
             current_time plus one hour.
         """

@@ -1,8 +1,13 @@
+"""Define the contract for performance counter implementations."""
+
 from __future__ import annotations
 from abc import ABC, abstractmethod
 
 class IPerformanceCounter(ABC):
+    """Define the contract for performance counter implementations."""
+
     __slots__ = ()
+    """Declare that this class introduces no additional instance slots."""
 
     @abstractmethod
     def start(self) -> IPerformanceCounter:
@@ -13,7 +18,7 @@ class IPerformanceCounter(ABC):
 
         Returns
         -------
-        IPerformanceCounter
+        orionis.support.performance.contracts.counter.IPerformanceCounter
             This instance for method chaining.
         """
 
@@ -26,7 +31,7 @@ class IPerformanceCounter(ABC):
 
         Returns
         -------
-        IPerformanceCounter
+        orionis.support.performance.contracts.counter.IPerformanceCounter
             The current instance for method chaining.
         """
 
@@ -36,11 +41,11 @@ class IPerformanceCounter(ABC):
         Stop the performance counter and compute elapsed time.
 
         Records the current high-resolution time as the end time and computes the
-        elapsed time since `start()` was called.
+        elapsed time since ``start()`` was called.
 
         Returns
         -------
-        IPerformanceCounter
+        orionis.support.performance.contracts.counter.IPerformanceCounter
             The current instance for method chaining.
 
         Raises
@@ -57,11 +62,11 @@ class IPerformanceCounter(ABC):
         Stop the performance counter asynchronously.
 
         Records the current high-resolution time as the end time and computes the
-        elapsed time since `astart()` was called.
+        elapsed time since ``astart()`` was called.
 
         Returns
         -------
-        IPerformanceCounter
+        orionis.support.performance.contracts.counter.IPerformanceCounter
             This instance for method chaining.
 
         Raises
@@ -204,7 +209,7 @@ class IPerformanceCounter(ABC):
 
         Returns
         -------
-        IPerformanceCounter
+        orionis.support.performance.contracts.counter.IPerformanceCounter
             This instance for method chaining.
         """
 
@@ -218,6 +223,6 @@ class IPerformanceCounter(ABC):
 
         Returns
         -------
-        IPerformanceCounter
+        orionis.support.performance.contracts.counter.IPerformanceCounter
             This instance for method chaining.
         """

@@ -1,3 +1,9 @@
+"""Provide foundation lifespan operations.
+
+Includes ``before_shutdown_orionis_generator``,
+``after_shutdown_orionis_generator``, ``shutdown_orionis_generator``.
+"""
+
 from __future__ import annotations
 import time
 from typing import TYPE_CHECKING
@@ -12,6 +18,7 @@ if TYPE_CHECKING:
 
 # Shared terminal output interface reused across all shutdown display functions
 _console = Console()
+"""Shared terminal output interface reused across all shutdown display functions."""
 
 # Pre-built static panel displayed while the server is stopping
 _BEFORE_SHUTDOWN_PANEL: Panel = Panel(
@@ -20,6 +27,7 @@ _BEFORE_SHUTDOWN_PANEL: Panel = Panel(
     border_style="red",
     padding=(1, 1),
 )
+"""Pre-built static panel displayed while the server is stopping."""
 
 def before_shutdown_orionis_generator() -> None:
     """
@@ -96,12 +104,12 @@ def shutdown_orionis_generator(
 
     Parameters
     ----------
-    app : IApplication
+    app : orionis.IApplication
         Application instance used to read mode flags and the startup timestamp.
 
     Returns
     -------
-    Generator[None]
+    collections.abc.Generator[None]
         Yields once; pre-shutdown runs before the yield, post-shutdown after.
     """
     print_panel: bool = app.isDebug() and not app.isProduction()

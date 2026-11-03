@@ -1,3 +1,5 @@
+"""Apply every migration that has not been run yet."""
+
 from typing import ClassVar
 from orionis.console.args.argument import Argument
 from orionis.console.commands.migrate.base import MigrationCommand
@@ -10,7 +12,9 @@ class MigrateCommand(MigrationCommand):
     # ruff: noqa: TC001
 
     signature: str = "migrate"
+    """Signature identifier: ``migrate``."""
     description: str = "Runs all pending database migrations."
+    """Description identifier: ``Runs all pending database migrations.``."""
 
     arguments: ClassVar[list[Argument]] = [
         *MigrationCommand.arguments,
@@ -22,6 +26,7 @@ class MigrateCommand(MigrationCommand):
             dest="seed",
         ),
     ]
+    """Command-line argument declarations accepted by this command."""
 
     async def handle(
         self,
@@ -33,9 +38,9 @@ class MigrateCommand(MigrationCommand):
 
         Parameters
         ----------
-        migrator : Migrator
+        migrator : orionis.database.migrations.Migrator
             Service that discovers and applies pending migrations.
-        seeder_runner : SeederRunner
+        seeder_runner : orionis.database.seeders.SeederRunner
             Service that runs pending seeders when ``--seed`` is selected.
 
         Returns

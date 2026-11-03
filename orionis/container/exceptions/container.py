@@ -1,3 +1,5 @@
+"""Raise when a circular dependency is detected in the Orionis container."""
+
 class CircularDependencyException(Exception):
     """
     Raise when a circular dependency is detected in the Orionis container.

@@ -1,3 +1,5 @@
+"""Build route definitions through chainable routing options."""
+
 from __future__ import annotations
 from typing import TYPE_CHECKING, Self
 from orionis.http.routes.contracts.fluent import IFluentRoute
@@ -16,6 +18,41 @@ if TYPE_CHECKING:
     from orionis.realtime.hub import Hub
 
 class FluentRoute(IFluentRoute):
+    """
+    Build route definitions through chainable routing options.
+
+    Attributes
+    ----------
+    __method
+        HTTP method (e.g., 'GET', 'POST').
+    __path
+        Route path.
+    __id
+        Identifier used to correlate or locate this protocol or storage record.
+    __class
+        Controller class selected to handle the route.
+    __handler
+        Callable or method selected to handle the registered operation.
+    __callable_handler
+        Direct callable selected as the route action.
+    __name
+        Name identifying this declaration within its containing registry.
+    __middleware
+        Middleware applied around the route handler.
+    __without_middleware
+        Without middleware produced by ``set``.
+    __kind
+        Kind identifier: ``web``.
+    __public
+        Whether the route is marked for public access.
+    __view
+        Template name rendered directly by the kernel. When given, the route carries no
+        Python handler and *action* is not parsed.
+    __hub
+        Realtime hub class attached to the route.
+    __hub_protocol
+        Wire protocol selected for the realtime hub route.
+    """
 
     _ALLOWED_METHODS: frozenset[str] = frozenset({
         "GET",
@@ -26,6 +63,7 @@ class FluentRoute(IFluentRoute):
         "QUERY",
         "WEBSOCKET",
     })
+    """Allowed methods used by ``FluentRoute``."""
 
     def __init__(
         self,
@@ -44,7 +82,7 @@ class FluentRoute(IFluentRoute):
             HTTP method (e.g., 'GET', 'POST').
         path : str
             Route path.
-        action : RouteAction | None, optional
+        action : orionis.http.routes.types.RouteAction | None, optional
             Action to execute. Three forms are accepted:
 
             * **Invokable controller** - bare class that defines ``__call__``::
@@ -166,7 +204,7 @@ class FluentRoute(IFluentRoute):
 
         Returns
         -------
-        Self
+        typing.Self
             This FluentRoute instance for method chaining.
         """
         _callable, _handler = parse_action([controller, handler])
@@ -184,14 +222,14 @@ class FluentRoute(IFluentRoute):
 
         Parameters
         ----------
-        hub : type[Hub]
+        hub : type[orionis.realtime.Hub]
             Concrete Hub subclass resolved through the application container.
         protocol : str
             Realtime codec name: ``json`` or ``msgpack``.
 
         Returns
         -------
-        Self
+        typing.Self
             This connection route with an explicit Hub action.
 
         Raises
@@ -228,7 +266,7 @@ class FluentRoute(IFluentRoute):
 
         Returns
         -------
-        Self
+        typing.Self
             This FluentRoute instance for method chaining.
         """
         if not isinstance(name, str):
@@ -241,7 +279,8 @@ class FluentRoute(IFluentRoute):
         return self
 
     def public(self, *, enabled: bool = True) -> Self:
-        """Select a stateless route without automatic session or identity setup.
+        """
+        Select a stateless route without automatic session or identity setup.
 
         Global security, CORS, rate limits, and explicitly attached middleware
         still run. Web session, CSRF, and automatic identity resolution do not.
@@ -255,7 +294,7 @@ class FluentRoute(IFluentRoute):
 
         Returns
         -------
-        Self
+        typing.Self
             This route with the requested execution profile.
 
         Raises
@@ -278,14 +317,14 @@ class FluentRoute(IFluentRoute):
 
         Parameters
         ----------
-        *middleware : MiddlewareInput
+        *middleware : orionis.http.routes.types.MiddlewareInput
             One or more middleware classes (not instances) to attach.
             Classes may be passed individually or wrapped in a
             ``list``, ``tuple`` or ``set``.
 
         Returns
         -------
-        Self
+        typing.Self
             This FluentRoute instance for method chaining.
         """
         self.__middleware.extend(flatten_middleware(*middleware))
@@ -300,14 +339,14 @@ class FluentRoute(IFluentRoute):
 
         Parameters
         ----------
-        *middleware : MiddlewareInput
+        *middleware : orionis.http.routes.types.MiddlewareInput
             One or more middleware classes to exclude from this route.
             Classes may be passed individually or wrapped in a
             ``list``, ``tuple`` or ``set``.
 
         Returns
         -------
-        Self
+        typing.Self
             This FluentRoute instance for method chaining.
         """
         self.__without_middleware.update(flatten_middleware(*middleware))
@@ -324,7 +363,7 @@ class FluentRoute(IFluentRoute):
 
         Returns
         -------
-        Self
+        typing.Self
             This FluentRoute instance for method chaining.
         """
         if not isinstance(prefix, str):
@@ -344,22 +383,23 @@ class FluentRoute(IFluentRoute):
         *,
         public: bool | None = None,
     ) -> Self:
-        """Apply validated group context during registration.
+        """
+        Apply validated group context during registration.
 
         Parameters
         ----------
         prefix : str
             Canonical prefix without a trailing slash, or an empty string.
-        middleware : tuple[type[BaseMiddleware], ...]
+        middleware : tuple[type[orionis.http.BaseMiddleware], ``...``]
             Parent middleware, in declaration order.
-        without_middleware : frozenset[type[BaseMiddleware]]
+        without_middleware : frozenset[type[orionis.http.BaseMiddleware]]
             Exclusions inherited by the route.
         public : bool | None, optional
             Parent profile applied only when the route has no explicit profile.
 
         Returns
         -------
-        Self
+        typing.Self
             This route with the parent context prepended.
         """
         if prefix:
@@ -382,7 +422,7 @@ class FluentRoute(IFluentRoute):
 
         Returns
         -------
-        Self
+        typing.Self
             This FluentRoute instance for method chaining.
         """
         if not isinstance(kind, str):

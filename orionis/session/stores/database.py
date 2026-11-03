@@ -1,3 +1,5 @@
+"""Session store that persists each session as a row in a database table."""
+
 import asyncio
 import time
 from datetime import UTC, datetime
@@ -22,11 +24,17 @@ if TYPE_CHECKING:
 
 # Default table name used when the session config does not override it.
 _DEFAULT_TABLE = "sessions"
+"""Default table name used when the session config does not override it."""
 
 # Codecs built once: msgspec resolves its internal state at construction time
 # instead of on every encode/decode call.
 _ENCODER = _msgjson.Encoder()
+"""
+Codecs built once: msgspec resolves its internal state at construction time instead
+of on every encode/decode call.
+"""
 _DECODER = _msgjson.Decoder()
+"""Decoder used by ``database``."""
 
 def _build_sessions_table(table: str) -> TableDefinition:
     """
@@ -39,7 +47,7 @@ def _build_sessions_table(table: str) -> TableDefinition:
 
     Returns
     -------
-    TableDefinition
+    orionis.orm.schema.TableDefinition
         Definition with ``id`` (primary key), ``payload`` (JSON data)
         and ``expires_at`` (epoch seconds) columns.
     """
@@ -73,12 +81,14 @@ class DatabaseSessionStore(ISessionStore):
     ``ON CONFLICT`` syntax is required.
 
     Unlike the cache backend, a plain SQL table has no native TTL, so
-    expired rows are evicted lazily on :meth:`read` and can be swept in
-    bulk via :meth:`gc`.
+    expired rows are evicted lazily on
+    :meth:`orionis.session.stores.database.DatabaseSessionStore.read` and can be swept
+    in
+    bulk via :meth:`orionis.session.stores.database.DatabaseSessionStore.gc`.
 
     Parameters
     ----------
-    connection : IConnection
+    connection : orionis.database.contracts.IConnection
         Database connection used to persist session records.
     table : str, optional
         Table name used to store session records.  Defaults to
@@ -92,6 +102,7 @@ class DatabaseSessionStore(ISessionStore):
         "_ready_lock",
         "_table",
     )
+    """Declare the instance attribute slots reserved by this class."""
 
     def __init__(self, connection: IConnection, table: str = _DEFAULT_TABLE) -> None:
         """
@@ -99,7 +110,7 @@ class DatabaseSessionStore(ISessionStore):
 
         Parameters
         ----------
-        connection : IConnection
+        connection : orionis.database.contracts.IConnection
             Database connection used to persist session records.
         table : str, optional
             Table name used to store session records.
@@ -107,6 +118,7 @@ class DatabaseSessionStore(ISessionStore):
         Returns
         -------
         None
+            Bind the store to *connection* and the target *table*.
         """
         if not connection.supportsUniqueConstraints():
             message = (
@@ -115,10 +127,15 @@ class DatabaseSessionStore(ISessionStore):
             )
             raise QueryException(message)
         self._connection = connection
+        """Database connection used to persist session records."""
         self._table = table
+        """Table name used to store session records."""
         self._ready = False
+        """Ready flag used by ``DatabaseSessionStore``."""
         self._ready_lock = asyncio.Lock()
+        """Synchronization primitive controlling access to ready lock."""
         self._definition = _build_sessions_table(table)
+        """Original declaration from which runtime metadata was compiled."""
 
     # ── Schema bootstrap ─────────────────────────────────────────────────────
 
@@ -133,7 +150,7 @@ class DatabaseSessionStore(ISessionStore):
 
         Raises
         ------
-        QueryException
+        orionis.database.QueryException
             If the connection cannot create the table.
         """
         await self._ensureSchema()
@@ -145,6 +162,7 @@ class DatabaseSessionStore(ISessionStore):
         Returns
         -------
         None
+            Create the sessions table on first use, if missing.
         """
         if self._ready:
             return
@@ -167,7 +185,7 @@ class DatabaseSessionStore(ISessionStore):
 
         Returns
         -------
-        SessionRecord | None
+        orionis.session.entities.record.SessionRecord | None
             The stored record, or ``None`` when absent, expired or
             corrupted.
         """
@@ -212,12 +230,13 @@ class DatabaseSessionStore(ISessionStore):
 
         Parameters
         ----------
-        record : SessionRecord
+        record : orionis.session.entities.record.SessionRecord
             The record to persist.
 
         Returns
         -------
         None
+            Insert or replace the record keyed by its identifier.
         """
         expiration = int(record.expires_at.timestamp())
 
@@ -250,13 +269,15 @@ class DatabaseSessionStore(ISessionStore):
         session_id : str
             Unique session identifier.
         payload : str
-            JSON-encoded session data already serialized by :meth:`write`.
+            JSON-encoded session data already serialized by
+            :meth:`orionis.session.stores.database.DatabaseSessionStore.write`.
         expiration : int
             Absolute expiration timestamp (whole epoch seconds).
 
         Returns
         -------
         None
+            Insert a new session row, falling back to an update on conflict.
         """
         try:
             async with self._connection.transaction():
@@ -278,11 +299,12 @@ class DatabaseSessionStore(ISessionStore):
                 raise
 
     async def update(self, record: SessionRecord) -> bool:
-        """Update only a live session row with a single SQL statement.
+        """
+        Update only a live session row with a single SQL statement.
 
         Parameters
         ----------
-        record : SessionRecord
+        record : orionis.session.entities.record.SessionRecord
             Replacement payload and expiration.
 
         Returns
@@ -336,6 +358,7 @@ class DatabaseSessionStore(ISessionStore):
         Returns
         -------
         None
+            Remove all rows whose ``expires_at`` is in the past.
         """
         await self._ensureSchema()
         await self._connection.delete(DeletePlan(
@@ -351,7 +374,7 @@ class DatabaseSessionStore(ISessionStore):
 
         Parameters
         ----------
-        data : dict[str, Any]
+        data : dict[str, typing.Any]
             Session data payload to encode.
 
         Returns
@@ -372,7 +395,7 @@ class DatabaseSessionStore(ISessionStore):
 
         Returns
         -------
-        dict[str, Any] | None
+        dict[str, typing.Any] | None
             Decoded data, or ``None`` when *raw* is missing or invalid.
         """
         if raw is None:

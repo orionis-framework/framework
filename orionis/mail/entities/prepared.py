@@ -1,3 +1,5 @@
+"""Carry immutable MIME bytes and a separate validated transport envelope."""
+
 from dataclasses import dataclass
 
 @dataclass(frozen=True, slots=True, kw_only=True)
@@ -8,13 +10,13 @@ class PreparedMail:
     Transports consume this value without seeing templates, Mailable classes,
     storage paths, or a mutable ``EmailMessage``.
 
-    Parameters
+    Attributes
     ----------
     message_id : str
         Message-ID generated once for the operation.
     sender : str
         Envelope sender used by the transport.
-    recipients : tuple[str, ...]
+    recipients : tuple[str, ``...``]
         Deduplicated union of To, Cc, and Bcc addresses.
     mime : bytes
         Serialized message without any Bcc header.

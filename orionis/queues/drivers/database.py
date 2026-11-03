@@ -1,3 +1,5 @@
+"""Persist queued jobs using atomic conditional updates and expiring leases."""
+
 import asyncio
 from typing import TYPE_CHECKING, Self
 from uuid import uuid4
@@ -25,10 +27,13 @@ if TYPE_CHECKING:
     from orionis.queues.entities.envelope import JobEnvelope
 
 _ENCODER = msgspec.json.Encoder()
+"""Encoder used by ``database``."""
 _CLAIM_ROUNDS = 100
+"""Claim rounds value used by ``database``."""
 
 def eligible_clauses(queue: str, now: float) -> list[WhereClause]:
-    """Build predicates for an available or expired queue row.
+    """
+    Build predicates for an available or expired queue row.
 
     Parameters
     ----------
@@ -39,7 +44,7 @@ def eligible_clauses(queue: str, now: float) -> list[WhereClause]:
 
     Returns
     -------
-    list of WhereClause
+    list of orionis.orm.query.WhereClause
         Predicates shared by candidate lookup and atomic claim.
     """
     return [
@@ -65,6 +70,7 @@ class DatabaseQueueDriver(_DatabaseStorage, IQueueDriver):
     """Persist queued jobs using atomic conditional updates and expiring leases."""
 
     __slots__ = ("_connection", "_definition", "_ready", "_ready_lock")
+    """Declare the instance attribute slots reserved by this class."""
 
     def __init__(self: Self, connection: IConnection, table: str = "jobs") -> None:
         """
@@ -72,7 +78,7 @@ class DatabaseQueueDriver(_DatabaseStorage, IQueueDriver):
 
         Parameters
         ----------
-        connection : IConnection
+        connection : orionis.database.contracts.IConnection
             Shared framework connection used for queue persistence.
         table : str, optional
             Logical table name, with the connection prefix applied by DB.
@@ -89,9 +95,13 @@ class DatabaseQueueDriver(_DatabaseStorage, IQueueDriver):
             )
             raise QueueStorageError(error_msg)
         self._connection = connection
+        """Shared framework connection used for queue persistence."""
         self._definition = build_jobs_table(table)
+        """Original declaration from which runtime metadata was compiled."""
         self._ready = False
+        """Ready flag used by ``DatabaseQueueDriver``."""
         self._ready_lock = asyncio.Lock()
+        """Synchronization primitive controlling access to ready lock."""
 
     async def push(self: Self, envelope: JobEnvelope, delay: float = 0) -> str:
         """
@@ -99,7 +109,7 @@ class DatabaseQueueDriver(_DatabaseStorage, IQueueDriver):
 
         Parameters
         ----------
-        envelope : JobEnvelope
+        envelope : orionis.queues.JobEnvelope
             Immutable serialized job configuration and state.
         delay : float, optional
             Seconds before the job becomes available.
@@ -148,12 +158,12 @@ class DatabaseQueueDriver(_DatabaseStorage, IQueueDriver):
 
         Returns
         -------
-        ReservedJob or None
+        orionis.queues.entities.reserved_job.ReservedJob or None
             Acquired reservation, or no available job.
 
         Raises
         ------
-        QueueStorageError
+        orionis.queues.exceptions.QueueStorageError
             If an ambient transaction would prevent committing the claim.
         """
         retry_after = validate_seconds(retry_after, "retry_after", positive=True)
@@ -220,12 +230,12 @@ class DatabaseQueueDriver(_DatabaseStorage, IQueueDriver):
 
         Parameters
         ----------
-        reserved : ReservedJob
+        reserved : orionis.queues.entities.reserved_job.ReservedJob
             Reservation whose ownership must still hold.
 
         Returns
         -------
-        list of WhereClause
+        list of orionis.orm.query.WhereClause
             Predicates fencing reclaimed and expired reservations.
         """
         return [
@@ -240,7 +250,7 @@ class DatabaseQueueDriver(_DatabaseStorage, IQueueDriver):
 
         Parameters
         ----------
-        reserved : ReservedJob
+        reserved : orionis.queues.entities.reserved_job.ReservedJob
             Reservation owned by the releasing worker.
         delay : float, optional
             Seconds before the job becomes available again.
@@ -272,7 +282,7 @@ class DatabaseQueueDriver(_DatabaseStorage, IQueueDriver):
 
         Parameters
         ----------
-        reserved : ReservedJob
+        reserved : orionis.queues.entities.reserved_job.ReservedJob
             Reservation owned by the acknowledging worker.
 
         Returns

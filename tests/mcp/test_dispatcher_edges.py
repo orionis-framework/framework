@@ -104,7 +104,7 @@ class TestDispatcherEdges(TestCase):
         self.app = _Container()
         self.client = await self.mcp(_Server, app=self.app)
 
-    async def test_extension_negotiation_and_typed_params(self):
+    async def testExtensionNegotiationAndTypedParams(self):
         """Extensions require this request's capability and their own decoder.
 
         Returns
@@ -124,7 +124,7 @@ class TestDispatcherEdges(TestCase):
         )
         self.assertEqual(invalid.message["error"]["code"], -32602)
 
-    async def test_invalid_declared_output_with_unset_error(self):
+    async def testInvalidDeclaredOutputWithUnsetError(self):
         """Validate successful raw results even when isError was omitted.
 
         Returns
@@ -136,7 +136,7 @@ class TestDispatcherEdges(TestCase):
         self.assertTrue(result.message["result"]["isError"])
         self.assertNotIn("not an integer", str(result.message))
 
-    async def test_empty_input_responses_disable_resource_cache(self):
+    async def testEmptyInputResponsesDisableResourceCache(self):
         """The presence of a retry field matters even for an empty map.
 
         Returns
@@ -153,7 +153,7 @@ class TestDispatcherEdges(TestCase):
         self.assertEqual(retry.message["result"]["ttlMs"], 0)
         self.assertEqual(retry.message["result"]["cacheScope"], "private")
 
-    async def test_unknown_completion_argument_and_malformed_uri(self):
+    async def testUnknownCompletionArgumentAndMalformedUri(self):
         """Reject client input rather than turning it into an internal error.
 
         Returns
@@ -172,7 +172,7 @@ class TestDispatcherEdges(TestCase):
         for response in (completion, resource):
             self.assertEqual(response.message["error"]["code"], -32602)
 
-    async def test_catalog_limits_and_validation(self):
+    async def testCatalogLimitsAndValidation(self):
         """Catalog calls cannot bypass argument validation or batch bounds.
 
         Returns
@@ -199,7 +199,7 @@ class TestDispatcherEdges(TestCase):
         )
         self.assertEqual(response.message["error"]["code"], -32602)
 
-    async def test_single_catalog_mrtr_and_retry(self):
+    async def testSingleCatalogMrtrAndRetry(self):
         """Surface interim input at the enclosing protocol result boundary.
 
         Returns
@@ -226,7 +226,7 @@ class TestDispatcherEdges(TestCase):
         retried.assertOk()
         self.assertIn("received", str(retried.message))
 
-    async def test_subscription_capacity_and_unstarted_cleanup(self):
+    async def testSubscriptionCapacityAndUnstartedCleanup(self):
         """Reject admission before SSE begins and release unstarted subscriptions.
 
         Returns
@@ -252,15 +252,15 @@ class TestDispatcherEdges(TestCase):
         async with self.app.beginScope():
             first = await client.dispatcher.handle(data)
             self.assertTrue(first.streaming)
-            self.assertEqual(client.dispatcher.bus.listener_count, 1)
+            self.assertEqual(client.dispatcher.bus.listenerCount, 1)
             async with self.app.beginScope():
                 denied = await client.dispatcher.handle(data)
                 self.assertEqual(denied.status, 503)
                 self.assertFalse(denied.streaming)
             await first.body.aclose()
-            self.assertEqual(client.dispatcher.bus.listener_count, 0)
+            self.assertEqual(client.dispatcher.bus.listenerCount, 0)
 
-    async def test_catalog_multi_call_interim_does_not_trigger_batch_replay(self):
+    async def testCatalogMultiCallInterimDoesNotTriggerBatchReplay(self):
         """Prevent retrying earlier side effects through an ambiguous batch interim.
 
         Returns

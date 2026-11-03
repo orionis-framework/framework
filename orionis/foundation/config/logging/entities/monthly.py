@@ -1,3 +1,5 @@
+"""Represent the configuration for monthly log file management."""
+
 from __future__ import annotations
 from dataclasses import dataclass, field
 from orionis.environment import Env
@@ -6,6 +8,7 @@ from orionis.foundation.config.logging.validators import IsValidLevel, IsValidPa
 from orionis.support.entities.base import BaseEntity
 
 _DEFAULT_PATH: str = "storage/logs/monthly_{suffix}.log"
+"""Default path identifier: ``storage/logs/monthly_{suffix}.log``."""
 
 @dataclass(frozen=True, kw_only=True)
 class Monthly(BaseEntity):
@@ -16,7 +19,7 @@ class Monthly(BaseEntity):
     ----------
     path : str
         The file path where the log is stored.
-    level : int | str | Level
+    level : int | str | orionis.foundation.config.logging.Level
         The logging level (e.g., 'info', 'error', 'debug').
     retention_months : int
         The number of months to retain log files before deletion.
@@ -63,7 +66,7 @@ class Monthly(BaseEntity):
 
         Parameters
         ----------
-        self : Monthly
+        self : orionis.foundation.config.logging.Monthly
             Instance of the Monthly configuration entity.
 
         Returns

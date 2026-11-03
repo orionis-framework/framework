@@ -1,3 +1,5 @@
+"""A type for ``int`` integers."""
+
 from __future__ import annotations
 from orionis.orm.schema.column.definition import ColumnDefinition
 from orionis.orm.schema.types.column_type import ColumnType
@@ -6,6 +8,7 @@ class Integer(ColumnDefinition):
     """A type for ``int`` integers."""
 
     __slots__ = ()
+    """Declare that this class introduces no additional instance slots."""
 
     def __init__(self) -> None:
         """

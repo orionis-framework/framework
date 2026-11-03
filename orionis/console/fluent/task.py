@@ -1,3 +1,5 @@
+"""Configure scheduled command execution with fluent scheduling options."""
+
 from __future__ import annotations
 import secrets
 from datetime import datetime
@@ -17,11 +19,19 @@ if TYPE_CHECKING:
 class Task(ITask):
 
     # ruff: noqa: PLR2004, PLR0913
+    """Configure scheduled command execution with fluent scheduling options."""
 
     _ERROR_MSG_INVALID_INTERVAL = "Interval value must be a positive integer."
+    """
+    Error text for error msg invalid interval: ``Interval value must be a positive
+    integer.``.
+    """
     _ERROR_MSG_INVALID_MINUTE = "Minute must be between 0 and 59."
+    """Error text for error msg invalid minute: ``Minute must be between 0 and 59.``."""
     _ERROR_MSG_INVALID_SECOND = "Second must be between 0 and 59."
+    """Error text for error msg invalid second: ``Second must be between 0 and 59.``."""
     _ERROR_MSG_INVALID_HOUR = "Hour must be between 0 and 23."
+    """Error text for error msg invalid hour: ``Hour must be between 0 and 23.``."""
 
     # Map event labels to their listener methods.
     _LISTENER_METHODS_MAP: ClassVar[dict[str, TaskEvent]] = {
@@ -33,6 +43,7 @@ class Task(ITask):
         "onTaskSubmitted": TaskEvent.SUBMITTED,
         "onTaskMaxInstances": TaskEvent.MAX_INSTANCES,
     }
+    """Map event labels to their listener methods."""
 
     def __init__(
         self,
@@ -67,46 +78,60 @@ class Task(ITask):
         """
         # Initialize the default timezone for the event using DateTime utility.
         self.__default_tz = DateTime.getZoneInfo()
+        """Initialize the default timezone for the event using DateTime utility."""
 
         # Store the task's unique signature
         self.__signature: str = signature
+        """Unique identifier for the task. Must be a non-empty string."""
 
         # Store the task's arguments, defaulting to an empty list if None is provided
         self.__args: list[str] | None = args if args is not None else []
+        """List of arguments for the task. Defaults to an empty list if None."""
 
         # Store the task's keyword arguments,
         # defaulting to an empty dict if None is provided
         self.__kwargs: dict | None = kwargs if kwargs is not None else {}
+        """Value supplied for ``kwargs``."""
 
         # Store the task's purpose or description
         self.__purpose: str | None = purpose
+        """Human-readable description or purpose of the task."""
 
         # Initialize the random delay attribute (in seconds) as None
         self.__random_delay: int | None = None
+        """Initialize the random delay attribute (in seconds) as None."""
 
         # Initialize the start date for the task as None
         self.__start_date: datetime | None = None
+        """Initialize the start date for the task as None."""
 
         # Initialize the end date for the task as None
         self.__end_date: datetime | None = None
+        """Initialize the end date for the task as None."""
 
         # Initialize the trigger for the task as None
         self.__trigger: CronTrigger | DateTrigger | IntervalTrigger | None = None
+        """Initialize the trigger for the task as None."""
 
         # Initialize the details for the task as None
         self.__details: str | None = None
+        """Initialize the details for the task as None."""
 
         # Initialize list to hold task event listeners
         self.__listeners: list[Callable] = []
+        """Initialize list to hold task event listeners."""
 
         # Initialize the maximum instances attribute as 1
         self.__max_instances: int | None = None
+        """Initialize the maximum instances attribute as 1."""
 
         # Initialize the misfire grace time attribute as None
         self.__misfire_grace_time: int | None = None
+        """Initialize the misfire grace time attribute as None."""
 
         # Initialize the coalesce attribute as None
         self.__coalesce: bool | None = None
+        """Initialize the coalesce attribute as None."""
 
     def __datetime(
         self,
@@ -140,7 +165,7 @@ class Task(ITask):
 
         Returns
         -------
-        datetime
+        datetime.datetime
             A datetime instance constructed from the provided components.
 
         Raises
@@ -221,7 +246,7 @@ class Task(ITask):
 
         Returns
         -------
-        TaskEntity
+        orionis.console.entities.Task
             The TaskEntity instance containing the task's data.
 
         Raises
@@ -298,7 +323,7 @@ class Task(ITask):
 
         Returns
         -------
-        Task
+        orionis.console.fluent.Task
             The current Task instance for method chaining.
         """
         # Set the internal coalesce attribute to control missed execution behavior.
@@ -322,13 +347,13 @@ class Task(ITask):
 
         Returns
         -------
-        Task
+        orionis.console.fluent.Task
             This instance for method chaining.
 
         Raises
         ------
         ValueError
-            If `seconds` is not a positive integer.
+            If ``seconds`` is not a positive integer.
         """
         # Validate that the seconds parameter is a positive integer.
         if not isinstance(seconds, int) or seconds <= 0:
@@ -356,7 +381,7 @@ class Task(ITask):
 
         Returns
         -------
-        Task
+        orionis.console.fluent.Task
             The current instance for method chaining.
 
         Raises
@@ -404,7 +429,7 @@ class Task(ITask):
 
         Returns
         -------
-        Self
+        typing.Self
             The current Task instance for method chaining.
 
         Raises
@@ -451,7 +476,7 @@ class Task(ITask):
 
         Returns
         -------
-        Self
+        typing.Self
             The current Task instance for method chaining.
 
         Raises
@@ -482,7 +507,7 @@ class Task(ITask):
 
         Returns
         -------
-        Task
+        orionis.console.fluent.Task
             The current Task instance for method chaining.
 
         Raises
@@ -527,7 +552,7 @@ class Task(ITask):
 
         Returns
         -------
-        Task
+        orionis.console.fluent.Task
             This instance for method chaining.
         """
         # Validate that max_instances is a positive integer.
@@ -551,20 +576,20 @@ class Task(ITask):
 
         Parameters
         ----------
-        event : TaskEvent
+        event : orionis.console.enums.TaskEvent
             The event type to listen for.
-        callback : Callable
+        callback : collections.abc.Callable
             The function to call when the event occurs.
 
         Returns
         -------
-        Task
+        orionis.console.fluent.Task
             The current Task instance for method chaining.
 
         Raises
         ------
         ValueError
-            If `event` is not a TaskEvent or `callback` is not callable.
+            If ``event`` is not a TaskEvent or ``callback`` is not callable.
         """
         # Validate that the event is a valid TaskEvent enum member.
         if not isinstance(event, TaskEvent):
@@ -591,12 +616,12 @@ class Task(ITask):
 
         Parameters
         ----------
-        listener : BaseTaskListener
+        listener : orionis.console.base.BaseTaskListener
             Listener instance implementing the BaseTaskListener interface.
 
         Returns
         -------
-        Self
+        typing.Self
             The current Task instance for method chaining.
 
         Raises
@@ -702,7 +727,7 @@ class Task(ITask):
         """
         Schedule the task to run at fixed intervals in seconds.
 
-        Validate that `seconds` is a positive integer. Set an IntervalTrigger to run
+        Validate that ``seconds`` is a positive integer. Set an IntervalTrigger to run
         at the specified interval. If a random delay is set, raise an error. Return
         True if scheduling is configured.
 
@@ -719,7 +744,7 @@ class Task(ITask):
         Raises
         ------
         ValueError
-            If `seconds` is not a positive integer or if random delay is set.
+            If ``seconds`` is not a positive integer or if random delay is set.
         """
         # Validate that the seconds parameter is a positive integer.
         if not isinstance(seconds, int) or seconds <= 0:
@@ -758,8 +783,8 @@ class Task(ITask):
         Schedule the task to run every five seconds.
 
         This method sets up the event to execute at a fixed interval of five seconds
-        using an `IntervalTrigger`. The scheduling window can be limited by the
-        `start_date` and `end_date` attributes if they are set. If a random delay
+        using an ``IntervalTrigger``. The scheduling window can be limited by the
+        ``start_date`` and ``end_date`` attributes if they are set. If a random delay
         (jitter) is configured, it will be applied to the trigger.
 
         Returns
@@ -777,7 +802,7 @@ class Task(ITask):
         Schedule the task to run every ten seconds.
 
         Configure the event to execute at a fixed interval of ten seconds using an
-        IntervalTrigger. The schedule can be limited by `start_date` and `end_date`.
+        IntervalTrigger. The schedule can be limited by ``start_date`` and ``end_date``.
         If a random delay (jitter) is set, it is not applied.
 
         Returns
@@ -795,7 +820,8 @@ class Task(ITask):
         Schedule the task to run every fifteen seconds.
 
         Configure the event to execute at a fixed interval of fifteen seconds using an
-        IntervalTrigger. The schedule can be restricted by `start_date` and `end_date`.
+        IntervalTrigger. The schedule can be restricted by ``start_date`` and
+        ``end_date``.
         If a random delay (jitter) is set, it is not applied.
 
         Returns
@@ -813,7 +839,8 @@ class Task(ITask):
         Schedule the task to run every twenty seconds.
 
         Configures the event to execute at a fixed interval of twenty seconds using an
-        IntervalTrigger. The schedule can be restricted by `start_date` and `end_date`.
+        IntervalTrigger. The schedule can be restricted by ``start_date`` and
+        ``end_date``.
         If a random delay (jitter) is set, it is not applied.
 
         Returns
@@ -831,8 +858,8 @@ class Task(ITask):
         Schedule the task to run every twenty-five seconds.
 
         Configure the event to execute at a fixed interval of twenty-five seconds using
-        an IntervalTrigger. The schedule can be restricted by `start_date` and
-        `end_date`. If a random delay (jitter) is set, it is not applied.
+        an IntervalTrigger. The schedule can be restricted by ``start_date`` and
+        ``end_date``. If a random delay (jitter) is set, it is not applied.
 
         Returns
         -------
@@ -849,7 +876,7 @@ class Task(ITask):
         Schedule the task to run every thirty seconds.
 
         Configures the event to execute at a fixed interval of thirty seconds using an
-        IntervalTrigger. The schedule can be limited by `start_date` and `end_date`.
+        IntervalTrigger. The schedule can be limited by ``start_date`` and ``end_date``.
         If a random delay (jitter) is set, it is not applied.
 
         Returns
@@ -867,8 +894,8 @@ class Task(ITask):
         Schedule the task to run every thirty-five seconds.
 
         Configures the event to execute at a fixed interval of thirty-five seconds
-        using an IntervalTrigger. The schedule can be restricted by `start_date`
-        and `end_date`. If a random delay (jitter) is set, it is not applied.
+        using an IntervalTrigger. The schedule can be restricted by ``start_date``
+        and ``end_date``. If a random delay (jitter) is set, it is not applied.
 
         Returns
         -------
@@ -886,7 +913,8 @@ class Task(ITask):
         Schedule the task to run every forty seconds.
 
         Configure the event to execute at a fixed interval of forty seconds using an
-        IntervalTrigger. The schedule can be restricted by `start_date` and `end_date`.
+        IntervalTrigger. The schedule can be restricted by ``start_date`` and
+        ``end_date``.
         If a random delay (jitter) is set, it is not applied.
 
         Returns
@@ -904,7 +932,8 @@ class Task(ITask):
         Schedule the task to run every forty-five seconds.
 
         Configures the event to execute at a fixed interval of forty-five seconds using
-        an IntervalTrigger. The schedule can be limited by `start_date` and `end_date`.
+        an IntervalTrigger. The schedule can be limited by ``start_date`` and
+        ``end_date``.
         If a random delay (jitter) is set, it is not applied.
 
         Returns
@@ -922,8 +951,8 @@ class Task(ITask):
         Schedule the task to run every fifty seconds.
 
         Configure the event to execute at a fixed interval of fifty seconds using an
-        IntervalTrigger. The scheduling window can be restricted by `start_date` and
-        `end_date`. If a random delay (jitter) is set, it is not applied.
+        IntervalTrigger. The scheduling window can be restricted by ``start_date`` and
+        ``end_date``. If a random delay (jitter) is set, it is not applied.
 
         Returns
         -------
@@ -940,8 +969,8 @@ class Task(ITask):
         Schedule the task to run every fifty-five seconds.
 
         Configure the event to execute at a fixed interval of fifty-five seconds using
-        an IntervalTrigger. The scheduling window can be restricted by `start_date`
-        and `end_date`. If a random delay (jitter) is set, it is not applied.
+        an IntervalTrigger. The scheduling window can be restricted by ``start_date``
+        and ``end_date``. If a random delay (jitter) is set, it is not applied.
 
         Returns
         -------
@@ -958,8 +987,8 @@ class Task(ITask):
         """
         Schedule the task to run at fixed intervals in minutes.
 
-        Validates that `minutes` is a positive integer. Sets an IntervalTrigger with
-        the specified interval, using any configured `start_date`, `end_date`, and
+        Validates that ``minutes`` is a positive integer. Sets an IntervalTrigger with
+        the specified interval, using any configured ``start_date``, ``end_date``, and
         random delay (jitter) if set.
 
         Parameters
@@ -1000,7 +1029,7 @@ class Task(ITask):
         """
         Schedule the task to run every minute at a specific second.
 
-        Validate that `seconds` is an integer in [0, 59]. Set a CronTrigger to execute
+        Validate that ``seconds`` is an integer in [0, 59]. Set a CronTrigger to execute
         at the specified second of every minute. Ignore any previously set jitter.
 
         Parameters
@@ -1098,8 +1127,8 @@ class Task(ITask):
         Schedule the task to run every five minutes.
 
         Configures the event to execute at a fixed interval of five minutes using an
-        IntervalTrigger. The scheduling window can be restricted by `start_date` and
-        `end_date`. Applies random delay (jitter) if set.
+        IntervalTrigger. The scheduling window can be restricted by ``start_date`` and
+        ``end_date``. Applies random delay (jitter) if set.
 
         Returns
         -------
@@ -1117,8 +1146,8 @@ class Task(ITask):
         Schedule the task to run every five minutes at a specific second.
 
         Set the event to execute at the specified second (0-59) of every five-minute
-        interval. The scheduling window can be restricted by `start_date` and
-        `end_date`. Random delay (jitter) is not applied to this schedule,
+        interval. The scheduling window can be restricted by ``start_date`` and
+        ``end_date``. Random delay (jitter) is not applied to this schedule,
         since it targets an exact second.
 
         Parameters
@@ -1142,8 +1171,8 @@ class Task(ITask):
         Schedule to run every ten minutes.
 
         Configures the event to execute at a fixed interval of ten minutes using an
-        IntervalTrigger. The scheduling window can be restricted by `start_date` and
-        `end_date`. If a random delay (jitter) is set, it is applied to the trigger.
+        IntervalTrigger. The scheduling window can be restricted by ``start_date`` and
+        ``end_date``. If a random delay (jitter) is set, it is applied to the trigger.
 
         Returns
         -------
@@ -1162,7 +1191,7 @@ class Task(ITask):
 
         Configures the event to execute at the specified second (0-59) of every
         ten-minute interval. Ignores any previously set random delay (jitter).
-        The scheduling window can be restricted by `start_date` and `end_date`.
+        The scheduling window can be restricted by ``start_date`` and ``end_date``.
 
         Parameters
         ----------
@@ -1185,7 +1214,7 @@ class Task(ITask):
         Schedule the task to run every fifteen minutes.
 
         Set up an interval trigger for execution every fifteen minutes. The schedule
-        can be limited by `start_date` and `end_date`. If a random delay (jitter) is
+        can be limited by ``start_date`` and ``end_date``. If a random delay (jitter) is
         set, it is applied to the trigger.
 
         Returns
@@ -1204,8 +1233,8 @@ class Task(ITask):
         Schedule to run every fifteen minutes at a specific second.
 
         This method sets the event to execute at the given second (0-59) of every
-        fifteen-minute interval. The schedule can be limited by `start_date` and
-        `end_date`. Random delay (jitter) is not applied to this schedule, since
+        fifteen-minute interval. The schedule can be limited by ``start_date`` and
+        ``end_date``. Random delay (jitter) is not applied to this schedule, since
         it targets an exact second.
 
         Parameters
@@ -1229,13 +1258,13 @@ class Task(ITask):
         Schedule to run every twenty minutes.
 
         This method sets the event to execute at a fixed interval of twenty minutes
-        using an IntervalTrigger. The schedule can be limited by `start_date` and
-        `end_date`. If a random delay (jitter) is set, it is applied to the trigger.
+        using an IntervalTrigger. The schedule can be limited by ``start_date`` and
+        ``end_date``. If a random delay (jitter) is set, it is applied to the trigger.
 
         Returns
         -------
         bool
-            Always returns True after delegating scheduling to `everyMinute`.
+            Always returns True after delegating scheduling to ``everyMinute``.
         """
         # Delegate scheduling to the everyMinute method with an interval of 20 minutes.
         # This ensures consistent handling of start_date, end_date, and random_delay.
@@ -1249,8 +1278,8 @@ class Task(ITask):
         Schedule to run every twenty minutes at a specific second.
 
         Configures the event to execute at the specified second (0-59) of every
-        twenty-minute interval. The schedule can be restricted by `start_date`
-        and `end_date`. Random delay (jitter) is not applied to this schedule,
+        twenty-minute interval. The schedule can be restricted by ``start_date``
+        and ``end_date``. Random delay (jitter) is not applied to this schedule,
         since it targets an exact second.
 
         Parameters
@@ -1275,13 +1304,13 @@ class Task(ITask):
 
         Configures the event to execute at a fixed interval of twenty-five minutes
         using an IntervalTrigger. The scheduling window can be restricted by
-        `start_date` and `end_date`. If a random delay (jitter) is set, it is
+        ``start_date`` and ``end_date``. If a random delay (jitter) is set, it is
         applied to the trigger.
 
         Returns
         -------
         bool
-            Always returns True after delegating scheduling to `everyMinute`.
+            Always returns True after delegating scheduling to ``everyMinute``.
         """
         # Delegate scheduling to the everyMinute method with an interval of 25 minutes.
         # This ensures consistent handling of start_date, end_date, and random_delay.
@@ -1295,7 +1324,7 @@ class Task(ITask):
         Schedule to run every twenty-five minutes at a specific second.
 
         Set up the event to execute at the given second (0-59) of every twenty-five-
-        minute interval. The schedule can be limited by `start_date` and `end_date`.
+        minute interval. The schedule can be limited by ``start_date`` and ``end_date``.
 
         Parameters
         ----------
@@ -1318,13 +1347,14 @@ class Task(ITask):
         Schedule the task to run every thirty minutes.
 
         Configures the event to execute at a fixed interval of thirty minutes using an
-        IntervalTrigger. The schedule can be restricted by `start_date` and `end_date`.
+        IntervalTrigger. The schedule can be restricted by ``start_date`` and
+        ``end_date``.
         If a random delay (jitter) is set, it is applied to the trigger.
 
         Returns
         -------
         bool
-            Always returns True after delegating scheduling to `everyMinute`.
+            Always returns True after delegating scheduling to ``everyMinute``.
         """
         # Delegate scheduling to the everyMinute method with an interval of 30 minutes.
         # This ensures consistent handling of start_date, end_date, and random_delay.
@@ -1339,7 +1369,7 @@ class Task(ITask):
 
         Configures the event to execute at the given second (0-59) of every
         thirty-minute interval.
-        The schedule can be restricted by `start_date` and `end_date`. Random
+        The schedule can be restricted by ``start_date`` and ``end_date``. Random
         delay (jitter) is not applied to this schedule, since it targets an
         exact second.
 
@@ -1364,13 +1394,13 @@ class Task(ITask):
         Schedule to run every thirty-five minutes.
 
         This method sets the event to execute at a fixed interval of thirty-five minutes
-        using an `IntervalTrigger`. The schedule can be limited by `start_date` and
-        `end_date`. If a random delay (jitter) is set, it is applied to the trigger.
+        using an ``IntervalTrigger``. The schedule can be limited by ``start_date`` and
+        ``end_date``. If a random delay (jitter) is set, it is applied to the trigger.
 
         Returns
         -------
         bool
-            Always returns True after delegating scheduling to `everyMinute`.
+            Always returns True after delegating scheduling to ``everyMinute``.
         """
         # Delegate scheduling to the everyMinute method with an interval of 35 minutes.
         # This ensures consistent handling of start_date, end_date, and random_delay.
@@ -1396,7 +1426,7 @@ class Task(ITask):
         Raises
         ------
         ValueError
-            If `seconds` is not an integer between 0 and 59 (inclusive).
+            If ``seconds`` is not an integer between 0 and 59 (inclusive).
 
         Notes
         -----
@@ -1413,13 +1443,14 @@ class Task(ITask):
         Schedule the task to run every forty minutes.
 
         Configures the event to execute at a fixed interval of forty minutes using an
-        IntervalTrigger. The schedule can be restricted by `start_date` and `end_date`.
+        IntervalTrigger. The schedule can be restricted by ``start_date`` and
+        ``end_date``.
         If a random delay (jitter) is set, it is applied to the trigger.
 
         Returns
         -------
         bool
-            Always returns True after delegating scheduling to `everyMinute`.
+            Always returns True after delegating scheduling to ``everyMinute``.
         """
         # Delegate scheduling to the everyMinute method with an interval of 40 minutes.
         # This ensures consistent handling of start_date, end_date, and random_delay.
@@ -1433,8 +1464,8 @@ class Task(ITask):
         Schedule to run every forty minutes at a specific second.
 
         Configures the event to execute at the specified second (0-59) of every
-        forty-minute interval. The scheduling window can be restricted by `start_date`
-        and `end_date`. Random delay (jitter) is not applied to this schedule,
+        forty-minute interval. The scheduling window can be restricted by ``start_date``
+        and ``end_date``. Random delay (jitter) is not applied to this schedule,
         since it targets an exact second.
 
         Parameters
@@ -1458,13 +1489,13 @@ class Task(ITask):
         Schedule the task to run every forty-five minutes.
 
         Configure the event to execute at a fixed interval of forty-five minutes using
-        an IntervalTrigger. The schedule can be restricted by `start_date` and
-        `end_date`. If a random delay (jitter) is set, it is applied to the trigger.
+        an IntervalTrigger. The schedule can be restricted by ``start_date`` and
+        ``end_date``. If a random delay (jitter) is set, it is applied to the trigger.
 
         Returns
         -------
         bool
-            Always returns True after delegating scheduling to `everyMinute`.
+            Always returns True after delegating scheduling to ``everyMinute``.
         """
         # Delegate scheduling to the everyMinute method with an interval of 45 minutes.
         # This ensures consistent handling of start_date, end_date, and random_delay.
@@ -1478,7 +1509,7 @@ class Task(ITask):
         Schedule the task to run every forty-five minutes at a specific second.
 
         Set up the event to execute at the given second (0-59) of every forty-five-
-        minute interval. The schedule can be limited by `start_date` and `end_date`.
+        minute interval. The schedule can be limited by ``start_date`` and ``end_date``.
         Random delay (jitter) is not applied to this schedule, since it targets
         an exact second.
 
@@ -1505,13 +1536,14 @@ class Task(ITask):
         Schedule to run every fifty minutes.
 
         Configures the event to execute at a fixed interval of fifty minutes using an
-        IntervalTrigger. The schedule can be restricted by `start_date` and `end_date`.
+        IntervalTrigger. The schedule can be restricted by ``start_date`` and
+        ``end_date``.
         If a random delay (jitter) is set, it is applied to the trigger.
 
         Returns
         -------
         bool
-            Always returns True after delegating scheduling to `everyMinute`.
+            Always returns True after delegating scheduling to ``everyMinute``.
         """
         # Delegate scheduling to the everyMinute method with an interval of 50 minutes.
         # This ensures consistent handling of start_date, end_date, and random_delay.
@@ -1525,8 +1557,8 @@ class Task(ITask):
         Schedule to run every fifty minutes at a specific second.
 
         Configures the event to execute at the specified second (0-59) of every
-        fifty-minute interval. The scheduling window can be restricted by `start_date`
-        and `end_date`. Random delay (jitter) is not applied to this schedule,
+        fifty-minute interval. The scheduling window can be restricted by ``start_date``
+        and ``end_date``. Random delay (jitter) is not applied to this schedule,
         since it targets an exact second.
 
         Parameters
@@ -1551,13 +1583,13 @@ class Task(ITask):
         Schedule the task to run every fifty-five minutes.
 
         Configure the event to execute at a fixed interval of fifty-five minutes using
-        an IntervalTrigger. The schedule can be restricted by `start_date` and
-        `end_date`. If a random delay (jitter) is set, it is applied to the trigger.
+        an IntervalTrigger. The schedule can be restricted by ``start_date`` and
+        ``end_date``. If a random delay (jitter) is set, it is applied to the trigger.
 
         Returns
         -------
         bool
-            Always returns True after delegating scheduling to `everyMinute`.
+            Always returns True after delegating scheduling to ``everyMinute``.
         """
         # Delegate scheduling to the everyMinute method with an interval of 55 minutes.
         # This ensures consistent handling of start_date, end_date, and random_delay.
@@ -1583,7 +1615,7 @@ class Task(ITask):
 
         Notes
         -----
-        This method delegates scheduling to `everyMinutesAt` with an interval of
+        This method delegates scheduling to ``everyMinutesAt`` with an interval of
         55 minutes and the specified second.
         """
         # Delegate scheduling to the everyMinutesAt method with an
@@ -1597,7 +1629,7 @@ class Task(ITask):
         Schedule the task to run every hour.
 
         Configure the event to execute once every hour. The schedule starts from
-        `start_date` and ends at `end_date` if set. If a random delay (jitter) is
+        ``start_date`` and ends at ``end_date`` if set. If a random delay (jitter) is
         configured, it is applied to the trigger. The event is triggered at regular
         hourly intervals.
 
@@ -1629,7 +1661,7 @@ class Task(ITask):
         """
         Schedule the task to run every hour at a specific minute and second.
 
-        Validate that `minute` and `second` are integers within valid ranges. Set up
+        Validate that ``minute`` and ``second`` are integers within valid ranges. Set up
         an IntervalTrigger to execute the event every hour at the specified minute and
         second. Store a human-readable description of the schedule.
 
@@ -1648,7 +1680,7 @@ class Task(ITask):
         Raises
         ------
         ValueError
-            If `minute` or `second` are not integers in valid ranges.
+            If ``minute`` or ``second`` are not integers in valid ranges.
         """
         # Validate that minute and second are integers.
         if not isinstance(minute, int) or not isinstance(second, int):
@@ -1689,7 +1721,8 @@ class Task(ITask):
         Schedule the task to run at every odd hour of the day.
 
         Configure the event to execute at every odd-numbered hour using a CronTrigger.
-        The schedule can be restricted by `start_date` and `end_date`. If a random delay
+        The schedule can be restricted by ``start_date`` and ``end_date``. If a random
+        delay
         (jitter) is set, it is applied to the trigger.
 
         Returns
@@ -1720,7 +1753,8 @@ class Task(ITask):
         Schedule the task to run at every even hour of the day.
 
         Configure the event to execute at every even-numbered hour using a CronTrigger.
-        The schedule can be restricted by `start_date` and `end_date`. If a random delay
+        The schedule can be restricted by ``start_date`` and ``end_date``. If a random
+        delay
         (jitter) is set, it is applied to the trigger.
 
         Returns
@@ -1751,7 +1785,8 @@ class Task(ITask):
         """
         Schedule the task to run at fixed intervals in hours.
 
-        Validate that `hours` is a positive integer. Set up an IntervalTrigger with the
+        Validate that ``hours`` is a positive integer. Set up an IntervalTrigger with
+        the
         specified interval in hours, using any configured start and end dates,
         and random delay (jitter) if set.
 
@@ -1872,14 +1907,15 @@ class Task(ITask):
         """
         Schedule the task to run every two hours.
 
-        Use the `everyHours` method with an interval of two hours. The schedule can be
-        restricted by `start_date` and `end_date`. If a random delay (jitter) is set,
+        Use the ``everyHours`` method with an interval of two hours. The schedule can be
+        restricted by ``start_date`` and ``end_date``. If a random delay (jitter) is
+        set,
         it will be applied to the trigger.
 
         Returns
         -------
         bool
-            Always returns True after delegating scheduling to `everyHours`.
+            Always returns True after delegating scheduling to ``everyHours``.
         """
         # Delegate scheduling to the everyHours method with an interval of 2 hours.
         return self.everyHours(2)
@@ -1893,7 +1929,7 @@ class Task(ITask):
         Schedule to run every two hours at a specific minute and second.
 
         Validate input ranges for minute and second. Delegate scheduling to
-        `everyHoursAt` with an interval of two hours and the specified time.
+        ``everyHoursAt`` with an interval of two hours and the specified time.
 
         Parameters
         ----------
@@ -1917,14 +1953,16 @@ class Task(ITask):
         """
         Schedule the task to run every three hours.
 
-        Use the `everyHours` method with an interval of three hours. The schedule can be
-        restricted by `start_date` and `end_date`. If a random delay (jitter) is set, it
+        Use the ``everyHours`` method with an interval of three hours. The schedule can
+        be
+        restricted by ``start_date`` and ``end_date``. If a random delay (jitter) is
+        set, it
         will be applied to the trigger.
 
         Returns
         -------
         bool
-            Always returns True after delegating scheduling to `everyHours`.
+            Always returns True after delegating scheduling to ``everyHours``.
         """
         # Delegate scheduling to the everyHours method with an interval of 3 hours.
         return self.everyHours(3)
@@ -1938,7 +1976,8 @@ class Task(ITask):
         Schedule to run every three hours at a specific minute and second.
 
         Set up the event to execute every three hours at the given minute and second.
-        The schedule can be limited by `start_date` and `end_date`. Jitter is not used.
+        The schedule can be limited by ``start_date`` and ``end_date``. Jitter is not
+        used.
 
         Parameters
         ----------
@@ -1962,14 +2001,16 @@ class Task(ITask):
         """
         Schedule the task to run every four hours.
 
-        Use the `everyHours` method with an interval of four hours. The schedule can be
-        restricted by `start_date` and `end_date`. If a random delay (jitter) is set, it
+        Use the ``everyHours`` method with an interval of four hours. The schedule can
+        be
+        restricted by ``start_date`` and ``end_date``. If a random delay (jitter) is
+        set, it
         will be applied to the trigger.
 
         Returns
         -------
         bool
-            Always returns True after delegating scheduling to `everyHours`.
+            Always returns True after delegating scheduling to ``everyHours``.
         """
         # Delegate scheduling to the everyHours method with an interval of 4 hours.
         return self.everyHours(4)
@@ -1983,7 +2024,7 @@ class Task(ITask):
         Schedule to run every four hours at a specific minute and second.
 
         Validate input ranges for minute and second. Delegate scheduling to
-        `everyHoursAt` with an interval of four hours and the specified time.
+        ``everyHoursAt`` with an interval of four hours and the specified time.
 
         Parameters
         ----------
@@ -2007,14 +2048,16 @@ class Task(ITask):
         """
         Schedule the task to run every five hours.
 
-        Use the `everyHours` method with an interval of five hours. The schedule can be
-        restricted by `start_date` and `end_date`. If a random delay (jitter) is set, it
+        Use the ``everyHours`` method with an interval of five hours. The schedule can
+        be
+        restricted by ``start_date`` and ``end_date``. If a random delay (jitter) is
+        set, it
         will be applied to the trigger.
 
         Returns
         -------
         bool
-            Always returns True after delegating scheduling to `everyHours`.
+            Always returns True after delegating scheduling to ``everyHours``.
         """
         # Delegate scheduling to the everyHours method with an interval of 5 hours.
         return self.everyHours(5)
@@ -2028,7 +2071,7 @@ class Task(ITask):
         Schedule to run every five hours at a specific minute and second.
 
         Validates input ranges for minute and second. Delegates scheduling to
-        `everyHoursAt` with an interval of five hours and the specified time.
+        ``everyHoursAt`` with an interval of five hours and the specified time.
 
         Parameters
         ----------
@@ -2052,13 +2095,13 @@ class Task(ITask):
         """
         Schedule to run every six hours.
 
-        Delegates scheduling to `everyHours` with an interval of six hours.
+        Delegates scheduling to ``everyHours`` with an interval of six hours.
         Returns True if scheduling was configured.
 
         Returns
         -------
         bool
-            Always returns True after delegating scheduling to `everyHours`.
+            Always returns True after delegating scheduling to ``everyHours``.
         """
         # Delegate scheduling to the everyHours method with an interval of 6 hours.
         return self.everyHours(6)
@@ -2072,7 +2115,7 @@ class Task(ITask):
         Schedule to run every six hours at a specific minute and second.
 
         Validate input ranges for minute and second. Delegate scheduling to
-        `everyHoursAt` with an interval of six hours and the specified time.
+        ``everyHoursAt`` with an interval of six hours and the specified time.
 
         Parameters
         ----------
@@ -2096,13 +2139,14 @@ class Task(ITask):
         """
         Schedule to run every seven hours.
 
-        Use `everyHours` with an interval of seven hours. Restrict schedule with
-        `start_date` and `end_date` if set. Apply random delay (jitter) if configured.
+        Use ``everyHours`` with an interval of seven hours. Restrict schedule with
+        ``start_date`` and ``end_date`` if set. Apply random delay (jitter) if
+        configured.
 
         Returns
         -------
         bool
-            Always returns True after delegating scheduling to `everyHours`.
+            Always returns True after delegating scheduling to ``everyHours``.
         """
         # Delegate scheduling to the everyHours method with an interval of 7 hours.
         return self.everyHours(7)
@@ -2116,7 +2160,7 @@ class Task(ITask):
         Schedule to run every seven hours at a specific minute and second.
 
         Validate input ranges for minute and second. Delegate scheduling to
-        `everyHoursAt` with an interval of seven hours and the specified time.
+        ``everyHoursAt`` with an interval of seven hours and the specified time.
 
         Parameters
         ----------
@@ -2140,13 +2184,13 @@ class Task(ITask):
         """
         Schedule to run every eight hours.
 
-        Delegate scheduling to `everyHours` with an interval of eight hours.
+        Delegate scheduling to ``everyHours`` with an interval of eight hours.
         Return True if scheduling was configured.
 
         Returns
         -------
         bool
-            Always returns True after delegating scheduling to `everyHours`.
+            Always returns True after delegating scheduling to ``everyHours``.
         """
         # Delegate scheduling to the everyHours method with an interval of 8 hours.
         return self.everyHours(8)
@@ -2160,7 +2204,7 @@ class Task(ITask):
         Schedule to run every eight hours at a specific minute and second.
 
         Validate input ranges for minute and second. Delegate scheduling to
-        `everyHoursAt` with an interval of eight hours and the specified time.
+        ``everyHoursAt`` with an interval of eight hours and the specified time.
 
         Parameters
         ----------
@@ -2184,7 +2228,7 @@ class Task(ITask):
         """
         Schedule to run every nine hours.
 
-        Delegates scheduling to `everyHours` with an interval of nine hours.
+        Delegates scheduling to ``everyHours`` with an interval of nine hours.
         Returns True if scheduling was configured.
 
         Returns
@@ -2204,7 +2248,7 @@ class Task(ITask):
         Schedule to run every nine hours at a specific minute and second.
 
         Validate input ranges for minute and second. Delegate scheduling to
-        `everyHoursAt` with an interval of nine hours and the specified time.
+        ``everyHoursAt`` with an interval of nine hours and the specified time.
 
         Parameters
         ----------
@@ -2228,14 +2272,14 @@ class Task(ITask):
         """
         Schedule to run every ten hours.
 
-        Delegate scheduling to `everyHours` with an interval of ten hours.
-        The scheduling window can be restricted by `start_date` and `end_date`.
+        Delegate scheduling to ``everyHours`` with an interval of ten hours.
+        The scheduling window can be restricted by ``start_date`` and ``end_date``.
         Applies random delay (jitter) if configured.
 
         Returns
         -------
         bool
-            Always returns True after delegating scheduling to `everyHours`.
+            Always returns True after delegating scheduling to ``everyHours``.
         """
         # Delegate scheduling to the everyHours method with an interval of 10 hours.
         return self.everyHours(10)
@@ -2249,7 +2293,7 @@ class Task(ITask):
         Schedule to run every ten hours at a specific minute and second.
 
         Validate input ranges for minute and second. Delegate scheduling to
-        `everyHoursAt` with an interval of ten hours and the specified time.
+        ``everyHoursAt`` with an interval of ten hours and the specified time.
 
         Parameters
         ----------
@@ -2273,7 +2317,7 @@ class Task(ITask):
         """
         Schedule to run every eleven hours.
 
-        Delegates scheduling to `everyHours` with an interval of 11 hours.
+        Delegates scheduling to ``everyHours`` with an interval of 11 hours.
         Returns True if scheduling was configured.
 
         Returns
@@ -2293,7 +2337,7 @@ class Task(ITask):
         Schedule to run every eleven hours at a specific minute and second.
 
         Validate input ranges for minute and second. Delegate scheduling to
-        `everyHoursAt` with an interval of 11 hours and the specified time.
+        ``everyHoursAt`` with an interval of 11 hours and the specified time.
 
         Parameters
         ----------
@@ -2317,14 +2361,14 @@ class Task(ITask):
         """
         Schedule to run every twelve hours.
 
-        Delegates scheduling to `everyHours` with an interval of 12 hours.
-        The scheduling window can be restricted by `start_date` and `end_date`.
+        Delegates scheduling to ``everyHours`` with an interval of 12 hours.
+        The scheduling window can be restricted by ``start_date`` and ``end_date``.
         Applies random delay (jitter) if configured.
 
         Returns
         -------
         bool
-            Always returns True after delegating scheduling to `everyHours`.
+            Always returns True after delegating scheduling to ``everyHours``.
         """
         # Delegate scheduling to the everyHours method with an interval of 12 hours.
         return self.everyHours(12)
@@ -2338,7 +2382,7 @@ class Task(ITask):
         Schedule to run every twelve hours at a specific minute and second.
 
         Validate input ranges for minute and second. Delegate scheduling to
-        `everyHoursAt` with an interval of 12 hours and the specified time.
+        ``everyHoursAt`` with an interval of 12 hours and the specified time.
 
         Parameters
         ----------
@@ -2363,7 +2407,7 @@ class Task(ITask):
         Schedule the task to run once per day.
 
         Configure the event to execute daily at midnight using a CronTrigger.
-        Restrict the schedule with `start_date` and `end_date` if set.
+        Restrict the schedule with ``start_date`` and ``end_date`` if set.
         Apply random delay (jitter) if configured.
 
         Returns
@@ -2461,7 +2505,7 @@ class Task(ITask):
         """
         Schedule to run at fixed intervals measured in days.
 
-        Validates that `days` is a positive integer. Sets up an IntervalTrigger with
+        Validates that ``days`` is a positive integer. Sets up an IntervalTrigger with
         the specified interval in days, using any configured start and end dates, and
         random delay (jitter) if set.
 
@@ -2576,12 +2620,12 @@ class Task(ITask):
         """
         Schedule to run every two days.
 
-        Delegates scheduling to `everyDays` with an interval of 2 days.
+        Delegates scheduling to ``everyDays`` with an interval of 2 days.
 
         Returns
         -------
         bool
-            Always returns True after delegating scheduling to `everyDays`.
+            Always returns True after delegating scheduling to ``everyDays``.
         """
         # Delegate scheduling to the everyDays method with an interval of 2 days.
         return self.everyDays(2)
@@ -2596,7 +2640,7 @@ class Task(ITask):
         Schedule to run every two days at a specific hour, minute, and second.
 
         Validate input ranges for hour, minute, and second. Delegate scheduling to
-        `everyDaysAt` with an interval of 2 days and the specified time.
+        ``everyDaysAt`` with an interval of 2 days and the specified time.
 
         Parameters
         ----------
@@ -2621,7 +2665,7 @@ class Task(ITask):
         """
         Schedule to run every three days.
 
-        Delegates scheduling to `everyDays` with an interval of 3 days. Returns True.
+        Delegates scheduling to ``everyDays`` with an interval of 3 days. Returns True.
 
         Returns
         -------
@@ -2641,7 +2685,7 @@ class Task(ITask):
         Schedule to run every three days at a specific hour, minute, and second.
 
         Validates input ranges for hour, minute, and second. Delegates scheduling to
-        `everyDaysAt` with an interval of 3 days and the specified time.
+        ``everyDaysAt`` with an interval of 3 days and the specified time.
 
         Parameters
         ----------
@@ -2669,7 +2713,7 @@ class Task(ITask):
         Returns
         -------
         bool
-            Always returns True after delegating scheduling to `everyDays`.
+            Always returns True after delegating scheduling to ``everyDays``.
         """
         # Delegate scheduling to the everyDays method with an interval of 4 days.
         return self.everyDays(4)
@@ -2706,14 +2750,14 @@ class Task(ITask):
         """
         Schedule to run every five days.
 
-        Use the `everyDays` method with an interval of five days. The scheduling
-        window can be restricted by `start_date` and `end_date`. If a random delay
+        Use the ``everyDays`` method with an interval of five days. The scheduling
+        window can be restricted by ``start_date`` and ``end_date``. If a random delay
         (jitter) is configured, it is applied to the trigger.
 
         Returns
         -------
         bool
-            Always returns True after delegating scheduling to `everyDays`.
+            Always returns True after delegating scheduling to ``everyDays``.
         """
         # Delegate scheduling to the everyDays method with an interval of 5 days.
         return self.everyDays(5)
@@ -2728,7 +2772,7 @@ class Task(ITask):
         Schedule event to run every five days at a specific hour, minute, and second.
 
         Validate input ranges for hour, minute, and second. Delegate scheduling to
-        `everyDaysAt` with an interval of 5 days and the specified time.
+        ``everyDaysAt`` with an interval of 5 days and the specified time.
 
         Parameters
         ----------
@@ -2753,8 +2797,9 @@ class Task(ITask):
         """
         Schedule the task to run every six days.
 
-        Use the `everyDays` method with an interval of six days. The scheduling window
-        can be restricted by `start_date` and `end_date`. If a random delay (jitter) is
+        Use the ``everyDays`` method with an interval of six days. The scheduling window
+        can be restricted by ``start_date`` and ``end_date``. If a random delay (jitter)
+        is
         configured, it is applied to the trigger.
 
         Returns
@@ -2775,7 +2820,7 @@ class Task(ITask):
         Schedule event to run every six days at a specific hour, minute, and second.
 
         Validate input ranges for hour, minute, and second. Delegate scheduling to
-        `everyDaysAt` with an interval of 6 days and the specified time.
+        ``everyDaysAt`` with an interval of 6 days and the specified time.
 
         Parameters
         ----------
@@ -2800,8 +2845,8 @@ class Task(ITask):
         """
         Schedule the task to run every seven days.
 
-        Use the `everyDays` method with an interval of seven days. The scheduling
-        window can be restricted by `start_date` and `end_date`. If a random delay
+        Use the ``everyDays`` method with an interval of seven days. The scheduling
+        window can be restricted by ``start_date`` and ``end_date``. If a random delay
         (jitter) is configured, it is applied to the trigger.
 
         Returns
@@ -2822,7 +2867,7 @@ class Task(ITask):
         Schedule event to run every seven days at a specific hour, minute, and second.
 
         Validate input ranges for hour, minute, and second. Delegate scheduling to
-        `everyDaysAt` with an interval of 7 days and the specified time.
+        ``everyDaysAt`` with an interval of 7 days and the specified time.
 
         Parameters
         ----------
@@ -2870,7 +2915,8 @@ class Task(ITask):
         Raises
         ------
         ValueError
-            If `hour`, `minute`, or `second` are not integers within their valid ranges.
+            If ``hour``, ``minute``, or ``second`` are not integers within their valid
+            ranges.
         """
         # Validate that the hour is within the valid range [0, 23].
         if not (0 <= hour < 24):
@@ -3270,7 +3316,8 @@ class Task(ITask):
         Schedule the task to run every week.
 
         Configure the event to execute once per week on Sunday at 00:00:00. The schedule
-        can be restricted by `start_date` and `end_date`. If a random delay (jitter) is
+        can be restricted by ``start_date`` and ``end_date``. If a random delay (jitter)
+        is
         configured, it is applied to the trigger.
 
         Returns
@@ -3303,7 +3350,7 @@ class Task(ITask):
         """
         Configure the task to run at fixed intervals measured in weeks.
 
-        Validates that the `weeks` parameter is a positive integer. Sets up an
+        Validates that the ``weeks`` parameter is a positive integer. Sets up an
         IntervalTrigger with the specified interval in weeks. Returns True if
         the scheduling was successfully configured.
 
@@ -3320,7 +3367,7 @@ class Task(ITask):
         Raises
         ------
         ValueError
-            If `weeks` is not a positive integer.
+            If ``weeks`` is not a positive integer.
         """
         # Validate that the `weeks` parameter is a positive integer.
         if not isinstance(weeks, int) or weeks <= 0:

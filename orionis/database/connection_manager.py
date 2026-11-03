@@ -1,3 +1,5 @@
+"""Resolve named database connections and manage their lifecycle."""
+
 from typing import Any
 from orionis.database.contracts.connection import IConnection
 from orionis.database.contracts.connection_manager import IConnectionManager
@@ -10,8 +12,10 @@ from orionis.foundation.config.database.entities.database import (
 class ConnectionManager(IConnectionManager):
 
     # ruff: noqa: PLC0415, TC001
+    """Resolve named database connections and manage their lifecycle."""
 
     __slots__ = ("_cached_connections", "_connections", "_default")
+    """Declare the instance attribute slots reserved by this class."""
 
     def __init__(
         self,
@@ -22,7 +26,7 @@ class ConnectionManager(IConnectionManager):
 
         Parameters
         ----------
-        app : IApplication
+        app : orionis.IApplication
             Application container providing the database configuration.
 
         Returns
@@ -37,10 +41,13 @@ class ConnectionManager(IConnectionManager):
             else raw_config
         )
         self._default: str = str(payload["default"]).lower()
+        """Value used when the client omits this argument."""
         self._connections: dict[str, dict[str, Any]] = dict(
             payload.get("connections") or {},
         )
+        """Active realtime connections indexed by identifier."""
         self._cached_connections: dict[str, IConnection] = {}
+        """Cached connections value, computed on first access."""
 
     def connection(
         self,
@@ -59,12 +66,12 @@ class ConnectionManager(IConnectionManager):
 
         Returns
         -------
-        IConnection
+        orionis.database.contracts.IConnection
             Connection bound to its configuration.
 
         Raises
         ------
-        ConnectionNotFoundException
+        orionis.database.ConnectionNotFoundException
             If the connection is not declared in the configuration.
         """
         resolved_name: str = name or self._default
@@ -89,7 +96,8 @@ class ConnectionManager(IConnectionManager):
         Register or replace a named connection configuration at runtime.
 
         A live connection built from a previous configuration keeps
-        serving until :meth:`disconnect` is called for that name.
+        serving until :meth:`orionis.database.ConnectionManager.disconnect` is called
+        for that name.
 
         Parameters
         ----------
@@ -163,7 +171,7 @@ class ConnectionManager(IConnectionManager):
 
         Raises
         ------
-        ConnectionNotFoundException
+        orionis.database.ConnectionNotFoundException
             If the connection is not declared in the configuration.
         """
         if name not in self._connections:
@@ -207,12 +215,12 @@ class ConnectionManager(IConnectionManager):
 
         Returns
         -------
-        dict[str, Any]
+        dict[str, typing.Any]
             The configuration dictionary for the requested connection.
 
         Raises
         ------
-        ConnectionNotFoundException
+        orionis.database.ConnectionNotFoundException
             If the connection is not declared in the configuration.
         """
         resolved_name: str = name or self._default

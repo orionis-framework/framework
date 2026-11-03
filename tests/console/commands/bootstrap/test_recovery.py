@@ -98,7 +98,7 @@ class TestBootstrapRecovery(unittest.TestCase):
             check=False,
         )
 
-    def test_registered_missing_routes_can_be_recovered_for_every_context(self) -> None:
+    def testRegisteredMissingRoutesCanBeRecoveredForEveryContext(self) -> None:
         """Reach each native command before its absent route prevents app import.
 
         Returns
@@ -136,7 +136,7 @@ class TestBootstrapRecovery(unittest.TestCase):
                     for path in root.rglob("*.py")
                 })
 
-    def test_unrelated_missing_context_remains_strict(self) -> None:
+    def testUnrelatedMissingContextRemainsStrict(self) -> None:
         """Preserve missing API validation during console recovery.
 
         Returns
@@ -158,7 +158,7 @@ class TestBootstrapRecovery(unittest.TestCase):
             self.assertFalse((root / "endpoints").exists())
             self.assertFalse((root / "app").exists())
 
-    def test_help_does_not_relax_validation_or_create_resources(self) -> None:
+    def testHelpDoesNotRelaxValidationOrCreateResources(self) -> None:
         """Keep help invocations free of recovery effects for incomplete apps.
 
         Returns
@@ -180,7 +180,7 @@ class TestBootstrapRecovery(unittest.TestCase):
                     self.assertFalse((root / "endpoints").exists())
                     self.assertFalse((root / "app").exists())
 
-    def test_compiled_recovery_does_not_create_transient_caches(self) -> None:
+    def testCompiledRecoveryDoesNotCreateTransientCaches(self) -> None:
         """Ignore compiled state while repairing a registered missing console file.
 
         Returns
@@ -200,7 +200,7 @@ class TestBootstrapRecovery(unittest.TestCase):
             cache_path = root / "storage" / "framework" / "cache"
             self.assertEqual(list(cache_path.iterdir()), [])
 
-    def test_compiled_state_is_neither_read_nor_written_in_recovery(self) -> None:
+    def testCompiledStateIsNeitherReadNorWrittenInRecovery(self) -> None:
         """Expose a resolved cache path without reading or writing compiled state.
 
         Returns
@@ -229,7 +229,7 @@ class TestBootstrapRecovery(unittest.TestCase):
                 app._Application__persistCompiledState()
                 cache.save.assert_not_called()
 
-    def test_warm_compiled_application_uses_generated_registration_next_start(
+    def testWarmCompiledApplicationUsesGeneratedRegistrationNextStart(
         self,
     ) -> None:
         """Invalidate stale routing caches without configured monitored paths.
@@ -291,7 +291,7 @@ class TestBootstrapRecovery(unittest.TestCase):
                 for path in cache_path.iterdir() if path.is_file()
             })
 
-    def test_only_exact_commands_activate_recovery(self) -> None:
+    def testOnlyExactCommandsActivateRecovery(self) -> None:
         """Parse optional executable prefixes and exclude help or unknown commands.
 
         Returns
@@ -326,7 +326,7 @@ class TestBootstrapRecovery(unittest.TestCase):
                     recovering_route(route) for route in _CONTEXTS
                 ))
 
-    def test_context_resets_after_errors_and_nested_startup(self) -> None:
+    def testContextResetsAfterErrorsAndNestedStartup(self) -> None:
         """Keep scoped recovery active for CLI startup and restore it afterward.
 
         Returns

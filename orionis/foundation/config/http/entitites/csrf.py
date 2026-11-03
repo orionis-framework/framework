@@ -1,3 +1,5 @@
+"""CSRF protection configuration for web routes."""
+
 from __future__ import annotations
 from dataclasses import dataclass, field
 from typing import Literal
@@ -6,6 +8,7 @@ from orionis.foundation.config.validation import validate_boolean, validate_cook
 from orionis.support.entities.base import BaseEntity
 
 _MIN_TOKEN_LENGTH = 32
+"""Min token length value used by ``csrf``."""
 
 @dataclass(frozen=True, kw_only=True)
 class HTTPCsrf(BaseEntity):
@@ -33,7 +36,7 @@ class HTTPCsrf(BaseEntity):
         Set the ``Secure`` attribute on the XSRF cookie. When
         ``False``, the middleware automatically promotes the flag to
         ``True`` on HTTPS requests. Defaults to ``False``.
-    cookie_same_site : Literal["lax", "strict", "none"]
+    cookie_same_site : typing.Literal["lax", "strict", "none"]
         ``SameSite`` attribute for the XSRF cookie. Defaults to
         ``"lax"``.
     cookie_path : str

@@ -1,3 +1,8 @@
+"""Provide http adapters response operations.
+
+Includes ``close_stream``, ``await_cleanup``, ``send_until_disconnect``.
+"""
+
 from __future__ import annotations
 import asyncio
 from contextlib import suppress
@@ -16,7 +21,7 @@ async def close_stream(
 
     Parameters
     ----------
-    iterator : AsyncIterable[bytes] | None
+    iterator : collections.abc.AsyncIterable[bytes] | None
         Owned source whose optional asynchronous close must be awaited, if present.
     failure : BaseException | None
         Producer or transport failure already propagating through cleanup.
@@ -45,9 +50,9 @@ async def _finish_cancelled_cleanup[T](
 
     Parameters
     ----------
-    pending : Future[T]
+    pending : asyncio.Future[``T``]
         Cleanup operation which must finish before its owner returns.
-    ready : Future[Future[T]]
+    ready : asyncio.Future[asyncio.Future[``T``]]
         Completion notification carrying no cleanup exception.
     cancellation : asyncio.CancelledError
         Cancellation that the owner will re-raise after cleanup succeeds.
@@ -76,12 +81,12 @@ async def await_cleanup[T](pending: Future[T]) -> T:
 
     Parameters
     ----------
-    pending : Future[T]
+    pending : asyncio.Future[``T``]
         Cleanup operation protected from cancellation of its owner.
 
     Returns
     -------
-    T
+    ``T``
         Completed cleanup result when the owner was not cancelled.
 
     Raises
@@ -140,7 +145,7 @@ async def _cancel_tasks(tasks: tuple[Task[None], Task[None]]) -> None:
 
     Parameters
     ----------
-    tasks : tuple[Task[None], Task[None]]
+    tasks : tuple[asyncio.Task[None], asyncio.Task[None]]
         Sender and disconnect watcher owned by one response.
 
     Returns
@@ -167,9 +172,9 @@ def _record_completion[T](
 
     Parameters
     ----------
-    first : Future[Future[T]]
+    first : asyncio.Future[asyncio.Future[``T``]]
         Completion notification awaited by the stream coordinator or cleanup.
-    completed : Future[T]
+    completed : asyncio.Future[``T``]
         Operation whose completion triggered this callback.
 
     Returns
@@ -189,9 +194,9 @@ async def send_until_disconnect(
 
     Parameters
     ----------
-    sending : Coroutine[None, None, None]
+    sending : collections.abc.Coroutine[None, None, None]
         Delivery operation, including iterator cleanup and final framing.
-    disconnected : Coroutine[None, None, None]
+    disconnected : collections.abc.Coroutine[None, None, None]
         Operation returning when the client disconnects.
 
     Returns

@@ -99,7 +99,7 @@ class InMemoryMcpEventBus(IMcpEventBus):
         self._closed = False
 
     @property
-    def listener_count(self) -> int:
+    def listenerCount(self) -> int:
         """
         Expose aggregate lifecycle diagnostics, without subscriber identity.
 

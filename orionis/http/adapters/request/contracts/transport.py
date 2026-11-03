@@ -1,3 +1,5 @@
+"""Read/write abstraction over a protocol scope (ASGI or RSGI)."""
+
 from __future__ import annotations
 from abc import ABC, abstractmethod
 from typing import TYPE_CHECKING
@@ -19,6 +21,7 @@ class TransportAdapter(ABC):
 
     # Define the transport interface without instance state.
     __slots__ = ()
+    """Define the transport interface without instance state."""
 
     @abstractmethod
     def client(self) -> str | None:
@@ -103,7 +106,7 @@ class TransportAdapter(ABC):
 
         Returns
         -------
-        Headers
+        orionis.http.payload.estructures.headers.Headers
             The headers parsed from the scope, decoded to strings.
         """
 
@@ -116,7 +119,7 @@ class TransportAdapter(ABC):
         ----------
         key : str
             The attribute or dict key to set.
-        value : Any
+        value : typing.Any
             The value to store.
 
         Returns

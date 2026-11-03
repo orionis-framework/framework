@@ -1,9 +1,16 @@
+"""Provide mcp operations.
+
+Includes ``McpProtocolException``, ``McpInvalidParams``,
+``McpAuthorizationException``.
+"""
+
 import msgspec
 
 class McpProtocolException(Exception):
     """Carry an explicitly safe JSON-RPC error and HTTP status."""
 
     __slots__ = ("code", "data", "message", "status")
+    """Declare the instance attribute slots reserved by this class."""
 
     def __init__(
         self, code: int, message: str, *, status: int = 400,
@@ -30,14 +37,19 @@ class McpProtocolException(Exception):
         """
         super().__init__(message)
         self.code = code
+        """Value supplied for ``code``."""
         self.message = message
+        """Value supplied for ``message``."""
         self.status = status
+        """Value supplied for ``status``."""
         self.data = data
+        """Value supplied for ``data``."""
 
 class McpInvalidParams(McpProtocolException):
     """Reject malformed method parameters."""
 
     __slots__ = ()
+    """Declare that this class introduces no additional instance slots."""
 
     def __init__(
         self, message: str = "Invalid params", *, data: object = msgspec.UNSET,
@@ -63,6 +75,7 @@ class McpAuthorizationException(McpProtocolException):
     """Deny a primitive through its explicit authorization hook."""
 
     __slots__ = ()
+    """Declare that this class introduces no additional instance slots."""
 
     def __init__(self) -> None:
         """

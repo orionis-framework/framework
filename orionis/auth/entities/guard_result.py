@@ -1,3 +1,5 @@
+"""Carry what a guard learned about the incoming request."""
+
 from dataclasses import dataclass
 from typing import TYPE_CHECKING
 
@@ -11,7 +13,7 @@ class GuardResult:
 
     Attributes
     ----------
-    identity : IAuthenticatable
+    identity : orionis.auth.contracts.IAuthenticatable
         Identity resolved from the presented credential.
     guard : str
         Name of the guard that resolved the identity.

@@ -1,3 +1,5 @@
+"""Enumerate common MySQL collations."""
+
 from enum import Enum
 
 class MySQLCollation(Enum):

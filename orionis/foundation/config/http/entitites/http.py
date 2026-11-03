@@ -1,3 +1,5 @@
+"""Configure HTTP request handling and security."""
+
 from __future__ import annotations
 from dataclasses import dataclass, field
 from orionis.foundation.config.http.entitites.body import HTTPBodyLimits
@@ -17,9 +19,10 @@ from orionis.support.entities.base import BaseEntity
 
 @dataclass(frozen=True, kw_only=True)
 class HTTP(BaseEntity):
-    """Configure HTTP request handling and security.
+    """
+    Configure HTTP request handling and security.
 
-    Parameters
+    Attributes
     ----------
     monitor_disconnects : bool, optional
         Cancel handlers proactively when a client disconnects. Defaults to
@@ -43,6 +46,7 @@ class HTTP(BaseEntity):
             "default": lambda: HTTPBodyLimits().toDict(),
         },
     )
+    """Body limits produced by ``field``."""
 
     websocket: HTTPWebSocket | dict = field(
         default_factory=HTTPWebSocket,
@@ -51,6 +55,7 @@ class HTTP(BaseEntity):
             "default": lambda: HTTPWebSocket().toDict(),
         },
     )
+    """Websocket produced by ``field``."""
 
     proxies: HTTPProxies | dict = field(
         default_factory=HTTPProxies,
@@ -59,6 +64,7 @@ class HTTP(BaseEntity):
             "default": lambda: HTTPProxies().toDict(),
         },
     )
+    """Proxies produced by ``field``."""
 
     security: HTTPSecurity | dict = field(
         default_factory=HTTPSecurity,
@@ -67,6 +73,7 @@ class HTTP(BaseEntity):
             "default": lambda: HTTPSecurity().toDict(),
         },
     )
+    """Security produced by ``field``."""
 
     rate_limit: HTTPRateLimit | dict = field(
         default_factory=HTTPRateLimit,
@@ -75,6 +82,7 @@ class HTTP(BaseEntity):
             "default": lambda: HTTPRateLimit().toDict(),
         },
     )
+    """Rate limit produced by ``field``."""
 
     cors: Cors | dict = field(
         default_factory=Cors,
@@ -83,6 +91,7 @@ class HTTP(BaseEntity):
             "default": lambda: Cors().toDict(),
         },
     )
+    """Cors produced by ``field``."""
 
     csrf: HTTPCsrf | dict = field(
         default_factory=HTTPCsrf,
@@ -91,6 +100,7 @@ class HTTP(BaseEntity):
             "default": lambda: HTTPCsrf().toDict(),
         },
     )
+    """Csrf produced by ``field``."""
 
     def __post_init__(self) -> None:
         """
@@ -107,6 +117,7 @@ class HTTP(BaseEntity):
         Returns
         -------
         None
+            Validate and coerce all composite fields.
         """
         super().__post_init__()
         if not isinstance(self.monitor_disconnects, bool):
@@ -143,6 +154,7 @@ class HTTP(BaseEntity):
         Returns
         -------
         None
+            Validate the ``proxies`` field.
         """
         if not isinstance(
             self.proxies,
@@ -175,6 +187,7 @@ class HTTP(BaseEntity):
         Returns
         -------
         None
+            Validate the ``security`` field.
         """
         if not isinstance(
             self.security,
@@ -208,6 +221,7 @@ class HTTP(BaseEntity):
         Returns
         -------
         None
+            Validate the ``rate_limit`` field.
         """
         if not isinstance(
             self.rate_limit,
@@ -242,6 +256,7 @@ class HTTP(BaseEntity):
         Returns
         -------
         None
+            Validate the ``cors`` field.
         """
         if not isinstance(self.cors, (Cors, dict)):
             error_msg = "Invalid type for 'cors': expected a Cors instance or dict."
@@ -269,6 +284,7 @@ class HTTP(BaseEntity):
         Returns
         -------
         None
+            Validate the ``csrf`` field.
         """
         if not isinstance(self.csrf, (HTTPCsrf, dict)):
             error_msg = (

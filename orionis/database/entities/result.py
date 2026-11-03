@@ -1,3 +1,5 @@
+"""Outcome of an INSERT statement executed through a connection."""
+
 from __future__ import annotations
 from dataclasses import dataclass
 from typing import Any
@@ -9,7 +11,7 @@ class InsertResult:
 
     Attributes
     ----------
-    last_insert_id : Any
+    last_insert_id : typing.Any
         Primary key generated for the inserted row, or ``None`` when the
         driver cannot report it (for example on multi-row inserts).
     row_count : int

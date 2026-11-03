@@ -1,3 +1,5 @@
+"""Represent the immutable result of a successful route resolution."""
+
 from __future__ import annotations
 from dataclasses import dataclass
 from types import MappingProxyType
@@ -8,6 +10,7 @@ if TYPE_CHECKING:
     from orionis.http.routes.entities.compiled_route import CompiledRoute
 
 _EMPTY_PARAMS = MappingProxyType({})
+"""Empty params used by ``resolved_route``."""
 
 @dataclass(slots=True, frozen=True)
 class ResolvedRoute:
@@ -16,9 +19,9 @@ class ResolvedRoute:
 
     Attributes
     ----------
-    route : CompiledRoute
+    route : orionis.http.routes.entities.compiled_route.CompiledRoute
         The matched compiled route descriptor.
-    params : Mapping[str, Any]
+    params : collections.abc.Mapping[str, typing.Any]
         Path parameters extracted and type-converted from the URL.
         Empty for static routes.
     """
@@ -52,14 +55,14 @@ class ResolvedRoute:
 
         Parameters
         ----------
-        route : CompiledRoute
+        route : orionis.http.routes.entities.compiled_route.CompiledRoute
             Value supplied for ``route``.
-        params : dict[str, Any]
+        params : dict[str, typing.Any]
             Parameters decoded for the requested operation.
 
         Returns
         -------
-        ResolvedRoute
+        orionis.http.routes.entities.resolved_route.ResolvedRoute
             A route result wrapping the transferred parameter mapping.
         """
         result = object.__new__(cls)
@@ -72,7 +75,7 @@ class ResolvedRoute:
         """
         Return the route group kind (``'web'`` or ``'api'``).
 
-        Delegates to the underlying :attr:`route.kind` field so that
+        Delegates to the underlying ``route.kind`` field so that
         callers never need to reach into the compiled route directly.
 
         Returns

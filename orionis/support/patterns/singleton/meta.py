@@ -1,6 +1,9 @@
+"""Create one instance per class with synchronous and asynchronous access."""
+
 import threading
 
 _MISSING: object = object()
+"""Sentinel distinguishing missing from ordinary values."""
 
 class Singleton(type):
     """Create one instance per class with synchronous and asynchronous access."""
@@ -20,7 +23,7 @@ class Singleton(type):
             Class whose singleton state is initialized.
         name : str
             Name of the class being initialized.
-        bases : tuple[type, ...]
+        bases : tuple[type, ``...``]
             Base classes of the class being initialized.
         namespace : dict[str, object]
             Attributes defined in the class body.

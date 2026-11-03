@@ -1,3 +1,5 @@
+"""Shared machinery for the ``hasOne``/``hasMany`` relationship kinds."""
+
 from __future__ import annotations
 from collections import defaultdict
 from typing import TYPE_CHECKING, Any
@@ -14,12 +16,13 @@ class HasOneOrManyRelation[TRelated: "Model"](Relation[TRelated]):
 
     The related table holds the foreign key pointing back at the
     parent's local key. The two concrete kinds
-    (:class:`~orionis.orm.relations.has_one.HasOneRelation` and
-    :class:`~orionis.orm.relations.has_many.HasManyRelation`) only
+    (:class:`orionis.orm.relations.HasOneRelation` and
+    :class:`orionis.orm.relations.HasManyRelation`) only
     differ in how many rows they resolve to.
     """
 
     __slots__ = ("_foreign_key", "_local_key")
+    """Declare the instance attribute slots reserved by this class."""
 
     def __init__(
         self,
@@ -33,9 +36,9 @@ class HasOneOrManyRelation[TRelated: "Model"](Relation[TRelated]):
 
         Parameters
         ----------
-        parent : Model
+        parent : orionis.orm.Model
             Model instance the relationship is accessed from.
-        related : type of Model
+        related : type of orionis.orm.Model
             Model class the relationship targets.
         foreign_key : str or None
             Column on the related table referencing the parent; defaults
@@ -50,7 +53,15 @@ class HasOneOrManyRelation[TRelated: "Model"](Relation[TRelated]):
             This method does not return a value.
         """
         self._foreign_key = foreign_key or f"{snake_case(type(parent).__name__)}_id"
+        """
+        Column on the related table referencing the parent; defaults to
+        ``snake_case(ParentClass) + "_id"``.
+        """
         self._local_key = local_key or type(parent).__meta__.primary_key
+        """
+        Column on the parent compared against the foreign key; defaults to the
+        parent's primary key.
+        """
         super().__init__(parent, related)
 
     def addConstraints(self) -> None:
@@ -76,7 +87,7 @@ class HasOneOrManyRelation[TRelated: "Model"](Relation[TRelated]):
 
         Parameters
         ----------
-        models : list of Model
+        models : list of orionis.orm.Model
             Parent instances being eager loaded together.
 
         Returns
@@ -90,6 +101,7 @@ class HasOneOrManyRelation[TRelated: "Model"](Relation[TRelated]):
             if (value := getattr(model, self._local_key)) is not None
         }
         self._eager_keys_empty = not keys
+        """Whether eager loading has no parent keys to query."""
         self.whereIn(self._foreign_key, keys)
 
     def _groupByForeignKey(
@@ -101,7 +113,7 @@ class HasOneOrManyRelation[TRelated: "Model"](Relation[TRelated]):
 
         Parameters
         ----------
-        results : Collection
+        results : collections.abc.Collection
             Related rows produced by an eager query.
 
         Returns
@@ -128,12 +140,12 @@ class HasOneOrManyRelation[TRelated: "Model"](Relation[TRelated]):
 
         Returns
         -------
-        Model
+        orionis.orm.Model
             Persisted related model, already linked to the parent.
 
         Raises
         ------
-        MassAssignmentException
+        orionis.orm.exceptions.MassAssignmentException
             If an attribute (including the foreign key) violates the
             related model's fillable/guarded rules.
         """

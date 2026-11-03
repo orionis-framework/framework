@@ -1,3 +1,5 @@
+"""Ensure a value has an exact size."""
+
 from orionis.schemas.rules.measure import measure
 from orionis.schemas.rule import Rule
 
@@ -12,9 +14,12 @@ class Size(Rule):
     # ruff: noqa: ARG002
 
     __slots__ = ("_size",)
+    """Declare the instance attribute slots reserved by this class."""
 
     __message__ = "Value must have the required size."
+    """Error text for message: ``Value must have the required size.``."""
     __code__ = "size"
+    """Code identifier: ``size``."""
 
     def __init__(self, size: float, *, message: str | None = None) -> None:
         """
@@ -45,6 +50,7 @@ class Size(Rule):
             )
             raise ValueError(error_msg)
         self._size: float = size
+        """Exact size the value must have."""
 
     async def enforce(
         self,

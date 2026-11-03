@@ -1,3 +1,5 @@
+"""Resolve and execute registered console commands."""
+
 import argparse
 import operator
 import sys
@@ -19,6 +21,7 @@ from orionis.support.types.sentinel import MISSING
 class Reactor(IReactor):
 
     # ruff: noqa: PLR0913, SLF001, BLE001,TRY400, TC001, C901
+    """Resolve and execute registered console commands."""
 
     def __init__(
         self,
@@ -37,17 +40,17 @@ class Reactor(IReactor):
 
         Parameters
         ----------
-        app : IApplication
+        app : orionis.IApplication
             Application instance for command processing.
-        loader : Loader
+        loader : orionis.console.core.loader.Loader
             Loader instance for managing command loading.
-        executer : Executor
+        executer : orionis.console.output.executor.Executor
             Executor instance for managing command output.
-        logger : ILogger
+        logger : orionis.logging.contracts.ILogger
             Logger instance for logging command execution details.
-        catch : ICatch
+        catch : orionis.failure.contracts.ICatch
             Catch instance for handling exceptions.
-        performance_counter : PerformanceCounter
+        performance_counter : orionis.support.performance.PerformanceCounter
             PerformanceCounter instance for measuring command execution time.
 
         Returns
@@ -57,24 +60,31 @@ class Reactor(IReactor):
         """
         # Set the application instance for command processing
         self.__app = app
+        """Application instance for command processing."""
 
         # Initialize the list for fluent command definitions
         self.__loader = loader
+        """Loader instance for managing command loading."""
 
         # Initialize the executor for command output management
         self.__executer = executer
+        """Executor instance for managing command output."""
 
         # Initialize the logger service for logging command execution details
         self.__logger = logger
+        """Logger instance for logging command execution details."""
 
         # Initialize the performance counter for measuring command execution time
         self.__performance_counter = performance_counter
+        """PerformanceCounter instance for measuring command execution time."""
 
         # Store the catch instance for exception handling
         self.__catch = catch
+        """Catch instance for handling exceptions."""
 
         # Initialize cache for command information
         self.__cache_info: list[dict] | None = None
+        """Initialize cache for command information."""
 
     def __parseCommandArgs(
         self,
@@ -86,9 +96,9 @@ class Reactor(IReactor):
 
         Parameters
         ----------
-        command : Command
+        command : orionis.console.entities.Command
             Command object containing the argument parser and metadata.
-        args : Optional[list[str]], default None
+        args : typing.Optional[list[str]], default None
             List of command-line arguments to parse. If None, an empty list is used.
 
         Returns
@@ -165,12 +175,12 @@ class Reactor(IReactor):
         ----------
         signature : str
             Command signature to register.
-        handler : list[type[Any] | str | None] | str
+        handler : list[type[typing.Any] | str | None] | str
             Handler class and optional method name.
 
         Returns
         -------
-        ICommand
+        orionis.console.fluent.contracts.command.ICommand
             The registered command instance.
         """
         # Normalize handler to list format and register with loader

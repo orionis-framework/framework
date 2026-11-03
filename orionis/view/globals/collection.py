@@ -1,3 +1,5 @@
+"""Provide view globals operations through ``_global_collect``."""
+
 from __future__ import annotations
 from collections.abc import Iterable
 from typing import Any
@@ -11,23 +13,23 @@ def _global_collect() -> Any:
 
     Returns
     -------
-    Any
-        Callable wrapping a value in a :class:`Collection` instance.
+    typing.Any
+        Callable wrapping a value in a :class:`collections.abc.Collection` instance.
     """
     def collect(value: Any = None) -> Collection:
         """
-        Wrap a value in a fluent :class:`Collection` instance.
+        Wrap a value in a fluent :class:`collections.abc.Collection` instance.
 
         Parameters
         ----------
-        value : Any, optional
+        value : typing.Any, optional
             Value to wrap.  Iterables are expanded into items, scalars
             are wrapped as a single-item collection, and ``None``
             produces an empty collection.
 
         Returns
         -------
-        Collection
+        collections.abc.Collection
             Fluent collection exposing the collection helper API.
         """
         if value is None:

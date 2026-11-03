@@ -1,3 +1,5 @@
+"""Provide a base class for HTTP controllers."""
+
 class BaseController:
     """
     Provide a base class for HTTP controllers.

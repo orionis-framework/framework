@@ -1,3 +1,9 @@
+"""Provide auth middleware operations.
+
+Includes ``ResolveIdentityMiddleware``, ``ResolveSessionIdentityMiddleware``,
+``ResolveTokenIdentityMiddleware``.
+"""
+
 from typing import TYPE_CHECKING, ClassVar
 from orionis.auth.context.context import AuthenticationContext
 from orionis.auth.context.functions import (
@@ -39,10 +45,15 @@ class ResolveIdentityMiddleware(BaseMiddleware):
     # ruff: noqa: TC001 (Dependency Injection)
 
     __slots__ = ("_manager", "_permissions")
+    """Declare the instance attribute slots reserved by this class."""
 
     # An unpinned middleware reuses the request guard. Before any resolution,
     # ``None`` falls back to the configured default guard.
     guard: ClassVar[str | None] = None
+    """
+    An unpinned middleware reuses the request guard. Before any resolution, ``None``
+    falls back to the configured default guard.
+    """
 
     def __init__(
         self,
@@ -54,9 +65,9 @@ class ResolveIdentityMiddleware(BaseMiddleware):
 
         Parameters
         ----------
-        manager : IAuthManager
+        manager : orionis.auth.contracts.IAuthManager
             Manager exposing the configured guards.
-        permissions : IPermissionRepository
+        permissions : orionis.auth.contracts.IPermissionRepository
             Source the authorization snapshot is built from.
 
         Returns
@@ -66,7 +77,9 @@ class ResolveIdentityMiddleware(BaseMiddleware):
             stateless afterwards.
         """
         self._manager = manager
+        """Manager exposing the configured guards."""
         self._permissions = permissions
+        """Source the authorization snapshot is built from."""
 
     async def handle(
         self,
@@ -78,14 +91,14 @@ class ResolveIdentityMiddleware(BaseMiddleware):
 
         Parameters
         ----------
-        request : Request
+        request : orionis.http.Request
             Incoming HTTP request.
-        call_next : NextCallable
+        call_next : orionis.http.NextCallable
             Callable advancing to the next layer.
 
         Returns
         -------
-        Response
+        orionis.http.Response
             Response produced by the rest of the pipeline.
         """
         await self._establish(request)
@@ -101,12 +114,12 @@ class ResolveIdentityMiddleware(BaseMiddleware):
 
         Parameters
         ----------
-        request : Request
+        request : orionis.http.Request
             Incoming HTTP request.
 
         Returns
         -------
-        IAuthenticationContext
+        orionis.auth.contracts.IAuthenticationContext
             Context bound for the rest of the request.
         """
         async with authentication_lock():
@@ -137,6 +150,7 @@ class ResolveSessionIdentityMiddleware(ResolveIdentityMiddleware):
     """Resolve a web identity from the session without requiring a login."""
 
     __slots__ = ()
+    """Declare that this class introduces no additional instance slots."""
 
     guard: ClassVar[str | None] = Guards.SESSION.value
 
@@ -146,14 +160,14 @@ class ResolveSessionIdentityMiddleware(ResolveIdentityMiddleware):
 
         Parameters
         ----------
-        request : Request
+        request : orionis.http.Request
             Incoming HTTP request carrying the session.
-        call_next : NextCallable
+        call_next : orionis.http.NextCallable
             Callable advancing to the next layer in the request pipeline.
 
         Returns
         -------
-        Response
+        orionis.http.Response
             Response produced by the remaining pipeline, with any queued
             remember-cookie changes applied.
         """
@@ -165,5 +179,6 @@ class ResolveTokenIdentityMiddleware(ResolveIdentityMiddleware):
     """Resolve an API identity from a Bearer token while allowing guests."""
 
     __slots__ = ()
+    """Declare that this class introduces no additional instance slots."""
 
     guard: ClassVar[str | None] = Guards.TOKEN.value

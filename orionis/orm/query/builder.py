@@ -1,3 +1,5 @@
+"""Fluent query builder bound to a model class."""
+
 from __future__ import annotations
 import asyncio
 import inspect
@@ -21,17 +23,22 @@ if TYPE_CHECKING:
 
 # Default page size used by pagination.
 _DEFAULT_PER_PAGE: int = 15
+"""Default page size used by pagination."""
 
 # Soft delete visibility modes a model query can run under.
 _TRASHED_EXCLUDE: str = "exclude"
+"""Soft delete visibility modes a model query can run under."""
 _TRASHED_INCLUDE: str = "with"
+"""Trashed include identifier: ``with``."""
 _TRASHED_ONLY: str = "only"
+"""Trashed only identifier: ``only``."""
 
 class ModelQueryBuilder[TModel: "Model"](QueryBuilderBase, IModelQueryBuilder):
     """
     Fluent query builder bound to a model class.
 
-    It adds model awareness on top of :class:`QueryBuilderBase`: rows
+    It adds model awareness on top of
+    :class:`orionis.orm.query.base_builder.QueryBuilderBase`: rows
     are hydrated into model instances, written values go through the
     declared casts, timestamps are maintained, and relationships can be
     eager loaded. The query language itself is entirely inherited, so a
@@ -46,6 +53,7 @@ class ModelQueryBuilder[TModel: "Model"](QueryBuilderBase, IModelQueryBuilder):
         "_trashed_mode",
         "_without_scopes",
     )
+    """Declare the instance attribute slots reserved by this class."""
 
     # ruff: noqa: ANN401
 
@@ -55,7 +63,7 @@ class ModelQueryBuilder[TModel: "Model"](QueryBuilderBase, IModelQueryBuilder):
 
         Parameters
         ----------
-        model : type of Model
+        model : type of orionis.orm.Model
             Model class the queries run against.
 
         Returns
@@ -66,12 +74,19 @@ class ModelQueryBuilder[TModel: "Model"](QueryBuilderBase, IModelQueryBuilder):
         meta = model.__meta__
         super().__init__(meta.table)
         self._model = model
+        """Model class the queries run against."""
         self._meta = meta
+        """Meta supplied through ``meta``."""
         self._connection_name = meta.connection
+        """Name of the configured database connection to use."""
         self._eager_loads: dict[str, None] = {}
+        """Relations scheduled for eager loading with the query result."""
         self._without_scopes: set[str] = set()
+        """Without scopes produced by ``set``."""
         self._trashed_mode: str = _TRASHED_EXCLUDE
+        """Trashed mode supplied through ``_TRASHED_EXCLUDE``."""
         self._scopes_applied: bool = False
+        """Scopes applied flag used by ``ModelQueryBuilder``."""
 
     def __getattr__(self, name: str) -> Any:
         """
@@ -84,7 +99,7 @@ class ModelQueryBuilder[TModel: "Model"](QueryBuilderBase, IModelQueryBuilder):
 
         Returns
         -------
-        Any
+        typing.Any
             Callable applying the scope and returning the builder.
 
         Raises
@@ -111,14 +126,14 @@ class ModelQueryBuilder[TModel: "Model"](QueryBuilderBase, IModelQueryBuilder):
 
             Parameters
             ----------
-            *args : Any
+            *args : typing.Any
                 Positional arguments forwarded to the scope.
-            **kwargs : Any
+            **kwargs : typing.Any
                 Keyword arguments forwarded to the scope.
 
             Returns
             -------
-            ModelQueryBuilder
+            orionis.orm.query.ModelQueryBuilder
                 The same builder, enabling fluent chaining.
             """
             scope(self, *args, **kwargs)
@@ -133,7 +148,7 @@ class ModelQueryBuilder[TModel: "Model"](QueryBuilderBase, IModelQueryBuilder):
         Eager load the given relationships alongside the query.
 
         Each relationship is loaded once in declaration order;
-        :meth:`load` is an alias.
+        :meth:`orionis.orm.query.ModelQueryBuilder.load` is an alias.
 
         Parameters
         ----------
@@ -142,7 +157,7 @@ class ModelQueryBuilder[TModel: "Model"](QueryBuilderBase, IModelQueryBuilder):
 
         Returns
         -------
-        ModelQueryBuilder
+        orionis.orm.query.ModelQueryBuilder
             The same builder, enabling fluent chaining.
         """
         self._eager_loads.update(dict.fromkeys(names))
@@ -150,7 +165,9 @@ class ModelQueryBuilder[TModel: "Model"](QueryBuilderBase, IModelQueryBuilder):
 
     def load(self, *names: str) -> Self:
         """
-        Eager load the given relationships; alias of :meth:`withRelations`.
+        Eager load the given relationships.
+
+        Alias of :meth:`orionis.orm.query.ModelQueryBuilder.withRelations`.
 
         Parameters
         ----------
@@ -159,7 +176,7 @@ class ModelQueryBuilder[TModel: "Model"](QueryBuilderBase, IModelQueryBuilder):
 
         Returns
         -------
-        ModelQueryBuilder
+        orionis.orm.query.ModelQueryBuilder
             The same builder, enabling fluent chaining.
         """
         return self.withRelations(*names)
@@ -177,7 +194,7 @@ class ModelQueryBuilder[TModel: "Model"](QueryBuilderBase, IModelQueryBuilder):
 
         Returns
         -------
-        ModelQueryBuilder
+        orionis.orm.query.ModelQueryBuilder
             The same builder, enabling fluent chaining.
         """
         self._without_scopes.add(name)
@@ -194,7 +211,7 @@ class ModelQueryBuilder[TModel: "Model"](QueryBuilderBase, IModelQueryBuilder):
 
         Returns
         -------
-        ModelQueryBuilder
+        orionis.orm.query.ModelQueryBuilder
             The same builder, enabling fluent chaining.
         """
         self._without_scopes.update(names or self._meta.global_scopes)
@@ -211,19 +228,19 @@ class ModelQueryBuilder[TModel: "Model"](QueryBuilderBase, IModelQueryBuilder):
         ----------
         name : str
             Scope name, without the ``scope`` prefix.
-        *args : Any
+        *args : typing.Any
             Positional arguments forwarded to the scope.
-        **kwargs : Any
+        **kwargs : typing.Any
             Keyword arguments forwarded to the scope.
 
         Returns
         -------
-        ModelQueryBuilder
+        orionis.orm.query.ModelQueryBuilder
             The same builder, enabling fluent chaining.
 
         Raises
         ------
-        ScopeNotFoundException
+        orionis.orm.exceptions.ScopeNotFoundException
             If the model declares no such scope.
         """
         method = self._meta.scopes.get(name)
@@ -241,7 +258,7 @@ class ModelQueryBuilder[TModel: "Model"](QueryBuilderBase, IModelQueryBuilder):
 
         Returns
         -------
-        ModelQueryBuilder
+        orionis.orm.query.ModelQueryBuilder
             The same builder, enabling fluent chaining.
         """
         self._trashed_mode = _TRASHED_INCLUDE
@@ -253,7 +270,7 @@ class ModelQueryBuilder[TModel: "Model"](QueryBuilderBase, IModelQueryBuilder):
 
         Returns
         -------
-        ModelQueryBuilder
+        orionis.orm.query.ModelQueryBuilder
             The same builder, enabling fluent chaining.
         """
         self._trashed_mode = _TRASHED_ONLY
@@ -265,7 +282,7 @@ class ModelQueryBuilder[TModel: "Model"](QueryBuilderBase, IModelQueryBuilder):
 
         Returns
         -------
-        ModelQueryBuilder
+        orionis.orm.query.ModelQueryBuilder
             The same builder, enabling fluent chaining.
         """
         self._trashed_mode = _TRASHED_EXCLUDE
@@ -324,14 +341,14 @@ class ModelQueryBuilder[TModel: "Model"](QueryBuilderBase, IModelQueryBuilder):
 
         Returns
         -------
-        Collection
+        collections.abc.Collection
             Collection of hydrated model instances.
 
         Raises
         ------
-        QueryException
+        orionis.database.QueryException
             If the statement fails to compile or execute.
-        RelationNotFoundException
+        orionis.orm.exceptions.RelationNotFoundException
             If an eager-loaded relationship name does not resolve to one.
         """
         self._beforeExecute()
@@ -349,14 +366,14 @@ class ModelQueryBuilder[TModel: "Model"](QueryBuilderBase, IModelQueryBuilder):
 
         Returns
         -------
-        Model or None
+        orionis.orm.Model or None
             First matching model, or ``None`` without matches.
 
         Raises
         ------
-        QueryException
+        orionis.database.QueryException
             If the statement fails to compile or execute.
-        RelationNotFoundException
+        orionis.orm.exceptions.RelationNotFoundException
             If an eager-loaded relationship name does not resolve to one.
         """
         self._beforeExecute()
@@ -378,12 +395,12 @@ class ModelQueryBuilder[TModel: "Model"](QueryBuilderBase, IModelQueryBuilder):
 
         Returns
         -------
-        Model
+        orionis.orm.Model
             First matching model.
 
         Raises
         ------
-        ModelNotFoundException
+        orionis.orm.exceptions.ModelNotFoundException
             If the query yields no rows.
         """
         instance = await self.first()
@@ -398,12 +415,12 @@ class ModelQueryBuilder[TModel: "Model"](QueryBuilderBase, IModelQueryBuilder):
 
         Parameters
         ----------
-        key : Any
+        key : typing.Any
             Primary key value to look up.
 
         Returns
         -------
-        Model or None
+        orionis.orm.Model or None
             Matching model, or ``None`` when absent.
         """
         return await self.where(self._meta.primary_key, key).first()
@@ -414,17 +431,17 @@ class ModelQueryBuilder[TModel: "Model"](QueryBuilderBase, IModelQueryBuilder):
 
         Parameters
         ----------
-        key : Any
+        key : typing.Any
             Primary key value to look up.
 
         Returns
         -------
-        Model
+        orionis.orm.Model
             Matching model.
 
         Raises
         ------
-        ModelNotFoundException
+        orionis.orm.exceptions.ModelNotFoundException
             If no record matches the key.
         """
         instance = await self.find(key)
@@ -447,7 +464,7 @@ class ModelQueryBuilder[TModel: "Model"](QueryBuilderBase, IModelQueryBuilder):
 
         Returns
         -------
-        Any
+        typing.Any
             Column value, or ``None`` without matches.
         """
         instance = await self.clone().select(column).first()
@@ -465,7 +482,7 @@ class ModelQueryBuilder[TModel: "Model"](QueryBuilderBase, IModelQueryBuilder):
 
         Returns
         -------
-        Collection
+        collections.abc.Collection
             Collection of column values.
         """
         models = await self.clone().select(column).get()
@@ -489,12 +506,12 @@ class ModelQueryBuilder[TModel: "Model"](QueryBuilderBase, IModelQueryBuilder):
 
         Returns
         -------
-        Paginator
+        orionis.orm.collections.Paginator
             Page of hydrated models with pagination metadata.
 
         Raises
         ------
-        InvalidQueryException
+        orionis.orm.exceptions.InvalidQueryException
             If the page or page size are not positive integers.
         """
         self.forPage(page, per_page)
@@ -523,7 +540,7 @@ class ModelQueryBuilder[TModel: "Model"](QueryBuilderBase, IModelQueryBuilder):
 
         Returns
         -------
-        ModelQueryBuilder
+        orionis.orm.query.ModelQueryBuilder
             Detached copy carrying its own plan and eager-load list.
         """
         duplicate = super().clone()
@@ -566,7 +583,7 @@ class ModelQueryBuilder[TModel: "Model"](QueryBuilderBase, IModelQueryBuilder):
 
         Parameters
         ----------
-        models : list of Model
+        models : list of orionis.orm.Model
             Models hydrated by the terminal that just ran.
 
         Returns
@@ -587,7 +604,7 @@ class ModelQueryBuilder[TModel: "Model"](QueryBuilderBase, IModelQueryBuilder):
 
         Returns
         -------
-        IConnection
+        orionis.database.contracts.IConnection
             Connection declared by the model, or the default one.
         """
         return ConnectionResolver.connection(self._connection_name)
@@ -641,7 +658,7 @@ class ModelQueryBuilder[TModel: "Model"](QueryBuilderBase, IModelQueryBuilder):
 
     def _defaultTimestampColumn(self) -> str:
         """
-        Return the column :meth:`latest` and :meth:`oldest` default to.
+        Return the column ``latest`` and ``oldest`` default to.
 
         Returns
         -------
@@ -664,7 +681,7 @@ class ModelQueryBuilder[TModel: "Model"](QueryBuilderBase, IModelQueryBuilder):
 
         Parameters
         ----------
-        models : list of Model
+        models : list of orionis.orm.Model
             Hydrated models to attach the relationships onto.
 
         Returns
@@ -674,7 +691,7 @@ class ModelQueryBuilder[TModel: "Model"](QueryBuilderBase, IModelQueryBuilder):
 
         Raises
         ------
-        RelationNotFoundException
+        orionis.orm.exceptions.RelationNotFoundException
             If a requested name is not a relationship method.
         """
         # Imported locally: Relation subclasses ModelQueryBuilder, so

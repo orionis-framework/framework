@@ -1,3 +1,5 @@
+"""Configure finite request, buffering, multipart and concurrency budgets."""
+
 from __future__ import annotations
 from dataclasses import dataclass, field
 from orionis.environment import Env

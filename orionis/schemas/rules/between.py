@@ -1,3 +1,5 @@
+"""Ensure a value's size falls within an inclusive range."""
+
 from orionis.schemas.rules.measure import measure
 from orionis.schemas.rule import Rule
 
@@ -12,9 +14,12 @@ class Between(Rule):
     # ruff: noqa: ARG002
 
     __slots__ = ("_maximum", "_minimum")
+    """Declare the instance attribute slots reserved by this class."""
 
     __message__ = "Value must be between the configured bounds."
+    """Error text for message: ``Value must be between the configured bounds.``."""
     __code__ = "between"
+    """Code identifier: ``between``."""
 
     def __init__(
         self,
@@ -53,7 +58,9 @@ class Between(Rule):
             )
             raise ValueError(error_msg)
         self._minimum: float = minimum
+        """Lowest accepted size."""
         self._maximum: float = maximum
+        """Highest accepted size."""
 
     async def enforce(
         self,

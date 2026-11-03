@@ -1,3 +1,5 @@
+"""Enumerate supported MySQL storage engines."""
+
 from enum import Enum
 
 class MySQLEngine(Enum):
@@ -14,7 +16,7 @@ class MySQLEngine(Enum):
 
     Returns
     -------
-    MySQLEngine
+    orionis.foundation.config.database.MySQLEngine
         An enumeration member representing a MySQL storage engine.
     """
 

@@ -1,3 +1,5 @@
+"""Asynchronous wrapper around a lazily opened binary handle."""
+
 from __future__ import annotations
 import asyncio
 from typing import TYPE_CHECKING, Self
@@ -22,6 +24,7 @@ class AsyncStream(IStorageStream):
     """
 
     __slots__ = ("_handle", "_lock", "_on_close", "_opener")
+    """Declare the instance attribute slots reserved by this class."""
 
     def __init__(
         self: Self,
@@ -33,21 +36,29 @@ class AsyncStream(IStorageStream):
 
         Parameters
         ----------
-        opener : Callable[[], BinaryIO]
+        opener : collections.abc.Callable[[], typing.BinaryIO]
             Zero-argument callable returning the binary handle. It is
             invoked lazily on a worker thread.
-        on_close : Callable[[BinaryIO], None] | None
+        on_close : collections.abc.Callable[[typing.BinaryIO], None] | None
             Optional callback executed with the open handle right
             before it is closed.
 
         Returns
         -------
         None
+            Initialize the stream with its handle factory.
         """
         self._opener = opener
+        """
+        Zero-argument callable returning the binary handle. It is invoked lazily on
+        a worker thread.
+        """
         self._on_close = on_close
+        """Optional callback executed with the open handle right before it is closed."""
         self._handle: BinaryIO | None = None
+        """Open stream handle used for asynchronous file operations."""
         self._lock = asyncio.Lock()
+        """Lock protecting concurrent access to shared state."""
 
     async def __ensureHandle(self: Self) -> BinaryIO:
         """
@@ -55,7 +66,7 @@ class AsyncStream(IStorageStream):
 
         Returns
         -------
-        BinaryIO
+        typing.BinaryIO
             The open binary handle backing this stream.
         """
         # Open lazily so building the stream object stays side-effect free.
@@ -188,6 +199,7 @@ class AsyncStream(IStorageStream):
         Returns
         -------
         None
+            Flush pending data and release the underlying handle.
         """
         async with self._lock:
             handle = self._handle
@@ -218,7 +230,7 @@ class AsyncStream(IStorageStream):
 
         Returns
         -------
-        IStorageStream
+        orionis.storage.contracts.IStorageStream
             The stream itself, ready for I/O operations.
         """
         async with self._lock:
@@ -240,11 +252,12 @@ class AsyncStream(IStorageStream):
             Exception class raised inside the context, if any.
         exc : BaseException | None
             Exception instance raised inside the context, if any.
-        traceback : TracebackType | None
+        traceback : types.TracebackType | None
             Traceback of the raised exception, if any.
 
         Returns
         -------
         None
+            Close the stream when leaving the async context.
         """
         await self.close()

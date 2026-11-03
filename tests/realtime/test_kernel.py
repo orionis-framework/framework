@@ -135,7 +135,7 @@ class _RSGIHubPeer(_RSGIPeer):
         self.scope.path = "/hub/5"
         self.output = asyncio.Queue()
 
-    async def send_bytes(self, data: bytes) -> None:
+    async def sendBytes(self, data: bytes) -> None:
         """
         Record a binary message and publish it to the test client.
 
@@ -151,6 +151,9 @@ class _RSGIHubPeer(_RSGIPeer):
         """
         self.sent.append(data)
         self.output.put_nowait(data)
+
+    # Preserve the Granian RSGI protocol name.
+    send_bytes = sendBytes
 
 class TestHubKernel(TestCase):
     """Verify route preload, both protocols, connection scopes and cleanup."""

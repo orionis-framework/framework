@@ -1,3 +1,5 @@
+"""Share sliding-window quotas using a single-key atomic Redis script."""
+
 from __future__ import annotations
 from asyncio import timeout
 from hashlib import sha256
@@ -22,11 +24,13 @@ redis.call('ZADD', KEYS[1], now, ARGV[3])
 redis.call('PEXPIRE', KEYS[1], tonumber(ARGV[2]) * 1000)
 return 1
 """
+"""Redis owns the clock and makes expiration, quota checking and insertion atomic."""
 
 class RedisRateLimitStore:
     """Share sliding-window quotas using a single-key atomic Redis script."""
 
     __slots__ = ("__client", "__owns_client", "__prefix", "__timeout")
+    """Declare the instance attribute slots reserved by this class."""
 
     def __init__(
         self,
@@ -39,9 +43,9 @@ class RedisRateLimitStore:
 
         Parameters
         ----------
-        config : HTTPRateLimit
+        config : orionis.foundation.config.http.HTTPRateLimit
             Validated connection fields, namespace and operation timeout.
-        client : Redis | None, optional
+        client : ``redis.asyncio.Redis`` | None, optional
             Externally owned transport. The caller remains responsible for it.
 
         Returns
@@ -50,8 +54,11 @@ class RedisRateLimitStore:
             Prepare the backend without opening a network connection.
         """
         self.__prefix = config.rate_limit_redis_prefix
+        """Prefix applied when constructing names or storage keys."""
         self.__timeout = config.rate_limit_redis_timeout_seconds
+        """Maximum duration allowed for an execution attempt."""
         self.__owns_client = client is None
+        """Whether this object must close the client during its own cleanup."""
         connection = config.toDict()["rate_limit_redis"]
         self.__client = client if client is not None else Redis(
             host=connection["endpoint"],
@@ -65,6 +72,7 @@ class RedisRateLimitStore:
             max_connections=100,
             protocol=2,
         )
+        """Externally owned transport. The caller remains responsible for it."""
 
     async def hit(self, key: str, limit: int, window: int) -> bool:
         """
@@ -86,7 +94,7 @@ class RedisRateLimitStore:
 
         Raises
         ------
-        redis.exceptions.RedisError
+        ``redis.exceptions.RedisError``
             When storage is unavailable or contains an incompatible key type.
         """
         if limit <= 0:

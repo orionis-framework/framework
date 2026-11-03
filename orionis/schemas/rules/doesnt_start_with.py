@@ -1,3 +1,5 @@
+"""Ensure a string does not start with any of the given prefixes."""
+
 from orionis.schemas.rule import Rule
 
 class DoesntStartWith(Rule):
@@ -6,9 +8,15 @@ class DoesntStartWith(Rule):
     # ruff: noqa: ARG002
 
     __slots__ = ("_prefixes",)
+    """Declare the instance attribute slots reserved by this class."""
 
     __message__ = "Value must not start with any of the forbidden prefixes."
+    """
+    Error text for message: ``Value must not start with any of the forbidden
+    prefixes.``.
+    """
     __code__ = "doesnt_start_with"
+    """Code identifier: ``doesnt_start_with``."""
 
     def __init__(self, *prefixes: str, message: str | None = None) -> None:
         """
@@ -36,6 +44,7 @@ class DoesntStartWith(Rule):
             error_msg = "DoesntStartWith requires at least one prefix."
             raise ValueError(error_msg)
         self._prefixes: tuple[str, ...] = prefixes
+        """Prefixes the value must not start with. At least one is required."""
 
     async def enforce(
         self,

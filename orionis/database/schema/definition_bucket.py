@@ -1,3 +1,5 @@
+"""Mutable accumulator used while classifying schema definitions."""
+
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
@@ -14,6 +16,7 @@ class DefinitionBucket:
         "primary_columns",
         "unique_constraints",
     )
+    """Declare the instance attribute slots reserved by this class."""
 
     def __init__(self) -> None:
         """
@@ -25,8 +28,14 @@ class DefinitionBucket:
             This method does not return a value.
         """
         self.columns: dict[str, ColumnDefinition] = {}
+        """Column definitions included in the table schema."""
         self.primary_columns: list[str] = []
+        """Columns included in the primary-key constraint."""
         self.unique_constraints: list[object] = []
+        """Uniqueness constraints declared for the table."""
         self.foreign_keys: list[object] = []
+        """Foreign-key constraints declared for the table."""
         self.indexes: list[object] = []
+        """Indexes declared for the table."""
         self.kwargs: dict[str, object] = {}
+        """Keyword options forwarded to construction of the underlying object."""

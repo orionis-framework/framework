@@ -1,3 +1,5 @@
+"""Represent the configuration for trusted HTTP proxies."""
+
 from __future__ import annotations
 from dataclasses import dataclass, field
 from orionis.environment import Env
@@ -35,6 +37,7 @@ class HTTPProxies(BaseEntity):
         Returns
         -------
         None
+            Validate proxy fields.
         """
         super().__post_init__()
         self.__validateTrustedProxies()
@@ -53,6 +56,7 @@ class HTTPProxies(BaseEntity):
         Returns
         -------
         None
+            Validate the ``trusted_proxies`` field.
         """
         object.__setattr__(
             self,

@@ -1,15 +1,18 @@
+"""Register schema services in the application container."""
+
 from orionis.container.providers.service_provider import ServiceProvider
 from orionis.database.contracts.schema import ISchema
 from orionis.database.schema.schema import Schema
 
 class SchemaProvider(ServiceProvider):
+    """Register schema services in the application container."""
 
     def register(self) -> None:
         """
-        Bind the `ISchema` contract to the `Schema` implementation.
+        Bind the ``ISchema`` contract to the ``Schema`` implementation.
 
         A new instance is resolved on every request (transient lifetime),
-        since `Schema` stores the explicit connection selection for
+        since ``Schema`` stores the explicit connection selection for
         subsequent schema operations.
 
         Returns

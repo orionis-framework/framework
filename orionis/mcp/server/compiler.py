@@ -1,3 +1,9 @@
+"""Provide mcp server operations.
+
+Includes ``CompiledPrimitive``, ``CompiledCatalog``, ``CompiledMcpServer``,
+``compile_server``.
+"""
+
 import re
 from dataclasses import dataclass, field, replace
 from types import MappingProxyType, get_original_bases
@@ -26,8 +32,10 @@ if TYPE_CHECKING:
     from collections.abc import Iterator, Mapping
 
 type _JsonObject = dict[str, object]
+"""Type alias for ``dict[str, object]``."""
 
 _NAME = re.compile(r"[A-Za-z0-9_.-]{1,128}")
+"""Compiled pattern used to recognize name."""
 _CORE_METHODS = frozenset(
     {
         "server/discover",
@@ -44,76 +52,119 @@ _CORE_METHODS = frozenset(
         "initialize",
     },
 )
+"""Core methods used by ``compiler``."""
 
 class _SearchPayload(msgspec.Struct, forbid_unknown_fields=True):
     """Bounded searchable catalog arguments."""
 
     query: Annotated[str, msgspec.Meta(max_length=4096)] = ""
+    """Query identifier: ``''``."""
     limit: Annotated[int, msgspec.Meta(ge=1, le=100)] = 10
+    """Limit value used by ``_SearchPayload``."""
 
 class _CatalogCall(msgspec.Struct, forbid_unknown_fields=True):
     """An independent catalog invocation, with no Python call kwargs."""
 
     name: str
+    """Name identifying this declaration within its containing registry."""
     arguments: dict[str, object] = msgspec.field(default_factory=dict)
+    """Command-line argument declarations accepted by this command."""
 
 class _ExecutePayload(msgspec.Struct, forbid_unknown_fields=True):
     """Request limits are additionally enforced by the dispatcher configuration."""
 
     calls: Annotated[list[_CatalogCall], msgspec.Meta(min_length=1)]
+    """Tool invocations included in the catalog execution request."""
 
 @dataclass(frozen=True, slots=True, kw_only=True)
 class CompiledPrimitive:
     """Unbound declaration metadata, with no identity or per-call service instance."""
 
     definition: type[Primitive]
+    """Original declaration from which runtime metadata was compiled."""
     name: str
+    """Name identifying this declaration within its containing registry."""
     metadata: msgspec.Raw
+    """Compiled metadata used to describe and invoke the registered operation."""
     handler: McpInvoker | None
+    """Callable or method selected to handle the registered operation."""
     description: str = ""
+    """Description identifier: ``''``."""
     availability: McpInvoker | None = None
+    """Hook determining whether the primitive is visible for this request."""
     authorization: McpInvoker | None = None
+    """Hook deciding whether the current caller may invoke the primitive."""
     completion: McpInvoker | None = None
+    """Completion provider or result associated with the primitive."""
     input_type: object = None
+    """Python schema type used to decode and validate handler input."""
     output_type: object = msgspec.UNSET
     input_schema: msgspec.Raw | None = None
+    """JSON Schema describing the accepted input."""
     output_schema: msgspec.Raw | None = None
+    """JSON Schema describing the declared structured output."""
     mirrored_headers: tuple[HeaderBinding, ...] = ()
+    """HTTP-header bindings derived from the primitive input schema."""
     cache: CacheHint = field(default_factory=CacheHint)
+    """Cache policy or cached state used by this component."""
     uri: str | None = None
+    """Resource URI identifying the requested or returned content."""
     mime_type: str | None = None
+    """Media type describing the resource content."""
     prompt_arguments: tuple[PromptArgument, ...] = ()
+    """Argument declarations accepted by the prompt."""
     matcher: UriMatcher | None = None
+    """Compiled matcher resolving parameters from a resource URI."""
     synthetic: Literal["search", "execute"] | None = None
+    """Whether this primitive was generated for catalog dispatch."""
     catalog: int | None = None
+    """Catalog metadata associated with this primitive."""
     search_text: str = ""
+    """Search text identifier: ``''``."""
 
 @dataclass(frozen=True, slots=True, kw_only=True)
 class CompiledCatalog:
     """One hidden catalog and its deterministic boot-time lexical index."""
 
     tools: Mapping[str, CompiledPrimitive]
+    """Tool declarations available through this server or catalog."""
     search_name: str
+    """Public tool name used to search the catalog."""
     execute_name: str
+    """Public tool name used to execute catalog calls."""
     index: tuple[tuple[str, str], ...]
+    """Lookup index used to resolve registered entries."""
 
 @dataclass(frozen=True, slots=True, kw_only=True)
 class CompiledMcpServer:
     """A definition reusable by every request, worker and supported transport."""
 
     definition: type[Server]
+    """Original declaration from which runtime metadata was compiled."""
     tools: Mapping[str, CompiledPrimitive]
+    """Tool declarations available through this server or catalog."""
     resources: Mapping[str, CompiledPrimitive]
+    """Resource declarations available through this server."""
     prompts: Mapping[str, CompiledPrimitive]
+    """Prompt declarations available through this server."""
     templates: tuple[CompiledPrimitive, ...]
+    """Compiled resource templates indexed by their identifiers."""
     info: ServerInfo
+    """Server identity metadata exposed during discovery."""
     capabilities: Mapping[str, object]
+    """Capabilities advertised by the compiled server."""
     capabilities_wire: msgspec.Raw
+    """Preencoded capabilities retained for protocol responses."""
     instructions: str
+    """Instructions exposed by the server to protocol clients."""
     cache: CacheHint
+    """Cache policy or cached state used by this component."""
     extensions: tuple[McpExtension, ...]
+    """Extensions registered for this server or transport."""
     catalog_tools: Mapping[str, CompiledPrimitive]
+    """Tools belonging to compiled catalogs."""
     catalogs: tuple[CompiledCatalog, ...]
+    """Catalogs compiled for this server."""
 
 def _wire(value: object) -> msgspec.Raw:
     """
@@ -126,7 +177,7 @@ def _wire(value: object) -> msgspec.Raw:
 
     Returns
     -------
-    msgspec.Raw
+    ``msgspec.Raw``
         Result of the operation described above.
     """
     return msgspec.Raw(msgspec.json.encode(value))
@@ -162,7 +213,7 @@ def _extend_metadata(
     ----------
     metadata : dict[str, object]
         Metadata associated with the current operation.
-    extensions : tuple[McpExtension, ...]
+    extensions : tuple[orionis.mcp.McpExtension, ``...``]
         Value supplied for ``extensions``.
 
     Returns
@@ -195,7 +246,7 @@ def _name(definition: type[Primitive]) -> str:
 
     Parameters
     ----------
-    definition : type[Primitive]
+    definition : type[orionis.mcp.server.primitives.Primitive]
         Class declaration whose metadata is being inspected.
 
     Returns
@@ -224,7 +275,7 @@ def _metadata(definition: type[Primitive], name: str) -> dict[str, object]:
 
     Parameters
     ----------
-    definition : type[Primitive]
+    definition : type[orionis.mcp.server.primitives.Primitive]
         Class declaration whose metadata is being inspected.
     name : str
         Value supplied for ``name``.
@@ -256,7 +307,7 @@ def _hook(definition: type, method: str) -> McpInvoker | None:
 
     Returns
     -------
-    McpInvoker | None
+    orionis.mcp.invoker.McpInvoker | None
         Result of the operation described above.
     """
     return (
@@ -269,12 +320,12 @@ def _tool_arguments(definition: type[Tool]) -> Iterator[tuple[object, ...]]:
 
     Parameters
     ----------
-    definition : type[Tool]
+    definition : type[orionis.mcp.Tool]
         Tool declaration whose generic bases are inspected.
 
     Yields
     ------
-    tuple[object, ...]
+    tuple[object, ``...``]
         Input and output declarations from each Tool generic base.
     """
     for ancestor in definition.__mro__:
@@ -288,7 +339,7 @@ def _tool_types(definition: type[Tool]) -> tuple[object, object]:
 
     Parameters
     ----------
-    definition : type[Tool]
+    definition : type[orionis.mcp.Tool]
         Tool class carrying explicit fields or inherited generic arguments.
 
     Returns
@@ -309,6 +360,7 @@ class _Compiler:
     """Own only boot-time schema caches; discard them after the registry is built."""
 
     __slots__ = ("cache", "extensions", "schemas")
+    """Declare the instance attribute slots reserved by this class."""
 
     def __init__(self, extensions: tuple[McpExtension, ...], cache: CacheHint) -> None:
         """
@@ -316,9 +368,9 @@ class _Compiler:
 
         Parameters
         ----------
-        extensions : tuple[McpExtension, ...]
+        extensions : tuple[orionis.mcp.McpExtension, ``...``]
             Value supplied for ``extensions``.
-        cache : CacheHint
+        cache : orionis.mcp.CacheHint
             Value supplied for ``cache``.
 
         Returns
@@ -327,8 +379,11 @@ class _Compiler:
             Complete the documented operation without returning a value.
         """
         self.schemas: dict[tuple[object, bool], dict[str, object]] = {}
+        """Schema definitions collected during compilation."""
         self.extensions = extensions
+        """Value supplied for ``extensions``."""
         self.cache = cache
+        """Value supplied for ``cache``."""
 
     def schema(self, annotation: object, *, input_schema: bool) -> dict[str, object]:
         """
@@ -359,14 +414,14 @@ class _Compiler:
 
         Parameters
         ----------
-        definition : type[Primitive]
+        definition : type[orionis.mcp.server.primitives.Primitive]
             Class declaration whose metadata is being inspected.
-        kind : type[Primitive]
+        kind : type[orionis.mcp.server.primitives.Primitive]
             Value supplied for ``kind``.
 
         Returns
         -------
-        CompiledPrimitive
+        orionis.mcp.server.compiler.CompiledPrimitive
             Result of the operation described above.
         """
         if not isinstance(definition, type) or not issubclass(definition, kind):
@@ -421,16 +476,16 @@ class _Compiler:
 
         Parameters
         ----------
-        definition : type[Tool]
+        definition : type[orionis.mcp.Tool]
             Class declaration whose metadata is being inspected.
-        primitive : CompiledPrimitive
+        primitive : orionis.mcp.server.compiler.CompiledPrimitive
             Compiled tool, resource or prompt declaration.
         metadata : dict[str, object]
             Metadata associated with the current operation.
 
         Returns
         -------
-        CompiledPrimitive
+        orionis.mcp.server.compiler.CompiledPrimitive
             Result of the operation described above.
         """
         input_type, output_type = _tool_types(definition)
@@ -470,16 +525,16 @@ class _Compiler:
 
         Parameters
         ----------
-        definition : type[Resource]
+        definition : type[orionis.mcp.Resource]
             Class declaration whose metadata is being inspected.
-        primitive : CompiledPrimitive
+        primitive : orionis.mcp.server.compiler.CompiledPrimitive
             Compiled tool, resource or prompt declaration.
         metadata : dict[str, object]
             Metadata associated with the current operation.
 
         Returns
         -------
-        CompiledPrimitive
+        orionis.mcp.server.compiler.CompiledPrimitive
             Result of the operation described above.
         """
         if bool(definition.uri) == bool(definition.uri_template):
@@ -521,16 +576,16 @@ class _Compiler:
 
         Parameters
         ----------
-        definition : type[Prompt]
+        definition : type[orionis.mcp.Prompt]
             Class declaration whose metadata is being inspected.
-        primitive : CompiledPrimitive
+        primitive : orionis.mcp.server.compiler.CompiledPrimitive
             Compiled tool, resource or prompt declaration.
         metadata : dict[str, object]
             Metadata associated with the current operation.
 
         Returns
         -------
-        CompiledPrimitive
+        orionis.mcp.server.compiler.CompiledPrimitive
             Result of the operation described above.
         """
         arguments = tuple(definition.arguments)
@@ -555,14 +610,14 @@ class _Compiler:
         ----------
         name : str
             Value supplied for ``name``.
-        kind : Literal['search', 'execute']
+        kind : typing.Literal['``search``', '``execute``']
             Value supplied for ``kind``.
         catalog : int
             Value supplied for ``catalog``.
 
         Returns
         -------
-        CompiledPrimitive
+        orionis.mcp.server.compiler.CompiledPrimitive
             Result of the operation described above.
         """
         if not _NAME.fullmatch(name):
@@ -599,11 +654,11 @@ def _insert(
 
     Parameters
     ----------
-    registry : dict[str, CompiledPrimitive]
+    registry : dict[str, orionis.mcp.server.compiler.CompiledPrimitive]
         Value supplied for ``registry``.
     key : str
         Value supplied for ``key``.
-    primitive : CompiledPrimitive
+    primitive : orionis.mcp.server.compiler.CompiledPrimitive
         Compiled tool, resource or prompt declaration.
 
     Returns
@@ -622,12 +677,12 @@ def _extensions(definition: type[Server]) -> tuple[McpExtension, ...]:
 
     Parameters
     ----------
-    definition : type[Server]
+    definition : type[orionis.mcp.Server]
         Class declaration whose metadata is being inspected.
 
     Returns
     -------
-    tuple[McpExtension, ...]
+    tuple[orionis.mcp.McpExtension, ``...``]
         Result of the operation described above.
     """
     extensions = tuple(definition.extensions)
@@ -656,12 +711,12 @@ def _ordered(registry: dict[str, CompiledPrimitive]) -> dict[str, CompiledPrimit
 
     Parameters
     ----------
-    registry : dict[str, CompiledPrimitive]
+    registry : dict[str, orionis.mcp.server.compiler.CompiledPrimitive]
         Value supplied for ``registry``.
 
     Returns
     -------
-    dict[str, CompiledPrimitive]
+    dict[str, orionis.mcp.server.compiler.CompiledPrimitive]
         Result of the operation described above.
     """
     return dict(sorted(registry.items(), key=lambda item: item[1].name))
@@ -679,9 +734,9 @@ def _tool_registry(
 
     Parameters
     ----------
-    compiler : _Compiler
+    compiler : orionis.mcp.server.compiler._Compiler
         Value supplied for ``compiler``.
-    entries : tuple[object, ...]
+    entries : tuple[object, ``...``]
         Value supplied for ``entries``.
 
     Returns
@@ -733,14 +788,14 @@ def _resource_registry(
 
     Parameters
     ----------
-    compiler : _Compiler
+    compiler : orionis.mcp.server.compiler._Compiler
         Value supplied for ``compiler``.
-    entries : tuple[type[Resource], ...]
+    entries : tuple[type[orionis.mcp.Resource], ``...``]
         Value supplied for ``entries``.
 
     Returns
     -------
-    tuple[dict[str, CompiledPrimitive], tuple[CompiledPrimitive, ...]]
+    tuple[dict[str, CompiledPrimitive], tuple[CompiledPrimitive, ``...``]]
         Result of the operation described above.
     """
     resources: dict[str, CompiledPrimitive] = {}
@@ -777,15 +832,15 @@ def _capabilities(
 
     Parameters
     ----------
-    definition : type[Server]
+    definition : type[orionis.mcp.Server]
         Class declaration whose metadata is being inspected.
-    tools : Mapping[str, CompiledPrimitive]
+    tools : collections.abc.Mapping[str, orionis.mcp.server.compiler.CompiledPrimitive]
         Value supplied for ``tools``.
     resources : Mapping[str, CompiledPrimitive]
         Value supplied for ``resources``.
     prompts : Mapping[str, CompiledPrimitive]
         Value supplied for ``prompts``.
-    templates : tuple[CompiledPrimitive, ...]
+    templates : tuple[orionis.mcp.server.compiler.CompiledPrimitive, ``...``]
         Value supplied for ``templates``.
 
     Returns
@@ -822,12 +877,12 @@ def compile_server(definition: type[Server]) -> CompiledMcpServer:
 
     Parameters
     ----------
-    definition : type[Server]
+    definition : type[orionis.mcp.Server]
         Class declaration whose metadata is being inspected.
 
     Returns
     -------
-    CompiledMcpServer
+    orionis.mcp.server.compiler.CompiledMcpServer
         Result of the operation described above.
     """
     if not isinstance(definition, type) or not issubclass(definition, Server):
@@ -881,7 +936,7 @@ async def validate_payload(primitive: CompiledPrimitive, arguments: object) -> o
 
     Parameters
     ----------
-    primitive : CompiledPrimitive
+    primitive : orionis.mcp.server.compiler.CompiledPrimitive
         Compiled tool, resource or prompt declaration.
     arguments : object
         Arguments supplied for this operation.
@@ -908,7 +963,7 @@ async def validate_output(primitive: CompiledPrimitive, value: object) -> object
 
     Parameters
     ----------
-    primitive : CompiledPrimitive
+    primitive : orionis.mcp.server.compiler.CompiledPrimitive
         Compiled tool, resource or prompt declaration.
     value : object
         Value to inspect, transform or validate.
@@ -935,9 +990,9 @@ def validate_prompt_arguments(
 
     Parameters
     ----------
-    primitive : CompiledPrimitive
+    primitive : orionis.mcp.server.compiler.CompiledPrimitive
         Compiled tool, resource or prompt declaration.
-    arguments : Mapping[str, object]
+    arguments : collections.abc.Mapping[str, object]
         Arguments supplied for this operation.
 
     Returns

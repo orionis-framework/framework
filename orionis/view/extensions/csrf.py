@@ -1,3 +1,5 @@
+"""Provide the ``{% csrf %}`` statement tag."""
+
 from __future__ import annotations
 import inspect
 from typing import TYPE_CHECKING, ClassVar
@@ -11,6 +13,7 @@ if TYPE_CHECKING:
 
 # Template global the tag delegates to; registered by ViewServiceProvider.
 _CSRF_FIELD_GLOBAL = "csrf_field"
+"""Template global the tag delegates to; registered by ViewServiceProvider."""
 
 class CsrfExtension(Extension):
     """
@@ -22,6 +25,7 @@ class CsrfExtension(Extension):
     """
 
     tags: ClassVar[set[str]] = {"csrf"}
+    """Template tag names recognized by this Jinja extension."""
 
     def parse(self, parser: Parser) -> nodes.Output:
         """
@@ -29,12 +33,12 @@ class CsrfExtension(Extension):
 
         Parameters
         ----------
-        parser : Parser
+        parser : orionis.support.formatter.serializer.Parser
             Jinja2 parser positioned on the tag name token.
 
         Returns
         -------
-        nodes.Output
+        ``jinja2.nodes.Output``
             Node emitting the hidden CSRF input at render time.
         """
         # Consume the tag name token and keep its line for tracebacks
@@ -51,12 +55,12 @@ class CsrfExtension(Extension):
 
         Returns
         -------
-        Markup
+        ``markupsafe.Markup``
             Safe HTML markup with the hidden input.
 
         Raises
         ------
-        ViewRenderException
+        orionis.view.exceptions.ViewRenderException
             When the ``csrf_field`` template global is not registered.
         """
         builder = self.environment.globals.get(_CSRF_FIELD_GLOBAL)

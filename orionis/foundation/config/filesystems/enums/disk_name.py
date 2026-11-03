@@ -1,3 +1,5 @@
+"""Enumerate the built-in filesystem disk names supported by Orionis."""
+
 from enum import StrEnum
 
 class DiskName(StrEnum):
@@ -19,7 +21,7 @@ class DiskName(StrEnum):
 
     Returns
     -------
-    DiskName
+    orionis.foundation.config.filesystems.enums.DiskName
         An enumeration member representing a filesystem disk name.
     """
 

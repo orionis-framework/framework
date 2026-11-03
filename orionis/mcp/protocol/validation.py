@@ -1,3 +1,9 @@
+"""Provide mcp protocol operations.
+
+Includes ``validate_json``, ``validate_result``, ``validate_content``,
+``validate_resource``.
+"""
+
 import base64
 import math
 from collections.abc import Mapping
@@ -43,13 +49,16 @@ _RESULT_TYPES = {
     "completion/complete": CompleteCompletionResult,
     "subscriptions/listen": CompleteResult,
 }
+"""Result types definitions used by ``validation``."""
 _CONTENT_TYPES = {
     "text": TextContent,
     "image": ImageContent,
     "audio": AudioContent,
     "resource_link": ResourceLink,
 }
+"""Content types definitions used by ``validation``."""
 _MAX_COMPLETIONS = 100
+"""Max completions value used by ``validation``."""
 
 def validate_json(value: object) -> None:
     """
@@ -151,7 +160,7 @@ def _validate_completion(result: CompleteCompletionResult) -> None:
 
     Parameters
     ----------
-    result : CompleteCompletionResult
+    result : orionis.mcp.protocol.results.CompleteCompletionResult
         Completion response supplied by the application.
 
     Returns

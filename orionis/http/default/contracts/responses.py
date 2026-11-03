@@ -1,3 +1,5 @@
+"""Define the contract for default responses implementations."""
+
 from __future__ import annotations
 from abc import ABC, abstractmethod
 from typing import TYPE_CHECKING
@@ -13,8 +15,10 @@ if TYPE_CHECKING:
     )
 
 class IDefaultResponses(ABC):
+    """Define the contract for default responses implementations."""
 
     __slots__ = ()
+    """Declare that this class introduces no additional instance slots."""
 
     @abstractmethod
     async def favicon(self) -> FileResponse | Response:
@@ -28,7 +32,7 @@ class IDefaultResponses(ABC):
 
         Returns
         -------
-        FileResponse or Response
+        orionis.http.FileResponse or orionis.http.Response
             A FileResponse containing the favicon if found, otherwise a
             Response with status 404.
         """
@@ -43,7 +47,7 @@ class IDefaultResponses(ABC):
 
         Returns
         -------
-        FileResponse or Response
+        orionis.http.FileResponse or orionis.http.Response
             FileResponse with robots.txt if found, otherwise Response with 404.
         """
 
@@ -56,7 +60,7 @@ class IDefaultResponses(ABC):
 
         Returns
         -------
-        FileResponse or Response
+        orionis.http.FileResponse or orionis.http.Response
             FileResponse with sitemap.xml if found, otherwise Response with status 404.
         """
 
@@ -67,12 +71,12 @@ class IDefaultResponses(ABC):
 
         Parameters
         ----------
-        request : Request
+        request : orionis.http.Request
             The HTTP request object.
 
         Returns
         -------
-        HTMLResponse or JSONResponse
+        orionis.http.HTMLResponse or orionis.http.JSONResponse
             HTMLResponse with the state page content or JSONResponse with the
             application status. Status is 200 if healthy, 503 if under
             maintenance.
@@ -92,7 +96,7 @@ class IDefaultResponses(ABC):
 
         Parameters
         ----------
-        status_code : int | HTTPStatus
+        status_code : int | orionis.http.enums.HTTPStatus
             Integer HTTP status between 100 and 599. Unlisted codes use
             an ``HTTP <code>`` label on the HTML page.
         content : str | dict
@@ -107,7 +111,7 @@ class IDefaultResponses(ABC):
 
         Returns
         -------
-        HTMLResponse or JSONResponse
+        orionis.http.HTMLResponse or orionis.http.JSONResponse
             HTMLResponse with rendered error page, or JSONResponse if
             expects_json is True.
 
@@ -138,12 +142,12 @@ class IDefaultResponses(ABC):
             HTTP method of the request that caused the exception.
         exception : BaseException
             Exception instance to be rendered.
-        status_code : int | HTTPStatus, optional
+        status_code : int | orionis.http.enums.HTTPStatus, optional
             HTTP status code for the response. Defaults to 500.
 
         Returns
         -------
-        HTMLResponse
+        orionis.http.HTMLResponse
             Rendered exception page as an HTMLResponse with the given status code.
         """
 
@@ -160,13 +164,14 @@ class IDefaultResponses(ABC):
 
         Returns
         -------
-        HTMLResponse
+        orionis.http.HTMLResponse
             Uncached debug page using the shared local styles and fonts.
         """
 
     @abstractmethod
     def asset(self, path: str) -> FileResponse | Response:
-        """Return an allowlisted framework asset, or a 404 response.
+        """
+        Return an allowlisted framework asset, or a 404 response.
 
         Parameters
         ----------
@@ -175,6 +180,6 @@ class IDefaultResponses(ABC):
 
         Returns
         -------
-        FileResponse or Response
+        orionis.http.FileResponse or orionis.http.Response
             Packaged static file when allowed and present, otherwise a 404.
         """

@@ -149,6 +149,35 @@ asyncio.run(main())
 
 El valor `-1` produce dos fallos en su campo; `0` sólo incumple el mínimo. `limit` sigue siendo obligatorio aunque admita `None`. Las reglas `Rule` internas, como `list[Field[str, Email()]]`, se rechazan con `TypeError` al declarar el schema: para reglas por elemento use un schema hijo con `email: Field[str, Email()]`; una regla en el `Field` exterior de la lista comprueba la colección completa.
 
+### Coerción opcional
+
+Los campos siguen siendo estrictos salvo que su anotación incluya `Coerce()` de `orionis.schemas.metadata`. El marcador deduce el tipo destino de la anotación y convierte la entrada antes de los constraints y las reglas de aplicación:
+
+```python
+from orionis.schemas.constraints import GreaterThan
+from orionis.schemas.metadata import Coerce
+from orionis.schemas.validator import Schema as Validator
+
+
+class QuantityInput(Schema):
+    quantity: Field[int, Coerce(), GreaterThan(0)]
+
+
+payload = {"quantity": "12"}
+quantity = await Validator.validate(payload, QuantityInput)
+assert quantity.quantity == 12
+assert type(quantity.quantity) is int
+assert payload == {"quantity": "12"}
+```
+
+`"0"` se convierte en `0` y falla `GreaterThan(0)`. Valores incompatibles como `"abc"`, `""`, `"1.5"` y `None` conservan errores de tipo: nunca se truncan ni se sustituyen por cero. La conversión sigue los formatos nativos no estrictos, no constructores Python arbitrarios: por ejemplo, `"0012"` se rechaza y `"false"` se convierte en `False` para un destino booleano.
+
+Use `list[Field[int, Coerce()]]` para marcar elementos individuales. Un marcador sobre una colección o un schema anidado habilita la coerción de sus valores y campos descendientes. Las claves de diccionario y los campos hermanos sin marcar siguen siendo estrictos. Los tipos nullable conservan `None`; los campos obligatorios ausentes siguen ausentes. Las ramas de unión ya compatibles conservan su tipo.
+
+El orden de la metadata no cambia las fases: primero coerción, después tipos y constraints, y luego reglas con valores tipados. Los mismos valores preparados se usan para recopilar todos los errores, incluidas rutas anidadas y mensajes personalizados. Los contenedores originales no se modifican.
+
+La coerción se ejecuta mediante `await Validator.validate(...)`, no por construcción directa ni por `msgspec.convert` directo. También se aplica al validar ese schema como respuesta; deje los campos de salida sin marcar o use un schema de salida separado si necesita salidas estrictas.
+
 ### Reglas de aplicación
 
 Las reglas hacen checks de dominio tras convertir: strings, fechas, números, campos cruzados, aceptación, passwords, archivos/imágenes, red, URL, JSON, UUID/ULID, MIME/tamaño/dimensiones y unicidad database. Un plan recorre schemas/contenedores y acumula fallos.

@@ -2,12 +2,13 @@
 
 Constraints describe structural bounds compiled at class declaration. A `Rule` checks an application condition after type conversion. Combine them using `Field[T, ...]`; `Field` aliases `typing.Annotated`, not a function accepting `default=`.
 
-The 47 bundled validations comprise 37 executable rules and 10 compiled structural constraints. All executable rules expose the same mandatory asynchronous `enforce` method; structural constraints remain declaration metadata, not a second execution API.
+The 49 bundled validations comprise 39 executable rules and 10 compiled structural constraints. All executable rules expose the same mandatory asynchronous `enforce` method; structural constraints remain declaration metadata, not a second execution API.
 
 ## Choose a bundled rule
 
 | Need | Rules and relevant parameters |
 |---|---|
+| Empty values | `Empty`, `NoEmpty`. They use the same definition and always return opposite results. |
 | Text | `Alpha(ascii_only=False)`, `Ascii`, `Lowercase`, `Uppercase`, `Encoding(encoding="utf-8")`. |
 | Prefixes and suffixes | `StartsWith(*prefixes)`, `EndsWith(*suffixes)`, `DoesntStartWith(*prefixes)`, `DoesntEndWith(*suffixes)`. |
 | Formats | `Email`, `Json`, `IpAddress(version=4)`, `MacAddress`, `Uuid(version=None)`, `Ulid`. Use `IpAddress(version=None)` to permit IPv4 or IPv6. |
@@ -21,6 +22,25 @@ The 47 bundled validations comprise 37 executable rules and 10 compiled structur
 All accept the keyword option `message=`. `Between` and `Size` measure numeric magnitude, text/collection length, and upload size in kilobytes. `Dimensions` accepts `width`, `height`, `min_width`, `max_width`, `min_height`, `max_height`, `ratio`, `min_ratio`, and `max_ratio`; ratios may be numbers or strings such as `"3/2"`. Image inspection reads headers; it does not convert or sanitize a file. Rules that read upload contents offload the synchronous file reader so disk-backed uploads do not block the event loop.
 
 `StrongPassword` requires at least eight characters, an ASCII uppercase letter, an ASCII lowercase letter, and a digit. It does not require a symbol or check breached passwords. Validation does not replace [hashing](../../../hashing/docs/en/README.md).
+
+## Empty and non-empty values
+
+`Empty()` accepts `None`, empty or whitespace-only strings, numeric zero, `False`, and sized values with length zero. This includes lists, tuples, dictionaries, sets, bytes, arrays and similar containers. Uploaded files are empty when their byte size is zero; checking them never reads file contents. `NoEmpty()` rejects exactly those values.
+
+Whitespace is only inspected, not removed from the stored value. `"0"` and `"false"` are non-empty strings; with `Coerce()`, rules instead see the converted value, so numeric `0` and boolean `False` are empty. Collections are checked by their own length, not their contents: `[None]` and `{"key": None}` are non-empty. Unsized iterators and other objects are considered present without consuming them.
+
+```python
+from orionis.schemas import Schema
+from orionis.schemas.fields import Field
+from orionis.schemas.rules import Empty, NoEmpty
+
+class Form(Schema):
+    name: Field[str, NoEmpty(message="Name required.")]
+    tags: Field[list[str], NoEmpty()]
+    reserved: Field[str | None, Empty()] = None
+```
+
+Both rules accept `message=`. Failures use the codes `empty` and `no_empty`. Missing fields still follow schema requiredness, and type conversion happens before the rules: allowing `None` requires a compatible declared type. The rules are also re-exported by `orionis.schemas.constraints`.
 
 ## Combine registration and confirmation
 

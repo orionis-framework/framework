@@ -18,7 +18,7 @@ Schema documentation metadata is consumed by JSON Schema/OpenAPI-related compile
 
 ## Performance and concurrency
 
-Structural metadata and rule traversal plans are compiled at class creation and cached by schema type. Successful conversion uses a single optimized `msgspec.convert` call. Detailed field-by-field inspection is reserved for failure reporting.
+Structural metadata and rule traversal plans are compiled at class creation and cached by schema type. Schemas without `Coerce()` keep a single optimized `msgspec.convert` call on the successful path. Marked fields are first normalized using a bounded, cached traversal plan; the prepared payload is then used for both validation and failure reporting. Detailed field-by-field error inspection is reserved for rejected input.
 
 Schema instances and metadata plans are compact; validation itself retains no global request state. Asynchronous rules preserve the caller's event loop and transaction. Always await `validate`, even for schemas with no I/O rules. Every rule implements `async def enforce`; use native asynchronous I/O there to avoid blocking the loop. Pure checks do not require worker threads.
 

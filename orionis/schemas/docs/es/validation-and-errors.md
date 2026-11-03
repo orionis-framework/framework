@@ -21,7 +21,7 @@ La metadata documental alimenta compiladores JSON Schema/OpenAPI sin formar part
 
 ## Rendimiento y concurrencia
 
-Metadata estructural y planes se compilan al crear la clase y cachean por tipo. La conversión exitosa usa una llamada optimizada `msgspec.convert`; inspección detallada se reserva para errores.
+Metadata estructural y planes se compilan al crear la clase y cachean por tipo. Los schemas sin `Coerce()` conservan una sola llamada optimizada `msgspec.convert` en el camino exitoso. Los campos marcados se normalizan primero con un plan de recorrido cacheado y acotado; el payload preparado se usa tanto para validar como para recopilar fallos. La inspección detallada de errores se reserva para entradas rechazadas.
 
 Los planes se comparten por clase; no guarde datos de una solicitud en las instancias de reglas. Las reglas asíncronas preservan loop/transacción. Espere siempre `validate`, incluso en schemas sin reglas de I/O. Cada regla implementa `async def enforce`; use allí I/O asíncrono nativo para no bloquear el loop. Los checks puros no necesitan hilos auxiliares. Los tipos y constraints se verifican con el motor nativo de `msgspec`; las reglas Python y las consultas externas conservan su coste propio.
 

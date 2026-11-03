@@ -3,6 +3,7 @@
 from __future__ import annotations
 from typing import TYPE_CHECKING
 import msgspec
+from orionis.schemas.coercion import coerce_payload
 from orionis.schemas.exceptions.validation import ValidationException
 from orionis.schemas.failure_collector import FailureCollector
 from orionis.schemas.instance_payload import instance_payload
@@ -38,6 +39,9 @@ class Schema:
         """
         Validate a payload or existing struct and await its schema rules.
 
+        Coerce explicitly marked values before checking types and constraints.
+        Leave other fields strict and preserve the original payload.
+
         Parameters
         ----------
         payload : object
@@ -57,14 +61,15 @@ class Schema:
             collected failures grouped by field.
         """
         # Struct constructors and mutation do not validate their values.
-        # Only existing structs need this expansion; ordinary decoded request
-        # mappings retain the single C-level conversion below.
+        # Only existing structs need this expansion; unmarked request mappings
+        # retain the single C-level conversion below.
         if type(payload) is not dict and isinstance(payload, _Struct):
             payload = instance_payload(payload)
 
-        # Convert the payload into a schema instance using msgspec. A single
-        # C-level call handles the successful path; only when it fails is the
-        # payload re-inspected field by field to report every error.
+        payload = coerce_payload(payload, schema)
+
+        # After opt-in coercion, convert and validate the prepared payload in one
+        # C-level call. Only failures need detailed field-by-field inspection.
         try:
             instance = _convert(payload, type=schema)
 

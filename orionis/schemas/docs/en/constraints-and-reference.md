@@ -6,7 +6,7 @@
 
 - `orionis.schemas.fields`: `Field`, `Choice`, `Nullable`, `AnyOf`, `Constant`, `Alias`, `Static`.
 - `orionis.schemas.constraints`: structural constraints plus all bundled rule classes.
-- `orionis.schemas.metadata`: `Title`, `Description`, `Examples`, `ExtraJsonSchema`, `Extra`, `Message`.
+- `orionis.schemas.metadata`: `Coerce`, `Title`, `Description`, `Examples`, `ExtraJsonSchema`, `Extra`, `Message`.
 - `orionis.schemas.validator.Schema`: static asynchronous `validate(payload, schema)` utility; always await it and alias it as `Validator` to avoid confusing it with the declaration base.
 - `orionis.schemas.rule.Rule`: base for custom rules, with an asynchronous `validate(field, value, instance)` method.
 - `orionis.schemas.exceptions.ValidationException`: `failures`, first `failure`, grouped `errors`, summary `message`, and serializable `error()`.
@@ -20,8 +20,9 @@
 | `constraints.py`, `compiler.py` | Structural metadata and conflict-safe `msgspec.Meta` compilation. |
 | `rule.py`, `rules/` | Asynchronous rule validation with pure or native I/O predicates. |
 | `validator.py`, `rules_executor.py` | Payload conversion and cached nested rule execution. |
+| `coercion.py` | Opt-in, copy-on-write normalization before constraints and rules. |
 | `failure_collector.py`, `exception_parser.py` | Multi-field conversion failure recovery and messages. |
-| `metadata.py`, `meta/` | Documentation, message, and metadata marker types. |
+| `metadata.py`, `meta/` | Coercion, documentation, message, and metadata marker types. |
 | `entities/failure.py`, `exceptions/validation.py` | Immutable failure records and grouped exception output. |
 
 ## Evidence and next steps

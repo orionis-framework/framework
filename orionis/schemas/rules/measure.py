@@ -1,8 +1,9 @@
-"""Measure field lengths, numeric values and uploaded file sizes."""
+"""Measure field values and recognize empty data without consuming it."""
 
 import asyncio
 from collections.abc import Sized
 from decimal import Decimal
+from numbers import Number
 
 # Bytes per kilobyte, the unit size rules use to express file sizes.
 KILOBYTE = 1024
@@ -31,6 +32,36 @@ def is_file(value: object) -> bool:
         Return ``True`` when the value exposes the uploaded-file protocol.
     """
     return all(hasattr(value, name) for name in _FILE_ATTRIBUTES)
+
+def is_empty(value: object) -> bool:
+    """
+    Recognize empty text, containers, numbers and uploaded files.
+
+    Treat ``None``, whitespace-only strings, numeric zero and ``False`` as
+    empty. Sized values are empty when their length is zero, and uploaded
+    files when their byte size is zero. Do not consume unsized iterables.
+
+    Parameters
+    ----------
+    value : object
+        Value whose emptiness is checked without changing its contents.
+
+    Returns
+    -------
+    bool
+        Whether the value satisfies the shared emptiness definition.
+    """
+    if value is None:
+        return True
+    if isinstance(value, str):
+        return not value.strip()
+    if isinstance(value, Decimal):
+        return value.is_zero()
+    if isinstance(value, Number):
+        return value == 0
+    if is_file(value):
+        return getattr(value, "size", None) == 0
+    return isinstance(value, Sized) and len(value) == 0
 
 async def read_content(value: object) -> bytes | None:
     """

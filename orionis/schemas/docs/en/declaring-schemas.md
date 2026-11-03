@@ -34,6 +34,35 @@ assert profile.toDict() == {"name": "Ada", "age": 36, "newsletter": False}
 
 `GreaterThan`, `GreaterThanOrEqual`, `LessThan`, `LessThanOrEqual`, `MultipleOf`, `Pattern`, `MinLength`, `MaxLength`, `TimezoneAware`, and `TimezoneNaive` compile into the low-level conversion descriptor. Conflicting, duplicate, impossible, or invalid combinations fail when the schema class is created.
 
+### Opt-in coercion
+
+Fields remain strict unless their annotation includes `Coerce()` from `orionis.schemas.metadata`. The marker infers its target from the declared type and converts input before structural constraints and application rules:
+
+```python
+from orionis.schemas.constraints import GreaterThan
+from orionis.schemas.metadata import Coerce
+from orionis.schemas.validator import Schema as Validator
+
+
+class QuantityInput(Schema):
+    quantity: Field[int, Coerce(), GreaterThan(0)]
+
+
+payload = {"quantity": "12"}
+quantity = await Validator.validate(payload, QuantityInput)
+assert quantity.quantity == 12
+assert type(quantity.quantity) is int
+assert payload == {"quantity": "12"}
+```
+
+`"0"` converts to `0` and fails `GreaterThan(0)`. Incompatible values such as `"abc"`, `""`, `"1.5"`, and `None` remain type errors; they are never truncated or replaced with zero. Conversion follows native non-strict formats, not arbitrary Python constructors: for example, `"0012"` is rejected, and `"false"` converts to `False` for a boolean target.
+
+Use `list[Field[int, Coerce()]]` to mark individual items. A marker on an entire collection or nested schema enables coercion for its descendant values and fields. Dictionary keys and unmarked siblings remain strict. Nullable types keep `None`; missing required fields stay missing. Already compatible union branches retain their type.
+
+Metadata order does not change the phases: coercion precedes type/constraint checks, then application rules run with typed values. The same prepared values are used for complete error reporting, including nested paths and custom messages. Source containers are not mutated.
+
+Coercion runs through `await Validator.validate(...)`, not direct construction or direct `msgspec.convert`. It also applies when that schema is validated as a response; leave output fields unmarked, or use a separate output schema, when outputs must remain strict.
+
 ### Application rules
 
 Rules implement domain checks after conversion. They include strings, dates, numbers, cross-field comparisons, acceptance, passwords, files/images, network formats, URLs, JSON, UUID/ULID, MIME/size/dimensions, and database uniqueness. A plan walks nested schemas and containers and collects all failures instead of stopping at the first custom rule.

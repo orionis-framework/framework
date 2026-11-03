@@ -2,12 +2,13 @@
 
 Las constraints describen límites estructurales que se compilan al declarar la clase. Una `Rule` comprueba una condición de aplicación después de convertir los tipos. Combínalas con `Field[T, ...]`; `Field` es un alias de `typing.Annotated`, no una función que reciba `default=`.
 
-Las 47 validaciones incluidas se componen de 37 reglas ejecutables y 10 constraints estructurales compilados. Todas las reglas ejecutables exponen el mismo método `enforce` obligatoriamente asíncrono; los constraints estructurales siguen siendo metadata de declaración, no una segunda API de ejecución.
+Las 49 validaciones incluidas se componen de 39 reglas ejecutables y 10 constraints estructurales compilados. Todas las reglas ejecutables exponen el mismo método `enforce` obligatoriamente asíncrono; los constraints estructurales siguen siendo metadata de declaración, no una segunda API de ejecución.
 
 ## Elegir una regla incluida
 
 | Necesidad | Reglas y parámetros relevantes |
 |---|---|
+| Valores vacíos | `Empty`, `NoEmpty`. Comparten la definición de vacío y siempre devuelven resultados opuestos. |
 | Texto | `Alpha(ascii_only=False)`, `Ascii`, `Lowercase`, `Uppercase`, `Encoding(encoding="utf-8")`. |
 | Prefijos y sufijos | `StartsWith(*prefixes)`, `EndsWith(*suffixes)`, `DoesntStartWith(*prefixes)`, `DoesntEndWith(*suffixes)`. |
 | Formatos | `Email`, `Json`, `IpAddress(version=4)`, `MacAddress`, `Uuid(version=None)`, `Ulid`. Usa `IpAddress(version=None)` para permitir IPv4 o IPv6. |
@@ -21,6 +22,25 @@ Las 47 validaciones incluidas se componen de 37 reglas ejecutables y 10 constrai
 Todas aceptan `message=` como opción keyword. `Between` y `Size` usan magnitud numérica, longitud para texto/colecciones y kilobytes para uploads. `Dimensions` admite `width`, `height`, `min_width`, `max_width`, `min_height`, `max_height`, `ratio`, `min_ratio`, `max_ratio`; los ratios pueden ser números o textos como `"3/2"`. El lector de imágenes inspecciona cabeceras; no convierte ni sanea un archivo.
 
 `StrongPassword` exige al menos ocho caracteres, una mayúscula ASCII, una minúscula ASCII y un dígito. No exige un símbolo ni consulta contraseñas filtradas. La validación no reemplaza el [hashing](../../../hashing/docs/es/README.md).
+
+## Valores vacíos y no vacíos
+
+`Empty()` acepta `None`, strings vacíos o compuestos solo por espacios en blanco, cero numérico, `False` y valores de longitud cero. Esto incluye listas, tuplas, diccionarios, sets, bytes, arrays y contenedores similares. Los uploads están vacíos cuando su tamaño en bytes es cero; comprobarlo nunca lee el contenido del archivo. `NoEmpty()` rechaza exactamente esos valores.
+
+Los espacios solo se comprueban: no se eliminan del valor almacenado. `"0"` y `"false"` son strings no vacíos; con `Coerce()`, las reglas reciben el valor convertido, por lo que `0` numérico y `False` booleano están vacíos. Las colecciones se comprueban por su longitud, no por el contenido: `[None]` y `{"key": None}` no están vacíos. Los iteradores sin longitud y otros objetos se consideran presentes sin consumirlos.
+
+```python
+from orionis.schemas import Schema
+from orionis.schemas.fields import Field
+from orionis.schemas.rules import Empty, NoEmpty
+
+class Form(Schema):
+    name: Field[str, NoEmpty(message="Name required.")]
+    tags: Field[list[str], NoEmpty()]
+    reserved: Field[str | None, Empty()] = None
+```
+
+Ambas reglas aceptan `message=`. Sus errores usan los códigos `empty` y `no_empty`. Los campos ausentes conservan la obligatoriedad del schema y la conversión de tipos ocurre antes de las reglas: aceptar `None` exige un tipo declarado compatible. También se reexportan desde `orionis.schemas.constraints`.
 
 ## Componer registro y confirmación
 

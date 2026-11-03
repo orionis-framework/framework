@@ -6,7 +6,7 @@
 
 - `orionis.schemas.fields`: `Field`, `Choice`, `Nullable`, `AnyOf`, `Constant`, `Alias`, `Static`.
 - `orionis.schemas.constraints`: constraints estructurales y reglas incluidas.
-- `orionis.schemas.metadata`: `Title`, `Description`, `Examples`, `ExtraJsonSchema`, `Extra`, `Message`.
+- `orionis.schemas.metadata`: `Coerce`, `Title`, `Description`, `Examples`, `ExtraJsonSchema`, `Extra`, `Message`.
 - `orionis.schemas.validator.Schema`: utilidad estática asíncrona `validate(payload, schema)`; use alias `Validator` y espere siempre con `await`.
 - `orionis.schemas.rule.Rule`: base de reglas personalizadas con `validate(field, value, instance)` asíncrono.
 - `ValidationException`: `failures`, `failure`, `errors`, `message` y `error()`.
@@ -20,10 +20,11 @@
 | `constraints.py`, `compiler.py` | Metadata estructural y compilación segura. |
 | `rule.py`, `rules/` | Validación asíncrona con predicados puros o I/O nativo. |
 | `validator.py`, `rules_executor.py` | Conversión y ejecución anidada cacheada. |
+| `coercion.py` | Normalización opcional sin modificar el payload, antes de constraints y reglas. |
 | `failure_collector.py`, `exception_parser.py` | Recuperación multicausa y mensajes. |
 | `constraint_plan.py` | Planes de constraints independientes para enumerar fallos cuando la conversión falla. |
 | `instance_payload.py` | Expansión de instancias existentes para validar respuestas sin omitir defaults ni convertir hojas a JSON. |
-| `metadata.py`, `meta/` | Metadata documental y de validación. |
+| `metadata.py`, `meta/` | Metadata de coerción, documental y de validación. |
 | `entities/failure.py`, `exceptions/validation.py` | Fallos inmutables y excepción agrupada. |
 
 ## Fuentes y siguientes pasos

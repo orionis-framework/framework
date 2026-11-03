@@ -1,11 +1,25 @@
 """Provide schemas operations.
 
-Includes ``Title``, ``Description``, ``Examples``, ``ExtraJsonSchema``.
+Includes ``Coerce``, ``Title``, ``Description``, ``Examples``, ``ExtraJsonSchema``.
 """
 
 from __future__ import annotations
 from dataclasses import dataclass
 from orionis.schemas.meta.document import DocumentMetadata
+from orionis.schemas.meta.validation import ValidationMetadata
+
+@dataclass(frozen=True, slots=True)
+class Coerce(ValidationMetadata):
+    """
+    Convert a field to its declared type before validating its constraints.
+
+    Conversion follows the native non-strict conversion rules. On collections
+    and nested schemas, the marker also applies to their values and fields;
+    dictionary keys remain strict. Unmarked siblings are unaffected.
+
+    Invalid input is reported through the normal validation errors rather
+    than replaced with a default. Direct construction does not run coercion.
+    """
 
 @dataclass(frozen=True, slots=True)
 class Title(DocumentMetadata):
@@ -106,6 +120,7 @@ class Message(DocumentMetadata):
 # ---------------------------------------------------------------------------
 
 __all__: list[str] = [
+    "Coerce",
     "Description",
     "DocumentMetadata",
     "Examples",

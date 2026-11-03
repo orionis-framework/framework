@@ -2,13 +2,14 @@
 
 from __future__ import annotations
 import types
-from collections.abc import Collection, Mapping
+from collections.abc import Mapping
 from typing import TYPE_CHECKING, Annotated, Union, get_args, get_origin
 import msgspec
 import msgspec.structs
 from orionis.schemas.entities.failure import ValidationFailure
 from orionis.schemas.constraint_plan import annotation_messages, constraint_plan
 from orionis.schemas.exception_parser import ValidationErrorParser
+from orionis.schemas.instance_payload import matching_schema, matching_type
 from orionis.schemas.rules_executor import (
     _build_plan as _build_rule_plan,
     _cache_get as _rule_plan_get,
@@ -484,25 +485,7 @@ class FailureCollector:
         object | None
             Matching schema or collection annotation, if one applies.
         """
-        origin = get_origin(annotation)
-        if origin is Annotated:
-            return cls._matchingType(get_args(annotation)[0], value)
-        if origin is Union or origin is types.UnionType:
-            return next((
-                match for arg in get_args(annotation)
-                if (match := cls._matchingType(arg, value)) is not None
-            ), None)
-        schema = _nested_schema(annotation)
-        if schema is not None:
-            return cls._matchingSchema(schema, value)
-        if not isinstance(origin, type):
-            return None
-        expected = (
-            Mapping if issubclass(origin, Mapping) else (list, tuple, set, frozenset)
-        )
-        return annotation if (
-            issubclass(origin, Collection) and isinstance(value, expected)
-        ) else None
+        return matching_type(annotation, value)
 
     @staticmethod
     def _matchingSchema(
@@ -523,16 +506,7 @@ class FailureCollector:
         type[``msgspec.Struct``] | None
             Schema when its shape and tag match, otherwise ``None``.
         """
-        config = schema.__struct_config__
-        if config.array_like:
-            return schema if (
-                isinstance(value, list | tuple)
-                and (config.tag is None or (value and value[0] == config.tag))
-            ) else None
-        return schema if (
-            isinstance(value, Mapping)
-            and (config.tag is None or value.get(config.tag_field) == config.tag)
-        ) else None
+        return matching_schema(schema, value)
 
     @classmethod
     async def _blameCollection(

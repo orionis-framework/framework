@@ -10,6 +10,7 @@ from orionis.schemas.constraint_plan import _ConstraintMessages, register_messag
 from orionis.schemas.meta.validation import ValidationMetadata
 from orionis.schemas.rule import Rule
 from orionis.schemas.metadata import (
+    Coerce,
     Message,
 )
 from orionis.schemas.constraints import (
@@ -112,16 +113,18 @@ def _compile_annotated(
     """
     base, *metadata = arguments
     compiled_base, _ = _compile_annotation(base, nested=nested)
+    if nested and any(isinstance(item, Rule) for item in metadata):
+        error_msg = (
+            "Rules inside collection items or union branches are not supported. "
+            "Use a child Schema for item rules or an outer Field for field rules."
+        )
+        raise TypeError(error_msg)
     validation = []
     custom = []
     messages = {}
     for item in metadata:
-        if nested and isinstance(item, Rule):
-            error_msg = (
-                "Rules inside collection items or union branches are not supported. "
-                "Use a child Schema for item rules or an outer Field for field rules."
-            )
-            raise TypeError(error_msg)
+        if isinstance(item, Coerce):
+            custom.append(item)
         if isinstance(item, Message):
             messages.setdefault("type", item.text)
         elif isinstance(item, ValidationMetadata):
@@ -131,13 +134,12 @@ def _compile_annotated(
                 messages[key] = item.message
         else:
             custom.append(item)
+    compiled = annotation
     if validation:
         compiled = Annotated[
             (compiled_base, MetaCompiler.compile(validation), *custom)
         ]
-    elif compiled_base is base:
-        compiled = annotation
-    else:
+    elif compiled_base is not base:
         compiled = Annotated[(compiled_base, *metadata)]
     return register_messages(compiled, messages), messages
 

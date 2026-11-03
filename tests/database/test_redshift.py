@@ -1001,7 +1001,7 @@ import importlib.abc
 import sys
 
 class BlockPackage(importlib.abc.MetaPathFinder):
-    def find_spec(self, fullname, path=None, target=None):
+    def findSpec(self, fullname, path=None, target=None):
         \"\"\"Reject imports from the selected optional package.
 
         Parameters
@@ -1026,6 +1026,9 @@ class BlockPackage(importlib.abc.MetaPathFinder):
         if fullname.split('.')[0] == sys.argv[1]:
             raise ModuleNotFoundError('Optional package unavailable', name=fullname)
         return None
+
+    # Preserve the importlib finder protocol name.
+    find_spec = findSpec
 
 sys.meta_path.insert(0, BlockPackage())
 from orionis.database.connection import Connection

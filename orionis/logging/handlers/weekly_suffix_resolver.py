@@ -1,18 +1,23 @@
+"""Resolve log suffixes for weekly rotation windows."""
+
 from __future__ import annotations
 from datetime import datetime, time, timedelta
 from orionis.logging.contracts.suffix_resolver import SuffixResolver
 from orionis.support.facades.datetime import DateTime
 
 class WeeklySuffixResolver(SuffixResolver):
+    """Resolve log suffixes for weekly rotation windows."""
 
     __slots__ = ("at_time", "tz")
+    """Declare the instance attribute slots reserved by this class."""
 
     def __init__(self, at_time: time | None = None) -> None:
-        """Initialize WeeklySuffixResolver.
+        """
+        Initialize WeeklySuffixResolver.
 
         Parameters
         ----------
-        at_time : time or None, optional
+        at_time : datetime.time or None, optional
             The time of day when rotation should occur. Defaults to midnight.
 
         Returns
@@ -21,14 +26,17 @@ class WeeklySuffixResolver(SuffixResolver):
             This method does not return a value.
         """
         self.at_time = at_time or time(0, 0, 0)
+        """The time of day when rotation should occur. Defaults to midnight."""
         self.tz = DateTime.getZoneInfo()
+        """Tz produced by ``DateTime.getZoneInfo``."""
 
     def getSuffix(self, dt: datetime | None = None) -> str:
-        """Generate a weekly suffix based on the provided datetime.
+        """
+        Generate a weekly suffix based on the provided datetime.
 
         Parameters
         ----------
-        dt : datetime or None, optional
+        dt : datetime.datetime or None, optional
             The datetime to use for suffix generation. If None, uses current
             local datetime.
 
@@ -44,16 +52,17 @@ class WeeklySuffixResolver(SuffixResolver):
         return f"{year}-week{week:02d}"
 
     def getNextRotationTime(self, current_time: datetime) -> datetime:
-        """Calculate the next rotation datetime based on the current time.
+        """
+        Calculate the next rotation datetime based on the current time.
 
         Parameters
         ----------
-        current_time : datetime
+        current_time : datetime.datetime
             The current datetime.
 
         Returns
         -------
-        datetime
+        datetime.datetime
             The datetime when the next rotation should occur.
         """
         # Calculate days since last Monday (0 = Monday)

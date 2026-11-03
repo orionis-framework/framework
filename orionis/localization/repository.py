@@ -1,3 +1,5 @@
+"""In-memory cache of translation maps keyed by locale."""
+
 from __future__ import annotations
 import math
 from collections import OrderedDict
@@ -20,10 +22,12 @@ class TranslationRepository(ITranslationRepository):
     Notes
     -----
     A reentrant lock protects cache and loader access across threads.
-    :meth:`get` returns the cached mapping itself, not a copy.
+    :meth:`orionis.localization.TranslationRepository.get` returns the cached mapping
+    itself, not a copy.
     """
 
     __slots__ = ("_cache", "_expires", "_limit", "_loader", "_lock", "_negative_ttl")
+    """Declare the instance attribute slots reserved by this class."""
 
     def __init__(
         self: Self,
@@ -37,7 +41,7 @@ class TranslationRepository(ITranslationRepository):
 
         Parameters
         ----------
-        loader : ITranslationLoader
+        loader : orionis.localization.contracts.ITranslationLoader
             Loader used to read translation sources on cache misses.
         max_locales : int
             Maximum retained locales, including empty results.
@@ -47,8 +51,10 @@ class TranslationRepository(ITranslationRepository):
         Returns
         -------
         None
+            Initialize the repository with its translation loader.
         """
         self._loader = loader
+        """Loader used to read translation sources on cache misses."""
         if (
             isinstance(max_locales, bool)
             or not isinstance(max_locales, int)
@@ -60,10 +66,15 @@ class TranslationRepository(ITranslationRepository):
             error_msg = "negative_ttl must be finite and nonnegative."
             raise ValueError(error_msg)
         self._cache: OrderedDict[str, TranslationMap] = OrderedDict()
+        """Cache policy or cached state used by this component."""
         self._expires: dict[str, float] = {}
+        """Expiration deadline for the cached or protected value."""
         self._limit = max_locales
+        """Maximum retained locales, including empty results."""
         self._negative_ttl = negative_ttl
+        """Seconds to retain an empty result before retrying the loader."""
         self._lock = RLock()
+        """Lock protecting concurrent access to shared state."""
 
     def get(self: Self, locale: str) -> TranslationMap:
         """
@@ -76,13 +87,13 @@ class TranslationRepository(ITranslationRepository):
 
         Returns
         -------
-        TranslationMap
+        orionis.localization.types.TranslationMap
             Cached translation map for the locale. The mapping is the
             cached instance, not a copy.
 
         Raises
         ------
-        TranslationSyntaxException
+        orionis.localization.TranslationSyntaxException
             If a translation file contains invalid JSON.
         """
         with self._lock:
@@ -143,6 +154,7 @@ class TranslationRepository(ITranslationRepository):
         Returns
         -------
         None
+            Discard every cached translation map.
         """
         with self._lock:
             self._cache.clear()
@@ -154,7 +166,7 @@ class TranslationRepository(ITranslationRepository):
 
         Returns
         -------
-        tuple[str, ...]
+        tuple[str, ``...``]
             Locale codes present in the in-memory cache.
         """
         with self._lock:

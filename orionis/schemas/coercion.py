@@ -65,14 +65,14 @@ def _field_plan(
 
     Parameters
     ----------
-    schema : type[msgspec.Struct]
+    schema : type[``msgspec.Struct``]
         Schema whose fields are prepared.
     enabled : bool
         Whether an enclosing marker enables every field in this schema.
 
     Returns
     -------
-    tuple[tuple[str, int, object], ...]
+    tuple[tuple[str, int, object], ``...``]
         Encoded names, positional indices and field annotations.
     """
     offset = int(schema.__struct_config__.tag is not None)
@@ -92,7 +92,7 @@ def coerce_payload(
     ----------
     payload : object
         Input mapping, positional data or existing schema instance.
-    schema : type[msgspec.Struct]
+    schema : type[``msgspec.Struct``]
         Schema declaring the target types and coercion metadata.
     enabled : bool, optional
         Whether an enclosing marker enables all descendant fields.
@@ -164,7 +164,7 @@ def _coerce_array(
     ----------
     payload : list | tuple
         Positional schema input.
-    plan : tuple[tuple[str, int, object], ...]
+    plan : tuple[tuple[str, int, object], ``...``]
         Encoded field names, indices and target annotations.
     enabled : bool
         Whether an enclosing marker enables every field.

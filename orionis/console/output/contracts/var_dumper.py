@@ -1,10 +1,14 @@
+"""Define the contract for var dumper implementations."""
+
 from __future__ import annotations
 from abc import ABC, abstractmethod
 from typing import TypeVar
 
 T = TypeVar("T")
+"""Type parameter preserving the value type across var dumper operations."""
 
 class IVarDumper(ABC):
+    """Define the contract for var dumper implementations."""
 
     @abstractmethod
     def showTypes(self, *, show: bool = True) -> IVarDumper:
@@ -19,7 +23,7 @@ class IVarDumper(ABC):
 
         Returns
         -------
-        IVarDumper
+        orionis.console.output.contracts.var_dumper.IVarDumper
             The current instance with updated show types setting.
         """
 
@@ -35,7 +39,7 @@ class IVarDumper(ABC):
 
         Returns
         -------
-        IVarDumper
+        orionis.console.output.contracts.var_dumper.IVarDumper
             The current instance with updated show index setting.
         """
 
@@ -51,7 +55,7 @@ class IVarDumper(ABC):
 
         Returns
         -------
-        VarDumper
+        orionis.console.output.contracts.var_dumper.IVarDumper
             The current instance with updated expand all setting.
         """
 
@@ -67,14 +71,13 @@ class IVarDumper(ABC):
 
         Returns
         -------
-        IVarDumper
+        orionis.console.output.contracts.var_dumper.IVarDumper
             Returns self with updated max depth.
 
         Raises
         ------
         TypeError
             If 'depth' is not int or None.
-
         """
 
     @abstractmethod
@@ -89,7 +92,7 @@ class IVarDumper(ABC):
 
         Returns
         -------
-        IVarDumper
+        orionis.console.output.contracts.var_dumper.IVarDumper
             Returns the current instance with updated module path.
 
         Raises
@@ -110,7 +113,7 @@ class IVarDumper(ABC):
 
         Returns
         -------
-        IVarDumper
+        orionis.console.output.contracts.var_dumper.IVarDumper
             Returns self with updated line number.
 
         Raises
@@ -131,7 +134,7 @@ class IVarDumper(ABC):
 
         Returns
         -------
-        IVarDumper
+        orionis.console.output.contracts.var_dumper.IVarDumper
             Returns the current instance with the updated force exit setting.
 
         Raises
@@ -153,7 +156,7 @@ class IVarDumper(ABC):
 
         Returns
         -------
-        IVarDumper
+        orionis.console.output.contracts.var_dumper.IVarDumper
             The current instance with the updated redirect output setting.
 
         Raises
@@ -174,7 +177,7 @@ class IVarDumper(ABC):
 
         Returns
         -------
-        IVarDumper
+        orionis.console.output.contracts.var_dumper.IVarDumper
             Returns the current instance for method chaining.
 
         Raises
@@ -190,12 +193,12 @@ class IVarDumper(ABC):
 
         Parameters
         ----------
-        value : type[T]
+        value : type[orionis.console.output.contracts.var_dumper.T]
             The value to be stored for dumping.
 
         Returns
         -------
-        IVarDumper
+        orionis.console.output.contracts.var_dumper.IVarDumper
             Returns the current instance for method chaining.
 
         Notes

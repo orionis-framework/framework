@@ -1,3 +1,5 @@
+"""Declare asynchronous consumption and graceful stopping."""
+
 from abc import ABC, abstractmethod
 from typing import TYPE_CHECKING
 
@@ -8,6 +10,7 @@ class IWorker(ABC):
     """Declare asynchronous consumption and graceful stopping."""
 
     __slots__ = ()
+    """Declare that this class introduces no additional instance slots."""
 
     @abstractmethod
     async def run(
@@ -55,7 +58,7 @@ class IWorker(ABC):
 
         Parameters
         ----------
-        reserved : ReservedJob
+        reserved : orionis.queues.entities.reserved_job.ReservedJob
             Claim to execute.
         raise_errors : bool, optional
             Propagate the original error for synchronous dispatch.

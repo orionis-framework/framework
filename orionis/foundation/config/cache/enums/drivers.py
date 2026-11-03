@@ -1,3 +1,5 @@
+"""Enumerate supported cache drivers."""
+
 from enum import StrEnum
 
 class Drivers(StrEnum):
@@ -15,12 +17,14 @@ class Drivers(StrEnum):
 
     Returns
     -------
-    Drivers
+    orionis.foundation.config.cache.Drivers
         An enumeration member representing a cache driver.
     """
 
     FILE = "file"
     MEMCACHED = "memcached"
     MEMORY = "memory"
+    """Memory identifier: ``memory``."""
     REDIS = "redis"
     DATABASE = "database"
+    """Database identifier: ``database``."""

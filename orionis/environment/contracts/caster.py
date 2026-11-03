@@ -1,3 +1,5 @@
+"""Define the contract for environment caster implementations."""
+
 from __future__ import annotations
 from abc import ABC, abstractmethod
 from typing import TYPE_CHECKING
@@ -6,8 +8,10 @@ if TYPE_CHECKING:
     from orionis.environment.enums.value_type import EnvironmentValueType
 
 class IEnvironmentCaster(ABC):
+    """Define the contract for environment caster implementations."""
 
     __slots__ = ()
+    """Declare that this class introduces no additional instance slots."""
 
     @abstractmethod
     def get(
@@ -23,7 +27,7 @@ class IEnvironmentCaster(ABC):
 
         Parameters
         ----------
-        self : EnvironmentCaster
+        self : orionis.environment.dynamic.caster.EnvironmentCaster
             Instance of the EnvironmentCaster class.
 
         Returns
@@ -50,9 +54,9 @@ class IEnvironmentCaster(ABC):
 
         Parameters
         ----------
-        type_hint : str or EnvironmentValueType
+        type_hint : str or orionis.environment.enums.EnvironmentValueType
             The type to which the internal value should be converted. Must be a
-            valid option in `OPTIONS`.
+            valid option in ``OPTIONS``.
 
         Returns
         -------

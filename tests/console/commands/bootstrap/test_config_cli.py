@@ -126,7 +126,7 @@ class TestBootstrapConfigCli(unittest.TestCase):
             check=False,
         )
 
-    def test_help_exposes_optional_file_without_creating_configuration(self) -> None:
+    def testHelpExposesOptionalFileWithoutCreatingConfiguration(self) -> None:
         """
         Show the optional positional argument without downloading configuration.
 
@@ -144,7 +144,7 @@ class TestBootstrapConfigCli(unittest.TestCase):
                 self.assertRegex(result.stdout, r"file\s+str\s+No")
                 self.assertFalse((self.root / "config").exists())
 
-    def test_selected_remote_file_is_created_once_and_preserves_local_changes(
+    def testSelectedRemoteFileIsCreatedOnceAndPreservesLocalChanges(
         self,
     ) -> None:
         """
@@ -178,7 +178,7 @@ class TestBootstrapConfigCli(unittest.TestCase):
         )
         self.assertFalse((self.root / "config" / "mail.py").exists())
 
-    def test_unknown_file_reports_current_remote_options_without_writes(self) -> None:
+    def testUnknownFileReportsCurrentRemoteOptionsWithoutWrites(self) -> None:
         """
         Report a missing selection using the actual remote configuration catalog.
 

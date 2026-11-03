@@ -1,3 +1,5 @@
+"""Describe registered servers without opening their transports."""
+
 from orionis.console.base.command import BaseCommand
 from orionis.mcp.contracts.manager import IMcpManager
 
@@ -7,8 +9,11 @@ class McpListCommand(BaseCommand):
     """Describe registered servers without opening their transports."""
 
     timestamps = False
+    """Timestamps flag used by ``McpListCommand``."""
     signature = "mcp:list"
+    """Signature identifier: ``mcp:list``."""
     description = "List registered HTTP and local MCP servers."
+    """Description identifier: ``List registered HTTP and local MCP servers.``."""
 
     async def handle(self, manager: IMcpManager) -> None:
         """
@@ -16,7 +21,7 @@ class McpListCommand(BaseCommand):
 
         Parameters
         ----------
-        manager : IMcpManager
+        manager : orionis.mcp.contracts.manager.IMcpManager
             Value supplied for ``manager``.
 
         Returns

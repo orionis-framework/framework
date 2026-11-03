@@ -1,3 +1,9 @@
+"""Provide storage operations.
+
+Includes ``StorageException``, ``DiskNotFoundException``,
+``DriverNotSupportedException``, ``MissingStorageDependencyException``.
+"""
+
 from __future__ import annotations
 
 class StorageException(Exception):

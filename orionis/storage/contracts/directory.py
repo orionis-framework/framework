@@ -1,3 +1,5 @@
+"""Define the contract for a directory on a storage disk."""
+
 from __future__ import annotations
 from abc import ABC, abstractmethod
 from typing import TYPE_CHECKING
@@ -15,6 +17,7 @@ class IDirectory(ABC):
     """
 
     __slots__ = ()
+    """Declare that this class introduces no additional instance slots."""
 
     @abstractmethod
     def path(self) -> str:
@@ -35,7 +38,7 @@ class IDirectory(ABC):
 
         Returns
         -------
-        IDirectory
+        orionis.storage.contracts.IDirectory
             The directory itself, enabling fluent chaining.
         """
 
@@ -68,7 +71,7 @@ class IDirectory(ABC):
 
         Returns
         -------
-        list[IFile]
+        list[orionis.storage.contracts.IFile]
             File objects for every direct child file, sorted by path.
         """
 
@@ -79,7 +82,7 @@ class IDirectory(ABC):
 
         Returns
         -------
-        list[IFile]
+        list[orionis.storage.contracts.IFile]
             File objects for all nested files, sorted by path.
         """
 
@@ -90,7 +93,7 @@ class IDirectory(ABC):
 
         Returns
         -------
-        list[IDirectory]
+        list[orionis.storage.contracts.IDirectory]
             Directory objects for every direct child directory,
             sorted by path.
         """
@@ -102,7 +105,7 @@ class IDirectory(ABC):
 
         Returns
         -------
-        list[IDirectory]
+        list[orionis.storage.contracts.IDirectory]
             Directory objects for all nested directories, sorted by
             path.
         """

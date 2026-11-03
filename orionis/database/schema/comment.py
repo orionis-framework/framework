@@ -1,7 +1,10 @@
+"""Describe a database schema comment."""
+
 import re
 import unicodedata
 
 class Comment:
+    """Describe a database schema comment."""
 
     def __init__(self, text: str) -> None:
         """
@@ -15,6 +18,7 @@ class Comment:
         Returns
         -------
         None
+            Initialize a Comment instance.
         """
         # Normaliza Unicode
         text = unicodedata.normalize("NFC", text)
@@ -27,3 +31,4 @@ class Comment:
 
         # Store the comment text.
         self.text = text.strip()
+        """The comment text content."""

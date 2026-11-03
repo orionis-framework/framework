@@ -1,3 +1,5 @@
+"""Web-layer middleware that enforces Cross-Site Request Forgery protection."""
+
 import secrets
 from typing import TYPE_CHECKING
 from orionis.foundation.config.http.entitites.csrf import HTTPCsrf
@@ -16,18 +18,25 @@ if TYPE_CHECKING:
 
 # HTTP methods that do not mutate state: CSRF check is skipped entirely.
 _SAFE_METHODS: frozenset[str] = frozenset({"GET", "HEAD", "OPTIONS", "TRACE"})
+"""HTTP methods that do not mutate state: CSRF check is skipped entirely."""
 
 # Content-Types that may carry the CSRF value inside the request body.
 _FORM_MIME_URLENCODED: str = "application/x-www-form-urlencoded"
+"""Content-Types that may carry the CSRF value inside the request body."""
 _FORM_MIME_MULTIPART: str = "multipart/form-data"
+"""Form mime multipart identifier: ``multipart/form-data``."""
 
 # Request header names inspected for the submitted value (lowercase).
 _HDR_CSRF: str = "x-csrf-token"
+"""Request header names inspected for the submitted value (lowercase)."""
 _HDR_XSRF: str = "x-xsrf-token"
+"""Hdr xsrf identifier: ``x-xsrf-token``."""
 
 # Form field names inspected for the submitted value, in priority order.
 _FIELD_CSRF: str = "_csrf"
+"""Form field names inspected for the submitted value, in priority order."""
 _FIELD_CSRF_ALT: str = "csrf_token"
+"""Field csrf alt identifier: ``csrf_token``."""
 
 
 class CSRFTokenMiddleware(BaseMiddleware):
@@ -69,6 +78,7 @@ class CSRFTokenMiddleware(BaseMiddleware):
         "_token_length",
         "_xsrf_cookie",
     )
+    """Declare the instance attribute slots reserved by this class."""
 
     def __init__(self, config: dict) -> None:
         """
@@ -83,15 +93,21 @@ class CSRFTokenMiddleware(BaseMiddleware):
         Returns
         -------
         None
+            Initialise the middleware from a raw configuration dictionary.
         """
         cfg = HTTPCsrf(**config)
         self._cfg: HTTPCsrf = cfg
+        """Cfg supplied through ``cfg``."""
 
         # Store the settings used by the token lifecycle.
         self._enabled: bool = cfg.enabled
+        """Store the settings used by the token lifecycle."""
         self._session_key: str = cfg.session_key
+        """Session key under which the authenticated identity is stored."""
         self._token_length: int = cfg.token_length
+        """Token length obtained from ``cfg.token_length``."""
         self._xsrf_cookie: bool = cfg.xsrf_cookie
+        """Xsrf cookie obtained from ``cfg.xsrf_cookie``."""
 
     # ------------------------------------------------------------------
     # Public interface
@@ -115,7 +131,7 @@ class CSRFTokenMiddleware(BaseMiddleware):
 
         Parameters
         ----------
-        request : Request
+        request : orionis.http.Request
             Incoming HTTP request with an active session available at
             ``request.state.session``.
         call_next : Callable[[], Awaitable[Response]]
@@ -124,13 +140,13 @@ class CSRFTokenMiddleware(BaseMiddleware):
 
         Returns
         -------
-        Response
+        orionis.http.Response
             HTTP response, optionally augmented with the ``XSRF-TOKEN``
             cookie when ``xsrf_cookie`` is enabled.
 
         Raises
         ------
-        CSRFTokenMismatchException
+        orionis.http.layer.web.exceptions.CSRFTokenMismatchException
             When an unsafe request does not supply a valid CSRF token.
         """
         if not self._enabled:
@@ -180,7 +196,7 @@ class CSRFTokenMiddleware(BaseMiddleware):
 
         Parameters
         ----------
-        request : Request
+        request : orionis.http.Request
             Current request; session is read from ``request.state.session``.
 
         Returns
@@ -220,7 +236,7 @@ class CSRFTokenMiddleware(BaseMiddleware):
 
         Parameters
         ----------
-        request : Request
+        request : orionis.http.Request
             Incoming HTTP request.
 
         Returns
@@ -255,7 +271,7 @@ class CSRFTokenMiddleware(BaseMiddleware):
 
         Parameters
         ----------
-        request : Request
+        request : orionis.http.Request
             Incoming HTTP request.
 
         Returns
@@ -311,9 +327,9 @@ class CSRFTokenMiddleware(BaseMiddleware):
 
         Parameters
         ----------
-        request : Request
+        request : orionis.http.Request
             Provides the scheme to decide whether to promote the Secure flag.
-        response : Response
+        response : orionis.http.Response
             Response to which the ``Set-Cookie`` header is appended.
         token : str
             CSRF token to embed in the cookie value.
@@ -321,6 +337,7 @@ class CSRFTokenMiddleware(BaseMiddleware):
         Returns
         -------
         None
+            Set the ``XSRF-TOKEN`` cookie on the outgoing response.
         """
         cfg = self._cfg
         session = getattr(request.state, "session", None)

@@ -1,3 +1,5 @@
+"""Group the hashing components and public imports."""
+
 from typing import TYPE_CHECKING as _TYPE_CHECKING
 from orionis._exports import resolve_export as _resolve_export
 
@@ -17,6 +19,7 @@ _EXPORTS = {
     "BcryptHasher": ("orionis.hashing.hashers.bcrypt_hasher", "BcryptHasher"),
     "HashManager": ("orionis.hashing.hash_manager", "HashManager"),
 }
+"""Public export names mapped to their defining modules and attributes."""
 
 def __getattr__(name: str) -> object:
     """

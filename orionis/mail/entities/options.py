@@ -1,3 +1,5 @@
+"""Snapshot the explicitly supplied options of one independent chain."""
+
 from dataclasses import dataclass
 from typing import TYPE_CHECKING
 from orionis.mail.entities.envelope import Envelope
@@ -11,23 +13,23 @@ class MailOptions:
     """
     Snapshot the explicitly supplied options of one independent chain.
 
-    Parameters
+    Attributes
     ----------
     mailer : str | None
         Selected configuration name, or None for the central default.
-    from_address : Address | None
+    from_address : orionis.mail.entities.Address | None
         Explicit sender replacing any declared one.
     subject : str | None
         Explicit subject replacing any declared one.
-    to : tuple[Address, ...]
+    to : tuple[orionis.mail.entities.Address, ``...``]
         Visible recipients appended to a declaration.
-    cc : tuple[Address, ...]
+    cc : tuple[orionis.mail.entities.Address, ``...``]
         Carbon-copy recipients appended to a declaration.
-    bcc : tuple[Address, ...]
+    bcc : tuple[orionis.mail.entities.Address, ``...``]
         Hidden recipients appended to a declaration.
-    reply_to : tuple[Address, ...]
+    reply_to : tuple[orionis.mail.entities.Address, ``...``]
         Reply destinations appended to a declaration.
-    attachments : tuple[Attachment, ...]
+    attachments : tuple[orionis.mail.entities.Attachment, ``...``]
         Deferred attachments appended to a declaration.
     """
 
@@ -46,17 +48,17 @@ class MailOptions:
 
         Parameters
         ----------
-        base : Envelope | None
+        base : orionis.mail.entities.Envelope | None
             Optional reusable Mailable envelope.
 
         Returns
         -------
-        Envelope
+        orionis.mail.entities.Envelope
             Validated envelope owned by the operation.
 
         Raises
         ------
-        MailCompositionException
+        orionis.mail.exceptions.MailCompositionException
             If the merged recipients violate Bcc privacy.
         """
         source = base if base is not None else Envelope()

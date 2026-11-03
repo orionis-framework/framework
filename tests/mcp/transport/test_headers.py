@@ -107,7 +107,7 @@ class TestHeaders(TestCase):
             (-32020, 400),
         )
 
-    def test_standard_headers_match_typed_and_raw_parameters(self):
+    def testStandardHeadersMatchTypedAndRawParameters(self):
         """Known typed params and unknown raw methods share the same header gate.
 
         Returns
@@ -134,7 +134,7 @@ class TestHeaders(TestCase):
             decode_params(request)
         self.assertEqual(caught.exception.status, 404)
 
-    def test_required_mismatch_and_duplicate_headers(self):
+    def testRequiredMismatchAndDuplicateHeaders(self):
         """Reject missing metadata and disagreeing or repeated singleton headers.
 
         Returns
@@ -154,7 +154,7 @@ class TestHeaders(TestCase):
                 request,
             )
 
-    def test_header_name_case_and_value_case_are_distinct(self):
+    def testHeaderNameCaseAndValueCaseAreDistinct(self):
         """Normalize field names without case folding method or name values.
 
         Returns
@@ -170,7 +170,7 @@ class TestHeaders(TestCase):
         self.assertMismatch(self.headers(name="WEATHER"), request)
         self.assertMismatch(self.headers(method="TOOLS/CALL"), request)
 
-    def test_legacy_missing_headers_fail_before_unknown_method(self):
+    def testLegacyMissingHeadersFailBeforeUnknownMethod(self):
         """A header-less initialize receives the modern header validation error.
 
         Returns
@@ -181,7 +181,7 @@ class TestHeaders(TestCase):
         request = decode_envelope(b'{"jsonrpc":"2.0","id":1,"method":"initialize"}')
         self.assertMismatch(Headers([]), request)
 
-    def test_missing_body_metadata_is_invalid_params_when_headers_exist(self):
+    def testMissingBodyMetadataIsInvalidParamsWhenHeadersExist(self):
         """Honor the official stateless conformance error classification.
 
         Returns
@@ -204,7 +204,7 @@ class TestHeaders(TestCase):
                 validate_headers(self.headers("server/discover", None), request)
             self.assertEqual(caught.exception.code, -32602)
 
-    def test_unsupported_matching_version_is_left_to_protocol(self):
+    def testUnsupportedMatchingVersionIsLeftToProtocol(self):
         """Do not misclassify a matching unsupported version as a header mismatch.
 
         Returns
@@ -232,7 +232,7 @@ class TestHeaders(TestCase):
             decode_params(request)
         self.assertEqual(caught.exception.code, -32022)
 
-    def test_unicode_whitespace_and_sentinel_name_encoding(self):
+    def testUnicodeWhitespaceAndSentinelNameEncoding(self):
         """Decode UTF-8 names and literals that would otherwise resemble sentinels.
 
         Returns
@@ -245,7 +245,7 @@ class TestHeaders(TestCase):
             validate_headers(self.headers(name=self.encoded(name)), request)
             self.assertMismatch(self.headers(name=name), request)
 
-    def test_malformed_encoded_values_and_unsafe_raw_values(self):
+    def testMalformedEncodedValuesAndUnsafeRawValues(self):
         """Reject invalid Base64, invalid UTF-8, controls and outer whitespace.
 
         Returns
@@ -265,7 +265,7 @@ class TestHeaders(TestCase):
         ):
             self.assertMismatch(self.headers(name=value), request)
 
-    def test_static_nested_paths_are_compiled_without_dotted_key_expansion(self):
+    def testStaticNestedPathsAreCompiledWithoutDottedKeyExpansion(self):
         """Nested properties and literal dotted properties resolve independently.
 
         Returns
@@ -305,7 +305,7 @@ class TestHeaders(TestCase):
             bindings=bindings,
         )
 
-    def test_schema_rejects_unreachable_annotations_and_duplicate_names(self):
+    def testSchemaRejectsUnreachableAnnotationsAndDuplicateNames(self):
         """Fail malformed catalog metadata at compilation rather than first call.
 
         Returns
@@ -330,7 +330,7 @@ class TestHeaders(TestCase):
             with self.subTest(schema=schema), self.assertRaises(ValueError):
                 compile_header_bindings(schema)
 
-    def test_schema_rejects_invalid_names_and_nonprimitive_types(self):
+    def testSchemaRejectsInvalidNamesAndNonprimitiveTypes(self):
         """Token syntax and primitive restrictions cover CRLF and nullable unions.
 
         Returns
@@ -363,7 +363,7 @@ class TestHeaders(TestCase):
                     },
                 )
 
-    def test_optional_missing_null_and_extra_recognized_headers(self):
+    def testOptionalMissingNullAndExtraRecognizedHeaders(self):
         """Omit absent or null values and reject injected recognized headers.
 
         Returns
@@ -402,7 +402,7 @@ class TestHeaders(TestCase):
             bindings,
         )
 
-    def test_parameter_string_boolean_and_numeric_comparisons(self):
+    def testParameterStringBooleanAndNumericComparisons(self):
         """Require strict primitive kinds while comparing integers numerically.
 
         Returns
@@ -436,7 +436,7 @@ class TestHeaders(TestCase):
                 bindings=bindings,
             )
 
-    def test_parameter_type_range_and_header_disagreement_are_rejected(self):
+    def testParameterTypeRangeAndHeaderDisagreementAreRejected(self):
         """Reject coercion, unsafe integers and values different from the body.
 
         Returns
@@ -475,7 +475,7 @@ class TestHeaders(TestCase):
                 bindings,
             )
 
-    def test_notification_headers_are_not_request_metadata(self):
+    def testNotificationHeadersAreNotRequestMetadata(self):
         """The revision does not prescribe request metadata for notification POSTs.
 
         Returns

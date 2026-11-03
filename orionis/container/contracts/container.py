@@ -1,3 +1,5 @@
+"""Define the contract for container implementations."""
+
 from __future__ import annotations
 from abc import ABC, abstractmethod
 from typing import TYPE_CHECKING
@@ -10,6 +12,7 @@ if TYPE_CHECKING:
 class IContainer(ABC):
 
     # ruff: noqa: ANN401
+    """Define the contract for container implementations."""
 
     @abstractmethod
     def instance(
@@ -25,7 +28,7 @@ class IContainer(ABC):
 
         Parameters
         ----------
-        abstract : type[Any] | None
+        abstract : type[typing.Any] | None
             The abstract contract class to associate with the instance, or None.
         instance : object
             The initialized object to register.
@@ -62,9 +65,9 @@ class IContainer(ABC):
 
         Parameters
         ----------
-        abstract : type[Any] | None
+        abstract : type[typing.Any] | None
             The abstract contract type to bind, or None to use the concrete type.
-        concrete : type[Any]
+        concrete : type[typing.Any]
             The concrete implementation type to register.
         alias : str | None, optional
             An optional alias for the service.
@@ -91,9 +94,9 @@ class IContainer(ABC):
 
         Parameters
         ----------
-        abstract : type[Any] | None
+        abstract : type[typing.Any] | None
             The abstract contract type to bind, or None to use the concrete type.
-        concrete : type[Any]
+        concrete : type[typing.Any]
             The concrete implementation type to register.
         alias : str | None, optional
             An optional alias for the service.
@@ -120,9 +123,9 @@ class IContainer(ABC):
 
         Parameters
         ----------
-        abstract : type[Any] | None
+        abstract : type[typing.Any] | None
             The abstract contract type to bind, or None to use the concrete type.
-        concrete : type[Any]
+        concrete : type[typing.Any]
             The concrete implementation type to register.
         alias : str | None, optional
             An optional alias for the service.
@@ -145,7 +148,7 @@ class IContainer(ABC):
 
         Parameters
         ----------
-        key : type[Any] | str
+        key : type[typing.Any] | str
             The abstract type or alias to check for binding.
 
         Returns
@@ -162,12 +165,12 @@ class IContainer(ABC):
 
         Parameters
         ----------
-        self : Container
+        self : orionis.container.container.Container
             The container instance.
 
         Returns
         -------
-        ScopeManager
+        orionis.container.context.manager.ScopeManager
             Context manager for managing the lifecycle of scoped services.
         """
 
@@ -178,19 +181,19 @@ class IContainer(ABC):
 
         Parameters
         ----------
-        self : Container
+        self : orionis.container.container.Container
             The container instance.
 
         Returns
         -------
-        ScopeManager | None
+        orionis.container.context.manager.ScopeManager | None
             The current active scope context if available, otherwise None.
             The scope context is a dictionary-like object that contains
             instances of scoped services registered in the current scope.
 
         Notes
         -----
-        Returns None if there is no active scope. Use `beginScope()` to create
+        Returns None if there is no active scope. Use ``beginScope()`` to create
         a new scope context before accessing scoped services.
         """
 
@@ -206,16 +209,16 @@ class IContainer(ABC):
 
         Parameters
         ----------
-        key : type[Any] | str
+        key : type[typing.Any] | str
             The abstract type or alias to resolve.
-        *args : tuple[Any, ...]
+        *args : tuple[typing.Any, ``...``]
             Positional arguments for instantiation.
-        **kwargs : dict[str, Any]
+        **kwargs : dict[str, typing.Any]
             Keyword arguments for instantiation.
 
         Returns
         -------
-        Any
+        typing.Any
             The resolved service instance.
 
         Raises
@@ -231,21 +234,21 @@ class IContainer(ABC):
         *args: tuple[Any, ...],
         **kwargs: dict[str, Any],
     ) -> Any:
-        r"""
+        """
         Build and return an instance of the specified type.
 
         Parameters
         ----------
-        type\_ : Callable[..., Any]
+        ``type_`` : collections.abc.Callable[``...``, typing.Any]
             The class to instantiate.
-        *args : tuple[Any, ...]
+        *args : tuple[typing.Any, ``...``]
             Positional arguments for the constructor.
-        **kwargs : dict[str, Any]
+        **kwargs : dict[str, typing.Any]
             Keyword arguments for the constructor.
 
         Returns
         -------
-        Any
+        typing.Any
             Instantiated object of the specified type.
 
         Raises
@@ -270,22 +273,22 @@ class IContainer(ABC):
 
         Parameters
         ----------
-        fn : Callable[..., Any]
+        fn : collections.abc.Callable[``...``, typing.Any]
             The callable to invoke. Must not be a class or type.
-        *args : tuple[Any, ...]
+        *args : tuple[typing.Any, ``...``]
             Positional arguments for the callable.
-        **kwargs : dict[str, Any]
+        **kwargs : dict[str, typing.Any]
             Keyword arguments for the callable.
 
         Returns
         -------
-        Any
+        typing.Any
             The result of the callable execution with dependencies injected.
 
         Raises
         ------
         TypeError
-            If `fn` is not a callable or is a class/type.
+            If ``fn`` is not a callable or is a class/type.
         """
 
     @abstractmethod
@@ -312,7 +315,7 @@ class IContainer(ABC):
 
         Returns
         -------
-        Any
+        typing.Any
             The result of the method invocation with dependencies resolved.
 
         Raises

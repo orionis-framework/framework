@@ -1,3 +1,5 @@
+"""Convert nested mutable structures to immutable snapshots and back."""
+
 from __future__ import annotations
 from types import MappingProxyType
 from typing import Any
@@ -5,11 +7,17 @@ from typing import Any
 # Define container types handled by the freezer.
 # Avoids re-creating the type-tuple on every call and enables JIT specialization.
 _CONTAINER_TYPES: tuple[type, ...] = (dict, list, tuple, MappingProxyType)
+"""
+Define container types handled by the freezer. Avoids re-creating the type-tuple on
+every call and enables JIT specialization.
+"""
 _MUTABLE_TYPES: tuple[type, ...] = (dict, list, tuple)
+"""Mutable types definitions used by ``freezer``."""
 
 class FreezeThaw:
 
     # ruff: noqa: PLR0912, C901
+    """Convert nested mutable structures to immutable snapshots and back."""
 
     @staticmethod
     def thaw(obj: object) -> object:  # NOSONAR

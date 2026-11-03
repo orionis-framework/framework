@@ -1,3 +1,5 @@
+"""Define the contract for rule implementations."""
+
 from __future__ import annotations
 from abc import ABC
 from abc import abstractmethod
@@ -7,8 +9,10 @@ if TYPE_CHECKING:
     from orionis.schemas.entities.failure import ValidationFailure
 
 class IRule(ABC):
+    """Define the contract for rule implementations."""
 
     __slots__ = ()
+    """Declare that this class introduces no additional instance slots."""
 
     @abstractmethod
     def __init__(self, *, message: str | None = None) -> None:
@@ -73,7 +77,7 @@ class IRule(ABC):
 
         Returns
         -------
-        ValidationFailure | None
+        orionis.schemas.entities.failure.ValidationFailure | None
             A failure describing the constraint violation, or ``None`` when
             the value is valid.
         """

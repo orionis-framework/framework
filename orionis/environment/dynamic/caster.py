@@ -1,3 +1,5 @@
+"""Convert raw environment strings to the requested Python value type."""
+
 from __future__ import annotations
 import ast
 import base64
@@ -10,10 +12,17 @@ class EnvironmentCaster(IEnvironmentCaster):
 
     # Precompute the set of valid type hints from the
     # EnvironmentValueType enum for fast membership checks.
+    """Convert raw environment strings to the requested Python value type."""
+
     OPTIONS: ClassVar[frozenset[str]] = frozenset(e.value for e in EnvironmentValueType)
+    """
+    Precompute the set of valid type hints from the EnvironmentValueType enum for
+    fast membership checks.
+    """
 
     # Restrict instances to the declared attributes.
     __slots__ = ("_EnvironmentCaster__type_hint", "_EnvironmentCaster__value_raw")
+    """Restrict instances to the declared attributes."""
 
     @staticmethod
     def supportedTypes() -> frozenset[str]:
@@ -108,7 +117,9 @@ class EnvironmentCaster(IEnvironmentCaster):
         """
         # Initialize type hint and value to default None
         self.__type_hint: str | None = None
+        """Initialize type hint and value to default None."""
         self.__value_raw: str | Any = None
+        """Raw environment value before conversion to the requested type."""
 
         # Process string inputs to extract type hint and value
         if isinstance(raw, str):
@@ -146,7 +157,7 @@ class EnvironmentCaster(IEnvironmentCaster):
 
         Parameters
         ----------
-        self : EnvironmentCaster
+        self : orionis.environment.dynamic.caster.EnvironmentCaster
             Instance of the EnvironmentCaster class.
 
         Returns
@@ -215,9 +226,9 @@ class EnvironmentCaster(IEnvironmentCaster):
 
         Parameters
         ----------
-        type_hint : str or EnvironmentValueType
+        type_hint : str or orionis.environment.enums.EnvironmentValueType
             The type to which the internal value should be converted. Must be a
-            valid option in `OPTIONS`.
+            valid option in ``OPTIONS``.
 
         Returns
         -------
@@ -383,7 +394,7 @@ class EnvironmentCaster(IEnvironmentCaster):
         Convert the internal raw value to a normalized POSIX path string.
 
         Process the internal value as a file system path. If the value is already
-        a `Path` object, return its POSIX representation. If the value is a string,
+        a ``Path`` object, return its POSIX representation. If the value is a string,
         replace backslashes with forward slashes for normalization and return the
         POSIX path string.
 
@@ -421,7 +432,7 @@ class EnvironmentCaster(IEnvironmentCaster):
 
         Parameters
         ----------
-        self : EnvironmentCaster
+        self : orionis.environment.dynamic.caster.EnvironmentCaster
             Instance of the EnvironmentCaster class.
 
         Returns
@@ -485,7 +496,7 @@ class EnvironmentCaster(IEnvironmentCaster):
 
         Parameters
         ----------
-        self : EnvironmentCaster
+        self : orionis.environment.dynamic.caster.EnvironmentCaster
             Instance of the EnvironmentCaster class.
 
         Returns
@@ -597,7 +608,7 @@ class EnvironmentCaster(IEnvironmentCaster):
 
         Parameters
         ----------
-        self : EnvironmentCaster
+        self : orionis.environment.dynamic.caster.EnvironmentCaster
             Instance of the EnvironmentCaster class.
 
         Returns
@@ -628,7 +639,7 @@ class EnvironmentCaster(IEnvironmentCaster):
 
         Parameters
         ----------
-        self : EnvironmentCaster
+        self : orionis.environment.dynamic.caster.EnvironmentCaster
             Instance of the EnvironmentCaster class.
 
         Returns
@@ -719,7 +730,7 @@ class EnvironmentCaster(IEnvironmentCaster):
 
         Parameters
         ----------
-        self : EnvironmentCaster
+        self : orionis.environment.dynamic.caster.EnvironmentCaster
             Instance of the EnvironmentCaster class.
 
         Returns
@@ -771,7 +782,7 @@ class EnvironmentCaster(IEnvironmentCaster):
         Parse the internal raw value and convert it to a Python list.
 
         Strips leading and trailing whitespace from the internal raw value,
-        then safely evaluates the string as a Python list using `ast.literal_eval`.
+        then safely evaluates the string as a Python list using ``ast.literal_eval``.
         Raises an exception if the conversion fails or the result is not a list.
 
         Returns
@@ -838,7 +849,7 @@ class EnvironmentCaster(IEnvironmentCaster):
 
         Strips leading and trailing whitespace from the internal raw value,
         then safely evaluates the string as a Python dictionary using
-        `ast.literal_eval`. Raises an error if the conversion fails or the
+        ``ast.literal_eval``. Raises an error if the conversion fails or the
         result is not a dictionary.
 
         Returns
@@ -874,7 +885,7 @@ class EnvironmentCaster(IEnvironmentCaster):
 
         Parameters
         ----------
-        self : EnvironmentCaster
+        self : orionis.environment.dynamic.caster.EnvironmentCaster
             Instance of the EnvironmentCaster class.
 
         Returns
@@ -906,7 +917,7 @@ class EnvironmentCaster(IEnvironmentCaster):
         Parse the internal raw value and convert it to a Python tuple.
 
         Remove leading and trailing whitespace from the internal raw value,
-        then safely evaluate the string as a Python tuple using `ast.literal_eval`.
+        then safely evaluate the string as a Python tuple using ``ast.literal_eval``.
         Raise a ValueError if conversion fails or the result is not a tuple.
 
         Returns
@@ -943,7 +954,7 @@ class EnvironmentCaster(IEnvironmentCaster):
 
         Parameters
         ----------
-        self : EnvironmentCaster
+        self : orionis.environment.dynamic.caster.EnvironmentCaster
             Instance of the EnvironmentCaster class.
 
         Returns
@@ -975,7 +986,7 @@ class EnvironmentCaster(IEnvironmentCaster):
         Parse the internal raw value and convert it to a Python set.
 
         Remove leading and trailing whitespace from the internal raw value,
-        then safely evaluate the string as a Python set using `ast.literal_eval`.
+        then safely evaluate the string as a Python set using ``ast.literal_eval``.
         Raise a TypeError if the result is not a set, or a ValueError if the
         conversion fails.
 
@@ -1013,7 +1024,7 @@ class EnvironmentCaster(IEnvironmentCaster):
 
         Parameters
         ----------
-        self : EnvironmentCaster
+        self : orionis.environment.dynamic.caster.EnvironmentCaster
             Instance of the EnvironmentCaster class.
 
         Returns

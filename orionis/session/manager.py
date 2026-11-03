@@ -1,3 +1,5 @@
+"""Coordinates the session lifecycle for every HTTP request."""
+
 import re
 from datetime import UTC, datetime, timedelta
 from typing import TYPE_CHECKING
@@ -16,6 +18,7 @@ if TYPE_CHECKING:
     from orionis.session.contracts.store import ISessionStore
 
 _VALID_SESSION_ID = re.compile(r"[A-Za-z0-9_-]{1,255}\Z")
+"""Compiled pattern used to recognize valid session id."""
 
 class SessionManager:
     """
@@ -27,10 +30,10 @@ class SessionManager:
 
     Parameters
     ----------
-    config : SessionConfig
-        Resolved session configuration entity.
-    store : ISessionStore
-        Pre-built backing-store instance.
+    app : orionis.IApplication
+        Application providing session configuration and filesystem paths.
+    cache : orionis.cache.contracts.ICacheManager
+        Cache manager used when the configured session store is cache-backed.
     """
 
     # ruff: noqa: PLC0415, SLF001, TC001
@@ -51,6 +54,7 @@ class SessionManager:
         "_store",
         "_track_previous_url",
     )
+    """Declare the instance attribute slots reserved by this class."""
 
     def __init__(
         self,
@@ -62,9 +66,9 @@ class SessionManager:
 
         Parameters
         ----------
-        app : IApplication
+        app : orionis.IApplication
             The application instance.
-        cache : ICacheManager
+        cache : orionis.cache.contracts.ICacheManager
             The application's cache manager, injected so the cache-backed
             store can be built without depending on the ``Cache`` facade's
             pin state.
@@ -72,8 +76,10 @@ class SessionManager:
         Returns
         -------
         None
+            Initialise the manager, pre-computing all request-invariant values.
         """
         self._app = app
+        """The application instance."""
 
         config = SessionConfig(**app.config("session"))
 
@@ -82,28 +88,41 @@ class SessionManager:
             config=config,
             cache=cache,
         )
+        """Pre-built backing-store instance."""
         self._lifetime_delta: timedelta = timedelta(minutes=config.lifetime)
+        """Lifetime delta produced by ``timedelta``."""
         self._renewal_delta = (
             timedelta(seconds=config.renewal_interval)
             if config.renewal_interval else None
         )
+        """Interval used to calculate the next session renewal deadline."""
         self._renewal_window = (
             self._lifetime_delta - self._renewal_delta
             if self._renewal_delta is not None else None
         )
+        """Window during which a session becomes eligible for renewal."""
         self._track_previous_url = config.track_previous_url
+        """Track previous url obtained from ``config.track_previous_url``."""
         self._cookie_name: str = config.cookie
+        """Cookie name obtained from ``config.cookie``."""
         self._cookie_path: str = config.path
+        """Cookie path obtained from ``config.path``."""
         self._cookie_domain: str | None = config.domain
+        """Cookie domain obtained from ``config.domain``."""
         self._cookie_max_age: int | None = (
             None if config.expire_on_close else config.lifetime * 60
         )
+        """Lifetime applied to the session cookie."""
         self._cookie_secure: bool = config.secure
+        """Cookie secure obtained from ``config.secure``."""
         self._cookie_http_only: bool = config.http_only
+        """Cookie http only obtained from ``config.http_only``."""
         self._cookie_same_site: str = getattr(
             config.same_site, "value", config.same_site,
         )
+        """Cookie same site produced by ``getattr``."""
         self._cookie_partitioned: bool = config.partitioned
+        """Cookie partitioned obtained from ``config.partitioned``."""
 
     # ── Public API ──────────────────────────────────────────────────────────────
 
@@ -125,12 +144,12 @@ class SessionManager:
 
         Parameters
         ----------
-        request : Request
+        request : orionis.http.Request
             The incoming HTTP request.
 
         Returns
         -------
-        Session
+        orionis.session.session.Session
             An active or blank lazy session, with flash data aged.
         """
         # Read the session ID from the cookie, and restore the session from
@@ -159,14 +178,15 @@ class SessionManager:
 
         Parameters
         ----------
-        response : Response
+        response : orionis.http.Response
             Outgoing HTTP response.
-        session : Session
+        session : orionis.session.session.Session
             The session returned by ``start()``.
 
         Returns
         -------
         None
+            Persist the session and set the cookie on *response*.
         """
         if session.invalidated:
             await self.__invalidateSession(response, session)
@@ -192,11 +212,12 @@ class SessionManager:
     # ── Private helpers ─────────────────────────────────────────────────────────
 
     async def abort(self, session: Session) -> None:
-        """Persist pending revocation when a request cannot produce a response.
+        """
+        Persist pending revocation when a request cannot produce a response.
 
         Parameters
         ----------
-        session : Session
+        session : orionis.session.session.Session
             Session belonging to a failed or cancelled request.
 
         Returns
@@ -215,12 +236,13 @@ class SessionManager:
 
         Parameters
         ----------
-        session : Session
+        session : orionis.session.session.Session
             The session to register.
 
         Returns
         -------
         None
+            Register the session in the application container.
         """
         # Bind the request-scoped session under its contract so any service
         # (and the Session facade) can resolve it through the container.
@@ -237,16 +259,16 @@ class SessionManager:
 
         Parameters
         ----------
-        base_path : Path
+        base_path : pathlib.Path
             Base project path used to resolve file-store directories.
-        config : SessionConfig
+        config : orionis.foundation.config.session.Session
             Session configuration containing the selected driver.
-        cache : ICacheManager
+        cache : orionis.cache.contracts.ICacheManager
             The application's cache manager, used by the cache driver.
 
         Returns
         -------
-        ISessionStore
+        orionis.session.contracts.ISessionStore
             Store implementing the selected file, cache, database or memory driver.
         """
         driver = config.driver
@@ -287,7 +309,7 @@ class SessionManager:
 
         Returns
         -------
-        Session
+        orionis.session.session.Session
             Restored session, or a blank lazy session on cache miss.
         """
         if _VALID_SESSION_ID.fullmatch(session_id) is None:
@@ -313,7 +335,7 @@ class SessionManager:
 
         Parameters
         ----------
-        session : Session
+        session : orionis.session.session.Session
             The session to persist.  ``session.id`` must not be ``None``.
 
         Returns
@@ -343,7 +365,7 @@ class SessionManager:
 
         Parameters
         ----------
-        session : Session
+        session : orionis.session.session.Session
             The session whose ID is to be rotated.
 
         Returns
@@ -370,14 +392,15 @@ class SessionManager:
 
         Parameters
         ----------
-        response : Response
+        response : orionis.http.Response
             Response on which the expired cookie is set.
-        session : Session
+        session : orionis.session.session.Session
             The session to remove.
 
         Returns
         -------
         None
+            Remove the session record and expire the cookie on *response*.
         """
         if session.id is not None:
             await self._store.delete(session.id)
@@ -389,7 +412,7 @@ class SessionManager:
 
         Parameters
         ----------
-        response : Response
+        response : orionis.http.Response
             The outgoing response.
         session_id : str
             The session identifier to embed in the cookie value.
@@ -397,6 +420,7 @@ class SessionManager:
         Returns
         -------
         None
+            Attach the session identifier cookie to *response*.
         """
         response.setCookie(
             self._cookie_name,
@@ -416,12 +440,13 @@ class SessionManager:
 
         Parameters
         ----------
-        response : Response
+        response : orionis.http.Response
             The outgoing response.
 
         Returns
         -------
         None
+            Set an expired cookie to instruct the browser to clear it.
         """
         response.deleteCookie(
             self._cookie_name,

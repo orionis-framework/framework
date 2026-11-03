@@ -1,3 +1,5 @@
+"""Define enumeration of route types for the framework."""
+
 from enum import StrEnum
 
 
@@ -10,7 +12,12 @@ class RouteType(StrEnum):
     """
 
     CONTROLLER = "controller"
+    """Controller identifier: ``controller``."""
     FUNCTION = "function"
+    """Function identifier: ``function``."""
     INVOKABLE = "invokable"
+    """Invokable identifier: ``invokable``."""
     VIEW = "view"
+    """View identifier: ``view``."""
     HUB = "hub"
+    """Hub identifier: ``hub``."""

@@ -1,3 +1,5 @@
+"""Register one manager and load declarations before either runtime starts."""
+
 from runpy import run_path
 from typing import cast
 from orionis.console.bootstrap import recovering_route
@@ -15,6 +17,7 @@ class McpProvider(ServiceProvider):
     """Register one manager and load declarations before either runtime starts."""
 
     __slots__ = ("_routes_loaded",)
+    """Declare the instance attribute slots reserved by this class."""
 
     def register(self) -> None:
         """
@@ -41,6 +44,7 @@ class McpProvider(ServiceProvider):
         )
         self.app.singleton(IMcpManager, McpManager)
         self._routes_loaded = False
+        """Routes loaded flag used by ``McpProvider``."""
 
     async def boot(self) -> None:
         """

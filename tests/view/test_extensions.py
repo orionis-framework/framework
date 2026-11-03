@@ -6,7 +6,7 @@ from orionis.view.extensions import CsrfExtension
 
 _FIELD = Markup('<input type="hidden" name="_csrf" value="tok-123">')
 
-def _makeEnvironment(csrf_field: object = None) -> Environment:
+def _make_environment(csrf_field: object = None) -> Environment:
     """
     Build an async Jinja2 environment with the CSRF extension loaded.
 
@@ -60,7 +60,7 @@ class TestCsrfExtension(TestCase):
             """
             return _FIELD
 
-        env = _makeEnvironment(csrf_field)
+        env = _make_environment(csrf_field)
         result = await env.from_string("{% csrf %}").render_async()
         self.assertEqual(result, str(_FIELD))
 
@@ -71,7 +71,7 @@ class TestCsrfExtension(TestCase):
         Validates that a plain callable is supported as well, without
         requiring the global to be a coroutine function.
         """
-        env = _makeEnvironment(lambda: _FIELD)
+        env = _make_environment(lambda: _FIELD)
         result = await env.from_string("{% csrf %}").render_async()
         self.assertEqual(result, str(_FIELD))
 
@@ -82,7 +82,7 @@ class TestCsrfExtension(TestCase):
         Validates that the safe :class:`Markup` value is written as-is
         instead of being escaped into entities.
         """
-        env = _makeEnvironment(lambda: _FIELD)
+        env = _make_environment(lambda: _FIELD)
         result = await env.from_string("{% csrf %}").render_async()
         self.assertNotIn("&lt;", result)
         self.assertIn('name="_csrf"', result)
@@ -94,7 +94,7 @@ class TestCsrfExtension(TestCase):
         Validates that a value not marked as safe cannot inject markup
         into the rendered template.
         """
-        env = _makeEnvironment(lambda: "<script>alert(1)</script>")
+        env = _make_environment(lambda: "<script>alert(1)</script>")
         result = await env.from_string("{% csrf %}").render_async()
         self.assertNotIn("<script>", result)
         self.assertIn("&lt;script&gt;", result)
@@ -106,7 +106,7 @@ class TestCsrfExtension(TestCase):
         Validates that the tag can be placed anywhere in a template and
         composes with the surrounding static markup.
         """
-        env = _makeEnvironment(lambda: _FIELD)
+        env = _make_environment(lambda: _FIELD)
         template = env.from_string("<form>{% csrf %}</form>")
         result = await template.render_async()
         self.assertEqual(result, f"<form>{_FIELD}</form>")
@@ -118,7 +118,7 @@ class TestCsrfExtension(TestCase):
         Validates that each occurrence resolves the global independently
         and produces its own hidden input.
         """
-        env = _makeEnvironment(lambda: _FIELD)
+        env = _make_environment(lambda: _FIELD)
         template = env.from_string("{% csrf %}{% csrf %}")
         result = await template.render_async()
         self.assertEqual(result.count('name="_csrf"'), 2)
@@ -130,6 +130,6 @@ class TestCsrfExtension(TestCase):
         Validates that a misconfigured environment reports a view error
         instead of rendering an empty field silently.
         """
-        env = _makeEnvironment()
+        env = _make_environment()
         with self.assertRaises(ViewRenderException):
             await env.from_string("{% csrf %}").render_async()

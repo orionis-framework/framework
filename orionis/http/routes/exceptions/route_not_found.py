@@ -1,3 +1,5 @@
+"""Signal that no route matches the requested path under any HTTP method."""
+
 from __future__ import annotations
 
 

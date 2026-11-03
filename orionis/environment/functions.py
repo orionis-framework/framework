@@ -1,3 +1,5 @@
+"""Provide environment operations through ``env``."""
+
 from __future__ import annotations
 from orionis.environment.facade import Env
 

@@ -1,3 +1,5 @@
+"""Report an invalid schema returned by an HTTP handler."""
+
 class ResponseValidationException(RuntimeError):
     """
     Report an invalid schema returned by an HTTP handler.

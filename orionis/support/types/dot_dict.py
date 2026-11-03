@@ -1,11 +1,16 @@
+"""Expose nested dictionary values through dot-delimited paths."""
+
 from __future__ import annotations
 from typing import Any
 
 _MISSING = object()
+"""Sentinel distinguishing missing from ordinary values."""
 
 class DotDict(dict):
+    """Expose nested dictionary values through dot-delimited paths."""
 
     __slots__ = ()
+    """Declare that this class introduces no additional instance slots."""
 
     def __getattr__(self, key: str) -> object | None:
         """
@@ -18,7 +23,7 @@ class DotDict(dict):
 
         Returns
         -------
-        Any or None
+        typing.Any or None
             Value associated with the key, converted to DotDict if it is a dict.
             Returns None if the key does not exist.
 
@@ -43,7 +48,7 @@ class DotDict(dict):
         ----------
         key : str
             Attribute name to set.
-        value : Any
+        value : typing.Any
             Value to assign. If a dict (not DotDict), it is converted to DotDict.
 
         Returns
@@ -140,7 +145,7 @@ class DotDict(dict):
 
         Returns
         -------
-        DotDict
+        orionis.support.types.DotDict
             A new DotDict instance with recursively copied contents.
         """
         result = DotDict()

@@ -1,3 +1,5 @@
+"""Describe cycling attributes without owning a shared counter."""
+
 from collections.abc import Callable
 from copy import deepcopy
 from inspect import iscoroutinefunction
@@ -9,6 +11,7 @@ from orionis.orm.factories.exceptions import (
 )
 
 type SequenceEntry = dict[str, Any] | Callable[[int], dict[str, Any]]
+"""Type alias for ``dict[str, Any] | Callable[[int], dict[str, Any]]``."""
 
 class Sequence:
     """
@@ -19,18 +22,20 @@ class Sequence:
     """
 
     __slots__ = ("_entries",)
+    """Declare the instance attribute slots reserved by this class."""
 
     def __init__(self, *entries: SequenceEntry) -> None:
-        """Capture one or more detached dictionaries or index callbacks.
+        """
+        Capture one or more detached dictionaries or index callbacks.
 
         Parameters
         ----------
-        *entries : dict or Callable
+        *entries : dict or collections.abc.Callable
             Entries to cycle through in their supplied order.
 
         Raises
         ------
-        FactoryConfigurationException
+        orionis.orm.factories.FactoryConfigurationException
             If no entries or an asynchronous callback is supplied.
 
         Returns
@@ -58,6 +63,7 @@ class Sequence:
                 error_msg = "Sequence entries must be dictionaries or callbacks."
                 raise FactoryConfigurationException(error_msg) from exc
         self._entries = tuple(validated)
+        """Entries to cycle through in their supplied order."""
 
     def resolve(self, index: int) -> dict[str, Any]:
         """
@@ -70,12 +76,12 @@ class Sequence:
 
         Returns
         -------
-        dict of str to Any
+        dict of str ``to`` typing.Any
             Detached attributes for this position.
 
         Raises
         ------
-        FactoryConfigurationException
+        orionis.orm.factories.FactoryConfigurationException
             If the index is not a nonnegative integer.
         """
         if isinstance(index, bool) or not isinstance(index, int) or index < 0:

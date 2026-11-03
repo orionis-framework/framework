@@ -1,16 +1,23 @@
+"""Load and render source templates used by code-generation commands."""
+
 import re
 from pathlib import Path
 
 # Validate names containing lowercase letters, digits, and underscores.
 _NAME_RE: re.Pattern[str] = re.compile(r"[a-z][a-z0-9_]*")
+"""Validate names containing lowercase letters, digits, and underscores."""
 _EXTENSION_RE: re.Pattern[str] = re.compile(r"[a-z][a-z0-9]*")
+"""Compiled pattern used to recognize extension re."""
 _TEMPLATE_DIR: Path = Path(__file__).parent
+"""Template dir used by ``stub``."""
 _CLASS_NAME_PLACEHOLDERS: tuple[str, str] = (
     "{{ class_name }}",
     "{{class_name}}",
 )
+"""Class name placeholders definitions used by ``stub``."""
 
 class Stub:
+    """Load and render source templates used by code-generation commands."""
 
     __slots__ = (
         "_class_name",
@@ -22,6 +29,7 @@ class Stub:
         "_replacements",
         "_template_name",
     )
+    """Declare the instance attribute slots reserved by this class."""
 
     def __init__(
         self,
@@ -53,20 +61,29 @@ class Stub:
             The instance is initialized in place.
         """
         self._template_name: str = template_name
+        """Name of the template file without its ``.stub`` suffix."""
         self._class_name: str = class_name
+        """Name used to derive the generated filename and class name."""
         self._prefix: str | None = prefix
+        """Prefix prepended to the derived filename and class name."""
         self._postfix: str | None = postfix
+        """Suffix appended to the derived filename and class name."""
         self._replacements: dict[str, str] | None = replacements
+        """Placeholder values to apply to the loaded template."""
         self._filename: str | None = None
+        """Filename used when rendering or storing the resource."""
         self._classname: str | None = None
+        """Python class name substituted into the generated source."""
         self._directory_parts: tuple[str, ...] = ()
+        """Path components locating the generated resource directory."""
 
     def __parseName(self) -> tuple[str, ...]:
-        """Normalize a generated name and reject unsafe path components.
+        """
+        Normalize a generated name and reject unsafe path components.
 
         Returns
         -------
-        tuple[str, ...]
+        tuple[str, ``...``]
             Directory components followed by the file stem.
 
         Raises
@@ -241,9 +258,9 @@ class Stub:
 
         Parameters
         ----------
-        directory : Path
+        directory : pathlib.Path
             Directory where the generated Python file is created.
-        relative_to : Path | None, optional
+        relative_to : pathlib.Path | None, optional
             Path to which the generated file path should be made relative.
             Both paths are resolved before computing the relative path.
             If None, the file path is returned as an absolute path.

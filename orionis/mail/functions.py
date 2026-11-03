@@ -1,3 +1,8 @@
+"""Provide mail operations.
+
+Includes ``header_value``, ``attachment_name``, ``media_type``, ``freeze_owned``.
+"""
+
 from collections.abc import Mapping
 from string import ascii_letters, digits
 from types import MappingProxyType
@@ -9,13 +14,20 @@ from orionis.mail.exceptions import (
 
 # Characters allowed by RFC 2045 in a MIME type or subtype token.
 _TOKEN_CHARS = frozenset(ascii_letters + digits + "!#$%&'*+-.^_`|~")
+"""Characters allowed by RFC 2045 in a MIME type or subtype token."""
 
 # Unicode categories rejected in headers: controls, formatting, surrogates,
 # and line or paragraph separators.
 _HEADER_CONTROLS = frozenset({"Cc", "Cf", "Cs", "Zl", "Zp"})
+"""
+Unicode categories rejected in headers: controls, formatting, surrogates, and line
+or paragraph separators.
+"""
 
 _MEDIA_TYPE_PARTS = 2
+"""Media type parts value used by ``functions``."""
 _MAX_REASON_LENGTH = 512
+"""Max reason length value used by ``functions``."""
 
 def header_value(value: str, label: str) -> str:
     """
@@ -35,7 +47,7 @@ def header_value(value: str, label: str) -> str:
 
     Raises
     ------
-    MailCompositionException
+    orionis.mail.exceptions.MailCompositionException
         If the value is not text or contains control characters.
     """
     if not isinstance(value, str) or any(
@@ -61,7 +73,7 @@ def attachment_name(value: str) -> str:
 
     Raises
     ------
-    MailAttachmentException
+    orionis.mail.exceptions.MailAttachmentException
         If the name is empty, unsafe, or contains a path.
     """
     try:
@@ -96,7 +108,7 @@ def media_type(value: str) -> str:
 
     Raises
     ------
-    MailAttachmentException
+    orionis.mail.exceptions.MailAttachmentException
         If either token is invalid or parameters are present.
     """
     parts = value.split("/") if isinstance(value, str) else []
@@ -125,7 +137,7 @@ def freeze_owned(value: object, active: frozenset[int] = frozenset()) -> object:
 
     Raises
     ------
-    MailCompositionException
+    orionis.mail.exceptions.MailCompositionException
         If a container cycle prevents an immutable snapshot.
     """
     # Values that are not owned containers are shared by reference, so
@@ -154,7 +166,7 @@ def sanitize_reason(value: str | bytes, sensitive: tuple[str, ...] = ()) -> str:
     ----------
     value : str | bytes
         Server response, decoded with replacement when needed.
-    sensitive : tuple[str, ...]
+    sensitive : tuple[str, ``...``]
         Credentials and credential-bearing URL representations to redact.
 
     Returns

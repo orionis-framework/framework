@@ -1,3 +1,5 @@
+"""Service provider wiring the authentication module."""
+
 from orionis.auth.authorization.authorizer import Authorizer
 from orionis.auth.authorization.registrar import PermissionRegistrar
 from orionis.auth.authorization.repository import DatabasePermissionRepository

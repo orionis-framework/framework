@@ -1,3 +1,5 @@
+"""Attribute handling behavior shared by every model."""
+
 from __future__ import annotations
 import json
 import uuid
@@ -12,6 +14,7 @@ if TYPE_CHECKING:
 
 # Strings interpreted as truthy when casting to bool.
 _TRUTHY_STRINGS: frozenset[str] = frozenset({"1", "true", "yes", "on"})
+"""Strings interpreted as truthy when casting to bool."""
 
 def _cast_bool(value: Any) -> bool:  # noqa: ANN401
     """
@@ -19,7 +22,7 @@ def _cast_bool(value: Any) -> bool:  # noqa: ANN401
 
     Parameters
     ----------
-    value : Any
+    value : typing.Any
         Raw attribute value.
 
     Returns
@@ -37,12 +40,12 @@ def _cast_datetime(value: Any) -> datetime:  # noqa: ANN401
 
     Parameters
     ----------
-    value : Any
+    value : typing.Any
         Datetime instance, ISO-8601 string, or POSIX timestamp.
 
     Returns
     -------
-    datetime
+    datetime.datetime
         Datetime representation of the value.
     """
     if isinstance(value, datetime):
@@ -57,12 +60,12 @@ def _cast_date(value: Any) -> date:  # noqa: ANN401
 
     Parameters
     ----------
-    value : Any
+    value : typing.Any
         Date, datetime, or ISO-8601 string.
 
     Returns
     -------
-    date
+    datetime.date
         Date representation of the value.
     """
     if isinstance(value, datetime):
@@ -77,12 +80,12 @@ def _cast_json(value: Any) -> Any:  # noqa: ANN401
 
     Parameters
     ----------
-    value : Any
+    value : typing.Any
         JSON string, or an already decoded structure.
 
     Returns
     -------
-    Any
+    typing.Any
         Decoded Python structure.
     """
     if isinstance(value, (bytes, bytearray, str)):
@@ -91,16 +94,16 @@ def _cast_json(value: Any) -> Any:  # noqa: ANN401
 
 def _cast_uuid(value: Any) -> uuid.UUID:  # noqa: ANN401
     """
-    Cast a raw value to :class:`uuid.UUID`.
+    Cast a raw value to ``uuid.UUID``.
 
     Parameters
     ----------
-    value : Any
+    value : typing.Any
         UUID instance or its string form.
 
     Returns
     -------
-    uuid.UUID
+    ``uuid.UUID``
         UUID representation of the value.
     """
     if isinstance(value, uuid.UUID):
@@ -117,6 +120,7 @@ _CAST_HANDLERS: dict[str, Callable[[Any], Any]] = {
     "json": _cast_json,
     "uuid": _cast_uuid,
 }
+"""Registry of supported cast names."""
 
 def get_cast_handler(cast: str) -> Callable[[Any], Any]:
     """
@@ -129,12 +133,12 @@ def get_cast_handler(cast: str) -> Callable[[Any], Any]:
 
     Returns
     -------
-    Callable
+    collections.abc.Callable
         Function converting raw values into the cast type.
 
     Raises
     ------
-    OrmException
+    orionis.orm.exceptions.OrmException
         If the cast name is not supported.
     """
     handler = _CAST_HANDLERS.get(str(cast).strip().lower())
@@ -158,7 +162,7 @@ def serialize_for_storage(
 
     Parameters
     ----------
-    meta : ModelMetadata
+    meta : orionis.orm.metaclass.ModelMetadata
         Metadata of the model owning the attributes.
     values : dict
         Attribute values to serialize.
@@ -199,6 +203,7 @@ class AttributesMixin:
     """
 
     __slots__ = ()
+    """Declare that this class introduces no additional instance slots."""
 
     def fill(self, attributes: dict[str, Any]) -> Any:  # noqa: ANN401
         """
@@ -211,12 +216,12 @@ class AttributesMixin:
 
         Returns
         -------
-        Model
+        orionis.orm.Model
             The same instance, enabling fluent chaining.
 
         Raises
         ------
-        MassAssignmentException
+        orionis.orm.exceptions.MassAssignmentException
             If a key is not a column or is guarded from mass assignment.
         """
         meta = self.__meta__
@@ -248,7 +253,7 @@ class AttributesMixin:
         ----------
         key : str
             Attribute name.
-        value : Any
+        value : typing.Any
             Raw value to assign.
 
         Returns
@@ -277,12 +282,12 @@ class AttributesMixin:
         ----------
         key : str
             Attribute name.
-        default : Any, optional
+        default : typing.Any, optional
             Value returned when the attribute is absent.
 
         Returns
         -------
-        Any
+        typing.Any
             Attribute value, or the default when absent.
         """
         accessor = self.__meta__.accessors.get(key)
@@ -355,7 +360,7 @@ class AttributesMixin:
 
         Parameters
         ----------
-        **kwargs : Any
+        **kwargs : typing.Any
             Additional keyword arguments forwarded to ``json.dumps``.
 
         Returns

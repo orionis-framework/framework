@@ -19,7 +19,7 @@ class _Backend:
         self.entered = asyncio.Event()
         self.block = False
 
-    def build_key(self: Self, key: str) -> str:
+    def buildKey(self: Self, key: str) -> str:
         """
         Return the unprefixed key used by the test backend.
 
@@ -34,6 +34,9 @@ class _Backend:
             The supplied key without an additional prefix.
         """
         return key
+
+    # Preserve the aiocache backend protocol name.
+    build_key = buildKey
 
     async def _add(self: Self, key: str, value: str, *, ttl: float) -> None:
         """
@@ -62,7 +65,7 @@ class _Backend:
         if self.block:
             await asyncio.Event().wait()
 
-    async def _redlock_release(self: Self, key: str, owner: str) -> int:
+    async def _redlockRelease(self: Self, key: str, owner: str) -> int:
         """
         Delete a lease only when its stored owner matches.
 
@@ -82,6 +85,9 @@ class _Backend:
             del self.values[key]
             return 1
         return 0
+
+    # Preserve the aiocache lock protocol name.
+    _redlock_release = _redlockRelease
 
 
 class TestResolverLease(TestCase):

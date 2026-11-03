@@ -1,3 +1,5 @@
+"""Provide view globals operations through ``_global_dump``."""
+
 from __future__ import annotations
 from typing import Any
 from markupsafe import Markup
@@ -11,7 +13,7 @@ def _global_dump() -> Any:
 
     Returns
     -------
-    Any
+    typing.Any
         Callable dumping the given variables and returning safe HTML.
     """
     def dump(*args: Any) -> Markup:
@@ -20,12 +22,12 @@ def _global_dump() -> Any:
 
         Parameters
         ----------
-        *args : Any
+        *args : typing.Any
             Values to dump.
 
         Returns
         -------
-        Markup
+        ``markupsafe.Markup``
             Safe HTML markup with the dumped variables, exempt from the
             environment autoescaping.
         """

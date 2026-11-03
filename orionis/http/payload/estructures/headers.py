@@ -1,3 +1,5 @@
+"""Parse and expose HTTP headers with case-insensitive lookup."""
+
 from typing import TYPE_CHECKING, Self
 from orionis.support.patterns.final.meta import Final
 
@@ -7,7 +9,10 @@ if TYPE_CHECKING:
     from granian.rsgi import Headers as RSGIHeaders
 
 class Headers(metaclass=Final):
+    """Parse and expose HTTP headers with case-insensitive lookup."""
+
     __slots__ = ("_has_invalid_format", "_index", "_items")
+    """Declare the instance attribute slots reserved by this class."""
 
     def __init__(
         self: Self,
@@ -28,6 +33,7 @@ class Headers(metaclass=Final):
         Returns
         -------
         None
+            Initialize Headers from an iterable of key-value pairs.
         """
         # Copy incoming pairs while indexing names and checking their format.
         items: list[tuple[str, str]] = []
@@ -47,8 +53,11 @@ class Headers(metaclass=Final):
             else:
                 index[key] = [bucket, v]
         self._index = index
+        """Lookup index used to resolve registered entries."""
         self._items = items
+        """Items supplied through ``items``."""
         self._has_invalid_format = invalid
+        """Has invalid format supplied through ``invalid``."""
 
     @classmethod
     def _fromRSGI(cls: type[Self], raw: RSGIHeaders) -> Self:
@@ -57,12 +66,12 @@ class Headers(metaclass=Final):
 
         Parameters
         ----------
-        raw : RSGIHeaders
+        raw : ``granian.rsgi.Headers``
             Transport collection exposing header names and ``get_all`` values.
 
         Returns
         -------
-        Self
+        typing.Self
             Headers retaining duplicate order, owned lists and CRLF validation.
         """
         items: list[tuple[str, str]] = []
@@ -215,7 +224,7 @@ class Headers(metaclass=Final):
 
         Returns
         -------
-        Iterator[tuple[str, str]]
+        collections.abc.Iterator[tuple[str, str]]
             An iterator over ``(name, value)`` pairs.
         """
         return iter(self._items)
@@ -237,7 +246,7 @@ class Headers(metaclass=Final):
 
         Returns
         -------
-        Iterator[tuple[bytes, bytes]]
+        collections.abc.Iterator[tuple[bytes, bytes]]
             Each ``(name, value)`` pair encoded as UTF-8 bytes.
         """
         for k, v in self._items:

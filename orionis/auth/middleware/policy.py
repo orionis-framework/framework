@@ -1,3 +1,5 @@
+"""Gate a route behind a policy ability declared on a resource class."""
+
 from typing import TYPE_CHECKING, ClassVar
 from orionis.auth.context.functions import current_auth_context
 from orionis.auth.contracts.authorizer import IAuthorizer
@@ -34,12 +36,15 @@ class RequirePolicyMiddleware(BaseMiddleware):
     # ruff: noqa: TC001 (Dependency Injection)
 
     __slots__ = ("_authorizer",)
+    """Declare the instance attribute slots reserved by this class."""
 
     # Ability declared by the policy of the resource.
     ability: ClassVar[str] = ""
+    """Ability declared by the policy of the resource."""
 
     # Resource class protected by the policy.
     resource: ClassVar[type | None] = None
+    """Resource class protected by the policy."""
 
     def __init__(self, authorizer: IAuthorizer) -> None:
         """
@@ -47,7 +52,7 @@ class RequirePolicyMiddleware(BaseMiddleware):
 
         Parameters
         ----------
-        authorizer : IAuthorizer
+        authorizer : orionis.auth.contracts.IAuthorizer
             Component resolving and running the policy.
 
         Returns
@@ -56,6 +61,7 @@ class RequirePolicyMiddleware(BaseMiddleware):
             The middleware keeps no per request state.
         """
         self._authorizer = authorizer
+        """Component resolving and running the policy."""
 
     async def handle(
         self,
@@ -67,23 +73,23 @@ class RequirePolicyMiddleware(BaseMiddleware):
 
         Parameters
         ----------
-        request : Request
+        request : orionis.http.Request
             Incoming HTTP request, unused by this middleware.
-        call_next : NextCallable
+        call_next : orionis.http.NextCallable
             Callable advancing to the next layer.
 
         Returns
         -------
-        Response
+        orionis.http.Response
             Response produced by the rest of the pipeline.
 
         Raises
         ------
-        AuthConfigurationException
+        orionis.auth.AuthConfigurationException
             When the subclass declares no ability or no resource.
-        AuthenticationException
+        orionis.auth.AuthenticationException
             When the request carries no authenticated identity.
-        AuthorizationException
+        orionis.auth.AuthorizationException
             When the policy denies the operation.
         """
         ability = self.ability

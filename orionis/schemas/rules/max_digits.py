@@ -1,3 +1,5 @@
+"""Ensure an integer is written with at most a given number of digits."""
+
 from orionis.schemas.rule import Rule
 
 class MaxDigits(Rule):
@@ -10,9 +12,14 @@ class MaxDigits(Rule):
     # ruff: noqa: ARG002
 
     __slots__ = ("_maximum",)
+    """Declare the instance attribute slots reserved by this class."""
 
     __message__ = "Value must not exceed the allowed number of digits."
+    """
+    Error text for message: ``Value must not exceed the allowed number of digits.``.
+    """
     __code__ = "max_digits"
+    """Code identifier: ``max_digits``."""
 
     def __init__(self, maximum: int, *, message: str | None = None) -> None:
         """
@@ -43,6 +50,7 @@ class MaxDigits(Rule):
             )
             raise ValueError(error_msg)
         self._maximum: int = maximum
+        """Highest accepted number of digits."""
 
     async def enforce(
         self,

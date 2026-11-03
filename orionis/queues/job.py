@@ -1,3 +1,5 @@
+"""Declare serializable job fields and asynchronous service dependencies."""
+
 from typing import ClassVar
 from orionis.queues.contracts.job import IJob
 
@@ -11,11 +13,12 @@ class BaseJob(IJob):
         Maximum reservations, or the configured worker default.
     timeout : float | None
         Cooperative execution timeout, or the configured worker default.
-    backoff : tuple[float, ...] | None
+    backoff : tuple[float, ``...``] | None
         Delay after each failed attempt, or the configured worker default.
     """
 
     __slots__ = ()
+    """Declare that this class introduces no additional instance slots."""
 
     tries: ClassVar[int | None] = None
     timeout: ClassVar[float | None] = None

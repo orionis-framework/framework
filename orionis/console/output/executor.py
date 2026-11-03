@@ -1,3 +1,5 @@
+"""Execute external commands and expose their console results."""
+
 from __future__ import annotations
 from typing import TYPE_CHECKING
 from orionis.console.enums.styles import ANSIColors
@@ -10,6 +12,7 @@ if TYPE_CHECKING:
 class Executor(IExecutor):
 
     # ruff: noqa: T201
+    """Execute external commands and expose their console results."""
 
     def __getNow(self) -> datetime:
         """
@@ -17,7 +20,7 @@ class Executor(IExecutor):
 
         Returns
         -------
-        datetime
+        datetime.datetime
             Current date and time as a datetime object.
         """
         # Use DateTime facade to get current datetime

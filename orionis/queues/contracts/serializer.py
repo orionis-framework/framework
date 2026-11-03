@@ -1,3 +1,5 @@
+"""Declare explicit state serialization and trusted job registration."""
+
 from abc import ABC, abstractmethod
 from typing import TYPE_CHECKING
 
@@ -9,6 +11,7 @@ class IJobSerializer(ABC):
     """Declare explicit state serialization and trusted job registration."""
 
     __slots__ = ()
+    """Declare that this class introduces no additional instance slots."""
 
     @abstractmethod
     def register(self, job_type: type[BaseJob]) -> None:
@@ -17,7 +20,7 @@ class IJobSerializer(ABC):
 
         Parameters
         ----------
-        job_type : type[BaseJob]
+        job_type : type[orionis.queues.BaseJob]
             Class supplied by trusted application code.
 
         Returns
@@ -33,7 +36,7 @@ class IJobSerializer(ABC):
 
         Parameters
         ----------
-        job : BaseJob
+        job : orionis.queues.BaseJob
             Application job instance.
 
         Returns
@@ -56,7 +59,7 @@ class IJobSerializer(ABC):
 
         Returns
         -------
-        BaseJob
+        orionis.queues.BaseJob
             Job whose handle method can receive DI services.
         """
 
@@ -67,7 +70,7 @@ class IJobSerializer(ABC):
 
         Parameters
         ----------
-        envelope : JobEnvelope
+        envelope : orionis.queues.JobEnvelope
             Immutable data to persist.
 
         Returns
@@ -88,6 +91,6 @@ class IJobSerializer(ABC):
 
         Returns
         -------
-        JobEnvelope
+        orionis.queues.JobEnvelope
             Validated immutable execution data.
         """

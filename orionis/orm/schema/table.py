@@ -1,3 +1,5 @@
+"""Framework-agnostic description of a database table."""
+
 from __future__ import annotations
 from dataclasses import dataclass, field
 from typing import TYPE_CHECKING
@@ -23,7 +25,7 @@ class TableDefinition:
     ----------
     name : str
         Logical table name without any connection prefix.
-    columns : dict of str to ColumnDefinition
+    columns : dict of str ``to`` orionis.orm.schema.column.ColumnDefinition
         Column definitions keyed by attribute name.
     primary_key : str
         Name of the primary key column, when it is a single column.
@@ -34,11 +36,11 @@ class TableDefinition:
     composite_primary_key : tuple of str or None
         Column names forming a multi-column primary key. When set, it
         takes precedence over the single-column ``primary_key``.
-    unique_constraints : tuple of UniqueConstraint
+    unique_constraints : tuple of orionis.orm.schema.constraints.UniqueConstraint
         Composite ``UNIQUE`` constraints spanning multiple columns.
-    foreign_keys : tuple of CompositeForeignKey
+    foreign_keys : tuple of orionis.orm.schema.constraints.CompositeForeignKey
         Multi-column foreign key constraints.
-    indexes : tuple of TableIndex
+    indexes : tuple of orionis.orm.schema.constraints.TableIndex
         Composite indexes spanning multiple columns.
     """
 

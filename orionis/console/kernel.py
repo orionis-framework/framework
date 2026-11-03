@@ -1,3 +1,5 @@
+"""Bootstrap the console runtime and dispatch command invocations."""
+
 from __future__ import annotations
 from typing import TYPE_CHECKING, ClassVar
 from orionis.console.contracts.kernel import IKernelCLI
@@ -7,15 +9,19 @@ if TYPE_CHECKING:
     from orionis.foundation.contracts.application import IApplication
 
 class KernelCLI(IKernelCLI):
+    """Bootstrap the console runtime and dispatch command invocations."""
 
     __slots__ = ("__reactor",)
+    """Declare the instance attribute slots reserved by this class."""
 
     IGNORE_FLAGS: ClassVar[frozenset[str]] = frozenset({
         "reactor", "-c", "-m", "-", "-i", "-q", "-B", "-O", "-OO", "-v",
         "-vv", "-d", "-x", "-E", "-s", "-S", "-u", "-I", "-W",
     })
+    """Ignore flags used by ``KernelCLI``."""
 
     _HELP_FLAGS: ClassVar[frozenset[str]] = frozenset({"help", "--help", "-h"})
+    """Help flags used by ``KernelCLI``."""
 
     async def boot(
         self,
@@ -26,7 +32,7 @@ class KernelCLI(IKernelCLI):
 
         Parameters
         ----------
-        application : IApplication
+        application : orionis.IApplication
             The application instance used to create the reactor.
 
         Returns
@@ -36,6 +42,7 @@ class KernelCLI(IKernelCLI):
         """
         # Create and assign the reactor instance using the application factory.
         self.__reactor: IReactor = await application.make(IReactor)
+        """Create and assign the reactor instance using the application factory."""
 
     async def handle(self, args: list[str] | None = None) -> int:
         """

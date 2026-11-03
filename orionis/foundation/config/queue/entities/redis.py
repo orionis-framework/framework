@@ -1,3 +1,5 @@
+"""Configure a durable Redis queue connection."""
+
 from dataclasses import dataclass, field
 from orionis.environment import Env
 from orionis.foundation.config.queue.enums.drivers import Drivers
@@ -11,15 +13,16 @@ from orionis.foundation.config.validation import (
 from orionis.support.entities.base import BaseEntity
 
 _MAX_PORT = 65535
+"""Max port value used by ``redis``."""
 
 @dataclass(frozen=True, kw_only=True, slots=True)
 class Redis(BaseEntity):
     """
     Configure a durable Redis queue connection.
 
-    Parameters
+    Attributes
     ----------
-    driver : Drivers | str
+    driver : orionis.foundation.config.queue.enums.Drivers | str
         Redis driver identifier.
     endpoint : str
         Redis host read from ``REDIS_HOST``.

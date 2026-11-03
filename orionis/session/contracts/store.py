@@ -1,3 +1,5 @@
+"""Contract every session backing-store must satisfy."""
+
 from abc import ABC, abstractmethod
 from typing import TYPE_CHECKING
 
@@ -24,6 +26,7 @@ class ISessionStore(ABC):
     """
 
     __slots__ = ()
+    """Declare that this class introduces no additional instance slots."""
 
     @abstractmethod
     async def read(self, session_id: str) -> SessionRecord | None:
@@ -37,7 +40,7 @@ class ISessionStore(ABC):
 
         Returns
         -------
-        SessionRecord | None
+        orionis.session.entities.record.SessionRecord | None
             The stored record, or ``None`` when absent.
         """
 
@@ -48,21 +51,23 @@ class ISessionStore(ABC):
 
         Parameters
         ----------
-        record : SessionRecord
+        record : orionis.session.entities.record.SessionRecord
             The record to store.
 
         Returns
         -------
         None
+            Persist *record*, creating or overwriting the existing entry.
         """
 
     @abstractmethod
     async def update(self, record: SessionRecord) -> bool:
-        """Update a live session atomically without creating a missing record.
+        """
+        Update a live session atomically without creating a missing record.
 
         Parameters
         ----------
-        record : SessionRecord
+        record : orionis.session.entities.record.SessionRecord
             Replacement session payload and expiration.
 
         Returns
@@ -96,4 +101,5 @@ class ISessionStore(ABC):
         Returns
         -------
         None
+            Remove all records whose ``expires_at`` is in the past.
         """

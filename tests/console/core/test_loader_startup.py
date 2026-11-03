@@ -56,7 +56,7 @@ def command_metadata(command: type[BaseCommand]) -> dict:
 class TestLoaderStartup(unittest.IsolatedAsyncioTestCase):
     """Verify command cache usage without booting unrelated services."""
 
-    def make_loader(self, metadata: dict | None) -> tuple[Loader, Mock]:
+    def makeLoader(self, metadata: dict | None) -> tuple[Loader, Mock]:
         """
         Create a loader with a controlled command-cache result.
 
@@ -124,7 +124,7 @@ class TestLoaderStartup(unittest.IsolatedAsyncioTestCase):
         """
         selected = command_metadata(StartupCommand)
         unrelated = dict(selected, module_path="startup.unused", signature="unused")
-        loader, persistence = self.make_loader({
+        loader, persistence = self.makeLoader({
             StartupCommand.signature: selected,
             "unused": unrelated,
         })
@@ -166,7 +166,7 @@ class TestLoaderStartup(unittest.IsolatedAsyncioTestCase):
         None
             Assert core, custom, and fluent discovery order and one cache write.
         """
-        loader, persistence = self.make_loader(None)
+        loader, persistence = self.makeLoader(None)
         selected = command_metadata(StartupCommand)
         calls = []
 
@@ -236,7 +236,7 @@ class TestLoaderStartup(unittest.IsolatedAsyncioTestCase):
         """
         from orionis.console.core.commands import CORE_COMMANDS
 
-        loader, _ = self.make_loader(None)
+        loader, _ = self.makeLoader(None)
         await loader._Loader__loadCoreCommands()
 
         self.assertIsInstance(CORE_COMMANDS, tuple)

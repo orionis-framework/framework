@@ -1,3 +1,5 @@
+"""Ensure a string holds a syntactically valid JSON document."""
+
 import msgspec
 from orionis.schemas.rule import Rule
 
@@ -7,9 +9,12 @@ class Json(Rule):
     # ruff: noqa: ARG002
 
     __slots__ = ()
+    """Declare that this class introduces no additional instance slots."""
 
     __message__ = "Value must be a valid JSON string."
+    """Error text for message: ``Value must be a valid JSON string.``."""
     __code__ = "json"
+    """Code identifier: ``json``."""
 
     async def enforce(
         self,

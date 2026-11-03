@@ -1,3 +1,5 @@
+"""Customize endpoint framing without replacing routing or middleware."""
+
 from __future__ import annotations
 from abc import ABC, abstractmethod
 from typing import TYPE_CHECKING, ClassVar
@@ -11,7 +13,9 @@ class IHttpEndpointPolicy(ABC):
     """Customize endpoint framing without replacing routing or middleware."""
 
     __slots__ = ()
+    """Declare that this class introduces no additional instance slots."""
     monitor_disconnects: ClassVar[bool] = False
+    """Monitor disconnects flag used by ``IHttpEndpointPolicy``."""
 
     @abstractmethod
     def before(self, adapter: TransportAdapter) -> Response | None:
@@ -20,12 +24,12 @@ class IHttpEndpointPolicy(ABC):
 
         Parameters
         ----------
-        adapter : TransportAdapter
+        adapter : orionis.http.adapters.request.contracts.transport.TransportAdapter
             Value supplied for ``adapter``.
 
         Returns
         -------
-        Response | None
+        orionis.http.Response | None
             Result of the operation described above.
         """
 
@@ -36,12 +40,12 @@ class IHttpEndpointPolicy(ABC):
 
         Parameters
         ----------
-        response : Response
+        response : orionis.http.Response
             Value supplied for ``response``.
 
         Returns
         -------
-        Response
+        orionis.http.Response
             Result of the operation described above.
         """
 
@@ -61,6 +65,6 @@ class IHttpEndpointPolicy(ABC):
 
         Returns
         -------
-        Response
+        orionis.http.Response
             Result of the operation described above.
         """

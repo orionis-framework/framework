@@ -1,3 +1,5 @@
+"""Provide auth tokens operations through ``lookup_owner``."""
+
 from typing import TYPE_CHECKING
 from sqlalchemy import BigInteger, and_, case, cast, func, or_, select
 from orionis.auth.identity.provider import ModelIdentityProvider
@@ -16,6 +18,7 @@ if TYPE_CHECKING:
 # providers, connections and nontrivial query shapes keep their original path.
 # ruff: noqa: SLF001
 _INTEGER_DIGITS = 19
+"""Integer digits value used by ``lookup``."""
 _INTEGERS = frozenset(
     {
         ColumnType.BIG_INTEGER,
@@ -26,6 +29,7 @@ _INTEGERS = frozenset(
         ColumnType.SMALLINT,
     },
 )
+"""Integers used by ``lookup``."""
 _STRINGS = frozenset(
     {
         ColumnType.STRING,
@@ -36,6 +40,7 @@ _STRINGS = frozenset(
         ColumnType.NVARCHAR,
     },
 )
+"""Strings used by ``lookup``."""
 _COLUMNS = (
     "id",
     "tokenable_type",
@@ -47,6 +52,7 @@ _COLUMNS = (
     "last_used_at",
     "revoked_at",
 )
+"""Columns definitions used by ``lookup``."""
 
 def _integer_key(value: ColumnElement, length: Callable) -> ColumnElement:
     """
@@ -54,14 +60,14 @@ def _integer_key(value: ColumnElement, length: Callable) -> ColumnElement:
 
     Parameters
     ----------
-    value : ColumnElement
+    value : ``sqlalchemy.sql.elements.ColumnElement``
         SQL expression containing the stored string identifier.
-    length : Callable
+    length : collections.abc.Callable
         Dialect-specific SQL string-length function.
 
     Returns
     -------
-    ColumnElement
+    ``sqlalchemy.sql.elements.ColumnElement``
         Guarded integer cast, yielding SQL NULL for malformed keys.
     """
     digits = func.replace(value, "-", "")
@@ -87,15 +93,16 @@ async def lookup_owner(  # noqa: PLR0911
     identities: object,
     validate: Callable[[dict], object | None],
 ) -> tuple[object, object] | NotImplementedType | None:
-    """Read a token and a native ORM identity in one bounded SELECT.
+    """
+    Read a token and a native ORM identity in one bounded SELECT.
 
     Parameters
     ----------
-    query : RawQueryBuilder
+    query : orionis.orm.query.raw_builder.RawQueryBuilder
         Token digest query, with no plaintext credential in its bindings.
     identities : object
         Provider to optimize only when its native lookup semantics are known.
-    validate : Callable
+    validate : collections.abc.Callable
         Validate token metadata before hydrating or dispatching identity events.
 
     Returns

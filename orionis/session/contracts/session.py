@@ -1,3 +1,5 @@
+"""Contract for a single HTTP session runtime object."""
+
 from __future__ import annotations
 from abc import ABC, abstractmethod
 from typing import TYPE_CHECKING, Any
@@ -21,6 +23,7 @@ class ISession(ABC):
     """
 
     __slots__ = ()
+    """Declare that this class introduces no additional instance slots."""
 
     # ── Read-only properties ────────────────────────────────────────────────────
 
@@ -107,12 +110,12 @@ class ISession(ABC):
         ----------
         key : str
             Session data key.
-        default : Any, optional
+        default : typing.Any, optional
             Fallback value returned when *key* is not found.
 
         Returns
         -------
-        Any
+        typing.Any
             The stored value, or *default*.
         """
 
@@ -125,12 +128,13 @@ class ISession(ABC):
         ----------
         key : str
             Session data key.
-        value : Any
+        value : typing.Any
             Value to store.
 
         Returns
         -------
         None
+            Store *value* under *key*, activating the session on the first call.
         """
 
     @abstractmethod
@@ -162,6 +166,7 @@ class ISession(ABC):
         Returns
         -------
         None
+            Remove *key* from session data (no-op when absent).
         """
 
     @abstractmethod
@@ -172,6 +177,7 @@ class ISession(ABC):
         Returns
         -------
         None
+            Remove all data from this session.
         """
 
     @abstractmethod
@@ -183,12 +189,13 @@ class ISession(ABC):
         ----------
         key : str
             Flash data key.
-        value : Any
+        value : typing.Any
             Flash data value.
 
         Returns
         -------
         None
+            Store *value* under *key* for exactly one subsequent request.
         """
 
     @abstractmethod
@@ -203,12 +210,12 @@ class ISession(ABC):
         ----------
         key : str
             Flash data key.
-        default : Any, optional
+        default : typing.Any, optional
             Fallback value when the key is absent from both bags.
 
         Returns
         -------
-        Any
+        typing.Any
             The flash value, or *default*.
         """
 
@@ -219,13 +226,14 @@ class ISession(ABC):
 
         Parameters
         ----------
-        values : Mapping[str, Any]
+        values : collections.abc.Mapping[str, typing.Any]
             Submitted payload to remember.  Credential-like fields are
             stripped before storing.
 
         Returns
         -------
         None
+            Flash a submitted form payload so the next request can repopulate it.
         """
 
     @abstractmethod
@@ -237,12 +245,12 @@ class ISession(ABC):
         ----------
         key : str
             Form field name.
-        default : Any, optional
+        default : typing.Any, optional
             Fallback value when the field was not submitted.
 
         Returns
         -------
-        Any
+        typing.Any
             The previously submitted value, or *default*.
         """
 
@@ -253,12 +261,13 @@ class ISession(ABC):
 
         Parameters
         ----------
-        errors : Mapping[str, Any] | Exception
+        errors : collections.abc.Mapping[str, typing.Any] | Exception
             Mapping of field to message(s), or a validation exception.
 
         Returns
         -------
         None
+            Flash validation errors for the next request.
         """
 
     @abstractmethod
@@ -285,6 +294,7 @@ class ISession(ABC):
         Returns
         -------
         None
+            Remember the page the user is currently viewing.
         """
 
     @abstractmethod
@@ -311,6 +321,7 @@ class ISession(ABC):
         Returns
         -------
         None
+            Request a session ID rotation (e.g. immediately after login).
         """
 
     @abstractmethod
@@ -321,6 +332,7 @@ class ISession(ABC):
         Returns
         -------
         None
+            Mark the session for full deletion and clear in-memory data.
         """
 
     @abstractmethod
@@ -330,6 +342,6 @@ class ISession(ABC):
 
         Returns
         -------
-        dict[str, Any]
+        dict[str, typing.Any]
             Copy of all session key-value pairs including internal flash bags.
         """

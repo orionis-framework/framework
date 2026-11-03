@@ -1,3 +1,5 @@
+"""Define fields for schemas."""
+
 from typing import Annotated as Field
 from typing import ClassVar as Static
 from typing import Final as Constant

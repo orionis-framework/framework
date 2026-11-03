@@ -1,3 +1,5 @@
+"""Provide view filters operations through ``_filter_json``."""
+
 from __future__ import annotations
 from typing import Any
 import msgspec
@@ -11,7 +13,7 @@ def _filter_json() -> Any:
 
     Returns
     -------
-    Any
+    typing.Any
         Callable serialising a value to a JSON string.
     """
     def jsonify(value: Any, indent: int | None = None) -> str:
@@ -20,7 +22,7 @@ def _filter_json() -> Any:
 
         Parameters
         ----------
-        value : Any
+        value : typing.Any
             Value to serialise.  Must be JSON-serialisable.
         indent : int | None, optional
             If provided, pretty-prints the output with the given

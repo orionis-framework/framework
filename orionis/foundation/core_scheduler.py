@@ -1,3 +1,5 @@
+"""Provide foundation operations through ``get_core_scheduler_mapping``."""
+
 from types import MappingProxyType
 
 def get_core_scheduler_mapping() -> MappingProxyType:
@@ -6,7 +8,7 @@ def get_core_scheduler_mapping() -> MappingProxyType:
 
     Returns
     -------
-    MappingProxyType
+    types.MappingProxyType
         Immutable mapping containing the 'module' and 'class' keys, referencing
         the BaseScheduler's module and class name.
     """
@@ -15,3 +17,4 @@ def get_core_scheduler_mapping() -> MappingProxyType:
     )
 
 CORE_SCHEDULER: MappingProxyType = get_core_scheduler_mapping()
+"""Core scheduler used by ``core_scheduler``."""

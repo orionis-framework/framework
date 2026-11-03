@@ -1,3 +1,5 @@
+"""Create the native scheduler task table without starting scheduled tasks."""
+
 from orionis.console.base.command import BaseCommand
 from orionis.console.contracts.store import IScheduleStore
 from orionis.database.exceptions import DatabaseException
@@ -8,10 +10,17 @@ class ScheduleMigrateCommand(BaseCommand):
     # ruff: noqa: TC001
 
     __slots__ = ()
+    """Declare that this class introduces no additional instance slots."""
 
     timestamps: bool = False
+    """Timestamps flag used by ``ScheduleMigrateCommand``."""
     signature: str = "schedule:migrate"
+    """Signature identifier: ``schedule:migrate``."""
     description: str = "Create the configured database scheduler task table."
+    """
+    Description identifier: ``Create the configured database scheduler task
+    table.``.
+    """
 
     async def handle(self, store: IScheduleStore) -> int:
         """
@@ -19,7 +28,7 @@ class ScheduleMigrateCommand(BaseCommand):
 
         Parameters
         ----------
-        store : IScheduleStore
+        store : orionis.console.contracts.store.IScheduleStore
             Service owning the database job store configuration and schema.
 
         Returns

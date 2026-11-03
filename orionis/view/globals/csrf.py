@@ -1,3 +1,8 @@
+"""Provide view globals operations.
+
+Includes ``_global_csrf_token``, ``_global_csrf_field``.
+"""
+
 from __future__ import annotations
 from typing import TYPE_CHECKING, Any
 from markupsafe import Markup
@@ -8,14 +13,17 @@ if TYPE_CHECKING:
 
 # ruff: noqa: ANN401
 _CSRF_SESSION_KEY = "_csrf_token"
+"""Csrf session key identifier: ``_csrf_token``."""
 
 # Form field read back by ``CSRFTokenMiddleware`` on unsafe requests.
 _CSRF_FIELD_NAME = "_csrf"
+"""Form field read back by ``CSRFTokenMiddleware`` on unsafe requests."""
 
 # Template of the hidden input; ``Markup.format`` escapes the token.
 _CSRF_FIELD_TEMPLATE = Markup(
     '<input type="hidden" name="{name}" value="{token}">',
 )
+"""Template of the hidden input; ``Markup.format`` escapes the token."""
 
 def _global_csrf_token(app: IApplication) -> Any:
     """
@@ -23,12 +31,12 @@ def _global_csrf_token(app: IApplication) -> Any:
 
     Parameters
     ----------
-    app : IApplication
+    app : orionis.IApplication
         Application container used for service resolution.
 
     Returns
     -------
-    Any
+    typing.Any
         Async callable that reads the CSRF token from the session.
     """
     # Resolve the session key once: configuration is frozen after boot.
@@ -58,12 +66,12 @@ def _global_csrf_field(app: IApplication) -> Any:
 
     Parameters
     ----------
-    app : IApplication
+    app : orionis.IApplication
         Application container used for service resolution.
 
     Returns
     -------
-    Any
+    typing.Any
         Async callable that returns a hidden input field with the CSRF token.
     """
     read_token = _global_csrf_token(app)
@@ -74,7 +82,7 @@ def _global_csrf_field(app: IApplication) -> Any:
 
         Returns
         -------
-        Markup
+        ``markupsafe.Markup``
             Safe HTML markup with the hidden input, exempt from the
             environment autoescaping so templates need no ``| safe``.
         """

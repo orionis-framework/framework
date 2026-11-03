@@ -1,3 +1,5 @@
+"""Represent a binding between a contract and its implementation."""
+
 from __future__ import annotations
 from dataclasses import dataclass, field
 from orionis.container.enums.lifetimes import Lifetime
@@ -8,7 +10,7 @@ class Binding(BaseEntity):
     """
     Represent a binding between a contract and its implementation.
 
-    Parameters
+    Attributes
     ----------
     contract : type | None
         Contract of the concrete class to inject.
@@ -16,7 +18,7 @@ class Binding(BaseEntity):
         Concrete class implementing the contract.
     instance : object | None
         Concrete instance of the class, if provided.
-    lifetime : Lifetime
+    lifetime : orionis.container.enums.Lifetime
         Lifetime of the instance.
     alias : str | None
         Alias for resolving the dependency from the container.
@@ -75,7 +77,7 @@ class Binding(BaseEntity):
 
         Parameters
         ----------
-        self : Binding
+        self : orionis.container.entities.Binding
             The instance of the Binding class.
 
         Returns

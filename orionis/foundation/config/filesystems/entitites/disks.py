@@ -1,3 +1,5 @@
+"""Represent the configuration for different filesystem disks."""
+
 from __future__ import annotations
 from dataclasses import dataclass, field
 from orionis.foundation.config.filesystems.entitites.aws import S3
@@ -14,6 +16,7 @@ _DISK_ENTITIES: tuple[tuple[str, type], ...] = (
     ("azure", Azure),
     ("gcs", GCS),
 )
+"""Disk entities definitions used by ``disks``."""
 
 @dataclass(frozen=True, kw_only=True)
 class Disks(BaseEntity):
@@ -22,15 +25,15 @@ class Disks(BaseEntity):
 
     Attributes
     ----------
-    local : Local | dict
+    local : orionis.foundation.config.filesystems.Local | dict
         The disk configuration for local file storage.
-    public : Public | dict
+    public : orionis.foundation.config.filesystems.Public | dict
         The disk configuration for public file storage.
-    s3 : S3 | dict
+    s3 : orionis.foundation.config.filesystems.S3 | dict
         The configuration for AWS S3 storage.
-    azure : Azure | dict
+    azure : orionis.foundation.config.filesystems.Azure | dict
         The configuration for Azure Blob Storage.
-    gcs : GCS | dict
+    gcs : orionis.foundation.config.filesystems.GCS | dict
         The configuration for Google Cloud Storage.
     """
 
@@ -87,7 +90,7 @@ class Disks(BaseEntity):
 
         Parameters
         ----------
-        self : Disks
+        self : orionis.foundation.config.filesystems.Disks
             The instance of the Disks class.
 
         Returns

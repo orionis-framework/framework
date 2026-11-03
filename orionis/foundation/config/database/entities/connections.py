@@ -1,3 +1,5 @@
+"""Represent all database connections used by the application."""
+
 from __future__ import annotations
 from dataclasses import dataclass, field
 from orionis.foundation.config.database.entities.mysql import MySQL
@@ -17,6 +19,7 @@ _CONNECTION_ENTITIES: tuple[tuple[str, type], ...] = (
     ("sqlserver", SQLServer),
     ("redshift", Redshift),
 )
+"""Table-driven mapping between connection field names and their entities."""
 
 @dataclass(frozen=True, kw_only=True)
 class Connections(BaseEntity):
@@ -25,17 +28,17 @@ class Connections(BaseEntity):
 
     Attributes
     ----------
-    sqlite : SQLite | dict
+    sqlite : orionis.foundation.config.database.SQLite | dict
         Configuration for the SQLite database connection.
-    mysql : MySQL | dict
+    mysql : orionis.foundation.config.database.MySQL | dict
         Configuration for the MySQL database connection.
-    pgsql : PGSQL | dict
+    pgsql : orionis.foundation.config.database.PGSQL | dict
         Configuration for the PostgreSQL database connection.
-    oracle : Oracle | dict
+    oracle : orionis.foundation.config.database.Oracle | dict
         Configuration for the Oracle database connection.
-    sqlserver : SQLServer | dict
+    sqlserver : orionis.foundation.config.database.SQLServer | dict
         Configuration for the Microsoft SQL Server database connection.
-    redshift : Redshift | dict
+    redshift : orionis.foundation.config.database.Redshift | dict
         Configuration for the Amazon Redshift database connection.
     """
 

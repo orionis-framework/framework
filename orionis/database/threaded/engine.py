@@ -1,3 +1,5 @@
+"""Expose asynchronous checkouts without claiming a blocking driver is async."""
+
 from __future__ import annotations
 from contextlib import asynccontextmanager
 from typing import TYPE_CHECKING
@@ -14,6 +16,7 @@ class ThreadedEngine:
     """Expose asynchronous checkouts without claiming a blocking driver is async."""
 
     __slots__ = ("_name", "sync_engine")
+    """Declare the instance attribute slots reserved by this class."""
 
     def __init__(self, engine: Engine, name: str = "redshift") -> None:
         """
@@ -21,7 +24,7 @@ class ThreadedEngine:
 
         Parameters
         ----------
-        engine : Engine
+        engine : ``sqlalchemy.engine.Engine``
             Blocking Core engine backed by the official connector dialect.
         name : str, optional
             Connection name used in sanitized opening errors.
@@ -32,7 +35,9 @@ class ThreadedEngine:
             Initialize the adapter without starting worker threads.
         """
         self.sync_engine = engine
+        """Blocking Core engine backed by the official connector dialect."""
         self._name = name
+        """Connection name used in sanitized opening errors."""
 
     async def connect(self) -> ThreadedConnection:
         """
@@ -40,12 +45,12 @@ class ThreadedEngine:
 
         Returns
         -------
-        ThreadedConnection
+        orionis.database.threaded.connection.ThreadedConnection
             Connection owning a worker until it closes.
 
         Raises
         ------
-        QueryException
+        orionis.database.QueryException
             If the connector cannot open the connection; driver details are omitted.
         """
         try:
@@ -64,7 +69,7 @@ class ThreadedEngine:
 
         Yields
         ------
-        ThreadedConnection
+        orionis.database.threaded.connection.ThreadedConnection
             Checkout with an active root transaction.
         """
         connection = await self.connect()

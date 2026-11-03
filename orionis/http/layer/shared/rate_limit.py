@@ -1,3 +1,5 @@
+"""Apply configured request-rate limits before dispatch."""
+
 from __future__ import annotations
 import sys
 from typing import TYPE_CHECKING
@@ -12,6 +14,7 @@ if TYPE_CHECKING:
 class RateLimitMiddleware:
 
     # ruff: noqa: PLC0415
+    """Apply configured request-rate limits before dispatch."""
 
     __slots__ = (
         "__default_responses",
@@ -21,19 +24,21 @@ class RateLimitMiddleware:
         "__retry_after_value",
         "__store",
     )
+    """Declare the instance attribute slots reserved by this class."""
 
     def __init__(
         self,
         config: dict,
         default_responses: IDefaultResponses,
     ) -> None:
-        """Initialize the middleware with the given rate-limit configuration.
+        """
+        Initialize the middleware with the given rate-limit configuration.
 
         Parameters
         ----------
         config : dict
             A dictionary whose keys must match ``HTTPRateLimit`` fields.
-        default_responses : IDefaultResponses
+        default_responses : orionis.http.default.contracts.responses.IDefaultResponses
             Predefined default responses for common HTTP errors.
 
         Returns
@@ -44,13 +49,18 @@ class RateLimitMiddleware:
         # Validate the raw configuration through the entity dataclass.
         cfg = HTTPRateLimit(**config)
         self.__rate_limit_enabled = cfg.rate_limit_enabled
+        """Rate limit enabled obtained from ``cfg.rate_limit_enabled``."""
         self.__rate_limit_requests = cfg.rate_limit_requests
+        """Rate limit requests obtained from ``cfg.rate_limit_requests``."""
         self.__rate_limit_window_seconds = cfg.rate_limit_window_seconds
+        """Rate limit window seconds obtained from ``cfg.rate_limit_window_seconds``."""
 
         # Pre-render the Retry-After header value for rejection responses.
         self.__retry_after_value = str(cfg.rate_limit_window_seconds)
+        """Pre-render the Retry-After header value for rejection responses."""
 
         self.__store = None
+        """Backend storing the state needed by this service."""
         if cfg.rate_limit_enabled:
             if cfg.rate_limit_store == "redis":
                 from orionis.http.layer.store.redis_rate_limit import (
@@ -64,6 +74,7 @@ class RateLimitMiddleware:
                     max_events=cfg.rate_limit_max_events,
                 )
         self.__default_responses = default_responses
+        """Predefined default responses for common HTTP errors."""
 
     async def close(self) -> None:
         """
@@ -97,19 +108,20 @@ class RateLimitMiddleware:
         self,
         adapter: TransportAdapter,
     ) -> Response | None:
-        """Enforce the sliding-window rate limit for the incoming request.
+        """
+        Enforce the sliding-window rate limit for the incoming request.
 
         Skip disabled limits and unresolved client addresses.
 
         Parameters
         ----------
-        adapter : TransportAdapter
+        adapter : orionis.http.adapters.request.contracts.transport.TransportAdapter
             Transport abstraction providing client IP and header
             negotiation helpers.
 
         Returns
         -------
-        Response | None
+        orionis.http.Response | None
             Return 429 for exhausted quotas, 503 for Redis failures, or
             ``None`` when the request is allowed to proceed.
         """

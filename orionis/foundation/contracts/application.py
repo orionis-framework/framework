@@ -1,3 +1,5 @@
+"""Define application configuration, lifecycle and runtime entry points."""
+
 from __future__ import annotations
 from abc import ABC, abstractmethod
 from typing import TYPE_CHECKING, Any, Self
@@ -14,11 +16,13 @@ if TYPE_CHECKING:
     from orionis.http.layer.contracts.middleware import IBaseMiddleware
 
 _SENTINEL = object()
+"""Sentinel distinguishing sentinel from ordinary values."""
 
 class IApplication(IContainer, ABC):
     """Define application configuration, lifecycle and runtime entry points."""
 
     __slots__ = ()
+    """Declare that this class introduces no additional instance slots."""
 
     @property
     @abstractmethod
@@ -203,23 +207,23 @@ class IApplication(IContainer, ABC):
 
         Parameters
         ----------
-        lifespan : Lifespan
+        lifespan : orionis.foundation.enums.Lifespan
             The application lifespan event to register callbacks for.
-        *callbacks : Callable[..., Any] | Callable[..., Awaitable[Any]]
+        *callbacks
             One or more callback functions to execute during the event.
-        runtime : Runtime | None, optional
+        runtime : orionis.foundation.enums.Runtime | None, optional
             The runtime environment for which to register the callbacks.
             If None, callbacks are registered for all runtimes.
 
         Returns
         -------
-        Self
+        typing.Self
             The current Application instance for method chaining.
 
         Raises
         ------
         TypeError
-            If `lifespan` is not a Lifespan enum or any callback is not callable.
+            If ``lifespan`` is not a Lifespan enum or any callback is not callable.
         ValueError
             If no callbacks are provided.
 
@@ -239,13 +243,13 @@ class IApplication(IContainer, ABC):
 
         Parameters
         ----------
-        middleware : tuple[type[IBaseMiddleware], ...]
+        middleware
             Middleware classes to register. Each must inherit from
             IBaseMiddleware.
 
         Returns
         -------
-        Self
+        typing.Self
             The current Application instance for method chaining.
         """
 
@@ -256,7 +260,7 @@ class IApplication(IContainer, ABC):
 
         Returns
         -------
-        list[type[IBaseMiddleware]]
+        list[type[orionis.http.layer.contracts.middleware.IBaseMiddleware]]
             A list of middleware classes registered in the application.
         """
 
@@ -270,13 +274,13 @@ class IApplication(IContainer, ABC):
 
         Parameters
         ----------
-        providers : tuple[type[IServiceProvider], ...]
+        providers
             Service provider classes to register. Each must inherit from
             IServiceProvider.
 
         Returns
         -------
-        Self
+        typing.Self
             The current Application instance for method chaining.
 
         Raises
@@ -317,7 +321,7 @@ class IApplication(IContainer, ABC):
 
         Returns
         -------
-        Self
+        typing.Self
             The current Application instance for method chaining.
 
         Raises
@@ -339,12 +343,12 @@ class IApplication(IContainer, ABC):
 
         Parameters
         ----------
-        handler : type[IBaseExceptionHandler]
+        handler : type[orionis.failure.contracts.handler.IBaseExceptionHandler]
             Exception handler class to use. Must inherit from BaseExceptionHandler.
 
         Returns
         -------
-        Self
+        typing.Self
             The current Application instance for method chaining.
 
         Raises
@@ -367,14 +371,9 @@ class IApplication(IContainer, ABC):
         """
         Retrieve the registered exception handler instance.
 
-        Parameters
-        ----------
-        self : Application
-            The current application instance.
-
         Returns
         -------
-        IBaseExceptionHandler
+        orionis.failure.contracts.handler.IBaseExceptionHandler
             The registered exception handler instance. If none is set, returns
             the default BaseExceptionHandler instance.
 
@@ -394,12 +393,12 @@ class IApplication(IContainer, ABC):
 
         Parameters
         ----------
-        scheduler : type[IBaseScheduler]
+        scheduler : type[orionis.console.base.contracts.scheduler.IBaseScheduler]
             The scheduler class to be used. Must inherit from IBaseScheduler.
 
         Returns
         -------
-        Self
+        typing.Self
             The current Application instance for method chaining.
 
         Raises
@@ -424,7 +423,7 @@ class IApplication(IContainer, ABC):
 
         Returns
         -------
-        IBaseScheduler
+        orionis.console.base.contracts.scheduler.IBaseScheduler
             The registered scheduler instance.
 
         Raises
@@ -450,13 +449,14 @@ class IApplication(IContainer, ABC):
 
         Returns
         -------
-        Self
+        typing.Self
             The current Application instance for method chaining.
         """
 
     @abstractmethod
     def withConfigMcp(self: Self, **mcp_config: object) -> Self:
-        """Configure MCP protocol limits and the explicit Origin allowlist.
+        """
+        Configure MCP protocol limits and the explicit Origin allowlist.
 
         Parameters
         ----------
@@ -465,7 +465,7 @@ class IApplication(IContainer, ABC):
 
         Returns
         -------
-        Self
+        typing.Self
             The application for further configuration.
         """
 
@@ -481,12 +481,12 @@ class IApplication(IContainer, ABC):
         ----------
         **auth_config : object
             Keyword arguments for authentication configuration. Keys must match
-            the fields of the `Auth` dataclass from
-            `orionis.foundation.config.auth.entities.auth.Auth`.
+            the fields of the ``Auth`` dataclass from
+            ``orionis.foundation.config.auth.entities.auth.Auth``.
 
         Returns
         -------
-        Self
+        typing.Self
             The current Application instance for method chaining.
         """
 
@@ -502,12 +502,12 @@ class IApplication(IContainer, ABC):
         ----------
         **cache_config : object
             Keyword arguments representing cache configuration options. Keys must
-            match the field names and types expected by the `Cache` dataclass from
-            `orionis.foundation.config.cache.entities.cache.Cache`.
+            match the field names and types expected by the ``Cache`` dataclass from
+            ``orionis.foundation.config.cache.entities.cache.Cache``.
 
         Returns
         -------
-        Self
+        typing.Self
             The current Application instance for method chaining.
         """
 
@@ -523,12 +523,12 @@ class IApplication(IContainer, ABC):
         ----------
         **http_config : object
             Keyword arguments for HTTP configuration. Keys must match the field
-            names and types expected by the `HTTP` dataclass from
-            `orionis.foundation.config.http.entitites.http.HTTP`.
+            names and types expected by the ``HTTP`` dataclass from
+            ``orionis.foundation.config.http.entitites.http.HTTP``.
 
         Returns
         -------
-        Self
+        typing.Self
             The current Application instance for method chaining.
         """
 
@@ -544,12 +544,12 @@ class IApplication(IContainer, ABC):
         ----------
         **database_config : object
             Keyword arguments for database configuration. Keys must match the
-            fields of the `Database` dataclass from
-            `orionis.foundation.config.database.entities.database.Database`.
+            fields of the ``Database`` dataclass from
+            ``orionis.foundation.config.database.entities.database.Database``.
 
         Returns
         -------
-        Self
+        typing.Self
             The current Application instance for method chaining.
         """
 
@@ -565,12 +565,12 @@ class IApplication(IContainer, ABC):
         ----------
         **filesystems_config : object
             Keyword arguments for filesystems configuration. Keys must match the
-            fields of the `Filesystems` dataclass from
-            `orionis.foundation.config.filesystems.entitites.filesystems.Filesystems`.
+            fields of the ``Filesystems`` dataclass from
+            ``orionis.foundation.config.filesystems.entitites.filesystems.Filesystems``.
 
         Returns
         -------
-        Self
+        typing.Self
             The current Application instance for method chaining.
         """
 
@@ -586,12 +586,12 @@ class IApplication(IContainer, ABC):
         ----------
         **logging_config : object
             Keyword arguments for logging configuration. Keys must match the
-            fields of the `Logging` dataclass from
-            `orionis.foundation.config.logging.entities.logging.Logging`.
+            fields of the ``Logging`` dataclass from
+            ``orionis.foundation.config.logging.entities.logging.Logging``.
 
         Returns
         -------
-        Self
+        typing.Self
             The current Application instance for method chaining.
         """
 
@@ -607,12 +607,12 @@ class IApplication(IContainer, ABC):
         ----------
         **mail_config : object
             Keyword arguments for mail configuration. Keys must match the fields
-            of the `Mail` dataclass from
-            `orionis.foundation.config.mail.entities.mail.Mail`.
+            of the ``Mail`` dataclass from
+            ``orionis.foundation.config.mail.entities.mail.Mail``.
 
         Returns
         -------
-        Self
+        typing.Self
             The current Application instance for method chaining.
         """
 
@@ -628,12 +628,12 @@ class IApplication(IContainer, ABC):
         ----------
         **queue_config : object
             Keyword arguments representing queue configuration options. Keys must
-            match the field names and types expected by the `Queue` dataclass from
-            `orionis.foundation.config.queue.entities.queue.Queue`.
+            match the field names and types expected by the ``Queue`` dataclass from
+            ``orionis.foundation.config.queue.entities.queue.Queue``.
 
         Returns
         -------
-        Self
+        typing.Self
             The current Application instance for method chaining.
         """
 
@@ -649,12 +649,12 @@ class IApplication(IContainer, ABC):
         ----------
         **session_config : object
             Keyword arguments for session configuration. Keys must match the
-            fields of the `Session` dataclass from
-            `orionis.foundation.config.session.entities.session.Session`.
+            fields of the ``Session`` dataclass from
+            ``orionis.foundation.config.session.entities.session.Session``.
 
         Returns
         -------
-        Self
+        typing.Self
             The current Application instance for method chaining.
         """
 
@@ -670,12 +670,12 @@ class IApplication(IContainer, ABC):
         ----------
         **testing_config : object
             Keyword arguments for testing configuration. Keys must match the
-            fields of the `Testing` dataclass from
-            `orionis.foundation.config.testing.entities.testing.Testing`.
+            fields of the ``Testing`` dataclass from
+            ``orionis.foundation.config.testing.entities.testing.Testing``.
 
         Returns
         -------
-        Self
+        typing.Self
             The current Application instance for method chaining.
         """
 
@@ -689,7 +689,7 @@ class IApplication(IContainer, ABC):
 
         Parameters
         ----------
-        **paths : str | Path | None
+        **paths : str | pathlib.Path | None
             Optional directory path overrides. Valid keys are 'app', 'console',
             'exceptions', 'http', 'models', 'providers', 'notifications',
             'services', 'jobs', 'bootstrap', 'config', 'database', 'resources',
@@ -697,7 +697,7 @@ class IApplication(IContainer, ABC):
 
         Returns
         -------
-        Self
+        typing.Self
             The current Application instance for method chaining.
         """
 
@@ -711,17 +711,18 @@ class IApplication(IContainer, ABC):
 
         Returns
         -------
-        Self
+        typing.Self
             The current Application instance for method chaining.
         """
 
     @abstractmethod
     async def boot(self: Self) -> Self:
-        """Create the application and await eager providers for headless use.
+        """
+        Create the application and await eager providers for headless use.
 
         Returns
         -------
-        Self
+        typing.Self
             The application after successful eager provider startup.
 
         Raises
@@ -817,7 +818,7 @@ class IApplication(IContainer, ABC):
 
         Returns
         -------
-        Path | Mapping[str, Path] | None
+        pathlib.Path | collections.abc.Mapping[str, pathlib.Path] | None
             The resolved path for the given key, all paths as a read-only
             mapping, or None if the key does not exist.
 
@@ -849,7 +850,7 @@ class IApplication(IContainer, ABC):
 
         Returns
         -------
-        list[Path] | dict | None
+        list[pathlib.Path] | dict | None
             List of Path objects for the specified routing type, the complete
             routing configuration dictionary if no key is provided, or None
             if the key is not one of the valid routing types.

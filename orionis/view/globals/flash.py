@@ -1,3 +1,5 @@
+"""Provide view globals operations through ``_global_flash``."""
+
 from __future__ import annotations
 from typing import TYPE_CHECKING, Any
 from orionis.session.contracts.session import ISession
@@ -13,12 +15,12 @@ def _global_flash(app: IApplication) -> Any:
 
     Parameters
     ----------
-    app : IApplication
+    app : orionis.IApplication
         Application container used for service resolution.
 
     Returns
     -------
-    Any
+    typing.Any
         Async callable that reads one-request status messages.
     """
     async def flash(key: str, default: Any = None) -> Any:
@@ -33,12 +35,12 @@ def _global_flash(app: IApplication) -> Any:
         ----------
         key : str
             Flash data key.
-        default : Any, optional
+        default : typing.Any, optional
             Fallback value when the key is absent or no session exists.
 
         Returns
         -------
-        Any
+        typing.Any
             The flashed value, or *default*.
         """
         try:

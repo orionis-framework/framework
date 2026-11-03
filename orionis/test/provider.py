@@ -1,3 +1,5 @@
+"""Register testing services in the application container."""
+
 from __future__ import annotations
 from orionis.container.providers.deferrable_provider import DeferrableProvider
 from orionis.container.providers.service_provider import ServiceProvider
@@ -7,6 +9,7 @@ from orionis.test.contracts.engine import ITestingEngine
 class TestingProvider(ServiceProvider, DeferrableProvider):
 
     # ruff: noqa: PLC0415
+    """Register testing services in the application container."""
 
     @classmethod
     def provides(cls) -> list[type]:
@@ -15,7 +18,7 @@ class TestingProvider(ServiceProvider, DeferrableProvider):
 
         Returns
         -------
-        list[type[ITestingEngine]]
+        list[type[orionis.test.contracts.engine.ITestingEngine]]
             A list containing the ITestingEngine interface that this provider
             registers.
         """

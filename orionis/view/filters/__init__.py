@@ -1,3 +1,5 @@
+"""Group the view filters components and public imports."""
+
 from typing import TYPE_CHECKING as _TYPE_CHECKING
 from orionis._exports import resolve_export as _resolve_export
 
@@ -14,6 +16,7 @@ _EXPORTS = {
     "_filter_json": ("orionis.view.filters.json", "_filter_json"),
     "_filter_markdown": ("orionis.view.filters.markdown", "_filter_markdown"),
 }
+"""Public export names mapped to their defining modules and attributes."""
 
 def __getattr__(name: str) -> object:
     """

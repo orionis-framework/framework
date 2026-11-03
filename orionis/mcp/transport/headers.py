@@ -1,3 +1,5 @@
+"""One statically reachable argument mirrored into a lowercase HTTP header."""
+
 from __future__ import annotations
 import base64
 import binascii
@@ -16,15 +18,24 @@ if TYPE_CHECKING:
     from orionis.mcp.protocol.requests import JsonRpcRequest, RequestParams
 
 type HeaderKind = Literal["string", "integer", "boolean"]
+"""Type alias for ``Literal['string', 'integer', 'boolean']``."""
 
 _TOKEN = re.compile(r"[!#$%&'*+\-.^_`|~0-9A-Za-z]+\Z")
+"""Compiled pattern used to recognize token."""
 _PLAIN = re.compile(r"(?:[\x21-\x7e](?:[\x09\x20-\x7e]*[\x21-\x7e])?)?\Z")
+"""Compiled pattern used to recognize plain."""
 _NUMBER = re.compile(r"-?(?:0|[1-9]\d*)(?:\.\d+)?(?:[eE][+-]?\d+)?\Z", re.ASCII)
+"""Compiled pattern used to recognize number."""
 _SAFE_INTEGER = 9007199254740991
+"""Safe integer value used by ``headers``."""
 _ANNOTATION = "x-mcp-header"
+"""Annotation identifier: ``x-mcp-header``."""
 _PREFIX = "=?base64?"
+"""Prefix identifier: ``=?base64?``."""
 _SUFFIX = "?="
+"""Suffix identifier: ``?=``."""
 _NAMED_METHODS = frozenset({"tools/call", "resources/read", "prompts/get"})
+"""Named methods used by ``headers``."""
 
 
 @dataclass(frozen=True, slots=True)
@@ -32,8 +43,11 @@ class HeaderBinding:
     """One statically reachable argument mirrored into a lowercase HTTP header."""
 
     path: tuple[str, ...]
+    """Field path locating the value bound to the transport header."""
     name: str
+    """Name identifying this declaration within its containing registry."""
     kind: HeaderKind
+    """Primitive value kind used when decoding the transport header."""
 
 def _contains_annotation(value: object) -> bool:
     """
@@ -63,14 +77,14 @@ def _binding(schema: Mapping[str, object], path: tuple[str, ...]) -> HeaderBindi
 
     Parameters
     ----------
-    schema : Mapping[str, object]
+    schema : collections.abc.Mapping[str, object]
         Schema declaration used for conversion and validation.
-    path : tuple[str, ...]
+    path : tuple[str, ``...``]
         Value supplied for ``path``.
 
     Returns
     -------
-    HeaderBinding
+    orionis.mcp.transport.headers.HeaderBinding
         Result of the operation described above.
     """
     name = schema[_ANNOTATION]
@@ -93,11 +107,11 @@ def _walk_schema(
 
     Parameters
     ----------
-    schema : Mapping[str, object]
+    schema : collections.abc.Mapping[str, object]
         Schema declaration used for conversion and validation.
-    path : tuple[str, ...]
+    path : tuple[str, ``...``]
         Value supplied for ``path``.
-    bindings : list[HeaderBinding]
+    bindings : list[orionis.mcp.transport.headers.HeaderBinding]
         Declared bindings associated with this operation.
 
     Returns
@@ -128,11 +142,11 @@ def _walk_properties(
 
     Parameters
     ----------
-    properties : Mapping[str, object]
+    properties : collections.abc.Mapping[str, object]
         Named child schemas.
-    path : tuple[str, ...]
+    path : tuple[str, ``...``]
         Parent property path.
-    bindings : list[HeaderBinding]
+    bindings : list[orionis.mcp.transport.headers.HeaderBinding]
         Accumulator for mirrored header declarations.
 
     Returns
@@ -152,12 +166,12 @@ def compile_header_bindings(
 
     Parameters
     ----------
-    input_schema : Mapping[str, object]
+    input_schema : collections.abc.Mapping[str, object]
         Value supplied for ``input_schema``.
 
     Returns
     -------
-    tuple[HeaderBinding, ...]
+    tuple[orionis.mcp.transport.headers.HeaderBinding, ``...``]
         Result of the operation described above.
     """
     bindings: list[HeaderBinding] = []
@@ -179,7 +193,7 @@ def _mismatch(name: str) -> McpProtocolException:
 
     Returns
     -------
-    McpProtocolException
+    orionis.mcp.exceptions.McpProtocolException
         Result of the operation described above.
     """
     return McpProtocolException(-32020, f"Header mismatch: {name}", status=400)
@@ -220,7 +234,7 @@ def _single_header(headers: Headers, name: str, *, encoded: bool = False) -> str
 
     Parameters
     ----------
-    headers : Headers
+    headers : orionis.http.payload.estructures.headers.Headers
         Value supplied for ``headers``.
     name : str
         Value supplied for ``name``.
@@ -267,7 +281,7 @@ def _argument(arguments: object, path: tuple[str, ...]) -> object:
     ----------
     arguments : object
         Arguments supplied for this operation.
-    path : tuple[str, ...]
+    path : tuple[str, ``...``]
         Value supplied for ``path``.
 
     Returns
@@ -317,7 +331,7 @@ def _matches_value(binding: HeaderBinding, header: str, value: object) -> bool:
 
     Parameters
     ----------
-    binding : HeaderBinding
+    binding : orionis.mcp.transport.headers.HeaderBinding
         Value supplied for ``binding``.
     header : str
         Value supplied for ``header``.
@@ -345,9 +359,9 @@ def _validate_binding(
 
     Parameters
     ----------
-    headers : Headers
+    headers : orionis.http.payload.estructures.headers.Headers
         Value supplied for ``headers``.
-    binding : HeaderBinding
+    binding : orionis.mcp.transport.headers.HeaderBinding
         Value supplied for ``binding``.
     arguments : object
         Arguments supplied for this operation.
@@ -378,7 +392,7 @@ def _validate_standard(
 
     Parameters
     ----------
-    headers : Headers
+    headers : orionis.http.payload.estructures.headers.Headers
         Value supplied for ``headers``.
     name : str
         Value supplied for ``name``.
@@ -401,7 +415,7 @@ def _validate_version(headers: Headers, metadata: object) -> None:
 
     Parameters
     ----------
-    headers : Headers
+    headers : orionis.http.payload.estructures.headers.Headers
         Value supplied for ``headers``.
     metadata : object
         Metadata associated with the current operation.
@@ -433,13 +447,13 @@ def validate_headers(
 
     Parameters
     ----------
-    headers : Headers
+    headers : orionis.http.payload.estructures.headers.Headers
         Value supplied for ``headers``.
-    envelope : JsonRpcRequest
+    envelope : orionis.mcp.protocol.requests.JsonRpcRequest
         Value supplied for ``envelope``.
     params : RequestParams | Mapping[str, object] | None
         Parameters decoded for the requested operation.
-    bindings : tuple[HeaderBinding, ...]
+    bindings : tuple[orionis.mcp.transport.headers.HeaderBinding, ``...``]
         Declared bindings associated with this operation.
 
     Returns

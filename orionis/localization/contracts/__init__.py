@@ -1,3 +1,5 @@
+"""Group the localization contracts components and public imports."""
+
 from orionis.localization.contracts.loader import ITranslationLoader
 from orionis.localization.contracts.manager import ILocalizationManager
 from orionis.localization.contracts.repository import ITranslationRepository

@@ -116,7 +116,7 @@ def _facades(app):
 class TestMcpIntegration(TestCase):
     """Connect public registrations to real containers, router and event bus."""
 
-    async def test_fluent_and_group_prefixes_resolve_after_registration(self):
+    async def testFluentAndGroupPrefixesResolveAfterRegistration(self):
         """Respect native path mutations without searching every incoming request.
 
         Returns
@@ -148,7 +148,7 @@ class TestMcpIntegration(TestCase):
                     manager.getWebServer("/one/mcp")
                 self.assertIsNotNone(manager.getWebServer("/nested/one/mcp"))
 
-    async def test_facade_di_transports_and_cache_share_compiled_metadata(self):
+    async def testFacadeDiTransportsAndCacheShareCompiledMetadata(self):
         """Preserve native API routes and one compiled object in both modes.
 
         Returns
@@ -194,7 +194,7 @@ class TestMcpIntegration(TestCase):
                 self.assertIs(manager, await app.make(IMcpManager))
                 await manager.shutdown()
 
-    async def test_ai_registrations_load_once_per_app_independent_of_import_cache(
+    async def testAiRegistrationsLoadOncePerAppIndependentOfImportCache(
         self,
     ) -> None:
         """Load registrations for each application even when Python cached imports.
@@ -231,7 +231,7 @@ class TestMcpIntegration(TestCase):
                         [(root / "ai.py").resolve()],
                     )
 
-    async def test_duplicate_registration_and_unregistered_events_fail_at_boot(self):
+    async def testDuplicateRegistrationAndUnregisteredEventsFailAtBoot(self):
         """Reject duplicate handles, ambiguous paths and unknown server events.
 
         Returns
@@ -257,7 +257,7 @@ class TestMcpIntegration(TestCase):
                 with self.assertRaises(ValueError):
                     manager.web("/mcp/{dynamic}", ExampleServer)
 
-    async def test_notifications_use_the_injected_bus_and_shutdown_unblocks(self):
+    async def testNotificationsUseTheInjectedBusAndShutdownUnblocks(self):
         """Use one event bus and release consumers when the application shuts down.
 
         Returns
@@ -285,12 +285,12 @@ class TestMcpIntegration(TestCase):
                 await manager.shutdown()
                 with self.assertRaises(StopAsyncIteration):
                     await asyncio.wait_for(waiter, timeout=1)
-                self.assertEqual(bus.listener_count, 0)
+                self.assertEqual(bus.listenerCount, 0)
 
 class TestMcpCli(TestCase):
     """Protect the protocol stream and generate usable native declarations."""
 
-    def test_core_wiring_and_generators(self):
+    def testCoreWiringAndGenerators(self):
         """Generate compilable declarations and retain existing file safety guards.
 
         Returns
@@ -317,7 +317,7 @@ class TestMcpCli(TestCase):
                 with self.assertRaises(ValueError): # NOSONAR
                     command().createFile(app, "../../escape")
 
-    def test_early_stdout_boundary_is_nested_and_restored(self):
+    def testEarlyStdoutBoundaryIsNestedAndRestored(self):
         """Separate diagnostics from protocol bytes throughout nested bootstrap.
 
         Returns
@@ -343,7 +343,7 @@ class TestMcpCli(TestCase):
         self.assertEqual(binary.getvalue(), b'{"jsonrpc":"2.0"}\n')
         self.assertIn("bootstrap diagnostic", diagnostics.getvalue())
 
-    def test_normal_commands_keep_stdout(self):
+    def testNormalCommandsKeepStdout(self):
         """Leave ordinary console output available to users and pipelines.
 
         Returns
@@ -356,7 +356,7 @@ class TestMcpCli(TestCase):
             sys.stdout.write("ordinary command")
         self.assertEqual(output.getvalue(), "ordinary command")
 
-    def test_unknown_local_handle_never_writes_protocol_stdout(self):
+    def testUnknownLocalHandleNeverWritesProtocolStdout(self):
         """Reject an invalid handle from the actual CLI without corrupting stdout.
 
         Returns

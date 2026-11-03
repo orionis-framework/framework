@@ -1,3 +1,5 @@
+"""Configure the optional persistent login cookie separately from sessions."""
+
 from dataclasses import dataclass, field
 from orionis.environment import Env
 from orionis.support.entities.base import BaseEntity

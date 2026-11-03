@@ -1,3 +1,5 @@
+"""Encapsulate and configure a Jinja2 ``Environment`` instance."""
+
 from pathlib import Path
 from typing import Any, TYPE_CHECKING
 import jinja2
@@ -12,20 +14,21 @@ if TYPE_CHECKING:
 
 class ViewEnvironment(IViewEnvironment):
     """
-    Encapsulate and configure a Jinja2 :class:`Environment` instance.
+    Encapsulate and configure a Jinja2 ``Environment`` instance.
 
     This is the single authorised class for configuring the underlying
     template engine.  All loaders, caches, globals, filters, tests and
     extensions must be registered through the public methods of this class.
 
-    The Jinja2 :class:`Environment` is built once during construction and
+    The Jinja2 ``Environment`` is built once during construction and
     stored internally; no other class may access it directly except through
-    :meth:`getJinjaEnvironment`.
+    :meth:`orionis.view.environment.ViewEnvironment.getJinjaEnvironment`.
     """
 
     # ruff: noqa: ANN401, TC001
 
     __slots__ = ("_jinja_env",)
+    """Declare the instance attribute slots reserved by this class."""
 
     def __init__(self, app: IApplication) -> None:
         """
@@ -33,13 +36,14 @@ class ViewEnvironment(IViewEnvironment):
 
         Parameters
         ----------
-        app : IApplication
+        app : orionis.IApplication
             Application container used to read view configuration and resolve
             the base path for relative template directories.
 
         Returns
         -------
         None
+            Build the Jinja2 environment from the application view configuration.
         """
         # Resolve and normalise configuration
         _raw: dict = app.config("view")
@@ -80,7 +84,7 @@ class ViewEnvironment(IViewEnvironment):
 
             Returns
             -------
-            tuple[str, str | None, Callable] | None
+            tuple[str, str | None, collections.abc.Callable] | None
                 Template source metadata for a packaged page, if present.
             """
             if name.startswith(_default_prefix):
@@ -131,6 +135,10 @@ class ViewEnvironment(IViewEnvironment):
             undefined=jinja2.Undefined,
             keep_trailing_newline=True,
         )
+        """
+        Async rendering is not configurable: the engine only ever calls render_async
+        and every template global is awaited by Jinja2.
+        """
 
     def addGlobal(self, name: str, value: Any) -> None:
         """
@@ -140,12 +148,13 @@ class ViewEnvironment(IViewEnvironment):
         ----------
         name : str
             Identifier used to reference the value inside templates.
-        value : Any
+        value : typing.Any
             Value or callable to expose as a template global.
 
         Returns
         -------
         None
+            Register a global variable or callable in all templates.
         """
         self._jinja_env.globals[name] = value
 
@@ -157,12 +166,13 @@ class ViewEnvironment(IViewEnvironment):
         ----------
         name : str
             Filter name referenced inside template expressions (e.g. ``| slug``).
-        callback : Callable
+        callback : collections.abc.Callable
             Function applied to the piped value.
 
         Returns
         -------
         None
+            Register a filter callable that templates can apply with ``|``.
         """
         self._jinja_env.filters[name] = callback
 
@@ -174,12 +184,13 @@ class ViewEnvironment(IViewEnvironment):
         ----------
         name : str
             Test name referenced inside template ``is`` expressions.
-        callback : Callable
+        callback : collections.abc.Callable
             Function receiving the tested value and returning a bool.
 
         Returns
         -------
         None
+            Register a test callable used in Jinja2 ``is`` expressions.
         """
         self._jinja_env.tests[name] = callback
 
@@ -189,16 +200,17 @@ class ViewEnvironment(IViewEnvironment):
 
         Parameters
         ----------
-        extension : Any
-            A Jinja2 :class:`Extension` subclass or its dotted import path.
+        extension : typing.Any
+            A Jinja2 ``Extension`` subclass or its dotted import path.
 
         Returns
         -------
         None
+            Register a Jinja2 extension class with the environment.
 
         Raises
         ------
-        ViewException
+        orionis.view.exceptions.ViewException
             When the extension cannot be registered by Jinja2.
         """
         try:
@@ -212,11 +224,11 @@ class ViewEnvironment(IViewEnvironment):
 
     def getJinjaEnvironment(self) -> jinja2.Environment:
         """
-        Return the configured Jinja2 :class:`Environment` instance.
+        Return the configured Jinja2 ``Environment`` instance.
 
         Returns
         -------
-        jinja2.Environment
+        ``jinja2.Environment``
             The internal Jinja2 environment.  Treat as read-only outside
             this class; all mutations must flow through the typed helpers.
         """

@@ -1,3 +1,5 @@
+"""Provide view globals operations through ``_global_cache``."""
+
 from __future__ import annotations
 from typing import TYPE_CHECKING, Any
 from orionis.cache.contracts.cache_manager import ICacheManager
@@ -13,12 +15,12 @@ def _global_cache(app: IApplication) -> Any:
 
     Parameters
     ----------
-    app : IApplication
+    app : orionis.IApplication
         Application container to expose in templates.
 
     Returns
     -------
-    Any
+    typing.Any
         Callable returning the application instance.
     """
 
@@ -30,12 +32,12 @@ def _global_cache(app: IApplication) -> Any:
         ----------
         key : str
             The cache key.
-        default : Any | None, optional
+        default : typing.Any | None, optional
             The default value to return if the cache key is not found.
 
         Returns
         -------
-        Any
+        typing.Any
             The cached value or the default value if the key is not found.
         """
         cache_manager: ICacheManager = await app.make(ICacheManager)

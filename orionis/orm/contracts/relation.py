@@ -1,3 +1,5 @@
+"""Contract for a query builder bound to a parent model instance."""
+
 from __future__ import annotations
 from abc import abstractmethod
 from typing import TYPE_CHECKING, Any
@@ -18,6 +20,7 @@ class IRelation(IModelQueryBuilder):
     """
 
     __slots__ = ()
+    """Declare that this class introduces no additional instance slots."""
 
     @abstractmethod
     def addConstraints(self) -> None:
@@ -40,7 +43,7 @@ class IRelation(IModelQueryBuilder):
 
         Parameters
         ----------
-        models : list of Model
+        models : list of orionis.orm.Model
             Parent instances being eager loaded together.
 
         Returns
@@ -56,8 +59,8 @@ class IRelation(IModelQueryBuilder):
 
         Returns
         -------
-        Any
-            A single model, ``None``, or a :class:`Collection`,
+        typing.Any
+            A single model, ``None``, or a :class:`collections.abc.Collection`,
             depending on the relationship kind.
         """
 
@@ -68,7 +71,7 @@ class IRelation(IModelQueryBuilder):
 
         Returns
         -------
-        Collection
+        collections.abc.Collection
             Every related row across the whole eager-loaded batch.
         """
 
@@ -84,10 +87,10 @@ class IRelation(IModelQueryBuilder):
 
         Parameters
         ----------
-        models : list of Model
+        models : list of orionis.orm.Model
             Parent instances being eager loaded together.
-        results : Collection
-            Rows produced by :meth:`getEager`.
+        results : collections.abc.Collection
+            Rows produced by :meth:`orionis.orm.contracts.relation.IRelation.getEager`.
         name : str
             Relationship name the results are stored under.
 

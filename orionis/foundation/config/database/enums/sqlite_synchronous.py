@@ -1,3 +1,5 @@
+"""Represent SQLite synchronous settings for transaction durability."""
+
 from enum import Enum
 
 class SQLiteSynchronous(Enum):
@@ -17,7 +19,7 @@ class SQLiteSynchronous(Enum):
 
     Returns
     -------
-    SQLiteSynchronous
+    orionis.foundation.config.database.SQLiteSynchronous
         Enum member representing the synchronous setting.
     """
 

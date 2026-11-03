@@ -1,3 +1,5 @@
+"""Publish complete private .eml files atomically without overwriting."""
+
 import os
 import secrets
 from contextlib import suppress
@@ -16,7 +18,9 @@ if TYPE_CHECKING:
     from orionis.mail.entities.prepared import PreparedMail
 
 _DEFAULT_OUTPUT_PATH = "storage/mail"
+"""Default output path identifier: ``storage/mail``."""
 _DIRECTORY_MODE = 0o700
+"""Directory mode value used by ``file``."""
 
 class FileTransport(IMailTransport):
     """
@@ -29,6 +33,7 @@ class FileTransport(IMailTransport):
     """
 
     __slots__ = ("_path",)
+    """Declare the instance attribute slots reserved by this class."""
 
     def __init__(self, path: Path) -> None:
         """
@@ -36,7 +41,7 @@ class FileTransport(IMailTransport):
 
         Parameters
         ----------
-        path : Path
+        path : pathlib.Path
             Absolute output directory, already anchored by the factory.
 
         Returns
@@ -45,6 +50,7 @@ class FileTransport(IMailTransport):
             Store only transport configuration.
         """
         self._path = path
+        """Absolute output directory, already anchored by the factory."""
 
     async def send(
         self,
@@ -58,7 +64,7 @@ class FileTransport(IMailTransport):
 
         Parameters
         ----------
-        message : PreparedMail
+        message : orionis.mail.entities.PreparedMail
             Complete MIME bytes and intended recipients.
         mailer : str
             Selected configuration name.
@@ -67,12 +73,12 @@ class FileTransport(IMailTransport):
 
         Returns
         -------
-        MailResult
+        orionis.mail.entities.MailResult
             Stored result with the final path and no SMTP acceptance claims.
 
         Raises
         ------
-        MailTransportException
+        orionis.mail.exceptions.MailTransportException
             If writing, syncing, or atomic publication fails.
         """
         try:
@@ -101,7 +107,7 @@ class FileTransport(IMailTransport):
 
         Returns
         -------
-        Path
+        pathlib.Path
             Absolute uniquely named final file.
 
         Raises
@@ -143,19 +149,19 @@ def create_file_transport(
 
     Parameters
     ----------
-    app : IApplication
+    app : orionis.IApplication
         Container exposing the absolute application root.
-    config : Mapping[str, object]
+    config : collections.abc.Mapping[str, object]
         Normalized selected mailer configuration.
 
     Returns
     -------
-    IMailTransport
+    orionis.mail.contracts.IMailTransport
         A transport that creates no files until a message is sent.
 
     Raises
     ------
-    MailConfigurationException
+    orionis.mail.exceptions.MailConfigurationException
         If the configured output path is empty, invalid, or drive-relative.
     """
     raw = config.get("path", _DEFAULT_OUTPUT_PATH)

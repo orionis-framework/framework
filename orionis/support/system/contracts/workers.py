@@ -1,8 +1,12 @@
+"""Define the contract for workers implementations."""
+
 from __future__ import annotations
 from abc import ABC, abstractmethod
 
 
 class IWorkers(ABC):
+    """Define the contract for workers implementations."""
+
     @classmethod
     @abstractmethod
     def setRamPerWorker(cls, ram_per_worker: float) -> None:
@@ -35,10 +39,6 @@ class IWorkers(ABC):
     def calculate(cls) -> int:
         """
         Calculate the recommended maximum number of worker processes.
-
-        Parameters
-        ----------
-        None
 
         Returns
         -------

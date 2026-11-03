@@ -1,3 +1,5 @@
+"""Represent a command-line argument definition."""
+
 from __future__ import annotations
 from dataclasses import dataclass, field
 from typing import Any, TYPE_CHECKING
@@ -11,6 +13,7 @@ if TYPE_CHECKING:
 
 # Valid nargs values for argparse
 _VALID_NARGS: set[str] = {"?", "*", "+"}
+"""Valid nargs values for argparse."""
 
 # Actions that do not support type conversion and should not have a 'type_' parameter
 _ACTIONS_WITHOUT_TYPE: frozenset[str] = frozenset({
@@ -19,6 +22,9 @@ _ACTIONS_WITHOUT_TYPE: frozenset[str] = frozenset({
     "append_const",
     "store_const",
 })
+"""
+Actions that do not support type conversion and should not have a '``type_``' parameter.
+"""
 
 @dataclass(kw_only=True, frozen=True, slots=True)
 class Argument(BaseEntity):
@@ -28,33 +34,33 @@ class Argument(BaseEntity):
     This entity encapsulates the configuration required to register an argument
     in an ``argparse.ArgumentParser``.
 
-    Parameters
+    Attributes
     ----------
-    name_or_flags : str | Iterable[str]
+    name_or_flags : str | collections.abc.Iterable[str]
         Name or flags for the argument (e.g. "--file" or ("-f", "--file")).
-    action : str | ArgumentAction | None, optional
+    action : str | orionis.console.enums.ArgumentAction | None, optional
         Action to perform when the argument is encountered.
     nargs : int | str | None, optional
         Number of arguments to consume ('?', '*', '+', or integer).
-    const : Any, optional
+    const : typing.Any, optional
         Constant value used by actions like 'store_const'.
-    default : Any, optional
+    default : typing.Any, optional
         Default value if the argument is not provided.
-    ``type_`` : Callable[[str], Any] | None, optional
+    ``type_`` : collections.abc.Callable[[str], typing.Any] | None, optional
         Function used to convert the argument value.
-    choices : Iterable[Any] | None, optional
+    choices : collections.abc.Iterable[typing.Any] | None, optional
         Allowed values for the argument.
     required : bool, optional
         Whether the argument is required.
     help : str | None, optional
         Help text for the argument.
-    metavar : str | tuple[str, ...] | None, optional
+    metavar : str | tuple[str, ``...``] | None, optional
         Name used in help messages.
     dest : str | None, optional
         Attribute name where the parsed value is stored.
     version : str | None, optional
         Version string used with ``action="version"``.
-    extra : dict[str, Any], optional
+    extra : dict[str, typing.Any], optional
         Additional parameters forwarded to ``add_argument``.
     """
 
@@ -232,7 +238,7 @@ class Argument(BaseEntity):
 
         Parameters
         ----------
-        parser : argparse.ArgumentParser
+        parser : ``argparse.ArgumentParser``
             Parser instance where the argument will be registered.
 
         Returns

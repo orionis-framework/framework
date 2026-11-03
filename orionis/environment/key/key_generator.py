@@ -1,3 +1,5 @@
+"""Generate cryptographically secure application secret keys."""
+
 from __future__ import annotations
 import os
 import base64
@@ -5,8 +7,10 @@ from typing import ClassVar
 from orionis.foundation.config.app.enums.ciphers import Cipher
 
 class SecureKeyGenerator:
+    """Generate cryptographically secure application secret keys."""
 
     __slots__ = ()
+    """Declare that this class introduces no additional instance slots."""
 
     # Mapping of cipher modes to their respective key sizes in bytes
     KEY_SIZES: ClassVar[dict[Cipher, int]] = {
@@ -15,6 +19,7 @@ class SecureKeyGenerator:
         Cipher.AES_128_GCM: 16,
         Cipher.AES_256_GCM: 32,
     }
+    """Mapping of cipher modes to their respective key sizes in bytes."""
 
     @staticmethod
     def generate(cipher: str | Cipher = Cipher.AES_256_CBC) -> str:
@@ -23,7 +28,7 @@ class SecureKeyGenerator:
 
         Parameters
         ----------
-        cipher : str | Cipher, default Cipher.AES_256_CBC
+        cipher
             The cipher algorithm to use for key generation.
 
         Returns

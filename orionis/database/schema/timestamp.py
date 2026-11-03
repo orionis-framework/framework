@@ -1,4 +1,7 @@
+"""Describe the standard creation and update timestamp columns."""
+
 class Timestamps:
+    """Describe the standard creation and update timestamp columns."""
 
     def __init__(self, *, timezone: bool = True) -> None:
         """
@@ -15,3 +18,4 @@ class Timestamps:
             This method does not return a value.
         """
         self.timezone = timezone
+        """Whether the timestamp should include timezone information."""

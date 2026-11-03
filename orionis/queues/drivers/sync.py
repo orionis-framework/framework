@@ -1,3 +1,5 @@
+"""Execute one immediate attempt through the shared worker pipeline."""
+
 from typing import TYPE_CHECKING
 from uuid import uuid4
 from orionis.queues.contracts.driver import IQueueDriver
@@ -16,6 +18,7 @@ class SyncQueueDriver(IQueueDriver):
     """Execute one immediate attempt through the shared worker pipeline."""
 
     __slots__ = ("_retry_after", "_serializer", "_worker")
+    """Declare the instance attribute slots reserved by this class."""
 
     def __init__(
         self,
@@ -30,13 +33,13 @@ class SyncQueueDriver(IQueueDriver):
 
         Parameters
         ----------
-        app : IApplication
+        app : orionis.IApplication
             Existing application container.
-        serializer : IJobSerializer
+        serializer : orionis.queues.contracts.serializer.IJobSerializer
             Registered job serializer.
         connection : str
             Logical connection name.
-        failed_resolver : FailedResolver
+        failed_resolver : orionis.queues.worker.FailedResolver
             Resolver called only on terminal failure.
         retry_after : float, optional
             Execution lease used by the shared pipeline.
@@ -47,7 +50,9 @@ class SyncQueueDriver(IQueueDriver):
             Complete the documented operation without returning a value.
         """
         self._serializer = serializer
+        """Registered job serializer."""
         self._retry_after = retry_after
+        """Execution lease used by the shared pipeline."""
         self._worker = Worker(
             app,
             self,
@@ -58,6 +63,7 @@ class SyncQueueDriver(IQueueDriver):
             ),
             failed_resolver,
         )
+        """Worker produced by ``Worker``."""
 
     async def push(self, envelope: JobEnvelope, delay: float = 0.0) -> str:
         """
@@ -65,7 +71,7 @@ class SyncQueueDriver(IQueueDriver):
 
         Parameters
         ----------
-        envelope : JobEnvelope
+        envelope : orionis.queues.JobEnvelope
             Immutable job payload and execution settings.
         delay : float, optional
             Delay, which must be zero for immediate execution.
@@ -77,7 +83,7 @@ class SyncQueueDriver(IQueueDriver):
 
         Raises
         ------
-        QueueDispatchError
+        orionis.queues.exceptions.QueueDispatchError
             If delayed execution is requested.
         """
         if delay != 0:
@@ -101,7 +107,7 @@ class SyncQueueDriver(IQueueDriver):
 
         Parameters
         ----------
-        queues : tuple[str, ...]
+        queues : tuple[str, ``...``]
             Unused channel selection.
         retry_after : float
             Unused lease lifetime.
@@ -120,7 +126,7 @@ class SyncQueueDriver(IQueueDriver):
 
         Parameters
         ----------
-        reserved : ReservedJob
+        reserved : orionis.queues.entities.reserved_job.ReservedJob
             Unused immediate reservation.
         delay : float, optional
             Requested retry delay.
@@ -132,7 +138,7 @@ class SyncQueueDriver(IQueueDriver):
 
         Raises
         ------
-        QueueDispatchError
+        orionis.queues.exceptions.QueueDispatchError
             Always, because immediate jobs have no durable storage.
         """
         del reserved, delay
@@ -145,7 +151,7 @@ class SyncQueueDriver(IQueueDriver):
 
         Parameters
         ----------
-        reserved : ReservedJob
+        reserved : orionis.queues.entities.reserved_job.ReservedJob
             Unused immediate reservation.
 
         Returns

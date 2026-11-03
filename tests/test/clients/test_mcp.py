@@ -114,10 +114,10 @@ class TestMcpTestClient(TestCase):
             self.assertIsNot(ScopedContext.getCurrentScope(), parent_scope)
             request = await self.app.make(McpRequest)
             self.assertEqual(request.method, "subscriptions/listen")
-            self.assertEqual(first.dispatcher.bus.listener_count, 1)
-            self.assertEqual(second.dispatcher.bus.listener_count, 0)
+            self.assertEqual(first.dispatcher.bus.listenerCount, 1)
+            self.assertEqual(second.dispatcher.bus.listenerCount, 0)
         self.assertIs(ScopedContext.getCurrentScope(), parent_scope)
-        self.assertEqual(first.dispatcher.bus.listener_count, 0)
+        self.assertEqual(first.dispatcher.bus.listenerCount, 0)
 
 class TestMcpTestResponse(TestCase):
     """Check assertion failures exposed by the native MCP response."""

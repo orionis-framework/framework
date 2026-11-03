@@ -1,3 +1,5 @@
+"""Run synchronous and asynchronous tests through the application container."""
+
 from __future__ import annotations
 import fnmatch
 import functools
@@ -22,14 +24,23 @@ _LIFECYCLE_HOOKS: frozenset[str] = frozenset({
     "setUpClass", "tearDownClass",
     "asyncSetUp", "asyncTearDown",
 })
+"""Lifecycle hooks that must never be wrapped regardless of naming pattern."""
 
 # Precompiled regex for the default glob pattern avoids repeated fnmatch compilation.
 _DEFAULT_PATTERN: re.Pattern[str] = re.compile(fnmatch.translate("test*"))
+"""
+Precompiled regex for the default glob pattern avoids repeated fnmatch compilation.
+"""
 
 # unittest enables asyncio debug for every isolated test. Its 0.1-second
 # default reports routine test work as a slow task; retain debug with a
 # threshold that highlights substantial event-loop blocking.
 _SLOW_CALLBACK_DURATION: float = 1.0
+"""
+unittest enables asyncio debug for every isolated test. Its 0.1-second default
+reports routine test work as a slow task; retain debug with a threshold that
+highlights substantial event-loop blocking.
+"""
 
 # Context-local pattern: a value set by one run is never seen by another run
 # executing in a different task or thread.
@@ -37,8 +48,13 @@ _METHOD_PATTERN: ContextVar[re.Pattern[str]] = ContextVar(
     "orionis_test_method_pattern",
     default=_DEFAULT_PATTERN,
 )
+"""
+Context-local pattern: a value set by one run is never seen by another run executing
+in a different task or thread.
+"""
 
 class TestCase(unittest.IsolatedAsyncioTestCase): # NOSONAR
+    """Run synchronous and asynchronous tests through the application container."""
 
     @classmethod
     def setMethodPattern(cls, pattern: str) -> None:
@@ -101,15 +117,15 @@ class TestCase(unittest.IsolatedAsyncioTestCase): # NOSONAR
         ----------
         server : type[Server] | CompiledMcpServer
             Server declaration or compiled snapshot to exercise.
-        config : McpConfig | None, optional
+        config : orionis.mcp.config.McpConfig | None, optional
             Client limits; use MCP defaults when omitted.
-        app : IContainer | None, optional
+        app : orionis.container.contracts.container.IContainer | None, optional
             Explicit container for isolated tests; otherwise use the application
             already booted by the Orionis test runner.
 
         Returns
         -------
-        McpTestClient
+        orionis.test.McpTestClient
             In-process client with independent request scopes and event state.
 
         Raises
@@ -146,12 +162,12 @@ class TestCase(unittest.IsolatedAsyncioTestCase): # NOSONAR
 
         Parameters
         ----------
-        method : Callable[..., Any]
+        method : collections.abc.Callable[``...``, typing.Any]
             The test method to be wrapped.
 
         Returns
         -------
-        Callable[..., Any]
+        collections.abc.Callable[``...``, typing.Any]
             An asynchronous wrapper that invokes the test method within the
             application context.
         """

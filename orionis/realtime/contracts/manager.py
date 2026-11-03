@@ -1,3 +1,5 @@
+"""Define connection ownership and Hub delivery for registry providers."""
+
 from __future__ import annotations
 from abc import ABC, abstractmethod
 from typing import TYPE_CHECKING
@@ -20,6 +22,7 @@ class IConnectionManager(ABC):
     """
 
     __slots__ = ()
+    """Declare that this class introduces no additional instance slots."""
 
     @property
     @abstractmethod
@@ -29,7 +32,7 @@ class IConnectionManager(ABC):
 
         Returns
         -------
-        RealtimeConfig
+        orionis.realtime.config.RealtimeConfig
             Application-wide invocation, group and broadcast limits.
         """
 
@@ -40,7 +43,7 @@ class IConnectionManager(ABC):
 
         Parameters
         ----------
-        connection : RealtimeConnectionLike
+        connection : orionis.realtime.contracts.RealtimeConnectionLike
             Connection with a unique identifier and owning Hub namespace.
 
         Returns
@@ -61,7 +64,7 @@ class IConnectionManager(ABC):
 
         Parameters
         ----------
-        connection : RealtimeConnectionLike
+        connection : orionis.realtime.contracts.RealtimeConnectionLike
             Exact connection instance to release.
 
         Returns
@@ -81,12 +84,12 @@ class IConnectionManager(ABC):
         ----------
         connection_id : str
             Identifier of the requested connection.
-        hub : type[Hub] | None, optional
+        hub : type[orionis.realtime.Hub] | None, optional
             Required owning Hub class, or None to omit namespace filtering.
 
         Returns
         -------
-        RealtimeConnectionLike | None
+        orionis.realtime.contracts.RealtimeConnectionLike | None
             Ready, nonclosing connection in the requested namespace, or None.
         """
 
@@ -97,7 +100,7 @@ class IConnectionManager(ABC):
 
         Returns
         -------
-        tuple[RealtimeConnectionLike, ...]
+        tuple[orionis.realtime.contracts.RealtimeConnectionLike, ``...``]
             Connections owned at the time of the call, regardless of readiness.
         """
 
@@ -108,12 +111,12 @@ class IConnectionManager(ABC):
 
         Parameters
         ----------
-        hub : type[Hub]
+        hub : type[orionis.realtime.Hub]
             Owning Hub class restricting the selection.
 
         Returns
         -------
-        tuple[str, ...]
+        tuple[str, ``...``]
             Identifiers of current ready, nonclosing connections.
         """
 
@@ -124,14 +127,14 @@ class IConnectionManager(ABC):
 
         Parameters
         ----------
-        hub : type[Hub]
+        hub : type[orionis.realtime.Hub]
             Owning Hub class restricting the selection.
         group : str
             Nonempty Hub-local group name of at most 256 characters.
 
         Returns
         -------
-        tuple[str, ...]
+        tuple[str, ``...``]
             Identifiers of ready, nonclosing members of the named group.
 
         Raises
@@ -197,12 +200,12 @@ class IConnectionManager(ABC):
 
         Parameters
         ----------
-        hub : type[Hub]
+        hub : type[orionis.realtime.Hub]
             Hub class whose clients should receive events or invocations.
 
         Returns
         -------
-        HubClients
+        orionis.realtime.HubClients
             Hub-local client selectors without a connection-specific caller.
 
         Raises
@@ -220,16 +223,16 @@ class IConnectionManager(ABC):
 
         Parameters
         ----------
-        hub : type[Hub]
+        hub : type[orionis.realtime.Hub]
             Hub namespace restricting every recipient.
-        connection_ids : tuple[str, ...]
+        connection_ids : tuple[str, ``...``]
             Snapshot of recipient identifiers selected by the application.
         envelope : object
             Protocol envelope accepted by the selected Hub codecs.
 
         Returns
         -------
-        BroadcastResult
+        orionis.realtime.BroadcastResult
             Successful and failed delivery counts; cancellation propagates.
 
         Raises

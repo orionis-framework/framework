@@ -197,7 +197,7 @@ class _NativeServer(Server):
 class TestResponses(TestCase):
     """Preserve JSON scalar/null values and base64 binary contents."""
 
-    def test_structured_json_values(self):
+    def testStructuredJsonValues(self):
         """Arrays, scalars and null are valid modern structured content.
 
         Returns
@@ -330,7 +330,7 @@ class TestResponses(TestCase):
         content = prompt.message["result"]["messages"][0]["content"]["resource"]
         self.assertEqual(msgspec.json.decode(content["text"]), _NATIVE_JSON)
 
-    def test_content_factories(self):
+    def testContentFactories(self):
         """Images, audio and blobs use protocol-defined shapes.
 
         Returns
@@ -355,7 +355,7 @@ class TestResponses(TestCase):
         self.assertEqual(values[0]["data"], "YWJj")
         self.assertEqual(values[2]["resource"]["blob"], "YWJj")
 
-    def test_progress_rejects_nonfinite_values(self):
+    def testProgressRejectsNonfiniteValues(self):
         """Do not emit NaN as an invalid JSON number.
 
         Returns
@@ -366,7 +366,7 @@ class TestResponses(TestCase):
         with self.assertRaises(ValueError):
             McpResponse.progress(float("nan"))
 
-    def test_metadata_and_annotations(self):
+    def testMetadataAndAnnotations(self):
         """Keep result and content metadata separate while preserving hints.
 
         Returns
@@ -388,7 +388,7 @@ class TestResponses(TestCase):
             with self.assertRaises(ValueError):
                 factory({"io.modelcontextprotocol/serverInfo": {"name": "forged"}})
 
-    def test_structured_rejects_values_that_json_would_coerce(self):
+    def testStructuredRejectsValuesThatJsonWouldCoerce(self):
         """Never silently turn NaN into null or serialize arbitrary Python objects.
 
         Returns

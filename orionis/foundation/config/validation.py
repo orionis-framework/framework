@@ -1,3 +1,9 @@
+"""Provide foundation config operations.
+
+Includes ``validate_integer``, ``validate_string``, ``validate_boolean``,
+``normalize_enum``.
+"""
+
 from __future__ import annotations
 import re
 from functools import lru_cache
@@ -12,10 +18,15 @@ if TYPE_CHECKING:
     from orionis.foundation.config.queue.enums.drivers import Drivers
 
 _NAME_PATTERN = re.compile(r"[A-Za-z0-9][A-Za-z0-9_.-]{0,127}")
+"""Compiled pattern used to recognize name pattern."""
 _TABLE_PATTERN = re.compile(r"[A-Za-z_]\w*", re.ASCII)
+"""Compiled pattern used to recognize table pattern."""
 _STORE_TABLE_PATTERN = re.compile(r"[a-z_]+")
+"""Compiled pattern used to recognize store table pattern."""
 _MAX_STORE_PORT = 65535
+"""Max store port value used by ``validation``."""
 _ENUM_SCALAR_TYPES = frozenset({str, bytes, int, float, complex, bool, type(None)})
+"""Enum scalar types used by ``validation``."""
 
 def validate_integer(
     value: object,
@@ -130,14 +141,14 @@ def _enum_values(
 
     Parameters
     ----------
-    enum_type : type[Enum]
+    enum_type : type[orionis.orm.schema.types.Enum]
         Enum class defining the accepted names and values.
     _member_count : int
         Number of declared names, including aliases, used as a cache revision.
 
     Returns
     -------
-    MappingProxyType or None
+    types.MappingProxyType or None
         Read-only scalar lookup preserving declaration order, or None when values
         require their current string representation on every lookup.
     """
@@ -157,7 +168,7 @@ def normalize_enum(value: object, enum_type: type[Enum], name: str) -> object:
     ----------
     value : object
         Enum member, member name, or string value to normalize.
-    enum_type : type[Enum]
+    enum_type : type[orionis.orm.schema.types.Enum]
         Enum class that defines the accepted members.
     name : str
         Field name used in validation errors.
@@ -331,7 +342,7 @@ def validate_driver(value: object, expected: Drivers) -> None:
     ----------
     value : object
         Configured driver name or enum member.
-    expected : Drivers
+    expected : orionis.foundation.config.queue.enums.Drivers
         Driver supported by the entity.
 
     Returns

@@ -1,6 +1,9 @@
+"""Represent the absence of a value without conflating it with None."""
+
 class _MISSING_TYPE: # NOSONAR
 
     # ruff: noqa: N801
+    """Represent the absence of a value without conflating it with None."""
 
     def __repr__(self) -> str:
         """
@@ -26,3 +29,4 @@ class _MISSING_TYPE: # NOSONAR
 
 # Instance representing a missing value sentinel.
 MISSING = _MISSING_TYPE()
+"""Instance representing a missing value sentinel."""

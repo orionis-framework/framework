@@ -1,3 +1,5 @@
+"""Represent possible values for the SameSite attribute of cookies."""
+
 from enum import Enum
 
 class SameSitePolicy(Enum):
@@ -18,7 +20,7 @@ class SameSitePolicy(Enum):
 
     Returns
     -------
-    SameSitePolicy
+    orionis.foundation.config.session.enums.SameSitePolicy
         An enumeration member representing the SameSite policy.
     """
 

@@ -1,3 +1,5 @@
+"""Install optional features declared by the resolved project manifest."""
+
 import sys
 import tomllib
 from asyncio import CancelledError, create_subprocess_exec, to_thread
@@ -18,11 +20,17 @@ from orionis.console.enums.actions import ArgumentAction
 from orionis.foundation.contracts.application import IApplication
 
 _ACCENT_STYLE = "bold cyan"
+"""Accent style identifier: ``bold cyan``."""
 _ERROR_STYLE = "bold red"
+"""Console style used to display installation errors."""
 _WARNING_STYLE = "yellow"
+"""Warning style identifier: ``yellow``."""
 _MANIFEST_NAME = "pyproject.toml"
+"""Manifest name identifier: ``pyproject.toml``."""
 _PACKAGE_MANIFEST = Path(__file__).resolve().parents[3] / _MANIFEST_NAME
+"""Package manifest used by ``install``."""
 _SOURCE_MANIFEST = Path(__file__).resolve().parents[4] / _MANIFEST_NAME
+"""Source manifest used by ``install``."""
 
 class InstallCommand(BaseCommand):
     """Install optional features declared by the resolved project manifest."""
@@ -30,10 +38,17 @@ class InstallCommand(BaseCommand):
     # ruff: noqa: TC001
 
     __slots__ = ("_console", "_purposes")
+    """Declare the instance attribute slots reserved by this class."""
 
     timestamps: bool = False
+    """Timestamps flag used by ``InstallCommand``."""
     signature: str = "packages"
+    """Signature identifier: ``packages``."""
     description: str = "Install optional Orionis features and development tools."
+    """
+    Description identifier: ``Install optional Orionis features and development
+    tools.``.
+    """
     arguments: ClassVar[list[Argument]] = [
         Argument(
             name_or_flags="options",
@@ -55,6 +70,7 @@ class InstallCommand(BaseCommand):
             help="Install the selected options without asking for confirmation.",
         ),
     ]
+    """Command-line argument declarations accepted by this command."""
 
     def __init__(self) -> None:
         """
@@ -67,7 +83,9 @@ class InstallCommand(BaseCommand):
         """
         super().__init__()
         self._console = RichConsole()
+        """Console produced by ``RichConsole``."""
         self._purposes: dict[str, str] = {}
+        """Human-readable descriptions of installable extras and dependency groups."""
 
     async def handle(self, app: IApplication) -> int:
         """
@@ -75,7 +93,7 @@ class InstallCommand(BaseCommand):
 
         Parameters
         ----------
-        app : IApplication
+        app : orionis.IApplication
             Application providing the project root.
 
         Returns
@@ -109,12 +127,12 @@ class InstallCommand(BaseCommand):
 
         Parameters
         ----------
-        application_root : Path
+        application_root : pathlib.Path
             Application directory used when no framework manifest is available.
 
         Returns
         -------
-        Path
+        pathlib.Path
             Bundled framework manifest, source manifest or application fallback.
         """
         for project_path in (_PACKAGE_MANIFEST, _SOURCE_MANIFEST):
@@ -128,12 +146,12 @@ class InstallCommand(BaseCommand):
 
         Parameters
         ----------
-        project_path : Path
+        project_path : pathlib.Path
             Application manifest to read.
 
         Returns
         -------
-        dict[str, tuple[str, ...]]
+        dict[str, tuple[str, ``...``]]
             Namespaced options and their deduplicated package requirements.
 
         Raises
@@ -240,7 +258,7 @@ class InstallCommand(BaseCommand):
 
         Returns
         -------
-        tuple[str, ...]
+        tuple[str, ``...``]
             Nonempty requirement strings in declaration order.
 
         Raises
@@ -270,12 +288,12 @@ class InstallCommand(BaseCommand):
             Dependency group to expand.
         groups : dict[str, object]
             All dependency groups declared by the manifest.
-        chain : tuple[str, ...]
+        chain : tuple[str, ``...``]
             Groups already visited in this expansion.
 
         Returns
         -------
-        tuple[str, ...]
+        tuple[str, ``...``]
             Deduplicated requirements including referenced groups.
 
         Raises
@@ -321,9 +339,9 @@ class InstallCommand(BaseCommand):
 
         Parameters
         ----------
-        project_path : Path
+        project_path : pathlib.Path
             Manifest supplying the catalog.
-        options : dict[str, tuple[str, ...]]
+        options : dict[str, tuple[str, ``...``]]
             Namespaced installation options.
 
         Returns
@@ -401,7 +419,7 @@ class InstallCommand(BaseCommand):
 
         Parameters
         ----------
-        options : dict[str, tuple[str, ...]]
+        options : dict[str, tuple[str, ``...``]]
             Available namespaced installation options.
 
         Returns
@@ -451,7 +469,7 @@ class InstallCommand(BaseCommand):
         ----------
         token : str
             Selection supplied by the user.
-        keys : tuple[str, ...]
+        keys : tuple[str, ``...``]
             Available keys in the order displayed by the catalog.
 
         Returns
@@ -490,9 +508,9 @@ class InstallCommand(BaseCommand):
 
         Parameters
         ----------
-        project_root : Path
+        project_root : pathlib.Path
             Working directory for relative package references.
-        options : dict[str, tuple[str, ...]]
+        options : dict[str, tuple[str, ``...``]]
             Available dependency requirements.
         selected : list[str]
             Canonical keys chosen by the user.
@@ -557,9 +575,9 @@ class InstallCommand(BaseCommand):
 
         Parameters
         ----------
-        project_root : Path
+        project_root : pathlib.Path
             Working directory used to resolve local dependency references.
-        requirements : tuple[str, ...]
+        requirements : tuple[str, ``...``]
             Requirement strings passed unchanged as individual arguments.
 
         Returns
@@ -570,7 +588,7 @@ class InstallCommand(BaseCommand):
 
         Raises
         ------
-        CancelledError
+        asyncio.CancelledError
             If execution is canceled after stopping and waiting for the child.
         OSError
             If uv cannot be started.

@@ -1,3 +1,5 @@
+"""Provide cache operations through ``CacheException``, ``CacheStoreException``."""
+
 from __future__ import annotations
 
 class CacheException(Exception):

@@ -1,3 +1,5 @@
+"""Contract of the query language shared by every Orionis builder."""
+
 from __future__ import annotations
 from abc import ABC, abstractmethod
 from typing import TYPE_CHECKING, Any, Self
@@ -24,6 +26,7 @@ class IQueryBuilderBase(ABC):
     # ruff: noqa: ANN401
 
     __slots__ = ()
+    """Declare that this class introduces no additional instance slots."""
 
     def chunks(self: Self, size: int = 1000) -> AsyncIterator[Collection]:
         """
@@ -36,7 +39,7 @@ class IQueryBuilderBase(ABC):
 
         Returns
         -------
-        AsyncIterator[Collection]
+        collections.abc.AsyncIterator[collections.abc.Collection]
             Iterator of rows or hydrated models.
         """
         raise NotImplementedError
@@ -50,7 +53,7 @@ class IQueryBuilderBase(ABC):
 
         Returns
         -------
-        SelectPlan
+        orionis.orm.query.SelectPlan
             Live plan owned by this builder.
         """
 
@@ -73,11 +76,11 @@ class IQueryBuilderBase(ABC):
 
         Raises
         ------
-        InvalidQueryException
+        orionis.orm.exceptions.InvalidQueryException
             If no target table has been selected.
-        QueryException
+        orionis.database.QueryException
             If the query or a literal value cannot be compiled.
-        MissingDatabaseDependencyException
+        orionis.database.MissingDatabaseDependencyException
             If the selected connection's SQL dialect is unavailable.
         """
 
@@ -88,7 +91,7 @@ class IQueryBuilderBase(ABC):
 
         Returns
         -------
-        IQueryBuilderBase
+        orionis.orm.contracts.base_builder.IQueryBuilderBase
             Detached copy carrying its own plan.
         """
 
@@ -106,7 +109,7 @@ class IQueryBuilderBase(ABC):
 
         Returns
         -------
-        IQueryBuilderBase
+        orionis.orm.contracts.base_builder.IQueryBuilderBase
             The same builder, enabling fluent chaining.
         """
 
@@ -122,7 +125,7 @@ class IQueryBuilderBase(ABC):
 
         Returns
         -------
-        IQueryBuilderBase
+        orionis.orm.contracts.base_builder.IQueryBuilderBase
             The same builder, enabling fluent chaining.
         """
 
@@ -147,7 +150,7 @@ class IQueryBuilderBase(ABC):
 
         Returns
         -------
-        IQueryBuilderBase
+        orionis.orm.contracts.base_builder.IQueryBuilderBase
             The same builder, enabling fluent chaining.
         """
 
@@ -158,7 +161,7 @@ class IQueryBuilderBase(ABC):
 
         Parameters
         ----------
-        query : Any
+        query : typing.Any
             Callable receiving a fresh builder, another builder, or a
             ready-made select plan.
         alias : str
@@ -166,7 +169,7 @@ class IQueryBuilderBase(ABC):
 
         Returns
         -------
-        IQueryBuilderBase
+        orionis.orm.contracts.base_builder.IQueryBuilderBase
             The same builder, enabling fluent chaining.
         """
 
@@ -177,7 +180,7 @@ class IQueryBuilderBase(ABC):
 
         Returns
         -------
-        IQueryBuilderBase
+        orionis.orm.contracts.base_builder.IQueryBuilderBase
             The same builder, enabling fluent chaining.
         """
 
@@ -190,16 +193,16 @@ class IQueryBuilderBase(ABC):
 
         Parameters
         ----------
-        column : Any
+        column : typing.Any
             Column name, mapping of equality pairs, or a callable
             receiving a nested builder whose conditions are grouped in
             parentheses.
-        *args : Any
+        *args : typing.Any
             Either the bound value, or an operator followed by a value.
 
         Returns
         -------
-        IQueryBuilderBase
+        orionis.orm.contracts.base_builder.IQueryBuilderBase
             The same builder, enabling fluent chaining.
         """
 
@@ -210,14 +213,14 @@ class IQueryBuilderBase(ABC):
 
         Parameters
         ----------
-        column : Any
+        column : typing.Any
             Column name, mapping of equality pairs, or grouping callable.
-        *args : Any
+        *args : typing.Any
             Either the bound value, or an operator followed by a value.
 
         Returns
         -------
-        IQueryBuilderBase
+        orionis.orm.contracts.base_builder.IQueryBuilderBase
             The same builder, enabling fluent chaining.
         """
 
@@ -230,12 +233,12 @@ class IQueryBuilderBase(ABC):
         ----------
         column : str
             Column name to filter by.
-        values : Any
+        values : typing.Any
             Accepted values, or a subquery producing them.
 
         Returns
         -------
-        IQueryBuilderBase
+        orionis.orm.contracts.base_builder.IQueryBuilderBase
             The same builder, enabling fluent chaining.
         """
 
@@ -248,12 +251,12 @@ class IQueryBuilderBase(ABC):
         ----------
         column : str
             Column name to filter by.
-        values : Any
+        values : typing.Any
             Accepted values, or a subquery producing them.
 
         Returns
         -------
-        IQueryBuilderBase
+        orionis.orm.contracts.base_builder.IQueryBuilderBase
             The same builder, enabling fluent chaining.
         """
 
@@ -266,12 +269,12 @@ class IQueryBuilderBase(ABC):
         ----------
         column : str
             Column name to filter by.
-        values : Any
+        values : typing.Any
             Rejected values, or a subquery producing them.
 
         Returns
         -------
-        IQueryBuilderBase
+        orionis.orm.contracts.base_builder.IQueryBuilderBase
             The same builder, enabling fluent chaining.
         """
 
@@ -284,12 +287,12 @@ class IQueryBuilderBase(ABC):
         ----------
         column : str
             Column name to filter by.
-        values : Any
+        values : typing.Any
             Rejected values, or a subquery producing them.
 
         Returns
         -------
-        IQueryBuilderBase
+        orionis.orm.contracts.base_builder.IQueryBuilderBase
             The same builder, enabling fluent chaining.
         """
 
@@ -305,7 +308,7 @@ class IQueryBuilderBase(ABC):
 
         Returns
         -------
-        IQueryBuilderBase
+        orionis.orm.contracts.base_builder.IQueryBuilderBase
             The same builder, enabling fluent chaining.
         """
 
@@ -321,7 +324,7 @@ class IQueryBuilderBase(ABC):
 
         Returns
         -------
-        IQueryBuilderBase
+        orionis.orm.contracts.base_builder.IQueryBuilderBase
             The same builder, enabling fluent chaining.
         """
 
@@ -337,7 +340,7 @@ class IQueryBuilderBase(ABC):
 
         Returns
         -------
-        IQueryBuilderBase
+        orionis.orm.contracts.base_builder.IQueryBuilderBase
             The same builder, enabling fluent chaining.
         """
 
@@ -353,7 +356,7 @@ class IQueryBuilderBase(ABC):
 
         Returns
         -------
-        IQueryBuilderBase
+        orionis.orm.contracts.base_builder.IQueryBuilderBase
             The same builder, enabling fluent chaining.
         """
 
@@ -366,12 +369,12 @@ class IQueryBuilderBase(ABC):
         ----------
         column : str
             Column name to filter by.
-        bounds : Iterable
+        bounds : collections.abc.Iterable
             Exactly two values: the lower and upper boundaries.
 
         Returns
         -------
-        IQueryBuilderBase
+        orionis.orm.contracts.base_builder.IQueryBuilderBase
             The same builder, enabling fluent chaining.
         """
 
@@ -384,12 +387,12 @@ class IQueryBuilderBase(ABC):
         ----------
         column : str
             Column name to filter by.
-        bounds : Iterable
+        bounds : collections.abc.Iterable
             Exactly two values: the lower and upper boundaries.
 
         Returns
         -------
-        IQueryBuilderBase
+        orionis.orm.contracts.base_builder.IQueryBuilderBase
             The same builder, enabling fluent chaining.
         """
 
@@ -407,7 +410,7 @@ class IQueryBuilderBase(ABC):
 
         Returns
         -------
-        IQueryBuilderBase
+        orionis.orm.contracts.base_builder.IQueryBuilderBase
             The same builder, enabling fluent chaining.
         """
 
@@ -425,7 +428,7 @@ class IQueryBuilderBase(ABC):
 
         Returns
         -------
-        IQueryBuilderBase
+        orionis.orm.contracts.base_builder.IQueryBuilderBase
             The same builder, enabling fluent chaining.
         """
 
@@ -443,7 +446,7 @@ class IQueryBuilderBase(ABC):
 
         Returns
         -------
-        IQueryBuilderBase
+        orionis.orm.contracts.base_builder.IQueryBuilderBase
             The same builder, enabling fluent chaining.
         """
 
@@ -461,7 +464,7 @@ class IQueryBuilderBase(ABC):
 
         Returns
         -------
-        IQueryBuilderBase
+        orionis.orm.contracts.base_builder.IQueryBuilderBase
             The same builder, enabling fluent chaining.
         """
 
@@ -479,7 +482,7 @@ class IQueryBuilderBase(ABC):
 
         Returns
         -------
-        IQueryBuilderBase
+        orionis.orm.contracts.base_builder.IQueryBuilderBase
             The same builder, enabling fluent chaining.
         """
 
@@ -497,7 +500,7 @@ class IQueryBuilderBase(ABC):
 
         Returns
         -------
-        IQueryBuilderBase
+        orionis.orm.contracts.base_builder.IQueryBuilderBase
             The same builder, enabling fluent chaining.
         """
 
@@ -515,7 +518,7 @@ class IQueryBuilderBase(ABC):
 
         Returns
         -------
-        IQueryBuilderBase
+        orionis.orm.contracts.base_builder.IQueryBuilderBase
             The same builder, enabling fluent chaining.
         """
 
@@ -533,7 +536,7 @@ class IQueryBuilderBase(ABC):
 
         Returns
         -------
-        IQueryBuilderBase
+        orionis.orm.contracts.base_builder.IQueryBuilderBase
             The same builder, enabling fluent chaining.
         """
 
@@ -553,7 +556,7 @@ class IQueryBuilderBase(ABC):
 
         Returns
         -------
-        IQueryBuilderBase
+        orionis.orm.contracts.base_builder.IQueryBuilderBase
             The same builder, enabling fluent chaining.
         """
 
@@ -573,7 +576,7 @@ class IQueryBuilderBase(ABC):
 
         Returns
         -------
-        IQueryBuilderBase
+        orionis.orm.contracts.base_builder.IQueryBuilderBase
             The same builder, enabling fluent chaining.
         """
 
@@ -595,7 +598,7 @@ class IQueryBuilderBase(ABC):
 
         Returns
         -------
-        IQueryBuilderBase
+        orionis.orm.contracts.base_builder.IQueryBuilderBase
             The same builder, enabling fluent chaining.
         """
 
@@ -617,7 +620,7 @@ class IQueryBuilderBase(ABC):
 
         Returns
         -------
-        IQueryBuilderBase
+        orionis.orm.contracts.base_builder.IQueryBuilderBase
             The same builder, enabling fluent chaining.
         """
 
@@ -628,13 +631,13 @@ class IQueryBuilderBase(ABC):
 
         Parameters
         ----------
-        query : Any
+        query : typing.Any
             Callable receiving a fresh builder, another builder, or a
             ready-made select plan.
 
         Returns
         -------
-        IQueryBuilderBase
+        orionis.orm.contracts.base_builder.IQueryBuilderBase
             The same builder, enabling fluent chaining.
         """
 
@@ -645,12 +648,12 @@ class IQueryBuilderBase(ABC):
 
         Parameters
         ----------
-        query : Any
+        query : typing.Any
             Subquery source producing the correlated rows.
 
         Returns
         -------
-        IQueryBuilderBase
+        orionis.orm.contracts.base_builder.IQueryBuilderBase
             The same builder, enabling fluent chaining.
         """
 
@@ -661,12 +664,12 @@ class IQueryBuilderBase(ABC):
 
         Parameters
         ----------
-        query : Any
+        query : typing.Any
             Subquery source producing the correlated rows.
 
         Returns
         -------
-        IQueryBuilderBase
+        orionis.orm.contracts.base_builder.IQueryBuilderBase
             The same builder, enabling fluent chaining.
         """
 
@@ -677,12 +680,12 @@ class IQueryBuilderBase(ABC):
 
         Parameters
         ----------
-        query : Any
+        query : typing.Any
             Subquery source producing the correlated rows.
 
         Returns
         -------
-        IQueryBuilderBase
+        orionis.orm.contracts.base_builder.IQueryBuilderBase
             The same builder, enabling fluent chaining.
         """
 
@@ -703,9 +706,9 @@ class IQueryBuilderBase(ABC):
 
         Parameters
         ----------
-        table : str or TableDefinition
+        table : str or orionis.orm.schema.TableDefinition
             Table name to join, or its full definition.
-        first : Any, optional
+        first : typing.Any, optional
             Left-hand column of the ON condition, or a callable
             receiving a join clause to declare several conditions.
         operator : str or None, optional
@@ -717,7 +720,7 @@ class IQueryBuilderBase(ABC):
 
         Returns
         -------
-        IQueryBuilderBase
+        orionis.orm.contracts.base_builder.IQueryBuilderBase
             The same builder, enabling fluent chaining.
         """
 
@@ -736,9 +739,9 @@ class IQueryBuilderBase(ABC):
 
         Parameters
         ----------
-        table : str or TableDefinition
+        table : str or orionis.orm.schema.TableDefinition
             Table name to join, or its full definition.
-        first : Any, optional
+        first : typing.Any, optional
             Left-hand column of the ON condition, or a join callable.
         operator : str or None, optional
             Comparison operator relating both sides.
@@ -749,7 +752,7 @@ class IQueryBuilderBase(ABC):
 
         Returns
         -------
-        IQueryBuilderBase
+        orionis.orm.contracts.base_builder.IQueryBuilderBase
             The same builder, enabling fluent chaining.
         """
 
@@ -768,9 +771,9 @@ class IQueryBuilderBase(ABC):
 
         Parameters
         ----------
-        table : str or TableDefinition
+        table : str or orionis.orm.schema.TableDefinition
             Table name to join, or its full definition.
-        first : Any, optional
+        first : typing.Any, optional
             Left-hand column of the ON condition, or a join callable.
         operator : str or None, optional
             Comparison operator relating both sides.
@@ -781,7 +784,7 @@ class IQueryBuilderBase(ABC):
 
         Returns
         -------
-        IQueryBuilderBase
+        orionis.orm.contracts.base_builder.IQueryBuilderBase
             The same builder, enabling fluent chaining.
         """
 
@@ -800,9 +803,9 @@ class IQueryBuilderBase(ABC):
 
         Parameters
         ----------
-        table : str or TableDefinition
+        table : str or orionis.orm.schema.TableDefinition
             Table name to join, or its full definition.
-        first : Any, optional
+        first : typing.Any, optional
             Left-hand column of the ON condition, or a join callable.
         operator : str or None, optional
             Comparison operator relating both sides.
@@ -813,7 +816,7 @@ class IQueryBuilderBase(ABC):
 
         Returns
         -------
-        IQueryBuilderBase
+        orionis.orm.contracts.base_builder.IQueryBuilderBase
             The same builder, enabling fluent chaining.
         """
 
@@ -829,14 +832,14 @@ class IQueryBuilderBase(ABC):
 
         Parameters
         ----------
-        table : str or TableDefinition
+        table : str or orionis.orm.schema.TableDefinition
             Table name to join, or its full definition.
         alias : str or None, optional
             Alias the joined table is referred to by.
 
         Returns
         -------
-        IQueryBuilderBase
+        orionis.orm.contracts.base_builder.IQueryBuilderBase
             The same builder, enabling fluent chaining.
         """
 
@@ -854,11 +857,11 @@ class IQueryBuilderBase(ABC):
 
         Parameters
         ----------
-        query : Any
+        query : typing.Any
             Subquery source producing the derived table.
         alias : str
             Name the derived table is referred to by.
-        first : Any, optional
+        first : typing.Any, optional
             Left-hand column of the ON condition, or a join callable.
         operator : str or None, optional
             Comparison operator relating both sides.
@@ -867,7 +870,7 @@ class IQueryBuilderBase(ABC):
 
         Returns
         -------
-        IQueryBuilderBase
+        orionis.orm.contracts.base_builder.IQueryBuilderBase
             The same builder, enabling fluent chaining.
         """
 
@@ -885,11 +888,11 @@ class IQueryBuilderBase(ABC):
 
         Parameters
         ----------
-        query : Any
+        query : typing.Any
             Subquery source producing the derived table.
         alias : str
             Name the derived table is referred to by.
-        first : Any, optional
+        first : typing.Any, optional
             Left-hand column of the ON condition, or a join callable.
         operator : str or None, optional
             Comparison operator relating both sides.
@@ -898,7 +901,7 @@ class IQueryBuilderBase(ABC):
 
         Returns
         -------
-        IQueryBuilderBase
+        orionis.orm.contracts.base_builder.IQueryBuilderBase
             The same builder, enabling fluent chaining.
         """
 
@@ -916,11 +919,11 @@ class IQueryBuilderBase(ABC):
 
         Parameters
         ----------
-        query : Any
+        query : typing.Any
             Subquery source producing the derived table.
         alias : str
             Name the derived table is referred to by.
-        first : Any, optional
+        first : typing.Any, optional
             Left-hand column of the ON condition, or a join callable.
         operator : str or None, optional
             Comparison operator relating both sides.
@@ -929,7 +932,7 @@ class IQueryBuilderBase(ABC):
 
         Returns
         -------
-        IQueryBuilderBase
+        orionis.orm.contracts.base_builder.IQueryBuilderBase
             The same builder, enabling fluent chaining.
         """
 
@@ -949,7 +952,7 @@ class IQueryBuilderBase(ABC):
 
         Returns
         -------
-        IQueryBuilderBase
+        orionis.orm.contracts.base_builder.IQueryBuilderBase
             The same builder, enabling fluent chaining.
         """
 
@@ -965,7 +968,7 @@ class IQueryBuilderBase(ABC):
 
         Returns
         -------
-        IQueryBuilderBase
+        orionis.orm.contracts.base_builder.IQueryBuilderBase
             The same builder, enabling fluent chaining.
         """
 
@@ -981,7 +984,7 @@ class IQueryBuilderBase(ABC):
 
         Returns
         -------
-        IQueryBuilderBase
+        orionis.orm.contracts.base_builder.IQueryBuilderBase
             The same builder, enabling fluent chaining.
         """
 
@@ -997,7 +1000,7 @@ class IQueryBuilderBase(ABC):
 
         Returns
         -------
-        IQueryBuilderBase
+        orionis.orm.contracts.base_builder.IQueryBuilderBase
             The same builder, enabling fluent chaining.
         """
 
@@ -1008,14 +1011,14 @@ class IQueryBuilderBase(ABC):
 
         Parameters
         ----------
-        column : Any
+        column : typing.Any
             Column name, mapping of equality pairs, or grouping callable.
-        *args : Any
+        *args : typing.Any
             Either the bound value, or an operator followed by a value.
 
         Returns
         -------
-        IQueryBuilderBase
+        orionis.orm.contracts.base_builder.IQueryBuilderBase
             The same builder, enabling fluent chaining.
         """
 
@@ -1026,14 +1029,14 @@ class IQueryBuilderBase(ABC):
 
         Parameters
         ----------
-        column : Any
+        column : typing.Any
             Column name, mapping of equality pairs, or grouping callable.
-        *args : Any
+        *args : typing.Any
             Either the bound value, or an operator followed by a value.
 
         Returns
         -------
-        IQueryBuilderBase
+        orionis.orm.contracts.base_builder.IQueryBuilderBase
             The same builder, enabling fluent chaining.
         """
 
@@ -1055,7 +1058,7 @@ class IQueryBuilderBase(ABC):
 
         Returns
         -------
-        IQueryBuilderBase
+        orionis.orm.contracts.base_builder.IQueryBuilderBase
             The same builder, enabling fluent chaining.
         """
 
@@ -1071,7 +1074,7 @@ class IQueryBuilderBase(ABC):
 
         Returns
         -------
-        IQueryBuilderBase
+        orionis.orm.contracts.base_builder.IQueryBuilderBase
             The same builder, enabling fluent chaining.
         """
 
@@ -1087,7 +1090,7 @@ class IQueryBuilderBase(ABC):
 
         Returns
         -------
-        IQueryBuilderBase
+        orionis.orm.contracts.base_builder.IQueryBuilderBase
             The same builder, enabling fluent chaining.
         """
 
@@ -1103,7 +1106,7 @@ class IQueryBuilderBase(ABC):
 
         Returns
         -------
-        IQueryBuilderBase
+        orionis.orm.contracts.base_builder.IQueryBuilderBase
             The same builder, enabling fluent chaining.
         """
 
@@ -1119,7 +1122,7 @@ class IQueryBuilderBase(ABC):
 
         Returns
         -------
-        IQueryBuilderBase
+        orionis.orm.contracts.base_builder.IQueryBuilderBase
             The same builder, enabling fluent chaining.
         """
 
@@ -1137,7 +1140,7 @@ class IQueryBuilderBase(ABC):
 
         Returns
         -------
-        IQueryBuilderBase
+        orionis.orm.contracts.base_builder.IQueryBuilderBase
             The same builder, enabling fluent chaining.
         """
 
@@ -1150,7 +1153,7 @@ class IQueryBuilderBase(ABC):
 
         Returns
         -------
-        IQueryBuilderBase
+        orionis.orm.contracts.base_builder.IQueryBuilderBase
             The same builder, enabling fluent chaining.
         """
 
@@ -1161,7 +1164,7 @@ class IQueryBuilderBase(ABC):
 
         Returns
         -------
-        IQueryBuilderBase
+        orionis.orm.contracts.base_builder.IQueryBuilderBase
             The same builder, enabling fluent chaining.
         """
 
@@ -1172,12 +1175,12 @@ class IQueryBuilderBase(ABC):
 
         Parameters
         ----------
-        query : Any
+        query : typing.Any
             Subquery source whose rows are appended.
 
         Returns
         -------
-        IQueryBuilderBase
+        orionis.orm.contracts.base_builder.IQueryBuilderBase
             The same builder, enabling fluent chaining.
         """
 
@@ -1188,12 +1191,12 @@ class IQueryBuilderBase(ABC):
 
         Parameters
         ----------
-        query : Any
+        query : typing.Any
             Subquery source whose rows are appended.
 
         Returns
         -------
-        IQueryBuilderBase
+        orionis.orm.contracts.base_builder.IQueryBuilderBase
             The same builder, enabling fluent chaining.
         """
 
@@ -1249,7 +1252,7 @@ class IQueryBuilderBase(ABC):
 
         Returns
         -------
-        Any
+        typing.Any
             Maximum value, or ``None`` without matches.
         """
 
@@ -1265,7 +1268,7 @@ class IQueryBuilderBase(ABC):
 
         Returns
         -------
-        Any
+        typing.Any
             Minimum value, or ``None`` without matches.
         """
 
@@ -1297,7 +1300,7 @@ class IQueryBuilderBase(ABC):
 
         Returns
         -------
-        Any
+        typing.Any
             Sum of the values, or ``0`` without matches.
         """
 
@@ -1318,7 +1321,7 @@ class IQueryBuilderBase(ABC):
 
         Returns
         -------
-        InsertResult
+        orionis.database.entities.InsertResult
             Result carrying the generated key and affected row count.
         """
 

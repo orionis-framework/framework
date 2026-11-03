@@ -1,3 +1,5 @@
+"""Collect and organize validation failures by field path."""
+
 from __future__ import annotations
 import types
 from collections.abc import Collection, Mapping
@@ -22,10 +24,15 @@ if TYPE_CHECKING:
 _convert = msgspec.convert
 _ValidationError = msgspec.ValidationError
 _INVALID = object()
+"""Sentinel distinguishing invalid from ordinary values."""
 
 # Cache: schema type -> tuple of
 # (encode_name, field_type, required, nested, rules, attribute, default, factory).
 _FIELD_PLAN_CACHE: dict[type, tuple] = {}
+"""
+Cache: schema type -> tuple of (encode_name, field_type, required, nested, rules,
+attribute, default, factory).
+"""
 
 # Bind the field plan lookup.
 _plan_get = _FIELD_PLAN_CACHE.get
@@ -41,7 +48,7 @@ def _nested_schema(tp: object) -> type[msgspec.Struct] | None:
 
     Returns
     -------
-    type[msgspec.Struct] | None
+    type[``msgspec.Struct``] | None
         Nested schema class, or ``None`` when the field holds no schema.
     """
     origin = get_origin(tp)
@@ -117,14 +124,14 @@ def _payload_fields(payload: Mapping | list | tuple, schema: type) -> Mapping:
 
     Parameters
     ----------
-    payload : Mapping | list | tuple
+    payload : collections.abc.Mapping | list | tuple
         Field mapping or positional schema data, including any tag.
     schema : type
         Schema defining field order, encoded names and tag configuration.
 
     Returns
     -------
-    Mapping
+    collections.abc.Mapping
         Original mapping or positional values keyed by encoded field name.
     """
     if isinstance(payload, Mapping):
@@ -138,7 +145,10 @@ def _payload_fields(payload: Mapping | list | tuple, schema: type) -> Mapping:
 class FailureCollector:
 
     # Prevent per-instance dictionaries; the class is used statically.
+    """Collect and organize validation failures by field path."""
+
     __slots__ = ()
+    """Prevent per-instance dictionaries; the class is used statically."""
 
     @classmethod
     async def collect(
@@ -159,12 +169,12 @@ class FailureCollector:
             Raw input data that failed conversion.
         schema : type
             Schema class the payload was converted against.
-        error : msgspec.ValidationError
+        error : ``msgspec.ValidationError``
             Original error raised by the whole-payload conversion.
 
         Returns
         -------
-        tuple[ValidationFailure, ...]
+        tuple[orionis.schemas.entities.failure.ValidationFailure, ``...``]
             Every failure found, including the original parsed error when no
             field could be blamed for it.
         """
@@ -198,7 +208,7 @@ class FailureCollector:
 
         Parameters
         ----------
-        payload : Mapping | list | tuple
+        payload : collections.abc.Mapping | list | tuple
             Field mapping or positional data for an array-like schema.
         schema : type
             Schema class owning the fields being converted.
@@ -206,7 +216,7 @@ class FailureCollector:
             Root schema class, used to resolve custom messages by path.
         base : str
             Dotted path of ``payload`` relative to the root schema.
-        failures : list[ValidationFailure]
+        failures : list[orionis.schemas.entities.failure.ValidationFailure]
             Accumulator receiving every failure found.
 
         Returns
@@ -284,7 +294,7 @@ class FailureCollector:
 
         Parameters
         ----------
-        error : msgspec.ValidationError
+        error : ``msgspec.ValidationError``
             Error raised by the original field conversion.
         value : object
             Rejected field value.
@@ -297,7 +307,7 @@ class FailureCollector:
 
         Returns
         -------
-        tuple[object, list[ValidationFailure]]
+        tuple[object, list[orionis.schemas.entities.failure.ValidationFailure]]
             Converted value and failures, or ``_INVALID`` and failures when
             the value remains structurally incompatible.
         """
@@ -333,7 +343,7 @@ class FailureCollector:
 
         Returns
         -------
-        list[ValidationFailure]
+        list[orionis.schemas.entities.failure.ValidationFailure]
             Local constraint failures, excluding type and child errors.
         """
         failures = []
@@ -375,7 +385,7 @@ class FailureCollector:
             Entries of ``(path, value, rules, nested_annotation)`` to check.
         converted_values : dict[str, object]
             Type-compatible values, including defaults, keyed by attribute name.
-        failures : list[ValidationFailure]
+        failures : list[orionis.schemas.entities.failure.ValidationFailure]
             Accumulator receiving every failure found.
 
         Returns
@@ -412,7 +422,7 @@ class FailureCollector:
 
         Parameters
         ----------
-        error : msgspec.ValidationError
+        error : ``msgspec.ValidationError``
             Error raised while converting the field value.
         value : object
             Rejected field value.
@@ -425,7 +435,7 @@ class FailureCollector:
 
         Returns
         -------
-        list[ValidationFailure]
+        list[orionis.schemas.entities.failure.ValidationFailure]
             Constraint and child failures, or the parsed original error.
         """
         base_type, probes = constraint_plan(nested)
@@ -503,14 +513,14 @@ class FailureCollector:
 
         Parameters
         ----------
-        schema : type[msgspec.Struct]
+        schema : type[``msgspec.Struct``]
             Schema class whose representation is checked.
         value : object
             Rejected input to compare with the schema configuration.
 
         Returns
         -------
-        type[msgspec.Struct] | None
+        type[``msgspec.Struct``] | None
             Schema when its shape and tag match, otherwise ``None``.
         """
         config = schema.__struct_config__
@@ -538,7 +548,7 @@ class FailureCollector:
 
         Parameters
         ----------
-        error : msgspec.ValidationError
+        error : ``msgspec.ValidationError``
             Error raised by converting the entire collection.
         value : object
             Collection selected by ``_matchingType``.
@@ -551,7 +561,7 @@ class FailureCollector:
 
         Returns
         -------
-        list[ValidationFailure]
+        list[orionis.schemas.entities.failure.ValidationFailure]
             Collection-level failures and failures from every child.
         """
         args = get_args(annotation)

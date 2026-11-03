@@ -1,3 +1,5 @@
+"""Register and run the application's scheduled tasks."""
+
 import asyncio
 import os
 import sys
@@ -19,6 +21,10 @@ _LISTENER_MAP: tuple[tuple[str, SchedulerEvent], ...] = (
     ("onResumed", SchedulerEvent.RESUMED),
     ("onShutdown", SchedulerEvent.SHUTDOWN),
 )
+"""
+Ordered pairs of scheduler method names and their corresponding events, used to
+register optional event listeners defined on the Scheduler class.
+"""
 
 class ScheduleWorkCommand(BaseCommand):
     """Register and run the application's scheduled tasks."""
@@ -27,12 +33,15 @@ class ScheduleWorkCommand(BaseCommand):
 
     # Indicates whether timestamps will be shown in the command output
     timestamps: bool = False
+    """Indicates whether timestamps will be shown in the command output."""
 
     # Command signature and description
     signature: str = "schedule:work"
+    """Command signature and description."""
 
     # Command description
     description: str = "Run the scheduled tasks defined by the application."
+    """Command description."""
 
     def __startPanel(self, console: Console) -> None:
         """
@@ -40,7 +49,7 @@ class ScheduleWorkCommand(BaseCommand):
 
         Parameters
         ----------
-        console : Console
+        console : orionis.console.Console
             Rich console used to display the startup message.
 
         Returns
@@ -85,7 +94,7 @@ class ScheduleWorkCommand(BaseCommand):
 
         Parameters
         ----------
-        schedule_service : ISchedule
+        schedule_service : orionis.console.contracts.ISchedule
             Scheduler service to shut down.
 
         Returns
@@ -108,7 +117,7 @@ class ScheduleWorkCommand(BaseCommand):
         ----------
         scheduler : object
             Application scheduler that may define event callbacks.
-        schedule_service : ISchedule
+        schedule_service : orionis.console.contracts.ISchedule
             Schedule service receiving the callbacks.
 
         Returns
@@ -131,9 +140,9 @@ class ScheduleWorkCommand(BaseCommand):
 
         Parameters
         ----------
-        app : IApplication
+        app : orionis.IApplication
             Application instance for configuration and service resolution.
-        console : Console
+        console : orionis.console.Console
             Rich console used to display scheduler startup information.
 
         Returns

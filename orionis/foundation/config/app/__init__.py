@@ -1,3 +1,5 @@
+"""Group the foundation config app components and public imports."""
+
 from typing import TYPE_CHECKING as _TYPE_CHECKING
 from orionis._exports import resolve_export as _resolve_export
 
@@ -17,6 +19,7 @@ _EXPORTS = {
     "Cipher": ("orionis.foundation.config.app.enums.ciphers", "Cipher"),
     "Environments": ("orionis.foundation.config.app.enums.environments", "Environments"),
 }
+"""Public export names mapped to their defining modules and attributes."""
 
 def __getattr__(name: str) -> object:
     """

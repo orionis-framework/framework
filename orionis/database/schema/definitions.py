@@ -1,3 +1,5 @@
+"""Define definitions for database schema."""
+
 from orionis.database.schema.comment import Comment
 from orionis.database.schema.foreign import ForeignKey
 from orionis.database.schema.index import Index
@@ -9,3 +11,4 @@ from orionis.orm.schema.column import ColumnDefinition
 type SchemaDefinition = (
     ColumnDefinition | Comment | ForeignKey | Index | PrimaryKey | Unique
 )
+"""A schema definition collected by ``Blueprint`` and compiled by ``Schema``."""

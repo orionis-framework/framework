@@ -1,3 +1,5 @@
+"""Define the contract for the localization manager."""
+
 from __future__ import annotations
 from abc import ABC, abstractmethod
 from typing import TYPE_CHECKING
@@ -15,6 +17,7 @@ class ILocalizationManager(ABC):
     """
 
     __slots__ = ()
+    """Declare that this class introduces no additional instance slots."""
 
     @abstractmethod
     def translator(self) -> ITranslator:
@@ -23,6 +26,6 @@ class ILocalizationManager(ABC):
 
         Returns
         -------
-        ITranslator
+        orionis.localization.contracts.ITranslator
             Translator configured from the application settings.
         """

@@ -1,9 +1,12 @@
+"""Provide environment validators operations through ``_validate_key_name``."""
+
 from __future__ import annotations
 import re
 import functools
 
 # Precompile the regex pattern for validating environment variable names.
 _pattern = re.compile(r"^[A-Z][A-Z0-9_]*$")
+"""Precompile the regex pattern for validating environment variable names."""
 
 @functools.lru_cache(maxsize=512)
 def _validate_key_name(key: str) -> str:

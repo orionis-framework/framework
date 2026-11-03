@@ -1,3 +1,5 @@
+"""Represent SMTP configuration settings."""
+
 from __future__ import annotations
 from dataclasses import dataclass, field
 from orionis.environment import Env
@@ -9,9 +11,9 @@ class Smtp(BaseEntity):
     """
     Represent SMTP configuration settings.
 
-    Parameters
+    Attributes
     ----------
-    driver : str, default="smtp"
+    driver : str, default="``smtp``"
         The driver type for the mail transport. Default is "smtp".
     url : str
         Full URL for the SMTP service. Default is from 'MAIL_URL'.

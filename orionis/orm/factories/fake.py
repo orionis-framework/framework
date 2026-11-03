@@ -1,3 +1,5 @@
+"""Generate fake data with optional and unique value constraints."""
+
 from functools import lru_cache
 from types import MappingProxyType
 from typing import TYPE_CHECKING, Any
@@ -26,7 +28,8 @@ def _camel_case(name: str) -> str:
 
 @lru_cache(maxsize=128)
 def _provider_aliases(names: tuple[str, ...]) -> MappingProxyType[str, str]:
-    """Compile immutable aliases for one set of backend member names.
+    """
+    Compile immutable aliases for one set of backend member names.
 
     Parameters
     ----------
@@ -35,7 +38,7 @@ def _provider_aliases(names: tuple[str, ...]) -> MappingProxyType[str, str]:
 
     Returns
     -------
-    MappingProxyType of str to str
+    types.MappingProxyType of str ``to`` str
         Shared camelCase aliases containing no bound provider methods.
     """
     aliases: dict[str, str] = {}
@@ -48,8 +51,10 @@ def _provider_aliases(names: tuple[str, ...]) -> MappingProxyType[str, str]:
     return MappingProxyType(aliases)
 
 class _ProviderState:
+    """Retain the random generator and locale state for fake-data providers."""
 
     __slots__ = ("aliases", "backend", "revision")
+    """Declare the instance attribute slots reserved by this class."""
 
     def __init__(self, backend: object) -> None:
         """Initialize provider names and cache revision for one instance.
@@ -65,7 +70,9 @@ class _ProviderState:
             Apply the described operation.
         """
         self.backend: Any = backend
+        """Instance-local data generator."""
         self.revision = 0
+        """Revision value used by ``_ProviderState``."""
         self.refresh()
 
     def refresh(self) -> None:
@@ -78,20 +85,24 @@ class _ProviderState:
             Replace the immutable name table and advance this instance's revision.
         """
         self.aliases = _provider_aliases(tuple(dir(self.backend)))
+        """Aliases produced by ``_provider_aliases``."""
         self.revision += 1
 
 class _ProviderView:
+    """Expose fake-data provider methods through a configured view."""
 
     __slots__ = ("_backend", "_cache", "_revision", "_state")
+    """Declare the instance attribute slots reserved by this class."""
 
     def __init__(self, backend: object, state: _ProviderState) -> None:
-        """Bind a normal, unique, or optional provider view.
+        """
+        Bind a normal, unique, or optional provider view.
 
         Parameters
         ----------
         backend : object
             Backend object dispatching this view's calls.
-        state : _ProviderState
+        state : orionis.orm.factories.fake._ProviderState
             Names and revision shared by views of the same generator.
 
         Returns
@@ -100,9 +111,13 @@ class _ProviderView:
             Apply the described operation.
         """
         self._backend: Any = backend
+        """Backend object dispatching this view's calls."""
         self._state = state
+        """Names and revision shared by views of the same generator."""
         self._revision = state.revision
+        """Revision obtained from ``state.revision``."""
         self._cache: dict[str, Callable[..., Any]] = {}
+        """Cache policy or cached state used by this component."""
 
     def __getattr__(self, name: str) -> Any:  # noqa: ANN401
         """
@@ -115,7 +130,7 @@ class _ProviderView:
 
         Returns
         -------
-        Any
+        typing.Any
             Bound callable, including dynamically registered providers.
 
         Raises
@@ -158,8 +173,10 @@ class _ProviderView:
         return sorted(methods)
 
 class UniqueFake(_ProviderView):
+    """Generate fake values while tracking and rejecting duplicates."""
 
     __slots__ = ()
+    """Declare that this class introduces no additional instance slots."""
 
     def clear(self) -> None:
         """
@@ -183,7 +200,7 @@ class UniqueFake(_ProviderView):
 
         Returns
         -------
-        UniqueFake
+        orionis.orm.factories.UniqueFake
             View sharing the backend's unique pool and dispatch lifecycle.
         """
         return UniqueFake(self._backend.exclude_types(types), self._state)
@@ -199,18 +216,22 @@ class UniqueFake(_ProviderView):
 
         Returns
         -------
-        UniqueFake
+        orionis.orm.factories.UniqueFake
             Locale-specific uniqueness view.
         """
         return UniqueFake(self._backend[locale], self._state)
 
 class OptionalFake(_ProviderView):
+    """Generate optional fake values according to a configured probability."""
 
     __slots__ = ()
+    """Declare that this class introduces no additional instance slots."""
 
 class Fake(_ProviderView):
+    """Generate fake values through the configured data providers."""
 
     __slots__ = ("_optional", "_unique")
+    """Declare the instance attribute slots reserved by this class."""
 
     def __init__(self, backend: object) -> None:
         """Wrap an independently configured backend without changing its seed.
@@ -227,7 +248,9 @@ class Fake(_ProviderView):
         """
         super().__init__(backend, _ProviderState(backend))
         self._unique: UniqueFake | None = None
+        """View tracking previously generated fake values."""
         self._optional: OptionalFake | None = None
+        """View controlling whether fake-data generation returns a value."""
 
     @property
     def unique(self) -> UniqueFake:
@@ -236,7 +259,7 @@ class Fake(_ProviderView):
 
         Returns
         -------
-        UniqueFake
+        orionis.orm.factories.UniqueFake
             Stable view retaining the instance's unique history.
         """
         view = self._unique
@@ -251,7 +274,7 @@ class Fake(_ProviderView):
 
         Returns
         -------
-        OptionalFake
+        orionis.orm.factories.OptionalFake
             Stable view accepting a ``prob`` keyword on provider calls.
         """
         view = self._optional
@@ -278,7 +301,7 @@ class Fake(_ProviderView):
 
         Returns
         -------
-        Random
+        random.Random
             Random generator owned by this backend instance.
         """
         return self._backend.random
@@ -294,7 +317,7 @@ class Fake(_ProviderView):
 
         Returns
         -------
-        Fake
+        orionis.orm.factories.Fake
             This facade when its single configured locale is selected.
         """
         backend = self._backend[locale]
@@ -359,19 +382,20 @@ class Fake(_ProviderView):
 
         Returns
         -------
-        Callable
+        collections.abc.Callable
             Bound provider callable.
         """
         return self.__getattr__(name)
 
     def setFormatter(self, name: str, formatter: Callable[..., Any]) -> None:
-        """Install a formatter under its public camelCase provider name.
+        """
+        Install a formatter under its public camelCase provider name.
 
         Parameters
         ----------
         name : str
             Public camelCase name, with no underscores.
-        formatter : Callable
+        formatter : collections.abc.Callable
             Callable accepting the desired provider arguments.
 
         Raises
@@ -409,14 +433,14 @@ class Fake(_ProviderView):
         ----------
         formatter : str
             Public provider method name.
-        *args : Any
+        *args : typing.Any
             Positional provider arguments.
-        **kwargs : Any
+        **kwargs : typing.Any
             Provider keyword arguments, retaining snake_case names.
 
         Returns
         -------
-        Any
+        typing.Any
             Value produced by the requested provider method.
         """
         return self.getFormatter(formatter)(*args, **kwargs)

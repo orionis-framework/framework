@@ -1,3 +1,5 @@
+"""Create application files from packaged stubs."""
+
 from asyncio import to_thread
 from pathlib import Path
 from typing import ClassVar
@@ -10,11 +12,17 @@ class MakeStubCommand(BaseCommand):
     """Create application files from packaged stubs."""
 
     template_name: ClassVar[str]
+    """Name of the source template rendered by the generator."""
     path_key: ClassVar[str]
+    """Application path key selecting the destination directory."""
     success_label: ClassVar[str]
+    """Resource label displayed after successful generation."""
     prefix: ClassVar[str | None] = None
+    """Prefix applied when constructing names or storage keys."""
     postfix: ClassVar[str | None] = None
+    """Suffix appended to the generated resource name."""
     replacement_arguments: ClassVar[dict[str, str]] = {}
+    """Command arguments forwarded to template placeholder replacement."""
     arguments: ClassVar[list[Argument]] = [
         Argument(
             name_or_flags="name",
@@ -23,6 +31,7 @@ class MakeStubCommand(BaseCommand):
             help="The file and class name for the generated file.",
         ),
     ]
+    """Command-line argument declarations accepted by this command."""
 
     def getTemplateName(self) -> str:
         """
@@ -72,7 +81,7 @@ class MakeStubCommand(BaseCommand):
 
         Parameters
         ----------
-        app : IApplication
+        app : orionis.IApplication
             Application that resolves the destination path.
         name : str
             File name and optional nested directory path.
@@ -127,14 +136,14 @@ class MakeStubCommand(BaseCommand):
 
         Parameters
         ----------
-        app : IApplication
+        app : orionis.IApplication
             Application that resolves the destination path.
         name : str
             File name and optional nested directory path.
 
         Returns
         -------
-        tuple[tuple[str, str], ...]
+        tuple[tuple[str, str], ``...``]
             Success labels and generated application-relative paths.
         """
         return ((self.success_label, self.createFile(app, name)),)
@@ -145,7 +154,7 @@ class MakeStubCommand(BaseCommand):
 
         Parameters
         ----------
-        app : IApplication
+        app : orionis.IApplication
             Application that provides destination paths.
 
         Returns

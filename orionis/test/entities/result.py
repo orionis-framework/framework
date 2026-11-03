@@ -1,3 +1,5 @@
+"""Represent the outcome of a test execution."""
+
 from __future__ import annotations
 from dataclasses import dataclass, field
 from typing import Any, TYPE_CHECKING
@@ -11,13 +13,13 @@ class TestResult(BaseEntity):
     """
     Represent the outcome of a test execution.
 
-    Parameters
+    Attributes
     ----------
-    id : Any
+    id : typing.Any
         Unique identifier for the test result.
     name : str
         Name of the test.
-    status : TestStatus
+    status : orionis.test.enums.status.TestStatus
         Status of the test execution (e.g., passed, failed).
     execution_time : float
         Time taken to execute the test, in seconds.
@@ -179,3 +181,4 @@ class TestResult(BaseEntity):
             ),
         },
     )
+    """Source code produced by ``field``."""

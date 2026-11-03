@@ -1,3 +1,5 @@
+"""Defer a single dispatch until awaited and allow options before submission."""
+
 import asyncio
 from typing import TYPE_CHECKING
 from orionis.queues.exceptions import QueueDispatchError
@@ -14,6 +16,7 @@ class PendingDispatch:
     __slots__ = (
         "_completion", "_connection", "_delay", "_job", "_queue", "_submit",
     )
+    """Declare the instance attribute slots reserved by this class."""
 
     def __init__(self, submit: DispatchCallback, job: BaseJob) -> None:
         """
@@ -21,9 +24,9 @@ class PendingDispatch:
 
         Parameters
         ----------
-        submit : DispatchCallback
+        submit : orionis.queues.types.DispatchCallback
             Manager entry point invoked only when awaited.
-        job : BaseJob
+        job : orionis.queues.BaseJob
             Instance whose declared data will be serialized on submission.
 
         Returns
@@ -32,11 +35,17 @@ class PendingDispatch:
             Complete the documented operation without returning a value.
         """
         self._submit = submit
+        """Manager entry point invoked only when awaited."""
         self._job: BaseJob | None = job
+        """Instance whose declared data will be serialized on submission."""
         self._connection: str | None = None
+        """Configured connection used to store or dispatch the operation."""
         self._queue: str | None = None
+        """Name of the queue receiving or storing the job."""
         self._delay = 0.0
+        """Delay value used by ``PendingDispatch``."""
         self._completion: asyncio.Future[str] | None = None
+        """Completion provider or result associated with the primitive."""
 
     def onConnection(self, name: str) -> PendingDispatch:
         """
@@ -49,7 +58,7 @@ class PendingDispatch:
 
         Returns
         -------
-        PendingDispatch
+        orionis.queues.PendingDispatch
             This pending operation.
         """
         self._checkMutable()
@@ -67,7 +76,7 @@ class PendingDispatch:
 
         Returns
         -------
-        PendingDispatch
+        orionis.queues.PendingDispatch
             This pending operation.
         """
         self._checkMutable()
@@ -85,7 +94,7 @@ class PendingDispatch:
 
         Returns
         -------
-        PendingDispatch
+        orionis.queues.PendingDispatch
             This pending operation.
         """
         self._checkMutable()
@@ -138,11 +147,12 @@ class PendingDispatch:
             return result
 
     def __await__(self) -> Generator[object, None, str]:
-        """Start or join the deferred dispatch when awaited.
+        """
+        Start or join the deferred dispatch when awaited.
 
         Returns
         -------
-        Generator[object, None, str]
+        collections.abc.Generator[object, None, str]
             Iterator consumed by Python's await protocol.
         """
         return self._run().__await__()

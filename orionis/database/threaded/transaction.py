@@ -1,3 +1,5 @@
+"""Settle a Core transaction on its connection's reserved worker."""
+
 from __future__ import annotations
 from typing import TYPE_CHECKING
 
@@ -9,17 +11,19 @@ class ThreadedTransaction:
     """Settle a Core transaction on its connection's reserved worker."""
 
     __slots__ = ("_transaction", "_worker")
+    """Declare the instance attribute slots reserved by this class."""
 
     def __init__(
         self, transaction: Transaction, worker: ThreadedWorker,
     ) -> None:
-        """Retain the Core transaction and its owning worker.
+        """
+        Retain the Core transaction and its owning worker.
 
         Parameters
         ----------
-        transaction : Transaction
+        transaction : orionis.database.Transaction
             Open Core transaction.
-        worker : ThreadedWorker
+        worker : orionis.database.threaded.worker.ThreadedWorker
             Worker owning the associated DBAPI checkout.
 
         Returns
@@ -28,7 +32,9 @@ class ThreadedTransaction:
             Initialize the asynchronous transaction adapter.
         """
         self._transaction = transaction
+        """Open Core transaction."""
         self._worker = worker
+        """Worker owning the associated DBAPI checkout."""
 
     async def commit(self) -> None:
         """Commit before allowing the connection to return to the pool.

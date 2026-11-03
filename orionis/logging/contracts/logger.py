@@ -1,3 +1,5 @@
+"""Define the contract for logger implementations."""
+
 from __future__ import annotations
 import asyncio
 from abc import ABC, abstractmethod
@@ -8,6 +10,7 @@ if TYPE_CHECKING:
     import logging
 
 class ILogger(ABC):
+    """Define the contract for logger implementations."""
 
     async def aclose(self: Self) -> None:
         """
@@ -119,7 +122,7 @@ class ILogger(ABC):
 
         Returns
         -------
-        logging.Logger
+        ``logging.Logger``
             The configured logger instance.
 
         Raises

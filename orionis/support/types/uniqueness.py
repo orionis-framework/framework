@@ -1,3 +1,5 @@
+"""Provide support types operations through ``unique_items``."""
+
 from __future__ import annotations
 from typing import TYPE_CHECKING
 
@@ -5,8 +7,11 @@ if TYPE_CHECKING:
     from collections.abc import Callable
 
 _UNSUPPORTED = object()
+"""Sentinel distinguishing unsupported from ordinary values."""
 _SCALARS = {str, bytes, int, float, complex, bool, type(None)}
+"""Scalars definitions used by ``uniqueness``."""
 _SMALL_INPUT = 128
+"""Small input value used by ``uniqueness``."""
 
 def _structural_key(value: object, active: set[int]) -> object:  # noqa: PLR0911
     """
@@ -58,18 +63,19 @@ def unique_items[T]( # NOSONAR
     items: list[T],
     selector: Callable[[T],object],
 ) -> list[T]:
-    """Preserve the first item for each equality key, with a safe tree fast path.
+    """
+    Preserve the first item for each equality key, with a safe tree fast path.
 
     Parameters
     ----------
-    items : list[T]
+    items : list[``T``]
         Values whose order and identity are preserved.
-    selector : Callable[[T], object]
+    selector : collections.abc.Callable[[``T``], object]
         Explicit business identity, or the value itself.
 
     Returns
     -------
-    list[T]
+    list[``T``]
         First representatives. Arbitrary unhashable objects and cycles retain
         Python equality fallback; no universal hash is assumed for custom types.
     """

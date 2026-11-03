@@ -1,6 +1,9 @@
+"""Describe a foreign-key constraint and its referential actions."""
+
 from orionis.orm.schema.constraints import CompositeForeignKey
 
 class ForeignKey:
+    """Describe a foreign-key constraint and its referential actions."""
 
     def __init__(
         self,
@@ -26,6 +29,7 @@ class ForeignKey:
         Returns
         -------
         None
+            Initialize a foreign key constraint.
         """
         # Create a composite foreign key wrapper for single column
         self.foreign = CompositeForeignKey(
@@ -34,3 +38,4 @@ class ForeignKey:
             ref_columns=(ref_column,),
             name=name,
         )
+        """Create a composite foreign key wrapper for single column."""

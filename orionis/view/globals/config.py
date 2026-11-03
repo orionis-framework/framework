@@ -1,3 +1,5 @@
+"""Provide view globals operations through ``_global_config``."""
+
 from __future__ import annotations
 from typing import TYPE_CHECKING, Any
 
@@ -12,12 +14,12 @@ def _global_config(app: IApplication) -> Any:
 
     Parameters
     ----------
-    app : IApplication
+    app : orionis.IApplication
         Application container providing configuration access.
 
     Returns
     -------
-    Any
+    typing.Any
         Callable that retrieves a dot-separated configuration key.
     """
     def config(key: str, default: Any = None) -> Any:
@@ -28,12 +30,12 @@ def _global_config(app: IApplication) -> Any:
         ----------
         key : str
             Dot-separated configuration key (e.g. ``'app.name'``).
-        default : Any, optional
+        default : typing.Any, optional
             Value returned when the key is absent.
 
         Returns
         -------
-        Any
+        typing.Any
             Configuration value or *default*.
         """
         cnf_value = app.config(key)

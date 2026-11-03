@@ -1,3 +1,5 @@
+"""Expose the current reservation and explicit lifecycle operations."""
+
 from collections.abc import Awaitable, Callable
 from typing import TYPE_CHECKING
 from orionis.queues.entities.reserved_job import ReservedJob
@@ -5,6 +7,7 @@ from orionis.queues.exceptions import QueueLeaseError
 from orionis.queues.functions import validate_seconds
 
 type FailureCallback = Callable[[ReservedJob, Exception], Awaitable[bool]]
+"""Type alias for ``Callable[[ReservedJob, Exception], Awaitable[bool]]``."""
 
 if TYPE_CHECKING:
     from orionis.queues.contracts.driver import IQueueDriver
@@ -20,6 +23,7 @@ class JobContext:
         "_finished",
         "_reserved",
     )
+    """Declare the instance attribute slots reserved by this class."""
 
     def __init__(
         self,
@@ -33,13 +37,13 @@ class JobContext:
 
         Parameters
         ----------
-        driver : IQueueDriver
+        driver : orionis.queues.contracts.driver.IQueueDriver
             Driver owning the reservation.
-        reserved : ReservedJob
+        reserved : orionis.queues.entities.reserved_job.ReservedJob
             Current fenced reservation.
         connection : str
             Logical connection name.
-        fail : FailureCallback
+        fail : orionis.queues.context.FailureCallback
             Callback persisting a terminal failure.
 
         Returns
@@ -48,11 +52,17 @@ class JobContext:
             Complete the documented operation without returning a value.
         """
         self._driver = driver
+        """Driver owning the reservation."""
         self._reserved = reserved
+        """Current fenced reservation."""
         self._connection = connection
+        """Logical connection name."""
         self._fail = fail
+        """Callback persisting a terminal failure."""
         self._finished = False
+        """Finished flag used by ``JobContext``."""
         self._failure: Exception | None = None
+        """Failure retained for propagation or reporting."""
 
     @property
     def id(self) -> str:
@@ -137,7 +147,7 @@ class JobContext:
 
         Raises
         ------
-        QueueLeaseError
+        orionis.queues.exceptions.QueueLeaseError
             If a lifecycle operation already completed.
         """
         if self._finished:
@@ -160,9 +170,9 @@ class JobContext:
 
         Raises
         ------
-        QueueConfigurationError
+        orionis.queues.exceptions.QueueConfigurationError
             If the delay is invalid.
-        QueueLeaseError
+        orionis.queues.exceptions.QueueLeaseError
             If the reservation is no longer owned by this execution.
         """
         self._requireActive()
@@ -183,7 +193,7 @@ class JobContext:
 
         Raises
         ------
-        QueueLeaseError
+        orionis.queues.exceptions.QueueLeaseError
             If the reservation is no longer owned by this execution.
         """
         self._requireActive()
@@ -208,7 +218,7 @@ class JobContext:
 
         Raises
         ------
-        QueueLeaseError
+        orionis.queues.exceptions.QueueLeaseError
             If the reservation is no longer owned by this execution.
         """
         self._requireActive()

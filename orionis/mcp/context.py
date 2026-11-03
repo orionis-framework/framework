@@ -93,7 +93,7 @@ class McpRequest:
         return self.authentication.identity
 
     @property
-    def client_capabilities(self) -> Mapping[str, object]:
+    def clientCapabilities(self) -> Mapping[str, object]:
         """
         Read capabilities declared on this request, never a previous call.
 

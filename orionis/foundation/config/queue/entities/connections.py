@@ -1,3 +1,5 @@
+"""Group the conventional validated queue connections."""
+
 from dataclasses import dataclass, field
 from orionis.foundation.config.queue.entities.database import Database
 from orionis.foundation.config.queue.entities.redis import Redis
@@ -5,19 +7,20 @@ from orionis.foundation.config.queue.entities.sync import Sync
 from orionis.support.entities.base import BaseEntity
 
 _CONNECTION_ENTITIES = (("sync", Sync), ("database", Database), ("redis", Redis))
+"""Connection entities definitions used by ``connections``."""
 
 @dataclass(frozen=True, kw_only=True, slots=True)
 class Connections(BaseEntity):
     """
     Group the conventional validated queue connections.
 
-    Parameters
+    Attributes
     ----------
-    sync : Sync | dict
+    sync : orionis.foundation.config.queue.Sync | dict
         Synchronous connection settings.
-    database : Database | dict
+    database : orionis.foundation.config.queue.Database | dict
         Durable database connection settings.
-    redis : Redis | dict
+    redis : orionis.foundation.config.queue.Redis | dict
         Durable Redis connection settings.
     """
 

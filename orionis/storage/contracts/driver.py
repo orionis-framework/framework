@@ -1,3 +1,5 @@
+"""Define the low-level contract every storage backend must implement."""
+
 from __future__ import annotations
 from abc import ABC, abstractmethod
 from typing import TYPE_CHECKING
@@ -16,13 +18,14 @@ class IStorageDriver(ABC):
     A driver translates canonical root-relative paths into operations
     against a physical medium (local disk, memory, S3, Azure, GCS...).
     Drivers contain **no business logic**; higher-level behavior lives
-    in :class:`~orionis.storage.file.File`,
-    :class:`~orionis.storage.directory.Directory`, and
-    :class:`~orionis.storage.disk.Disk`. User code never interacts with
+    in :class:`orionis.storage.File`,
+    :class:`orionis.storage.Directory`, and
+    :class:`orionis.storage.Disk`. User code never interacts with
     a driver directly.
     """
 
     __slots__ = ()
+    """Declare that this class introduces no additional instance slots."""
 
     @abstractmethod
     async def read(self, path: str) -> bytes:
@@ -41,7 +44,7 @@ class IStorageDriver(ABC):
 
         Raises
         ------
-        StorageFileNotFoundException
+        orionis.storage.exceptions.StorageFileNotFoundException
             If the file does not exist.
         """
 
@@ -63,12 +66,12 @@ class IStorageDriver(ABC):
 
         Returns
         -------
-        AsyncIterator[bytes]
+        collections.abc.AsyncIterator[bytes]
             Asynchronous iterator yielding consecutive chunks.
 
         Raises
         ------
-        StorageFileNotFoundException
+        orionis.storage.exceptions.StorageFileNotFoundException
             If the file does not exist.
         """
 
@@ -95,6 +98,7 @@ class IStorageDriver(ABC):
         Returns
         -------
         None
+            Write *contents* to *path*, replacing any existing file.
         """
 
     @abstractmethod
@@ -111,7 +115,7 @@ class IStorageDriver(ABC):
         ----------
         path : str
             Root-relative file path.
-        stream : AsyncIterable[bytes]
+        stream : collections.abc.AsyncIterable[bytes]
             Asynchronous byte-chunk producer.
         visibility : str | None
             Visibility to apply, or ``None`` for the medium default.
@@ -119,6 +123,7 @@ class IStorageDriver(ABC):
         Returns
         -------
         None
+            Write the chunks produced by *stream* to *path*.
         """
 
     @abstractmethod
@@ -168,10 +173,11 @@ class IStorageDriver(ABC):
         Returns
         -------
         None
+            Copy the file at *source* to *target*.
 
         Raises
         ------
-        StorageFileNotFoundException
+        orionis.storage.exceptions.StorageFileNotFoundException
             If the source file does not exist.
         """
 
@@ -190,10 +196,11 @@ class IStorageDriver(ABC):
         Returns
         -------
         None
+            Move the file at *source* to *target*.
 
         Raises
         ------
-        StorageFileNotFoundException
+        orionis.storage.exceptions.StorageFileNotFoundException
             If the source file does not exist.
         """
 
@@ -214,7 +221,7 @@ class IStorageDriver(ABC):
 
         Raises
         ------
-        StorageFileNotFoundException
+        orionis.storage.exceptions.StorageFileNotFoundException
             If the file does not exist.
         """
 
@@ -246,12 +253,12 @@ class IStorageDriver(ABC):
 
         Returns
         -------
-        datetime
+        datetime.datetime
             Timezone-aware modification timestamp (UTC).
 
         Raises
         ------
-        StorageFileNotFoundException
+        orionis.storage.exceptions.StorageFileNotFoundException
             If the file does not exist.
         """
 
@@ -268,6 +275,7 @@ class IStorageDriver(ABC):
         Returns
         -------
         None
+            Create the directory at *path*, including missing parents.
         """
 
     @abstractmethod
@@ -366,7 +374,7 @@ class IStorageDriver(ABC):
 
         Raises
         ------
-        UnsupportedStorageOperationException
+        orionis.storage.exceptions.UnsupportedStorageOperationException
             If the disk does not expose public URLs.
         """
 
@@ -389,7 +397,7 @@ class IStorageDriver(ABC):
 
         Raises
         ------
-        UnsupportedStorageOperationException
+        orionis.storage.exceptions.UnsupportedStorageOperationException
             If the driver does not support temporary URLs.
         """
 
@@ -410,7 +418,7 @@ class IStorageDriver(ABC):
 
         Raises
         ------
-        StorageFileNotFoundException
+        orionis.storage.exceptions.StorageFileNotFoundException
             If the file does not exist.
         """
 
@@ -429,12 +437,13 @@ class IStorageDriver(ABC):
         Returns
         -------
         None
+            Change the visibility of the file at *path*.
 
         Raises
         ------
-        StorageFileNotFoundException
+        orionis.storage.exceptions.StorageFileNotFoundException
             If the file does not exist.
-        UnsupportedStorageOperationException
+        orionis.storage.exceptions.UnsupportedStorageOperationException
             If *visibility* is not a supported level.
         """
 
@@ -447,18 +456,18 @@ class IStorageDriver(ABC):
         ----------
         path : str
             Root-relative file path on the disk.
-        destination : str | Path
+        destination : str | pathlib.Path
             Local target. When it points to an existing directory the
             file keeps its original name inside that directory.
 
         Returns
         -------
-        Path
+        pathlib.Path
             Absolute local path of the downloaded file.
 
         Raises
         ------
-        StorageFileNotFoundException
+        orionis.storage.exceptions.StorageFileNotFoundException
             If the file does not exist.
         """
 
@@ -472,7 +481,7 @@ class IStorageDriver(ABC):
         path : str
             Root-relative file path.
         algorithm : str
-            Any algorithm name accepted by :func:`hashlib.new`.
+            Any algorithm name accepted by ``hashlib.new``.
 
         Returns
         -------
@@ -481,7 +490,7 @@ class IStorageDriver(ABC):
 
         Raises
         ------
-        StorageFileNotFoundException
+        orionis.storage.exceptions.StorageFileNotFoundException
             If the file does not exist.
         """
 
@@ -497,13 +506,13 @@ class IStorageDriver(ABC):
 
         Returns
         -------
-        FileInfo
+        orionis.storage.entities.FileInfo
             Immutable entity with size, MIME type, timestamps, hashes,
             visibility, and URL when available.
 
         Raises
         ------
-        StorageFileNotFoundException
+        orionis.storage.exceptions.StorageFileNotFoundException
             If the file does not exist.
         """
 
@@ -522,11 +531,11 @@ class IStorageDriver(ABC):
 
         Returns
         -------
-        IStorageStream
+        orionis.storage.contracts.IStorageStream
             Lazily opened stream; use it as an async context manager.
 
         Raises
         ------
-        UnsupportedStorageOperationException
+        orionis.storage.exceptions.UnsupportedStorageOperationException
             If *mode* is not a supported binary mode.
         """

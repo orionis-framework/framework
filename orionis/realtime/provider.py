@@ -1,3 +1,5 @@
+"""Register one worker-local registry and pin the synchronous target facade."""
+
 from orionis.container.providers.service_provider import ServiceProvider
 from typing import cast
 from orionis.foundation.config.realtime.entities.realtime import RealtimeConfig
@@ -9,6 +11,7 @@ class RealtimeProvider(ServiceProvider):
     """Register one worker-local registry and pin the synchronous target facade."""
 
     __slots__ = ()
+    """Declare that this class introduces no additional instance slots."""
 
     def register(self) -> None:
         """

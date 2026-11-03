@@ -1,3 +1,5 @@
+"""Build every kind of HTTP response from a single entry-point."""
+
 from __future__ import annotations
 from typing import TYPE_CHECKING, Any
 from orionis.http.responses import (
@@ -24,7 +26,7 @@ class ResponseFactory:
     """
     Build every kind of HTTP response from a single entry-point.
 
-    Controllers use the module-level :data:`response` instance so they do
+    Controllers use the module-level :data:`orionis.http.response` instance so they do
     not need to import a different class for each response type::
 
         return response.view("users.index", users=users)
@@ -35,6 +37,7 @@ class ResponseFactory:
     # ruff: noqa: ANN401, PLR0913
 
     __slots__ = ()
+    """Declare that this class introduces no additional instance slots."""
 
     def view(self, template: str, **context: Any) -> PendingView:
         """
@@ -45,13 +48,13 @@ class ResponseFactory:
         template : str
             Template name using dot notation (e.g. ``'users.index'``) or a
             relative path (e.g. ``'users/index.html'``).
-        **context : Any
+        **context : typing.Any
             Keyword arguments forwarded as template variables.
 
         Returns
         -------
-        PendingView
-            Awaitable proxy that resolves to an :class:`HTMLResponse` and
+        orionis.view.pending.PendingView
+            Awaitable proxy that resolves to an :class:`orionis.http.HTMLResponse` and
             accepts chained mutators such as ``withErrors()``.
         """
         return View.make(template, **context)
@@ -70,16 +73,16 @@ class ResponseFactory:
         ----------
         content : str | bytes, optional
             HTML content to send.
-        status_code : HTTPStatus | int, optional
+        status_code : orionis.http.enums.HTTPStatus | int, optional
             The HTTP status code for the response.
-        headers : Mapping[str, str] | None, optional
+        headers : collections.abc.Mapping[str, str] | None, optional
             Extra headers to include.
-        background : BackgroundTask | None, optional
+        background : orionis.background.BackgroundTask | None, optional
             Task to run after the response is sent.
 
         Returns
         -------
-        HTMLResponse
+        orionis.http.HTMLResponse
             The configured HTML response.
         """
         return HTMLResponse(
@@ -106,13 +109,13 @@ class ResponseFactory:
 
         Parameters
         ----------
-        content : Any
+        content : typing.Any
             Content to serialise as JSON.
-        status_code : HTTPStatus | int, optional
+        status_code : orionis.http.enums.HTTPStatus | int, optional
             The HTTP status code for the response.
-        headers : Mapping[str, str] | None, optional
+        headers : collections.abc.Mapping[str, str] | None, optional
             Extra headers to include.
-        background : BackgroundTask | None, optional
+        background : orionis.background.BackgroundTask | None, optional
             Task to run after the response is sent.
         indent : int | None, optional
             Indentation level for pretty-printing JSON.
@@ -120,12 +123,12 @@ class ResponseFactory:
             Whether to escape non-ASCII characters.
         separators : tuple[str, str] | None, optional
             Item and key separators for JSON output.
-        default : Any | None, optional
+        default : typing.Any | None, optional
             Custom encoder for unsupported types.
 
         Returns
         -------
-        JSONResponse
+        orionis.http.JSONResponse
             The configured JSON response.
         """
         return JSONResponse(
@@ -153,16 +156,16 @@ class ResponseFactory:
         ----------
         content : str | bytes, optional
             Plain text content to send.
-        status_code : HTTPStatus | int, optional
+        status_code : orionis.http.enums.HTTPStatus | int, optional
             The HTTP status code for the response.
-        headers : Mapping[str, str] | None, optional
+        headers : collections.abc.Mapping[str, str] | None, optional
             Extra headers to include.
-        background : BackgroundTask | None, optional
+        background : orionis.background.BackgroundTask | None, optional
             Task to run after the response is sent.
 
         Returns
         -------
-        PlainTextResponse
+        orionis.http.PlainTextResponse
             The configured plain text response.
         """
         return PlainTextResponse(
@@ -186,16 +189,16 @@ class ResponseFactory:
         ----------
         url : str
             Target URL for the redirection.
-        status_code : HTTPStatus | int, optional
+        status_code : orionis.http.enums.HTTPStatus | int, optional
             Redirect status code (301, 302, 303, 307, 308).
-        headers : Mapping[str, str] | None, optional
+        headers : collections.abc.Mapping[str, str] | None, optional
             Extra headers to include.
-        background : BackgroundTask | None, optional
+        background : orionis.background.BackgroundTask | None, optional
             Task to run after the response is sent.
 
         Returns
         -------
-        RedirectResponse
+        orionis.http.RedirectResponse
             The configured redirect response.
         """
         return RedirectResponse(
@@ -218,20 +221,20 @@ class ResponseFactory:
 
         Parameters
         ----------
-        content : AsyncIterable[bytes] | Iterable[bytes]
+        content : collections.abc.AsyncIterable[bytes] | collections.abc.Iterable[bytes]
             Streaming content source.
-        status_code : HTTPStatus | int, optional
+        status_code : orionis.http.enums.HTTPStatus | int, optional
             The HTTP status code for the response.
-        headers : Mapping[str, str] | None, optional
+        headers : collections.abc.Mapping[str, str] | None, optional
             Extra headers to include.
         media_type : str | None, optional
             Media type advertised for the stream.
-        background : BackgroundTask | None, optional
+        background : orionis.background.BackgroundTask | None, optional
             Task to run after the response is sent.
 
         Returns
         -------
-        StreamingResponse
+        orionis.http.StreamingResponse
             The configured streaming response.
         """
         return StreamingResponse(
@@ -254,18 +257,18 @@ class ResponseFactory:
 
         Parameters
         ----------
-        content : AsyncIterable[ServerSentEvent | str] | Iterable[ServerSentEvent | str]
+        content
             Typed events or text payloads, consumed lazily during delivery.
-        status_code : HTTPStatus | int, optional
+        status_code : orionis.http.enums.HTTPStatus | int, optional
             HTTP status code for the response.
-        headers : Mapping[str, str] | None, optional
+        headers : collections.abc.Mapping[str, str] | None, optional
             Extra headers; Content-Length is discarded.
-        background : BackgroundTask | None, optional
+        background : orionis.background.BackgroundTask | None, optional
             Task to run after successful delivery and stream cleanup.
 
         Returns
         -------
-        EventStreamResponse
+        orionis.http.EventStreamResponse
             The configured server-sent event response.
         """
         return EventStreamResponse(
@@ -290,11 +293,11 @@ class ResponseFactory:
 
         Parameters
         ----------
-        path : str | Path
+        path : str | pathlib.Path
             Path to the file to serve.
-        status_code : HTTPStatus | int, optional
+        status_code : orionis.http.enums.HTTPStatus | int, optional
             The HTTP status code for the response.
-        headers : Mapping[str, str] | None, optional
+        headers : collections.abc.Mapping[str, str] | None, optional
             Extra headers to include.
         media_type : str | None, optional
             Media type of the file; guessed from the path when omitted.
@@ -302,12 +305,12 @@ class ResponseFactory:
             Name advertised in the ``Content-Disposition`` header.
         chunk_size : int, optional
             Size of the chunks read from disk.
-        background : BackgroundTask | None, optional
+        background : orionis.background.BackgroundTask | None, optional
             Task to run after the response is sent.
 
         Returns
         -------
-        FileResponse
+        orionis.http.FileResponse
             The configured file response.
         """
         return FileResponse(
@@ -333,20 +336,20 @@ class ResponseFactory:
 
         Parameters
         ----------
-        path : str | Path
+        path : str | pathlib.Path
             Path to the file to serve.
         filename : str | None, optional
             Name advertised to the client; defaults to the file name.
-        headers : Mapping[str, str] | None, optional
+        headers : collections.abc.Mapping[str, str] | None, optional
             Extra headers to include.
         media_type : str | None, optional
             Media type of the file; guessed from the path when omitted.
-        background : BackgroundTask | None, optional
+        background : orionis.background.BackgroundTask | None, optional
             Task to run after the response is sent.
 
         Returns
         -------
-        FileResponse
+        orionis.http.FileResponse
             The configured attachment response.
         """
         file_response = FileResponse(
@@ -373,16 +376,16 @@ class ResponseFactory:
 
         Parameters
         ----------
-        status_code : HTTPStatus | int, optional
+        status_code : orionis.http.enums.HTTPStatus | int, optional
             The HTTP status code for the response.
-        headers : Mapping[str, str] | None, optional
+        headers : collections.abc.Mapping[str, str] | None, optional
             Extra headers to include.
-        background : BackgroundTask | None, optional
+        background : orionis.background.BackgroundTask | None, optional
             Task to run after the response is sent.
 
         Returns
         -------
-        Response
+        orionis.http.Response
             The configured empty response.
         """
         return Response(
@@ -404,20 +407,20 @@ class ResponseFactory:
 
         Parameters
         ----------
-        content : Any, optional
+        content : typing.Any, optional
             The response content or stream.
-        status_code : HTTPStatus | int, optional
+        status_code : orionis.http.enums.HTTPStatus | int, optional
             The HTTP status code for the response.
-        headers : Mapping[str, str] | None, optional
+        headers : collections.abc.Mapping[str, str] | None, optional
             Extra headers to include.
         media_type : str | None, optional
             Media type advertised for the content.
-        background : BackgroundTask | None, optional
+        background : orionis.background.BackgroundTask | None, optional
             Task to run after the response is sent.
 
         Returns
         -------
-        Response
+        orionis.http.Response
             The configured response.
         """
         return Response(
@@ -430,3 +433,4 @@ class ResponseFactory:
 
 # Stateless factory shared by every controller; safe to import directly.
 response: ResponseFactory = ResponseFactory()
+"""Stateless factory shared by every controller; safe to import directly."""

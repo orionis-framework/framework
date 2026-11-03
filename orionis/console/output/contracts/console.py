@@ -1,3 +1,5 @@
+"""Define the contract for console implementations."""
+
 from __future__ import annotations
 from abc import ABC, abstractmethod
 from typing import TYPE_CHECKING, Any
@@ -9,6 +11,7 @@ if TYPE_CHECKING:
 class IConsole(ABC):
 
     # ruff: noqa: PLR0913
+    """Define the contract for console implementations."""
 
     @property
     @abstractmethod
@@ -18,7 +21,7 @@ class IConsole(ABC):
 
         Returns
         -------
-        IProgressBar
+        orionis.console.dynamic.contracts.progress_bar.IProgressBar
             A new instance of the ProgressBar class.
         """
 
@@ -415,8 +418,8 @@ class IConsole(ABC):
         sep : str | None, optional
             Separator between values. Defaults to " ".
         end : str | None, optional
-            String appended after the last value. Defaults to "\n".
-        file : SupportsWrite[str] | None, optional
+            String appended after the last value. Defaults to "\\n".
+        file : ``_typeshed.SupportsWrite[str]`` | None, optional
             Output stream. Defaults to sys.stdout.
         flush : bool, optional
             Whether to forcibly flush the stream. Defaults to False.
@@ -571,7 +574,7 @@ class IConsole(ABC):
         Raises
         ------
         ValueError
-            If `choices` is empty or `default_index` is out of range.
+            If ``choices`` is empty or ``default_index`` is out of range.
 
         Notes
         -----
@@ -650,7 +653,7 @@ class IConsole(ABC):
 
         Parameters
         ----------
-        *args : Any
+        *args : typing.Any
             Variables to be dumped.
         show_types : bool, optional
             Show variable types (default is True).

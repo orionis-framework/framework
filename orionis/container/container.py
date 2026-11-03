@@ -1,3 +1,5 @@
+"""Resolve services from contracts, aliases and constructor signatures."""
+
 from __future__ import annotations
 import asyncio
 import contextvars
@@ -24,13 +26,16 @@ if TYPE_CHECKING:
 _resolution_stack: contextvars.ContextVar[frozenset[type]] = contextvars.ContextVar(
     "x-orionis-resolution-stack", default=frozenset(),
 )
+"""Context variable to track the resolution stack for circular dependency detection."""
 _provider_stack: contextvars.ContextVar[frozenset[tuple[int, tuple[str, str]]]] = (
     contextvars.ContextVar("x-orionis-provider-stack", default=frozenset())
 )
+"""Context-local provider stack isolated between asynchronous tasks."""
 
 # Sentinel for parameters without annotations or default values.
 _INSPECT_EMPTY = inspect.Parameter.empty
 _MISSING = object()
+"""Sentinel distinguishing missing from ordinary values."""
 
 class Container(IContainer):
     """
@@ -55,10 +60,18 @@ class Container(IContainer):
     # Dictionary to hold singleton instances for each class
     # This allows proper inheritance of the singleton pattern
     _instances: ClassVar[dict] = {}
+    """
+    Dictionary to hold singleton instances for each class This allows proper
+    inheritance of the singleton pattern.
+    """
 
     # Lock for thread-safe singleton instantiation and access
     # This lock ensures that only one thread can create or access instances at a time
     _lock: ClassVar[threading.RLock] = threading.RLock()
+    """
+    Lock for thread-safe singleton instantiation and access This lock ensures that
+    only one thread can create or access instances at a time.
+    """
 
     def __new__(cls: type[Self], *args: object, **kwargs: object) -> Self:
         """
@@ -69,6 +82,8 @@ class Container(IContainer):
 
         Parameters
         ----------
+        cls : type
+            Class or metaclass to allocate.
         *args : object
             Value supplied for ``*args``.
         **kwargs : object
@@ -76,7 +91,7 @@ class Container(IContainer):
 
         Returns
         -------
-        Self
+        typing.Self
             The singleton instance of the calling class.
         """
         # Return the instance already registered for this class.
@@ -116,20 +131,27 @@ class Container(IContainer):
         if "_Container__initialized" not in self.__dict__:
             # Deferred providers for lazy loading
             self._deferred_providers: dict[str, dict[str, str]] = {}
+            """Deferred providers for lazy loading."""
 
             # Cache for singleton instances
             self.__singleton_cache: dict[str, Any] = {}
+            """Cache for singleton instances."""
 
             # Aliases mapping for service resolution
             self.__aliases: dict[str, type] = {}
+            """Aliases mapping for service resolution."""
 
             # Registered bindings for services
             self.__bindings: dict[Any, Binding] = {}
+            """Registered bindings for services."""
 
             # Tracks resolved deferred providers
             self.__cache_resolve_deferred_providers: set[Any] = set()
+            """Tracks resolved deferred providers."""
             self.__registered_deferred: dict[tuple[str, str], IServiceProvider] = {}
+            """Deferred providers whose bindings have already been registered."""
             self.__pending_deferred: dict[str, tuple[str, str]] = {}
+            """Deferred providers with boot work that is still pending."""
 
             # Per-key locks serialising one-shot construction, paired with the
             # loop they were created on so a second loop never awaits a foreign lock.
@@ -137,9 +159,14 @@ class Container(IContainer):
                 Any,
                 tuple[asyncio.AbstractEventLoop, asyncio.Lock],
             ] = {}
+            """
+            Per-key locks serialising one-shot construction, paired with the loop
+            they were created on so a second loop never awaits a foreign lock.
+            """
 
             # Mark as initialized to prevent re-initialization
             self._Container__initialized = True
+            """Mark as initialized to prevent re-initialization."""
 
     def __creationLock(
         self: Self,
@@ -150,7 +177,7 @@ class Container(IContainer):
 
         Parameters
         ----------
-        key : Any
+        key : typing.Any
             Contract or deferred provider key whose construction is guarded.
 
         Returns
@@ -177,7 +204,7 @@ class Container(IContainer):
 
         Parameters
         ----------
-        concrete : type[Any]
+        concrete : type[typing.Any]
             Concrete class about to be constructed.
 
         Returns
@@ -244,9 +271,9 @@ class Container(IContainer):
         ----------
         override : bool
             Whether to allow overriding existing registrations.
-        abstract : type[Any]
+        abstract : type[typing.Any]
             The abstract contract type to check.
-        scope : ScopeManager
+        scope : orionis.container.context.manager.ScopeManager
             The current scoped service registry.
 
         Returns
@@ -282,7 +309,7 @@ class Container(IContainer):
         ----------
         override : bool
             Whether to allow overriding existing registrations.
-        abstract : type[Any]
+        abstract : type[typing.Any]
             The abstract contract type to check.
         alias : str | None
             The alias to check for conflicts.
@@ -321,7 +348,7 @@ class Container(IContainer):
 
         Parameters
         ----------
-        abstract : type[Any]
+        abstract : type[typing.Any]
             The abstract class type to check against.
         instance : object
             The object instance to validate.
@@ -334,7 +361,7 @@ class Container(IContainer):
         Raises
         ------
         TypeError
-            If `abstract` is not a class type or `instance` does not implement it.
+            If ``abstract`` is not a class type or ``instance`` does not implement it.
         """
         # Check that the abstract argument is a class type
         if not isinstance(abstract, type):
@@ -356,9 +383,9 @@ class Container(IContainer):
 
         Parameters
         ----------
-        abstract : type[Any]
+        abstract : type[typing.Any]
             The abstract class type to check against.
-        concrete : type[Any]
+        concrete : type[typing.Any]
             The concrete class type to validate.
 
         Returns
@@ -369,8 +396,8 @@ class Container(IContainer):
         Raises
         ------
         TypeError
-            If `abstract` or `concrete` is not a class type, or if `concrete`
-            does not implement `abstract`.
+            If ``abstract`` or ``concrete`` is not a class type, or if ``concrete``
+            does not implement ``abstract``.
         """
         # Validate that abstract is a class type
         if not isinstance(abstract, type):
@@ -401,12 +428,12 @@ class Container(IContainer):
 
         Parameters
         ----------
-        lifetime : Lifetime
+        lifetime : orionis.container.enums.Lifetime
             The lifetime of the binding (singleton, scoped, or transient).
-        abstract : type[Any] | None
+        abstract : type[typing.Any] | None
             The abstract contract class to associate with the concrete class,
             or None to use the concrete class as the contract.
-        concrete : type[Any]
+        concrete : type[typing.Any]
             The concrete class to register.
         alias : str | None
             An optional alias for the registration.
@@ -469,7 +496,7 @@ class Container(IContainer):
 
         Parameters
         ----------
-        abstract : type[Any] | None
+        abstract : type[typing.Any] | None
             The abstract contract class to associate with the instance, or None.
         instance : object
             The initialized object to register.
@@ -549,9 +576,9 @@ class Container(IContainer):
 
         Parameters
         ----------
-        abstract : type[Any] | None
+        abstract : type[typing.Any] | None
             The abstract contract type to bind, or None to use the concrete type.
-        concrete : type[Any]
+        concrete : type[typing.Any]
             The concrete implementation type to register.
         alias : str | None, optional
             An optional alias for the service.
@@ -585,9 +612,9 @@ class Container(IContainer):
 
         Parameters
         ----------
-        abstract : type[Any] | None
+        abstract : type[typing.Any] | None
             The abstract contract type to bind, or None to use the concrete type.
-        concrete : type[Any]
+        concrete : type[typing.Any]
             The concrete implementation type to register.
         alias : str | None, optional
             An optional alias for the service.
@@ -621,9 +648,9 @@ class Container(IContainer):
 
         Parameters
         ----------
-        abstract : type[Any] | None
+        abstract : type[typing.Any] | None
             The abstract contract type to bind, or None to use the concrete type.
-        concrete : type[Any]
+        concrete : type[typing.Any]
             The concrete implementation type to register.
         alias : str | None, optional
             An optional alias for the service.
@@ -653,7 +680,7 @@ class Container(IContainer):
 
         Parameters
         ----------
-        key : type[Any] | str
+        key : type[typing.Any] | str
             The abstract type or alias to check for binding.
 
         Returns
@@ -684,12 +711,12 @@ class Container(IContainer):
 
         Parameters
         ----------
-        self : Container
+        self : orionis.container.container.Container
             The container instance.
 
         Returns
         -------
-        ScopeManager
+        orionis.container.context.manager.ScopeManager
             Context manager for managing the lifecycle of scoped services.
         """
         # Instantiate and return a new ScopeManager for scoped service management
@@ -701,19 +728,19 @@ class Container(IContainer):
 
         Parameters
         ----------
-        self : Container
+        self : orionis.container.container.Container
             The container instance.
 
         Returns
         -------
-        ScopeManager | None
+        orionis.container.context.manager.ScopeManager | None
             The current active scope context if available, otherwise None.
             The scope context is a dictionary-like object that contains
             instances of scoped services registered in the current scope.
 
         Notes
         -----
-        Returns None if there is no active scope. Use `beginScope()` to create
+        Returns None if there is no active scope. Use ``beginScope()`` to create
         a new scope context before accessing scoped services.
         """
         # Return the current active scope context from ScopedContext
@@ -728,7 +755,7 @@ class Container(IContainer):
 
         Parameters
         ----------
-        key : type[Any] | str
+        key : type[typing.Any] | str
             The service type or fully qualified class name for which to find the
             deferred provider.
 
@@ -818,7 +845,7 @@ class Container(IContainer):
 
         Parameters
         ----------
-        key : type[Any] | str
+        key : type[typing.Any] | str
             Service type or alias requested by a resolver.
 
         Returns
@@ -854,12 +881,12 @@ class Container(IContainer):
 
         Parameters
         ----------
-        key : type[Any] | str
+        key : type[typing.Any] | str
             Service identifier as an abstract type or alias string.
 
         Returns
         -------
-        type[Any]
+        type[typing.Any]
             The resolved abstract service type.
 
         Raises
@@ -900,18 +927,18 @@ class Container(IContainer):
 
         Parameters
         ----------
-        abstract : type[Any]
+        abstract : type[typing.Any]
             Abstract service type to resolve.
-        key : type[Any] | str
+        key : type[typing.Any] | str
             Original service key used for resolution and error messages.
-        *args : tuple[Any, ...]
+        *args : tuple[typing.Any, ``...``]
             Positional arguments passed to the resolver or builder.
-        **kwargs : dict[str, Any]
+        **kwargs : dict[str, typing.Any]
             Keyword arguments passed to the resolver or builder.
 
         Returns
         -------
-        Any
+        typing.Any
             Resolved service instance.
 
         Raises
@@ -947,16 +974,16 @@ class Container(IContainer):
 
         Parameters
         ----------
-        key : type[Any] | str
+        key : type[typing.Any] | str
             The abstract type or alias to resolve.
-        *args : tuple[Any, ...]
+        *args : tuple[typing.Any, ``...``]
             Positional arguments for instantiation.
-        **kwargs : dict[str, Any]
+        **kwargs : dict[str, typing.Any]
             Keyword arguments for instantiation.
 
         Returns
         -------
-        Any
+        typing.Any
             The resolved service instance.
 
         Raises
@@ -1003,16 +1030,16 @@ class Container(IContainer):
 
         Parameters
         ----------
-        binding : Binding
+        binding : orionis.container.entities.Binding
             The binding to resolve.
-        *args : tuple[Any, ...]
+        *args : tuple[typing.Any, ``...``]
             Positional arguments for the constructor.
-        **kwargs : dict[str, Any]
+        **kwargs : dict[str, typing.Any]
             Keyword arguments for the constructor.
 
         Returns
         -------
-        Any
+        typing.Any
             The resolved instance according to the binding's lifetime.
 
         Raises
@@ -1062,16 +1089,16 @@ class Container(IContainer):
 
         Parameters
         ----------
-        binding : Binding
+        binding : orionis.container.entities.Binding
             The singleton binding to materialize.
-        *args : tuple[Any, ...]
+        *args : tuple[typing.Any, ``...``]
             Positional arguments for the constructor.
-        **kwargs : dict[str, Any]
+        **kwargs : dict[str, typing.Any]
             Keyword arguments for the constructor.
 
         Returns
         -------
-        Any
+        typing.Any
             The cached instance, built by this call or by the task that won
             the creation lock.
         """
@@ -1104,18 +1131,18 @@ class Container(IContainer):
 
         Parameters
         ----------
-        binding : Binding
+        binding : orionis.container.entities.Binding
             The scoped binding to materialize.
-        scope : ScopeManager
+        scope : orionis.container.context.manager.ScopeManager
             The active scope that owns the resulting instance.
-        *args : tuple[Any, ...]
+        *args : tuple[typing.Any, ``...``]
             Positional arguments for the constructor.
-        **kwargs : dict[str, Any]
+        **kwargs : dict[str, typing.Any]
             Keyword arguments for the constructor.
 
         Returns
         -------
-        Any
+        typing.Any
             The scoped instance, built by this call or by the task that won
             the creation lock.
         """
@@ -1146,21 +1173,21 @@ class Container(IContainer):
 
         Parameters
         ----------
-        type_ : Callable[..., Any]
+        ``type_`` : collections.abc.Callable[``...``, typing.Any]
             The class to instantiate.
-        *args : tuple[Any, ...]
+        *args : tuple[typing.Any, ``...``]
             Positional arguments for the constructor.
-        **kwargs : dict[str, Any]
+        **kwargs : dict[str, typing.Any]
             Keyword arguments for the constructor.
 
         Returns
         -------
-        Any
+        typing.Any
             The instantiated object with dependencies resolved.
 
         Raises
         ------
-        CircularDependencyException
+        orionis.container.exceptions.CircularDependencyException
             If a circular dependency is detected.
         Exception
             If the type cannot be auto-resolved.
@@ -1217,16 +1244,16 @@ class Container(IContainer):
 
         Parameters
         ----------
-        type_ : Callable[..., Any]
+        ``type_`` : collections.abc.Callable[``...``, typing.Any]
             The class to instantiate.
-        *args : tuple[Any, ...]
+        *args : tuple[typing.Any, ``...``]
             Positional arguments for the constructor.
-        **kwargs : dict[str, Any]
+        **kwargs : dict[str, typing.Any]
             Keyword arguments for the constructor.
 
         Returns
         -------
-        Any
+        typing.Any
             Instantiated object of the specified type.
 
         Raises
@@ -1264,22 +1291,22 @@ class Container(IContainer):
 
         Parameters
         ----------
-        fn : Callable[..., Any]
+        fn : collections.abc.Callable[``...``, typing.Any]
             The callable to invoke. Must not be a class or type.
-        *args : tuple[Any, ...]
+        *args : tuple[typing.Any, ``...``]
             Positional arguments for the callable.
-        **kwargs : dict[str, Any]
+        **kwargs : dict[str, typing.Any]
             Keyword arguments for the callable.
 
         Returns
         -------
-        Any
+        typing.Any
             The result of the callable execution with dependencies injected.
 
         Raises
         ------
         TypeError
-            If `fn` is not a callable or is a class/type.
+            If ``fn`` is not a callable or is a class/type.
         """
         # Ensure the provided function is callable and not a class/type
         if not callable(fn) or isinstance(fn, type):
@@ -1312,7 +1339,7 @@ class Container(IContainer):
 
         Returns
         -------
-        Any
+        typing.Any
             The result of the method invocation with dependencies resolved.
 
         Raises
@@ -1355,7 +1382,7 @@ class Container(IContainer):
 
         Parameters
         ----------
-        type_ : Callable[..., Any]
+        ``type_`` : collections.abc.Callable[``...``, typing.Any]
             The callable to invoke.
         *args : object
             Positional arguments for the callable.
@@ -1364,12 +1391,12 @@ class Container(IContainer):
 
         Returns
         -------
-        Any
+        typing.Any
             The result of the callable invocation.
 
         Raises
         ------
-        OrionisContainerCircularDependencyException
+        orionis.container.exceptions.CircularDependencyException
             If a circular dependency is detected.
         Exception
             If the callable cannot be auto-resolved.
@@ -1412,14 +1439,14 @@ class Container(IContainer):
 
         Parameters
         ----------
-        arguments : tuple[Argument, ...]
+        arguments : tuple[Argument, ``...``]
             Parameters from a plan with no keyword-only arguments.
-        args : tuple[object, ...]
+        args : tuple[object, ``...``]
             Explicit positional values, including any variadic tail.
 
         Returns
         -------
-        list[Any] | tuple[object, ...]
+        list[typing.Any] | tuple[object, ``...``]
             Explicit values followed by dependencies resolved at call time.
         """
         position = len(args)
@@ -1456,16 +1483,16 @@ class Container(IContainer):
 
         Parameters
         ----------
-        arguments : tuple[Argument, ...]
+        arguments : tuple[Argument, ``...``]
             Parameter metadata in declaration order.
-        args : tuple[object, ...]
+        args : tuple[object, ``...``]
             Positional arguments to pass to the callable.
         kwargs : dict[str, object]
             Invocation-owned keyword mapping, consumed during resolution.
 
         Returns
         -------
-        tuple[list[Any], dict[str, Any]]
+        tuple[list[typing.Any], dict[str, typing.Any]]
             A tuple containing the resolved positional and keyword arguments.
         """
         # Consume the local keyword mapping and positional tuple.
@@ -1571,12 +1598,12 @@ class Container(IContainer):
 
         Parameters
         ----------
-        argument : Argument
+        argument : orionis.introspection.dependencies.entities.argument.Argument
             Parameter metadata declaring the schema to construct.
 
         Returns
         -------
-        msgspec.Struct
+        ``msgspec.Struct``
             Schema instance populated from the request body.
 
         Raises
@@ -1605,12 +1632,12 @@ class Container(IContainer):
 
         Parameters
         ----------
-        argument : Argument
+        argument : orionis.introspection.dependencies.entities.argument.Argument
             The argument metadata to resolve.
 
         Returns
         -------
-        Any
+        typing.Any
             The resolved value for the argument.
 
         Raises

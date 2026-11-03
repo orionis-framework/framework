@@ -4,6 +4,23 @@ from datetime import datetime
 from importlib import import_module
 from unittest.mock import Mock, patch
 from app.models.user import User
+from database.migrations.m0000000005_create_users_table import CreateUsersTable
+from database.migrations.m0000000006_create_permissions_table import (
+    CreatePermissionsTable,
+)
+from database.migrations.m0000000007_create_roles_table import CreateRolesTable
+from database.migrations.m0000000008_create_model_has_permissions_table import (
+    CreateModelHasPermissionsTable,
+)
+from database.migrations.m0000000009_create_model_has_roles_table import (
+    CreateModelHasRolesTable,
+)
+from database.migrations.m0000000010_create_role_has_permissions_table import (
+    CreateRoleHasPermissionsTable,
+)
+from database.migrations.m0000000012_create_password_reset_tokens_table import (
+    CreatePasswordResetTokensTable,
+)
 from database.schemas.users_v1 import USERS_V1
 from orionis.database.connection import Connection
 from orionis.database.contracts.connection_manager import IConnectionManager
@@ -17,10 +34,6 @@ from orionis.support.facades.schema import Schema as SchemaFacade
 from orionis.test import TestCase
 
 _TABLE_COLUMNS = {
-    "scheduler_tasks": ("id", "next_run_time", "job_state"),
-    "cache": ("cache_key", "cache_value", "expiration"),
-    "cache_locks": ("cache_key", "owner", "expiration"),
-    "sessions": ("id", "payload", "expires_at"),
     "users": (
         "id", "name", "email", "email_verified_at", "password",
         "remember_token", "active", "created_at", "updated_at",
@@ -30,17 +43,13 @@ _TABLE_COLUMNS = {
     "model_has_permissions": ("permission_id", "model_type", "model_id"),
     "model_has_roles": ("role_id", "model_type", "model_id"),
     "role_has_permissions": ("permission_id", "role_id"),
-    "personal_access_tokens": (
-        "id", "tokenable_type", "tokenable_id", "name", "token", "abilities",
-        "last_used_at", "expires_at", "revoked_at", "created_at", "updated_at",
-    ),
     "password_reset_tokens": (
         "email", "token", "user_id", "password_fingerprint", "created_at",
     ),
 }
 
 class TestApplicationSchemas(TestCase):
-    """Exercise application migrations against a private physical database."""
+    """Exercise application-owned migrations against a private database."""
 
     async def asyncSetUp(self) -> None:
         """Bind the real migrations and model to an isolated SQLite connection.
@@ -64,16 +73,15 @@ class TestApplicationSchemas(TestCase):
         self.enterContext(patch.object(
             SchemaFacade, "_pinned_instance", Schema(self.manager),
         ))
-        self.migrations = []
-        for number, table in enumerate(_TABLE_COLUMNS, 1):
-            module = import_module(
-                f"database.migrations.m{number:010d}_create_{table}_table",
-            )
-            class_name = (
-                "Create" + "".join(part.title() for part in table.split("_"))
-                + "Table"
-            )
-            self.migrations.append(getattr(module, class_name)())
+        self.migrations = [
+            CreateUsersTable(),
+            CreatePermissionsTable(),
+            CreateRolesTable(),
+            CreateModelHasPermissionsTable(),
+            CreateModelHasRolesTable(),
+            CreateRoleHasPermissionsTable(),
+            CreatePasswordResetTokensTable(),
+        ]
         await self._migrateUp()
 
     async def _migrateUp(self) -> None:
@@ -134,8 +142,6 @@ class TestApplicationSchemas(TestCase):
             Assertions verify the behavior described above.
         """
         primary_keys = {
-            "cache": ("cache_key",),
-            "cache_locks": ("cache_key",),
             "model_has_permissions": (
                 "permission_id", "model_id", "model_type",
             ),
@@ -181,18 +187,12 @@ class TestApplicationSchemas(TestCase):
             Assertions verify the behavior described above.
         """
         expected = {
-            "scheduler_tasks": {(False, ("next_run_time",))},
             "users": {(True, ("email",))},
             "permissions": {(True, ("name",))},
             "roles": {(True, ("name",))},
             "model_has_permissions": {(False, ("model_id", "model_type"))},
             "model_has_roles": {(False, ("model_id", "model_type"))},
             "role_has_permissions": {(False, ("role_id", "permission_id"))},
-            "personal_access_tokens": {
-                (True, ("token",)), (False, ("expires_at",)),
-                (False, ("revoked_at",)),
-                (False, ("tokenable_type", "tokenable_id")),
-            },
             "password_reset_tokens": {
                 (False, ("created_at",)), (False, ("token",)),
             },
@@ -354,7 +354,7 @@ class TestApplicationSchemas(TestCase):
             Assertions verify the behavior described above.
         """
         self.assertIs(User.__meta__.table, USERS_V1)
-        migration = self.migrations[4]
+        migration = CreateUsersTable()
         module = import_module(type(migration).__module__)
         self.assertIs(module.USERS_V1, USERS_V1)
         newer = replace(

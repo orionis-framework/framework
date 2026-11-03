@@ -1,3 +1,5 @@
+"""Abstract base class for all database migrations."""
+
 from abc import ABC, abstractmethod
 
 class Migration(ABC):
@@ -8,7 +10,8 @@ class Migration(ABC):
     A migration represents a reversible set of schema changes that can be
     applied to or reverted from the database.
 
-    Subclasses must implement the :meth:`up` and :meth:`down` methods to
+    Subclasses must implement the :meth:`orionis.database.Migration.up` and
+    :meth:`orionis.database.Migration.down` methods to
     describe how the migration is applied and rolled back, respectively.
 
     Notes
@@ -18,11 +21,12 @@ class Migration(ABC):
 
     See Also
     --------
-    Migrator
+    orionis.database.migrations.Migrator
         Executes and manages migration lifecycle operations.
     """
 
     __slots__ = ()
+    """Declare that this class introduces no additional instance slots."""
 
     @abstractmethod
     async def up(self) -> None:
@@ -50,7 +54,8 @@ class Migration(ABC):
         """
         Revert the migration.
 
-        This method should undo the changes performed by :meth:`up`,
+        This method should undo the changes performed by
+        :meth:`orionis.database.Migration.up`,
         restoring the database schema to its previous state whenever
         possible.
 

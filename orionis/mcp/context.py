@@ -1,3 +1,5 @@
+"""Hold only explicit input and native context for one independent call."""
+
 from collections.abc import Mapping
 from dataclasses import dataclass, field
 from types import MappingProxyType
@@ -55,18 +57,30 @@ class McpRequest:
     """Hold only explicit input and native context for one independent call."""
 
     id: str | int
+    """Identifier used to correlate or locate this protocol or storage record."""
     method: str
+    """JSON-RPC method requested by the client."""
     server_id: str = ""
+    """Server id identifier: ``''``."""
     meta: Mapping[str, object] = field(default_factory=dict)
+    """Meta produced by ``field``."""
     arguments: Mapping[str, object] = field(default_factory=dict)
+    """Command-line argument declarations accepted by this command."""
     params: Mapping[str, object] = field(default_factory=dict)
+    """Parameters carried by the JSON-RPC message."""
     uri_variables: Mapping[str, object] = field(default_factory=dict)
+    """Uri variables produced by ``field``."""
     uri: str | None = None
+    """Resource URI identifying the requested or returned content."""
     input_responses: Mapping[str, object] = field(default_factory=dict)
+    """Input responses produced by ``field``."""
     request_state: str | msgspec.UnsetType = msgspec.UNSET
     transport: Literal["http", "stdio", "test"] = "test"
+    """Transport identifier: ``test``."""
     authentication: IAuthenticationContext = field(default_factory=current_auth_context)
+    """Authentication produced by ``field``."""
     native_request: Request | None = None
+    """Underlying HTTP request when this call arrived over HTTP."""
 
     def __post_init__(self) -> None:
         """
@@ -87,7 +101,7 @@ class McpRequest:
 
         Returns
         -------
-        IAuthenticatable | None
+        orionis.auth.contracts.IAuthenticatable | None
             Result of the operation described above.
         """
         return self.authentication.identity
@@ -99,7 +113,7 @@ class McpRequest:
 
         Returns
         -------
-        Mapping[str, object]
+        collections.abc.Mapping[str, object]
             Result of the operation described above.
         """
         value = self.meta.get("io.modelcontextprotocol/clientCapabilities", {})

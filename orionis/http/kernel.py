@@ -1,3 +1,5 @@
+"""Serve concurrent requests within one worker event loop."""
+
 import asyncio
 import importlib
 import logging
@@ -70,12 +72,15 @@ if TYPE_CHECKING:
 # Kernel context identifier reused across all request scopes.
 _KERNEL_CONTEXT: KernelContext = KernelContext.HTTP
 _LOGGER = logging.getLogger(__name__)
+"""Logger used by ``kernel``."""
 _SHUTDOWN_TIMEOUT = 5.0
+"""Shutdown timeout value used by ``kernel``."""
 
 class _MiddlewareNext[T]:
     """Hold one request-local continuation that can be consumed only once."""
 
     __slots__ = ("_args", "_called", "_terminal")
+    """Declare the instance attribute slots reserved by this class."""
 
     def __init__(self, terminal: Callable, args: tuple) -> None:
         """
@@ -83,7 +88,7 @@ class _MiddlewareNext[T]:
 
         Parameters
         ----------
-        terminal : Callable
+        terminal : collections.abc.Callable
             Asynchronous next middleware or handler.
         args : tuple
             Arguments supplied when advancing the pipeline.
@@ -94,8 +99,11 @@ class _MiddlewareNext[T]:
             The continuation is ready for one invocation.
         """
         self._terminal = terminal
+        """Asynchronous next middleware or handler."""
         self._args = args
+        """Arguments supplied when advancing the pipeline."""
         self._called = False
+        """Called flag used by ``_MiddlewareNext``."""
 
     async def __call__(self) -> T:
         """
@@ -103,7 +111,7 @@ class _MiddlewareNext[T]:
 
         Returns
         -------
-        Response
+        orionis.http.Response
             Response returned by the next middleware or handler.
 
         Raises
@@ -134,6 +142,7 @@ class _MiddlewarePipeline[T]:
         "_terminal",
         "_terminal_args",
     )
+    """Declare the instance attribute slots reserved by this class."""
 
     def __init__(
         self,
@@ -149,9 +158,9 @@ class _MiddlewarePipeline[T]:
         ----------
         instances : tuple
             Ordered tuple of pre-built middleware instances.
-        request : Request
+        request : orionis.http.Request
             Incoming HTTP request forwarded to each layer.
-        terminal : Callable[..., Awaitable[Response]]
+        terminal : Callable[``...``, Awaitable[Response]]
             Async callable invoked after all middleware layers have run.
         terminal_args : tuple, optional
             Positional arguments forwarded to the terminal callable.
@@ -159,13 +168,20 @@ class _MiddlewarePipeline[T]:
         Returns
         -------
         None
+            Store the middleware stack and terminal callable for one request.
         """
         self._instances = instances
+        """Ordered tuple of pre-built middleware instances."""
         self._request = request
+        """Incoming HTTP request forwarded to each layer."""
         self._terminal = terminal
+        """Async callable invoked after all middleware layers have run."""
         self._terminal_args = terminal_args
+        """Positional arguments forwarded to the terminal callable."""
         self._n = len(instances)
+        """N produced by ``len``."""
         self._called = False
+        """Called flag used by ``_MiddlewarePipeline``."""
 
     async def __call__(self) -> T:
         """
@@ -173,7 +189,7 @@ class _MiddlewarePipeline[T]:
 
         Returns
         -------
-        T
+        ``T``
             Result produced by the middleware stack or terminal.
 
         Raises
@@ -198,7 +214,7 @@ class _MiddlewarePipeline[T]:
 
         Returns
         -------
-        T
+        ``T``
             Result returned by this middleware and its descendants.
         """
         if depth >= self._n:
@@ -243,6 +259,7 @@ class KernelHTTP(IKernelHTTP):
         "__websocket_slots",
         "__websocket_tasks",
     )
+    """Declare the instance attribute slots reserved by this class."""
 
     def __init__(
         self,
@@ -254,28 +271,41 @@ class KernelHTTP(IKernelHTTP):
 
         Parameters
         ----------
-        app : IApplication
+        app : orionis.IApplication
             Application instance providing configuration and DI container.
-        catch : ICatch
+        catch : orionis.failure.contracts.ICatch
             Failure handler used to format unhandled exceptions.
 
         Returns
         -------
         None
+            Initialize the HTTP kernel with application and failure handler.
         """
         self.__app = app
+        """Application instance providing configuration and DI container."""
         self.__boot: bool = False
+        """Boot flag used by ``KernelHTTP``."""
         self.__catch: ICatch = catch
+        """Failure handler used to format unhandled exceptions."""
         self.__body_limits = HTTPBodyLimits()
+        """Body limits produced by ``HTTPBodyLimits``."""
         self.__request_slots = self.__body_limits.max_concurrent_requests
+        """
+        Request slots obtained from ``self.__body_limits.max_concurrent_requests``.
+        """
         self.__websocket_config = HTTPWebSocket()
+        """Websocket config produced by ``HTTPWebSocket``."""
         self.__websocket_slots = BoundedSemaphore(
             self.__websocket_config.max_connections,
         )
+        """Synchronization primitive controlling access to websocket slots."""
         self.__websocket_tasks: set[asyncio.Task] = set()
+        """Websocket tasks produced by ``set``."""
         # Associate each route middleware stack with its instances.
         self.__middleware_cache: dict[tuple, tuple] = {}
+        """Associate each route middleware stack with its instances."""
         self.__endpoint_policies: dict[str, IHttpEndpointPolicy] = {}
+        """Compiled policies associated with each dispatched endpoint."""
 
     def disconnectPaths(self) -> frozenset[str]:
         """
@@ -298,6 +328,7 @@ class KernelHTTP(IKernelHTTP):
         Returns
         -------
         None
+            Boot the HTTP kernel by initializing all core components.
         """
         # Prevent redundant initialization on repeated calls.
         if self.__boot:
@@ -318,6 +349,7 @@ class KernelHTTP(IKernelHTTP):
         self.__default_responses: IDefaultResponses = await self.__app.build(
             DefaultResponses,
         )
+        """Build the default response factory for common HTTP error responses."""
 
         # Instantiate global middleware from the application HTTP configuration.
         self.__defaultMiddleware(
@@ -326,6 +358,7 @@ class KernelHTTP(IKernelHTTP):
             under_maintenance=self.__app.underMaintenance(),
         )
         self.__health_path = self.__app.routeHealthCheck.rstrip("/")
+        """Health path produced by ``self.__app.routeHealthCheck.rstrip``."""
 
         # Resolve web identities only after session restoration and CSRF checks.
         self.__web_middleware: tuple = (
@@ -333,20 +366,28 @@ class KernelHTTP(IKernelHTTP):
             CSRFTokenMiddleware(config=self.__app.config("http").get("csrf", {})),
             await self.__app.build(ResolveSessionIdentityMiddleware),
         )
+        """Resolve web identities only after session restoration and CSRF checks."""
         # API identity resolution uses Bearer credentials without starting a session.
         self.__api_middleware: tuple = (
             await self.__app.build(ResolveTokenIdentityMiddleware),
         )
+        """
+        API identity resolution uses Bearer credentials without starting a session.
+        """
 
         # Protocol-level response adapters for RSGI and ASGI transports.
         self.__rsgi_adapter = await self.__app.build(RSGIResponseAdapter)
+        """Protocol-level response adapters for RSGI and ASGI transports."""
         self.__asgi_adapter = await self.__app.build(ASGIResponseAdapter)
+        """Adapter translating ASGI request events into framework operations."""
 
         # Request logger; only active when the application runs in debug mode.
         self.__request_printer = await self.__app.build(HTTPRequestPrinter)
+        """Request logger; only active when the application runs in debug mode."""
         self.__request_printer.setEnabled(enabled=self.__app.isDebug())
         # Record whether requests should be timed and logged.
         self.__printer_enabled: bool = self.__app.isDebug()
+        """Record whether requests should be timed and logged."""
 
         # Resolve the registered fallback handler.
         _raw_fallback = self.__routes.fallback()
@@ -355,6 +396,7 @@ class KernelHTTP(IKernelHTTP):
             if (_raw_fallback is not None and _raw_fallback != (None, None))
             else None
         )
+        """Handler or route selected when no ordinary route matches."""
 
         if any(
             route.protocol is RouteProtocol.WEBSOCKET
@@ -377,12 +419,13 @@ class KernelHTTP(IKernelHTTP):
 
         Parameters
         ----------
-        route_loader : IRouteLoader
+        route_loader : orionis.http.routes.contracts.loader.IRouteLoader
             Route loader instance to discover and load routes.
 
         Returns
         -------
         None
+            Initialize route resolver with loaded routes.
         """
         # Build the resolver with compiled routes and a fixed hot-cache budget.
         self.__routes = RouteResolver(
@@ -390,6 +433,7 @@ class KernelHTTP(IKernelHTTP):
             fallback=route_loader.fallback,
             hot_cache_size=512,
         )
+        """Build the resolver with compiled routes and a fixed hot-cache budget."""
 
     async def __preloadHandlers(self) -> None:
         """
@@ -405,6 +449,7 @@ class KernelHTTP(IKernelHTTP):
         Returns
         -------
         None
+            Import route handlers and prepare their dependency metadata at boot time.
         """
         fn_dispatch: dict[int, object] = {}
         cls_dispatch: dict[int, tuple[type, str]] = {}
@@ -453,9 +498,13 @@ class KernelHTTP(IKernelHTTP):
                 await self.__preloadEndpointPolicy(controller, route, policy_instances)
 
         self.__fn_dispatch: dict[int, object] = fn_dispatch
+        """Fn dispatch supplied through ``fn_dispatch``."""
         self.__cls_dispatch: dict[int, tuple[type, str]] = cls_dispatch
+        """Cls dispatch supplied through ``cls_dispatch``."""
         self.__view_dispatch: dict[int, str] = view_dispatch
+        """View dispatch supplied through ``view_dispatch``."""
         self.__hub_dispatch = hub_dispatch
+        """Hub dispatch supplied through ``hub_dispatch``."""
 
     async def __preloadEndpointPolicy(
         self,
@@ -470,7 +519,7 @@ class KernelHTTP(IKernelHTTP):
         ----------
         controller : type
             Controller declaring an optional HTTP protocol policy.
-        route : CompiledRoute
+        route : orionis.http.routes.entities.compiled_route.CompiledRoute
             Compiled route associated with the controller.
         policy_instances : dict[type[IHttpEndpointPolicy], IHttpEndpointPolicy]
             Policy instances already constructed during this kernel boot.
@@ -520,7 +569,7 @@ class KernelHTTP(IKernelHTTP):
         ----------
         http_config : dict
             HTTP configuration dictionary with middleware settings.
-        default_responses : IDefaultResponses
+        default_responses : orionis.http.default.contracts.responses.IDefaultResponses
             Default response handler for middleware rejections.
 
         under_maintenance : bool
@@ -529,6 +578,7 @@ class KernelHTTP(IKernelHTTP):
         Returns
         -------
         None
+            Initialize default HTTP middleware stack.
         """
         limits = http_config.get("body_limits", {})
         websocket = http_config.get("websocket", {})
@@ -546,23 +596,29 @@ class KernelHTTP(IKernelHTTP):
         self.__proxies = ProxiesMiddleware(
             config=http_config.get("proxies"),
         )
+        """Proxies produced by ``ProxiesMiddleware``."""
         self.__security = SecurityMiddleware(
             config=http_config.get("security"),
             default_responses=default_responses,
         )
+        """Security produced by ``SecurityMiddleware``."""
         self.__cors = CORSMiddleware(
             config=http_config.get("cors"),
         )
+        """Cors produced by ``CORSMiddleware``."""
         self.__rate_limit = RateLimitMiddleware(
             config=http_config.get("rate_limit"),
             default_responses=default_responses,
         )
+        """Rate limit produced by ``RateLimitMiddleware``."""
         self.__under_maintenance = UnderMaintenanceMiddleware(
             under_maintenance=under_maintenance,
             default_responses=default_responses,
         )
+        """Value supplied for ``under_maintenance``."""
         # Record whether rate limiting is active.
         self.__rate_limit_enabled = self.__rate_limit.isEnabled()
+        """Record whether rate limiting is active."""
         if (
             self.__rate_limit_enabled
             and http_config["rate_limit"].get("rate_limit_store", "memory") == "redis"
@@ -586,19 +642,20 @@ class KernelHTTP(IKernelHTTP):
 
         Parameters
         ----------
-        adapter : RSGITransportAdapter
+        adapter : orionis.http.adapters.request.rsgi.RSGITransportAdapter
             RSGI transport adapter with HTTP scope and client connection.
-        response : Response
+        response : orionis.http.Response
             HTTP response object to send to client.
-        protocol : HTTPProtocol
+        protocol : ``granian.rsgi.HTTPProtocol``
             RSGI HTTP protocol version indicator.
 
-        policy : IHttpEndpointPolicy | None
+        policy : orionis.http.contracts.endpoint_policy.IHttpEndpointPolicy | None
             Value supplied for ``policy``.
 
         Returns
         -------
         None
+            Send an RSGI HTTP response through the transport adapter.
         """
         if policy is not None:
             response = await policy.response(response)
@@ -624,21 +681,22 @@ class KernelHTTP(IKernelHTTP):
 
         Parameters
         ----------
-        adapter : TransportAdapter
+        adapter : orionis.http.adapters.request.contracts.transport.TransportAdapter
             Transport adapter encapsulating the HTTP request.
-        response : Response
+        response : orionis.http.Response
             HTTP response object to send to client.
         receive : object
             ASGI receive callable for reading request body.
         send : object
             ASGI send callable for sending response.
 
-        policy : IHttpEndpointPolicy | None
+        policy : orionis.http.contracts.endpoint_policy.IHttpEndpointPolicy | None
             Value supplied for ``policy``.
 
         Returns
         -------
         None
+            Send ASGI HTTP response through transport adapter.
         """
         if policy is not None:
             response = await policy.response(response)
@@ -663,12 +721,12 @@ class KernelHTTP(IKernelHTTP):
 
         Parameters
         ----------
-        adapter : TransportAdapter
+        adapter : orionis.http.adapters.request.contracts.transport.TransportAdapter
             Transport adapter encapsulating the HTTP request.
 
         Returns
         -------
-        Response | None
+        orionis.http.Response | None
             HTTP response if middleware rejects request, None if request
             passes all middleware checks.
         """
@@ -714,6 +772,7 @@ class KernelHTTP(IKernelHTTP):
         Returns
         -------
         None
+            Pre-build middleware instances for all routes at boot time.
         """
         for route in self.__routes.allRoutes():
             if route.method == "WEBSOCKET":
@@ -737,14 +796,14 @@ class KernelHTTP(IKernelHTTP):
 
         Parameters
         ----------
-        request : Request
+        request : orionis.http.Request
             Incoming HTTP request.
-        resolved_route : ResolvedRoute
+        resolved_route : orionis.http.routes.entities.resolved_route.ResolvedRoute
             Resolved route metadata.
 
         Returns
         -------
-        Response
+        orionis.http.Response
             HTTP response produced by the middleware pipeline.
         """
         if resolved_route.route.public:
@@ -787,14 +846,14 @@ class KernelHTTP(IKernelHTTP):
 
         Parameters
         ----------
-        request : Request
+        request : orionis.http.Request
             Incoming HTTP request.
-        resolved_route : ResolvedRoute
+        resolved_route : orionis.http.routes.entities.resolved_route.ResolvedRoute
             Resolved route metadata.
 
         Returns
         -------
-        Response
+        orionis.http.Response
             Handler response, or a redirect back carrying the errors.
         """
         try:
@@ -812,14 +871,14 @@ class KernelHTTP(IKernelHTTP):
 
         Parameters
         ----------
-        request : Request
+        request : orionis.http.Request
             Incoming HTTP request.
-        resolved_route : ResolvedRoute
+        resolved_route : orionis.http.routes.entities.resolved_route.ResolvedRoute
             Resolved route with matched handler and path parameters.
 
         Returns
         -------
-        Response
+        orionis.http.Response
             HTTP response produced by the pipeline or the handler.
         """
         stack = resolved_route.route.compiled_middlewares
@@ -861,21 +920,21 @@ class KernelHTTP(IKernelHTTP):
 
         Parameters
         ----------
-        resolved_route : ResolvedRoute
+        resolved_route : orionis.http.routes.entities.resolved_route.ResolvedRoute
             Resolved route descriptor with handler reference and path params.
-        request : Request
+        request : orionis.http.Request
             Request-local parameters, including middleware changes.
 
         Returns
         -------
-        Response
+        orionis.http.Response
             Handler response or JSON response containing the handler result.
 
         Raises
         ------
         TypeError
             If the handler does not return a Response, dict, or msgspec.Struct.
-        ResponseValidationException
+        orionis.http.exceptions.response_validation.ResponseValidationException
             If a returned Orionis schema violates its output contract.
         """
         route = resolved_route.route
@@ -941,7 +1000,7 @@ class KernelHTTP(IKernelHTTP):
 
         Returns
         -------
-        Response
+        orionis.http.Response
             HTTP response produced by the fallback handler.
 
         Raises
@@ -982,14 +1041,13 @@ class KernelHTTP(IKernelHTTP):
             Current request object (may be the raw transport adapter for
             pre-routing errors).
 
-        policy : IHttpEndpointPolicy | None
+        policy : orionis.http.contracts.endpoint_policy.IHttpEndpointPolicy | None
             Value supplied for ``policy``.
 
         Returns
         -------
-        Response
+        orionis.http.Response
             Appropriate HTTP response for the given exception type.
-
         """
         try:
             if isinstance(exc, HttpDump):
@@ -1021,12 +1079,12 @@ class KernelHTTP(IKernelHTTP):
             Error to report or translate.
         request : object
             Typed request or the adapter used before routing.
-        policy : IHttpEndpointPolicy | None
+        policy : orionis.http.contracts.endpoint_policy.IHttpEndpointPolicy | None
             Optional endpoint-specific failure policy.
 
         Returns
         -------
-        Response
+        orionis.http.Response
             Response produced by ordinary failure handling.
         """
         if policy is not None:
@@ -1057,12 +1115,12 @@ class KernelHTTP(IKernelHTTP):
 
         Parameters
         ----------
-        adapter : TransportAdapter
+        adapter : orionis.http.adapters.request.contracts.transport.TransportAdapter
             Incoming transport metadata.
 
         Returns
         -------
-        Response | None
+        orionis.http.Response | None
             A 400 or 413 response for rejected framing, otherwise None. Stream
             byte counting remains authoritative when length is absent or false.
         """
@@ -1105,21 +1163,21 @@ class KernelHTTP(IKernelHTTP):
 
         Parameters
         ----------
-        interface : Interface
+        interface : orionis.http.enums.Interface
             Transport interface type used to construct the BodyStream.
-        adapter : TransportAdapter
+        adapter : orionis.http.adapters.request.contracts.transport.TransportAdapter
             Protocol adapter carrying request metadata.
         receive_or_protocol : object
             ASGI receive callable or RSGI HTTPProtocol instance.
-        request_context : ScopeManager
+        request_context : orionis.container.context.manager.ScopeManager
             Active DI request scope for per-request bindings.
 
-        policy : IHttpEndpointPolicy | None
+        policy : orionis.http.contracts.endpoint_policy.IHttpEndpointPolicy | None
             Value supplied for ``policy``.
 
         Returns
         -------
-        Response
+        orionis.http.Response
             The fully constructed HTTP response.
         """
         request_context.set("kernel", _KERNEL_CONTEXT)
@@ -1188,9 +1246,9 @@ class KernelHTTP(IKernelHTTP):
 
         Parameters
         ----------
-        scope : Scope
+        scope : ``granian.rsgi.Scope``
             Granian RSGI scope with connection metadata.
-        protocol : HTTPProtocol
+        protocol : ``granian.rsgi.HTTPProtocol``
             RSGI protocol object for writing the response.
 
         Returns
@@ -1254,6 +1312,7 @@ class KernelHTTP(IKernelHTTP):
         Returns
         -------
         None
+            Handle an incoming ASGI HTTP request end-to-end.
         """
         adapter = ASGITransportAdapter(scope)
         if scope["type"] == "websocket":
@@ -1296,7 +1355,7 @@ class KernelHTTP(IKernelHTTP):
 
         Parameters
         ----------
-        adapter : TransportAdapter
+        adapter : orionis.http.adapters.request.contracts.transport.TransportAdapter
             Proxy-normalized handshake metadata.
 
         Returns
@@ -1324,9 +1383,9 @@ class KernelHTTP(IKernelHTTP):
 
         Parameters
         ----------
-        resolved_route : ResolvedRoute
+        resolved_route : orionis.http.routes.entities.resolved_route.ResolvedRoute
             Compiled route with converted parameters.
-        socket : WebSocket
+        socket : orionis.http.WebSocket
             Scoped connection injected into application handlers.
 
         Returns
@@ -1367,9 +1426,9 @@ class KernelHTTP(IKernelHTTP):
 
         Parameters
         ----------
-        interface : Interface
+        interface : orionis.http.enums.Interface
             Server protocol identifier.
-        adapter : TransportAdapter
+        adapter : orionis.http.adapters.request.contracts.transport.TransportAdapter
             Handshake request metadata.
         receive_or_protocol : object
             ASGI receive callback or Granian WebsocketProtocol.
@@ -1453,9 +1512,9 @@ class KernelHTTP(IKernelHTTP):
 
         Parameters
         ----------
-        adapter : TransportAdapter
+        adapter : orionis.http.adapters.request.contracts.transport.TransportAdapter
             Handshake metadata for global guards and route matching.
-        socket : WebSocket
+        socket : orionis.http.WebSocket
             Connection already bound to the active application scope.
 
         Returns

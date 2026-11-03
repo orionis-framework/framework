@@ -1,3 +1,5 @@
+"""Define the contract for the in-memory translation cache."""
+
 from __future__ import annotations
 from abc import ABC, abstractmethod
 from typing import TYPE_CHECKING
@@ -20,6 +22,7 @@ class ITranslationRepository(ABC):
     """
 
     __slots__ = ()
+    """Declare that this class introduces no additional instance slots."""
 
     @abstractmethod
     def get(self, locale: str) -> TranslationMap:
@@ -33,7 +36,7 @@ class ITranslationRepository(ABC):
 
         Returns
         -------
-        TranslationMap
+        orionis.localization.types.TranslationMap
             Cached translation map for the locale. The mapping is the
             cached instance, not a copy.
         """
@@ -78,6 +81,7 @@ class ITranslationRepository(ABC):
         Returns
         -------
         None
+            Discard every cached translation map.
         """
 
     @abstractmethod
@@ -87,6 +91,6 @@ class ITranslationRepository(ABC):
 
         Returns
         -------
-        tuple[str, ...]
+        tuple[str, ``...``]
             Locale codes present in the in-memory cache.
         """

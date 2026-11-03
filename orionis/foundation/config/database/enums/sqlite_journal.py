@@ -1,3 +1,5 @@
+"""Enumerate SQLite journal modes."""
+
 from enum import Enum
 
 class SQLiteJournalMode(Enum):

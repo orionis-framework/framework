@@ -1,3 +1,5 @@
+"""Represent the configuration entity for an in-memory cache store."""
+
 from __future__ import annotations
 from dataclasses import dataclass, field
 from orionis.support.entities.base import BaseEntity

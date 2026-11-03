@@ -1,3 +1,5 @@
+"""Contract for the query builder bound to a model class."""
+
 from __future__ import annotations
 from abc import abstractmethod
 from typing import TYPE_CHECKING, Any, Self
@@ -12,7 +14,8 @@ class IModelQueryBuilder(IQueryBuilderBase):
     """
     Contract for the query builder bound to a model class.
 
-    It inherits the whole query language from :class:`IQueryBuilderBase`
+    It inherits the whole query language from
+    :class:`orionis.orm.contracts.base_builder.IQueryBuilderBase`
     and only adds what model awareness brings: hydrated results,
     primary-key lookups, and relationship eager loading.
     """
@@ -20,6 +23,7 @@ class IModelQueryBuilder(IQueryBuilderBase):
     # ruff: noqa: ANN401
 
     __slots__ = ()
+    """Declare that this class introduces no additional instance slots."""
 
     @abstractmethod
     def withRelations(self, *names: str) -> Self:
@@ -33,7 +37,7 @@ class IModelQueryBuilder(IQueryBuilderBase):
 
         Returns
         -------
-        IModelQueryBuilder
+        orionis.orm.contracts.IModelQueryBuilder
             The same builder, enabling fluent chaining.
         """
 
@@ -49,7 +53,7 @@ class IModelQueryBuilder(IQueryBuilderBase):
 
         Returns
         -------
-        IModelQueryBuilder
+        orionis.orm.contracts.IModelQueryBuilder
             The same builder, enabling fluent chaining.
         """
 
@@ -60,7 +64,7 @@ class IModelQueryBuilder(IQueryBuilderBase):
 
         Returns
         -------
-        Collection
+        collections.abc.Collection
             Collection of hydrated model instances.
         """
 
@@ -71,7 +75,7 @@ class IModelQueryBuilder(IQueryBuilderBase):
 
         Returns
         -------
-        Model or None
+        orionis.orm.Model or None
             First matching model, or ``None`` without matches.
         """
 
@@ -82,12 +86,12 @@ class IModelQueryBuilder(IQueryBuilderBase):
 
         Returns
         -------
-        Model
+        orionis.orm.Model
             First matching model.
 
         Raises
         ------
-        ModelNotFoundException
+        orionis.orm.exceptions.ModelNotFoundException
             If the query yields no rows.
         """
 
@@ -98,12 +102,12 @@ class IModelQueryBuilder(IQueryBuilderBase):
 
         Parameters
         ----------
-        key : Any
+        key : typing.Any
             Primary key value to look up.
 
         Returns
         -------
-        Model or None
+        orionis.orm.Model or None
             Matching model, or ``None`` when absent.
         """
 
@@ -114,17 +118,17 @@ class IModelQueryBuilder(IQueryBuilderBase):
 
         Parameters
         ----------
-        key : Any
+        key : typing.Any
             Primary key value to look up.
 
         Returns
         -------
-        Model
+        orionis.orm.Model
             Matching model.
 
         Raises
         ------
-        ModelNotFoundException
+        orionis.orm.exceptions.ModelNotFoundException
             If no record matches the key.
         """
 
@@ -140,7 +144,7 @@ class IModelQueryBuilder(IQueryBuilderBase):
 
         Returns
         -------
-        Any
+        typing.Any
             Column value, or ``None`` without matches.
         """
 
@@ -156,7 +160,7 @@ class IModelQueryBuilder(IQueryBuilderBase):
 
         Returns
         -------
-        Collection
+        collections.abc.Collection
             Collection of column values.
         """
 
@@ -174,6 +178,6 @@ class IModelQueryBuilder(IQueryBuilderBase):
 
         Returns
         -------
-        Paginator
+        orionis.orm.collections.Paginator
             Page of hydrated models with pagination metadata.
         """

@@ -1,3 +1,5 @@
+"""Group the orm schema constraints components and public imports."""
+
 from typing import TYPE_CHECKING as _TYPE_CHECKING
 from orionis._exports import resolve_export as _resolve_export
 
@@ -20,6 +22,7 @@ _EXPORTS = {
     "TableIndex": ("orionis.orm.schema.constraints.table_index", "TableIndex"),
     "UniqueConstraint": ("orionis.orm.schema.constraints.unique_constraint", "UniqueConstraint"),
 }
+"""Public export names mapped to their defining modules and attributes."""
 
 def __getattr__(name: str) -> object:
     """

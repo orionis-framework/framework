@@ -1,3 +1,5 @@
+"""Provide chainable operations over a string value."""
+
 from __future__ import annotations
 import base64
 import hashlib
@@ -15,22 +17,35 @@ from typing import Any, Self
 
 # Define the patterns used by string transformations.
 _RE_CAMEL_SEP = re.compile(r"[_\-\s]+")
+"""Define the patterns used by string transformations."""
 _RE_KEBAB_CAMEL = re.compile(r"([a-z0-9])([A-Z])")
+"""Compiled pattern used to recognize re kebab camel."""
 _RE_KEBAB_SEP = re.compile(r"[_\s]+")
+"""Compiled pattern used to recognize re kebab sep."""
 _RE_KEBAB_MULTI = re.compile(r"-+")
+"""Compiled pattern used to recognize re kebab multi."""
 _RE_SQUISH = re.compile(r"\s+")
+"""Compiled pattern used to recognize re squish."""
 _RE_NUMBERS = re.compile(r"\D")
+"""Compiled pattern used to recognize re numbers."""
 _RE_HEADLINE = re.compile(r"\b\w+\b")
+"""Compiled pattern used to recognize re headline."""
 _RE_UCSPLIT = re.compile(r"[A-Z][a-z]*|[a-z]+|\d+")
+"""Compiled pattern used to recognize re ucsplit."""
 _RE_PASCAL_WORDS = re.compile(r"[A-Z][a-z]*|[a-z]+")
+"""Compiled pattern used to recognize re pascal words."""
 _RE_STRIP_TAGS = re.compile(r"<[^>]*>")
+"""Compiled pattern used to recognize re strip tags."""
 _ULID_RE = re.compile(r"^[0123456789ABCDEFGHJKMNPQRSTVWXYZ]{26}$")
+"""Compiled pattern used to recognize ulid re."""
 
 class Stringable(str):
 
     # ruff: noqa: PLC0415, PLR0915, PLR0912, C901, PLR2004, ANN401, S324, FBT001
+    """Provide chainable operations over a string value."""
 
     __slots__ = ()
+    """Declare that this class introduces no additional instance slots."""
 
     def after(self: Self, search: str) -> Stringable:
         """
@@ -43,7 +58,7 @@ class Stringable(str):
 
         Returns
         -------
-        Stringable
+        orionis.support.types.Stringable
             New Stringable containing the substring after the first occurrence
             of the search string, or the original string if not found.
         """
@@ -63,7 +78,7 @@ class Stringable(str):
 
         Returns
         -------
-        Stringable
+        orionis.support.types.Stringable
             New Stringable containing the substring after the last occurrence of
             the search string, or the original string if not found.
         """
@@ -83,7 +98,7 @@ class Stringable(str):
 
         Returns
         -------
-        Stringable
+        orionis.support.types.Stringable
             A new Stringable instance with all provided values appended.
         """
         # Ensure all values are strings before appending
@@ -105,7 +120,7 @@ class Stringable(str):
 
         Returns
         -------
-        Stringable
+        orionis.support.types.Stringable
             A new Stringable instance with the specified number of newline
             characters appended.
         """
@@ -123,7 +138,7 @@ class Stringable(str):
 
         Returns
         -------
-        Stringable
+        orionis.support.types.Stringable
             New Stringable instance containing the substring before the first
             occurrence of the search string, or the original string if not found.
         """
@@ -147,7 +162,7 @@ class Stringable(str):
 
         Returns
         -------
-        Stringable
+        orionis.support.types.Stringable
             New Stringable instance containing the substring before the last
             occurrence of the search string, or the original string if not found.
         """
@@ -167,7 +182,7 @@ class Stringable(str):
 
         Parameters
         ----------
-        needles : str | Iterable[str]
+        needles : str | collections.abc.Iterable[str]
             Value or values to search for within the string.
         ignore_case : bool, optional
             If True, perform case-insensitive search. Default is False.
@@ -204,7 +219,7 @@ class Stringable(str):
 
         Parameters
         ----------
-        needles : str | Iterable[str]
+        needles : str | collections.abc.Iterable[str]
             Substring or substrings to check at the end of the string.
 
         Returns
@@ -272,7 +287,7 @@ class Stringable(str):
 
         Returns
         -------
-        Stringable
+        orionis.support.types.Stringable
             A new Stringable instance with all characters in lowercase.
         """
         # Convert all characters to lowercase using the built-in method
@@ -284,7 +299,7 @@ class Stringable(str):
 
         Returns
         -------
-        Stringable
+        orionis.support.types.Stringable
             A new Stringable instance with all characters in uppercase.
         """
         # Convert all characters to uppercase using the built-in method
@@ -296,7 +311,7 @@ class Stringable(str):
 
         Returns
         -------
-        Stringable
+        orionis.support.types.Stringable
             A new Stringable instance with characters in reverse order.
         """
         # Return the reversed string using slicing
@@ -313,7 +328,7 @@ class Stringable(str):
 
         Returns
         -------
-        Stringable
+        orionis.support.types.Stringable
             New Stringable instance with the string repeated the specified
             number of times.
         """
@@ -336,16 +351,16 @@ class Stringable(str):
 
         Parameters
         ----------
-        search : str | Iterable[str]
+        search : str | collections.abc.Iterable[str]
             Substring(s) to search for in the string.
-        replace : str | Iterable[str]
+        replace : str | collections.abc.Iterable[str]
             Replacement string(s) for each search substring.
         case_sensitive : bool, optional
             If True, perform case-sensitive replacement. Default is True.
 
         Returns
         -------
-        Stringable
+        orionis.support.types.Stringable
             A new Stringable instance with the specified replacements applied.
         """
         # Start with the original string
@@ -386,7 +401,7 @@ class Stringable(str):
 
         Returns
         -------
-        Stringable
+        orionis.support.types.Stringable
             A new Stringable instance with tags removed.
         """
         # If allowed_tags is specified, unescape HTML entities only.
@@ -401,7 +416,7 @@ class Stringable(str):
 
         Returns
         -------
-        Stringable
+        orionis.support.types.Stringable
             A new Stringable instance containing the Base64-encoded string.
         """
         # Encode the string to Base64 and decode to string
@@ -418,7 +433,7 @@ class Stringable(str):
 
         Returns
         -------
-        Stringable
+        orionis.support.types.Stringable
             A new Stringable instance with Base64-decoded content. If decoding fails
             and strict is False, returns an empty Stringable.
         """
@@ -571,7 +586,7 @@ class Stringable(str):
 
         Returns
         -------
-        Stringable
+        orionis.support.types.Stringable
             Stringable instance for the selected item(s).
         """
         # Return a Stringable for the selected item(s)
@@ -721,7 +736,7 @@ class Stringable(str):
 
         Returns
         -------
-        Stringable
+        orionis.support.types.Stringable
             A new Stringable instance with leading characters removed.
         """
         if chars is not None and not isinstance(chars, str):
@@ -741,7 +756,7 @@ class Stringable(str):
 
         Returns
         -------
-        Stringable
+        orionis.support.types.Stringable
             A new Stringable instance with trailing characters removed.
         """
         # Validate that chars is either a string or None
@@ -758,13 +773,9 @@ class Stringable(str):
         Converts uppercase characters to lowercase and lowercase characters to
         uppercase, leaving other characters unchanged.
 
-        Parameters
-        ----------
-        None
-
         Returns
         -------
-        Stringable
+        orionis.support.types.Stringable
             New Stringable instance with all character cases swapped.
         """
         # Use built-in swapcase to invert the case of all characters
@@ -781,7 +792,7 @@ class Stringable(str):
 
         Returns
         -------
-        Stringable
+        orionis.support.types.Stringable
             A new Stringable instance padded with leading zeros.
         """
         if not isinstance(width, int) or width < 0:
@@ -798,7 +809,7 @@ class Stringable(str):
 
         Returns
         -------
-        Stringable
+        orionis.support.types.Stringable
             A new Stringable instance containing only ASCII characters.
         """
         # Normalize Unicode and discard non-ASCII code points.
@@ -810,13 +821,9 @@ class Stringable(str):
         """
         Convert the string to camel case.
 
-        Parameters
-        ----------
-        None
-
         Returns
         -------
-        Stringable
+        orionis.support.types.Stringable
             A new Stringable instance in camelCase.
         """
         # Split the string by common separators and normalize to words
@@ -833,7 +840,7 @@ class Stringable(str):
 
         Returns
         -------
-        Stringable
+        orionis.support.types.Stringable
             A new Stringable instance in kebab-case.
         """
         # Insert dash between lowercase/number and uppercase letters
@@ -854,7 +861,7 @@ class Stringable(str):
 
         Returns
         -------
-        Stringable
+        orionis.support.types.Stringable
             A new Stringable instance in snake_case.
         """
         # Insert delimiter between lowercase/number and uppercase letters
@@ -878,7 +885,7 @@ class Stringable(str):
 
         Returns
         -------
-        Stringable
+        orionis.support.types.Stringable
             A new Stringable instance in StudlyCase.
         """
         # Replace separators with spaces, split into words, capitalize, and join
@@ -892,7 +899,7 @@ class Stringable(str):
 
         Returns
         -------
-        Stringable
+        orionis.support.types.Stringable
             A new Stringable instance in PascalCase.
         """
         # Use studly() to convert to PascalCase (StudlyCase)
@@ -915,7 +922,7 @@ class Stringable(str):
 
         Returns
         -------
-        Stringable
+        orionis.support.types.Stringable
             A new Stringable instance containing the URL-friendly slug.
         """
         if not isinstance(separator, str):
@@ -957,7 +964,7 @@ class Stringable(str):
 
         Returns
         -------
-        Stringable
+        orionis.support.types.Stringable
             A new Stringable instance with each word capitalized.
         """
         # Capitalize the first letter of each word using the built-in title method
@@ -972,7 +979,7 @@ class Stringable(str):
 
         Returns
         -------
-        Stringable
+        orionis.support.types.Stringable
             A new Stringable instance with each word capitalized.
         """
         # Split the string into words using word boundaries.
@@ -985,13 +992,9 @@ class Stringable(str):
         """
         Convert to APA-style title case.
 
-        Parameters
-        ----------
-        None
-
         Returns
         -------
-        Stringable
+        orionis.support.types.Stringable
             A new Stringable instance in APA title case.
         """
         # Set of words not capitalized in APA style except at start or end
@@ -1037,7 +1040,7 @@ class Stringable(str):
 
         Returns
         -------
-        Stringable
+        orionis.support.types.Stringable
             A new Stringable instance with the first character in uppercase.
         """
         # Return self if string is empty, else capitalize first character
@@ -1051,7 +1054,7 @@ class Stringable(str):
 
         Returns
         -------
-        Stringable
+        orionis.support.types.Stringable
             A new Stringable instance with the first character in lowercase.
         """
         # Return self if string is empty, else lowercase first character
@@ -1181,7 +1184,7 @@ class Stringable(str):
 
         Returns
         -------
-        Stringable
+        orionis.support.types.Stringable
             New Stringable with the needle removed from the start if present.
         """
         # Get the string representation
@@ -1213,7 +1216,7 @@ class Stringable(str):
 
         Returns
         -------
-        Stringable
+        orionis.support.types.Stringable
             New Stringable with the needle removed from the end if present.
         """
         s = str(self)
@@ -1240,7 +1243,7 @@ class Stringable(str):
 
         Returns
         -------
-        Stringable
+        orionis.support.types.Stringable
             Stringable with consecutive characters replaced by a single instance.
         """
         if not isinstance(character, str) or len(character) != 1:
@@ -1270,7 +1273,7 @@ class Stringable(str):
 
         Returns
         -------
-        Stringable
+        orionis.support.types.Stringable
             A new Stringable with the specified portion masked.
         """
         # Validate character is a single character string
@@ -1320,16 +1323,16 @@ class Stringable(str):
         ----------
         limit : int, default=100
             Maximum number of characters allowed.
-        end : str, default="..."
+        end : str, default="``...``"
             String to append if truncation occurs.
         preserve_words : bool, default=False
             If True, do not cut off words in the middle.
 
         Returns
         -------
-        Stringable
+        orionis.support.types.Stringable
             New Stringable instance limited to the specified number of characters.
-            If truncation occurs, the `end` string is appended.
+            If truncation occurs, the ``end`` string is appended.
         """
         # Validate input parameters
         if not isinstance(limit, int) or limit < 0:
@@ -1373,7 +1376,7 @@ class Stringable(str):
 
         Returns
         -------
-        Stringable
+        orionis.support.types.Stringable
             New Stringable instance with padding added to both sides.
         """
         # Validate input parameters
@@ -1414,7 +1417,7 @@ class Stringable(str):
 
         Returns
         -------
-        Stringable
+        orionis.support.types.Stringable
             New Stringable instance with left padding added.
         """
         # Validate input parameters
@@ -1450,7 +1453,7 @@ class Stringable(str):
 
         Returns
         -------
-        Stringable
+        orionis.support.types.Stringable
             A new Stringable instance with right padding added.
         """
         # Validate input parameters
@@ -1484,7 +1487,7 @@ class Stringable(str):
 
         Returns
         -------
-        Stringable
+        orionis.support.types.Stringable
             New Stringable instance with specified characters trimmed.
         """
         # Validate that characters is a string or None
@@ -1505,7 +1508,7 @@ class Stringable(str):
 
         Returns
         -------
-        Stringable
+        orionis.support.types.Stringable
             A new Stringable instance with leading characters removed.
         """
         # Validate that characters is a string or None
@@ -1526,7 +1529,7 @@ class Stringable(str):
 
         Returns
         -------
-        Stringable
+        orionis.support.types.Stringable
             New Stringable instance with trailing characters removed.
         """
         # Validate that characters is a string or None
@@ -1608,7 +1611,7 @@ class Stringable(str):
 
         Returns
         -------
-        Stringable
+        orionis.support.types.Stringable
             A new Stringable containing the first match, or an empty Stringable
             if no match is found.
         """
@@ -1701,12 +1704,12 @@ class Stringable(str):
 
         Parameters
         ----------
-        self : Stringable
+        self : orionis.support.types.Stringable
             The current string instance.
 
         Returns
         -------
-        Stringable
+        orionis.support.types.Stringable
             A new Stringable containing only numeric characters.
         """
         # Remove all non-digit characters using regular expression.
@@ -1786,7 +1789,7 @@ class Stringable(str):
 
         Returns
         -------
-        Stringable
+        orionis.support.types.Stringable
             A new Stringable instance containing the basename with the suffix
             removed if present.
         """
@@ -1804,7 +1807,7 @@ class Stringable(str):
 
         Returns
         -------
-        Stringable
+        orionis.support.types.Stringable
             Stringable instance containing the parent directory path.
         """
         # Use pathlib.Path for robust path handling
@@ -1826,7 +1829,7 @@ class Stringable(str):
 
         Returns
         -------
-        Stringable
+        orionis.support.types.Stringable
             New Stringable containing text between delimiters, or empty if not found.
         """
         # Validate input types for delimiters
@@ -1864,7 +1867,7 @@ class Stringable(str):
 
         Returns
         -------
-        Stringable
+        orionis.support.types.Stringable
             Stringable containing text between the first pair of delimiters,
             or an empty Stringable if not found.
         """
@@ -1881,7 +1884,7 @@ class Stringable(str):
 
         Returns
         -------
-        Stringable
+        orionis.support.types.Stringable
             Stringable instance ending with the specified cap.
         """
         # Validate that cap is a string
@@ -1910,7 +1913,7 @@ class Stringable(str):
 
         Returns
         -------
-        Stringable
+        orionis.support.types.Stringable
             A new Stringable instance starting with the specified prefix.
         """
         # Validate that prefix is a string
@@ -2013,7 +2016,7 @@ class Stringable(str):
 
         Parameters
         ----------
-        self : Stringable
+        self : orionis.support.types.Stringable
             The current string instance.
 
         Returns
@@ -2035,7 +2038,7 @@ class Stringable(str):
 
         Returns
         -------
-        Stringable
+        orionis.support.types.Stringable
             Stringable instance with normalized whitespace.
         """
         # Replace multiple whitespace characters with a single space, then trim.
@@ -2054,7 +2057,7 @@ class Stringable(str):
 
         Returns
         -------
-        Stringable
+        orionis.support.types.Stringable
             New Stringable instance containing at most the specified number of
             words, with the end string appended if truncation occurs.
         """
@@ -2132,7 +2135,7 @@ class Stringable(str):
 
         Returns
         -------
-        Stringable
+        orionis.support.types.Stringable
             New Stringable instance with wrapped text.
         """
         # Use textwrap to wrap the string according to the specified options.
@@ -2165,11 +2168,11 @@ class Stringable(str):
         before : str
             Prefix to prepend to the string.
         after : str | None, optional
-            Suffix to append to the string. If None, uses `before`.
+            Suffix to append to the string. If None, uses ``before``.
 
         Returns
         -------
-        Stringable
+        orionis.support.types.Stringable
             New Stringable instance with the string wrapped by prefix and suffix.
         """
         # Validate input types for prefix and suffix
@@ -2198,11 +2201,11 @@ class Stringable(str):
         before : str
             Prefix string to remove from the start.
         after : str | None, optional
-            Suffix string to remove from the end. If None, uses `before`.
+            Suffix string to remove from the end. If None, uses ``before``.
 
         Returns
         -------
-        Stringable
+        orionis.support.types.Stringable
             New Stringable instance with the specified prefix and suffix removed.
         """
         # Validate input types for prefix and suffix
@@ -2246,7 +2249,7 @@ class Stringable(str):
 
         Returns
         -------
-        Stringable
+        orionis.support.types.Stringable
             New Stringable instance with sequential replacements applied.
         """
         # Validate that replace is a list of strings
@@ -2287,7 +2290,7 @@ class Stringable(str):
 
         Returns
         -------
-        Stringable
+        orionis.support.types.Stringable
             New Stringable instance with the first occurrence replaced.
         """
         # Validate input types for search and replace
@@ -2311,7 +2314,7 @@ class Stringable(str):
 
         Returns
         -------
-        Stringable
+        orionis.support.types.Stringable
             New Stringable instance with the last occurrence replaced.
         """
         # Validate input types for search and replace
@@ -2345,7 +2348,7 @@ class Stringable(str):
 
         Returns
         -------
-        Stringable
+        orionis.support.types.Stringable
             New Stringable with the start replaced if the search string is found.
         """
         # Validate input types for search and replace
@@ -2376,7 +2379,7 @@ class Stringable(str):
 
         Returns
         -------
-        Stringable
+        orionis.support.types.Stringable
             New Stringable instance with the end replaced if the search string is
             found, otherwise returns the original string.
         """
@@ -2408,14 +2411,14 @@ class Stringable(str):
         ----------
         pattern : str | list[str]
             Regular expression pattern(s) to search for.
-        replace : str | Callable
+        replace : str | collections.abc.Callable
             Replacement string or callback function.
         limit : int, optional
             Maximum number of replacements. Default is -1 (no limit).
 
         Returns
         -------
-        Stringable
+        orionis.support.types.Stringable
             New Stringable instance with pattern matches replaced.
         """
         # Validate pattern argument type
@@ -2472,7 +2475,7 @@ class Stringable(str):
 
         Returns
         -------
-        Stringable
+        orionis.support.types.Stringable
             New Stringable instance with specified substrings removed.
         """
         # Validate search argument type
@@ -2512,14 +2515,14 @@ class Stringable(str):
 
         Parameters
         ----------
-        count : int | list | Any, optional
+        count : int | list | typing.Any, optional
             Count to determine if plural is needed, by default 2
         prepend_count : bool, optional
             Whether to prepend the count, by default False
 
         Returns
         -------
-        Stringable
+        orionis.support.types.Stringable
             A new Stringable with plural form
         """
         # Validate prepend_count type
@@ -2574,12 +2577,12 @@ class Stringable(str):
 
         Parameters
         ----------
-        count : int | list | Any, optional
+        count : int | list | typing.Any, optional
             Count to determine if plural is needed, by default 2
 
         Returns
         -------
-        Stringable
+        orionis.support.types.Stringable
             A new Stringable with pluralized last word in StudlyCase
         """
         s = str(self)
@@ -2601,12 +2604,12 @@ class Stringable(str):
 
         Parameters
         ----------
-        count : int | list | Any, optional
+        count : int | list | typing.Any, optional
             Count to determine if plural is needed. Default is 2.
 
         Returns
         -------
-        Stringable
+        orionis.support.types.Stringable
             New Stringable with pluralized last word in PascalCase.
         """
         # Get string representation
@@ -2640,7 +2643,7 @@ class Stringable(str):
 
         Returns
         -------
-        Stringable
+        orionis.support.types.Stringable
             A new Stringable with singular form of the word.
         """
         # Get lowercase version for comparison and original for case preservation
@@ -2712,7 +2715,7 @@ class Stringable(str):
 
         Returns
         -------
-        Stringable
+        orionis.support.types.Stringable
             Result of callback execution or self.
         """
         # Validate that condition is a boolean or callable
@@ -2759,14 +2762,14 @@ class Stringable(str):
         ----------
         needles : str | list[str]
             Substring(s) to search for in the string.
-        callback : Callable
+        callback : collections.abc.Callable
             Function to execute if the condition is True.
-        default : Callable | None, optional
+        default : collections.abc.Callable | None, optional
             Function to execute if the condition is False.
 
         Returns
         -------
-        Stringable
+        orionis.support.types.Stringable
             Result of callback execution or the original Stringable instance.
         """
         # Use the when method to conditionally execute the callback.
@@ -2785,14 +2788,14 @@ class Stringable(str):
         ----------
         needles : list[str]
             Substrings to search for in the string.
-        callback : Callable
+        callback : collections.abc.Callable
             Function to execute if all substrings are found.
-        default : Callable | None, optional
+        default : collections.abc.Callable | None, optional
             Function to execute if not all substrings are found.
 
         Returns
         -------
-        Stringable
+        orionis.support.types.Stringable
             Result of callback execution or the original Stringable instance.
         """
         # Check if all needles are present in the string
@@ -2809,14 +2812,14 @@ class Stringable(str):
 
         Parameters
         ----------
-        callback : Callable
+        callback : collections.abc.Callable
             Function to execute if the string is empty.
-        default : Callable | None, optional
+        default : collections.abc.Callable | None, optional
             Function to execute if the string is not empty.
 
         Returns
         -------
-        Stringable
+        orionis.support.types.Stringable
             Result of callback execution or the original Stringable instance.
         """
         # Use the when method to conditionally execute the callback if empty.
@@ -2832,14 +2835,14 @@ class Stringable(str):
 
         Parameters
         ----------
-        callback : Callable
+        callback : collections.abc.Callable
             Function to execute if the string is not empty.
-        default : Callable | None, optional
+        default : collections.abc.Callable | None, optional
             Function to execute if the string is empty.
 
         Returns
         -------
-        Stringable
+        orionis.support.types.Stringable
             Result of callback execution or the original Stringable instance.
         """
         # Call the callback if the string is not empty, else call default.
@@ -2858,14 +2861,14 @@ class Stringable(str):
         ----------
         needles : str or list[str]
             Substring(s) to check at the end of the string.
-        callback : Callable
+        callback : collections.abc.Callable
             Function to execute if the condition is True.
-        default : Callable | None, optional
+        default : collections.abc.Callable | None, optional
             Function to execute if the condition is False.
 
         Returns
         -------
-        Stringable
+        orionis.support.types.Stringable
             Result of callback execution or the original Stringable instance.
         """
         # Use the when method to conditionally execute the callback if endsWith is True.
@@ -2884,14 +2887,14 @@ class Stringable(str):
         ----------
         needles : str | list[str]
             Substring(s) to check at the end of the string.
-        callback : Callable
+        callback : collections.abc.Callable
             Function to execute if the condition is True.
-        default : Callable | None, optional
+        default : collections.abc.Callable | None, optional
             Function to execute if the condition is False.
 
         Returns
         -------
-        Stringable
+        orionis.support.types.Stringable
             Result of callback execution or the original Stringable instance.
         """
         # Call the callback if the string does not end with any needle,
@@ -2911,14 +2914,14 @@ class Stringable(str):
         ----------
         value : str
             Value to compare for an exact match.
-        callback : Callable
+        callback : collections.abc.Callable
             Function to execute if the string matches exactly.
-        default : Callable | None, optional
+        default : collections.abc.Callable | None, optional
             Function to execute if the string does not match exactly.
 
         Returns
         -------
-        Stringable
+        orionis.support.types.Stringable
             Result of callback execution or the original Stringable instance.
         """
         # Use the when method to conditionally execute the callback if exactly is True.
@@ -2937,14 +2940,14 @@ class Stringable(str):
         ----------
         value : str
             Value to compare for an exact match.
-        callback : Callable
+        callback : collections.abc.Callable
             Function to execute if the string does not match exactly.
-        default : Callable | None, optional
+        default : collections.abc.Callable | None, optional
             Function to execute if the string matches exactly.
 
         Returns
         -------
-        Stringable
+        orionis.support.types.Stringable
             Result of callback execution or the original Stringable instance.
         """
         # Call the callback if the string does not match exactly, else call default.
@@ -2963,14 +2966,14 @@ class Stringable(str):
         ----------
         needles : str or list[str]
             Substring(s) to check at the start of the string.
-        callback : Callable
+        callback : collections.abc.Callable
             Function to execute if the condition is True.
-        default : Callable | None, optional
+        default : collections.abc.Callable | None, optional
             Function to execute if the condition is False.
 
         Returns
         -------
-        Stringable
+        orionis.support.types.Stringable
             Result of callback execution or the original Stringable instance.
         """
         # Normalize needles to a list for consistent processing
@@ -3000,14 +3003,14 @@ class Stringable(str):
         ----------
         needles : str or list[str]
             Substring(s) to check at the start of the string.
-        callback : Callable
+        callback : collections.abc.Callable
             Function to execute if the condition is True.
-        default : Callable | None, optional
+        default : collections.abc.Callable | None, optional
             Function to execute if the condition is False.
 
         Returns
         -------
-        Stringable
+        orionis.support.types.Stringable
             Result of callback execution or the original Stringable instance.
         """
         # Normalize needles to a list for consistent processing
@@ -3037,14 +3040,14 @@ class Stringable(str):
         ----------
         pattern : str
             Regular expression pattern to match.
-        callback : Callable
+        callback : collections.abc.Callable
             Function to execute if the pattern matches.
-        default : Callable | None, optional
+        default : collections.abc.Callable | None, optional
             Function to execute if the pattern does not match. Default is None.
 
         Returns
         -------
-        Stringable
+        orionis.support.types.Stringable
             Result of callback execution or the original Stringable instance.
         """
         # Use the when method to conditionally execute the callback if test is True.
@@ -3065,7 +3068,7 @@ class Stringable(str):
 
         Returns
         -------
-        Stringable
+        orionis.support.types.Stringable
             New Stringable instance with converted case.
         """
         # Validate that mode is an integer or None
@@ -3111,7 +3114,7 @@ class Stringable(str):
 
         Returns
         -------
-        Stringable
+        orionis.support.types.Stringable
             A new Stringable with transliterated text.
         """
         # Validate that unknown is a single character string
@@ -3150,7 +3153,7 @@ class Stringable(str):
 
         Returns
         -------
-        Stringable
+        orionis.support.types.Stringable
             A new Stringable instance containing the hexadecimal hash.
 
         Raises
@@ -3174,12 +3177,12 @@ class Stringable(str):
 
         Parameters
         ----------
-        callback : Callable
+        callback : collections.abc.Callable
             The callback function to apply to the string.
 
         Returns
         -------
-        Stringable
+        orionis.support.types.Stringable
             A new Stringable instance containing the result of the callback.
 
         Raises
@@ -3209,7 +3212,7 @@ class Stringable(str):
 
         Returns
         -------
-        Stringable
+        orionis.support.types.Stringable
             A new Stringable containing the taken characters.
         """
         # Validate that limit is an integer
@@ -3230,12 +3233,12 @@ class Stringable(str):
 
         Parameters
         ----------
-        map_dict : Dict[str, str]
+        map_dict : typing.Dict[str, str]
             Dictionary mapping old values to new values.
 
         Returns
         -------
-        Stringable
+        orionis.support.types.Stringable
             A new Stringable instance with swapped values.
 
         Raises
@@ -3337,7 +3340,7 @@ class Stringable(str):
 
         Returns
         -------
-        Stringable
+        orionis.support.types.Stringable
             A new Stringable with replaced text
 
         Raises
@@ -3526,7 +3529,7 @@ class Stringable(str):
 
         Returns
         -------
-        Stringable
+        orionis.support.types.Stringable
             A new Stringable instance with all provided values prepended.
 
         Raises
@@ -3557,7 +3560,7 @@ class Stringable(str):
 
         Returns
         -------
-        Stringable
+        orionis.support.types.Stringable
             A new Stringable instance containing the extracted substring.
 
         Raises
@@ -3941,14 +3944,14 @@ class Stringable(str):
         ----------
         pattern : str or list of str
             Pattern(s) to match against.
-        callback : Callable
+        callback : collections.abc.Callable
             Function to execute if the string matches the pattern.
-        default : Callable or None, optional
+        default : collections.abc.Callable or None, optional
             Function to execute if the string does not match the pattern.
 
         Returns
         -------
-        Stringable
+        orionis.support.types.Stringable
             Result of callback execution or the original Stringable instance.
         """
         # Call the callback if the string matches the pattern, else call default.
@@ -3964,14 +3967,14 @@ class Stringable(str):
 
         Parameters
         ----------
-        callback : Callable
+        callback : collections.abc.Callable
             Function to execute if the string is ASCII.
-        default : Callable | None, optional
+        default : collections.abc.Callable | None, optional
             Function to execute if the string is not ASCII.
 
         Returns
         -------
-        Stringable
+        orionis.support.types.Stringable
             Result of callback execution or the original Stringable instance.
         """
         # Call the callback if the string is ASCII, else call default.
@@ -3987,14 +3990,14 @@ class Stringable(str):
 
         Parameters
         ----------
-        callback : Callable
+        callback : collections.abc.Callable
             Function to execute if the string is a valid UUID.
-        default : Callable | None, optional
+        default : collections.abc.Callable | None, optional
             Function to execute if the string is not a valid UUID.
 
         Returns
         -------
-        Stringable
+        orionis.support.types.Stringable
             Result of callback execution or the original Stringable instance.
         """
         # Call the callback if the string is a valid UUID, else call default.
@@ -4010,14 +4013,14 @@ class Stringable(str):
 
         Parameters
         ----------
-        callback : Callable
+        callback : collections.abc.Callable
             Function to execute if the string is a valid ULID.
-        default : Callable | None, optional
+        default : collections.abc.Callable | None, optional
             Function to execute if the string is not a valid ULID.
 
         Returns
         -------
-        Stringable
+        orionis.support.types.Stringable
             Result of callback execution or the original Stringable instance.
         """
         # Call the callback if the string is a valid ULID, else call default.
@@ -4034,7 +4037,7 @@ class Stringable(str):
 
         Returns
         -------
-        datetime or None
+        datetime.datetime or None
             Parsed datetime object if successful, otherwise raises ValueError.
         """
         # Import necessary modules
@@ -4061,7 +4064,7 @@ class Stringable(str):
 
         Returns
         -------
-        Stringable
+        orionis.support.types.Stringable
             The encrypted string as a Stringable instance.
         """
         # Use the Crypt facade to encrypt the string.
@@ -4078,7 +4081,7 @@ class Stringable(str):
 
         Returns
         -------
-        Stringable
+        orionis.support.types.Stringable
             The decrypted string as a Stringable instance.
         """
         # Use the Crypt facade to decrypt the string.
@@ -4094,7 +4097,7 @@ class Stringable(str):
 
         Returns
         -------
-        Stringable
+        orionis.support.types.Stringable
             A new Stringable instance containing the HTML-escaped string.
         """
         # Escape HTML entities for safe HTML output
@@ -4106,12 +4109,12 @@ class Stringable(str):
 
         Parameters
         ----------
-        callback : Callable[[Stringable], Any]
+        callback : typing.Callable[[Stringable], typing.Any]
             Function to execute with the string.
 
         Returns
         -------
-        Stringable
+        orionis.support.types.Stringable
             The same Stringable instance.
         """
         # Call the callback with self, do not modify the string.

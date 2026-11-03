@@ -1,3 +1,5 @@
+"""Provide view globals operations through ``_global_session``."""
+
 from __future__ import annotations
 from typing import TYPE_CHECKING, Any
 from orionis.session.contracts.session import ISession
@@ -13,12 +15,12 @@ def _global_session(app: IApplication) -> Any:
 
     Parameters
     ----------
-    app : IApplication
+    app : orionis.IApplication
         Application container used for service resolution.
 
     Returns
     -------
-    Any
+    typing.Any
         Async callable that resolves the current session.
     """
     async def session() -> ISession | None:
@@ -27,7 +29,7 @@ def _global_session(app: IApplication) -> Any:
 
         Returns
         -------
-        ISession | None
+        orionis.session.contracts.ISession | None
             The session instance bound to the active request scope, or
             ``None`` when the session service is unavailable.
         """

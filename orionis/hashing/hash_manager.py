@@ -1,3 +1,5 @@
+"""Expose an algorithm-agnostic hashing API."""
+
 from typing import Self
 from orionis.foundation.config.hashing.entities.hashing import Hashing as _HashingConfig
 from orionis.foundation.config.hashing.enums.drivers import Drivers
@@ -29,6 +31,7 @@ class HashManager(IHashManager):
     # ruff: noqa: PLC0415, TC001
 
     __slots__ = ("_config", "_default", "_drivers")
+    """Declare the instance attribute slots reserved by this class."""
 
     def __init__(self, app: IApplication) -> None:
         """
@@ -39,7 +42,7 @@ class HashManager(IHashManager):
 
         Parameters
         ----------
-        app : IApplication
+        app : orionis.IApplication
             Application container used to read the configuration.
 
         Returns
@@ -53,9 +56,12 @@ class HashManager(IHashManager):
             if isinstance(config_data, dict)
             else config_data
         )
+        """Validated configuration used to construct and operate the service."""
 
         self._default: str = str(self._config.driver)
+        """Value used when the client omits this argument."""
         self._drivers: dict[str, IHasher] = {}
+        """Configured backend drivers cached by their registered names."""
 
     # ── Driver resolution ───────────────────────────────────────────────────
 
@@ -71,13 +77,13 @@ class HashManager(IHashManager):
 
         Returns
         -------
-        IHasher
+        orionis.hashing.contracts.IHasher
             Hasher instance for the requested driver, created on first
             access and cached afterwards.
 
         Raises
         ------
-        HashDriverNotSupportedException
+        orionis.hashing.exceptions.HashDriverNotSupportedException
             If the requested driver is not supported.
         """
         resolved: str = name or self._default
@@ -109,12 +115,12 @@ class HashManager(IHashManager):
 
         Returns
         -------
-        IHasher
+        orionis.hashing.contracts.IHasher
             Configured hasher instance.
 
         Raises
         ------
-        HashDriverNotSupportedException
+        orionis.hashing.exceptions.HashDriverNotSupportedException
             If *name* does not match any supported driver.
         """
         if name == Drivers.ARGON2.value:
@@ -237,12 +243,12 @@ class HashManager(IHashManager):
 
         Returns
         -------
-        Self
+        typing.Self
             The same manager instance, allowing fluent configuration.
 
         Raises
         ------
-        HashConfigurationException
+        orionis.hashing.exceptions.HashConfigurationException
             If the value is not valid for the active driver.
         """
         self.driver().setRounds(rounds)

@@ -1,3 +1,5 @@
+"""Define the contract for router implementations."""
+
 from __future__ import annotations
 from abc import ABC, abstractmethod
 from typing import TYPE_CHECKING
@@ -10,8 +12,10 @@ if TYPE_CHECKING:
     from orionis.realtime.hub import Hub
 
 class IRouter(ABC):
+    """Define the contract for router implementations."""
 
     __slots__ = ()
+    """Declare that this class introduces no additional instance slots."""
 
     @abstractmethod
     def hub(
@@ -21,20 +25,21 @@ class IRouter(ABC):
         *,
         protocol: str = "json",
     ) -> FluentRoute:
-        """Register a Hub connection endpoint with a fixed wire codec.
+        """
+        Register a Hub connection endpoint with a fixed wire codec.
 
         Parameters
         ----------
         path : str
             WebSocket route path, with optional converted parameters.
-        hub : type[Hub]
+        hub : type[orionis.realtime.Hub]
             Hub subclass resolved through the application container.
         protocol : str, optional
             ``json`` by default, or ``msgpack`` for binary frames.
 
         Returns
         -------
-        FluentRoute
+        orionis.http.routes.fluent.FluentRoute
             Registered Hub route builder.
         """
 
@@ -44,18 +49,19 @@ class IRouter(ABC):
         path: str,
         action: RouteAction | None = None,
     ) -> FluentRoute:
-        """Register a WebSocket connection handler independently of HTTP routes.
+        """
+        Register a WebSocket connection handler independently of HTTP routes.
 
         Parameters
         ----------
         path : str
             Connection path with optional converted parameters.
-        action : RouteAction | None, optional
+        action : orionis.http.routes.types.RouteAction | None, optional
             Function, controller action, or invokable controller.
 
         Returns
         -------
-        FluentRoute
+        orionis.http.routes.fluent.FluentRoute
             Registered connection route builder.
         """
 
@@ -108,7 +114,7 @@ class IRouter(ABC):
 
         Returns
         -------
-        FluentRoute
+        orionis.http.routes.fluent.FluentRoute
             The registered FluentRoute instance.
         """
 
@@ -125,7 +131,7 @@ class IRouter(ABC):
         ----------
         path : str
             URL path for the route.
-        action : RouteAction | None, optional
+        action : orionis.http.routes.types.RouteAction | None, optional
             Callable, invokable controller class (defining ``__call__``),
             or ``[ControllerClass, 'method_name']`` list.
             If omitted or None, call ``action(controller, handler)`` on the
@@ -133,7 +139,7 @@ class IRouter(ABC):
 
         Returns
         -------
-        FluentRoute
+        orionis.http.routes.fluent.FluentRoute
             The registered FluentRoute instance.
         """
 
@@ -150,7 +156,7 @@ class IRouter(ABC):
         ----------
         path : str
             URL path for the route.
-        action : RouteAction | None, optional
+        action : orionis.http.routes.types.RouteAction | None, optional
             Callable, invokable controller class (defining ``__call__``),
             or ``[ControllerClass, 'method_name']`` list.
             If omitted or None, call ``action(controller, handler)`` on the
@@ -158,7 +164,7 @@ class IRouter(ABC):
 
         Returns
         -------
-        FluentRoute
+        orionis.http.routes.fluent.FluentRoute
             The registered FluentRoute instance.
         """
 
@@ -175,7 +181,7 @@ class IRouter(ABC):
         ----------
         path : str
             URL path for the route.
-        action : RouteAction | None, optional
+        action : orionis.http.routes.types.RouteAction | None, optional
             Callable, invokable controller class (defining ``__call__``),
             or ``[ControllerClass, 'method_name']`` list.
             If omitted or None, call ``action(controller, handler)`` on the
@@ -183,7 +189,7 @@ class IRouter(ABC):
 
         Returns
         -------
-        FluentRoute
+        orionis.http.routes.fluent.FluentRoute
             The registered FluentRoute instance.
         """
 
@@ -200,7 +206,7 @@ class IRouter(ABC):
         ----------
         path : str
             URL path for the route.
-        action : RouteAction | None, optional
+        action : orionis.http.routes.types.RouteAction | None, optional
             Callable, invokable controller class (defining ``__call__``),
             or ``[ControllerClass, 'method_name']`` list.
             If omitted or None, call ``action(controller, handler)`` on the
@@ -208,7 +214,7 @@ class IRouter(ABC):
 
         Returns
         -------
-        FluentRoute
+        orionis.http.routes.fluent.FluentRoute
             The registered FluentRoute instance.
         """
 
@@ -225,7 +231,7 @@ class IRouter(ABC):
         ----------
         path : str
             URL path for the route.
-        action : RouteAction | None, optional
+        action : orionis.http.routes.types.RouteAction | None, optional
             Callable, invokable controller class (defining ``__call__``),
             or ``[ControllerClass, 'method_name']`` list.
             If omitted or None, call ``action(controller, handler)`` on the
@@ -233,7 +239,7 @@ class IRouter(ABC):
 
         Returns
         -------
-        FluentRoute
+        orionis.http.routes.fluent.FluentRoute
             The registered FluentRoute instance.
         """
 
@@ -250,7 +256,7 @@ class IRouter(ABC):
         ----------
         path : str
             URL path for the route.
-        action : RouteAction | None, optional
+        action : orionis.http.routes.types.RouteAction | None, optional
             Callable, invokable controller class (defining ``__call__``),
             or ``[ControllerClass, 'method_name']`` list.
             If omitted or None, call ``action(controller, handler)`` on the
@@ -258,7 +264,7 @@ class IRouter(ABC):
 
         Returns
         -------
-        FluentRoute
+        orionis.http.routes.fluent.FluentRoute
             The registered FluentRoute instance.
         """
 
@@ -275,7 +281,7 @@ class IRouter(ABC):
 
         Parameters
         ----------
-        action : RouteAction
+        action : orionis.http.routes.types.RouteAction
             Callable, invokable controller class (defining ``__call__``),
             or ``[ControllerClass, 'method_name']`` list. Required because
             fallback registration does not return a fluent route builder.
@@ -287,7 +293,7 @@ class IRouter(ABC):
 
         Raises
         ------
-        FallbackRouteAlreadyRegisteredException
+        orionis.http.routes.exceptions.fallback_route_already_registered.FallbackRouteAlreadyRegisteredException
             If a fallback handler has already been registered.
         TypeError
             If the action is None or is not an accepted handler form.
@@ -313,10 +319,10 @@ class IRouter(ABC):
         ----------
         prefix : str | None, optional
             URL prefix prepended to every route path in the group.
-        middleware : MiddlewareInput | None, optional
+        middleware : orionis.http.routes.types.MiddlewareInput | None, optional
             Middleware classes to attach to every route in the group.
             Accepts a single class or a container of classes.
-        without_middleware : MiddlewareInput | None, optional
+        without_middleware : orionis.http.routes.types.MiddlewareInput | None, optional
             Middleware classes to exclude from every route in the group.
             Accepts a single class or a container of classes.
         routes : Sequence[FluentRoute | RouteGroup] | None, optional
@@ -326,7 +332,7 @@ class IRouter(ABC):
 
         Returns
         -------
-        RouteGroup
+        orionis.http.routes.group.RouteGroup
             Flattened membership for composition by another group.
 
         Raises

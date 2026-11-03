@@ -8,7 +8,7 @@ from orionis.test import TestCase
 
 class TestHTTPRequestPrinter(TestCase):
 
-    def _make_adapter(
+    def _makeAdapter(
         self,
         method: str = "GET",
         path: str = "/test",
@@ -33,7 +33,7 @@ class TestHTTPRequestPrinter(TestCase):
         adapter.path.return_value = path
         return adapter
 
-    def _make_response(self, code: int = 200) -> MagicMock:
+    def _makeResponse(self, code: int = 200) -> MagicMock:
         """
         Build a mock Response with a controllable status code.
 
@@ -62,7 +62,7 @@ class TestHTTPRequestPrinter(TestCase):
         """
         return HTTPRequestPrinter()
 
-    def _make_with_width(self, columns: int) -> HTTPRequestPrinter:
+    def _makeWithWidth(self, columns: int) -> HTTPRequestPrinter:
         """
         Create an HTTPRequestPrinter forcing a specific terminal column count.
 
@@ -257,8 +257,8 @@ class TestHTTPRequestPrinter(TestCase):
             printer = self._make()
             printer.startTimer()
             result = printer.printRequest(
-                self._make_adapter("GET", "/api/health"),
-                self._make_response(200),
+                self._makeAdapter("GET", "/api/health"),
+                self._makeResponse(200),
             )
         self.assertIsNone(result)
 
@@ -278,8 +278,8 @@ class TestHTTPRequestPrinter(TestCase):
             printer = self._make()
             printer.startTimer()
             printer.printRequest(
-                self._make_adapter("GET", "/api/health"),
-                self._make_response(200),
+                self._makeAdapter("GET", "/api/health"),
+                self._makeResponse(200),
             )
         self.assertGreater(len(buf.getvalue()), 0)
 
@@ -299,8 +299,8 @@ class TestHTTPRequestPrinter(TestCase):
             printer = self._make()
             printer.startTimer()
             result = printer.printRequest(
-                self._make_adapter("GET", "/users"),
-                self._make_response(200),
+                self._makeAdapter("GET", "/users"),
+                self._makeResponse(200),
             )
         self.assertIsNone(result)
 
@@ -320,8 +320,8 @@ class TestHTTPRequestPrinter(TestCase):
             printer = self._make()
             printer.startTimer()
             result = printer.printRequest(
-                self._make_adapter("POST", "/users"),
-                self._make_response(201),
+                self._makeAdapter("POST", "/users"),
+                self._makeResponse(201),
             )
         self.assertIsNone(result)
 
@@ -340,8 +340,8 @@ class TestHTTPRequestPrinter(TestCase):
             printer = self._make()
             printer.startTimer()
             result = printer.printRequest(
-                self._make_adapter("DELETE", "/users/1"),
-                self._make_response(204),
+                self._makeAdapter("DELETE", "/users/1"),
+                self._makeResponse(204),
             )
         self.assertIsNone(result)
 
@@ -361,8 +361,8 @@ class TestHTTPRequestPrinter(TestCase):
             printer = self._make()
             printer.startTimer()
             result = printer.printRequest(
-                self._make_adapter("BREW", "/coffee"),
-                self._make_response(418),
+                self._makeAdapter("BREW", "/coffee"),
+                self._makeResponse(418),
             )
         self.assertIsNone(result)
 
@@ -382,8 +382,8 @@ class TestHTTPRequestPrinter(TestCase):
             printer = self._make()
             printer.startTimer()
             result = printer.printRequest(
-                self._make_adapter("get", "/api"),
-                self._make_response(200),
+                self._makeAdapter("get", "/api"),
+                self._makeResponse(200),
             )
         self.assertIsNone(result)
 
@@ -403,8 +403,8 @@ class TestHTTPRequestPrinter(TestCase):
             printer = self._make()
             printer.startTimer()
             printer.printRequest(
-                self._make_adapter("GET", "/"),
-                self._make_response(200),
+                self._makeAdapter("GET", "/"),
+                self._makeResponse(200),
             )
         self.assertIn("ms", buf.getvalue())
 
@@ -424,8 +424,8 @@ class TestHTTPRequestPrinter(TestCase):
             printer = self._make()
             printer.startTimer()
             printer.printRequest(
-                self._make_adapter("GET", "/"),
-                self._make_response(200),
+                self._makeAdapter("GET", "/"),
+                self._makeResponse(200),
             )
         self.assertIn("200", buf.getvalue())
 
@@ -445,8 +445,8 @@ class TestHTTPRequestPrinter(TestCase):
             printer = self._make()
             printer.startTimer()
             printer.printRequest(
-                self._make_adapter("GET", "/missing"),
-                self._make_response(404),
+                self._makeAdapter("GET", "/missing"),
+                self._makeResponse(404),
             )
         self.assertIn("404", buf.getvalue())
 
@@ -466,8 +466,8 @@ class TestHTTPRequestPrinter(TestCase):
             printer = self._make()
             printer.startTimer()
             printer.printRequest(
-                self._make_adapter("POST", "/crash"),
-                self._make_response(500),
+                self._makeAdapter("POST", "/crash"),
+                self._makeResponse(500),
             )
         self.assertIn("500", buf.getvalue())
 
@@ -486,8 +486,8 @@ class TestHTTPRequestPrinter(TestCase):
             printer = self._make()
             printer.startTimer()
             result = printer.printRequest(
-                self._make_adapter("GET", "/moved"),
-                self._make_response(301),
+                self._makeAdapter("GET", "/moved"),
+                self._makeResponse(301),
             )
         self.assertIsNone(result)
 
@@ -507,8 +507,8 @@ class TestHTTPRequestPrinter(TestCase):
             printer = self._make()
             printer.startTimer()
             printer.printRequest(
-                self._make_adapter("GET", "/.well-known/acme-challenge"),
-                self._make_response(200),
+                self._makeAdapter("GET", "/.well-known/acme-challenge"),
+                self._makeResponse(200),
             )
         self.assertEqual(buf.getvalue(), "")
 
@@ -529,8 +529,8 @@ class TestHTTPRequestPrinter(TestCase):
             printer = self._make()
             printer.startTimer()
             printer.printRequest(
-                self._make_adapter("GET", long_path),
-                self._make_response(200),
+                self._makeAdapter("GET", long_path),
+                self._makeResponse(200),
             )
         self.assertIn("...", buf.getvalue())
 
@@ -550,8 +550,8 @@ class TestHTTPRequestPrinter(TestCase):
             printer = self._make()
             printer.startTimer()
             result = printer.printRequest(
-                self._make_adapter("GET", "/"),
-                self._make_response(200),
+                self._makeAdapter("GET", "/"),
+                self._makeResponse(200),
             )
         self.assertIsNone(result)
 
@@ -570,8 +570,8 @@ class TestHTTPRequestPrinter(TestCase):
         with patch("sys.stdout", buf):
             printer = self._make()
             printer.printRequest(
-                self._make_adapter("GET", "/"),
-                self._make_response(200),
+                self._makeAdapter("GET", "/"),
+                self._makeResponse(200),
             )
         self.assertEqual(buf.getvalue(), "")
 
@@ -591,8 +591,8 @@ class TestHTTPRequestPrinter(TestCase):
             printer.setEnabled(enabled=False)
             printer.startTimer()
             printer.printRequest(
-                self._make_adapter("GET", "/"),
-                self._make_response(200),
+                self._makeAdapter("GET", "/"),
+                self._makeResponse(200),
             )
         self.assertEqual(buf.getvalue(), "")
 
@@ -614,8 +614,8 @@ class TestHTTPRequestPrinter(TestCase):
             printer.setEnabled(enabled=True)
             printer.startTimer()
             printer.printRequest(
-                self._make_adapter("GET", "/"),
-                self._make_response(200),
+                self._makeAdapter("GET", "/"),
+                self._makeResponse(200),
             )
         self.assertGreater(len(buf.getvalue()), 0)
 
@@ -630,7 +630,7 @@ class TestHTTPRequestPrinter(TestCase):
         None
             Assertions verify the behavior described above.
         """
-        printer = self._make_with_width(10)
+        printer = self._makeWithWidth(10)
         self.assertGreaterEqual(printer._total_width, 60)
 
     def testTotalWidthClampedToMaximum(self) -> None:
@@ -644,7 +644,7 @@ class TestHTTPRequestPrinter(TestCase):
         None
             Assertions verify the behavior described above.
         """
-        printer = self._make_with_width(1000)
+        printer = self._makeWithWidth(1000)
         self.assertLessEqual(printer._total_width, 120)
 
     async def testStartCreatesQueueAndWorker(self) -> None:
@@ -700,8 +700,8 @@ class TestHTTPRequestPrinter(TestCase):
             await printer.start()
             printer.startTimer()
             printer.printRequest(
-                self._make_adapter("GET", "/test"),
-                self._make_response(200),
+                self._makeAdapter("GET", "/test"),
+                self._makeResponse(200),
             )
         await asyncio.sleep(0.05)
         queue = printer._HTTPRequestPrinter__queue
@@ -730,7 +730,7 @@ class TestHTTPRequestPrinter(TestCase):
         with patch("sys.stdout", io.StringIO()):
             printer.startTimer()
             printer.printRequest(
-                self._make_adapter("GET", "/overflow"),
-                self._make_response(200),
+                self._makeAdapter("GET", "/overflow"),
+                self._makeResponse(200),
             )
         await printer.stop()

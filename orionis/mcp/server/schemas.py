@@ -1,3 +1,5 @@
+"""Provide mcp server operations through ``compile_schema``, ``convert_payload``."""
+
 from typing import Annotated, cast, get_args, get_origin
 import msgspec
 
@@ -18,6 +20,7 @@ _META_FIELDS = (
     "examples",
     "extra",
 )
+"""Meta fields definitions used by ``schemas``."""
 _ANNOTATION_KEYS = frozenset(
     {
         "title",
@@ -31,8 +34,11 @@ _ANNOTATION_KEYS = frozenset(
         "$comment",
     },
 )
+"""Annotation keys used by ``schemas``."""
 _DIALECT = "https://json-schema.org/draft/2020-12/schema"
+"""Dialect identifier: ``https://json-schema.org/draft/2020-12/schema``."""
 _DEFINITIONS = "$defs"
+"""Definitions identifier: ``$defs``."""
 
 def _schema_hook(annotation: type) -> dict[str, object]:
     """
@@ -206,7 +212,7 @@ def _inline(
         Value to inspect, transform or validate.
     definitions : dict[str, object]
         Value supplied for ``definitions``.
-    ancestors : tuple[str, ...]
+    ancestors : tuple[str, ``...``]
         Value supplied for ``ancestors``.
     referenced : set[str]
         Value supplied for ``referenced``.

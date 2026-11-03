@@ -1,3 +1,5 @@
+"""Secondary, type-specific knobs mirroring SQLAlchemy constructor args."""
+
 from __future__ import annotations
 from dataclasses import dataclass
 from typing import TYPE_CHECKING
@@ -11,7 +13,8 @@ class ColumnOptions:
     """
     Secondary, type-specific knobs mirroring SQLAlchemy constructor args.
 
-    A single options object keeps :class:`ColumnDefinition` constructible
+    A single options object keeps :class:`orionis.orm.schema.column.ColumnDefinition`
+    constructible
     with a handful of parameters while still exposing every keyword that
     the equivalent SQLAlchemy Core type accepts, one attribute per keyword.
 
@@ -47,7 +50,7 @@ class ColumnOptions:
         Whether UUID values are interpreted as ``uuid.UUID`` objects.
     native_uuid : bool
         Whether to use the backend's native UUID-storing type.
-    item_type : ColumnDefinition or None
+    item_type : orionis.orm.schema.column.ColumnDefinition or None
         Element type declaration for array columns.
     dimensions : int or None
         Fixed number of dimensions for array columns.
@@ -68,7 +71,7 @@ class ColumnOptions:
         Pickle protocol used by pickle-backed columns.
     pickler : object or None
         Object exposing ``dumps``/``loads``, defaults to ``pickle``.
-    comparator : Callable or None
+    comparator : collections.abc.Callable or None
         Predicate used to compare pickled values for equality.
     impl : object or None
         Binary-storing type used in place of the default.

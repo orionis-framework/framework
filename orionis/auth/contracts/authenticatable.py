@@ -1,3 +1,5 @@
+"""Define the minimum surface an application identity must expose."""
+
 from abc import ABC, abstractmethod
 
 class IAuthenticatable(ABC):
@@ -9,6 +11,7 @@ class IAuthenticatable(ABC):
     """
 
     __slots__ = ()
+    """Declare that this class introduces no additional instance slots."""
 
     @abstractmethod
     def getAuthIdentifierName(self) -> str:

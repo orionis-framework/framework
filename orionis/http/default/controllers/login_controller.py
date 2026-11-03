@@ -1,3 +1,5 @@
+"""Handle the built-in sign-in and sign-out endpoints."""
+
 from typing import Any
 from orionis.auth.contracts.manager import IAuthManager
 from orionis.foundation.contracts.application import IApplication
@@ -9,11 +11,16 @@ from orionis.http.request import Request
 class LoginController(BaseController):
 
     # ruff: noqa: TC001
+    """Handle the built-in sign-in and sign-out endpoints."""
 
     HOME_REDIRECT_PATH: str = "/home"
+    """Home redirect path identifier: ``/home``."""
     DEFAULT_LOGIN_PATH: str = "/login"
+    """Default login path identifier: ``/login``."""
     LOGOUT_REDIRECT_PATH: str = "/"
+    """Logout redirect path identifier: ``/``."""
     LOGIN_VIEW_NAME: str = "auth.login"
+    """Login view name identifier: ``auth.login``."""
 
     def __init__(
         self,
@@ -27,7 +34,7 @@ class LoginController(BaseController):
 
         Parameters
         ----------
-        application : IApplication
+        application : orionis.IApplication
             Application instance used to read the ``auth`` configuration.
 
         Returns
@@ -39,6 +46,7 @@ class LoginController(BaseController):
         self.redirect_to: str = (
             application.config("auth.session.home") or self.HOME_REDIRECT_PATH
         )
+        """Cache the destination used after a valid session login."""
 
     async def index(
         self,
@@ -48,7 +56,7 @@ class LoginController(BaseController):
 
         Returns
         -------
-        HttpResponse
+        orionis.http.Response
             Rendered response for the login page.
         """
         # Render the template through the view factory.
@@ -65,16 +73,16 @@ class LoginController(BaseController):
 
         Parameters
         ----------
-        request : Request
+        request : orionis.http.Request
             Incoming HTTP request, used to read the raw submitted payload.
-        payload : LoginSchema
+        payload : orionis.http.default.schemas.login.LoginSchema
             Validated credentials; invalid submissions never reach this method.
-        auth : IAuthManager
+        auth : orionis.auth.contracts.IAuthManager
             Authentication service using the request's existing session.
 
         Returns
         -------
-        HttpResponse
+        orionis.http.Response
             Redirect to the dashboard, or back with a generic credential error.
         """
         # Keep the raw payload so it can be flashed back when login fails.
@@ -108,12 +116,12 @@ class LoginController(BaseController):
 
         Parameters
         ----------
-        auth : IAuthManager
+        auth : orionis.auth.contracts.IAuthManager
             Authentication service bound to the current request.
 
         Returns
         -------
-        HttpResponse
+        orionis.http.Response
             Redirect whose session cookie is cleared by the web middleware.
         """
         # Drop the authenticated identity before leaving the private area.

@@ -1,3 +1,5 @@
+"""Represent the password hashing configuration for the application."""
+
 from __future__ import annotations
 from dataclasses import dataclass, field
 from orionis.environment import Env
@@ -8,6 +10,7 @@ from orionis.support.entities.base import BaseEntity
 
 # Define the supported hashing driver names.
 _DRIVER_NAMES: frozenset[str] = frozenset(Drivers._member_names_)
+"""Define the supported hashing driver names."""
 
 @dataclass(frozen=True, kw_only=True)
 class Hashing(BaseEntity):
@@ -16,13 +19,13 @@ class Hashing(BaseEntity):
 
     Attributes
     ----------
-    driver : Drivers | str
+    driver : orionis.foundation.config.hashing.Drivers | str
         Default hashing driver. Accepts a ``Drivers`` enum member or a
         plain string (``'argon2'`` or ``'bcrypt'``). Resolved from the
         ``HASH_DRIVER`` environment variable or ``Drivers.ARGON2.value``.
-    argon2 : Argon2 | dict
+    argon2 : orionis.foundation.config.hashing.Argon2 | dict
         Cost parameters applied by the Argon2id driver.
-    bcrypt : Bcrypt | dict
+    bcrypt : orionis.foundation.config.hashing.Bcrypt | dict
         Cost parameters applied by the bcrypt driver.
     """
 

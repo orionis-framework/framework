@@ -1,3 +1,8 @@
+"""Provide mcp protocol operations.
+
+Includes ``CacheHint``, ``Icon``, ``ToolAnnotations``, ``ContentAnnotations``.
+"""
+
 from typing import Literal
 import msgspec
 
@@ -5,10 +10,12 @@ class CacheHint(msgspec.Struct, frozen=True, kw_only=True):
     """Describe client cache freshness without caching server-side results."""
 
     ttl_ms: int = msgspec.field(name="ttlMs", default=0)
+    """Ttl ms produced by ``msgspec.field``."""
     scope: Literal["public", "private"] = msgspec.field(
         name="cacheScope",
         default="private",
     )
+    """Dependency-injection scope associated with the current operation."""
 
     def __post_init__(self) -> None:
         """
@@ -37,10 +44,12 @@ class Icon(msgspec.Struct, frozen=True, kw_only=True, omit_defaults=True):
     """An icon reference; the server never fetches its source."""
 
     src: str
+    """URI or data URL locating the icon image."""
     mime_type: str | msgspec.UnsetType = msgspec.field(
         name="mimeType",
         default=msgspec.UNSET,
     )
+    """Media type describing the resource content."""
     sizes: tuple[str, ...] | msgspec.UnsetType = msgspec.UNSET
     theme: Literal["light", "dark"] | msgspec.UnsetType = msgspec.UNSET
 
@@ -72,18 +81,22 @@ class ToolAnnotations(msgspec.Struct, frozen=True, kw_only=True, omit_defaults=T
         name="readOnlyHint",
         default=msgspec.UNSET,
     )
+    """Read only produced by ``msgspec.field``."""
     destructive: bool | msgspec.UnsetType = msgspec.field(
         name="destructiveHint",
         default=msgspec.UNSET,
     )
+    """Destructive produced by ``msgspec.field``."""
     idempotent: bool | msgspec.UnsetType = msgspec.field(
         name="idempotentHint",
         default=msgspec.UNSET,
     )
+    """Idempotent produced by ``msgspec.field``."""
     open_world: bool | msgspec.UnsetType = msgspec.field(
         name="openWorldHint",
         default=msgspec.UNSET,
     )
+    """Open world produced by ``msgspec.field``."""
 
 class ContentAnnotations(msgspec.Struct, frozen=True, kw_only=True, omit_defaults=True):
     """Resource/content audience, relevance, and modification hints."""
@@ -96,6 +109,7 @@ class ContentAnnotations(msgspec.Struct, frozen=True, kw_only=True, omit_default
         name="lastModified",
         default=msgspec.UNSET,
     )
+    """Last modified produced by ``msgspec.field``."""
 
     def __post_init__(self) -> None:
         """
@@ -119,41 +133,50 @@ class PromptArgument(msgspec.Struct, frozen=True, kw_only=True, omit_defaults=Tr
     """Declare one string-valued prompt argument."""
 
     name: str
+    """Name identifying this declaration within its containing registry."""
     title: str | msgspec.UnsetType = msgspec.UNSET
     description: str | msgspec.UnsetType = msgspec.UNSET
     required: bool = False
+    """Required flag used by ``PromptArgument``."""
 
 class ServerInfo(msgspec.Struct, frozen=True, kw_only=True, omit_defaults=True):
     """Describe one compiled server implementation."""
 
     name: str
+    """Name identifying this declaration within its containing registry."""
     version: str
+    """Version string advertised by the implementation."""
     title: str | msgspec.UnsetType = msgspec.UNSET
     description: str | msgspec.UnsetType = msgspec.UNSET
     website_url: str | msgspec.UnsetType = msgspec.field(
         name="websiteUrl",
         default=msgspec.UNSET,
     )
+    """Website url produced by ``msgspec.field``."""
     icons: tuple[Icon, ...] | msgspec.UnsetType = msgspec.UNSET
 
 class PrimitiveMetadata(msgspec.Struct, frozen=True, kw_only=True):
     """Common typed fields used to validate static registry metadata at boot."""
 
     name: str
+    """Name identifying this declaration within its containing registry."""
     title: str | msgspec.UnsetType = msgspec.UNSET
     description: str | msgspec.UnsetType = msgspec.UNSET
     icons: tuple[Icon, ...] | msgspec.UnsetType = msgspec.UNSET
     meta: dict[str, object] | msgspec.UnsetType = msgspec.field(
         name="_meta", default=msgspec.UNSET,
     )
+    """Meta produced by ``msgspec.field``."""
 
 class ToolMetadata(PrimitiveMetadata, frozen=True, kw_only=True):
     """A native tool schema with optional behavioral hints."""
 
     input_schema: dict[str, object] = msgspec.field(name="inputSchema")
+    """JSON Schema describing the accepted input."""
     output_schema: dict[str, object] | msgspec.UnsetType = msgspec.field(
         name="outputSchema", default=msgspec.UNSET,
     )
+    """JSON Schema describing the declared structured output."""
     annotations: ToolAnnotations | msgspec.UnsetType = msgspec.UNSET
 
 class ResourceMetadata(PrimitiveMetadata, frozen=True, kw_only=True):
@@ -163,9 +186,11 @@ class ResourceMetadata(PrimitiveMetadata, frozen=True, kw_only=True):
     uri_template: str | msgspec.UnsetType = msgspec.field(
         name="uriTemplate", default=msgspec.UNSET,
     )
+    """Uri template produced by ``msgspec.field``."""
     mime_type: str | msgspec.UnsetType = msgspec.field(
         name="mimeType", default=msgspec.UNSET,
     )
+    """Media type describing the resource content."""
     size: int | msgspec.UnsetType = msgspec.UNSET
     annotations: ContentAnnotations | msgspec.UnsetType = msgspec.UNSET
 

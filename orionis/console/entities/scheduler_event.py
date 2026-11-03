@@ -1,3 +1,5 @@
+"""Represent a scheduler event entity."""
+
 from __future__ import annotations
 from dataclasses import dataclass, field
 from orionis.console.enums.events import SchedulerEvent as SchedulerEventEnum
@@ -8,7 +10,7 @@ class SchedulerEvent(BaseEntity):
     """
     Represent a scheduler event entity.
 
-    Parameters
+    Attributes
     ----------
     code : int
         Unique identifier code for the scheduler event.

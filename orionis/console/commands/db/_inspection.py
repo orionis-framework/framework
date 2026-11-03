@@ -1,3 +1,5 @@
+"""Inspect user objects without opening a separate database engine."""
+
 from __future__ import annotations
 from typing import TYPE_CHECKING, Any
 from orionis.database.exceptions import QueryException
@@ -12,6 +14,7 @@ class DatabaseInspector:
     # ruff: noqa: PLC0415, S608
 
     __slots__ = ("config", "connection", "driver", "name")
+    """Declare the instance attribute slots reserved by this class."""
 
     def __init__(
         self,
@@ -23,7 +26,7 @@ class DatabaseInspector:
 
         Parameters
         ----------
-        manager : IConnectionManager
+        manager : orionis.database.contracts.IConnectionManager
             Manager that resolves database configurations and connections.
         name : str | None, optional
             Named connection, or the configured default.
@@ -36,9 +39,13 @@ class DatabaseInspector:
         from orionis.database.dialect import resolve_driver
 
         self.name = name or manager.getDefaultName()
+        """Named connection, or the configured default."""
         self.config = manager.configFor(self.name)
+        """Validated configuration used to construct and operate the service."""
         self.driver = resolve_driver(self.config)
+        """Driver produced by ``resolve_driver``."""
         self.connection: IConnection = manager.connection(self.name)
+        """Configured connection used to store or dispatch the operation."""
 
     def quoteIdentifier(self, name: str, *, qualified: bool = True) -> str:
         """
@@ -721,7 +728,7 @@ class DatabaseInspector:
 
         Returns
         -------
-        dict[str, Any]
+        dict[str, typing.Any]
             Table metadata and statistics.
 
         Raises
@@ -1268,7 +1275,7 @@ class DatabaseInspector:
 
         Returns
         -------
-        list[dict[str, Any]]
+        list[dict[str, typing.Any]]
             Visible object names or one aggregate count.
         """
         # These system views cannot be joined on Redshift compute nodes.
@@ -1325,7 +1332,7 @@ class DatabaseInspector:
 
         Returns
         -------
-        list[dict[str, Any]] | None
+        list[dict[str, typing.Any]] | None
             Sizes in bytes, or None when optional metadata access is unavailable.
         """
         from sqlalchemy.exc import SQLAlchemyError

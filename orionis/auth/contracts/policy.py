@@ -1,3 +1,5 @@
+"""Define the contract shared by every resource policy."""
+
 from abc import ABC, abstractmethod
 
 class IPolicy(ABC):
@@ -10,6 +12,7 @@ class IPolicy(ABC):
     """
 
     __slots__ = ()
+    """Declare that this class introduces no additional instance slots."""
 
     @abstractmethod
     async def before(self, identity: object, ability: str) -> bool | None:

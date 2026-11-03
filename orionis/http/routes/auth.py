@@ -1,3 +1,5 @@
+"""Provide http routes operations through ``build_auth_routes``."""
+
 from typing import TYPE_CHECKING
 from orionis.http.default.controllers.forgot_password_controller import ForgotPasswordController
 from orionis.auth.middleware.authenticate import AuthenticateSessionMiddleware
@@ -22,7 +24,7 @@ def build_auth_routes(
 
     Parameters
     ----------
-    router : IRouter
+    router : orionis.http.routes.contracts.router.IRouter
         Router that receives the authentication routes.
     login_controller : type | None, optional
         Controller type used for login and logout routes.

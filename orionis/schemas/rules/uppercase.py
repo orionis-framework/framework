@@ -1,3 +1,5 @@
+"""Ensure a string contains no lowercase characters."""
+
 from orionis.schemas.rule import Rule
 
 class Uppercase(Rule):
@@ -6,9 +8,12 @@ class Uppercase(Rule):
     # ruff: noqa: ARG002
 
     __slots__ = ()
+    """Declare that this class introduces no additional instance slots."""
 
     __message__ = "Value must be uppercase."
+    """Error text for message: ``Value must be uppercase.``."""
     __code__ = "uppercase"
+    """Code identifier: ``uppercase``."""
 
     async def enforce(
         self,

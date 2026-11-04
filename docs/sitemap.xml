@@ -79,6 +79,9 @@
     <loc>https://api.orionis-framework.com/orionis.auth.authorization.repository.html</loc>
   </url>
   <url>
+    <loc>https://api.orionis-framework.com/orionis.auth.authorization.schema.html</loc>
+  </url>
+  <url>
     <loc>https://api.orionis-framework.com/orionis.auth.authorization.snapshot.html</loc>
   </url>
   <url>
@@ -317,6 +320,9 @@
   </url>
   <url>
     <loc>https://api.orionis-framework.com/orionis.auth.passwords.html</loc>
+  </url>
+  <url>
+    <loc>https://api.orionis-framework.com/orionis.auth.passwords.schema.html</loc>
   </url>
   <url>
     <loc>https://api.orionis-framework.com/orionis.auth.PolicyNotFoundException.html</loc>

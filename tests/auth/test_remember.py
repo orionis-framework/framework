@@ -3,19 +3,16 @@ import tempfile
 from pathlib import Path
 from types import SimpleNamespace
 from unittest.mock import AsyncMock, patch
-from database.migrations import (
-    m0000000012_create_password_reset_tokens_table as reset_migration,
-)
 from orionis.auth.concerns.authenticatable import Authenticatable
 from orionis.auth.exceptions import AuthException
 from orionis.auth.guards.session_guard import SessionGuard
 from orionis.auth.identity.provider import ModelIdentityProvider
 from orionis.auth.middleware.resolve_identity import ResolveSessionIdentityMiddleware
 from orionis.auth.passwords.broker import PasswordBroker
+from orionis.auth.passwords.schema import build_password_reset_table
 from orionis.auth.remember import RememberMe, apply_remember_cookie
 from orionis.container.context.manager import ScopeManager
 from orionis.database.connection_manager import ConnectionManager
-from orionis.database.schema.schema import Schema as DatabaseSchema
 from orionis.foundation.config.auth import RememberAuth
 from orionis.hashing.hash_manager import HashManager
 from orionis.http.default.controllers.login_controller import LoginController
@@ -417,8 +414,9 @@ class TestRememberMe(TestCase):
             Assertions verify the behavior described above.
         """
         original = queued_cookie(await self.login())
-        with patch.object(reset_migration, "Schema", DatabaseSchema(self.manager)):
-            await reset_migration.CreatePasswordResetTokensTable().up()
+        await self.connection.createTable(
+            build_password_reset_table("password_reset_tokens"),
+        )
         broker = PasswordBroker(self.app, QueryBuilder(self.manager), self.hashing)
         _, token = await broker.issue(self.user.email)
         self.assertIsNotNone(

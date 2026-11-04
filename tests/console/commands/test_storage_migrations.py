@@ -1,6 +1,9 @@
 from tempfile import TemporaryDirectory
 from threading import get_ident
 from typing import TYPE_CHECKING
+from orionis.auth.authorization.registrar import PermissionRegistrar
+from orionis.auth.authorization.schema import build_authorization_tables
+from orionis.auth.passwords.schema import build_password_reset_table
 from orionis.auth.tokens.repository import AccessTokenRepository
 from orionis.cache.stores.database import DatabaseCacheBackend
 from orionis.console.commands.auth.migrate import AuthMigrateCommand
@@ -92,6 +95,7 @@ class _Application(CommandApplication):
                 "tokens": {
                     "table": "api_tokens", "expiration": None, "secret_bytes": 40,
                 },
+                "passwords": {"table": "reset_links"},
             },
             "cache": {
                 "default": "memory",
@@ -252,6 +256,146 @@ class TestStorageMigrations(TestCase):
             )
         self.assertEqual(manager._drivers, {})
         self.assertIsNone(manager._failed)
+
+    async def testAuthMigrateCreatesInternalTablesWithConfiguredNamesAndPrefix(
+        self,
+    ) -> None:
+        """
+        Prepare auth infrastructure without creating identity or seed data.
+
+        Returns
+        -------
+        None
+            Verify all seven schemas, configured names, prefix, and SQL routing.
+        """
+        command = _record(AuthMigrateCommand)
+        self.assertEqual(await command.handle(self.app, self.app.manager), 0)
+        self.assertEqual(set(self.app.manager._cached_connections), {"default"})
+        connection = self.app.manager.connection()
+        expected = {
+            "app_permissions": ("id", "name", "created_at", "updated_at"),
+            "app_roles": ("id", "name", "created_at", "updated_at"),
+            "app_model_has_permissions": ("permission_id", "model_type", "model_id"),
+            "app_model_has_roles": ("role_id", "model_type", "model_id"),
+            "app_role_has_permissions": ("permission_id", "role_id"),
+            "app_api_tokens": (
+                "id", "tokenable_type", "tokenable_id", "name", "token", "abilities",
+                "last_used_at", "expires_at", "revoked_at", "created_at", "updated_at",
+            ),
+            "app_reset_links": (
+                "email", "token", "user_id", "password_fingerprint", "created_at",
+            ),
+        }
+        tables = await connection.select(
+            "SELECT name FROM sqlite_master "
+            "WHERE type = 'table' AND name NOT LIKE 'sqlite_%'",
+        )
+        self.assertEqual({row["name"] for row in tables}, set(expected))
+        for table, names in expected.items():
+            with self.subTest(table=table):
+                columns = await connection.select(
+                    "SELECT name FROM pragma_table_info(:table)", {"table": table},
+                )
+                self.assertEqual(tuple(column["name"] for column in columns), names)
+        db = QueryBuilder(self.app.manager)
+        for table in ("permissions", "roles"):
+            self.assertEqual(await db.table(table).count(), 0)
+
+    async def testAuthMigrateUsesDefaultCredentialTablesWithoutConfiguration(
+        self,
+    ) -> None:
+        """
+        Prepare the standard credential tables when auth settings are absent.
+
+        Returns
+        -------
+        None
+            Verify default token and password-reset names retain the SQL prefix.
+        """
+        self.app.settings["auth"].clear()
+        command = _record(AuthMigrateCommand)
+        self.assertEqual(await command.handle(self.app, self.app.manager), 0)
+        tables = await self.app.manager.connection().select(
+            "SELECT name FROM sqlite_master WHERE type = 'table'",
+        )
+        names = {row["name"] for row in tables}
+        self.assertTrue({
+            "app_personal_access_tokens", "app_password_reset_tokens",
+        } <= names)
+        self.assertTrue({"app_api_tokens", "app_reset_links"}.isdisjoint(names))
+
+    async def testAuthMigratePreservesExistingAuthorizationAndRecoveryRecords(
+        self,
+    ) -> None:
+        """
+        Adopt existing auth tables without replacing grants or reset credentials.
+
+        Returns
+        -------
+        None
+            Verify populated auth tables survive adoption and repeated preparation.
+        """
+        connection = self.app.manager.connection()
+        for definition in (
+            *build_authorization_tables(), build_password_reset_table("reset_links"),
+        ):
+            await connection.createTable(definition)
+        db = QueryBuilder(self.app.manager)
+        registrar = PermissionRegistrar(db)
+        identity = _Identity(123)
+        await registrar.assignRole(identity, "editor")
+        await registrar.grantToRole("editor", "posts.update")
+        await registrar.givePermissionTo(identity, "posts.view")
+        await db.table("reset_links").insert({
+            "email": "editor@example.test",
+            "token": "a" * 64,
+            "user_id": "123",
+            "password_fingerprint": "b" * 64,
+            "created_at": 123,
+        })
+        expected = {
+            table: await db.table(table).get()
+            for table in (
+                "permissions", "roles", "model_has_permissions", "model_has_roles",
+                "role_has_permissions", "reset_links",
+            )
+        }
+        command = _record(AuthMigrateCommand)
+        self.assertEqual(await command.handle(self.app, self.app.manager), 0)
+        repository = AccessTokenRepository(self.app, db)
+        issued = await repository.create(identity, "preserved")
+        self.assertEqual(await command.handle(self.app, self.app.manager), 0)
+        for table, rows in expected.items():
+            with self.subTest(table=table):
+                self.assertEqual(await db.table(table).get(), rows)
+        self.assertIsNotNone(await repository.findByPlainText(issued.plain_text))
+
+    async def testAuthMigrateRejectsConflictingTableNamesBeforeCreatingStorage(
+        self,
+    ) -> None:
+        """
+        Reject configured credential tables that alias another auth table.
+
+        Returns
+        -------
+        None
+            Verify collisions fail explicitly before opening the SQL engine.
+        """
+        for section, table in (
+            ("tokens", "roles"),
+            ("tokens", "ROLES"),
+            ("passwords", "model_has_permissions"),
+            ("passwords", "api_tokens"),
+        ):
+            with self.subTest(section=section, table=table):
+                self.app.settings["auth"]["tokens"]["table"] = "api_tokens"
+                self.app.settings["auth"]["passwords"]["table"] = "reset_links"
+                self.app.settings["auth"][section]["table"] = table
+                command = _record(AuthMigrateCommand)
+                self.assertEqual(await command.handle(self.app, self.app.manager), 1)
+                self.assertEqual(command.messages[0][0], "error")
+                self.assertIn("must be distinct", command.messages[0][1])
+                self.assertIsNone(self.app.manager.connection()._engine)
 
     async def testAuthMigrateCreatesUsableTokenStorageAndPreservesTokens(self) -> None:
         """
@@ -444,7 +588,11 @@ class TestStorageMigrations(TestCase):
         default_tables = await self.app.manager.connection().select(
             "SELECT name FROM sqlite_master WHERE type = 'table'",
         )
-        self.assertEqual(default_tables, [{"name": "app_api_tokens"}])
+        self.assertEqual({row["name"] for row in default_tables}, {
+            "app_permissions", "app_roles", "app_model_has_permissions",
+            "app_model_has_roles", "app_role_has_permissions", "app_api_tokens",
+            "app_reset_links",
+        })
 
     async def testStorageCommandsReportDatabaseFailures(self) -> None:
         """

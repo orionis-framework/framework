@@ -4,7 +4,9 @@ Un permiso identifica una capacidad, como `posts.publish`; un rol agrupa permiso
 
 ## Crear y asignar capacidades
 
-`PermissionRegistrar` utiliza las tablas de migraciones auth: `permissions`, `roles`, `model_has_permissions`, `model_has_roles` y `role_has_permissions`.
+`PermissionRegistrar` utiliza tablas internas del framework: `permissions`, `roles`, `model_has_permissions`, `model_has_roles` y `role_has_permissions`. Prepáralas con `python -B reactor auth:migrate`; estas tablas no necesitan migraciones de aplicación.
+
+Define los nombres de roles y permisos del negocio, sus asignaciones y las políticas en código o seeders de aplicación. El framework proporciona el almacenamiento, no privilegios predeterminados ni cuentas de administrador.
 
 ```python
 from orionis.auth.authorization.registrar import PermissionRegistrar

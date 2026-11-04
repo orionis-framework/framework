@@ -4,7 +4,9 @@ Permissions name capabilities such as `posts.publish`; roles group permissions. 
 
 ## Creating and assigning capabilities
 
-`PermissionRegistrar` uses authentication migration tables: `permissions`, `roles`, `model_has_permissions`, `model_has_roles` and `role_has_permissions`.
+`PermissionRegistrar` uses framework-owned tables: `permissions`, `roles`, `model_has_permissions`, `model_has_roles` and `role_has_permissions`. Prepare them with `python -B reactor auth:migrate`; no application migrations are required for these tables.
+
+Define application-specific role and permission names, assignments, and policies in application code or seeders. The framework supplies the storage, not default privileges or administrator accounts.
 
 ```python
 from orionis.auth.authorization.registrar import PermissionRegistrar

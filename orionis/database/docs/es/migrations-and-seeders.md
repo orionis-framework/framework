@@ -8,7 +8,7 @@ Estos comandos crean las tablas faltantes a partir del código del framework, si
 
 | Comando | Tablas configuradas | Conexión SQL |
 |---|---|---|
-| `auth:migrate` | `AUTH_TOKEN_TABLE` | Predeterminada de la aplicación. |
+| `auth:migrate` | `AUTH_TOKEN_TABLE`, `AUTH_PASSWORD_RESET_TABLE` y las cinco tablas de autorización. | Predeterminada de la aplicación. |
 | `cache:migrate` | `DB_CACHE_TABLE` y `DB_CACHE_LOCK_TABLE` | `DB_CACHE_CONNECTION`. |
 | `queue:migrate` | `QUEUE_TABLE` de cada cola SQL y `QUEUE_FAILED_TABLE` | `QUEUE_DB_CONNECTION` y `QUEUE_FAILED_DB_CONNECTION`; también respeta las conexiones de colas SQL adicionales. |
 | `schedule:migrate` | `DB_TASK_TABLE` | `DB_TASK_CONNECTION`. |
@@ -16,9 +16,13 @@ Estos comandos crean las tablas faltantes a partir del código del framework, si
 
 Ejecuta, por ejemplo, `python reactor auth:migrate` desde la aplicación inicializada. Los comandos usan los valores de configuración derivados de esas variables; no reciben `--database`. `QUEUE_DB_CONNECTION` es una conexión, no una tabla.
 
-Se pueden ejecutar aunque el driver activo sea memoria, archivo o sync. Caché y scheduler requieren su configuración de almacenamiento `database`. Las tablas de tokens, caché, colas y sesiones respetan el prefijo de su conexión; el scheduler utiliza el nombre y los índices del job store nativo de APScheduler, sin iniciar tareas.
+`auth:migrate` administra `permissions`, `roles`, `model_has_permissions`, `model_has_roles` y `role_has_permissions`, además de las tablas configuradas de tokens personales y recuperación de contraseñas. Los nombres configurados de credenciales deben ser distintos entre sí y de las tablas de autorización, sin distinguir mayúsculas. El comando no crea tablas de identidad ni inserta roles, permisos o cuentas de administrador. Las migraciones de usuarios/dominio, los valores de capacidades, sus asignaciones y las políticas siguen en la aplicación. En una base nueva ejecuta `python -B reactor migrate`, `python -B reactor auth:migrate` y luego `python -B reactor seed`.
+
+Se pueden ejecutar aunque el driver activo sea memoria, archivo o sync. Caché y scheduler requieren su configuración de almacenamiento `database`. Las tablas de autenticación, caché, colas y sesiones respetan el prefijo de su conexión; el scheduler utiliza el nombre y los índices del job store nativo de APScheduler, sin iniciar tareas.
 
 Repetir un comando conserva los registros. No ejecuta `DROP` ni `ALTER`: una tabla existente con otro esquema necesita una migración explícita. Un fallo devuelve código 1; la creación completa devuelve 0. Las restricciones del backend siguen aplicándose, incluida la necesidad de claves únicas efectivas.
+
+Al actualizar una aplicación existente, `auth:migrate` reutiliza sus tablas de autenticación y deja intacto el historial de migraciones. Conserva los archivos de migraciones antiguas de aplicación que ya se hayan ejecutado: eliminarlos puede impedir revertir sus lotes registrados. La preparación interna no reescribe identidades ni historiales desplegados.
 
 ## Escribir una migración reversible
 

@@ -5,23 +5,9 @@ from importlib import import_module
 from unittest.mock import Mock, patch
 from app.models.user import User
 from database.migrations.m0000000005_create_users_table import CreateUsersTable
-from database.migrations.m0000000006_create_permissions_table import (
-    CreatePermissionsTable,
-)
-from database.migrations.m0000000007_create_roles_table import CreateRolesTable
-from database.migrations.m0000000008_create_model_has_permissions_table import (
-    CreateModelHasPermissionsTable,
-)
-from database.migrations.m0000000009_create_model_has_roles_table import (
-    CreateModelHasRolesTable,
-)
-from database.migrations.m0000000010_create_role_has_permissions_table import (
-    CreateRoleHasPermissionsTable,
-)
-from database.migrations.m0000000012_create_password_reset_tokens_table import (
-    CreatePasswordResetTokensTable,
-)
 from database.schemas.users_v1 import USERS_V1
+from orionis.auth.authorization.schema import build_authorization_tables
+from orionis.auth.passwords.schema import build_password_reset_table
 from orionis.database.connection import Connection
 from orionis.database.contracts.connection_manager import IConnectionManager
 from orionis.database.exceptions import QueryException
@@ -49,7 +35,7 @@ _TABLE_COLUMNS = {
 }
 
 class TestApplicationSchemas(TestCase):
-    """Exercise application-owned migrations against a private database."""
+    """Exercise identity migrations beside framework-owned authentication tables."""
 
     async def asyncSetUp(self) -> None:
         """Bind the real migrations and model to an isolated SQLite connection.
@@ -73,15 +59,12 @@ class TestApplicationSchemas(TestCase):
         self.enterContext(patch.object(
             SchemaFacade, "_pinned_instance", Schema(self.manager),
         ))
-        self.migrations = [
-            CreateUsersTable(),
-            CreatePermissionsTable(),
-            CreateRolesTable(),
-            CreateModelHasPermissionsTable(),
-            CreateModelHasRolesTable(),
-            CreateRoleHasPermissionsTable(),
-            CreatePasswordResetTokensTable(),
-        ]
+        self.migrations = [CreateUsersTable()]
+        for definition in (
+            *build_authorization_tables(),
+            build_password_reset_table("password_reset_tokens"),
+        ):
+            await self.connection.createTable(definition)
         await self._migrateUp()
 
     async def _migrateUp(self) -> None:
@@ -111,7 +94,7 @@ class TestApplicationSchemas(TestCase):
         return {row["name"] for row in rows}
 
     async def testMigrationsRollbackAndReplay(self) -> None:
-        """Create, remove, and recreate the complete application schema.
+        """Reverse identity storage without dropping the framework auth tables.
 
         Returns
         -------
@@ -126,7 +109,7 @@ class TestApplicationSchemas(TestCase):
         with migration_connection_scope(self.connection):
             for migration in reversed(self.migrations):
                 await migration.down()
-        self.assertEqual(await self._tableNames(), set())
+        self.assertEqual(await self._tableNames(), set(_TABLE_COLUMNS) - {"users"})
         await self._migrateUp()
         self.assertEqual(await self._tableNames(), set(_TABLE_COLUMNS))
         self.manager.connection.assert_not_called()

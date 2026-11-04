@@ -8,17 +8,14 @@ from unittest.mock import AsyncMock, patch
 from urllib.parse import parse_qs, urlsplit
 from jinja2 import Environment, FileSystemLoader
 from markupsafe import Markup
-from database.migrations import (
-    m0000000012_create_password_reset_tokens_table as reset_migration,
-)
 from orionis.auth.guards.session_guard import SessionGuard
 from orionis.auth.identity.provider import ModelIdentityProvider
 from orionis.auth.middleware import AuthenticateSessionMiddleware, GuestMiddleware
 from orionis.auth.passwords.broker import PasswordBroker
+from orionis.auth.passwords.schema import build_password_reset_table
 from orionis.auth.tokens.functions import hash_token_secret
 from orionis.background.task import BackgroundTask
 from orionis.database.connection_manager import ConnectionManager
-from orionis.database.schema.schema import Schema as DatabaseSchema
 from orionis.foundation.config.auth import Auth, PasswordReset
 from orionis.hashing.hash_manager import HashManager
 from orionis.http.default.controllers.forgot_password_controller import (
@@ -74,10 +71,12 @@ class TestPasswordReset(TestCase):
         self.previous = ConnectionResolver._manager
         ConnectionResolver.setManager(self.manager)
         self.connection = self.manager.connection("sqlite")
-        for table in (accounts_table(), tokens_table()):
+        for table in (
+            accounts_table(),
+            tokens_table(),
+            build_password_reset_table("password_reset_tokens"),
+        ):
             await self.connection.createTable(table)
-        with patch.object(reset_migration, "Schema", DatabaseSchema(self.manager)):
-            await reset_migration.CreatePasswordResetTokensTable().up()
         self.hashing = HashManager(self.app)
         self.db = QueryBuilder(self.manager)
         self.broker = PasswordBroker(self.app, self.db, self.hashing)

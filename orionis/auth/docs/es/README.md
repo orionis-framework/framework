@@ -7,7 +7,21 @@ Orionis resuelve la identidad actual mediante sesión de navegador o token perso
 3. [Tokens personales](personal-access-tokens.md): emitir, limitar y revocar credenciales.
 4. [Recordarme y recuperación de cuentas](account-recovery.md): cookies persistentes, reset y páginas predeterminadas.
 
-Requiere Python 3.14+, modelo ORM configurado, hashing y migraciones de autenticación para persistencia. Los ejemplos de facade y repositorios necesitan una aplicación inicializada; los ejemplos de snapshots son independientes. Revisa [sesiones](../../../session/docs/es/README.md), [HTTP](../../../http/docs/es/README.md) y [ORM](../../../orm/docs/es/README.md).
+Requiere Python 3.14+, modelo ORM configurado, hashing y almacenamiento interno de autenticación para persistencia. Los ejemplos de facade y repositorios necesitan una aplicación inicializada; los ejemplos de snapshots son independientes. Revisa [sesiones](../../../session/docs/es/README.md), [HTTP](../../../http/docs/es/README.md) y [ORM](../../../orm/docs/es/README.md).
+
+## Preparar el almacenamiento de autenticación
+
+En una base nueva, aplica las migraciones de aplicación, prepara las tablas internas de auth y luego ejecuta los seeders de aplicación:
+
+```shell
+python -B reactor migrate
+python -B reactor auth:migrate
+python -B reactor seed
+```
+
+`auth:migrate` crea roles, permisos, sus tres tablas de asignación, tokens personales y almacenamiento de recuperación de contraseñas desde definiciones del core. Usa la conexión SQL predeterminada de la aplicación y respeta su prefijo, `AUTH_TOKEN_TABLE` y `AUTH_PASSWORD_RESET_TABLE`. Repetirlo conserva los registros existentes; el comando no crea usuarios, concede privilegios, ejecuta seeders ni escribe historial de migraciones de aplicación.
+
+El modelo de identidad y su migración, los nombres de roles/permisos del negocio, sus asignaciones y las políticas de recursos siguen en la aplicación. Consulta la [preparación de tablas internas y precauciones de actualización](../../../database/docs/es/migrations-and-seeders.md#preparar-tablas-internas-del-framework).
 
 ## Ejecución acotada y rendimiento
 

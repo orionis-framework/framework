@@ -8,7 +8,7 @@ These commands create missing tables from framework-owned code, without discover
 
 | Command | Configured tables | SQL connection |
 |---|---|---|
-| `auth:migrate` | `AUTH_TOKEN_TABLE` | Application default. |
+| `auth:migrate` | `AUTH_TOKEN_TABLE`, `AUTH_PASSWORD_RESET_TABLE`, and the five authorization tables. | Application default. |
 | `cache:migrate` | `DB_CACHE_TABLE` and `DB_CACHE_LOCK_TABLE` | `DB_CACHE_CONNECTION`. |
 | `queue:migrate` | Each SQL queue's `QUEUE_TABLE` and `QUEUE_FAILED_TABLE` | `QUEUE_DB_CONNECTION` and `QUEUE_FAILED_DB_CONNECTION`; additional configured SQL queues retain their own connections. |
 | `schedule:migrate` | `DB_TASK_TABLE` | `DB_TASK_CONNECTION`. |
@@ -16,9 +16,13 @@ These commands create missing tables from framework-owned code, without discover
 
 For example, run `python reactor auth:migrate` from the booted application. Commands use configuration values derived from these variables and do not accept `--database`. `QUEUE_DB_CONNECTION` identifies a connection, not a table.
 
-Preparation works even when memory, file, or sync is the active driver. Cache and scheduler require their `database` store configuration. Tokens, cache, queues, and sessions honor their SQL connection prefix; the scheduler uses its native APScheduler job store's table name and indexes without starting tasks.
+`auth:migrate` owns `permissions`, `roles`, `model_has_permissions`, `model_has_roles`, and `role_has_permissions`, plus the configured access-token and password-reset tables. Configured credential table names must differ from each other and the authorization table names, ignoring case. The command neither creates identity tables nor inserts roles, permissions, or administrator accounts. Keep user/domain migrations, capability values, assignments, and policies in the application. On a new database, run `python -B reactor migrate`, `python -B reactor auth:migrate`, and then `python -B reactor seed`.
+
+Preparation works even when memory, file, or sync is the active driver. Cache and scheduler require their `database` store configuration. Authentication, cache, queues, and sessions honor their SQL connection prefix; the scheduler uses its native APScheduler job store's table name and indexes without starting tasks.
 
 Repeated commands preserve records. They perform neither `DROP` nor `ALTER`: an existing table with a different layout requires an explicit migration. Failures return exit code 1; completed creation returns 0. Backend restrictions still apply, including enforced unique keys.
+
+When upgrading an existing application, `auth:migrate` reuses existing authentication tables and leaves migration history untouched. Preserve any already-applied legacy application migration files: deleting them can prevent rollback of their recorded batches. Core storage preparation does not rewrite deployed migration identities or histories.
 
 ## Write a reversible migration
 

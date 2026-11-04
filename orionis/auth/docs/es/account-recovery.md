@@ -1,6 +1,6 @@
 # Recordarme, recuperación y verificación de cuentas
 
-La autenticación persistente y la recuperación usan credenciales distintas de tokens personales de API. Requieren identidad ORM, migraciones auth, hashing y entrega de correo. Los controladores predeterminados son una integración inicial que debes adaptar al modelo y vistas de aplicación.
+La autenticación persistente y la recuperación usan credenciales distintas de tokens personales de API. Requieren identidad ORM, almacenamiento interno preparado con `python -B reactor auth:migrate`, hashing y entrega de correo. Los controladores predeterminados son una integración inicial que debes adaptar al modelo y vistas de aplicación.
 
 ## Recordar un navegador
 
@@ -23,6 +23,8 @@ async def reset_password(broker: PasswordBroker, email: str, token: str, passwor
 El broker normaliza email, almacena hash del secreto y comprueba condicionalmente la contraseña previa para resolver carreras. Rechaza tokens consumidos, vencidos o vinculados a una contraseña anterior. El flujo limpia `remember_token` y revoca tokens personales; revisa estas garantías antes de agregar otros mecanismos propios. La contraseña nueva debe validar los requisitos de aplicación antes de llamar al servicio.
 
 `AUTH_PASSWORD_RESET_EXPIRATION` vale 60 minutos, `AUTH_PASSWORD_RESET_THROTTLE` 60 segundos y `AUTH_PASSWORD_RESET_TABLE` `password_reset_tokens`. Devuelve un mensaje público uniforme al solicitar un enlace para no revelar existencia de cuentas.
+
+`auth:migrate` crea la tabla configurada de recuperación desde el esquema del core sin reemplazar credenciales existentes. Las columnas de identidad, incluida `remember_token`, siguen siendo responsabilidad de su migración de aplicación.
 
 ## Páginas y email de verificación
 

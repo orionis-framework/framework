@@ -1,5 +1,4 @@
 import asyncio
-import importlib
 import tempfile
 from pathlib import Path
 from typing import Any
@@ -14,8 +13,6 @@ from orionis.database.compiler import SQLCompiler
 from orionis.database.connection import Connection
 from orionis.database.connection_manager import ConnectionManager
 from orionis.database.exceptions import QueryException
-from orionis.database.migrations.migrator import Migrator
-from orionis.database.schema.schema import Schema
 from orionis.orm.query_builder import QueryBuilder
 from orionis.orm.resolver import ConnectionResolver
 from orionis.orm.schema.constraints import UniqueConstraint
@@ -23,29 +20,6 @@ from orionis.orm.schema.table import TableDefinition
 from orionis.orm.schema.types import BigInteger, String
 from orionis.test import TestCase
 from tests.auth import test_manager as auth_fixtures
-
-_AUTH_MIGRATIONS = (
-    (
-        "m0000000006_create_permissions_table",
-        "CreatePermissionsTable",
-    ),
-    (
-        "m0000000007_create_roles_table",
-        "CreateRolesTable",
-    ),
-    (
-        "m0000000008_create_model_has_permissions_table",
-        "CreateModelHasPermissionsTable",
-    ),
-    (
-        "m0000000009_create_model_has_roles_table",
-        "CreateModelHasRolesTable",
-    ),
-    (
-        "m0000000010_create_role_has_permissions_table",
-        "CreateRoleHasPermissionsTable",
-    ),
-)
 
 class _StubApp:
     """Application stub exposing a file backed SQLite database."""
@@ -682,7 +656,7 @@ class TestDatabasePermissionRepository(_AuthorizationCase):
         )
 
 class TestAuthMigrations(TestCase):
-    """Test application authorization migrations with framework token storage."""
+    """Test framework-owned authorization and credential storage together."""
 
     async def asyncSetUp(self) -> None:
         """Bind migration schema access to a temporary database, never the app DB.
@@ -708,27 +682,17 @@ class TestAuthMigrations(TestCase):
         self.registrar = PermissionRegistrar(self.db)
         self.repository = DatabasePermissionRepository(self.db)
         self.tokens = AccessTokenRepository(self.app, self.db)
-        migrations: dict[str, type] = {}
-        for module_name, class_name in _AUTH_MIGRATIONS:
-            module = importlib.import_module(f"database.migrations.{module_name}")
-            self.addCleanup(setattr, module, "Schema", module.Schema)
-            module.Schema = Schema(self.manager)
-            migrations[module_name] = getattr(module, class_name)
-        self.migrator = Migrator(self.app, self.manager)
-        self.migrator._Migrator__discovered_cache = migrations
+        self.command = AuthMigrateCommand()
 
-    async def testRealMigrationsSupportUuidOwnersAndRollback(self) -> None:
-        """Apply authorization migrations without coupling tokens to their rollback.
+    async def testCoreMigrationsSupportUuidOwnersAndPreserveGrants(self) -> None:
+        """Prepare authorization independently of application migrations.
 
         Returns
         -------
         None
-            Verify UUID grants and token preservation after application rollback.
+            Verify UUID grants and tokens survive repeated core preparation.
         """
-        applied = await self.migrator.migrate()
-        self.assertEqual(len(applied), 5)
-        self.assertEqual(await self.migrator.migrate(), [])
-        self.assertEqual(await AuthMigrateCommand().handle(self.app, self.manager), 0)
+        self.assertEqual(await self.command.handle(self.app, self.manager), 0)
         identity = _Identity(uuid4())
         await self.registrar.assignRole(identity, "editor")
         await self.registrar.grantToRole("editor", "posts.update")
@@ -741,8 +705,15 @@ class TestAuthMigrations(TestCase):
         tables = await self.connection.select(
             "SELECT name FROM sqlite_master WHERE type = :kind", {"kind": "table"},
         )
-        self.assertNotIn("users", {row["name"] for row in tables})
-        self.assertEqual(await self.migrator.rollback(), list(reversed(applied)))
+        self.assertTrue(
+            {"users", "migrations", "seeders"}.isdisjoint(
+                {row["name"] for row in tables},
+            ),
+        )
+        self.assertEqual(await self.command.handle(self.app, self.manager), 0)
+        self.assertEqual(
+            await self.repository.loadFor(identity), (permissions, roles),
+        )
         self.assertIsNotNone(await self.tokens.findByPlainText(issued.plain_text))
 
     async def testForeignKeysDoNotPermitOrphanedRoleGrants(self) -> None:
@@ -753,7 +724,7 @@ class TestAuthMigrations(TestCase):
         None
             Assertions verify the behavior described above.
         """
-        await self.migrator.migrate()
+        self.assertEqual(await self.command.handle(self.app, self.manager), 0)
         role_id = await self.registrar.createRole("editor")
         await self.registrar.assignRole(_Identity(1), "editor")
         with self.assertRaises(QueryException):

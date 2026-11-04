@@ -7,7 +7,21 @@ Orionis resolves the current identity through browser sessions or personal acces
 3. [Personal access tokens](personal-access-tokens.md): issue, restrict and revoke credentials.
 4. [Remember-me and account recovery](account-recovery.md): persistent cookies, resets and default pages.
 
-Requires Python 3.14+, a configured ORM identity model, hashing and authentication migrations for persistence. Facade/repository examples require a booted application; snapshot examples are independent. Review [sessions](../../../session/docs/en/README.md), [HTTP](../../../http/docs/en/README.md) and [ORM](../../../orm/docs/en/README.md).
+Requires Python 3.14+, a configured ORM identity model, hashing and framework authentication storage for persistence. Facade/repository examples require a booted application; snapshot examples are independent. Review [sessions](../../../session/docs/en/README.md), [HTTP](../../../http/docs/en/README.md) and [ORM](../../../orm/docs/en/README.md).
+
+## Prepare authentication storage
+
+For a new database, apply application migrations, prepare the internal auth tables, and then run application seeders:
+
+```shell
+python -B reactor migrate
+python -B reactor auth:migrate
+python -B reactor seed
+```
+
+`auth:migrate` creates roles, permissions, their three assignment tables, personal access tokens, and password-reset storage from core definitions. It uses the application's default SQL connection and honors its prefix, `AUTH_TOKEN_TABLE`, and `AUTH_PASSWORD_RESET_TABLE`. Repeated runs preserve existing records; the command does not create users, grant privileges, execute seeders, or write application migration history.
+
+Keep the identity model and its migration, application-specific role/permission names, assignments, and resource policies in the application. See [framework storage preparation and upgrade precautions](../../../database/docs/en/migrations-and-seeders.md#prepare-framework-storage-tables).
 
 ## Bounded execution and performance
 

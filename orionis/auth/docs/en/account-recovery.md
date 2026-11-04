@@ -1,6 +1,6 @@
 # Remember-me, recovery and email verification
 
-Persistent authentication and recovery use credentials separate from personal API tokens. They require an ORM identity, authentication migrations, hashing and email delivery. Default controllers are a starting integration to adapt to your application's model and views.
+Persistent authentication and recovery use credentials separate from personal API tokens. They require an ORM identity, framework storage prepared with `python -B reactor auth:migrate`, hashing and email delivery. Default controllers are a starting integration to adapt to your application's model and views.
 
 ## Remembering a browser
 
@@ -23,6 +23,8 @@ async def reset_password(broker: PasswordBroker, email: str, token: str, passwor
 The broker normalizes email, stores a secret hash and conditionally checks the previous password to resolve races. It rejects consumed, expired and previous-password-bound tokens. The flow clears `remember_token` and revokes personal tokens; check these guarantees before adding custom mechanisms. Validate application password requirements before calling the service.
 
 `AUTH_PASSWORD_RESET_EXPIRATION` defaults to 60 minutes, `AUTH_PASSWORD_RESET_THROTTLE` to 60 seconds and `AUTH_PASSWORD_RESET_TABLE` to `password_reset_tokens`. Use a uniform public response for link requests so callers cannot discover account existence.
+
+`auth:migrate` creates the configured password-reset table from the core schema without replacing existing credentials. The identity's columns, including `remember_token`, remain the responsibility of its application migration.
 
 ## Pages and verification email
 

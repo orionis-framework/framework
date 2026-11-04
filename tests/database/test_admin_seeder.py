@@ -2,13 +2,10 @@ from pathlib import Path
 from types import SimpleNamespace
 from unittest.mock import AsyncMock, Mock, patch
 from app.models.user import User
-from database.schemas.model_has_roles_v1 import MODEL_HAS_ROLES_V1
-from database.schemas.permissions_v1 import PERMISSIONS_V1
-from database.schemas.role_has_permissions_v1 import ROLE_HAS_PERMISSIONS_V1
-from database.schemas.roles_v1 import ROLES_V1
 from database.schemas.users_v1 import USERS_V1
 from database.seeders import s0000000001_create_admin_authorization as admin_seeder
 from orionis.auth.authorization.registrar import PermissionRegistrar
+from orionis.auth.authorization.schema import build_authorization_tables
 from orionis.database.connection import Connection
 from orionis.database.contracts.connection_manager import IConnectionManager
 from orionis.database.exceptions import QueryException
@@ -37,13 +34,7 @@ class TestAdminSeeder(TestCase):
             "foreign_key_constraints": True,
         })
         self.addAsyncCleanup(self.connection.disconnect)
-        for definition in (
-            USERS_V1,
-            PERMISSIONS_V1,
-            ROLES_V1,
-            MODEL_HAS_ROLES_V1,
-            ROLE_HAS_PERMISSIONS_V1,
-        ):
+        for definition in (USERS_V1, *build_authorization_tables()):
             await self.connection.createTable(definition)
 
         manager = Mock(spec=IConnectionManager)

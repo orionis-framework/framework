@@ -4,8 +4,11 @@ from __future__ import annotations
 import asyncio
 import functools
 import inspect
+from contextvars import copy_context
 from typing import TYPE_CHECKING, Any
 from orionis.background.contracts.task import IBackgroundTask
+from orionis.failure.runtime import capture, operation
+from orionis.support.concurrency import complete_on_cancel
 from orionis.support.facades.logger import Log
 
 if TYPE_CHECKING:
@@ -98,26 +101,36 @@ class BackgroundTask(IBackgroundTask):
         task_name: str = getattr(
             self.__func, "__qualname__", self.__func.__class__.__name__,
         )
-        try:
-            # Await the coroutine function directly
-            if self.__is_async:
-                await self.__func(*self.__args, **self.__kwargs)  # type: ignore[arg-type]
-            # Run the synchronous function in a thread pool executor.
-            # functools.partial is required because run_in_executor only
-            # accepts positional arguments and does not forward **kwargs.
+        with operation(flow="background", operation=task_name, isolated=True):
+            try:
+                if self.__is_async:
+                    await self.__func(*self.__args, **self.__kwargs)  # type: ignore[arg-type]
+                else:
+                    loop = asyncio.get_running_loop()
+                    bound = functools.partial(
+                        self.__func, *self.__args, **self.__kwargs,
+                    )
+                    result = await complete_on_cancel(
+                        loop.run_in_executor(None, copy_context().run, bound),
+                    )
+                    if inspect.isawaitable(result):
+                        await result
+            except Exception as error:
+                receipt = await capture(error, flow="background", operation=task_name)
+                if receipt is None:
+                    try:
+                        Log.error(f"Background task '{task_name}' failed: {error}")
+                    except Exception as log_error:  # noqa: BLE001
+                        await capture(log_error, flow="background", phase="report",
+                                      operation=task_name)
+                raise
             else:
-                loop: asyncio.AbstractEventLoop = asyncio.get_running_loop()
-                bound: functools.partial[Any] = functools.partial(
-                    self.__func, *self.__args, **self.__kwargs,  # type: ignore[arg-type]
-                )
-                result = await loop.run_in_executor(None, bound)
-                if inspect.isawaitable(result):
-                    await result
-        except Exception as error:
-            Log.error(f"Background task '{task_name}' failed: {error}")
-            raise
-        else:
-            Log.info(f"Background task '{task_name}' executed successfully.")
+                try:
+                    Log.info(f"Background task '{task_name}' executed successfully.")
+                except Exception as error:
+                    await capture(error, flow="background", phase="report",
+                                  operation=task_name)
+                    raise
 
     async def run(self) -> None:
         """

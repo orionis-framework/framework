@@ -62,13 +62,18 @@ async def _wait_for_completion[T](
         while not notification.done():
             with suppress(asyncio.CancelledError):
                 await asyncio.shield(notification)
-        if (
-            not future.cancelled()
-            and future.exception() is None
-            and on_cancel is not None
-        ):
-            with suppress(asyncio.CancelledError):
-                await on_cancel(future.result())
+        if not future.cancelled():
+            from orionis.failure.runtime import capture  # noqa: PLC0415
+
+            error = future.exception()
+            if error is not None:
+                await capture(error, flow="database", phase="cancelled_work")
+            elif on_cancel is not None:
+                try:
+                    with suppress(asyncio.CancelledError):
+                        await on_cancel(future.result())
+                except Exception as cleanup_error:  # noqa: BLE001
+                    await capture(cleanup_error, flow="database", phase="cleanup")
         raise
     return future.result()
 

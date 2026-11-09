@@ -97,7 +97,7 @@ class SeederRunner:
     """
 
     # The container resolves constructor dependencies from runtime types.
-    # ruff: noqa: TC001
+    # ruff: noqa: TC001, PLC0415
 
     __slots__ = ("__app", "__conn_manager", "__discovered_cache")
     """Declare the instance attribute slots reserved by this class."""
@@ -200,6 +200,15 @@ class SeederRunner:
                 await self.__getRan(connection)
             except QueryException:
                 raise exc from None
+            from orionis.failure.runtime import capture
+            await capture(
+                exc,
+                app=self.__app,
+                flow="database",
+                phase="recovery",
+                operation="seeders.schema",
+                expected=True,
+            )
 
     def __seedersPath(self) -> Path:
         """
@@ -369,6 +378,15 @@ class SeederRunner:
                 )
         except _ClaimFailed as exc:
             if await self.__isRecorded(connection, name):
+                from orionis.failure.runtime import capture
+                await capture(
+                    exc.error,
+                    app=self.__app,
+                    flow="database",
+                    phase="recovery",
+                    operation="seeders.claim",
+                    expected=True,
+                )
                 return False
             events.started(name)
             events.failed(name, time.perf_counter() - started_at)

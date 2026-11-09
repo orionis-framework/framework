@@ -54,7 +54,7 @@ keywords = [
 ]
 
 classifiers = [
-    "Development Status :: 3 - Alpha",
+    "Development Status :: 5 - Production/Stable",
     "Intended Audience :: Developers",
     "Environment :: Web Environment",
     "Operating System :: OS Independent",

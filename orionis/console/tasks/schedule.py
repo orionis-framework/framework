@@ -4,6 +4,7 @@ import asyncio
 import functools
 import inspect
 import logging
+from contextlib import suppress
 from typing import TYPE_CHECKING, Self
 from orionis.console.contracts.schedule import ISchedule
 from orionis.console.contracts.store import IScheduleStore
@@ -16,6 +17,7 @@ from orionis.console.enums.events import SchedulerEvent, TaskEvent
 from orionis.console.enums.states import ScheduleStates
 from orionis.console.fluent.contracts.task import ITask
 from orionis.failure.contracts.catch import ICatch
+from orionis.failure.runtime import capture, capture_nowait, get_runtime, operation
 from orionis.support.facades.datetime import DateTime
 from orionis.support.facades.logger import Log
 from orionis.support.facades.reactor import Reactor
@@ -35,30 +37,24 @@ async def _execute_scheduled_command(
     args: list[str] | None = None,
 ) -> int:
     """
-    Execute a scheduled command signature through the Reactor facade.
+    Execute a scheduled command through the Reactor facade.
 
     Parameters
     ----------
     signature : str
-        The command signature to execute.
-    args : list of str, optional
-        Arguments to pass to the command. Defaults to an empty list.
+        Registered command signature to execute.
+    args : list[str] or None, optional
+        Command-line tokens; use an empty list when ``None``.
 
     Returns
     -------
     int
-        The result of the reactor call, typically an exit code or status.
+        Exit code returned by the command dispatcher.
 
     Notes
     -----
-    Used as the callable registered with APScheduler jobs instead of a
-    bound instance method. Persistent job stores (e.g. the "database"
-    job store) serialize the job's callable as a textual reference
-    (``module:function``); a bound method forces APScheduler to also
-    pickle the owning instance (``self``) to restore it, which drags in
-    the whole dependency graph (Reactor/Application) and fails on
-    unpicklable objects such as a ``mappingproxy``. Resolving the reactor
-    through the ``Reactor`` facade avoids that entirely.
+    Use a module-level callable so persistent job stores can serialize its
+    import path without pickling the scheduler or application dependencies.
     """
     return await Reactor.call(signature, args or [])
 
@@ -82,21 +78,21 @@ class Schedule(ISchedule):
         stores: IScheduleStore,
     ) -> None:
         """
-        Initialize the Schedule instance.
+        Initialize scheduler dependencies, task registries, and shutdown state.
 
         Parameters
         ----------
         reactor : orionis.console.core.contracts.reactor.IReactor
-            Reactor instance for command execution.
-        exception_handler : orionis.failure.contracts.ICatch
-            Exception handler for managing errors.
+            Command dispatcher used to discover available signatures.
+        exception_handler : orionis.failure.contracts.catch.ICatch
+            Fallback handler for event-listener failures.
         stores : orionis.console.contracts.store.IScheduleStore
-            Schedule store for managing job stores.
+            Job-store factory providing the scheduler configuration.
 
         Returns
         -------
         None
-            This constructor does not return a value.
+            Store dependencies and prepare a stopped scheduler.
         """
         self.__reactor: IReactor = reactor
         """Reactor instance for command execution."""
@@ -131,22 +127,26 @@ class Schedule(ISchedule):
         self.__pending_listener_tasks: set[asyncio.Task] = set()
         """Pending listener tasks produced by ``set``."""
         self.__shutdown_event = asyncio.Event()
-        """Shutdown event produced by ``asyncio.Event``."""
+        """Notify callers when scheduler shutdown settles."""
+        self.__shutdown_error: BaseException | None = None
+        """Failure retained for the caller awaiting shutdown completion."""
+        self.__shutdown_task: asyncio.Task | None = None
+        """Single shutdown operation owned by the current scheduler cycle."""
+        self.__failure_runtime = None
+        """Application runtime retained for callbacks outside the starting context."""
         self.__wait_to_shutdown: float = 0.5
         """Wait to shutdown value used by ``Schedule``."""
 
     async def __loadAvailableCommands(self: Self) -> None:
         """
-        Retrieve and cache available command signatures from the reactor.
+        Cache command signatures exposed by the reactor.
 
-        Queries the reactor for all available jobs/commands and stores their
-        signatures in the internal set for quick lookup.
+        Skip discovery when the signature cache is already populated.
 
         Returns
         -------
         None
-            This method does not return any value. It updates the internal set
-            of available command signatures.
+            Update the internal set of available command signatures.
         """
         # Return early if command signatures are already cached
         if self.__available_command_signatures:
@@ -160,16 +160,12 @@ class Schedule(ISchedule):
 
     def __suppressApschedulerLogging(self: Self) -> None:
         """
-        Disable APScheduler logging to prevent log message interference.
-
-        Set APScheduler component loggers to CRITICAL level and disable message
-        propagation to prevent internal scheduler logs from appearing in the
-        application's logging output.
+        Disable APScheduler loggers and their message propagation.
 
         Returns
         -------
         None
-            Modifies APScheduler logging configuration in place.
+            Set scheduler component loggers to ``CRITICAL`` and disable them.
         """
         for logger_name in (
             "apscheduler",
@@ -183,15 +179,17 @@ class Schedule(ISchedule):
 
     async def __validateAndLoadFluentTasks(self: Self) -> None:
         """
-        Validate and load fluent tasks from the internal registry.
-
-        Ensures that all fluent tasks have signatures available in the reactor.
-        Populates the internal tasks dictionary with validated task entities.
+        Validate fluent task signatures and build their task entities.
 
         Returns
         -------
         None
-            This method updates the internal tasks dictionary in place.
+            Populate the task registry using configured scheduling defaults.
+
+        Raises
+        ------
+        ValueError
+            If a task signature is unavailable in the reactor.
         """
         # Read defaults shared by every fluent task.
         available = self.__available_command_signatures
@@ -217,12 +215,18 @@ class Schedule(ISchedule):
 
     async def info(self: Self) -> list[dict]:
         """
-        Retrieve information about all loaded fluent tasks.
+        Return scheduling metadata for all validated tasks.
 
         Returns
         -------
-        list of dict
-            A list of dictionaries, each containing details about a loaded task.
+        list[dict]
+            Task metadata with ``start_date`` and ``end_date`` formatted as
+            ``YYYY-MM-DD HH:MM:SS``, or ``None`` when unset.
+
+        Raises
+        ------
+        ValueError
+            If a task signature is unavailable in the reactor.
         """
         # Ensure available command signatures are loaded before validating tasks
         await self.__loadAvailableCommands()
@@ -260,18 +264,18 @@ class Schedule(ISchedule):
         event: APSchedulerEvent,
     ) -> None:
         """
-        Call the registered global event listener for a scheduler event.
+        Dispatch a scheduler event to its registered listener.
 
         Parameters
         ----------
         event : ``apscheduler.events.SchedulerEvent``
-            The scheduler event that occurred.
+            Lifecycle event to wrap for the listener.
 
         Returns
         -------
         None
-            This method does not return a value. It triggers the appropriate
-            listener for the event.
+            Invoke a synchronous listener or supervise an asynchronous listener,
+            reporting failures. Do nothing when no listener is registered.
         """
         # Select the listener registered for this event code.
         code = event.code
@@ -290,24 +294,22 @@ class Schedule(ISchedule):
             try:
                 listener(event_entity)
             except Exception as e:
-                Log.error(f"Error executing listener: {e}")
                 self.__createManagedTask(self.__handleListenerException(e))
             return
 
         # Handle asynchronous listeners using an async wrapper
         async def _async_listener_wrapper() -> None:
             """
-            Invoke the scheduler listener and handle its failure.
+            Invoke the asynchronous scheduler listener and report failures.
 
             Returns
             -------
             None
-                Complete the documented operation without returning a value.
+                Await the listener and route exceptions through error handling.
             """
             try:
                 await listener(event_entity)
             except Exception as e:
-                Log.error(f"Error executing listener: {e}")
                 await self.__handleListenerException(e)
 
         # Schedule the async listener wrapper as a managed task
@@ -318,23 +320,28 @@ class Schedule(ISchedule):
         event: APJobEvent,
     ) -> None:
         """
-        Dispatch registered task event listener for a specific job event.
+        Observe task failures and dispatch the matching event listener.
 
         Parameters
         ----------
         event : ``apscheduler.events.JobEvent``
-            The job event that occurred.
+            Job event containing a task signature and execution metadata.
 
         Returns
         -------
         None
-            This method does not return a value. It triggers the appropriate
-            listener for the event.
+            Update removal bookkeeping, report execution failures, and invoke
+            the registered listener when present.
         """
         # Read the job signature from the event.
         signature = getattr(event, "job_id", None)
         if not signature:
             return
+
+        # Infrastructure failures must be observed even without user listeners.
+        error = getattr(event, "exception", None)
+        if isinstance(error, BaseException):
+            self.__createManagedTask(self.__handleTaskException(error, signature))
 
         # Keep internal bookkeeping in sync with jobs that APScheduler itself
         # removes (e.g. a one-shot DateTrigger job that already fired, or a
@@ -374,24 +381,22 @@ class Schedule(ISchedule):
             try:
                 listener(event_entity)
             except Exception as e:
-                Log.error(f"Error executing listener: {e}")
                 self.__createManagedTask(self.__handleListenerException(e))
             return
 
         # Handle asynchronous listeners using an async wrapper
         async def _async_listener_wrapper() -> None:
             """
-            Invoke the task listener and handle its failure.
+            Invoke the asynchronous task listener and report failures.
 
             Returns
             -------
             None
-                Complete the documented operation without returning a value.
+                Await the listener and route exceptions through error handling.
             """
             try:
                 await listener(event_entity)
             except Exception as e:
-                Log.error(f"Error executing listener: {e}")
                 await self.__handleListenerException(e)
 
         # Schedule the async listener wrapper as a managed task
@@ -400,72 +405,199 @@ class Schedule(ISchedule):
     def __createManagedTask(
         self: Self,
         coroutine: Coroutine,
-    ) -> None:
+    ) -> asyncio.Task:
         """
-        Create and manage an asyncio task with automatic cleanup.
+        Create a supervised asyncio task and retain it until completion.
 
         Parameters
         ----------
         coroutine : collections.abc.Coroutine
-            The coroutine to be executed as an async task.
+            Coroutine to execute and close if its supervisor never starts.
+
+        Returns
+        -------
+        asyncio.Task
+            Task supervised for failures and removed from the pending set when
+            complete.
+        """
+        started = False
+
+        async def supervise() -> None:
+            """
+            Run the managed coroutine within a scheduler failure context.
+
+            Returns
+            -------
+            None
+                Await the coroutine and report ordinary execution errors.
+
+            Raises
+            ------
+            asyncio.CancelledError
+                If execution is cancelled.
+            """
+            nonlocal started
+            started = True
+            with operation(runtime=self.__failure_runtime, flow="scheduler"):
+                try:
+                    await coroutine
+                except Exception as error:
+                    await self.__handleListenerException(error, legacy=False)
+
+        def completed(task: asyncio.Task) -> None:
+            """
+            Release the managed task and collect supervisor failures.
+
+            Parameters
+            ----------
+            task : asyncio.Task
+                Completed supervisor task whose outcome must be collected.
+
+            Returns
+            -------
+            None
+                Remove the task from the pending set, close an unstarted
+                coroutine, and report any exceptional supervisor exit.
+            """
+            pending.discard(task)
+            if not started:
+                coroutine.close()
+            if not task.cancelled():
+                error = task.exception()
+                if error is not None:
+                    capture_nowait(
+                        error,
+                        runtime=self.__failure_runtime,
+                        flow="scheduler",
+                        phase="supervisor",
+                    )
+
+        pending = self.__pending_listener_tasks
+        task = asyncio.create_task(supervise())
+        pending.add(task)
+        task.add_done_callback(completed)
+        return task
+
+    async def __handleTaskException(
+        self: Self, exception: BaseException, signature: str,
+    ) -> None:
+        """
+        Report a task execution failure independently of event listeners.
+
+        Parameters
+        ----------
+        exception : BaseException
+            Execution error reported by the scheduler.
+        signature : str
+            Command signature associated with the failed job.
 
         Returns
         -------
         None
-            This method does not return a value. It manages the lifecycle of
-            the created asyncio task.
+            Capture the error and use fallback reporting for ordinary exceptions
+            when runtime reporting is unavailable.
         """
-        # Create and track the async task, ensuring cleanup on completion
-        # Remove completed tasks from the pending set.
-        pending = self.__pending_listener_tasks
-        task = asyncio.create_task(coroutine)
-        pending.add(task)
-        task.add_done_callback(pending.discard)
+        runtime = self.__failure_runtime or get_runtime()
+        app = runtime.app if runtime is not None else None
+        with operation(app, flow="scheduler", operation=signature, isolated=True):
+            receipt = await capture(
+                exception,
+                runtime=runtime,
+                flow="scheduler",
+                phase="job",
+                operation=signature,
+            )
+            if receipt is None and isinstance(exception, Exception):
+                await self.__handleListenerException(exception, legacy=False)
 
     async def __handleListenerException(
         self: Self,
         exception: Exception,
+        *,
+        legacy: bool = True,
     ) -> None:
         """
-        Handle exceptions raised in event listeners.
+        Report a scheduler failure through runtime or legacy handling.
 
         Parameters
         ----------
         exception : Exception
-            The exception raised by the listener.
+            Exception raised by a scheduled operation or event listener.
+        legacy : bool, default True
+            Allow the configured exception handler as a fallback; log instead
+            when ``False``.
 
         Returns
         -------
         None
-            This method does not return any value.
+            Capture the failure or apply the selected fallback reporting path.
         """
+        with operation(runtime=self.__failure_runtime, flow="scheduler", isolated=True):
+            receipt = await capture(
+                exception,
+                runtime=self.__failure_runtime,
+                flow="scheduler",
+                phase="listener",
+            )
+        if receipt is not None:
+            return
+        if not legacy:
+            # New observers never resolve the app handler before activation.
+            with suppress(Exception):
+                Log.error(f"Scheduler operation failed: {exception}")
+            return
         try:
-            # Handle the exception using the provided exception handler
             await self.__exception_handler.exception(exception)
         except Exception as handler_error:
-            # Log errors that occur within the exception handler itself
-            Log.error(f"Error in exception handler: {handler_error}")
+            # Legacy logging cannot interrupt listener cleanup or recurse.
+            with suppress(Exception):
+                Log.error(f"Error in exception handler: {handler_error}")
+
+    def __controlFailure(self, message: str, action: str) -> RuntimeError:
+        """
+        Report a scheduler control failure and return its error.
+
+        Parameters
+        ----------
+        message : str
+            Message describing the failed scheduler operation.
+        action : str
+            Control-method name attached to the failure report.
+
+        Returns
+        -------
+        RuntimeError
+            New error carrying the supplied message.
+        """
+        error = RuntimeError(message)
+        receipt = capture_nowait(
+            error,
+            runtime=self.__failure_runtime,
+            flow="scheduler",
+            phase="control",
+            operation=action,
+        )
+        if receipt is None:
+            with suppress(Exception):
+                Log.error(message)
+        return error
 
     def __addConfiguredJobStore(self: Self) -> None:
         """
-        Add the database or redis jobstore matching the configured driver.
+        Register the configured database or Redis job store.
 
-        ``stores.database``/``stores.redis`` default to None when not declared
-        in config, so this validates explicitly instead of letting an
-        AttributeError leak out of the config object when the selected
-        driver's dedicated section was never configured.
+        Leave the in-memory store unchanged when no persistent driver is selected.
 
         Returns
         -------
         None
-            This method does not return a value. It registers the
-            corresponding jobstore on the running scheduler, if applicable.
+            Add the selected persistent store to the scheduler.
 
         Raises
         ------
         RuntimeError
-            If the selected store is "database" or "redis" but its
-            dedicated configuration section is missing.
+            If persistent-store configuration is missing or its backend is
+            unsupported.
         """
         if self.__stores.store == "database":
             self.__scheduler.add_jobstore(
@@ -482,13 +614,25 @@ class Schedule(ISchedule):
 
     async def boot(self: Self) -> None:
         """
-        Initialize the scheduler and register configured tasks and listeners.
+        Initialize and start the scheduler with configured tasks and listeners.
 
         Returns
         -------
         None
-            Start the configured scheduler and its jobs.
+            Register job stores, jobs, and event dispatchers, then start scheduling.
+
+        Raises
+        ------
+        ValueError
+            If a task signature is unavailable in the reactor.
+        RuntimeError
+            If a selected job store lacks required configuration or a supported
+            backend.
         """
+        self.__failure_runtime = get_runtime()
+        self.__shutdown_error = None
+        self.__shutdown_task = None
+        self.__shutdown_event.clear()
         # Load available command signatures from the CLI reactor
         await self.__loadAvailableCommands()
 
@@ -611,26 +755,26 @@ class Schedule(ISchedule):
         listener: Callable,
     ) -> Self:
         """
-        Register a listener for a scheduler event.
+        Register or replace a listener for a scheduler lifecycle event.
 
         Parameters
         ----------
-        event : orionis.console.enums.SchedulerEvent
-            The scheduler event to listen for.
+        event : orionis.console.enums.events.SchedulerEvent
+            Scheduler lifecycle event to observe.
         listener : collections.abc.Callable
-            The callable to invoke when the event occurs.
+            Synchronous or asynchronous callback receiving a scheduler event entity.
 
         Returns
         -------
         typing.Self
-            The Schedule instance for method chaining.
+            This scheduler for chained configuration.
 
         Raises
         ------
         RuntimeError
-            If the scheduler has already been booted.
+            If the scheduler is not stopped.
         TypeError
-            If event is not a SchedulerEvent or listener is not callable.
+            If ``event`` is not a scheduler event or ``listener`` is not callable.
         """
         # Prevent listener registration after scheduler boot
         if not self.isStopped():
@@ -655,48 +799,48 @@ class Schedule(ISchedule):
 
     def state(self: Self) -> str:
         """
-        Return the current scheduler state as a string.
+        Return the current scheduler state value.
 
         Returns
         -------
         str
-            The current state of the scheduler, e.g., "RUNNING", "PAUSED", or "STOPPED".
+            ``RUNNING``, ``PAUSED``, or ``STOPPED``.
         """
         # Return the value of the internal state enum
         return self.__state.value
 
     def isRunning(self: Self) -> bool:
         """
-        Determine if the scheduler is currently running.
+        Check whether the scheduler is running.
 
         Returns
         -------
         bool
-            True if the scheduler state is "RUNNING", otherwise False.
+            ``True`` when the scheduler state is ``RUNNING``, otherwise ``False``.
         """
         # Check if the internal state is RUNNING
         return self.__state == ScheduleStates.RUNNING
 
     def isPaused(self: Self) -> bool:
         """
-        Determine if the scheduler is currently paused.
+        Check whether the scheduler is paused.
 
         Returns
         -------
         bool
-            True if the scheduler state is "PAUSED", otherwise False.
+            ``True`` when the scheduler state is ``PAUSED``, otherwise ``False``.
         """
         # Check if the internal state is PAUSED
         return self.__state == ScheduleStates.PAUSED
 
     def isStopped(self: Self) -> bool:
         """
-        Determine if the scheduler is currently stopped.
+        Check whether the scheduler is stopped.
 
         Returns
         -------
         bool
-            True if the scheduler state is "STOPPED", otherwise False.
+            ``True`` when the scheduler state is ``STOPPED``, otherwise ``False``.
         """
         # Check if the internal state is STOPPED
         return self.__state == ScheduleStates.STOPPED
@@ -708,28 +852,31 @@ class Schedule(ISchedule):
         purpose: str | None = None,
     ) -> ITask:
         """
-        Add a command for fluent configuration.
+        Declare a command for fluent scheduling configuration.
+
+        Replace any existing fluent declaration with the same signature.
 
         Parameters
         ----------
         signature : str
-            Unique signature of the command to schedule.
-        args : list[str] | None, optional
-            Arguments for the command. Defaults to None.
-        purpose : str | None, optional
-            Description of the command's purpose.
+            Non-empty command signature to schedule.
+        args : list[str] or None, optional
+            Command-line tokens; use an empty list when ``None``.
+        purpose : str or None, optional
+            Human-readable description of the scheduled command.
 
         Returns
         -------
         orionis.console.fluent.contracts.task.ITask
-            Task instance for further configuration.
+            Fluent task definition for configuring timing and listeners.
 
         Raises
         ------
         RuntimeError
-            If the scheduler has already been started.
+            If the scheduler is not stopped.
         TypeError
-            If the signature is not a non-empty string or arguments are invalid.
+            If the signature is blank or not a string, or arguments are not
+            a list of strings or ``None``.
         """
         # Prevent adding new commands after the scheduler has started
         if not self.isStopped():
@@ -778,23 +925,20 @@ class Schedule(ISchedule):
         Parameters
         ----------
         signature : str
-            Unique identifier of the task to pause.
+            Signature of the running task to pause.
 
         Returns
         -------
         bool
-            True if the task was successfully paused, otherwise raises an exception.
+            ``True`` after pausing the job and updating task bookkeeping.
 
         Raises
         ------
         RuntimeError
-            If the scheduler has not been started or the task is not running.
+            If the scheduler is uninitialized, the task is not running, or the
+            pause operation fails.
         ValueError
-            If the specified task does not exist.
-
-        Notes
-        -----
-        This method pauses a running task in the scheduler.
+            If the scheduler cannot find the tracked job.
         """
         # Ensure the scheduler is initialized before pausing a task
         scheduler = self.__scheduler
@@ -825,8 +969,7 @@ class Schedule(ISchedule):
             return True
         except Exception as e:
             error_msg = f"Failed to pause task '{signature}': {e!s}"
-            Log.error(error_msg)
-            raise RuntimeError(error_msg) from e
+            raise self.__controlFailure(error_msg, "pauseTask") from e
 
     def resumeTask(
         self: Self,
@@ -838,23 +981,20 @@ class Schedule(ISchedule):
         Parameters
         ----------
         signature : str
-            Unique identifier of the task to resume.
+            Signature of the paused task to resume.
 
         Returns
         -------
         bool
-            True if the task was successfully resumed, otherwise raises an exception.
+            ``True`` after resuming the job and updating task bookkeeping.
 
         Raises
         ------
         RuntimeError
-            If the scheduler has not been started or the task is not paused.
+            If the scheduler is uninitialized, the task is not paused, or the
+            resume operation fails.
         ValueError
-            If the specified task does not exist.
-
-        Notes
-        -----
-        This method resumes a paused task in the scheduler.
+            If the scheduler cannot find the tracked job.
         """
         # Ensure the scheduler is initialized before resuming a task
         scheduler = self.__scheduler
@@ -885,36 +1025,32 @@ class Schedule(ISchedule):
             return True
         except Exception as e:
             error_msg = f"Failed to resume task '{signature}': {e!s}"
-            Log.error(error_msg)
-            raise RuntimeError(error_msg) from e
+            raise self.__controlFailure(error_msg, "resumeTask") from e
 
     def removeTask(
         self: Self,
         signature: str,
     ) -> bool:
         """
-        Remove a task from the scheduler by its signature.
+        Remove a tracked task from the scheduler.
 
         Parameters
         ----------
         signature : str
-            Unique identifier of the task to remove.
+            Signature of the running or paused task to remove.
 
         Returns
         -------
         bool
-            True if the task was successfully removed, otherwise raises an exception.
+            ``True`` after removing the job and updating task bookkeeping.
 
         Raises
         ------
         RuntimeError
-            If the scheduler has not been started or the task is not found.
+            If the scheduler is uninitialized, the task is not tracked as running
+            or paused, or the removal operation fails.
         ValueError
-            If the specified task does not exist.
-
-        Notes
-        -----
-        This method removes a task from the scheduler and updates internal state.
+            If the scheduler cannot find the tracked job.
         """
         # Ensure the scheduler is initialized before removing a task
         scheduler = self.__scheduler
@@ -944,8 +1080,7 @@ class Schedule(ISchedule):
             return True
         except Exception as e:
             error_msg = f"Failed to remove task '{signature}': {e!s}"
-            Log.error(error_msg)
-            raise RuntimeError(error_msg) from e
+            raise self.__controlFailure(error_msg, "removeTask") from e
 
     def removeAllTasks(self: Self) -> bool:
         """
@@ -954,16 +1089,12 @@ class Schedule(ISchedule):
         Returns
         -------
         bool
-            True if all tasks were successfully removed, otherwise raises an exception.
+            ``True`` after removing all jobs and clearing active task bookkeeping.
 
         Raises
         ------
         RuntimeError
-            If the scheduler has not been started or an error occurs during removal.
-
-        Notes
-        -----
-        This method removes all tasks from the scheduler and updates internal state.
+            If the scheduler is uninitialized or the removal operation fails.
         """
         # Ensure the scheduler is initialized before removing tasks
         scheduler = self.__scheduler
@@ -980,27 +1111,21 @@ class Schedule(ISchedule):
             return True
         except Exception as e:
             error_msg = f"Failed to remove all tasks: {e!s}"
-            Log.error(error_msg)
-            raise RuntimeError(error_msg) from e
+            raise self.__controlFailure(error_msg, "removeAllTasks") from e
 
     def pause(self: Self) -> bool:
         """
-        Pause the scheduler if it is running.
-
-        Parameters
-        ----------
-        self : orionis.console.tasks.schedule.Schedule
-            The Schedule instance.
+        Pause scheduling when the scheduler is running.
 
         Returns
         -------
         bool
-            True if the scheduler was successfully paused.
+            ``True`` after pausing the scheduler and updating its state.
 
         Raises
         ------
         RuntimeError
-            If the scheduler is not started or not running.
+            If the scheduler is uninitialized, is not running, or cannot be paused.
         """
         # Ensure the scheduler is initialized before pausing
         scheduler = self.__scheduler
@@ -1020,27 +1145,21 @@ class Schedule(ISchedule):
             return True
         except Exception as e:
             error_msg = f"Failed to pause the scheduler: {e!s}"
-            Log.error(error_msg)
-            raise RuntimeError(error_msg) from e
+            raise self.__controlFailure(error_msg, "pause") from e
 
     def resume(self: Self) -> bool:
         """
-        Resume the scheduler if it is paused.
-
-        Parameters
-        ----------
-        self : orionis.console.tasks.schedule.Schedule
-            The Schedule instance.
+        Resume scheduling when the scheduler is paused.
 
         Returns
         -------
         bool
-            True if the scheduler was successfully resumed.
+            ``True`` after resuming the scheduler and updating its state.
 
         Raises
         ------
         RuntimeError
-            If the scheduler is not started or not paused.
+            If the scheduler is uninitialized, is not paused, or cannot be resumed.
         """
         # Ensure the scheduler is initialized before resuming
         scheduler = self.__scheduler
@@ -1060,36 +1179,30 @@ class Schedule(ISchedule):
             return True
         except Exception as e:
             error_msg = f"Failed to resume the scheduler: {e!s}"
-            Log.error(error_msg)
-            raise RuntimeError(error_msg) from e
+            raise self.__controlFailure(error_msg, "resume") from e
 
     def shutdown(self: Self, wait: int | None = None) -> None:
         """
-        Shut down the task scheduler safely without waiting for running tasks.
+        Schedule graceful shutdown without blocking the caller.
 
-        This method terminates the scheduler execution safely. It does not wait
-        for currently executing tasks to complete, but prevents new tasks from
-        starting and cleans up scheduler resources. Ideal for console
-        environments where the process stops immediately after calling this
-        method.
+        Start at most one shutdown task per scheduler boot cycle. The task observes
+        a grace period, drains managed listeners, and requests scheduler shutdown.
 
         Parameters
         ----------
-        wait : int | None, optional
-            Time in seconds to wait before completing shutdown. Defaults to
-            None, which keeps the previously configured grace period instead
-            of collapsing it to zero.
+        wait : int or None, optional
+            Non-negative grace period in seconds. Keep the current period when
+            ``None``; the initial default is ``0.5`` seconds.
 
         Returns
         -------
         None
-            This method does not return a value. It initiates graceful shutdown.
+            Start or reuse the managed shutdown task without waiting for completion.
 
         Raises
         ------
         TypeError
-            If ``wait`` is neither None nor a non-negative integer (bool is
-            explicitly rejected even though it is technically an int subtype).
+            If ``wait`` is negative, a boolean, or neither an integer nor ``None``.
         """
         # Only override the configured grace period (defaults to 0.5s, see
         # __init__) when an explicit, valid value is provided. Unconditionally
@@ -1104,21 +1217,71 @@ class Schedule(ISchedule):
                 raise TypeError(error_msg)
             self.__wait_to_shutdown = wait
 
-        # Create and execute the shutdown task asynchronously
-        self.__createManagedTask(self.__gracefulShutdown())
+        if self.__shutdown_task is not None:
+            return
+        self.__shutdown_task = self.__createManagedTask(self.__gracefulShutdown())
+        self.__shutdown_task.add_done_callback(self.__shutdownCompleted)
 
-    async def __gracefulShutdown(self: Self) -> None:
+    def __shutdownCompleted(self, task: asyncio.Task) -> None:
         """
-        Execute graceful shutdown of the scheduler without blocking.
+        Notify shutdown waiters if the managed shutdown task was cancelled.
 
-        This method runs the scheduler shutdown in a thread executor to avoid
-        blocking the event loop, then sets the shutdown event to notify any
-        waiting tasks that shutdown is complete.
+        Parameters
+        ----------
+        task : asyncio.Task
+            Completed shutdown supervisor task.
 
         Returns
         -------
         None
-            This method does not return a value.
+            Record cancellation and signal completion if shutdown has not done so.
+        """
+        if task.cancelled() and not self.__shutdown_event.is_set():
+            self.__shutdown_error = asyncio.CancelledError()
+            self.__shutdown_event.set()
+
+    async def __gracefulShutdown(self: Self) -> None:
+        """
+        Finalize shutdown and preserve failures for waiting callers.
+
+        Returns
+        -------
+        None
+            Run shutdown, retain any failure, and always notify shutdown waiters.
+
+        Raises
+        ------
+        BaseException
+            If shutdown is cancelled or raises another non-``Exception`` error.
+        """
+        try:
+            await self.__finishShutdown()
+        except BaseException as error:
+            self.__shutdown_error = error
+            receipt = await capture(
+                error,
+                runtime=self.__failure_runtime,
+                flow="scheduler",
+                phase="shutdown",
+            )
+            if receipt is None and isinstance(error, Exception):
+                await self.__handleListenerException(error, legacy=False)
+            if not isinstance(error, Exception):
+                raise
+        finally:
+            self.__shutdown_event.set()
+
+    async def __finishShutdown(self: Self) -> None:
+        """
+        Drain listeners and request scheduler shutdown off the event loop.
+
+        Wait for the configured grace period before draining pending listeners.
+        Submit the shutdown request with ``wait=True`` to an executor.
+
+        Returns
+        -------
+        None
+            Complete listener cleanup and the scheduler shutdown request.
         """
         # Get the current event loop for executing shutdown in a separate thread
         loop = asyncio.get_running_loop()
@@ -1139,30 +1302,41 @@ class Schedule(ISchedule):
             if not task.done() and task is not current_task
         )
         if pending:
-            await asyncio.gather(*pending, return_exceptions=True)
+            outcomes = await asyncio.gather(*pending, return_exceptions=True)
+            for error in outcomes:
+                if isinstance(error, BaseException):
+                    await capture(
+                        error,
+                        runtime=self.__failure_runtime,
+                        flow="scheduler",
+                        phase="drain",
+                    )
 
         # Execute scheduler shutdown without blocking the main thread
-        await loop.run_in_executor(
-            None,
-            functools.partial(self.__scheduler.shutdown, wait=True),
-        )
+        from orionis.support.concurrency import complete_on_cancel
 
-        # Signal that shutdown is complete
-        self.__shutdown_event.set()
+        await complete_on_cancel(
+            loop.run_in_executor(
+                None,
+                functools.partial(self.__scheduler.shutdown, wait=True),
+            ),
+        )
 
     async def wait(self: Self) -> None:
         """
-        Wait for the scheduler shutdown to complete.
-
-        This method blocks until the shutdown process initiated by the shutdown()
-        method has finished. It provides a way to synchronize with the graceful
-        shutdown process.
+        Wait for shutdown completion and re-raise any retained failure.
 
         Returns
         -------
         None
-            This method does not return a value but blocks until shutdown
-            completes.
+            Return once shutdown completes successfully.
+
+        Raises
+        ------
+        BaseException
+            If shutdown failed or its task was cancelled.
         """
         # Wait for the shutdown event to be set by the graceful shutdown process
         await self.__shutdown_event.wait()
+        if self.__shutdown_error is not None:
+            raise self.__shutdown_error

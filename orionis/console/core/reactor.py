@@ -13,15 +13,16 @@ from orionis.console.output.executor import Executor
 from orionis.console.output.help_command import HelpCommand
 from orionis.failure.contracts.catch import ICatch
 from orionis.failure.enums.kernel_type import KernelContext
+from orionis.failure.runtime import capture, capture_result, operation
 from orionis.foundation.contracts.application import IApplication
 from orionis.logging.contracts.logger import ILogger
 from orionis.support.performance.counter import PerformanceCounter
 from orionis.support.types.sentinel import MISSING
 
 class Reactor(IReactor):
-
-    # ruff: noqa: PLR0913, SLF001, BLE001,TRY400, TC001, C901
     """Resolve and execute registered console commands."""
+
+    # ruff: noqa: PLR0913, SLF001, BLE001,TRY400, TC001, C901, PLR0912, PLR0915
 
     def __init__(
         self,
@@ -33,30 +34,27 @@ class Reactor(IReactor):
         performance_counter: PerformanceCounter,
     ) -> None:
         """
-        Initialize Reactor instance for command discovery and management.
-
-        Set up the command processing environment, establish the application context,
-        and initialize internal registries for command lookup and execution.
+        Initialize the command dispatcher and its services.
 
         Parameters
         ----------
-        app : orionis.IApplication
-            Application instance for command processing.
+        app : orionis.foundation.contracts.application.IApplication
+            Application container used to resolve and invoke command handlers.
         loader : orionis.console.core.loader.Loader
-            Loader instance for managing command loading.
+            Loader used to register and discover commands.
         executer : orionis.console.output.executor.Executor
-            Executor instance for managing command output.
-        logger : orionis.logging.contracts.ILogger
-            Logger instance for logging command execution details.
-        catch : orionis.failure.contracts.ICatch
-            Catch instance for handling exceptions.
-        performance_counter : orionis.support.performance.PerformanceCounter
-            PerformanceCounter instance for measuring command execution time.
+            Output service used to display command execution status.
+        logger : orionis.logging.contracts.logger.ILogger
+            Logger used to record command outcomes.
+        catch : orionis.failure.contracts.catch.ICatch
+            Exception handler used to present command failures.
+        performance_counter : orionis.support.performance.counter.PerformanceCounter
+            Timer used to measure command execution.
 
         Returns
         -------
         None
-            This constructor does not return any value.
+            Initialize the dispatcher with an empty metadata cache.
         """
         # Set the application instance for command processing
         self.__app = app
@@ -92,27 +90,25 @@ class Reactor(IReactor):
         args: list[str] | None = None,
     ) -> dict:
         """
-        Parse command-line arguments for a command using its ArgumentParser.
+        Parse command arguments and omit values marked as missing.
 
         Parameters
         ----------
-        command : orionis.console.entities.Command
-            Command object containing the argument parser and metadata.
-        args : typing.Optional[list[str]], default None
-            List of command-line arguments to parse. If None, an empty list is used.
+        command : orionis.console.entities.command.Command
+            Command whose argument parser supplies the parsed values.
+        args : list[str] or None, optional
+            Command-line tokens to parse; use an empty list when ``None``.
 
         Returns
         -------
         dict
-            Dictionary with parsed argument names and values. Returns an empty dict
-            if no arguments are expected or provided.
+            Parsed arguments without ``MISSING`` values, or an empty dictionary
+            when the command has no argument parser.
 
         Raises
         ------
         SystemExit
-            Raised by argparse if argument parsing fails or help is requested.
-        RuntimeError
-            Raised if argument parsing fails for reasons other than SystemExit.
+            If argument parsing fails or help is requested.
         """
         # Initialize parsed_args to None
         parsed_args = None
@@ -169,19 +165,29 @@ class Reactor(IReactor):
         handler: list[type[Any] | str | None] | str,
     ) -> ICommand:
         """
-        Register a fluent command with the given signature and handler.
+        Register a command and return its fluent configuration.
 
         Parameters
         ----------
         signature : str
-            Command signature to register.
+            Signature used to identify the command.
         handler : list[type[typing.Any] | str | None] | str
-            Handler class and optional method name.
+            Handler definition forwarded to the loader; default the method to
+            ``__call__`` when omitted.
 
         Returns
         -------
         orionis.console.fluent.contracts.command.ICommand
-            The registered command instance.
+            Fluent command definition for further configuration.
+
+        Raises
+        ------
+        TypeError
+            If the handler class or method name has an invalid type.
+        ValueError
+            If the handler list is empty.
+        AttributeError
+            If the handler method is missing or not callable.
         """
         # Normalize handler to list format and register with loader
         normalized_handler = (
@@ -197,27 +203,27 @@ class Reactor(IReactor):
         Parameters
         ----------
         signature : str
-            Command signature to look up.
+            Signature of the command to locate.
 
         Returns
         -------
         bool
-            Whether the signature identifies a registered command.
+            ``True`` if the loader finds the command, otherwise ``False``.
         """
         return await self.__loader.get(signature) is not None
 
     async def info(self) -> list[dict]:
         """
-        Return registered commands metadata.
+        Return cached metadata for non-internal commands.
 
-        Retrieve all loaded commands from the internal registry, skipping internal
-        commands (those with double underscores). Each command is represented as a
-        dictionary containing its signature and description.
+        Exclude signatures enclosed in double underscores and cache the result
+        after the first lookup.
 
         Returns
         -------
-        list of dict
-            List of dictionaries with 'signature' and 'description' for each command.
+        list[dict]
+            Dictionaries containing ``timestamps``, ``signature``, ``description``,
+            ``arguments``, ``object``, and ``method``, sorted by signature.
         """
         # None = not yet built; [] = empty but valid
         if self.__cache_info is not None:
@@ -251,32 +257,74 @@ class Reactor(IReactor):
         self.__cache_info = sorted(commands_info, key=operator.itemgetter("signature"))
         return self.__cache_info
 
-    async def call( # NOSONAR  # noqa: PLR0912, PLR0915
+    async def call(
+        self, signature: str, args: list[str] | None = None,
+    ) -> int:
+        """
+        Execute a command in an isolated failure-reporting context.
+
+        Parameters
+        ----------
+        signature : str
+            Registered command signature to execute.
+        args : list[str] or None, optional
+            Command-line tokens to parse; use an empty list when ``None``.
+
+        Returns
+        -------
+        int
+            Handler exit code, ``0`` for non-integer results, or ``1`` for
+            failures handled during dispatch.
+
+        Raises
+        ------
+        SystemExit
+            If argument parsing fails or command help is requested.
+        Exception
+            If dispatch or failure reporting raises an unhandled error.
+        """
+        with operation(self.__app, flow="console", operation=signature, isolated=True):
+            try:
+                return await self.__call(signature, args)
+            except Exception as error:
+                await capture(
+                    error,
+                    app=self.__app,
+                    flow="console",
+                    phase="dispatch",
+                )
+                raise
+
+    async def __call( # NOSONAR
         self,
         signature: str,
         args: list[str] | None = None,
     ) -> int:
         """
-        Execute a registered command by its signature.
+        Execute a command within a scoped application context.
+
+        Parse arguments, resolve the handler, and report execution status and
+        handled failures.
 
         Parameters
         ----------
         signature : str
-            Command signature to execute.
-        args : list of str or None, optional
-            Arguments to pass to the command.
+            Registered command signature to execute.
+        args : list[str] or None, optional
+            Command-line tokens to parse; use an empty list when ``None``.
 
         Returns
         -------
         int
-            The output produced by the command execution.
+            Handler exit code, ``0`` for non-integer results, or ``1`` after
+            handling a dispatch or execution error.
 
         Raises
         ------
-        ValueError
-            If the command is not found.
+        SystemExit
+            If argument parsing fails or command help is requested.
         Exception
-            If command execution fails.
+            If scope management, initial timing, or failure reporting fails.
         """
         # Create a new scope for the command execution context
         async with self.__app.beginScope() as scope:
@@ -355,7 +403,7 @@ class Reactor(IReactor):
                     )
 
                 # If the instance implements the IBaseCommand interface,
-                elif isinstance(instance, IBaseCommand):
+                else:
 
                     # Inject the parsed arguments into the instance for use
                     # in command execution
@@ -381,31 +429,74 @@ class Reactor(IReactor):
                 # Return the result of the command execution, ensuring
                 # it is an integer exit code
                 if isinstance(result, int):
+                    if result != 0:
+                        await capture_result(
+                            result,
+                            app=self.__app,
+                            flow="console",
+                            phase="result",
+                            operation=signature,
+                        )
                     return result
                 return 0
 
             except Exception as e:
-
-                # Custom loggers and exception handlers may use native writers.
-                # Retire feedback before reporting discovery or signature errors.
-                feedback = sys.modules.get("orionis.console.startup")
-                if feedback is not None:
-                    feedback.stop_startup_feedback()
-
-                # Log the error in the logger service
-                error_msg = f"Command '{signature}' execution failed: {e}"
-                self.__logger.error(error_msg)
-
-                # Stop the timer and log failure if timestamps are enabled
-                await self.__performance_counter.astop()
-                elapsed_time = round(await self.__performance_counter.agetSeconds(), 2)
-                if command and command.timestamps:
-                    self.__executer.fail(program=signature, time=f"{elapsed_time}s")
-
-                # Delegate exception handling to the catch service
+                target = signature
                 if target_class and target_method:
-                    e.args = (f"[{target_class}.{target_method}] {e}",)
-                await self.__catch.exception(e)
-
-                # Return a failure code
+                    target = f"{target_class}.{target_method}"
+                receipt = await capture(
+                    e,
+                    app=self.__app,
+                    flow="console",
+                    operation=target,
+                )
+                try:
+                    feedback = sys.modules.get("orionis.console.startup")
+                    if feedback is not None:
+                        feedback.stop_startup_feedback()
+                except Exception as feedback_error:
+                    await capture(
+                        feedback_error,
+                        app=self.__app,
+                        flow="console",
+                        phase="feedback",
+                        operation=target,
+                    )
+                if receipt is None:
+                    try:
+                        error_message = f"Command '{signature}' execution failed: {e}"
+                        self.__logger.error(error_message)
+                    except Exception as log_error:
+                        await capture(
+                            log_error,
+                            app=self.__app,
+                            flow="console",
+                            phase="report",
+                            operation=target,
+                        )
+                try:
+                    await self.__performance_counter.astop()
+                    elapsed_time = round(
+                        await self.__performance_counter.agetSeconds(), 2,
+                    )
+                    if command and command.timestamps:
+                        self.__executer.fail(program=signature, time=f"{elapsed_time}s")
+                except Exception as feedback_error:
+                    await capture(
+                        feedback_error,
+                        app=self.__app,
+                        flow="console",
+                        phase="feedback",
+                        operation=target,
+                    )
+                try:
+                    await self.__catch.exception(e)
+                except Exception as handler_error:
+                    await capture(
+                        handler_error,
+                        app=self.__app,
+                        flow="console",
+                        phase="presentation",
+                        operation=target,
+                    )
                 return 1

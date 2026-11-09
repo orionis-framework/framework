@@ -1547,7 +1547,7 @@
         </div>
 
         <div class="extrasDocstring">
-          <a href="https://github.com/orionis-framework/framework/tree/c9319a7aed9233108f1af7ee2753b932d8e14bc4/orionis/foundation/application.py" class="sourceLink">(source)</a>
+          <a href="https://github.com/orionis-framework/framework/tree/cdb7f8478088171dec64e1e908d982057286c9c1/orionis/foundation/application.py" class="sourceLink">(source)</a>
         </div>
 
         <div class="moduleDocstring">
@@ -1645,7 +1645,7 @@ Please call create() first.</tt>.</td>
     
     
     <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">_asgi_receive_dispatcher</span><span class="function-signature long-signature">(<span class="rst-sig-param">receive: <code><a href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Callable" class="intersphinx-link">Callable</a>[<wbr></wbr>[], <wbr></wbr><a href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Awaitable" class="intersphinx-link">Awaitable</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#dict" class="intersphinx-link">dict</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <wbr></wbr><a href="https://docs.python.org/3/library/typing.html#typing.Any" class="intersphinx-link">Any</a>]]]</code>, </span><span class="rst-sig-param">request_queue: <code><a href="https://docs.python.org/3/library/asyncio-queue.html#asyncio.Queue" class="intersphinx-link">asyncio.Queue</a></code>, </span><span class="rst-sig-param">handler_task: <code><a href="https://docs.python.org/3/library/asyncio-task.html#asyncio.Task" class="intersphinx-link">asyncio.Task</a></code></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/c9319a7aed9233108f1af7ee2753b932d8e14bc4/orionis/foundation/application.py#L121">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/cdb7f8478088171dec64e1e908d982057286c9c1/orionis/foundation/application.py#L121">
       
       (source)
     </a>
@@ -1676,7 +1676,7 @@ receive calls until the handler consumes a buffered message.</p>
     
     
     <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">_await_http_tasks</span><span class="function-signature long-signature">(<span class="rst-sig-param">handler_task: <code><a href="https://docs.python.org/3/library/asyncio-task.html#asyncio.Task" class="intersphinx-link">asyncio.Task</a></code>, </span><span class="rst-sig-param">disconnect_task: <code><a href="https://docs.python.org/3/library/asyncio-task.html#asyncio.Task" class="intersphinx-link">asyncio.Task</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a>]</code></span>) -&gt; <code><a href="https://docs.python.org/3/library/typing.html#typing.Any" class="intersphinx-link">Any</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/c9319a7aed9233108f1af7ee2753b932d8e14bc4/orionis/foundation/application.py#L189">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/cdb7f8478088171dec64e1e908d982057286c9c1/orionis/foundation/application.py#L189">
       
       (source)
     </a>
@@ -1703,7 +1703,7 @@ receive calls until the handler consumes a buffered message.</p>
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">_create_http_handler_task</span><span class="function-signature long-signature">(<span class="rst-sig-param">loop: <code><a href="https://docs.python.org/3/library/asyncio-eventloop.html#asyncio.AbstractEventLoop" class="intersphinx-link">asyncio.AbstractEventLoop</a></code>, </span><span class="rst-sig-param">coroutine: <code><a href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Coroutine" class="intersphinx-link">Coroutine</a></code></span>) -&gt; <code><a href="https://docs.python.org/3/library/asyncio-task.html#asyncio.Task" class="intersphinx-link">asyncio.Task</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/c9319a7aed9233108f1af7ee2753b932d8e14bc4/orionis/foundation/application.py#L94">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/cdb7f8478088171dec64e1e908d982057286c9c1/orionis/foundation/application.py#L94">
       
       (source)
     </a>
@@ -1731,7 +1731,7 @@ other loops and factories receive their standard task-creation arguments.</td></
     
     <div><span class="decorator">@<a href="https://docs.python.org/3/library/functools.html#functools.lru_cache" class="intersphinx-link">lru_cache</a>(<wbr></wbr>maxsize=<a href="#_CONFIG_KEY_CACHE_SIZE" class="internal-link" title="orionis.foundation.application._CONFIG_KEY_CACHE_SIZE">_CONFIG_KEY_CACHE_SIZE</a>)<br /></span></div>
     <span class="py-keyword">def</span>&#160;<span class="py-defname">_parse_config_key</span><span class="function-signature">(<span class="rst-sig-param">key: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" class="intersphinx-link">tuple</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <wbr></wbr><span class="rst-variable-ellipsis">...</span>]</code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/c9319a7aed9233108f1af7ee2753b932d8e14bc4/orionis/foundation/application.py#L77">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/cdb7f8478088171dec64e1e908d982057286c9c1/orionis/foundation/application.py#L77">
       
       (source)
     </a>
@@ -1758,7 +1758,7 @@ other loops and factories receive their standard task-creation arguments.</td></
     
     
     <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">_rsgi_disconnect_watcher</span><span class="function-signature">(<span class="rst-sig-param">protocol: <code>HTTPProtocol</code>, </span><span class="rst-sig-param">handler_task: <code><a href="https://docs.python.org/3/library/asyncio-task.html#asyncio.Task" class="intersphinx-link">asyncio.Task</a></code></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/c9319a7aed9233108f1af7ee2753b932d8e14bc4/orionis/foundation/application.py#L160">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/cdb7f8478088171dec64e1e908d982057286c9c1/orionis/foundation/application.py#L160">
       
       (source)
     </a>
@@ -1784,7 +1784,7 @@ other loops and factories receive their standard task-creation arguments.</td></
   <div class="functionHeader">
     
     <span class="py-defname">_ASGI_BODY_QUEUE_SIZE</span>: <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/c9319a7aed9233108f1af7ee2753b932d8e14bc4/orionis/foundation/application.py#L57">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/cdb7f8478088171dec64e1e908d982057286c9c1/orionis/foundation/application.py#L57">
       
       (source)
     </a>
@@ -1811,7 +1811,7 @@ other loops and factories receive their standard task-creation arguments.</td></
   <div class="functionHeader">
     
     <span class="py-defname">_CONFIG_KEY_CACHE_SIZE</span>: <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/c9319a7aed9233108f1af7ee2753b932d8e14bc4/orionis/foundation/application.py#L63">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/cdb7f8478088171dec64e1e908d982057286c9c1/orionis/foundation/application.py#L63">
       
       (source)
     </a>
@@ -1838,7 +1838,7 @@ other loops and factories receive their standard task-creation arguments.</td></
   <div class="functionHeader">
     
     <span class="py-defname">_CORE_PATHS_PATH</span> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/c9319a7aed9233108f1af7ee2753b932d8e14bc4/orionis/foundation/application.py#L61">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/cdb7f8478088171dec64e1e908d982057286c9c1/orionis/foundation/application.py#L61">
       
       (source)
     </a>
@@ -1865,7 +1865,7 @@ other loops and factories receive their standard task-creation arguments.</td></
   <div class="functionHeader">
     
     <span class="py-defname">_CWD</span> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/c9319a7aed9233108f1af7ee2753b932d8e14bc4/orionis/foundation/application.py#L59">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/cdb7f8478088171dec64e1e908d982057286c9c1/orionis/foundation/application.py#L59">
       
       (source)
     </a>
@@ -1892,7 +1892,7 @@ other loops and factories receive their standard task-creation arguments.</td></
   <div class="functionHeader">
     
     <span class="py-defname">_ERR_NOT_CONFIGURED</span>: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/c9319a7aed9233108f1af7ee2753b932d8e14bc4/orionis/foundation/application.py#L69">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/cdb7f8478088171dec64e1e908d982057286c9c1/orionis/foundation/application.py#L69">
       
       (source)
     </a>
@@ -1920,7 +1920,7 @@ Please call create() first.</tt>.</p></div>
   <div class="functionHeader">
     
     <span class="py-defname">_MAINTENANCE_REFRESH_NS</span>: <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/c9319a7aed9233108f1af7ee2753b932d8e14bc4/orionis/foundation/application.py#L65">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/cdb7f8478088171dec64e1e908d982057286c9c1/orionis/foundation/application.py#L65">
       
       (source)
     </a>
@@ -1947,7 +1947,7 @@ Please call create() first.</tt>.</p></div>
   <div class="functionHeader">
     
     <span class="py-defname">_ROUTER_FACADE_MODULE</span>: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/c9319a7aed9233108f1af7ee2753b932d8e14bc4/orionis/foundation/application.py#L67">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/cdb7f8478088171dec64e1e908d982057286c9c1/orionis/foundation/application.py#L67">
       
       (source)
     </a>
@@ -1974,7 +1974,7 @@ Please call create() first.</tt>.</p></div>
   <div class="functionHeader">
     
     <span class="py-defname">_SENTINEL</span> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/c9319a7aed9233108f1af7ee2753b932d8e14bc4/orionis/foundation/application.py#L55">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/cdb7f8478088171dec64e1e908d982057286c9c1/orionis/foundation/application.py#L55">
       
       (source)
     </a>
@@ -2000,7 +2000,7 @@ Please call create() first.</tt>.</p></div>
   <div class="orionis-footer-inner">
     <div class="orionis-footer-copy">
       <p>API documentation for <a href="https://orionis-framework.com/" class="projecthome">Orionis</a>.</p>
-      <p class="orionis-footer-meta">Generated with <a href="https://github.com/twisted/pydoctor/">Pydoctor</a> 25.10.1.<span class="orionis-footer-build"> Built 2026-11-03 19:09:59.</span></p>
+      <p class="orionis-footer-meta">Generated with <a href="https://github.com/twisted/pydoctor/">Pydoctor</a> 25.10.1.<span class="orionis-footer-build"> Built 2026-11-09 11:00:41.</span></p>
     </div>
     <nav class="orionis-footer-links" aria-label="Additional resources">
       <a href="https://docs.orionis-framework.com">Read the guide <span aria-hidden="true">↗</span></a>

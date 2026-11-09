@@ -9168,7 +9168,7 @@
         </div>
 
         <div class="extrasDocstring">
-          <p class="class-signature"><code><span class="py-keyword">class</span> <span class="py-defname">Unique</span>(<a href="orionis.schemas.rule.Rule.html" class="internal-link" title="orionis.schemas.rule.Rule">Rule</a>): <a href="https://github.com/orionis-framework/framework/tree/c9319a7aed9233108f1af7ee2753b932d8e14bc4/orionis/schemas/rules/unique.py#L9" class="sourceLink">(source)</a></code></p><p>Constructor: <code><a href="#__init__" class="internal-link" title="orionis.schemas.rules.Unique.__init__">Unique(table, column, ignore, ignore_column, ...)</a></code></p><p><a href="classIndex.html#orionis.schemas.rules.Unique">View In Hierarchy</a></p>
+          <p class="class-signature"><code><span class="py-keyword">class</span> <span class="py-defname">Unique</span>(<a href="orionis.schemas.rule.Rule.html" class="internal-link" title="orionis.schemas.rule.Rule">Rule</a>): <a href="https://github.com/orionis-framework/framework/tree/cdb7f8478088171dec64e1e908d982057286c9c1/orionis/schemas/rules/unique.py#L9" class="sourceLink">(source)</a></code></p><p>Constructor: <code><a href="#__init__" class="internal-link" title="orionis.schemas.rules.Unique.__init__">Unique(table, column, ignore, ignore_column, ...)</a></code></p><p><a href="classIndex.html#orionis.schemas.rules.Unique">View In Hierarchy</a></p>
         </div>
 
         <div class="moduleDocstring">
@@ -9287,7 +9287,7 @@ and active transaction.</p>
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">__init__</span><span class="function-signature long-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">table: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code>, </span><span class="rst-sig-param">column: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code>, </span><span class="rst-sig-symbol">*, </span><span class="rst-sig-param">ignore: <code><a href="https://docs.python.org/3/builtins/functions.html#object" class="intersphinx-link">object</a></code> = <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a>, </span><span class="rst-sig-param">ignore_column: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code> = <span class="rst-variable-quote">'</span><span class="rst-variable-string">id</span><span class="rst-variable-quote">'</span>, </span><span class="rst-sig-param">connection: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a> | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code> = <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a>, </span><span class="rst-sig-param">message: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a> | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code> = <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></span>):</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/c9319a7aed9233108f1af7ee2753b932d8e14bc4/orionis/schemas/rules/unique.py#L27">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/cdb7f8478088171dec64e1e908d982057286c9c1/orionis/schemas/rules/unique.py#L27">
       
       (source)
     </a>
@@ -9315,7 +9315,7 @@ does not clash with itself.</td></tr><tr><td class="fieldArgContainer"><span cla
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">__plan</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">value: <code><a href="https://docs.python.org/3/builtins/functions.html#object" class="intersphinx-link">object</a></code></span>) -&gt; <code>SelectPlan</code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/c9319a7aed9233108f1af7ee2753b932d8e14bc4/orionis/schemas/rules/unique.py#L108">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/cdb7f8478088171dec64e1e908d982057286c9c1/orionis/schemas/rules/unique.py#L108">
       
       (source)
     </a>
@@ -9342,7 +9342,7 @@ does not clash with itself.</td></tr><tr><td class="fieldArgContainer"><span cla
     
     
     <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">enforce</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">field: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code>, </span><span class="rst-sig-param">value: <code><a href="https://docs.python.org/3/builtins/functions.html#object" class="intersphinx-link">object</a></code>, </span><span class="rst-sig-param">instance: <code><a href="https://docs.python.org/3/builtins/functions.html#object" class="intersphinx-link">object</a></code></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/c9319a7aed9233108f1af7ee2753b932d8e14bc4/orionis/schemas/rules/unique.py#L76">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/cdb7f8478088171dec64e1e908d982057286c9c1/orionis/schemas/rules/unique.py#L76">
       
       (source)
     </a>
@@ -9368,7 +9368,7 @@ does not clash with itself.</td></tr><tr><td class="fieldArgContainer"><span cla
   <div class="functionHeader">
     
     <span class="py-defname">__code__</span>: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/c9319a7aed9233108f1af7ee2753b932d8e14bc4/orionis/schemas/rules/unique.py#L21">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/cdb7f8478088171dec64e1e908d982057286c9c1/orionis/schemas/rules/unique.py#L21">
       
       (source)
     </a>
@@ -9395,7 +9395,7 @@ does not clash with itself.</td></tr><tr><td class="fieldArgContainer"><span cla
   <div class="functionHeader">
     
     <span class="py-defname">__message__</span>: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/c9319a7aed9233108f1af7ee2753b932d8e14bc4/orionis/schemas/rules/unique.py#L19">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/cdb7f8478088171dec64e1e908d982057286c9c1/orionis/schemas/rules/unique.py#L19">
       
       (source)
     </a>
@@ -9422,7 +9422,7 @@ does not clash with itself.</td></tr><tr><td class="fieldArgContainer"><span cla
   <div class="functionHeader">
     
     <span class="py-defname">__slots__</span>: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" class="intersphinx-link">tuple</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <wbr></wbr><span class="rst-variable-ellipsis">...</span>]</code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/c9319a7aed9233108f1af7ee2753b932d8e14bc4/orionis/schemas/rules/unique.py#L24">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/cdb7f8478088171dec64e1e908d982057286c9c1/orionis/schemas/rules/unique.py#L24">
       
       (source)
     </a>
@@ -9449,7 +9449,7 @@ does not clash with itself.</td></tr><tr><td class="fieldArgContainer"><span cla
   <div class="functionHeader">
     
     <span class="py-defname">_column</span>: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/c9319a7aed9233108f1af7ee2753b932d8e14bc4/orionis/schemas/rules/unique.py#L64">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/cdb7f8478088171dec64e1e908d982057286c9c1/orionis/schemas/rules/unique.py#L64">
       
       (source)
     </a>
@@ -9476,7 +9476,7 @@ does not clash with itself.</td></tr><tr><td class="fieldArgContainer"><span cla
   <div class="functionHeader">
     
     <span class="py-defname">_connection</span>: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a> | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/c9319a7aed9233108f1af7ee2753b932d8e14bc4/orionis/schemas/rules/unique.py#L73">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/cdb7f8478088171dec64e1e908d982057286c9c1/orionis/schemas/rules/unique.py#L73">
       
       (source)
     </a>
@@ -9503,7 +9503,7 @@ does not clash with itself.</td></tr><tr><td class="fieldArgContainer"><span cla
   <div class="functionHeader">
     
     <span class="py-defname">_ignore</span>: <code><a href="https://docs.python.org/3/builtins/functions.html#object" class="intersphinx-link">object</a></code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/c9319a7aed9233108f1af7ee2753b932d8e14bc4/orionis/schemas/rules/unique.py#L66">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/cdb7f8478088171dec64e1e908d982057286c9c1/orionis/schemas/rules/unique.py#L66">
       
       (source)
     </a>
@@ -9531,7 +9531,7 @@ with itself.</p></div>
   <div class="functionHeader">
     
     <span class="py-defname">_ignore_column</span>: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/c9319a7aed9233108f1af7ee2753b932d8e14bc4/orionis/schemas/rules/unique.py#L71">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/cdb7f8478088171dec64e1e908d982057286c9c1/orionis/schemas/rules/unique.py#L71">
       
       (source)
     </a>
@@ -9558,7 +9558,7 @@ with itself.</p></div>
   <div class="functionHeader">
     
     <span class="py-defname">_table</span>: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/c9319a7aed9233108f1af7ee2753b932d8e14bc4/orionis/schemas/rules/unique.py#L62">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/cdb7f8478088171dec64e1e908d982057286c9c1/orionis/schemas/rules/unique.py#L62">
       
       (source)
     </a>
@@ -9584,7 +9584,7 @@ with itself.</p></div>
   <div class="orionis-footer-inner">
     <div class="orionis-footer-copy">
       <p>API documentation for <a href="https://orionis-framework.com/" class="projecthome">Orionis</a>.</p>
-      <p class="orionis-footer-meta">Generated with <a href="https://github.com/twisted/pydoctor/">Pydoctor</a> 25.10.1.<span class="orionis-footer-build"> Built 2026-11-03 19:09:59.</span></p>
+      <p class="orionis-footer-meta">Generated with <a href="https://github.com/twisted/pydoctor/">Pydoctor</a> 25.10.1.<span class="orionis-footer-build"> Built 2026-11-09 11:00:41.</span></p>
     </div>
     <nav class="orionis-footer-links" aria-label="Additional resources">
       <a href="https://docs.orionis-framework.com">Read the guide <span aria-hidden="true">↗</span></a>

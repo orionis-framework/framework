@@ -2057,7 +2057,7 @@
         </div>
 
         <div class="extrasDocstring">
-          <p class="class-signature"><code><span class="py-keyword">class</span> <span class="py-defname">IFile</span>(ABC): <a href="https://github.com/orionis-framework/framework/tree/c9319a7aed9233108f1af7ee2753b932d8e14bc4/orionis/storage/contracts/file.py#L14" class="sourceLink">(source)</a></code></p><p>Known subclasses: <code><a href="orionis.storage.File.html" class="internal-link">orionis.storage.File</a></code></p><p><a href="classIndex.html#orionis.storage.contracts.IFile">View In Hierarchy</a></p>
+          <p class="class-signature"><code><span class="py-keyword">class</span> <span class="py-defname">IFile</span>(ABC): <a href="https://github.com/orionis-framework/framework/tree/cdb7f8478088171dec64e1e908d982057286c9c1/orionis/storage/contracts/file.py#L14" class="sourceLink">(source)</a></code></p><p>Known subclasses: <code><a href="orionis.storage.File.html" class="internal-link">orionis.storage.File</a></code></p><p><a href="classIndex.html#orionis.storage.contracts.IFile">View In Hierarchy</a></p>
         </div>
 
         <div class="moduleDocstring">
@@ -2203,7 +2203,7 @@ which physical medium (local, memory, S3...) backs it.</p>
     
     <div><span class="decorator">@abstractmethod<br /></span></div>
     <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">copyTo</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">target: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></span>) -&gt; <code><a href="orionis.storage.contracts.IFile.html" class="internal-link" title="orionis.storage.contracts.IFile">IFile</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/c9319a7aed9233108f1af7ee2753b932d8e14bc4/orionis/storage/contracts/file.py#L157">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/cdb7f8478088171dec64e1e908d982057286c9c1/orionis/storage/contracts/file.py#L157">
       
       (source)
     </a>
@@ -2230,7 +2230,7 @@ which physical medium (local, memory, S3...) backs it.</p>
     
     <div><span class="decorator">@abstractmethod<br /></span></div>
     <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">delete</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/c9319a7aed9233108f1af7ee2753b932d8e14bc4/orionis/storage/contracts/file.py#L135">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/cdb7f8478088171dec64e1e908d982057286c9c1/orionis/storage/contracts/file.py#L135">
       
       (source)
     </a>
@@ -2257,7 +2257,7 @@ which physical medium (local, memory, S3...) backs it.</p>
     
     <div><span class="decorator">@abstractmethod<br /></span></div>
     <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">download</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">destination: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a> | Path</code></span>) -&gt; <code>Path</code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/c9319a7aed9233108f1af7ee2753b932d8e14bc4/orionis/storage/contracts/file.py#L339">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/cdb7f8478088171dec64e1e908d982057286c9c1/orionis/storage/contracts/file.py#L339">
       
       (source)
     </a>
@@ -2285,7 +2285,7 @@ file keeps its original name inside that directory.</td></tr></table><table clas
     
     <div><span class="decorator">@abstractmethod<br /></span></div>
     <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">exists</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/c9319a7aed9233108f1af7ee2753b932d8e14bc4/orionis/storage/contracts/file.py#L146">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/cdb7f8478088171dec64e1e908d982057286c9c1/orionis/storage/contracts/file.py#L146">
       
       (source)
     </a>
@@ -2312,7 +2312,7 @@ file keeps its original name inside that directory.</td></tr></table><table clas
     
     <div><span class="decorator">@abstractmethod<br /></span></div>
     <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">hash</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">algorithm: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code> = <span class="rst-variable-quote">'</span><span class="rst-variable-string">sha256</span><span class="rst-variable-quote">'</span></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/c9319a7aed9233108f1af7ee2753b932d8e14bc4/orionis/storage/contracts/file.py#L361">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/cdb7f8478088171dec64e1e908d982057286c9c1/orionis/storage/contracts/file.py#L361">
       
       (source)
     </a>
@@ -2339,7 +2339,7 @@ file keeps its original name inside that directory.</td></tr></table><table clas
     
     <div><span class="decorator">@abstractmethod<br /></span></div>
     <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">info</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>) -&gt; <code>FileInfo</code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/c9319a7aed9233108f1af7ee2753b932d8e14bc4/orionis/storage/contracts/file.py#L382">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/cdb7f8478088171dec64e1e908d982057286c9c1/orionis/storage/contracts/file.py#L382">
       
       (source)
     </a>
@@ -2367,7 +2367,7 @@ visibility, and URL when available.</td></tr></table><table class="fieldTable"><
     
     <div><span class="decorator">@abstractmethod<br /></span></div>
     <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">lastModified</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>) -&gt; <code><a href="https://docs.python.org/3/library/datetime.html#module-datetime" class="intersphinx-link">datetime</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/c9319a7aed9233108f1af7ee2753b932d8e14bc4/orionis/storage/contracts/file.py#L249">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/cdb7f8478088171dec64e1e908d982057286c9c1/orionis/storage/contracts/file.py#L249">
       
       (source)
     </a>
@@ -2394,7 +2394,7 @@ visibility, and URL when available.</td></tr></table><table class="fieldTable"><
     
     <div><span class="decorator">@abstractmethod<br /></span></div>
     <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">mimeType</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a> | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/c9319a7aed9233108f1af7ee2753b932d8e14bc4/orionis/storage/contracts/file.py#L238">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/cdb7f8478088171dec64e1e908d982057286c9c1/orionis/storage/contracts/file.py#L238">
       
       (source)
     </a>
@@ -2421,7 +2421,7 @@ visibility, and URL when available.</td></tr></table><table class="fieldTable"><
     
     <div><span class="decorator">@abstractmethod<br /></span></div>
     <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">moveTo</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">target: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></span>) -&gt; <code><a href="orionis.storage.contracts.IFile.html" class="internal-link" title="orionis.storage.contracts.IFile">IFile</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/c9319a7aed9233108f1af7ee2753b932d8e14bc4/orionis/storage/contracts/file.py#L178">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/cdb7f8478088171dec64e1e908d982057286c9c1/orionis/storage/contracts/file.py#L178">
       
       (source)
     </a>
@@ -2448,7 +2448,7 @@ visibility, and URL when available.</td></tr></table><table class="fieldTable"><
     
     <div><span class="decorator">@abstractmethod<br /></span></div>
     <span class="py-keyword">def</span>&#160;<span class="py-defname">open</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">mode: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code> = <span class="rst-variable-quote">'</span><span class="rst-variable-string">rb</span><span class="rst-variable-quote">'</span></span>) -&gt; <code><a href="orionis.storage.contracts.IStorageStream.html" class="internal-link" title="orionis.storage.contracts.IStorageStream">IStorageStream</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/c9319a7aed9233108f1af7ee2753b932d8e14bc4/orionis/storage/contracts/file.py#L118">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/cdb7f8478088171dec64e1e908d982057286c9c1/orionis/storage/contracts/file.py#L118">
       
       (source)
     </a>
@@ -2476,7 +2476,7 @@ visibility, and URL when available.</td></tr></table><table class="fieldTable"><
     
     <div><span class="decorator">@abstractmethod<br /></span></div>
     <span class="py-keyword">def</span>&#160;<span class="py-defname">path</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/c9319a7aed9233108f1af7ee2753b932d8e14bc4/orionis/storage/contracts/file.py#L26">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/cdb7f8478088171dec64e1e908d982057286c9c1/orionis/storage/contracts/file.py#L26">
       
       (source)
     </a>
@@ -2503,7 +2503,7 @@ visibility, and URL when available.</td></tr></table><table class="fieldTable"><
     
     <div><span class="decorator">@abstractmethod<br /></span></div>
     <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">read</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/stdtypes.html#bytes" class="intersphinx-link">bytes</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/c9319a7aed9233108f1af7ee2753b932d8e14bc4/orionis/storage/contracts/file.py#L37">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/cdb7f8478088171dec64e1e908d982057286c9c1/orionis/storage/contracts/file.py#L37">
       
       (source)
     </a>
@@ -2530,7 +2530,7 @@ visibility, and URL when available.</td></tr></table><table class="fieldTable"><
     
     <div><span class="decorator">@abstractmethod<br /></span></div>
     <span class="py-keyword">def</span>&#160;<span class="py-defname">readStream</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">chunk_size: <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code> = 65536</span>) -&gt; <code>AsyncIterator[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#bytes" class="intersphinx-link">bytes</a>]</code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/c9319a7aed9233108f1af7ee2753b932d8e14bc4/orionis/storage/contracts/file.py#L53">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/cdb7f8478088171dec64e1e908d982057286c9c1/orionis/storage/contracts/file.py#L53">
       
       (source)
     </a>
@@ -2557,7 +2557,7 @@ visibility, and URL when available.</td></tr></table><table class="fieldTable"><
     
     <div><span class="decorator">@abstractmethod<br /></span></div>
     <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">rename</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">name: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></span>) -&gt; <code><a href="orionis.storage.contracts.IFile.html" class="internal-link" title="orionis.storage.contracts.IFile">IFile</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/c9319a7aed9233108f1af7ee2753b932d8e14bc4/orionis/storage/contracts/file.py#L199">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/cdb7f8478088171dec64e1e908d982057286c9c1/orionis/storage/contracts/file.py#L199">
       
       (source)
     </a>
@@ -2584,7 +2584,7 @@ visibility, and URL when available.</td></tr></table><table class="fieldTable"><
     
     <div><span class="decorator">@abstractmethod<br /></span></div>
     <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">setVisibility</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">visibility: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></span>) -&gt; <code><a href="orionis.storage.contracts.IFile.html" class="internal-link" title="orionis.storage.contracts.IFile">IFile</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/c9319a7aed9233108f1af7ee2753b932d8e14bc4/orionis/storage/contracts/file.py#L318">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/cdb7f8478088171dec64e1e908d982057286c9c1/orionis/storage/contracts/file.py#L318">
       
       (source)
     </a>
@@ -2611,7 +2611,7 @@ visibility, and URL when available.</td></tr></table><table class="fieldTable"><
     
     <div><span class="decorator">@abstractmethod<br /></span></div>
     <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">size</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/c9319a7aed9233108f1af7ee2753b932d8e14bc4/orionis/storage/contracts/file.py#L222">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/cdb7f8478088171dec64e1e908d982057286c9c1/orionis/storage/contracts/file.py#L222">
       
       (source)
     </a>
@@ -2638,7 +2638,7 @@ visibility, and URL when available.</td></tr></table><table class="fieldTable"><
     
     <div><span class="decorator">@abstractmethod<br /></span></div>
     <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">temporaryUrl</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">expires_in: <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code> = 3600</span>) -&gt; <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/c9319a7aed9233108f1af7ee2753b932d8e14bc4/orionis/storage/contracts/file.py#L281">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/cdb7f8478088171dec64e1e908d982057286c9c1/orionis/storage/contracts/file.py#L281">
       
       (source)
     </a>
@@ -2665,7 +2665,7 @@ visibility, and URL when available.</td></tr></table><table class="fieldTable"><
     
     <div><span class="decorator">@abstractmethod<br /></span></div>
     <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">url</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/c9319a7aed9233108f1af7ee2753b932d8e14bc4/orionis/storage/contracts/file.py#L265">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/cdb7f8478088171dec64e1e908d982057286c9c1/orionis/storage/contracts/file.py#L265">
       
       (source)
     </a>
@@ -2692,7 +2692,7 @@ visibility, and URL when available.</td></tr></table><table class="fieldTable"><
     
     <div><span class="decorator">@abstractmethod<br /></span></div>
     <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">visibility</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/c9319a7aed9233108f1af7ee2753b932d8e14bc4/orionis/storage/contracts/file.py#L302">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/cdb7f8478088171dec64e1e908d982057286c9c1/orionis/storage/contracts/file.py#L302">
       
       (source)
     </a>
@@ -2719,7 +2719,7 @@ visibility, and URL when available.</td></tr></table><table class="fieldTable"><
     
     <div><span class="decorator">@abstractmethod<br /></span></div>
     <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">write</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">contents: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#bytes" class="intersphinx-link">bytes</a> | <a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code>, </span><span class="rst-sig-param">visibility: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a> | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code> = <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></span>) -&gt; <code><a href="orionis.storage.contracts.IFile.html" class="internal-link" title="orionis.storage.contracts.IFile">IFile</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/c9319a7aed9233108f1af7ee2753b932d8e14bc4/orionis/storage/contracts/file.py#L74">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/cdb7f8478088171dec64e1e908d982057286c9c1/orionis/storage/contracts/file.py#L74">
       
       (source)
     </a>
@@ -2746,7 +2746,7 @@ visibility, and URL when available.</td></tr></table><table class="fieldTable"><
     
     <div><span class="decorator">@abstractmethod<br /></span></div>
     <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">writeStream</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">stream: <code>AsyncIterable[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#bytes" class="intersphinx-link">bytes</a>]</code>, </span><span class="rst-sig-param">visibility: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a> | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code> = <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></span>) -&gt; <code><a href="orionis.storage.contracts.IFile.html" class="internal-link" title="orionis.storage.contracts.IFile">IFile</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/c9319a7aed9233108f1af7ee2753b932d8e14bc4/orionis/storage/contracts/file.py#L96">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/cdb7f8478088171dec64e1e908d982057286c9c1/orionis/storage/contracts/file.py#L96">
       
       (source)
     </a>
@@ -2772,7 +2772,7 @@ visibility, and URL when available.</td></tr></table><table class="fieldTable"><
   <div class="functionHeader">
     
     <span class="py-defname">__slots__</span>: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" class="intersphinx-link">tuple</a></code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/c9319a7aed9233108f1af7ee2753b932d8e14bc4/orionis/storage/contracts/file.py#L23">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/cdb7f8478088171dec64e1e908d982057286c9c1/orionis/storage/contracts/file.py#L23">
       
       (source)
     </a>
@@ -2798,7 +2798,7 @@ visibility, and URL when available.</td></tr></table><table class="fieldTable"><
   <div class="orionis-footer-inner">
     <div class="orionis-footer-copy">
       <p>API documentation for <a href="https://orionis-framework.com/" class="projecthome">Orionis</a>.</p>
-      <p class="orionis-footer-meta">Generated with <a href="https://github.com/twisted/pydoctor/">Pydoctor</a> 25.10.1.<span class="orionis-footer-build"> Built 2026-11-03 19:09:59.</span></p>
+      <p class="orionis-footer-meta">Generated with <a href="https://github.com/twisted/pydoctor/">Pydoctor</a> 25.10.1.<span class="orionis-footer-build"> Built 2026-11-09 11:00:41.</span></p>
     </div>
     <nav class="orionis-footer-links" aria-label="Additional resources">
       <a href="https://docs.orionis-framework.com">Read the guide <span aria-hidden="true">↗</span></a>

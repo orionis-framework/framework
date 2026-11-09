@@ -39,7 +39,7 @@ class PermissionRegistrar:
     row that won.
     """
 
-    # ruff: noqa: TC001 (Dependency Injection)
+    # ruff: noqa: TC001, PLC0415
 
     __slots__ = ("__db",)
     """Declare the instance attribute slots reserved by this class."""
@@ -341,13 +341,26 @@ class PermissionRegistrar:
             return existing
 
         try:
+
             async with self.__db.transaction():
                 result = await self.__db.table(table).insert({"name": name})
-        except QueryException:
+
+        except QueryException as error:
+
             # Another caller inserted the very same row first.
             existing = await self.__findId(table, name)
             if existing is None:
                 raise
+
+            # Capture the failure
+            from orionis.failure.runtime import capture
+            await capture(
+                error,
+                flow="auth",
+                phase="recovery",
+                operation="authorization.create",
+                expected=True,
+            )
             return existing
 
         identifier = result.last_insert_id
@@ -380,11 +393,23 @@ class PermissionRegistrar:
             If insertion fails and no identical pivot row exists.
         """
         try:
+
             async with self.__db.transaction():
                 await self.__db.table(table).insert(values)
-        except QueryException:
+
+        except QueryException as error:
+
             query = self.__db.table(table)
             for column, value in values.items():
                 query.where(column, value)
             if not await query.exists():
                 raise
+
+            from orionis.failure.runtime import capture
+            await capture(
+                error,
+                flow="auth",
+                phase="recovery",
+                operation="authorization.attach",
+                expected=True,
+            )

@@ -24,7 +24,7 @@ class _StalePassword(Exception):
 class PasswordBroker:
     """Issue hashed credentials and consume them with the password atomically."""
 
-    # ruff: noqa: TC001 (Dependency injection)
+    # ruff: noqa: TC001, PLC0415
 
     def __init__(
         self, app: IApplication, db: IQueryBuilder, hashing: IHashManager,
@@ -115,9 +115,17 @@ class PasswordBroker:
             await self.db.table(self.settings.table).insert({
                 "email": email, **values,
             })
-        except QueryException:
+        except QueryException as error:
             # Only swallow a competing insert; other database failures surface.
             if await self._records(email).exists():
+                from orionis.failure.runtime import capture
+                await capture(
+                    error,
+                    flow="auth",
+                    phase="recovery",
+                    operation="password.create",
+                    expected=True,
+                )
                 return None
             raise
         return user, token

@@ -28,6 +28,8 @@ class Loop:
     All state is class-level; no instance creation is required or intended.
     """
 
+    # ruff: noqa: PLC0415, ANN401
+
     # ------------------------------------------------------------------
     # Shared class state
     # ------------------------------------------------------------------
@@ -128,7 +130,7 @@ class Loop:
 
             if not cls._IS_WIN32:
                 try:
-                    import uvloop  # type: ignore[import-untyped]  # noqa: PLC0415
+                    import uvloop  # type: ignore[import-untyped]
                     cls._uvloop_factory = uvloop.new_event_loop
                 except ImportError:
                     pass
@@ -305,9 +307,9 @@ class Loop:
     async def execute(
         func: Callable[..., Any],
         /,
-        *args: Any,  # noqa: ANN401
-        **kwargs: Any,  # noqa: ANN401
-    ) -> Any:  # noqa: ANN401
+        *args: Any,
+        **kwargs: Any,
+    ) -> Any:
         """
         Transparently execute a sync or async callable.
 
@@ -419,6 +421,10 @@ class Loop:
         asyncio.Task
             Task scheduled to execute the supplied coroutine.
         """
+        from orionis.failure.runtime import get_runtime
+        runtime = get_runtime()
+        if runtime is not None:
+            return runtime.createTask(coro, name=name)
         return asyncio.create_task(coro, name=name)
 
     @classmethod

@@ -1,7 +1,6 @@
 """Poll a Redis NX lease rather than relying on process-local waiter events."""
 
 import asyncio
-from contextlib import suppress
 from typing import TYPE_CHECKING, Any, Self
 from uuid import uuid4
 from orionis.cache.locks.lock import CacheLock, _is_backend
@@ -11,7 +10,7 @@ if TYPE_CHECKING:
     from types import TracebackType
 
 # Low-level aiocache methods deliberately avoid reserializing the ownership token.
-# ruff: noqa: ANN401, SLF001
+# ruff: noqa: ANN401, SLF001, BLE001, PLC0415
 
 class RedisResolverLease:
     """Poll a Redis NX lease rather than relying on process-local waiter events."""
@@ -96,8 +95,16 @@ class RedisResolverLease:
         except BaseException:
             # SET may have succeeded when its reply was cancelled. Compare/delete
             # is safe even if another owner now holds the key. TTL is the fallback.
-            with suppress(Exception):
+            try:
                 await complete_on_cancel(self._release())
+            except Exception as cleanup_error:
+                from orionis.failure.runtime import capture
+                await capture(
+                    cleanup_error,
+                    flow="cache",
+                    phase="cleanup",
+                    operation="lock.release",
+                )
             raise
         return self
 

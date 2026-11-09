@@ -29,8 +29,9 @@ _LOCK_STRIPES: int = 64
 """Lock stripes value used by ``file``."""
 
 class FileCacheBackend:
-    # ruff: noqa: ANN401
     """Implement asynchronous cache operations over filesystem entries."""
+
+    # ruff: noqa: ANN401, PLC0415
 
     __slots__ = ("_counter_lock", "_locks", "_path", "_rename_lock")
     """Declare the instance attribute slots reserved by this class."""
@@ -164,7 +165,11 @@ class FileCacheBackend:
         """
         try:
             entry = _msgjson.decode(file.read_bytes())
-        except OSError, msgspec.DecodeError:
+        except FileNotFoundError:
+            return None
+        except (OSError, msgspec.DecodeError) as error:
+            from orionis.failure.runtime import capture_nowait
+            capture_nowait(error, flow="cache", phase="read", operation="file_cache")
             return None
         if not isinstance(entry, dict):
             return None
@@ -225,7 +230,16 @@ class FileCacheBackend:
             tmp.write_bytes(data)
             self.__replaceSync(tmp, file)
         except OSError:
-            tmp.unlink(missing_ok=True)
+            try:
+                tmp.unlink(missing_ok=True)
+            except OSError as cleanup_error:
+                from orionis.failure.runtime import capture_nowait
+                capture_nowait(
+                    cleanup_error,
+                    flow="cache",
+                    phase="cleanup",
+                    operation="file_cache",
+                )
             raise
 
     def __replaceSync(self: Self, tmp: Path, file: Path) -> None:
@@ -254,10 +268,19 @@ class FileCacheBackend:
             try:
                 with self._rename_lock:
                     tmp.replace(file)
-            except PermissionError:
+            except PermissionError as error:
                 # Windows refuses the rename while another process swaps it.
                 if attempt == last:
                     raise
+                from orionis.failure.runtime import capture_nowait
+                capture_nowait(
+                    error,
+                    flow="cache",
+                    phase="retry",
+                    expected=True,
+                    operation="file_cache",
+                    metadata={"attempt": attempt + 1},
+                )
                 time.sleep(_REPLACE_BACKOFF_SECONDS)
             else:
                 return

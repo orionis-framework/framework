@@ -111,7 +111,7 @@ class DatabaseCacheBackend:
     require Redis or Memcached to support locking.
     """
 
-    # ruff: noqa: ANN401
+    # ruff: noqa: ANN401, PLC0415
 
     __slots__ = (
         "_connection", "_entry_definition", "_lock_definition", "_lock_table",
@@ -240,7 +240,14 @@ class DatabaseCacheBackend:
         data = raw.encode() if isinstance(raw, str) else raw
         try:
             return _msgjson.decode(data)
-        except msgspec.DecodeError:
+        except msgspec.DecodeError as error:
+            from orionis.failure.runtime import capture_nowait
+            capture_nowait(
+                error,
+                flow="cache",
+                phase="decode",
+                operation="database.read",
+            )
             return None
 
     # ── Public async API (mirrors FileCacheBackend) ──────────────────────────
@@ -353,7 +360,7 @@ class DatabaseCacheBackend:
                     }],
                 ),
             )
-        except QueryException:
+        except QueryException as error:
             # Another writer inserted the row first; retry as an update.
             await self._connection.update(
                 UpdatePlan(
@@ -361,6 +368,14 @@ class DatabaseCacheBackend:
                     values={"cache_value": encoded, "expiration": expiration},
                     wheres=[WhereClause("cache_key", value=key)],
                 ),
+            )
+            from orionis.failure.runtime import capture
+            await capture(
+                error,
+                flow="cache",
+                phase="recovery",
+                operation="database.set",
+                expected=True,
             )
 
     async def replace(self, key: str, value: Any, ttl: float | None = None) -> bool:
@@ -692,7 +707,7 @@ class DatabaseCacheBackend:
                     }],
                 ),
             )
-        except QueryException:
+        except QueryException as error:
             updated = await self._connection.update(
                 UpdatePlan(
                     table=self._lock_definition,
@@ -707,6 +722,14 @@ class DatabaseCacheBackend:
                         ]),
                     ],
                 ),
+            )
+            from orionis.failure.runtime import capture
+            await capture(
+                error,
+                flow="cache",
+                phase="recovery",
+                operation="database.lock",
+                expected=True,
             )
             return updated > 0
         return True

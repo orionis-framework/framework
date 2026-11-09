@@ -398,9 +398,9 @@ def _decode(obj: Any) -> Any:
     return obj
 
 class Serializer:
-
-    # ruff: noqa: ANN401, PLR0911, C901
     """Encode and decode cache values with the configured serialization format."""
+
+    # ruff: noqa: ANN401, PLR0911, C901, PLC0415
 
     @staticmethod
     def dumps(data: Any, indent: int | None = None) -> str:
@@ -471,7 +471,16 @@ class Serializer:
             tmp_file.write_bytes(_msgjson.encode(_encode(data)))
             tmp_file.replace(file_path)
         except OSError:
-            tmp_file.unlink(missing_ok=True)
+            try:
+                tmp_file.unlink(missing_ok=True)
+            except OSError as cleanup_error:
+                from orionis.failure.runtime import capture_nowait
+                capture_nowait(
+                    cleanup_error,
+                    flow="cache",
+                    phase="cleanup",
+                    operation="serializer.write",
+                )
             raise
 
     @staticmethod
@@ -493,7 +502,16 @@ class Serializer:
         # Read the file and handle a missing path below.
         try:
             content = file_path.read_bytes()
-        except OSError:
+        except FileNotFoundError:
+            return None
+        except OSError as error:
+            from orionis.failure.runtime import capture_nowait
+            capture_nowait(
+                error,
+                flow="cache",
+                phase="read",
+                operation="serializer.read",
+            )
             return None
         if not content:
             return None

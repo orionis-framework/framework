@@ -1,6 +1,6 @@
 # Instalación y primer proyecto
 
-Orionis requiere Python 3.14 o posterior. Este checkout declara la versión `0.901.0` y el estado Alpha en `pyproject.toml`. Usa los manuales junto con la misma revisión del framework: las APIs y dependencias descritas pertenecen a este árbol de código.
+Orionis requiere Python 3.14 o posterior. El framework es estable y apto para producción; la versión actual se declara en `pyproject.toml`. Usa los manuales junto con la misma revisión del framework: las APIs y dependencias descritas pertenecen a este árbol de código.
 
 ## Preparar el entorno
 

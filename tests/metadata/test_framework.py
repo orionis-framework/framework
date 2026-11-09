@@ -482,6 +482,24 @@ class TestFrameworkProjectManifest(TestCase):
         """
         self.assertEqual(self.project["version"], framework.VERSION)
 
+    def testDevelopmentStatusIsProductionStable(self) -> None:
+        """Advertise a single stable production status.
+
+        Returns
+        -------
+        None
+            Assertions verify the package's release classification.
+        """
+        status_classifiers = [
+            classifier
+            for classifier in self.project["classifiers"]
+            if classifier.startswith("Development Status ::")
+        ]
+        self.assertEqual(
+            status_classifiers,
+            ["Development Status :: 5 - Production/Stable"],
+        )
+
     def testNameAndDescriptionMatchTheProjectManifest(self) -> None:
         """Publish the same name and summary in both declarations.
 

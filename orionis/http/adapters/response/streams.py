@@ -19,7 +19,7 @@ async def close_stream(
     iterator: AsyncIterable[bytes] | None, failure: BaseException | None,
 ) -> None:
     """
-    Close an iterator without letting sibling cancellation erase a failure.
+    Close an iterator without letting cleanup erase a delivery failure.
 
     Parameters
     ----------
@@ -37,19 +37,23 @@ async def close_stream(
     if close is not None:
         try:
             await close()
+            return
         except BaseException as close_error:
             if isinstance(failure, Exception):
                 await capture(failure, flow="http", phase="stream")
             if isinstance(close_error, Exception):
                 await capture(close_error, flow="http", phase="stream.cleanup")
-            if failure is not None and isinstance(close_error, asyncio.CancelledError):
-                raise failure from close_error
-            raise
+            preserve_failure = isinstance(failure, (Exception, BaseExceptionGroup))
+            preserve_failure = preserve_failure or isinstance(
+                close_error, asyncio.CancelledError,
+            )
+            if failure is None or not preserve_failure:
+                raise
+        raise failure
 
 async def _finish_cancelled_cleanup[T](
     pending: Future[T],
     ready: Future[Future[T]],
-    cancellation: asyncio.CancelledError,
 ) -> None:
     """
     Join owned cleanup after cancellation and retain its failure cause.
@@ -60,18 +64,12 @@ async def _finish_cancelled_cleanup[T](
         Cleanup operation which must finish before its owner returns.
     ready : asyncio.Future[asyncio.Future[``T``]]
         Completion notification carrying no cleanup exception.
-    cancellation : asyncio.CancelledError
-        Cancellation that the owner will re-raise after cleanup succeeds.
 
     Returns
     -------
     None
         Finish cleanup while deferring additional cancellation requests.
 
-    Raises
-    ------
-    BaseException
-        If cleanup fails, chain its error to the original cancellation.
     """
     while not pending.done():
         with suppress(asyncio.CancelledError):
@@ -80,7 +78,6 @@ async def _finish_cancelled_cleanup[T](
         failure = pending.exception()
         if failure is not None:
             await capture(failure, flow="http", phase="stream.cleanup")
-            raise failure from cancellation
 
 async def await_cleanup[T](pending: Future[T]) -> T:
     """
@@ -106,12 +103,20 @@ async def await_cleanup[T](pending: Future[T]) -> T:
     ready = asyncio.get_running_loop().create_future()
     record = partial(_record_completion, ready)
     pending.add_done_callback(record)
+    cancellation_cause = None
     try:
         try:
             await asyncio.shield(ready)
         except asyncio.CancelledError as cancellation:
-            await _finish_cancelled_cleanup(pending, ready, cancellation)
-            raise
+            await _finish_cancelled_cleanup(pending, ready)
+            if pending.cancelled() or pending.exception() is None:
+                raise
+            failure = pending.exception()
+            has_chain = failure.__cause__ is not None or failure.__context__ is not None
+            if not has_chain and not failure.__suppress_context__:
+                cancellation_cause = cancellation
+        if cancellation_cause is not None:
+            raise pending.exception() from cancellation_cause
         return pending.result()
     finally:
         pending.remove_done_callback(record)

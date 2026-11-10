@@ -289,7 +289,7 @@ class DatabaseSessionStore(ISessionStore):
                         "expires_at": int(expiration),
                     }],
                 ))
-        except QueryException:
+        except QueryException as error:
             updated = await self._connection.update(UpdatePlan(
                 table=self._definition,
                 values={"payload": payload, "expires_at": int(expiration)},
@@ -297,6 +297,14 @@ class DatabaseSessionStore(ISessionStore):
             ))
             if not updated:
                 raise
+            from orionis.failure.runtime import capture  # noqa: PLC0415
+            await capture(
+                error,
+                flow="session",
+                phase="recovery",
+                operation="database.write",
+                expected=True,
+            )
 
     async def update(self, record: SessionRecord) -> bool:
         """
@@ -403,6 +411,13 @@ class DatabaseSessionStore(ISessionStore):
         data = raw.encode() if isinstance(raw, str) else raw
         try:
             payload = _DECODER.decode(data)
-        except (msgspec.DecodeError, UnicodeDecodeError):
+        except (msgspec.DecodeError, UnicodeDecodeError) as error:
+            from orionis.failure.runtime import capture_nowait  # noqa: PLC0415
+            capture_nowait(
+                error,
+                flow="session",
+                phase="decode",
+                operation="database.read",
+            )
             return None
         return payload if isinstance(payload, dict) else None

@@ -1,7 +1,6 @@
 """Session store that persists each session as a JSON file on disk."""
 
 import asyncio
-import contextlib
 import os
 import re
 import secrets
@@ -218,7 +217,14 @@ class FileSessionStore(ISessionStore):
                 data=payload.data,
                 expires_at=payload.expires_at,
             )
-        except (ValueError, msgspec.DecodeError):
+        except (ValueError, msgspec.DecodeError) as error:
+            from orionis.failure.runtime import capture_nowait  # noqa: PLC0415
+            capture_nowait(
+                error,
+                flow="session",
+                phase="decode",
+                operation="file.read",
+            )
             return None
 
     def _readFile(self, path: Path) -> bytes | None:
@@ -289,7 +295,16 @@ class FileSessionStore(ISessionStore):
             tmp.write_bytes(content)
             self._replace(tmp, path)
         except OSError:
-            tmp.unlink(missing_ok=True)
+            try:
+                tmp.unlink(missing_ok=True)
+            except OSError as cleanup_error:
+                from orionis.failure.runtime import capture_nowait  # noqa: PLC0415
+                capture_nowait(
+                    cleanup_error,
+                    flow="session",
+                    phase="cleanup",
+                    operation="file.write",
+                )
             raise
 
     def _replace(self, tmp: Path, path: Path) -> None:
@@ -322,9 +337,18 @@ class FileSessionStore(ISessionStore):
             try:
                 with self._rename_lock:
                     tmp.replace(path)
-            except PermissionError:
+            except PermissionError as error:
                 if attempt == last:
                     raise
+                from orionis.failure.runtime import capture_nowait  # noqa: PLC0415
+                capture_nowait(
+                    error,
+                    flow="session",
+                    phase="retry",
+                    operation="file.replace",
+                    expected=True,
+                    metadata={"attempt": attempt + 1},
+                )
                 time.sleep(_REPLACE_BACKOFF_SECONDS)
             else:
                 return
@@ -446,17 +470,22 @@ class FileSessionStore(ISessionStore):
                 if not entry.is_file():
                     continue
 
-                if entry.name.endswith(".tmp"):
-                    with contextlib.suppress(OSError):
+                try:
+                    if entry.name.endswith(".tmp"):
                         if entry.stat().st_mtime <= stale_before:
                             os.unlink(entry.path)  # noqa: PTH108
-                    continue
-
-                if not entry.name.endswith(".json"):
-                    continue
-
-                with contextlib.suppress(OSError):
-                    self._readRecord(self._directory / entry.name)
+                    elif entry.name.endswith(".json"):
+                        self._readRecord(self._directory / entry.name)
+                except FileNotFoundError:
+                    pass
+                except OSError as error:
+                    from orionis.failure.runtime import capture_nowait  # noqa: PLC0415
+                    capture_nowait(
+                        error,
+                        flow="session",
+                        phase="cleanup",
+                        operation="file.gc",
+                    )
 
     # ------------------------------------------------------------------
     # ISessionStore interface

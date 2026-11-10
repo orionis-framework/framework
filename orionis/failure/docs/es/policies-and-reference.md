@@ -43,6 +43,11 @@ El handler selecciona callbacks y retorna el plan. Las protecciones de reporte d
 
 `capture`, `capture_result` y `operation` están disponibles en `orionis.failure.runtime`. Capturar requiere un runtime activo después del inicio. Los propietarios notifican fallos explícitamente y conservan sus respuestas, reintentos, recuperación y propagación. Un plan personalizado de resultado puede registrar, pero `capture_result` no reemplaza el resultado original ni renderiza automáticamente.
 
+Cuando la limpieza cruza una frontera de tareas, el propietario puede pasar el
+`event_id` del recibo original mediante `capture(..., parent_event_id=...)`.
+Así conserva la relación causal del incidente sin modificar la causa ni el
+contexto Python de la excepción secundaria.
+
 ## Configuración y valores predeterminados
 
 No hay archivo de configuración dedicado. Registra la clase del handler mediante `app.withExceptionHandler(...)` antes de `create()`. La política HTTP base lee `app.debug`:
@@ -61,6 +66,7 @@ Las excepciones conocidas se mapean a 401 autenticación, 403 autorización, 404
 - La ausencia de scope o `kernel` produce `RuntimeError` en `Catch.exception()`; usa captura para recepción sin scope.
 - Pasa el request vivo o su adaptador para presentación HTTP. El plan base no produce salida HTTP sin él.
 - El runtime protege la ejecución del hook y el logging diferido con comprobaciones de recursión, timeout cooperativo y fallback acotado en stderr. Un fallo del reporte puede degradar la entrega sin impedir la presentación.
+- La presentación solicitada por `Catch` usa el mismo timeout cooperativo y protección de reentrada. Si falla o se cancela internamente, se diagnostica una vez en stderr y se propaga el fallo primario sin sustituir su causa. La cancelación real del caller sigue propagándose. No se reintenta una salida que pudo ejecutarse parcialmente; llamadas posteriores reutilizan el fallo del plan.
 - La cancelación, `KeyboardInterrupt`, `SystemExit` y `GeneratorExit` no se convierten en fallos de servidor.
 - Antes de la activación, capturar retorna `None`. `create()` por sí solo no activa el runtime y los fallos anteriores al inicio exitoso quedan fuera de la garantía.
 - El código externo que consume excepciones debe notificarlas explícitamente. Orionis no instala hooks globales de Python para ejecución externa arbitraria.
